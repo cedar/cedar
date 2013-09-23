@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef RECORDERPROPERTY_H_
-#define RECORDERPROPERTY_H_
+#ifndef CEDAR_PROC_GUI_RECORDER_PROPERTY_H
+#define CEDAR_PROC_GUI_RECORDER_PROPERTY_H
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
@@ -47,6 +47,8 @@
 #include <QSpinBox>
 #include <QCheckBox>
 
+/*!@todo Documentation
+ */
 class cedar::proc::gui::RecorderProperty : public QHBoxLayout
 {
   //----------------------------------------------------------------------------
@@ -96,7 +98,6 @@ private:
 
   //!@brief Stores the record interval of the slot. Is changed by the mStepSize spin box.
   unsigned int mStepSizeValue;
-
 };
 
-#endif /* RECORDERPROPERTY_H_ */
+#endif // CEDAR_PROC_GUI_RECORDER_PROPERTY_H

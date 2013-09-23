@@ -95,8 +95,6 @@ public:
    */
   const std::set<std::string>& getPluginDirectories() const;
 
-  std::string getRecorderWorkspace() const;
-
   /*!@brief Returns the plugin workspace directory.
    *
    *        This is the first directoriy searched for a plugin.
@@ -129,9 +127,6 @@ private:
 protected:
   //!@brief Parameter representing the plugin workspace.
   cedar::aux::DirectoryParameterPtr mPluginWorkspace;
-
-  //!@brief Parameter representing where recorded files will be saved.
-  cedar::aux::DirectoryParameterPtr mRecorderWorkspace;
 
   //!@brief List of directories to use when looking for plugins.
   cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;

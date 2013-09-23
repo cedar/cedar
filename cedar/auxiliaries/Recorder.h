@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_RECORDER_H_
-#define CEDAR_AUX_RECORDER_H_
+#ifndef CEDAR_AUX_RECORDER_H
+#define CEDAR_AUX_RECORDER_H
 
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
@@ -62,7 +62,6 @@
    */
 class cedar::aux::Recorder : public cedar::aux::LoopedThread
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -76,6 +75,7 @@ class cedar::aux::Recorder : public cedar::aux::LoopedThread
 private:
   //!@brief The private constructor for singleton usage.
   Recorder();
+  
 public:
   //!@brief The Destructor.
   ~Recorder();
@@ -102,12 +102,11 @@ public:
   //!@brief Unregister all DataPtr.
   void clear();
 
-
   //!@brief Sets the directory the recorded data will be written to.
   void setOutputDirectory(const std::string& path);
 
   //!@brief Gets the OutputDirectory
-  std::string getOutputDirectory() const;
+  const std::string& getOutputDirectory() const;
 
   //!@brief Returns the elapsed time in ms since the REcorder thread has been started.
   int getTimeStamp() const;
@@ -192,8 +191,8 @@ namespace cedar
 {
   namespace aux
   {
-    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<Recorder>);
-    typedef cedar::aux::Singleton<Recorder> RecorderSingleton;
+    CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::Recorder>);
+    typedef cedar::aux::Singleton<cedar::aux::Recorder> RecorderSingleton;
   }
 }
 

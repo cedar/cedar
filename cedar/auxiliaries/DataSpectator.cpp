@@ -46,12 +46,13 @@
 //------------------------------------------------------------------------------
 
 cedar::aux::DataSpectator::DataSpectator(cedar::aux::ConstDataPtr toSpectate, int recordIntv, const std::string& name)
+:
+mData(toSpectate),
+mpOfstreamLock(new QReadWriteLock()),
+mpQueueLock(new QReadWriteLock()),
+mName(name)
 {
-  this->mpQueueLock = new QReadWriteLock();
-  this->mpOfstreamLock = new QReadWriteLock();
   this->setStepSize(recordIntv);
-  mName = name;
-  mData = toSpectate;
 }
 
 
@@ -73,13 +74,14 @@ void cedar::aux::DataSpectator::step(double)
 void cedar::aux::DataSpectator::applyStart()
 {
   mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" + mName;
-  mOutputStream.open(mOutputPath,std::ios::out | std::ios::app);
+  mOutputStream.open(mOutputPath, std::ios::out | std::ios::app);
   writeHeader();
 }
 
-void cedar::aux::DataSpectator::applyStop(bool/* suppressWarning*/)
+void cedar::aux::DataSpectator::applyStop(bool /* suppressWarning */)
 {
   writeAllRecordData();
+  
   {
     QWriteLocker locker(mpOfstreamLock);
     mOutputStream.close();
@@ -96,16 +98,15 @@ void cedar::aux::DataSpectator::writeHeader()
 void cedar::aux::DataSpectator::record()
 {
   // Copy the Data
-  cedar::aux::DataPtr d = mData->clone();
+  cedar::aux::DataPtr data = mData->clone();
 
   //Create new recordData
-  recordData rec;
-  rec.mData = d;
+  RecordData rec;
+  rec.mData = data;
   rec.mRecordTime = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
-  const recordData r = rec;
   //Lock the Queue and push record Data
   QWriteLocker locker(mpQueueLock);
-  mDataQueue.push_back(r);
+  mDataQueue.push_back(rec);
 }
 
 void cedar::aux::DataSpectator::writeFirstRecordData()
@@ -124,7 +125,7 @@ void cedar::aux::DataSpectator::writeFirstRecordData()
   if (size > 0)
   {
     // Save data to disk.
-    recordData data;
+    RecordData data;
     {
       QWriteLocker locker(mpQueueLock);
       data = mDataQueue.front();
@@ -149,7 +150,7 @@ void cedar::aux::DataSpectator::writeAllRecordData()
 
   while (mDataQueue.size() > 0)
   {
-    recordData data;
+    RecordData data;
     data = mDataQueue.front();
 
     {
@@ -164,7 +165,7 @@ void cedar::aux::DataSpectator::writeAllRecordData()
 }
 
 
-const std::string& cedar::aux::DataSpectator::getName()
+const std::string& cedar::aux::DataSpectator::getName() const
 {
   return this->mName;
 }
@@ -175,12 +176,12 @@ void cedar::aux::DataSpectator::setName(const std::string& name)
   this->mName = name;
 }
 
-cedar::aux::ConstDataPtr cedar::aux::DataSpectator::getData()
+cedar::aux::ConstDataPtr cedar::aux::DataSpectator::getData() const
 {
   return this->mData;
 }
 
-int cedar::aux::DataSpectator::getRecordIntervalTime()
+int cedar::aux::DataSpectator::getRecordIntervalTime() const
 {
   return this->getStepSize();
 }

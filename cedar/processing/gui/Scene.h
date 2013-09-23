@@ -260,11 +260,11 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
    */
-  void setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget);
+  void setConfigurableWidget(cedar::aux::gui::PropertyPane* pConfigurableWidget);
 
   /*!@brief Sets the widget used for displaying/editing the record parameters.
    */
-  void setRecorderWidget(cedar::proc::gui::RecorderWidget *pRecorderWidget);
+  void setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget);
 
   /*!@brief Exports the scene to an svg file
    */

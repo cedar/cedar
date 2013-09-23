@@ -36,10 +36,10 @@
 
 // CEDAR INCLUDES
 
-#include "Recorder.h"
+#include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
-#include "cedar/processing/FrameworkSettings.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 #include <list>
@@ -50,34 +50,36 @@
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/pointer_cast.hpp>
+
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
+
 cedar::aux::Recorder::Recorder()
 {
   mOutputDirectory = "Unknown";
 }
 
-cedar::aux::Recorder:: ~Recorder()
+cedar::aux::Recorder::~Recorder()
 {
-  clear();
+  this->clear();
 }
 
 void cedar::aux::Recorder::step(double)
 {
   //Writing the first value of every DataSpectator queue.
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
-    mDataSpectatorCollection.get<DataSpectator>(i)->writeFirstRecordData();
+    mDataSpectatorCollection.get<cedar::aux::DataSpectator>(i)->writeFirstRecordData();
   }
 }
 
 void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, unsigned int recordIntv, const std::string& name)
 {
   //check if Name is not already in use
-  if(isRegistered(name))
+  if (isRegistered(name))
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException,"The data with name "+name+" is already registered");
+    CEDAR_THROW(cedar::aux::DuplicateNameException,"The data with name " + name + " is already registered");
   }
 
   // create new DataSpectaor and push it to the DataSpectator list
@@ -86,7 +88,7 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, uns
   mDataSpectatorCollection.addThread(spec);
 
   // If Recorder is already running, also start the new DataSpectator
-  if(this->isRunning())
+  if (this->isRunning())
   {
     spec->start();
   }
@@ -96,12 +98,17 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, uns
 void cedar::aux::Recorder::unregisterData(const std::string& name)
 {
   //throw exception if running
-  if(isRunning())
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  if (isRunning())
+  {
+    CEDAR_THROW(cedar::aux::ThreadRunningExeption, "Cannot unregister data while Recorder is running");
+  }
+    
+  //!@todo This is redundant with the code below (unregisterData(cedar::aux::ConstDataPtr data)); please remove these
+  //!      redundancies as far as possible (make this function call the one below, or the other way around)
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); ++i)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getName() == name)
+    if (spec->getName() == name)
     {
       mDataSpectatorCollection.remove(i);
       break;
@@ -112,12 +119,14 @@ void cedar::aux::Recorder::unregisterData(const std::string& name)
 void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 {
   //throw exception if running
-  if(isRunning())
+  if (this->isRunning())
+  {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  }
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); ++i)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getData() == data)
+    if (spec->getData() == data)
     {
       mDataSpectatorCollection.remove(i);
       break;
@@ -128,14 +137,14 @@ void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 
 void cedar::aux::Recorder::createOutputDirectory()
 {
-  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
-  mOutputDirectory = settings->getRecorderWorkspace() + "/" + QDateTime::currentDateTime().toString("yy.MM.dd hh-mm-ss").toStdString();
+  mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspace()
+                       + "/" + QDateTime::currentDateTime().toString("yy.MM.dd hh-mm-ss").toStdString();
   boost::filesystem::create_directories(mOutputDirectory);
 }
 
 void cedar::aux::Recorder::applyStart()
 {
-  if(mDataSpectatorCollection.size() > 0)
+  if (mDataSpectatorCollection.size() > 0)
   {
     //Generate output directory
     this->createOutputDirectory();
@@ -145,8 +154,9 @@ void cedar::aux::Recorder::applyStart()
   mStartTime.start();
 
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
+  //!@todo Use std::numeric_limits<int> for this
   int min = 1000;
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
     if(spec->getStepSize()<min)
@@ -169,8 +179,11 @@ void cedar::aux::Recorder::applyStop(bool /*suppressWarning*/)
 void cedar::aux::Recorder::clear()
 {
   //throw exception if running
-  if(isRunning())
+  if (isRunning())
+  {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
+  }
+
   stop();
   //remove all data.
   mDataSpectatorCollection.removeAll();
@@ -180,12 +193,15 @@ void cedar::aux::Recorder::clear()
 void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
 {
   //throw exception if running
-  if(isRunning())
+  if (isRunning())
+  {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change output directory while recorder is running");
+  }
+
   this->mOutputDirectory = path;
 }
 
-std::string cedar::aux::Recorder::getOutputDirectory() const
+const std::string& cedar::aux::Recorder::getOutputDirectory() const
 {
   return this->mOutputDirectory;
 }
@@ -198,52 +214,55 @@ int cedar::aux::Recorder::getTimeStamp() const
 void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, unsigned int recordIntv)
 {
   //throw exception if running
-  if(isRunning())
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change record inerval while recorder is running");
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  if (isRunning())
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getName() == name)
+    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change record inerval while recorder is running");
+  }
+
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<cedar::aux::DataSpectator>(i);
+    if (spec->getName() == name)
     {
       spec->setStepSize(recordIntv);
       return;
     }
   }
-  CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr named "+name+" is not registered.");
+  CEDAR_THROW(cedar::aux::UnknownNameException, "The data named \"" + name + "\" is not registered.");
 }
 
 unsigned int cedar::aux::Recorder::getRecordIntervalTime(const std::string& name) const
 {
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getName() == name)
+    if (spec->getName() == name)
     {
       return spec->getRecordIntervalTime();
     }
   }
-  CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr named "+name+" is not registered.");
+  CEDAR_THROW(cedar::aux::UnknownNameException, "The data named \"" + name + "\" is not registered.");
 }
 
 unsigned int cedar::aux::Recorder::getRecordIntervalTime(cedar::aux::ConstDataPtr data) const
 {
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getData() == data)
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<cedar::aux::DataSpectator>(i);
+    if (spec->getData() == data)
     {
       return spec->getRecordIntervalTime();
     }
   }
-  CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr is not registered.");
+  CEDAR_THROW(cedar::aux::UnknownNameException, "The given data pointer is not registered.");
 }
 
 bool cedar::aux::Recorder::isRegistered(const std::string& name) const
 {
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getName() == name)
+    if (spec->getName() == name)
     {
       return true;
     }
@@ -253,10 +272,10 @@ bool cedar::aux::Recorder::isRegistered(const std::string& name) const
 
 bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data) const
 {
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getData() == data)
+    if (spec->getData() == data)
     {
       return true;
     }
@@ -268,11 +287,14 @@ void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, c
 {
   //throw exception if running
   if(isRunning())
+  {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot rename data while recorder is running");
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  }
+
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getData() == data)
+    if (spec->getData() == data)
     {
       spec->setName(newName);
     }

@@ -56,7 +56,7 @@ cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName
   this->addWidget(label);
   
   //Create spacer.
-  QWidget* empty= new QWidget();
+  QWidget* empty = new QWidget();
   empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);  
   this->addWidget(empty);
 
@@ -72,7 +72,7 @@ cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName
   mStepSize->setMinimum(0);  
   if (registered)
   {
-    mStepSize->setValue(cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(mStepName+"_"+mName));  
+    mStepSize->setValue(cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(mStepName + "_" + mName));
   }
   else
   {
@@ -89,7 +89,7 @@ cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName
 cedar::proc::gui::RecorderProperty::~RecorderProperty()
 {  
   QLayoutItem *item;
-  while((item = this->takeAt(0))) 
+  while ((item = this->takeAt(0)) != NULL)
   {
     delete item->widget();
   }
@@ -97,23 +97,23 @@ cedar::proc::gui::RecorderProperty::~RecorderProperty()
 
 void cedar::proc::gui::RecorderProperty::registerRecordData(int status)
 {  
-  if(status)
+  if (status)
   {
-    if(!cedar::aux::RecorderSingleton::getInstance()->isRegistered(mStepName+"_"+mName))
+    if (!cedar::aux::RecorderSingleton::getInstance()->isRegistered(mStepName + "_" + mName))
     {
-      cedar::aux::RecorderSingleton::getInstance()->registerData(mData, mStepSizeValue, mStepName+"_"+mName);
+      cedar::aux::RecorderSingleton::getInstance()->registerData(mData, mStepSizeValue, mStepName + "_" + mName);
     }
     mStepSize->setEnabled(true);
   }
   else
   {
-    cedar::aux::RecorderSingleton::getInstance()->unregisterData(mStepName+"_"+mName); 
+    cedar::aux::RecorderSingleton::getInstance()->unregisterData(mStepName + "_" + mName); 
     mStepSize->setEnabled(false);
   }   
 }
 
 void cedar::proc::gui::RecorderProperty::updateStepSize(int value)
 {
-  mStepSizeValue = (int)value;
-  cedar::aux::RecorderSingleton::getInstance()->setRecordIntervalTime(mStepName+"_"+mName, static_cast<unsigned int>(value));
+  mStepSizeValue = static_cast<int>(value);
+  cedar::aux::RecorderSingleton::getInstance()->setRecordIntervalTime(mStepName + "_" + mName, static_cast<unsigned int>(value));
 }

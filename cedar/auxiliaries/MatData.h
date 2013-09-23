@@ -67,7 +67,6 @@ public:
   {
   }
 
-
   //!@brief This constructor initializes the internal data to a value.
   MatData(const cv::Mat& value)
   :
@@ -80,7 +79,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void serializeData(std::ostream& stream) const;
+  
   void serializeHeader(std::ostream& stream) const;
+  
   cedar::aux::DataPtr clone() const;
 
   std::string getDescription() const;
