@@ -46,8 +46,8 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include<QReadLocker>
-#include<QReadWriteLock>
+#include <QReadLocker>
+#include <QReadWriteLock>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,22 +109,24 @@ void cedar::aux::MatData::serializeData(std::ostream& stream) const
   std::vector<int> index(mData.dims, 0);
 
   //iterate  as long the last dimension has exceeded
-  while(index[mData.dims-1] < mData.size[mData.dims-1])
+  while (index[mData.dims-1] < mData.size[mData.dims-1])
   {
     // get memory address of the element.
     uchar* element = mData.data;
-    for(int i = 0; i < mData.dims; i++)
+    for (int i = 0; i < mData.dims; i++)
     {
       //Addresses an element of the Mat. See OpenCv Documentation.
       element += mData.step[i]*index[i];
     }
     //check data type
-    for(int i = 0; i < mData.channels(); i++)
+    for (int i = 0; i < mData.channels(); i++)
     {
-      switch(mData.depth())
+    	//!@todo Don't use c-casts, use static_casts instead
+      switch (mData.depth())
       {
         case CV_8U:
         {
+        	// instead of i * 1, write i * sizeof(uchar); same for all other cases
           stream << (int)(*(uchar*)(element+i*1)) << ",";
           break;
         }
@@ -162,6 +164,8 @@ void cedar::aux::MatData::serializeData(std::ostream& stream) const
     }
 
     //increase index
+	  //!@todo This is slow in multiple ways; a faster approach would be to iterate over the linear memory with a linear index
+    //!@todo Also, we have an iterator class for iterating over a 3d matrix
     index[0]++;
     for(int i =0; i < mData.dims-1; i++)
     {
@@ -178,7 +182,9 @@ void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
 {
   QReadLocker locker(this->mpLock);
   stream << "Mat" << ",";
+  //!@todo Don't write an int for the type, write the literal constants as strings (e.g., CV_32F)
   stream << mData.type() << ",";
+  //!@todo Dims don't need to be written here, you can infer them from the matrix size
   stream << mData.dims << ",";
   for(int i =0; i < mData.dims;i++)
   {
@@ -190,7 +196,7 @@ cedar::aux::DataPtr cedar::aux::MatData::clone() const
 {
   QReadLocker locker(this->mpLock);
   MatDataPtr cloned(new MatData(mData.clone()));
-  unlock();
+  locker.unlock();
   return cloned;
 }
 

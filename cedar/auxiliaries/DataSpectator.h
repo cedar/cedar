@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_DATASPECTATOR_H_
-#define CEDAR_AUX_DATASPECTATOR_H_
+#ifndef CEDAR_AUX_DATA_SPECTATOR_H
+#define CEDAR_AUX_DATA_SPECTATOR_H
 
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
@@ -68,7 +68,7 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread
   //--------------------------------------------------------------------------------------------------------------------
 private:
 //!@brief A data structure to store all the DataPtr with time stamp (in ms) in a list.
-  struct recordData
+  struct RecordData
   {
     unsigned int mRecordTime;
     cedar::aux::DataPtr mData;
@@ -91,7 +91,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Gets the DataPtr.
-  cedar::aux::ConstDataPtr getData();
+  cedar::aux::ConstDataPtr getData() const;
 
   //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written.
   void applyStart();
@@ -100,13 +100,13 @@ public:
   void applyStop(bool suppressWarning);
 
   //!@brief Gets the unique Name.
-  const std::string& getName();
+  const std::string& getName() const;
 
   //!@brief Sets the unique Name.
   void setName(const std::string& name);
 
   //!@brief Returns the record interval for this DataPtr.
-  int getRecordIntervalTime();
+  int getRecordIntervalTime() const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ private:
   QReadWriteLock* mpOfstreamLock;
 
   //!@brief This queue will be write to disk every time step is called.
-  std::list<recordData> mDataQueue;
+  std::list<RecordData> mDataQueue;
 
   //!@brief Locks mDataQueue.
   QReadWriteLock* mpQueueLock;

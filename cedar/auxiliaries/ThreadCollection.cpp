@@ -57,26 +57,26 @@ void cedar::aux::ThreadCollection::addThread(cedar::aux::ThreadWrapperPtr thread
   mThreads.push_back(thread);
 }
 
-void  cedar::aux::ThreadCollection::startAll()
+void cedar::aux::ThreadCollection::startAll()
 {
   QWriteLocker locker(mpListLock);
-  for(unsigned int i = 0; i < mThreads.size(); i++)
+  for (unsigned int i = 0; i < mThreads.size(); i++)
   {
     mThreads[i]->start();
   }
 }
 
-void  cedar::aux::ThreadCollection::stopAll()
+void cedar::aux::ThreadCollection::stopAll()
 {
   QWriteLocker locker(mpListLock);
   //First performing a requestStop() to stop all thread as fast as possible without blocking
-  for(unsigned int i = 0; i < mThreads.size(); i++)
+  for (unsigned int i = 0; i < mThreads.size(); i++)
   {
     mThreads[i]->requestStop();
   }
 
   //Waiting for each thread stopped.
-  for(unsigned int i = 0; i < mThreads.size(); i++)
+  for (unsigned int i = 0; i < mThreads.size(); i++)
   {
     mThreads[i]->stop();
   }

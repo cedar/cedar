@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 
-#ifndef RECORDERWIDGET_H_
-#define RECORDERWIDGET_H_
+#ifndef CEDAR_PROC_GUI_RECORDER_WIDGET_H
+#define CEDAR_PROC_GUI_RECORDER_WIDGET_H
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
@@ -52,9 +52,9 @@ class cedar::proc::gui::RecorderWidget
 :
 public QWidget
 {
-  //----------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
   // macros
-  //----------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public:
   RecorderWidget();
 
   //!@brief The public constructor.
-  RecorderWidget( QWidget* pParent);
+  RecorderWidget(QWidget* pParent);
 
   //!@brief The public destructor.
   ~RecorderWidget();
@@ -113,7 +113,6 @@ private:
 
   //!@brief The layout for this widget.
   QVBoxLayout* mMainLayout;
-
 };
 
-#endif /* RECORDERWIDGET_H_ */
+#endif // CEDAR_PROC_GUI_RECORDER_WIDGET_H

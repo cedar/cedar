@@ -229,13 +229,13 @@ class cedar::aux::NotImplementedException: public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::NotImplementedException
 
-/*!@brief An exception that is thrown, when thread is running and a operation
- * is called which not allow this.
+/*!@brief An exception that is thrown, when a thread is running and an operation
+ *        is called which is not allowed.
+ * @todo  This exception needs a better name
  */
-
 class cedar::aux::ThreadRunningExeption: public cedar::aux::ExceptionBase
 {
-}; // class cedar::aux::NotImplementedException
+}; // class cedar::aux::ThreadRunningExeption
 
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

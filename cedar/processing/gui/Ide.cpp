@@ -847,7 +847,7 @@ void cedar::proc::gui::Ide::closeAllPlots()
 
 void cedar::proc::gui::Ide::toggleRecorder(bool status)
 {
-  if(!status)
+  if (!status)
   {
     cedar::aux::RecorderSingleton::getInstance()->stop();
   }

@@ -231,6 +231,7 @@ bool cedar::proc::Connectable::hasRole(DataRole::Id role)
   }  
   return true;
 }
+
 cedar::proc::Connectable::SlotList& cedar::proc::Connectable::getSlotList(DataRole::Id role)
 {
   std::map<DataRole::Id, SlotList>::iterator iter = this->mDataConnectionsOrder.find(role);
