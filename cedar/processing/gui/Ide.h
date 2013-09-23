@@ -196,6 +196,9 @@ public slots:
   //!@brief closes all plot windows of every step
   void closeAllPlots();
 
+  //!@brief Starts or stops the recorder function();
+  void toggleRecorder(bool status);
+
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const
   {

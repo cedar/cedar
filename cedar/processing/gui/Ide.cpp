@@ -59,6 +59,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -125,6 +126,7 @@ mpBoostControl(NULL)
 
   // set the property pane as the scene's property displayer
   this->mpProcessingDrawer->getScene()->setConfigurableWidget(this->mpPropertyTable);
+  this->mpProcessingDrawer->getScene()->setRecorderWidget(this->mpRecorderWidget);
 
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
                    this, SLOT(architectureToolFinished()));
@@ -141,6 +143,7 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
   QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+  QObject::connect(this->mpActionRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecorder(bool)));
   
 
 
@@ -865,5 +868,17 @@ void cedar::proc::gui::Ide::closeAllPlots()
   for(auto it = steps.begin(); it != steps.end(); ++it)
   {
     it->second->closeAllPlots();
+  }
+}
+
+void cedar::proc::gui::Ide::toggleRecorder(bool status)
+{
+  if (!status)
+  {
+    cedar::aux::RecorderSingleton::getInstance()->stop();
+  }
+  else
+  {
+    cedar::aux::RecorderSingleton::getInstance()->start();
   }
 }

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,109 +22,97 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatData.h
+    File:        Recorder.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 12 09
+    Maintainer:  Christian Bodenstein
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2013 08 19
 
-    Description: This is a dummy header for the typedef MatData (which is actually a cedar::aux::DataTemplate<cv::Mat>).
+    Description: Header for the @em cedar::aux::gui::RecorderWidget class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MAT_DATA_H
-#define CEDAR_AUX_MAT_DATA_H
+
+#ifndef CEDAR_PROC_GUI_RECORDER_WIDGET_H
+#define CEDAR_PROC_GUI_RECORDER_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
+#include <QWidget>
+#include <QVBoxLayout>
 
-/*!@brief Data containing matrices.
- */
-class cedar::aux::MatData : public cedar::aux::DataTemplate<cv::Mat>
+/*!@brief GUI representation for the recorder tool.
+  */
+class cedar::proc::gui::RecorderWidget
+:
+public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef cedar::aux::DataTemplate<cv::Mat> Super;
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  MatData()
-  {
-  }
+  //!@brief The public constructor.
+  RecorderWidget();
 
-  //!@brief This constructor initializes the internal data to a value.
-  MatData(const cv::Mat& value)
-  :
-  cedar::aux::DataTemplate<cv::Mat>(value)
-  {
-  }
+  //!@brief The public constructor.
+  RecorderWidget(QWidget* pParent);
+
+  //!@brief The public destructor.
+  ~RecorderWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  void serializeData(std::ostream& stream) const;
-  
-  void serializeHeader(std::ostream& stream) const;
-  
-  cedar::aux::DataPtr clone() const;
+public slots:
+  //!@brief Sets the obtained step and recreating the widget to set the record parameters.
+  void setStep(cedar::proc::StepPtr step);
+ 
+  //!@brief Resets this widget
+  void resetContents();
 
-  std::string getDescription() const;
+  //!@brief Unregister all slots of this step;
+  void unregister(cedar::proc::StepPtr pStep);
 
-  /*!@brief Returns the dimensionality of the matrix stored in this data.
-   *
-   * @remarks Calls cedar::aux::math::getDimensionalityOf(this->getData()) to determine the dimensionality.
+  /*!@brief If the name of a Step has changed all slots have to unregister in the recoder and 
+   *registered with the new name.
    */
-  unsigned int getDimensionality() const;
-
-  //! Convenience method that returns the opencv-type of the stored matrix.
-  inline int getCvType() const
-  {
-    return this->getData().type();
-  }
-
-  //! Checks if the matrix is empty.
-  bool isEmpty() const
-  {
-    return this->getData().empty();
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+  void updateName();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Updates the GUI.
+  void refreshWidget();
+
+  //!@brief Resets the widget and its GUI elements.
+  void clearLayout();
+
+  //!@brief Create the headers for the Widget.
+  void createHeader(const std::string& name);
+
+  //!@brief Create a header for a role section.
+  void createRoleSection(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
-  // none yet
+  //!@brief The step currently displayed.
+  cedar::proc::StepPtr mStepToConfigure;
 
-}; // class cedar::aux::MatData
+  //!@brief The layout for this widget.
+  QVBoxLayout* mMainLayout;
+};
 
-#endif // CEDAR_AUX_MAT_DATA_H
+#endif // CEDAR_PROC_GUI_RECORDER_WIDGET_H
