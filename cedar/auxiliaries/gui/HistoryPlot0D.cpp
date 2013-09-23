@@ -150,7 +150,7 @@ void cedar::aux::gui::HistoryPlot0D::showLegend(bool show)
   if (show)
   {
     // show legend
-    QwtLegend* p_legend = cedar::aux::asserted_cast<QwtLegend*>(this->mpPlot->legend());
+    auto p_legend = this->mpPlot->legend();
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();
@@ -258,7 +258,7 @@ void cedar::aux::gui::HistoryPlot0D::applyStyle(size_t lineId, QwtPlotCurve *pCu
 void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mCurves.clear();
-  this->doAppend(data, title);
+  this->append(data, title);
 
   this->startTimer(30);
 }

@@ -78,10 +78,46 @@ cedar::aux::Configurable::~Configurable()
 
 void cedar::aux::Configurable::addDeprecatedName(cedar::aux::ParameterPtr parameter, const std::string& deprecatedName)
 {
+  // check if there is already a parameter with this name
+  if (this->mParameterAssociations.find(deprecatedName) != this->mParameterAssociations.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "Cannot use deprecated name \"" + deprecatedName + "\"; there is already a parameter with this name."
+    );
+  }
+
+  // check if another parameter already uses the deprecated name
+  for
+  (
+    auto param_iter = this->mDeprecatedParameterNames.begin();
+    param_iter != this->mDeprecatedParameterNames.end();
+    ++param_iter
+  )
+  {
+    auto deprecated_names = param_iter->second;
+    for (auto iter = deprecated_names.begin(); iter != deprecated_names.end(); ++iter)
+    {
+      const std::string& other_deprecated_name = *iter;
+      if (other_deprecated_name == deprecatedName)
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::DuplicateNameException,
+          "Cannot use deprecated name \"" + deprecatedName + "\"; there is already a parameter with this deprecated name."
+        );
+      }
+    }
+  }
+
+  // create a vector of deprecated names, if none exists yet
   if (mDeprecatedParameterNames.find(parameter->getName()) == mDeprecatedParameterNames.end())
   {
     mDeprecatedParameterNames[parameter->getName()] = std::vector<std::string>();
   }
+
+  // add the deprecated name for the parameter
   auto iter = mDeprecatedParameterNames.find(parameter->getName());
   iter->second.push_back(deprecatedName);
 }

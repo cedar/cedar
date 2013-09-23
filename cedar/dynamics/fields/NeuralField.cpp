@@ -44,8 +44,10 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
@@ -89,6 +91,15 @@ namespace
     field_plot_data.appendData(DataRole::OUTPUT, "activation", true);
     field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
     declaration->definePlot(field_plot_data);
+
+    // define field plot again, but this time with image plots
+    //!@todo different icon
+    ElementDeclaration::PlotDefinition field_image_plot_data("field plot (image)", ":/cedar/dynamics/gui/field_image_plot.svg");
+    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot"));
+    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot"));
+    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::OUTPUT, "activation", true, "cedar::aux::gui::ImagePlot"));
+    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::OUTPUT, "sigmoided activation", false, "cedar::aux::gui::ImagePlot"));
+    declaration->definePlot(field_image_plot_data);
 
     ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
     kernel_plot_data.appendData(DataRole::BUFFER, "lateral kernel");
@@ -156,7 +167,7 @@ _mDimensionality
     this,
     "dimensionality",
     2,
-    cedar::aux::UIntParameter::LimitType::positiveZero(1000)
+    cedar::aux::UIntParameter::LimitType::positiveZero(4)
   )
 ),
 _mSizes
@@ -167,7 +178,7 @@ _mSizes
     "sizes",
     2,
     10,
-    cedar::aux::UIntParameter::LimitType::positive(1000)
+    cedar::aux::UIntParameter::LimitType::positive(5000)
   )
 ),
 _mInputNoiseGain
@@ -281,11 +292,11 @@ void cedar::dyn::NeuralField::discreteMetricChanged()
   {
     if (this->_mDiscreteMetric->getValue() == true)
     {
-      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
     }
     else
     {
-      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteCoordinates>();
+      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteMetric>();
     }
   }
 }
@@ -489,9 +500,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
-  // having a pointer to the convolution in the same scope as the reference prevents the object from being deleted.
-  cedar::aux::conv::ConvolutionPtr convolution_ptr = this->getConvolution();
-  cedar::aux::conv::Convolution& lateral_convolution = *convolution_ptr;
 
   boost::shared_ptr<QReadLocker> activation_read_locker;
   if (this->activationIsOutput())
@@ -506,6 +514,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   {
     cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
     neural_noise = this->_mNoiseCorrelationKernelConvolution->convolve(neural_noise);
+
     //!@todo not sure, if dividing time by 1000 (which is an implicit tau) makes any sense or should be a parameter
     //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
     sigmoid_u = _mSigmoid->getValue()->compute<float>
@@ -523,7 +532,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   sigmoid_u_lock.unlock();
 
   QReadLocker sigmoid_u_readlock(&this->mSigmoidalActivation->getLock());
-  lateral_interaction = lateral_convolution(sigmoid_u);
+  lateral_interaction = this->_mLateralKernelConvolution->convolve(sigmoid_u);
 
   this->updateInputSum();
 
@@ -609,6 +618,13 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
 void cedar::dyn::NeuralField::dimensionalityChanged()
 {
   this->_mSizes->resize(this->getDimensionality(), _mSizes->getDefaultValue());
+#ifdef CEDAR_USE_FFTW
+  if (this->getDimensionality() >= 3)
+  {
+    this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+    this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+  }
+#endif // CEDAR_USE_FFTW
   this->updateMatrices();
 }
 

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DiscreteCoordinates.h
+    File:        DiscreteMetric.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 
 // SYSTEM INCLUDES
 
@@ -50,7 +50,7 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::aux::annotation::DiscreteCoordinates::getDescription() const
+std::string cedar::aux::annotation::DiscreteMetric::getDescription() const
 {
-  return "Coordinates are discrete.";
+  return "The metric of this data is discrete.";
 }

@@ -40,7 +40,6 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/Triggerable.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
