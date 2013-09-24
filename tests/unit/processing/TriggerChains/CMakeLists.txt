@@ -24,13 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp,
-#                Mathis Richter,
-#                Stephan Zibner
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-#                mathis.richter@ini.ruhr-uni-bochum.de,
-#                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 05 23
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2012 07 25
 #
 #   Description:
 #
@@ -38,6 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(SequenceTest
-  SequenceTest.cpp
-)
+cedar_add_unit_test(TriggerChains
+                    triggerChains.cpp
+                    )
