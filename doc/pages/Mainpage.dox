@@ -22,16 +22,18 @@ framework and add custom steps.
 developers' guide @endlink.
 
 @section Installation Installing cedar
-Please refer to the @ref readme page or the readme.md file in the root of the repository to find instructions on how to
-install cedar.
+Please refer to the @link md_readme readme@endlink page or the readme.md file in the root of the repository to find
+instructions on how to install cedar. If you are experiencing troubles during installation or use of cedar, please take
+a look at our @link md_troubleshooting troubleshooting@endlink document (also found as troubleshooting.md in the root
+directory of cedar).
 
 @section VersionNotes Version notes
-Version notes can be found in the @ref changelog (or the changelog.md in the root directory of cedar). This also
-includes a list of known issues.
+Version notes can be found in the @link md_changelog changelog@endlink (or the changelog.md in the root directory of
+cedar). This also includes a list of known issues.
 
 @section Documentation How to get this documentation
 This documentation is included in your copy of cedar. cmake will create a Doxyfile in your build folder. You need
-Doxygen to create this documentation from the generated Doxyfile (see "readme.txt" file for more information about
+Doxygen to create this documentation from the generated Doxyfile (see "readme.md" file for more information about
 the build system). Doxygen will create an HTML and a PDF output of the code documentation and additional pages like
 this introductory page. Feel free to browse through the class documentation, or just dig into the concepts incorporated
 in the implementation. You can also start with one of our tutorials, to get accustomed to the ways cedar can be used.

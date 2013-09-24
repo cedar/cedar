@@ -54,7 +54,7 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-
+      CEDAR_DECLARE_PROC_CLASS(AbsoluteValue);
       CEDAR_DECLARE_PROC_CLASS(ComponentMultiply);
       CEDAR_DECLARE_PROC_CLASS(CoordinateTransformation);
       CEDAR_DECLARE_PROC_CLASS(ChannelSplit);
@@ -63,6 +63,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(Convolution);
       CEDAR_DECLARE_PROC_CLASS(CoordinateTransformation);
       CEDAR_DECLARE_PROC_CLASS(Flip);
+      CEDAR_DECLARE_PROC_CLASS(Histogram);
       CEDAR_DECLARE_PROC_CLASS(MatrixMultiply);
       CEDAR_DECLARE_PROC_CLASS(MatrixTypeConverter);
       CEDAR_DECLARE_PROC_CLASS(Projection);
@@ -70,6 +71,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
       CEDAR_DECLARE_PROC_CLASS(Sum);
       CEDAR_DECLARE_PROC_CLASS(Switch);
+      CEDAR_DECLARE_PROC_CLASS(Threshold);
       CEDAR_DECLARE_PROC_CLASS(TransferFunction);
       CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
       CEDAR_DECLARE_PROC_CLASS(TransformationType);

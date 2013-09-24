@@ -154,22 +154,6 @@ public slots:
    */
   void recentFileItemTriggered();
 
-  /*!@brief Reacts to changes in the zoom level.
-   */
-  void zoomLevelSet(double zoomLevel);
-
-  /*!@brief Resets the zoom level to 100%.
-   */
-  void resetZoomLevel();
-
-  /*!@brief Increases the zoom level.
-   */
-  void increaseZoomLevel();
-
-  /*!@brief Decreases the zoom level.
-   */
-  void decreaseZoomLevel();
-
   /*!@brief Returns the architecture view used by the ide.
    */
   cedar::proc::gui::View* getArchitectureView();
@@ -212,6 +196,18 @@ public slots:
 
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
+
+  //!@brief closes all plot windows of every step
+  void closeAllPlots();
+
+  //!@brief Starts or stops the recorder function();
+  void toggleRecorder(bool status);
+
+  //! Returns the log widget of this ide.
+  cedar::aux::gui::Log* getLog() const
+  {
+    return this->mpLog;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -259,6 +255,9 @@ private:
    */
   void displayFilename(const std::string& filename);
 
+  //! Updates the start and stop triggers threads.
+  void updateTriggerStartStopThreadCallers();
+
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
@@ -286,6 +285,12 @@ private:
 
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;
+
+  //! Used for starting all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
+
+  //! Used for stopping all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
 }; // class cedar::MainWindow
 

@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -115,12 +116,17 @@ void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPan
   this->mpConfigurableWidget = pConfigurableWidget;
 }
 
+void cedar::proc::gui::Scene::setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget)
+{
+  this->mpRecorderWidget = pRecorderWidget;
+}
+
 void cedar::proc::gui::Scene::itemSelected()
 {
   using cedar::proc::Step;
   using cedar::proc::Manager;
 
-  if (this->mpConfigurableWidget == NULL)
+  if (this->mpConfigurableWidget == NULL || this->mpRecorderWidget == NULL)
   {
     return;
   }
@@ -134,12 +140,18 @@ void cedar::proc::gui::Scene::itemSelected()
       if (p_item->getElement())
       {
         this->mpConfigurableWidget->display(p_item->getElement());
+      
+        if(cedar::proc::StepPtr castedStep = boost::dynamic_pointer_cast<cedar::proc::Step>(p_item->getElement()))
+        {
+          this->mpRecorderWidget->setStep(castedStep);
+        }
       }
     }
   }
   else
   {
     this->mpConfigurableWidget->resetContents();
+    this->mpRecorderWidget->resetContents();
   }
 }
 
@@ -168,10 +180,20 @@ void cedar::proc::gui::Scene::reset()
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
 {
+  return this->getStepMap();
+}
+
+const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::getStepMap() const
+{
   return this->mStepMap;
 }
 
 const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::triggerMap() const
+{
+  return this->getTriggerMap();
+}
+
+const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMap() const
 {
   return this->mTriggerMap;
 }
@@ -512,7 +534,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
   if (a == p_reset)
   {
-    this->mNetwork->getNetwork()->reset();
+    if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
+    {
+      p_ide->resetRootNetwork();
+    }
   }
   else if (a != NULL)
   {
@@ -941,6 +966,10 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
+
+  //unregister this step in th recorder
+  //!@todo This is misplaced. If a step needs to be unregistered, that should happen in the destructor of proc::Step.
+  this->mpRecorderWidget->unregister(pStep->getStep());
 }
 
 cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()

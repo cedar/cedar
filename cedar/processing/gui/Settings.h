@@ -157,6 +157,9 @@ public:
   //!@brief saves the UI settings
   void save();
 
+  //! Loads the plugins set to be loaded by default.
+  void loadDefaultPlugins();
+
   //!@brief returns a list of all plugins that should be loaded on start-up
   const std::set<std::string>& pluginsToLoad();
   //!@brief adds a plugin to the list of plugins that are loaded on start-up
@@ -235,6 +238,12 @@ public:
     return this->_mDataSlotScalingEnabled->getValue();
   }
 
+  //! Returns whether or not connections of selected steps should be highlighted.
+  inline bool getHighlightConnections() const
+  {
+    return this->_mHighlightConnections->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -301,6 +310,9 @@ private:
 
   //!@brief Disables or enables graphics item shadows.
   cedar::aux::BoolParameterPtr mSnapToGrid;
+
+  //!@brief Disables or enables highlighting of the connections of selected steps.
+  cedar::aux::BoolParameterPtr _mHighlightConnections;
 
   //! Default display mode for steps.
   cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;

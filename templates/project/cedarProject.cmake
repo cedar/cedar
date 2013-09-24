@@ -59,46 +59,6 @@ if (DEBUG_CEDAR_BUILD_SYSTEM)
   message ("  >> cedar home is set to ${CEDAR_HOME}")
 endif(DEBUG_CEDAR_BUILD_SYSTEM)
 
-
-# Look for qt
-find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml)
-if(QT4_FOUND)
-  # Include qt's cmake scripts
-  include(${QT_USE_FILE})
-  
-  # Add qt include directories
-  include_directories(${QT_INCLUDE_DIRS})
-else(QT4_FOUND)
-  find_package(Qt5Widgets REQUIRED)
-  find_package(Qt5OpenGL REQUIRED)
-  find_package(Qt5Xml REQUIRED)
-
-  if(Qt5Widgets_FOUND)
-    include_directories(${Qt5Widgets_INCLUDE_DIRS})
-    SET(QT_LIBRARIES ${QT_LIBRARIES} ${Qt5Widgets_LIBRARIES})
-  endif(Qt5Widgets_FOUND)
-
-  if(Qt5OpenGL_FOUND)
-    include_directories(${Qt5OpenGL_INCLUDE_DIRS})
-    SET(QT_LIBRARIES ${QT_LIBRARIES} ${Qt5OpenGL_LIBRARIES})
-  endif(Qt5OpenGL_FOUND)
-
-  if(Qt5Xml_FOUND)
-    include_directories(${Qt5Xml_INCLUDE_DIRS})
-    SET(QT_LIBRARIES ${QT_LIBRARIES} ${Qt5Xml_LIBRARIES})
-  endif(Qt5Xml_FOUND)
-endif(QT4_FOUND)
-
-# libQGLViewer
-message("-- Searching for QGLViewer...")
-find_package(QGLViewer REQUIRED)
-if(QGLViewer_FOUND)
-  include_directories(${QGLViewer_INCLUDE_DIRS})
-endif(QGLViewer_FOUND)
-
-# Look for opencv
-link_libraries(opencv_highgui opencv_core)
-
 if(CEDAR_HOME)
   message("-- Using local cedar version in ${CEDAR_HOME}")
   # Add include directories
@@ -108,7 +68,7 @@ if(CEDAR_HOME)
   link_directories("${CEDAR_HOME}/${CEDAR_LIB_DIR}")
   
   # includes and libraries of external dependencies
-  include("${CEDAR_HOME}/build/cedar_configuration.cmake")
+  include("${CEDAR_HOME}/${CEDAR_BUILD_DIR}/cedar_configuration.cmake")
   
 elseif(CEDAR_HOME_INSTALLED)
   message("-- Using installed cedar version in ${CEDAR_HOME_INSTALLED}")

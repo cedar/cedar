@@ -59,12 +59,30 @@ mpStartCallsLock(new QMutex())
 
 cedar::proc::Triggerable::~Triggerable()
 {
+  while (!this->mTriggersListenedTo.empty())
+  {
+    cedar::proc::TriggerPtr trigger = this->mTriggersListenedTo.begin()->lock();
+    CEDAR_ASSERT(trigger);
+    trigger->removeListener(this);
+  }
   delete this->mpStartCallsLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Triggerable::triggeredBy(cedar::proc::TriggerPtr trigger)
+{
+  this->mTriggersListenedTo.insert(trigger);
+}
+
+void cedar::proc::Triggerable::noLongerTriggeredBy(cedar::proc::TriggerPtr trigger)
+{
+  auto iter = this->mTriggersListenedTo.find(trigger);
+  CEDAR_ASSERT(iter != this->mTriggersListenedTo.end());
+  this->mTriggersListenedTo.erase(iter);
+}
 
 boost::signals2::connection cedar::proc::Triggerable::connectToStateChanged(boost::function<void ()> slot)
 {
@@ -201,7 +219,8 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getFinishedTrigger()
 {
   if (!this->mFinished)
   {
-    mFinished = cedar::proc::TriggerPtr(new cedar::proc::Trigger("processingDone"));
+    this->mFinished = cedar::proc::TriggerPtr(new cedar::proc::Trigger("processingDone"));
+    this->mFinished->setOwner(this);
   }
   return this->mFinished;
 }

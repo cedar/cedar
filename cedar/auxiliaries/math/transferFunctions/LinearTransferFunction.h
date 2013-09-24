@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/transferFunctions/namespace.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -72,6 +73,18 @@ public:
    */
   virtual double compute(double value) const;
 
+  //! Returns the offset of the linear function, i.e., \f$ m \f$ in \f$ f(x) = m \cdot x + b \f$.
+  inline double getFactor() const
+  {
+    return this->_mFactor->getValue();
+  }
+
+  //! Returns the offset of the linear function, i.e., \f$ b \f$ in \f$ f(x) = m \cdot x + b \f$.
+  inline double getOffset() const
+  {
+    return this->_mOffset->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,6 +104,18 @@ protected:
   // none yet
 private:
   // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+private:
+  //! Factor with which the input is multiplied.
+  cedar::aux::DoubleParameterPtr _mFactor;
+
+  //! Offset added to the input.
+  cedar::aux::DoubleParameterPtr _mOffset;
 };
 
 #endif  // CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H

@@ -60,13 +60,13 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(DataConnection);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
+    CEDAR_DECLARE_PROC_CLASS(PlotData);
     CEDAR_DECLARE_PROC_CLASS(Element);
     CEDAR_DECLARE_PROC_CLASS(ElementDeclaration);
     CEDAR_DECLARE_PROC_CLASS(ExternalData);
     CEDAR_DECLARE_PROC_CLASS(LoopArguments);
     CEDAR_DECLARE_PROC_CLASS(FrameworkSettings);
     CEDAR_DECLARE_PROC_CLASS(LoopedTrigger);
-    CEDAR_DECLARE_PROC_CLASS(MultiTrigger);
     CEDAR_DECLARE_PROC_CLASS(Step);
     CEDAR_DECLARE_PROC_CLASS(StepTime);
     CEDAR_DECLARE_PROC_CLASS(Trigger);
@@ -119,6 +119,7 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT NoMappingException;
     class CEDAR_PROC_LIB_EXPORT NoMeasurementException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
+    class CEDAR_PROC_LIB_EXPORT TriggerCycleException;
     //!@endcond
   }
 }

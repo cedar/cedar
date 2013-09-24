@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MultiTrigger.h
+    File:        AbsoluteValue.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 27
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 08 02
 
     Description:
 
@@ -38,51 +34,41 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_MULTI_TRIGGER_H
-#define CEDAR_PROC_MULTI_TRIGGER_H
+#ifndef CEDAR_PROC_STEPS_ABSOLUTE_VALUE_H
+#define CEDAR_PROC_STEPS_ABSOLUTE_VALUE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
+#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <map>
 
-/*!@brief A trigger that merges multiple trigger signals into one.
+
+/*!@brief   Computes the absolute value of its input.
  *
- * This class maintains a list of incoming triggers. Everytime one of the incoming triggers receives a trigger signal,
- * it is marked as triggered. Once all incoming triggers are marked thusly, the MultiTrigger sends a trigger signal to
- * all its listeners.
+ * @remarks This step declares the following interface:
+ *          input - any matrix data
+ *          absolute value - the absolute value of the input
+ *
+ *          This step has no parameters.
  */
-class cedar::proc::MultiTrigger : public Trigger
+class cedar::proc::steps::AbsoluteValue : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MultiTrigger();
-
-  //!@brief Destructor
-  virtual ~MultiTrigger();
+  AbsoluteValue();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief process trigger event
-  void onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr pSender);
-
-  //!@brief if a trigger connects to the MultiTrigger, add it to the internal storage of sources
-  void notifyConnected(cedar::proc::TriggerPtr trigger);
-
-  //!@brief if a trigger disconnects from a MultiTrigger, remove it from internal storage of sources
-  void notifyDisconnected(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,31 +80,30 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief check if all incoming triggers are triggered at least once before sending own trigger signal
-  void checkCondition();
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
 
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
 private:
-  //!@brief internal storage of incoming triggers
-  std::map<cedar::proc::TriggerPtr, bool> mIncoming;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
 
 private:
-  // none yet
 
-}; // class cedar::proc::Trigger
+}; // class cedar::proc::steps::AbsoluteValue
 
-#endif // CEDAR_PROC_TRIGGER_H
-
+#endif // CEDAR_PROC_STEPS_ABSOLUTE_VALUE_H

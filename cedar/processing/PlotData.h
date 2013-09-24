@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DiscreteCoordinates.h
+    File:        PlotData.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 07 10
+    Maintainer:  Kai Kuchenbecker
+    Email:       Kai.Kuchenbecker@ini.rub.de
+    Date:        2013-08-02
 
     Description:
 
@@ -34,42 +34,56 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
-#define CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_PROC_PLOT_DATA_H
+#define CEDAR_PROC_PLOT_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/annotation/namespace.h"
-#include "cedar/auxiliaries/annotation/Annotation.h"
-#include "cedar/auxiliaries/Cloneable.h"
+#include "cedar/configuration.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/DataRole.h"
 
 // SYSTEM INCLUDES
+// none yet
 
-/*!@brief An annotation that indicates disparity data.
+/*!@brief Holds information about data in a custom step plot.
+ *
  */
-class cedar::aux::annotation::DiscreteCoordinates
-:
-public cedar::aux::annotation::Annotation,
-public cedar::aux::Cloneable<cedar::aux::annotation::DiscreteCoordinates, cedar::aux::annotation::Annotation>
+class cedar::proc::PlotData : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*! Constructor.
+   *
+   * @param id Role of the data to be plotted.
+   * @param name Name of the data slot of the step whose data is to be plotted.
+   * @param ignoreIfMissing If true, no warning will be generated if the slot is missing.
+   */
+  PlotData
+  (
+    cedar::proc::DataRole::Id id = cedar::proc::DataRole::OUTPUT,
+    const std::string& name = "",
+    bool ignoreIfMissing = false,
+    const std::string& plotDeclaration = ""
+  );
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  std::string getDescription() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,9 +103,15 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! Role of the data to be plotted.
+  cedar::aux::EnumParameterPtr mId;
+  //! Name of the data to be plotted.
+  cedar::aux::StringParameterPtr mName;
+  //! If true, no exception will be thrown if the data cannot be found.
+  cedar::aux::BoolParameterPtr mIgnoreIfMissing;
+  //! Plot Type to be used to plot the data
+  cedar::aux::StringParameterPtr mPlotDeclaration;
 
-}; // class cedar::aux::annotation::DiscreteCoordinates
+}; // cedar::proc::PlotData
 
-#endif // CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
-
+#endif // CEDAR_PROC_PLOT_DATA_H

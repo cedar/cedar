@@ -123,6 +123,9 @@ public:
   //!@brief Adds a list of elements to the network efficiently.
   void addElements(const std::list<QGraphicsItem*>& elements);
 
+  //! Duplicates an element and places it at the given position.
+  void duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
+
   //!@brief Sets the scene containing this item.
   void setScene(cedar::proc::gui::Scene* pScene);
 
@@ -205,6 +208,8 @@ private:
   void processElementAddedSignal(cedar::proc::ElementPtr);
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
+
+  void readOpenPlots(const cedar::aux::ConfigurationNode& node);
 
 private slots:
   //!@brief Updates the label of the network.

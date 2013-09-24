@@ -171,6 +171,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   mSliceMatrix = cv::Mat::ones(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, mat.type());
   mSliceMatrixByte = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC1);
   mSliceMatrixByteC3 = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC3);
+  cv::Mat frame = cv::Mat::ones(mSliceMatrixByte.rows, mSliceMatrixByte.cols, mSliceMatrixByte.type());
 
   // decide which plot code is used depending on the OpenCV version
   // versions are defined since version 2.4, which supports the following code
@@ -199,22 +200,20 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     // set size from 3d to 2d
     slice.copySize(mSliceSize);
     // copy slice to the right tile in the larger matrix
-    slice.copyTo
-          (
-            mSliceMatrix
-            (
-              cv::Range
-              (
-                row * mat.size[0] + row,
-                row + mat.size[0] * (row + 1)
-              ),
-              cv::Range
-              (
-                column * mat.size[1] + column,
-                column + mat.size[1] * (column + 1)
-              )
-            )
-          );
+    cv::Range dest_rows
+    (
+      row * mat.size[0] + row,
+      row + mat.size[0] * (row + 1)
+    );
+
+    cv::Range dest_cols
+    (
+      column * mat.size[1] + column,
+      column + mat.size[1] * (column + 1)
+    );
+
+    slice.copyTo(mSliceMatrix(dest_rows, dest_cols));
+    frame(dest_rows, dest_cols) = cv::Scalar(0);
   }
 #else
   // for each tile, copy content to right place
@@ -245,6 +244,8 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   scaled.convertTo(mSliceMatrixByte, CV_8U);
 
   mSliceMatrixByteC3 = cedar::aux::gui::ImagePlot::colorizedMatrix(mSliceMatrixByte);
+
+  mSliceMatrixByteC3.setTo(0xFFFFFF, frame);
 
   QWriteLocker lock(&this->mImageLock);
   this->mImage = QImage

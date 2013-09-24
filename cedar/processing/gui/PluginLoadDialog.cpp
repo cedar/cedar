@@ -41,8 +41,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PluginLoadDialog.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/FrameworkSettings.h"
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/assert.h"
