@@ -196,6 +196,9 @@ public slots:
   //!@brief closes all plot windows of every step
   void closeAllPlots();
 
+  //!@brief Starts or stops the recorder function();
+  void toggleRecorder(bool status);
+
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const
   {
@@ -247,6 +250,9 @@ private:
   /*!@brief Sets the filename in the title of the main window.
    */
   void displayFilename(const std::string& filename);
+
+  //! Updates the start and stop triggers threads.
+  void updateTriggerStartStopThreadCallers();
 
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
