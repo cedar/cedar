@@ -421,21 +421,7 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   this->mNetwork->addElementsToScene();
   this->mpPropertyTable->resetContents();
 
-  this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
-      (
-        new cedar::aux::CallFunctionInThread
-        (
-          boost::bind(&cedar::proc::Network::startTriggers, this->mNetwork->getNetwork(), true)
-        )
-      );
-
-  this->mStopThreadsCaller = cedar::aux::CallFunctionInThreadPtr
-      (
-        new cedar::aux::CallFunctionInThread
-        (
-          boost::bind(&cedar::proc::Network::stopTriggers, this->mNetwork->getNetwork(), true)
-        )
-      );
+  this->updateTriggerStartStopThreadCallers();
 
   if (this->mpConsistencyChecker != NULL)
   {
@@ -446,6 +432,25 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   {
     this->mpBoostControl->setNetwork(network->getNetwork());
   }
+}
+
+void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
+{
+  this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+                              (
+                                new cedar::aux::CallFunctionInThread
+                                (
+                                  boost::bind(&cedar::proc::Network::startTriggers, this->mNetwork->getNetwork(), true)
+                                )
+                              );
+
+  this->mStopThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+                             (
+                               new cedar::aux::CallFunctionInThread
+                               (
+                                 boost::bind(&cedar::proc::Network::stopTriggers, this->mNetwork->getNetwork(), true)
+                               )
+                             );
 }
 
 void cedar::proc::gui::Ide::architectureToolFinished()
@@ -757,6 +762,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
   this->mpActionSave->setEnabled(true);
 
+  //!@todo Why doesn't this call resetTo?
   this->mNetwork = network;
 
   if (this->mpBoostControl)
@@ -765,6 +771,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
 
   this->displayFilename(file.toStdString());
+  this->updateTriggerStartStopThreadCallers();
 
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
