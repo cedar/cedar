@@ -222,12 +222,6 @@ class cedar::aux::InvalidPathException : public cedar::aux::ExceptionBase
 {
 };
 
-/*!@brief An exception thrown when a method is not implemented.
- */
-class cedar::aux::NotImplementedException : public cedar::aux::ExceptionBase
-{
-};
-
 /*!@brief Exception that occurs when threading code is mis-used
  */
 class cedar::aux::ThreadingErrorException : public cedar::aux::ExceptionBase
