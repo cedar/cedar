@@ -198,7 +198,13 @@ void cedar::proc::LoopedTrigger::step(double time)
 {
   cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));
 
-  this->trigger(arguments);
+  //!@todo Is this right?
+  auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
+  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  {
+    this->mListeners.at(i)->onTrigger(arguments, this_ptr);
+  }
+//  this->trigger(arguments);
 
   if (this->mWait->getValue())
   {
