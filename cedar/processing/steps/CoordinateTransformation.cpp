@@ -544,7 +544,7 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
-  if (!this->mInput)
+  if (!this->mInput || this->mInput->getDimensionality() != 2)
   {
     return;
   }

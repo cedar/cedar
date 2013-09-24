@@ -49,8 +49,8 @@
 #include <fstream>
 
 /*!@brief The Recorder uses this class to observe the registered DataPtr.
- *      This class copy the observed DataPtr on each time step and stores the copy with time stamp in a queue. The
- *      recorder can access this queue and write the elements to disk.
+ *        This class copies the observed DataPtr in each time step and stores the copy in a queue together with time
+ *        stamp. The recorder can access this queue and write the elements to disk.
  */
 class cedar::aux::DataSpectator : public cedar::aux::LoopedThread
 {
@@ -58,16 +58,16 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread
   // friends
   //--------------------------------------------------------------------------------------------------------------------
 
-  /* Recorder should be the only class that could create a DataSpectator. THus the constructor is private,
+  /* Recorder should be the only class that could create a DataSpectator. Thus the constructor is private,
    * Recorder must be a friend class.
    */
-  friend Recorder;
+  friend class cedar::aux::Recorder;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-//!@brief A data structure to store all the DataPtr with time stamp (in ms) in a list.
+  //!@brief A data structure to store all the DataPtr with time stamp (in ms) in a list.
   struct RecordData
   {
     unsigned int mRecordTime;
