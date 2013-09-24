@@ -40,8 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/FrameworkSettings.h"
 #include "cedar/processing/FrameworkSettings.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 
@@ -57,6 +57,7 @@ QWidget(pParent)
 
   cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
   this->mpPluginWorkspaceEdit->setParameter(settings->mPluginWorkspace);
+  this->mpRecorderWorkspaceEdit->setParameter(cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

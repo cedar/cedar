@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
@@ -66,8 +67,9 @@ mpSource(pSource),
 mpTarget(pTarget),
 mpArrowStart(0),
 mpArrowEnd(0),
-mValidity(CONNECT_UNKNOWN),
-mSmartMode(false)
+mValidity(CONNECT_NOT_SET),
+mSmartMode(false),
+mHighlight(false)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
@@ -76,22 +78,10 @@ mSmartMode(false)
   pTarget->addConnection(this);
 
   QPen pen = this->pen();
-  if (pSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
-      || pTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER)
+  if (this->isTriggerConnection())
   {
-    pen.setWidthF(1.5);
     pen.setColor(QColor(180, 180, 180));
-  }
-  else
-  {
-    pen.setWidthF(2.5);
-  }
-  this->setPen(pen);
 
-  if (pSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
-      || pTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER)
-  {
-    pen.setColor(QColor(180, 180, 180));
     QVector<QPointF> arrow;
     arrow.push_back(QPointF(5.0, 0.0));
     arrow.push_back(QPointF(-5.0, 0.0));
@@ -112,6 +102,11 @@ mSmartMode(false)
       mpArrowEnd->setBrush(brush);
     }
   }
+  else
+  {
+    pen.setWidth(2.5);
+  }
+  this->setPen(pen);
 
 
   // update validity
@@ -142,6 +137,7 @@ mSmartMode(false)
     this->setValidity(validity);
   }
 
+  this->setHighlightedBySelection(false);
   this->update();
 }
 
@@ -154,6 +150,52 @@ cedar::proc::gui::Connection::~Connection()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Connection::isTriggerConnection() const
+{
+  return this->mpSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+         || this->mpTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER;
+}
+
+void cedar::proc::gui::Connection::setHighlightedBySelection(bool highlight)
+{
+  mHighlight = highlight;
+
+  if (!cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightConnections())
+  {
+    return;
+  }
+
+  QColor col;
+  if (highlight)
+  {
+    col = this->highlightColor(this->pen().color());
+  }
+  else
+  {
+    col = this->pen().color();
+  }
+
+  if (this->mpArrowStart)
+  {
+    QBrush brush = this->mpArrowStart->brush();
+    brush.setColor(col);
+    QPen pen = this->mpArrowStart->pen();
+    pen.setColor(col);
+    this->mpArrowStart->setPen(pen);
+    this->mpArrowStart->setBrush(brush);
+  }
+
+  if (this->mpArrowEnd)
+  {
+    QBrush brush = this->mpArrowEnd->brush();
+    brush.setColor(col);
+    QPen pen = this->mpArrowEnd->pen();
+    pen.setColor(col);
+    this->mpArrowEnd->setPen(pen);
+    this->mpArrowEnd->setBrush(brush);
+  }
+}
 
 void cedar::proc::gui::Connection::disconnect()
 {
@@ -339,28 +381,47 @@ void cedar::proc::gui::Connection::update()
   this->setPath(path);
 }
 
+QColor cedar::proc::gui::Connection::highlightColor(const QColor& source) const
+{
+  return QColor::fromHsvF
+      (
+        std::fmod(source.hsvHueF() + 1.01, 1.0),
+        std::max(0.0, source.hsvSaturationF()),
+        std::max(0.0, source.valueF() - 0.2)
+      );
+}
+
 void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   pPainter->save();
 
+  QPen pen = this->pen();
+
+  if
+  (
+    !this->isSelected()
+    && this->mHighlight
+    && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightConnections()
+  )
+  {
+    QColor new_color = this->highlightColor(pen.color());
+
+    pen.setColor(new_color);
+    pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
+  }
+
   if (this->isSelected())
   {
-    QPen pen = this->pen();
-    pen.setColor(Qt::black);
-    pen.setStyle(Qt::DashLine);
-    pPainter->setPen(pen);
+    QPen dash_pen = pen;
+    dash_pen.setColor(Qt::black);
+    dash_pen.setStyle(Qt::DashLine);
+    dash_pen.setWidthF(static_cast<qreal>(1.5) * pen.widthF());
+    pPainter->setPen(dash_pen);
     pPainter->drawPath(this->path());
+  }
 
-    pen = this->pen();
-    pen.setWidthF(1.5);
-    pPainter->setPen(pen);
-    pPainter->drawPath(this->path());
-  }
-  else
-  {
-    pPainter->setPen(this->pen());
-    pPainter->drawPath(this->path());
-  }
+  pPainter->setPen(pen);
+  pPainter->drawPath(this->path());
   pPainter->restore();
 }
 

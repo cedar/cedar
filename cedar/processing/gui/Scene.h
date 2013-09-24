@@ -203,13 +203,21 @@ public:
    */
   void reset();
 
+  /*!@brief Deprecated, see getStepMap(). Returns the step map.
+   */
+  CEDAR_DECLARE_DEPRECATED(const StepMap& stepMap() const);
+
   /*!@brief Returns the step map.
    */
-  const StepMap& stepMap() const;
+  const StepMap& getStepMap() const;
+
+  /*!@brief Deprecated, see getTriggerMap(). Returns the trigger map.
+   */
+  CEDAR_DECLARE_DEPRECATED(const TriggerMap& triggerMap() const);
 
   /*!@brief Returns the trigger map.
    */
-  const TriggerMap& triggerMap() const;
+  const TriggerMap& getTriggerMap() const;
 
   /*!@brief Returns the gui::network that displays the given network.
    */
@@ -252,7 +260,11 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
    */
-  void setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget);
+  void setConfigurableWidget(cedar::aux::gui::PropertyPane* pConfigurableWidget);
+
+  /*!@brief Sets the widget used for displaying/editing the record parameters.
+   */
+  void setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget);
 
   /*!@brief Exports the scene to an svg file
    */
@@ -378,6 +390,9 @@ private:
 
   //! The widget used to display configurables when they are selected in the scene. May be null.
   cedar::aux::gui::PropertyPane *mpConfigurableWidget;
+
+  //! The widget used to display record settings of steps when they are selected in the scene. May be null.
+  cedar::proc::gui::RecorderWidget *mpRecorderWidget;
 
 }; // class ProcessingScene
 

@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/units/Length.h"
-#include "cedar/processing/exceptions.h" // for DuplicateNameException
+#include "cedar/auxiliaries/exceptions.h" // for DuplicateNameException
 
 // SYSTEM INCLUDES
 #include <boost/lexical_cast.hpp>

@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/FrameworkSettings.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES

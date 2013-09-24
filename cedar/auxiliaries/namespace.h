@@ -76,11 +76,14 @@ namespace cedar
 
     CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
+    CEDAR_DECLARE_AUX_CLASS(ThreadCollection);
     CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
+    CEDAR_DECLARE_AUX_CLASS(Recorder);
+    CEDAR_DECLARE_AUX_CLASS(DataSpectator);
     //!@endcond
 
     template <class T> class Singleton;
@@ -90,6 +93,10 @@ namespace cedar
     template <class ReturnedT> class CloneableBase;
 
     template <class ClonedT, class ReturnedT> class Cloneable;
+
+    template <typename NodePayloadT = void*, typename EdgePayloadT = void*> class GraphTemplate;
+
+    typedef GraphTemplate<> Graph;
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
@@ -273,6 +280,8 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
     CEDAR_DECLARE_AUX_CLASS(ThreadingErrorException);
+    CEDAR_DECLARE_AUX_CLASS(NotImplementedException);
+    CEDAR_DECLARE_AUX_CLASS(ThreadRunningExeption);
     //!@endcond
     
     //!@cond SKIPPED_DOCUMENTATION
