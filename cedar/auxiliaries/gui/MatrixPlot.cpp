@@ -162,6 +162,10 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
   const cv::Mat& mat = this->mData->getData();
   unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
+  if (mat.empty())
+  {
+    dims = std::numeric_limits<unsigned int>::max();
+  }
 
   switch (dims)
   {
@@ -192,11 +196,20 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       break;
     }
 
+    case std::numeric_limits<unsigned int>::max():
+    {
+      std::string message = "The matrix plot widget can not handle empty matrices.";
+      message += "\nPress here to refresh the plot after you have changed the dimensionality.";
+      this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
+      connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SLOT(processChangedData()));
+      break;
+    }
+
     default:
     {
       std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
       message += cedar::aux::toString(mat.dims);
-      message += "\nPress here to refresh the plot after you have changed the dimensionality.";
+      message += ").\nPress here to refresh the plot after you have changed the dimensionality.";
       this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
       connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SLOT(processChangedData()));
     }
