@@ -251,6 +251,9 @@ private:
    */
   void displayFilename(const std::string& filename);
 
+  //! Updates the start and stop triggers threads.
+  void updateTriggerStartStopThreadCallers();
+
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
