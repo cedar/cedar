@@ -67,7 +67,7 @@ mpSource(pSource),
 mpTarget(pTarget),
 mpArrowStart(0),
 mpArrowEnd(0),
-mValidity(CONNECT_UNKNOWN),
+mValidity(CONNECT_NOT_SET),
 mSmartMode(false),
 mHighlight(false)
 {
@@ -385,7 +385,7 @@ QColor cedar::proc::gui::Connection::highlightColor(const QColor& source) const
 {
   return QColor::fromHsvF
       (
-        std::fmod(source.hsvHueF() + 0.01, 1.0),
+        std::fmod(source.hsvHueF() + 1.01, 1.0),
         std::max(0.0, source.hsvSaturationF()),
         std::max(0.0, source.valueF() - 0.2)
       );
