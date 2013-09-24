@@ -109,7 +109,6 @@ _mPort(new cedar::aux::StringParameter(this, "port",
     false
   );
 
-
   // the Reader will be instantiated on the first read
 }
 
