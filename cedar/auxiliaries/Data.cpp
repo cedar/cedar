@@ -60,6 +60,22 @@ cedar::aux::Data::~Data()
   delete mpLock;
 }
 
+
+void cedar::aux::Data::serializeData(std::ostream& /*stream*/) const
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException,"serializeData function not implemented for this type of data");
+}
+
+void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/) const
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException,"serializeHeader function not implemented for this type of data");
+}
+
+cedar::aux::DataPtr cedar::aux::Data::clone() const
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException,"Clone function not implemented for this type of data");
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,3 +99,5 @@ void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
 {
   this->mpeOwner = step;
 }
+
+

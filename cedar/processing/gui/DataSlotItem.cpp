@@ -111,6 +111,14 @@ cedar::proc::gui::DataSlotItem::~DataSlotItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::DataSlotItem::setHighlightedBySelection(bool highlight)
+{
+  for (size_t i = 0; i < this->getConnections().size(); ++i)
+  {
+    this->getConnections().at(i)->setHighlightedBySelection(highlight);
+  }
+}
+
 cedar::proc::ConstDataSlotPtr cedar::proc::gui::DataSlotItem::getSlot() const
 {
   return this->mSlot;

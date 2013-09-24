@@ -196,6 +196,9 @@ public slots:
   //!@brief closes all plot windows of every step
   void closeAllPlots();
 
+  //!@brief Starts or stops the recorder function();
+  void toggleRecorder(bool status);
+
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const
   {
@@ -275,6 +278,12 @@ private:
 
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;
+
+  //! Used for starting all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
+
+  //! Used for stopping all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
 }; // class cedar::MainWindow
 

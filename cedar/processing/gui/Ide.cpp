@@ -57,7 +57,9 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -124,6 +126,7 @@ mpBoostControl(NULL)
 
   // set the property pane as the scene's property displayer
   this->mpProcessingDrawer->getScene()->setConfigurableWidget(this->mpPropertyTable);
+  this->mpProcessingDrawer->getScene()->setRecorderWidget(this->mpRecorderWidget);
 
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
                    this, SLOT(architectureToolFinished()));
@@ -140,6 +143,7 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
   QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+  QObject::connect(this->mpActionRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecorder(bool)));
   
 
 
@@ -259,6 +263,10 @@ void cedar::proc::gui::Ide::exportSvg()
 
 void cedar::proc::gui::Ide::duplicateStep()
 {
+  // get current mouse position
+  QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
+  QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
+
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   for (int i = 0; i < selected_items.size(); ++i)
   {
@@ -266,10 +274,11 @@ void cedar::proc::gui::Ide::duplicateStep()
     {
       try
       {
-        this->mNetwork->getNetwork()->duplicate(p_base->getElement()->getName());
+        this->mNetwork->duplicate(new_pos, p_base->getElement()->getName());
       }
       catch (cedar::aux::ExceptionBase& exc)
       {
+        //!@todo Properly display an error message to the user.
       }
     }
   }
@@ -411,6 +420,22 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork->addElementsToScene();
   this->mpPropertyTable->resetContents();
+
+  this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+      (
+        new cedar::aux::CallFunctionInThread
+        (
+          boost::bind(&cedar::proc::Network::startTriggers, this->mNetwork->getNetwork(), true)
+        )
+      );
+
+  this->mStopThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+      (
+        new cedar::aux::CallFunctionInThread
+        (
+          boost::bind(&cedar::proc::Network::stopTriggers, this->mNetwork->getNetwork(), true)
+        )
+      );
 
   if (this->mpConsistencyChecker != NULL)
   {
@@ -577,7 +602,9 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 
 void cedar::proc::gui::Ide::startThreads()
 {
-  this->mNetwork->getNetwork()->startTriggers();
+  CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
+  // calls this->mNetwork->getNetwork()->startTriggers()
+  this->mStartThreadsCaller->start();
 }
 
 void cedar::proc::gui::Ide::stepThreads()
@@ -594,7 +621,9 @@ void cedar::proc::gui::Ide::stepThreads()
 
 void cedar::proc::gui::Ide::stopThreads()
 {
-  this->mNetwork->getNetwork()->stopTriggers();
+  CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
+  // calls this->mNetwork->getNetwork()->stopTriggers()
+  this->mStopThreadsCaller->start();
 }
 
 void cedar::proc::gui::Ide::newFile()
@@ -839,5 +868,17 @@ void cedar::proc::gui::Ide::closeAllPlots()
   for(auto it = steps.begin(); it != steps.end(); ++it)
   {
     it->second->closeAllPlots();
+  }
+}
+
+void cedar::proc::gui::Ide::toggleRecorder(bool status)
+{
+  if (!status)
+  {
+    cedar::aux::RecorderSingleton::getInstance()->stop();
+  }
+  else
+  {
+    cedar::aux::RecorderSingleton::getInstance()->start();
   }
 }

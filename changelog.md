@@ -67,6 +67,7 @@ known issues
   - Some of the interactive Caren tests may not run if you do not have the corresponding meshes.
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
     standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
+  - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
       
 Unreleased changes
 ==================
@@ -139,6 +140,8 @@ current testing
     tools -> settings -> user interface menu of the processingIde.
   - Please note that step icons can now only have the svg format. If you have an icon in a different format, please
     embed it in a svg file using, e.g., inkscape.
+  - Connections of selected steps in the processingIde are now hightlighted. This behavior is active by default and can
+    be disabled in the settings menu.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
