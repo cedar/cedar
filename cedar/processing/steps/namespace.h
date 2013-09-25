@@ -64,6 +64,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(ColorConversion);
       CEDAR_DECLARE_PROC_CLASS(Flip);
       CEDAR_DECLARE_PROC_CLASS(Histogram);
+      CEDAR_DECLARE_PROC_CLASS(Mask);
       CEDAR_DECLARE_PROC_CLASS(MatrixMultiply);
       CEDAR_DECLARE_PROC_CLASS(MatrixTypeConverter);
       CEDAR_DECLARE_PROC_CLASS(Projection);
