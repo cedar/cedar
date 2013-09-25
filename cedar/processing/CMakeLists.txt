@@ -79,6 +79,7 @@ cedar_add_library(cedarproc
   steps/MatrixMultiply.h
   steps/MatrixSlice.h
   steps/MatrixTypeConverter.h
+  steps/Normalization.h
   steps/Flip.h
   steps/Histogram.h
   steps/Threshold.h
