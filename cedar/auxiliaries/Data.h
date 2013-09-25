@@ -134,6 +134,9 @@ public:
   //!@brief Sets the owner of the data object.
   void setOwner(cedar::aux::Configurable* step);
 
+  //!@brief Copies the value from another generic data pointer; throws an exception if this fails.
+  virtual void copyValueFrom(cedar::aux::ConstDataPtr data);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

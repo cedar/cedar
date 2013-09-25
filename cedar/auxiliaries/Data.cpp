@@ -41,6 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 
@@ -100,4 +101,12 @@ void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
   this->mpeOwner = step;
 }
 
+void cedar::aux::Data::copyValueFrom(cedar::aux::ConstDataPtr)
+{
+  CEDAR_THROW
+  (
+    cedar::aux::NotImplementedException,
+    "Value copying is not implemented for this class. This class is: " + cedar::aux::objectTypeToString(this)
+  );
+}
 

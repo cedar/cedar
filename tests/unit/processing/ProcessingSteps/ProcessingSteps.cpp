@@ -50,6 +50,7 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
+#include "cedar/units/prefixes.h"
 
 // global includes
 #include <QApplication>
@@ -80,30 +81,31 @@ CEDAR_GENERATE_POINTER_TYPES(EmptyMatrixProvider);
 
 unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr testStep)
 {
-  // test if the step reacts properly when its parameters change (without an input)
-  for
-  (
-    cedar::aux::Configurable::ParameterList::iterator i = testStep->getParameters().begin();
-    i != testStep->getParameters().end();
-    ++i
-  )
-  {
-    cedar::aux::ParameterPtr parameter = *i;
-    std::cout << "Emitting valueChanged() of parameter \"" << parameter->getName() << "\"." << std::endl;
-    parameter->emitChangedSignal();
-
-    size_t count = 0;
-    while (QApplication::hasPendingEvents() && ++count < 1000)
-    {
-      QApplication::processEvents();
-    }
-  }
-
   // try connecting steps of different types
   unsigned int i = 0;
   try
   {
     network->add(testStep, "testStep");
+
+    // test if the step reacts properly when its parameters change (without an input)
+    for
+    (
+      cedar::aux::Configurable::ParameterList::iterator i = testStep->getParameters().begin();
+      i != testStep->getParameters().end();
+      ++i
+    )
+    {
+      cedar::aux::ParameterPtr parameter = *i;
+      std::cout << "Emitting valueChanged() of parameter \"" << parameter->getName() << "\"." << std::endl;
+      parameter->emitChangedSignal();
+
+      size_t count = 0;
+      while (QApplication::hasPendingEvents() && ++count < 1000)
+      {
+        QApplication::processEvents();
+      }
+    }
+
     // how many inputs does this step have?
     const cedar::proc::Connectable::SlotList& inputs = testStep->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
     std::vector<std::string> sources;
@@ -127,7 +129,8 @@ unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr test
       else
       {
         // send a dummy step time
-        cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(0.1)));
+        cedar::unit::Time time(0.1 * cedar::unit::milli * cedar::unit::seconds);
+        cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(time));
         testStep->onTrigger(arguments);
       }
 
