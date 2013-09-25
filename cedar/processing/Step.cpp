@@ -446,6 +446,7 @@ void cedar::proc::Step::run()
       this->getFinishedTrigger()->trigger();
     }
 
+    //!@todo Should busy be unlocked before triggering subsequent steps?
     this->mBusy.unlock();
   }
   else

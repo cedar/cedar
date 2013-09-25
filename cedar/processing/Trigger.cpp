@@ -101,6 +101,12 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
     for (auto iter = this->mListeners.begin(); iter != this->mListeners.end(); ++iter)
     {
       auto listener = *iter;
+
+      if (listener->isLooped())
+      {
+        continue;
+      }
+
       to_explore.push_back(listener);
       auto listener_node = graph.addNodeForPayload(listener);
       graph.addEdge(this_node, listener_node);
@@ -127,6 +133,12 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
     for (auto iter = done_trigger->mListeners.begin(); iter != done_trigger->mListeners.end(); ++iter)
     {
       auto listener = *iter;
+
+      if (listener->isLooped())
+      {
+        continue;
+      }
+
       if (!graph.hasNodeForPayload(listener))
       {
         graph.addNodeForPayload(listener);
