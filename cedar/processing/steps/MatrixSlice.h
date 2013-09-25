@@ -66,7 +66,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
 public slots:
   void rangeChanged();
@@ -90,6 +90,7 @@ private:
   void reset();
 
   void updateDimensionality();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,6 +106,9 @@ private:
 
   //! Vector containing the ranges used for slicing the matrix.
   std::vector<cv::Range> mRanges;
+
+  //! Used to remember limits from the configuration file.
+  std::vector<cedar::aux::math::Limits<unsigned int> > mStoredLimits;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

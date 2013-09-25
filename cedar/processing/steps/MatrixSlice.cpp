@@ -123,6 +123,20 @@ _mRangeUpper
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::MatrixSlice::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::proc::Step::readConfiguration(node);
+
+  this->mStoredLimits.clear();
+  for (size_t i = 0; i < std::min(this->_mRangeLower->size(), this->_mRangeUpper->size()); ++i)
+  {
+    this->mStoredLimits.push_back
+    (
+      cedar::aux::math::Limits<unsigned int>(this->_mRangeLower->at(i), this->_mRangeUpper->at(i))
+    );
+  }
+}
+
 void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& inputName)
 {
   CEDAR_DEBUG_ASSERT(inputName == "matrix");
@@ -138,8 +152,23 @@ void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& 
 void cedar::proc::steps::MatrixSlice::updateDimensionality()
 {
   unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
+  unsigned int old_dim = this->_mRangeLower->size();
   this->_mRangeLower->resize(matrix_dim);
   this->_mRangeUpper->resize(matrix_dim);
+
+  for (unsigned int d = old_dim; d < matrix_dim && d < this->mStoredLimits.size(); ++d)
+  {
+    const cedar::aux::math::Limits<unsigned int>& limits = this->mStoredLimits.at(d);
+
+    bool lower_blocked = this->_mRangeLower->blockSignals(true);
+    bool upper_blocked = this->_mRangeLower->blockSignals(true);
+
+    this->_mRangeLower->set(d, limits.getLower());
+    this->_mRangeUpper->set(d, limits.getUpper());
+
+    this->_mRangeLower->blockSignals(lower_blocked);
+    this->_mRangeUpper->blockSignals(upper_blocked);
+  }
 
   this->allocateOutputMatrix();
 }
