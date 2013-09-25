@@ -1,0 +1,235 @@
+/*======================================================================================================================
+
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        MatrixSlice.cpp
+
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 09 25
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+
+// CEDAR INCLUDES
+#include "cedar/processing/steps/MatrixSlice.h"
+#include "cedar/processing/typecheck/IsMatrix.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/ExternalData.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/assert.h"
+
+// SYSTEM INCLUDES
+#include <algorithm>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::MatrixSlice>
+      (
+        "Utilities",
+        "cedar.processing.MatrixSlice"
+      )
+    );
+    declaration->setIconPath(":/steps/matrix_slice.svg");
+    declaration->setDescription
+    (
+      "Extracts a subregion of a matrix."
+    );
+
+    declaration->declare();
+
+    return true;
+  }
+
+  bool declared = declare();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::steps::MatrixSlice::MatrixSlice()
+:
+mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+_mRangeLower
+(
+  new cedar::aux::UIntVectorParameter
+  (
+    this,
+    "range lower",
+    1,
+    0,
+    cedar::aux::UIntVectorParameter::LimitType::positiveZero()
+  )
+),
+_mRangeUpper
+(
+  new cedar::aux::UIntVectorParameter
+  (
+    this,
+    "range upper",
+    1,
+    1,
+    cedar::aux::UIntVectorParameter::LimitType::positiveZero()
+  )
+)
+{
+  auto input = this->declareInput("matrix");
+  input->setCheck(cedar::proc::typecheck::IsMatrix());
+
+  this->declareOutput("slice", mOutput);
+
+  QObject::connect(this->_mRangeLower.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()));
+  QObject::connect(this->_mRangeUpper.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& inputName)
+{
+  CEDAR_DEBUG_ASSERT(inputName == "matrix");
+
+  this->mInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
+
+  if (this->mInput)
+  {
+    this->updateDimensionality();
+  }
+}
+
+void cedar::proc::steps::MatrixSlice::updateDimensionality()
+{
+  unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
+  this->_mRangeLower->resize(matrix_dim);
+  this->_mRangeUpper->resize(matrix_dim);
+
+  this->allocateOutputMatrix();
+}
+
+void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
+{
+  if (!this->mInput || this->mInput->isEmpty())
+  {
+    return;
+  }
+
+  const cv::Mat& input = this->mInput->getData();
+  unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(input);
+
+  CEDAR_DEBUG_ASSERT(dimensionality == this->_mRangeLower->size());
+  CEDAR_DEBUG_ASSERT(dimensionality == this->_mRangeUpper->size());
+
+  mRanges.clear();
+  mRanges.resize(dimensionality);
+  std::vector<int> sizes;
+  sizes.resize(dimensionality);
+
+  for (unsigned int d = 0; d < dimensionality; ++d)
+  {
+    const unsigned int& lower = this->_mRangeLower->at(d);
+    const unsigned int& upper = this->_mRangeUpper->at(d);
+
+    CEDAR_DEBUG_ASSERT(lower < upper);
+    mRanges.at(d) = cv::Range(lower, upper);
+    sizes.at(d) = upper - lower;
+  }
+  if (dimensionality < 1)
+  {
+    mRanges.push_back(cv::Range::all());
+    sizes.push_back(1);
+  }
+  if (dimensionality < 2)
+  {
+    mRanges.push_back(cv::Range::all());
+    sizes.push_back(1);
+  }
+
+  // if the dimensionality is one ...
+  if (dimensionality == 1)
+  {
+    // ... and the vector is stored in the columns, the first entries have to be swapped.
+    if (input.rows == 1)
+    {
+      std::swap(mRanges[0], mRanges[1]);
+      std::swap(sizes[0], sizes[1]);
+    }
+  }
+
+  // preallocate the appropriate output matrix
+  cv::Mat output = cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type());
+  cv::Mat old_output = this->mOutput->getData();
+  this->mOutput->setData(output);
+
+  if (output.type() != old_output.type() || !cedar::aux::math::matrixSizesEqual(output, old_output))
+  {
+    this->emitOutputPropertiesChangedSignal("slice");
+  }
+}
+
+void cedar::proc::steps::MatrixSlice::reset()
+{
+  this->updateDimensionality();
+}
+
+void cedar::proc::steps::MatrixSlice::rangeChanged()
+{
+  if (!this->mInput)
+  {
+    return;
+  }
+
+  this->allocateOutputMatrix();
+
+  this->resetState();
+
+  this->onTrigger();
+}
+
+void cedar::proc::steps::MatrixSlice::compute(const cedar::proc::Arguments&)
+{
+  const cv::Mat& input = this->mInput->getData();
+  cv::Mat& output = this->mOutput->getData();
+
+  CEDAR_DEBUG_ASSERT(this->_mRangeLower->size() == cedar::aux::math::getDimensionalityOf(input));
+  CEDAR_DEBUG_ASSERT(this->_mRangeUpper->size() == cedar::aux::math::getDimensionalityOf(input));
+
+  output = input(&mRanges.front());
+}
