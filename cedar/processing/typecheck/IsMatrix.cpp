@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,44 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        IsMatrix.cpp
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2011 05 23
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 09 25
 
-    Description: Namespace file for cedar::aux::comp.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_TYPECHECK_NAMESPACE_H
-#define CEDAR_PROC_TYPECHECK_NAMESPACE_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/processing/typecheck/IsMatrix.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::DataSlot::VALIDITY
+  cedar::proc::typecheck::IsMatrix::check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const
 {
-  namespace proc
+  if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
-    /*! @brief Namespace containing classes related to automatic type checks for slots in processing steps.
-     */
-    namespace typecheck
+    if (!mat_data->isEmpty())
     {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(TypeCheck);
-
-      template <class T> class DerivedFrom;
-
-      CEDAR_DECLARE_PROC_CLASS(IsMatrix);
-      //!@endcond
+      return this->validityOk();
     }
   }
-}
 
-#endif // CEDAR_PROC_TYPECHECK_NAMESPACE_H
+  return this->validityBad();
+}
