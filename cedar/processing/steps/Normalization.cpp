@@ -135,6 +135,12 @@ void cedar::proc::steps::Normalization::compute(const cedar::proc::Arguments&)
   cv::Mat& normalized_image = this->mNormalizedImage->getData();
   cedar::proc::steps::NormalizationType::Id type = this->mNormalizationType->getValue();
 
+  if (type == cedar::proc::steps::NormalizationType::None)
+  {
+    normalized_image = input.clone();
+    return;
+  }
+
   double norm = cv::norm(input, type);
   if (norm == 0.0)
   {
