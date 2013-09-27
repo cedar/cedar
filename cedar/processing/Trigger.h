@@ -64,6 +64,7 @@ class cedar::proc::Trigger : public cedar::proc::Element,
   friend class cedar::proc::Manager;
   friend class cedar::proc::Network;
   friend class cedar::proc::TriggerConnection;
+  friend class cedar::proc::Triggerable;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -85,8 +86,8 @@ public:
   //!@brief handles an incoming trigger signal if Trigger instance is listener
   void onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr pSender);
 
-  //!@brief a boolean check, if a given step is a listener of this Trigger instance
-  bool isListener(cedar::proc::TriggerablePtr step) const;
+  //!@brief a boolean check, if a given triggerable is a listener of this Trigger instance
+  bool isListener(cedar::proc::TriggerablePtr triggerable) const;
 
   //!@brief returns a list of listeners
   const std::vector<cedar::proc::TriggerablePtr>& getListeners() const;
@@ -108,27 +109,52 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief removes a listener, which will no longer receive trigger signals
-  virtual void removeListener(cedar::proc::TriggerablePtr step);
+  virtual void removeListener(cedar::proc::TriggerablePtr triggerable);
+
+  //!@brief removes a listener, which will no longer receive trigger signals
+  virtual void removeListener(cedar::proc::Triggerable* triggerable);
 
   //!@brief adds a listener, which will receive trigger signals from this instance from now on
-  virtual void addListener(cedar::proc::TriggerablePtr step);
+  virtual void addListener(cedar::proc::TriggerablePtr triggerable);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Find a step in the list of listeners.
+  //!@brief Find a triggerable in the list of listeners.
   std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::TriggerablePtr triggerable);
 
-  //!@brief Find a step in the list of listeners (const-version).
+  //!@brief Find a triggerable in the list of listeners.
+  std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::Triggerable* triggerable);
+
+  //!@brief Find a triggerable in the list of listeners (const-version).
   std::vector<cedar::proc::TriggerablePtr>::const_iterator find(cedar::proc::TriggerablePtr triggerable) const;
+
+  /*!@brief Updates the order of processing of the subsequent triggerables
+   *
+   * @todo Describe this properly.
+   */
+  void updateTriggeringOrder(bool recurseUp = true, bool recurseDown = true);
+
+  void setOwner(cedar::proc::Triggerable* owner)
+  {
+    this->mpOwner = owner;
+  }
+
+  void buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! Triggerable owning this trigger
+  cedar::proc::Triggerable* mpOwner;
+
   //! List of listeners.
   std::vector<cedar::proc::TriggerablePtr> mListeners;
+
+  //! List of the triggerables following this one
+  std::map<unsigned int, std::set<cedar::proc::TriggerablePtr> > mTriggeringOrder;
 
   //! Lock for the listeners list.
   mutable QReadWriteLock mpListenersLock;

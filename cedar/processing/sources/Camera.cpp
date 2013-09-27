@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Camera.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
@@ -104,10 +105,10 @@ cedar::proc::sources::GrabberBase()
   this->declareOutput("camera", mImage);
 
   // applyParameter as an action
-  this->registerFunction("apply parameter", boost::bind(&cedar::proc::sources::Camera::applyParameter, this));
+  this->registerFunction("apply parameter", boost::bind(&cedar::proc::sources::Camera::applyParameter, this), false);
 
   // update picture as an action
-  this->registerFunction("update frame", boost::bind(&cedar::proc::sources::Camera::updateFrame, this));
+  this->registerFunction("update frame", boost::bind(&cedar::proc::sources::Camera::updateFrame, this), false);
 
   // listen to changed framesize in order to annotate a new image
   QObject::connect(grabber.get(),SIGNAL(frameSizeChanged()),this, SLOT(changedFrameSize()));
@@ -124,7 +125,9 @@ cedar::proc::sources::Camera::~Camera()
 
 void cedar::proc::sources::Camera::changedFrameSize()
 {
-  this->updateFrame();
+  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->compute(cedar::proc::Arguments());
+  this->unlock();
   this->emitOutputPropertiesChangedSignal("camera");
 }
 
@@ -193,18 +196,6 @@ void cedar::proc::sources::Camera::updateFrame()
 
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
-  // get the time-diff between two steps
-  /*
-  try
-  {
-    const cedar::proc::StepTime& step_time = dynamic_cast<const cedar::proc::StepTime&>(arguments);
-    this->eulerStep(step_time.getStepTime());
-  }
-  catch (const std::bad_cast& e)
-  {
-    CEDAR_THROW(cedar::proc::InvalidArgumentsException, "Bad arguments passed to dynamics. Expected StepTime.");
-  }
- */
   if (this->getCameraGrabber()->isCreated())
   {
     this->getCameraGrabber()->grab();

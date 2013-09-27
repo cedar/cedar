@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -89,6 +90,12 @@ private:
 
   typedef std::map<std::string, std::vector<FactoryTypePtr> > CategoryMap;
 
+  struct FactoryRecord
+  {
+    FactoryTypePtr factory;
+    bool deprecated;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -114,7 +121,7 @@ public:
     }
 
     // store mapping from type name to specified name
-    mTypeNameMapping[cedar::aux::typeToString<typename TypePtr::element_type>()] = used_type_name;
+    mTypeNameMapping[this->getTypeKey<TypePtr>()] = used_type_name;
 
     // check if typename exists
     if (mRegisteredFactories.find(used_type_name) != mRegisteredFactories.end())
@@ -124,36 +131,114 @@ public:
     }
 
     FactoryTypePtr factory(new cedar::aux::FactoryDerived<BaseTypePtr, TypePtr>());
-    mRegisteredFactories[used_type_name] = factory;
+    FactoryRecord factory_record;
+    factory_record.factory = factory;
+    factory_record.deprecated = false;
+    mRegisteredFactories[used_type_name] = factory_record;
 
     return true;
+  }
+
+  //! Deprecates the given class.
+  template <class TypePtr>
+  void deprecate()
+  {
+    std::string generated_name = this->getTypeKey<TypePtr>();
+    auto name_iter = mTypeNameMapping.find(generated_name);
+    if (name_iter == mTypeNameMapping.end())
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "No factory is known for the type \"" + generated_name + "\".");
+    }
+
+    const std::string& name = name_iter->second;
+
+    // check if typename exists
+    auto record_iter = mRegisteredFactories.find(name);
+    if (record_iter == mRegisteredFactories.end())
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "The type \"" + name + "\" is not registered.");
+    }
+
+    record_iter->second.deprecated = true;
+  }
+
+  //! Adds a deprecated name for the given type.
+  template <class TypePtr>
+  void addDeprecatedName(const std::string& deprecatedName)
+  {
+    std::string class_id = this->generateTypeName<TypePtr>();
+    this->addDeprecatedName(class_id, deprecatedName);
+  }
+
+  //! Adds a deprecated name for the given class id.
+  void addDeprecatedName(const std::string classId, const std::string& deprecatedName)
+  {
+    auto iter = this->mDeprecatedNames.find(deprecatedName);
+    // check if the deprecated name exists
+    if (iter != this->mDeprecatedNames.end())
+    {
+      // if it is different from the new one
+      if (iter->second != classId)
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::DuplicateNameException,
+          "The deprecated name \"" + deprecatedName + "\" is already used for a different type."
+        );
+      }
+    }
+    this->mDeprecatedNames[deprecatedName] = classId;
   }
 
   //! Converts the given class's type to a string.
   template <class TypePtr>
   std::string generateTypeName() const
   {
-    std::string generated_type_name = cedar::aux::typeToString<typename TypePtr::element_type>();
-    return cedar::aux::replace(generated_type_name, "::", ".");
+    return cedar::aux::replace(this->getTypeKey<TypePtr>(), "::", ".");
   }
 
   //!@brief allocate a new object of the given type
   BaseTypePtr allocate(const std::string& typeName)
   {
-    typename std::map<std::string, FactoryTypePtr>::const_iterator iter = mRegisteredFactories.find(typeName);
+    auto iter = mRegisteredFactories.find(typeName);
 
     if (iter == mRegisteredFactories.end())
     {
-      std::vector<std::string> types;
-      listTypes(types);
+      auto depr_iter = this->mDeprecatedNames.find(typeName);
+      if (depr_iter != this->mDeprecatedNames.end())
+      {
+        const std::string deprecated_name = depr_iter->first;
+        const std::string new_name = depr_iter->second;
 
-      std::string available_types = cedar::aux::join(types, ",");
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Allocating object with deprecated type name \"" + deprecated_name + "\". New name is: \"" + new_name + "\".",
+          "cedar::aux::FactoryManager::allocate(const std::string& typeName)"
+        );
 
-      CEDAR_THROW(cedar::aux::UnknownTypeException,
-        "No factory is registered for the type name \"" + typeName + "\". Known types are: " + available_types);
+        return this->allocate(new_name);
+      }
+      else
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::UnknownTypeException,
+          "No factory is registered for the type name \"" + typeName + "\"."
+        );
+      }
     }
 
-    return iter->second->allocate();
+    auto factory_record = iter->second;
+    if (factory_record.deprecated)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Allocating deprecated type \"" + typeName + "\".",
+        "cedar::aux::FactoryManager::allocate(const std::string& typeName)"
+      );
+    }
+
+    return factory_record.factory->allocate();
   }
 
   //!@brief look up the type id of an object
@@ -179,12 +264,7 @@ public:
   //!@brief list all types registered at the factory manager
   void listTypes(std::vector<std::string>& types) const
   {
-    for
-    (
-      typename std::map<std::string, FactoryTypePtr>::const_iterator iter = this->mRegisteredFactories.begin();
-      iter != this->mRegisteredFactories.end();
-      ++iter
-    )
+    for(auto iter = this->mRegisteredFactories.begin(); iter != this->mRegisteredFactories.end(); ++iter)
     {
       types.push_back(iter->first);
     }
@@ -200,7 +280,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  template <typename TypePtr>
+  std::string getTypeKey() const
+  {
+    return cedar::aux::typeToString<typename TypePtr::element_type>();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -208,8 +292,12 @@ private:
 protected:
   // none yet
 private:
-  std::map<std::string, FactoryTypePtr> mRegisteredFactories;
+  std::map<std::string, FactoryRecord> mRegisteredFactories;
+
   std::map<std::string, std::string> mTypeNameMapping;
+
+  //! map from deprecated name to new name
+  std::map<std::string, std::string> mDeprecatedNames;
 
 }; // class cedar::aux::FactoryManager
 

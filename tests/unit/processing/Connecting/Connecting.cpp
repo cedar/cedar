@@ -233,7 +233,7 @@ int testOnlineDisconnecting()
 
     auto trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
 
-    trigger->startTrigger();
+    trigger->start();
 
     cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
@@ -241,7 +241,7 @@ int testOnlineDisconnecting()
 
     cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
-    trigger->stopTrigger();
+    trigger->stop();
   }
 
   for (size_t i = 0; i < trials; ++i)
@@ -253,8 +253,8 @@ int testOnlineDisconnecting()
     auto trigger1 = network->getElement<cedar::proc::LoopedTrigger>("trigger1");
     auto trigger2 = network->getElement<cedar::proc::LoopedTrigger>("trigger2");
 
-    trigger1->startTrigger();
-    trigger2->startTrigger();
+    trigger1->start();
+    trigger2->start();
 
     cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
@@ -262,8 +262,8 @@ int testOnlineDisconnecting()
 
     cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
-    trigger1->stopTrigger();
-    trigger2->stopTrigger();
+    trigger1->stop();
+    trigger2->stop();
   }
 
   std::cout << "Online (dis-)connecting revealed " << errors << " error(s)." << std::endl;

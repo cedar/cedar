@@ -239,7 +239,6 @@ double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint) cons
         + " were found.",
       "cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int) const"
     );
-    //!@todo Throw an exception instead
     return 0.0;
   }
 

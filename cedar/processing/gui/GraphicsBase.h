@@ -256,7 +256,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //! Called whenever the item has been selected or deselected.
+  virtual void itemSelected(bool selected);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

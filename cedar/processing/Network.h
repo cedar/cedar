@@ -194,8 +194,9 @@ public:
    *
    * @param elementName Identifier of the existing element.
    * @param newName Name to be given to the new element.
+   * @returns The new name of the element.
    */
-  void duplicate(const std::string& elementName, const std::string& newName = "");
+  std::string duplicate(const std::string& elementName, const std::string& newName = "");
 
   /*!@brief unmodifiedName unmodified name, possibly non-unique in network
    * @return unique name created by attaching a number if name is already taken
@@ -446,10 +447,6 @@ private:
   /*!@brief Writes the child networks in the network to the configuration node.
    */
   void writeNetworks(cedar::aux::ConfigurationNode& root) const;
-
-  /*!@brief Reads a data connection from a configuration node and adds it to the network.
-   */
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes a data connection to the configuration node.
    */

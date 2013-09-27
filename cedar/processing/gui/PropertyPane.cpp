@@ -37,7 +37,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"

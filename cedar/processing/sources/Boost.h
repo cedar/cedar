@@ -79,6 +79,12 @@ public:
     return this->_mStrength->getValue();
   }
 
+  //!@brief convenience funtion to set the boost strength
+  inline void setStrength(double strength)
+  {
+    return this->_mStrength->setValue(strength);
+  }
+
   //!@brief convenience function for accessing the activity flag
   inline bool isActive() const
   {

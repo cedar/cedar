@@ -97,6 +97,12 @@ public:
   void declare() const
   {
     DeclarationManager::getInstance()->addDeclaration(this->shared_from_this());
+
+    for (size_t i = 0; i < this->deprecatedNames().size(); ++i)
+    {
+      PluginFactoryManager::getInstance()->addDeprecatedName(this->getClassName(), this->deprecatedNames().at(i));
+    }
+
     this->onDeclare();
   }
 
@@ -136,6 +142,11 @@ private:
   virtual void onDeclare() const
   {
     PluginFactoryManager::getInstance()->template registerType<PluginClassPtr>(this->mClassName);
+
+    if (this->isDeprecated())
+    {
+      PluginFactoryManager::getInstance()->template deprecate<PluginClassPtr>();
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
