@@ -111,6 +111,8 @@ protected:
   //!@brief Retrieves the handle for a given lock set name.
   LockSetHandle getLockSetHandle(const std::string& lockSet) const;
 
+  const Locks& getLocks(LockSetHandle lockSet = 0) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
