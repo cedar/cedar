@@ -317,6 +317,21 @@ public:
     return Limits(lower, NumericHelper<T>::smallestNegative());
   }
 
+  //! Returns an interval from lower to infinity, i.e., the interval [lower, inf)
+  static Limits fromLower(const T& lower)
+  {
+    return Limits(lower, boost::numeric::bounds<T>::highest());
+  }
+
+  /*! Returns an interval from -infinity to upper, i.e., the interval (-Inf, lower]
+   *
+   * @remarks For unsigned values, -Inf is replaced by zero.
+   */
+  static Limits toUpper(const T& upper)
+  {
+    return Limits(boost::numeric::bounds<T>::lowest(), upper);
+  }
+
   //!@brief Returns a limits object that covers the full range of values.
   static Limits full()
   {
@@ -358,6 +373,19 @@ public:
     {
       *it = this->limit(*it);
     }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // operators
+  //--------------------------------------------------------------------------------------------------------------------
+  bool operator!= (const Limits<T>& other) const
+  {
+    return !(other == *this);
+  }
+
+  bool operator== (const Limits<T>& other) const
+  {
+    return (other.getLower() == this->getLower()) && (other.getUpper() == this->getUpper());
   }
 
   //--------------------------------------------------------------------------------------------------------------------

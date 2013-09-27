@@ -44,7 +44,7 @@
 #include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   //start the grabbing-thread.
   p_grabber->setSpeedFactor(1);
   p_grabber->setLooped(true);
-  p_grabber->startGrabber();
+  p_grabber->start();
 
   std::cout << "VideoGrabber started" << std::endl;
 
@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  p_grabber->stopGrabber();
+  p_grabber->stop();
 
   if (p_net_writer)
   {

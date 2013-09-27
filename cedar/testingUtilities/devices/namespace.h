@@ -53,8 +53,8 @@ namespace cedar
     namespace dev
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_TESTING_CLASS(TestGrabber);
-      CEDAR_DECLARE_TESTING_CLASS(TestChannel);
+      CEDAR_DECLARE_TESTING_UTILITIES_CLASS(TestGrabber);
+      CEDAR_DECLARE_TESTING_UTILITIES_CLASS(TestChannel);
       //!@endcond
     }
   }

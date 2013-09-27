@@ -55,6 +55,8 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(TypeCheck);
 
       template <class T> class DerivedFrom;
+
+      CEDAR_DECLARE_PROC_CLASS(IsMatrix);
       //!@endcond
     }
   }

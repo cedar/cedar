@@ -43,7 +43,7 @@
 
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
   //start the grabber-thread for updating images from video file
   //----------------------------------------------------------------------------------------
 
-  p_grabber->startGrabber();
+  p_grabber->start();
 
   //----------------------------------------------------------------------------------------
   // send frames and show them on screen until window will be closed
@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  p_grabber->stopGrabber();
+  p_grabber->stop();
   std::cout << "finished\n";
   return 0;
 }

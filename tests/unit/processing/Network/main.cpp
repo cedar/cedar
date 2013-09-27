@@ -42,7 +42,6 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"

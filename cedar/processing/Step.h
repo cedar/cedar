@@ -89,7 +89,7 @@ class cedar::proc::Step : public QThread,
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! Map from action names to their corresponding functions.
-  typedef std::map<std::string, boost::function<void()> > ActionMap;
+  typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -123,7 +123,7 @@ public:
 
   /*!@brief Sets the arguments used by the next execution of the run function.
    */
-  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments);
+  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
@@ -208,6 +208,11 @@ protected:
 
   /*!@brief Method that registers a function of an object so that it can be used by the framework.
    *
+   * @param actionName Name of the action
+   * @param function The function to call (use boost::bind)
+   * @param autoLock Whether or not to automatically lock the data of the step. If false, the called method needs to
+   *                 take care of properly locking the data and parameters of the step.
+   *
    * As an example, consider a class A that has a function void A::foo():
    *
    * @code
@@ -233,7 +238,7 @@ protected:
    * @endcode
    *
    */
-  void registerFunction(const std::string& actionName, boost::function<void()> function);
+  void registerFunction(const std::string& actionName, boost::function<void()> function, bool autoLock = true);
 
   /*!@brief Sets whether inputs and outputs are locked automatically.
    *
@@ -352,6 +357,9 @@ private:
 
   //!@brief The arguments for the next cedar::proc::Step::compute call.
   ConstArgumentsPtr mNextArguments;
+
+  //! Whether or not subseqent steps should be triggered after the next arguments have been processed.
+  bool mTriggerSubsequent;
 
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;

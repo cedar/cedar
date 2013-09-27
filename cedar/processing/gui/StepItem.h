@@ -46,12 +46,14 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/EnumType.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <QGraphicsSvgItem>
 #include <QIcon>
 #include <QObject>
 #include <map>
@@ -115,7 +117,7 @@ private:
   class Decoration
   {
     public:
-      Decoration(StepItem* pStep, const QString& icon, const QString& description);
+      Decoration(StepItem* pStep, const QString& icon, const QString& description, const QColor& bg = QColor(255, 255, 255));
 
       ~Decoration()
       {
@@ -128,11 +130,9 @@ private:
       void setSize(double sizeFactor);
 
     private:
-      QGraphicsPixmapItem* mpIcon;
+      QGraphicsSvgItem* mpIcon;
 
       QGraphicsRectItem* mpRectangle;
-
-      QIcon mIconSource;
 
       QString mIconFile;
   };
@@ -206,12 +206,20 @@ public:
   //! Removes all effects of magnetization
   void demagnetizeSlots();
 
+  //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
+  void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
+
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
   void updateStepState();
 
   //!@brief handles a redraw of the graphical representation
   void redraw();
+
+  //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
+  void removeChildWidget();
+
+  void closeAllPlots();
 
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
@@ -263,20 +271,21 @@ private:
   //! Fills in the actions for the display style.
   void fillDisplayStyleMenu(QMenu* pMenu);
 
+  //!@brief Gets the default plotter and then opens a new DockWidget to show the plot.
+  void showPlot
+  (
+    const QPoint& position,
+    std::string& dataName,
+    const cedar::aux::Enum& role
+  );
+
   //!@brief Opens a new DockWidget to show the plot.
   void showPlot
   (
     const QPoint& position,
-    cedar::aux::gui::PlotInterface* plot,
-    cedar::proc::DataSlotPtr slot,
-    std::string title = ""
-  );
-
-  //! Opens plots for all data in this step.
-  void multiplot
-  (
-    const QPoint& position,
-    cedar::proc::ElementDeclaration::DataList data = (cedar::proc::ElementDeclaration::DataList())
+    std::string& dataName,
+    const cedar::aux::Enum& role,
+    cedar::aux::gui::ConstPlotDeclarationPtr declaration
   );
 
   //! Updates the display of the step's run time measurements.
@@ -300,9 +309,21 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
-  QWidget* createDockWidget(const std::string& title, QWidget* pPlot) const;
+  QWidget* createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position);
+
+  QWidget* createDockWidget(const std::string& title, QWidget* pWidget);
 
   void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
+
+  void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const;
+
+  void closeAllChildWidgets();
+
+  void updateIconGeometry();
+
+  qreal getContentsPadding() const;
+
+  void itemSelected(bool selected);
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
@@ -337,6 +358,9 @@ private:
   //!@brief a vector of all triggers of the current step
   std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
 
+  //!@brief a vector of all child widgets fo the current step
+  std::vector<QWidget*> mChildWidgets;
+
   //!@brief Identifier of the timer used for updating the run time measurements.
   int mRunTimeMeasurementTimerId;
 
@@ -358,9 +382,6 @@ private:
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
 
-  //!@brief the icon representing the contained step
-  QIcon mStepIcon;
-
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;
 
@@ -369,6 +390,9 @@ private:
 
   //! The decorations for this step.
   std::vector<DecorationPtr> mDecorations;
+
+  //! SvgItem displaying the step's icon
+  QGraphicsSvgItem* mpIconDisplay;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

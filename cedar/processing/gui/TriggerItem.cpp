@@ -52,6 +52,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
@@ -213,6 +214,22 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
     QObject::connect(looped_trigger.get(), SIGNAL(triggerStopping()), this, SLOT(triggerStateChanging()));
     QObject::connect(looped_trigger.get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
     QObject::connect(looped_trigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
+
+    this->mStartCaller = cedar::aux::CallFunctionInThreadPtr
+        (
+          new cedar::aux::CallFunctionInThread
+          (
+            boost::bind(&cedar::proc::LoopedTrigger::start, looped_trigger)
+          )
+        );
+
+    this->mStopCaller = cedar::aux::CallFunctionInThreadPtr
+        (
+          new cedar::aux::CallFunctionInThread
+          (
+            boost::bind(&cedar::proc::LoopedTrigger::stop, looped_trigger, UINT_MAX, false)
+          )
+        );
   }
 }
 
@@ -271,11 +288,17 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
 
     if (a == p_start)
     {
-      looped_trigger->startTrigger();
+      CEDAR_DEBUG_ASSERT(this->mStartCaller);
+
+      // calls looped_trigger->start()
+      this->mStartCaller->start();
     }
     else if (a == p_stop)
     {
-      looped_trigger->stopTrigger();
+      CEDAR_DEBUG_ASSERT(this->mStopCaller);
+
+      // calls looped_trigger->stop()
+      this->mStopCaller->start();
     }
     else if (a == p_single)
     {

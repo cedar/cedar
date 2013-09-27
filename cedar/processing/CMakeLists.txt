@@ -53,12 +53,15 @@ cedar_add_library(cedarproc
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
+  gui/DataSlotItem.h
   gui/ElementClassList.h
   gui/Ide.h
   gui/IdeApplication.h
   gui/PluginLoadDialog.h
   gui/PluginManagerDialog.h
   gui/ProjectionMappingParameter.h
+  gui/RecorderWidget.h
+  gui/RecorderProperty.h
   gui/Scene.h
   gui/SettingsDialog.h
   gui/StepItem.h
@@ -74,10 +77,14 @@ cedar_add_library(cedarproc
   steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
   steps/MatrixMultiply.h
+  steps/MatrixSlice.h
   steps/MatrixTypeConverter.h
+  steps/Normalization.h
   steps/Flip.h
   steps/StaticGain.h
   steps/UnitConverter.h
+  steps/Histogram.h
+  steps/Threshold.h
   steps/TransferFunction.h
   sources/Boost.h
   sources/Noise.h

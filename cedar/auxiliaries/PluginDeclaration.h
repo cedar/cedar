@@ -135,6 +135,21 @@ public:
    */
   void read(const cedar::aux::ConfigurationNode& node);
 
+  /*! Sets the source of this declaration. Should be empty for build-in plugins.
+   *
+   * @remarks This is automatically set by the plugin system.
+   *
+   * @todo This should be done via being friends with PluginProxy, which is currently in proc.
+   */
+  void setSource(const std::string& source);
+
+  /*! Returns the source of this declaration, i.e., the plugin which declared it. Empty for built-in types.
+   */
+  inline const std::string& getSource() const
+  {
+    return this->mSource;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -167,6 +182,9 @@ private:
 
   //! A list of deprecated names for this class.
   std::vector<std::string> mDeprecatedNames;
+
+  //! Source of the declaration. Empty for built-ins.
+  std::string mSource;
 
 }; // class cedar::aux::PluginDeclaration
 

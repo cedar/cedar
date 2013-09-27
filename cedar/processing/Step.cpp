@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/BoolParameter.h"
@@ -76,6 +75,7 @@ cedar::proc::Step::Step(bool runInThread, bool isLooped)
 Triggerable(isLooped),
 // initialize members
 mpArgumentsLock(new QReadWriteLock()),
+mTriggerSubsequent(true),
 // average the last 100 iteration times
 mMovingAverageIterationTime(100),
 // average the last 100 iteration times
@@ -97,7 +97,7 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
-  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this));
+  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
 }
 
 cedar::proc::Step::~Step()
@@ -187,13 +187,13 @@ void cedar::proc::Step::setAutoLockInputsAndOutputs(bool autoLock)
   this->mAutoLockInputsAndOutputs = autoLock;
 }
 
-void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function)
+void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function, bool autoLock)
 {
   if (this->mActions.find(actionName) != this->mActions.end())
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "Duplicate action name: " + actionName);
   }
-  this->mActions[actionName] = function;
+  this->mActions[actionName] = std::make_pair(function, autoLock);
 }
 
 void cedar::proc::Step::callAction(const std::string& name)
@@ -207,10 +207,23 @@ void cedar::proc::Step::callAction(const std::string& name)
   }
 
   // get the functor
-  boost::function<void()>& function = iter->second;
+  boost::function<void()>& function = iter->second.first;
+
+  bool autolock = iter->second.second;
+  if (autolock)
+  {
+    // lock the step
+    this->lock(cedar::aux::LOCK_TYPE_WRITE);
+  }
 
   // call it
   function();
+
+  if (autolock)
+  {
+    // unlock the step
+    this->unlock();
+  }
 }
 
 const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
@@ -248,7 +261,7 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
   this->mTriggers.push_back(trigger);
 }
 
-void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr)
+void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr trigger)
 {
 #ifdef DEBUG_RUNNING
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
@@ -277,7 +290,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
     return;
   }
 
-  if (!this->setNextArguments(args))
+  if (!this->setNextArguments(args, !trigger))
   {
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
@@ -427,9 +440,13 @@ void cedar::proc::Step::run()
     // take time measurements
     this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
 
-    // remove the argumens, as they have been processed.
-    this->getFinishedTrigger()->trigger();
+    //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
+    if (this->mTriggerSubsequent || this->isLooped() || !this->isTriggered())
+    {
+      this->getFinishedTrigger()->trigger();
+    }
 
+    //!@todo Should busy be unlocked before triggering subsequent steps?
     this->mBusy.unlock();
   }
   else
@@ -555,7 +572,7 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
  * @remarks The function returns false only if arguments have previously been set that were not yet processed by the
  *          run function.
  */
-bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr arguments)
+bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent)
 {
   // first, check if new arguments have already been set.
   {
@@ -583,6 +600,7 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr argument
 
   QWriteLocker arg_lock(mpArgumentsLock);
   this->mNextArguments = arguments;
+  this->mTriggerSubsequent = triggerSubsequent;
   arg_lock.unlock();
   this->mBusy.unlock();
   return true;

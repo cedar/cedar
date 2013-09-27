@@ -272,7 +272,7 @@ private:
   //! The worker that does actual converison.
   cedar::aux::gui::detail::VtkLinePlotWorkerPtr mConversionWorker;
 
-}; // class cedar::aux::gui::LinePlot
+}; // class cedar::aux::gui::VtkLinePlot
 
 #endif // CEDAR_USE_VTK
 #endif // CEDAR_AUX_GUI_VTK_LINE_PLOT_H
