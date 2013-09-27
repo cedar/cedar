@@ -191,8 +191,8 @@ void cedar::proc::steps::Flip::compute(const cedar::proc::Arguments&)
       cv::Mat output_slice(input.size[0], input.size[1], input.type());
 
       this->flip2D(input_slice, output_slice, this->isDimensionFlipped(0), this->isDimensionFlipped(1));
-      cv::Mat blubb = output(dst_range).clone();
-      output_slice.copySize(blubb);
+      cv::Mat output_slice_clone = output(dst_range).clone();
+      output_slice.copySize(output_slice_clone);
 
       output(dst_range) = 1.0 * output_slice;
     }
