@@ -109,7 +109,7 @@ void cedar::proc::ExternalData::clear()
 void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)
 {
   CEDAR_DEBUG_ASSERT(data);
-
+  std::cout << "remove data called" << std::endl;
   // Find the data entry.
   std::vector<cedar::aux::DataWeakPtr>::iterator iter;
   for (iter = this->mData.begin(); iter != this->mData.end(); ++iter)
