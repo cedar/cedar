@@ -61,6 +61,9 @@ cedar::aux::Data::~Data()
   delete mpLock;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
 
 void cedar::aux::Data::serializeData(std::ostream& /*stream*/) const
 {
@@ -71,15 +74,6 @@ void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/) const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException,"serializeHeader function not implemented for this type of data");
 }
-
-cedar::aux::DataPtr cedar::aux::Data::clone() const
-{
-  CEDAR_THROW(cedar::aux::NotImplementedException,"Clone function not implemented for this type of data");
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 
 QReadWriteLock& cedar::aux::Data::getLock()
 {
@@ -115,6 +109,6 @@ cedar::aux::DataPtr cedar::aux::Data::clone() const
   CEDAR_THROW
   (
     cedar::aux::NotImplementedException,
-    "Cloning is not implemented for this class. This class is: " + cedar::aux::objectTypeToString(this)
+    "Cloning is not implemented for the  \"" + cedar::aux::objectTypeToString(this) + "\"."
   );
 }
