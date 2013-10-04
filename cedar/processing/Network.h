@@ -194,8 +194,9 @@ public:
    *
    * @param elementName Identifier of the existing element.
    * @param newName Name to be given to the new element.
+   * @returns The new name of the element.
    */
-  void duplicate(const std::string& elementName, const std::string& newName = "");
+  std::string duplicate(const std::string& elementName, const std::string& newName = "");
 
   /*!@brief unmodifiedName unmodified name, possibly non-unique in network
    * @return unique name created by attaching a number if name is already taken

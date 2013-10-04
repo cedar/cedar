@@ -24,13 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp,
-#                Mathis Richter,
-#                Stephan Zibner
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-#                mathis.richter@ini.ruhr-uni-bochum.de,
-#                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 05 23
+#   Maintainer:  Christian Bodenstein
+#   Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
+#   Date:        2013 07 10
 #
 #   Description:
 #
@@ -38,6 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(SequenceTest
-  SequenceTest.cpp
-)
+cedar_add_performance_test(RecorderPerformance main.cpp)

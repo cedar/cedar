@@ -149,6 +149,12 @@ private:
   //!@brief the internal trigger
   cedar::proc::TriggerPtr mTrigger;
 
+  //! Used to start the trigger in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStartCaller;
+
+  //! Used to stop the trigger in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStopCaller;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

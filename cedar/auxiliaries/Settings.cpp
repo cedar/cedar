@@ -54,6 +54,13 @@ cedar::aux::Settings::Settings()
 cedar::aux::Configurable(),
 _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false))
 {
+  mRecorderWorkspace = new cedar::aux::DirectoryParameter
+                       (
+                         this,
+                         "recorder output directory",
+                         cedar::aux::getUserHomeDirectory() + "/cedarRecordings/"
+                       );
+
   cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
   this->addConfigurableChild("plugins", plugins);
 
@@ -112,6 +119,16 @@ cedar::aux::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspaceParameter() const
+{
+  return this->mRecorderWorkspace;
+}
+
+std::string cedar::aux::Settings::getRecorderWorkspace() const
+{
+  return this->mRecorderWorkspace->getValue().absolutePath().toStdString();
+}
 
 void cedar::aux::Settings::swapPluginSearchPaths(unsigned int first, unsigned int second)
 {

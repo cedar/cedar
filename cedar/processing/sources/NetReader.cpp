@@ -101,6 +101,14 @@ _mPort(new cedar::aux::StringParameter(this, "port",
   // declare all data
   this->declareOutput("output", mOutput);
 
+  //add actions that emits the output properties changed signal
+  this->registerFunction
+  (
+    "emit output properties changed signal",
+    boost::bind(&cedar::proc::sources::NetReader::emitOutputPropertiesChangedSignalOnAction, this),
+    false
+  );
+
   // the Reader will be instantiated on the first read
 }
 
@@ -112,6 +120,11 @@ void cedar::proc::sources::NetReader::reset()
 {
   mReader.reset();
   this->connect();
+}
+
+void cedar::proc::sources::NetReader::emitOutputPropertiesChangedSignalOnAction()
+{
+  this->emitOutputPropertiesChangedSignal("output");
 }
 
 void cedar::proc::sources::NetReader::connect()

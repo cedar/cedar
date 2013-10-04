@@ -41,6 +41,7 @@
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Log.h"
@@ -68,6 +69,32 @@ mTarget(target)
   {
     // ok
   }
+  catch (cedar::aux::ExceptionBase& exc)
+  {
+    // we ignore exceptions during this constructor, but notify the user
+    if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+    {
+      p_triggerable->setState
+      (
+        cedar::proc::Triggerable::STATE_EXCEPTION,
+        "An exception occured during establishing a connection: "
+        + exc.getMessage()
+      );
+    }
+  }
+  catch (std::exception& exc)
+  {
+    // we ignore exceptions during this constructor, but notify the user
+    if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+    {
+      p_triggerable->setState
+      (
+        cedar::proc::Triggerable::STATE_EXCEPTION,
+        "An exception occured during establishing a connection: "
+        + std::string(exc.what())
+      );
+    }
+  }
 }
 
 cedar::proc::DataConnection::~DataConnection()
@@ -84,6 +111,32 @@ cedar::proc::DataConnection::~DataConnection()
     catch (cedar::proc::ConnectionMemberDeletedException)
     {
       // ok
+    }
+    catch (cedar::aux::ExceptionBase& exc)
+    {
+      // we ignore exceptions during this destructor, but notify the user
+      if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+      {
+        p_triggerable->setState
+        (
+          cedar::proc::Triggerable::STATE_EXCEPTION,
+          "An exception occured during removing a connection: "
+          + exc.getMessage()
+        );
+      }
+    }
+    catch (std::exception& exc)
+    {
+      // we ignore exceptions during this destructor, but notify the user
+      if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+      {
+        p_triggerable->setState
+        (
+          cedar::proc::Triggerable::STATE_EXCEPTION,
+          "An exception occured during removing a connection: "
+          + std::string(exc.what())
+        );
+      }
     }
   }
 }

@@ -103,6 +103,13 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                         )
                       );
 
+  this->_mHighlightConnections = new cedar::aux::BoolParameter
+                                 (
+                                   ui_settings.get(),
+                                   "highlight connections of selected steps",
+                                   true
+                                 );
+
   cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
   this->addConfigurableChild("displaySettings", display_settings);
   mUseGraphicsItemShadowEffects = cedar::aux::BoolParameterPtr

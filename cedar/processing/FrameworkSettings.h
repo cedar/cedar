@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MultiTrigger.h
+    File:        FrameworkSettings.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 27
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 26
 
     Description:
 
@@ -38,51 +34,72 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_MULTI_TRIGGER_H
-#define CEDAR_PROC_MULTI_TRIGGER_H
+#ifndef CEDAR_PROC_FRAMEWORK_SETTINGS_H
+#define CEDAR_PROC_FRAMEWORK_SETTINGS_H
 
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <map>
+#include <set>
 
-/*!@brief A trigger that merges multiple trigger signals into one.
- *
- * This class maintains a list of incoming triggers. Everytime one of the incoming triggers receives a trigger signal,
- * it is marked as triggered. Once all incoming triggers are marked thusly, the MultiTrigger sends a trigger signal to
- * all its listeners.
+
+/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
  */
-class cedar::proc::MultiTrigger : public Trigger
+class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friend
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::FrameworkSettings;
+  friend class cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+private:
   //!@brief The standard constructor.
-  MultiTrigger();
+  FrameworkSettings();
 
-  //!@brief Destructor
-  virtual ~MultiTrigger();
+public:
+  //!@brief The destructor.
+  ~FrameworkSettings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief process trigger event
-  void onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr pSender);
+  /*!@brief Loads the settings from a file in the user's home directory.
+   */
+  void load();
 
-  //!@brief if a trigger connects to the MultiTrigger, add it to the internal storage of sources
-  void notifyConnected(cedar::proc::TriggerPtr trigger);
+  /*!@brief Saves the settings to a file in the user's home directory.
+   */
+  void save();
 
-  //!@brief if a trigger disconnects from a MultiTrigger, remove it from internal storage of sources
-  void notifyDisconnected(cedar::proc::TriggerPtr trigger);
+  /*!@brief Adds a plugin to the list of plugins known by the processing framework.
+   */
+  void addKnownPlugin(const std::string& file);
+
+  /*!@brief Removes a plugin from the list of plugins known by the processing framework.
+   */
+  void removeKnownPlugin(const std::string& file);
+
+  /*!@brief Returns the set of plugins known by the processing framework.
+   */
+  const std::set<std::string>& getKnownPlugins() const;
+
+  /*!@brief Returns the set of plugin directories known by the processing framework.
+   */
+  const std::set<std::string>& getPluginDirectories() const;
+
+  /*!@brief Returns the plugin workspace directory.
+   *
+   *        This is the first directoriy searched for a plugin.
+   */
+  std::string getPluginWorkspace() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,31 +111,34 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief check if all incoming triggers are triggered at least once before sending own trigger signal
-  void checkCondition();
+  // none yet
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-
+  // none yet
 private:
-  //!@brief internal storage of incoming triggers
-  std::map<cedar::proc::TriggerPtr, bool> mIncoming;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
+  //!@brief Parameter representing the plugin workspace.
+  cedar::aux::DirectoryParameterPtr mPluginWorkspace;
+
+  //!@brief List of directories to use when looking for plugins.
+  cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;
+
+  //!@brief List of known plugins.
+  cedar::aux::StringSetParameterPtr mKnownPlugins;
 
 private:
   // none yet
 
-}; // class cedar::proc::Trigger
+}; // class cedar::proc::FrameworkSettings
 
-#endif // CEDAR_PROC_TRIGGER_H
+CEDAR_PROC_SINGLETON(FrameworkSettings);
 
+#endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H

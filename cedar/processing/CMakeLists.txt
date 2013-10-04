@@ -58,6 +58,8 @@ cedar_add_library(cedarproc
   gui/Ide.h
   gui/IdeApplication.h
   gui/ProjectionMappingParameter.h
+  gui/RecorderWidget.h
+  gui/RecorderProperty.h
   gui/Scene.h
   gui/SettingsDialog.h
   gui/StepItem.h
@@ -73,7 +75,9 @@ cedar_add_library(cedarproc
   steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
   steps/MatrixMultiply.h
+  steps/MatrixSlice.h
   steps/MatrixTypeConverter.h
+  steps/Normalization.h
   steps/Flip.h
   steps/Histogram.h
   steps/Threshold.h
