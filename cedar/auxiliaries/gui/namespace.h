@@ -81,6 +81,8 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT UIntParameter;
       class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
 
+      class CEDAR_AUX_LIB_EXPORT SettingsWidget;
+
       class CEDAR_AUX_LIB_EXPORT ExceptionDialog;
 
       class CEDAR_AUX_LIB_EXPORT Log;
