@@ -225,6 +225,12 @@ public:
     return this->_mDataSlotScalingEnabled->getValue();
   }
 
+  //! Returns whether or not connections of selected steps should be highlighted.
+  inline bool getHighlightConnections() const
+  {
+    return this->_mHighlightConnections->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -285,6 +291,9 @@ private:
 
   //!@brief Disables or enables graphics item shadows.
   cedar::aux::BoolParameterPtr mSnapToGrid;
+
+  //!@brief Disables or enables highlighting of the connections of selected steps.
+  cedar::aux::BoolParameterPtr _mHighlightConnections;
 
   //! Default display mode for steps.
   cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;

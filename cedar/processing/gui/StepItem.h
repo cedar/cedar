@@ -323,6 +323,8 @@ private:
 
   qreal getContentsPadding() const;
 
+  void itemSelected(bool selected);
+
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
