@@ -187,6 +187,7 @@ private:
 class cedar::proc::TriggerCycleException : public cedar::aux::ExceptionBase
 {
   public:
+    //! Constructor. Takes a vector of sets where each set contains the nodes of one trigger cycle.
     TriggerCycleException(const std::vector<std::set<cedar::proc::TriggerablePtr> >& cycles);
 }; // cedar::proc::TriggerCycleException
 
