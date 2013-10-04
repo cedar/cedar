@@ -96,8 +96,9 @@ public:
   //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
-  //!@brief Returns is @para role a role of this Connectable. 
-  bool hasRole(DataRole::Id role);
+  //!@brief Returns whether this connectable has a slot of the given role.
+  //!@todo Rename this to hasSlotForRole.
+  bool hasRole(cedar::proc::DataRole::Id role);
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;

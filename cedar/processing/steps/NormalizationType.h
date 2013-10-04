@@ -55,8 +55,10 @@ class cedar::proc::steps::NormalizationType
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type of the enum.
   typedef cedar::aux::EnumId Id;
 public:
+  //! Pointer to the enumeration type.
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,9 +70,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Constructs the enumeration values.
   static void construct();
 
+  //! Returns the enum base class.
   static const cedar::aux::EnumBase& type();
+
+  //! Returns a pointer to the enum base class.
   static const cedar::proc::steps::NormalizationType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------

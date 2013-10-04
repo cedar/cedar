@@ -238,11 +238,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // operators
   //--------------------------------------------------------------------------------------------------------------------
+
+  //! Compares two limits.
   bool operator!= (const Limits<T>& other) const
   {
     return !(other == *this);
   }
 
+  //! Compares two limits.
   bool operator== (const Limits<T>& other) const
   {
     return (other.getLower() == this->getLower()) && (other.getUpper() == this->getUpper());

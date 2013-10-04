@@ -76,7 +76,6 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
     CEDAR_DECLARE_AUX_CLASS(Recorder);
     CEDAR_DECLARE_AUX_CLASS(DataSpectator);
-    //!@endcond
 
     template <class T> class Singleton;
 
@@ -90,7 +89,6 @@ namespace cedar
 
     typedef GraphTemplate<> Graph;
 
-    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
     CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrame);
@@ -101,6 +99,7 @@ namespace cedar
 
     //!@brief A type for identifying enum entries. Corresponds to the C++ enum int values for each enum entry.
     typedef unsigned int EnumId;
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Enum);
     CEDAR_DECLARE_AUX_CLASS(EnumBase);
