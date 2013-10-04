@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginManagerDialog.h
+    File:        SettingsWidget.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 26
+    Date:        2013 10 04
 
     Description:
 
@@ -34,50 +34,39 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
-#define CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
+#ifndef CEDAR_AUX_GUI_SETTINGS_WIDGET_H
+#define CEDAR_AUX_GUI_SETTINGS_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_PluginManagerDialog.h"
-
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/PluginProxy.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/ui_SettingsWidget.h"
 
 // SYSTEM INCLUDES
-#include <QDialog>
 
 
-/*!@brief A widget for managing plugins.
+/*!@brief Widget for displaying and manipulating the settings in cedar::aux and cedar::aux::gui.
  */
-class cedar::proc::gui::PluginManagerDialog : public QDialog, public Ui_PluginManagerDialog
+class cedar::aux::gui::SettingsWidget : public QWidget, public Ui_SettingsWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PluginManagerDialog(QWidget *pParent = NULL);
+  SettingsWidget(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-public slots:
-  /*!@brief Slot that is called when the dialog is closed by clicking ok.
-   */
-  void accepted();
-
-  //! Removes the plugins currently checked for deletion.
-  void removePlugins();
-
-  //! Enables or disables the delete button.
-  void toggleDeleteButton();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,13 +78,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Fills the plugin list.
-   */
-  void populate();
-
-  /*!@brief Adds a plugin to the list.
-   */
-  void addPlugin(const std::string& path);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -103,7 +86,18 @@ private:
 protected:
   // none yet
 private:
+  // none yet
 
-}; // class cedar::PluginManagerDialog
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
+private:
+  // none yet
+
+}; // class cedar::aux::gui::SettingsWidget
+
+#endif // CEDAR_AUX_GUI_SETTINGS_WIDGET_H
+

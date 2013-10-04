@@ -26,7 +26,7 @@
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 01 31
+    Date:        2011 07 26
 
     Description:
 
@@ -34,44 +34,87 @@
 
 ======================================================================================================================*/
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-
 // CEDAR INCLUDES
-#include "cedar/processing/gui/FrameworkSettings.h"
-#include "cedar/processing/FrameworkSettings.h"
-#include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/Settings.h"
+#include "cedar/auxiliaries/gui/Settings.h"
+#include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/filesystem.hpp>
+#include <QMainWindow>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::FrameworkSettings::FrameworkSettings(QWidget *pParent)
+cedar::aux::gui::Settings::Settings()
 :
-QWidget(pParent)
+mWritingDisabled(false)
 {
-  this->setupUi(this);
+  this->_mPluginLoadDialogLocation = new cedar::aux::DirectoryParameter
+                                     (
+                                       this,
+                                       "last plugin load dialog location",
+                                       ""
+                                     );
 
-  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
-  this->mpPluginWorkspaceEdit->setParameter(settings->mPluginWorkspace);
-  this->mpRecorderWorkspaceEdit->setParameter(cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter());
+  this->load();
+}
+
+
+cedar::aux::gui::Settings::~Settings()
+{
+  this->save();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::FrameworkSettings::reject()
+cedar::aux::DirectoryParameterPtr cedar::aux::gui::Settings::lastPluginLoadDialogLocation() const
 {
-  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
-  settings->load();
+  return this->_mPluginLoadDialogLocation;
 }
 
-void cedar::proc::gui::FrameworkSettings::accept()
+void cedar::aux::gui::Settings::setLastPluginDialogLocation(const std::string& location)
 {
-  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
-  settings->save();
+  this->_mPluginLoadDialogLocation->setValue(location);
+}
+
+void cedar::aux::gui::Settings::save()
+{
+  if (!mWritingDisabled)
+  {
+    std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/auxiliaries_gui";
+    try
+    {
+      this->writeJson(path);
+    }
+    catch (const boost::property_tree::json_parser::json_parser_error& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        std::string("Error saving aux gui settings: ") + e.what(),
+        "void cedar::aux::gui::Settings::load()"
+      );
+    }
+  }
+}
+
+void cedar::aux::gui::Settings::load()
+{
+  std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/auxiliaries_gui";
+  try
+  {
+    this->readJson(path);
+  }
+  catch (const boost::property_tree::json_parser::json_parser_error& e)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      std::string("Error reading aux gui settings: ") + e.what(),
+      "void cedar::aux::gui::Settings::load()"
+    );
+  }
 }

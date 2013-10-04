@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FrameworkSettings.h
+    File:        Settings.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,72 +34,62 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_FRAMEWORK_SETTINGS_H
-#define CEDAR_PROC_FRAMEWORK_SETTINGS_H
+#ifndef CEDAR_AUX_GUI_SETTINGS_H
+#define CEDAR_AUX_GUI_SETTINGS_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 
 // SYSTEM INCLUDES
-#include <set>
 
 
-/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
+/*!@brief User interface settings for widgets in the aux namespace.
  */
-class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
+class cedar::aux::gui::Settings : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friend
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::gui::FrameworkSettings;
-  friend class cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
+  friend class cedar::aux::Singleton<cedar::aux::gui::Settings>;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief The standard constructor.
-  FrameworkSettings();
+  Settings();
 
 public:
-  //!@brief The destructor.
-  ~FrameworkSettings();
+  //!@brief Destructor
+  ~Settings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Loads the settings from a file in the user's home directory.
-   */
+  //!@brief loads the UI settings
   void load();
 
-  /*!@brief Saves the settings to a file in the user's home directory.
-   */
+  //!@brief saves the UI settings
   void save();
 
-  /*!@brief Adds a plugin to the list of plugins known by the processing framework.
-   */
-  void addKnownPlugin(const std::string& file);
+  //!@brief returns the last directory, from which a plugin was loaded
+  cedar::aux::DirectoryParameterPtr lastPluginLoadDialogLocation() const;
 
-  /*!@brief Removes a plugin from the list of plugins known by the processing framework.
-   */
-  void removeKnownPlugin(const std::string& file);
+  //! Sets the last directory from which a plugin was loaded.
+  void setLastPluginDialogLocation(const std::string& location);
 
-  /*!@brief Returns the set of plugins known by the processing framework.
-   */
-  const std::set<std::string>& getKnownPlugins() const;
-
-  /*!@brief Returns the set of plugin directories known by the processing framework.
-   */
-  const std::set<std::string>& getPluginDirectories() const;
-
-  /*!@brief Returns the plugin workspace directory.
-   *
-   *        This is the first directoriy searched for a plugin.
-   */
-  std::string getPluginWorkspace() const;
+  //! Disables writing.
+  void disableWriting(bool disable = true)
+  {
+    this->mWritingDisabled = disable;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -119,26 +109,33 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! Disables writing of the properties; this is useful for unit tests that shouldn't alter the configuration.
+  bool mWritingDisabled;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Parameter representing the plugin workspace.
-  cedar::aux::DirectoryParameterPtr mPluginWorkspace;
-
-  //!@brief List of directories to use when looking for plugins.
-  cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;
-
-  //!@brief List of known plugins.
-  cedar::aux::StringSetParameterPtr mKnownPlugins;
-
-private:
   // none yet
 
-}; // class cedar::proc::FrameworkSettings
+private:
+  //!@brief Directory, where the PluginLoadDialog is supposed to open.
+  cedar::aux::DirectoryParameterPtr _mPluginLoadDialogLocation;
 
-CEDAR_PROC_SINGLETON(FrameworkSettings);
+}; // class cedar::proc::gui::Settings
 
-#endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      typedef cedar::aux::Singleton<cedar::aux::gui::Settings> SettingsSingleton;
+    }
+  }
+}
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::proc::gui::Settings);
+
+#endif // CEDAR_AUX_GUI_SETTINGS_H
+

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        FrameworkSettings.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,22 +34,30 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/processing/gui/FrameworkSettings.h"
+#include "cedar/auxiliaries/gui/SettingsWidget.h"
+#include "cedar/auxiliaries/Settings.h"
+#include "cedar/auxiliaries/gui/DirectoryParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
 
-//------------------------------------------------------------------------------
-// methods
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-int main(int argc , char ** argv)
+cedar::aux::gui::SettingsWidget::SettingsWidget(QWidget *pParent)
+:
+QWidget(pParent)
 {
-  QApplication application(argc, argv);
+  this->setupUi(this);
 
-  cedar::proc::gui::FrameworkSettings *p_settings = new cedar::proc::gui::FrameworkSettings();
-  p_settings->show();
-
-  return application.exec();
+  this->mpRecorderWorkspaceEdit->setParameter(cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter());
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

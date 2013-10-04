@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FrameworkSettings.h
+    File:        PluginInfoDialog.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 01 31
+    Date:        2011 07 22
 
     Description:
 
@@ -34,43 +34,41 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
-#define CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_AUX_GUI_PLUGIN_INFO_DIALOG_H
+#define CEDAR_AUX_GUI_PLUGIN_INFO_DIALOG_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/ui_FrameworkSettings.h"
+#include "cedar/auxiliaries/gui/ui_PluginInfoDialog.h"
+
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
+#include <QDialog>
 
 
-/*!@brief A widget for displaying the settings stored in cedar::proc::gui::FrameworkSettings.
+/*!@brief A dialog for loading a plugin.
  */
-class cedar::proc::gui::FrameworkSettings : public QWidget, public Ui_FrameworkSettings
+class cedar::aux::gui::PluginInfoDialog : public QDialog, public Ui_PluginInfoDialog
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FrameworkSettings(QWidget *pParent = NULL);
+  PluginInfoDialog(QWidget *pParent, cedar::aux::PluginProxyPtr plugin);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! reject changes made in the dialog
-  void reject();
-  //! accepts changes made in the dialog
-  void accept();
+  //! Returns the (loaded) plugin.
+  cedar::aux::PluginProxyPtr plugin();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -82,7 +80,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*!@brief Loads a plugin file.
+   */
+  void updateWidgets();
+
+  int addCategoryPage(const std::string& categoryName);
+
+  int getCategoryPageId(const std::string& category) const;
+
+  void addDeclarationToPage(int pageId, cedar::aux::PluginDeclarationPtr declaration);
+
+private slots:
+  void readInfo();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -90,18 +99,9 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! The loaded plugin.
+  cedar::aux::PluginProxyPtr mPlugin;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // class cedar::aux::PluginInfoDialog
 
-private:
-  // none yet
-
-}; // class cedar::proc::gui::FrameworkSettings
-
-#endif // CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
-
+#endif // CEDAR_AUX_GUI_PLUGIN_INFO_DIALOG_H

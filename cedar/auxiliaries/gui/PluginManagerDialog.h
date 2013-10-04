@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginLoadDialog.h
+    File:        PluginManagerDialog.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2011 07 26
 
     Description:
 
@@ -34,22 +34,21 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
-#define CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
+#ifndef CEDAR_AUX_GUI_PLUGIN_MANAGER_DIALOG_H
+#define CEDAR_AUX_GUI_PLUGIN_MANAGER_DIALOG_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_PluginLoadDialog.h"
+#include "cedar/auxiliaries/gui/ui_PluginManagerDialog.h"
 
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/PluginProxy.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QDialog>
 
 
-/*!@brief A dialog for loading a plugin.
+/*!@brief A widget for managing plugins.
  */
-class cedar::proc::gui::PluginLoadDialog : public QDialog, public Ui_PluginLoadDialog
+class cedar::aux::gui::PluginManagerDialog : public QDialog, public Ui_PluginManagerDialog
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -61,23 +60,12 @@ class cedar::proc::gui::PluginLoadDialog : public QDialog, public Ui_PluginLoadD
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PluginLoadDialog(QWidget *pParent = NULL);
+  PluginManagerDialog(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Returns the (loaded) plugin.
-  cedar::proc::PluginProxyPtr plugin();
-
-public slots:
-  /*!@brief Opens a file browser to locate the plugin to load.
-   */
-  void browseFile();
-
-  /*!@brief Reacts to a change in the plugin file line edit.
-   */
-  void pluginFileChanged(const QString& file);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,9 +77,63 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Loads a plugin file.
+  /*!@brief Fills the plugin list.
    */
-  void loadFile(const std::string& file);
+  void populate();
+
+  /*!@brief Adds a plugin to the list.
+   */
+  void addPlugin(const std::string& plugin);
+
+  //! Removes the plugin with the given name from the UI.
+  void removePlugin(const std::string& pluginName);
+
+  void addPluginSearchPath(const std::string& path);
+
+  void removePluginSearchPath(const std::string& path);
+
+  void removePluginSearchPathIndex(size_t index);
+
+  std::string getPluginNameFromRow(int row) const;
+
+  int getPluginRowFromName(const std::string& pluginName) const;
+
+  void updatePluginPath(int row);
+
+  void updatePluginPaths();
+
+  void pluginDeclared(const std::string& pluginName);
+
+  void swapSearchPaths(unsigned int first, unsigned int second);
+
+private slots:
+  //! Removes the plugins currently checked for deletion.
+  void removeSelectedPlugins();
+
+  //! Enables or disables the buttons that operate on a selection of plugins.
+  void toggleSelectedPluginsButtons();
+
+  //! Reacts to a click on the "add" button in the search paths tab.
+  void addSearchPathClicked();
+
+  //! Reacts to a click on the "remove" button in the search paths tab.
+  void removeSearchPathClicked();
+
+  void addPluginClicked();
+
+  void loadOnStartupCheckboxToggled(bool loaded);
+
+  void loadSelectedPlugins();
+
+  void openInfoDialog();
+
+  void moveSelectedSearchPathUp();
+
+  void moveSelectedSearchPathDown();
+
+  void selectedSearchPathChanged();
+
+  void showSearchPathHelp();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -99,9 +141,7 @@ private:
 protected:
   // none yet
 private:
-  //! The loaded plugin.
-  cedar::proc::PluginProxyPtr mPlugin;
 
-}; // class cedar::PluginLoadDialog
+}; // class cedar::aux::PluginManagerDialog
 
-#endif // CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
+#endif // CEDAR_AUX_GUI_PLUGIN_MANAGER_DIALOG_H

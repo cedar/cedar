@@ -34,13 +34,15 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PLUGIN_PROXY_H
-#define CEDAR_PROC_PLUGIN_PROXY_H
+#ifndef CEDAR_AUX_PLUGIN_PROXY_H
+#define CEDAR_AUX_PLUGIN_PROXY_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 #include <string>
 
 #ifdef CEDAR_OS_WINDOWS
@@ -49,7 +51,7 @@
 
 /*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
  */
-class cedar::proc::PluginProxy
+class cedar::aux::PluginProxy
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -60,12 +62,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+private:
   //!@brief The standard constructor.
   PluginProxy();
-  //!@brief Some other constructor.
-  PluginProxy(const std::string& file);
 
+  //!@brief A constructor that takes a plugin name.
+  PluginProxy(const std::string& pluginName);
+
+public:
   //!@brief Destructor
   ~PluginProxy();
 
@@ -74,13 +78,27 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief loaded a shared/dynamic library from a file path
-  void load(const std::string& file);
+  void load();
 
   //! Actually declares the contents of the plugin.
   void declare();
 
   //!@brief get declaration of this proxy
   cedar::aux::PluginDeclarationListPtr getDeclaration();
+
+  //! Returns the name of the plugin.
+  std::string getPluginName() const;
+
+  //! Returns the normalized search path to be used for this plugin.
+  std::string getNormalizedSearchPath() const;
+
+  //! If true, the declarations of this plugin have been added to the manager.
+  inline bool isDeclared() const
+  {
+    return this->mIsDeclared;
+  }
+
+  //!@todo with all these static functions, should this maybe get a manager?
 
   /*!@brief Returns the canonical name of a plugin based on its filepath
    */
@@ -89,6 +107,24 @@ public:
 #ifdef CEDAR_OS_UNIX
   static void abortHandler(int signal);
 #endif // CEDAR_OS_UNIX
+
+  //! Whether or not a path can be found for the given plugin name.
+  static bool canFindPlugin(const std::string& pluginName);
+
+  //!@brief search known directories for this plugin.
+  static std::string findPlugin(const std::string& pluginName);
+
+  //!@brief search for this plugin in the given workspace.
+  static std::string findPlugin(const std::string& pluginName, const std::string& workspace);
+
+  //! Gets a plugin with the given name.
+  static cedar::aux::PluginProxyPtr getPlugin(const std::string pluginName);
+
+  //! Connect to plugin removed signal
+  static boost::signals2::connection connectToPluginDeclaredSignal(boost::function<void (const std::string&)> slot)
+  {
+    return mPluginDeclaredSignal.connect(slot);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,9 +136,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief search known directories for this plugin.
-  std::string findPluginFile(const std::string& file) const;
-
   //!@brief Searches for the plugin description file.
   std::string findPluginDescription(const std::string& plugin_path) const;
 
@@ -118,8 +151,12 @@ protected:
 private:
   //!@brief plugin declaration
   cedar::aux::PluginDeclarationListPtr mDeclaration;
+
   //!@brief file path to plugin
   std::string mFileName;
+
+  //! True if the plugin declarations have been added to the manager.
+  bool mIsDeclared;
 
   //! Handle to the dynamically loaded library.
 #ifdef CEDAR_OS_UNIX
@@ -134,7 +171,11 @@ private:
 #else
 #error Implement me for your os!
 #endif
-}; // class cedar::proc::PluginProxy
 
-#endif // CEDAR_PROC_PLUGIN_PROXY_H
+  static std::map<std::string, cedar::aux::PluginProxyPtr> mPluginMap;
+
+  static boost::signals2::signal<void (const std::string&)> mPluginDeclaredSignal;
+}; // class cedar::aux::PluginProxy
+
+#endif // CEDAR_AUX_PLUGIN_PROXY_H
 
