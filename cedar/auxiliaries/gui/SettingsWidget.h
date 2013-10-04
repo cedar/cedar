@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FrameworkSettings.h
+    File:        SettingsWidget.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 26
+    Date:        2013 10 04
 
     Description:
 
@@ -34,72 +34,39 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_FRAMEWORK_SETTINGS_H
-#define CEDAR_PROC_FRAMEWORK_SETTINGS_H
+#ifndef CEDAR_AUX_GUI_SETTINGS_WIDGET_H
+#define CEDAR_AUX_GUI_SETTINGS_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/ui_SettingsWidget.h"
 
 // SYSTEM INCLUDES
-#include <set>
 
 
-/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
+/*!@brief Widget for displaying and manipulating the settings in cedar::aux and cedar::aux::gui.
  */
-class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
+class cedar::aux::gui::SettingsWidget : public QWidget, public Ui_SettingsWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friend
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::gui::FrameworkSettings;
-  friend class cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //!@brief The standard constructor.
-  FrameworkSettings();
-
 public:
-  //!@brief The destructor.
-  ~FrameworkSettings();
+  //!@brief The standard constructor.
+  SettingsWidget(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Loads the settings from a file in the user's home directory.
-   */
-  void load();
-
-  /*!@brief Saves the settings to a file in the user's home directory.
-   */
-  void save();
-
-  /*!@brief Adds a plugin to the list of plugins known by the processing framework.
-   */
-  void addKnownPlugin(const std::string& file);
-
-  /*!@brief Removes a plugin from the list of plugins known by the processing framework.
-   */
-  void removeKnownPlugin(const std::string& file);
-
-  /*!@brief Returns the set of plugins known by the processing framework.
-   */
-  const std::set<std::string>& getKnownPlugins() const;
-
-  /*!@brief Returns the set of plugin directories known by the processing framework.
-   */
-  const std::set<std::string>& getPluginDirectories() const;
-
-  /*!@brief Returns the plugin workspace directory.
-   *
-   *        This is the first directoriy searched for a plugin.
-   */
-  std::string getPluginWorkspace() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -125,20 +92,12 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Parameter representing the plugin workspace.
-  cedar::aux::DirectoryParameterPtr mPluginWorkspace;
-
-  //!@brief List of directories to use when looking for plugins.
-  cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;
-
-  //!@brief List of known plugins.
-  cedar::aux::StringSetParameterPtr mKnownPlugins;
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::FrameworkSettings
+}; // class cedar::aux::gui::SettingsWidget
 
-CEDAR_PROC_SINGLETON(FrameworkSettings);
+#endif // CEDAR_AUX_GUI_SETTINGS_WIDGET_H
 
-#endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H

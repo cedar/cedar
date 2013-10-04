@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FrameworkSettings</class>
- <widget class="QWidget" name="FrameworkSettings">
+ <class>SettingsWidget</class>
+ <widget class="QWidget" name="SettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <property name="spacing">
     <number>3</number>
    </property>
@@ -35,31 +35,6 @@
       </item>
       <item row="0" column="1">
        <widget class="cedar::aux::gui::DirectoryParameter" name="mpRecorderWorkspaceEdit" native="true"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Plugin Settings</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="toolTip">
-         <string>The plugin workspace determines the folder in which the processing framework looks for plugins. In addition, if you add a plugin to your architecture from the workspace, its path is specified relative to this path.</string>
-        </property>
-        <property name="text">
-         <string>Plugin workspace*</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="cedar::aux::gui::DirectoryParameter" name="mpPluginWorkspaceEdit" native="true"/>
       </item>
      </layout>
     </widget>

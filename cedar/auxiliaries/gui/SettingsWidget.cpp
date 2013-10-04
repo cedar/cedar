@@ -38,10 +38,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/FrameworkSettings.h"
-#include "cedar/processing/FrameworkSettings.h"
-#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/gui/SettingsWidget.h"
 #include "cedar/auxiliaries/Settings.h"
+#include "cedar/auxiliaries/gui/DirectoryParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -49,29 +49,15 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::FrameworkSettings::FrameworkSettings(QWidget *pParent)
+cedar::aux::gui::SettingsWidget::SettingsWidget(QWidget *pParent)
 :
 QWidget(pParent)
 {
   this->setupUi(this);
 
-  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
-  this->mpPluginWorkspaceEdit->setParameter(settings->mPluginWorkspace);
   this->mpRecorderWorkspaceEdit->setParameter(cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::proc::gui::FrameworkSettings::reject()
-{
-  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
-  settings->load();
-}
-
-void cedar::proc::gui::FrameworkSettings::accept()
-{
-  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
-  settings->save();
-}
