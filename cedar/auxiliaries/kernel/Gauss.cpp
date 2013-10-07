@@ -74,6 +74,7 @@ cedar::aux::kernel::Gauss::Gauss
 cedar::aux::kernel::Separable(),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", amplitude, -10000.0, 10000.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", dimensionality, sigmas, 0.01, 10000)),
+_mNormalize(new cedar::aux::BoolParameter(this, "normalize", true)),
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", dimensionality, shifts, -10000.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
@@ -182,8 +183,13 @@ void cedar::aux::kernel::Gauss::calculateParts()
       {
         kernel_part.at<float>(0, 0) = 1;
       }
+
       // normalize
-      kernel_part /= cv::sum(kernel_part).val[0];
+      if (this->_mNormalize->getValue())
+      {
+        //!@todo Is this the right approach to the normalization? Also, can't this be computed more efficient by sqrt(2*sigma...)?
+        kernel_part /= cv::sum(kernel_part).val[0];
+      }
 
       this->setKernelPart(dim, kernel_part);
     }
