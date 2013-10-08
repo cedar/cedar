@@ -48,7 +48,8 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Log.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -74,8 +75,11 @@ cedar::proc::Step::Step(bool runInThread, bool isLooped)
 Triggerable(isLooped),
 // initialize members
 mpArgumentsLock(new QReadWriteLock()),
-mMovingAverageIterationTime(100), // average the last 100 iteration times
-mLockingTime(100), // average the last 100 iteration times
+mTriggerSubsequent(true),
+// average the last 100 iteration times
+mMovingAverageIterationTime(100),
+// average the last 100 iteration times
+mLockingTime(100),
 mRoundTime(100), // average the last 100 iteration times
 mLastComputeCall(0),
 // initialize parameters
@@ -257,7 +261,7 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
   this->mTriggers.push_back(trigger);
 }
 
-void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr)
+void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr trigger)
 {
 #ifdef DEBUG_RUNNING
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
@@ -286,7 +290,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
     return;
   }
 
-  if (!this->setNextArguments(args))
+  if (!this->setNextArguments(args, !trigger))
   {
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
@@ -346,7 +350,7 @@ void cedar::proc::Step::run()
     clock_t lock_end = clock();
     clock_t lock_elapsed = lock_end - lock_start;
     double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-    this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+    this->setLockTimeMeasurement(lock_elapsed_s * cedar::unit::seconds);
 
     if (!this->mandatoryConnectionsAreSet())
     {
@@ -366,7 +370,7 @@ void cedar::proc::Step::run()
       this->mLastComputeCall = clock();
       clock_t elapsed = this->mLastComputeCall - last;
       double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-      this->setRoundTimeMeasurement(cedar::unit::Seconds(elapsed_s));
+      this->setRoundTimeMeasurement(elapsed_s * cedar::unit::seconds);
     }
     else
     {
@@ -434,11 +438,15 @@ void cedar::proc::Step::run()
     this->unlock();
 
     // take time measurements
-    this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
+    this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
 
-    // remove the argumens, as they have been processed.
-    this->getFinishedTrigger()->trigger();
+    //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
+    if (this->mTriggerSubsequent || this->isLooped() || !this->isTriggered())
+    {
+      this->getFinishedTrigger()->trigger();
+    }
 
+    //!@todo Should busy be unlocked before triggering subsequent steps?
     this->mBusy.unlock();
   }
   else
@@ -454,19 +462,19 @@ void cedar::proc::Step::run()
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLastIterationTimeLock);
-  this->mMovingAverageIterationTime.append(cedar::unit::Seconds(time));
+  this->mMovingAverageIterationTime.append(time);
 }
 
 void cedar::proc::Step::setLockTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLockTimeLock);
-  this->mLockingTime.append(cedar::unit::Seconds(time));
+  this->mLockingTime.append(time);
 }
 
 void cedar::proc::Step::setRoundTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mRoundTimeLock);
-  this->mRoundTime.append(cedar::unit::Seconds(time));
+  this->mRoundTime.append(time);
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
@@ -564,7 +572,7 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
  * @remarks The function returns false only if arguments have previously been set that were not yet processed by the
  *          run function.
  */
-bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr arguments)
+bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent)
 {
   // first, check if new arguments have already been set.
   {
@@ -592,6 +600,7 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr argument
 
   QWriteLocker arg_lock(mpArgumentsLock);
   this->mNextArguments = arguments;
+  this->mTriggerSubsequent = triggerSubsequent;
   arg_lock.unlock();
   this->mBusy.unlock();
   return true;

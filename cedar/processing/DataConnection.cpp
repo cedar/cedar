@@ -101,6 +101,14 @@ cedar::proc::DataConnection::~DataConnection()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
+  this->disconnect();
+}
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::DataConnection::disconnect()
+{
   if (cedar::proc::DataSlotPtr source = this->mSource.lock())
   {
     try
@@ -203,6 +211,30 @@ bool cedar::proc::DataConnection::connects(
     return true;
   }
   return false;
+}
+
+cedar::proc::DataSlotPtr cedar::proc::DataConnection::getSource()
+{
+  if (cedar::proc::DataSlotPtr source_shared = mSource.lock())
+  {
+    return source_shared;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Shared pointer is already deleted.");
+  }
+}
+
+cedar::proc::DataSlotPtr cedar::proc::DataConnection::getTarget()
+{
+  if (cedar::proc::DataSlotPtr target_shared = mTarget.lock())
+  {
+    return target_shared;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Shared pointer is already deleted.");
+  }
 }
 
 cedar::proc::ConstDataSlotPtr cedar::proc::DataConnection::getSource() const

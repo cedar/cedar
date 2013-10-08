@@ -47,7 +47,6 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
@@ -124,7 +123,7 @@ public:
 
   /*!@brief Sets the arguments used by the next execution of the run function.
    */
-  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments);
+  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
@@ -359,6 +358,9 @@ private:
   //!@brief The arguments for the next cedar::proc::Step::compute call.
   ConstArgumentsPtr mNextArguments;
 
+  //! Whether or not subseqent steps should be triggered after the next arguments have been processed.
+  bool mTriggerSubsequent;
+
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 
@@ -366,13 +368,13 @@ private:
   ActionMap mActions;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mMovingAverageIterationTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mMovingAverageIterationTime;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mLockingTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mLockingTime;
 
   //!@brief Moving average of the time between compute calls.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mRoundTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mRoundTime;
 
   clock_t mLastComputeCall;
 

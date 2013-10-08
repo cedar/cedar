@@ -69,7 +69,7 @@ void record()
 
 
   cedar::aux::RecorderSingleton::getInstance()->start();
-  cedar::aux::sleep(5);
+  cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
   cedar::aux::RecorderSingleton::getInstance()->stop();
 
 
@@ -77,9 +77,9 @@ void record()
 
 void run_test()
 {
-  errors= 0;
+  errors = 0;
 
-  cedar::test::test_time("Recording different Mats", record );
+  cedar::test::test_time("Recording different Mats", record);
 }
 
 
