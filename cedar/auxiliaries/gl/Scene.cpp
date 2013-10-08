@@ -43,6 +43,8 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gl::Scene::Scene()
+:
+mObjectVisualizationLock(QReadWriteLock::Recursive) //TODO: this locker is not used everywhere it needs to be used
 {
   init();
 }
@@ -78,6 +80,8 @@ double cedar::aux::gl::Scene::getSceneLimit() const
 
 int cedar::aux::gl::Scene::addObjectVisualization(cedar::aux::gl::ObjectVisualizationPtr pObjectVisualization)
 {
+  QWriteLocker write_locker(&mObjectVisualizationLock);
+
   mObjectVisualizations.push_back(pObjectVisualization);
   for (int i=0; i<mViewers.size(); i++)
   {
@@ -108,6 +112,8 @@ int cedar::aux::gl::Scene::removeViewer(cedar::aux::gui::Viewer* pViewer)
 
 void cedar::aux::gl::Scene::deleteObjectVisualization(int index)
 {
+  QWriteLocker write_locker(&mObjectVisualizationLock);
+
   mObjectVisualizations.removeAt(index);
   mSceneChanged();
 }
@@ -120,6 +126,7 @@ void cedar::aux::gl::Scene::clear()
 
 void cedar::aux::gl::Scene::draw()
 {
+  QReadLocker read_locker(&mObjectVisualizationLock);
   // save origin transformation to stack
   glPushMatrix();
 
