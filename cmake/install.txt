@@ -37,12 +37,22 @@
 ########################################################################################################################
 # install setup
 
+#------------------------
+# cedar configuration
+#------------------------
+# configure the file exposing cmake variables to projects
+configure_file("${CEDAR_HOME}/cmake/resources/cedar_configuration.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar_configuration.cmake")
+install(FILES "${CEDAR_BUILD_DIR}/cedar_configuration.cmake" DESTINATION "${CEDAR_DOC_INSTALL_DIR}" OPTIONAL)
 
 #------------------------
 # Header files
 #------------------------
 
 file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
+# delete old header installation
+if(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
+  install(CODE "execute_process(COMMAND rm -r ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION})")
+endif(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
 install(FILES ${cedarHeaders} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
 install(FILES ${CEDAR_CONFIGURATION_HEADER_OUTPUT} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
 # create links for the header directory

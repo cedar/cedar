@@ -103,6 +103,10 @@ private:
   //!@brief Resets the step and recreates the yarp connection.
   void reset();
 
+  //!@brief calls emitOutputPropertiesChangedSignal on all outputs
+  //! needed because emitOutputPropertiesChanged() is protected
+  void emitOutputPropertiesChangedSignalOnAction();
+
   void connect();
 
   //--------------------------------------------------------------------------------------------------------------------

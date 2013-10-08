@@ -90,7 +90,7 @@ class cedar::proc::Step : public QThread,
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! Map from action names to their corresponding functions.
-  typedef std::map<std::string, boost::function<void()> > ActionMap;
+  typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -123,9 +123,8 @@ public:
        );
 
   /*!@brief Sets the arguments used by the next execution of the run function.
-   *!@todo cedar::proc::Step::setNextArguments should take a const pointer.
    */
-  bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
+  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
@@ -210,6 +209,11 @@ protected:
 
   /*!@brief Method that registers a function of an object so that it can be used by the framework.
    *
+   * @param actionName Name of the action
+   * @param function The function to call (use boost::bind)
+   * @param autoLock Whether or not to automatically lock the data of the step. If false, the called method needs to
+   *                 take care of properly locking the data and parameters of the step.
+   *
    * As an example, consider a class A that has a function void A::foo():
    *
    * @code
@@ -235,7 +239,7 @@ protected:
    * @endcode
    *
    */
-  void registerFunction(const std::string& actionName, boost::function<void()> function);
+  void registerFunction(const std::string& actionName, boost::function<void()> function, bool autoLock = true);
 
   /*!@brief Sets whether inputs and outputs are locked automatically.
    *
@@ -281,6 +285,10 @@ protected:
    */
   void unlock() const;
 
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
   void revalidateInputSlot(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -343,14 +351,13 @@ protected:
 
 private:
   //!@brief flag that states if step is still computing its latest output
-  //!@todo Should busy be a part of STATE_*? Or even a lock?
   mutable QMutex mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
   QReadWriteLock* mpArgumentsLock;
 
   //!@brief The arguments for the next cedar::proc::Step::compute call.
-  ArgumentsPtr mNextArguments;
+  ConstArgumentsPtr mNextArguments;
 
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;

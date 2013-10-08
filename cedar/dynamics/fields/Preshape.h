@@ -48,8 +48,6 @@
 
 
 /*!@brief A step that implements preshape dynamics.
- *
- * @todo More descriptions, including equations and references to relevant papers.
  */
 class cedar::dyn::Preshape : public cedar::dyn::Dynamics
 {
@@ -123,7 +121,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
-  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
+  cedar::aux::UIntParameterPtr _mDimensionality;
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
   //!@brief time scale build up

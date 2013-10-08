@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -115,12 +116,17 @@ void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPan
   this->mpConfigurableWidget = pConfigurableWidget;
 }
 
+void cedar::proc::gui::Scene::setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget)
+{
+  this->mpRecorderWidget = pRecorderWidget;
+}
+
 void cedar::proc::gui::Scene::itemSelected()
 {
   using cedar::proc::Step;
   using cedar::proc::Manager;
 
-  if (this->mpConfigurableWidget == NULL)
+  if (this->mpConfigurableWidget == NULL || this->mpRecorderWidget == NULL)
   {
     return;
   }
@@ -134,13 +140,18 @@ void cedar::proc::gui::Scene::itemSelected()
       if (p_item->getElement())
       {
         this->mpConfigurableWidget->display(p_item->getElement());
+      
+        if(cedar::proc::StepPtr castedStep = boost::dynamic_pointer_cast<cedar::proc::Step>(p_item->getElement()))
+        {
+          this->mpRecorderWidget->setStep(castedStep);
+        }
       }
     }
   }
-  //!@ todo Handle the cases: multiple
   else
   {
     this->mpConfigurableWidget->resetContents();
+    this->mpRecorderWidget->resetContents();
   }
 }
 
@@ -169,10 +180,20 @@ void cedar::proc::gui::Scene::reset()
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
 {
+  return this->getStepMap();
+}
+
+const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::getStepMap() const
+{
   return this->mStepMap;
 }
 
 const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::triggerMap() const
+{
+  return this->getTriggerMap();
+}
+
+const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMap() const
 {
   return this->mTriggerMap;
 }
@@ -302,7 +323,6 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& /*menu*/)
 {
   /*
-  //!@todo Fix networks and reenable this functionality
   QAction *p_add_to_new_network = menu.addAction("group into new network");
   QObject::connect(p_add_to_new_network, SIGNAL(triggered()), this, SLOT(promoteElementToNewGroup()));
 
@@ -401,18 +421,11 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
    */
   cedar::proc::NetworkPtr new_parent_network;
 
-  //!@todo Solve this better
-  if (cedar::proc::gui::Network* p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
+  auto p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected.at(0));
+
+  if (p_base)
   {
-    new_parent_network = p_element->getNetwork()->getNetwork();
-  }
-  else if (cedar::proc::gui::StepItem* p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
-  {
-    new_parent_network = p_element->getStep()->getNetwork();
-  }
-  else if (cedar::proc::gui::TriggerItem* p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(0)))
-  {
-    new_parent_network = p_element->getTrigger()->getNetwork();
+    new_parent_network = p_base->getElement()->getNetwork();
   }
   else
   {
@@ -521,7 +534,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
   if (a == p_reset)
   {
-    this->mNetwork->getNetwork()->reset();
+    if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
+    {
+      p_ide->resetRootNetwork();
+    }
   }
   else if (a != NULL)
   {
@@ -646,7 +662,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
       {
         connected = true;
 
-        //!@todo a virtual connectTo method in cedar::proc::gui::GraphicsBase might be a better choice.
         switch (mpConnectionStart->getGroup())
         {
           // source item is a data item
@@ -664,7 +679,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                   = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name
                   = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
-                //!@todo this code is really messy, think about restructuring the GUI
                 if
                 (
                   cedar::proc::ConstPromotedExternalDataPtr ptr
@@ -673,7 +687,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 {
                   target_name = ptr->getParentPtr()->getName() + std::string(".") + p_data_target->getSlot()->getName();
                 }
-                //!@todo decide, at which network those two steps must be connected
                 CEDAR_DEBUG_ASSERT(dynamic_cast<cedar::proc::Element*>(p_source->getSlot()->getParentPtr()));
                 static_cast<cedar::proc::Element*>
                 (
@@ -815,9 +828,6 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
   try
   {
     mNetwork->getNetwork()->create(classId, adjusted_name);
-    /*@todo check if this works in all cases since adding an item triggers a signal/slot chain,
-     * which may not been processed completely
-     */
     CEDAR_DEBUG_ASSERT(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get());
     this->getGraphicsItemFor(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
   }
@@ -868,22 +878,11 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
   }
 }
 
-
-//!@todo Shouldn't this be const pointers?
 cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc::Step* step)
 {
   StepMap::iterator iter = this->mStepMap.find(step);
-  if (iter == this->mStepMap.end())
-  {
-#ifdef DEBUG
-    std::cout << "Could not find step item for step \"" << step->getName() << "\"" << std::endl;
-#endif // DEBUG
-    return NULL;
-  }
-  else
-  {
-    return iter->second;
-  }
+  CEDAR_ASSERT(iter != this->mStepMap.end());
+  return iter->second;
 }
 
 cedar::proc::gui::Network* cedar::proc::gui::Scene::getNetworkFor(cedar::proc::Network* network)
@@ -967,6 +966,10 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
+
+  //unregister this step in th recorder
+  //!@todo This is misplaced. If a step needs to be unregistered, that should happen in the destructor of proc::Step.
+  this->mpRecorderWidget->unregister(pStep->getStep());
 }
 
 cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()
@@ -1004,7 +1007,7 @@ void cedar::proc::gui::Scene::handleTriggerModeChange()
     }
     case MODE_SMART:
     {
-      //TODO do something smart here :)
+      // not yet implemented
     }
     default:
     {

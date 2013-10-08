@@ -86,7 +86,6 @@ cedar::aux::gui::ObjectParameter::~ObjectParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo This is redundant with the code in ObjectListParameter; unify that somehow!
 QString cedar::aux::gui::ObjectParameter::prettyTypeId(const QString& typeId) const
 {
   QStringList parts = typeId.split('.');

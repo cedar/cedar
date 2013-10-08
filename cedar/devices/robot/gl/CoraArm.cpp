@@ -131,7 +131,7 @@ void cedar::dev::robot::gl::CoraArm::drawSegment(unsigned int index)
     cedar::aux::gl::drawBlock(0.09, 0.09, 0.09, mIsDrawnAsWireFrame);
     setMaterial(WHITE_PLASTIC);
     glTranslated(0, 0, -.043);
-    //! \todo check directions of disk faces
+    //!@todo check directions of disk faces
     cedar::aux::gl::drawDisk(0, .0785, mResolution, mResolution, true, mIsDrawnAsWireFrame);
     setMaterial(ARTIFICIAL_SKIN);
     cedar::aux::gl::drawDisk(.0785, .0825, mResolution, mResolution, true, mIsDrawnAsWireFrame);
@@ -179,7 +179,7 @@ void cedar::dev::robot::gl::CoraArm::drawSegment(unsigned int index)
     cedar::aux::gl::drawBlock(0.07, 0.07, 0.07, mIsDrawnAsWireFrame);
     glTranslated(0, 0, -.0285);
     setMaterial(WHITE_PLASTIC);
-    //! \todo check directions of disk faces
+    //!@todo check directions of disk faces
     cedar::aux::gl::drawDisk(0, .055, mResolution, mResolution, true, mIsDrawnAsWireFrame);
     setMaterial(ARTIFICIAL_SKIN);
     cedar::aux::gl::drawDisk(.055, .062, mResolution, mResolution, true, mIsDrawnAsWireFrame);

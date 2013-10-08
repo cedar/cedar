@@ -64,7 +64,7 @@ namespace cedar
       class Writer;
 
       template <typename T>
-      class BlockingReader;
+      class Reader;
 
       template <typename T>
       class BlockingReader;
@@ -74,6 +74,7 @@ namespace cedar
       /* exceptions */
       CEDAR_DECLARE_AUX_CLASS(NetMissingRessourceException);
       CEDAR_DECLARE_AUX_CLASS(NetUnexpectedDataException);
+      CEDAR_DECLARE_AUX_CLASS(NetNoNewDataException);
       CEDAR_DECLARE_AUX_CLASS(NetUnhandledDataException);
       CEDAR_DECLARE_AUX_CLASS(NetWaitingForWriterException);
       //!@endcond

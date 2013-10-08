@@ -52,8 +52,6 @@
  *
  *        Connectable objects can have a number of DataSlots associated with them. These slots represent, e.g., inputs
  *        of the connectable and are used to define what data a connectable expects as input.
- *
- * @todo The design of having a parent and returning a shared pointer to connect two slots is not perfect.
  */
 class cedar::proc::DataSlot
 :
@@ -87,6 +85,7 @@ public:
     VALIDITY_UNKNOWN
   };
 
+  //! Type of the function that is called for type checks.
   typedef
     boost::function<VALIDITY (cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr)>
     TypeCheckFunction;
@@ -218,6 +217,7 @@ protected:
   //! The parent that owns the slot.
   cedar::proc::Connectable* mpParent;
 
+  //! Signal that is emitted when the validity of the data slot changes.
   boost::signals2::signal<void ()> mValidityChanged;
 
 private:

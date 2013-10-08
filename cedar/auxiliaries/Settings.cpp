@@ -53,16 +53,24 @@ cedar::aux::Settings::Settings()
 cedar::aux::Configurable(),
 _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false))
 {
+  mRecorderWorkspace = new cedar::aux::DirectoryParameter
+                       (
+                         this,
+                         "recorder output directory",
+                         cedar::aux::getUserHomeDirectory() + "/cedarRecordings/"
+                       );
+
   try
   {
     this->load();
   }
   catch (cedar::aux::ParseException& exc)
   {
-    //!\todo pass a log message to somewhere
-#ifdef DEBUG
-    std::cout << "error loading settings, a new file will be generated" << std::endl;
-#endif
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Error loading settings, a new file will be generated.",
+      "cedar::aux::Settings::Settings()"
+    );
   }
 }
 
@@ -74,15 +82,28 @@ cedar::aux::Settings::~Settings()
   }
   catch(cedar::aux::ParseException& exc)
   {
-    //!\todo pass a log message to somewhere
-    std::cout << "error saving settings, please check file permissions in "
-              << cedar::aux::getUserApplicationDataDirectory() << "/.cedar" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error saving settings, please check file permissions in"
+        + cedar::aux::getUserApplicationDataDirectory() + "/.cedar",
+      "cedar::aux::Settings::~Settings()"
+    );
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspaceParameter() const
+{
+  return this->mRecorderWorkspace;
+}
+
+std::string cedar::aux::Settings::getRecorderWorkspace() const
+{
+  return this->mRecorderWorkspace->getValue().absolutePath().toStdString();
+}
 
 void cedar::aux::Settings::load()
 {

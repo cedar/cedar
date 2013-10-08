@@ -80,8 +80,11 @@ namespace
 cedar::dyn::Preshape::Preshape()
 :
 mActivation(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
-_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
+_mDimensionality
+(
+  new cedar::aux::UIntParameter(this, "dimensionality", 2, cedar::aux::UIntParameter::LimitType::positiveZero(4))
+),
+_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 5000)),
 _mTimeScaleBuildUp
 (
   new cedar::aux::DoubleParameter(this, "time scale build up", 10.0, cedar::aux::DoubleParameter::LimitType::positive())
@@ -91,7 +94,6 @@ _mTimeScaleDecay
   new cedar::aux::DoubleParameter(this, "time scale decay", 1000.0, cedar::aux::DoubleParameter::LimitType::positive())
 )
 {
-  _mDimensionality->setValue(2);
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
@@ -145,7 +147,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    //!@todo Reenable this once the annotations for space code are introduced.
     /* if (cedar::dyn::ConstSpaceCodePtr input = boost::dynamic_pointer_cast<const cedar::dyn::SpaceCode>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
@@ -166,7 +167,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
       else
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
-        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */ // see above todo entry
       }
     }
     return cedar::proc::DataSlot::VALIDITY_ERROR;

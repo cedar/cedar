@@ -39,7 +39,6 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-//!@todo Why does this need libdc?
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"

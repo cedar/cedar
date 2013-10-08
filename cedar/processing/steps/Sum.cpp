@@ -39,6 +39,7 @@
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
@@ -105,7 +106,6 @@ void cedar::proc::steps::Sum::compute(const cedar::proc::Arguments&)
     this->mOutput->getData() *= 0;
     return;
   }
-  //!@todo this may be slow, as it may allocate a matrix on each compute()
   cv::Mat sum = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(0))->getData().clone();
   for (unsigned int data_id = 1; data_id < this->mInputs->getDataCount(); ++data_id)
   {
@@ -133,11 +133,18 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
 
     if (this->mInputs->getDataCount() > 0)
     {
-      const cv::Mat& first_mat
-        = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(0))->getData();
-      if (!cedar::aux::math::matrixSizesEqual(first_mat, mat_data->getData()))
+      for (size_t i = 0; i < this->mInputs->getDataCount(); ++i)
       {
-        return cedar::proc::DataSlot::VALIDITY_ERROR;
+        const cv::Mat& mat
+          = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(i))->getData();
+        if
+        (
+          mat.type() != mat_data->getData().type()
+          || !cedar::aux::math::matrixSizesEqual(mat, mat_data->getData())
+        )
+        {
+          return cedar::proc::DataSlot::VALIDITY_ERROR;
+        }
       }
     }
     // Mat data is accepted.
@@ -152,7 +159,16 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
 
 void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputName*/)
 {
-  this->onTrigger();
-  this->emitOutputPropertiesChangedSignal("sum");
-  this->onTrigger();
+  if (this->mInputs->getDataCount() > 0)
+  {
+    if (!this->allInputsValid())
+    {
+      return;
+    }
+    this->lock(cedar::aux::LOCK_TYPE_READ);
+    this->compute(cedar::proc::Arguments());
+    this->unlock();
+    this->emitOutputPropertiesChangedSignal("sum");
+    this->onTrigger();
+  }
 }

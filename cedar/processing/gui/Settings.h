@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Enum.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -55,7 +56,6 @@
 /*!@brief All settings concerning the currently visible widgets of the ui: sizes, where they are docked and so on.
  *
  * More detailed description of the class.
- * @todo management of plugins could be moved somewhere else
  */
 class cedar::proc::gui::Settings : public cedar::aux::Configurable
 {
@@ -93,6 +93,7 @@ public:
   CEDAR_GENERATE_POINTER_TYPES(DockSettings);
   //!@endcond
 
+  //! Enum of the possible default step display modes.
   class StepDisplayMode
   {
     public:
@@ -124,11 +125,11 @@ public:
         return mType.type();
       }
 
-      //! Identifier for the role input.
+      //! Steps are always created with the icon only display mode
       static const Id ICON_ONLY = 0;
-      //! Identifier for the role output.
+      //! Looped steps have their text displayed, others are icon only.
       static const Id TEXT_FOR_LOOPED = 1;
-      //! Identifier for the role buffer.
+      //! All steps also show their text.
       static const Id ICON_AND_TEXT = 2;
 
     private:
@@ -155,6 +156,9 @@ public:
   void load();
   //!@brief saves the UI settings
   void save();
+
+  //! Loads the plugins set to be loaded by default.
+  void loadDefaultPlugins();
 
   //!@brief returns a list of all plugins that should be loaded on start-up
   const std::set<std::string>& pluginsToLoad();
@@ -228,9 +232,16 @@ public:
     return this->_mDataSlotScalingSensitivity->getValue();
   }
 
+  //! Returns wheter data slots should scalse based on the distance of the mouse.
   bool getDataSlotScalingEnabled() const
   {
     return this->_mDataSlotScalingEnabled->getValue();
+  }
+
+  //! Returns whether or not connections of selected steps should be highlighted.
+  inline bool getHighlightConnections() const
+  {
+    return this->_mHighlightConnections->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -300,6 +311,9 @@ private:
   //!@brief Disables or enables graphics item shadows.
   cedar::aux::BoolParameterPtr mSnapToGrid;
 
+  //!@brief Disables or enables highlighting of the connections of selected steps.
+  cedar::aux::BoolParameterPtr _mHighlightConnections;
+
   //! Default display mode for steps.
   cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;
 
@@ -311,6 +325,9 @@ private:
 
   //! Sensitivity for slot items growth when the mouse approaches them while connecting.
   cedar::aux::DoubleParameterPtr _mDataSlotScalingSensitivity;
+
+  //! Maximum number of entries in the recent files list.
+  cedar::aux::UIntParameterPtr _mMaxFileHistorySize;
 
 }; // class cedar::proc::gui::Settings
 

@@ -138,7 +138,6 @@ namespace cedar
     namespace gui
     {
       /*!@brief singleton specialization for the plot manager
-       * @todo Template instantiation
        */
       typedef cedar::aux::Singleton<cedar::aux::gui::PlotManager> PlotManagerSingleton;
     }

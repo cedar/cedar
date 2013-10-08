@@ -41,6 +41,7 @@
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Log.h"
@@ -58,21 +59,41 @@ mTarget(target)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source));
-  // add the source data to target
-  //!@todo This code is redundant with the code below -- unify this
-  if (source && target)
+  try
   {
-    // remove the source data from target
-    cedar::proc::DataSlotPtr real_target = target;
-    while
-    (
-      cedar::proc::PromotedExternalDataPtr promoted
-        = boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(real_target)
-    )
-    {
-      real_target = promoted->mDataSlot;
-    }
+    // add the source data to target
+    cedar::proc::DataSlotPtr real_target = this->getRealTarget();
     real_target->getParentPtr()->setInput(real_target->getName(), source->getData());
+  }
+  catch (cedar::proc::ConnectionMemberDeletedException)
+  {
+    // ok
+  }
+  catch (cedar::aux::ExceptionBase& exc)
+  {
+    // we ignore exceptions during this constructor, but notify the user
+    if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+    {
+      p_triggerable->setState
+      (
+        cedar::proc::Triggerable::STATE_EXCEPTION,
+        "An exception occured during establishing a connection: "
+        + exc.getMessage()
+      );
+    }
+  }
+  catch (std::exception& exc)
+  {
+    // we ignore exceptions during this constructor, but notify the user
+    if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+    {
+      p_triggerable->setState
+      (
+        cedar::proc::Triggerable::STATE_EXCEPTION,
+        "An exception occured during establishing a connection: "
+        + std::string(exc.what())
+      );
+    }
   }
 }
 
@@ -80,8 +101,54 @@ cedar::proc::DataConnection::~DataConnection()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  cedar::proc::DataSlotPtr source = mSource.lock();
-  cedar::proc::DataSlotPtr target = mTarget.lock();
+  if (cedar::proc::DataSlotPtr source = this->mSource.lock())
+  {
+    try
+    {
+      cedar::proc::DataSlotPtr real_target = this->getRealTarget();
+      this->getRealTarget()->getParentPtr()->freeInput(real_target->getName(), source->getData());
+    }
+    catch (cedar::proc::ConnectionMemberDeletedException)
+    {
+      // ok
+    }
+    catch (cedar::aux::ExceptionBase& exc)
+    {
+      // we ignore exceptions during this destructor, but notify the user
+      if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+      {
+        p_triggerable->setState
+        (
+          cedar::proc::Triggerable::STATE_EXCEPTION,
+          "An exception occured during removing a connection: "
+          + exc.getMessage()
+        );
+      }
+    }
+    catch (std::exception& exc)
+    {
+      // we ignore exceptions during this destructor, but notify the user
+      if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+      {
+        p_triggerable->setState
+        (
+          cedar::proc::Triggerable::STATE_EXCEPTION,
+          "An exception occured during removing a connection: "
+          + std::string(exc.what())
+        );
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::DataSlotPtr cedar::proc::DataConnection::getRealTarget() const
+{
+  cedar::proc::DataSlotPtr source = this->mSource.lock();
+  cedar::proc::DataSlotPtr target = this->mTarget.lock();
 
   // first make a check if pointers are valid for source and target
   if (source && target)
@@ -96,12 +163,14 @@ cedar::proc::DataConnection::~DataConnection()
     {
       real_target = promoted->mDataSlot;
     }
-    real_target->getParentPtr()->freeInput(real_target->getName(), source->getData());
+    return real_target;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Could not acquire source or target.");
   }
 }
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+
 bool cedar::proc::DataConnection::equals(
                                           cedar::proc::ConstDataSlotPtr source,
                                           cedar::proc::ConstDataSlotPtr target

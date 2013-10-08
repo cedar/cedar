@@ -99,6 +99,7 @@ namespace cedar
           ImagePlotLegend();
 
         public slots:
+          //! Updates the minimum and maximum value displayed by the legend.
           void updateMinMax(double min, double max);
 
         private:
@@ -161,10 +162,7 @@ public:
   ImagePlot(QWidget *pParent = NULL);
 
   //!@brief Constructor that plots some data.
-  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
-
-  //!@todo implement this constructor (see SurfacePlot.cpp)
-  // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
   //!@brief Destructor.
   ~ImagePlot();
@@ -194,9 +192,13 @@ public:
   void setLimits(double min, double max);
 
   /*!@brief Applies a color scale to a matrix.
-   * @todo Put this functionality into its own class.
+   *
+   * @param matrix Matrix to colorize
+   * @param limits Whether or not there are limits to the scaling.
+   * @param min    lower limit - if limits is true, values above this will be blacked out
+   * @param max    upper limit - if limits is true, values below this will be blacked out
    */
-  static cv::Mat colorizedMatrix(cv::Mat matrix);
+  static cv::Mat colorizedMatrix(cv::Mat matrix, bool limits = false, double min = 0.0, double max = 0.0);
 
   /*! Fills the gradient used for colorization into a QGradient
    */

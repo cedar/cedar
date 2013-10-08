@@ -97,9 +97,7 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
       //!@endcond
 
-      /*! The factory for gui parameters.
-       * @todo It should be possible to add new gui parameters within a plugin.
-       */
+      //! The factory for gui parameters.
       typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
 
       //!@brief singleton specialization for the parameter factory
@@ -126,12 +124,14 @@ namespace cedar
         CEDAR_DECLARE_AUX_CLASS(VtkSurfacePlot);
       #endif // CEDAR_USE_VTK
       #ifdef CEDAR_USE_QWT
-        CEDAR_DECLARE_AUX_CLASS(LinePlot);
+        CEDAR_DECLARE_AUX_CLASS(QwtLinePlot);
+        CEDAR_DECLARE_DEPRECATED(typedef QwtLinePlot LinePlot);
         CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
         CEDAR_DECLARE_AUX_CLASS(MatrixVectorPlot);
       #endif // CEDAR_USE_QWT
       #ifdef CEDAR_USE_QWTPLOT3D
-        CEDAR_DECLARE_AUX_CLASS(SurfacePlot);
+        CEDAR_DECLARE_AUX_CLASS(QwtSurfacePlot);
+        CEDAR_DECLARE_DEPRECATED(typedef QwtSurfacePlot SurfacePlot);
       #endif // CEDAR_USE_QWTPLOT3D
       //!@endcond
 

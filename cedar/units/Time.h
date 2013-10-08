@@ -48,11 +48,6 @@
 
 
 /*!@brief Base class for time units.
- *
- * More detailed description of the class.
- *
- * @todo explain here that functions expecting a time as argument should always use this class and not, e.g.,
- *       cedar::units::Milliseconds.
  */
 class cedar::unit::Time
 {

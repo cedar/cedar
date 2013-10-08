@@ -94,6 +94,10 @@ public:
     return this->mReturnedOnFail;
   }
 
+  /*! Performs the type check for the given slot and data object.
+   *
+   *  @see check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr)
+   */
   cedar::proc::DataSlot::VALIDITY operator()(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
   {
     return this->check(slot, data);

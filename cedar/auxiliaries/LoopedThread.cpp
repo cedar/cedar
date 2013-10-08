@@ -54,9 +54,24 @@ cedar::aux::LoopedThread::LoopedThread
   cedar::aux::EnumId mode
 )
 :
-_mStepSize(new cedar::aux::DoubleParameter(this, "step size", stepSize)),
-_mIdleTime(new cedar::aux::DoubleParameter(this, "idle time", idleTime)),
-_mSimulatedTime(new cedar::aux::DoubleParameter(this, "simulated time", simulatedTime)),
+_mStepSize
+(
+  new cedar::aux::DoubleParameter(this, "step size", stepSize, cedar::aux::DoubleParameter::LimitType::fromLower(1.0))
+),
+_mIdleTime
+(
+  new cedar::aux::DoubleParameter(this, "idle time", idleTime, cedar::aux::DoubleParameter::LimitType::positiveZero())
+),
+_mSimulatedTime
+(
+  new cedar::aux::DoubleParameter
+      (
+        this,
+        "simulated time",
+        simulatedTime,
+        cedar::aux::DoubleParameter::LimitType::positive()
+      )
+),
 _mLoopMode
 (
   new cedar::aux::EnumParameter

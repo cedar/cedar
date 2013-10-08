@@ -223,4 +223,19 @@ class cedar::aux::ParseException: public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::ParseException
 
+/*!@brief An exception that is thrown, when a function is not implemented.
+ */
+class cedar::aux::NotImplementedException: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::NotImplementedException
+
+/*!@brief An exception that is thrown, when a thread is running and an operation
+ *        is called which is not allowed.
+ * @todo  This exception needs a better name
+ */
+class cedar::aux::ThreadRunningExeption: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ThreadRunningExeption
+
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

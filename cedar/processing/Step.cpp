@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/BoolParameter.h"
@@ -94,7 +93,7 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
-  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this));
+  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
 }
 
 cedar::proc::Step::~Step()
@@ -184,14 +183,13 @@ void cedar::proc::Step::setAutoLockInputsAndOutputs(bool autoLock)
   this->mAutoLockInputsAndOutputs = autoLock;
 }
 
-void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function)
+void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function, bool autoLock)
 {
-  //!@todo Check for restrictions on the name, e.g., no dots, ...
   if (this->mActions.find(actionName) != this->mActions.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate action name: " + actionName);
+    CEDAR_THROW(cedar::aux::InvalidNameException, "Duplicate action name: " + actionName);
   }
-  this->mActions[actionName] = function;
+  this->mActions[actionName] = std::make_pair(function, autoLock);
 }
 
 void cedar::proc::Step::callAction(const std::string& name)
@@ -201,14 +199,27 @@ void cedar::proc::Step::callAction(const std::string& name)
   if (iter == this->mActions.end())
   {
     // if it doesn't exist, throw
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown action name: " + name);
+    CEDAR_THROW(cedar::aux::InvalidNameException, "Unknown action name: " + name);
   }
 
   // get the functor
-  boost::function<void()>& function = iter->second;
+  boost::function<void()>& function = iter->second.first;
+
+  bool autolock = iter->second.second;
+  if (autolock)
+  {
+    // lock the step
+    this->lock(cedar::aux::LOCK_TYPE_WRITE);
+  }
 
   // call it
   function();
+
+  if (autolock)
+  {
+    // unlock the step
+    this->unlock();
+  }
 }
 
 const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
@@ -280,13 +291,6 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
     this->mpArgumentsLock->unlock();
-    //!@todo This may happen a lot when running multiple looped triggers -- investigate
-    /*
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      "Step \"" + this->getName() + " did not succeed in setting arguments, skipping onTrigger().",
-      "cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr)"
-    );*/
     return;
   }
 
@@ -313,7 +317,7 @@ void cedar::proc::Step::run()
   if (this->mBusy.tryLock())
   {
     // Read out the arguments
-    cedar::proc::ArgumentsPtr arguments;
+    cedar::proc::ConstArgumentsPtr arguments;
 
     // if no arguments have been set, create default ones.
     this->mpArgumentsLock->lockForWrite();
@@ -560,7 +564,7 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
  * @remarks The function returns false only if arguments have previously been set that were not yet processed by the
  *          run function.
  */
-bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
+bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr arguments)
 {
   // first, check if new arguments have already been set.
   {

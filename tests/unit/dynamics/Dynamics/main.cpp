@@ -48,7 +48,6 @@
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
@@ -84,7 +83,7 @@ void run_test()
 
   std::cout << "Reading Setup1.json ... ";
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile("Setup1.json");
+  network->readJson("Setup1.json");
   std::cout << "done." << std::endl;
 
   // Create trigger for the "main loop"

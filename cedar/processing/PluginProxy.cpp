@@ -36,9 +36,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/PluginProxy.h"
-#include "cedar/auxiliaries/PluginDeclarationList.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/FrameworkSettings.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/configuration.h"
 
@@ -91,6 +91,14 @@ cedar::proc::PluginProxy::~PluginProxy()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::PluginProxy::declare()
+{
+  if (this->getDeclaration())
+  {
+    this->getDeclaration()->declareAll();
+  }
+}
 
 std::string cedar::proc::PluginProxy::getPluginNameFromPath(const std::string& path)
 {
@@ -227,25 +235,23 @@ void cedar::proc::PluginProxy::load(const std::string& file)
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
   }
 
-  //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
 #elif defined CEDAR_OS_WINDOWS
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
-    //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
   }
   
   p_interface = (PluginInterfaceMethod) (GetProcAddress(this->mpLibHandle, TEXT("pluginDeclaration")));
   if (!p_interface)
   {
-    //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
   }
 #endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS
   
-  this->mDeclaration = cedar::proc::PluginDeclarationPtr(new cedar::proc::PluginDeclaration());
+  this->mDeclaration = cedar::aux::PluginDeclarationListPtr(new cedar::aux::PluginDeclarationList());
   (*p_interface)(this->mDeclaration);
+  this->mDeclaration->setSource(this->mFileName);
 
   // try to load the plugin description file
   std::string description = this->findPluginDescription(this->mFileName);

@@ -107,7 +107,6 @@ protected:
   cedar::aux::BoolParameterPtr _mFlipFirstDimension;
   //!@brief Should this step flip along the second dimension?
   cedar::aux::BoolParameterPtr _mFlipSecondDimension;
-  //!@todo flip annotations flag
 
 private:
 

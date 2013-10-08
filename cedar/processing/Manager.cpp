@@ -66,7 +66,6 @@ cedar::proc::Manager::Manager()
 
 cedar::proc::Manager::~Manager()
 {
-  this->stopThreads();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,58 +73,12 @@ cedar::proc::Manager::~Manager()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::Manager::loadDefaultPlugins()
 {
-  const std::set<std::string>& plugins = cedar::proc::gui::SettingsSingleton::getInstance()->pluginsToLoad();
-  for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
-  {
-    std::string action = "reading";
-    try
-    {
-      action = "opening";
-      cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
-      action = "loading";
-      this->load(plugin);
-      cedar::aux::LogSingleton::getInstance()->message
-      (
-        "Loaded default plugin \"" + (*iter) + "\"",
-        "void cedar::proc::Manager::loadDefaultPlugins()"
-      );
-    }
-    catch (const cedar::aux::ExceptionBase& e)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Error while " + action + " default plugin \"" + (*iter) + "\": " + e.exceptionInfo(),
-        "void cedar::proc::Manager::loadDefaultPlugins()"
-      );
-    }
-    catch (std::exception& e)
-    {
-      std::string what = e.what();
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Error while " + action + " default plugin \"" + (*iter) + "\": " + what,
-        "void cedar::proc::Manager::loadDefaultPlugins()"
-      );
-    }
-    catch (...)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Unknown error while " + action + " default plugin.",
-        "void cedar::proc::Manager::loadDefaultPlugins()"
-      );
-    }
-  }
+  cedar::proc::gui::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
 {
-  cedar::proc::PluginDeclarationPtr decl = plugin->getDeclaration();
-  if (decl)
-  {
-    // load steps
-    this->load(decl);
-  }
+  plugin->declare();
 }
 
 void cedar::proc::Manager::load(cedar::proc::PluginDeclarationPtr declaration)
@@ -143,10 +96,9 @@ void cedar::proc::Manager::startThreads()
 {
   for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
   {
-    //!@todo Ugly solution -- is there a better one?
     if (cedar::proc::LoopedTrigger* looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(iter->get()))
     {
-      looped_trigger->startTrigger();
+      looped_trigger->start();
     }
     else
     {
@@ -160,10 +112,9 @@ void cedar::proc::Manager::stopThreads(bool wait)
   // Stop all the threads
   for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
   {
-    //!@todo Ugly solution -- is there a better one?
     if (cedar::proc::LoopedTrigger* looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(iter->get()))
     {
-      looped_trigger->stopTrigger();
+      looped_trigger->stop();
     }
     else
     {
@@ -186,3 +137,7 @@ cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()
   return this->mThreadRegistry;
 }
 
+cedar::proc::Manager& cedar::proc::Manager::getInstance()
+{
+  return *cedar::proc::ManagerSingleton::getInstance();
+}

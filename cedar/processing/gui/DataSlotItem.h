@@ -49,14 +49,17 @@
 #include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 /*!@brief User-Interface representation of a cedar::proc::DataSlot.
  *
  *        This class implements a cedar::proc::gui::GraphicsBase that is used to display a cedar::proc::DataSlot inside
  *        a cedar::proc::gui::Scene.
  */
-class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::DataSlotItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,15 +116,20 @@ public:
    */
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
+  //! Sets the scaling factor of the slot that occurs due to mouse interaction.
   void setMagneticScale(qreal scale)
   {
     this->mMagneticScale = scale;
   }
 
+  //! Returns how much the slot is currently scaled due to mouse interaction.
   qreal getMagneticScale() const
   {
     return this->mMagneticScale;
   }
+
+  //! Sets whether the connections of this item are highlighted due to one of its owners being selected.
+  void setHighlightedBySelection(bool highlight);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -130,19 +138,23 @@ protected:
   //! creates a tool tip if the mouse cursor hovers over this object
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
+signals:
+  void connectionValidityChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief Generates a tool tip depending on the content of DataSlot.
-   * @todo this should be called by a signal-slot mechanism
    */
   void generateTooltip();
 
-  void updateConnections();
-
   cedar::proc::gui::ConnectValidity translateValidity(cedar::proc::DataSlot::VALIDITY validity) const;
 
+  void translateValidityChangedSignal();
+
+private slots:
+  void updateConnectionValidity();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

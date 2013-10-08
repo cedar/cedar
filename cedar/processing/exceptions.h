@@ -44,12 +44,11 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 
-/*!@brief An exception that occurs when a name is used as an index that is not known.
- * @todo  There is already an InvalidNameException in aux, so remove this one.
+/*!@brief An exception that occurs when data is not found.
  */
-class cedar::proc::InvalidNameException : public cedar::aux::ExceptionBase
+class cedar::proc::DataNotFoundException : public cedar::aux::ExceptionBase
 {
-}; // class cedar::proc::InvalidNameException
+}; // class cedar::proc::DataNotFoundException
 
 /*!@brief An exception that occurs when a deadlock may be caused by a user action.
  */

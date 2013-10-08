@@ -123,7 +123,11 @@ cedar::aux::math::Limits<double> cedar::aux::gui::MatrixVectorPlot::getXLimits()
 {
   cedar::aux::math::Limits<double> limits;
 
+#if QWT_VERSION >= 0x060100
+  const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#else // QWT_VERSION >= 0x060100
   QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#endif // QWT_VERSION >= 0x060100
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -232,7 +236,6 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
 
   this->buildArrays(plot_series, num);
 
-  //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
 #if (QWT_VERSION >> 16) == 5
   plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
 #elif (QWT_VERSION >> 16) == 6
@@ -244,7 +247,7 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
 
   mpLock->unlock();
 
-  this->startTimer(30); //!@todo make the refresh time configurable.
+  this->startTimer(30);
 }
 
 void cedar::aux::gui::MatrixVectorPlot::attachMarker(QwtPlotMarker *pMarker)
@@ -265,7 +268,7 @@ void cedar::aux::gui::MatrixVectorPlot::plot(cedar::aux::ConstDataPtr data, cons
 
   this->append(data, title);
 
-  this->startTimer(30); //!@todo make the refresh time configurable.
+  this->startTimer(30);
 }
 
 void cedar::aux::gui::MatrixVectorPlot::init()
@@ -322,7 +325,7 @@ void cedar::aux::gui::MatrixVectorPlot::showLegend(bool show)
   if (show)
   {
     // show legend
-    QwtLegend *p_legend = this->mpPlot->legend();
+    QwtLegend* p_legend = cedar::aux::asserted_cast<QwtLegend*>(this->mpPlot->legend());
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();
@@ -405,20 +408,29 @@ void cedar::aux::gui::MatrixVectorPlot::timerEvent(QTimerEvent * /* pEvent */)
     series->mYValues.at(1) = cedar::aux::math::getMatrixEntry<double>(mat, 1);
     series->mMatData->unlock();
 
-    //!@todo put the enum values for x and y in vectors
     for (unsigned int i = 0; i < 2; ++i)
     {
-      QwtScaleDiv* p_lower;
-      QwtScaleDiv* p_upper;
+      const QwtScaleDiv* p_lower;
+      const QwtScaleDiv* p_upper;
       if (i == 0)
       {
+#if QWT_VERSION >= 0x060100
+        p_lower = &this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+        p_upper = &this->mpPlot->axisScaleDiv(QwtPlot::xTop);
+#else // QWT_VERSION >= 0x060100
         p_lower = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
         p_upper = this->mpPlot->axisScaleDiv(QwtPlot::xTop);
+#endif // QWT_VERSION >= 0x060100
       }
       else
       {
+#if QWT_VERSION >= 0x060100
+        p_lower = &this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+        p_upper = &this->mpPlot->axisScaleDiv(QwtPlot::yRight);
+#else // QWT_VERSION >= 0x060100
         p_lower = this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
         p_upper = this->mpPlot->axisScaleDiv(QwtPlot::yRight);
+#endif // QWT_VERSION >= 0x060100
       }
       double entry = std::abs(cedar::aux::math::getMatrixEntry<double>(mat, i));
       if (p_upper->upperBound() < entry || p_lower->lowerBound() > -1.0 * entry)
@@ -437,7 +449,6 @@ void cedar::aux::gui::MatrixVectorPlot::timerEvent(QTimerEvent * /* pEvent */)
     }
 
     // choose the right function depending on the qwt version
-    //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
 #if (QWT_VERSION >> 16) == 5
     series->mpCurve->setData
     (

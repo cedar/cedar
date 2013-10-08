@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/ExternalData.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -119,9 +120,16 @@ void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)
       break;
     }
   }
-  //!@todo Throw a proper exception here.
+
   // The data should always be in the vector.
-  CEDAR_ASSERT(iter != this->mData.end());
+  if (iter == this->mData.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::proc::DataNotFoundException,
+      "The given data object could not be removed because it was not found in the slot \"" + this->getName() + "\"."
+    );
+  }
 
   // Erase the data.
   this->mData.erase(iter);

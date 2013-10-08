@@ -96,11 +96,11 @@ int testOnlineDisconnecting()
   for (size_t i = 0; i < trials; ++i)
   {
     cedar::proc::NetworkPtr network(new cedar::proc::Network());
-    network->readFile("projection.json");
+    network->readJson("projection.json");
 
     auto trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
 
-    trigger->startTrigger();
+    trigger->start();
 
     cedar::aux::sleep(cedar::unit::Milliseconds(50));
 
@@ -108,20 +108,20 @@ int testOnlineDisconnecting()
 
     cedar::aux::sleep(cedar::unit::Milliseconds(50));
 
-    trigger->stopTrigger();
+    trigger->stop();
   }
 
   for (size_t i = 0; i < trials; ++i)
   {
     std::cout << "Testing double-triggered case ..." << std::endl;
     cedar::proc::NetworkPtr network(new cedar::proc::Network());
-    network->readFile("taste_the_double_trigger.json");
+    network->readJson("taste_the_double_trigger.json");
 
     auto trigger1 = network->getElement<cedar::proc::LoopedTrigger>("trigger1");
     auto trigger2 = network->getElement<cedar::proc::LoopedTrigger>("trigger2");
 
-    trigger1->startTrigger();
-    trigger2->startTrigger();
+    trigger1->start();
+    trigger2->start();
 
     cedar::aux::sleep(cedar::unit::Milliseconds(50));
 
@@ -129,8 +129,8 @@ int testOnlineDisconnecting()
 
     cedar::aux::sleep(cedar::unit::Milliseconds(50));
 
-    trigger1->stopTrigger();
-    trigger2->stopTrigger();
+    trigger1->stop();
+    trigger2->stop();
   }
 
   std::cout << "Online (dis-)connecting revealed " << errors << " error(s)." << std::endl;
