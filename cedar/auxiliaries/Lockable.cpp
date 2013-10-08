@@ -65,6 +65,12 @@ cedar::aux::Lockable::~Lockable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+const cedar::aux::Lockable::Locks& cedar::aux::Lockable::getLocks(LockSetHandle lockSet) const
+{
+  CEDAR_ASSERT(lockSet < this->mLockSets.size());
+  return this->mLockSets[lockSet];
+}
+
 size_t cedar::aux::Lockable::getLockCount() const
 {
   return this->mLockSets[this->getLockSetHandle("all")].size();

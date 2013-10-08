@@ -37,11 +37,11 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
-#include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
-#include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/devices/robot/gl/KinematicChain.h"
-#include "cedar/devices/robot/gl/KukaArm.h"
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/gui/KinematicChainMonitorWidget.h"
+#include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/gl/KinematicChain.h"
+#include "cedar/devices/gl/KukaArm.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -68,7 +68,7 @@ public:
   //!@brief constructor
   WorkerThread
   (
-    cedar::dev::robot::KinematicChainPtr arm,
+    cedar::dev::KinematicChainPtr arm,
     cedar::aux::LocalCoordinateFramePtr target
   )
   :
@@ -90,7 +90,8 @@ private:
     if (mpArm->isMovable())
     {
       // calculate direction of movement
-      cv::Mat vector_to_target_hom = (mTarget->getTranslation() - mpArm->calculateEndEffectorPosition());
+      cv::Mat vector_to_target_hom
+        = (mTarget->getTranslation().matrix - mpArm->calculateEndEffectorPosition());
       cv::Mat vector_to_target(vector_to_target_hom, cv::Rect(0, 0, 1, 3));
       if (norm(vector_to_target) == 0)
       {
@@ -125,7 +126,7 @@ private:
 
 private:
   //! hardware interface
-  cedar::dev::robot::KinematicChainPtr mpArm;
+  cedar::dev::KinematicChainPtr mpArm;
   //! target
   cedar::aux::LocalCoordinateFramePtr mTarget;
   //! movement speed towards target
@@ -169,7 +170,7 @@ int main(int argc, char **argv)
 
   // create interface to the arm
   cedar::dev::kuka::gui::FriStatusWidget* p_fri_status_widget = 0;
-  cedar::dev::robot::KinematicChainPtr arm;
+  cedar::dev::KinematicChainPtr arm;
 
   if (use_hardware)
   {
@@ -185,7 +186,7 @@ int main(int argc, char **argv)
   else
   {
     // simulated arm
-    cedar::dev::robot::KinematicChainPtr sim(new cedar::dev::robot::SimulatedKinematicChain());
+    cedar::dev::KinematicChainPtr sim(new cedar::dev::SimulatedKinematicChain());
     sim->readJson(configuration_file);
     arm = sim;
 
@@ -215,7 +216,7 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
 
   // create an arm visualization and add it to the scene
-  cedar::dev::robot::gl::KinematicChainPtr arm_visualization(new cedar::dev::robot::gl::KukaArm(arm));
+  cedar::dev::gl::KinematicChainPtr arm_visualization(new cedar::dev::gl::KukaArm(arm));
   arm_visualization->setDisplayEndEffectorVelocity(false);
   scene->addObjectVisualization(arm_visualization);
 
@@ -235,8 +236,8 @@ int main(int argc, char **argv)
   target_widget->show();
 
   // monitor/command widget for the arm
-  cedar::dev::robot::gui::KinematicChainMonitorWidget* p_kinematic_chain_widget
-    = new cedar::dev::robot::gui::KinematicChainMonitorWidget(arm);
+  cedar::dev::gui::KinematicChainMonitorWidget* p_kinematic_chain_widget
+    = new cedar::dev::gui::KinematicChainMonitorWidget(arm);
   p_kinematic_chain_widget->show();
 
   // create the worker thread

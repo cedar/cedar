@@ -359,6 +359,10 @@ protected:
     return iter->second;
   }
 
+  /*!@brief Removes all declared data slots.
+   */
+  void clearDataSlots();
+
   /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
    *        changed.
    *

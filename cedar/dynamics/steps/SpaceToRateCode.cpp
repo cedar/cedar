@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -92,7 +94,14 @@ mFixPoint(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
 // parameters
 _mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
 _mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0)),
-_mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, cedar::aux::DoubleParameter::LimitType::positive()))
+_mTau(new cedar::aux::TimeParameter
+          (
+            this,
+            "tau",
+            cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds),
+            cedar::aux::TimeParameter::LimitType::positive()
+          )
+     )
 {
   // declare all data
   this->declareInput("input");
@@ -200,8 +209,9 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
   // the result is simply input * gain; see explanation above for variable names
   double s = cv::sum(this->mInput->getData()).val[0];
   double o = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
-  double dt = cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(1.0);
-  double tau = cedar::unit::Milliseconds(this->getTau()) / cedar::unit::Milliseconds(1.0);
+  double dt = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
+  //!@todo use the time unit throughout the computation
+  double tau = this->getTau() / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
 
   double h = dt;
   if (h / tau * s >= 2) // stability criterion

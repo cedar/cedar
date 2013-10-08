@@ -35,26 +35,35 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/math/IntLimitsParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/kteam/Drive.h"
-#include "cedar/devices/communication/SerialCommunication.h"
 #include "cedar/devices/exceptions.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/Frequency.h"
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <boost/units/cmath.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kteam::Drive::Drive(cedar::dev::com::SerialCommunicationPtr communication)
+cedar::dev::kteam::Drive::Drive()
 :
-cedar::dev::robot::DifferentialDrive(),
-mSerialCommunication(communication),
 _mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1)),
-_mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", -32768, 0, 0, 32767))
+_mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", 0, -32768, 0, 32767, 0, 32767))
+{
+}
+
+cedar::dev::kteam::Drive::Drive(cedar::dev::ChannelPtr channel)
+:
+cedar::dev::DifferentialDrive(channel),
+_mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1)),
+_mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", 0, -32768, 0, 32767, 0, 32767))
 {
 }
 
@@ -62,7 +71,7 @@ _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits",
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::dev::kteam::Drive::getDistancePerPulse() const
+cedar::unit::Length cedar::dev::kteam::Drive::getDistancePerPulse() const
 {
   return 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
 }
@@ -77,92 +86,6 @@ cedar::aux::math::IntLimitsParameterPtr cedar::dev::kteam::Drive::getEncoderLimi
   return _mEncoderLimits;
 }
 
-std::string cedar::dev::kteam::Drive::getCommandSetSpeed() const
-{
-  return "D";
-}
-
-std::string cedar::dev::kteam::Drive::getCommandSetEncoder() const
-{
-  return "P";
-}
-
-std::string cedar::dev::kteam::Drive::getCommandGetEncoder() const
-{
-  return "Q";
-}
-
-cedar::dev::com::SerialCommunicationPtr cedar::dev::kteam::Drive::getSerialCommunication() const
-{
-  return mSerialCommunication;
-}
-
-void cedar::dev::kteam::Drive::sendMovementCommand()
-{
-  // the speed has be thresholded based on the maximum possible number
-  // of pulses per second (this is hardware-specific).
-  // first: convert speed from m/s into Pulses/s ...
-  std::vector<int> wheel_speed_pulses(2, 0);
-  wheel_speed_pulses[0] = cedar::aux::math::round(this->getWheelSpeed()[0] / this->getDistancePerPulse());
-  wheel_speed_pulses[1] = cedar::aux::math::round(this->getWheelSpeed()[1] / this->getDistancePerPulse());
-
-  // construct the command string "D,x,y"
-  // where x is the speed of the left wheel (in pulses/s)
-  // and y is the speed of the right wheel (in pulses/s)
-  std::ostringstream command;
-  command << getCommandSetSpeed() << "," << wheel_speed_pulses[0] << "," << wheel_speed_pulses[1];
-
-  // wait for an answer
-  std::string answer = getSerialCommunication()->sendAndReceiveLocked(command.str());
-
-  checkAnswer(answer, getCommandSetSpeed());
-}
-
-std::vector<int> cedar::dev::kteam::Drive::getEncoders() const
-{
-  // the left and right encoder value will be saved in this vector
-  std::vector<int> encoders(2);
-
-  // send the command to receive the values of the encoders
-  std::string answer
-    = getSerialCommunication()->sendAndReceiveLocked(cedar::aux::toString(getCommandGetEncoder()));
-
-  // check whether the answer begins with the correct character
-  checkAnswer(answer, getCommandGetEncoder());
-
-  std::istringstream answer_stream;
-  answer_stream.str(answer);
-
-  // skip the answer characters (e.g., 'q,') at the beginning
-  answer_stream.ignore(2);
-  checkStream(answer_stream, false);
-
-  // read the left encoder value
-  answer_stream >> encoders[0];
-  checkStream(answer_stream, false);
-
-  // skip the colon separating the encoder values
-  answer_stream.ignore(1);
-  checkStream(answer_stream, false);
-
-  // read the right encoder value
-  answer_stream >> encoders[1];
-  checkStream(answer_stream, true);
-
-  return encoders;
-}
-
-void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
-{
-  // create a command string which will set the encoder values
-  std::ostringstream command;
-  command << getCommandSetEncoder() << "," << encoders[0] << "," << encoders[1];
-  std::string answer = getSerialCommunication()->sendAndReceiveLocked(command.str());
-
-  // check whether the answer begins with the correct character
-  checkAnswer(answer, getCommandSetEncoder());
-}
-
 void cedar::dev::kteam::Drive::reset()
 {
   // stop the robot
@@ -175,47 +98,56 @@ void cedar::dev::kteam::Drive::reset()
   setEncoders(encoders);
 }
 
-std::string cedar::dev::kteam::Drive::determineCorrectAnswer(std::string commandString) const
+std::vector<cedar::unit::Frequency> cedar::dev::kteam::Drive::convertWheelSpeedToPulses
+                                    (
+                                      const std::vector<cedar::unit::Velocity>& wheelSpeed
+                                    ) const
 {
-  std::transform(commandString.begin(), commandString.end(), commandString.begin(), ::tolower);
-  return commandString;
+  CEDAR_ASSERT(wheelSpeed.size() == 2);
+
+  // the speed has be thresholded based on the maximum possible number
+  // of pulses per second (this is hardware-specific).
+  // first: convert speed from m/s into Pulses/s ...
+  std::vector<cedar::unit::Frequency> wheel_speed_pulses
+                                      (
+                                        wheelSpeed.size(),
+                                        0.0 * cedar::unit::DEFAULT_FREQUENCY_UNIT
+                                      );
+
+  for (unsigned int i = 0; i < wheelSpeed.size(); ++i)
+  {
+    // compute the number of pulses per second and round the value to a natural number
+    wheel_speed_pulses[i] = boost::units::round(wheelSpeed[i] / this->getDistancePerPulse());
+  }
+
+  return wheel_speed_pulses;
 }
 
-void cedar::dev::kteam::Drive::checkAnswer
-     (
-       const std::string& answer,
-       const std::string& command,
-       const std::string& expectedAnswer
-     ) const
+std::vector<cedar::unit::Velocity> cedar::dev::kteam::Drive::convertPulsesToWheelSpeed
+                                    (
+                                      const std::vector<cedar::unit::Frequency>& wheelSpeedPulses
+                                    ) const
 {
-  std::string expected_answer = expectedAnswer;
+  CEDAR_ASSERT(wheelSpeedPulses.size() == 2);
 
-  if (expected_answer.empty())
+  // first: convert speed from Pulses/s into m/s ...
+  std::vector<cedar::unit::Velocity> wheel_speed
+                                      (
+                                        wheelSpeedPulses.size(),
+                                        0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT
+                                      );
+
+  for (unsigned int i = 0; i < wheelSpeedPulses.size(); ++i)
   {
-    expected_answer = this->determineCorrectAnswer(command);
+    // compute the number of pulses per second and round the value to a natural number
+    wheel_speed[i] = wheelSpeedPulses[i] * this->getDistancePerPulse();
   }
 
-  // if the answer is incorrect ...
-  if (answer.empty() || answer.compare(0, expected_answer.size(), expected_answer, 0, expected_answer.size()) != 0)
-  {
-    // ... throw an exception
-    std::string exception_message = "Unexpected answer during serial communication: " + answer;
-    CEDAR_THROW
-    (
-      cedar::dev::SerialCommunicationException,
-      exception_message
-    );
-  }
+  return wheel_speed;
 }
 
-void cedar::dev::kteam::Drive::checkStream(const std::istringstream& answerStream, bool atEndOfStream) const
+void cedar::dev::kteam::Drive::setWheelSpeedPulses(const std::vector<cedar::unit::Frequency>& wheelSpeedPulses)
 {
-  if (answerStream.fail() || (!atEndOfStream && answerStream.eof()))
-  {
-    CEDAR_THROW
-    (
-      cedar::dev::SerialCommunicationException,
-      "Error while parsing answer received from robot. Unexpected structure of answer. (Answer: " + answerStream.str() + "\")"
-    );
-  }
+  std::vector<cedar::unit::Velocity> wheel_speeds = convertPulsesToWheelSpeed(wheelSpeedPulses);
+  this->setWheelSpeed(wheel_speeds);
 }

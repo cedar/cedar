@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 
@@ -132,9 +134,9 @@ void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
   // one possible preshape dynamic
   preshape +=
   (
-    cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau_build_up)
+    time / cedar::unit::Time(tau_build_up * cedar::unit::milli * cedar::unit::seconds)
       * (-1.0 * preshape + input_mat).mul(sigmoided_input)
-    + cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau_decay)
+    + time / cedar::unit::Time(tau_decay * cedar::unit::milli * cedar::unit::seconds)
       * (-1.0 * preshape.mul((1.0 - sigmoided_input)))
   ) * peak;
 }

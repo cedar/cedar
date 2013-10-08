@@ -123,53 +123,78 @@ std::string cedar::aux::getUserApplicationDataDirectory()
 #error Implement me for this OS!
 #endif // CEDAR_OS_WINDOWS
 }
-
-std::string cedar::aux::locateResource(const std::string& resourcePath)
+std::vector<std::string> cedar::aux::listResourcePaths()
 {
-  std::string function_name = "cedar::aux::locateResource";
-  std::string in_home = CEDAR_HOME_DIRECTORY "/resources/" + resourcePath;
-  std::string in_install = CEDAR_RESOURCE_INSTALL_DIR "/" + resourcePath;
-  std::string cedar_resource_path;
+  std::vector<std::string> paths;
+
+  paths.push_back(boost::filesystem::path(boost::filesystem::current_path()).string());
+
+  paths.push_back(CEDAR_HOME_DIRECTORY "/resources/");
+
   char *p_resource_path = getenv("CEDAR_RESOURCE_PATH");
   if (p_resource_path)
   {
-    cedar_resource_path = p_resource_path;
-  }
-  
-  if (boost::filesystem::exists(resourcePath))
-  {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" locally.", function_name);
-    return resourcePath;
-  }
-  
-  if (!cedar_resource_path.empty())
-  {
-    // this bool is used to avoid notifying about using the environment variable every time this function is used.
-    static bool notified_about_this = false;
-    if (!notified_about_this)
+    std::string cedar_resource_path = p_resource_path;
+
+    if (!cedar_resource_path.empty())
     {
-      cedar::aux::LogSingleton::getInstance()->systemInfo("Using CEDAR_RESOURCE_PATH for finding resources.", function_name);
-      notified_about_this = true;
+      static bool notified_about_this = false;
+      if (!notified_about_this)
+      {
+        cedar::aux::LogSingleton::getInstance()->systemInfo
+        (
+          "Using CEDAR_RESOURCE_PATH \"" + cedar_resource_path + "\"for finding resources.",
+          "std::vector<std::string> cedar::aux::listResourcePaths()"
+        );
+        notified_about_this = true;
+      }
+
+      paths.push_back(cedar_resource_path);
     }
-    std::string path = cedar_resource_path + "/" + resourcePath;
+  }
+
+  paths.push_back(CEDAR_HOME_DIRECTORY "/resources/");
+  paths.push_back(CEDAR_RESOURCE_INSTALL_DIR "/");
+
+  return paths;
+}
+
+std::string cedar::aux::locateResource(const std::string& resourcePath)
+{
+  bool is_directory = false;
+  std::vector<std::string> paths = cedar::aux::listResourcePaths();
+  for (auto path_iter = paths.begin(); path_iter != paths.end(); ++path_iter)
+  {
+    std::string path = (*path_iter) + "/" + resourcePath;
     if (boost::filesystem::exists(path))
     {
-      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".", function_name);
-      return path;
+      if (boost::filesystem::is_regular_file(path))
+      {
+        cedar::aux::LogSingleton::getInstance()->systemInfo
+        (
+          "Found resource \"" + resourcePath + "\" at \"" + path + "\".",
+          "std::string cedar::aux::locateResource(const std::string&)"
+        );
+        return path;
+      }
+      else
+      {
+        is_directory = true;
+      }
     }
   }
-  
-  if (boost::filesystem::exists(in_home))
+
+  if (is_directory)
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_home + "\".", function_name);
-    return in_home;
+    CEDAR_THROW
+    (
+      cedar::aux::ResourceNotFoundException,
+      "The resource \"" + resourcePath + "\" could not be found: all instances seem to be directories."
+    );
   }
-  if (boost::filesystem::exists(in_install))
+  else
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_install + "\".", function_name);
-    return in_install;
+    CEDAR_THROW(cedar::aux::ResourceNotFoundException, "The resource \"" + resourcePath + "\" could not be found.");
   }
-  
-  CEDAR_THROW(cedar::aux::ResourceNotFoundException, "The resource \"" + resourcePath + "\" could not be found.");
 }
 

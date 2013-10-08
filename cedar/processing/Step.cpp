@@ -48,7 +48,8 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Log.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -75,8 +76,10 @@ Triggerable(isLooped),
 // initialize members
 mpArgumentsLock(new QReadWriteLock()),
 mTriggerSubsequent(true),
-mMovingAverageIterationTime(100), // average the last 100 iteration times
-mLockingTime(100), // average the last 100 iteration times
+// average the last 100 iteration times
+mMovingAverageIterationTime(100),
+// average the last 100 iteration times
+mLockingTime(100),
 mRoundTime(100), // average the last 100 iteration times
 mLastComputeCall(0),
 // initialize parameters
@@ -347,7 +350,7 @@ void cedar::proc::Step::run()
     clock_t lock_end = clock();
     clock_t lock_elapsed = lock_end - lock_start;
     double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-    this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+    this->setLockTimeMeasurement(lock_elapsed_s * cedar::unit::seconds);
 
     if (!this->mandatoryConnectionsAreSet())
     {
@@ -367,7 +370,7 @@ void cedar::proc::Step::run()
       this->mLastComputeCall = clock();
       clock_t elapsed = this->mLastComputeCall - last;
       double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-      this->setRoundTimeMeasurement(cedar::unit::Seconds(elapsed_s));
+      this->setRoundTimeMeasurement(elapsed_s * cedar::unit::seconds);
     }
     else
     {
@@ -435,7 +438,7 @@ void cedar::proc::Step::run()
     this->unlock();
 
     // take time measurements
-    this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
+    this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
 
     //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
     if (this->mTriggerSubsequent || this->isLooped() || !this->isTriggered())
@@ -459,19 +462,19 @@ void cedar::proc::Step::run()
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLastIterationTimeLock);
-  this->mMovingAverageIterationTime.append(cedar::unit::Seconds(time));
+  this->mMovingAverageIterationTime.append(time);
 }
 
 void cedar::proc::Step::setLockTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLockTimeLock);
-  this->mLockingTime.append(cedar::unit::Seconds(time));
+  this->mLockingTime.append(time);
 }
 
 void cedar::proc::Step::setRoundTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mRoundTimeLock);
-  this->mRoundTime.append(cedar::unit::Seconds(time));
+  this->mRoundTime.append(time);
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
