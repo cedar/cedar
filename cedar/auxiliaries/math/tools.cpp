@@ -280,7 +280,7 @@ void cedar::aux::math::reduceCvMat3D
       {
         for (dim_2 = 0; dim_2 < source_size[1]; ++dim_2)
         {
-          max = std::numeric_limits<int>::min();
+          max = static_cast<T>(std::numeric_limits<int>::min());
           for (dim_dropped = 0; dim_dropped < dropped_size; ++dim_dropped)
           {
             max = std::max(max, source.at<T>(src_index));
@@ -296,7 +296,7 @@ void cedar::aux::math::reduceCvMat3D
       {
         for (dim_2 = 0; dim_2 < source_size[1]; ++dim_2)
         {
-          min = std::numeric_limits<int>::max();
+          min = static_cast<T>(std::numeric_limits<int>::max());
           for (dim_dropped = 0; dim_dropped < dropped_size; ++dim_dropped)
           {
             min = std::min(min, source.at<T>(src_index));

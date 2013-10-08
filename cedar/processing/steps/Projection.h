@@ -135,11 +135,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Sets the dimensionality of the output.
   inline void setOutputDimensionality(unsigned int dimensionality)
   {
     this->_mOutputDimensionality->setValue(dimensionality);
   }
 
+  //! Sets the size of the output in the given dimension.
   inline void setOutputDimensionSize(unsigned int dimension, unsigned int size)
   {
     this->_mOutputDimensionSizes->set(dimension, size);
