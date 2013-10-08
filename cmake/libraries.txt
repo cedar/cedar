@@ -239,7 +239,7 @@ if(VTK_FOUND AND (QT4_FOUND OR (VTK_MAJOR_VERSION GREATER 5 AND VTK_MINOR_VERSIO
   # Vtk 5 must explicitly link qvtk
 else()
   message("-- VTK 5.6 or higher not found")
-set(CEDAR_USE_VTK OFF)
+  set(CEDAR_USE_VTK OFF)
 endif()
 
 # OpenGL
