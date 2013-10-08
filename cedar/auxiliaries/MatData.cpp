@@ -181,9 +181,7 @@ void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
   QReadLocker locker(this->mpLock);
   stream << "Mat" << ",";
   //!@todo Don't write an int for the type, write the literal constants as strings (e.g., CV_32F)
-  stream << mData.type() << ",";
-  //!@todo Dims don't need to be written here, you can infer them from the matrix size
-  stream << mData.dims << ",";
+  stream << cedar::aux::math::matrixTypeToString(mData) << ",";
   for(int i =0; i < mData.dims;i++)
   {
     stream << mData.size[i] << ",";
