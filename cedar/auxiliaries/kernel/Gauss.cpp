@@ -97,6 +97,7 @@ cedar::aux::kernel::Gauss::Gauss(
 cedar::aux::kernel::Separable(dimensionality),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", amplitude, -10000.0, 10000.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", sigmas, 0.01, 10000)),
+_mNormalize(new cedar::aux::BoolParameter(this, "normalize", true)),
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, -10000.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {

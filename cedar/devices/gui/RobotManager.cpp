@@ -272,9 +272,9 @@ void cedar::dev::gui::RobotManager::addRobotClicked()
   }
 }
 
-void cedar::dev::gui::RobotManager::loadConfiguration(const std::string& configuration)
+void cedar::dev::gui::RobotManager::loadConfiguration(const std::string& /*configuration*/)
 {
-  // TODO
+  //!@todo implement this method
 }
 
 void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
