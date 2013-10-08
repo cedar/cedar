@@ -83,7 +83,7 @@ void run_test()
 
   //Start Recorder - wait 5 secs -stop Recorder
   cedar::aux::RecorderSingleton::getInstance()->start();
-  cedar::aux::sleep(5);
+  cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
   cedar::aux::RecorderSingleton::getInstance()->stop();
 
 
