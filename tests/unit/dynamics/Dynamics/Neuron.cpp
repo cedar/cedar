@@ -38,6 +38,8 @@
 #include "Neuron.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/DoubleData.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // PROJECT INCLUDES
 
@@ -73,9 +75,6 @@ double cedar::Neuron::getActivity() const
 
 void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
 {
-  using cedar::unit::Seconds;
-  using cedar::unit::Milliseconds;
-
   double& activation = mActivation->getData();
   double input = this->getInput("input")->getData<double>();
   double resting_level = mRestingLevel->getValue();
@@ -88,7 +87,8 @@ void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
     interaction = 1.0;
   }
 
-  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + resting_level + interaction_weight * interaction);
+  activation += time / cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds)
+                     * (-1.0 * activation + resting_level + interaction_weight * interaction);
 
   mOutput->getData() = activation;
 }

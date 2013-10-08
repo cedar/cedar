@@ -49,7 +49,7 @@
 #include "cedar/auxiliaries/FileParameter.h"
 //#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
 
 
 // SYSTEM INCLUDES
@@ -128,10 +128,10 @@ protected:
   // none yet
 private:
   //!@brief the time in ms between two frames. Depends on the the framerate of the video
-  cedar::unit::Milliseconds mFrameDuration;
+  cedar::unit::Time mFrameDuration;
 
   //!@brief the time elapsed since the last frame is displayed
-  cedar::unit::Milliseconds mTimeElapsed;
+  cedar::unit::Time mTimeElapsed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -141,10 +141,6 @@ protected:
 
 private:
   // none yet
-
-
 }; // class cedar::proc::sources::Video
-
 #endif // CEDAR_PROC_SOURCES_VIDEO_H
-
 

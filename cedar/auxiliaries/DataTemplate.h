@@ -68,6 +68,8 @@ class cedar::aux::DataTemplate : public cedar::aux::Data
 public:
   //! The type being stored in this data object.
   typedef T DataType;
+  typedef cedar::aux::DataTemplate<T> SelfType;
+  CEDAR_GENERATE_POINTER_TYPES(SelfType);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -111,6 +113,24 @@ public:
   {
     this->mData = data;
   }
+
+  void copyValueFrom(cedar::aux::ConstDataPtr data)
+  {
+    if (ConstSelfTypePtr self_type_ptr = boost::dynamic_pointer_cast<ConstSelfType>(data))
+    {
+      this->setData(self_type_ptr->getData());
+    }
+    else
+    {
+      CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot cast to the appropriate type.");
+    }
+  }
+
+  cedar::aux::DataPtr clone() const
+  {
+    return SelfTypePtr(new SelfType(this->getData()));
+  }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

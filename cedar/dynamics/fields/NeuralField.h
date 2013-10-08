@@ -114,6 +114,12 @@ public:
     return this->mActivation;
   }
 
+  //! Returns the matrix data pointer that holds the sum of all inputs in this field.
+  inline cedar::aux::ConstMatDataPtr getInputSum() const
+  {
+    return this->mInputSum;
+  }
+
   /*!@brief   Overrides the default configuration reading.
    *
    * @remarks This method provides downwards-compatibility for reading fields that were written with a previous version.

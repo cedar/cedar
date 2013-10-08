@@ -684,7 +684,9 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         cv::Mat merged, converted;
         cv::merge(merge_vec, merged);
         cv::cvtColor(merged, converted, CV_HSV2BGR);
-        return converted;
+        cv::Mat converted_8uc3;
+        converted.convertTo(converted_8uc3, CV_8UC3);
+        return converted_8uc3;
       }
       else
       {
@@ -721,7 +723,9 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
         cv::Mat converted;
         cv::merge(merge_vec, converted);
-        return converted;
+        cv::Mat converted_8uc3;
+        converted.convertTo(converted_8uc3, CV_8UC3);
+        return converted_8uc3;
       }
     }
 

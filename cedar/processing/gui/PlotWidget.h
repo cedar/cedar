@@ -51,8 +51,7 @@
 #include <QGridLayout>
 #include <QLabel>
 
-/*!@brief Class for ...
- *
+/*!@todo Document this.
  */
 class cedar::proc::gui::PlotWidget : public QWidget
 {
