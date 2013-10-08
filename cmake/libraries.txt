@@ -231,12 +231,28 @@ else(qwtplot3d_FOUND)
   set(CEDAR_USE_QWTPLOT3D OFF)
 endif(qwtplot3d_FOUND)
 
+# VTK
+option(CEDAR_USE_VTK "Include VTK plots if possible." ON)
+message("-- Searching for VTK...")
+find_package(VTK)
+
 # We only support vtk 5.6 and upwards.
 # If Qt5 is used we have to disable Vtk unless it is Vtk 6.1 which probably will have Qt5 Support (not released yet)
 if(VTK_FOUND AND (QT4_FOUND OR (VTK_MAJOR_VERSION GREATER 5 AND VTK_MINOR_VERSION GREATER 0)) AND (VTK_MAJOR_VERSION GREATER 5 OR (VTK_MAJOR_VERSION EQUAL 5 AND VTK_MINOR_VERSION GREATER 5)))
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
     message("-- VTK ${VTK_VERSION} was found in ${VTK_INCLUDE_DIRS}")
+  else()
     message("-- VTK ${VTK_VERSION} was found")
+  endif()
+  
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${VTK_LIBRARIES})
+
   # Vtk 5 must explicitly link qvtk
+  if(NOT VTK_MAJOR_VERSION GREATER 5)
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QVTK)
+  endif()
+  
+  include(${VTK_USE_FILE})
 else()
   message("-- VTK 5.6 or higher not found")
   set(CEDAR_USE_VTK OFF)
