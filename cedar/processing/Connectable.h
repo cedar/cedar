@@ -96,6 +96,9 @@ public:
   //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
+  //!@brief Returns is @para role a role of this Connectable. 
+  bool hasRole(DataRole::Id role);
+
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
 
@@ -355,6 +358,12 @@ protected:
     return iter->second;
   }
 
+  /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
+   *        changed.
+   *
+   *        Examples of instances in which this function should be called are matrices that change size, type or
+   *        dimensionality.
+   */
   void emitOutputPropertiesChangedSignal(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -468,7 +477,7 @@ protected:
   //!@brief Lock for making accesses to the connections thread-safe.
   QReadWriteLock* mpConnectionLock;
 
-  // signal that is emitted if the properties of an output require data revalidation along connections
+  //! signal that is emitted if the properties of an output require data revalidation along connections
   boost::signals2::signal<void (const std::string&)> mOutputPropertiesChanged;
 private:
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output

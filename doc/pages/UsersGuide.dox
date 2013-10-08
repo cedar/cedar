@@ -9,8 +9,9 @@ Welcome to cedar!
 We provide a number of tutorials for certain parts of cedar, for which some additional guidance may be
 beneficial or even necessary.
 @subsection BeginnersTutorials Beginners' Tutorials
-- @ref ProjectsWithCedar
 - @link ProcessingGuiTutorial Processing gui @endlink
+- @link DFTTutorial DFT tutorial @endlink
+- @ref ProjectsWithCedar
 - @link ProcessingFrameworkTutorial Processing framework @endlink
 - @ref ConfigurableAndParameters
 @subsection AdvancedTutorials Advanced Tutorials

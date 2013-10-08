@@ -12,14 +12,17 @@ For each library or executable you want to have in your project, add a subfolder
 @code
 cedar_project_add_target
 (
-  LIBRARY # or EXECUTABLE
+  LIBRARY folder # or EXECUTABLE
   TARGET_NAME YourTargetName
   MOC_HEADERS path/to/header.h # optional, if you want to moc anything
   DEPENDS_ON YourOtherTargetNames # optional, if you have multiple targets that depends on each other
 )
 @endcode
 
-Now, to compile your project, go to [your project] and type
+Note, that there is no need to manually specify any source or ui files. They are found automatically by the project
+script, i.e., all cpp, c, h and ui files in the folder specified by @em folder are automatically added to the project.
+
+Thus, to compile your project, go to [your project] and type
 @code
 mkdir build
 cd build

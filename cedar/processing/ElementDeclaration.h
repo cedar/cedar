@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/PlotData.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
@@ -51,46 +52,32 @@
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
 // SYSTEM INCLUDES
+#include <QIcon>
+#include <QResource>
 #include <vector>
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
  * create a step of this id. It is a concretization of DeclarationBase.
- * @todo With the revised factory, passing the factory type is probably unnecessary
  */
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
-  struct PlotData
-  {
-    PlotData
-    (
-      cedar::proc::DataRole::Id id = cedar::proc::DataRole::OUTPUT,
-      const std::string& name = "",
-      bool ignoreIfMissing = false
-    )
-    :
-    mId(id),
-    mName(name),
-    mIgnoreIfMissing(ignoreIfMissing)
-    {
-    }
-
-    //! Role of the data to be plotted.
-    cedar::proc::DataRole::Id mId;
-
-    //! Name of the data to be plotted.
-    std::string mName;
-
-    //! If true, no exception will be thrown if the data cannot be found.
-    bool mIgnoreIfMissing;
-  };
-
+  //! PlotData struct is replaced by cedar::proc::PlotData
+  CEDAR_DECLARE_DEPRECATED(typedef cedar::proc::PlotData PlotData);
+  
   //!@brief list that pairs a data role with the desired plot
-  typedef std::vector<PlotData> DataList;
+  typedef std::vector<cedar::proc::PlotDataPtr> DataList;
 
+  /*!@brief Structure that holds information about custom plots defined for a processing step.
+   */
   struct PlotDefinition
   {
+    /*! Constructor
+     *
+     * @param name Name of the plot to be displayed in the "defined plots" menu.
+     * @param icon (Optional) path to the icon to be used for the plot in the "defined plots" menu.
+     */
     PlotDefinition(const std::string& name, const std::string& icon = std::string())
     :
     mName(name),
@@ -98,9 +85,10 @@ public:
     {
     }
 
+    //! Appends data to the list of items to plot.
     void appendData(cedar::proc::DataRole::Id id, const std::string& dataName, bool ignoreIfMissing = false)
     {
-      this->mData.push_back(PlotData(id, dataName, ignoreIfMissing));
+      this->mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(id, dataName, ignoreIfMissing)));
     }
 
     //! Name of the plot.
@@ -143,6 +131,36 @@ public:
     return this->mIconPath;
   }
 
+  //!@brief Returns the actual icon for the element.
+  QIcon getIcon() const
+  {
+    return QIcon(this->determinedIconPath());
+  }
+
+  /*! Returns the path for the icon to use; this will also return special icons if there is an error with the specified
+   * icons.
+   */
+  QString determinedIconPath() const
+  {
+    QResource existance_test(QString::fromStdString(this->getIconPath()));
+    if (existance_test.isValid())
+    {
+      auto icon = QIcon(QString::fromStdString(this->getIconPath()));
+      if (icon.isNull())
+      {
+        return ":/steps/no_icon.svg";
+      }
+      else
+      {
+        return QString::fromStdString(this->getIconPath());
+      }
+    }
+    else
+    {
+      return ":/steps/broken_icon.svg";
+    }
+  }
+
   //!@brief Method for setting the description of the element.
   void setDescription(const std::string& description)
   {
@@ -157,10 +175,7 @@ public:
 
   /*!@brief Defines a new plot for this type of element
    *
-   * @param plotName    Name of the plot, displayed in the UI.
-   * @param slotsToPlot  List of data slots to plot.
-   *
-   * @todo  This should also be read from the plugin xml file.
+   * @param plotDefinition Definition of the plot.
    */
   void definePlot(const PlotDefinition& plotDefinition)
   {
@@ -182,6 +197,7 @@ public:
     this->mDefaultPlot = plotName;
   }
 
+  //! Returns the name of the default plot. Empty if none is set.
   const std::string& getDefaultPlot() const
   {
     return this->mDefaultPlot;

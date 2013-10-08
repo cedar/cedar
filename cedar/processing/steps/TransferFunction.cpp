@@ -46,7 +46,7 @@
 #include <cedar/processing/ElementDeclaration.h>
 #include <cedar/auxiliaries/MatData.h>
 #include <cedar/auxiliaries/math/TransferFunction.h>
-#include <cedar/auxiliaries/math/sigmoids/AbsSigmoid.h>
+#include <cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h>
 #include <cedar/auxiliaries/assert.h>
 #include <cedar/auxiliaries/math/tools.h>
 #include <cedar/auxiliaries/Log.h>
@@ -99,11 +99,14 @@ _mTransferFunction
   new cedar::proc::steps::TransferFunction::TransferFunctionParameter
   (
     this,
-    "sigmoid",
+    "function",
     cedar::aux::math::TransferFunctionPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
   )
 )
 {
+  // add deprecated name for transfer function
+  this->_mTransferFunction->addDeprecatedName("sigmoid");
+
   //declare input and output
   this->declareInput("input");
   this->declareOutput("sigmoided output", mOutput);
@@ -113,7 +116,6 @@ _mTransferFunction
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo Replace by type check
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::TransferFunction::determineInputValidity
                                                                       (
                                                                         cedar::proc::ConstDataSlotPtr,

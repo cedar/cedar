@@ -72,7 +72,11 @@ public slots:
   /*!@brief Slot that is called when the dialog is closed by clicking ok.
    */
   void accepted();
+
+  //! Removes the plugins currently checked for deletion.
   void removePlugins();
+
+  //! Enables or disables the delete button.
   void toggleDeleteButton();
 
   //--------------------------------------------------------------------------------------------------------------------

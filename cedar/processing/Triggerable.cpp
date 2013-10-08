@@ -93,7 +93,6 @@ void cedar::proc::Triggerable::callOnStart()
 //  cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
 //  std::cout << named->getName() << "->callOnStart():" << __LINE__ << ": " << this->mStartCalls << std::endl;
 
-  //!@todo onStart might take a long time - can/should this be done better, e.g., by first storing a bool, then incrementing, then unlocking, then calling onStart?
   // only call onStart if this triggerable hasn't been started yet
   if (this->mStartCalls == 0)
   {

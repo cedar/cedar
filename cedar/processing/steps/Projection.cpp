@@ -104,7 +104,7 @@ cedar::proc::steps::Projection::Projection()
 :
 mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
-_mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
+_mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 4)),
 _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
 _mCompressionType(new cedar::aux::EnumParameter(
                                                  this,
@@ -173,7 +173,6 @@ void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 
 void cedar::proc::steps::Projection::reconfigure()
 {
-  // @todo this should be handled by a more suitable mechanism for users
   if (!this->mInput)
   {
     this->setState(
@@ -278,7 +277,6 @@ void cedar::proc::steps::Projection::reconfigure()
     }
   }
 
-  // @todo this should be handled by a more suitable mechanism for users
   if (this->_mDimensionMappings->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
   {
     this->setState(
@@ -346,7 +344,6 @@ void cedar::proc::steps::Projection::expand0DtoND()
 }
 
 //! not used at the moment
-//!@todo check whether this is faster than the generic function
 void cedar::proc::steps::Projection::expand1Dto2D()
 {
   const cv::Mat& input = this->mInput->getData();

@@ -165,25 +165,69 @@ public:
   }
 
   //!@brief set the value of type T of this parameter
-  void setValue(const cedar::aux::math::Limits<T>& value)
+  void setValue(const cedar::aux::math::Limits<T>& value, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
+    cedar::aux::math::Limits<T> old_value = this->mLimits;
     this->mLimits = value;
-    this->emitChangedSignal();
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
+    if (old_value != value)
+    {
+      this->emitChangedSignal();
+    }
   }
 
   //!@brief sets the lower limit and emits a signal
-  void setLowerLimit(const T& value)
+  void setLowerLimit(const T& value, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
+    T old_value = this->mLimits.getLower();
     this->mLimits.setLower(value);
-    this->emitPropertyChangedSignal();
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
+    if (value != old_value)
+    {
+      this->emitChangedSignal();
+    }
   }
 
   //!@brief sets the upper limit and emits a signal
-  void setUpperLimit(const T& value)
+  void setUpperLimit(const T& value, bool lock = false)
   {
-    // todo: check whether the new upper limit is inside the provided extrema
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
+    T old_value = this->mLimits.getUpper();
     this->mLimits.setUpper(value);
-    this->emitPropertyChangedSignal();
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
+    if (value != old_value)
+    {
+      this->emitChangedSignal();
+    }
   }
 
   //!@brief returns the lower limit

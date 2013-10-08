@@ -60,10 +60,6 @@
  *        Whenever you want to connect up a number of processing steps, you should first add them to a network and then
  *        use the connect functions of this network. This ensures proper management of storage and deletion of all the
  *        elements in the network.
- *
- * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
- *
- * @todo Write a separate class for the read/writeFromV1 method and all that belongs to it.
  */
 class cedar::proc::Network : public QObject, public cedar::proc::Connectable
 {
@@ -116,30 +112,47 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief Reads the network from a configuration node.
-   *
-   * @todo This should be called readConfiguration (as in Configurable).
    */
-  void readFrom(const cedar::aux::ConfigurationNode& root);
+  void readConfiguration(const cedar::aux::ConfigurationNode& root);
+
+  /*!@deprecated Use readConfiguration instead.
+   */
+  CEDAR_DECLARE_DEPRECATED(void readFrom(const cedar::aux::ConfigurationNode& root))
+  {
+    this->readConfiguration(root);
+  }
+
 
   /*!@brief Writes the network to a configuration node.
-   *
-   * @todo This should be called writeConfiguration (as in Configurable).
    */
-  void writeTo(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
+  /*!@deprecated Use writeConfiguration instead.
+   */
+  CEDAR_DECLARE_DEPRECATED(void writeTo(cedar::aux::ConfigurationNode& root))
+  {
+    this->writeConfiguration(root);
+  }
 
   /*!@brief Reads the network from a given json file.
    *
    *        This file must have the same format as the one output by cedar::proc::Network::writeFile.
    *
-   * @todo Should be replaced by readJson (from Configurable)
+   * @deprecated Use readJson (from cedar::aux::Configurable)
    */
-  void readFile(const std::string& filename);
+  CEDAR_DECLARE_DEPRECATED(void readFile(const std::string& filename))
+  {
+    this->readJson(filename);
+  }
 
   /*!@brief Writes the network to a given json file.
    *
-   * @todo Should be replaced by writeJson (from Configurable)
+   * @deprecated Use writeJson (from cedar::aux::Configurable)
    */
-  void writeFile(const std::string& filename);
+  CEDAR_DECLARE_DEPRECATED(void writeFile(const std::string& filename))
+  {
+    this->writeJson(filename);
+  }
 
   /*!@brief Removes an element from the network.
    *
@@ -181,8 +194,9 @@ public:
    *
    * @param elementName Identifier of the existing element.
    * @param newName Name to be given to the new element.
+   * @returns The new name of the element.
    */
-  void duplicate(const std::string& elementName, const std::string& newName = "");
+  std::string duplicate(const std::string& elementName, const std::string& newName = "");
 
   /*!@brief unmodifiedName unmodified name, possibly non-unique in network
    * @return unique name created by attaching a number if name is already taken
@@ -207,13 +221,13 @@ public:
 
   /*!@brief  Returns a pointer to the element with the given name. Uses the const function getElement.
    *
-   * @throws cedar::proc::InvalidNameException if no element is found with the given name.
+   * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
   cedar::proc::ElementPtr getElement(const std::string& name);
 
   /*!@brief  Returns a const pointer to the element with the given name.
    *
-   * @throws cedar::proc::InvalidNameException if no element is found with the given name.
+   * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
   cedar::proc::ConstElementPtr getElement(const std::string& name) const;
 
@@ -253,8 +267,6 @@ public:
    *
    * @param sourceSlot The source slot.
    * @param targetSlot The target slot.
-   *
-   * @todo Should this be private/protected?
    */
   void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
 
@@ -285,13 +297,16 @@ public:
   const cedar::proc::Network::DataConnectionVector& getDataConnections() const;
 
   /*!@brief Returns a const reference to the map of names to elements stored in the network.
-   *
-   * @todo Should be called getElements
    */
-  const ElementMap& elements() const;
+  const ElementMap& getElements() const;
+
+  //!@deprecated Use getElements instead.
+  CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
+  {
+    return this->getElements();
+  }
 
   /*!@brief Updates the name stored for the object.
-   * @todo This should be solved with signals/slots.
    */
   void updateObjectName(cedar::proc::Element* object);
 
@@ -301,8 +316,6 @@ public:
 
   /*!@brief Find the complete path of an element, if it exists in the tree structure
    * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
-   * @todo instead of returning an empty string, this function should throw an exception (catch it internally
-   * in recursive call)
    */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
   
@@ -349,10 +362,6 @@ public:
   //!@brief Register a function pointer to react to changes in slots
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
-  //!@brief processes slot promotion
-  //!@todo Make this private?
-  void processPromotedSlots();
-
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadUINode()
   {
@@ -383,18 +392,10 @@ public:
    */
   void stepTriggers(cedar::unit::Time stepTime);
 
-  /*!@brief   Single-steps all triggers in this network with the given time step.
-   *
-   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
-   *          all triggers are stopped.
-   *
-   * @todo    Should a double-version of this method be available at all?
-   */
-  void stepTriggers(double stepTime);
-
   //! Returns a list of issues in the network.
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
 
+  //! Returns a list of all the looped triggers in this network.
   std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -409,7 +410,7 @@ protected:
 private:
   /*!@brief Reads the network from a configuration node and writes all exceptions into the given vector.
    */
-  void readFrom
+  void readConfiguration
   (
     const cedar::aux::ConfigurationNode& root,
     std::vector<std::string>& exceptions
@@ -421,7 +422,7 @@ private:
 
   /*!@brief Writes the meta data to the configuration.
    */
-  void writeMetaData(cedar::aux::ConfigurationNode& root);
+  void writeMetaData(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Reads steps from the configuration node and adds them to the network.
    */
@@ -429,7 +430,7 @@ private:
 
   /*!@brief Writes the steps in the network to the configuration node.
    */
-  void writeSteps(cedar::aux::ConfigurationNode& root);
+  void writeSteps(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Reads triggers from a configuration node and adds them to the network.
    */
@@ -437,7 +438,7 @@ private:
 
   /*!@brief Writes the triggers in the network to the configuration node.
    */
-  void writeTriggers(cedar::aux::ConfigurationNode& root);
+  void writeTriggers(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Reads networks from a configuration node and adds them to the parent network.
    */
@@ -445,15 +446,11 @@ private:
 
   /*!@brief Writes the child networks in the network to the configuration node.
    */
-  void writeNetworks(cedar::aux::ConfigurationNode& root);
-
-  /*!@brief Reads a data connection from a configuration node and adds it to the network.
-   */
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
+  void writeNetworks(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Writes a data connection to the configuration node.
    */
-  void writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection);
+  void writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection) const;
 
   /*!@brief Reads data connections from a configuration node and adds them to the network.
    */
@@ -461,11 +458,10 @@ private:
 
   /*!@brief Writes the data connections in the network to the configuration node.
    */
-  void writeDataConnections(cedar::aux::ConfigurationNode& root);
+  void writeDataConnections(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
    * @returns return the next iterator
-   * @todo clean up this function
    */
   cedar::proc::Network::DataConnectionVector::iterator removeDataConnection
                                                        (
@@ -473,12 +469,20 @@ private:
                                                        );
 
   //!@brief revalidates all outgoing connections of a slot
-  //!@todo this could be moved to Connectable, once it knows about its connections
   void revalidateConnections(const std::string& sender);
+
+  //!@brief processes slot promotion
+  void processPromotedSlots();
+
+  /*!@brief   Single-steps all triggers in this network with the given time step.
+   *
+   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
+   *          all triggers are stopped.
+   */
+  void stepTriggers(double stepTime);
 
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
-  //!@todo Find a more generic approach, react to name changes of each contained element rather than this way around.
   void onNameChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members

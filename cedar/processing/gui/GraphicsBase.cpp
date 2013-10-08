@@ -59,7 +59,7 @@
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(170, 218, 24);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
-const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(206, 109, 11);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(0, 76, 249);
 
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
@@ -308,7 +308,6 @@ void cedar::proc::gui::GraphicsBase::setHighlightMode(cedar::proc::gui::Graphics
 QRectF cedar::proc::gui::GraphicsBase::boundingRect() const
 {
   qreal padding = static_cast<qreal>(1.0);
-  //! @todo properly map the size to the scene coordinate system
   return QRectF(QPointF(-padding, -padding), QSizeF(this->width() + padding, this->height() + padding));
 }
 
@@ -483,6 +482,10 @@ const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity v
   }
 }
 
+void cedar::proc::gui::GraphicsBase::itemSelected(bool)
+{
+  // empty default implementation
+}
 
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
@@ -510,6 +513,12 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     case QGraphicsItem::ItemPositionHasChanged:
     {
       this->updateConnections();
+      break;
+    }
+
+    case QGraphicsItem::ItemSelectedHasChanged:
+    {
+      this->itemSelected(value.toBool());
       break;
     }
 

@@ -50,8 +50,6 @@
 #include <QWidget>
 
 //!@brief A simple widget to monitor and change the state of a rigid body visualization
-//!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::ObjectVisualizationWidget
 class cedar::aux::gui::ObjectVisualizationWidget
 :
 public QWidget

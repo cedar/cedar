@@ -44,11 +44,13 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -89,6 +91,15 @@ namespace
     field_plot_data.appendData(DataRole::OUTPUT, "activation", true);
     field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
     declaration->definePlot(field_plot_data);
+
+    // define field plot again, but this time with image plots
+    //!@todo different icon
+    ElementDeclaration::PlotDefinition field_image_plot_data("field plot (image)", ":/cedar/dynamics/gui/field_image_plot.svg");
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::OUTPUT, "activation", true, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::OUTPUT, "sigmoided activation", false, "cedar::aux::gui::ImagePlot")));
+    declaration->definePlot(field_image_plot_data);
 
     ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
     kernel_plot_data.appendData(DataRole::BUFFER, "lateral kernel");
@@ -148,7 +159,7 @@ mGlobalInhibition
 ),
 // parameters
 _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
-_mDiscreteActivation(new cedar::aux::BoolParameter(this, "discrete activation (workaround)", false)),
+_mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -156,7 +167,7 @@ _mDimensionality
     this,
     "dimensionality",
     2,
-    cedar::aux::UIntParameter::LimitType::positiveZero(1000)
+    cedar::aux::UIntParameter::LimitType::positiveZero(4)
   )
 ),
 _mSizes
@@ -167,7 +178,7 @@ _mSizes
     "sizes",
     2,
     10,
-    cedar::aux::UIntParameter::LimitType::positive(1000)
+    cedar::aux::UIntParameter::LimitType::positive(5000)
   )
 ),
 _mInputNoiseGain
@@ -205,7 +216,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareInputCollection("input");
 
   this->_mOutputActivation->markAdvanced();
-  this->_mDiscreteActivation->markAdvanced();
+  this->_mDiscreteMetric->markAdvanced();
 
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
@@ -250,7 +261,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   QObject::connect(_mOutputActivation.get(), SIGNAL(valueChanged()), this, SLOT(activationAsOutputChanged()));
-  QObject::connect(_mDiscreteActivation.get(), SIGNAL(valueChanged()), this, SLOT(discreteActivationChanged()));
+  QObject::connect(_mDiscreteMetric.get(), SIGNAL(valueChanged()), this, SLOT(discreteMetricChanged()));
 
   mKernelAddedConnection
     = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
@@ -270,7 +281,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dyn::NeuralField::discreteActivationChanged()
+void cedar::dyn::NeuralField::discreteMetricChanged()
 {
   std::vector<cedar::aux::DataPtr> data_items;
   data_items.push_back(this->mActivation);
@@ -279,13 +290,13 @@ void cedar::dyn::NeuralField::discreteActivationChanged()
 
   for (size_t i = 0; i < data_items.size(); ++i)
   {
-    if (this->_mDiscreteActivation->getValue() == true)
+    if (this->_mDiscreteMetric->getValue() == true)
     {
-      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
     }
     else
     {
-      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteCoordinates>();
+      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteMetric>();
     }
   }
 }
@@ -470,8 +481,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
       }
       else
       {
-        //!@todo Output warning if the input is not space code
-        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
@@ -491,9 +500,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
-  // having a pointer to the convolution in the same scope as the reference prevents the object from being deleted.
-  cedar::aux::conv::ConvolutionPtr convolution_ptr = this->getConvolution();
-  cedar::aux::conv::Convolution& lateral_convolution = *convolution_ptr;
 
   boost::shared_ptr<QReadLocker> activation_read_locker;
   if (this->activationIsOutput())
@@ -508,6 +514,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   {
     cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
     neural_noise = this->_mNoiseCorrelationKernelConvolution->convolve(neural_noise);
+
     //!@todo not sure, if dividing time by 1000 (which is an implicit tau) makes any sense or should be a parameter
     //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
     sigmoid_u = _mSigmoid->getValue()->compute<float>
@@ -525,7 +532,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   sigmoid_u_lock.unlock();
 
   QReadLocker sigmoid_u_readlock(&this->mSigmoidalActivation->getLock());
-  lateral_interaction = lateral_convolution(sigmoid_u);
+  lateral_interaction = this->_mLateralKernelConvolution->convolve(sigmoid_u);
 
   this->updateInputSum();
 
@@ -568,7 +575,6 @@ void cedar::dyn::NeuralField::updateInputSum()
     if (input)
     {
       QReadLocker locker(&input->getLock());
-      //!@todo This is probably slow -- store the type of each input and static_cast instead.
       cv::Mat& input_mat = input->getData<cv::Mat>();
 
       unsigned int input_dim = cedar::aux::math::getDimensionalityOf(input_mat);
@@ -612,6 +618,13 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
 void cedar::dyn::NeuralField::dimensionalityChanged()
 {
   this->_mSizes->resize(this->getDimensionality(), _mSizes->getDefaultValue());
+#ifdef CEDAR_USE_FFTW
+  if (this->getDimensionality() >= 3)
+  {
+    this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+    this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+  }
+#endif // CEDAR_USE_FFTW
   this->updateMatrices();
 }
 

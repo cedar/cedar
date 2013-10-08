@@ -22,7 +22,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
   //recording will also be stopped
   if (p_grabber->isRunning())
   {
-    p_grabber->stopGrabber();
+    p_grabber->stop();
   }
 
   // p_grabber is deleted in the shared-pointer class

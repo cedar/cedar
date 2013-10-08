@@ -94,14 +94,6 @@ public slots:
    */
   void notify(const QString& message);
 
-  /*!@brief Slot that displays errors.
-   */
-  void error(const QString& message);
-
-  /*!@brief Slot that displays messages.
-   */
-  void message(const QString& message);
-
   /*!@brief Changes the mode back to select when an architecture tool is finished.
    */
   void architectureToolFinished();
@@ -162,22 +154,6 @@ public slots:
    */
   void recentFileItemTriggered();
 
-  /*!@brief Reacts to changes in the zoom level.
-   */
-  void zoomLevelSet(double zoomLevel);
-
-  /*!@brief Resets the zoom level to 100%.
-   */
-  void resetZoomLevel();
-
-  /*!@brief Increases the zoom level.
-   */
-  void increaseZoomLevel();
-
-  /*!@brief Decreases the zoom level.
-   */
-  void decreaseZoomLevel();
-
   /*!@brief Returns the architecture view used by the ide.
    */
   cedar::proc::gui::View* getArchitectureView();
@@ -217,14 +193,24 @@ public slots:
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
 
+  //!@brief closes all plot windows of every step
+  void closeAllPlots();
+
+  //!@brief Starts or stops the recorder function();
+  void toggleRecorder(bool status);
+
+  //! Returns the log widget of this ide.
+  cedar::aux::gui::Log* getLog() const
+  {
+    return this->mpLog;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
   /*!@brief Deletes the list of graphics items.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteElements(QList<QGraphicsItem*>& items);
 
@@ -233,8 +219,6 @@ protected:
   void deleteElement(QGraphicsItem* pItem);
 
   /*!@brief Deletes the elements currently selected in the scene.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteSelectedElements();
 
@@ -263,13 +247,12 @@ private:
    */
   void restoreSettings();
 
-  /*!@brief Writes an error message into the log window.
-   */
-  void logError(const std::string& message);
-
   /*!@brief Sets the filename in the title of the main window.
    */
   void displayFilename(const std::string& filename);
+
+  //! Updates the start and stop triggers threads.
+  void updateTriggerStartStopThreadCallers();
 
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
@@ -298,6 +281,12 @@ private:
 
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;
+
+  //! Used for starting all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
+
+  //! Used for stopping all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
 }; // class cedar::MainWindow
 

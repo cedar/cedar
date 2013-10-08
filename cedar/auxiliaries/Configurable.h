@@ -224,6 +224,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*! Registers a deprecated name for a parameter
+   *
+   * @remarks This is stored here to keep the memory footprint of the deprecation system smaller.
+   */
+  void addDeprecatedName(cedar::aux::ParameterPtr parameter, const std::string& deprecatedName);
+
   /*!@brief register a new parameter at this Configurable - throws an exception if parameter is already part of this
    * Configurable
    */
@@ -310,7 +316,6 @@ private:
       // write value:
       //<< std::setprecision(4) // set decimal precision for data. saves a lot of bytes ;)
       stream << ( pt.template get_value<Str>() ); 
-        // TODO: add escaping special characters
     }
     else if (pt.count(Str()) == pt.size() && indent > 0)
     {
@@ -376,6 +381,9 @@ private:
    * @remarks In order to avoid multiple inheritance down the line, configurable has, rather than is, a lockable.
    */
   mutable std::set<QReadWriteLock*> mParameterLocks;
+
+  //! Association parameter name -> deprecated names
+  std::map<std::string, std::vector<std::string> > mDeprecatedParameterNames;
 }; // class cedar::aux::Configurable
 
 #endif // CEDAR_AUX_CONFIGURABLE_H

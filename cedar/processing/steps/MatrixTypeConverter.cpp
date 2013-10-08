@@ -41,6 +41,7 @@
 #include "cedar/processing/steps/MatrixTypeConverter.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
@@ -137,8 +138,9 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
 
   this->mConverted->copyAnnotationsFrom(this->mMatrix);
 
-  //!@todo fix this
-  this->onTrigger();
+  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->compute(cedar::proc::Arguments());
+  this->unlock();
   this->emitOutputPropertiesChangedSignal("converted matrix");
   this->onTrigger();
 }

@@ -174,7 +174,6 @@ void cedar::aux::kernel::Gauss::calculateParts()
       {
         for (unsigned int j = 0; j < mSizes.at(dim); j++)
         {
-          //!\todo move filling up of matrix to some tool function
           kernel_part.at<float>(j, 0)
               = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), sigma);
         }

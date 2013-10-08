@@ -49,10 +49,6 @@
 #include <limits>
 #include <iostream>
 
-// \todo find a more generic version of this
-#undef DEBUG_VERBOSE
-
-
 /*!@brief Structure representing the limits of an interval.
  */
 template <typename T>
@@ -181,6 +177,21 @@ public:
     }
   }
 
+  //! Returns an interval from lower to infinity, i.e., the interval [lower, inf)
+  static Limits fromLower(const T& lower)
+  {
+    return Limits(lower, boost::numeric::bounds<T>::highest());
+  }
+
+  /*! Returns an interval from -infinity to upper, i.e., the interval (-Inf, lower]
+   *
+   * @remarks For unsigned values, -Inf is replaced by zero.
+   */
+  static Limits toUpper(const T& upper)
+  {
+    return Limits(boost::numeric::bounds<T>::lowest(), upper);
+  }
+
   //!@brief Returns a limits object that covers the full range of values.
   static Limits full()
   {
@@ -198,32 +209,10 @@ public:
   {
     if (value < getLower())
     {
-#ifdef DEBUG_VERBOSE
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Thresholding a value to the lower limit.",
-          "cedar::aux::math::Limits",
-          "Tresholding"
-        );
-      }
-#endif // DEBUG_VERBOSE
-
       return getLower();
     }
     else if (value > getUpper())
     {
-#ifdef DEBUG_VERBOSE
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Thresholding a value to the upper limit.",
-          "cedar::aux::math::Limits",
-          "Tresholding"
-        );
-      }
-#endif // DEBUG_VERBOSE
-
       return getUpper();
     }
 
@@ -244,6 +233,19 @@ public:
     {
       *it = this->limit(*it);
     }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // operators
+  //--------------------------------------------------------------------------------------------------------------------
+  bool operator!= (const Limits<T>& other) const
+  {
+    return !(other == *this);
+  }
+
+  bool operator== (const Limits<T>& other) const
+  {
+    return (other.getLower() == this->getLower()) && (other.getUpper() == this->getUpper());
   }
 
   //--------------------------------------------------------------------------------------------------------------------

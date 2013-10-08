@@ -80,7 +80,7 @@ public:
   //!@brief add a tool to the toolbox, represented by a simple string name
   void addStringItem(const std::string& icon, const std::string& data, const std::string& tooltip);
 
-  //!@brief \todo add comment here
+  //!@brief Return the data of the current item.
   std::string getCurrentItemData() const;
 
   //!@brief set a specific tool mode

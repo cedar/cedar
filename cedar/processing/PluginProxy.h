@@ -48,8 +48,6 @@
 #endif // CEDAR_OS_WINDOWS
 
 /*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
- *
- * @todo In the long run, this should be moved into aux, along with proc::Manager as a more generalized PluginManager.
  */
 class cedar::proc::PluginProxy
 {
@@ -77,6 +75,9 @@ public:
 public:
   //!@brief loaded a shared/dynamic library from a file path
   void load(const std::string& file);
+
+  //! Actually declares the contents of the plugin.
+  void declare();
 
   //!@brief get declaration of this proxy
   cedar::aux::PluginDeclarationListPtr getDeclaration();

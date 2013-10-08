@@ -49,9 +49,6 @@
 
 
 /*!@brief A step that generates noise.
- *
- * @todo More descriptions
- * @todo Does this take the sqrt(dt) problem into account? (may need to divide the output by dt/sqrt(dt))
  */
 class cedar::proc::sources::Noise : public cedar::proc::Step
 {
@@ -108,7 +105,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief the matrix dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
-  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
+  cedar::aux::UIntParameterPtr _mDimensionality;
   //!@brief the matrix sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
   //!@brief the mean of the normal distribution

@@ -58,9 +58,9 @@
  *
  *        HistoryPlot0D     for 0D matrices,
  *
- *        LinePlot          for 1D matrices,
+ *        QwtLinePlot       for 1D matrices,
  *
- *        SurfacePlot       for 2D matrices and
+ *        QwtSurfacePlot    for 2D matrices and
  *
  *        MatrixSlicePlot3D for 3D matrices.
  *
@@ -124,6 +124,8 @@ private:
 
   //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;
+
+  std::string mTitle;
 
 }; // class cedar::aux::gui::MatrixPlot
 

@@ -34,8 +34,6 @@
 
 ======================================================================================================================*/
 
-//TODO example architecture with description & interactive unit test
-
 // CEDAR INCLUDES
 #include "cedar/processing/steps/CoordinateTransformation.h"
 #include "cedar/auxiliaries/math/constants.h"
@@ -188,8 +186,8 @@ _mTransformationDirection
 ),
 _mSamplesPerDegree(new cedar::aux::DoubleParameter(this, "samples per degree", 1, 0.001, 100)),
 _mSamplesPerDistance(new cedar::aux::DoubleParameter(this, "samples per distance", 1, 0.001, 100)),
-_mNumberOfRows(new cedar::aux::UIntParameter(this, "rows size", 10)),
-_mNumberOfCols(new cedar::aux::UIntParameter(this, "cols size", 10)),
+_mNumberOfRows(new cedar::aux::UIntParameter(this, "rows size", 10, cedar::aux::UIntParameter::LimitType::positive())),
+_mNumberOfCols(new cedar::aux::UIntParameter(this, "cols size", 10, cedar::aux::UIntParameter::LimitType::positive())),
 _mMagnitudeForward(new cedar::aux::DoubleParameter(this, "magnitude forward", 10, 0, 1000)),
 _mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 10, 0, 1000))
 {
@@ -276,16 +274,13 @@ void cedar::proc::steps::CoordinateTransformation::transformDirectionChanged()
 void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Arguments&)
 {
   const cv::Mat& input = mInput->getData();
-  unsigned int input_rows = static_cast<unsigned int>(input.rows);
-  unsigned int input_cols = static_cast<unsigned int>(input.cols);
-  if (mInputRows != input_rows || mInputCols != input_cols)
-  {
-    mInputRows = input_rows;
-    mInputCols = input_cols;
-    createMap();
-  }
-
   cv::Mat& output = mOutput->getData();
+
+  //if the input is an empty matrix, coordinate transformation cannot be done
+  if (input.empty())
+  {
+    return;
+  }
 
   cv::remap
   (
@@ -302,6 +297,7 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
 void cedar::proc::steps::CoordinateTransformation::recompute()
 {
   this->createMap();
+  emitOutputPropertiesChangedSignal("result");
   this->onTrigger();
 }
 
@@ -409,7 +405,6 @@ void cedar::proc::steps::CoordinateTransformation::createCartPolarMapBackward()
   {
     for (unsigned int col = 0; col < map_cols; ++col)
     {
-      //!@todo Check if this is correct
       float angle = fmod
                     (
                       atan2
@@ -549,31 +544,35 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
-  if (!this->mInput)
+  if (!this->mInput || this->mInput->getDimensionality() != 2)
   {
     return;
   }
 
+  //remember old values to recognize if output properties changed
+  cv::Mat output = mOutput->getData();
+  int output_rows = output.rows;
+  int output_cols = output.cols;
+  int output_type = output.type();
+  
+  this->createMap();
   this->mOutput->copyAnnotationsFrom(this->mInput);
   this->applyAnnotations();
+
+  //trigger revalidation if output parameters changed
+  output = mOutput->getData();
+  if (output_rows != output.rows || output_cols != output.cols || output_type != output.type())
+  {
+    emitOutputPropertiesChangedSignal("result");
+  }
 }
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfRows()
 {
-  //!@todo This constraint should be expressed as limits of the parameter.
-  if (this->_mNumberOfRows->getValue() == 0)
-  {
-    this->_mNumberOfRows->setValue(1);
-  }
   this->recompute();
 }
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfCols()
 {
-  //!@todo This constraint should be expressed as limits of the parameter.
-  if (this->_mNumberOfCols->getValue() == 0)
-  {
-    this->_mNumberOfCols->setValue(1);
-  }
   this->recompute();
 }

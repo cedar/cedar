@@ -140,7 +140,15 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   }
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
   {
-    CEDAR_ASSERT(matrix.size[dim] >= kernel.size[dim])
+    if (matrix.size[dim] < kernel.size[dim])
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::RangeException,
+        "Kernel size is too big for FFTW convolution, "
+        "please decrease kernel size or switch to different convolution engine."
+      );
+    }
   }
 
   cv::Mat matrix_64;
@@ -181,8 +189,8 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   fftw_complex *matrix_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
   fftw_complex *result_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
   fftw_complex *kernel_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
-  // transform sigmoid U to frequency domain (fft)
-  //!@todo the first block of plan generation has to be done only once, not everytime something is convolved
+
+  // transform matrix to frequency domain (fft)
   cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
   fftw_plan matrix_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, const_cast<double*>(matrix_64.clone().ptr<double>()), matrix_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
   fftw_plan kernel_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(padded_kernel), padded_kernel.size, const_cast<double*>(padded_kernel.clone().ptr<double>()), kernel_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
@@ -199,7 +207,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   fftw_execute(matrix_plan_forward);
   fftw_execute(kernel_plan_forward);
 
-  // this is the simplest indexing method compared to the other ones
+  // go trhough all data points
   for (unsigned int xyz = 0; xyz < transformed_elements; ++xyz)
   {
     // complex multiplication (lateral)

@@ -51,10 +51,6 @@
 
 /*!@brief Template class for time units.
  *
- * @todo Describe this.
- *
- * @todo Read units from strings.
- *
  * @see @ref UnitsConcept
  */
 template <unsigned int T_factor, const char* T_suffix>
