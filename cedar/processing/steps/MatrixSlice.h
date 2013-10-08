@@ -69,6 +69,7 @@ public:
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
 public slots:
+  //! Called when the selected range of the slice changes.
   void rangeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
