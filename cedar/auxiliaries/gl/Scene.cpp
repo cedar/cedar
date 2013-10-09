@@ -44,7 +44,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gl::Scene::Scene()
 :
-mObjectVisualizationLock(QReadWriteLock::Recursive) //TODO: this locker is not used everywhere it needs to be used
+mObjectVisualizationLock(QReadWriteLock::Recursive) //!Todo: this locker is not used everywhere it needs to be used
 {
   init();
 }
