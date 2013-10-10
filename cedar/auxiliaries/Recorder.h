@@ -103,7 +103,7 @@ public:
   void clear();
 
   //!@brief Sets the directory the recorded data will be written to.
-  void setOutputDirectory(const std::string& path);
+  void setRecordedProjectName(const std::string& name);
 
   //!@brief Gets the OutputDirectory
   const std::string& getOutputDirectory() const;
@@ -178,6 +178,9 @@ private:
 
   //!@brief The output directory.
   std::string mOutputDirectory;
+
+  //!@brief The name of the project that will be recorded
+  std::string mProjectName;
 
   //!@brief Counts the time from when the recorder is started.
   QTime mStartTime;
