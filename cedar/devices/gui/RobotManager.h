@@ -73,7 +73,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void loadConfiguration(const std::string& configuration);
+  void loadConfiguration(const cedar::aux::Path& configuration);
 
 signals:
   void robotNameAdded(QString addedRobotName);
