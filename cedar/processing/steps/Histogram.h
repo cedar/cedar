@@ -62,13 +62,19 @@ class cedar::proc::steps::Histogram : public cedar::proc::Step
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*! Enumeration class for the different types of normalizations.
+   */
   class Normalization
   {
     public:
+      //! Type id of the enumeration.
       typedef cedar::aux::EnumId Id;
+
+      //! Pointer type of the base class.
       typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
     public:
+      //! Registers the enum values.
       static void construct()
       {
         mType.type()->def(cedar::aux::Enum(None, "None"));
@@ -76,19 +82,26 @@ public:
         mType.type()->def(cedar::aux::Enum(Maximum, "Maximum"));
       }
 
+      //! Returns the enumeration type.
       static const cedar::aux::EnumBase& type()
       {
         return *mType.type();
       }
 
+      //! Returns a pointer to an enumeration type.
       static const TypePtr& typePtr()
       {
         return mType.type();
       }
 
     public:
+      //! No normalization.
       static const Id None = 0;
+
+      //! Normalization by image size.
       static const Id ImageSize = 1;
+
+      //! Normalization by the maximum value of the histogram.
       static const Id Maximum = 2;
 
     private:
