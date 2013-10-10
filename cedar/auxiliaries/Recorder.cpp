@@ -57,7 +57,7 @@
 
 cedar::aux::Recorder::Recorder()
 {
-  mOutputDirectory = "Unknown";
+  mProjectName = "Unnamed";
 }
 
 cedar::aux::Recorder::~Recorder()
@@ -137,8 +137,9 @@ void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 
 void cedar::aux::Recorder::createOutputDirectory()
 {
+  std::string projectName = boost::filesystem::path(this->mProjectName).stem().string();
   mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspace()
-                       + "/" + QDateTime::currentDateTime().toString("yy.MM.dd hh-mm-ss").toStdString();
+                       + "/"+projectName+"/recording_" + QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
   boost::filesystem::create_directories(mOutputDirectory);
 }
 
@@ -190,7 +191,7 @@ void cedar::aux::Recorder::clear()
 }
 
 
-void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
+void cedar::aux::Recorder::setRecordedProjectName(const std::string& name)
 {
   //throw exception if running
   if (isRunning())
@@ -198,7 +199,7 @@ void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change output directory while recorder is running");
   }
 
-  this->mOutputDirectory = path;
+  this->mProjectName = name;
 }
 
 const std::string& cedar::aux::Recorder::getOutputDirectory() const

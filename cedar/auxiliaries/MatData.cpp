@@ -121,43 +121,41 @@ void cedar::aux::MatData::serializeData(std::ostream& stream) const
     //check data type
     for (int i = 0; i < mData.channels(); i++)
     {
-    	//!@todo Don't use c-casts, use static_casts instead
       switch (mData.depth())
       {
         case CV_8U:
         {
-        	// instead of i * 1, write i * sizeof(uchar); same for all other cases
-          stream << (int)(*(uchar*)(element+i*1)) << ",";
+          stream << static_cast<int>(element[i]) << ",";
           break;
         }
         case CV_8S:
         {
-          stream  << (int)(*(schar*)(element+i*1)) << ",";
+          stream  << static_cast<int>(reinterpret_cast<schar*>(element)[i]) << ",";
           break;
         }
         case CV_16U:
         {
-          stream  << *(unsigned short*)(element+i*2) << ",";
+          stream  << reinterpret_cast<unsigned short*>(element)[i] << ",";
           break;
         }
         case CV_16S:
         {
-          stream  << *(short*)(element+i*2) << ",";
+          stream  << reinterpret_cast<short*>(element)[i] << ",";
           break;
         }
         case CV_32S:
         {
-          stream  << *(int*)(element+i*4) << ",";
+          stream  << reinterpret_cast<int*>(element)[i] << ",";
           break;
         }
         case CV_32F:
         {
-          stream  << *(float*)(element+i*4) << ",";
+          stream  << reinterpret_cast<float*>(element)[i] << ",";
           break;
         }
         case CV_64F:
         {
-          stream  << *(double*)(element+i*8) << ",";
+          stream  << reinterpret_cast<double*>(element)[i] << ",";
           break;
         }
       }
@@ -182,10 +180,7 @@ void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
 {
   QReadLocker locker(this->mpLock);
   stream << "Mat" << ",";
-  //!@todo Don't write an int for the type, write the literal constants as strings (e.g., CV_32F)
-  stream << mData.type() << ",";
-  //!@todo Dims don't need to be written here, you can infer them from the matrix size
-  stream << mData.dims << ",";
+  stream << cedar::aux::math::matrixTypeToString(mData) << ",";
   for(int i =0; i < mData.dims;i++)
   {
     stream << mData.size[i] << ",";
