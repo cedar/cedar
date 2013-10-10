@@ -118,11 +118,6 @@ void cedar::aux::Recorder::unregisterData(const std::string& name)
 
 void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 {
-  //throw exception if running
-  if (this->isRunning())
-  {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
-  }
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); ++i)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);

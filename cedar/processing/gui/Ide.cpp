@@ -901,9 +901,11 @@ void cedar::proc::gui::Ide::toggleRecorder(bool status)
   if (!status)
   {
     cedar::aux::RecorderSingleton::getInstance()->stop();
+    this->mpRecorderWidget->setEnabled(true);
   }
   else
   {
+    this->mpRecorderWidget->setEnabled(false);
     cedar::aux::RecorderSingleton::getInstance()->start();
   }
 }
