@@ -404,7 +404,7 @@ endmacro(cedar_qt_wrap_ui)
 # directory and generates the header files in the same relative path. When the
 # binary dir is included in the include path, these files can then be accessed.
 macro(cedar_qt4_wrap_ui outfiles)
-  if (ARGN)
+  if (NOT "${ARGN}" STREQUAL "")
     qt4_extract_options(ui_files ui_options ${ARGN})
   endif()
 
@@ -435,6 +435,7 @@ endmacro(cedar_qt4_wrap_ui)
 macro(cedar_qt5_wrap_ui outfiles)
   qt5_extract_options(ui_files ui_options ${ARGN})
 
+  # TODO is this an exact copy from cedar_qt4_wrap_ui? If so, why is this not wrapped in its own macro?
   foreach (it ${ui_files})
     get_filename_component(outfile ${it} NAME_WE)
     get_filename_component(infile ${it} ABSOLUTE)
