@@ -335,7 +335,8 @@ macro(cedar_add_library)
 
   # add the library to the 'make install' target
   if(WIN32)
-    message("-- The install command is not implemented for Windows. Library ${libraryName} will not be installed!")
+    # TODO: this may work on linux, but needs to be tested
+    install(TARGETS ${libraryName} DESTINATION ${CEDAR_LIB_INSTALL_DIR})
   else(WIN32)
     install(TARGETS ${libraryName} LIBRARY DESTINATION ${CEDAR_LIB_INSTALL_DIR})
   endif(WIN32)
