@@ -144,6 +144,11 @@ macro(cedar_add_test)
   	set_target_properties(${testExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
   endif(CMAKE_COMPILER_IS_GNUCC)
   
+  if (MSVC)
+    # In visual studio, put all unit tests into a subfolder
+    set_target_properties(${testExecutableName} PROPERTIES FOLDER "${test_PREFIX}")
+  endif (MSVC)
+  
   # add the unit test to the CMake build system (will create a build target and run the test when calling 'make test')
   # This sets up the unit test so that it is run as if the executable were lying in the source path of the unit test,
   # so that you can put test configuration files into the source directory.
@@ -324,6 +329,11 @@ macro(cedar_add_library)
   
   add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles} ${recourceCompilerSrcs})
   cedar_set_common_target_properties(${libraryName})
+  
+  if (MSVC)
+    # In visual studio, put all unit tests into a subfolder
+    set_target_properties(${libraryName} PROPERTIES FOLDER "cedar libraries")
+  endif (MSVC)
   
   if (MSVC)
     set(LIB_EXPORTS "CEDAR_LIB_EXPORTS_${CAP_LIB_NAME}")
