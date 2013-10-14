@@ -255,7 +255,17 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
       if ((dimensionality == 1 || dimensionality == 2) && mat_data->getData().type() == CV_32F)
       {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
+        if (this->getInput("values"))
+        {
+          if (cedar::aux::math::matrixSizesEqual(this->getInput("values")->getData<cv::Mat>(), mat_data->getData()))
+          {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+          }
+        }
+        else
+        {
+          return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
       }
     }
   }
@@ -267,7 +277,18 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
       if ((dimensionality == 1 || dimensionality == 2) && mat_data->getData().type() == CV_32F)
       {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
+        // check if size of values fits the bin map input
+        if (this->getInput("bin map"))
+        {
+          if (cedar::aux::math::matrixSizesEqual(this->getInput("bin map")->getData<cv::Mat>(), mat_data->getData()))
+          {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+          }
+        }
+        else
+        {
+          return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
       }
     }
   }
