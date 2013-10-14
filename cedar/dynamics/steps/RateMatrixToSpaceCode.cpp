@@ -323,7 +323,9 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
   }
   if (mDimensionality == 2)
   {
-    this->mOutput->setData(cv::Mat(this->mInput->getData().rows, this->getNumberOfBins(), CV_32F));
+    this->mOutput->lockForWrite();
+    this->mOutput->setData(cv::Mat::zeros(this->mInput->getData().rows, this->getNumberOfBins(), CV_32F));
+    this->mOutput->unlock();
   }
   else if (mDimensionality == 3)
   {
@@ -332,7 +334,11 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
     sizes_signed.push_back(this->mInput->getData().cols);
     sizes_signed.push_back(this->getNumberOfBins());
     cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
+    new_matrix = 0.0;
+    this->mOutput->lockForWrite();
     this->mOutput->setData(new_matrix);
+    this->mOutput->unlock();
   }
+  this->onTrigger();
   this->emitOutputPropertiesChangedSignal("output");
 }
