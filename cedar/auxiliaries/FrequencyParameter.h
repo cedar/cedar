@@ -76,7 +76,9 @@ namespace cedar
                       <
                         cedar::unit::Frequency::unit_type,
                         boost::units::si::dimensionless,
-                        cedar::unit::Time::unit_type
+                        cedar::unit::Time::unit_type,
+                        1,
+                        1
                       >(postFix);
       }
     }

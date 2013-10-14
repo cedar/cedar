@@ -48,10 +48,10 @@
 
 // SYSTEM INCLUDES
 
-const cedar::unit::Length cedar::unit::DEFAULT_LENGTH_UNIT = 1 * meter;
-const cedar::unit::Time cedar::unit::DEFAULT_TIME_UNIT = 1 * second;
-const cedar::unit::Velocity cedar::unit::DEFAULT_VELOCITY_UNIT = 1 * meter_per_second;
-const cedar::unit::Acceleration cedar::unit::DEFAULT_ACCELERATION_UNIT = 1 * meter_per_second_squared;
-const cedar::unit::PlaneAngle cedar::unit::DEFAULT_PLANE_ANGLE_UNIT = 1 * radian;
-const cedar::unit::Frequency cedar::unit::DEFAULT_FREQUENCY_UNIT = 1 * hertz;
-const cedar::unit::AngularVelocity cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT = 1 * radian_per_second;
+const cedar::unit::Length cedar::unit::DEFAULT_LENGTH_UNIT = 1 * boost::units::si::meter;
+const cedar::unit::Time cedar::unit::DEFAULT_TIME_UNIT = 1 * boost::units::si::second;
+const cedar::unit::Velocity cedar::unit::DEFAULT_VELOCITY_UNIT = 1 * boost::units::si::meter_per_second;
+const cedar::unit::Acceleration cedar::unit::DEFAULT_ACCELERATION_UNIT = 1 * boost::units::si::meter_per_second_squared;
+const cedar::unit::PlaneAngle cedar::unit::DEFAULT_PLANE_ANGLE_UNIT = 1 * boost::units::si::radian;
+const cedar::unit::Frequency cedar::unit::DEFAULT_FREQUENCY_UNIT = 1 * boost::units::si::hertz;
+const cedar::unit::AngularVelocity cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT = 1 * boost::units::si::radian_per_second;
