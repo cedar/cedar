@@ -57,7 +57,9 @@ namespace cedar
                     <
                       cedar::unit::Velocity::unit_type,
                       cedar::unit::Length::unit_type,
-                      cedar::unit::Time::unit_type
+                      cedar::unit::Time::unit_type,
+                      1,
+                      1
                     >(unitStr);
     }
 

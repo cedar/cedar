@@ -59,7 +59,9 @@ namespace cedar
                     <
                       cedar::unit::AngularVelocity::unit_type,
                       cedar::unit::PlaneAngle::unit_type,
-                      cedar::unit::Time::unit_type
+                      cedar::unit::Time::unit_type,
+                      1,
+                      1
                     >(unitStr);
     }
 
