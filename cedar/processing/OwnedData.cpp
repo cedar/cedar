@@ -61,7 +61,7 @@ cedar::proc::DataSlot(role, name, pParent, isMandatory)
 cedar::proc::OwnedData::~OwnedData()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
-  //the slot could still be registered in the Recorder. If this the case, unregister it
+  //the slot could still be registered in the Recorder. If this the case, unregister it.
   cedar::aux::RecorderSingleton::getInstance()->unregisterData(this->mData);
 }
 

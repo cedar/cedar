@@ -50,6 +50,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/pointer_cast.hpp>
+#include <limits>
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -149,8 +150,8 @@ void cedar::aux::Recorder::applyStart()
   mStartTime.start();
 
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
-  //!@todo Use std::numeric_limits<int> for this
-  int min = 1000;
+  //!@todo Use  for this
+  int min = std::numeric_limits<int>::max() ;
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
