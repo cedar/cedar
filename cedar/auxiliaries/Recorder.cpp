@@ -133,7 +133,7 @@ void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 
 void cedar::aux::Recorder::createOutputDirectory()
 {
-  mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspace()
+  mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
                        + "/"+mProjectName+"/recording_" + QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
   boost::filesystem::create_directories(mOutputDirectory);
 }
