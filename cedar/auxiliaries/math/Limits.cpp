@@ -39,13 +39,13 @@
 
 // SYSTEM INCLUDES
 
-template struct cedar::aux::math::Limits<double>;
-template struct cedar::aux::math::Limits<int>;
-template struct cedar::aux::math::Limits<unsigned int>;
-template struct cedar::aux::math::Limits<cedar::unit::Time>;
-template struct cedar::aux::math::Limits<cedar::unit::Length>;
-template struct cedar::aux::math::Limits<cedar::unit::Velocity>;
-template struct cedar::aux::math::Limits<cedar::unit::Acceleration>;
-template struct cedar::aux::math::Limits<cedar::unit::PlaneAngle>;
-template struct cedar::aux::math::Limits<cedar::unit::Frequency>;
-template struct cedar::aux::math::Limits<cedar::unit::AngularVelocity>;
+template class cedar::aux::math::Limits<double>;
+template class cedar::aux::math::Limits<int>;
+template class cedar::aux::math::Limits<unsigned int>;
+template class cedar::aux::math::Limits<cedar::unit::Time>;
+template class cedar::aux::math::Limits<cedar::unit::Length>;
+template class cedar::aux::math::Limits<cedar::unit::Velocity>;
+template class cedar::aux::math::Limits<cedar::unit::Acceleration>;
+template class cedar::aux::math::Limits<cedar::unit::PlaneAngle>;
+template class cedar::aux::math::Limits<cedar::unit::Frequency>;
+template class cedar::aux::math::Limits<cedar::unit::AngularVelocity>;

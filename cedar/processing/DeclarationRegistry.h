@@ -62,14 +62,14 @@ namespace cedar
 
     //! Sinleton of the element manager.
     typedef
-      cedar::aux::Singleton<ElementManager>
+      cedar::aux::Singleton<cedar::proc::ElementManager>
       ElementManagerSingleton;
   }
 
   namespace aux
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<ElementManager>);
+    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<cedar::proc::ElementManager>);
     //!@endcond
   }
 }

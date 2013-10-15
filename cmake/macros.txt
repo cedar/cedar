@@ -144,6 +144,11 @@ macro(cedar_add_test)
   	set_target_properties(${testExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
   endif(CMAKE_COMPILER_IS_GNUCC)
   
+  if (MSVC)
+    # In visual studio, put all unit tests into a subfolder
+    set_target_properties(${testExecutableName} PROPERTIES FOLDER "${test_PREFIX}")
+  endif (MSVC)
+  
   # add the unit test to the CMake build system (will create a build target and run the test when calling 'make test')
   # This sets up the unit test so that it is run as if the executable were lying in the source path of the unit test,
   # so that you can put test configuration files into the source directory.
@@ -152,7 +157,7 @@ macro(cedar_add_test)
   if (test_AUTOMATIC)
     set(working_dir "${test_DIRECTORY}/${testSubdirectory}/${testName}")
     # we need at least version 2.8.4
-    if (CMAKE_MAJOR_VERSION GREATER 1 AND CMAKE_MINOR_VERSION GREATER 7 AND CMAKE_PATCH_VERSION GREATER 3)
+    if (${CMAKE_VERSION} VERSION_GREATER "2.8.3")
       add_test(NAME ${testName}
                WORKING_DIRECTORY ${working_dir}
                COMMAND ${testExecutableName} ${test_ARGUMENTS}
@@ -326,6 +331,11 @@ macro(cedar_add_library)
   cedar_set_common_target_properties(${libraryName})
   
   if (MSVC)
+    # In visual studio, put all unit tests into a subfolder
+    set_target_properties(${libraryName} PROPERTIES FOLDER "cedar libraries")
+  endif (MSVC)
+  
+  if (MSVC)
     set(LIB_EXPORTS "CEDAR_LIB_EXPORTS_${CAP_LIB_NAME}")
     set_target_properties(${libraryName} PROPERTIES COMPILE_FLAGS -D${LIB_EXPORTS})
   endif (MSVC)
@@ -335,7 +345,8 @@ macro(cedar_add_library)
 
   # add the library to the 'make install' target
   if(WIN32)
-    message("-- The install command is not implemented for Windows. Library ${libraryName} will not be installed!")
+    # TODO: this may work on linux, but needs to be tested
+    install(TARGETS ${libraryName} DESTINATION ${CEDAR_LIB_INSTALL_DIR})
   else(WIN32)
     install(TARGETS ${libraryName} LIBRARY DESTINATION ${CEDAR_LIB_INSTALL_DIR})
   endif(WIN32)
@@ -403,9 +414,8 @@ endmacro(cedar_qt_wrap_ui)
 # directory and generates the header files in the same relative path. When the
 # binary dir is included in the include path, these files can then be accessed.
 macro(cedar_qt4_wrap_ui outfiles)
-  qt4_extract_options(ui_files ui_options ${ARGN})
 
-  foreach (it ${ui_files})
+  foreach (it ${ARGN})
     get_filename_component(outfile ${it} NAME_WE)
     get_filename_component(infile ${it} ABSOLUTE)
     get_filename_component(generated_path ${it} PATH)
@@ -432,6 +442,7 @@ endmacro(cedar_qt4_wrap_ui)
 macro(cedar_qt5_wrap_ui outfiles)
   qt5_extract_options(ui_files ui_options ${ARGN})
 
+  # TODO is this an exact copy from cedar_qt4_wrap_ui? If so, why is this not wrapped in its own macro?
   foreach (it ${ui_files})
     get_filename_component(outfile ${it} NAME_WE)
     get_filename_component(infile ${it} ABSOLUTE)

@@ -90,12 +90,12 @@ unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr test
     // test if the step reacts properly when its parameters change (without an input)
     for
     (
-      cedar::aux::Configurable::ParameterList::iterator i = testStep->getParameters().begin();
-      i != testStep->getParameters().end();
-      ++i
+      cedar::aux::Configurable::ParameterList::iterator iter = testStep->getParameters().begin();
+      iter != testStep->getParameters().end();
+      ++iter
     )
     {
-      cedar::aux::ParameterPtr parameter = *i;
+      cedar::aux::ParameterPtr parameter = *iter;
       std::cout << "Emitting valueChanged() of parameter \"" << parameter->getName() << "\"." << std::endl;
       parameter->emitChangedSignal();
 

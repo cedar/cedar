@@ -272,9 +272,41 @@ void cedar::dev::gui::RobotManager::addRobotClicked()
   }
 }
 
-void cedar::dev::gui::RobotManager::loadConfiguration(const std::string& /*configuration*/)
+void cedar::dev::gui::RobotManager::loadConfiguration(const cedar::aux::Path& configuration)
 {
-  //!@todo implement this method
+  std::string robot_name = this->getSelectedRobotName();
+  try
+  {
+    cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfiguration(robot_name, configuration);
+  }
+  catch (const cedar::aux::ResourceNotFoundException& e)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      e.exceptionInfo(),
+      "void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
+    );
+    QMessageBox::critical
+    (
+      this,
+      "Resource not found.",
+      QString::fromStdString(e.exceptionInfo())
+    );
+  }
+  catch (const cedar::dev::ChannelConfigurationNotFoundException& e)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      e.exceptionInfo(),
+      "void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
+    );
+    QMessageBox::critical
+    (
+      this,
+      "Invalid configuration file.",
+      QString::fromStdString(e.exceptionInfo())
+    );
+  }
 }
 
 void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
@@ -285,39 +317,7 @@ void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
 
   if (!resource.isEmpty())
   {
-    std::string robot_name = this->getSelectedRobotName();
-    try
-    {
-      cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfiguration(robot_name, resource);
-    }
-    catch (const cedar::aux::ResourceNotFoundException& e)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        e.exceptionInfo(),
-        "void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
-      );
-      QMessageBox::critical
-      (
-        this,
-        "Resource not found.",
-        QString::fromStdString(e.exceptionInfo())
-      );
-    }
-    catch (const cedar::dev::ChannelConfigurationNotFoundException& e)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        e.exceptionInfo(),
-        "void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
-      );
-      QMessageBox::critical
-      (
-        this,
-        "Invalid configuration file.",
-        QString::fromStdString(e.exceptionInfo())
-      );
-    }
+    this->loadConfiguration(resource);
   }
 }
 
