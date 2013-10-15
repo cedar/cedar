@@ -63,6 +63,8 @@ if(NOT WITH_QT5)
     if (CEDAR_VERBOSE_BUILD_SYSTEM)
       message("   Qt was found in ${QT_INCLUDE_DIRS}")
     endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+  else (QT4_FOUND)
+    message("    Qt4 was not found.")
   endif(QT4_FOUND)
 
   SET(QT_FOUND ${QT4_FOUND})

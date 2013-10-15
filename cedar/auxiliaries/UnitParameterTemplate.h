@@ -163,8 +163,8 @@ namespace cedar
       typename T,
       typename Numerator,
       typename Denominator,
-      long NumeratorPower = 1,
-      long DenominatorPower = 1
+      long NumeratorPower,
+      long DenominatorPower
     >
     inline boost::units::quantity<T> parseCompoundUnit(const std::string& unitStr)
     {

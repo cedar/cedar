@@ -49,6 +49,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <limits.h>
 #include <boost/regex.hpp>
 
 namespace cedar
@@ -336,11 +337,12 @@ namespace cedar
       {
         if (string == "inf")
         {
-          return INFINITY;
+          //!@todo num_limits<>::has_infinity could help make this more generic/remove the need for double, float specialization
+          return std::numeric_limits<double>::infinity();
         }
         else if (string == "-inf")
         {
-          return -INFINITY;
+          return -std::numeric_limits<double>::infinity();
         }
         else
         {
@@ -365,11 +367,11 @@ namespace cedar
       {
         if (string == "inf")
         {
-          return INFINITY;
+          return std::numeric_limits<float>::infinity();
         }
         else if (string == "-inf")
         {
-          return -INFINITY;
+          return -std::numeric_limits<float>::infinity();
         }
         else
         {

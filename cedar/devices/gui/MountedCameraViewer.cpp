@@ -167,7 +167,7 @@ void cedar::dev::gui::MountedCameraViewer::draw()
   // export these to the camera in the viewer
   qglviewer::Camera* viewer_camera = this->camera();
   viewer_camera->setFromProjectionMatrix(projection_matrix_float.ptr<float>());
-  viewer_camera->setZNearCoefficient(0.025);
+  viewer_camera->setZNearCoefficient(0.025f);
   //!@todo clean up this code
 /*
   // get single parameters

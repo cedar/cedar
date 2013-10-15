@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/MapParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/enable_shared_from_this.hpp>
