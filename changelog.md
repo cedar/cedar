@@ -89,7 +89,11 @@ current testing
 ---------------
 - general
   - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
-    for example anchor, shift, and limit of kernels and threshold of sigmoids. 
+    for example anchor, shift, and limit of kernels and threshold of sigmoids.
+  - The plugin system has been changed. It is no longer specific to the processing framework, although it is not (yet)
+    used elsewhere. Plugins can now be added in an improved manager. They are found in a different way, now: a list of
+    user-defined paths is searched for a plugin of a given name by appending certain directories (such as the plugin
+    name itself and a "build" folder.) Using this new functionality, architectures now store which plugins they require.
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.

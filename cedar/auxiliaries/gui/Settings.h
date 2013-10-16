@@ -46,6 +46,12 @@
 
 
 /*!@brief User interface settings for widgets in the aux namespace.
+ *
+ *        This class provides (singleton) access to settings that concern the user interface classes located in the
+ *        cedar::aux namespace.
+ *
+ *        It takes care of storing and restoring the configuration to and from a file located in the user's home
+ *        directory.
  */
 class cedar::aux::gui::Settings : public cedar::aux::Configurable
 {

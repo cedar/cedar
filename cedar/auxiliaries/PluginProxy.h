@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2011 07 22
 
-    Description:
+    Description: Header file for the cedar::aux::PluginProxy class.
 
     Credits:
 
@@ -77,10 +77,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief loaded a shared/dynamic library from a file path
+  /*!@brief   This function actually reads in the plugin.
+   *
+   * @remarks As this actually loads the plugin, this may take a long time and, if the plugin does some bad things,
+   *          actually crash the program.
+   */
   void load();
 
-  //! Actually declares the contents of the plugin.
+  /*!@brief   Actually declares the contents of the plugin.
+   *
+   * @remarks If the plugin has not been loaded yet, the load function will be invoked.
+   */
   void declare();
 
   //!@brief get declaration of this proxy
