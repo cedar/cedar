@@ -53,6 +53,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
+#include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
