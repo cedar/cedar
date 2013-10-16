@@ -55,6 +55,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -445,6 +446,7 @@ void cedar::proc::gui::Network::write()
 void cedar::proc::gui::Network::write(const std::string& destination)
 {
   this->mFileName = destination;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
 
@@ -466,6 +468,7 @@ void cedar::proc::gui::Network::write(const std::string& destination)
 void cedar::proc::gui::Network::read(const std::string& source)
 {
   this->mFileName = source;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
   read_json(source, root);

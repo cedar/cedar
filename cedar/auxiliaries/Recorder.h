@@ -102,13 +102,15 @@ public:
   //!@brief Unregister all DataPtr.
   void clear();
 
-  //!@brief Sets the directory the recorded data will be written to.
-  void setOutputDirectory(const std::string& path);
+  /*!@brief Sets the directory the recorded data will be written to.
+   *            If @param name is a full path the function will extract the stem of the filename.
+   */
+  void setRecordedProjectName(const std::string& name);
 
   //!@brief Gets the OutputDirectory
   const std::string& getOutputDirectory() const;
 
-  //!@brief Returns the elapsed time in ms since the REcorder thread has been started.
+  //!@brief Returns the elapsed time in ms since the Recorder thread has been started.
   int getTimeStamp() const;
 
   /*!@brief Change the record interval of 'name'
@@ -178,6 +180,9 @@ private:
 
   //!@brief The output directory.
   std::string mOutputDirectory;
+
+  //!@brief The name of the project that will be recorded
+  std::string mProjectName;
 
   //!@brief Counts the time from when the recorder is started.
   QTime mStartTime;
