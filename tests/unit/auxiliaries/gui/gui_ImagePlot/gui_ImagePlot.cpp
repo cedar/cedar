@@ -43,7 +43,6 @@
 
 // SYSTEM INCLUDES
 #include <QApplication>
-#include <QTime>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -79,15 +78,9 @@ int test_annotation_with_float(cedar::aux::annotation::ColorSpace::ChannelType t
   plot->plot(data, "unit test plot");
   plot->triggerConversion();
 
-  QTime t;
-  t.start();
-  // run for 100 milliseconds
-  while (t.elapsed() < 1000)
+  while (QApplication::hasPendingEvents())
   {
-    if (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    QApplication::processEvents();
   }
 
   delete plot;
