@@ -115,7 +115,7 @@ void cedar::aux::MatData::serializeData(std::ostream& stream) const
     uchar* element = mData.data;
     for (int i = 0; i < mData.dims; i++)
     {
-      //Addresses an element of the Mat. See OpenCv Documentation.
+      //Addresses an element of the Mat. See OpenCV Documentation.
       element += mData.step[i]*index[i];
     }
     //check data type
