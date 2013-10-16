@@ -139,6 +139,7 @@ protected:
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
 signals:
+  //! Signal that is emitted whenever the validity of attached connections changes.
   void connectionValidityChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -255,7 +255,17 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
       if ((dimensionality == 1 || dimensionality == 2) && mat_data->getData().type() == CV_32F)
       {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
+        if (this->getInput("values"))
+        {
+          if (cedar::aux::math::matrixSizesEqual(this->getInput("values")->getData<cv::Mat>(), mat_data->getData()))
+          {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+          }
+        }
+        else
+        {
+          return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
       }
     }
   }
@@ -267,7 +277,18 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
       if ((dimensionality == 1 || dimensionality == 2) && mat_data->getData().type() == CV_32F)
       {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
+        // check if size of values fits the bin map input
+        if (this->getInput("bin map"))
+        {
+          if (cedar::aux::math::matrixSizesEqual(this->getInput("bin map")->getData<cv::Mat>(), mat_data->getData()))
+          {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+          }
+        }
+        else
+        {
+          return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
       }
     }
   }
@@ -302,7 +323,9 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
   }
   if (mDimensionality == 2)
   {
-    this->mOutput->setData(cv::Mat(this->mInput->getData().rows, this->getNumberOfBins(), CV_32F));
+    this->mOutput->lockForWrite();
+    this->mOutput->setData(cv::Mat::zeros(this->mInput->getData().rows, this->getNumberOfBins(), CV_32F));
+    this->mOutput->unlock();
   }
   else if (mDimensionality == 3)
   {
@@ -311,7 +334,11 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
     sizes_signed.push_back(this->mInput->getData().cols);
     sizes_signed.push_back(this->getNumberOfBins());
     cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
+    new_matrix = 0.0;
+    this->mOutput->lockForWrite();
     this->mOutput->setData(new_matrix);
+    this->mOutput->unlock();
   }
+  this->onTrigger();
   this->emitOutputPropertiesChangedSignal("output");
 }

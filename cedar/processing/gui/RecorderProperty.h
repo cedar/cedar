@@ -47,7 +47,7 @@
 #include <QSpinBox>
 #include <QCheckBox>
 
-/*!@todo Documentation
+/*!@brief With help if this class, the user is able to register,unregister and edit single DataSlots in the Recorder.
  */
 class cedar::proc::gui::RecorderProperty : public QHBoxLayout
 {

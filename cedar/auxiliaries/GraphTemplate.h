@@ -59,19 +59,30 @@ class cedar::aux::GraphTemplate
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type of the nodes' payloads.
   typedef NodePayloadT NodePayload;
+
+  //! Type of the edges' payloads.
   typedef EdgePayloadT EdgePayload;
+
+  //! Type used for indexing nodes.
   typedef unsigned int IndexType;
 
+  /*! @brief A generic class that represents a node in a graph.
+   *
+   *         Nodes can be associated with custom data, i.e., a payload. The type of this data can be chosen by the user.
+   */
   class Node
   {
     public:
+      //! Constructor.
       Node(const NodePayload& payload)
       :
       mPayload(payload)
       {
       }
 
+      //! Returns the payload of the node.
       const NodePayload& getPayload() const
       {
         return this->mPayload;
@@ -80,11 +91,15 @@ public:
     private:
       NodePayload mPayload;
   };
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(Node);
+  //!@endcond
 
+  //! A generic class for representing edges in a graph.
   class Edge
   {
     public:
+      //! Standard constructor.
       Edge(const EdgePayload& payload = EdgePayload())
       :
       mPayload(payload)
@@ -94,7 +109,9 @@ public:
     private:
       EdgePayload mPayload;
   };
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(Edge);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -109,6 +126,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*! Adds a node to the graph.
+   */
   void addNode(NodePtr node)
   {
     // get a new index for the node
@@ -119,6 +138,8 @@ public:
     this->mNodesById[index] = node;
   }
 
+  /*! Creates a node with the given payload, adds it to the graph and returns it.
+   */
   NodePtr addNodeForPayload(const NodePayload& payload)
   {
     auto node = NodePtr(new Node(payload));
@@ -126,6 +147,8 @@ public:
     return node;
   }
 
+  /*! Adds an edge in the graph.
+   */
   void addEdge(NodePtr source, NodePtr target, EdgePtr edge = EdgePtr(new Edge()))
   {
     IndexType source_id = this->getIdByNode(source);
@@ -142,6 +165,8 @@ public:
     this->mDirectedEdges[source_id][target_id] = edge;
   }
 
+  /*! Tests whether an edge exists between the given nodes.
+   */
   bool edgeExists(NodePtr source, NodePtr target)
   {
     IndexType source_id = this->getIdByNode(source);
@@ -150,6 +175,8 @@ public:
     return edgeExists(source_id, target_id);
   }
 
+  /*! Checks whether a node with the given payload exists in this graph.
+   */
   bool hasNodeForPayload(const NodePayload& payload) const
   {
     if (this->getNodeByPayload(payload))
@@ -162,6 +189,8 @@ public:
     }
   }
 
+  /*! Returns the node for the given payload.
+   */
   NodePtr getNodeByPayload(const NodePayload& payload) const
   {
     NodePtr node;
@@ -210,6 +239,8 @@ public:
     return cycles;
   }
 
+  /*! Returns a list of all direct successors of the given node.
+   */
   std::vector<NodePtr> getDirectSuccessors(NodePtr source) const
   {
     IndexType source_id = getIdByNode(source);

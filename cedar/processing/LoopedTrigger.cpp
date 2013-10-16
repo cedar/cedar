@@ -46,7 +46,8 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -194,9 +195,14 @@ void cedar::proc::LoopedTrigger::applyStop(bool)
   mStopping = false;
 }
 
+//!@todo this should take a cedar::unit::Time as argument
 void cedar::proc::LoopedTrigger::step(double time)
 {
-  cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));
+  cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime
+                                          (
+                                            cedar::unit::Time(time * cedar::unit::milli * cedar::unit::seconds)
+                                          )
+                                     );
 
   //!@todo Is this right?
   auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());

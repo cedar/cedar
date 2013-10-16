@@ -59,6 +59,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/prefixes.h"
 
 #include "cedar/processing/consistency/LoopedStepNotConnected.h"
 
@@ -208,7 +209,7 @@ void cedar::proc::Network::startTriggers(bool wait)
       auto trigger = *iter;
       while (!trigger->isRunning())
       {
-        cedar::aux::sleep(cedar::unit::Milliseconds(5));
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
     }
   }
@@ -234,7 +235,7 @@ void cedar::proc::Network::stopTriggers(bool wait)
       auto trigger = *iter;
       while (trigger->isRunning())
       {
-        cedar::aux::sleep(cedar::unit::Milliseconds(5));
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
     }
   }
@@ -259,7 +260,8 @@ void cedar::proc::Network::stepTriggers()
 
 void cedar::proc::Network::stepTriggers(cedar::unit::Time stepTime)
 {
-  this->stepTriggers(cedar::unit::Milliseconds(stepTime) / cedar::unit::Milliseconds(1));
+  double time_milli = stepTime / cedar::unit::seconds * 1000;
+  this->stepTriggers(time_milli);
 }
 
 void cedar::proc::Network::stepTriggers(double timeStep)
@@ -1683,8 +1685,9 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
                                                      )
 {
   //!@todo This code needs to be cleaned up, simplified and commented
-  std::string source_name = (*it)->getSource()->getParent();
-  std::string target_name = (*it)->getTarget()->getParent();
+  cedar::proc::DataConnectionPtr connection = *it;
+  std::string source_name = connection->getSource()->getParent();
+  std::string target_name = connection->getTarget()->getParent();
   std::string real_source_name = source_name;
   if (cedar::proc::ConstPromotedExternalDataPtr ext = boost::dynamic_pointer_cast<const cedar::proc::PromotedExternalData>((*it)->getSource()))
   {
@@ -1718,7 +1721,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   CEDAR_DEBUG_ASSERT(triggerable_target);
   if (!triggerable_target->isLooped())
   {
-    target_name = (*it)->getTarget()->getParent(); // reset target_name
+    target_name = connection->getTarget()->getParent(); // reset target_name
     // check that both Connectables are not connected through some other DataSlots
     cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
     for (DataConnectionVector::iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
@@ -1762,6 +1765,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   }
   else
   {
+
     it = mDataConnections.erase(it);
   }
   return it;

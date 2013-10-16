@@ -83,8 +83,8 @@ public:
   //! Whether or not memory output is generated.
   bool getMemoryDebugOutput();
 
-  //!@todo Documentation; also, this should be called getRecorderOutputDirectory()
-  std::string getRecorderWorkspace() const;
+  //!@brief Returns the directory where the recorder will save the recorded files.
+  std::string getRecorderOutputDirectory() const;
 
   //! Returns the parameter that contains the recorder's output directory.
   cedar::aux::DirectoryParameterPtr getRecorderWorkspaceParameter() const;

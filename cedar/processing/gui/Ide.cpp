@@ -51,7 +51,7 @@
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/auxiliaries/gui/PluginManagerDialog.h"
+#include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/Settings.h"
@@ -60,6 +60,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
@@ -176,6 +177,11 @@ mpBoostControl(NULL)
                    this,
                    SLOT(exportSvg()));
 
+  QObject::connect(mpActionShowRobotManager,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showRobotManager()));
+
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
 
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
@@ -198,6 +204,16 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showRobotManager()
+{
+  auto p_dialog = new QDialog(this);
+  auto p_layout = new QVBoxLayout();
+  p_dialog->setLayout(p_layout);
+  p_layout->addWidget(new cedar::dev::gui::RobotManager());
+  p_dialog->setMinimumHeight(500);
+  p_dialog->show();
+}
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 {
@@ -609,7 +625,8 @@ void cedar::proc::gui::Ide::stepThreads()
 {
   if (this->mpCustomTimeStep->isEnabled())
   {
-    this->mNetwork->getNetwork()->stepTriggers(cedar::unit::Milliseconds(this->mpCustomTimeStep->value()));
+    cedar::unit::Time step_size(this->mpCustomTimeStep->value() * cedar::unit::milli * cedar::unit::seconds);
+    this->mNetwork->getNetwork()->stepTriggers(step_size);
   }
   else
   {
@@ -960,9 +977,11 @@ void cedar::proc::gui::Ide::toggleRecorder(bool status)
   if (!status)
   {
     cedar::aux::RecorderSingleton::getInstance()->stop();
+    this->mpRecorderWidget->setEnabled(true);
   }
   else
   {
+    this->mpRecorderWidget->setEnabled(false);
     cedar::aux::RecorderSingleton::getInstance()->start();
   }
 }

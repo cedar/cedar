@@ -166,6 +166,10 @@ public slots:
    */
   void exportSvg();
 
+  /*!@brief Opens a dialog that contains the robot manager widget.
+   */
+  void showRobotManager();
+  
   /*!@brief Duplicates a selected step
    */
   void duplicateStep();
