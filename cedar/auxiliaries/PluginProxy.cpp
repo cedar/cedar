@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2011 07 22
 
-    Description:
+    Description: Implementation of the cedar::aux::PluginProxy class.
 
     Credits:
 
@@ -115,6 +115,8 @@ cedar::aux::PluginProxyPtr cedar::aux::PluginProxy::getPlugin(const std::string 
 
 std::string cedar::aux::PluginProxy::getNormalizedSearchPath() const
 {
+  CEDAR_ASSERT(!this->mFileName.empty());
+
   boost::filesystem::path plugin_path(this->mFileName);
 
   std::string path = plugin_path.parent_path()
@@ -212,6 +214,7 @@ std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& pl
     return plugin_dir.string();
   }
 
+  //!@todo This should throw an exception.
   return "";
 }
 

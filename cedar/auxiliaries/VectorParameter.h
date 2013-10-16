@@ -48,6 +48,7 @@
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <algorithm>
 
 namespace cedar
 {
@@ -300,9 +301,7 @@ public:
     CEDAR_ASSERT(first < this->mValues.size());
     CEDAR_ASSERT(second < this->mValues.size());
 
-    T helper = this->mValues.at(first);
-    this->mValues[first] = this->mValues.at(second);
-    this->mValues[second] = helper;
+    std::swap(this->mValues[first], this->mValues[second]);
 
     this->emitChangedSignal();
   }
