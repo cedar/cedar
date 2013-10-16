@@ -67,7 +67,12 @@ mConverting(false)
   this->init();
 }
 
-cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent)
+cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D
+(
+  cedar::aux::ConstDataPtr matData,
+  const std::string& title,
+  QWidget* pParent
+)
 :
 cedar::aux::gui::PlotInterface(pParent),
 mTimerId(0),
@@ -108,7 +113,10 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
   this->setToolTip(QString("Use + and - to alter number of columns."));
 
   this->mpWorkerThread = new QThread();
-  mWorker = cedar::aux::gui::detail::MatrixSlicePlot3DWorkerPtr(new cedar::aux::gui::detail::MatrixSlicePlot3DWorker(this));
+  mWorker = cedar::aux::gui::detail::MatrixSlicePlot3DWorkerPtr
+            (
+              new cedar::aux::gui::detail::MatrixSlicePlot3DWorker(this)
+            );
   mWorker->moveToThread(this->mpWorkerThread);
 
   QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
@@ -317,7 +325,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::updateData()
 //  case CV_64FC1:
     {
       this->mData->lockForRead();
-      this->slicesFromMat(mat);
+      this->slicesFromMat(this->mData->getData());
       this->mData->unlock();
       break;
     }

@@ -125,7 +125,7 @@ cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspacePara
   return this->mRecorderWorkspace;
 }
 
-std::string cedar::aux::Settings::getRecorderWorkspace() const
+std::string cedar::aux::Settings::getRecorderOutputDirectory() const
 {
   return this->mRecorderWorkspace->getValue().absolutePath().toStdString();
 }
