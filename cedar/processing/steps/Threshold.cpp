@@ -175,7 +175,7 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
   }
 }
 
-void cedar::proc::steps::Threshold::Threshold::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
 {
   const cv::Mat& input = this->mInputImage->getData();
   cv::Mat& thresholded_image = this->mThresholdedImage->getData();

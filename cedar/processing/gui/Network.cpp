@@ -55,6 +55,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -101,6 +102,13 @@ _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
+  QObject::connect
+  (
+    this,
+    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange)),
+    this,
+    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange))
+  );
 
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
@@ -438,6 +446,7 @@ void cedar::proc::gui::Network::write()
 void cedar::proc::gui::Network::write(const std::string& destination)
 {
   this->mFileName = destination;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
 
@@ -459,6 +468,7 @@ void cedar::proc::gui::Network::write(const std::string& destination)
 void cedar::proc::gui::Network::read(const std::string& source)
 {
   this->mFileName = source;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
@@ -708,29 +718,48 @@ void cedar::proc::gui::Network::checkDataConnection
        cedar::proc::Network::ConnectionChange change
      )
 {
+  emit signalDataConnectionChange
+       (
+         QString::fromStdString(source->getParent()),
+         QString::fromStdString(source->getName()),
+         QString::fromStdString(target->getParent()),
+         QString::fromStdString(target->getName()),
+         change
+       );
+}
+
+void cedar::proc::gui::Network::dataConnectionChanged
+     (
+       QString sourceName,
+       QString sourceSlot,
+       QString targetName,
+       QString targetSlot,
+       cedar::proc::Network::ConnectionChange change
+     )
+{
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
   cedar::proc::gui::GraphicsBase* p_base_source
-    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(source->getParent()).get());
+    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(sourceName.toStdString()).get());
   if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
   {
-    source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+    source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
   }
   else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base_source))
   {
-    source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+    source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
   }
   CEDAR_ASSERT(source_slot);
 
   cedar::proc::gui::DataSlotItem* target_slot = NULL;
   cedar::proc::gui::GraphicsBase* p_base
-    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(target->getParent()).get());
+    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(targetName.toStdString()).get());
   if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
   {
-    target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+    target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
   }
   else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base))
   {
-    target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+    target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
   }
   CEDAR_ASSERT(target_slot);
 

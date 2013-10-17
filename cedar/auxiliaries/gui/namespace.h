@@ -65,6 +65,8 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT PropertyPane;
       CEDAR_DECLARE_AUX_CLASS(Parameter);
 
+      class CEDAR_AUX_LIB_EXPORT AccelerationParameter;
+      class CEDAR_AUX_LIB_EXPORT AngularVelocityParameter;
       class CEDAR_AUX_LIB_EXPORT BoolParameter;
       class CEDAR_AUX_LIB_EXPORT BoolVectorParameter;
       class CEDAR_AUX_LIB_EXPORT DirectoryParameter;
@@ -72,13 +74,20 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
       class CEDAR_AUX_LIB_EXPORT EnumParameter;
       class CEDAR_AUX_LIB_EXPORT FileParameter;
+      class CEDAR_AUX_LIB_EXPORT FrequencyParameter;
       class CEDAR_AUX_LIB_EXPORT IntParameter;
       class CEDAR_AUX_LIB_EXPORT IntVectorParameter;
+      class CEDAR_AUX_LIB_EXPORT LengthParameter;
       class CEDAR_AUX_LIB_EXPORT ObjectParameter;
       class CEDAR_AUX_LIB_EXPORT ObjectListParameter;
+      class CEDAR_AUX_LIB_EXPORT PlaneAngleParameter;
       class CEDAR_AUX_LIB_EXPORT StringParameter;
+      class CEDAR_AUX_LIB_EXPORT TimeParameter;
       class CEDAR_AUX_LIB_EXPORT UIntParameter;
       class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
+      class CEDAR_AUX_LIB_EXPORT VelocityParameter;
+
+      class CEDAR_AUX_LIB_EXPORT ResourceDialog;
 
       class CEDAR_AUX_LIB_EXPORT ExceptionDialog;
 

@@ -43,7 +43,6 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/processing/DeclarationRegistry.h"

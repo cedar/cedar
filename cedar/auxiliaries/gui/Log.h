@@ -129,6 +129,7 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! Called periodically. Responsible for fading out older messages.
   void timerEvent(QTimerEvent* pEvent);
 
 signals:
