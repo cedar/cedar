@@ -65,9 +65,6 @@ public:
   //!@brief The standard constructor.
   Component();
 
-  //!@brief Destructor
-  virtual ~Component();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,6 +92,10 @@ private:
                                     cedar::aux::ConstDataPtr data
                                   ) const;
 
+  void onStart();
+
+  void onStop();
+
 private slots:
   void componentChanged();
 
@@ -104,7 +105,8 @@ private slots:
 protected:
   // none yet
 private:
-  // none yet
+  //! Remembers whether onStart connected the component/robot. If true, onStop will disconnect.
+  bool mConnectedOnStart;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
