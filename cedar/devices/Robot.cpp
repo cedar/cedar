@@ -57,9 +57,7 @@
 //! constructor
 cedar::dev::Robot::Robot()
 :
-_mRobotDescription(new cedar::aux::Configurable()) //,
-//_mComponentSlots(new cedar::dev::Robot::ComponentSlotParameter(_mRobotDescription.get(), "component slots")),
-//_mChannels(new cedar::dev::Robot::ChannelParameter(_mRobotDescription.get(), "channels"))
+mRobotDescription(new cedar::aux::Configurable())
 {
 }
 
@@ -166,7 +164,7 @@ unsigned int cedar::dev::Robot::getNumberOfChannels() const
 
 void cedar::dev::Robot::setChannel(const std::string& channel)
 {
-  for (auto slot_iter = _mComponentSlots.begin(); slot_iter != _mComponentSlots.end(); ++slot_iter)
+  for (auto slot_iter = mComponentSlots.begin(); slot_iter != mComponentSlots.end(); ++slot_iter)
   {
     cedar::dev::ComponentSlotPtr slot = slot_iter->second;
     slot->setChannel(channel);
@@ -192,7 +190,7 @@ std::vector<std::string> cedar::dev::Robot::listComponentSlots() const
 {
   std::vector<std::string> slot_vector;
 
-  for (auto slot_iter = _mComponentSlots.begin(); slot_iter != _mComponentSlots.end(); ++slot_iter)
+  for (auto slot_iter = mComponentSlots.begin(); slot_iter != mComponentSlots.end(); ++slot_iter)
   {
     slot_vector.push_back(slot_iter->first);
   }
@@ -222,7 +220,7 @@ void cedar::dev::Robot::performConsistencyCheck() const
   // gather all channels from the component slots
   std::set<std::string> slot_channels;
 
-  for (auto slot_iter = this->_mComponentSlots.begin(); slot_iter != this->_mComponentSlots.end(); ++slot_iter)
+  for (auto slot_iter = this->mComponentSlots.begin(); slot_iter != this->mComponentSlots.end(); ++slot_iter)
   {
     cedar::dev::ConstComponentSlotPtr slot = slot_iter->second;
     std::vector<std::string> slot_channel_list = slot->listChannels();
@@ -230,7 +228,7 @@ void cedar::dev::Robot::performConsistencyCheck() const
   }
 
   // check if every slot specifies relationships for every channel
-  for (auto slot_iter = this->_mComponentSlots.begin(); slot_iter != this->_mComponentSlots.end(); ++slot_iter)
+  for (auto slot_iter = this->mComponentSlots.begin(); slot_iter != this->mComponentSlots.end(); ++slot_iter)
   {
     cedar::dev::ConstComponentSlotPtr slot = slot_iter->second;
     const std::string& slot_name = slot_iter->first;
@@ -252,7 +250,7 @@ void cedar::dev::Robot::performConsistencyCheck() const
 void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& node)
 {
   // read using default procedure (where possible)
-  this->_mRobotDescription->readConfiguration(node);
+  this->mRobotDescription->readConfiguration(node);
 
   // read the component slots
   auto desc_file_node = node.find("component slots");
@@ -269,7 +267,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
     const cedar::aux::ConfigurationNode& component_slots = desc_file_node->second;
 
     //!@todo Maybe this kind of list/map of configurables of fixed type can be generalized to a parameter?
-    _mComponentSlots.clear();
+    mComponentSlots.clear();
     for (auto slot_iter = component_slots.begin(); slot_iter != component_slots.end(); ++slot_iter)
     {
       const std::string& slot_name = slot_iter->first;
@@ -277,7 +275,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
 
       cedar::dev::ComponentSlotPtr slot(new cedar::dev::ComponentSlot(this->shared_from_this(), slot_name));
       slot->readConfiguration(slot_config);
-      _mComponentSlots[slot_name] = slot;
+      mComponentSlots[slot_name] = slot;
     }
   }
 
@@ -299,8 +297,20 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
   this->performConsistencyCheck();
 }
 
+void cedar::dev::Robot::clear()
+{
+  this->mChannelTypes.clear();
+  this->mChannelConfigurations.clear();
+  this->mChannelInstances.clear();
+  this->mComponentSlots.clear();
+
+  this->mRobotDescription = cedar::aux::ConfigurablePtr(new cedar::aux::Configurable());
+}
+
 void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
+  this->clear();
+
   // read description file
   const cedar::aux::ConfigurationNode::const_assoc_iterator desc_file_node = node.find("description file");
   if (desc_file_node == node.not_found())
@@ -422,7 +432,7 @@ std::vector<std::string> cedar::dev::Robot::getComponentSlotNames() const
   std::vector<std::string> slot_names;
 
   // for all elements in the _mComponentSlots map
-  for(auto map_entry = _mComponentSlots.begin(); map_entry != _mComponentSlots.end(); ++map_entry)
+  for(auto map_entry = mComponentSlots.begin(); map_entry != mComponentSlots.end(); ++map_entry)
   {
     // copy the key of the map (i.e., the name of the slot) into the vector
     slot_names.push_back(map_entry->first);
@@ -433,9 +443,9 @@ std::vector<std::string> cedar::dev::Robot::getComponentSlotNames() const
 
 cedar::dev::ComponentSlotPtr cedar::dev::Robot::getComponentSlot(const std::string& componentSlotName) const
 {
-  auto slot_it = _mComponentSlots.find(componentSlotName);
+  auto slot_it = mComponentSlots.find(componentSlotName);
 
-  if (slot_it == _mComponentSlots.end())
+  if (slot_it == mComponentSlots.end())
   {
     std::ostringstream exception_message;
     exception_message << "The robot does not have a component slot with the name \""
