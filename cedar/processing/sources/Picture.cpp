@@ -161,8 +161,8 @@ void cedar::proc::sources::Picture::updatePicture()
   {
     this->annotateImage();
     this->emitOutputPropertiesChangedSignal("Picture");
-    onTrigger();
   }
+  onTrigger();
 }
 
 void cedar::proc::sources::Picture::compute(const cedar::proc::Arguments&)
