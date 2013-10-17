@@ -66,7 +66,7 @@ namespace
         "cedar.processing.steps.Component"
       )
     );
-//    declaration->setIconPath(":/steps/color_conversion.svg");
+    declaration->setIconPath(":/cedar/dev/gui/icons/generic_hardware_icon.svg");
 //    declaration->setDescription
 //    (
 //      "Converts a matrix from one color space into another."
