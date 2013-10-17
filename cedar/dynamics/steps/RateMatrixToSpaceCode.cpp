@@ -174,7 +174,12 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
   const cv::Mat& input = this->getInput("bin map")->getData<cv::Mat>();
   cv::Mat& output = this->mOutput->getData();
   output = 0.0;
-  if (this->getInput("values") && cedar::aux::math::matrixSizesEqual(this->getInput("values")->getData<cv::Mat>(), input))
+  if
+  (
+    this->getInput("values")
+      && cedar::aux::math::matrixSizesEqual(this->getInput("values")->getData<cv::Mat>(), input)
+      && this->getInput("values")->getData<cv::Mat>().type() == input.type()
+  )
   {
     const cv::Mat& values = this->getInput("values")->getData<cv::Mat>();
     if (mDimensionality == 3)
@@ -186,6 +191,10 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
           index.at(0) = row;
           index.at(1) = col;
           index.at(2) = this->interpolateBin(input.at<float>(row, col));
+          CEDAR_DEBUG_ASSERT(index.at(0) < output.size[0]);
+          CEDAR_DEBUG_ASSERT(index.at(1) < output.size[1]);
+          CEDAR_DEBUG_ASSERT(index.at(2) < output.size[2]);
+
           if (index.at(2) != -1)
           {
             //!@todo This should probably use cedar::aux::math::getMatrixEntry
@@ -218,6 +227,9 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
           index.at(0) = row;
           index.at(1) = col;
           index.at(2) = this->interpolateBin(input.at<float>(row, col));
+          CEDAR_DEBUG_ASSERT(index.at(0) < output.size[0]);
+          CEDAR_DEBUG_ASSERT(index.at(1) < output.size[1]);
+          CEDAR_DEBUG_ASSERT(index.at(2) < output.size[2]);
           if (index.at(2) != -1)
           {
             output.at<float>(&(index.front())) = 1.0;
@@ -311,6 +323,11 @@ void cedar::dyn::RateMatrixToSpaceCode::inputConnectionChanged(const std::string
     mDimensionality = mInput->getDimensionality() + 1;
 
     // This should always work since other types should not be accepted.
+    this->outputSizesChanged();
+  }
+
+  if (inputName == "values")
+  {
     this->outputSizesChanged();
   }
 }
