@@ -305,11 +305,10 @@ void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& n
   const cedar::aux::ConfigurationNode::const_assoc_iterator desc_file_node = node.find("description file");
   if (desc_file_node == node.not_found())
   {
-    // TODO throw
-    std::cout << "Node not found." << std::endl;
-    return;
+    CEDAR_THROW(cedar::aux::MalformedConfigurationTreeException, "No \"description file\" specified for the robot.");
   }
 
+  //!@todo Use path class here
   std::string description_file = desc_file_node->second.get_value<std::string>();
   std::string description_resource = cedar::aux::locateResource(description_file);
   cedar::aux::ConfigurationNode description;
@@ -334,7 +333,14 @@ void cedar::dev::Robot::readChannels(const cedar::aux::ConfigurationNode& node)
       const cedar::aux::ConfigurationNode& channel_configuration = iter->second;
 
       // check for duplicate channel configurations
-      CEDAR_ASSERT(this->mChannelConfigurations.find(channel_name) == this->mChannelConfigurations.end());
+      if (this->mChannelConfigurations.find(channel_name) != this->mChannelConfigurations.end())
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::DuplicateChannelNameException,
+          "The channel \"" + channel_name + "\" is already declared."
+        );
+      }
 
       this->mChannelConfigurations[channel_name] = channel_configuration;
     }
@@ -346,8 +352,14 @@ void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::Config
   std::vector<std::string> component_slots = this->listComponentSlots();
 
   auto component_slots_iter = node.find("component slots");
-  //!@todo Proper component_slots_node
-  CEDAR_ASSERT(component_slots_iter != node.not_found());
+  if (component_slots_iter == node.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::MalformedConfigurationTreeException,
+      "No node \"component slots\" found in the configuration."
+    );
+  }
   const cedar::aux::ConfigurationNode& component_slots_node = component_slots_iter->second;
 
   // iterate over all slots; there should be an entry in the configuration for each of them.
