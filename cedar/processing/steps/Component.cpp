@@ -94,31 +94,45 @@ _mComponent(new cedar::dev::ComponentParameter(this, "component"))
 
 void cedar::proc::steps::Component::onStart()
 {
-  if (auto component = this->getComponent())
+  try
   {
-    if (auto channel = component->getChannel())
+    if (auto component = this->getComponent())
     {
-      if (!channel->isOpen())
+      if (auto channel = component->getChannel())
       {
-        this->mConnectedOnStart = true;
-        channel->open();
+        if (!channel->isOpen())
+        {
+          this->mConnectedOnStart = true;
+          channel->open();
+        }
       }
     }
+  }
+  catch (cedar::dev::NoComponentSelectedException)
+  {
+    // ok, don't do anything in this case.
   }
 }
 
 void cedar::proc::steps::Component::onStop()
 {
-  if (auto component = this->getComponent())
+  try
   {
-    if (auto channel = component->getChannel())
+    if (auto component = this->getComponent())
     {
-      if (this->mConnectedOnStart)
+      if (auto channel = component->getChannel())
       {
-        channel->close();
-        this->mConnectedOnStart = false;
+        if (this->mConnectedOnStart)
+        {
+          channel->close();
+          this->mConnectedOnStart = false;
+        }
       }
     }
+  }
+  catch (cedar::dev::NoComponentSelectedException)
+  {
+    // ok, don't do anything in this case.
   }
 }
 
