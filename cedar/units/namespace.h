@@ -44,6 +44,11 @@
 
 // SYSTEM INCLUDES
 
+/*! Defined to indicate that the new unit framework is in effect. This can be used to keep software compatible with
+ *  multiple versions of cedar.
+ */
+#define CEDAR_UNITS_FRAMEWORK_V2
+
 namespace cedar
 {
   /*!@brief Namespace for all aux classes. */
