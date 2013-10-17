@@ -174,7 +174,12 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
   const cv::Mat& input = this->getInput("bin map")->getData<cv::Mat>();
   cv::Mat& output = this->mOutput->getData();
   output = 0.0;
-  if (this->getInput("values") && cedar::aux::math::matrixSizesEqual(this->getInput("values")->getData<cv::Mat>(), input))
+  if
+  (
+    this->getInput("values")
+      && cedar::aux::math::matrixSizesEqual(this->getInput("values")->getData<cv::Mat>(), input)
+      && this->getInput("values")->getData<cv::Mat>().type() == input.type()
+  )
   {
     const cv::Mat& values = this->getInput("values")->getData<cv::Mat>();
     if (mDimensionality == 3)
@@ -186,6 +191,10 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
           index.at(0) = row;
           index.at(1) = col;
           index.at(2) = this->interpolateBin(input.at<float>(row, col));
+          CEDAR_DEBUG_ASSERT(index.at(0) < output.size[0]);
+          CEDAR_DEBUG_ASSERT(index.at(1) < output.size[1]);
+          CEDAR_DEBUG_ASSERT(index.at(2) < output.size[2]);
+
           if (index.at(2) != -1)
           {
             //!@todo This should probably use cedar::aux::math::getMatrixEntry
@@ -218,6 +227,9 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
           index.at(0) = row;
           index.at(1) = col;
           index.at(2) = this->interpolateBin(input.at<float>(row, col));
+          CEDAR_DEBUG_ASSERT(index.at(0) < output.size[0]);
+          CEDAR_DEBUG_ASSERT(index.at(1) < output.size[1]);
+          CEDAR_DEBUG_ASSERT(index.at(2) < output.size[2]);
           if (index.at(2) != -1)
           {
             output.at<float>(&(index.front())) = 1.0;
@@ -255,7 +267,17 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
       if ((dimensionality == 1 || dimensionality == 2) && mat_data->getData().type() == CV_32F)
       {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
+        if (this->getInput("values"))
+        {
+          if (cedar::aux::math::matrixSizesEqual(this->getInput("values")->getData<cv::Mat>(), mat_data->getData()))
+          {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+          }
+        }
+        else
+        {
+          return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
       }
     }
   }
@@ -267,7 +289,18 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
       if ((dimensionality == 1 || dimensionality == 2) && mat_data->getData().type() == CV_32F)
       {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
+        // check if size of values fits the bin map input
+        if (this->getInput("bin map"))
+        {
+          if (cedar::aux::math::matrixSizesEqual(this->getInput("bin map")->getData<cv::Mat>(), mat_data->getData()))
+          {
+            return cedar::proc::DataSlot::VALIDITY_VALID;
+          }
+        }
+        else
+        {
+          return cedar::proc::DataSlot::VALIDITY_VALID;
+        }
       }
     }
   }
@@ -292,6 +325,11 @@ void cedar::dyn::RateMatrixToSpaceCode::inputConnectionChanged(const std::string
     // This should always work since other types should not be accepted.
     this->outputSizesChanged();
   }
+
+  if (inputName == "values")
+  {
+    this->outputSizesChanged();
+  }
 }
 
 void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
@@ -302,7 +340,9 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
   }
   if (mDimensionality == 2)
   {
-    this->mOutput->setData(cv::Mat(this->mInput->getData().rows, this->getNumberOfBins(), CV_32F));
+    this->mOutput->lockForWrite();
+    this->mOutput->setData(cv::Mat::zeros(this->mInput->getData().rows, this->getNumberOfBins(), CV_32F));
+    this->mOutput->unlock();
   }
   else if (mDimensionality == 3)
   {
@@ -311,7 +351,11 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
     sizes_signed.push_back(this->mInput->getData().cols);
     sizes_signed.push_back(this->getNumberOfBins());
     cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
+    new_matrix = 0.0;
+    this->mOutput->lockForWrite();
     this->mOutput->setData(new_matrix);
+    this->mOutput->unlock();
   }
+  this->onTrigger();
   this->emitOutputPropertiesChangedSignal("output");
 }
