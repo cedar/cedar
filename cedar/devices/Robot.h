@@ -177,6 +177,9 @@ private:
   //! Allocates the channel of the given name.
   void allocateChannel(const std::string& channelName);
 
+  //! Clears all components and channels.
+  void clear();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -193,6 +196,12 @@ private:
   //! Map from channel names to instances.
   std::map<std::string, cedar::dev::ChannelPtr> mChannelInstances;
 
+  //! mapping of all slot names to their component slots
+  ComponentSlotParameter mComponentSlots;
+
+  //! Configurable object used for storing robot setup in a separate file.
+  cedar::aux::ConfigurablePtr mRobotDescription;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -200,15 +209,7 @@ protected:
   // none yet
 
 private:
-  //! Configurable object used for storing robot setup in a separate file.
-  cedar::aux::ConfigurablePtr _mRobotDescription;
-
-  //! mapping of all slot names to their component slots
-  ComponentSlotParameter _mComponentSlots;
-
-
-  //! mapping of all channel names to the channel
-//  ChannelParameterPtr _mChannels;
+  // none yet
 
 }; // class cedar::dev::Robot
 #endif // CEDAR_DEV_ROBOT_H
