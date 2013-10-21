@@ -99,6 +99,8 @@ mLastExceptionType(NONE)
   }
 
   this->mpIde = new cedar::proc::gui::Ide(!no_plugins, !no_log_redirect);
+
+  QObject::connect(this, SIGNAL(showExceptionDialogSignal()), this, SLOT(showExceptionDialog()));
 }
 
 cedar::proc::gui::IdeApplication::~IdeApplication()
@@ -214,9 +216,7 @@ void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
 
 bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent)
 {
-  static std::string intro_message("This exception was caught by the cedar::proc::gui::IdeApplication."
-          " This is most likely a bug, please report it. You should probably also save your current work under a different"
-          " name and restart the application.");
+  //!@todo Make this flag a setting?
 #ifdef CATCH_EXCEPTIONS_IN_GUI
   try
   {
@@ -228,25 +228,58 @@ bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
-    auto p_dialog = new cedar::aux::gui::ExceptionDialog();
-    p_dialog->setAdditionalString(intro_message);
-    p_dialog->displayCedarException(e);
-    p_dialog->exec();
+    QWriteLocker locker(&mLastExceptionInfoLock);
+    this->mLastCedarException = e;
+    this->mLastExceptionType = CEDAR_EXCEPTION;
+    emit showExceptionDialogSignal();
   }
   catch(const std::exception& e)
   {
-    auto p_dialog = new cedar::aux::gui::ExceptionDialog();
-    p_dialog->setAdditionalString(intro_message);
-    p_dialog->displayStdException(e);
-    p_dialog->exec();
+    QWriteLocker locker(&mLastExceptionInfoLock);
+    this->mLastStdException = e;
+    this->mLastExceptionType = STD_EXCEPTION;
+    emit showExceptionDialogSignal();
   }
   catch(...)
   {
-    auto p_dialog = new cedar::aux::gui::ExceptionDialog();
-    p_dialog->setAdditionalString(intro_message);
-    p_dialog->displayUnknownException();
-    p_dialog->exec();
+    QWriteLocker locker(&mLastExceptionInfoLock);
+    this->mLastExceptionType = UNKNOWN_EXCEPTION;
+    emit showExceptionDialogSignal();
   }
 #endif // CATCH_EXCEPTIONS_IN_GUI
   return false;
+}
+
+void cedar::proc::gui::IdeApplication::showExceptionDialog()
+{
+  static std::string intro_message("This exception was caught by the cedar::proc::gui::IdeApplication."
+          " This is most likely a bug, please report it. You should probably also save your current work under a different"
+          " name and restart the application.");
+
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(QThread::currentThread() == QCoreApplication::instance()->thread());
+
+  auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+  p_dialog->setAdditionalString(intro_message);
+
+  QReadLocker locker(&mLastExceptionInfoLock);
+  switch (mLastExceptionType)
+  {
+    case CEDAR_EXCEPTION:
+      p_dialog->displayCedarException(this->mLastCedarException);
+      break;
+
+    case STD_EXCEPTION:
+      p_dialog->displayStdException(this->mLastStdException);
+      break;
+
+    case UNKNOWN_EXCEPTION:
+      p_dialog->displayUnknownException();
+      break;
+
+    default:
+      CEDAR_DEBUG_NON_CRITICAL_ASSERT(false && "Unhandled exception type.");
+  }
+  locker.unlock();
+
+  p_dialog->exec();
 }
