@@ -109,9 +109,7 @@ public:
 protected:
 
 signals:
-  /*!@brief Signal that is sent when cedar::proc::gui::Ide::notify catches an otherwise unhandled exception.
-   */
-  void exception(const QString& message);
+  void showExceptionDialogSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -127,6 +125,9 @@ private:
   static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
 #endif // CEDAR_COMPILER_MSVC
 
+private slots:
+  void showExceptionDialog();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -140,6 +141,12 @@ private:
 
   //! Last cedar exception caught by the application.
   cedar::aux::ExceptionBase mLastCedarException;
+
+  //! Last std::exception caught by the application.
+  std::exception mLastStdException;
+
+  //! Lock for the last exception information.
+  QReadWriteLock mLastExceptionInfoLock;
 
 }; // class cedar::proc::gui::IdeApplication
 
