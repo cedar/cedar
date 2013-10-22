@@ -216,8 +216,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>129</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -229,8 +229,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>129</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -288,7 +288,7 @@
               <x>0</x>
               <y>0</y>
               <width>254</width>
-              <height>429</height>
+              <height>427</height>
              </rect>
             </property>
             <property name="palette">
@@ -405,22 +405,22 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionSave"/>
-   <addaction name="mpActionResetRootNetwork"/>
-   <addaction name="separator"/>
-   <addaction name="mpActionToggleTriggerVisibility"/>
    <addaction name="separator"/>
    <addaction name="mpThreadsStartAll"/>
    <addaction name="mpThreadsStopAll"/>
+   <addaction name="mpThreadsSingleStep"/>
+   <addaction name="mpActionResetRootNetwork"/>
    <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="separator"/>
-   <addaction name="mpThreadsSingleStep"/>
    <addaction name="mpActionBoostControl"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleSmartConnections"/>
+   <addaction name="mpActionShowHideGrid"/>
+   <addaction name="mpActionToggleTriggerVisibility"/>
    <addaction name="mpActionCloseAllPlots"/>
+   <addaction name="separator"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
