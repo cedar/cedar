@@ -138,6 +138,7 @@ void cedar::dev::gui::ComponentParameter::openComponentSelector()
     delete this->mpComponentDialog;
   }
   this->mpComponentDialog = new QDialog();
+  this->mpComponentDialog->setWindowTitle("Please select a component...");
 
   this->mpComponentDialog->setModal(true);
   auto p_layout = new QVBoxLayout();
