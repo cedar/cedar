@@ -244,6 +244,18 @@ public:
     return this->_mHighlightConnections->getValue();
   }
 
+  //! Returns whether or not deprecated steps should be displayed in the element list.
+  bool getElementListShowsDeprecated() const;
+
+  //! Sets whether or not deprecated steps should be displayed in the element list.
+  void setElementListShowsDeprecated(bool show);
+
+  //! Returns the parameter that stores whether element lists should show deprecated types.
+  cedar::aux::BoolParameterPtr getElementListShowsDeprecatedParameter() const
+  {
+    return this->_mElementListShowsDeprecated;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -328,6 +340,9 @@ private:
 
   //! Maximum number of entries in the recent files list.
   cedar::aux::UIntParameterPtr _mMaxFileHistorySize;
+
+  //! Whether or not the element list should display deprecated element types.
+  cedar::aux::BoolParameterPtr _mElementListShowsDeprecated;
 
 }; // class cedar::proc::gui::Settings
 
