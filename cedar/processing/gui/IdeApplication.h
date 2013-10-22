@@ -142,8 +142,11 @@ private:
   //! Last cedar exception caught by the application.
   cedar::aux::ExceptionBase mLastCedarException;
 
-  //! Last std::exception caught by the application.
-  std::exception mLastStdException;
+  //! what() of the last std::exception caught by the application.
+  std::string mLastStdExceptionWhat;
+
+  //! type of the last std::exception caught by the application.
+  std::string mLastStdExceptionType;
 
   //! Lock for the last exception information.
   QReadWriteLock mLastExceptionInfoLock;
