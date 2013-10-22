@@ -151,7 +151,7 @@ void cedar::proc::gui::Scene::itemSelected()
   else
   {
     this->mpConfigurableWidget->resetContents();
-    this->mpRecorderWidget->resetContents();
+    this->mpRecorderWidget->clearLayout();
   }
 }
 
@@ -966,10 +966,6 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
-
-  //unregister this step in th recorder
-  //!@todo This is misplaced. If a step needs to be unregistered, that should happen in the destructor of proc::Step.
-  this->mpRecorderWidget->unregister(pStep->getStep());
 }
 
 cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()

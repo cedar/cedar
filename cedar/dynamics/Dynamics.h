@@ -44,7 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 

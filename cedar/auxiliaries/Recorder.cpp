@@ -50,6 +50,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/pointer_cast.hpp>
+#include <limits>
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -57,7 +58,7 @@
 
 cedar::aux::Recorder::Recorder()
 {
-  mOutputDirectory = "Unknown";
+  mProjectName = "Unnamed";
 }
 
 cedar::aux::Recorder::~Recorder()
@@ -118,11 +119,6 @@ void cedar::aux::Recorder::unregisterData(const std::string& name)
 
 void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 {
-  //throw exception if running
-  if (this->isRunning())
-  {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
-  }
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); ++i)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
@@ -137,8 +133,8 @@ void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 
 void cedar::aux::Recorder::createOutputDirectory()
 {
-  mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspace()
-                       + "/" + QDateTime::currentDateTime().toString("yy.MM.dd hh-mm-ss").toStdString();
+  mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
+                       + "/"+mProjectName+"/recording_" + QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
   boost::filesystem::create_directories(mOutputDirectory);
 }
 
@@ -154,8 +150,8 @@ void cedar::aux::Recorder::applyStart()
   mStartTime.start();
 
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
-  //!@todo Use std::numeric_limits<int> for this
-  int min = 1000;
+  //!@todo Use  for this
+  int min = std::numeric_limits<int>::max() ;
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
@@ -190,7 +186,7 @@ void cedar::aux::Recorder::clear()
 }
 
 
-void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
+void cedar::aux::Recorder::setRecordedProjectName(const std::string& name)
 {
   //throw exception if running
   if (isRunning())
@@ -198,7 +194,7 @@ void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change output directory while recorder is running");
   }
 
-  this->mOutputDirectory = path;
+  this->mProjectName = boost::filesystem::path(name).stem().string();
 }
 
 const std::string& cedar::aux::Recorder::getOutputDirectory() const

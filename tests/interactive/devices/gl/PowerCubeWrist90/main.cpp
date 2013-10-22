@@ -34,9 +34,9 @@
  -----------------------------------------------------------------------------*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gl/PowerCubeWrist90.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gl/PowerCubeWrist90.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -56,13 +56,13 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create dummy kinematic chain and model to represent the joint angles
-  cedar::dev::robot::KinematicChainPtr head(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr head(new cedar::dev::SimulatedKinematicChain());
   head->readJson(head_configuration_file);
 
   // create gl visualization objects
-  cedar::dev::robot::gl::PowerCubeWrist90Ptr head_visualization
+  cedar::dev::gl::PowerCubeWrist90Ptr head_visualization
   (
-    new cedar::dev::robot::gl::PowerCubeWrist90(head)
+    new cedar::dev::gl::PowerCubeWrist90(head)
   );
 
   // create scene and viewer to display the arm
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
   // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
-  cedar::dev::robot::gui::KinematicChainWidget widget_head(head);
+  cedar::dev::gui::KinematicChainWidget widget_head(head);
 
   // show and start everything
   scene_widget->show();

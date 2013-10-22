@@ -41,11 +41,12 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Gauss kernel class.
+/*!@brief A class for a convolution kernel that has the shape of a Gaussian distribution.
  *
  */
 class cedar::aux::kernel::Gauss : public cedar::aux::kernel::Separable
@@ -143,10 +144,16 @@ private:
 protected:
   //!@brief amplitude of the kernel - after normalization of each dimension, this is applied to the first one
   cedar::aux::DoubleParameterPtr _mAmplitude;
+
   //!@brief sigmas of the Gauss function for each dimension
   cedar::aux::DoubleVectorParameterPtr _mSigmas;
+
+  //! Whether or not the kernel is normalized.
+  cedar::aux::BoolParameterPtr _mNormalize;
+
   //!@brief shift of the Gauss function from the center for each dimension
   cedar::aux::DoubleVectorParameterPtr _mShifts;
+
   //!@brief scalar value, which is multiplied by the dimensions' sigmas to determine the pixel size
   cedar::aux::DoubleParameterPtr _mLimit;
 private:
