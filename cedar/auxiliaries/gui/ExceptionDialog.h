@@ -77,6 +77,9 @@ public:
   //! Display a std::exception.
   void displayStdException(const std::exception& exception);
 
+  //! Display generic exception information
+  void displayGenericException(const std::string& what, const std::string& type);
+
   //! Display an unknown exception.
   void displayUnknownException();
 
