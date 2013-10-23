@@ -414,6 +414,7 @@ void cedar::proc::gui::Settings::load()
       std::string("Error reading framework gui settings: ") + e.what(),
       "void cedar::proc::gui::Settings::load()"
     );
+    //!@todo Restore defaults
   }
 }
 
