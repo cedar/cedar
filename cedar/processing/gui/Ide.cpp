@@ -494,7 +494,7 @@ void cedar::proc::gui::Ide::resetStepList()
     {
       p_tab = mElementClassListWidgets[category_name];
     }
-    p_tab->showList(ElementManagerSingleton::getInstance()->getCategoryEntries(category_name));
+    p_tab->showList(category_name);
   }
 }
 

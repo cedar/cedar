@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IdeApplication.h
+    File:        RemoveMean.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 07
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 01 27
 
     Description:
 
@@ -38,120 +34,76 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_IDE_APPLICATION_H
-#define CEDAR_PROC_GUI_IDE_APPLICATION_H
+#ifndef CEDAR_PROC_STEPS_REMOVE_MEAN_H
+#define CEDAR_PROC_STEPS_REMOVE_MEAN_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
-
-#ifdef CEDAR_COMPILER_MSVC
-#include <Windows.h>
-#endif // CEDAR_COMPILER_MSVC
 
 
-/*!@brief The application for the processingIde.
+/*!@brief A processing step that calculates the mean of a matrix and returns the mean-free version of the matrix.
  */
-class cedar::proc::gui::IdeApplication : public QApplication
+class cedar::proc::steps::RemoveMean : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  enum LastExceptionType
-  {
-    CEDAR_EXCEPTION,
-    STD_EXCEPTION,
-    UNKNOWN_EXCEPTION,
-    NONE
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  IdeApplication(int& argc, char** argv);
-
-  //!@brief Destructor.
-  ~IdeApplication();
-
+  RemoveMean();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Executes the main loop.
-   */
-  int exec();
-
-  /*!@brief Handles notifications.
-   */
-  bool notify(QObject* pReceiver, QEvent* pEvent);
-
-  //! returns the ide object
-  inline cedar::proc::gui::Ide* getIde() const
-  {
-    return this->mpIde;
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-signals:
-  void showExceptionDialogSignal();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Handler for SEGV and other signals.
-   */
-  static void signalHandler(int signal);
+  void compute(const cedar::proc::Arguments&);
 
-  static void cleanupAfterCrash();
-
-#ifdef CEDAR_COMPILER_MSVC
-  static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
-#endif // CEDAR_COMPILER_MSVC
-
-private slots:
-  void showExceptionDialog();
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  //! The main window.
-  cedar::proc::gui::Ide* mpIde;
+  // inputs
+  //! Matrix to be mean-freed.
+  cedar::aux::ConstMatDataPtr mMatrix;
 
-  LastExceptionType mLastExceptionType;
+  // outputs
+  //! Mean-free version of the input matrix.
+  cedar::aux::MatDataPtr mMeanFreeMat;
 
-  //! Last cedar exception caught by the application.
-  cedar::aux::ExceptionBase mLastCedarException;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-  //! what() of the last std::exception caught by the application.
-  std::string mLastStdExceptionWhat;
+private:
+  // none yet
 
-  //! type of the last std::exception caught by the application.
-  std::string mLastStdExceptionType;
+}; // class utilities::Normalization
 
-  //! Lock for the last exception information.
-  QReadWriteLock mLastExceptionInfoLock;
-
-}; // class cedar::proc::gui::IdeApplication
-
-#endif // CEDAR_PROC_GUI_IDE_APPLICATION_H
-
+#endif // CEDAR_PROC_STEPS_REMOVE_MEAN_H

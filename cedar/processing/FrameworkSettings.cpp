@@ -176,7 +176,12 @@ void cedar::proc::FrameworkSettings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    CEDAR_THROW(cedar::aux::ParseException, "Error reading framework settings: " + std::string(e.what()));
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      std::string("Error reading framework settings: ") + std::string(e.what()),
+      "void cedar::proc::FrameworkSettings::load()"
+    );
+    //!@todo Restore defaults
   }
 }
 

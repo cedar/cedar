@@ -70,6 +70,7 @@ namespace cedar
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
+    CEDAR_DECLARE_AUX_CLASS(CommandLineParser);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(Lockable);
     CEDAR_DECLARE_AUX_CLASS(Settings);
@@ -254,6 +255,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(DimensionalityMismatchException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(DuplicateChannelNameException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
     CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
@@ -261,6 +263,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
     CEDAR_DECLARE_AUX_CLASS(InvalidPathException);
+    CEDAR_DECLARE_AUX_CLASS(MalformedConfigurationTreeException);
     CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
     CEDAR_DECLARE_AUX_CLASS(NotFoundException);
