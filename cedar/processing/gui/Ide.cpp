@@ -88,6 +88,7 @@ mpBoostControl(NULL)
   this->mpToolBar->insertWidget(this->mpActionBoostControl, p_enable_custom_time_step);
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
+  this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
   this->mpCustomTimeStep->setValue(10.0);
   this->mpCustomTimeStep->setMinimum(1.0);
   this->mpCustomTimeStep->setSuffix(" ms");
