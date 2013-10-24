@@ -558,7 +558,7 @@ void cedar::proc::gui::StepItem::setRecorded(bool status)
 {
 	if (status)
 	{
-	  if(!mpRecordedDecoration)
+	  if (!mpRecordedDecoration)
 	  {
       mpRecordedDecoration = DecorationPtr(
         new Decoration
