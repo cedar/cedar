@@ -117,8 +117,11 @@ public:
     const std::string& group = std::string()
   );
 
-  //! Test if a flag is present in the parsed inputs.
+  //! Test if a flag is present in the parsed options.
   bool hasFlag(const std::string& longName) const;
+
+  //! Test if a value is present in the parsed options. Does not take default values into account.
+  bool hasValue(const std::string& longName) const;
 
   /*!@brief   Parse the given command line options
    *
@@ -143,7 +146,24 @@ public:
     return cedar::aux::fromString<T>(this->getValue(longName));
   }
 
+  //! Adds a given option to a group.
   void addOptionToGroup(const std::string& groupName, const std::string& longName);
+
+  /*!@brief Writes the currently parsed arguments to a file.
+   *
+   *        This method is called automatically if the --write-config-to-file argument is passed on the command line.
+   *        The file written by this method can then later on be read with --read-config-from-file or the
+   *        readConfigFromFile method.
+   */
+  void writeConfigToFile(const cedar::aux::Path& path) const;
+
+  /*!@brief Reads the configuration to use from a file.
+   *
+   *        This method is called automatically if the --read-config-to-file argument is passed on the command line.
+   *        The file read by this method should have the format written by --write-config-to-file or the
+   *        writeConfigToFile method.
+   */
+  void readConfigFromFile(const cedar::aux::Path& path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -185,6 +205,12 @@ private:
 
   void writeHeading(std::ostream& stream, const std::string& heading, char fill) const;
 
+  void writeGroup(cedar::aux::ConfigurationNode& node, const std::set<std::string>& group) const;
+
+  void setParsedValue(const std::string& longName, const std::string& value);
+
+  void setParsedFlag(const std::string& longName, bool value);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -214,6 +240,15 @@ private:
 
   //! Parameters in groups.
   std::map<std::string, std::set<std::string> > mGroups;
+
+  // Static members
+  static std::string M_STANDARD_OPTIONS_GROUP;
+
+  static std::string M_WRITE_CONFIG_COMMAND;
+
+  static std::string M_READ_CONFIG_COMMAND;
+
+  static std::string M_UNGROUPED_OPTIONS_NAME;
 
 }; // class cedar::aux::CommandLineParser
 
