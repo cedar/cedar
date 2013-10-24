@@ -120,6 +120,12 @@ public:
   //! Assigns a path.
   cedar::aux::Path& operator= (const char* pathStr);
 
+  //! Test whether the path actually exists.
+  bool exists() const;
+
+  //! Test whether the path points to a directory.
+  bool isDirectory() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
