@@ -51,6 +51,7 @@
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/defines.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QMutexLocker>
@@ -559,6 +560,31 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
   {
     CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
+}
+
+
+bool cedar::proc::Step::isRecorded() const
+{
+  std::vector<cedar::proc::DataRole::Id> slotTypes;
+  slotTypes.push_back(cedar::proc::DataRole::BUFFER);
+  slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
+
+  for (unsigned int s = 0; s < slotTypes.size(); s++)
+  {
+
+    if (this->hasRole(slotTypes[s]))
+    {
+      cedar::proc::Connectable::SlotList dataSlots = this->getOrderedDataSlots(slotTypes[s]);
+      for (unsigned int i = 0; i < dataSlots.size(); i++)
+      {
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getData()))
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 void cedar::proc::Step::setThreaded(bool isThreaded)

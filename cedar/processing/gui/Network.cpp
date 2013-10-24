@@ -930,3 +930,13 @@ void cedar::proc::gui::Network::toggleSmartConnectionMode()
     }
   }
 }
+
+void cedar::proc::gui::Network::stepRecordStateChanged()
+{
+	std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> steps = this->mpScene->getStepMap();
+
+	for (auto iter = steps.begin(); iter != steps.end(); ++iter)
+	{
+		iter->second->setRecorded(iter->first->isRecorded());
+	}
+}

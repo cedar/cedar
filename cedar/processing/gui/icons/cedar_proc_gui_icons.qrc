@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="/">
     <file>decorations/looped.svg</file>
+    <file>decorations/record.svg</file>
     <file>decorations/from_plugin.svg</file>
     <file>modeicons/select.svg</file>
     <file>modeicons/connect.svg</file>

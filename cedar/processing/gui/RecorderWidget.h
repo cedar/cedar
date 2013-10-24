@@ -73,7 +73,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public slots:
+public:
   //!@brief Sets the obtained step and recreating the widget to set the record parameters.
   void setStep(cedar::proc::StepPtr step);
 
@@ -83,7 +83,14 @@ public slots:
   /*!@brief If the name of a Step has changed all slots have to unregister in the recoder and 
    *registered with the new name.
    */
+
+  void emitStepRegisteredinRecorder();
+public slots:
   void updateName();
+
+
+signals:
+  void stepRegisteredinRecorder();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

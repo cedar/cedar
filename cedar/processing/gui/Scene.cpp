@@ -201,6 +201,7 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
 void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
+  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
 }
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)

@@ -187,6 +187,8 @@ public:
     return this->mBusy;
   }
 
+  bool isRecorded() const;
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
