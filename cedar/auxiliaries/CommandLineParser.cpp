@@ -39,10 +39,21 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/CommandLineParser.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <boost/property_tree/json_parser.hpp>
+
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::CommandLineParser::M_STANDARD_OPTIONS_GROUP = "common options";
+std::string cedar::aux::CommandLineParser::M_WRITE_CONFIG_COMMAND = "write-config-to-file";
+std::string cedar::aux::CommandLineParser::M_READ_CONFIG_COMMAND = "read-config-from-file";
+std::string cedar::aux::CommandLineParser::M_UNGROUPED_OPTIONS_NAME = "ungrouped";
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -51,15 +62,171 @@
 cedar::aux::CommandLineParser::CommandLineParser()
 {
   // default commands
-  std::string standard_group = "common options";
-  this->defineFlag("help", "Displays help.", 'h', standard_group);
-  this->defineValue("read-config-from-file", "Reads configuration options from a file.", 0, standard_group);
-  this->defineValue("write-config-to-file", "Writes the chosen configuration options to a file.", 0, standard_group);
+  this->defineFlag
+        (
+          "help",
+          "Displays help.",
+          'h',
+          M_STANDARD_OPTIONS_GROUP
+        );
+
+  this->defineValue
+        (
+          M_READ_CONFIG_COMMAND,
+          "Reads configuration options from a file.",
+          0,
+          M_STANDARD_OPTIONS_GROUP
+        );
+
+  this->defineValue
+        (
+          M_WRITE_CONFIG_COMMAND,
+          "Writes the chosen configuration options to a file.",
+          0,
+          M_STANDARD_OPTIONS_GROUP
+        );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::CommandLineParser::setParsedValue(const std::string& longName, const std::string& value)
+{
+  this->mParsedValues[longName] = value;
+}
+
+void cedar::aux::CommandLineParser::setParsedFlag(const std::string& longName, bool value)
+{
+  if (value)
+  {
+    this->mParsedFlags.push_back(longName);
+  }
+  else
+  {
+    // erase all occurrences of longName
+    for (auto iter = this->mParsedFlags.begin(); iter != this->mParsedFlags.end();)
+    {
+      if (*iter == longName)
+      {
+        this->mParsedFlags.erase(iter);
+      }
+      else
+      {
+        ++iter;
+      }
+    }
+  }
+}
+
+void cedar::aux::CommandLineParser::readConfigFromFile(const cedar::aux::Path& path)
+{
+  cedar::aux::ConfigurationNode root;
+  boost::property_tree::read_json(path.absolute().toString(), root);
+
+  for (auto node_iter = root.begin(); node_iter != root.end(); ++node_iter)
+  {
+    const cedar::aux::ConfigurationNode& group = node_iter->second;
+
+    auto flags_iter = group.find("flags");
+    if (flags_iter != group.not_found())
+    {
+      auto flags_node = flags_iter->second;
+      for (auto iter = flags_node.begin(); iter != flags_node.end(); ++iter)
+      {
+        auto long_name = iter->first;
+        auto value = iter->second.get_value<bool>();
+        this->setParsedFlag(long_name, value);
+      }
+    }
+
+    auto values_iter = group.find("values");
+    if (values_iter != group.not_found())
+    {
+      auto values_node = values_iter->second;
+      for (auto iter = values_node.begin(); iter != values_node.end(); ++iter)
+      {
+        auto long_name = iter->first;
+        auto value = iter->second.get_value<std::string>();
+        this->setParsedValue(long_name, value);
+      }
+    }
+  }
+}
+
+void cedar::aux::CommandLineParser::writeConfigToFile(const cedar::aux::Path& path) const
+{
+  cedar::aux::ConfigurationNode root;
+  for (auto iter = this->mGroups.begin(); iter != this->mGroups.end(); ++iter)
+  {
+    std::string group_name = iter->first;
+    auto group = iter->second;
+
+    // standard options are not written out
+    if (group_name == M_STANDARD_OPTIONS_GROUP)
+    {
+      continue;
+    }
+
+    cedar::aux::ConfigurationNode group_node;
+    this->writeGroup(group_node, group);
+
+    if (!group_node.empty())
+    {
+      if (group_name.empty())
+      {
+        group_name = M_UNGROUPED_OPTIONS_NAME;
+      }
+      root.push_back(cedar::aux::ConfigurationNode::value_type(group_name, group_node));
+    }
+  }
+
+  boost::property_tree::write_json(path.absolute().toString(), root);
+}
+
+void cedar::aux::CommandLineParser::writeGroup
+     (
+       cedar::aux::ConfigurationNode& node,
+       const std::set<std::string>& group
+     )
+     const
+{
+  cedar::aux::ConfigurationNode flags_node;
+  cedar::aux::ConfigurationNode values_node;
+
+  for (auto iter = group.begin(); iter != group.end(); ++iter)
+  {
+    auto option_name = *iter;
+    if (this->isFlag(option_name))
+    {
+      flags_node.put(option_name, this->hasFlag(option_name));
+    }
+    else
+    {
+      try
+      {
+        auto value = this->getValue(option_name);
+        values_node.put(option_name, value);
+
+      }
+      catch (cedar::aux::NotFoundException)
+      {
+        // ok -- no value given for parameter
+      }
+    }
+  }
+
+  if (!flags_node.empty())
+  {
+    node.push_back(cedar::aux::ConfigurationNode::value_type("flags", flags_node));
+  }
+
+  if (!values_node.empty())
+  {
+    node.push_back(cedar::aux::ConfigurationNode::value_type("values", values_node));
+  }
+}
+
 
 void cedar::aux::CommandLineParser::defineFlag
      (
@@ -221,7 +388,7 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
               // long name
               if (this->isFlag(command))
               {
-                this->mParsedFlags.push_back(command);
+                this->setParsedFlag(command, true);
               }
               else
               {
@@ -282,8 +449,9 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
       {
         //!@todo Proper exception: expecting a value.
         CEDAR_ASSERT(!current_option.empty());
-        this->mParsedValues[current_option] = string;
+        this->setParsedValue(current_option, string);
         state = STATE_PLAIN;
+        current_option = std::string();
         break;
       }
     }
@@ -300,7 +468,25 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
       exit(0);
     }
   }
+
+  if (this->hasValue(M_READ_CONFIG_COMMAND))
+  {
+    const std::string& path = this->getValue(M_READ_CONFIG_COMMAND);
+    this->readConfigFromFile(path);
+  }
+
+  if (this->hasValue(M_WRITE_CONFIG_COMMAND))
+  {
+    const std::string& path = this->getValue(M_WRITE_CONFIG_COMMAND);
+    this->writeConfigToFile(path);
+  }
 }
+
+bool cedar::aux::CommandLineParser::hasValue(const std::string& longName) const
+{
+  return this->mParsedValues.find(longName) != this->mParsedValues.end();
+}
+
 
 bool cedar::aux::CommandLineParser::isDefined(const std::string& longName) const
 {
