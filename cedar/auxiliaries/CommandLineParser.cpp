@@ -54,6 +54,7 @@ std::string cedar::aux::CommandLineParser::M_STANDARD_OPTIONS_GROUP = "common op
 std::string cedar::aux::CommandLineParser::M_WRITE_CONFIG_COMMAND = "write-config-to-file";
 std::string cedar::aux::CommandLineParser::M_READ_CONFIG_COMMAND = "read-config-from-file";
 std::string cedar::aux::CommandLineParser::M_UNGROUPED_OPTIONS_NAME = "ungrouped";
+std::string cedar::aux::CommandLineParser::M_CFG_FILE_INCLUDE_TAG = "include";
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -124,8 +125,33 @@ void cedar::aux::CommandLineParser::readConfigFromFile(const cedar::aux::Path& p
   cedar::aux::ConfigurationNode root;
   boost::property_tree::read_json(path.absolute().toString(), root);
 
+  auto include_iter = root.find(M_CFG_FILE_INCLUDE_TAG);
+  if (include_iter != root.not_found())
+  {
+    auto includes = include_iter->second;
+    for (auto include_iter = includes.begin(); include_iter != includes.end(); ++include_iter)
+    {
+      const std::string& include = include_iter->second.get_value<std::string>();
+      cedar::aux::Path dir = path.getDirectory();
+      this->readConfigFromFile(dir + include);
+    }
+  }
+
+  this->readConfiguration(root);
+}
+
+void cedar::aux::CommandLineParser::readConfiguration(cedar::aux::ConfigurationNode& root)
+{
   for (auto node_iter = root.begin(); node_iter != root.end(); ++node_iter)
   {
+    const std::string& group_name = node_iter->first;
+
+    // skip includes; they are processed by readConfigFromFile
+    if (group_name == M_CFG_FILE_INCLUDE_TAG)
+    {
+      continue;
+    }
+
     const cedar::aux::ConfigurationNode& group = node_iter->second;
 
     auto flags_iter = group.find("flags");

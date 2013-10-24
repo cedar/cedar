@@ -221,6 +221,8 @@ private:
 
   void writeGroup(cedar::aux::ConfigurationNode& node, const std::set<std::string>& group) const;
 
+  void readConfiguration(cedar::aux::ConfigurationNode& node);
+
   void setParsedValue(const std::string& longName, const std::string& value);
 
   void setParsedFlag(const std::string& longName, bool value);
@@ -263,6 +265,8 @@ private:
   static std::string M_READ_CONFIG_COMMAND;
 
   static std::string M_UNGROUPED_OPTIONS_NAME;
+
+  static std::string M_CFG_FILE_INCLUDE_TAG;
 
 }; // class cedar::aux::CommandLineParser
 
