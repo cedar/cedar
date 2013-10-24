@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2013 10 23
 
-    Description:
+    Description: Header file for the cedar::aux::CommandLineParser class.
 
     Credits:
 
@@ -54,7 +54,7 @@
  *
  *        Can also read/write parameters to a file.
  *
- * @todo  defineValue: there should be a variant that allows giving values as any type (i.e., a templated version).
+ * @todo  Type-checking for defined values.
  */
 class cedar::aux::CommandLineParser
 {
@@ -94,16 +94,21 @@ public:
    * @param description Description of the option.
    * @param shortName   Optional short name of the option.
    */
+  template <typename T>
   void defineValue
   (
     const std::string& longName,
     const std::string& description,
-    const std::string& defaultValue,
+    const T& defaultValue,
     char shortName = 0,
     const std::string& group = std::string()
-  );
+  )
+  {
+    this->defineValueInt(longName, description, cedar::aux::toString(defaultValue), shortName, group);
+  }
 
-  /*!@brief Defines a command line value, i.e., an option that must be given a value. If this option is missing
+  /*!@brief Defines a command line value, i.e., an option that must be given a value. If this option is missing, the
+   *        parser throws an exception when it is queried by the application.
    *
    * @param longName    Long name of the option.
    * @param description Description of the option.
@@ -175,6 +180,15 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void defineValueInt
+  (
+    const std::string& longName,
+    const std::string& description,
+    const std::string& defaultValue,
+    char shortName = 0,
+    const std::string& group = std::string()
+  );
+
   void defineOption
        (
          const std::string& longName,

@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2013 10 23
 
-    Description:
+    Description: Source file for the cedar::aux::CommandLineParser class.
 
     Credits:
 
@@ -251,7 +251,7 @@ void cedar::aux::CommandLineParser::defineValue
   this->defineOption(longName, description, shortName, group);
 }
 
-void cedar::aux::CommandLineParser::defineValue
+void cedar::aux::CommandLineParser::defineValueInt
      (
        const std::string& longName,
        const std::string& description,
