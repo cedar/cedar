@@ -118,10 +118,10 @@ public:
   );
 
   //! Test if a flag is present in the parsed options.
-  bool hasFlag(const std::string& longName) const;
+  bool hasParsedFlag(const std::string& longName) const;
 
   //! Test if a value is present in the parsed options. Does not take default values into account.
-  bool hasValue(const std::string& longName) const;
+  bool hasParsedValue(const std::string& longName) const;
 
   /*!@brief   Parse the given command line options
    *

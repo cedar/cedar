@@ -199,7 +199,7 @@ void cedar::aux::CommandLineParser::writeGroup
     auto option_name = *iter;
     if (this->isFlag(option_name))
     {
-      flags_node.put(option_name, this->hasFlag(option_name));
+      flags_node.put(option_name, this->hasParsedFlag(option_name));
     }
     else
     {
@@ -317,7 +317,7 @@ bool cedar::aux::CommandLineParser::isFlag(const std::string& longName) const
   return this->mFlags.find(longName) != this->mFlags.end();
 }
 
-bool cedar::aux::CommandLineParser::hasFlag(const std::string& longName) const
+bool cedar::aux::CommandLineParser::hasParsedFlag(const std::string& longName) const
 {
   auto iter = std::find(this->mParsedFlags.begin(), this->mParsedFlags.end(), longName);
   return iter != this->mParsedFlags.end();
@@ -460,7 +460,7 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
   //!@todo Proper exception: should not end while looking for value.
   CEDAR_ASSERT(state == STATE_PLAIN);
 
-  if (this->hasFlag("help"))
+  if (this->hasParsedFlag("help"))
   {
     this->writeHelp();
     if (terminationAllowed)
@@ -469,20 +469,20 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
     }
   }
 
-  if (this->hasValue(M_READ_CONFIG_COMMAND))
+  if (this->hasParsedValue(M_READ_CONFIG_COMMAND))
   {
     const std::string& path = this->getValue(M_READ_CONFIG_COMMAND);
     this->readConfigFromFile(path);
   }
 
-  if (this->hasValue(M_WRITE_CONFIG_COMMAND))
+  if (this->hasParsedValue(M_WRITE_CONFIG_COMMAND))
   {
     const std::string& path = this->getValue(M_WRITE_CONFIG_COMMAND);
     this->writeConfigToFile(path);
   }
 }
 
-bool cedar::aux::CommandLineParser::hasValue(const std::string& longName) const
+bool cedar::aux::CommandLineParser::hasParsedValue(const std::string& longName) const
 {
   return this->mParsedValues.find(longName) != this->mParsedValues.end();
 }
@@ -626,6 +626,12 @@ void cedar::aux::CommandLineParser::writeHelp(std::ostream& stream) const
 
 void cedar::aux::CommandLineParser::writeSummary(std::ostream& stream) const
 {
+  // if there's nothing to print, don't bother
+  if (this->mParsedFlags.empty() && this->mParsedValues.empty())
+  {
+    return;
+  }
+
   stream << "------------------------------------------" << std::endl;
   stream << " Read the following command line options:" << std::endl;
   stream << "------------------------------------------" << std::endl;
