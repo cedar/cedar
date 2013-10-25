@@ -681,7 +681,7 @@ void cedar::aux::CommandLineParser::writeConfigurationValues(std::ostream& strea
       }
       catch (const cedar::aux::NotFoundException&)
       {
-        stream << " (not set)";
+        stream << "(not set)";
       }
     }
 
