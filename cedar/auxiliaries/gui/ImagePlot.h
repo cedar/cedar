@@ -47,7 +47,6 @@
 #include <QLabel>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
 
 namespace cedar
