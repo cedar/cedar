@@ -143,6 +143,10 @@ public:
    */
   void writeSummary(std::ostream& stream = std::cout) const;
 
+  /*! Writes all currently set configuration values to the given stream.
+   */
+  void writeConfigurationValues(std::ostream& stream = std::cout) const;
+
   /*!@brief Returns a value with a given type.
    */
   template <typename T>

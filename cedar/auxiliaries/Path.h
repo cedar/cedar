@@ -111,6 +111,10 @@ public:
    */
   cedar::aux::Path getDirectory() const;
 
+  /*! Returns only the filename.
+   */
+  std::string getFileNameOnly() const;
+
   //! Appends the given path to this one.
   cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
 
@@ -119,6 +123,12 @@ public:
 
   //! Assigns a path.
   cedar::aux::Path& operator= (const char* pathStr);
+
+  //! Test whether the path actually exists.
+  bool exists() const;
+
+  //! Test whether the path points to a directory.
+  bool isDirectory() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
