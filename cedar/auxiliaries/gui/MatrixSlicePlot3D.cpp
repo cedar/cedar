@@ -52,6 +52,7 @@
 #include <QThread>
 #include <QReadLocker>
 #include <QWriteLocker>
+#include <QKeyEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
