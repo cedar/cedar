@@ -45,10 +45,12 @@
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+#include <boost/make_shared.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -213,6 +215,12 @@ _mSigmoid
   this->declareBuffer("memory node output", this->mMemoryNodeOutputBuffer);
   // set up the rest
   this->numberOfOrdinalPositionsChanged();
+
+  // make the plots of these matrices appear as discrete points rather than lines
+  this->mOrdinalNodeActivationBuffer->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
+  this->mMemoryNodeActivationBuffer->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
+  this->mOrdinalNodeOutputBuffer->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
+  this->mMemoryNodeOutputBuffer->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
 
   // connect the parameter's change signal
   QObject::connect(_mNumberOfOrdinalPositions.get(), SIGNAL(valueChanged()), this, SLOT(numberOfOrdinalPositionsChanged()));
