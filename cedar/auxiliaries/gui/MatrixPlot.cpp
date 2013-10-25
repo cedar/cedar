@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
+#include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #ifdef CEDAR_USE_QWT
   #include "cedar/auxiliaries/gui/QwtLinePlot.h"
   #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
@@ -92,7 +93,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // static members
 //----------------------------------------------------------------------------------------------------------------------
-Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
+std::vector<cedar::aux::gui::ColorValueRGBA> cedar::aux::gui::MatrixPlot::mStandardColorVector;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -219,43 +220,43 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
   mTitle = title;
 }
 
-const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()
+const std::vector<cedar::aux::gui::ColorValueRGBA>& cedar::aux::gui::MatrixPlot::getStandardColorVector()
 {
   if (cedar::aux::gui::MatrixPlot::mStandardColorVector.empty())
   {
-    Qwt3D::RGBA rgb;
-    rgb.a = 1;
+    cedar::aux::gui::ColorValueRGBA rgb;
+    rgb.alpha = 1;
     for (double i = 0; i < 256; i++)
     {
       if(i < 32.0)
       {
-        rgb.r = 0.0;
-        rgb.g = 0.0;
-        rgb.b = 0.5 + 0.5 * i/32.0;
+        rgb.red = 0.0;
+        rgb.green = 0.0;
+        rgb.blue = 0.5 + 0.5 * i/32.0;
       }
       else if(i < 96.0)
       {
-        rgb.r = 0.0;
-        rgb.g = (i - 32.0) / 64.0;
-        rgb.b = 1;
+        rgb.red = 0.0;
+        rgb.green = (i - 32.0) / 64.0;
+        rgb.blue = 1;
       }
       else if(i < 160.0)
       {
-        rgb.r = (i - 96.0) / 64.0;
-        rgb.g = 1.0;
-        rgb.b = 1.0 - (i - 96.0) / 64.0;
+        rgb.red = (i - 96.0) / 64.0;
+        rgb.green = 1.0;
+        rgb.blue = 1.0 - (i - 96.0) / 64.0;
       }
       else if(i < 224.0)
       {
-        rgb.r = 1.0;
-        rgb.g = 1.0 - (i - 160.0) / 64.0;
-        rgb.b = 0.0;
+        rgb.red = 1.0;
+        rgb.green = 1.0 - (i - 160.0) / 64.0;
+        rgb.blue = 0.0;
       }
       else if(i < 256.0)
       {
-        rgb.r = 1.0 - (i - 224.0) / 64.0;
-        rgb.g = 0.0;
-        rgb.b = 0.0;
+        rgb.red = 1.0 - (i - 224.0) / 64.0;
+        rgb.green = 0.0;
+        rgb.blue = 0.0;
       }
       cedar::aux::gui::MatrixPlot::mStandardColorVector.push_back(rgb);
     }
