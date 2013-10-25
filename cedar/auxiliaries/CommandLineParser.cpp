@@ -650,6 +650,45 @@ void cedar::aux::CommandLineParser::writeHelp(std::ostream& stream) const
   } // group iter
 }
 
+void cedar::aux::CommandLineParser::writeConfigurationValues(std::ostream& stream) const
+{
+  stream << "--------------------------------------" << std::endl;
+  stream << " The following parameters are chosen:" << std::endl;
+  stream << "--------------------------------------" << std::endl;
+
+  for (auto option_it = this->mDescriptions.begin(); option_it != this->mDescriptions.end(); ++option_it)
+  {
+    const std::string& long_name = option_it->first;
+    stream << long_name << ": ";
+
+    if (this->isFlag(long_name))
+    {
+      if (this->hasParsedFlag(long_name))
+      {
+        stream << "true";
+      }
+      else
+      {
+        stream << "false";
+      }
+    }
+    else
+    {
+      try
+      {
+        std::string value = this->getValue(long_name);
+        stream << this->getValue(long_name);
+      }
+      catch (const cedar::aux::NotFoundException&)
+      {
+        stream << " (not set)";
+      }
+    }
+
+    stream << std::endl;
+  }
+}
+
 void cedar::aux::CommandLineParser::writeSummary(std::ostream& stream) const
 {
   // if there's nothing to print, don't bother
