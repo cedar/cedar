@@ -111,6 +111,10 @@ public:
    */
   cedar::aux::Path getDirectory() const;
 
+  /*! Returns only the filename.
+   */
+  std::string getFileNameOnly() const;
+
   //! Appends the given path to this one.
   cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
 
