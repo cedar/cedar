@@ -49,7 +49,6 @@
 #include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
 /*!@brief Base class for plots that can display matrices.
  *
@@ -89,7 +88,7 @@ public:
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
   //!@brief return vector of standard colors
-  static const Qwt3D::ColorVector& getStandardColorVector();
+  static const std::vector<cedar::aux::gui::ColorValueRGBA>& getStandardColorVector();
 
 public slots:
   /*!@brief Reacts to a change in the plotted data.
@@ -123,7 +122,7 @@ private:
   QWidget* mpCurrentPlotWidget;
 
   //!@brief vector filled with standard colors
-  static Qwt3D::ColorVector mStandardColorVector;
+  static std::vector<cedar::aux::gui::ColorValueRGBA> mStandardColorVector;
 
   std::string mTitle;
 

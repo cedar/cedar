@@ -118,6 +118,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(PlotDeclaration);
       template <class DataType, class PlotType> class PlotDeclarationTemplate;
 
+      CEDAR_DECLARE_AUX_CLASS(ColorValueRGBA);
       CEDAR_DECLARE_AUX_CLASS(ImagePlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
       CEDAR_DECLARE_AUX_CLASS(DataPlotter);
