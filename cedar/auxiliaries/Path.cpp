@@ -80,6 +80,25 @@ cedar::aux::Path::~Path()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::aux::Path::getFileNameOnly() const
+{
+  //!@todo If the path exists, check if it is a directory.
+  //!@todo Proper exception
+  CEDAR_ASSERT(!this->mComponents.empty());
+
+  return this->mComponents.back();
+}
+
+bool cedar::aux::Path::exists() const
+{
+  return boost::filesystem::exists(this->absolute().toString());
+}
+
+bool cedar::aux::Path::isDirectory() const
+{
+  return boost::filesystem::is_directory(this->absolute().toString());
+}
+
 cedar::aux::Path cedar::aux::Path::getDirectory() const
 {
   if (boost::filesystem::is_directory(this->absolute().toString()))
