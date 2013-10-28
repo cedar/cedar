@@ -39,8 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/SettingsWidget.h"
-#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/gui/DirectoryParameter.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 
 // SYSTEM INCLUDES
@@ -55,7 +55,10 @@ QWidget(pParent)
 {
   this->setupUi(this);
 
-  this->mpRecorderWorkspaceEdit->setParameter(cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter());
+  this->mpRecorderWorkspaceEdit->setParameter
+                                 (
+                                   cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter()
+                                 );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
