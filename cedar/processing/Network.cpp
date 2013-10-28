@@ -1131,7 +1131,6 @@ std::set<std::string> cedar::proc::Network::getRequiredPlugins(const std::string
   return plugins;
 }
 
-
 void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode& root)
 {
   std::vector<std::string> exceptions;

@@ -266,7 +266,6 @@ void cedar::aux::Settings::removePluginSearchPath(size_t index)
   mSearchPathsChangedSignal();
 }
 
-
 const std::vector<std::string>& cedar::aux::Settings::getPluginSearchPaths() const
 {
   return this->_mPluginSearchPaths->getValue();

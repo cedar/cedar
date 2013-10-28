@@ -61,7 +61,7 @@ class cedar::aux::gui::SettingsWidget : public QWidget, public Ui_SettingsWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SettingsWidget(QWidget *pParent = NULL);
+  SettingsWidget(QWidget* pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

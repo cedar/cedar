@@ -61,7 +61,7 @@ class cedar::aux::gui::PluginInfoDialog : public QDialog, public Ui_PluginInfoDi
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PluginInfoDialog(QWidget *pParent, cedar::aux::PluginProxyPtr plugin);
+  PluginInfoDialog(QWidget* pParent, cedar::aux::PluginProxyPtr plugin);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

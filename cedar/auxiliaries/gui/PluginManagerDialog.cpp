@@ -58,7 +58,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::gui::PluginManagerDialog::PluginManagerDialog(QWidget *pParent)
+cedar::aux::gui::PluginManagerDialog::PluginManagerDialog(QWidget* pParent)
 :
 QDialog(pParent)
 {
