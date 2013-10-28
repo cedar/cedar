@@ -68,7 +68,11 @@ known issues
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
     standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
   - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
-      
+  - Singleton-related classes may sometimes cause crashes when programs exit. If you experience random crashes when your
+    own programs exit and the stack contains cedar::aux::Log::getMemoryDebugFlag(), this may be the cause. As a
+    workaround, make sure to reset all smart pointers at the end of your main method (the usual cause are global-scope
+    smart pointers that send a log message after the log singleton was freed.)
+
 Unreleased changes
 ==================
 
