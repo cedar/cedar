@@ -102,12 +102,12 @@ void cedar::proc::gui::RecorderWidget::refreshWidget()
       cedar::proc::Connectable::SlotList dataSlots = mStepToConfigure->getOrderedDataSlots(slotTypes[s]);
       if (dataSlots.size() > 0)
       {
-        createRoleSection(cedar::proc::DataRole::type().get(slotTypes[s]).prettyString()); //!@todo Don't hard-code the "Buffers" string - we have a function for that somewhere
+        createRoleSection(cedar::proc::DataRole::type().get(slotTypes[s]).prettyString());
       }
 
       for (unsigned int i = 0; i < dataSlots.size(); i++)
       {
-        mMainLayout->addLayout(new RecorderProperty(mStepToConfigure->getName(), dataSlots[i]));
+        mMainLayout->addLayout(new RecorderProperty(this, mStepToConfigure->getName(), dataSlots[i]));
       }
     }
   }
@@ -212,4 +212,9 @@ void cedar::proc::gui::RecorderWidget::updateName()
 
     this->refreshWidget();
   }
+}
+
+void cedar::proc::gui::RecorderWidget::emitStepRegisteredinRecorder()
+{
+  emit stepRegisteredinRecorder();
 }

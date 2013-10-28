@@ -66,11 +66,7 @@ namespace
         "cedar.processing.steps.Component"
       )
     );
-//    declaration->setIconPath(":/steps/color_conversion.svg");
-//    declaration->setDescription
-//    (
-//      "Converts a matrix from one color space into another."
-//    );
+    declaration->setIconPath(":/cedar/dev/gui/icons/generic_hardware_icon.svg");
     declaration->declare();
 
     return true;
@@ -86,18 +82,59 @@ namespace
 cedar::proc::steps::Component::Component()
 :
 cedar::proc::Step(false, true),
+mConnectedOnStart(false),
 _mComponent(new cedar::dev::ComponentParameter(this, "component"))
 {
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChanged()));
 }
 
-cedar::proc::steps::Component::~Component()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::steps::Component::onStart()
+{
+  try
+  {
+    if (auto component = this->getComponent())
+    {
+      if (auto channel = component->getChannel())
+      {
+        if (!channel->isOpen())
+        {
+          this->mConnectedOnStart = true;
+          channel->open();
+        }
+      }
+    }
+  }
+  catch (cedar::dev::NoComponentSelectedException)
+  {
+    // ok, don't do anything in this case.
+  }
+}
+
+void cedar::proc::steps::Component::onStop()
+{
+  try
+  {
+    if (auto component = this->getComponent())
+    {
+      if (auto channel = component->getChannel())
+      {
+        if (this->mConnectedOnStart)
+        {
+          channel->close();
+          this->mConnectedOnStart = false;
+        }
+      }
+    }
+  }
+  catch (cedar::dev::NoComponentSelectedException)
+  {
+    // ok, don't do anything in this case.
+  }
+}
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {

@@ -39,7 +39,7 @@
 #define CEDAR_AUX_RECORDER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/ThreadCollection.h"

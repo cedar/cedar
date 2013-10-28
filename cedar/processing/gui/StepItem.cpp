@@ -554,6 +554,40 @@ void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNod
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 
+void cedar::proc::gui::StepItem::setRecorded(bool status)
+{
+	if (status)
+	{
+	  if (!mpRecordedDecoration)
+	  {
+      mpRecordedDecoration = DecorationPtr(
+        new Decoration
+        (
+          this,
+          ":/decorations/record.svg",
+          "This step has one or more slots registered in the recorder."
+        )
+      );
+      this->mDecorations.push_back(mpRecordedDecoration);
+	  }
+	}
+	else
+	{
+	    for (unsigned int i = 0; i < mDecorations.size();i++)
+	    {
+	      if (mDecorations[i]==mpRecordedDecoration)
+	      {
+	         mDecorations.erase(mDecorations.begin()+i);
+	         mpRecordedDecoration.reset();
+	         break;
+	      }
+	    }
+	}
+
+	this->updateDecorationPositions();
+
+}
+
 void cedar::proc::gui::StepItem::addDecorations()
 {
   this->mDecorations.clear();

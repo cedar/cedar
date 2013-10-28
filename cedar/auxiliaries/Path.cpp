@@ -80,6 +80,43 @@ cedar::aux::Path::~Path()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::aux::Path::getFileNameOnly() const
+{
+  //!@todo If the path exists, check if it is a directory.
+  //!@todo Proper exception
+  CEDAR_ASSERT(!this->mComponents.empty());
+
+  return this->mComponents.back();
+}
+
+bool cedar::aux::Path::exists() const
+{
+  return boost::filesystem::exists(this->absolute().toString());
+}
+
+bool cedar::aux::Path::isDirectory() const
+{
+  return boost::filesystem::is_directory(this->absolute().toString());
+}
+
+cedar::aux::Path cedar::aux::Path::getDirectory() const
+{
+  if (boost::filesystem::is_directory(this->absolute().toString()))
+  {
+    return *this;
+  }
+  else
+  {
+    // copy this string
+    cedar::aux::Path copy = *this;
+    // remove last component of the copy
+    auto iter = copy.mComponents.end();
+    --iter;
+    copy.mComponents.erase(iter);
+    return copy;
+  }
+}
+
 cedar::aux::Path cedar::aux::Path::absolute() const
 {
   if (this->isResource())
@@ -117,7 +154,7 @@ bool cedar::aux::Path::isAbsolute() const
   {
     return true;
   }
-  // TODO this should probably return true in other circumstances!
+  //!@todo this should probably return true in other circumstances!
   return false;
 }
 
@@ -266,8 +303,14 @@ std::string cedar::aux::Path::toString(bool withProtocol) const
     }
   }
 
-  CEDAR_ASSERT(!this->mComponents.front().empty());
-  if (this->isAbsolute() && this->mComponents.front().at(this->mComponents.front().size() - 1) != ':')
+  if
+  (
+    this->isAbsolute() &&
+    (
+      this->mComponents.front().empty()
+      || this->mComponents.front().at(this->mComponents.front().size() - 1) != ':'
+    )
+  )
   {
     path += '/';
   }

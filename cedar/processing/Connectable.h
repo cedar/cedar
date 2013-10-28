@@ -98,7 +98,7 @@ public:
 
   //!@brief Returns whether this connectable has a slot of the given role.
   //!@todo Rename this to hasSlotForRole.
-  bool hasRole(cedar::proc::DataRole::Id role);
+  bool hasRole(cedar::proc::DataRole::Id role) const;
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;

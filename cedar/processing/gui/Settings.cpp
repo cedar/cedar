@@ -103,6 +103,13 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                         )
                       );
 
+  this->_mElementListShowsDeprecated = new cedar::aux::BoolParameter
+      (
+        ui_settings.get(),
+        "show deprecated steps in elemen list",
+        true
+      );
+
   this->_mHighlightConnections = new cedar::aux::BoolParameter
                                  (
                                    ui_settings.get(),
@@ -183,6 +190,16 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Settings::getElementListShowsDeprecated() const
+{
+  return this->_mElementListShowsDeprecated->getValue();
+}
+
+void cedar::proc::gui::Settings::setElementListShowsDeprecated(bool show)
+{
+  this->_mElementListShowsDeprecated->setValue(show);
+}
 
 bool cedar::proc::gui::Settings::snapToGrid() const
 {
@@ -322,6 +339,7 @@ void cedar::proc::gui::Settings::load()
       std::string("Error reading framework gui settings: ") + e.what(),
       "void cedar::proc::gui::Settings::load()"
     );
+    //!@todo Restore defaults
   }
 }
 

@@ -97,8 +97,7 @@ cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& na
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
 mWait(new cedar::aux::BoolParameter(this, "wait", true)),
-mStarting(false),
-mStopping(false)
+mStarted(false)
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -147,14 +146,14 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
 
 void cedar::proc::LoopedTrigger::applyStart()
 {
-  QMutexLocker locker(&mStartingMutex);
+  QMutexLocker locker(&mStartedMutex);
 
-  if (this->isRunning() || mStarting)
+  if (this->mStarted)
   {
     return;
   }
 
-  mStarting = true;
+  this->mStarted = true;
   locker.unlock();
 
   emit triggerStarting();
@@ -163,23 +162,19 @@ void cedar::proc::LoopedTrigger::applyStart()
   {
     this->mListeners.at(i)->callOnStart();
   }
-  CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
 
   emit triggerStarted();
-
-  locker.relock();
-  mStarting = false;
 }
 
 void cedar::proc::LoopedTrigger::applyStop(bool)
 {
-  QMutexLocker locker(&mStoppingMutex);
-  if (!this->isRunning() || mStopping)
+  QMutexLocker locker(&mStartedMutex);
+  if (!this->mStarted)
   {
     return;
   }
 
-  mStopping = true;
+  mStarted = false;
   locker.unlock();
 
   emit triggerStopping();
@@ -190,9 +185,6 @@ void cedar::proc::LoopedTrigger::applyStop(bool)
   }
 
   emit triggerStopped();
-
-  locker.relock();
-  mStopping = false;
 }
 
 //!@todo this should take a cedar::unit::Time as argument

@@ -145,6 +145,13 @@ class cedar::aux::DuplicateNameException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::DuplicateNameException
 
+/*!@brief Exception that occurs when a unique channel name appears twice.
+ */
+class cedar::aux::DuplicateChannelNameException : public cedar::aux::DuplicateNameException
+{
+}; // class cedar::aux::DuplicateChannelNameException
+
+
 /*!@brief Exception that occurs when a value leaves a certain range.
  */
 class cedar::aux::RangeException : public cedar::aux::ExceptionBase
@@ -218,6 +225,12 @@ class cedar::aux::UnmanglingFailedException : public cedar::aux::ExceptionBase
 /*!@brief Exception that is thrown when a singleton object does not exist any more.
  */
 class cedar::aux::DeadReferenceException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception that is thrown when a configuration tree does not have the right format.
+ */
+class cedar::aux::MalformedConfigurationTreeException : public cedar::aux::ExceptionBase
 {
 };
 
