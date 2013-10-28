@@ -420,7 +420,6 @@
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionToggleTriggerVisibility"/>
    <addaction name="mpActionCloseAllPlots"/>
-   <addaction name="separator"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
