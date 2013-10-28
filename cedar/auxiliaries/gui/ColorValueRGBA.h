@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,42 +22,56 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        ColorValueRGBA.h
 
     Maintainer:  Mathis Richter
-
     Email:       mathis.richter@ini.rub.de
+    Date:        2013 10 25
 
-    Date:        2013 02 18
-
-    Description: Namespace file for cedar::units.
+    Description: A color value in RGBA (red, green, blue, alpha).
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_NAMESPACE_H
-#define CEDAR_UNITS_NAMESPACE_H
+#ifndef CEDAR_AUX_GUI_COLOR_VALUE_RGBA_H
+#define CEDAR_AUX_GUI_COLOR_VALUE_RGBA_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/units/lib.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 
-/*! Defined to indicate that the new unit framework is in effect. This can be used to keep software compatible with
- *  multiple versions of cedar.
- */
-#define CEDAR_UNIT_FRAMEWORK_V2
 
-namespace cedar
+//!@brief A color value in RGBA (red, green, blue, alpha).
+struct cedar::aux::gui::ColorValueRGBA
 {
-  /*!@brief Namespace for all aux classes. */
-  namespace unit
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    template <typename DimensionType> struct UnitMatrix;
-    //!@endcond
-  }
-}
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructor
+  //--------------------------------------------------------------------------------------------------------------------
+  //!@brief The standard constructor.
+  ColorValueRGBA()
+  {}
 
-#endif // CEDAR_UNITS_NAMESPACE_H
+  ColorValueRGBA(double r, double g, double b, double a = 1.0)
+  {
+    red = r;
+    green = g;
+    blue = b;
+    alpha = a;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public members
+  //--------------------------------------------------------------------------------------------------------------------
+  double red;
+  double green;
+  double blue;
+  double alpha;
+}; // class cedar::aux::gui::ColorValueRGBA
+
+#endif // CEDAR_AUX_GUI_COLOR_VALUE_RGBA_H
+

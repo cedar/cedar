@@ -150,8 +150,8 @@ void cedar::aux::Recorder::applyStart()
   mStartTime.start();
 
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
-  //!@todo Use  for this
-  int min = std::numeric_limits<int>::max() ;
+  //!@todo std::numeric_limits<int>::max() will lock the GUI!!!!
+  int min = 1000;// std::numeric_limits<int>::max() ;
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);

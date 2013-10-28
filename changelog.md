@@ -107,6 +107,9 @@ current testing
   - Log entries in gui::Log can now be removed using the right-click context menu.
   - Parameters of LoopedThread are now set to constant depending on the current mode (e.g., blocking "simulated time").
   - Memory debug output is turned off by default, can be activated through a configuration file.
+  - There is now a command line parser available. This is intended to make software that performs experiments easy to
+    customize; it features auto-generated help texts, reading and writing of options to file and some sanity checking of
+    user inputs. It is still being developed.
 - cedar::aux::gui
   - LinePlots now have an option in their context menu to set fixed limits for the y axis.
   - There is now a history plot for 1D matrices.

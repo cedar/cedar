@@ -238,7 +238,7 @@ const cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(
   return iter->second;
 }
 
-bool cedar::proc::Connectable::hasRole(cedar::proc::DataRole::Id role)
+bool cedar::proc::Connectable::hasRole(cedar::proc::DataRole::Id role) const
 {
   auto iter = this->mDataConnectionsOrder.find(role);
   if (iter == this->mDataConnectionsOrder.end())

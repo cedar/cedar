@@ -113,6 +113,10 @@ unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr test
     sources.push_back("1D.Gauss input");
     sources.push_back("2D.Gauss input");
     sources.push_back("3D.Gauss input");
+    sources.push_back("double_0D.converted matrix");
+    sources.push_back("double_1D.converted matrix");
+    sources.push_back("double_2D.converted matrix");
+    sources.push_back("double_3D.converted matrix");
     sources.push_back("emp.empty matrix");
     for (unsigned int src = 0; src < sources.size(); ++src)
     {
