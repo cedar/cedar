@@ -176,11 +176,17 @@ protected:
     this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   }
 
+  /*!@brief Executes the given call, catching all exceptions.
+   *
+   *        If an exception occurs during the execution of the given function, the state of this step will be set to
+   *        exception.
+   */
+  void exceptionWrappedCall(const boost::function<void()>& call, const std::string& messagePreface) throw();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
   //!@brief Method that gets called once by cedar::proc::LoopedTrigger once prior to starting the trigger.
   virtual void onStart();
 
