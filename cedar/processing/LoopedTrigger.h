@@ -164,16 +164,10 @@ private:
   cedar::aux::BoolParameterPtr mWait;
 
   //! Used to prevent multiple start calls to the trigger.
-  bool mStarting;
+  bool mStarted;
 
   //! Used to prevent multiple start calls to the trigger.
-  QMutex mStartingMutex;
-
-  //! Used to prevent multiple start calls to the trigger.
-  bool mStopping;
-
-  //! Used to prevent multiple start calls to the trigger.
-  QMutex mStoppingMutex;
+  QMutex mStartedMutex;
 
 }; // class cedar::proc::LoopedTrigger
 
