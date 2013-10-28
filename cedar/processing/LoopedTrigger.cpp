@@ -148,7 +148,7 @@ void cedar::proc::LoopedTrigger::applyStart()
 {
   QMutexLocker locker(&mStartedMutex);
 
-  if (this->isRunning() || !this->mStarted)
+  if (this->mStarted)
   {
     return;
   }
@@ -169,7 +169,7 @@ void cedar::proc::LoopedTrigger::applyStart()
 void cedar::proc::LoopedTrigger::applyStop(bool)
 {
   QMutexLocker locker(&mStartedMutex);
-  if (!this->isRunning() || !this->mStarted)
+  if (!this->mStarted)
   {
     return;
   }
