@@ -243,29 +243,6 @@ void cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     this->closeGrabber();
   }
 
-  // init message
-  std::stringstream init_message;
-  init_message << ": Initialize Grabber with " << num_channels << " camera(s) ..." << std::endl;
-  for (unsigned int channel = 0; channel < num_channels; ++channel)
-  {
-    init_message << "Channel " << channel << ": capture from ";
-
-    if (getCameraChannel(channel)->getByGuid())
-    {
-      init_message << "Camera-GUID: ";
-    }
-    else
-    {
-      init_message << "Bus-ID: ";
-    }
-    init_message << getCameraChannel(channel)->getCameraId();
-  }
-  cedar::aux::LogSingleton::getInstance()->message
-                                           (
-                                             this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::camera::Grabber::onCreateGrabber()"
-                                           );
-
   // create capture device, which depends on the chosen backend
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
@@ -287,7 +264,7 @@ void cedar::dev::sensors::camera::Grabber::onCreateGrabber()
       // Backend device not longer used. Channel::mVideoCapture does the job
       getCameraChannel(channel)->mpBackend.reset();
     }
-    catch(cedar::dev::sensors::camera::CreateBackendException& e)
+    catch (cedar::dev::sensors::camera::CreateBackendException& e)
     {
       std::string msg = this->getName() + " Channel " + cedar::aux::toString(channel)
                           + ": " + e.getMessage();
@@ -458,12 +435,6 @@ std::string cedar::dev::sensors::camera::Grabber::onGetSourceInfo(unsigned int c
 
 void cedar::dev::sensors::camera::Grabber::onCleanUp()
 {
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             this->getName() + ": onCleanUp",
-                                             "cedar::dev::sensors::camera::Grabber::onCleanUp()"
-                                           );
-
   // close all captures
   this->onCloseGrabber();
 }
@@ -626,8 +597,8 @@ cedar::dev::sensors::camera::FrameRate::Id
 cv::Size cedar::dev::sensors::camera::Grabber::getCameraFrameSize( unsigned int channel)
 {
   cv::Size size;
-  size.width = getPropertyFromCamera(channel,cedar::dev::sensors::camera::Setting::FRAME_WIDTH);
-  size.height = getPropertyFromCamera(channel,cedar::dev::sensors::camera::Setting::FRAME_HEIGHT);
+  size.width = getPropertyFromCamera(channel, cedar::dev::sensors::camera::Setting::FRAME_WIDTH);
+  size.height = getPropertyFromCamera(channel, cedar::dev::sensors::camera::Setting::FRAME_HEIGHT);
   return size;
 }
 
