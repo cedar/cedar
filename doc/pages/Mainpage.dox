@@ -1,0 +1,62 @@
+/*!
+
+@mainpage Cognition, embodiment, dynamics, and autonomy for robots
+Welcome to cedar!
+
+@section Motivation Motivation
+cedar is a C++ library that provides tools for scientific work in the fields of cognition, embodiment, dynamical
+systems, and autonomous robotics. cedar is primarily being developed at the Institut fuer Neuroinformatik in Bochum,
+Germany. It is a complete rewrite of a collection of powerful, yet somewhat fragmented code. cedar captures our
+scientific knowledge and ideology in a coherent framework. A lot of effort goes into keeping the different parts of
+cedar compatible to each other. Linking up perception and motor control of a robot and putting some cognitive processing
+in between should not be constrained by programming issues, but only be a question of applied concepts. cedar provides a
+tool aimed at facilitating the connection of modules to create robotic architectures. You can focus on "what" to
+connect, keeping the effort of "how" to connect it very low.
+
+@section Guidelines Guidelines
+We have assembled documents that assist users of cedar to get productive with this framework. Please refer to the
+category that fits your profile the most:
+- If you just want to use cedar, have a look at our @link UsersGuide tutorials @endlink on how to use the processing 
+framework and add custom steps.
+- If you want to add new features to cedar or fix existing bugs, please take a look at the @link DevelopersGuide 
+developers' guide @endlink.
+
+@section Installation Installing cedar
+Please refer to the @link md_readme readme@endlink page or the readme.md file in the root of the repository to find
+instructions on how to install cedar. If you are experiencing troubles during installation or use of cedar, please take
+a look at our @link md_troubleshooting troubleshooting@endlink document (also found as troubleshooting.md in the root
+directory of cedar).
+
+@section VersionNotes Version notes
+Version notes can be found in the @link md_changelog changelog@endlink (or the changelog.md in the root directory of
+cedar). This also includes a list of known issues.
+
+@section Documentation How to get this documentation
+This documentation is included in your copy of cedar. cmake will create a Doxyfile in your build folder. You need
+Doxygen to create this documentation from the generated Doxyfile (see "readme.md" file for more information about
+the build system). Doxygen will create an HTML and a PDF output of the code documentation and additional pages like
+this introductory page. Feel free to browse through the class documentation, or just dig into the concepts incorporated
+in the implementation. You can also start with one of our tutorials, to get accustomed to the ways cedar can be used.
+
+@section CitingCedar Citing cedar
+
+In 2013, we published a paper on cedar at ICANN. To cite this paper, use the following bibtex information:
+@verbatim
+@incollection{cedar2013,
+              year={2013},
+              isbn={978-3-642-40727-7},
+              booktitle={Artificial Neural Networks and Machine Learning --- ICANN 2013},
+              volume={8131},
+              series={Lecture Notes in Computer Science},
+              editor={Mladenov, Valeri and Koprinkova-Hristova, Petia and Palm, G\"{u}nther and Villa, Alessandro E.P. and Appollini, Bruno and Kasabov, Nikola},
+              doi={10.1007/978-3-642-40728-4\_60},
+              title={A Software Framework for Cognition, Embodiment, Dynamics, and Autonomy in Robotics: cedar},
+              url={http://dx.doi.org/10.1007/978-3-642-40728-4\_60},
+              publisher={Springer Berlin Heidelberg},
+              keywords={software framework; embodied cognition; neural dynamics; Dynamic Field Theory; cognitive robotic models},
+              author={Lomp, Oliver and Zibner, Stephan Klaus Ulrich and Richter, Mathis and Ra\~{n}\'{o}, I\~{n}aki and Sch\"{o}ner, Gregor},
+              pages={475-482}
+              }
+@endverbatim
+
+*/
