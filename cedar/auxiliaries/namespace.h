@@ -70,6 +70,7 @@ namespace cedar
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
+    CEDAR_DECLARE_AUX_CLASS(CommandLineParser);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(Lockable);
     CEDAR_DECLARE_AUX_CLASS(Settings);

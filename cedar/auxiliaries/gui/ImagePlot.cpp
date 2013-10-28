@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
+#include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/assert.h"
@@ -545,7 +546,8 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits,
     if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
     {
       const size_t steps = 256;
-      const Qwt3D::ColorVector& standard = cedar::aux::gui::MatrixPlot::getStandardColorVector();
+      const std::vector<cedar::aux::gui::ColorValueRGBA>& standard
+        = cedar::aux::gui::MatrixPlot::getStandardColorVector();
       mLookupTableR.resize(steps, 0);
       mLookupTableG.resize(steps, 0);
       mLookupTableB.resize(steps, 0);
@@ -562,14 +564,14 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits,
 
         CEDAR_DEBUG_ASSERT(closest_standard < standard.size());
 
-        double r_lower = static_cast<double>(standard.at(closest_standard).r) * 255.0;
-        double g_lower = static_cast<double>(standard.at(closest_standard).g) * 255.0;
-        double b_lower = static_cast<double>(standard.at(closest_standard).b) * 255.0;
+        double r_lower = static_cast<double>(standard.at(closest_standard).red) * 255.0;
+        double g_lower = static_cast<double>(standard.at(closest_standard).green) * 255.0;
+        double b_lower = static_cast<double>(standard.at(closest_standard).blue) * 255.0;
         if (closest_standard + 1 < standard.size())
         {
-          double r_upper = static_cast<double>(standard.at(closest_standard + 1).r);
-          double g_upper = static_cast<double>(standard.at(closest_standard + 1).g);
-          double b_upper = static_cast<double>(standard.at(closest_standard + 1).b);
+          double r_upper = static_cast<double>(standard.at(closest_standard + 1).red);
+          double g_upper = static_cast<double>(standard.at(closest_standard + 1).green);
+          double b_upper = static_cast<double>(standard.at(closest_standard + 1).blue);
 
           double factor = static_cast<double>(v - lower_closest) / static_cast<double>(upper_closest - lower_closest);
 

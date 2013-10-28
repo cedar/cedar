@@ -74,19 +74,22 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const cedar::proc::ElementManager::BasePluginList& entries);
+  void showList(const std::string& categoryName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! Opens up the context menu.
+  void contextMenuEvent(QContextMenuEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void showDeprecatedSteps(bool show);
+
+  void rebuild();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -94,7 +97,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  std::string mCategoryName;
 
 }; // class ElementClassList
 

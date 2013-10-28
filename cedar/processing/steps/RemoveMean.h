@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        VtkMatrixPlot.h
+    File:        RemoveMean.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 01 27
 
     Description:
 
@@ -38,65 +34,37 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
-#define CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
-
-#include "cedar/configuration.h"
-
-#ifdef CEDAR_USE_VTK
+#ifndef CEDAR_PROC_STEPS_REMOVE_MEAN_H
+#define CEDAR_PROC_STEPS_REMOVE_MEAN_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
 
-/*!@brief Base class for plots that can display matrices.
- *
- *        Based on the dimensionality of the data plotted, this class decides which type of plot to open. Currently,
- *        these are:
- *
- *        none              for 0D matrices,
- *
- *        VtkLinePlot       for 1D matrices,
- *
- *        VtkSurfacePlot    for 2D matrices and
- *
- *        none              for 3D matrices.
- *
+
+/*!@brief A processing step that calculates the mean of a matrix and returns the mean-free version of the matrix.
  */
-class cedar::aux::gui::VtkMatrixPlot : public cedar::aux::gui::MultiPlotInterface
+class cedar::proc::steps::RemoveMean : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  VtkMatrixPlot(QWidget* pParent = NULL);
+  RemoveMean();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief display a MatData
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
-  bool canAppend(cedar::aux::ConstDataPtr data) const;
-
-public slots:
-  /*!@brief Reacts to a change in the plotted data.
-   *
-   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
-   */
-  void processChangedData();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,21 +76,34 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void compute(const cedar::proc::Arguments&);
+
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  //!@brief the displayed MatData
-  cedar::aux::ConstMatDataPtr mData;
+  // inputs
+  //! Matrix to be mean-freed.
+  cedar::aux::ConstMatDataPtr mMatrix;
 
-  //!@brief the plot widget
-  QWidget* mpCurrentPlotWidget;
+  // outputs
+  //! Mean-free version of the input matrix.
+  cedar::aux::MatDataPtr mMeanFreeMat;
 
-}; // class cedar::aux::gui::VtkMatrixPlot
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_USE_VTK
-#endif // CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
+private:
+  // none yet
+
+}; // class utilities::Normalization
+
+#endif // CEDAR_PROC_STEPS_REMOVE_MEAN_H

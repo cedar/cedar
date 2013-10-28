@@ -88,6 +88,7 @@ mpBoostControl(NULL)
   this->mpToolBar->insertWidget(this->mpActionResetRootNetwork, p_enable_custom_time_step);
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
+  this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
   this->mpCustomTimeStep->setValue(10.0);
   this->mpCustomTimeStep->setMinimum(1.0);
   this->mpCustomTimeStep->setSuffix(" ms");
@@ -494,7 +495,7 @@ void cedar::proc::gui::Ide::resetStepList()
     {
       p_tab = mElementClassListWidgets[category_name];
     }
-    p_tab->showList(ElementManagerSingleton::getInstance()->getCategoryEntries(category_name));
+    p_tab->showList(category_name);
   }
 }
 

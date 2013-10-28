@@ -229,8 +229,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>129</width>
-          <height>418</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -287,8 +287,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>427</height>
+              <width>98</width>
+              <height>429</height>
              </rect>
             </property>
             <property name="palette">
@@ -539,7 +539,7 @@
     <string>Reset root network</string>
    </property>
    <property name="toolTip">
-    <string>Resets the root network of the current architecture.</string>
+    <string>Resets all steps</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>

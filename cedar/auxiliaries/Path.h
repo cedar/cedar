@@ -106,6 +106,15 @@ public:
   //! Returns a string representation of the path.
   std::string toString(bool withProtocol = false) const;
 
+  /*! Returns the directory pointed to by the path. If this path is already a directory, the path itself is returned.
+   *  Otherwise, if this path points to a file, the filename is removed.
+   */
+  cedar::aux::Path getDirectory() const;
+
+  /*! Returns only the filename.
+   */
+  std::string getFileNameOnly() const;
+
   //! Appends the given path to this one.
   cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
 
@@ -114,6 +123,12 @@ public:
 
   //! Assigns a path.
   cedar::aux::Path& operator= (const char* pathStr);
+
+  //! Test whether the path actually exists.
+  bool exists() const;
+
+  //! Test whether the path points to a directory.
+  bool isDirectory() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
