@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>988</width>
+    <width>819</width>
     <height>762</height>
    </rect>
   </property>
@@ -58,8 +58,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>988</width>
-     <height>27</height>
+     <width>819</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -210,8 +210,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>129</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -223,8 +223,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>129</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -281,8 +281,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>429</height>
+              <width>254</width>
+              <height>427</height>
              </rect>
             </property>
             <property name="palette">
@@ -407,6 +407,7 @@
    <addaction name="mpActionResetRootNetwork"/>
    <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
+   <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
    <addaction name="mpActionBoostControl"/>
    <addaction name="separator"/>
@@ -414,6 +415,7 @@
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionToggleTriggerVisibility"/>
    <addaction name="mpActionCloseAllPlots"/>
+   <addaction name="separator"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -682,6 +684,18 @@
    </property>
    <property name="toolTip">
     <string notr="true">Record all registered slots.</string>
+   </property>
+  </action>
+  <action name="mpActionSnapshot">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/snapshot.svg</normaloff>:/toolbaricons/snapshot.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Snapshot</string>
+   </property>
+   <property name="toolTip">
+    <string>Takes a snapshot from the registered steps</string>
    </property>
   </action>
  </widget>
