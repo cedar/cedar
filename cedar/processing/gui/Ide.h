@@ -130,10 +130,6 @@ public slots:
    */
   void loadFile(QString path);
 
-  /*!@brief Opens the load plugin dialog.
-   */
-  void showLoadPluginDialog();
-
   /*!@brief Opens the manage plugins dialog.
    */
   void showManagePluginsDialog();

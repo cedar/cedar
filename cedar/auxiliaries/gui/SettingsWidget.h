@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FrameworkSettings.h
+    File:        SettingsWidget.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 01 31
+    Date:        2013 10 04
 
     Description:
 
@@ -34,24 +34,24 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
-#define CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_AUX_GUI_SETTINGS_WIDGET_H
+#define CEDAR_AUX_GUI_SETTINGS_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/ui_FrameworkSettings.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/ui_SettingsWidget.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
 
 
-/*!@brief A widget for displaying the settings stored in cedar::proc::gui::FrameworkSettings.
+/*!@brief Widget for displaying and manipulating the settings in cedar::aux and cedar::aux::gui.
  */
-class cedar::proc::gui::FrameworkSettings : public QWidget, public Ui_FrameworkSettings
+class cedar::aux::gui::SettingsWidget : public QWidget, public Ui_SettingsWidget
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -61,16 +61,12 @@ class cedar::proc::gui::FrameworkSettings : public QWidget, public Ui_FrameworkS
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FrameworkSettings(QWidget *pParent = NULL);
+  SettingsWidget(QWidget* pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! reject changes made in the dialog
-  void reject();
-  //! accepts changes made in the dialog
-  void accept();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,7 +97,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::gui::FrameworkSettings
+}; // class cedar::aux::gui::SettingsWidget
 
-#endif // CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
+#endif // CEDAR_AUX_GUI_SETTINGS_WIDGET_H
 

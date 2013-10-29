@@ -381,23 +381,19 @@ void cedar::proc::Step::run()
     // start measuring the execution time.
     clock_t run_start = clock();
 
+    /* since the cv::RNG is initialized once for every thread, we have to store its state for subsequent calls
+     * to run() - otherwise, the sequence of generated random numbers will be identical for each execution of run()
+     */
+    if (this->isThreaded() && mRNGState != 0)
+    {
+      cv::RNG& my_rng = cv::theRNG();
+      my_rng.state = mRNGState;
+    }
+
     try
     {
-      /* since the cv::RNG is initialized once for every thread, we have to store its state for subsequent calls
-       * to run() - otherwise, the sequence of generated random numbers will be identical for each execution of run()
-       */
-      if (this->isThreaded() && mRNGState != 0)
-      {
-        cv::RNG& my_rng = cv::theRNG();
-        my_rng.state = mRNGState;
-      }
       // call the compute function with the given arguments
       this->compute(*(arguments.get()));
-      if (this->isThreaded())
-      {
-        cv::RNG& my_rng = cv::theRNG();
-        mRNGState = my_rng.state;
-      }
     }
     // catch exceptions and translate them to the given state/message
     catch(const cedar::aux::ExceptionBase& e)
@@ -429,6 +425,12 @@ void cedar::proc::Step::run()
         this->getName()
       );
       this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
+    }
+
+    if (this->isThreaded())
+    {
+      cv::RNG& my_rng = cv::theRNG();
+      mRNGState = my_rng.state;
     }
 
     clock_t run_end = clock();
