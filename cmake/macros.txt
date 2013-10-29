@@ -49,11 +49,20 @@ macro(cedar_add_example)
 	cedar_add_target_executable(${ARGN} NO_INSTALL)
 endmacro(cedar_add_example)
 
+#
+# Macro cedar_add_target_executable
+#
+# Arguments:
+# PREFIX [string] prefix for the application
+# MOC_HEADERS [string list] a list of headers to pass to the moc command
+# CEDAR_DEPENDENCIES [string list] List of cedar libraries on which the application depends. Defaults to all cedar libraries if
+#                         not specified.
+#
 macro(cedar_add_target_executable)
   # find all cpp source files in the current source folder and save them in a list
   file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-  parse_arguments(executable "PREFIX;MOC_HEADERS" "NO_INSTALL" ${ARGN})
+  parse_arguments(executable "PREFIX;MOC_HEADERS;CEDAR_DEPENDENCIES" "NO_INSTALL" ${ARGN})
   car(executableName ${executable_DEFAULT_ARGS})
 
   qt_wrap_cpp(executableMocSources ${executable_MOC_HEADERS})
@@ -80,7 +89,13 @@ macro(cedar_add_target_executable)
   endif(CMAKE_COMPILER_IS_GNUCC)
   
   # link all cedar and third party libraries into the demo executable
-  target_link_libraries(${executableExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  if (executable_CEDAR_DEPENDENCIES)
+    target_link_libraries(${executableExecutableName} ${executable_CEDAR_DEPENDENCIES})
+  else(executable_CEDAR_DEPENDENCIES)
+    target_link_libraries(${executableExecutableName} ${CEDAR_LIBS})
+  endif(executable_CEDAR_DEPENDENCIES)
+  
+  target_link_libraries(${executableExecutableName} ${CEDAR_THIRD_PARTY_LIBS})
   
   # change the runtime output directory back to the original value
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
