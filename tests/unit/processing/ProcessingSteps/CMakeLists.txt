@@ -36,4 +36,5 @@
 
 cedar_add_unit_test(ProcessingSteps
                     ProcessingSteps.cpp
+                    LINK_ALL
                     )
