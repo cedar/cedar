@@ -138,10 +138,11 @@ endmacro(cedar_add_interactive_test)
 # PREFIX [string] a prefix describing the kind of test being added (unitTest, interactiveTest or performanceTest)
 # DIRECTORY [string] name of the directory in which the unit test is located
 # LINK_TESTUTILS Whether or not to link the cedartesting_utilities library
+# LINK_ALL When set, all cedar libraries will be linked.
 # ADDITIONAL_DEPENDENCIES [string list] optional list of additional cedar dependencies to add.
 #
 macro(cedar_add_test)
-  parse_arguments(test "PREFIX;DIRECTORY;ARGUMENTS;ADDITIONAL_DEPENDENCIES" "AUTOMATIC;LINK_TESTUTILS" ${ARGN})
+  parse_arguments(test "PREFIX;DIRECTORY;ARGUMENTS;ADDITIONAL_DEPENDENCIES" "AUTOMATIC;LINK_TESTUTILS;LINK_ALL" ${ARGN})
   car(testName ${test_DEFAULT_ARGS})
   cdr(testSources ${test_DEFAULT_ARGS})
   
@@ -201,7 +202,7 @@ macro(cedar_add_test)
   endif (test_AUTOMATIC)
   
   # link all cedar and third party libraries into the unit test executable
-  if (testCedarLib)
+  if (NOT test_LINK_ALL AND testCedarLib)
     if (testCedarLib MATCHES "units")
       set(test_linked_cedarlibs "cedarunits")
     elseif (testCedarLib MATCHES "auxiliaries")
@@ -217,10 +218,10 @@ macro(cedar_add_test)
       set(test_linked_cedarlibs ${CEDAR_LIBS})
     endif()
     target_link_libraries(${testExecutableName} ${test_linked_cedarlibs})
-  else (testCedarLib)
+  else ()
     # Could not determine library: link everything
     target_link_libraries(${testExecutableName} ${CEDAR_LIBS})
-  endif (testCedarLib)
+  endif ()
   
   # link third party libraries
   target_link_libraries(${testExecutableName} ${CEDAR_THIRD_PARTY_LIBS})
