@@ -187,3 +187,9 @@ int cedar::aux::DataSpectator::getRecordIntervalTime() const
 {
   return this->getStepSize();
 }
+
+void cedar::aux::DataSpectator::makeSnapshot()
+{
+  this->applyStart();
+  this->record();
+}
