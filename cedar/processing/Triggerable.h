@@ -55,6 +55,7 @@ class cedar::proc::Triggerable
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Trigger;
   friend class cedar::proc::DataConnection;
+  friend class cedar::proc::TriggerConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
