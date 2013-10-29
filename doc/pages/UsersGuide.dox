@@ -17,6 +17,7 @@ beneficial or even necessary.
 @subsection AdvancedTutorials Advanced Tutorials
 - @ref LoggingWithCedar
 - @ref ProvidingCompatibility
+- @link PluginsInCode Loading plugins @endlink
 
 @section ProgrammingConcepts Programming Concepts
 In the following pages you can find out about general programming concepts we used throughout the framework. If you are
