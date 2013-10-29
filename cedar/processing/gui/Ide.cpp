@@ -148,6 +148,7 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
   QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
   QObject::connect(this->mpActionRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecorder(bool)));
+  QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
   
 
 
@@ -986,4 +987,9 @@ void cedar::proc::gui::Ide::toggleRecorder(bool status)
     this->mpRecorderWidget->setEnabled(false);
     cedar::aux::RecorderSingleton::getInstance()->start();
   }
+}
+
+void cedar::proc::gui::Ide::takeSnapshot()
+{
+  cedar::aux::RecorderSingleton::getInstance()->takeSnapshot();
 }

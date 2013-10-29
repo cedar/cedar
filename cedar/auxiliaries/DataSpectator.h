@@ -107,6 +107,10 @@ public:
 
   //!@brief Returns the record interval for this DataPtr.
   int getRecordIntervalTime() const;
+
+  //!@brief Makes a snapshot of the data.
+  void makeSnapshot();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
