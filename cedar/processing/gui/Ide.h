@@ -199,6 +199,9 @@ public slots:
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);
 
+  //!@brief Takes a snap shot from the registered steps;
+  void takeSnapshot();
+
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const
   {

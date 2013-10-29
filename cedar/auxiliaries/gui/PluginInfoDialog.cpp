@@ -28,7 +28,7 @@
 
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
 
-    Date:        2011 07 05
+    Date:        2013 09 20
 
     Description:
 
@@ -81,8 +81,6 @@ void cedar::aux::gui::PluginInfoDialog::updateWidgets()
   this->mpLoadOnStartup->setEnabled(true);
   this->mpLoadOnStartup->setChecked(cedar::aux::SettingsSingleton::getInstance()->isPluginLoadedOnStartup(plugin_name));
   this->mpLoadOnStartup->setEnabled(false);
-
-  this->mpLoadBtn->setEnabled(!this->mPlugin->isDeclared());
 
   if (this->mPlugin->getDeclaration())
   {

@@ -147,7 +147,7 @@ void cedar::aux::Recorder::applyStart()
   }
 
   //start the timer.
-  mStartTime.start();
+  mStartTime.restart();
 
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
   //!@todo std::numeric_limits<int>::max() will lock the GUI!!!!
@@ -295,4 +295,22 @@ void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, c
       spec->setName(newName);
     }
   }
+}
+
+void cedar::aux::Recorder::takeSnapshot()
+{
+  std::string oldName = this->mProjectName;
+  this->mProjectName = oldName+"/Snapshots";
+  this->createOutputDirectory();
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    spec->makeSnapshot();
+  }
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    spec->applyStop(true);
+  }
+  this->mProjectName = oldName;
 }

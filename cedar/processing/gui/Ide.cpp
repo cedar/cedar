@@ -87,7 +87,7 @@ mpBoostControl(NULL)
   // manually added components
   auto p_enable_custom_time_step = new QCheckBox();
   p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
-  this->mpToolBar->insertWidget(this->mpActionBoostControl, p_enable_custom_time_step);
+  this->mpToolBar->insertWidget(this->mpActionResetRootNetwork, p_enable_custom_time_step);
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
   this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
@@ -97,14 +97,14 @@ mpBoostControl(NULL)
   this->mpCustomTimeStep->setMaximum(10000.0);
   this->mpCustomTimeStep->setDecimals(1);
   this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
-  this->mpToolBar->insertWidget(this->mpActionBoostControl, this->mpCustomTimeStep);
+  this->mpToolBar->insertWidget(this->mpActionResetRootNetwork, this->mpCustomTimeStep);
 
   p_enable_custom_time_step->setChecked(false);
   this->mpCustomTimeStep->setEnabled(false);
 
   QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
 
-  this->mpToolBar->insertSeparator(this->mpActionBoostControl);
+  this->mpToolBar->insertSeparator(this->mpActionResetRootNetwork);
 
   // set window title
   this->mDefaultWindowTitle = this->windowTitle();
@@ -148,6 +148,7 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
   QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
   QObject::connect(this->mpActionRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecorder(bool)));
+  QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
   
 
 
@@ -986,4 +987,9 @@ void cedar::proc::gui::Ide::toggleRecorder(bool status)
     this->mpRecorderWidget->setEnabled(false);
     cedar::aux::RecorderSingleton::getInstance()->start();
   }
+}
+
+void cedar::proc::gui::Ide::takeSnapshot()
+{
+  cedar::aux::RecorderSingleton::getInstance()->takeSnapshot();
 }
