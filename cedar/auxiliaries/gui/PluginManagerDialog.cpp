@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QMessageBox>
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
@@ -306,7 +307,20 @@ void cedar::aux::gui::PluginManagerDialog::addPluginClicked()
   {
     cedar::aux::PluginProxyPtr plugin = cedar::aux::PluginProxy::getPlugin(file.toStdString());
     cedar::aux::SettingsSingleton::getInstance()->addPlugin(plugin);
-    plugin->declare();
+
+    try
+    {
+      plugin->declare();
+    }
+    catch (const cedar::aux::PluginException& e)
+    {
+      QMessageBox::critical
+      (
+          this,
+          "Error adding plugin",
+          "The plugin could not be added: " + QString::fromStdString(e.exceptionInfo())
+      );
+    }
 
     QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
     last_dir->setValue(path);

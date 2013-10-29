@@ -108,8 +108,16 @@ cedar::aux::PluginProxyPtr cedar::aux::PluginProxy::getPlugin(const std::string 
   else
   {
     cedar::aux::PluginProxyPtr plugin(new cedar::aux::PluginProxy(pluginName));
-    mPluginMap[plugin->getPluginName()] = plugin;
-    return plugin;
+    auto iter = mPluginMap.find(plugin->getPluginName());
+    if (iter != mPluginMap.end())
+    {
+      return iter->second;
+    }
+    else
+    {
+      mPluginMap[plugin->getPluginName()] = plugin;
+      return plugin;
+    }
   }
 }
 
@@ -158,6 +166,10 @@ void cedar::aux::PluginProxy::declare()
 
   if (this->getDeclaration())
   {
+    if (this->mIsDeclared)
+    {
+      CEDAR_THROW(cedar::aux::PluginException, "Plugin was already declared.");
+    }
     this->getDeclaration()->declareAll();
     this->mIsDeclared = true;
     this->mPluginDeclaredSignal(this->getPluginName());
