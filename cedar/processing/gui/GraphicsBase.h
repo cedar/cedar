@@ -252,6 +252,9 @@ protected:
     return this->mConnections;
   }
 
+  //! Sets the fill stype
+  void setFillStyle(Qt::BrushStyle style, bool update = true);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -296,6 +299,9 @@ private:
 
   //!@brief the current fill color
   QColor mFillColor;
+
+  //! Brush style used for filling the shape.
+  Qt::BrushStyle mFillStyle;
 
   //!@brief The path used for drawing this shape.
   QPainterPath mPath;
