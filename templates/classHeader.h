@@ -28,7 +28,7 @@
     Email:       <email address>
     Date:        <creation date YYYY MM DD>
 
-    Description:
+    Description: Header file for the class <full class name>.
 
     Credits:
 
