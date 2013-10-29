@@ -26,7 +26,7 @@
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2013 09 20
 
     Description:
 

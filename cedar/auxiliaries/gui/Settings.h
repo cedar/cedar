@@ -26,9 +26,9 @@
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 26
+    Date:        2013 09 14
 
-    Description:
+    Description: Header file for the gui settings in cedar's auxiliaries library.
 
     Credits:
 
