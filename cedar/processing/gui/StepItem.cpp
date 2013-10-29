@@ -409,6 +409,7 @@ void cedar::proc::gui::StepItem::updateStepState()
   switch (this->mStep->getState())
   {
     case cedar::proc::Step::STATE_EXCEPTION:
+    case cedar::proc::Step::STATE_EXCEPTION_ON_START:
     case cedar::proc::Step::STATE_NOT_RUNNING:
       this->setOutlineColor(Qt::red);
       this->setFillColor(QColor(255, 175, 175));

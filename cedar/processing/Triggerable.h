@@ -71,7 +71,9 @@ public:
     //! The Triggerable is currently running.
     STATE_RUNNING,
     //! There was an exception thrown in the Triggerable's onTrigger function.
-    STATE_EXCEPTION
+    STATE_EXCEPTION,
+    //! Triggerable was not started correctly. This is different from a normal exception state.
+    STATE_EXCEPTION_ON_START
   };
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -174,15 +176,24 @@ protected:
    */
   inline void resetState()
   {
-    this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+    if (this->getState() != Triggerable::STATE_EXCEPTION_ON_START)
+    {
+      this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+    }
   }
 
   /*!@brief Executes the given call, catching all exceptions.
    *
    *        If an exception occurs during the execution of the given function, the state of this step will be set to
    *        exception.
+   * @return true if an exception occurred, false otherwise
    */
-  void exceptionWrappedCall(const boost::function<void()>& call, const std::string& messagePreface) throw();
+  bool exceptionWrappedCall
+       (
+         const boost::function<void()>& call,
+         const std::string& messagePreface,
+         Triggerable::State state = Triggerable::STATE_EXCEPTION
+       ) throw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

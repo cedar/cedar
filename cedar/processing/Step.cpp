@@ -268,7 +268,11 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
 #endif // DEBUG_RUNNING
   // if an exception has previously happened, do nothing.
-  if (this->mState == cedar::proc::Triggerable::STATE_EXCEPTION)
+  if
+  (
+    this->mState == cedar::proc::Triggerable::STATE_EXCEPTION
+      || this->mState == cedar::proc::Triggerable::STATE_EXCEPTION_ON_START
+  )
   {
     // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
