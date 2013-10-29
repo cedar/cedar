@@ -72,10 +72,11 @@ cedar::proc::Triggerable::~Triggerable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::Triggerable::exceptionWrappedCall
+bool cedar::proc::Triggerable::exceptionWrappedCall
      (
        const boost::function<void()>& call,
-       const std::string& messagePreface
+       const std::string& messagePreface,
+       cedar::proc::Triggerable::State state
      )
      throw()
 {
@@ -93,7 +94,8 @@ void cedar::proc::Triggerable::exceptionWrappedCall
       message,
       "cedar::proc::Triggerable::exceptionWrappedCall()"
     );
-    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, message);
+    this->setState(state, message);
+    return true;
   }
   catch(const std::exception& e)
   {
@@ -103,7 +105,8 @@ void cedar::proc::Triggerable::exceptionWrappedCall
       message,
       "cedar::proc::Triggerable::exceptionWrappedCall()"
     );
-    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, message);
+    this->setState(state, message);
+    return true;
   }
   catch(...)
   {
@@ -113,8 +116,10 @@ void cedar::proc::Triggerable::exceptionWrappedCall
       message,
       "cedar::proc::Triggerable::exceptionWrappedCall()"
     );
-    this->setState(cedar::proc::Triggerable::STATE_EXCEPTION, message);
+    this->setState(state, message);
+    return true;
   }
+  return false;
 }
 
 void cedar::proc::Triggerable::triggeredBy(cedar::proc::TriggerPtr trigger)
@@ -155,17 +160,23 @@ void cedar::proc::Triggerable::callOnStart()
   QMutexLocker locker(this->mpStartCallsLock);
 
   // only call onStart if this triggerable hasn't been started yet
+  bool exception_occurred;
   if (this->mStartCalls == 0)
   {
-    this->exceptionWrappedCall
-    (
-      boost::bind(&cedar::proc::Triggerable::onStart, this),
-      "An exception occurred while calling onStart()"
-    );
+    exception_occurred
+      = this->exceptionWrappedCall
+        (
+          boost::bind(&cedar::proc::Triggerable::onStart, this),
+          "An exception occurred while calling onStart(). You can fix this by restarting the trigger. The exception is",
+          cedar::proc::Triggerable::STATE_EXCEPTION_ON_START
+        );
   }
 
   // count how often this triggerable was started
-  ++this->mStartCalls;
+  if (!exception_occurred)
+  {
+    ++this->mStartCalls;
+  }
 
   locker.unlock();
 
@@ -185,7 +196,7 @@ void cedar::proc::Triggerable::callOnStop()
   cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
 
   // count how often this was stopped
-  if (this->mStartCalls == 0)
+  if (this->mStartCalls == 0 && this->getState() != cedar::proc::Triggerable::STATE_EXCEPTION_ON_START)
   {
     std::string name = "(unnamed step)";
     if (named)
@@ -198,6 +209,12 @@ void cedar::proc::Triggerable::callOnStop()
       "Step \"" + name + "\" has an invalid start count.",
       "void cedar::proc::Triggerable::callOnStop()"
     );
+    return;
+  }
+  else if (this->mStartCalls == 0 && this->getState() == cedar::proc::Triggerable::STATE_EXCEPTION_ON_START)
+  {
+    // reset state to unknown
+    this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
     return;
   }
   --this->mStartCalls;
