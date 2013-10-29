@@ -82,8 +82,6 @@ void cedar::aux::gui::PluginInfoDialog::updateWidgets()
   this->mpLoadOnStartup->setChecked(cedar::aux::SettingsSingleton::getInstance()->isPluginLoadedOnStartup(plugin_name));
   this->mpLoadOnStartup->setEnabled(false);
 
-  this->mpLoadBtn->setEnabled(!this->mPlugin->isDeclared());
-
   if (this->mPlugin->getDeclaration())
   {
     this->mpReadInfoBtn->setEnabled(false);
