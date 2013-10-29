@@ -650,22 +650,24 @@ void cedar::proc::gui::StepItem::updateDecorationPositions()
       origin.setY(origin.y() - 5.0);
   }
 
+  qreal factor;
+  switch (this->mDisplayMode)
+  {
+    case DisplayMode::ICON_ONLY:
+      factor = 0.7;
+      break;
+
+    default:
+      factor = 1.0;
+  }
+
   QPointF offset_dir(-1, 0);
-  qreal distance = 10.0;
+  qreal distance = 15.0;
   for (size_t i = 0; i < this->mDecorations.size(); ++i)
   {
     DecorationPtr decoration = this->mDecorations[i];
-    decoration->setPosition(origin + static_cast<qreal>(i) * distance * offset_dir);
-
-    switch (this->mDisplayMode)
-    {
-      case DisplayMode::ICON_ONLY:
-        decoration->setSize(0.7);
-        break;
-
-      default:
-        decoration->setSize(1.0);
-    }
+    decoration->setPosition(origin + static_cast<qreal>(i) * factor * distance * offset_dir);
+    decoration->setSize(factor);
   }
 }
 
