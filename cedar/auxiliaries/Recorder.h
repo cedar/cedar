@@ -102,6 +102,9 @@ public:
   //!@brief Unregister all DataPtr.
   void clear();
 
+  //!brief Takes a snapshot of all registered DataPtr
+  void takeSnapshot();
+
   /*!@brief Sets the directory the recorded data will be written to.
    *            If @param name is a full path the function will extract the stem of the filename.
    */

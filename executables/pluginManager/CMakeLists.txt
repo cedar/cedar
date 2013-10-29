@@ -26,7 +26,7 @@
 #
 #   Maintainer:  Oliver Lomp
 #   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2012 07 25
+#   Date:        2013 10 29
 #
 #   Description:
 #
@@ -34,7 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(ProcessingSteps
-                    ProcessingSteps.cpp
-                    LINK_ALL
-                    )
+cedar_add_executable(pluginManager CEDAR_DEPENDENCIES cedaraux)

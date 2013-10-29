@@ -35,4 +35,4 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(Grabber main.cpp )
+cedar_add_unit_test(Grabber main.cpp LINK_TESTUTILS)
