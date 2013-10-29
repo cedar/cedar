@@ -1,0 +1,8 @@
+/*!
+
+@page InterProcessCommunicationConcept Inter-process communication using yarp
+
+@section InterProcessIntroduction Introduction
+Inter-process communication will be added in one of the upcoming cedar releases. Currently, the corresponding code is
+still in an experimental phase.
+ */
