@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginLoadDialog.h
+    File:        Settings.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2011 07 26
 
     Description:
 
@@ -34,50 +34,68 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
-#define CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
+#ifndef CEDAR_AUX_GUI_SETTINGS_H
+#define CEDAR_AUX_GUI_SETTINGS_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_PluginLoadDialog.h"
-
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/PluginProxy.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 
 // SYSTEM INCLUDES
-#include <QDialog>
 
 
-/*!@brief A dialog for loading a plugin.
+/*!@brief User interface settings for widgets in the aux namespace.
+ *
+ *        This class provides (singleton) access to settings that concern the user interface classes located in the
+ *        cedar::aux namespace.
+ *
+ *        It takes care of storing and restoring the configuration to and from a file located in the user's home
+ *        directory.
  */
-class cedar::proc::gui::PluginLoadDialog : public QDialog, public Ui_PluginLoadDialog
+class cedar::aux::gui::Settings : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+  friend class cedar::aux::Singleton<cedar::aux::gui::Settings>;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+private:
   //!@brief The standard constructor.
-  PluginLoadDialog(QWidget *pParent = NULL);
+  Settings();
+
+public:
+  //!@brief Destructor
+  ~Settings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Returns the (loaded) plugin.
-  cedar::proc::PluginProxyPtr plugin();
+  //!@brief loads the UI settings
+  void load();
 
-public slots:
-  /*!@brief Opens a file browser to locate the plugin to load.
-   */
-  void browseFile();
+  //!@brief saves the UI settings
+  void save();
 
-  /*!@brief Reacts to a change in the plugin file line edit.
-   */
-  void pluginFileChanged(const QString& file);
+  //!@brief returns the last directory, from which a plugin was loaded
+  cedar::aux::DirectoryParameterPtr lastPluginLoadDialogLocation() const;
+
+  //! Sets the last directory from which a plugin was loaded.
+  void setLastPluginDialogLocation(const std::string& location);
+
+  //! Disables writing.
+  void disableWriting(bool disable = true)
+  {
+    this->mWritingDisabled = disable;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,9 +107,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Loads a plugin file.
-   */
-  void loadFile(const std::string& file);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -99,9 +115,33 @@ private:
 protected:
   // none yet
 private:
-  //! The loaded plugin.
-  cedar::proc::PluginProxyPtr mPlugin;
+  //! Disables writing of the properties; this is useful for unit tests that shouldn't alter the configuration.
+  bool mWritingDisabled;
 
-}; // class cedar::PluginLoadDialog
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
+private:
+  //!@brief Directory, where the PluginLoadDialog is supposed to open.
+  cedar::aux::DirectoryParameterPtr _mPluginLoadDialogLocation;
+
+}; // class cedar::proc::gui::Settings
+
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      typedef cedar::aux::Singleton<cedar::aux::gui::Settings> SettingsSingleton;
+    }
+  }
+}
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::proc::gui::Settings);
+
+#endif // CEDAR_AUX_GUI_SETTINGS_H
+

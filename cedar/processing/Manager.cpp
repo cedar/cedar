@@ -43,11 +43,12 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/processing/PluginProxy.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/defines.h"
@@ -72,10 +73,10 @@ cedar::proc::Manager::~Manager()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::Manager::loadDefaultPlugins()
 {
-  cedar::proc::gui::SettingsSingleton::getInstance()->loadDefaultPlugins();
+  cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
-void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
+void cedar::proc::Manager::load(cedar::aux::PluginProxyPtr plugin)
 {
   plugin->declare();
 }

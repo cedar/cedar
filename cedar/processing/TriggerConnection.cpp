@@ -50,10 +50,33 @@ cedar::proc::TriggerConnection::TriggerConnection(cedar::proc::TriggerPtr source
 mSourceTrigger(source),
 mTarget(target)
 {
-  // add the target to the list of listeners
-  source->addListener(target);
-  // add parent to target
-  target->setParentTrigger(source);
+  try
+  {
+    // add the target to the list of listeners
+    source->addListener(target);
+    // add parent to target
+    target->setParentTrigger(source);
+  }
+  catch (cedar::aux::ExceptionBase& exc)
+  {
+    // we ignore exceptions during this constructor, but notify the user
+    target->setState
+    (
+      cedar::proc::Triggerable::STATE_EXCEPTION,
+      "An exception occured during establishing a connection: "
+      + exc.getMessage()
+    );
+  }
+  catch (std::exception& exc)
+  {
+    // we ignore exceptions during this constructor, but notify the user
+    target->setState
+    (
+      cedar::proc::Triggerable::STATE_EXCEPTION,
+      "An exception occured during establishing a connection: "
+      + std::string(exc.what())
+    );
+  }
 }
 
 cedar::proc::TriggerConnection::~TriggerConnection()

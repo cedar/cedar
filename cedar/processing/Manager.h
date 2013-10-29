@@ -44,7 +44,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/FrameworkSettings.h"
 #include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
@@ -92,7 +91,7 @@ public:
 
   //!@brief load a plugin
   //!@deprecated Call declare() on the plugin pointer instead.
-  CEDAR_DECLARE_DEPRECATED(void load(cedar::proc::PluginProxyPtr plugin));
+  CEDAR_DECLARE_DEPRECATED(void load(cedar::aux::PluginProxyPtr plugin));
 
   //!@brief Loads the declarations from a plugin declaration.
   //!@deprecated Call declareAll() on the declaration pointer instead.

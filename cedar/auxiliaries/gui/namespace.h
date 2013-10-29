@@ -60,6 +60,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(ObjectVisualizationWidget);
       CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualizationWidget RigidBodyVisualizationWidget);
       CEDAR_DECLARE_AUX_CLASS(SceneWidget);
+      CEDAR_DECLARE_AUX_CLASS(Settings);
       CEDAR_DECLARE_AUX_CLASS(Viewer);
 
       class CEDAR_AUX_LIB_EXPORT PropertyPane;
@@ -89,6 +90,8 @@ namespace cedar
 
       class CEDAR_AUX_LIB_EXPORT ResourceDialog;
 
+      class CEDAR_AUX_LIB_EXPORT SettingsWidget;
+
       class CEDAR_AUX_LIB_EXPORT ExceptionDialog;
 
       class CEDAR_AUX_LIB_EXPORT Log;
@@ -104,6 +107,9 @@ namespace cedar
 
       /* Exceptions */
       class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
+
+      class CEDAR_AUX_LIB_EXPORT PluginInfoDialog;
+      class CEDAR_AUX_LIB_EXPORT PluginManagerDialog;
       //!@endcond
 
       //! The factory for gui parameters.

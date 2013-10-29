@@ -270,7 +270,6 @@ void cedar::aux::kernel::Gauss::updateDimensionality()
   {
     new_size = 1;
   }
-
   _mSigmas->resize(new_size);
   _mSigmas->setDefaultSize(new_size);
   _mShifts->resize(new_size);

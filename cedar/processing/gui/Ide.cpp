@@ -49,14 +49,15 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Network.h"
-#include "cedar/processing/gui/PluginLoadDialog.h"
-#include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
+#include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/assert.h"
@@ -68,6 +69,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDialogButtonBox>
+#include <QMessageBox>
 #include <boost/property_tree/detail/json_parser_error.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -140,7 +142,6 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
-  QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
@@ -190,6 +191,11 @@ mpBoostControl(NULL)
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
+
+  cedar::aux::PluginProxy::connectToPluginDeclaredSignal
+  (
+    boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
+  );
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -406,26 +412,12 @@ void cedar::proc::gui::Ide::restoreSettings()
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::gui::SettingsSingleton::getInstance()->loadDefaultPlugins();
-}
-
-void cedar::proc::gui::Ide::showLoadPluginDialog()
-{
-  cedar::proc::gui::PluginLoadDialog* p_dialog = new cedar::proc::gui::PluginLoadDialog(this);
-  int res = p_dialog->exec();
-
-  if (res == QDialog::Accepted && p_dialog->plugin())
-  {
-    p_dialog->plugin()->declare();
-    this->resetStepList();
-  }
-
-  delete p_dialog;
+  cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showManagePluginsDialog()
 {
-  cedar::proc::gui::PluginManagerDialog* p_dialog = new cedar::proc::gui::PluginManagerDialog(this);
+  cedar::aux::gui::PluginManagerDialog* p_dialog = new cedar::aux::gui::PluginManagerDialog(this);
   p_dialog->exec();
   delete p_dialog;
 }
@@ -478,6 +470,7 @@ void cedar::proc::gui::Ide::architectureToolFinished()
 
 void cedar::proc::gui::Ide::resetStepList()
 {
+  //!@todo This should become its own widget
   using cedar::proc::Manager;
 
   std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
@@ -725,6 +718,90 @@ void cedar::proc::gui::Ide::loadFile(QString file)
                                              "Loading file: " + file.toStdString(),
                                              "void cedar::proc::gui::Ide::loadFile(QString)"
                                            );
+
+  // check if all required plugins are loaded
+  auto required_plugins = cedar::proc::Network::getRequiredPlugins(file.toStdString());
+  std::set<std::string> plugins_not_found;
+  std::set<std::string> plugins_not_loaded;
+  for (auto iter = required_plugins.begin(); iter != required_plugins.end(); ++iter)
+  {
+    const std::string& plugin_name = *iter;
+    if (!cedar::aux::PluginProxy::canFindPlugin(plugin_name))
+    {
+      plugins_not_found.insert(plugin_name);
+    }
+    else if (!cedar::aux::PluginProxy::getPlugin(plugin_name)->isDeclared())
+    {
+      plugins_not_loaded.insert(plugin_name);
+    }
+  }
+
+  if (!plugins_not_found.empty())
+  {
+    auto p_message(new QMessageBox(this));
+
+    p_message->setWindowTitle("Missing plugins");
+    p_message->setText("Some plugins required for this architecture were not found. Continue?");
+
+    QString details = "The plugins not found are:";
+    for (auto iter = plugins_not_found.begin(); iter != plugins_not_found.end(); ++iter)
+    {
+      details += "\n";
+      details += QString::fromStdString(*iter);
+    }
+
+    p_message->setDetailedText(details);
+
+    p_message->addButton(QMessageBox::Yes);
+    p_message->addButton(QMessageBox::No);
+
+    int r = p_message->exec();
+
+    delete p_message;
+
+    if (r == QMessageBox::No)
+    {
+      return;
+    }
+  }
+
+  if (!plugins_not_loaded.empty())
+  {
+    auto p_message(new QMessageBox(this));
+
+    p_message->setWindowTitle("Unloaded plugins");
+    p_message->setText("Some plugins required for this architecture were not loaded. Load them?");
+
+    QString details = "The plugins not found are:";
+    for (auto iter = plugins_not_loaded.begin(); iter != plugins_not_loaded.end(); ++iter)
+    {
+      details += "\n";
+      details += QString::fromStdString(*iter);
+    }
+
+    p_message->setDetailedText(details);
+
+    p_message->addButton(QMessageBox::Yes);
+    p_message->addButton(QMessageBox::No);
+    p_message->addButton(QMessageBox::Cancel);
+
+    int r = p_message->exec();
+
+    delete p_message;
+
+    if (r == QMessageBox::Cancel)
+    {
+      return;
+    }
+    if (r == QMessageBox::Yes)
+    {
+      for (auto iter = plugins_not_loaded.begin(); iter != plugins_not_loaded.end(); ++iter)
+      {
+        auto plugin_name = *iter;
+        cedar::aux::PluginProxy::getPlugin(plugin_name)->declare();
+      }
+    }
+  }
 
   // reset scene
   this->mpProcessingDrawer->getScene()->reset();

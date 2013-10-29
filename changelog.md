@@ -68,7 +68,11 @@ known issues
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
     standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
   - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
-      
+  - Singleton-related classes may sometimes cause crashes when programs exit. If you experience random crashes when your
+    own programs exit and the stack contains cedar::aux::Log::getMemoryDebugFlag(), this may be the cause. As a
+    workaround, make sure to reset all smart pointers at the end of your main method (the usual cause are global-scope
+    smart pointers that send a log message after the log singleton was freed.)
+
 Unreleased changes
 ==================
 
@@ -89,7 +93,11 @@ current testing
 ---------------
 - general
   - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
-    for example anchor, shift, and limit of kernels and threshold of sigmoids. 
+    for example anchor, shift, and limit of kernels and threshold of sigmoids.
+  - The plugin system has been changed. It is no longer specific to the processing framework, although it is not (yet)
+    used elsewhere. Plugins can now be added in an improved manager. They are found in a different way, now: a list of
+    user-defined paths is searched for a plugin of a given name by appending certain directories (such as the plugin
+    name itself and a "build" folder.) Using this new functionality, architectures now store which plugins they require.
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.
