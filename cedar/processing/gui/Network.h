@@ -123,6 +123,9 @@ public:
   //!@brief Adds a list of elements to the network efficiently.
   void addElements(const std::list<QGraphicsItem*>& elements);
 
+  //! Duplicates an element and places it at the given position.
+  void duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
+
   //!@brief Sets the scene containing this item.
   void setScene(cedar::proc::gui::Scene* pScene);
 
@@ -143,7 +146,8 @@ public:
   //! deals with changes to the network gui item
   QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value);
 
-  bool sceneEventFilter(QGraphicsItem *pWatched, QEvent *pEvent);
+  //! deals with a mouse release event
+  bool sceneEventFilter(QGraphicsItem* pWatched, QEvent* pEvent);
 
   //! get the scene in which this network is embedded
   cedar::proc::gui::Scene* getScene()
@@ -173,6 +177,9 @@ public:
     return this->_mSmartMode->getValue();
   }
 
+public slots:
+  void stepRecordStateChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -197,7 +204,13 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, cedar::proc::Network::ConnectionChange change);
+  //!@brief a function that translates a boost signal to check a data connection into a Qt signal
+  void checkDataConnection
+       (
+         cedar::proc::ConstDataSlotPtr source,
+         cedar::proc::ConstDataSlotPtr target,
+         cedar::proc::Network::ConnectionChange change
+       );
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
@@ -205,11 +218,27 @@ private:
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
+  void readOpenPlots(const cedar::aux::ConfigurationNode& node);
+
+signals:
+  //!@brief signal that is emitted when a boost signal is received
+  void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange);
+
 private slots:
   //!@brief Updates the label of the network.
   void networkNameChanged();
 
   void toggleSmartConnectionMode();
+
+  //!@brief handle an internal signal to create or remove gui connections
+  void dataConnectionChanged
+       (
+         QString sourceName,
+         QString sourceSlot,
+         QString targetName,
+         QString targetSlot,
+         cedar::proc::Network::ConnectionChange change
+       );
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

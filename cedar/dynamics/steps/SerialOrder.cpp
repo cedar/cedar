@@ -45,10 +45,13 @@
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+#include <boost/make_shared.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -214,6 +217,12 @@ _mSigmoid
   // set up the rest
   this->numberOfOrdinalPositionsChanged();
 
+  // make the plots of these matrices appear as discrete points rather than lines
+  this->mOrdinalNodeActivationBuffer->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
+  this->mMemoryNodeActivationBuffer->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
+  this->mOrdinalNodeOutputBuffer->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
+  this->mMemoryNodeOutputBuffer->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
+
   // connect the parameter's change signal
   QObject::connect(_mNumberOfOrdinalPositions.get(), SIGNAL(valueChanged()), this, SLOT(numberOfOrdinalPositionsChanged()));
 }
@@ -344,7 +353,7 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
       d_dot -= this->mCosSignalInput->getData();
     }
 
-    d += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_dot;
+    d += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_dot;
 
     cv::Mat& dm = this->mMemoryNodes.at(i)->getData();
     const float& hm = this->_mMemoryNodeRestingLevel->getValue();
@@ -357,7 +366,7 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
                     + c5 * (sum_of_memory_outputs - f_dm)
                     + c6 * f_d;
 
-    dm += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * dm_dot;
+    dm += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * dm_dot;
 
     // save a copy of the output in the buffer
     //!@todo this is only needed because we don't have any nice way to plot all the discrete values yet

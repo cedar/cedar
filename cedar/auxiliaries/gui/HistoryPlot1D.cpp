@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot1D.h"
 #ifdef CEDAR_USE_QWTPLOT3D
-  #include "cedar/auxiliaries/gui/SurfacePlot.h"
+  #include "cedar/auxiliaries/gui/QwtSurfacePlot.h"
 #else // CEDAR_USE_QWTPLOT3D
   #include "cedar/auxiliaries/gui/ImagePlot.h"
 #endif // CEDAR_USE_QWTPLOT3D
@@ -81,7 +81,7 @@ void cedar::aux::gui::HistoryPlot1D::init()
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
 #ifdef CEDAR_USE_QWTPLOT3D
-  this->mpHistoryPlot = new cedar::aux::gui::SurfacePlot();
+  this->mpHistoryPlot = new cedar::aux::gui::QwtSurfacePlot();
 #else // CEDAR_USE_QWTPLOT3D
   this->mpHistoryPlot = new cedar::aux::gui::ImagePlot();
 #endif // CEDAR_USE_QWTPLOT3D

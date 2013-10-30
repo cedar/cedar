@@ -41,12 +41,14 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/SetParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.h"
 
 // SYSTEM INCLUDES
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 
-/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
- *
- * @todo  Write a widget for these settings.
+/*!@brief A singleton class for storing user-specific parameters related to the auxiliary library of cedar.
  */
 class cedar::aux::Settings : public cedar::aux::Configurable
 {
@@ -81,6 +83,93 @@ public:
   //! Whether or not memory output is generated.
   bool getMemoryDebugOutput();
 
+  //!@brief Returns the directory where the recorder will save the recorded files.
+  std::string getRecorderOutputDirectory() const;
+
+  //! Returns the parameter that contains the recorder's output directory.
+  cedar::aux::DirectoryParameterPtr getRecorderWorkspaceParameter() const;
+
+  //!@brief returns a list of all plugins that should be loaded on start-up
+  const std::set<std::string>& pluginsToLoad();
+
+  //! Returns the plugins search paths.
+  const std::vector<std::string>& getPluginSearchPaths() const;
+
+  //! Returns a list of known plugins
+  const std::set<std::string>& getKnownPlugins() const;
+
+  //! Adds a plugin search path.
+  void addPluginSearchPath(const std::string& path);
+
+  //! Removes all occurrences of the given plugin search path.
+  void removePluginSearchPath(const std::string& path);
+
+  //! Removes the plugin search path with the given index.
+  void removePluginSearchPath(size_t index);
+
+  //!@brief adds a plugin to the list of plugins that are loaded on start-up
+  void addPluginToLoad(const std::string& pluginName);
+
+  //!@brief removes a plugin from the list of plugins that are loaded on start-up
+  void removePluginToLoad(const std::string& pluginName);
+
+  //! Loads the plugins set to be loaded by default.
+  void loadDefaultPlugins();
+
+  //! Returns true if the plugin is loaded on startup, false otherwise.
+  bool isPluginLoadedOnStartup(const std::string& pluginName) const;
+
+  //! Connect to search path added signal
+  boost::signals2::connection connectToPluginSearchPathAddedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mPathAddedSignal.connect(slot);
+  }
+
+  //! Connect to search path removed signal
+  boost::signals2::connection connectToPluginSearchPathRemovedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mSearchPathRemovedSignal.connect(slot);
+  }
+
+  //! Connect to search path removed signal
+  boost::signals2::connection connectToPluginSearchPathsChangedSignal(boost::function<void ()> slot)
+  {
+    return this->mSearchPathsChangedSignal.connect(slot);
+  }
+
+  //! Connect to search path removed signal
+  boost::signals2::connection connectToPluginSearchPathIndexRemovedSignal(boost::function<void (size_t)> slot)
+  {
+    return this->mSearchPathIndexRemovedSignal.connect(slot);
+  }
+
+  //! Connect to plugin added signal
+  boost::signals2::connection connectToPluginAddedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mPluginAddedSignal.connect(slot);
+  }
+
+  //! Connect to plugin removed signal
+  boost::signals2::connection connectToPluginRemovedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mPluginRemovedSignal.connect(slot);
+  }
+
+  //! Connect to signal that is emitted whenver search paths are swapped.
+  boost::signals2::connection connectToSearchPathsSwappedSignal(boost::function<void (unsigned int, unsigned int)> slot)
+  {
+    return this->mSearchPathsSwappedSignal.connect(slot);
+  }
+
+  //! Adds the given plugin to the settings plugin.
+  void addPlugin(cedar::aux::PluginProxyPtr plugin);
+
+  //! Removes the given plugin from the settings.
+  void removePlugin(const std::string& pluginName);
+
+  //! Swaps the order of the given plugin paths.
+  void swapPluginSearchPaths(unsigned int first, unsigned int second);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,7 +188,19 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  boost::signals2::signal<void (const std::string&)> mPathAddedSignal;
+
+  boost::signals2::signal<void (const std::string&)> mSearchPathRemovedSignal;
+
+  boost::signals2::signal<void (size_t)> mSearchPathIndexRemovedSignal;
+
+  boost::signals2::signal<void ()> mSearchPathsChangedSignal;
+
+  boost::signals2::signal<void (const std::string&)> mPluginAddedSignal;
+
+  boost::signals2::signal<void (const std::string&)> mPluginRemovedSignal;
+
+  boost::signals2::signal<void (unsigned int, unsigned int)> mSearchPathsSwappedSignal;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -107,6 +208,18 @@ private:
 protected:
   //!@brief Parameter representing the plugin workspace.
   cedar::aux::BoolParameterPtr _mMemoryDebugOutput;
+
+  //!@brief Parameter representing where recorded files will be saved.
+  cedar::aux::DirectoryParameterPtr mRecorderWorkspace;
+
+  //!@brief List of plugins that should be loaded on startup.
+  cedar::aux::StringSetParameterPtr _mPluginsToLoad;
+
+  //!@brief List of plugins known to the system.
+  cedar::aux::StringSetParameterPtr _mKnownPlugins;
+
+  //! List of all the directories to search for plugins.
+  cedar::aux::StringVectorParameterPtr _mPluginSearchPaths;
 
 private:
   // none yet

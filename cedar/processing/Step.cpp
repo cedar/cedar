@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/BoolParameter.h"
@@ -49,8 +48,10 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Log.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 #include "cedar/defines.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QMutexLocker>
@@ -75,8 +76,11 @@ cedar::proc::Step::Step(bool runInThread, bool isLooped)
 Triggerable(isLooped),
 // initialize members
 mpArgumentsLock(new QReadWriteLock()),
-mMovingAverageIterationTime(100), // average the last 100 iteration times
-mLockingTime(100), // average the last 100 iteration times
+mTriggerSubsequent(true),
+// average the last 100 iteration times
+mMovingAverageIterationTime(100),
+// average the last 100 iteration times
+mLockingTime(100),
 mRoundTime(100), // average the last 100 iteration times
 mLastComputeCall(0),
 // initialize parameters
@@ -94,7 +98,7 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
-  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this));
+  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
 }
 
 cedar::proc::Step::~Step()
@@ -184,13 +188,13 @@ void cedar::proc::Step::setAutoLockInputsAndOutputs(bool autoLock)
   this->mAutoLockInputsAndOutputs = autoLock;
 }
 
-void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function)
+void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function, bool autoLock)
 {
   if (this->mActions.find(actionName) != this->mActions.end())
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "Duplicate action name: " + actionName);
   }
-  this->mActions[actionName] = function;
+  this->mActions[actionName] = std::make_pair(function, autoLock);
 }
 
 void cedar::proc::Step::callAction(const std::string& name)
@@ -204,10 +208,23 @@ void cedar::proc::Step::callAction(const std::string& name)
   }
 
   // get the functor
-  boost::function<void()>& function = iter->second;
+  boost::function<void()>& function = iter->second.first;
+
+  bool autolock = iter->second.second;
+  if (autolock)
+  {
+    // lock the step
+    this->lock(cedar::aux::LOCK_TYPE_WRITE);
+  }
 
   // call it
   function();
+
+  if (autolock)
+  {
+    // unlock the step
+    this->unlock();
+  }
 }
 
 const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
@@ -245,13 +262,17 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
   this->mTriggers.push_back(trigger);
 }
 
-void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr)
+void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr trigger)
 {
 #ifdef DEBUG_RUNNING
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
 #endif // DEBUG_RUNNING
   // if an exception has previously happened, do nothing.
-  if (this->mState == cedar::proc::Triggerable::STATE_EXCEPTION)
+  if
+  (
+    this->mState == cedar::proc::Triggerable::STATE_EXCEPTION
+      || this->mState == cedar::proc::Triggerable::STATE_EXCEPTION_ON_START
+  )
   {
     // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
@@ -274,7 +295,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
     return;
   }
 
-  if (!this->setNextArguments(args))
+  if (!this->setNextArguments(args, !trigger))
   {
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
@@ -334,7 +355,7 @@ void cedar::proc::Step::run()
     clock_t lock_end = clock();
     clock_t lock_elapsed = lock_end - lock_start;
     double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-    this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+    this->setLockTimeMeasurement(lock_elapsed_s * cedar::unit::seconds);
 
     if (!this->mandatoryConnectionsAreSet())
     {
@@ -354,7 +375,7 @@ void cedar::proc::Step::run()
       this->mLastComputeCall = clock();
       clock_t elapsed = this->mLastComputeCall - last;
       double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-      this->setRoundTimeMeasurement(cedar::unit::Seconds(elapsed_s));
+      this->setRoundTimeMeasurement(elapsed_s * cedar::unit::seconds);
     }
     else
     {
@@ -364,23 +385,19 @@ void cedar::proc::Step::run()
     // start measuring the execution time.
     clock_t run_start = clock();
 
+    /* since the cv::RNG is initialized once for every thread, we have to store its state for subsequent calls
+     * to run() - otherwise, the sequence of generated random numbers will be identical for each execution of run()
+     */
+    if (this->isThreaded() && mRNGState != 0)
+    {
+      cv::RNG& my_rng = cv::theRNG();
+      my_rng.state = mRNGState;
+    }
+
     try
     {
-      /* since the cv::RNG is initialized once for every thread, we have to store its state for subsequent calls
-       * to run() - otherwise, the sequence of generated random numbers will be identical for each execution of run()
-       */
-      if (this->isThreaded() && mRNGState != 0)
-      {
-        cv::RNG& my_rng = cv::theRNG();
-        my_rng.state = mRNGState;
-      }
       // call the compute function with the given arguments
       this->compute(*(arguments.get()));
-      if (this->isThreaded())
-      {
-        cv::RNG& my_rng = cv::theRNG();
-        mRNGState = my_rng.state;
-      }
     }
     // catch exceptions and translate them to the given state/message
     catch(const cedar::aux::ExceptionBase& e)
@@ -414,6 +431,12 @@ void cedar::proc::Step::run()
       this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
     }
 
+    if (this->isThreaded())
+    {
+      cv::RNG& my_rng = cv::theRNG();
+      mRNGState = my_rng.state;
+    }
+
     clock_t run_end = clock();
     clock_t run_elapsed = run_end - run_start;
     double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
@@ -422,11 +445,15 @@ void cedar::proc::Step::run()
     this->unlock();
 
     // take time measurements
-    this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
+    this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
 
-    // remove the argumens, as they have been processed.
-    this->getFinishedTrigger()->trigger();
+    //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
+    if (this->mTriggerSubsequent || this->isLooped() || !this->isTriggered())
+    {
+      this->getFinishedTrigger()->trigger();
+    }
 
+    //!@todo Should busy be unlocked before triggering subsequent steps?
     this->mBusy.unlock();
   }
   else
@@ -442,19 +469,19 @@ void cedar::proc::Step::run()
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLastIterationTimeLock);
-  this->mMovingAverageIterationTime.append(cedar::unit::Seconds(time));
+  this->mMovingAverageIterationTime.append(time);
 }
 
 void cedar::proc::Step::setLockTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLockTimeLock);
-  this->mLockingTime.append(cedar::unit::Seconds(time));
+  this->mLockingTime.append(time);
 }
 
 void cedar::proc::Step::setRoundTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mRoundTimeLock);
-  this->mRoundTime.append(cedar::unit::Seconds(time));
+  this->mRoundTime.append(time);
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
@@ -541,6 +568,31 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
   }
 }
 
+
+bool cedar::proc::Step::isRecorded() const
+{
+  std::vector<cedar::proc::DataRole::Id> slotTypes;
+  slotTypes.push_back(cedar::proc::DataRole::BUFFER);
+  slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
+
+  for (unsigned int s = 0; s < slotTypes.size(); s++)
+  {
+
+    if (this->hasRole(slotTypes[s]))
+    {
+      cedar::proc::Connectable::SlotList dataSlots = this->getOrderedDataSlots(slotTypes[s]);
+      for (unsigned int i = 0; i < dataSlots.size(); i++)
+      {
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getData()))
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 void cedar::proc::Step::setThreaded(bool isThreaded)
 {
   this->_mRunInThread->setValue(isThreaded);
@@ -552,7 +604,7 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
  * @remarks The function returns false only if arguments have previously been set that were not yet processed by the
  *          run function.
  */
-bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr arguments)
+bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent)
 {
   // first, check if new arguments have already been set.
   {
@@ -580,6 +632,7 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr argument
 
   QWriteLocker arg_lock(mpArgumentsLock);
   this->mNextArguments = arguments;
+  this->mTriggerSubsequent = triggerSubsequent;
   arg_lock.unlock();
   this->mBusy.unlock();
   return true;

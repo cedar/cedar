@@ -48,6 +48,8 @@
 // SYSTEM INCLUDES
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
+#include <QSlider>
+#include <QLineEdit>
 #include <QTimer>
 
 
@@ -142,7 +144,25 @@ signals:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //! Creates the widgets used for manipulating the zoom level.
+  void createZoomWidget();
+
+private slots:
+  /*!@brief Reacts to changes in the zoom level.
+   */
+  void zoomLevelSet(double zoomLevel);
+
+  /*!@brief Resets the zoom level to 100%.
+   */
+  void resetZoomLevel();
+
+  /*!@brief Increases the zoom level.
+   */
+  void increaseZoomLevel();
+
+  /*!@brief Decreases the zoom level.
+   */
+  void decreaseZoomLevel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -152,6 +172,11 @@ protected:
 private:
   //!@brief a pointer to a scene displayed by the view
   cedar::proc::gui::Scene* mpScene;
+
+  //! Pointer to the zoom level slider;
+  QSlider* mpZoomLevelSlider;
+
+  QLineEdit* mpZoomLevelDisplay;
 
   //!@brief Variable to keep track of the current zoom level.
   qreal mCurrentZoomLevel;

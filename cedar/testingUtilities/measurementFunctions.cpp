@@ -43,6 +43,7 @@
 // SYSTEM INCLUDES
 #include <functional>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/function.hpp>
 
 void cedar::test::write_measurement
      (
@@ -61,17 +62,25 @@ void cedar::test::write_measurement
       << std::endl;
 }
 
-void cedar::test::test_time(std::string id, std::function< void() > fun)
+void cedar::test::test_time(std::string id, std::function<void()> fun, unsigned int repetitions)
 {
   using boost::posix_time::ptime;
   using boost::posix_time::microsec_clock;
+
+  if (repetitions > 1)
+  {
+    id = cedar::aux::toString(repetitions) + "x " + id;
+  }
 
   double duration;
 
   auto start = microsec_clock::local_time();
 
   // execute the test:
-  fun();
+  for (unsigned int i = 0; i < repetitions; ++i)
+  {
+    fun();
+  }
 
   auto end = microsec_clock::local_time();
 

@@ -65,41 +65,22 @@ public:
     cedar::aux::Configurable* pOwner,
     const std::string& name,
     const T& defaultLowerLimit,
-    const T& defaultUpperLimit,
     const T& defaultLowerLimitMinimum,
     const T& defaultLowerLimitMaximum,
+    const T& defaultUpperLimit,
     const T& defaultUpperLimitMinimum,
     const T& defaultUpperLimitMaximum
   )
   :
   cedar::aux::Parameter(pOwner, name),
   mLowerLimitDefault(defaultLowerLimit),
-  mUpperLimitDefault(defaultUpperLimit),
   mLowerLimitMinimum(defaultLowerLimitMinimum),
   mLowerLimitMaximum(defaultLowerLimitMaximum),
+  mUpperLimitDefault(defaultUpperLimit),
   mUpperLimitMinimum(defaultUpperLimitMinimum),
   mUpperLimitMaximum(defaultUpperLimitMaximum)
   {
     this->makeDefault();
-  }
-
-  //!@brief the constructor
-  LimitsParameter
-  (
-    cedar::aux::Configurable* pOwner,
-    const std::string& name,
-    const T& defaultLowerLimitMinimum,
-    const T& defaultLowerLimitMaximum,
-    const T& defaultUpperLimitMinimum,
-    const T& defaultUpperLimitMaximum
-  )
-  :
-  cedar::aux::Parameter(pOwner, name),
-  mLowerLimitMinimum(defaultLowerLimitMinimum),
-  mLowerLimitMaximum(defaultLowerLimitMaximum),
-  mUpperLimitMinimum(defaultUpperLimitMinimum),
-  mUpperLimitMaximum(defaultUpperLimitMaximum)
-  {
   }
 
   //!@brief Destructor
@@ -165,24 +146,69 @@ public:
   }
 
   //!@brief set the value of type T of this parameter
-  void setValue(const cedar::aux::math::Limits<T>& value)
+  void setValue(const cedar::aux::math::Limits<T>& value, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
+    cedar::aux::math::Limits<T> old_value = this->mLimits;
     this->mLimits = value;
-    this->emitChangedSignal();
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
+    if (old_value != value)
+    {
+      this->emitChangedSignal();
+    }
   }
 
   //!@brief sets the lower limit and emits a signal
-  void setLowerLimit(const T& value)
+  void setLowerLimit(const T& value, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
+    T old_value = this->mLimits.getLower();
     this->mLimits.setLower(value);
-    this->emitPropertyChangedSignal();
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
+    if (value != old_value)
+    {
+      this->emitChangedSignal();
+    }
   }
 
   //!@brief sets the upper limit and emits a signal
-  void setUpperLimit(const T& value)
+  void setUpperLimit(const T& value, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
+    T old_value = this->mLimits.getUpper();
     this->mLimits.setUpper(value);
-    this->emitPropertyChangedSignal();
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
+    if (value != old_value)
+    {
+      this->emitChangedSignal();
+    }
   }
 
   //!@brief returns the lower limit
@@ -272,12 +298,13 @@ protected:
 private:
   //!@brief The default value of the lower limit
   T mLowerLimitDefault;
-  //!@brief The default value of the upper limit
-  T mUpperLimitDefault;
   //!@brief The minimum value of the lower limit
   T mLowerLimitMinimum;
   //!@brief The maximum value of the lower limit
   T mLowerLimitMaximum;
+
+  //!@brief The default value of the upper limit
+  T mUpperLimitDefault;
   //!@brief The minimum value of the upper limit
   T mUpperLimitMinimum;
   //!@brief The maximum value of the upper limit

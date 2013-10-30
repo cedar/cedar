@@ -165,16 +165,15 @@ public:
       }
     }
 
-    p_net_portable= mElementWrapper.read( BLOCK ); // Argument: shouldWait
+    p_net_portable = mElementWrapper.read(BLOCK); // Argument: shouldWait
  
-    if ( p_net_portable == NULL )
+    if (p_net_portable == NULL)
     {
-      CEDAR_THROW( cedar::aux::net::NetNoNewDataException,
-                   "YARP: currently no data in buffer (reading)" );
+      CEDAR_THROW(cedar::aux::net::NetNoNewDataException, "YARP: currently no data in buffer (reading)");
     }
     else
     {
-      ret_mat= p_net_portable->content();
+      ret_mat = p_net_portable->content();
 
       // thoughts on reference counters:
       // 1.) YARP creates an instance of YARPCollatedPortable in the background,
@@ -197,7 +196,7 @@ public:
       {
         CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
                      "matrix has wrong size - you wrote matrices of "
-                     "different size/type before! try to reset." );
+                     "different size/type before! Try to reset." );
       }
 #endif
 
@@ -210,4 +209,3 @@ public:
 } } } }  // end namespaces
 
 #endif
-

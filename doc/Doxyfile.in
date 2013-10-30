@@ -502,12 +502,6 @@ MAX_INITIALIZER_LINES  = 30
 
 SHOW_USED_FILES        = YES
 
-# If the sources in your project are distributed over multiple directories 
-# then setting the SHOW_DIRECTORIES tag to YES will show the directory hierarchy 
-# in the documentation. The default is NO.
-
-SHOW_DIRECTORIES       = NO
-
 # Set the SHOW_FILES tag to NO to disable the generation of the Files page. 
 # This will remove the Files entry from the Quick Index and from the 
 # Folder Tree View (if specified). The default is YES.
@@ -600,9 +594,10 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = "@DOXYFILE_SOURCE_DIR@"
-                         "@DOXYFILE_SOURCE_DIR@/changelog.md"
-                         "@DOXYFILE_SOURCE_DIR@/readme.md"
+INPUT                  = "@DOXYFILE_SOURCE_DIR@" \
+                         "@DOXYFILE_SOURCE_DIR@/changelog.md" \
+                         "@DOXYFILE_SOURCE_DIR@/readme.md" \
+                         "@DOXYFILE_SOURCE_DIR@/troubleshooting.md"
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -829,12 +824,6 @@ HTML_FOOTER            = "./doc/resources/footer.html"
 # stylesheet in the HTML output directory as well, or it will be erased!
 
 HTML_STYLESHEET        = "./doc/resources/style.css"
-
-# If the HTML_ALIGN_MEMBERS tag is set to YES, the members of classes, 
-# files or namespaces will be aligned in HTML using tables. If set to 
-# NO a bullet list will be used.
-
-HTML_ALIGN_MEMBERS     = YES
 
 # If the HTML_DYNAMIC_SECTIONS tag is set to YES then the generated HTML 
 # documentation will contain sections that can be hidden and shown after the 
@@ -1285,7 +1274,19 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = CEDAR_USE_FFTW \
                          CEDAR_USE_AMTEC \
                          CEDAR_USE_KUKA_LWR \
-                         CEDAR_DECLARE_DEPRECATED(x)=x
+                         CEDAR_DECLARE_DEPRECATED(x)=x \
+                         CEDAR_UNIT_LIB_EXPORT \
+                         CEDAR_AUX_LIB_EXPORT \
+                         CEDAR_DEV_LIB_EXPORT \
+                         CEDAR_PROC_LIB_EXPORT \
+                         CEDAR_DYN_LIB_EXPORT \
+                         CEDAR_TESTING_UTILITIES_LIB_EXPORT \
+                         CEDAR_INSTANTIATE_UNIT_TEMPLATE \
+                         CEDAR_INSTANTIATE_AUX_TEMPLATE \
+                         CEDAR_INSTANTIATE_DEV_TEMPLATE \
+                         CEDAR_INSTANTIATE_PROC_TEMPLATE \
+                         CEDAR_INSTANTIATE_DYN_TEMPLATE \
+                         CEDAR_INSTANTIATE_TESTING_UTILITIES_TEMPLATE
                          
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

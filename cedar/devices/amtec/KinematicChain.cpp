@@ -67,7 +67,7 @@
 
 cedar::dev::amtec::KinematicChain::KinematicChain()
 :
-cedar::dev::robot::KinematicChain(),
+cedar::dev::KinematicChain(),
 _mInitString(new cedar::aux::StringParameter(this, "amtec init string", "ESD:1,1000")),
 _mModuleMap
 (
@@ -239,7 +239,6 @@ double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint) cons
         + " were found.",
       "cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int) const"
     );
-    //!@todo Throw an exception instead
     return 0.0;
   }
 

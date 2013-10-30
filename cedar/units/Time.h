@@ -24,15 +24,11 @@
 
     File:        Time.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2013 02 14
 
-    Description:
+    Description: This is a header for all time-related units.
 
     Credits:
 
@@ -43,59 +39,28 @@
 
 // CEDAR INCLUDES
 #include "cedar/units/namespace.h"
+#include "cedar/units/UnitMatrix.h"
 
 // SYSTEM INCLUDES
+#include <boost/units/make_scaled_unit.hpp>
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/time.hpp>
 
-
-/*!@brief Base class for time units.
- */
-class cedar::unit::Time
+namespace cedar
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+  namespace unit
+  {
+    typedef boost::units::quantity<boost::units::si::time> Time;
+    using boost::units::si::second;
+    using boost::units::si::seconds;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // constructors and destructor
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // This class has no public constructors because it should not be used directly.
+    //!@brief template concretion for time
+    typedef UnitMatrix<boost::units::si::time> TimeMatrix;
 
-  //!@brief Destructor
-  virtual ~Time();
+    //!@brief default unit for time
+    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::Time DEFAULT_TIME_UNIT;
+  }
+}
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // public methods
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  /*!@brief returns the raw time (currently, this is microseconds), mainly used in conversion methods
-   * @return raw time (currently microseconds)
-   */
-  double getRawTime() const;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-  //!@brief The constructor.
-  Time(double amount);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief the internal representation of time, currently expressed in microseconds
-  double mAmountInMicroSeconds;
-private:
-  // none yet
-
-}; // class cedar::unit::Time
 
 #endif // CEDAR_UNITS_TIME_H

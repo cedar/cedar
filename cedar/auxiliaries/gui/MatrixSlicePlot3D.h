@@ -116,6 +116,7 @@ public:
   //!@brief The constructor.
   MatrixSlicePlot3D(QWidget* pParent = NULL);
 
+  //!@brief A constructor taking both a data pointer and a title.
   MatrixSlicePlot3D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
   //!@brief Destructor

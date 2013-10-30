@@ -56,7 +56,7 @@ cedar::aux::LoopedThread::LoopedThread
 :
 _mStepSize
 (
-  new cedar::aux::DoubleParameter(this, "step size", stepSize, cedar::aux::DoubleParameter::LimitType::positive())
+  new cedar::aux::DoubleParameter(this, "step size", stepSize, cedar::aux::DoubleParameter::LimitType::fromLower(1.0))
 ),
 _mIdleTime
 (

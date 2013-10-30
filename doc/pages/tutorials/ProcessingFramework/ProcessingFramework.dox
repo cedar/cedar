@@ -235,9 +235,9 @@ from the example in @ref ProcessingTutorialRunningTheSimpleStep by
 @code
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   
-  network->add("yourNamespace.SimpleSummation", "sum");
-  network->add("cedar.processing.sources.GaussInput", "gauss1");
-  network->add("cedar.processing.sources.GaussInput", "gauss2");
+  network->create("yourNamespace.SimpleSummation", "sum");
+  network->create("cedar.processing.sources.GaussInput", "gauss1");
+  network->create("cedar.processing.sources.GaussInput", "gauss2");
 @endcode
 Note that we don't need to declare the Gauss input here, as it is automatically declared as a standard within the
 framework.

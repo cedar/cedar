@@ -152,6 +152,7 @@ public:
   virtual unsigned int getSize(size_t dimension) const;
 
 public slots:
+  //!@brief this function calls calculate() and emits kernelUpdated() afterwards
   void updateKernel();
 
 signals:

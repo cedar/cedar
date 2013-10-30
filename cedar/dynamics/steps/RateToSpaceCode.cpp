@@ -200,6 +200,8 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateToSpaceCode::determineInputValid
     (
       !mat_data->isEmpty()
       &&
+      mat_data->getData().type() == CV_32F
+      &&
       (
         dimensionality == 0 || (dimensionality == 1 && cedar::aux::math::get1DMatrixSize(mat_data->getData()) < 4)
       )
@@ -255,6 +257,6 @@ void cedar::dyn::RateToSpaceCode::outputSizesChanged()
   }
   cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
   this->mOutput->setData(new_matrix);
-  this->recompute();
   this->emitOutputPropertiesChangedSignal("output");
+  this->recompute();
 }
