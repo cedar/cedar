@@ -54,8 +54,10 @@ struct cedar::aux::gui::ColorValueRGBA
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief The standard constructor.
   ColorValueRGBA()
-  {}
+  {
+  }
 
+  //!@brief Constructor that initializes RGB values.
   ColorValueRGBA(double r, double g, double b, double a = 1.0)
   {
     red = r;
@@ -67,9 +69,16 @@ struct cedar::aux::gui::ColorValueRGBA
   //--------------------------------------------------------------------------------------------------------------------
   // public members
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief the red value
   double red;
+
+  //!@brief the gren value
   double green;
+
+  //!@brief the blue value
   double blue;
+
+  //!@brief the alpha value
   double alpha;
 }; // class cedar::aux::gui::ColorValueRGBA
 
