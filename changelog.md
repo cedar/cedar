@@ -63,8 +63,7 @@ known issues
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it (it's deactivated in the gui anyway).
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
-  - the constness of parameters in the PropertyPane is sometimes not updated correctly - de- and reselecting helps
-  - Some of the interactive Caren tests may not run if you do not have the corresponding meshes.
+  - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
     standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
   - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.

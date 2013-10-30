@@ -219,6 +219,7 @@ public slots:
   //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
   void removeChildWidget();
 
+  //!@brief closes all plots
   void closeAllPlots();
 
 signals:

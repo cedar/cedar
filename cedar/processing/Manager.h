@@ -114,6 +114,7 @@ public:
    */
   CEDAR_DECLARE_DEPRECATED(void stopThreads(bool wait = false));
 
+  //!@brief get a singleton instance of Manager
   CEDAR_DECLARE_DEPRECATED(static cedar::proc::Manager& getInstance());
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

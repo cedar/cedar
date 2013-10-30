@@ -78,10 +78,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns a string that contains the matrix body in CSV format.
   void serializeData(std::ostream& stream) const;
   
+  //!@brief Returns a string that describes the matrix header in CSV format.
   void serializeHeader(std::ostream& stream) const;
   
+  //!@brief creates a deep copy of this data
   cedar::aux::DataPtr clone() const;
 
   std::string getDescription() const;
