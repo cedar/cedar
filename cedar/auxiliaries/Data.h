@@ -78,6 +78,9 @@ public:
   //!@brief Returns a string that describes the data in CSV format. Should be overridden for all inheriting classes.
   virtual void serializeHeader(std::ostream& stream) const;
 
+  //!@brief creates a deep copy of this data
+  virtual DataPtr clone() const;
+
   //!@brief Returns the lock associated with this data object.
   QReadWriteLock& getLock();
 

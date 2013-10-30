@@ -109,6 +109,7 @@ public:
 protected:
 
 signals:
+  //!@brief signals that the exception dialog should be opened
   void showExceptionDialogSignal();
 
   //--------------------------------------------------------------------------------------------------------------------

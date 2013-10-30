@@ -98,14 +98,22 @@ private:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief get number of rows
   int getRowCount();
+
+  //!@brief get number of columns
   int getColumnCount();
+
+  //!@brief write plot configuration to a configuration node
   void writeConfiguration(cedar::aux::ConfigurationNode& root);
+
+  //!@brief returns name of step plotted by this plot
   static const std::string getStepNameFromConfiguration(const cedar::aux::ConfigurationNode& node)
   {
     return node.get<std::string>("step");
   }
 
+  //!@brief recover plot from configuration
   static void createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::StepItem* pStepItem);
 
   //--------------------------------------------------------------------------------------------------------------------
