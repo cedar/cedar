@@ -58,6 +58,14 @@ cedar::aux::PluginDeclarationList::PluginDeclarationList()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::PluginDeclarationList::setSource(const std::string& source)
+{
+  for (size_t i = 0; i < this->mDeclarations.size(); ++i)
+  {
+    this->mDeclarations.at(i)->setSource(source);
+  }
+}
+
 void cedar::aux::PluginDeclarationList::add(cedar::aux::PluginDeclarationPtr declaration)
 {
   this->mDeclarations.push_back(declaration);

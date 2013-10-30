@@ -44,11 +44,19 @@
 #include <QObject>
 #include <QReadWriteLock>
 #include <boost/signals2.hpp>
+#include <set>
 
 /*!@brief Interface for all classes that can be triggered.
  */
 class cedar::proc::Triggerable
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Trigger;
+  friend class cedar::proc::DataConnection;
+  friend class cedar::proc::TriggerConnection;
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -63,7 +71,9 @@ public:
     //! The Triggerable is currently running.
     STATE_RUNNING,
     //! There was an exception thrown in the Triggerable's onTrigger function.
-    STATE_EXCEPTION
+    STATE_EXCEPTION,
+    //! Triggerable was not started correctly. This is different from a normal exception state.
+    STATE_EXCEPTION_ON_START
   };
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -84,7 +94,7 @@ public:
 public:
   /*!@brief handles an external trigger signal.
    * @param args arguments that should be passed to the Triggerable.
-   * @param pSender The trigger that sent the trigger signal.
+   * @param pSender The trigger that sent the trigger signal. If this is null, the trigger chain will be processed.
    */
   virtual void onTrigger
                (
@@ -140,6 +150,12 @@ public:
   //!@brief Waits for the trigger signal to be finished.
   virtual void waitForProcessing() = 0;
 
+  //! Returns true if there is at least one trigger triggering this triggerable.
+  inline bool isTriggered() const
+  {
+    return this->mTriggersListenedTo.size() > 0;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -160,19 +176,40 @@ protected:
    */
   inline void resetState()
   {
-    this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+    if (this->getState() != Triggerable::STATE_EXCEPTION_ON_START)
+    {
+      this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+    }
   }
+
+  /*!@brief Executes the given call, catching all exceptions.
+   *
+   *        If an exception occurs during the execution of the given function, the state of this step will be set to
+   *        exception.
+   * @return true if an exception occurred, false otherwise
+   */
+  bool exceptionWrappedCall
+       (
+         const boost::function<void()>& call,
+         const std::string& messagePreface,
+         Triggerable::State state = Triggerable::STATE_EXCEPTION
+       ) throw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
   //!@brief Method that gets called once by cedar::proc::LoopedTrigger once prior to starting the trigger.
   virtual void onStart();
 
   //!@brief Method that gets called once by cedar::proc::LoopedTrigger after it stops.
   virtual void onStop();
+
+  //! Adds a trigger from the list of triggers triggering this triggerable.
+  void triggeredBy(cedar::proc::TriggerPtr trigger);
+
+  //! Removes a trigger from the list of triggers triggering this triggerable.
+  void noLongerTriggeredBy(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -183,6 +220,10 @@ protected:
 
   //!@brief If set, this is the trigger that triggers the step.
   cedar::proc::TriggerWeakPtr mParentTrigger;
+
+  //! The triggers this step is triggered by.
+  //!@todo Unify this with mParentTrigger
+  std::set<TriggerWeakPtr> mTriggersListenedTo;
 
   //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;

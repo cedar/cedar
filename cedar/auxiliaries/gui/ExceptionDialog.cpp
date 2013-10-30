@@ -75,7 +75,12 @@ void cedar::aux::gui::ExceptionDialog::displayCedarException(const cedar::aux::E
 void cedar::aux::gui::ExceptionDialog::displayStdException(const std::exception& exception)
 {
   std::string type = cedar::aux::unmangleName(typeid(exception));
-  this->display(exception.what(), "The type of the exception is: " + type);
+  this->displayGenericException(exception.what(), type);
+}
+
+void cedar::aux::gui::ExceptionDialog::displayGenericException(const std::string& what, const std::string& type)
+{
+  this->display(what, "The type of the exception is: " + type);
 }
 
 void cedar::aux::gui::ExceptionDialog::displayUnknownException()

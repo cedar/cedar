@@ -49,7 +49,7 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-/*! @class cedar::testing::dev::TestGrabber
+/*! @class cedar::test::dev::TestGrabber
  *
  *  @brief A simple Grabber class for testing the Grabber interface
  *

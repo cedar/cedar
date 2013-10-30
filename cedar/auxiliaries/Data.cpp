@@ -41,6 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 
@@ -64,6 +65,16 @@ cedar::aux::Data::~Data()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::Data::serializeData(std::ostream& /*stream*/) const
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException,"serializeData function not implemented for this type of data");
+}
+
+void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/) const
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException,"serializeHeader function not implemented for this type of data");
+}
+
 QReadWriteLock& cedar::aux::Data::getLock()
 {
   return *this->mpLock;
@@ -82,4 +93,22 @@ cedar::aux::Configurable* cedar::aux::Data::getOwner() const
 void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
 {
   this->mpeOwner = step;
+}
+
+void cedar::aux::Data::copyValueFrom(cedar::aux::ConstDataPtr)
+{
+  CEDAR_THROW
+  (
+    cedar::aux::NotImplementedException,
+    "Value copying is not implemented for this class. This class is: " + cedar::aux::objectTypeToString(this)
+  );
+}
+
+cedar::aux::DataPtr cedar::aux::Data::clone() const
+{
+  CEDAR_THROW
+  (
+    cedar::aux::NotImplementedException,
+    "Cloning is not implemented for the  \"" + cedar::aux::objectTypeToString(this) + "\"."
+  );
 }

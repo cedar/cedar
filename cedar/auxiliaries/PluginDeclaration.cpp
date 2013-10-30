@@ -68,6 +68,11 @@ cedar::aux::PluginDeclaration::~PluginDeclaration()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::aux::PluginDeclaration::getPluginType() const
+{
+  return std::string();
+}
+
 bool cedar::aux::PluginDeclaration::isDeprecatedName(const std::string& name) const
 {
   for (size_t i = 0; i < this->mDeprecatedNames.size(); ++i)
@@ -126,3 +131,7 @@ void cedar::aux::PluginDeclaration::customRead(const cedar::aux::ConfigurationNo
   // empty default implementation, override in derived classes to read custom information
 }
 
+void cedar::aux::PluginDeclaration::setSource(const std::string& source)
+{
+  this->mSource = source;
+}

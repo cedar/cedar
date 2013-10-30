@@ -39,9 +39,6 @@ cmake_minimum_required(VERSION 2.8)
 # Include cedar's project script
 include("cedarProject.cmake")
 
-# Use this to link to any additional boost libraries
-# cedar_project_use_boost_libraries(program_options)
-
 # Use this to add targets; you can call this multiple times
 # cedar_project_add_target(
 #                          LIBRARY folder # use this if you want to compile a library

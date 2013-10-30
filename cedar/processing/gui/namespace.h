@@ -61,14 +61,12 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT DataSlotItem;
       class CEDAR_PROC_LIB_EXPORT ElementClassList;
       class CEDAR_PROC_LIB_EXPORT GraphicsBase;
-      class CEDAR_PROC_LIB_EXPORT FrameworkSettings;
       class CEDAR_PROC_LIB_EXPORT Ide;
       class CEDAR_PROC_LIB_EXPORT IdeApplication;
       class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
       CEDAR_DECLARE_PROC_CLASS(Network);
-      class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
+      CEDAR_DECLARE_PROC_CLASS(PlotWidget);
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
-      class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
       class CEDAR_PROC_LIB_EXPORT ResizeHandle;
       class CEDAR_PROC_LIB_EXPORT Scene;
       class CEDAR_PROC_LIB_EXPORT Settings;
@@ -79,6 +77,8 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT UiSettings;
       class CEDAR_PROC_LIB_EXPORT View;
       class CEDAR_PROC_LIB_EXPORT ProjectionMappingParameter;
+      class CEDAR_PROC_LIB_EXPORT RecorderWidget;
+      class CEDAR_PROC_LIB_EXPORT RecorderProperty;
 
       /* Exceptions */
       class CEDAR_PROC_LIB_EXPORT InvalidModeException;
@@ -91,7 +91,8 @@ namespace cedar
         CONNECT_ERROR,
         CONNECT_WARNING,
         CONNECT_NO,
-        CONNECT_UNKNOWN
+        CONNECT_UNKNOWN,
+        CONNECT_NOT_SET
       };
     }
   }

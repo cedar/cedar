@@ -124,27 +124,15 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()
 {
   // create
   unsigned int num_channels = getNumChannels();
-  std::stringstream init_message;
-  init_message << ": Initialize GrabbableGrabber with " << num_channels << " channels ..." << std::endl;
-
-  for (unsigned int channel = 0; channel < num_channels; ++channel)
-  {
-    init_message << "Channel " << channel << ": capture from Source: "
-                 << typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name() << std::endl;
-  }
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()"
-                                           );
 
   // register this grabber in the grabbable object and store the readwrite-lock
-  for (unsigned int channel=0; channel < num_channels;++channel)
+  for (unsigned int channel = 0; channel < num_channels;++channel)
   {
-    getGrabbableChannel(channel)->mpGrabberLock = getGrabbableChannel(channel)->mpSourceInterfaceClass->registerGrabber();
+    getGrabbableChannel(channel)->mpGrabberLock
+      = getGrabbableChannel(channel)->mpSourceInterfaceClass->registerGrabber();
 
     // check if successfully registered
-    if (! getGrabbableChannel(channel)->mpGrabberLock)
+    if (!getGrabbableChannel(channel)->mpGrabberLock)
     {
       std::string msg = "Error while register the grabber in the grabbable object "
                         "(perhaps already an other grabber active?)";

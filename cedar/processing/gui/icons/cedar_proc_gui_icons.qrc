@@ -1,6 +1,8 @@
 <RCC>
   <qresource prefix="/">
     <file>decorations/looped.svg</file>
+    <file>decorations/record.svg</file>
+    <file>decorations/from_plugin.svg</file>
     <file>modeicons/select.svg</file>
     <file>modeicons/connect.svg</file>
     <file>modeicons/group.svg</file>
@@ -11,6 +13,7 @@
     <file>steps/box_input.svg</file>
     <file>steps/no_icon.svg</file>
     <file>steps/broken_icon.svg</file>
+    <file>steps/absolute_value.svg</file>
     <file>steps/camera_grabber.svg</file>
     <file>steps/channel_split.svg</file>
     <file>steps/color_conversion.svg</file>
@@ -20,13 +23,19 @@
     <file>steps/field_temp.svg</file>
     <file>steps/flip.svg</file>
     <file>steps/gauss_input.svg</file>
+    <file>steps/histogram.svg</file>
+    <file>steps/mask.svg</file>
+    <file>steps/normalization.svg</file>
     <file>steps/rate_matrix_to_space_code.svg</file>
     <file>steps/rate_to_space_code.svg</file>
+    <file>steps/remove_mean.svg</file>
     <file>steps/serial_order.svg</file>
     <file>steps/space_to_rate_code.svg</file>
     <file>steps/static_gain.svg</file>
     <file>steps/switch.svg</file>
+    <file>steps/threshold.svg</file>
     <file>steps/matrix_multiply.svg</file>
+    <file>steps/matrix_slice.svg</file>
     <file>steps/matrix_type_conversion.svg</file>
     <file>steps/net_reader.svg</file>
     <file>steps/net_writer.svg</file>
@@ -36,6 +45,7 @@
     <file>steps/projection.svg</file>
     <file>steps/resize.svg</file>
     <file>steps/sum.svg</file>
+    <file>steps/unit_converter.svg</file>
     <file>steps/transferFunction.svg</file>
     <file>steps/video_grabber.svg</file>
     <file>menus/properties.svg</file>
@@ -55,6 +65,8 @@
     <file>toolbaricons/hide_triggers.svg</file>
     <file>toolbaricons/standard_connections.svg</file>
     <file>toolbaricons/smart_connections.svg</file>
+    <file>toolbaricons/close_all_plots.svg</file>
+    <file>toolbaricons/snapshot.svg</file>
     <file>processing_ide_app_icon.svg</file>
     <file>processing_ide_app_icon_48.png</file>
   </qresource>

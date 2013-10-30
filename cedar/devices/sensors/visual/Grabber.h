@@ -247,13 +247,13 @@ public:
   //!@deprecated Use the stop() method (see cedar::aux::TreaadWrapper) instead.
   CEDAR_DECLARE_DEPRECATED(void stopGrabber())
   {
-    this->start();
+    this->stop();
   }
 
   //!@deprecated Use the start() method (see cedar::aux::ThreadWrapper) instead.
   CEDAR_DECLARE_DEPRECATED(void startGrabber())
   {
-    this->stop();
+    this->start();
   }
 
 

@@ -80,7 +80,7 @@ cedar::proc::sources::Noise::Noise()
 :
 cedar::proc::Step(false, true),
 mRandomMatrix(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 4)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
 _mMean(new cedar::aux::DoubleParameter(this, "mean", 0.0, -1000, 1000)),
 _mStandardDeviation(new cedar::aux::DoubleParameter(this, "standard deviation", 1.0, 0.0, 1000.0))

@@ -1,4 +1,4 @@
-List of changes                                                                                             {#changelog}
+List of changes
 ===============
 
  <!--
@@ -26,7 +26,7 @@ List of changes                                                                 
    Institute:   Ruhr-Universitaet Bochum
                 Institut fuer Neuroinformatik
 
-   File:        changelog.txt
+   File:        changelog.md
 
    Maintainer:  all cedar developers
    Email:       cedar@ini.rub.de
@@ -63,11 +63,15 @@ known issues
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it (it's deactivated in the gui anyway).
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
-  - the constness of parameters in the PropertyPane is sometimes not updated correctly - de- and reselecting helps
-  - Some of the interactive Caren tests may not run if you do not have the corresponding meshes.
+  - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
     standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
-      
+  - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
+  - Singleton-related classes may sometimes cause crashes when programs exit. If you experience random crashes when your
+    own programs exit and the stack contains cedar::aux::Log::getMemoryDebugFlag(), this may be the cause. As a
+    workaround, make sure to reset all smart pointers at the end of your main method (the usual cause are global-scope
+    smart pointers that send a log message after the log singleton was freed.)
+
 Unreleased changes
 ==================
 
@@ -88,7 +92,11 @@ current testing
 ---------------
 - general
   - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
-    for example anchor, shift, and limit of kernels and threshold of sigmoids. 
+    for example anchor, shift, and limit of kernels and threshold of sigmoids.
+  - The plugin system has been changed. It is no longer specific to the processing framework, although it is not (yet)
+    used elsewhere. Plugins can now be added in an improved manager. They are found in a different way, now: a list of
+    user-defined paths is searched for a plugin of a given name by appending certain directories (such as the plugin
+    name itself and a "build" folder.) Using this new functionality, architectures now store which plugins they require.
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.
@@ -102,6 +110,9 @@ current testing
   - Log entries in gui::Log can now be removed using the right-click context menu.
   - Parameters of LoopedThread are now set to constant depending on the current mode (e.g., blocking "simulated time").
   - Memory debug output is turned off by default, can be activated through a configuration file.
+  - There is now a command line parser available. This is intended to make software that performs experiments easy to
+    customize; it features auto-generated help texts, reading and writing of options to file and some sanity checking of
+    user inputs. It is still being developed.
 - cedar::aux::gui
   - LinePlots now have an option in their context menu to set fixed limits for the y axis.
   - There is now a history plot for 1D matrices.
@@ -137,6 +148,10 @@ current testing
     architectures - this mode is fully automatic, so there's now way to move any lines around by hand.
   - DataSlots now scale when you drag a connection close to them. You can configure (and disable) this behavior in the
     tools -> settings -> user interface menu of the processingIde.
+  - Please note that step icons can now only have the svg format. If you have an icon in a different format, please
+    embed it in a svg file using, e.g., inkscape.
+  - Connections of selected steps in the processingIde are now hightlighted. This behavior is active by default and can
+    be disabled in the settings menu.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
