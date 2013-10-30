@@ -129,6 +129,7 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief reacts to timer event and slowly fades out old messages
   void timerEvent(QTimerEvent* pEvent);
 
 signals:
