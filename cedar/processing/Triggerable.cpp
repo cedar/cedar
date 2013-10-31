@@ -160,7 +160,7 @@ void cedar::proc::Triggerable::callOnStart()
   QMutexLocker locker(this->mpStartCallsLock);
 
   // only call onStart if this triggerable hasn't been started yet
-  bool exception_occurred;
+  bool exception_occurred = false;
   if (this->mStartCalls == 0)
   {
     exception_occurred
