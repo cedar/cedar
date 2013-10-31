@@ -46,10 +46,11 @@
 #include "cedar/version.h"
 
 // SYSTEM INCLUDES
+#include <boost/lexical_cast.hpp>
+#include <boost/regex.hpp>
 #include <vector>
 #include <string>
 #include <sstream>
-#include <boost/regex.hpp>
 
 namespace cedar
 {
@@ -305,9 +306,11 @@ namespace cedar
     template <class T>
     inline T fromString(const std::string& string)
     {
-      T result;
-      std::istringstream stream(string);
-      if((stream >> result).fail())
+      try
+      {
+        return boost::lexical_cast<T>(string);
+      }
+      catch (boost::bad_lexical_cast)
       {
         CEDAR_THROW
         (
@@ -315,8 +318,6 @@ namespace cedar
           "Could not convert the string \"" + string + "\" to the requested type."
         );
       }
-
-      return result;
     }
 
     //! Template specialization for double values.
