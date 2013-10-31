@@ -231,6 +231,8 @@ bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent
     QWriteLocker locker(&mLastExceptionInfoLock);
     this->mLastCedarException = e;
     this->mLastExceptionType = CEDAR_EXCEPTION;
+    locker.unlock();
+
     emit showExceptionDialogSignal();
   }
   catch(const std::exception& e)
@@ -239,12 +241,16 @@ bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent
     this->mLastStdExceptionWhat = e.what();
     this->mLastStdExceptionType = cedar::aux::unmangleName(typeid(e));
     this->mLastExceptionType = STD_EXCEPTION;
+    locker.unlock();
+
     emit showExceptionDialogSignal();
   }
   catch(...)
   {
     QWriteLocker locker(&mLastExceptionInfoLock);
     this->mLastExceptionType = UNKNOWN_EXCEPTION;
+    locker.unlock();
+
     emit showExceptionDialogSignal();
   }
 #endif // CATCH_EXCEPTIONS_IN_GUI
