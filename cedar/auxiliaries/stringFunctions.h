@@ -45,10 +45,11 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
+#include <boost/lexical_cast.hpp>
+#include <boost/regex.hpp>
 #include <vector>
 #include <string>
 #include <sstream>
-#include <boost/regex.hpp>
 
 namespace cedar
 {
@@ -304,9 +305,11 @@ namespace cedar
     template <class T>
     T fromString(const std::string& string)
     {
-      T result;
-      std::istringstream stream(string);
-      if((stream >> result).fail())
+      try
+      {
+        return boost::lexical_cast<T>(string);
+      }
+      catch (boost::bad_lexical_cast)
       {
         CEDAR_THROW
         (
@@ -314,8 +317,6 @@ namespace cedar
           "Could not convert the string \"" + string + "\" to the requested type."
         );
       }
-
-      return result;
     }
 
     /*!@brief a regular expressions based replace inside a string
