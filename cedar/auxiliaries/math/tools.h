@@ -311,11 +311,14 @@ namespace cedar
       template <typename T>
       inline T getMatrixEntry(const cv::Mat& matrix, int row, int col)
       {
-        CEDAR_ASSERT(matrix.type() == CV_8U || matrix.type() == CV_16UC1 || matrix.type() == CV_32F || matrix.type() == CV_64F);
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 2);
 
         switch (matrix.type())
         {
+          case CV_8S:
+            return static_cast<T>(matrix.at<char>(row, col));
+            break;
+
           case CV_8U:
             return static_cast<T>(matrix.at<unsigned char>(row, col));
             break;
@@ -334,7 +337,7 @@ namespace cedar
 
           default:
             // this should never happen due to the assert above.
-            CEDAR_ASSERT(false);
+            CEDAR_ASSERT(false && "Not implemented for this data type.");
         }
       }
 
