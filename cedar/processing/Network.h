@@ -398,6 +398,9 @@ public:
   //! Returns a list of all the looped triggers in this network.
   std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
 
+  //! Reads the meta information from the given file and extracts the plugins required by the architecture.
+  static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

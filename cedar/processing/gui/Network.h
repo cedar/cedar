@@ -177,6 +177,9 @@ public:
     return this->_mSmartMode->getValue();
   }
 
+public slots:
+  void stepRecordStateChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -201,7 +204,13 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, cedar::proc::Network::ConnectionChange change);
+  //!@brief a function that translates a boost signal to check a data connection into a Qt signal
+  void checkDataConnection
+       (
+         cedar::proc::ConstDataSlotPtr source,
+         cedar::proc::ConstDataSlotPtr target,
+         cedar::proc::Network::ConnectionChange change
+       );
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
@@ -211,11 +220,25 @@ private:
 
   void readOpenPlots(const cedar::aux::ConfigurationNode& node);
 
+signals:
+  //!@brief signal that is emitted when a boost signal is received
+  void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange);
+
 private slots:
   //!@brief Updates the label of the network.
   void networkNameChanged();
 
   void toggleSmartConnectionMode();
+
+  //!@brief handle an internal signal to create or remove gui connections
+  void dataConnectionChanged
+       (
+         QString sourceName,
+         QString sourceSlot,
+         QString targetName,
+         QString targetSlot,
+         cedar::proc::Network::ConnectionChange change
+       );
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

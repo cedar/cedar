@@ -61,15 +61,12 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT DataSlotItem;
       class CEDAR_PROC_LIB_EXPORT ElementClassList;
       class CEDAR_PROC_LIB_EXPORT GraphicsBase;
-      class CEDAR_PROC_LIB_EXPORT FrameworkSettings;
       class CEDAR_PROC_LIB_EXPORT Ide;
       class CEDAR_PROC_LIB_EXPORT IdeApplication;
       class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
       CEDAR_DECLARE_PROC_CLASS(Network);
       CEDAR_DECLARE_PROC_CLASS(PlotWidget);
-      class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
-      class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
       class CEDAR_PROC_LIB_EXPORT Scene;
       class CEDAR_PROC_LIB_EXPORT Settings;
       class CEDAR_PROC_LIB_EXPORT SettingsDialog;

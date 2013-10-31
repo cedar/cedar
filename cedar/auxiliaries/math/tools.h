@@ -77,15 +77,12 @@
  *  some precompiler macros are also defined here
  */
 
+
 /* epsilon surrounding for near zero values */
 #ifndef EQN_EPS
 #define EQN_EPS 1e-9
 #endif
 
-//#ifndef IsZero
-//CEDAR_DECLARE_DEPRECATE_MACRO(IsZero)
-//#define IsZero(x) (IsZero_MACRO(),(x) > -EQN_EPS && (x) < EQN_EPS)
-//#endif
 namespace cedar
 {
   namespace aux

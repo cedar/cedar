@@ -1274,7 +1274,19 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = CEDAR_USE_FFTW \
                          CEDAR_USE_AMTEC \
                          CEDAR_USE_KUKA_LWR \
-                         CEDAR_DECLARE_DEPRECATED(x)=x
+                         CEDAR_DECLARE_DEPRECATED(x)=x \
+                         CEDAR_UNIT_LIB_EXPORT \
+                         CEDAR_AUX_LIB_EXPORT \
+                         CEDAR_DEV_LIB_EXPORT \
+                         CEDAR_PROC_LIB_EXPORT \
+                         CEDAR_DYN_LIB_EXPORT \
+                         CEDAR_TESTING_UTILITIES_LIB_EXPORT \
+                         CEDAR_INSTANTIATE_UNIT_TEMPLATE \
+                         CEDAR_INSTANTIATE_AUX_TEMPLATE \
+                         CEDAR_INSTANTIATE_DEV_TEMPLATE \
+                         CEDAR_INSTANTIATE_PROC_TEMPLATE \
+                         CEDAR_INSTANTIATE_DYN_TEMPLATE \
+                         CEDAR_INSTANTIATE_TESTING_UTILITIES_TEMPLATE
                          
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

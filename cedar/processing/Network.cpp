@@ -59,11 +59,13 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/prefixes.h"
 
 #include "cedar/processing/consistency/LoopedStepNotConnected.h"
 
 // SYSTEM INCLUDES
 #include <boost/make_shared.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -207,7 +209,7 @@ void cedar::proc::Network::startTriggers(bool wait)
       auto trigger = *iter;
       while (!trigger->isRunning())
       {
-        cedar::aux::sleep(cedar::unit::Milliseconds(5));
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
     }
   }
@@ -233,7 +235,7 @@ void cedar::proc::Network::stopTriggers(bool wait)
       auto trigger = *iter;
       while (trigger->isRunning())
       {
-        cedar::aux::sleep(cedar::unit::Milliseconds(5));
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
     }
   }
@@ -258,7 +260,8 @@ void cedar::proc::Network::stepTriggers()
 
 void cedar::proc::Network::stepTriggers(cedar::unit::Time stepTime)
 {
-  this->stepTriggers(cedar::unit::Milliseconds(stepTime) / cedar::unit::Milliseconds(1));
+  double time_milli = stepTime / cedar::unit::seconds * 1000;
+  this->stepTriggers(time_milli);
 }
 
 void cedar::proc::Network::stepTriggers(double timeStep)
@@ -1065,6 +1068,67 @@ void cedar::proc::Network::writeConfiguration(cedar::aux::ConfigurationNode& roo
 void cedar::proc::Network::writeMetaData(cedar::aux::ConfigurationNode& meta) const
 {
   meta.put("format", 1);
+
+  // determine what plugins are used by the network
+  std::set<std::string> required_plugins;
+  for (auto element_iter = this->getElements().begin(); element_iter != this->getElements().end(); ++element_iter)
+  {
+    cedar::proc::ElementPtr element = element_iter->second;
+    auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(element);
+    if (!declaration->getSource().empty())
+    {
+      required_plugins.insert(declaration->getSource());
+    }
+  }
+
+  // if plugins are used, write them to the meta node
+  if (!required_plugins.empty())
+  {
+    cedar::aux::ConfigurationNode required_plugins_node;
+    for (auto iter = required_plugins.begin(); iter != required_plugins.end(); ++iter)
+    {
+      cedar::aux::ConfigurationNode value_node;
+      value_node.put_value(*iter);
+      required_plugins_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+    }
+
+    meta.push_back(cedar::aux::ConfigurationNode::value_type("required plugins", required_plugins_node));
+  }
+}
+
+std::set<std::string> cedar::proc::Network::getRequiredPlugins(const std::string& architectureFile)
+{
+  std::set<std::string> plugins;
+
+  cedar::aux::ConfigurationNode configuration;
+  try
+  {
+    boost::property_tree::read_json(architectureFile, configuration);
+  }
+  catch (boost::property_tree::json_parser::json_parser_error&)
+  {
+    return plugins;
+  }
+
+  auto meta_iter = configuration.find("meta");
+  if (meta_iter == configuration.not_found())
+  {
+    return plugins;
+  }
+
+  auto rq_plugins_iter = meta_iter->second.find("required plugins");
+  if (rq_plugins_iter == meta_iter->second.not_found())
+  {
+    return plugins;
+  }
+
+  auto rq_plugins_node = rq_plugins_iter->second;
+  for (auto iter = rq_plugins_node.begin(); iter != rq_plugins_node.end(); ++iter)
+  {
+    plugins.insert(iter->second.get_value<std::string>());
+  }
+
+  return plugins;
 }
 
 void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode& root)
@@ -1620,8 +1684,9 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
                                                      )
 {
   //!@todo This code needs to be cleaned up, simplified and commented
-  std::string source_name = (*it)->getSource()->getParent();
-  std::string target_name = (*it)->getTarget()->getParent();
+  cedar::proc::DataConnectionPtr connection = *it;
+  std::string source_name = connection->getSource()->getParent();
+  std::string target_name = connection->getTarget()->getParent();
   std::string real_source_name = source_name;
   if (cedar::proc::ConstPromotedExternalDataPtr ext = boost::dynamic_pointer_cast<const cedar::proc::PromotedExternalData>((*it)->getSource()))
   {
@@ -1655,7 +1720,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   CEDAR_DEBUG_ASSERT(triggerable_target);
   if (!triggerable_target->isLooped())
   {
-    target_name = (*it)->getTarget()->getParent(); // reset target_name
+    target_name = connection->getTarget()->getParent(); // reset target_name
     // check that both Connectables are not connected through some other DataSlots
     cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
     for (DataConnectionVector::iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
@@ -1699,6 +1764,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   }
   else
   {
+
     it = mDataConnections.erase(it);
   }
   return it;

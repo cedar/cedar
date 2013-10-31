@@ -130,10 +130,6 @@ public slots:
    */
   void loadFile(QString path);
 
-  /*!@brief Opens the load plugin dialog.
-   */
-  void showLoadPluginDialog();
-
   /*!@brief Opens the manage plugins dialog.
    */
   void showManagePluginsDialog();
@@ -170,6 +166,10 @@ public slots:
    */
   void exportSvg();
 
+  /*!@brief Opens a dialog that contains the robot manager widget.
+   */
+  void showRobotManager();
+  
   /*!@brief Duplicates a selected step
    */
   void duplicateStep();
@@ -198,6 +198,9 @@ public slots:
 
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);
+
+  //!@brief Takes a snap shot from the registered steps;
+  void takeSnapshot();
 
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const

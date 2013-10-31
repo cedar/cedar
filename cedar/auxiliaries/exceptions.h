@@ -90,6 +90,49 @@ class cedar::aux::ParameterNotFoundException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ParameterNotFoundException
 
+/*!@brief Exception that occurs when a plugin is not found.
+ */
+class cedar::aux::PluginNotFoundException : public cedar::aux::ExceptionBase
+{
+public:
+  //! constructor
+  PluginNotFoundException(const std::vector<std::string>& searchedPaths)
+  :
+  mSearchedPaths(searchedPaths)
+  {
+    std::string message = "The following paths were searched:";
+    for (size_t i = 0; i < searchedPaths.size(); ++i)
+    {
+      message += "\n";
+      message += searchedPaths.at(i);
+    }
+    this->setMessage(message);
+  }
+
+  //! destructor that ensure that no exception is thrown
+  ~PluginNotFoundException() throw ()
+  {
+  }
+
+  //! get the messages of this exception
+  const std::vector<std::string>& getSearchedPaths() const
+  {
+    return this->mSearchedPaths;
+  }
+
+private:
+  std::vector<std::string> mSearchedPaths;
+}; // class cedar::aux::PluginNotFoundException
+
+/*!@brief Exception that occurs when a plugin cannot be loaded.
+ *
+ * @todo This exception is too generic.
+ */
+class cedar::aux::PluginException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::PluginException
+
+
 /*!@brief Exception that occurs when a unique id appears twice.
  */
 class cedar::aux::DuplicateIdException : public cedar::aux::ExceptionBase
@@ -101,6 +144,13 @@ class cedar::aux::DuplicateIdException : public cedar::aux::ExceptionBase
 class cedar::aux::DuplicateNameException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::DuplicateNameException
+
+/*!@brief Exception that occurs when a unique channel name appears twice.
+ */
+class cedar::aux::DuplicateChannelNameException : public cedar::aux::DuplicateNameException
+{
+}; // class cedar::aux::DuplicateChannelNameException
+
 
 /*!@brief Exception that occurs when a value leaves a certain range.
  */
@@ -178,6 +228,12 @@ class cedar::aux::DeadReferenceException : public cedar::aux::ExceptionBase
 {
 };
 
+/*!@brief Exception that is thrown when a configuration tree does not have the right format.
+ */
+class cedar::aux::MalformedConfigurationTreeException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception that is thrown when two matrices do not match in type or size.
  */
 class cedar::aux::MatrixMismatchException : public cedar::aux::ExceptionBase
@@ -210,6 +266,17 @@ class cedar::aux::ConversionFailedException : public cedar::aux::ExceptionBase
 class cedar::aux::ValidationFailedException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ValidationFailedException
+
+/*!@brief Exception that occurs when a parameter validation fails.
+ */
+class cedar::aux::UnknownUnitSuffixException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::UnknownUnitSuffixException
+
+//! Exception that signals an invalid path.
+class cedar::aux::InvalidPathException : public cedar::aux::ExceptionBase
+{
+};
 
 /*!@brief Exception that occurs when threading code is mis-used
  */

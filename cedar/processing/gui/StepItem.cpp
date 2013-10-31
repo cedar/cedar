@@ -61,7 +61,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QPen>
@@ -373,8 +373,8 @@ void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
   {
     try
     {
-      cedar::unit::Milliseconds ms = measurements.at(i)();
-      double dval = ms / cedar::unit::Milliseconds(1);
+      cedar::unit::Time ms = measurements.at(i)();
+      double dval = ms / (0.001 * cedar::unit::seconds);
       tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
     }
     catch (const cedar::proc::NoMeasurementException&)
@@ -406,8 +406,12 @@ bool cedar::proc::gui::StepItem::hasGuiConnection
 
 void cedar::proc::gui::StepItem::updateStepState()
 {
+  this->setFillStyle(Qt::SolidPattern, false);
+
   switch (this->mStep->getState())
   {
+    case cedar::proc::Step::STATE_EXCEPTION_ON_START:
+      this->setFillStyle(Qt::BDiagPattern);
     case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
       this->setOutlineColor(Qt::red);
@@ -554,6 +558,40 @@ void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNod
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 
+void cedar::proc::gui::StepItem::setRecorded(bool status)
+{
+	if (status)
+	{
+	  if (!mpRecordedDecoration)
+	  {
+      mpRecordedDecoration = DecorationPtr(
+        new Decoration
+        (
+          this,
+          ":/decorations/record.svg",
+          "This step has one or more slots registered in the recorder."
+        )
+      );
+      this->mDecorations.push_back(mpRecordedDecoration);
+	  }
+	}
+	else
+	{
+	    for (unsigned int i = 0; i < mDecorations.size();i++)
+	    {
+	      if (mDecorations[i]==mpRecordedDecoration)
+	      {
+	         mDecorations.erase(mDecorations.begin()+i);
+	         mpRecordedDecoration.reset();
+	         break;
+	      }
+	    }
+	}
+
+	this->updateDecorationPositions();
+
+}
+
 void cedar::proc::gui::StepItem::addDecorations()
 {
   this->mDecorations.clear();
@@ -616,22 +654,24 @@ void cedar::proc::gui::StepItem::updateDecorationPositions()
       origin.setY(origin.y() - 5.0);
   }
 
+  qreal factor;
+  switch (this->mDisplayMode)
+  {
+    case DisplayMode::ICON_ONLY:
+      factor = 0.7;
+      break;
+
+    default:
+      factor = 1.0;
+  }
+
   QPointF offset_dir(-1, 0);
-  qreal distance = 10.0;
+  qreal distance = 15.0;
   for (size_t i = 0; i < this->mDecorations.size(); ++i)
   {
     DecorationPtr decoration = this->mDecorations[i];
-    decoration->setPosition(origin + static_cast<qreal>(i) * distance * offset_dir);
-
-    switch (this->mDisplayMode)
-    {
-      case DisplayMode::ICON_ONLY:
-        decoration->setSize(0.7);
-        break;
-
-      default:
-        decoration->setSize(1.0);
-    }
+    decoration->setPosition(origin + static_cast<qreal>(i) * factor * distance * offset_dir);
+    decoration->setSize(factor);
   }
 }
 

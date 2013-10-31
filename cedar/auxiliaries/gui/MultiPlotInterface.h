@@ -52,7 +52,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief a map that stores data and associated names/titles of their plots
+  //!@brief Map from data to strings. Used to associate data with its title.
   typedef std::map<cedar::aux::ConstDataPtr, std::string> DataMap;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -75,7 +75,8 @@ public:
   //!@brief check if given data can be appended to a plot
   virtual bool canAppend(cedar::aux::ConstDataPtr data) const = 0;
 
-  //!@brief returns the data map
+  //!@brief Returns a map of data associated with its title.
+  //!@todo Rename this to getDataNameMap?
   const DataMap& getDataMap() const;
 
   //--------------------------------------------------------------------------------------------------------------------

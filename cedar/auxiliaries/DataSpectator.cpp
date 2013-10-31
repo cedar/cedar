@@ -40,6 +40,7 @@
 #include "Recorder.h"
 
 // SYSTEM INCLUDES
+#include<boost/algorithm/string/replace.hpp>
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -73,7 +74,8 @@ void cedar::aux::DataSpectator::step(double)
 
 void cedar::aux::DataSpectator::applyStart()
 {
-  mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" + mName;
+  mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" +
+      boost::algorithm::replace_all_copy(mName," ","_") + ".csv";
   mOutputStream.open(mOutputPath, std::ios::out | std::ios::app);
   writeHeader();
 }
@@ -184,4 +186,10 @@ cedar::aux::ConstDataPtr cedar::aux::DataSpectator::getData() const
 int cedar::aux::DataSpectator::getRecordIntervalTime() const
 {
   return this->getStepSize();
+}
+
+void cedar::aux::DataSpectator::makeSnapshot()
+{
+  this->applyStart();
+  this->record();
 }

@@ -81,6 +81,11 @@ public:
   //!@brief allocates a new plot
   virtual cedar::aux::gui::PlotInterface* createPlot() const = 0;
 
+  std::string getPluginType() const
+  {
+    return "plot";
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

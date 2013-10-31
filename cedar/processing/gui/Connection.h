@@ -97,6 +97,9 @@ public:
   //! Returns true if this is a trigger connection.
   bool isTriggerConnection() const;
 
+  //! define a custom shape of this object, which doesn't add a filled region between line parts
+  QPainterPath shape() const;
+
 public slots:
   //!@brief update the position of this connection, depending on anchor points of source and target
   void update();
