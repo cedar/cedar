@@ -36,10 +36,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/PluginProxy.h"
-#include "cedar/processing/PluginDeclaration.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/FrameworkSettings.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_OS_UNIX
@@ -56,7 +57,15 @@
   #define BOOST_FILESYSTEM_VERSION 3
 #endif
 #include <boost/filesystem.hpp>
+#include <signal.h>
 
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+#ifdef CEDAR_OS_UNIX
+std::string cedar::proc::PluginProxy::mPluginBeingLoaded = "";
+#endif // CEDAR_OS_UNIX
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -82,6 +91,14 @@ cedar::proc::PluginProxy::~PluginProxy()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::PluginProxy::declare()
+{
+  if (this->getDeclaration())
+  {
+    this->getDeclaration()->declareAll();
+  }
+}
 
 std::string cedar::proc::PluginProxy::getPluginNameFromPath(const std::string& path)
 {
@@ -141,8 +158,8 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
     return file;
   }
 
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  std::string loc = settings.getPluginWorkspace() + "/" + file;
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  std::string loc = settings->getPluginWorkspace() + "/" + file;
   searched_locs += loc;
   if (boost::filesystem::exists(loc))
   {
@@ -150,8 +167,8 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
   }
 
   std::string ret_path;
-  std::set<std::string>::const_iterator path = settings.getPluginDirectories().begin();
-  std::set<std::string>::const_iterator path_end = settings.getPluginDirectories().end();
+  std::set<std::string>::const_iterator path = settings->getPluginDirectories().begin();
+  std::set<std::string>::const_iterator path_end = settings->getPluginDirectories().end();
   if (path != path_end)
   {
     do
@@ -173,6 +190,21 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
   return "";
 }
 
+#ifdef CEDAR_OS_UNIX
+void cedar::proc::PluginProxy::abortHandler(int)
+{
+  std::cout
+      << "==================================================================" << std::endl
+      << "  Something went horribly, HORRIBLY wrong while loading a plugin" << std::endl
+      << "==================================================================" << std::endl;
+  std::cout << std::endl << "The offending plugin is located at " << mPluginBeingLoaded  << std::endl << std::endl;
+  std::cout << "This often happens when you update your cedar version but don't recompile your plugins. You can try to "
+      << "disable your plugins while starting the processingIde. Run processingIde --help for details. If this helps, "
+      << "try to recompile the affected plugins." << std::endl;
+  exit(-2);
+}
+#endif // CEDAR_OS_UNIX
+
 void cedar::proc::PluginProxy::load(const std::string& file)
 {
   this->mFileName = this->findPluginFile(file);
@@ -180,7 +212,16 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   // OS-Dependent code for loading the plugin.
   PluginInterfaceMethod p_interface = NULL;
 #ifdef CEDAR_OS_UNIX
-  this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
+
+  mPluginBeingLoaded = file;
+  void (*old_abrt_handle)(int);
+  old_abrt_handle = signal(SIGABRT, &cedar::proc::PluginProxy::abortHandler);
+
+  this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW | RTLD_GLOBAL);
+
+  signal(SIGABRT, old_abrt_handle);
+  mPluginBeingLoaded = "not set";
+
   if (!this->mpLibHandle)
   {
     std::string dl_err = dlerror();
@@ -194,25 +235,23 @@ void cedar::proc::PluginProxy::load(const std::string& file)
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
   }
 
-  //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
 #elif defined CEDAR_OS_WINDOWS
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
-    //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
   }
   
   p_interface = (PluginInterfaceMethod) (GetProcAddress(this->mpLibHandle, TEXT("pluginDeclaration")));
   if (!p_interface)
   {
-    //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
   }
 #endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS
   
-  this->mDeclaration = cedar::proc::PluginDeclarationPtr(new cedar::proc::PluginDeclaration());
+  this->mDeclaration = cedar::aux::PluginDeclarationListPtr(new cedar::aux::PluginDeclarationList());
   (*p_interface)(this->mDeclaration);
+  this->mDeclaration->setSource(this->mFileName);
 
   // try to load the plugin description file
   std::string description = this->findPluginDescription(this->mFileName);
@@ -231,7 +270,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 
   // Finally, if nothing failed, add the plugin to the list of known plugins.
-  cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);
+  cedar::proc::FrameworkSettingsSingleton::getInstance()->addKnownPlugin(file);
 }
 
 cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()

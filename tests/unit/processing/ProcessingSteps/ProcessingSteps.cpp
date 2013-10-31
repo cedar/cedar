@@ -34,11 +34,13 @@
 
 ======================================================================================================================*/
 
+// cedar includes
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/processing/steps/Resize.h"
@@ -48,10 +50,33 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
+
+// global includes
 #include <QApplication>
 #include <exception>
 #include <string>
 #include <vector>
+
+class EmptyMatrixProvider : public cedar::proc::Step
+{
+  public:
+    EmptyMatrixProvider()
+    :
+    mData(new cedar::aux::MatData(cv::Mat()))
+    {
+      this->declareOutput("empty matrix", this->mData);
+    }
+
+  private:
+    void compute(const cedar::proc::Arguments&)
+    {
+    }
+
+    cedar::aux::MatDataPtr mData;
+};
+
+CEDAR_GENERATE_POINTER_TYPES(EmptyMatrixProvider);
+
 
 unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr testStep)
 {
@@ -86,14 +111,25 @@ unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr test
     sources.push_back("1D.Gauss input");
     sources.push_back("2D.Gauss input");
     sources.push_back("3D.Gauss input");
+    sources.push_back("emp.empty matrix");
     for (unsigned int src = 0; src < sources.size(); ++src)
     {
-      std::cout << "Testing connecting to " << sources.at(src) << std::endl;
+      std::cout << "Connecting " << sources.at(src) << " to " << inputs.at(i)->getName() << std::endl;
       for (unsigned int i = 0; i < inputs.size(); ++i)
       {
         network->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
       }
-      testStep->onTrigger();
+
+      if (!testStep->isLooped())
+      {
+        testStep->onTrigger();
+      }
+      else
+      {
+        // send a dummy step time
+        cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(0.1)));
+        testStep->onTrigger(arguments);
+      }
 
       for (unsigned int i = 0; i < inputs.size(); ++i)
       {
@@ -123,25 +159,45 @@ int main(int, char**)
 
   unsigned int errors = 0;
 
-  cedar::proc::DeclarationRegistryPtr declaration_registry = cedar::proc::DeclarationRegistrySingleton::getInstance();
-  const cedar::proc::DeclarationRegistry::Declarations& declarations = declaration_registry->declarations();
-  for
-  (
-    cedar::proc::DeclarationRegistry::Declarations::const_iterator declaration = declarations.begin();
-    declaration != declarations.end();
-    ++declaration
-  )
+  std::vector<std::string> failed_steps;
+
+  auto declarations = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarations();
+  for (auto declaration_iter = declarations.begin(); declaration_iter != declarations.end(); ++declaration_iter)
   {
+    cedar::aux::ConstPluginDeclarationPtr declaration = *declaration_iter;
     cedar::proc::NetworkPtr network(new cedar::proc::Network());
-    cedar::proc::ElementPtr elem = declaration_registry->allocateClass(declaration->second->getClassId());
+    cedar::proc::ElementPtr elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
     {
-      std::cout << "Testing class " << declaration->second->getClassId() << std::endl;
-      network->readFile("processing_steps.json");
-      errors += testStep(network, step);
+      std::cout << "=========================================" << std::endl;
+      std::cout << "  Testing class " << declaration->getClassName() << std::endl;
+      std::cout << "=========================================" << std::endl;
+      network->readJson("processing_steps.json");
+
+      EmptyMatrixProviderPtr empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
+      network->add(empty_provider, "emp");
+
+      int error_count = testStep(network, step);
+      errors += error_count;
+
+      if (error_count > 0)
+      {
+        failed_steps.push_back(declaration->getClassName());
+      }
     }
   }
 
-  std::cout << "Done. There were " << errors << " error(s)." << std::endl;
+  std::cout << "Test finished with " << errors << " error(s)." << std::endl;
+
+  if (!failed_steps.empty())
+  {
+    std::cout << "The following steps produced errors:" << std::endl;
+
+    for (size_t i = 0; i < failed_steps.size(); ++i)
+    {
+      std::cout << "- " << failed_steps.at(i) << std::endl;
+    }
+  }
+
   return errors;
 }

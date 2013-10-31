@@ -41,6 +41,7 @@
 #include "cedar/processing/steps/ColorConversion.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/casts.h"
@@ -70,7 +71,8 @@ namespace
     (
       "Converts a matrix from one color space into another."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -88,6 +90,8 @@ cedar::aux::EnumType<cedar::proc::steps::ColorConversion::ColorSpace>
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::BGR;
 const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::HSV;
+const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::YUV;
+const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::ColorConversion::ColorSpace::YCrCb;
 #endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -155,7 +159,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ColorConversion::determineIn
                                   cedar::aux::ConstDataPtr data
                                 ) const
 {
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
+  cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
+  if (mat_data && mat_data->getData().channels() == 3)
   {
     try
     {
@@ -175,6 +180,18 @@ void cedar::proc::steps::ColorConversion::updateTargetImageColorSpace()
   cedar::aux::annotation::ColorSpacePtr target_space;
   switch (this->getTargetColorSpace())
   {
+    case ColorSpace::YCrCb:
+    case ColorSpace::YUV:
+      target_space = cedar::aux::annotation::ColorSpacePtr
+                     (
+                       new cedar::aux::annotation::ColorSpace
+                       (
+                         cedar::aux::annotation::ColorSpace::Luminance,
+                         cedar::aux::annotation::ColorSpace::ChromaticRed,
+                         cedar::aux::annotation::ColorSpace::ChromaticBlue
+                       )
+                     );
+      break;
     case ColorSpace::HSV:
       target_space = cedar::aux::annotation::ColorSpacePtr
                      (
@@ -243,6 +260,15 @@ void cedar::proc::steps::ColorConversion::updateSourceImageColorSpace()
             {
               this->mInputColorSpace = ColorSpace::HSV;
             }
+            else if
+            (
+              this->mInputColorSpaceAnnotation->getChannelType(0) == cedar::aux::annotation::ColorSpace::Luminance
+              && this->mInputColorSpaceAnnotation->getChannelType(1) == cedar::aux::annotation::ColorSpace::ChromaticRed
+              && this->mInputColorSpaceAnnotation->getChannelType(2) == cedar::aux::annotation::ColorSpace::ChromaticBlue
+            )
+            {
+              this->mInputColorSpace = ColorSpace::YUV;
+            }
             else
             {
               CEDAR_THROW(cedar::aux::UnhandledValueException, "The channel combination of the source image is not handled.");
@@ -287,6 +313,11 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
         case ColorSpace::BGR:
           this->mCvConversionConstant = CV_HSV2BGR;
           break;
+
+        case ColorSpace::YCrCb:
+        case ColorSpace::YUV:
+          CEDAR_THROW(cedar::aux::UnhandledValueException, "HSV to YUV is not handled.");
+          break;
       }
       break;
 
@@ -295,6 +326,24 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
       {
         case ColorSpace::HSV:
           this->mCvConversionConstant = CV_BGR2HSV;
+          break;
+
+        case ColorSpace::YCrCb:
+        case ColorSpace::YUV:
+          this->mCvConversionConstant = CV_BGR2YCrCb;
+          break;
+      }
+      break;
+
+    case ColorSpace::YCrCb:
+    case ColorSpace::YUV:
+      switch (this->getTargetColorSpace())
+      {
+        case ColorSpace::BGR:
+          this->mCvConversionConstant = CV_YCrCb2BGR;
+          break;
+        case ColorSpace::HSV:
+          CEDAR_THROW(cedar::aux::UnhandledValueException, "YUV to HSV is not handled.");
           break;
       }
       break;
@@ -318,7 +367,15 @@ void cedar::proc::steps::ColorConversion::inputConnectionChanged(const std::stri
   this->updateTargetImageColorSpace();
   this->updateCvConvertConstant();
 
-  this->onTrigger();
+  // check if input is "valid" and propagate change
+  if (this->mInput->getData().channels() == 3)
+  {
+    this->lock(cedar::aux::LOCK_TYPE_READ);
+    this->compute(cedar::proc::Arguments());
+    this->unlock();
+    this->emitOutputPropertiesChangedSignal("converted image");
+    this->onTrigger();
+  }
 }
 
 void cedar::proc::steps::ColorConversion::compute(const cedar::proc::Arguments& /* arguments */)

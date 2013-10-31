@@ -41,11 +41,14 @@
 #include "cedar/auxiliaries/gui/Log.h"
 #include "cedar/auxiliaries/logFilter/All.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/Settings.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QHeaderView>
 #include <QLabel>
 #include <QScrollBar>
+#include <QMenu>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -63,7 +66,10 @@ QTabWidget(pParent)
 
 #ifdef DEBUG
   this->addPane(cedar::aux::LOG_LEVEL_DEBUG, "debug", ":/cedar/auxiliaries/gui/debug.svg");
-  this->addPane(cedar::aux::LOG_LEVEL_MEM_DEBUG, "memory", ":/cedar/auxiliaries/gui/memory.svg");
+  if (cedar::aux::SettingsSingleton::getInstance()->getMemoryDebugOutput())
+  {
+    this->addPane(cedar::aux::LOG_LEVEL_MEM_DEBUG, "memory", ":/cedar/auxiliaries/gui/memory.svg");
+  }
 #endif // DEBUG
 
   QObject::connect
@@ -73,6 +79,10 @@ QTabWidget(pParent)
     this,
     SLOT(printMessage(int, QString, QString))
   );
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(showContextMenu(const QPoint&)));
+
+  this->startTimer(3000);
 }
 
 cedar::aux::gui::Log::~Log()
@@ -83,6 +93,107 @@ cedar::aux::gui::Log::~Log()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::Log::scrollBarRangeChanged(int, int max)
+{
+  auto p_scroll_bar = cedar::aux::asserted_cast<QScrollBar*>(QObject::sender());
+
+  bool scroll_down = false;
+
+  auto max_iter = mMaxScrollBarRange.find(p_scroll_bar);
+  // either there is no record of a maximum, or the scroll bar was at its previous maximum
+  if (max_iter == mMaxScrollBarRange.end() || p_scroll_bar->value() == max_iter->second)
+  {
+    scroll_down = true;
+  }
+
+  if (scroll_down)
+  {
+    p_scroll_bar->setValue(max);
+  }
+
+  mMaxScrollBarRange[p_scroll_bar] = max;
+}
+
+void cedar::aux::gui::Log::timerEvent(QTimerEvent*)
+{
+  for (auto pane_iter = this->mpPanes.begin(); pane_iter != this->mpPanes.end(); ++pane_iter)
+  {
+    QTableWidget* p_table = pane_iter->second;
+    this->updatePaneCurrentness(p_table);
+  }
+
+  this->updatePaneCurrentness(this->mpDefaultPane);
+}
+
+void cedar::aux::gui::Log::outdateAllMessages()
+{
+  for (auto pane_iter = this->mpPanes.begin(); pane_iter != this->mpPanes.end(); ++pane_iter)
+  {
+    QTableWidget* p_table = pane_iter->second;
+    this->outdateAllMessages(p_table);
+  }
+
+  this->outdateAllMessages(this->mpDefaultPane);
+}
+
+void cedar::aux::gui::Log::outdateAllMessages(QTableWidget* pPane)
+{
+  int threshold = 200;
+
+  //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
+  for (int i = 0; i < pPane->rowCount(); ++i)
+  {
+    this->setMessageCurrentness(pPane, i, threshold);
+  }
+}
+
+void cedar::aux::gui::Log::updatePaneCurrentness(QTableWidget* pPane)
+{
+  int threshold_high = 240;
+  int threshold_low = 200;
+  int delta_high = -5;
+  int delta_low = -1;
+
+  //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
+  for (int i = 0; i < pPane->rowCount(); ++i)
+  {
+    int currentness = this->getMessageCurrentness(pPane, i);
+
+    if (currentness > threshold_high)
+    {
+      this->setMessageCurrentness(pPane, i, currentness + delta_high);
+    }
+    else if (currentness > threshold_low)
+    {
+      this->setMessageCurrentness(pPane, i, currentness + delta_low);
+    }
+  }
+}
+
+int cedar::aux::gui::Log::getMessageCurrentness(QTableWidget* pPane, int message)
+{
+  auto item = pPane->item(message, 0);
+
+  const QBrush& background = item->background();
+  return background.color().red();
+}
+
+void cedar::aux::gui::Log::setMessageCurrentness(QTableWidget* pPane, int message, int currentness)
+{
+  for (int i = 0; i < pPane->columnCount(); ++i)
+  {
+    QColor background(currentness, currentness, currentness);
+    if (auto item = pPane->item(message, i))
+    {
+      item->setBackground(QBrush(background));
+    }
+    else if (auto widget = pPane->cellWidget(message, i))
+    {
+      widget->setStyleSheet("background-color: 255, 0, 0");
+    }
+  }
+}
 
 void cedar::aux::gui::Log::installHandlers(bool removeMessages)
 {
@@ -131,6 +242,9 @@ QTableWidget* cedar::aux::gui::Log::addPane(const std::string& title, const std:
     this->addTab(widget, icon, QString::fromStdString(title));
   }
 
+  CEDAR_DEBUG_ASSERT(widget->verticalScrollBar() != NULL);
+  QObject::connect(widget->verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(scrollBarRangeChanged(int, int)));
+
   QStringList columns;
   widget->setColumnCount(2);
   columns << "title" << "message";
@@ -151,9 +265,6 @@ void cedar::aux::gui::Log::postMessage
   const QString& icon
 )
 {
-  QScrollBar* p_scroll_bar = pTable->verticalScrollBar();
-  bool scroll_down = (p_scroll_bar != NULL && p_scroll_bar->value() >= p_scroll_bar->maximum());
-
   Qt::ItemFlags item_flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   int row = pTable->rowCount();
   pTable->insertRow(row);
@@ -168,7 +279,10 @@ void cedar::aux::gui::Log::postMessage
     p_title_item = new QTableWidgetItem(QIcon(icon), title);
   }
 
+  p_title_item->setBackground(QBrush(Qt::white));
+
   QLabel* p_message_item = new QLabel(message);
+  p_message_item->setWordWrap(true);
   p_message_item->setToolTip("<p>" + message + "</p>");
 
   p_title_item->setFlags(item_flags);
@@ -176,13 +290,6 @@ void cedar::aux::gui::Log::postMessage
   pTable->setItem(row, 0, p_title_item);
   pTable->setCellWidget(row, 1, p_message_item);
   pTable->resizeRowToContents(row);
-
-  if (scroll_down)
-  {
-    CEDAR_DEBUG_ASSERT(p_scroll_bar != NULL);
-
-    p_scroll_bar->setValue(p_scroll_bar->maximum());
-  }
 }
 
 void cedar::aux::gui::Log::message
@@ -226,5 +333,36 @@ void cedar::aux::gui::Log::printMessage(int type, QString title, QString message
         this->postMessage(p_level_pane, message, title, icon);
       }
       this->postMessage(this->mpDefaultPane, message, title, icon);
+  }
+}
+
+void cedar::aux::gui::Log::showContextMenu(const QPoint& point)
+{
+  if (point.isNull())
+  {
+    return;
+  }
+
+  QMenu menu(this);
+  QAction* p_delete_here = menu.addAction(tr("Delete messages in this tab"));
+  QAction* p_delete_all = menu.addAction(tr("Delete all messages"));
+
+  QAction* a = menu.exec(this->mapToGlobal(point));
+  if (a == p_delete_here)
+  {
+    QTableWidget* p_current_table = dynamic_cast<QTableWidget*>(this->currentWidget());
+    p_current_table->setRowCount(0);
+  }
+  else if (a == p_delete_all)
+  {
+    for (int i = 0; i < this->count(); ++i)
+    {
+      QTableWidget* p_current_table = dynamic_cast<QTableWidget*>(this->widget(i));
+      p_current_table->setRowCount(0);
+    }
+  }
+  else if (a != NULL)
+  {
+    std::cout << "Unmatched action in cedar::aux::gui::Log::contextMenuEvent." << std::endl;
   }
 }

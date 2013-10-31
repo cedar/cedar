@@ -42,7 +42,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -50,6 +49,7 @@
 #include "cedar/units/TimeUnit.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 #include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ namespace
       "signal can be used as the step time, and the approximation can be updated using it."
     );
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(looped_trigger_declaration);
+    looped_trigger_declaration->declare();
 
     return true;
   }
@@ -95,8 +95,9 @@ cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& na
 :
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
-//!@todo Make a TimeParameter and use it here instead.
-mWait(new cedar::aux::BoolParameter(this, "wait", true))
+mWait(new cedar::aux::BoolParameter(this, "wait", true)),
+mStarting(false),
+mStopping(false)
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -104,7 +105,7 @@ mWait(new cedar::aux::BoolParameter(this, "wait", true))
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
 {
-  this->stopTrigger();
+  this->stop();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,7 +113,6 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 
 /*! This method takes care of changing the step's name in the registry as well.
- * @todo This should be solved better; currently, this has to be done for LoopedTriggers and Steps, with is copied code.
  */
 void cedar::proc::LoopedTrigger::onNameChanged()
 {
@@ -144,24 +144,54 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
   }
 }
 
-void cedar::proc::LoopedTrigger::startTrigger()
+void cedar::proc::LoopedTrigger::applyStart()
 {
+  QMutexLocker locker(&mStartingMutex);
+
+  if (this->isRunning() || mStarting)
+  {
+    return;
+  }
+
+  mStarting = true;
+  locker.unlock();
+
+  emit triggerStarting();
+
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStart();
   }
   CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
-  this->start();
+
+  emit triggerStarted();
+
+  locker.relock();
+  mStarting = false;
 }
 
-void cedar::proc::LoopedTrigger::stopTrigger()
+void cedar::proc::LoopedTrigger::applyStop(bool)
 {
-  this->stop(2000);
+  QMutexLocker locker(&mStoppingMutex);
+  if (!this->isRunning() || mStopping)
+  {
+    return;
+  }
+
+  mStopping = true;
+  locker.unlock();
+
+  emit triggerStopping();
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStop();
   }
+
+  emit triggerStopped();
+
+  locker.relock();
+  mStopping = false;
 }
 
 void cedar::proc::LoopedTrigger::step(double time)

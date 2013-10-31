@@ -73,6 +73,12 @@ public slots:
    */
   void accepted();
 
+  //! Removes the plugins currently checked for deletion.
+  void removePlugins();
+
+  //! Enables or disables the delete button.
+  void toggleDeleteButton();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

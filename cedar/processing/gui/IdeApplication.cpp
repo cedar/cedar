@@ -40,9 +40,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/dynamics/namespace.h"
+#include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -67,7 +67,8 @@
 cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 :
 QApplication(argc, argv),
-mpIde (NULL)
+mpIde (NULL),
+mLastExceptionType(NONE)
 {
   QStringList args = QCoreApplication::arguments();
 
@@ -76,6 +77,8 @@ mpIde (NULL)
     std::cout << "Possible command line arguments:" << std::endl;
     std::cout << std::endl;
     std::cout << "--no-plugins\tStart without loading any plugins." << std::endl;
+    std::cout << "--no-log\tDon't redirect log messages to the UI. May help debugging if too many log messages cause"
+              << " the UI to lock up." << std::endl;
     std::cout << "--help\tDisplay this help text." << std::endl;
 
     ::exit(0);
@@ -88,9 +91,16 @@ mpIde (NULL)
     std::cout << "-- Starting without plugins." << std::endl;
   }
 
-  this->mpIde = new cedar::proc::gui::Ide(!no_plugins);
+  bool no_log_redirect = args.contains("--no-log");
 
-  QObject::connect(this, SIGNAL(exception(const QString&)), this->mpIde, SLOT(exception(const QString&)));
+  if (no_log_redirect)
+  {
+    std::cout << "-- Log messages won't be redirected to the gui." << std::endl;
+  }
+
+  this->mpIde = new cedar::proc::gui::Ide(!no_plugins, !no_log_redirect);
+
+  QObject::connect(this, SIGNAL(showExceptionDialogSignal()), this, SLOT(showExceptionDialog()));
 }
 
 cedar::proc::gui::IdeApplication::~IdeApplication()
@@ -101,7 +111,6 @@ cedar::proc::gui::IdeApplication::~IdeApplication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo Generalize signal handling; allow the user to set a callback that receives a stacktrace on crash
 void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
 {
   std::string signal_name;
@@ -207,6 +216,7 @@ void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
 
 bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent)
 {
+  //!@todo Make this flag a setting?
 #ifdef CATCH_EXCEPTIONS_IN_GUI
   try
   {
@@ -218,32 +228,59 @@ bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
-    QString message("An exception occurred and was caught by the cedar::proc::gui::IdeApplication."
-        " This is most likely a bug, please report it. You should probably also save your current work under a different"
-        " name and restart the application.\nException info:\n");
-    message += e.exceptionInfo().c_str();
-    emit exception(message);
+    QWriteLocker locker(&mLastExceptionInfoLock);
+    this->mLastCedarException = e;
+    this->mLastExceptionType = CEDAR_EXCEPTION;
+    emit showExceptionDialogSignal();
   }
   catch(const std::exception& e)
   {
-    QString message("An exception occurred and was caught by the cedar::proc::gui::IdeApplication."
-        " This is most likely a bug, please report it. You should probably also save your current work under a different"
-        " name and restart the application.");
-
-    message += "\nException type:";
-    message += QString::fromStdString(cedar::aux::unmangleName(typeid(e)));
-    message += "\nException info:\n";
-    message += e.what();
-    emit exception(message);
+    QWriteLocker locker(&mLastExceptionInfoLock);
+    this->mLastStdExceptionWhat = e.what();
+    this->mLastStdExceptionType = cedar::aux::unmangleName(typeid(e));
+    this->mLastExceptionType = STD_EXCEPTION;
+    emit showExceptionDialogSignal();
   }
   catch(...)
   {
-    QString message("An unhandled exception occurred and was caught by the cedar::proc::gui::IdeApplication."
-        " This is most likely a bug, please report it. You should probably also save your current work under a different"
-        " name and restart the application.");
-    emit exception(message);
+    QWriteLocker locker(&mLastExceptionInfoLock);
+    this->mLastExceptionType = UNKNOWN_EXCEPTION;
+    emit showExceptionDialogSignal();
   }
 #endif // CATCH_EXCEPTIONS_IN_GUI
   return false;
 }
 
+void cedar::proc::gui::IdeApplication::showExceptionDialog()
+{
+  static std::string intro_message("This exception was caught by the cedar::proc::gui::IdeApplication."
+          " This is most likely a bug, please report it. You should probably also save your current work under a different"
+          " name and restart the application.");
+
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(QThread::currentThread() == QCoreApplication::instance()->thread());
+
+  auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+  p_dialog->setAdditionalString(intro_message);
+
+  QReadLocker locker(&mLastExceptionInfoLock);
+  switch (mLastExceptionType)
+  {
+    case CEDAR_EXCEPTION:
+      p_dialog->displayCedarException(this->mLastCedarException);
+      break;
+
+    case STD_EXCEPTION:
+      p_dialog->displayGenericException(this->mLastStdExceptionWhat, this->mLastStdExceptionType);
+      break;
+
+    case UNKNOWN_EXCEPTION:
+      p_dialog->displayUnknownException();
+      break;
+
+    default:
+      CEDAR_DEBUG_NON_CRITICAL_ASSERT(false && "Unhandled exception type.");
+  }
+  locker.unlock();
+
+  p_dialog->exec();
+}

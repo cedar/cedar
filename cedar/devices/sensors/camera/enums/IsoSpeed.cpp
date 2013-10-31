@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -68,7 +68,7 @@ void cedar::dev::sensors::camera::IsoSpeed::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET,
                                       "ISO_NOT_SET",
-                                      "automatic"
+                                      "auto"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(

@@ -85,13 +85,48 @@ public:
 
   /*! Returns an annotation of the given type as a constant pointer.
    *
-   *  @throws A cedar::aux::UnknownTypeException if no matching annotation can be found.
+   *  @throws A cedar::aux::AnnotationNotFoundException if no matching annotation can be found.
    */
   template <typename T>
   boost::shared_ptr<const T> getAnnotation() const
   {
     return cedar::aux::asserted_pointer_cast<const T>(this->mAnnotations[this->findAnnotation<T>()]);
   }
+
+  /*! Checks whether a certain annotation is present.
+   */
+  template <typename T>
+  bool hasAnnotation() const
+  {
+    try
+    {
+      this->findAnnotation<T>();
+      return true;
+    }
+    catch (cedar::aux::AnnotationNotFoundException)
+    {
+      return false;
+    }
+  }
+
+  //! Removes all instances of the given annotation type, if any. Does nothing if there are no annotations of this type.
+  template <typename T>
+  void removeAnnotations()
+  {
+    try
+    {
+      while (true)
+      {
+        size_t index = this->findAnnotation<T>();
+        this->mAnnotations.erase(this->mAnnotations.begin() + index);
+      }
+    }
+    catch (cedar::aux::AnnotationNotFoundException)
+    {
+      // done
+    }
+  }
+
 
   //! Copies all annotations from the given data pointer.
   void copyAnnotationsFrom(cedar::aux::annotation::ConstAnnotatablePtr other);

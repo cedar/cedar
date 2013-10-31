@@ -54,18 +54,18 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr noise_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::proc::sources::Noise>
           (
             "Sources", "cedar.processing.sources.Noise"
           )
     );
-    noise_decl->setIconPath(":/steps/noise.svg");
-    noise_decl->setDescription("A step that generates normally distributed random noise.");
-    noise_decl->deprecatedName("cedar.dynamics.Noise");
+    declaration->setIconPath(":/steps/noise.svg");
+    declaration->setDescription("A step that generates normally distributed random noise.");
+    declaration->deprecatedName("cedar.dynamics.Noise");
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(noise_decl);
+    declaration->declare();
 
     return true;
   }
@@ -78,8 +78,9 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::sources::Noise::Noise()
 :
+cedar::proc::Step(false, true),
 mRandomMatrix(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 4)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
 _mMean(new cedar::aux::DoubleParameter(this, "mean", 0.0, -1000, 1000)),
 _mStandardDeviation(new cedar::aux::DoubleParameter(this, "standard deviation", 1.0, 0.0, 1000.0))
@@ -99,8 +100,6 @@ _mStandardDeviation(new cedar::aux::DoubleParameter(this, "standard deviation", 
 void cedar::proc::sources::Noise::compute(const cedar::proc::Arguments&)
 {
   cv::Mat& random = this->mRandomMatrix->getData();
-
-  // one possible preshape dynamic
   cv::randn(random, cv::Scalar(_mMean->getValue()), cv::Scalar(_mStandardDeviation->getValue()));
 }
 
@@ -138,4 +137,5 @@ void cedar::proc::sources::Noise::updateMatrices()
     this->mRandomMatrix->getData() = cv::Mat(dimensionality,&sizes.at(0), CV_32F, cv::Scalar(0));
   }
   this->unlockAll();
+  this->emitOutputPropertiesChangedSignal("random");
 }

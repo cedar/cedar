@@ -47,6 +47,7 @@
 // SYSTEM INCLUDES
 #include <QTabWidget>
 #include <QTableWidget>
+#include <QGraphicsSceneContextMenuEvent>
 
 
 /*!@brief A default log widget.
@@ -117,10 +118,20 @@ public:
    */
   void uninstallHandlers();
 
+  //! Marks all log messages as outdated.
+  void outdateAllMessages();
+
+public slots:
+  //! Opens the context menu.
+  void showContextMenu(const QPoint& point);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief reacts to timer event and slowly fades out old messages
+  void timerEvent(QTimerEvent* pEvent);
+
 signals:
   //!@brief signals reception of a signal
   void messageReceived(int type, QString title, QString message);
@@ -128,6 +139,8 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  void scrollBarRangeChanged(int min, int max);
 private:
   void addPane(cedar::aux::LOG_LEVEL level, const std::string& title, const std::string& icon = "");
 
@@ -140,6 +153,18 @@ private:
     const QString& title,
     const QString& icon = ""
   );
+
+  //! Returns an (arbitrary) number representing a message's currentness (i.e., how old it is).
+  int getMessageCurrentness(QTableWidget* pPane, int message);
+
+  //! Sets an (arbitrary) number representing a message's currentness (i.e., how old it is).
+  void setMessageCurrentness(QTableWidget* pPane, int message, int currentness);
+
+  //! Updates the currentness of all items in the pane.
+  void updatePaneCurrentness(QTableWidget* pPane);
+
+  //! Outdates all messages in the given pane.
+  void outdateAllMessages(QTableWidget* pPane);
 
 private slots:
   void printMessage(int type, QString title, QString message);
@@ -157,6 +182,7 @@ private:
 
   std::map<cedar::aux::LOG_LEVEL, QTableWidget*> mpPanes;
   std::map<cedar::aux::LOG_LEVEL, std::string> mIcons;
+  std::map<QScrollBar*, int> mMaxScrollBarRange;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

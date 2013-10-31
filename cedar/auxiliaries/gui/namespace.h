@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_NAMESPACE_H
 #define CEDAR_AUX_GUI_NAMESPACE_H
 
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -78,6 +80,8 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT UIntParameter;
       class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
 
+      class CEDAR_AUX_LIB_EXPORT ExceptionDialog;
+
       class CEDAR_AUX_LIB_EXPORT Log;
 
       template <typename ValueT, class WidgetT> class NumericWidgetPolicy;
@@ -93,9 +97,7 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
       //!@endcond
 
-      /*! The factory for gui parameters.
-       * @todo It should be possible to add new gui parameters within a plugin.
-       */
+      //! The factory for gui parameters.
       typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
 
       //!@brief singleton specialization for the parameter factory
@@ -107,18 +109,31 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(PlotDeclaration);
       template <class DataType, class PlotType> class PlotDeclarationTemplate;
 
-      CEDAR_DECLARE_AUX_CLASS(PlotInterface);
-      CEDAR_DECLARE_AUX_CLASS(MultiPlotInterface);
-      CEDAR_DECLARE_AUX_CLASS(DataPlotter);
-      CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
-      CEDAR_DECLARE_AUX_CLASS(LinePlot);
-      CEDAR_DECLARE_AUX_CLASS(SurfacePlot);
-      CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
+      CEDAR_DECLARE_AUX_CLASS(ColorValueRGBA);
       CEDAR_DECLARE_AUX_CLASS(ImagePlot);
+      CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
+      CEDAR_DECLARE_AUX_CLASS(DataPlotter);
       CEDAR_DECLARE_AUX_CLASS(MatDataPlot);
-
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
-      CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
+      CEDAR_DECLARE_AUX_CLASS(PlotInterface);
+      CEDAR_DECLARE_AUX_CLASS(HistoryPlot1D);
+      CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
+      CEDAR_DECLARE_AUX_CLASS(MultiPlotInterface);
+      #ifdef CEDAR_USE_VTK
+        CEDAR_DECLARE_AUX_CLASS(VtkLinePlot);
+        CEDAR_DECLARE_AUX_CLASS(VtkMatrixPlot);
+        CEDAR_DECLARE_AUX_CLASS(VtkSurfacePlot);
+      #endif // CEDAR_USE_VTK
+      #ifdef CEDAR_USE_QWT
+        CEDAR_DECLARE_AUX_CLASS(QwtLinePlot);
+        CEDAR_DECLARE_DEPRECATED(typedef QwtLinePlot LinePlot);
+        CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
+        CEDAR_DECLARE_AUX_CLASS(MatrixVectorPlot);
+      #endif // CEDAR_USE_QWT
+      #ifdef CEDAR_USE_QWTPLOT3D
+        CEDAR_DECLARE_AUX_CLASS(QwtSurfacePlot);
+        CEDAR_DECLARE_DEPRECATED(typedef QwtSurfacePlot SurfacePlot);
+      #endif // CEDAR_USE_QWTPLOT3D
       //!@endcond
 
       //!@brief The manager for plot widgets
@@ -126,7 +141,7 @@ namespace cedar
           cedar::aux::TypeHierarchyMap
           <
             cedar::aux::Data,
-            std::vector<cedar::aux::gui::PlotDeclarationPtr>
+            std::vector<cedar::aux::gui::ConstPlotDeclarationPtr>
           >
           PlotDeclarationManager;
 

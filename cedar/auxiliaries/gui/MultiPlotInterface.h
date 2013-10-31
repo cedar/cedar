@@ -48,10 +48,12 @@
  */
 class cedar::aux::gui::MultiPlotInterface : public cedar::aux::gui::PlotInterface
 {
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+  //!@brief a map that stores data and associated names/titles of their plots
+  typedef std::map<cedar::aux::ConstDataPtr, std::string> DataMap;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,15 +70,13 @@ public:
    * @param data  The data to append.
    * @param title The tilte (legend entry) of the data object.
    */
-  void append(cedar::aux::ConstDataPtr data, const std::string& title)
-  {
-    //!@todo Move into cpp file
-    //!@todo Store data/title association?
-    this->doAppend(data, title);
-  }
+  void append(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //!@brief check if given data can be appended to a plot
   virtual bool canAppend(cedar::aux::ConstDataPtr data) const = 0;
+
+  //!@brief returns the data map
+  const DataMap& getDataMap() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,8 +97,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  DataMap mDataMap;
 }; // class cedar::aux::gui::MultiPlotInterface
 
 #endif // CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H
-

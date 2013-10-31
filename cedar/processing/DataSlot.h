@@ -38,20 +38,24 @@
 #define CEDAR_PROC_DATA_SLOT_H
 
 // CEDAR INCLUDES
+#include "cedar/processing/typecheck/namespace.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
 
 // SYSTEM INCLUDES
-
+#include <boost/function.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/signals2/connection.hpp>
+#include <boost/signals2/signal.hpp>
 
 /*!@brief This class represents data slots in connectable objects.
  *
  *        Connectable objects can have a number of DataSlots associated with them. These slots represent, e.g., inputs
  *        of the connectable and are used to define what data a connectable expects as input.
- *
- * @todo The design of having a parent and returning a shared pointer to connect two slots is not perfect.
  */
 class cedar::proc::DataSlot
+:
+public boost::enable_shared_from_this<cedar::proc::DataSlot>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
@@ -63,8 +67,9 @@ class cedar::proc::DataSlot
   friend class cedar::proc::PromotedOwnedData;
 
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
   /*! Enum describing the validity of the data connected to this slot.
    */
@@ -79,6 +84,11 @@ public:
     //! The validity is unknown and needs to be determined before execution.
     VALIDITY_UNKNOWN
   };
+
+  //! Type of the function that is called for type checks.
+  typedef
+    boost::function<VALIDITY (cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr)>
+    TypeCheckFunction;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -114,7 +124,10 @@ public:
   //!@brief get the name of this slot's parent
   const std::string& getParent() const;
 
-  //!@brief set some explanatory text for this slot
+  /*!@brief set some explanatory text for this slot
+   *
+   * @remarks Set to an empty string ("") to disable the text and use the name instead.
+   */
   void setText(const std::string& text);
 
   //!@brief Returns the text to display to the user.
@@ -153,6 +166,33 @@ public:
   //!@brief get the const pointer of this slot's parent
   const cedar::proc::Connectable* getParentPtr() const;
 
+  /*!@brief Used for setting the type check for this object.
+   *
+   *        This method can be used to set the type check object for this slot by using the assignment operator, i.e.,
+   *        slot->setCheck(...)
+   */
+  void setCheck(const TypeCheckFunction& check);
+
+  /*!@brief Checks whether this slot has a validity check associated with it.
+   * @see   setCheck
+   */
+  bool hasValidityCheck() const;
+
+  /*!@brief Checks the validity of the given data for this slot.
+   *
+   * @throw cedar::proc::NoCheckException if no check function is set.
+   */
+  cedar::proc::DataSlot::VALIDITY checkValidityOf(cedar::aux::ConstDataPtr data) const;
+
+  //! connect to the validity changed signal
+  inline boost::signals2::connection connectToValidityChangedSignal
+                                     (
+                                       boost::function<void ()> slot
+                                     )
+  {
+    return this->mValidityChanged.connect(slot);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -167,12 +207,18 @@ private:
   //!@brief Set the name of the data slot
   void setName(const std::string& name);
 
+  //! Returns the type check function object for this slot.
+  const TypeCheckFunction& getCheck() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! The parent that owns the slot.
   cedar::proc::Connectable* mpParent;
+
+  //! Signal that is emitted when the validity of the data slot changes.
+  boost::signals2::signal<void ()> mValidityChanged;
 
 private:
   //!@brief flag if this slot must be connected
@@ -192,6 +238,10 @@ private:
 
   //! Promoted flag
   bool mIsPromoted;
+
+  //! The function object holding a reference to the type check functions for this slot.
+  TypeCheckFunction mTypeCheck;
+
 }; // class cedar::proc::DataSlot
 
 #endif // CEDAR_PROC_DATA_SLOT_H

@@ -44,11 +44,14 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetBase.h"
 #include "cedar/auxiliaries/net/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
 
 // PROJECT INCLUDES
 #include <yarp/conf/version.h>
 #include <yarp/os/impl/NameConfig.h>
 #include <yarp/os/impl/NameClient.h>
+#include <yarp/os/Contact.h>
+#include <yarp/os/Network.h>
 
 
 // SYSTEM INCLUDES
@@ -147,9 +150,20 @@ bool AbstractNetBase::connectTwo(const std::string &writerPort, const std::strin
   if (mIsConnected)
     return false;
 
+  // check for name server settings. might be helpful
+  yarp::os::Contact contact = yarp::os::Network::getNameServerContact();
+  if (contact.getHost() == yarp::os::ConstString("127.0.0.1"))
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You misconfigured YARP. Cannot use yarp name server at IP 127.0.0.1!",
+      "cedar::aux::net::AbstractNetBase::connectTwo(std::string,std::string)"
+    );
+  }
+
   if (!mNetwork.connect( writerPort.c_str(),
                          readerPort.c_str(),
-                         "mcast",
+                         0, //"mcast",
                          true ) ) // 4. Argument: quiet = true
   {
     mIsConnected= false;

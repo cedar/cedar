@@ -45,8 +45,6 @@
 
 
 /*!@brief   This is a step that sums up a number of inputs.
- *
- * @todo    Allow adding double data and matrix data
  */
 class cedar::proc::steps::Sum : public cedar::proc::Step
 {
@@ -83,7 +81,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
+  //!@brief Method that is called whenever an input is connected to the Connectable.
+  virtual void inputConnectionChanged(const std::string& inputName);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

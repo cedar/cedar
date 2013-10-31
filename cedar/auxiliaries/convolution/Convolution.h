@@ -212,6 +212,12 @@ public:
     return this->_mEngine->getValue();
   }
 
+  //!@brief Returns the convolution engine.
+  inline void setEngine(cedar::aux::conv::EnginePtr engine)
+  {
+    this->_mEngine->setValue(engine);
+  }
+
   //!@brief Get the border type.
   inline cedar::aux::conv::BorderType::Id getBorderType() const
   {
@@ -308,8 +314,6 @@ protected:
 private:
   /*! Matrix representing the combined kernel. Convolving an image with this kernel is equivalent to convolving it with
    *  the kernel list.
-   *
-   *  @todo Make a unit test for this.
    */
   cedar::aux::MatDataPtr mCombinedKernel;
 

@@ -60,7 +60,7 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(DataConnection);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
-    CEDAR_DECLARE_PROC_CLASS(DeclarationRegistry);
+    CEDAR_DECLARE_PROC_CLASS(PlotData);
     CEDAR_DECLARE_PROC_CLASS(Element);
     CEDAR_DECLARE_PROC_CLASS(ElementDeclaration);
     CEDAR_DECLARE_PROC_CLASS(ExternalData);
@@ -74,21 +74,28 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
     CEDAR_DECLARE_PROC_CLASS(OwnedData);
-    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
-    CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
     CEDAR_DECLARE_PROC_CLASS(PromotedExternalData);
     CEDAR_DECLARE_PROC_CLASS(PromotedOwnedData);
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
     CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
     CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
     CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(ProjectionMappingParameter);
+
+    // consistency issues
+    CEDAR_DECLARE_PROC_CLASS(ConsistencyIssue);
+    CEDAR_DECLARE_PROC_CLASS(LoopedStepNotConnected);
     //!@endcond
 
     //!@cond SKIPPED_DOCUMENTATION
     template <class BaseClass, class FactoryType> class DeclarationBase;
     template <class DerivedClass> class ElementDeclarationTemplate;
-    template <class DerivedClass> class StepDeclarationT;
-    template <class DerivedClass> class TriggerDeclarationT;
+
+    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
+    //!@endcond
+
+    //!@cond SKIPPED_DOCUMENTATION
+    typedef cedar::aux::PluginDeclarationList PluginDeclaration;
+    CEDAR_GENERATE_POINTER_TYPES(PluginDeclaration);
     //!@endcond
 
     //!@brief a factory for elements
@@ -99,19 +106,20 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT ArchitectureLoadingException;
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
+    class CEDAR_PROC_LIB_EXPORT DataNotFoundException;
     class CEDAR_PROC_LIB_EXPORT DeadlockException;
     class CEDAR_PROC_LIB_EXPORT DuplicateConnectionException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
-    class CEDAR_PROC_LIB_EXPORT InvalidNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidObjectException;
     class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
     class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
-    class CEDAR_PROC_LIB_EXPORT ParseException;
-    class CEDAR_PROC_LIB_EXPORT PluginException;
+    class CEDAR_PROC_LIB_EXPORT NoCheckException;
     class CEDAR_PROC_LIB_EXPORT NoMappingException;
+    class CEDAR_PROC_LIB_EXPORT NoMeasurementException;
+    class CEDAR_PROC_LIB_EXPORT PluginException;
     //!@endcond
   }
 }

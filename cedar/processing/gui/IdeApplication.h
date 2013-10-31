@@ -63,6 +63,18 @@ class cedar::proc::gui::IdeApplication : public QApplication
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  enum LastExceptionType
+  {
+    CEDAR_EXCEPTION,
+    STD_EXCEPTION,
+    UNKNOWN_EXCEPTION,
+    NONE
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -97,9 +109,8 @@ public:
 protected:
 
 signals:
-  /*!@brief Signal that is sent when cedar::proc::gui::Ide::notify catches an otherwise unhandled exception.
-   */
-  void exception(const QString& message);
+  //!@brief signals that the exception dialog should be opened
+  void showExceptionDialogSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -115,6 +126,9 @@ private:
   static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
 #endif // CEDAR_COMPILER_MSVC
 
+private slots:
+  void showExceptionDialog();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -123,6 +137,20 @@ protected:
 private:
   //! The main window.
   cedar::proc::gui::Ide* mpIde;
+
+  LastExceptionType mLastExceptionType;
+
+  //! Last cedar exception caught by the application.
+  cedar::aux::ExceptionBase mLastCedarException;
+
+  //! what() of the last std::exception caught by the application.
+  std::string mLastStdExceptionWhat;
+
+  //! type of the last std::exception caught by the application.
+  std::string mLastStdExceptionType;
+
+  //! Lock for the last exception information.
+  QReadWriteLock mLastExceptionInfoLock;
 
 }; // class cedar::proc::gui::IdeApplication
 

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FrameworkSettings.h
+    File:        FrameworkSettings.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -40,8 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/FrameworkSettings.h"
 #include "cedar/processing/FrameworkSettings.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 
@@ -55,8 +55,9 @@ QWidget(pParent)
 {
   this->setupUi(this);
 
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  this->mpPluginWorkspaceEdit->setParameter(settings.mPluginWorkspace);
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  this->mpPluginWorkspaceEdit->setParameter(settings->mPluginWorkspace);
+  this->mpRecorderWorkspaceEdit->setParameter(cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,12 +66,12 @@ QWidget(pParent)
 
 void cedar::proc::gui::FrameworkSettings::reject()
 {
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  settings.load();
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  settings->load();
 }
 
 void cedar::proc::gui::FrameworkSettings::accept()
 {
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  settings.save();
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  settings->save();
 }

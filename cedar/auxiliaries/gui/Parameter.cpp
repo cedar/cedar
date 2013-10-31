@@ -58,6 +58,11 @@ QWidget(pParent)
 //!@brief Destructor
 cedar::aux::gui::Parameter::~Parameter()
 {
+  if (this->mParameter)
+  {
+    QObject::disconnect(this->mParameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
+    QObject::disconnect(this->mParameter.get(), SIGNAL(valueChanged()), this, SLOT(valueChanged()));
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

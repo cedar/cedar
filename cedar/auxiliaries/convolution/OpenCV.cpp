@@ -750,6 +750,7 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
       {
         kernel_mat = kernel_mat.t();
       }
+
       convolved = this->cvConvolve(matrix, kernel_mat, cvBorderType, anchor);
       break;
     }
@@ -1059,10 +1060,105 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
     CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
   }
 
-  //!@todo Cache the flipped matrices?
   cv::Mat flipped_kernel;
   cv::flip(kernel, flipped_kernel, -1);
   cv::Mat result;
+
+  // make sure the kernel isn't too large in any of the directions
+  if (cvBorderType == cv::BORDER_CONSTANT)
+  {
+    if (flipped_kernel.rows > 2 * matrix.rows)
+    {
+      int center = flipped_kernel.rows / 2;
+      // matrix is zero outside the image, kernel can be reduced to twice the image size
+      flipped_kernel = flipped_kernel(cv::Range(center - matrix.rows, center + matrix.rows + 1), cv::Range::all());
+    }
+    if (flipped_kernel.cols > 2 * matrix.cols)
+    {
+      int center = flipped_kernel.cols / 2;
+      // matrix is zero outside the image, kernel can be reduced to twice the image size
+      flipped_kernel = flipped_kernel(cv::Range::all(), cv::Range(center - matrix.cols, center + matrix.cols + 1));
+    }
+  }
+  else if (cvBorderType == cv::BORDER_WRAP)
+  {
+    // if the kernel is larger than the image, it can be reduced to an equivalent kernel of the same size as the image
+    // this is only possible due to the cyclic border conditions
+    if (flipped_kernel.rows > matrix.rows || flipped_kernel.cols > matrix.cols)
+    {
+      cv::Mat summed = cv::Mat::zeros
+                       (
+                         std::min(matrix.rows, flipped_kernel.rows),
+                         std::min(matrix.cols, flipped_kernel.cols),
+                         flipped_kernel.type()
+                       );
+
+      // first, we have to (virtually) increase the size of the kernel to a multiple of the image size
+      int num_complete_sums_row = flipped_kernel.rows / matrix.rows; // floored on purpose!
+      int num_complete_sums_col = flipped_kernel.cols / matrix.cols; // floored on purpose!
+
+      // if there is a remainder in the division, count that
+      if (flipped_kernel.rows % matrix.rows != 0)
+      {
+        num_complete_sums_row += 1;
+      }
+      if (flipped_kernel.cols % matrix.cols != 0)
+      {
+        num_complete_sums_col += 1;
+      }
+
+      int adapted_kernel_rows = num_complete_sums_row * matrix.rows;
+      int adapted_kernel_cols = num_complete_sums_col * matrix.cols;
+
+      int row_offset_top = (adapted_kernel_rows - flipped_kernel.rows) / 2;
+      int row_offset_bottom = (adapted_kernel_rows - flipped_kernel.rows + 1) / 2;
+      int col_offset_left = (adapted_kernel_cols - flipped_kernel.cols) / 2;
+      int col_offset_right = (adapted_kernel_cols - flipped_kernel.cols + 1) / 2;
+
+//      std::cout << std::endl << "LARGE KERNEL!!!" << std::endl << std::endl;
+//
+//      std::cout << "matrix size: " << matrix.rows << "x" << matrix.cols << std::endl;
+//      std::cout << "kernel size: " << flipped_kernel.rows << "x" << flipped_kernel.cols << std::endl;
+//      std::cout << std::endl;
+
+      // then sum over image-sized sections of the kernel
+      for (int start_row = 0; start_row < num_complete_sums_row; start_row += 1)
+      {
+        // construct ranges that lie within the kernel size
+        cv::Range summed_row_range
+                  (
+                    start_row == 0? row_offset_top : 0,
+                    start_row == num_complete_sums_row - 1? matrix.rows - row_offset_bottom : matrix.rows
+                  );
+        cv::Range kernel_row_range
+                  (
+                    std::max(0, start_row * matrix.rows - row_offset_top),
+                    std::min((start_row + 1) * matrix.rows - row_offset_top, flipped_kernel.rows)
+                  );
+
+//        std::cout << "row: " << start_row << ", kernel range: " << kernel_row_range.start << ", " << kernel_row_range.end << std::endl;
+//        std::cout << "row: " << start_row << ", dest range: " << summed_row_range.start << ", " << summed_row_range.end << std::endl;
+
+        for (int start_col = 0; start_col < num_complete_sums_col; start_col += 1)
+        {
+          cv::Range summed_col_range
+          (
+            start_col == 0? col_offset_left : 0,
+            start_col == num_complete_sums_col - 1? matrix.cols - col_offset_right : matrix.cols
+          );
+          cv::Range kernel_col_range
+          (
+            std::max(0, start_col * matrix.cols - col_offset_left),
+            std::min((start_col + 1) * matrix.cols - col_offset_left, flipped_kernel.cols)
+          );
+
+          summed(summed_row_range, summed_col_range) += flipped_kernel(kernel_row_range, kernel_col_range);
+        }
+      }
+
+      flipped_kernel = summed;
+    }
+  }
 
   if (cvBorderType != cv::BORDER_WRAP)
   {

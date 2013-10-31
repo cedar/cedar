@@ -47,8 +47,6 @@
 
 
 /*!@brief A singleton class for storing user-specific parameters related to the processing framework.
- *
- * @todo  Write a widget for these settings.
  */
 class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
 {
@@ -56,14 +54,16 @@ class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
   // friend
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::FrameworkSettings;
+  friend class cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+private:
   //!@brief The standard constructor.
   FrameworkSettings();
 
+public:
   //!@brief The destructor.
   ~FrameworkSettings();
 
@@ -82,6 +82,10 @@ public:
   /*!@brief Adds a plugin to the list of plugins known by the processing framework.
    */
   void addKnownPlugin(const std::string& file);
+
+  /*!@brief Removes a plugin from the list of plugins known by the processing framework.
+   */
+  void removeKnownPlugin(const std::string& file);
 
   /*!@brief Returns the set of plugins known by the processing framework.
    */
@@ -134,5 +138,7 @@ private:
   // none yet
 
 }; // class cedar::proc::FrameworkSettings
+
+CEDAR_PROC_SINGLETON(FrameworkSettings);
 
 #endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H

@@ -51,7 +51,8 @@
 
 /*!@brief Graphical representation of connections.
  *
- * @todo Write more detailed description of the class here.
+ *        This class is responsible for displaying connections between either the data slots of processing steps, or
+ *        between (looped) triggers and processing steps.
  */
 class cedar::proc::gui::Connection : public QGraphicsPathItem
 {
@@ -87,6 +88,15 @@ public:
   //!@brief Removes the underlying connection in the processing framework.
   void disconnect();
 
+  //! Displays this connection in smart mode.
+  void setSmartMode(bool smart);
+
+  //! Sets whether the connection is highlighted due to one of its owners being selected.
+  void setHighlightedBySelection(bool highlight);
+
+  //! Returns true if this is a trigger connection.
+  bool isTriggerConnection() const;
+
 public slots:
   //!@brief update the position of this connection, depending on anchor points of source and target
   void update();
@@ -101,7 +111,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  QColor highlightColor(const QColor& source) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -110,11 +120,20 @@ protected:
   // none yet
 private:
   //!@brief source of connection
-  cedar::proc::gui::GraphicsBase *mpSource;
+  cedar::proc::gui::GraphicsBase* mpSource;
   //!@brief target of connection
-  cedar::proc::gui::GraphicsBase *mpTarget;
-  //!@brief arrow that points out the direction of the line
-  QGraphicsPolygonItem *mpArrow;
+  cedar::proc::gui::GraphicsBase* mpTarget;
+  //!@brief arrow that points out the direction of the line at the starting point
+  QGraphicsPolygonItem* mpArrowStart;
+  //!@brief arrow that points out the direction of the line at the end point
+  QGraphicsPolygonItem* mpArrowEnd;
+  //!@brief the last set validity
+  cedar::proc::gui::ConnectValidity mValidity;
+  //!@brief smart mode flag (i.e., automatically draw nice lines with corners)
+  bool mSmartMode;
+
+  //! Whether or not to highlight the connection.
+  bool mHighlight;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H

@@ -91,9 +91,6 @@ public slots:
   //!@brief Slot for the recording-checkbox
   void setRecording();
 
-  //!@todo Enum RecordType (Encoding)
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -146,7 +143,6 @@ protected:
   // the values of the properties
   cedar::aux::BoolParameterPtr mRecording;
 
-  //!@brief The configuration filename
   //!@todo Enum RecordType (Encoding)
 
   //!@endcond

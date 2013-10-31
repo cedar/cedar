@@ -49,6 +49,7 @@
 // SYSTEM INCLUDES
 #include <QMainWindow>
 #include <QKeyEvent>
+#include <QDoubleSpinBox>
 #include <map>
 
 
@@ -65,8 +66,13 @@ class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Ide(bool loadDefaultPlugins = true);
+  /*!@brief The standard constructor.
+   *
+   * @param loadDefaultPlugins Loads all plugins set as default in the configuration.
+   * @param redirectLogToGui   Enables or disables redirection of log messages to the gui (can help when too many log
+   *                           messages lock up the user interface).
+   */
+  Ide(bool loadDefaultPlugins = true, bool redirectLogToGui = true);
 
   //!@brief Destructor
   ~Ide();
@@ -84,21 +90,9 @@ public:
   void resetTo(cedar::proc::gui::NetworkPtr network);
 
 public slots:
-  /*!@brief Slot that displays exceptions.
-   */
-  void exception(const QString& message);
-
   /*!@brief Slot that displays notifications.
    */
   void notify(const QString& message);
-
-  /*!@brief Slot that displays errors.
-   */
-  void error(const QString& message);
-
-  /*!@brief Slot that displays messages.
-   */
-  void message(const QString& message);
 
   /*!@brief Changes the mode back to select when an architecture tool is finished.
    */
@@ -111,6 +105,10 @@ public slots:
   /*!@brief Stops all looped triggers (and other derivatives of looped thread).
    */
   void stopThreads();
+
+  /*!@brief Single-step all looped triggers (and other derivatives of looped thread).
+   */
+  void stepThreads();
 
   /*!@brief Slot that is connected to the "new" item in the file menu.
    */
@@ -156,22 +154,6 @@ public slots:
    */
   void recentFileItemTriggered();
 
-  /*!@brief Reacts to changes in the zoom level.
-   */
-  void zoomLevelSet(double zoomLevel);
-
-  /*!@brief Resets the zoom level to 100%.
-   */
-  void resetZoomLevel();
-
-  /*!@brief Increases the zoom level.
-   */
-  void increaseZoomLevel();
-
-  /*!@brief Decreases the zoom level.
-   */
-  void decreaseZoomLevel();
-
   /*!@brief Returns the architecture view used by the ide.
    */
   cedar::proc::gui::View* getArchitectureView();
@@ -188,6 +170,40 @@ public slots:
    */
   void exportSvg();
 
+  /*!@brief Duplicates a selected step
+   */
+  void duplicateStep();
+
+  /*!@brief Select all elements
+   */
+  void selectAll();
+
+  /*!@brief Show/hide all trigger connections
+   */
+  void showTriggerConnections(bool show);
+
+  /*!@brief Shows a dialog for architecture consistency checking.
+   */
+  void showConsistencyChecker();
+
+  /*!@brief Opens a boost control widget.
+   */
+  void showBoostControl();
+
+  //!@brief toggle smart connections
+  void toggleSmartConnections(bool smart);
+
+  //!@brief closes all plot windows of every step
+  void closeAllPlots();
+
+  //!@brief Starts or stops the recorder function();
+  void toggleRecorder(bool status);
+
+  //! Returns the log widget of this ide.
+  cedar::aux::gui::Log* getLog() const
+  {
+    return this->mpLog;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -195,8 +211,6 @@ public slots:
 protected:
 
   /*!@brief Deletes the list of graphics items.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteElements(QList<QGraphicsItem*>& items);
 
@@ -205,8 +219,6 @@ protected:
   void deleteElement(QGraphicsItem* pItem);
 
   /*!@brief Deletes the elements currently selected in the scene.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteSelectedElements();
 
@@ -235,9 +247,12 @@ private:
    */
   void restoreSettings();
 
-  /*!@brief Writes an error message into the log window.
+  /*!@brief Sets the filename in the title of the main window.
    */
-  void logError(const std::string& message);
+  void displayFilename(const std::string& filename);
+
+  //! Updates the start and stop triggers threads.
+  void updateTriggerStartStopThreadCallers();
 
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
@@ -253,6 +268,25 @@ private:
 
   //! The network currently displayed.
   cedar::proc::gui::NetworkPtr mNetwork;
+
+  //! Architecture consistency check widget.
+  cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;
+
+  //! Dock widget for the consistency checker.
+  QDockWidget* mpConsistencyDock;
+
+  QString mDefaultWindowTitle;
+
+  cedar::proc::gui::BoostControl* mpBoostControl;
+
+  //! In which the user specifies the time step for single-step functionality.
+  QDoubleSpinBox* mpCustomTimeStep;
+
+  //! Used for starting all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
+
+  //! Used for stopping all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
 }; // class cedar::MainWindow
 

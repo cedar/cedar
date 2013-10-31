@@ -56,7 +56,7 @@ macro(cedar_add_target_executable)
   parse_arguments(executable "PREFIX;MOC_HEADERS" "NO_INSTALL" ${ARGN})
   car(executableName ${executable_DEFAULT_ARGS})
 
-  qt4_wrap_cpp(executableMocSources ${executable_MOC_HEADERS})
+  qt_wrap_cpp(executableMocSources ${executable_MOC_HEADERS})
   set(sourceFiles ${sourceFiles} ${executableMocSources})
   
   # remove the ${CEDAR_EXE_DIR} from the current source path and save the result in 'demoSubdirectory'
@@ -98,12 +98,19 @@ macro(cedar_add_unit_test)
   cedar_add_test(${unitTestName} ${unitTestSources} PREFIX "unitTest" DIRECTORY ${CEDAR_UNIT_TEST_DIR} ARGUMENTS ${unitTest_ARGUMENTS} AUTOMATIC)
 endmacro(cedar_add_unit_test)
 
+macro(cedar_add_performance_test)
+  parse_arguments(performanceTest "ARGUMENTS" "" ${ARGN})
+  car(performanceTestName ${performanceTest_DEFAULT_ARGS})
+  cdr(performanceTestSources ${performanceTest_DEFAULT_ARGS})
+  cedar_add_test(${performanceTestName} ${performanceTestSources} PREFIX "performanceTest" DIRECTORY ${CEDAR_PERFORMANCE_TEST_DIR} ARGUMENTS ${unitTest_ARGUMENTS} AUTOMATIC)
+endmacro(cedar_add_performance_test)
+
 macro(cedar_add_interactive_test)
   parse_arguments(interactiveTest "MOC_HEADERS" "" ${ARGN})
   car(interactiveTestName ${interactiveTest_DEFAULT_ARGS})
   cdr(interactiveTestSources ${interactiveTest_DEFAULT_ARGS})
 
-  qt4_wrap_cpp(interactiveMocSources ${interactiveTest_MOC_HEADERS})
+  qt_wrap_cpp(interactiveMocSources ${interactiveTest_MOC_HEADERS})
   set(interactiveTestSources ${interactiveTestSources} ${interactiveMocSources})
 
   cedar_add_test(${interactiveTestName} ${interactiveTestSources} PREFIX "interactiveTest" DIRECTORY ${CEDAR_INTERACTIVE_TEST_DIR} ARGUMENTS interactiveTest_ARGUMENTS)
@@ -157,10 +164,12 @@ macro(cedar_add_test)
       endif(WIN32)
       add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${CEDAR_EXE_DIR}/${test_PREFIX}/${testSubdirectory}/${testExecutableName} ${test_ARGUMENTS})
     endif()
+    
+    set_property(TEST ${testName} PROPERTY LABELS ${test_PREFIX})
   endif (test_AUTOMATIC)
   
   # link all cedar and third party libraries into the unit test executable
-  target_link_libraries(${testExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  target_link_libraries(${testExecutableName} ${CEDAR_LIBS} cedartesting_utilities ${CEDAR_THIRD_PARTY_LIBS})
   
   # change the runtime output directory back to the original value
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
@@ -227,33 +236,36 @@ endmacro(cedar_get_subdirectories)
 #                     [MOC_HEADERS header1 header2 ...]
 #                     [RESOURCES resource1 resource2 ...]
 #                     [LINK_LIBRARIES lib1 lib2 ...]
+#                     [NO_AUTOLINK]
 #                   )
 # library_name   name of the new library
 # MOC_HEADERS    header files that generate (Qt) moc-files
 # LINK_LIBRARIES libraries that need to link to from the new library (important for MacOS linking process)
+# NO_AUTOLINK    if provided, executables within cedar will not be linked to this library automatically.
 #
 # see http://www.cmake.org/Wiki/CMakeMacroParseArguments for a description of the parsing
 macro(cedar_add_library)
-  parse_arguments(library "MOC_HEADERS;RESOURCES;LINK_LIBRARIES" "" ${ARGN})
+  parse_arguments(library "MOC_HEADERS;RESOURCES;LINK_LIBRARIES" "NO_AUTOLINK" ${ARGN})
   car(libraryName ${library_DEFAULT_ARGS})
 
   # find files
   findfiles(${CMAKE_CURRENT_SOURCE_DIR})
 
   # create moc files from those headers that contain the Q_OBJECT macro
-  qt4_wrap_cpp(generatedMocSourceFiles ${library_MOC_HEADERS})
+  qt_wrap_cpp(generatedMocSourceFiles ${library_MOC_HEADERS})
   set(sourceFiles ${sourceFiles} ${generatedMocSourceFiles})
 
   # generate rules for building source files from the resources
-  qt4_add_resources(recourceCompilerSrcs ${library_RESOURCES})
+  qt_add_resources(recourceCompilerSrcs ${library_RESOURCES})
 
   # create ui headers from ui files
-  cedar_qt4_wrap_ui(generatedUiHeaders ${uiFiles})
+  cedar_qt_wrap_ui(generatedUiHeaders ${uiFiles})
   set(headerFiles ${headerFiles} ${generatedUiHeaders})
 
   # generate lib.h files
   string(TOUPPER "${libraryName}" CAP_LIB_NAME)
   string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
+  string(REGEX REPLACE "cedar" "" LIB_NAMESPACE_NAME "${libraryName}")
   
   set(libHOutputFile "${CMAKE_CURRENT_BINARY_DIR}/lib.h")
   configure_file("${CEDAR_HOME}/cmake/resources/lib.h.in" ${libHOutputFile})
@@ -306,7 +318,10 @@ macro(cedar_add_library)
   endforeach(sourceFile ${sourceFiles})
 
   # add the library and link it to all relevant cedar and third party libraries
-  set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
+  if (NOT library_NO_AUTOLINK)
+    set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
+  endif()
+  
   add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles} ${recourceCompilerSrcs})
   cedar_set_common_target_properties(${libraryName})
   
@@ -344,6 +359,42 @@ endmacro(findfiles)
 
 
 ################################################################################################################
+# Wrapper around QT4/5 macros
+#
+
+macro(qt_wrap_cpp)
+  if(QT_VERSION GREATER 4)
+    qt5_wrap_cpp(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_wrap_cpp(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_wrap_cpp)
+
+macro(qt_add_resources)
+  if(QT_VERSION GREATER 4)
+    qt5_add_resources(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_add_resources(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_add_resources)
+
+macro(qt_wrap_ui ${ARGV})
+  if(QT_VERSION GREATER 4)
+    qt5_wrap_ui(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_wrap_ui(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_wrap_ui)
+
+macro(cedar_qt_wrap_ui ${ARGV})
+  if(QT_VERSION GREATER 4)
+    cedar_qt5_wrap_ui(${ARGV})
+  else(QT_VERSION GREATER 4)
+    cedar_qt4_wrap_ui(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(cedar_qt_wrap_ui)
+
+################################################################################################################
 # Custom implementation of QT4_WRAP_UI.
 #
 # The builtin QT4_WRAP_UI puts all generated files in the current binary dir, ignoring
@@ -369,6 +420,54 @@ macro(cedar_qt4_wrap_ui outfiles)
   endforeach (it)
 
 endmacro(cedar_qt4_wrap_ui)
+
+################################################################################################################
+# Custom implementation of QT5_WRAP_UI.
+#
+# The builtin QT5_WRAP_UI puts all generated files in the current binary dir, ignoring
+# the relative path of the ui file in the project directory structure.
+# The custom implementation copies the directory structure to the build
+# directory and generates the header files in the same relative path. When the
+# binary dir is included in the include path, these files can then be accessed.
+macro(cedar_qt5_wrap_ui outfiles)
+  qt5_extract_options(ui_files ui_options ${ARGN})
+
+  foreach (it ${ui_files})
+    get_filename_component(outfile ${it} NAME_WE)
+    get_filename_component(infile ${it} ABSOLUTE)
+    get_filename_component(generated_path ${it} PATH)
+    string(REGEX REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" generated_path "${generated_path}")
+    set(generated_path ${CMAKE_CURRENT_BINARY_DIR}${generated_path})
+    set(outfile ${generated_path}/ui_${outfile}.h)
+    add_custom_command(OUTPUT ${outfile}
+      COMMAND ${QT_UIC_EXECUTABLE}
+      ARGS ${ui_options} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile})
+    set(${outfiles} ${${outfiles}} ${outfile})
+  endforeach (it)
+
+endmacro(cedar_qt5_wrap_ui)
+
+################################################################################################################
+# Qt5 does not come with an extract_options macro anymore. So we define it ourself.
+#
+
+MACRO (QT5_EXTRACT_OPTIONS _qt5_files _qt5_options)
+  SET(${_qt5_files})
+  SET(${_qt5_options})
+  SET(_QT5_DOING_OPTIONS FALSE)
+  FOREACH(_currentArg ${ARGN})
+    IF ("${_currentArg}" STREQUAL "OPTIONS")
+      SET(_QT5_DOING_OPTIONS TRUE)
+    ELSE ("${_currentArg}" STREQUAL "OPTIONS")
+      IF(_QT5_DOING_OPTIONS) 
+        LIST(APPEND ${_qt5_options} "${_currentArg}")
+      ELSE(_QT5_DOING_OPTIONS)
+        LIST(APPEND ${_qt5_files} "${_currentArg}")
+      ENDIF(_QT5_DOING_OPTIONS)
+    ENDIF ("${_currentArg}" STREQUAL "OPTIONS")
+  ENDFOREACH(_currentArg) 
+ENDMACRO (QT5_EXTRACT_OPTIONS)
 
 ########################################################################################################################
 

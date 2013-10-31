@@ -42,7 +42,6 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
@@ -95,12 +94,12 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declaration to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
+  test_module_decl->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Sample.json ... ";
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile("Sample.json");
+  network->readJson("Sample.json");
   std::cout << "done." << std::endl;
 
   std::cout << "Trying to call compute functions ... ";
@@ -125,6 +124,33 @@ int main(int /* argc */, char** /* argv */)
     std::cout << "Properly threw something." << std::endl;
   }
 
+  // test duplicate
+  //!@todo duplicate should return pointer to new object
+  //!@todo check for null pointer, right element in right network, values
+  std::cout << "test duplication of steps" << std::endl;
+  try
+  {
+    std::string new_name = network->getUniqueName("stepB");
+    network->duplicate("stepB");
+    network->getElement(new_name);
+  }
+  catch(cedar::aux::ExceptionBase&) // simple copy did not work
+  {
+    std::cout << "simple duplication did not work" << std::endl;
+    ++errors;
+  }
+
+  try
+  {
+    network->duplicate("stepB", "copied step B");
+    network->getElement("copied step B");
+  }
+  catch(cedar::aux::ExceptionBase&) // named copy did not work
+  {
+    std::cout << "named duplication did not work" << std::endl;
+    ++errors;
+  }
+
   // test nested networks
   std::cout << "Test nested network." << std::endl;
   cedar::proc::NetworkPtr network_parent(new cedar::proc::Network());
@@ -143,10 +169,10 @@ int main(int /* argc */, char** /* argv */)
   network_parent->add(network_child);
 
   std::cout << "Write nested network." << std::endl;
-  network_parent->writeFile("Nested.json");
+  network_parent->writeJson("Nested.json");
   std::cout << "Read nested network." << std::endl;
   cedar::proc::NetworkPtr network_nested(new cedar::proc::Network());
-  network_nested->readFile("Nested.json");
+  network_nested->readJson("Nested.json");
 
   std::cout << "testing Network::getElement for nested networks" << std::endl;
   network_nested->getElement<Step>("parent step");

@@ -58,11 +58,10 @@
 class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
                                    public cedar::proc::Trigger
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -83,13 +82,22 @@ public:
   void step(double time);
 
   /*!@brief Starts the trigger loop.
-   * @todo Make the start/stop methods in LoopedThread virtual and overload them in LoopedTrigger instead?
+   *
+   * @deprecated Use the ThreadWrapper::start() method instead.
    */
-  void startTrigger();
+  CEDAR_DECLARE_DEPRECATED(void startTrigger())
+  {
+    start();
+  }
 
   /*!@brief Stops the trigger loop.
+   *
+   * @deprecated Use the ThreadWrapper::stop() method instead.
    */
-  void stopTrigger();
+  CEDAR_DECLARE_DEPRECATED(void stopTrigger())
+  {
+    stop();
+  }
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -105,6 +113,19 @@ signals:
 protected:
   // none yet
 
+signals:
+  //! Emitted before the trigger is started.
+  void triggerStarting();
+
+  //! Emitted whenever the trigger is started.
+  void triggerStarted();
+
+  //! Emitted before the trigger is stopped.
+  void triggerStopping();
+
+  //! Emitted whenever the trigger is stopped.
+  void triggerStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,6 +137,12 @@ private:
   /*!@brief Adds the triggerable to the listeners of this of this trigger.
    */
   void addListener(cedar::proc::TriggerablePtr triggerable);
+
+  //! Called when the trigger is started.
+  void applyStart();
+
+  //! Called when the trigger is started.
+  void applyStop(bool);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -135,6 +162,18 @@ protected:
 private:
   //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
   cedar::aux::BoolParameterPtr mWait;
+
+  //! Used to prevent multiple start calls to the trigger.
+  bool mStarting;
+
+  //! Used to prevent multiple start calls to the trigger.
+  QMutex mStartingMutex;
+
+  //! Used to prevent multiple start calls to the trigger.
+  bool mStopping;
+
+  //! Used to prevent multiple start calls to the trigger.
+  QMutex mStoppingMutex;
 
 }; // class cedar::proc::LoopedTrigger
 

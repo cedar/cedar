@@ -47,9 +47,8 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-//#include <map>
 
-
+//#define DEBUG_GRABBER
 
 //------------------------------------------------------------------------
 // namespace for classes
@@ -66,51 +65,43 @@ namespace cedar
       {
         //!@cond SKIPPED_DOCUMENTATION
 
-        //-----------------------------------------------------------------------------------------------
-        // grabber classes
-        //-----------------------------------------------------------------------------------------------
-
-        // common base class for all grabbers
+        // common base classes for all grabbers
         CEDAR_DECLARE_DEV_CLASS(Grabber);
+        CEDAR_DECLARE_DEV_CLASS(GrabberChannel);
         
         // grabber
         CEDAR_DECLARE_DEV_CLASS(VideoGrabber);
+        CEDAR_DECLARE_DEV_CLASS(VideoChannel);
+
         CEDAR_DECLARE_DEV_CLASS(PictureGrabber);
-        CEDAR_DECLARE_DEV_CLASS(TestGrabber);
+        CEDAR_DECLARE_DEV_CLASS(PictureChannel);
+
         CEDAR_DECLARE_DEV_CLASS(GLGrabber);
+        CEDAR_DECLARE_DEV_CLASS(GLChannel);
+
+        CEDAR_DECLARE_DEV_CLASS(GrabbableChannel);
         CEDAR_DECLARE_DEV_CLASS(GrabbableGrabber);
 
 #ifdef CEDAR_USE_YARP
         CEDAR_DECLARE_DEV_CLASS(NetGrabber);
+        CEDAR_DECLARE_DEV_CLASS(NetChannel);
 #endif // CEDAR_USE_YARP
 
-        // enum classes
-        CEDAR_DECLARE_DEV_CLASS(RecordingFormat);
-
-
-        CEDAR_DECLARE_DEV_CLASS(GrabberChannel);
-        CEDAR_DECLARE_DEV_CLASS(PictureChannel);
-        CEDAR_DECLARE_DEV_CLASS(VideoChannel);
-        CEDAR_DECLARE_DEV_CLASS(NetChannel);
-        CEDAR_DECLARE_DEV_CLASS(GrabbableChannel);
-        CEDAR_DECLARE_DEV_CLASS(GLChannel);
-
+        // the channels as ObjectList for the processingGUI
         typedef cedar::aux::ObjectListParameterTemplate<GrabberChannel> ChannelParameter;
         CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ChannelParameter);
+
+        // enum class
+        CEDAR_DECLARE_DEV_CLASS(RecordingFormat);
 
         //-----------------------------------------------------------------------------------------------
         // exceptions
         //-----------------------------------------------------------------------------------------------
-
-        //!@brief An exception for errors on recording
         class GrabberRecordingException;
-
-        //!@brief An exception for errors on saving a snapshot
         class GrabberSnapshotException;
-
-        //!@brief An exception for errors on grabbing
         class GrabberGrabException;
-
+        class InvalidParameterException;
+        class CreateGrabberException;
         //!@endcond
       }
     }

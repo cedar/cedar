@@ -55,7 +55,7 @@ class cedar::proc::PluginProxy
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef void (*PluginInterfaceMethod)(cedar::proc::PluginDeclarationPtr);
+  typedef void (*PluginInterfaceMethod)(cedar::aux::PluginDeclarationListPtr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -76,12 +76,19 @@ public:
   //!@brief loaded a shared/dynamic library from a file path
   void load(const std::string& file);
 
+  //! Actually declares the contents of the plugin.
+  void declare();
+
   //!@brief get declaration of this proxy
-  cedar::proc::PluginDeclarationPtr getDeclaration();
+  cedar::aux::PluginDeclarationListPtr getDeclaration();
 
   /*!@brief Returns the canonical name of a plugin based on its filepath
    */
   static std::string getPluginNameFromPath(const std::string& path);
+
+#ifdef CEDAR_OS_UNIX
+  static void abortHandler(int signal);
+#endif // CEDAR_OS_UNIX
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -110,13 +117,18 @@ protected:
   // none yet
 private:
   //!@brief plugin declaration
-  cedar::proc::PluginDeclarationPtr mDeclaration;
+  cedar::aux::PluginDeclarationListPtr mDeclaration;
   //!@brief file path to plugin
   std::string mFileName;
 
   //! Handle to the dynamically loaded library.
 #ifdef CEDAR_OS_UNIX
   void *mpLibHandle;
+
+  /*! The plugin that is currently being loaded -- used to report to the user if a SIGABRT was caught during plugin
+   *  loading
+   */
+  static std::string mPluginBeingLoaded;
 #elif defined CEDAR_OS_WINDOWS
   HMODULE mpLibHandle;
 #else

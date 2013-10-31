@@ -83,9 +83,21 @@ public:
   //!@brief Sets the amplitude of the Gauss input.
   void setAmplitude(double amplitude);
 
+  //!@brief Returns the amplitude of the Gauss input.
+  double getAmplitude() const;
+
+  //! Sets the dimensionality of the Gauss input.
+  void setDimensionality(unsigned int dimensionality);
+
+  //! Sets the size of the Gauss in the given dimension.
+  void setSize(unsigned int dimension, unsigned int size);
+
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();
+
+  //!@brief a slot that is triggered if the matrix size is changed
+  void updateMatrixSize();
 
   //!@brief a slot to process changes in dimensionality, including reinitializing the buffers
   void updateDimensionality();
@@ -101,6 +113,8 @@ protected:
 private:
   //!@brief refreshes the internal matrix containing the Gaussian input
   void compute(const cedar::proc::Arguments& arguments);
+
+  void calculateOutput();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

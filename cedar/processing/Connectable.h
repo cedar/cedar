@@ -59,6 +59,11 @@
 class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux::Lockable
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Network;
+  friend class cedar::proc::Step;
+  //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -90,6 +95,10 @@ public:
 
   //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
+
+  //!@brief Returns if Connectable has data of a specific role.
+  //!@param role the specified role
+  bool hasRole(DataRole::Id role);
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
@@ -140,18 +149,29 @@ public:
   //!@brief Returns a specific data pointer stored in this Connectable.
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
 
-  //!@brief Checks the validity of a slot.
+  /*! @brief Checks the validity of a slot.
+   *
+   *  This function checks the current validity of a data slot. If the validity is already known, it is returned without
+   *  rechecking it. If the current validity is cedar::proc::DataSlot::VALIDITY_UNKNOWN, the slot's validity is determined
+   *  by calling the cedar::proc::Connectable::determineInputValidity method.
+   *
+   *  @param slot the slot that needs checking, specified via its smart pointer.
+   */
   cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
 
   //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slotName);
 
-  //!@brief Function that determines the validity of input data.
-  virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                          (
-                                            cedar::proc::ConstDataSlotPtr slot,
-                                            cedar::aux::ConstDataPtr data
-                                          ) const;
+  /*!@brief Function that checks the validity of input data.
+   *
+   * @remarks Internally, this function either calls the slot's associated type check or the determineInputValidity
+   *          function.
+   */
+  cedar::proc::DataSlot::VALIDITY checkInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::ConstDataPtr data
+                                  ) const;
 
   //!@brief Returns true, if this connectable already owns data in the target.
   bool ownsDataOf(cedar::proc::ConstOwnedDataPtr slot) const;
@@ -173,13 +193,13 @@ protected:
    * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the
    *                  Connectable unless the pointer to this slot (and all other mandatory slots) are non-zero.
    */
-  void declareInput(const std::string& name, bool mandatory = true);
+  cedar::proc::DataSlotPtr declareInput(const std::string& name, bool mandatory = true);
 
   /*!@brief Declares an input collection.
    *
    * @remarks This is equivalent to calling declareInput(name, false) and makeInputCollection(name).
    */
-  void declareInputCollection(const std::string& name);
+  cedar::proc::DataSlotPtr declareInputCollection(const std::string& name);
 
   //!@brief Declares a buffer slot.
   CEDAR_DECLARE_DEPRECATED(void declareBuffer(const std::string& name));
@@ -188,10 +208,10 @@ protected:
   CEDAR_DECLARE_DEPRECATED(void declareOutput(const std::string& name));
 
   //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
-  void declareBuffer(const std::string& name, cedar::aux::DataPtr data);
+  cedar::proc::DataSlotPtr declareBuffer(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Declares an output slot and immediately sets the data pointer for that slot.
-  void declareOutput(const std::string& name, cedar::aux::DataPtr data);
+  cedar::proc::DataSlotPtr declareOutput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Removes an input slot.
   inline void removeInputSlot(const std::string& name)
@@ -339,6 +359,14 @@ protected:
     return iter->second;
   }
 
+  /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
+   *        changed.
+   *
+   *        Examples of instances in which this function should be called are matrices that change size, type or
+   *        dimensionality.
+   */
+  void emitOutputPropertiesChangedSignal(const std::string& slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -350,7 +378,7 @@ private:
   bool hasSlot(DataRole::Id role, const std::string& name) const;
 
   //!@brief Declares a new piece of data in the connectable.
-  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+  cedar::proc::DataSlotPtr declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
 
   /*!@brief Sets the data pointer for the slot of the given name and role.
    */
@@ -381,6 +409,21 @@ private:
 
   //!@brief Method that is called whenever an input is connected to the Connectable.
   virtual void inputConnectionChanged(const std::string& inputName);
+
+  /*!@brief   Function that determines the validity of input data.
+   *
+   *          This can be overloaded in child classes to provide custom validation for incoming data.
+   *
+   * @remarks This method is thread-safe, i.e., all inputs, outputs and buffers are locked for reading.
+   *
+   * @return  Whether setting the data in the slot would be valid.
+   */
+  virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                          (
+                                            cedar::proc::ConstDataSlotPtr slot,
+                                            cedar::aux::ConstDataPtr data
+                                          ) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
   //--------------------------------------------------------------------------------------------------------------------
@@ -413,6 +456,15 @@ public:
     return this->mSlotRemoved.connect(slot);
   }
 
+  //! connect to the output slot properties altered signal, which deals with revalidation
+  inline boost::signals2::connection connectToOutputPropertiesChanged
+                                     (
+                                       boost::function<void (const std::string&)> slot
+                                     )
+  {
+    return this->mOutputPropertiesChanged.connect(slot);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -422,6 +474,12 @@ protected:
 
   //!@brief Vector with the names of all invalid input data.
   std::vector<std::string> mInvalidInputNames;
+
+  //!@brief Lock for making accesses to the connections thread-safe.
+  QReadWriteLock* mpConnectionLock;
+
+  //! signal that is emitted if the properties of an output require data revalidation along connections
+  boost::signals2::signal<void (const std::string&)> mOutputPropertiesChanged;
 private:
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mSlotMaps;

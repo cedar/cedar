@@ -39,7 +39,6 @@
 #include "cedar/auxiliaries/DoubleData.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -121,8 +120,8 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declarations to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(double_test_module_decl);
+  test_module_decl->declare();
+  double_test_module_decl->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Creating network ... " << std::endl;
@@ -194,7 +193,7 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Saving network ... ";
-  network->writeFile("architecture1.json");
+  network->writeJson("architecture1.json");
   std::cout << "done." << std::endl;
 
   std::cout << "Resetting ... ";
@@ -206,7 +205,7 @@ int main(int, char**)
 
   std::cout << "Loading network ... ";
   network = cedar::proc::NetworkPtr(new cedar::proc::Network());
-  network->readFile("architecture1.json");
+  network->readJson("architecture1.json");
   std::cout << "done." << std::endl;
 
   try
@@ -228,7 +227,7 @@ int main(int, char**)
       std::cout << "done." << std::endl;
     }
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;
@@ -253,7 +252,7 @@ int main(int, char**)
       std::cout << "done." << std::endl;
     }
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;
@@ -266,7 +265,7 @@ int main(int, char**)
     CEDAR_ASSERT(trigger);
     std::cout << "found." << std::endl;
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;

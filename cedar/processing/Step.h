@@ -53,6 +53,7 @@
 // SYSTEM INCLUDES
 #include <QThread>
 #include <QReadWriteLock>
+#include <QMutex>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <map>
@@ -80,11 +81,16 @@ class cedar::proc::Step : public QThread,
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Network;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! Map from action names to their corresponding functions.
-  typedef std::map<std::string, boost::function<void()> > ActionMap;
+  typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -117,9 +123,8 @@ public:
        );
 
   /*!@brief Sets the arguments used by the next execution of the run function.
-   *!@todo cedar::proc::Step::setNextArguments should take a const pointer.
    */
-  bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
+  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
@@ -169,6 +174,20 @@ public:
    */
   cedar::unit::Time getLockTimeAverage() const;
 
+  /*!@brief Returns the last round time measured for this step, i.e., the time between the last two compute calls.
+   */
+  cedar::unit::Time getRoundTimeMeasurement() const;
+
+  /*!@brief Returns the average round time measured for this step, i.e., the average time between compute calls.
+   */
+  cedar::unit::Time getRoundTimeAverage() const;
+
+  //! Returns the mutex that is prevents mutual access in run calls.
+  QMutex& getComputeMutex() const
+  {
+    return this->mBusy;
+  }
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -189,6 +208,11 @@ protected:
   void addTrigger(cedar::proc::TriggerPtr trigger);
 
   /*!@brief Method that registers a function of an object so that it can be used by the framework.
+   *
+   * @param actionName Name of the action
+   * @param function The function to call (use boost::bind)
+   * @param autoLock Whether or not to automatically lock the data of the step. If false, the called method needs to
+   *                 take care of properly locking the data and parameters of the step.
    *
    * As an example, consider a class A that has a function void A::foo():
    *
@@ -215,7 +239,7 @@ protected:
    * @endcode
    *
    */
-  void registerFunction(const std::string& actionName, boost::function<void()> function);
+  void registerFunction(const std::string& actionName, boost::function<void()> function, bool autoLock = true);
 
   /*!@brief Sets whether inputs and outputs are locked automatically.
    *
@@ -249,6 +273,24 @@ protected:
    */
   void setAutoLockInputsAndOutputs(bool autoLock);
 
+  /*!@brief Locks the data and parameters of the step.
+   *
+   * @remarks Usually, this should only be called automatically.
+   */
+  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
+
+  /*!@brief Unlocks the data and parameters of the step.
+   *
+   * @remarks Usually, this should only be called automatically.
+   */
+  void unlock() const;
+
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  void revalidateInputSlot(const std::string& slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -281,13 +323,9 @@ private:
    */
   void setLockTimeMeasurement(const cedar::unit::Time& time);
 
-  /*!@brief Locks the data and parameters of the step.
+  /*!@brief Sets the current round time measurement.
    */
-  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
-
-  /*!@brief Unlocks the data and parameters of the step.
-   */
-  void unlock() const;
+  void setRoundTimeMeasurement(const cedar::unit::Time& time);
 
   /*!@brief Locks the data of the step according to the current method.
    *
@@ -301,6 +339,10 @@ private:
    */
   void unlockData() const;
 
+  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
+   *
+   */
+  void callInputConnectionChanged(const std::string& slot);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -309,14 +351,13 @@ protected:
 
 private:
   //!@brief flag that states if step is still computing its latest output
-  //!@todo Should busy be a part of STATE_*? Or even a lock?
-  bool mBusy;
+  mutable QMutex mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
   QReadWriteLock* mpArgumentsLock;
 
   //!@brief The arguments for the next cedar::proc::Step::compute call.
-  ArgumentsPtr mNextArguments;
+  ConstArgumentsPtr mNextArguments;
 
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
@@ -330,11 +371,19 @@ private:
   //!@brief Moving average of the iteration time.
   cedar::aux::MovingAverage<cedar::unit::Milliseconds> mLockingTime;
 
+  //!@brief Moving average of the time between compute calls.
+  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mRoundTime;
+
+  clock_t mLastComputeCall;
+
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock mLastIterationTimeLock;
 
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock mLockTimeLock;
+
+  //!@brief Lock for the round time.
+  mutable QReadWriteLock mRoundTimeLock;
 
   //! The state of open-cv's RNG.
   uint64 mRNGState;

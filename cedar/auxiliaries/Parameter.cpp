@@ -58,6 +58,7 @@ mHasDefault(hasDefault),
 mConstant(false),
 mIsHidden(false),
 mChanged(false),
+mAdvanced(false),
 mpLock(new QReadWriteLock())
 {
   CEDAR_ASSERT(this->mpOwner != NULL);
@@ -77,6 +78,11 @@ cedar::aux::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::Parameter::addDeprecatedName(const std::string& deprecatedName)
+{
+  this->mpOwner->addDeprecatedName(this, deprecatedName);
+}
 
 void cedar::aux::Parameter::lockForWrite() const
 {

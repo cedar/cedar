@@ -81,7 +81,7 @@ public:
   GLGrabber
   (
     QGLWidget *qglWidget,
-    const std::string& grabberName
+    const std::string& grabberName = "GLGrabber"
   );
 
   /*! @brief Constructor for a stereo channel grabber
@@ -93,7 +93,7 @@ public:
   (
     QGLWidget *qglWidget0,
     QGLWidget *qglWidget1,
-    const std::string& grabberName
+    const std::string& grabberName = "StereoGLGrabber"
   );
 
   //!@brief Destructor
@@ -104,9 +104,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-
   /*! @brief Set a new Widget to grab from
    *
+   * @param channel The channel to assign the new widget
+   * @param qglWidget The new widget
+   * @throw cedar::aux::IndexOutOfRangeException When the channel is out of range
+   * @throw cedar::dev::sensors::visual::InvalidParameterException When the qglWidget is a NULL-pointer
    */
   void setWidget(unsigned int channel, QGLWidget *qglWidget);
 
@@ -115,17 +118,18 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  // derived from Grabber
-  bool onInit();
-  bool onDeclareParameters();
+  // inherited from Grabber
   void onCleanUp();
-  void onUpdateSourceInfo(unsigned int channel);
-  bool onGrab();
+  void onGrab(unsigned int channel);
+  void onCreateGrabber();
+  void onCloseGrabber();
+  std::string onGetSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline GLChannelPtr getGLChannel(unsigned int channel)
   {

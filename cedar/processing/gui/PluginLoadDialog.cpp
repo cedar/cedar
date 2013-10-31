@@ -40,10 +40,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PluginLoadDialog.h"
-#include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/FrameworkSettings.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -66,7 +66,7 @@ QDialog(pParent)
   this->mpFileNameEdit->lineEdit()->setReadOnly(true);
 
   this->mpFileNameEdit->addItem("");
-  const std::set<std::string>& known_plugins = cedar::proc::Manager::getInstance().settings().getKnownPlugins();
+  const std::set<std::string>& known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance()->getKnownPlugins();
   for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
   {
     this->mpFileNameEdit->addItem(iter->c_str());
@@ -91,12 +91,16 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
 #elif defined CEDAR_OS_WINDOWS
   QString filter = "Plugins (*.dll)";
 #endif // CEDAR_OS_*
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastPluginLoadDialogLocation();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastPluginLoadDialogLocation();
   QString file = QFileDialog::getOpenFileName
                               (
                                 this, // parent = 0,
                                 "Select a plugin", // caption = QString(),
+#if QT_VERSION >= 0x050000
+                                "/",
+#else
                                 last_dir->getValue().absolutePath(),
+#endif
                                 filter
                               );
   if (!file.isEmpty())
@@ -116,19 +120,15 @@ void cedar::proc::gui::PluginLoadDialog::pluginFileChanged(const QString& file)
 
 void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
 {
-  //!@todo handle plugin exceptions.
   mPlugin = cedar::proc::PluginProxyPtr(new cedar::proc::PluginProxy(file));
 
   this->mpStepsList->clear();
 
-  cedar::proc::PluginDeclarationPtr declaration = this->mPlugin->getDeclaration();
-  if (declaration)
+  const cedar::aux::PluginDeclarationListPtr declarations = this->mPlugin->getDeclaration();
+  for (size_t i = 0; i < declarations->size(); ++i)
   {
-    for (size_t i = 0; i < declaration->elementDeclarations().size(); ++i)
-    {
-      const std::string& classId = declaration->elementDeclarations().at(i)->getClassId();
-      this->mpStepsList->addItem(QString(classId.c_str()));
-    }
+    const std::string& classId = declarations->at(i)->getClassName();
+    this->mpStepsList->addItem(QString::fromStdString(classId));
   }
 }
 

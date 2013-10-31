@@ -79,6 +79,12 @@ public:
     return this->_mStrength->getValue();
   }
 
+  //!@brief convenience funtion to set the boost strength
+  inline void setStrength(double strength)
+  {
+    return this->_mStrength->setValue(strength);
+  }
+
   //!@brief convenience function for accessing the activity flag
   inline bool isActive() const
   {
@@ -102,6 +108,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void compute(const cedar::proc::Arguments& arguments);
+
+  void reset();
 
 private slots:
   void recompute();
@@ -127,6 +135,9 @@ private:
 
   //! Whether or not the boost is active.
   cedar::aux::BoolParameterPtr _mActive;
+
+  //! Whether or not the boost is deactivated when a reset occurs.
+  cedar::aux::BoolParameterPtr _mDeactivateOnReset;
 }; // class cedar::proc::sources::Boost
 
 #endif // CEDAR_PROC_SOURCES_BOOST_H

@@ -50,40 +50,40 @@
 
 int main(int argc, char **argv)
 {
+  // find resources
   std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_kuka_arm(new cedar::dev::robot::SimulatedKinematicChain());
-  p_kuka_arm->readJson(configuration_file);
+  cedar::dev::robot::KinematicChainPtr kuka_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  kuka_arm->readJson(configuration_file);
 
   // create gl visualization objects
-  cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
-  cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
+  cedar::dev::robot::gl::KukaArmPtr kuka_arm_visualization
   (
-    new cedar::dev::robot::gl::KukaArm(p_kuka_arm)
+    new cedar::dev::robot::gl::KukaArm(kuka_arm)
   );
-  p_arm_visualization = p_kuka_arm_visualization;
 
   // create scene and viewer to display the arm
-  cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
-  p_scene->setSceneLimit(2);
-  p_scene->drawFloor(true);
-  p_scene->addObjectVisualization(p_arm_visualization);
-  cedar::aux::gui::Viewer viewer(p_scene);
+  cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene());
+  scene->setSceneLimit(2);
+  scene->drawFloor(true);
+  scene->addObjectVisualization(kuka_arm_visualization);
+  cedar::aux::gui::Viewer viewer(scene);
   viewer.show();
-  viewer.setSceneRadius(p_scene->getSceneLimit());
+  viewer.setSceneRadius(scene->getSceneLimit());
 
   // create control widgets for the scene and the arm
-  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  cedar::dev::robot::gui::KinematicChainWidget widget_arm(p_kuka_arm);
+  cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
+  cedar::dev::robot::gui::KinematicChainWidget widget_arm(kuka_arm);
 
   // show and start everything
-  p_scene_widget->show();
+  scene_widget->show();
   widget_arm.show();
   viewer.startTimer(20);
-  p_kuka_arm->startTimer(20);
+  kuka_arm->startTimer(20);
+  kuka_arm->start();
   a.exec();
 
   return 0;

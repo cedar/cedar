@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
@@ -95,7 +96,10 @@ void multi_thread_test()
   }
 }
 
-int main()
+// global variable
+unsigned int errors;
+
+void run_test()
 {
   // the number of errors encountered in this test
   int errors = 0;
@@ -231,7 +235,24 @@ int main()
   {
     errors = 255;
   }
+}
+
+int main(int argc, char* argv[])
+{
+  QCoreApplication* app;
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
 
   return errors;
 }
+
 #endif // CEDAR_USE_FFTW

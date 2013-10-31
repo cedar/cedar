@@ -143,8 +143,8 @@ public:
     }
     else // you never know ...
     {
-      CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
-                   "YARP: unexpectedly read NULL from port" );
+      CEDAR_THROW( cedar::aux::net::NetNoNewDataException,
+                   "YARP: currently no data in buffer (reading)" );
       return 0;
     }
   }
@@ -155,4 +155,3 @@ public:
 } } } } // end namespaces
 
 #endif
-

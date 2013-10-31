@@ -216,13 +216,13 @@ public:
           NodePtr child = *child_iter;
           if (child->matchesDerived(probeInstance))
           {
-            correspondingNode = child->insert<T>(probeInstance, data, correspondingNode);
+            correspondingNode = child->template insert<T>(probeInstance, data, correspondingNode);
             is_child = true;
           }
-          else if (child->derivesFrom<T>())
+          else if (child->template derivesFrom<T>())
           {
             // in this case, nothing else may be done.
-            return this->insertSuperClass<T>(data, correspondingNode);
+            return this->template insertSuperClass<T>(data, correspondingNode);
           }
         }
 
@@ -444,7 +444,7 @@ public:
       template <class T>
       bool derivesFrom() const
       {
-        return boost::dynamic_pointer_cast<const T>(this->mProbeInstance);
+        return static_cast<bool>(boost::dynamic_pointer_cast<const T>(this->mProbeInstance));
       }
 
       /*!@brief Counts all nodes connected to this node (directly and transitively).
@@ -582,7 +582,7 @@ public:
         )
         {
           NodePtr child = *child_iter;
-          if (child->derivesFrom<T>())
+          if (child->template derivesFrom<T>())
           {
             insertedNode->addChild(child);
             children_to_remove.insert(child);
@@ -709,7 +709,7 @@ private:
        */
       bool matchesDerived(ConstRootTypePtr instance) const
       {
-        return boost::dynamic_pointer_cast<const T>(instance);
+        return static_cast<bool>(boost::dynamic_pointer_cast<const T>(instance));
       }
   };
 
@@ -737,7 +737,7 @@ public:
   void insert(const DataType& data)
   {
     RootTypePtr instance(new T());
-    this->mRootNode->insert<T>(instance, data);
+    this->mRootNode->template insert<T>(instance, data);
   }
 
   /*!@brief Returns all the data along the path of the instance.

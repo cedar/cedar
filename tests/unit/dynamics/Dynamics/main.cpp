@@ -45,9 +45,9 @@
 #include "cedar/processing/Arguments.h"
 #include "Neuron.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
@@ -60,12 +60,15 @@
 
 typedef boost::shared_ptr<cedar::Neuron> NeuronPtr;
 
-int main(int, char**)
+// global variable
+unsigned int global_errors;
+
+void run_test()
 {
   using cedar::proc::LoopedTrigger;
   using cedar::proc::Manager;
 
-  unsigned int errors = 0;
+  global_errors = 0;
 
   std::cout << "Creating step declaration ... ";
   cedar::proc::ElementDeclarationPtr neuron_declaration
@@ -75,12 +78,12 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declaration to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(neuron_declaration);
+  neuron_declaration->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Setup1.json ... ";
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile("Setup1.json");
+  network->readJson("Setup1.json");
   std::cout << "done." << std::endl;
 
   // Create trigger for the "main loop"
@@ -108,6 +111,25 @@ int main(int, char**)
   network->getElement<LoopedTrigger>("Main Trigger")->stop();
 
   // return
-  std::cout << "Done. There were " << errors << " errors." << std::endl;
-  return errors;
+  std::cout << "Done. There were " << global_errors << " errors." << std::endl;
 }
+
+int main(int argc, char* argv[])
+{
+  QCoreApplication* app;
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
+
+  return global_errors;
+}
+
+

@@ -42,54 +42,76 @@
 #define CEDAR_PROC_ELEMENT_DECLARATION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/DeclarationBase.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/PlotData.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
 // SYSTEM INCLUDES
+#include <QIcon>
+#include <QResource>
 #include <vector>
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
  * create a step of this id. It is a concretization of DeclarationBase.
- * @todo With the revised factory, passing the factory type is probably unnecessary
  */
-class cedar::proc::ElementDeclaration : public cedar::proc::DeclarationBase
-                                               <
-                                                 cedar::proc::Element,
-                                                 cedar::aux::Factory<cedar::proc::ElementPtr>
-                                               >
+class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
+  //! PlotData struct is replaced by cedar::proc::PlotData
+  CEDAR_DECLARE_DEPRECATED(typedef cedar::proc::PlotData PlotData);
+  
   //!@brief list that pairs a data role with the desired plot
-  typedef std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > DataList;
+  typedef std::vector<cedar::proc::PlotDataPtr> DataList;
+
+  /*!@brief Structure that holds information about custom plots defined for a processing step.
+   */
+  struct PlotDefinition
+  {
+    /*! Constructor
+     *
+     * @param name Name of the plot to be displayed in the "defined plots" menu.
+     * @param icon (Optional) path to the icon to be used for the plot in the "defined plots" menu.
+     */
+    PlotDefinition(const std::string& name, const std::string& icon = std::string())
+    :
+    mName(name),
+    mIcon(icon)
+    {
+    }
+
+    //! Appends data to the list of items to plot.
+    void appendData(cedar::proc::DataRole::Id id, const std::string& dataName, bool ignoreIfMissing = false)
+    {
+      this->mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(id, dataName, ignoreIfMissing)));
+    }
+
+    //! Name of the plot.
+    std::string mName;
+
+    //! Icon of the plot.
+    std::string mIcon;
+
+    //! Data to be plotted.
+    DataList mData;
+  };
+
   //!@brief list of plot definitions
-  typedef std::vector<std::pair<std::string, DataList> > PlotDefinitionList;
+  typedef std::vector<PlotDefinition> PlotDefinitionList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief The standard constructor.
-  ElementDeclaration(
-                      cedar::proc::ElementFactoryPtr classFactory,
-                      const std::string& classId,
-                      const std::string& category
-                    )
+public:
+  //! Constructor that takes a category and an (optional) class name to use for the element.
+  ElementDeclaration(const std::string& category, const std::string& className = "")
   :
-  DeclarationBase<cedar::proc::Element, cedar::aux::Factory<cedar::proc::ElementPtr> >
-  (
-    classFactory,
-    classId,
-    category
-  )
-  {
-  }
-
-  //!@brief Destructor
-  ~ElementDeclaration()
+  cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>(category, className)
   {
   }
 
@@ -109,6 +131,36 @@ public:
     return this->mIconPath;
   }
 
+  //!@brief Returns the actual icon for the element.
+  QIcon getIcon() const
+  {
+    return QIcon(this->determinedIconPath());
+  }
+
+  /*! Returns the path for the icon to use; this will also return special icons if there is an error with the specified
+   * icons.
+   */
+  QString determinedIconPath() const
+  {
+    QResource existance_test(QString::fromStdString(this->getIconPath()));
+    if (existance_test.isValid())
+    {
+      auto icon = QIcon(QString::fromStdString(this->getIconPath()));
+      if (icon.isNull())
+      {
+        return ":/steps/no_icon.svg";
+      }
+      else
+      {
+        return QString::fromStdString(this->getIconPath());
+      }
+    }
+    else
+    {
+      return ":/steps/broken_icon.svg";
+    }
+  }
+
   //!@brief Method for setting the description of the element.
   void setDescription(const std::string& description)
   {
@@ -121,37 +173,34 @@ public:
     return this->mDescription;
   }
 
-  /*!@brief Reads some values such as the icon path from the configuration node.
-   */
-  virtual void read(const cedar::aux::ConfigurationNode& node)
-  {
-    if (node.find("icon") != node.not_found())
-    {
-      this->setIconPath(node.get_child("icon").get_value<std::string>());
-    }
-
-    if (node.find("description") != node.not_found())
-    {
-      this->setDescription(node.get_child("description").get_value<std::string>());
-    }
-  }
-
   /*!@brief Defines a new plot for this type of element
    *
-   * @param plotName    Name of the plot, displayed in the UI.
-   * @param slotsToPlot  List of data slots to plot.
-   *
-   * @todo  This should also be read from the plugin xml file.
+   * @param plotDefinition Definition of the plot.
    */
-  void definePlot(const std::string& plotName, const DataList& slotsToPlot)
+  void definePlot(const PlotDefinition& plotDefinition)
   {
-    this->mPlots.push_back(std::make_pair(plotName, slotsToPlot));
+    this->mPlots.push_back(plotDefinition);
   }
 
   //!@brief Returns the defined plots for this declaration.
   const PlotDefinitionList& definedPlots() const
   {
     return this->mPlots;
+  }
+
+  //! Overriden in the templated version by the super class implementation.
+  virtual void declare() const = 0;
+
+  //! Set the default plot. When the plot is an empty string, "plot all" will be the default.
+  void setDefaultPlot(const std::string& plotName)
+  {
+    this->mDefaultPlot = plotName;
+  }
+
+  //! Returns the name of the default plot. Empty if none is set.
+  const std::string& getDefaultPlot() const
+  {
+    return this->mDefaultPlot;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,7 +213,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void customRead(const cedar::aux::ConfigurationNode& node)
+  {
+    if (node.find("icon") != node.not_found())
+    {
+      this->setIconPath(node.get_child("icon").get_value<std::string>());
+    }
+
+    if (node.find("description") != node.not_found())
+    {
+      this->setDescription(node.get_child("description").get_value<std::string>());
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -180,17 +240,31 @@ private:
 
   //!@brief Declarations of plots.
   PlotDefinitionList mPlots;
+
+  //! Default plot to open (if empty, all data is plotted).
+  std::string mDefaultPlot;
 };
 
 
 /*!@brief This is a template class for comfortably generating element declarations.
  */
 template <class DerivedClass>
-class cedar::proc::ElementDeclarationTemplate : public ElementDeclaration
+class cedar::proc::ElementDeclarationTemplate
+    :
+    public cedar::aux::PluginDeclarationTemplate
+    <
+      cedar::proc::ElementPtr,
+      boost::shared_ptr<DerivedClass>,
+      cedar::proc::ElementDeclaration
+    >
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef
+      cedar::aux::PluginDeclarationTemplate<cedar::proc::ElementPtr, boost::shared_ptr<DerivedClass>, cedar::proc::ElementDeclaration>
+      DeclarationSuper;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -203,38 +277,19 @@ public:
    *                 example, a class test::namespaceName::ClassName will result in the name
    *                 test.namespaceName.ClassName.
    */
-
   ElementDeclarationTemplate(const std::string& category, const std::string& classId = "")
   :
-  ElementDeclaration
+  DeclarationSuper
   (
-    cedar::proc::ElementFactoryPtr
-    (
-      new cedar::aux::FactoryDerived<cedar::proc::ElementPtr, boost::shared_ptr<DerivedClass> >()
-    ),
-    classId,
-    category
+    category,
+    classId
   )
   {
-    // if no class name is specified,
-    if (classId.empty())
-    {
-      std::string class_name = cedar::aux::unmangleName(typeid(DerivedClass));
-      class_name = cedar::aux::replace(class_name, "::", ".");
-      this->setClassId(class_name);
-    }
   }
 
-  //!@brief Destructor
-  ~ElementDeclarationTemplate()
+  void declare() const
   {
-  }
-
-  //!@brief checks if a generic Element is of a given child type (the template parameter of ElementDeclarationT)
-  //!@param pointer step instance that is checked
-  bool isObjectInstanceOf(cedar::proc::ElementPtr pointer)
-  {
-    return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
+    DeclarationSuper::declare();
   }
 }; // class cedar::proc::ElementDeclarationTemplate
 

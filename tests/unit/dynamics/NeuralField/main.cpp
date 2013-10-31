@@ -45,6 +45,7 @@
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/processing/Network.h"
@@ -61,16 +62,19 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
-int main(int, char**)
+// global variables
+unsigned int global_errors;
+
+void run_test()
 {
   using cedar::proc::LoopedTrigger;
   using cedar::dyn::NeuralField;
 
-  unsigned int errors = 0;
+  global_errors = 0;
 
   std::cout << "Reading network.json ... " << std::endl;
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile("network.json");
+  network->readJson("network.json");
   std::cout << "done." << std::endl;
 
 #ifdef CEDAR_USE_FFTW
@@ -100,6 +104,25 @@ int main(int, char**)
 #endif
 
   // return
-  std::cout << "Done. There were " << errors << " errors." << std::endl;
-  return errors;
+  std::cout << "Done. There were " << global_errors << " errors." << std::endl;
 }
+
+int main(int argc, char* argv[])
+{
+  QCoreApplication* app;
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
+
+  return global_errors;
+}
+
+

@@ -42,6 +42,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -68,8 +69,9 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
-    input_declaration->setDescription("Writes incoming matrices to a yarp port.");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
+    input_declaration->setDescription("Writes incoming matrices to the local network.");
+
+    input_declaration->declare();
 
     return true;
   }
@@ -82,9 +84,14 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::sinks::NetWriter::NetWriter()
 :
+cedar::proc::Step(false, true),
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
-mWriter()
+mWriter(),
+_mPort(new cedar::aux::StringParameter(this, "port", 
+                                       "CEDAR/" 
+                                       + cedar::aux::versionNumberToString(CEDAR_VERSION)
+                                       + "/MISC" ))
 {
   // declare all data
   this->declareInput("input");
@@ -95,6 +102,13 @@ mWriter()
 
 void cedar::proc::sinks::NetWriter::onStart()
 {
+  _mPort->setConstant(true);
+
+  this->connect();
+}
+
+void cedar::proc::sinks::NetWriter::connect()
+{
   // instantiate the reader, if not yet done
   if (!mWriter)
   {
@@ -103,25 +117,29 @@ void cedar::proc::sinks::NetWriter::onStart()
       mWriter
         = boost::shared_ptr<cedar::aux::net::Writer<cedar::aux::MatData::DataType> >
           (
-            new cedar::aux::net::Writer<cedar::aux::MatData::DataType>("DEMOCHANNEL")
+            new cedar::aux::net::Writer<cedar::aux::MatData::DataType>(this->getPort())
           );
-      // TODO: make channel configurable
     }
     catch (cedar::aux::net::NetMissingRessourceException& e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
-      // TODO: set state of step
+      this->setState(cedar::proc::Step::STATE_EXCEPTION, "Network communication exception: " + e.exceptionInfo());
       throw (e); // lets try this ...
     }
-    // TODO: set state to OK
   }
 }
 
 void cedar::proc::sinks::NetWriter::onStop()
 {
   mWriter.reset();
+  _mPort->setConstant(false);
 }
 
+void cedar::proc::sinks::NetWriter::reset()
+{
+  mWriter.reset();
+  this->connect();
+}
 
 void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
 {
@@ -135,10 +153,14 @@ void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
   {
     mWriter->write(mInput->getData());
   }
+  // note, we could catch NetUnexpectedDataException here (which is thrown when 
+  // the matrix changes size) but that is more than a validation error, because
+  // it also breaks the architecture on the receiving side. Prefer a big,
+  // horrible and noticeable exception for the moment.
   catch (cedar::aux::net::NetMissingRessourceException& e)
   {
     // somehow YARP doesnt work ... :( typically fatal.
-    // TODO: set state of step
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Network communication exception: " + e.exceptionInfo());
     throw (e); // lets try this ...
   }
 }
@@ -181,7 +203,7 @@ void cedar::proc::sinks::NetWriter::inputConnectionChanged(const std::string& in
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-  if(!this->mInput)
+  if (!this->mInput)
   {
     return;
   }

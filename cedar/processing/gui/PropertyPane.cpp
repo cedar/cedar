@@ -37,7 +37,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
@@ -60,16 +59,19 @@ cedar::aux::gui::PropertyPane(pParent)
 
 std::string cedar::proc::gui::PropertyPane::getInstanceTypeId(cedar::aux::ConfigurablePtr pConfigurable) const
 {
-  if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(pConfigurable))
+  cedar::proc::ElementPtr element = boost::dynamic_pointer_cast<cedar::proc::Element>(pConfigurable);
+
+  if (!element)
   {
-    return cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(step)->getClassId();
+    return "Cannot determine type: not an element.";
   }
-  else if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(pConfigurable))
+
+  try
   {
-    return cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(trigger)->getClassId();
+    return cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element);
   }
-  else
+  catch (cedar::aux::UnknownTypeException)
   {
-    return this->cedar::aux::gui::PropertyPane::getInstanceTypeId(pConfigurable);
+    return "Could not determine type.";
   }
 }

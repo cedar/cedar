@@ -46,6 +46,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/net/Reader.h"
@@ -75,6 +76,19 @@ public:
   void onStop();
   void onStart();
 
+  /*! Returns the name of the port.
+   */
+  inline const std::string& getPort() const
+  {
+    return this->_mPort->getValue();
+  }
+
+  /*! Sets the name of the port.
+   */
+  inline void setPort(const std::string& port)
+  {
+    this->_mPort->setValue(port);
+  }
 
 public slots:
 
@@ -86,6 +100,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Resets the step and recreates the yarp connection.
+  void reset();
+
+  //!@brief calls emitOutputPropertiesChangedSignal on all outputs
+  //! needed because emitOutputPropertiesChanged() is protected
+  void emitOutputPropertiesChangedSignalOnAction();
+
+  void connect();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -100,9 +122,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-
 private:
+  cedar::aux::StringParameterPtr _mPort;
 
 }; // class cedar::proc::sources::NetReader
 

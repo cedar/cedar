@@ -68,7 +68,7 @@ int main(int, char *argv[])
   {
     uint64_t guid;
     guid = fw_interface.getCamGuid(camera_nr);
-    unsigned int guid_int = (unsigned int)(guid&0x00000000FFFFFFFF);  //only lower 32bit
+    unsigned int guid_int = static_cast<unsigned int>(guid&0x00000000FFFFFFFF);  //only lower 32bit
 
     std::cout << "bus-id: " << camera_nr << " : "
               << "guid: " << std::dec << guid_int

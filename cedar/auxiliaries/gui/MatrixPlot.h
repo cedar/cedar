@@ -49,7 +49,6 @@
 #include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
 /*!@brief Base class for plots that can display matrices.
  *
@@ -58,9 +57,9 @@
  *
  *        HistoryPlot0D     for 0D matrices,
  *
- *        LinePlot          for 1D matrices,
+ *        QwtLinePlot       for 1D matrices,
  *
- *        SurfacePlot       for 2D matrices and
+ *        QwtSurfacePlot    for 2D matrices and
  *
  *        MatrixSlicePlot3D for 3D matrices.
  *
@@ -89,9 +88,13 @@ public:
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
   //!@brief return vector of standard colors
-  static const Qwt3D::ColorVector& getStandardColorVector();
+  static const std::vector<cedar::aux::gui::ColorValueRGBA>& getStandardColorVector();
 
 public slots:
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
+   */
   void processChangedData();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,10 +119,12 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
   //!@brief vector filled with standard colors
-  static Qwt3D::ColorVector mStandardColorVector;
+  static std::vector<cedar::aux::gui::ColorValueRGBA> mStandardColorVector;
+
+  std::string mTitle;
 
 }; // class cedar::aux::gui::MatrixPlot
 

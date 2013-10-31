@@ -41,7 +41,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
-#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/ColorValueRGBA.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -49,12 +50,20 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QReadLocker>
 #include <QWriteLocker>
 #include <QToolTip>
 #include <QMouseEvent>
 #include <QThread>
+#include <QMenu>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFrame>
+#include <QDoubleSpinBox>
+#include <QPushButton>
+#include <QLinearGradient>
+#include <QPalette>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,9 +73,9 @@ namespace
 {
   bool registerPlot()
   {
-    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::ImagePlot> DeclarationTypeM;
-    boost::shared_ptr<DeclarationTypeM> declaration(new DeclarationTypeM());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::ImagePlot> DeclarationType;
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    declaration->declare();
 
     return true;
   }
@@ -88,36 +97,59 @@ QReadWriteLock cedar::aux::gui::ImagePlot::mLookupTableLock;
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 :
-cedar::aux::gui::PlotInterface(pParent),
-mTimerId(0),
-mDataType(DATA_TYPE_UNKNOWN),
-mConverting(false)
+cedar::aux::gui::PlotInterface(pParent)
 {
-  QVBoxLayout *p_layout = new QVBoxLayout();
-  p_layout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(p_layout);
-  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-
-  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay("no image loaded");
-  p_layout->addWidget(mpImageDisplay);
-
-  this->mpWorkerThread = new QThread();
-  mWorker = cedar::aux::gui::detail::ImagePlotWorkerPtr(new cedar::aux::gui::detail::ImagePlotWorker(this));
-  mWorker->moveToThread(this->mpWorkerThread);
-
-  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
-  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
-  QObject::connect(mWorker.get(), SIGNAL(failed()), this, SLOT(conversionFailed()));
-
-  this->mpWorkerThread->start(QThread::LowPriority);
+  this->construct();
 }
 
-cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(const QString& text)
+cedar::aux::gui::ImagePlot::ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
 :
-QLabel(text)
+cedar::aux::gui::PlotInterface(pParent)
+{
+  this->construct();
+
+  this->plot(matData, title);
+}
+
+cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text)
+:
+QLabel(text),
+mpPlot(pPlot)
 {
   this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   this->setWordWrap(true);
+}
+
+cedar::aux::gui::detail::ImagePlotLegend::ImagePlotLegend()
+{
+  this->mpMin = new QLabel("min");
+  this->mpMax = new QLabel("max");
+
+  this->mpMin->setMinimumWidth(35);
+  this->mpMax->setMinimumWidth(35);
+
+  auto p_gradient = new QFrame();
+  p_gradient->setSizePolicy(QSizePolicy::Fixed, p_gradient->sizePolicy().verticalPolicy());
+  p_gradient->setFixedWidth(20);
+  p_gradient->setFrameStyle(QFrame::Box);
+
+  this->mGradient = QLinearGradient(0, 0, 0, 1);
+  this->mGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+  cedar::aux::gui::ImagePlot::fillColorizationGradient(this->mGradient);
+
+  QPalette palette = p_gradient->palette();
+  palette.setBrush(QPalette::Window, QBrush(this->mGradient));
+  p_gradient->setAutoFillBackground(true);
+  p_gradient->setPalette(palette);
+
+  auto p_layout = new QGridLayout();
+  p_layout->setContentsMargins(1, 1, 1, 1);
+  p_layout->addWidget(p_gradient, 0, 0, 3, 1);
+  p_layout->addWidget(this->mpMax, 0, 1);
+  p_layout->addWidget(this->mpMin, 2, 1);
+  p_layout->setColumnStretch(1, 1);
+  p_layout->setRowStretch(1, 1);
+  this->setLayout(p_layout);
 }
 
 cedar::aux::gui::ImagePlot::~ImagePlot()
@@ -135,15 +167,166 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEvent)
+void cedar::aux::gui::ImagePlot::construct()
 {
-  //!@todo Use the channel annotation for values from three channel images
-  if (!this->pixmap() || !this->mData)
+  this->mTimerId = 0;
+  this->mDataType = DATA_TYPE_UNKNOWN;
+  this->mConverting = false;
+  this->mSmoothScaling = true;
+  this->mAutoScaling = true;
+  this->mpLegend = NULL;
+
+  QHBoxLayout *p_layout = new QHBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(p_layout);
+  this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay(this, "no image loaded");
+  p_layout->addWidget(mpImageDisplay);
+  mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  mpImageDisplay->setMinimumSize(QSize(50, 50));
+
+  this->mpWorkerThread = new QThread();
+  mWorker = cedar::aux::gui::detail::ImagePlotWorkerPtr(new cedar::aux::gui::detail::ImagePlotWorker(this));
+  mWorker->moveToThread(this->mpWorkerThread);
+
+  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
+  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
+  QObject::connect(mWorker.get(), SIGNAL(failed()), this, SLOT(conversionFailed()));
+
+  this->mpWorkerThread->start(QThread::LowPriority);
+}
+
+void cedar::aux::gui::ImagePlot::setLimits(double min, double max)
+{
+  if (this->mpLegend)
+  {
+    this->mpLegend->updateMinMax(min, max);
+  }
+  this->mValueLimits.setLower(min);
+  this->mValueLimits.setUpper(max);
+  this->mAutoScaling = false;
+}
+
+//! Enables automatic scaling.
+void cedar::aux::gui::ImagePlot::setAutomaticScaling()
+{
+  this->mAutoScaling = true;
+}
+
+void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double max)
+{
+  int precision = 2;
+  double diff = std::abs(max - min);
+  double log = std::log10(diff);
+  if (log < 0)
+  {
+    precision = std::max(precision, static_cast<int>(std::round(std::abs(log))));
+  }
+  this->mpMin->setText(QString("%1").arg(min, 0, 'g', precision));
+  this->mpMax->setText(QString("%1").arg(max, 0, 'g', precision));
+}
+
+void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
+{
+  if (mDataType != DATA_TYPE_MAT)
+  {
+    // currently, there are no context menu options for any plots other than matrices.
     return;
+  }
+
+  QMenu menu(this);
+
+  QAction *p_legend = menu.addAction("legend");
+  p_legend->setCheckable(true);
+  QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
+  p_legend->setChecked(this->mpLegend != NULL && this->mpLegend->isVisible());
+
+  QMenu* p_scaling = menu.addMenu("value scaling");
+
+  auto p_auto_scale = p_scaling->addAction("automatic");
+  p_auto_scale->setCheckable(true);
+  p_auto_scale->setChecked(this->mAutoScaling);
+  QObject::connect(p_auto_scale, SIGNAL(triggered()), this, SLOT(setAutomaticScaling()));
+
+  auto p_fixed_scaling = p_scaling->addAction("fixed ...");
+  p_fixed_scaling->setCheckable(true);
+  p_fixed_scaling->setChecked(!this->mAutoScaling);
+  QObject::connect(p_fixed_scaling, SIGNAL(triggered()), this, SLOT(queryFixedValueScale()));
+
+  menu.exec(pEvent->globalPos());
+}
+
+void cedar::aux::gui::ImagePlot::queryFixedValueScale()
+{
+  QDialog* p_dialog = new QDialog();
+  p_dialog->setModal(true);
+  auto p_layout = new QGridLayout();
+  p_dialog->setLayout(p_layout);
+  QLabel* p_label;
+  p_label = new QLabel("lower limit:");
+  p_layout->addWidget(p_label, 0, 0);
+
+  auto p_lower = new QDoubleSpinBox();
+  p_layout->addWidget(p_lower, 0, 1);
+  p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_lower->setMaximum(boost::numeric::bounds<double>::highest());
+  p_lower->setValue(this->mValueLimits.getLower());
+
+  p_label = new QLabel("upper limit:");
+  p_layout->addWidget(p_label, 1, 0);
+
+  auto p_upper = new QDoubleSpinBox();
+  p_layout->addWidget(p_upper, 1, 1);
+  p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_upper->setMaximum(boost::numeric::bounds<double>::highest());
+  p_upper->setValue(this->mValueLimits.getUpper());
+
+  auto p_buttons = new QDialogButtonBox();
+  p_buttons->addButton(QDialogButtonBox::Ok);
+  p_buttons->addButton(QDialogButtonBox::Cancel);
+  p_layout->addWidget(p_buttons, 2, 0, 1, 2);
+
+  QObject::connect(p_buttons->button(QDialogButtonBox::Ok), SIGNAL(clicked()), p_dialog, SLOT(accept()));
+  QObject::connect(p_buttons->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), p_dialog, SLOT(reject()));
+
+  int res = p_dialog->exec();
+
+  if (res == QDialog::Accepted)
+  {
+    this->setLimits(p_lower->value(), p_upper->value());
+  }
+}
+
+void cedar::aux::gui::ImagePlot::showLegend(bool show)
+{
+  if (this->mpLegend == NULL)
+  {
+    auto p_layout = cedar::aux::asserted_cast<QHBoxLayout*>(this->layout());
+    this->mpLegend = new cedar::aux::gui::detail::ImagePlotLegend();
+    p_layout->addWidget(this->mpLegend);
+    p_layout->setStretch(0, 1);
+    p_layout->setStretch(1, 0);
+    QObject::connect(this->mWorker.get(), SIGNAL(minMaxChanged(double, double)), this->mpLegend, SLOT(updateMinMax(double, double)));
+  }
+
+  this->mpLegend->setVisible(show);
+}
+
+void cedar::aux::gui::ImagePlot::setSmoothScaling(bool smooth)
+{
+  this->mSmoothScaling = smooth;
+}
+
+void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEvent)
+{
+  if (!this->pixmap() || !this->mData || pEvent->button() != Qt::LeftButton)
+    return;
+
+  QReadLocker locker(&this->mData->getLock());
 
   const cv::Mat& matrix = this->mData->getData();
 
-  QReadLocker locker(&this->mData->getLock());
   if (matrix.empty())
   {
     return;
@@ -206,6 +389,13 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEv
       QToolTip::showText(pEvent->globalPos(), QString("Matrix channel count (%1) not handled.").arg(matrix.channels()));
       return;
   }
+
+  // if applicable, display color space as well
+  if (this->mpPlot->mDataColorSpace)
+  {
+    info_text += QString(" (%1)").arg(QString::fromStdString(this->mpPlot->mDataColorSpace->getChannelCode()));
+  }
+
   locker.unlock();
 
   QToolTip::showText(pEvent->globalPos(), info_text);
@@ -244,27 +434,48 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
     case CV_8UC3:
     {
-      this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
-      read_lock.unlock();
+
+      // check if this is a HSV image
+      if
+      (
+        this->mpPlot->mDataColorSpace
+        && this->mpPlot->mDataColorSpace->getNumberOfChannels() == 3
+        && this->mpPlot->mDataColorSpace->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
+        && this->mpPlot->mDataColorSpace->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
+        && this->mpPlot->mDataColorSpace->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
+      )
+      {
+        cv::Mat converted;
+        cv::cvtColor(this->mpPlot->mData->getData(), converted, CV_HSV2BGR);
+				read_lock.unlock();
+        this->mpPlot->imageFromMat(converted);
+      }
+      else
+      {
+        this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
+				read_lock.unlock();
+      }
       break;
     }
 
     case CV_32FC1:
     {
-      //!@todo This should color-code when the data is not an image (i.e., a matrix)
-      //!@todo Some code here is redundant
-      // find min and max for scaling
-      double min, max;
-      cv::minMaxLoc(mat, &min, &max);
-      cv::Mat scaled = (mat - min) / (max - min) * 255.0;
-      read_lock.unlock();
-      cv::Mat mat_8u;
-      scaled.convertTo(mat_8u, CV_8U);
-
       // convert grayscale to three-channel matrix
-      cv::Mat converted = this->mpPlot->threeChannelGrayscale(mat_8u);
+      cv::Mat copy = mat.clone();
+      double min, max;
+      if (this->mpPlot->mAutoScaling)
+      {
+        cv::minMaxLoc(mat, &min, &max);
+      }
+      read_lock.unlock();
+      cv::Mat converted = this->mpPlot->threeChannelGrayscale(copy);
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->mpPlot->imageFromMat(converted);
+
+      if (this->mpPlot->mAutoScaling)
+      {
+        emit minMaxChanged(min, max);
+      }
       break;
     }
 
@@ -314,11 +525,18 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
   emit convert();
 }
 
-//!@todo encapsulate lookup table functionality in own class
-cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
+void cedar::aux::gui::ImagePlot::fillColorizationGradient(QGradient& gradient)
 {
-  CEDAR_DEBUG_ASSERT(in.channels() == 1);
+  gradient.setColorAt(static_cast<qreal>(1.0), QColor(0, 0, 127));
+  gradient.setColorAt(static_cast<qreal>(1.0 - 32.0/256.0), QColor(0, 0, 255));
+  gradient.setColorAt(static_cast<qreal>(1.0 - 96.0/256.0), QColor(0, 255, 255));
+  gradient.setColorAt(static_cast<qreal>(1.0 - 160.0/256.0), QColor(255, 255, 0));
+  gradient.setColorAt(static_cast<qreal>(1.0 - 224.0/256.0), QColor(255, 0, 0));
+  gradient.setColorAt(static_cast<qreal>(0.0), QColor(127, 0, 0));
+}
 
+cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits, double min, double max)
+{
   QReadLocker lookup_readlock(&mLookupTableLock);
   if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
   {
@@ -328,7 +546,8 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
     if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
     {
       const size_t steps = 256;
-      const Qwt3D::ColorVector& standard = cedar::aux::gui::MatrixPlot::getStandardColorVector();
+      const std::vector<cedar::aux::gui::ColorValueRGBA>& standard
+        = cedar::aux::gui::MatrixPlot::getStandardColorVector();
       mLookupTableR.resize(steps, 0);
       mLookupTableG.resize(steps, 0);
       mLookupTableB.resize(steps, 0);
@@ -345,14 +564,14 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
         CEDAR_DEBUG_ASSERT(closest_standard < standard.size());
 
-        double r_lower = static_cast<double>(standard.at(closest_standard).r) * 255.0;
-        double g_lower = static_cast<double>(standard.at(closest_standard).g) * 255.0;
-        double b_lower = static_cast<double>(standard.at(closest_standard).b) * 255.0;
+        double r_lower = static_cast<double>(standard.at(closest_standard).red) * 255.0;
+        double g_lower = static_cast<double>(standard.at(closest_standard).green) * 255.0;
+        double b_lower = static_cast<double>(standard.at(closest_standard).blue) * 255.0;
         if (closest_standard + 1 < standard.size())
         {
-          double r_upper = static_cast<double>(standard.at(closest_standard + 1).r);
-          double g_upper = static_cast<double>(standard.at(closest_standard + 1).g);
-          double b_upper = static_cast<double>(standard.at(closest_standard + 1).b);
+          double r_upper = static_cast<double>(standard.at(closest_standard + 1).red);
+          double g_upper = static_cast<double>(standard.at(closest_standard + 1).green);
+          double b_upper = static_cast<double>(standard.at(closest_standard + 1).blue);
 
           double factor = static_cast<double>(v - lower_closest) / static_cast<double>(upper_closest - lower_closest);
 
@@ -375,6 +594,76 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
     lookup_readlock.relock();
   }
 
+  // accept only char type matrices
+
+  int channels = matrix.channels();
+
+  int rows = matrix.rows * channels;
+  int cols = matrix.cols;
+
+  if (matrix.isContinuous())
+  {
+    cols *= rows;
+    rows = 1;
+  }
+
+  cv::Mat in_converted;
+
+  if (matrix.type() != CV_8UC1)
+  {
+    switch (matrix.type())
+    {
+      case CV_32F:
+      {
+        cv::Mat scaled = (matrix - min) / (max - min) * 255.0;
+        scaled.convertTo(in_converted, CV_8UC1);
+        break;
+      }
+      default:
+        matrix.convertTo(in_converted, CV_8UC1);
+        break;
+    }
+  }
+  else
+  {
+    in_converted = matrix;
+  }
+
+  cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
+
+  const unsigned char* p_in;
+  unsigned char* p_converted;
+  for (int i = 0; i < rows; ++i)
+  {
+    p_in = in_converted.ptr<unsigned char>(i);
+    p_converted = converted.ptr<unsigned char>(i);
+    for (int j = 0; j < cols; ++j)
+    {
+      size_t v = static_cast<size_t>(p_in[j]);
+      // channel 0
+      p_converted[3 * j + 0] = mLookupTableB.at(v);
+      // channel 1
+      p_converted[3 * j + 1] = mLookupTableG.at(v);
+      // channel 2
+      p_converted[3 * j + 2] = mLookupTableR.at(v);
+    }
+  }
+
+  if (limits)
+  {
+    cv::Mat min_vals = (matrix < min);
+    cv::Mat max_vals = (matrix > max);
+    converted.setTo(0xFFFFFF, min_vals | max_vals);
+  }
+
+  return converted;
+}
+
+cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
+{
+  CEDAR_DEBUG_ASSERT(in.channels() == 1);
+
+  // find min and max for scaling
   switch (this->mDataType)
   {
     default:
@@ -397,7 +686,9 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         cv::Mat merged, converted;
         cv::merge(merge_vec, merged);
         cv::cvtColor(merged, converted, CV_HSV2BGR);
-        return converted;
+        cv::Mat converted_8uc3;
+        converted.convertTo(converted_8uc3, CV_8UC3);
+        return converted_8uc3;
       }
       else
       {
@@ -434,47 +725,25 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
         cv::Mat converted;
         cv::merge(merge_vec, converted);
-        return converted;
+        cv::Mat converted_8uc3;
+        converted.convertTo(converted_8uc3, CV_8UC3);
+        return converted_8uc3;
       }
     }
 
     case DATA_TYPE_MAT:
     {
-      // accept only char type matrices
-      CEDAR_ASSERT(in.depth() != sizeof(char));
-
-      int channels = in.channels();
-
-      int rows = in.rows * channels;
-      int cols = in.cols;
-
-      if (in.isContinuous())
+      double min, max;
+      if (this->mAutoScaling)
       {
-          cols *= rows;
-          rows = 1;
+        cv::minMaxLoc(in, &min, &max);
       }
-
-      cv::Mat converted = cv::Mat(in.rows, in.cols, CV_8UC3);
-
-      int i,j;
-      const unsigned char* p_in;
-      unsigned char* p_converted;
-      for( i = 0; i < rows; ++i)
+      else
       {
-          p_in = in.ptr<unsigned char>(i);
-          p_converted = converted.ptr<unsigned char>(i);
-          for ( j = 0; j < cols; ++j)
-          {
-            size_t v = static_cast<size_t>(p_in[j]);
-            // channel 0
-            p_converted[3 * j + 0] = mLookupTableB.at(v);
-            // channel 1
-            p_converted[3 * j + 1] = mLookupTableG.at(v);
-            // channel 2
-            p_converted[3 * j + 2] = mLookupTableR.at(v);
-          }
+        min = this->mValueLimits.getLower();
+        max = this->mValueLimits.getUpper();
       }
-      return converted;
+      return cedar::aux::gui::ImagePlot::colorizedMatrix(in, !this->mAutoScaling, min, max);
     }
   }
 }
@@ -553,9 +822,19 @@ void cedar::aux::gui::ImagePlot::resizePixmap()
         && !this->mImage.isNull()
       )
   {
+    Qt::TransformationMode transformation_mode;
+    if (this->mSmoothScaling)
+    {
+      transformation_mode = Qt::SmoothTransformation;
+    }
+    else
+    {
+      transformation_mode = Qt::FastTransformation;
+    }
+
     QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(),
                                               Qt::KeepAspectRatio,
-                                              Qt::SmoothTransformation);
+                                              transformation_mode);
     this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
   }
 }

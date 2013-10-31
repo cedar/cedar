@@ -55,18 +55,18 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr preshape_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("DFT", "cedar.dynamics.Preshape")
     );
-    preshape_decl->setIconPath(":/steps/preshape.svg");
-    preshape_decl->setDescription
+    declaration->setIconPath(":/steps/preshape.svg");
+    declaration->setDescription
     (
       "A dynamical system that slowly accumulates activation at locations of strongly active input. The activation "
       "decays slowly over time."
     );
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(preshape_decl);
+    declaration->declare();
 
     return true;
   }
@@ -80,8 +80,11 @@ namespace
 cedar::dyn::Preshape::Preshape()
 :
 mActivation(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
-_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
+_mDimensionality
+(
+  new cedar::aux::UIntParameter(this, "dimensionality", 2, cedar::aux::UIntParameter::LimitType::positiveZero(4))
+),
+_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 5000)),
 _mTimeScaleBuildUp
 (
   new cedar::aux::DoubleParameter(this, "time scale build up", 10.0, cedar::aux::DoubleParameter::LimitType::positive())
@@ -91,7 +94,6 @@ _mTimeScaleDecay
   new cedar::aux::DoubleParameter(this, "time scale decay", 1000.0, cedar::aux::DoubleParameter::LimitType::positive())
 )
 {
-  _mDimensionality->setValue(2);
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
@@ -145,7 +147,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    //!@todo Reenable this once the annotations for space code are introduced.
     /* if (cedar::dyn::ConstSpaceCodePtr input = boost::dynamic_pointer_cast<const cedar::dyn::SpaceCode>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
@@ -166,7 +167,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
       else
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
-        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */ // see above todo entry
       }
     }
     return cedar::proc::DataSlot::VALIDITY_ERROR;
@@ -184,38 +184,20 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
-  return this->cedar::proc::Step::determineInputValidity(slot, data);
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 bool cedar::dyn::Preshape::isMatrixCompatibleInput(const cv::Mat& matrix) const
 {
-  // special case due to opencv's strange handling of 1d-matrices
-  if(matrix.dims == 2 && (matrix.rows == 1 || matrix.cols == 1))
+  if (matrix.type() != CV_32F)
   {
-    // if this field is set to more dimensions than the input (in this case 1), they are not compatible
-    if (this->_mDimensionality->getValue() != 1)
-      return false;
-
-    CEDAR_DEBUG_ASSERT(this->_mSizes->getValue().size() == 1);
-
-    // if the dimensions are both 1, rows or cols must be the same as the field size
-    if (static_cast<int>(this->_mSizes->at(0)) != matrix.rows
-        && static_cast<int>(this->_mSizes->at(0)) != matrix.cols)
-      return false;
+    return false;
   }
-  else
-  {
-    if (static_cast<int>(this->_mDimensionality->getValue()) != matrix.dims)
-      return false;
-    for (unsigned int dim = 0; dim < this->_mSizes->getValue().size(); ++dim)
-    {
-      if (matrix.size[static_cast<int>(dim)] != static_cast<int>(this->_mSizes->at(dim)))
-        return false;
-    }
-  }
-  return true;
+
+  unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(matrix);
+  return this->_mDimensionality->getValue() == matrix_dim
+           && cedar::aux::math::matrixSizesEqual(matrix, this->mActivation->getData());
 }
 
 void cedar::dyn::Preshape::dimensionalityChanged()
@@ -268,4 +250,6 @@ void cedar::dyn::Preshape::updateMatrices()
     this->mActivation->getData() = cv::Mat(dimensionality,&sizes.at(0), CV_32F, cv::Scalar(0));
   }
   this->unlockAll();
+  this->revalidateInputSlot("input");
+  this->emitOutputPropertiesChangedSignal("activation");
 }

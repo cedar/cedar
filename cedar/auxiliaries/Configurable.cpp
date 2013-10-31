@@ -54,7 +54,6 @@
 #include <sstream>
 #include <fstream> // only used for legacy configurable compatibility
 
-//!@todo Store parameter locks properly
 //!@todo Store parameter locks of children & subparameters properly
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,6 +61,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::Configurable::Configurable()
+:
+mIsAdvanced(false)
 {
   this->connectToTreeChangedSignal(boost::bind(&cedar::aux::Configurable::updateLockSet, this));
 }
@@ -74,6 +75,79 @@ cedar::aux::Configurable::~Configurable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::Configurable::addDeprecatedName(cedar::aux::ParameterPtr parameter, const std::string& deprecatedName)
+{
+  // check if there is already a parameter with this name
+  if (this->mParameterAssociations.find(deprecatedName) != this->mParameterAssociations.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "Cannot use deprecated name \"" + deprecatedName + "\"; there is already a parameter with this name."
+    );
+  }
+
+  // check if another parameter already uses the deprecated name
+  for
+  (
+    auto param_iter = this->mDeprecatedParameterNames.begin();
+    param_iter != this->mDeprecatedParameterNames.end();
+    ++param_iter
+  )
+  {
+    auto deprecated_names = param_iter->second;
+    for (auto iter = deprecated_names.begin(); iter != deprecated_names.end(); ++iter)
+    {
+      const std::string& other_deprecated_name = *iter;
+      if (other_deprecated_name == deprecatedName)
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::DuplicateNameException,
+          "Cannot use deprecated name \"" + deprecatedName + "\"; there is already a parameter with this deprecated name."
+        );
+      }
+    }
+  }
+
+  // create a vector of deprecated names, if none exists yet
+  if (mDeprecatedParameterNames.find(parameter->getName()) == mDeprecatedParameterNames.end())
+  {
+    mDeprecatedParameterNames[parameter->getName()] = std::vector<std::string>();
+  }
+
+  // add the deprecated name for the parameter
+  auto iter = mDeprecatedParameterNames.find(parameter->getName());
+  iter->second.push_back(deprecatedName);
+}
+
+size_t cedar::aux::Configurable::countAdvanced() const
+{
+  size_t advanced_count = 0;
+  for (auto iter = mParameterList.begin(); iter != mParameterList.end(); ++iter)
+  {
+    cedar::aux::ConstParameterPtr parameter = *iter;
+    if (parameter->isAdvanced())
+    {
+      ++advanced_count;
+    }
+  }
+
+  for (auto iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
+  {
+    cedar::aux::ConfigurablePtr conf = iter->second;
+
+    if (conf->isAdvanced())
+    {
+      ++advanced_count;
+    }
+
+    advanced_count += conf->countAdvanced();
+  }
+
+  return advanced_count;
+}
 
 void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType) const
 {
@@ -116,6 +190,14 @@ void cedar::aux::Configurable::configurationLoaded()
 
 cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const std::string& path)
 {
+  return boost::const_pointer_cast<cedar::aux::Configurable>
+         (
+           static_cast<const cedar::aux::Configurable*>(this)->getConfigurableChild(path)
+         );
+}
+
+cedar::aux::ConstConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const std::string& path) const
+{
   std::vector<std::string> path_components;
   cedar::aux::split(path, ".", path_components);
 
@@ -127,7 +209,7 @@ cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const
     CEDAR_THROW(cedar::aux::UnknownNameException, "Child \"" + path + "\" not found.");
   }
 
-  cedar::aux::ConfigurablePtr child = iter->second;
+  cedar::aux::ConstConfigurablePtr child = iter->second;
   if (path_components.size() == 1)
   {
     return child;
@@ -146,13 +228,24 @@ cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const
   }
 }
 
-
 cedar::aux::ParameterPtr cedar::aux::Configurable::getParameter(const std::string& path)
 {
+  return boost::const_pointer_cast<cedar::aux::Parameter>
+         (
+           static_cast<const cedar::aux::Configurable*>(this)->getParameter(path)
+         );
+}
+
+cedar::aux::ConstParameterPtr cedar::aux::Configurable::getParameter(const std::string& path) const
+{
+  // this method looks for configurables by traversing a dot-separated path of names
+  // each entry in this path should address a configurable child, except the final one which addresses the
+  // parameter in the child.
   std::vector<std::string> path_components, subpath_components;
   cedar::aux::split(path, ".", path_components);
 
-  cedar::aux::Configurable *p_configurable = this;
+  // the first configruable we look at is the this object
+  const cedar::aux::Configurable* p_configurable = this;
 
   if (path_components.size() > 1)
   {
@@ -165,13 +258,12 @@ cedar::aux::ParameterPtr cedar::aux::Configurable::getParameter(const std::strin
     p_configurable = this->getConfigurableChild(subpath).get();
   }
 
-  ParameterMap::iterator iter = p_configurable->mParameterAssociations.find(path_components.back());
+  auto iter = p_configurable->mParameterAssociations.find(path_components.back());
   if (iter == p_configurable->mParameterAssociations.end())
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "Parameter \"" + path + "\" was not found.");
   }
-  cedar::aux::ParameterPtr parameter = *(iter->second);
-  return parameter;
+  return *(iter->second);
 }
 
 
@@ -262,8 +354,7 @@ void cedar::aux::Configurable::newFormatToOld(cedar::aux::ConfigurationNode& nod
   }
 }
 
-
-void cedar::aux::Configurable::writeJson(const std::string& filename) const
+std::string cedar::aux::Configurable::normalizeFilename(const std::string& filename) const
 {
   std::string dir = filename;
 
@@ -274,9 +365,25 @@ void cedar::aux::Configurable::writeJson(const std::string& filename) const
     boost::filesystem::create_directories(dir);
   }
 
+  return filename;
+}
+
+void cedar::aux::Configurable::writeJson(const std::string& filename) const
+{
+  std::string new_filename = normalizeFilename(filename);
+
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
   boost::property_tree::write_json(filename, configuration);
+}
+
+void cedar::aux::Configurable::writeCsv(const std::string& filename, const char separator) const
+{
+  std::string new_filename = normalizeFilename(filename);
+
+  cedar::aux::ConfigurationNode configuration;
+  this->writeConfiguration(configuration);
+  writeCsvConfiguration(new_filename, configuration, separator);
 }
 
 void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* parameter)
@@ -399,22 +506,42 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
   for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)
   {
     cedar::aux::ParameterPtr& parameter = *iter;
-    try
+
+    auto param_iter = node.find(parameter->getName());
+
+    // if there is a deprecated name for this parameter, try to find the parameter by this name
+    if (param_iter == node.not_found())
     {
-      const cedar::aux::ConfigurationNode& value = node.get_child(parameter->getName());
-
-      // set the parameter to the value read from the file
-      parameter->readFromNode(value);
-
-      // reset the changed flag of the parameter
-      (*iter)->setChangedFlag(false);
+      // check if there are deprecated names for this parameter
+      auto depr_iter = this->mDeprecatedParameterNames.find(parameter->getName());
+      if (depr_iter != this->mDeprecatedParameterNames.end())
+      {
+        // if so, see if there is a node for any of them
+        const std::vector<std::string>& depr_names = depr_iter->second;
+        for (auto iter = depr_names.begin(); iter != depr_names.end(); ++iter)
+        {
+          const std::string& deprecated_name = *iter;
+          param_iter = node.find(deprecated_name);
+          if (param_iter != node.not_found())
+          {
+            cedar::aux::LogSingleton::getInstance()->warning
+            (
+              "Using deprecated name \"" + deprecated_name + "\" for parameter \"" + parameter->getName() + "\".",
+              "cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode&)"
+            );
+            break;
+          }
+        }
+      }
     }
-    catch (const boost::property_tree::ptree_bad_path& e)
+
+
+    if (param_iter == node.not_found())
     {
       if (!parameter->getHasDefault())
       {
         std::string error_message;
-        error_message = "Config node " + parameter->getName() + " not found. Node names are:";
+        error_message = "Mandatory parameter " + parameter->getName() + " not found in configuration. Node names are:";
 
         for (cedar::aux::ConfigurationNode::const_iterator node_iter = node.begin();
              node_iter != node.end();
@@ -422,17 +549,26 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
         {
           error_message += " " + node_iter->first;
         }
-        error_message += ". Boost message: ";
-        error_message += e.what();
+        error_message += ".";
 
         CEDAR_THROW(cedar::aux::ParameterNotFoundException, error_message);
       }
       else
       {
         parameter->makeDefault();
+        // nothing to read -- continue with next parameter
+        continue;
       }
     }
-  }
+
+    const cedar::aux::ConfigurationNode& value = param_iter->second;
+
+    // set the parameter to the value read from the file
+    parameter->readFromNode(value);
+
+    // reset the changed flag of the parameter
+    (*iter)->setChangedFlag(false);
+  } // for parameter
 
   for (Children::iterator child = this->mChildren.begin(); child != this->mChildren.end(); ++child)
   {

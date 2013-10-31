@@ -126,6 +126,12 @@ class cedar::aux::TypeMismatchException : public cedar::aux::ExceptionBase
 {
 };
 
+/*!@brief Exception that occurs when an given dimensionalities do not match.
+ */
+class cedar::aux::DimensionalityMismatchException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception thrown when a connection (i.e. a network connection) is too bad to continue.
  */
 class cedar::aux::BadConnectionException : public cedar::aux::ExceptionBase
@@ -204,5 +210,32 @@ class cedar::aux::ConversionFailedException : public cedar::aux::ExceptionBase
 class cedar::aux::ValidationFailedException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ValidationFailedException
+
+/*!@brief Exception that occurs when threading code is mis-used
+ */
+class cedar::aux::ThreadingErrorException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ThreadingErrorException
+
+/*!@brief An exception that is thrown, when reading or writing jsons encounters a parsing error.
+ */
+class cedar::aux::ParseException: public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::ParseException
+
+/*!@brief An exception that is thrown, when a function is not implemented.
+ */
+class cedar::aux::NotImplementedException: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::NotImplementedException
+
+/*!@brief An exception that is thrown, when a thread is running and an operation
+ *        is called which is not allowed.
+ * @todo  This exception needs a better name
+ */
+class cedar::aux::ThreadRunningExeption: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ThreadRunningExeption
+
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

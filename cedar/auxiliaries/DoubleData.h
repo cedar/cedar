@@ -40,6 +40,84 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/math/tools.h"
+
+/*!@brief Data containing matrices.
+ */
+class cedar::aux::DoubleData : public cedar::aux::MatData
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! The super class of this type.
+  typedef cedar::aux::MatData Super;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  DoubleData()
+  :
+  Super(cv::Mat(1, 1, CV_64F))
+  {
+  }
+
+  //!@brief This constructor initializes the internal data to a value.
+  DoubleData(double value)
+  :
+  Super(cv::Mat(1, 1, CV_64F, value))
+  {
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*!@brief Returns a const reference to the stored parameter value.
+   */
+  const double& getData() const
+  {
+    return this->Super::getData().at<double>(0, 0);
+  }
+
+  /*!@brief Returns a reference to the stored parameter value.
+   */
+  double& getData()
+  {
+    return this->Super::getData().at<double>(0, 0);
+  }
+
+  /*!@brief Sets the given value in the parameter.
+   */
+  void setData(double value)
+  {
+    this->Super::getData().at<double>(0, 0) = value;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+};
 
 #endif // CEDAR_AUX_DOUBLE_DATA_H

@@ -44,12 +44,11 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 
-/*!@brief An exception that occurs when a name is used as an index that is not known.
- * @todo  There is already an InvalidNameException in aux, so remove this one.
+/*!@brief An exception that occurs when data is not found.
  */
-class cedar::proc::InvalidNameException : public cedar::aux::ExceptionBase
+class cedar::proc::DataNotFoundException : public cedar::aux::ExceptionBase
 {
-}; // class cedar::proc::InvalidNameException
+}; // class cedar::proc::DataNotFoundException
 
 /*!@brief An exception that occurs when a deadlock may be caused by a user action.
  */
@@ -109,13 +108,6 @@ class cedar::proc::PluginException: public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::PluginException
 
-/*!@brief An exception that is thrown, when FrameworkSettings encounters a parsing error during loading or saving
- * of settings.
- */
-class cedar::proc::ParseException: public cedar::aux::ExceptionBase
-{
-}; // class cedar::proc::ParseException
-
 /*!@brief An exception that is thrown by the Manager, if a connection that is marked for deletion, cannot be found in
  * the list of connections.
  */
@@ -136,11 +128,23 @@ class cedar::proc::DuplicateConnectionException : public cedar::aux::ExceptionBa
 {
 }; // class cedar::proc::DuplicateConnectionException
 
+/*!@brief An exception that is thrown by processing steps when no measurements for lock time etc. are present.
+ */
+class cedar::proc::NoMeasurementException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::NoMeasurementException
+
 /*!@brief An exception that is thrown by ProjectionMapping when a user wants to look up a mapping that does not exist.
  */
 class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::NoMappingException
+
+/*!@brief An exception that is thrown by cedar::proc::DataSlot when a type check is requested that is not set.
+ */
+class cedar::proc::NoCheckException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::NoCheckException
 
 /*!@brief An exception that is a collection of exception messages that occurred during loading of an architecture.
  */

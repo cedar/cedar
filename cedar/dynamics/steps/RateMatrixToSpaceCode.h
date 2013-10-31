@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -122,7 +122,6 @@ private:
     _mUpperLimit->setValue(limit);
   }
 
-  //!@todo generalize to a math utility function
   inline int interpolateBin(double value)
   {
     double interpolated = (value - this->getLowerLimit()) / mInterval;

@@ -78,6 +78,15 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns a string that contains the matrix body in CSV format.
+  void serializeData(std::ostream& stream) const;
+  
+  //!@brief Returns a string that describes the matrix header in CSV format.
+  void serializeHeader(std::ostream& stream) const;
+  
+  //!@brief creates a deep copy of this data
+  cedar::aux::DataPtr clone() const;
+
   std::string getDescription() const;
 
   /*!@brief Returns the dimensionality of the matrix stored in this data.
@@ -85,6 +94,18 @@ public:
    * @remarks Calls cedar::aux::math::getDimensionalityOf(this->getData()) to determine the dimensionality.
    */
   unsigned int getDimensionality() const;
+
+  //! Convenience method that returns the opencv-type of the stored matrix.
+  inline int getCvType() const
+  {
+    return this->getData().type();
+  }
+
+  //! Checks if the matrix is empty.
+  bool isEmpty() const
+  {
+    return this->getData().empty();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

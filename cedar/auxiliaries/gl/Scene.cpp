@@ -179,7 +179,6 @@ void cedar::aux::gl::Scene::initGl()
   glEnable(GL_MAP2_VERTEX_3);
   glEnable(GL_AUTO_NORMAL);
 
-  //!@todo this somehow sets the light relative to the camera, which might not be wanted. check!
   // set light
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);

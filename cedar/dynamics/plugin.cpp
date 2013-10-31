@@ -47,7 +47,7 @@
 // SYSTEM INCLUDES
 
 
-void pluginDeclaration(cedar::proc::PluginDeclarationPtr)
+void pluginDeclaration(cedar::aux::PluginDeclarationListPtr)
 {
 #ifndef CEDAR_OS_WINDOWS
   cedar::aux::LogSingleton::getInstance()->warning

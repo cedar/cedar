@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -138,6 +138,9 @@ protected:
 
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
+
+  //!@brief Contains the current fixed point (mainly used for visualization)
+  cedar::aux::MatDataPtr mFixPoint;
 private:
   cv::Mat mRamp;
 

@@ -47,8 +47,6 @@
 #include <map>
 
 /*!@brief Base class for robots.
- *
- * @todo More detailed description of the class.
  */
 class cedar::dev::robot::Robot
 {

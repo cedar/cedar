@@ -77,6 +77,17 @@ public:
     MODE_CONNECT
   };
 
+  //! Current trigger connection mode
+  enum TRIGGER_CONNECTION_MODE
+  {
+    //!
+    MODE_HIDE_ALL,
+    //!
+    MODE_SHOW_ALL,
+    //!
+    MODE_SMART
+  };
+
   //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
   typedef std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
 
@@ -192,13 +203,21 @@ public:
    */
   void reset();
 
+  /*!@brief Deprecated, see getStepMap(). Returns the step map.
+   */
+  CEDAR_DECLARE_DEPRECATED(const StepMap& stepMap() const);
+
   /*!@brief Returns the step map.
    */
-  const StepMap& stepMap() const;
+  const StepMap& getStepMap() const;
+
+  /*!@brief Deprecated, see getTriggerMap(). Returns the trigger map.
+   */
+  CEDAR_DECLARE_DEPRECATED(const TriggerMap& triggerMap() const);
 
   /*!@brief Returns the trigger map.
    */
-  const TriggerMap& triggerMap() const;
+  const TriggerMap& getTriggerMap() const;
 
   /*!@brief Returns the gui::network that displays the given network.
    */
@@ -241,19 +260,34 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
    */
-  void setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget);
+  void setConfigurableWidget(cedar::aux::gui::PropertyPane* pConfigurableWidget);
+
+  /*!@brief Sets the widget used for displaying/editing the record parameters.
+   */
+  void setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget);
 
   /*!@brief Exports the scene to an svg file
    */
   void exportSvg(const QString& file);
 
+  /*! Sets the display mode for triggers.
+   */
+  void setTriggerDisplayMode(TRIGGER_CONNECTION_MODE mode)
+  {
+    this->mTriggerMode = mode;
+    this->handleTriggerModeChange();
+  }
+
+  //! select all items
+  void selectAll();
+
+  //! deselect all items
+  void selectNone();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
 signals:
-  /*!@brief Signal that is emitted when an exception occurs.
-   */
-  void exception(const QString& message);
   /*!@brief Signal that is emitted when the current mode finishes, e.g., when a connection has been made.
    */
   void modeFinished();
@@ -298,6 +332,8 @@ private:
    */
   void removeNetworkItem(cedar::proc::gui::Network* pNetwork);
 
+  void handleTriggerModeChange();
+
 private slots:
   void promoteElementToExistingGroup();
 
@@ -315,6 +351,9 @@ protected:
 private:
   //! The current mode.
   MODE mMode;
+
+  //! The current trigger mode.
+  TRIGGER_CONNECTION_MODE mTriggerMode;
 
   //! The parameter for the current mode.
   QString mModeParam;
@@ -351,6 +390,9 @@ private:
 
   //! The widget used to display configurables when they are selected in the scene. May be null.
   cedar::aux::gui::PropertyPane *mpConfigurableWidget;
+
+  //! The widget used to display record settings of steps when they are selected in the scene. May be null.
+  cedar::proc::gui::RecorderWidget *mpRecorderWidget;
 
 }; // class ProcessingScene
 

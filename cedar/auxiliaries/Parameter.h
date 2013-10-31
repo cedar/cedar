@@ -110,6 +110,26 @@ public:
   //!@brief set flag if this parameter is hidden (for GUI)
   void setHidden(bool hide);
 
+  /*!@brief   Marks this parameter as advanced.
+   *
+   *          Advanced parameters are those that usually don't need to be changed. This is mainly used by user interfaces
+   *          to avoid cluttering lists with parameters that are rarely needed, or may need specific knowledge to be
+   *          set to proper values.
+   *
+   * @remarks Currently, this should not be changed at runtime; call this once, right after you add the parameter to a
+   *          configurable.
+   */
+  void markAdvanced(bool advanced = true)
+  {
+    this->mAdvanced = advanced;
+  }
+
+  //!@brief Returns whether this parameter is marked as advanced.
+  bool isAdvanced() const
+  {
+    return this->mAdvanced;
+  }
+
   //!@brief emit the value changed signal
   void emitChangedSignal();
   //!@brief emit the property changed signal
@@ -149,6 +169,21 @@ public:
 
   //!@brief Removes all the locks needed to lock this parameter properly from the set.
   virtual void removeLocks(std::set<QReadWriteLock*>& locks) const;
+
+  //! Returns the owner of the parameter.
+  cedar::aux::Configurable* getOwner() const
+  {
+    return this->mpOwner;
+  }
+
+  /*! @brief Adds a deprecated name to the parameter.
+   *
+   *         Values for this parameter can then be read under the deprecated name(s), but these names are no longer used
+   *         to write the value. Also, a warning about this will be printed.
+   *
+   * @param  deprecatedName
+   */
+  void addDeprecatedName(const std::string& deprecatedName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -199,6 +234,9 @@ private:
 
   //! Flag that indicates whether this parameter was changed since the last file reading.
   bool mChanged;
+
+  //! Flag that indicates whether this parameter is advanced.
+  bool mAdvanced;
 
   //! Lock for the parameter.
   mutable QReadWriteLock* mpLock;

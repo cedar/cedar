@@ -37,6 +37,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -44,6 +45,7 @@
 #include <set>
 #include <string>
 #include <iostream>
+#include <math.h>
 
 void logVector(const std::vector<std::string>& vector)
 {
@@ -55,6 +57,44 @@ void logVector(const std::vector<std::string>& vector)
     std::cout << "\"" << vector.at(i) << "\"";
   }
   std::cout << "]";
+}
+
+template<typename T>
+int test_to_and_from_string()
+{
+  int errors = 0;
+
+  std::vector <T> values;
+  values.push_back(static_cast<T>(1.0));
+  values.push_back(static_cast<T>(-1.0));
+  values.push_back(static_cast<T>(0.0));
+  values.push_back(static_cast<T>(INFINITY));
+  values.push_back(static_cast<T>(-INFINITY));
+
+  for (size_t i = 0; i < values.size(); ++i)
+  {
+    T value = values.at(i);
+
+    try
+    {
+      std::string to_str = cedar::aux::toString(value);
+      T from_str = cedar::aux::fromString<T>(to_str);
+      if (value != from_str)
+      {
+        ++errors;
+        std::cout << "Error: value " << value << " was not converted properly." << std::endl;
+      }
+    }
+    catch (const cedar::aux::ConversionFailedException& e)
+    {
+      ++errors;
+      std::cout << "Error: value " << value << " was not converted properly: " << e.exceptionInfo() << std::endl;
+    }
+  }
+
+  std::cout << "to/fromString<" << cedar::aux::typeToString<T>()
+            << "> test revealed " << errors << " error(s)." << std::endl;
+  return errors;
 }
 
 int main()
@@ -391,6 +431,9 @@ int main()
     std::cout << "Accepted longer string." << std::endl;
     ++errors;
   }
+
+  errors += test_to_and_from_string<float>();
+  errors += test_to_and_from_string<double>();
 
   std::cout << "Test finished with " << errors << " error(s)." << std::endl;
 
