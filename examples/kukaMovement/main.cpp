@@ -223,7 +223,7 @@ int main(int argc, char **argv)
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
   arm->updateTransformations();
-  target->setTranslation(arm->calculateEndEffectorPosition());
+  target->setTranslation(cedar::unit::LengthMatrix(arm->calculateEndEffectorPosition(), 1.0 * cedar::unit::meters));
   cedar::aux::gl::ObjectVisualizationPtr sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   sphere->setDrawAsWireFrame(true);
   scene->addObjectVisualization(sphere);
