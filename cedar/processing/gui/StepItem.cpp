@@ -1031,8 +1031,12 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   p_advanced_plotting->setIcon(QIcon(":/menus/plot_advanced.svg"));
 
   QAction* p_close_all_plots = menu.addAction("close all plots");
-  p_close_all_plots->setIcon(QIcon(":/menus/plot_all.svg"));
+  p_close_all_plots->setIcon(QIcon(":/menus/close_all_plots.svg"));
   QObject::connect(p_close_all_plots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+
+  QAction* p_toggle_visibility_of_plots = menu.addAction("toggle visibility");
+  p_toggle_visibility_of_plots->setIcon(QIcon(":/menus/toggle_plot_visibility.svg"));
+  QObject::connect(p_toggle_visibility_of_plots, SIGNAL(triggered()), this, SLOT(toggleVisibilityOfPlots()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -1498,6 +1502,14 @@ void cedar::proc::gui::StepItem::addPlotWidget(cedar::proc::gui::PlotWidget* pPl
 void cedar::proc::gui::StepItem::closeAllPlots()
 {
   this->closeAllChildWidgets();
+}
+
+void cedar::proc::gui::StepItem::toggleVisibilityOfPlots()
+{
+  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  {
+    (*it)->setVisible(!(*it)->isVisible());
+  }
 }
 
 void cedar::proc::gui::StepItem::closeAllChildWidgets()
