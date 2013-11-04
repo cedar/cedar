@@ -100,17 +100,17 @@ mpLock(new QReadWriteLock())
 
 cedar::aux::gui::QwtLinePlot::~QwtLinePlot()
 {
-  if (mpLock)
-  {
-    delete mpLock;
-  }
-
   if (this->mpWorkerThread)
   {
     this->mpWorkerThread->quit();
     this->mpWorkerThread->wait();
     delete this->mpWorkerThread;
     this->mpWorkerThread = NULL;
+  }
+
+  if (mpLock)
+  {
+    delete mpLock;
   }
 }
 

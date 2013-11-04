@@ -101,17 +101,17 @@ mpLock(new QReadWriteLock())
 
 cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
 {
-  if (mpLock)
-  {
-    delete mpLock;
-  }
-
   if (this->mpWorkerThread)
   {
     this->mpWorkerThread->quit();
     this->mpWorkerThread->wait();
     delete this->mpWorkerThread;
     this->mpWorkerThread = NULL;
+  }
+  // delete lock AFTER waiting for conversion worker to finish
+  if (mpLock)
+  {
+    delete mpLock;
   }
 }
 
