@@ -210,8 +210,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>129</width>
-          <height>418</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -223,8 +223,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>129</width>
-          <height>418</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -281,8 +281,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>427</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -414,7 +414,8 @@
    <addaction name="mpActionToggleSmartConnections"/>
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionToggleTriggerVisibility"/>
-   <addaction name="mpActionCloseAllPlots"/>
+   <addaction name="mpActionClosePlots"/>
+   <addaction name="mpActionToggleVisibilityOfPlots"/>
    <addaction name="separator"/>
   </widget>
   <action name="mpActionNew">
@@ -655,7 +656,7 @@
     <string>toggle smart connections</string>
    </property>
   </action>
-  <action name="mpActionCloseAllPlots">
+  <action name="mpActionClosePlots">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/close_all_plots.svg</normaloff>:/toolbaricons/close_all_plots.svg</iconset>
@@ -696,6 +697,18 @@
    </property>
    <property name="toolTip">
     <string>Takes a snapshot from the registered steps</string>
+   </property>
+  </action>
+  <action name="mpActionToggleVisibilityOfPlots">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</iconset>
+   </property>
+   <property name="text">
+    <string>toggle visibility of plots</string>
+   </property>
+   <property name="toolTip">
+    <string>hides/shows all open plots</string>
    </property>
   </action>
  </widget>

@@ -146,7 +146,8 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
-  QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+  QObject::connect(this->mpActionClosePlots, SIGNAL(triggered()), this, SLOT(closePlots()));
+  QObject::connect(this->mpActionToggleVisibilityOfPlots, SIGNAL(triggered()), this, SLOT(toggleVisibilityOfPlots()));
   QObject::connect(this->mpActionRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecorder(bool)));
   QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
   
@@ -966,12 +967,21 @@ void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
   this->mNetwork->toggleSmartConnectionMode(smart);
 }
 
-void cedar::proc::gui::Ide::closeAllPlots()
+void cedar::proc::gui::Ide::closePlots()
 {
   auto steps = this->mNetwork->getScene()->getStepMap();
   for(auto it = steps.begin(); it != steps.end(); ++it)
   {
     it->second->closeAllPlots();
+  }
+}
+
+void cedar::proc::gui::Ide::toggleVisibilityOfPlots()
+{
+  auto steps = this->mNetwork->getScene()->getStepMap();
+  for(auto it = steps.begin(); it != steps.end(); ++it)
+  {
+    it->second->toggleVisibilityOfPlots();
   }
 }
 

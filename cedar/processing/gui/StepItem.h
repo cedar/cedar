@@ -223,6 +223,7 @@ public slots:
 
   //! Closes all plots that were opened for this step.
   void closeAllPlots();
+  void toggleVisibilityOfPlots();
 
 
 signals:

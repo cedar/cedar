@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="/">
+    <file>menus/toggle_plot_visibility.svg</file>
+    <file>toolbaricons/toggle_visibility_of_plots.svg</file>
+    <file>menus/close_all_plots.svg</file>
     <file>decorations/looped.svg</file>
     <file>decorations/record.svg</file>
     <file>decorations/from_plugin.svg</file>
