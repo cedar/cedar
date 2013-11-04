@@ -194,7 +194,10 @@ public slots:
   void toggleSmartConnections(bool smart);
 
   //!@brief closes all plot windows of every step
-  void closeAllPlots();
+  void closePlots();
+
+  //!@brief shows/hides all plot windows of every step
+  void toggleVisibilityOfPlots();
 
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);
