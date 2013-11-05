@@ -443,6 +443,14 @@ private:
    */
   void writeTriggers(cedar::aux::ConfigurationNode& root) const;
 
+  /*!@brief Writes the steps that are registered in the recorder in the network to the configuration node.
+   */
+  void writeRecords(cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Reads the slots that should be registered in the recorder.
+  */
+  void readRecords(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
+
   /*!@brief Reads networks from a configuration node and adds them to the parent network.
    */
   void readNetworks(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);

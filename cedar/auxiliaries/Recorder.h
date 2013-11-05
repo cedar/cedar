@@ -50,6 +50,7 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <map>
 #include <string>
 #include <QReadWriteLock>
 #include <QTime>
@@ -126,8 +127,6 @@ public:
    */
   unsigned int getRecordIntervalTime(const std::string& name) const;
 
-
-
   /*!@brief Returns the specified record interval of the DataPtr in ms.
    *         It will return -1 if name was not registered
    */
@@ -143,6 +142,10 @@ public:
 
   //!@brief Changes the name of the DataPtr.
   void renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName);
+
+  //!@brief Returns all registered DataPtr by name and their record interval
+  std::map<std::string, int> getRegisteredData() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

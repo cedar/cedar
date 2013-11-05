@@ -314,3 +314,15 @@ void cedar::aux::Recorder::takeSnapshot()
   }
   this->mProjectName = oldName;
 }
+
+std::map<std::string, int> cedar::aux::Recorder::getRegisteredData() const
+{
+  std::map<std::string, int> registeredData;
+
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    registeredData[spec->getName()] = spec->getRecordIntervalTime();
+  }
+  return registeredData;
+}
