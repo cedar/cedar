@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_XXX_XXX_H
-#define CEDAR_XXX_XXX_H
+#ifndef CEDAR_XXX_XXX_FWD_H
+#define CEDAR_XXX_XXX_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,10 +44,13 @@
 #include "<namespace path>/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
+//!@cond SKIPPED_DOCUMENTATION
 <begin namespaces>
 <namespaces indent>CEDAR_DECLARE_<CAP_SHORT_MAIN_NAMESPACE>_CLASS(<class name>);
 <end namespaces>
+//!@endcond
 
-#endif // CEDAR_XXX_XXX_H
+#endif // CEDAR_XXX_XXX_FWD_H
 
