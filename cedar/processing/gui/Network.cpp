@@ -483,6 +483,8 @@ void cedar::proc::gui::Network::read(const std::string& source)
     //!TODO: this weaves control-flow logic into exceptions, that's not proper!
     this->toggleSmartConnectionMode(false);
   }
+  //update recorder icons
+  this->stepRecordStateChanged();
 }
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)

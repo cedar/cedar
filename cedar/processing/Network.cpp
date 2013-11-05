@@ -59,6 +59,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/Recorder.h"
 #include "cedar/units/prefixes.h"
 
 #include "cedar/processing/consistency/LoopedStepNotConnected.h"
@@ -1062,6 +1063,11 @@ void cedar::proc::Network::writeConfiguration(cedar::aux::ConfigurationNode& roo
   if (!connections.empty())
     root.add_child("connections", connections);
 
+  cedar::aux::ConfigurationNode records;
+  this->writeRecords(records);
+  if (!records.empty())
+    root.add_child("records", records);
+
   this->cedar::aux::Configurable::writeConfiguration(root);
 }
 
@@ -1237,6 +1243,16 @@ void cedar::proc::Network::readFromV1
   {
     // no triggers declared -- this is ok.
   }
+
+  try
+  {
+    const cedar::aux::ConfigurationNode& records = root.get_child("records");
+    this->readRecords(records, exceptions);
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    // no records declared -- this is ok.
+  }
 }
 
 void cedar::proc::Network::writeSteps(cedar::aux::ConfigurationNode& steps) const
@@ -1316,6 +1332,7 @@ void cedar::proc::Network::writeTriggers(cedar::aux::ConfigurationNode& triggers
     }
   }
 }
+
 
 void cedar::proc::Network::readTriggers
      (
@@ -1410,6 +1427,60 @@ void cedar::proc::Network::readTriggers
     catch (const boost::property_tree::ptree_bad_path&)
     {
       // no listeners declared -- this is ok.
+    }
+  }
+}
+
+void cedar::proc::Network::writeRecords(cedar::aux::ConfigurationNode& records) const
+{
+  std::map<std::string, int> dataMap = cedar::aux::RecorderSingleton::getInstance()->getRegisteredData();
+  for (auto iter = dataMap.begin(); iter != dataMap.end(); ++iter)
+  {
+    cedar::aux::ConfigurationNode recorder_node(std::to_string(iter->second));
+    records.push_back(cedar::aux::ConfigurationNode::value_type(iter->first,recorder_node));
+  }
+}
+
+void cedar::proc::Network::readRecords
+     (
+       const cedar::aux::ConfigurationNode& root,
+       std::vector<std::string>& exceptions
+     )
+{
+  //clear all registered data
+  cedar::aux::RecorderSingleton::getInstance()->clear();
+  //create a new map to get a better data structure
+  std::map<std::string, int> data;
+  for (cedar::aux::ConfigurationNode::const_iterator node_iter = root.begin();
+       node_iter != root.end();
+       ++node_iter)
+  {
+      data[node_iter->first] = root.get<int>(node_iter->first);
+  }
+
+  // check for every slot if it is to register or not
+  for (auto iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second))
+    {
+      std::vector<cedar::proc::DataRole::Id> slotTypes;
+      slotTypes.push_back(cedar::proc::DataRole::BUFFER);
+      slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
+      for (unsigned int s = 0; s < slotTypes.size(); s++)
+      {
+        if (step->hasRole(slotTypes[s]))
+        {
+          cedar::proc::Connectable::SlotList dataSlots = step->getOrderedDataSlots(slotTypes[s]);
+          for (unsigned int i = 0; i < dataSlots.size(); i++)
+          {
+            std::string name =  step->getName()+"_"+dataSlots[i]->getName();
+            if (data.count(name)==1)
+            {
+              cedar::aux::RecorderSingleton::getInstance()->registerData(dataSlots[i]->getData(),data[name],name);
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -1971,3 +2042,4 @@ void cedar::proc::Network::revalidateConnections(const std::string& sender)
     receiver->callInputConnectionChanged(connections.at(i)->getTarget()->getName());
   }
 }
+
