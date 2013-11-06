@@ -177,6 +177,12 @@ public:
     return this->_mSmartMode->getValue();
   }
 
+  void addPlotGroup(std::string plotGroupName);
+  void removePlotGroup(std::string plotGroupName);
+  void renamePlotGroup(std::string from, std::string to);
+  std::list<std::string> getPlotGroupNames();
+  void displayPlotGroup(std::string plotGroupName);
+
 public slots:
   void stepRecordStateChanged();
 
@@ -218,7 +224,9 @@ private:
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
-  void readOpenPlots(const cedar::aux::ConfigurationNode& node);
+  void readPlotList(const cedar::aux::ConfigurationNode& node);
+
+  void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
 
 signals:
   //!@brief signal that is emitted when a boost signal is received
@@ -288,6 +296,8 @@ private:
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
   cedar::aux::BoolParameterPtr _mSmartMode;
+
+  cedar::aux::ConfigurationNode mPlotGroupsNode;
 
 }; // class cedar::proc::gui::NetworkFile
 

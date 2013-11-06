@@ -223,8 +223,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -281,8 +281,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>429</height>
              </rect>
             </property>
             <property name="palette">
@@ -417,6 +417,10 @@
    <addaction name="mpActionClosePlots"/>
    <addaction name="mpActionToggleVisibilityOfPlots"/>
    <addaction name="separator"/>
+   <addaction name="mpActionDisplayPlotGroup"/>
+   <addaction name="mpActionNewPlotGroup"/>
+   <addaction name="mpActionEditPlotGroup"/>
+   <addaction name="mpActionDeletePlotGroup"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -709,6 +713,54 @@
    </property>
    <property name="toolTip">
     <string>hides/shows all open plots</string>
+   </property>
+  </action>
+  <action name="mpActionNewPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/new.svg</normaloff>:/toolbaricons/new.svg</iconset>
+   </property>
+   <property name="text">
+    <string>New Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>add a plot group</string>
+   </property>
+  </action>
+  <action name="mpActionEditPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/edit.svg</normaloff>:/toolbaricons/edit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>edit selected plot group</string>
+   </property>
+  </action>
+  <action name="mpActionDisplayPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/display.svg</normaloff>:/toolbaricons/display.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Display Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>display selected plot group</string>
+   </property>
+  </action>
+  <action name="mpActionDeletePlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/trash.svg</normaloff>:/toolbaricons/trash.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>delete selected plot group</string>
    </property>
   </action>
  </widget>
