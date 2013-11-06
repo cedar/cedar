@@ -55,33 +55,20 @@ namespace cedar
   namespace proc
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_PROC_CLASS(Arguments);
-    CEDAR_DECLARE_PROC_CLASS(Connectable);
-    CEDAR_DECLARE_PROC_CLASS(DataConnection);
-    CEDAR_DECLARE_PROC_CLASS(DataRole);
-    CEDAR_DECLARE_PROC_CLASS(DataSlot);
     CEDAR_DECLARE_PROC_CLASS(PlotData);
-    CEDAR_DECLARE_PROC_CLASS(Element);
     CEDAR_DECLARE_PROC_CLASS(ElementDeclaration);
     CEDAR_DECLARE_PROC_CLASS(ExternalData);
     CEDAR_DECLARE_PROC_CLASS(LoopArguments);
     CEDAR_DECLARE_PROC_CLASS(LoopedTrigger);
-    CEDAR_DECLARE_PROC_CLASS(Step);
-    CEDAR_DECLARE_PROC_CLASS(StepTime);
     CEDAR_DECLARE_PROC_CLASS(Trigger);
     CEDAR_DECLARE_PROC_CLASS(Manager);
-    CEDAR_DECLARE_PROC_CLASS(Network);
     CEDAR_DECLARE_PROC_CLASS(OwnedData);
-    CEDAR_DECLARE_PROC_CLASS(PromotedExternalData);
-    CEDAR_DECLARE_PROC_CLASS(PromotedOwnedData);
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
     CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
     CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
     CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(ProjectionMappingParameter);
 
     // consistency issues
-    CEDAR_DECLARE_PROC_CLASS(ConsistencyIssue);
-    CEDAR_DECLARE_PROC_CLASS(LoopedStepNotConnected);
     //!@endcond
 
     //!@cond SKIPPED_DOCUMENTATION
@@ -95,7 +82,7 @@ namespace cedar
     //!@endcond
 
     //!@brief a factory for elements
-    typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;
+//    typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;
 
     /* Exceptions */
     //!@cond SKIPPED_DOCUMENTATION

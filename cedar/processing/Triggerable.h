@@ -40,6 +40,10 @@
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/DataConnection.fwd.h"
+#include "cedar/processing/Arguments.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QObject>
 #include <QReadWriteLock>

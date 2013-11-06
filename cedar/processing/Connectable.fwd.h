@@ -22,59 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeclarationRegistry.h
+    File:        Connectable.fwd.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 11 18
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 06
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::Connectable.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DECLARATION_REGISTRY_H
-#define CEDAR_PROC_DECLARATION_REGISTRY_H
+#ifndef CEDAR_PROC_CONNECTABLE_FWD_H
+#define CEDAR_PROC_CONNECTABLE_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/exceptions.h"
-#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
-#include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/assert.h"
-
-// FORWARD DECLARATIONS
-#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
+//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace proc
   {
-    /*! Manages declarations of element classes.
-     */
-    typedef
-      cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
-      ElementManager;
-
-    //! Sinleton of the element manager.
-    typedef
-      cedar::aux::Singleton<cedar::proc::ElementManager>
-      ElementManagerSingleton;
-  }
-
-  namespace aux
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<cedar::proc::ElementManager>);
-    //!@endcond
+    CEDAR_DECLARE_PROC_CLASS(Connectable);
   }
 }
 
-#endif // CEDAR_PROC_DECLARATION_REGISTRY_H
+//!@endcond
+
+#endif // CEDAR_PROC_CONNECTABLE_FWD_H
+

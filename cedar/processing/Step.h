@@ -49,6 +49,9 @@
 #include "cedar/auxiliaries/MovingAverage.h"
 #include "cedar/units/Time.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/Step.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QThread>
 #include <QReadWriteLock>
