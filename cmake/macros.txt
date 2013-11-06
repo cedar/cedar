@@ -403,9 +403,9 @@ endmacro(cedar_qt_wrap_ui)
 # directory and generates the header files in the same relative path. When the
 # binary dir is included in the include path, these files can then be accessed.
 macro(cedar_qt4_wrap_ui outfiles)
-  qt4_extract_options(ui_files ui_options ${ARGN})
+#  qt4_extract_options(ui_files ui_options ${ARGN})
 
-  foreach (it ${ui_files})
+  foreach (it ${ARGN})
     get_filename_component(outfile ${it} NAME_WE)
     get_filename_component(infile ${it} ABSOLUTE)
     get_filename_component(generated_path ${it} PATH)
