@@ -46,6 +46,11 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Step.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
 #include <QMainWindow>
