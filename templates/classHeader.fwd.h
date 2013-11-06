@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "<namespace path>/lib.h"
+#include "<base namespace path>/lib.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
