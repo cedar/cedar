@@ -69,7 +69,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDialogButtonBox>
-#include <QMessageBox>
+#include <QInputDialog>
 #include <boost/property_tree/detail/json_parser_error.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -105,6 +105,11 @@ mpBoostControl(NULL)
   QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
 
   this->mpToolBar->insertSeparator(this->mpActionResetRootNetwork);
+
+  // PlotGroupsComboBox, insert it before the displayplotgroup action
+  this->mpPlotGroupsComboBox = new QComboBox;
+  this->mpToolBar->insertWidget(this->mpActionDisplayPlotGroup, this->mpPlotGroupsComboBox);
+
 
   // set window title
   this->mDefaultWindowTitle = this->windowTitle();
@@ -150,6 +155,11 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionToggleVisibilityOfPlots, SIGNAL(triggered()), this, SLOT(toggleVisibilityOfPlots()));
   QObject::connect(this->mpActionRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecorder(bool)));
   QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
+
+  QObject::connect(this->mpActionNewPlotGroup, SIGNAL(triggered()), this, SLOT(addPlotGroup()));
+  QObject::connect(this->mpActionEditPlotGroup, SIGNAL(triggered()), this, SLOT(editPlotGroup()));
+  QObject::connect(this->mpActionDisplayPlotGroup, SIGNAL(triggered()), this, SLOT(displayPlotGroup()));
+  QObject::connect(this->mpActionDeletePlotGroup, SIGNAL(triggered()), this, SLOT(deletePlotGroup()));
   
 
 
@@ -444,6 +454,8 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   {
     this->mpBoostControl->setNetwork(network->getNetwork());
   }
+
+  this->loadPlotGroupsIntoComboBox();
 }
 
 void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
@@ -870,6 +882,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->displayFilename(file.toStdString());
   this->updateTriggerStartStopThreadCallers();
+  this->loadPlotGroupsIntoComboBox();
 
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
@@ -1002,4 +1015,73 @@ void cedar::proc::gui::Ide::toggleRecorder(bool status)
 void cedar::proc::gui::Ide::takeSnapshot()
 {
   cedar::aux::RecorderSingleton::getInstance()->takeSnapshot();
+}
+
+void cedar::proc::gui::Ide::addPlotGroup()
+{
+  bool ok;
+  QString plot_group_default_name = QString("Plotgroup#%1").arg(this->mNetwork->getPlotGroupNames().size());
+  QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Plotgroup name:"), QLineEdit::Normal, plot_group_default_name, &ok);
+  if (ok && !text.isEmpty())
+  {
+    this->mNetwork->addPlotGroup(text.toStdString()); // toStdString assumes ascii, for utf8 use toUtf8().constData()
+    int pos = this->mpPlotGroupsComboBox->count();
+    this->mpPlotGroupsComboBox->insertItem(pos, text);
+    this->mpPlotGroupsComboBox->setCurrentIndex(pos);
+  }
+}
+  
+void cedar::proc::gui::Ide::editPlotGroup()
+{
+  bool ok;
+  // get selecte plot group
+  QString plot_group_current_name = this->mpPlotGroupsComboBox->currentText();
+  int position = this->mpPlotGroupsComboBox->currentIndex();
+  if(position != -1)
+  {
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Plotgroup name:"), QLineEdit::Normal, plot_group_current_name, &ok);
+    if (ok && !text.isEmpty())
+    {
+      this->mNetwork->renamePlotGroup(plot_group_current_name.toStdString(), text.toStdString()); // toStdString assumes ascii
+      this->mpPlotGroupsComboBox->removeItem(position);
+      this->mpPlotGroupsComboBox->insertItem(position, text);
+      this->mpPlotGroupsComboBox->setCurrentIndex(position);
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::displayPlotGroup()
+{
+  QString plot_group_name = this->mpPlotGroupsComboBox->currentText();
+  if(this->mpPlotGroupsComboBox->currentIndex() != -1)
+  {
+    this->mNetwork->displayPlotGroup(plot_group_name.toStdString()); // toStdString assumes ascii
+  }
+}
+
+void cedar::proc::gui::Ide::deletePlotGroup()
+{
+  QString plot_group_name = this->mpPlotGroupsComboBox->currentText();
+  int position = this->mpPlotGroupsComboBox->currentIndex();
+  if(position != -1)
+  {
+    QMessageBox::StandardButton reply;
+    QString message = QString("This will delete %1. Proceed?").arg(plot_group_name);
+    reply = QMessageBox::question(this, "Delete Plot Group", message, QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes)
+    {
+      this->mNetwork->removePlotGroup(plot_group_name.toStdString()); // toStdString assumes ascii
+      this->mpPlotGroupsComboBox->removeItem(position);
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::loadPlotGroupsIntoComboBox()
+{
+  this->mpPlotGroupsComboBox->clear();
+  std::list<std::string> plot_group_names = this->mNetwork->getPlotGroupNames();
+  for(auto it = plot_group_names.begin(); it != plot_group_names.end(); ++it)
+  {
+    this->mpPlotGroupsComboBox->addItem(QString::fromStdString(*it));
+  }
 }

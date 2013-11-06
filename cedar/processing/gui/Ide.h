@@ -50,6 +50,7 @@
 #include <QMainWindow>
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
+#include <QComboBox>
 #include <map>
 
 
@@ -205,6 +206,17 @@ public slots:
   //!@brief Takes a snap shot from the registered steps;
   void takeSnapshot();
 
+  //!@brief opens dialogue to add plotgroup
+  void addPlotGroup();
+  
+  //!@brief opens dialogue to edit selected plotgroup
+  void editPlotGroup();
+
+  //!@brief displays the selected plotgroup
+  void displayPlotGroup();
+
+  //!@brief deletes the selected plotgroup
+  void deletePlotGroup();
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const
   {
@@ -263,6 +275,9 @@ private:
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
+
+  //!@brief populates the Plot Groups Combobox with available Plot Groups
+  void loadPlotGroupsIntoComboBox();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -293,6 +308,9 @@ private:
 
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
+
+  // Combobox to select plot groups
+  QComboBox* mpPlotGroupsComboBox;
 
 }; // class cedar::MainWindow
 
