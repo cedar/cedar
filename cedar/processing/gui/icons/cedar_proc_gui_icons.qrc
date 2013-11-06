@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="/">
+    <file>toolbaricons/trash.svg</file>
+    <file>toolbaricons/display.svg</file>
+    <file>toolbaricons/new.svg</file>
+    <file>toolbaricons/edit.svg</file>
     <file>menus/toggle_plot_visibility.svg</file>
     <file>toolbaricons/toggle_visibility_of_plots.svg</file>
     <file>menus/close_all_plots.svg</file>
