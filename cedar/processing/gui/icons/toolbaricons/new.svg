@@ -9,8 +9,8 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="768.47296"
-   height="805"
+   width="968.47296"
+   height="1005"
    id="svg2"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
@@ -25,15 +25,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.13563468"
-     inkscape:cx="408.66109"
-     inkscape:cy="473.15965"
+     inkscape:cx="508.66109"
+     inkscape:cy="573.15965"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     fit-margin-top="50"
-     fit-margin-left="50"
-     fit-margin-right="50"
-     fit-margin-bottom="50"
+     fit-margin-top="150"
+     fit-margin-left="150"
+     fit-margin-right="150"
+     fit-margin-bottom="150"
      inkscape:window-width="1920"
      inkscape:window-height="1030"
      inkscape:window-x="0"
@@ -46,8 +46,8 @@
        visible="true"
        enabled="true"
        snapvisiblegridlinesonly="true"
-       originx="-57.5px"
-       originy="-117.50001px" />
+       originx="42.5px"
+       originy="-17.50001px" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -65,7 +65,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-57.5,-129.86218)">
+     transform="translate(42.5,-29.86218)">
     <path
        style="fill:none;stroke:#000000;stroke-width:25;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:600, 600;stroke-dashoffset:0"
        d="m 120,872.36218 480,0 0,-680 -360,0 -120,100 z"
