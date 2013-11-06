@@ -81,7 +81,8 @@ mNetwork(network),
 mpScene(scene),
 mpMainWindow(pMainWindow),
 mHoldFitToContents(false),
-_mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
+_mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
+mPlotGroupsNode(cedar::aux::ConfigurationNode())
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -488,14 +489,21 @@ void cedar::proc::gui::Network::read(const std::string& source)
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+  // restore plots that were open when architecture was last saved
   auto plot_list = node.find("open plots");
   if(plot_list != node.not_found())
   {
-    this->readOpenPlots(plot_list->second);
+    this->readPlotList(plot_list->second);
+  }
+  // read defined plot groups
+  auto plot_groups = node.find("plot groups");
+  if(plot_groups != node.not_found())
+  {
+    this->mPlotGroupsNode = plot_groups->second;
   }
 }
 
-void cedar::proc::gui::Network::readOpenPlots(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::gui::Network::readPlotList(const cedar::aux::ConfigurationNode& node)
 {
   for(auto it = node.begin(); it != node.end(); ++it)
   {
@@ -509,13 +517,22 @@ void cedar::proc::gui::Network::readOpenPlots(const cedar::aux::ConfigurationNod
 void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   root.put("network", this->mNetwork->getName());
+  // add open plots to architecture
   cedar::aux::ConfigurationNode node;
+  this->writeOpenPlotsTo(node);
+  root.put_child("open plots", node);
+  // add plot groups to architecture
+  root.put_child("plot groups", this->mPlotGroupsNode);
+
+  this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
+}
+
+void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
+{
   for(auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
   {
     it->second->writeOpenChildWidgets(node);
   }
-  root.put_child("open plots", node);
-  this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
@@ -939,4 +956,70 @@ void cedar::proc::gui::Network::stepRecordStateChanged()
 	{
 		iter->second->setRecorded(iter->first->isRecorded());
 	}
+}
+
+void cedar::proc::gui::Network::addPlotGroup(std::string plotGroupName)
+{
+  cedar::aux::ConfigurationNode node;
+  this->writeOpenPlotsTo(node);
+  this->mPlotGroupsNode.put_child(plotGroupName, node);
+}
+
+void cedar::proc::gui::Network::removePlotGroup(std::string plotGroupName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Network::removePlotGroup could not remove plot group. Does not exist."
+    );
+  }
+
+  this->mPlotGroupsNode.erase(mPlotGroupsNode.to_iterator(plot_group));
+}
+
+void cedar::proc::gui::Network::renamePlotGroup(std::string from, std::string to)
+{
+  auto plot_group = this->mPlotGroupsNode.find(from);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Network::renamePlotGroup could not rename plot group. Does not exist."
+    );
+  }
+  // rename
+  cedar::aux::ConfigurationNode node = plot_group->second;
+  this->mPlotGroupsNode.erase(mPlotGroupsNode.to_iterator(plot_group));
+  this->mPlotGroupsNode.put_child(to, node);
+  //maybe just do: plot_group->first = to;
+}
+
+std::list<std::string> cedar::proc::gui::Network::getPlotGroupNames()
+{
+  std::list<std::string> plot_group_names;
+  for(auto it = this->mPlotGroupsNode.begin(); it != this->mPlotGroupsNode.end(); ++it)
+  {
+    plot_group_names.push_back(it->first);
+  }
+
+  return plot_group_names;
+}
+
+void cedar::proc::gui::Network::displayPlotGroup(std::string plotGroupName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Network::displayPlotGroup could not display plot group. Does not exist."
+    );
+  }
+
+  this->readPlotList(plot_group->second);
 }
