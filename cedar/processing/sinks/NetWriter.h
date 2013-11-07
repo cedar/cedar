@@ -40,15 +40,15 @@
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_YARP
 
-// LOCAL INCLUDES
-#include "cedar/processing/sinks/namespace.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/net/Writer.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/sinks/NetWriter.fwd.h"
 
 // SYSTEM INCLUDES
 
