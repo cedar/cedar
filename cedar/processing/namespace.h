@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.rub.de
     Date:        2011 05 23
 
-    Description: Namespace file for cedar::aux::comp.
+    Description: Namespace file for cedar::proc.
 
     Credits:
 
@@ -45,67 +45,32 @@
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
 
-namespace cedar
-{
-  /*!
-   *  @brief Namespace containing main elements of cedar's processing framework.
-   *
-   *  @see   @ref ProcessingFrameworkConcept for an introduction into the concepts using within the processing framework.
-   */
-  namespace proc
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_PROC_CLASS(PlotData);
-    CEDAR_DECLARE_PROC_CLASS(ElementDeclaration);
-    CEDAR_DECLARE_PROC_CLASS(ExternalData);
-    CEDAR_DECLARE_PROC_CLASS(LoopArguments);
-    CEDAR_DECLARE_PROC_CLASS(LoopedTrigger);
-    CEDAR_DECLARE_PROC_CLASS(Trigger);
-    CEDAR_DECLARE_PROC_CLASS(Manager);
-    CEDAR_DECLARE_PROC_CLASS(OwnedData);
-    CEDAR_DECLARE_PROC_CLASS(Triggerable);
-    CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
-    CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
-    CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(ProjectionMappingParameter);
+#warning Do not include this header any more. Use the new forward-declaration headers instead.
 
-    // consistency issues
-    //!@endcond
-
-    //!@cond SKIPPED_DOCUMENTATION
-    template <class BaseClass, class FactoryType> class DeclarationBase;
-    template <class DerivedClass> class ElementDeclarationTemplate;
-    //!@endcond
-
-    //!@cond SKIPPED_DOCUMENTATION
-    typedef cedar::aux::PluginDeclarationList PluginDeclaration;
-    CEDAR_GENERATE_POINTER_TYPES(PluginDeclaration);
-    //!@endcond
-
-    //!@brief a factory for elements
-//    typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;
-
-    /* Exceptions */
-    //!@cond SKIPPED_DOCUMENTATION
-    class CEDAR_PROC_LIB_EXPORT ArchitectureLoadingException;
-    class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
-    class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
-    class CEDAR_PROC_LIB_EXPORT DataNotFoundException;
-    class CEDAR_PROC_LIB_EXPORT DeadlockException;
-    class CEDAR_PROC_LIB_EXPORT DuplicateConnectionException;
-    class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
-    class CEDAR_PROC_LIB_EXPORT InvalidObjectException;
-    class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
-    class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
-    class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
-    class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
-    class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
-    class CEDAR_PROC_LIB_EXPORT NoCheckException;
-    class CEDAR_PROC_LIB_EXPORT NoMappingException;
-    class CEDAR_PROC_LIB_EXPORT NoMeasurementException;
-    class CEDAR_PROC_LIB_EXPORT PluginException;
-    class CEDAR_PROC_LIB_EXPORT TriggerCycleException;
-    //!@endcond
-  }
-}
+#include "cedar/processing/Arguments.fwd.h"
+#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/DataConnection.fwd.h"
+#include "cedar/processing/DataRole.fwd.h"
+#include "cedar/processing/DataSlot.fwd.h"
+#include "cedar/processing/exceptions.fwd.h"
+#include "cedar/processing/ElementDeclaration.fwd.h"
+#include "cedar/processing/ElementDeclarationTemplate.fwd.h"
+#include "cedar/processing/ExternalData.fwd.h"
+#include "cedar/processing/LoopArguments.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/processing/Manager.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/OwnedData.fwd.h"
+#include "cedar/processing/PlotData.fwd.h"
+#include "cedar/processing/PluginDeclaration.fwd.h"
+#include "cedar/processing/ProjectionMapping.fwd.h"
+#include "cedar/processing/ProjectionMappingParameter.fwd.h"
+#include "cedar/processing/PromotedExternalData.fwd.h"
+#include "cedar/processing/PromotedOwnedData.fwd.h"
+#include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/StepTime.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+#include "cedar/processing/TriggerConnection.fwd.h"
 
 #endif // CEDAR_PROC_NAMESPACE_H

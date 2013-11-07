@@ -22,33 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeclarationBase.h
+    File:        Trigger.fwd.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 11
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 07
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::Trigger.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DECLARATION_BASE_H
-#define CEDAR_PROC_DECLARATION_BASE_H
+#ifndef CEDAR_PROC_TRIGGER_FWD_H
+#define CEDAR_PROC_TRIGGER_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-
-// FORWARD DECLARATIONS
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-#warning Including this header is deprecated; use cedar/auxiliaries/DelarationManager instead.
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace proc
+  {
+    CEDAR_DECLARE_PROC_CLASS(Trigger);
+  }
+}
 
+//!@endcond
 
-#endif // CEDAR_PROC_DECLARATION_BASE_H
+#endif // CEDAR_PROC_TRIGGER_FWD_H
 

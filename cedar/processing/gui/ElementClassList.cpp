@@ -109,7 +109,6 @@ void cedar::proc::gui::ElementClassList::rebuild()
 
 void cedar::proc::gui::ElementClassList::showList(const std::string& categoryName)
 {
-  using cedar::proc::Manager;
   using cedar::proc::ElementDeclarationPtr;
 
   this->mCategoryName = categoryName;

@@ -37,18 +37,21 @@
 #ifndef CEDAR_PROC_PLOT_DATA_H
 #define CEDAR_PROC_PLOT_DATA_H
 
-// CEDAR INCLUDES
+// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+
+// CEDAR INCLUDES
+#include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/DataRole.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/PlotData.fwd.h"
 
 // SYSTEM INCLUDES
-// none yet
 
 /*!@brief Holds information about data in a custom step plot.
  *

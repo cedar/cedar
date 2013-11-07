@@ -46,7 +46,11 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+#include "cedar/processing/TriggerConnection.fwd.h"
 #include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 
 // SYSTEM INCLUDES
