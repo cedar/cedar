@@ -42,14 +42,13 @@
 #define CEDAR_PROC_STEP_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES

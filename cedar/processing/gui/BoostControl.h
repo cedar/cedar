@@ -44,7 +44,6 @@
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/ui_BoostControl.h"
 #include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"

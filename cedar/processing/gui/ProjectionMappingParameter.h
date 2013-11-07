@@ -38,7 +38,6 @@
 #define CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 

@@ -41,7 +41,6 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES

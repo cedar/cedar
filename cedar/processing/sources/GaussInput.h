@@ -43,7 +43,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"

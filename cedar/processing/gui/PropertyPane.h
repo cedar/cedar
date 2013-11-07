@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 
