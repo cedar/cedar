@@ -37,7 +37,6 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/DoubleData.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/ElementDeclaration.h"
