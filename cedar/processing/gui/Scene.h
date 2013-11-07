@@ -50,6 +50,7 @@
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Network.fwd.h"
 #include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>

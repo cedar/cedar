@@ -42,7 +42,6 @@
 #define CEDAR_PROC_ELEMENT_DECLARATION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/PlotData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -50,6 +49,10 @@
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/ElementDeclaration.fwd.h"
+#include "cedar/processing/ElementDeclarationTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QIcon>
@@ -252,6 +255,8 @@ private:
 
 
 /*!@brief This is a template class for comfortably generating element declarations.
+ *
+ * @todo This class should get its own header file
  */
 template <class DerivedClass>
 class cedar::proc::ElementDeclarationTemplate

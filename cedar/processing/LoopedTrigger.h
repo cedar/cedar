@@ -42,10 +42,12 @@
 #define CEDAR_PROC_LOOPED_TRIGGER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/LoopedTrigger.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>

@@ -43,14 +43,16 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/Manager.fwd.h"
+
 // SYSTEM INCLUDES
+#include <QObject>
 #include <map>
 #include <set>
 #include <vector>
-#include <QObject>
 
 
 /*!@brief A manager for processing architectures.

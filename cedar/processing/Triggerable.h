@@ -38,14 +38,17 @@
 #define CEDAR_PROC_TRIGGERABLE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Arguments.fwd.h"
+#include "cedar/processing/DataConnection.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+#include "cedar/processing/TriggerConnection.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <QMutex>
 #include <QReadWriteLock>
 #include <boost/signals2.hpp>
 #include <set>
@@ -57,8 +60,8 @@ class cedar::proc::Triggerable
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Trigger;
   friend class cedar::proc::DataConnection;
+  friend class cedar::proc::Trigger;
   friend class cedar::proc::TriggerConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
