@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,24 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        NetReader.fwd.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 07
 
-    Description: Namespace file for cedar::proc::source.
+    Description: Forward declaration file for the class cedar::proc::sources::NetReader.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_NAMESPACE_H
-#define CEDAR_PROC_SOURCES_NAMESPACE_H
+#ifndef CEDAR_PROC_SOURCES_NET_READER_FWD_H
+#define CEDAR_PROC_SOURCES_NET_READER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -48,18 +44,24 @@
 #include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-#warning Do not include this header any more. Use cedar's new forward declaration headers instead.
+//!@cond SKIPPED_DOCUMENTATION
+#ifdef CEDAR_USE_YARP
 
+namespace cedar
+{
+  namespace proc
+  {
+    namespace sources
+    {
+      CEDAR_DECLARE_PROC_CLASS(NetReader);
+    }
+  }
+}
 
-#include "cedar/processing/sources/Boost.fwd.h"
-#include "cedar/processing/sources/BoxInput.fwd.h"
-#include "cedar/processing/sources/Camera.fwd.h"
-#include "cedar/processing/sources/GaussInput.fwd.h"
-#include "cedar/processing/sources/GrabberBase.fwd.h"
-#include "cedar/processing/sources/NetReader.fwd.h"
-#include "cedar/processing/sources/Noise.fwd.h"
-#include "cedar/processing/sources/Picture.fwd.h"
-#include "cedar/processing/sources/Video.fwd.h"
+#endif
+//!@endcond
 
-#endif // CEDAR_PROC_SOURCES_NAMESPACE_H
+#endif // CEDAR_PROC_SOURCES_NET_READER_FWD_H
+

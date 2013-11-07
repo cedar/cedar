@@ -42,12 +42,14 @@
 #define CEDAR_PROC_SOURCES_GAUSS_INPUT_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/GaussInput.fwd.h"
 
 // SYSTEM INCLUDES
 

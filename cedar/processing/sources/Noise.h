@@ -38,12 +38,13 @@
 #define CEDAR_DYN_NOISE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/Noise.fwd.h"
 
 // SYSTEM INCLUDES
 

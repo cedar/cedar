@@ -41,16 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 #include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/FileParameter.h"
-//#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/units/Time.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/Video.fwd.h"
 
 // SYSTEM INCLUDES
 

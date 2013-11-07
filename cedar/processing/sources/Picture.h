@@ -41,12 +41,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/Picture.fwd.h"
 
 // SYSTEM INCLUDES
 
