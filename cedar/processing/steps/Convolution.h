@@ -38,12 +38,14 @@
 #define CEDAR_PROC_STEPS_CONVOLUTION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Convolution.fwd.h"
 
 // SYSTEM INCLUDES
 

@@ -38,9 +38,11 @@
 #define CEDAR_PROC_STEPS_NORMALIZATION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Normalization.fwd.h"
 
 // SYSTEM INCLUDES
 
