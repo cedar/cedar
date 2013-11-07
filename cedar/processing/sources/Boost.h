@@ -41,10 +41,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/Boost.fwd.h"
 
 // SYSTEM INCLUDES
 
