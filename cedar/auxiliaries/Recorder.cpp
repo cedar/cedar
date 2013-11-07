@@ -146,9 +146,6 @@ void cedar::aux::Recorder::applyStart()
     this->createOutputDirectory();
   }
 
-  //start the timer.
-  mStartTime.restart();
-
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
   //!@todo std::numeric_limits<int>::max() will lock the GUI!!!!
   int min = 1000;// std::numeric_limits<int>::max() ;
@@ -200,11 +197,6 @@ void cedar::aux::Recorder::setRecordedProjectName(const std::string& name)
 const std::string& cedar::aux::Recorder::getOutputDirectory() const
 {
   return this->mOutputDirectory;
-}
-
-int cedar::aux::Recorder::getTimeStamp() const
-{
-  return mStartTime.elapsed();
 }
 
 void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, unsigned int recordIntv)

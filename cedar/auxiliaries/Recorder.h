@@ -114,9 +114,6 @@ public:
   //!@brief Gets the OutputDirectory
   const std::string& getOutputDirectory() const;
 
-  //!@brief Returns the elapsed time in ms since the Recorder thread has been started.
-  int getTimeStamp() const;
-
   /*!@brief Change the record interval of 'name'
    *          If 'name' is not a registered it will throw an UnknownNameExeption.
    */
@@ -190,8 +187,6 @@ private:
   //!@brief The name of the project that will be recorded
   std::string mProjectName;
 
-  //!@brief Counts the time from when the recorder is started.
-  QTime mStartTime;
 };
 
 
