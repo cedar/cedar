@@ -41,7 +41,6 @@
 #include "cedar/dynamics/fields/Preshape.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES

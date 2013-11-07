@@ -47,6 +47,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Manager.fwd.h"
+#include "cedar/processing/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>

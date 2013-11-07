@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_TRIGGERABLE_FWD_H
-#define CEDAR_PROC_TRIGGERABLE_FWD_H
+#ifndef CEDAR_PROC_EXCEPTIONS_FWD_H
+#define CEDAR_PROC_EXCEPTIONS_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -74,5 +74,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_PROC_TRIGGERABLE_FWD_H
+#endif // CEDAR_PROC_EXCEPTIONS_FWD_H
 
