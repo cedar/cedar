@@ -41,7 +41,6 @@
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/IntVectorParameter.h"
-#include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
