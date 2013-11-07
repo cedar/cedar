@@ -37,11 +37,11 @@
 #ifndef CEDAR_PROCESSING_STEPS_NORMALIZATION_TYPE_H
 #define CEDAR_PROCESSING_STEPS_NORMALIZATION_TYPE_H
 
-// LOCAL INCLUDES
-#include "cedar/processing/steps/namespace.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 
-// PROJECT INCLUDES
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/NormalizationType.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

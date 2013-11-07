@@ -38,11 +38,13 @@
 #define CEDAR_PROC_STEPS_FLIP_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/BoolVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Flip.fwd.h"
 
 // SYSTEM INCLUDES
 

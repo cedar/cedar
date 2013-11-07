@@ -46,6 +46,10 @@
 #include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/namespace.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+
 // SYSTEM INCLUDES
 #include <boost/signals2.hpp>
 
