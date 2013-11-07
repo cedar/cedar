@@ -43,6 +43,9 @@
 // CEDAR INCLUDES
 #include "cedar/processing/DataSlot.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/typecheck/TypeCheck.fwd.h"
+
 // SYSTEM INCLUDES
 
 

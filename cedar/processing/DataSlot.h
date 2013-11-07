@@ -38,7 +38,6 @@
 #define CEDAR_PROC_DATA_SLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/namespace.h"
 #include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
