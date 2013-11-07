@@ -1,4 +1,4 @@
-/*=============================================================================
+/*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
@@ -17,35 +17,48 @@
     You should have received a copy of the GNU Lesser General Public License
     along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
-===============================================================================
+========================================================================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        IsMatrix.fwd.h
 
-    Maintainer:  Jean-Stephane Jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Fri 11 May 2012
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 07
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::typecheck::IsMatrix.
 
     Credits:
 
-=============================================================================*/
+======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SINKS_NAMESPACE_H
-#define CEDAR_PROC_SINKS_NAMESPACE_H
+#ifndef CEDAR_PROC_TYPECHECK_IS_MATRIX_FWD_H
+#define CEDAR_PROC_TYPECHECK_IS_MATRIX_FWD_H
 
+// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-#warning Do not include this header any more. Use the new forward declaration headers instead.
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace proc
+  {
+    namespace typecheck
+    {
+      CEDAR_DECLARE_PROC_CLASS(IsMatrix);
+    }
+  }
+}
 
-#include "cedar/processing/sinks/NetWriter.fwd.h"
+//!@endcond
 
-#endif // CEDAR_PROC_STEPS_NAMESPACE_H
+#endif // CEDAR_PROC_TYPECHECK_IS_MATRIX_FWD_H
+
