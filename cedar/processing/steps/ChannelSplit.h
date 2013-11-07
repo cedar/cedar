@@ -41,9 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/annotation/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/ChannelSplit.fwd.h"
 
 // SYSTEM INCLUDES
 

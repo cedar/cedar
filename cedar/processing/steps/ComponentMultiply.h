@@ -38,10 +38,12 @@
 #define CEDAR_PROC_STEPS_COMPONENT_MULTIPLY_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/ComponentMultiply.fwd.h"
 
 // SYSTEM INCLUDES
 

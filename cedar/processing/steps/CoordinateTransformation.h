@@ -43,8 +43,10 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/EnumBase.h"
-#include "cedar/processing/steps/namespace.h"
-#include "cedar/processing/Step.h" // if we are going to inherit from cedar::proc::Step, we have to include the header
+#include "cedar/processing/Step.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/CoordinateTransformation.fwd.h"
 
 // SYSTEM INCLUDES
 

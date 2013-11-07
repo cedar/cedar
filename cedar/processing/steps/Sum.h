@@ -38,8 +38,10 @@
 #define CEDAR_PROC_STEPS_SUM_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Sum.fwd.h"
 
 // SYSTEM INCLUDES
 
