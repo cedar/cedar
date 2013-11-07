@@ -39,13 +39,7 @@ List of changes
 =======================================================================================================================
 -->
 
-Below, you can find a list of current changes for the different branches of cedar.
-
-stable release
---------------
-
-Please keep in mind that "stable" refers to the state of our interfaces, i.e., doesn't mean the software is crash- or
-bug-free, but rather, that we'll try to not change any signatures of functions without deprecating them first.
+Below, you can find a list of current changes of cedar. Please keep in mind that we try to keep our interfaces as stable as possible. This doesn't mean the software is crash- or bug-free.
 
 Currently, there are still a few classes and frameworks that are under development. Here's a list of interfaces that are
 likely to undergo major changes:
@@ -72,31 +66,31 @@ known issues
     workaround, make sure to reset all smart pointers at the end of your main method (the usual cause are global-scope
     smart pointers that send a log message after the log singleton was freed.)
 
-Unreleased changes
-==================
 
-The following is a list of all the changes that have not been released in an official version, yet. You can get them by
-accessing the corresponding repositories.
+Unreleased
+==========
 
-
-current stable
---------------
-- cedar::proc::gui
-  - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
-    (see also issue #10 in stable)
-- cedar::dyn
-  - Fixed a potential deadlock in the neural field that occurred when the activation was set as output and an exception occurred during the Euler step.
-
-
-current testing
----------------
 - general
-  - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
-    for example anchor, shift, and limit of kernels and threshold of sigmoids.
   - The plugin system has been changed. It is no longer specific to the processing framework, although it is not (yet)
     used elsewhere. Plugins can now be added in an improved manager. They are found in a different way, now: a list of
     user-defined paths is searched for a plugin of a given name by appending certain directories (such as the plugin
     name itself and a "build" folder.) Using this new functionality, architectures now store which plugins they require.
+- cedar::aux
+  - There is now a command line parser available. This is intended to make software that performs experiments easy to
+    customize; it features auto-generated help texts, reading and writing of options to file and some sanity checking of
+    user inputs. It is still being developed.
+
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+
+Version 2.0.0
+-------------
+- general
+  - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
+    for example anchor, shift, and limit of kernels and threshold of sigmoids.
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.
@@ -110,9 +104,6 @@ current testing
   - Log entries in gui::Log can now be removed using the right-click context menu.
   - Parameters of LoopedThread are now set to constant depending on the current mode (e.g., blocking "simulated time").
   - Memory debug output is turned off by default, can be activated through a configuration file.
-  - There is now a command line parser available. This is intended to make software that performs experiments easy to
-    customize; it features auto-generated help texts, reading and writing of options to file and some sanity checking of
-    user inputs. It is still being developed.
 - cedar::aux::gui
   - LinePlots now have an option in their context menu to set fixed limits for the y axis.
   - There is now a history plot for 1D matrices.
@@ -152,15 +143,17 @@ current testing
     embed it in a svg file using, e.g., inkscape.
   - Connections of selected steps in the processingIde are now hightlighted. This behavior is active by default and can
     be disabled in the settings menu.
-
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
 
-Released versions
-=================
 
-The following are the changes made in the release versions. You can find these on the cedar home page as well as the
-repositories.
+Version 1.0.10
+-------------
+- cedar::proc::gui
+  - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
+    (see also issue #10 in stable)
+- cedar::dyn
+  - Fixed a potential deadlock in the neural field that occurred when the activation was set as output and an exception occurred during the Euler step.
 
 
 Version 1.0.9
