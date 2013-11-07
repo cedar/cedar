@@ -36,11 +36,11 @@
 
 
 // CEDAR INCLUDES
-#include "DataSpectator.h"
-#include "Recorder.h"
+#include "cedar/auxiliaries/DataSpectator.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
-#include<boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 //------------------------------------------------------------------------------
 // constructors and destructor

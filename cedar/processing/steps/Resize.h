@@ -38,11 +38,13 @@
 #define CEDAR_PROC_STEPS_RESIZE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Resize.fwd.h"
 
 // SYSTEM INCLUDES
 

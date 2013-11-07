@@ -45,6 +45,7 @@ import re
 
 # Script configuration:
 namespace_aliases = {}
+namespace_aliases["unit"] = "units"
 namespace_aliases["aux"] = "auxiliaries"
 namespace_aliases["proc"] = "processing"
 namespace_aliases["dyn"] = "dynamics"
@@ -89,12 +90,16 @@ parser = OptionParser()
 parser.add_option("-c", "--header-only", dest="header_only",
                   help="When specified, no cpp file will be generated",
                   default=False, action="store_true")
+parser.add_option("-f", "--fwd-only", dest="fwd_only",
+                  help="When specified, only the forward-declaration header will be generated.",
+                  default=False, action="store_true")
                  
 
 (options, args) = parser.parse_args()
 
 # Deal with the arguments
 header_only = options.header_only
+fwd_only = options.fwd_only
 
 if len(args) > 1:
     print "Too many arguments (", args, "). Stopping."
@@ -107,13 +112,15 @@ elif len(args) == 0:
 class_name_full = args[0]
 
 extensions = []
-extensions.append("h")
-if not header_only:
+extensions.append("fwd.h")
+if not fwd_only:
+    extensions.append("h")
+if not header_only and not fwd_only:
     extensions.append("cpp")
   
 # Get user information if it is missing
 if users_name is None:
-  users_name = raw_input("Please input your <first name> <last name>: ")
+    users_name = raw_input("Please input your <first name> <last name>: ")
   
 if users_mail is None:
     users_mail = raw_input("Please input your <email>: ")
@@ -125,6 +132,10 @@ with open(config_file_path, "w") as config:
   
 # derive some names & values
 class_path = class_name_full
+
+namespaces = class_name_full.split("::")
+namespaces = namespaces[:-1]
+top_level_namespace = namespaces[1]
 
 for namespace, alias in namespace_aliases.items():
   class_path = class_path.replace("::" + namespace, "::" + alias)
@@ -145,17 +156,40 @@ replacements["<creation date YYYY MM DD>"] = str(today.year) + " " + ("%02i") % 
 replacements["<class header path>"] = class_path + ".h"
 replacements["class cedar::xxx::xxx"] = "class " + class_name_full
 replacements["CEDAR_XXX_XXX_H"] = class_id_all_cap + "_H"
+replacements["CEDAR_XXX_XXX_FWD_H"] = class_id_all_cap + "_FWD_H"
 replacements["<first name> <last name>"] = users_name
 replacements["<email address>"] = users_mail
 replacements["<class name>"] = class_name
 replacements["<full class name>"] = class_name_full
 replacements["<namespace path>"] = namespace_path
+replacements["<base namespace path>"] = "cedar/" + namespace_aliases[top_level_namespace]
+replacements["<CAP_SHORT_MAIN_NAMESPACE>"] = top_level_namespace.upper()
+
+# build namespace replacement
+namespace_begin = ""
+namespace_end = ""
+indent = ""
+
+for namespace in namespaces:
+    namespace_begin += indent + "namespace " + namespace + "\n" + indent + "{\n"
+    namespace_end = indent + "}\n" + namespace_end
+    
+    indent += "  "
+
+# remove final (superfluous) newline
+namespace_begin = namespace_begin[:-1]
+
+replacements["<begin namespaces>"] = namespace_begin
+replacements["<end namespaces>"] = namespace_end
+replacements["<namespaces indent>"] = indent
   
 # Get user confirmation
 
 print "Creating class:", class_name_full, "aka", class_name
 print "at:", class_path + ".{" + ", ".join(extensions) + "}"
 # print "replacements:", replacements
+# print "namespaces:", namespaces
+print "top-level namespace:", top_level_namespace
 choice = None
 while not choice in ('y', 'n'):
     choice = raw_input("Do you want to proceed? (y/n): ")
@@ -164,12 +198,12 @@ if choice == 'n':
     print "Okay, bye!"
     sys.exit()
 
-templates = {"h": "classHeader.h", "cpp": "classImplementation.cpp"}
+templates = {"h": "classHeader.h", "fwd.h": "classHeader.fwd.h", "cpp": "classImplementation.cpp"}
 
 for extension in extensions:
     print "Copying template", templates[extension]
     replacements["<filename>"] = class_name + "." + extension
-    with open(templates[extension], "r") as header:
+    with open("../templates/" + templates[extension], "r") as header:
         contents = header.read()
     
     for search, replace in replacements.items():
@@ -185,5 +219,5 @@ for extension in extensions:
     with open(destination, "w") as out:
       out.write(contents)
     
-print "Done. Please remember to enter the class into the appropriate namespace header and rerun cmake!"
+print "Done. Please remember to rerun cmake!"
 

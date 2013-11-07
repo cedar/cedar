@@ -48,6 +48,9 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QGraphicsItem>
 #include <QPen>

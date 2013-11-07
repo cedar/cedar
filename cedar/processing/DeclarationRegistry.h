@@ -48,6 +48,9 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/assert.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
+
 // SYSTEM INCLUDES
 
 namespace cedar
