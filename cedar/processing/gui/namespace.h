@@ -67,6 +67,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(Network);
       CEDAR_DECLARE_PROC_CLASS(PlotWidget);
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
+      class CEDAR_PROC_LIB_EXPORT ResizeHandle;
       class CEDAR_PROC_LIB_EXPORT Scene;
       class CEDAR_PROC_LIB_EXPORT Settings;
       class CEDAR_PROC_LIB_EXPORT SettingsDialog;
