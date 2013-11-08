@@ -60,11 +60,14 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(ObjectVisualizationWidget);
       CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualizationWidget RigidBodyVisualizationWidget);
       CEDAR_DECLARE_AUX_CLASS(SceneWidget);
+      CEDAR_DECLARE_AUX_CLASS(Settings);
       CEDAR_DECLARE_AUX_CLASS(Viewer);
 
       class CEDAR_AUX_LIB_EXPORT PropertyPane;
       CEDAR_DECLARE_AUX_CLASS(Parameter);
 
+      class CEDAR_AUX_LIB_EXPORT AccelerationParameter;
+      class CEDAR_AUX_LIB_EXPORT AngularVelocityParameter;
       class CEDAR_AUX_LIB_EXPORT BoolParameter;
       class CEDAR_AUX_LIB_EXPORT BoolVectorParameter;
       class CEDAR_AUX_LIB_EXPORT DirectoryParameter;
@@ -72,13 +75,22 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
       class CEDAR_AUX_LIB_EXPORT EnumParameter;
       class CEDAR_AUX_LIB_EXPORT FileParameter;
+      class CEDAR_AUX_LIB_EXPORT FrequencyParameter;
       class CEDAR_AUX_LIB_EXPORT IntParameter;
       class CEDAR_AUX_LIB_EXPORT IntVectorParameter;
+      class CEDAR_AUX_LIB_EXPORT LengthParameter;
       class CEDAR_AUX_LIB_EXPORT ObjectParameter;
       class CEDAR_AUX_LIB_EXPORT ObjectListParameter;
+      class CEDAR_AUX_LIB_EXPORT PlaneAngleParameter;
       class CEDAR_AUX_LIB_EXPORT StringParameter;
+      class CEDAR_AUX_LIB_EXPORT TimeParameter;
       class CEDAR_AUX_LIB_EXPORT UIntParameter;
       class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
+      class CEDAR_AUX_LIB_EXPORT VelocityParameter;
+
+      class CEDAR_AUX_LIB_EXPORT ResourceDialog;
+
+      class CEDAR_AUX_LIB_EXPORT SettingsWidget;
 
       class CEDAR_AUX_LIB_EXPORT ExceptionDialog;
 
@@ -95,6 +107,9 @@ namespace cedar
 
       /* Exceptions */
       class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
+
+      class CEDAR_AUX_LIB_EXPORT PluginInfoDialog;
+      class CEDAR_AUX_LIB_EXPORT PluginManagerDialog;
       //!@endcond
 
       //! The factory for gui parameters.
@@ -109,6 +124,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(PlotDeclaration);
       template <class DataType, class PlotType> class PlotDeclarationTemplate;
 
+      CEDAR_DECLARE_AUX_CLASS(ColorValueRGBA);
       CEDAR_DECLARE_AUX_CLASS(ImagePlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
       CEDAR_DECLARE_AUX_CLASS(DataPlotter);
@@ -124,12 +140,14 @@ namespace cedar
         CEDAR_DECLARE_AUX_CLASS(VtkSurfacePlot);
       #endif // CEDAR_USE_VTK
       #ifdef CEDAR_USE_QWT
-        CEDAR_DECLARE_AUX_CLASS(LinePlot);
+        CEDAR_DECLARE_AUX_CLASS(QwtLinePlot);
+        CEDAR_DECLARE_DEPRECATED(typedef QwtLinePlot LinePlot);
         CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
         CEDAR_DECLARE_AUX_CLASS(MatrixVectorPlot);
       #endif // CEDAR_USE_QWT
       #ifdef CEDAR_USE_QWTPLOT3D
-        CEDAR_DECLARE_AUX_CLASS(SurfacePlot);
+        CEDAR_DECLARE_AUX_CLASS(QwtSurfacePlot);
+        CEDAR_DECLARE_DEPRECATED(typedef QwtSurfacePlot SurfacePlot);
       #endif // CEDAR_USE_QWTPLOT3D
       //!@endcond
 

@@ -36,4 +36,6 @@
 
 cedar_add_unit_test(gui_ProcessingIde
                     gui_ProcessingIde.cpp
+                    ADDITIONAL_DEPENDENCIES
+                    cedardyn
                     )

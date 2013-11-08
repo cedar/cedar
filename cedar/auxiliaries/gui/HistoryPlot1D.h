@@ -105,7 +105,7 @@ private:
 
   //! Subplot used for plotting the history matrix.
   #ifdef CEDAR_USE_QWTPLOT3D
-    cedar::aux::gui::SurfacePlot* mpHistoryPlot;
+    cedar::aux::gui::QwtSurfacePlot* mpHistoryPlot;
   #else // CEDAR_USE_QWTPLOT3D
     cedar::aux::gui::ImagePlot* mpHistoryPlot;
   #endif // CEDAR_USE_QWTPLOT3D

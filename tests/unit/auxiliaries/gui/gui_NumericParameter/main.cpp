@@ -219,6 +219,33 @@ int test_parameter
   return errors;
 }
 
+int test_parameter_limits()
+{
+  int errors = 0;
+  double lower_limit = 0.00000001;
+  cedar::aux::ConfigurablePtr test_cfg(new cedar::aux::Configurable());
+  cedar::aux::DoubleParameterPtr parameter
+    = new cedar::aux::DoubleParameter(test_cfg.get(), "test", 1.0, cedar::aux::DoubleParameter::LimitType(lower_limit, 10.0));
+
+  auto p_widget = new cedar::aux::gui::DoubleParameter();
+  p_widget->setParameter(parameter);
+
+  p_widget->mpWidget->setValue(0.0);
+
+  if (parameter->getValue() != lower_limit)
+  {
+    std::cout << "ERROR: lower limit not applied properly!" << std::endl;
+    ++errors;
+  }
+  else
+  {
+    std::cout << "Value limited correctly; is now: " << parameter->getValue() << std::endl;
+  }
+
+  delete p_widget;
+  return errors;
+}
+
 int main(int argc, char** argv)
 {
   // needs to be created because we deal with widgets here
@@ -247,6 +274,8 @@ int main(int argc, char** argv)
         cedar::aux::gui::DoubleParameter,
         int
       >(-100, 0, -2, -3, -4);
+
+  errors += test_parameter_limits();
 
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;

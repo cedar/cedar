@@ -40,13 +40,19 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ElementClassList.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <QContextMenuEvent>
 #include <QApplication>
 #include <QResource>
+#include <QPainter>
+#include <QPixmap>
+#include <QIcon>
+#include <QMenu>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,6 +68,14 @@ QListWidget(pParent)
   this->setResizeMode(QListView::Adjust);
   this->setDragEnabled(true);
   this->setIconSize(QSize(40, 40));
+
+  QObject::connect
+  (
+    cedar::proc::gui::SettingsSingleton::getInstance()->getElementListShowsDeprecatedParameter().get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(rebuild())
+  );
 }
 
 cedar::proc::gui::ElementClassList::~ElementClassList()
@@ -72,10 +86,34 @@ cedar::proc::gui::ElementClassList::~ElementClassList()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementManager::BasePluginList& entries)
+void cedar::proc::gui::ElementClassList::contextMenuEvent(QContextMenuEvent* pEvent)
+{
+  QMenu context_menu(this);
+  auto action = context_menu.addAction("show deprecated steps");
+  action->setCheckable(true);
+  action->setChecked(cedar::proc::gui::SettingsSingleton::getInstance()->getElementListShowsDeprecated());
+  QObject::connect(action, SIGNAL(toggled(bool)), this, SLOT(showDeprecatedSteps(bool)));
+
+  context_menu.exec(pEvent->globalPos());
+}
+
+void cedar::proc::gui::ElementClassList::showDeprecatedSteps(bool show)
+{
+  cedar::proc::gui::SettingsSingleton::getInstance()->setElementListShowsDeprecated(show);
+}
+
+void cedar::proc::gui::ElementClassList::rebuild()
+{
+  this->showList(this->mCategoryName);
+}
+
+void cedar::proc::gui::ElementClassList::showList(const std::string& categoryName)
 {
   using cedar::proc::Manager;
   using cedar::proc::ElementDeclarationPtr;
+
+  this->mCategoryName = categoryName;
+  auto entries = ElementManagerSingleton::getInstance()->getCategoryEntries(this->mCategoryName);
 
   this->clear();
 
@@ -86,22 +124,53 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementMana
     CEDAR_ASSERT(elem_decl);
 
     std::string only_class_name = class_id->getClassNameWithoutNamespace();
-//    std::string namespace_name = class_id->getNamespaceName();
 
     QString label = QString::fromStdString(only_class_name);
     QListWidgetItem *p_item = new QListWidgetItem(label);
     p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
 
-    p_item->setIcon(elem_decl->getIcon());
+    QSize icon_size = this->iconSize();
+    int decoration_size = 12;
 
-    QString class_description;
-    class_description += "<nobr>class <big><b>" + QString::fromStdString(only_class_name) + "</b></big></nobr>";
+    QIcon icon = elem_decl->getIcon();
+    std::vector<QString> decorations;
+    if (!class_id->getSource().empty())
+    {
+      decorations.push_back(":/decorations/from_plugin.svg");
+    }
 
     if (class_id->isDeprecated())
     {
-      class_description += "<br /><div align=\"right\"><b>DEPRECATED</b></div>";
-      p_item->setBackground(QApplication::palette().brush(QPalette::Dark));
+      if (!cedar::proc::gui::SettingsSingleton::getInstance()->getElementListShowsDeprecated())
+      {
+        continue;
+      }
+      decorations.push_back(":/cedar/auxiliaries/gui/warning.svg");
     }
+
+    QPixmap result(icon_size);
+    result.fill(Qt::transparent);
+    QPixmap icon_pm = icon.pixmap(icon_size);
+
+    {
+      QPainter overlayer(&result);
+      overlayer.drawPixmap(0, 0, icon_pm);
+
+      for (size_t i = 0; i < decorations.size(); ++i)
+      {
+        QIcon decoration(decorations.at(i));
+        overlayer.drawPixmap
+                  (
+                    icon_size.width() - decoration_size, icon_size.height() - (i + 1) * decoration_size,
+                    decoration.pixmap(decoration_size, decoration_size)
+                  );
+      }
+    }
+
+    p_item->setIcon(QIcon(result));
+
+    QString class_description;
+    class_description += "<nobr>class <big><b>" + QString::fromStdString(only_class_name) + "</b></big></nobr>";
 
     class_description += "<hr />";
     class_description += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(class_id->getClassName()) + "</i></small></nobr></div>";
@@ -116,6 +185,12 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementMana
     {
       class_description += "<br /><b>This class is deprecated:</b> ";
       class_description += QString::fromStdString(class_id->getDeprecationDescription());
+    }
+
+    if (!class_id->getSource().empty())
+    {
+      class_description += "<br /><b>From plugin:</b> "
+                           + QString::fromStdString(class_id->getSource());
     }
 
     p_item->setToolTip(class_description);

@@ -104,7 +104,7 @@ _mTransferFunction
   )
 )
 {
-  // add deprecated name for trasnfer function
+  // add deprecated name for transfer function
   this->_mTransferFunction->addDeprecatedName("sigmoid");
 
   //declare input and output

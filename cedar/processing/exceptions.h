@@ -32,7 +32,7 @@
                  stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 06 17
 
-    Description: Header file for exceptions in the cedar::aux::proc namespace.
+    Description: Header file for exceptions in the cedar::proc namespace.
 
     Credits:
 
@@ -43,6 +43,9 @@
 
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
+
+#include <vector>
+#include <set>
 
 /*!@brief An exception that occurs when data is not found.
  */
@@ -156,6 +159,13 @@ public:
   :
   mExceptionInfos(exception_infos)
   {
+    std::string message = "One or more exceptions occurred while loading the architecture. They are:";
+    for (size_t i = 0; i < this->mExceptionInfos.size(); ++i)
+    {
+      message += "\n";
+      message += this->mExceptionInfos.at(i);
+    }
+    this->setMessage(message);
   }
 
   //! destructor that ensure that no exception is thrown
@@ -172,5 +182,13 @@ public:
 private:
   std::vector<std::string> mExceptionInfos;
 }; // class cedar::proc::ArchitectureLoadingException
+
+//! Thrown when a cycle is detected between the given triggers.
+class cedar::proc::TriggerCycleException : public cedar::aux::ExceptionBase
+{
+  public:
+    //! Constructor. Takes a vector of sets where each set contains the nodes of one trigger cycle.
+    TriggerCycleException(const std::vector<std::set<cedar::proc::TriggerablePtr> >& cycles);
+}; // cedar::proc::TriggerCycleException
 
 #endif // CEDAR_PROC_EXCEPTIONS_H

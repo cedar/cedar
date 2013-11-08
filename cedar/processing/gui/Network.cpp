@@ -47,7 +47,6 @@
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
@@ -56,6 +55,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -102,6 +102,13 @@ _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
+  QObject::connect
+  (
+    this,
+    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange)),
+    this,
+    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange))
+  );
 
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
@@ -179,6 +186,15 @@ cedar::proc::gui::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
+{
+  std::string new_name = this->getNetwork()->duplicate(elementName, newName);
+
+  auto duplicate = this->getNetwork()->getElement(new_name);
+  auto duplicate_ui = this->getScene()->getGraphicsItemFor(duplicate.get());
+  duplicate_ui->setPos(scenePos);
+}
+
 void cedar::proc::gui::Network::networkNameChanged()
 {
   this->mpNameDisplay->setPlainText(QString::fromStdString(this->getNetwork()->getName()));
@@ -224,7 +240,7 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
 
 bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
 {
-  if(!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
+  if (!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
   {
     return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
   }
@@ -430,6 +446,7 @@ void cedar::proc::gui::Network::write()
 void cedar::proc::gui::Network::write(const std::string& destination)
 {
   this->mFileName = destination;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
 
@@ -451,6 +468,7 @@ void cedar::proc::gui::Network::write(const std::string& destination)
 void cedar::proc::gui::Network::read(const std::string& source)
 {
   this->mFileName = source;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
@@ -462,6 +480,7 @@ void cedar::proc::gui::Network::read(const std::string& source)
   }
   catch (boost::property_tree::ptree_bad_path& exc) // doesn't exist yet
   {
+    //!TODO: this weaves control-flow logic into exceptions, that's not proper!
     this->toggleSmartConnectionMode(false);
   }
 }
@@ -469,11 +488,33 @@ void cedar::proc::gui::Network::read(const std::string& source)
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+  auto plot_list = node.find("open plots");
+  if(plot_list != node.not_found())
+  {
+    this->readOpenPlots(plot_list->second);
+  }
+}
+
+void cedar::proc::gui::Network::readOpenPlots(const cedar::aux::ConfigurationNode& node)
+{
+  for(auto it = node.begin(); it != node.end(); ++it)
+  {
+    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it->second);
+    auto step = this->getNetwork()->getElement<cedar::proc::Step>(step_name);
+    auto step_item = this->mpScene->getStepItemFor(step.get());
+    cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it->second, step_item);
+  }
 }
 
 void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   root.put("network", this->mNetwork->getName());
+  cedar::aux::ConfigurationNode node;
+  for(auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
+  {
+    it->second->writeOpenChildWidgets(node);
+  }
+  root.put_child("open plots", node);
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 
@@ -677,29 +718,48 @@ void cedar::proc::gui::Network::checkDataConnection
        cedar::proc::Network::ConnectionChange change
      )
 {
+  emit signalDataConnectionChange
+       (
+         QString::fromStdString(source->getParent()),
+         QString::fromStdString(source->getName()),
+         QString::fromStdString(target->getParent()),
+         QString::fromStdString(target->getName()),
+         change
+       );
+}
+
+void cedar::proc::gui::Network::dataConnectionChanged
+     (
+       QString sourceName,
+       QString sourceSlot,
+       QString targetName,
+       QString targetSlot,
+       cedar::proc::Network::ConnectionChange change
+     )
+{
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
   cedar::proc::gui::GraphicsBase* p_base_source
-    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(source->getParent()).get());
+    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(sourceName.toStdString()).get());
   if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
   {
-    source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+    source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
   }
   else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base_source))
   {
-    source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+    source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
   }
   CEDAR_ASSERT(source_slot);
 
   cedar::proc::gui::DataSlotItem* target_slot = NULL;
   cedar::proc::gui::GraphicsBase* p_base
-    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(target->getParent()).get());
+    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(targetName.toStdString()).get());
   if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
   {
-    target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+    target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
   }
   else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base))
   {
-    target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+    target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
   }
   CEDAR_ASSERT(target_slot);
 
@@ -869,4 +929,14 @@ void cedar::proc::gui::Network::toggleSmartConnectionMode()
       con->setSmartMode(smart);
     }
   }
+}
+
+void cedar::proc::gui::Network::stepRecordStateChanged()
+{
+	std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> steps = this->mpScene->getStepMap();
+
+	for (auto iter = steps.begin(); iter != steps.end(); ++iter)
+	{
+		iter->second->setRecorded(iter->first->isRecorded());
+	}
 }

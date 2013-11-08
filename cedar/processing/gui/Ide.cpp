@@ -49,22 +49,27 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Network.h"
-#include "cedar/processing/gui/PluginLoadDialog.h"
-#include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
+#include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/prefixes.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDialogButtonBox>
+#include <QMessageBox>
 #include <boost/property_tree/detail/json_parser_error.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,23 +87,24 @@ mpBoostControl(NULL)
   // manually added components
   auto p_enable_custom_time_step = new QCheckBox();
   p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
-  this->mpToolBar->insertWidget(this->mpActionBoostControl, p_enable_custom_time_step);
+  this->mpToolBar->insertWidget(this->mpActionResetRootNetwork, p_enable_custom_time_step);
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
+  this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
   this->mpCustomTimeStep->setValue(10.0);
   this->mpCustomTimeStep->setMinimum(1.0);
   this->mpCustomTimeStep->setSuffix(" ms");
   this->mpCustomTimeStep->setMaximum(10000.0);
   this->mpCustomTimeStep->setDecimals(1);
   this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
-  this->mpToolBar->insertWidget(this->mpActionBoostControl, this->mpCustomTimeStep);
+  this->mpToolBar->insertWidget(this->mpActionResetRootNetwork, this->mpCustomTimeStep);
 
   p_enable_custom_time_step->setChecked(false);
   this->mpCustomTimeStep->setEnabled(false);
 
   QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
 
-  this->mpToolBar->insertSeparator(this->mpActionBoostControl);
+  this->mpToolBar->insertSeparator(this->mpActionResetRootNetwork);
 
   // set window title
   this->mDefaultWindowTitle = this->windowTitle();
@@ -125,6 +131,7 @@ mpBoostControl(NULL)
 
   // set the property pane as the scene's property displayer
   this->mpProcessingDrawer->getScene()->setConfigurableWidget(this->mpPropertyTable);
+  this->mpProcessingDrawer->getScene()->setRecorderWidget(this->mpRecorderWidget);
 
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
                    this, SLOT(architectureToolFinished()));
@@ -135,51 +142,15 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
-  QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
+  QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+  QObject::connect(this->mpActionRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecorder(bool)));
+  QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
+  
 
-  QObject::connect
-  (
-    this->mpZoomSlider,
-    SIGNAL(valueChanged(int)),
-    this->mpProcessingDrawer,
-    SLOT(setZoomLevel(int))
-  );
-
-  QObject::connect
-  (
-    this->mpProcessingDrawer,
-    SIGNAL(zoomLevelChanged(double)),
-    this,
-    SLOT(zoomLevelSet(double))
-  );
-
-  QObject::connect
-  (
-    this->mpResetZoom,
-    SIGNAL(clicked()),
-    this,
-    SLOT(resetZoomLevel())
-  );
-
-  QObject::connect
-  (
-    this->mpZoomPlus,
-    SIGNAL(clicked()),
-    this,
-    SLOT(increaseZoomLevel())
-  );
-
-  QObject::connect
-  (
-    this->mpZoomMinus,
-    SIGNAL(clicked()),
-    this,
-    SLOT(decreaseZoomLevel())
-  );
 
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -193,9 +164,6 @@ mpBoostControl(NULL)
                    this,
                    SLOT(fillRecentFilesList()));
   fillRecentFilesList();
-
-  this->zoomLevelSet(this->mpProcessingDrawer->getZoomLevel());
-
 
   QObject::connect(mpActionAbout,
                    SIGNAL(triggered()),
@@ -212,6 +180,11 @@ mpBoostControl(NULL)
                    this,
                    SLOT(exportSvg()));
 
+  QObject::connect(mpActionShowRobotManager,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showRobotManager()));
+
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
 
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
@@ -219,6 +192,11 @@ mpBoostControl(NULL)
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
+
+  cedar::aux::PluginProxy::connectToPluginDeclaredSignal
+  (
+    boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
+  );
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -229,6 +207,16 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showRobotManager()
+{
+  auto p_dialog = new QDialog(this);
+  auto p_layout = new QVBoxLayout();
+  p_dialog->setLayout(p_layout);
+  p_layout->addWidget(new cedar::dev::gui::RobotManager());
+  p_dialog->setMinimumHeight(500);
+  p_dialog->show();
+}
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 {
@@ -300,6 +288,10 @@ void cedar::proc::gui::Ide::exportSvg()
 
 void cedar::proc::gui::Ide::duplicateStep()
 {
+  // get current mouse position
+  QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
+  QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
+
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   for (int i = 0; i < selected_items.size(); ++i)
   {
@@ -307,10 +299,11 @@ void cedar::proc::gui::Ide::duplicateStep()
     {
       try
       {
-        this->mNetwork->getNetwork()->duplicate(p_base->getElement()->getName());
+        this->mNetwork->duplicate(new_pos, p_base->getElement()->getName());
       }
       catch (cedar::aux::ExceptionBase& exc)
       {
+        //!@todo Properly display an error message to the user.
       }
     }
   }
@@ -323,6 +316,7 @@ void cedar::proc::gui::Ide::selectAll()
 
 void cedar::proc::gui::Ide::resetRootNetwork()
 {
+  this->getLog()->outdateAllMessages();
   this->mNetwork->getNetwork()->reset();
 }
 
@@ -367,40 +361,6 @@ void cedar::proc::gui::Ide::showSettingsDialog()
 {
   cedar::proc::gui::SettingsDialog *p_settings = new cedar::proc::gui::SettingsDialog(this);
   p_settings->show();
-}
-
-void cedar::proc::gui::Ide::increaseZoomLevel()
-{
-  int delta = this->mpZoomSlider->pageStep();
-  this->mpZoomSlider->setValue(this->mpZoomSlider->value() + delta);
-}
-
-void cedar::proc::gui::Ide::decreaseZoomLevel()
-{
-  int delta = this->mpZoomSlider->pageStep();
-  this->mpZoomSlider->setValue(this->mpZoomSlider->value() - delta);
-}
-
-void cedar::proc::gui::Ide::resetZoomLevel()
-{
-  this->mpZoomSlider->setValue(100);
-}
-
-void cedar::proc::gui::Ide::zoomLevelSet(double zoomLevel)
-{
-  int zoom_level = static_cast<int>(zoomLevel * 100.0);
-  this->mpZoomDisplay->setText(QString("%1%").arg(zoom_level));
-
-  if (this->mpZoomSlider->value() != zoom_level)
-  {
-    this->mpZoomSlider->setValue(zoom_level);
-
-    // if the slider's value wasn't changed, apply the slider's value (this happens when the new value is out of range)
-    if (this->mpZoomSlider->value() != zoom_level)
-    {
-      this->mpProcessingDrawer->setZoomLevel(this->mpZoomSlider->value());
-    }
-  }
 }
 
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
@@ -453,26 +413,12 @@ void cedar::proc::gui::Ide::restoreSettings()
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::ManagerSingleton::getInstance()->loadDefaultPlugins();
-}
-
-void cedar::proc::gui::Ide::showLoadPluginDialog()
-{
-  cedar::proc::gui::PluginLoadDialog* p_dialog = new cedar::proc::gui::PluginLoadDialog(this);
-  int res = p_dialog->exec();
-
-  if (res == QDialog::Accepted && p_dialog->plugin())
-  {
-    cedar::proc::ManagerSingleton::getInstance()->load(p_dialog->plugin());
-    this->resetStepList();
-  }
-
-  delete p_dialog;
+  cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showManagePluginsDialog()
 {
-  cedar::proc::gui::PluginManagerDialog* p_dialog = new cedar::proc::gui::PluginManagerDialog(this);
+  cedar::aux::gui::PluginManagerDialog* p_dialog = new cedar::aux::gui::PluginManagerDialog(this);
   p_dialog->exec();
   delete p_dialog;
 }
@@ -486,6 +432,8 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   this->mNetwork->addElementsToScene();
   this->mpPropertyTable->resetContents();
 
+  this->updateTriggerStartStopThreadCallers();
+
   if (this->mpConsistencyChecker != NULL)
   {
     this->mpConsistencyChecker->setNetwork(network);
@@ -497,6 +445,25 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   }
 }
 
+void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
+{
+  this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+                              (
+                                new cedar::aux::CallFunctionInThread
+                                (
+                                  boost::bind(&cedar::proc::Network::startTriggers, this->mNetwork->getNetwork(), true)
+                                )
+                              );
+
+  this->mStopThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+                             (
+                               new cedar::aux::CallFunctionInThread
+                               (
+                                 boost::bind(&cedar::proc::Network::stopTriggers, this->mNetwork->getNetwork(), true)
+                               )
+                             );
+}
+
 void cedar::proc::gui::Ide::architectureToolFinished()
 {
   this->mpArchitectureToolBox->selectMode("mode.Select");
@@ -504,6 +471,7 @@ void cedar::proc::gui::Ide::architectureToolFinished()
 
 void cedar::proc::gui::Ide::resetStepList()
 {
+  //!@todo This should become its own widget
   using cedar::proc::Manager;
 
   std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
@@ -521,7 +489,7 @@ void cedar::proc::gui::Ide::resetStepList()
     {
       p_tab = mElementClassListWidgets[category_name];
     }
-    p_tab->showList(ElementManagerSingleton::getInstance()->getCategoryEntries(category_name));
+    p_tab->showList(category_name);
   }
 }
 
@@ -651,14 +619,17 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 
 void cedar::proc::gui::Ide::startThreads()
 {
-  this->mNetwork->getNetwork()->startTriggers();
+  CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
+  // calls this->mNetwork->getNetwork()->startTriggers()
+  this->mStartThreadsCaller->start();
 }
 
 void cedar::proc::gui::Ide::stepThreads()
 {
   if (this->mpCustomTimeStep->isEnabled())
   {
-    this->mNetwork->getNetwork()->stepTriggers(cedar::unit::Milliseconds(this->mpCustomTimeStep->value()));
+    cedar::unit::Time step_size(this->mpCustomTimeStep->value() * cedar::unit::milli * cedar::unit::seconds);
+    this->mNetwork->getNetwork()->stepTriggers(step_size);
   }
   else
   {
@@ -668,7 +639,9 @@ void cedar::proc::gui::Ide::stepThreads()
 
 void cedar::proc::gui::Ide::stopThreads()
 {
-  this->mNetwork->getNetwork()->stopTriggers();
+  CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
+  // calls this->mNetwork->getNetwork()->stopTriggers()
+  this->mStopThreadsCaller->start();
 }
 
 void cedar::proc::gui::Ide::newFile()
@@ -747,6 +720,90 @@ void cedar::proc::gui::Ide::loadFile(QString file)
                                              "void cedar::proc::gui::Ide::loadFile(QString)"
                                            );
 
+  // check if all required plugins are loaded
+  auto required_plugins = cedar::proc::Network::getRequiredPlugins(file.toStdString());
+  std::set<std::string> plugins_not_found;
+  std::set<std::string> plugins_not_loaded;
+  for (auto iter = required_plugins.begin(); iter != required_plugins.end(); ++iter)
+  {
+    const std::string& plugin_name = *iter;
+    if (!cedar::aux::PluginProxy::canFindPlugin(plugin_name))
+    {
+      plugins_not_found.insert(plugin_name);
+    }
+    else if (!cedar::aux::PluginProxy::getPlugin(plugin_name)->isDeclared())
+    {
+      plugins_not_loaded.insert(plugin_name);
+    }
+  }
+
+  if (!plugins_not_found.empty())
+  {
+    auto p_message(new QMessageBox(this));
+
+    p_message->setWindowTitle("Missing plugins");
+    p_message->setText("Some plugins required for this architecture were not found. Continue?");
+
+    QString details = "The plugins not found are:";
+    for (auto iter = plugins_not_found.begin(); iter != plugins_not_found.end(); ++iter)
+    {
+      details += "\n";
+      details += QString::fromStdString(*iter);
+    }
+
+    p_message->setDetailedText(details);
+
+    p_message->addButton(QMessageBox::Yes);
+    p_message->addButton(QMessageBox::No);
+
+    int r = p_message->exec();
+
+    delete p_message;
+
+    if (r == QMessageBox::No)
+    {
+      return;
+    }
+  }
+
+  if (!plugins_not_loaded.empty())
+  {
+    auto p_message(new QMessageBox(this));
+
+    p_message->setWindowTitle("Unloaded plugins");
+    p_message->setText("Some plugins required for this architecture were not loaded. Load them?");
+
+    QString details = "The plugins not found are:";
+    for (auto iter = plugins_not_loaded.begin(); iter != plugins_not_loaded.end(); ++iter)
+    {
+      details += "\n";
+      details += QString::fromStdString(*iter);
+    }
+
+    p_message->setDetailedText(details);
+
+    p_message->addButton(QMessageBox::Yes);
+    p_message->addButton(QMessageBox::No);
+    p_message->addButton(QMessageBox::Cancel);
+
+    int r = p_message->exec();
+
+    delete p_message;
+
+    if (r == QMessageBox::Cancel)
+    {
+      return;
+    }
+    if (r == QMessageBox::Yes)
+    {
+      for (auto iter = plugins_not_loaded.begin(); iter != plugins_not_loaded.end(); ++iter)
+      {
+        auto plugin_name = *iter;
+        cedar::aux::PluginProxy::getPlugin(plugin_name)->declare();
+      }
+    }
+  }
+
   // reset scene
   this->mpProcessingDrawer->getScene()->reset();
   // create new root network
@@ -802,6 +859,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
   this->mpActionSave->setEnabled(true);
 
+  //!@todo Why doesn't this call resetTo?
   this->mNetwork = network;
 
   if (this->mpBoostControl)
@@ -810,6 +868,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
 
   this->displayFilename(file.toStdString());
+  this->updateTriggerStartStopThreadCallers();
 
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
@@ -905,4 +964,32 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
 void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
 {
   this->mNetwork->toggleSmartConnectionMode(smart);
+}
+
+void cedar::proc::gui::Ide::closeAllPlots()
+{
+  auto steps = this->mNetwork->getScene()->getStepMap();
+  for(auto it = steps.begin(); it != steps.end(); ++it)
+  {
+    it->second->closeAllPlots();
+  }
+}
+
+void cedar::proc::gui::Ide::toggleRecorder(bool status)
+{
+  if (!status)
+  {
+    cedar::aux::RecorderSingleton::getInstance()->stop();
+    this->mpRecorderWidget->setEnabled(true);
+  }
+  else
+  {
+    this->mpRecorderWidget->setEnabled(false);
+    cedar::aux::RecorderSingleton::getInstance()->start();
+  }
+}
+
+void cedar::proc::gui::Ide::takeSnapshot()
+{
+  cedar::aux::RecorderSingleton::getInstance()->takeSnapshot();
 }

@@ -46,7 +46,7 @@ namespace cedar
 {
   /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
    *
-   *        This is an internal namespace of cedar. Functinonality in here should not be used outside of unit tests!
+   *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
    */
   namespace test
   {

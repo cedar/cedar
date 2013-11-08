@@ -41,6 +41,7 @@
 #include "cedar/processing/steps/ChannelSplit.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/casts.h"
@@ -197,12 +198,23 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     );
   }
 
-  this->onTrigger();
-  for (size_t i = 0; i < this->mChannelData.size(); ++i)
+  if
+  (
+    !this->mInput->isEmpty()
+    && this->mInput->getData().channels() > 1
+    && this->mInput->getData().channels() <= 4
+    && cedar::aux::math::getDimensionalityOf(this->mInput->getData()) < 3
+  )
   {
-    this->emitOutputPropertiesChangedSignal(this->generateDataName(i));
+    this->lock(cedar::aux::LOCK_TYPE_READ);
+    this->compute(cedar::proc::Arguments());
+    this->unlock();
+    for (size_t i = 0; i < this->mChannelData.size(); ++i)
+    {
+      this->emitOutputPropertiesChangedSignal(this->generateDataName(i));
+    }
+    this->onTrigger();
   }
-  this->onTrigger();
 }
 
 std::string cedar::proc::steps::ChannelSplit::generateDataName(unsigned int channel) const

@@ -55,9 +55,59 @@ class cedar::dev::SerialCommunicationException : public cedar::aux::ExceptionBas
 {
 }; // class cedar::dev::SerialCommunicationException
 
+//!@brief Exception that occurs when something goes wrong during any communication with a robot.
+class cedar::dev::CommunicationException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::CommunicationException
+
+//!@brief Exception that occurs when a timeout expires.
+class cedar::dev::TimeoutException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::TimeoutException
+
 //!@brief Exception that occurs when the operating system of the computer cannot be determined.
 class cedar::dev::UnknownOperatingSystemException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::dev::UnknownOperatingSystemException
+
+//!@brief Exception that occurs a resource (e.g., a component or channel) is not available.
+class cedar::dev::ResourceNotAvailableException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::ComponentNotAvailableException
+
+//!@brief Exception that occurs when a configuration for a given channel is not found.
+class cedar::dev::ChannelConfigurationNotFoundException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no template has been loaded for a robot.
+class cedar::dev::NoTemplateLoadedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no template has been loaded for a robot.
+class cedar::dev::NoTemplateConfigurationLoadedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no template by the given name exists.
+class cedar::dev::TemplateNotFoundException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no component has been selected.
+class cedar::dev::NoComponentSelectedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Thrown when a channel has no instance.
+class cedar::dev::ChannelNotInstantiatedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Thrown when an invalid component path is found by the system.
+class cedar::dev::InvalidComponentPathException : public cedar::aux::ExceptionBase
+{
+};
 
 #endif // CEDAR_DEV_EXCEPTIONS_H

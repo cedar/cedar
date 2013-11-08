@@ -85,13 +85,19 @@ public:
    *
    * @deprecated Use the ThreadWrapper::start() method instead.
    */
-  CEDAR_DECLARE_DEPRECATED(void startTrigger());
+  CEDAR_DECLARE_DEPRECATED(void startTrigger())
+  {
+    start();
+  }
 
   /*!@brief Stops the trigger loop.
    *
    * @deprecated Use the ThreadWrapper::stop() method instead.
    */
-  CEDAR_DECLARE_DEPRECATED(void stopTrigger());
+  CEDAR_DECLARE_DEPRECATED(void stopTrigger())
+  {
+    stop();
+  }
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -158,16 +164,10 @@ private:
   cedar::aux::BoolParameterPtr mWait;
 
   //! Used to prevent multiple start calls to the trigger.
-  bool mStarting;
+  bool mStarted;
 
   //! Used to prevent multiple start calls to the trigger.
-  QMutex mStartingMutex;
-
-  //! Used to prevent multiple start calls to the trigger.
-  bool mStopping;
-
-  //! Used to prevent multiple start calls to the trigger.
-  QMutex mStoppingMutex;
+  QMutex mStartedMutex;
 
 }; // class cedar::proc::LoopedTrigger
 

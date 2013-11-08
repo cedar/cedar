@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleData.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/UnitData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
 
@@ -150,7 +151,7 @@ void cedar::aux::gui::HistoryPlot0D::showLegend(bool show)
   if (show)
   {
     // show legend
-    QwtLegend *p_legend = this->mpPlot->legend();
+    auto p_legend = this->mpPlot->legend();
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();
@@ -173,9 +174,31 @@ void cedar::aux::gui::HistoryPlot0D::showLegend(bool show)
 
 bool cedar::aux::gui::HistoryPlot0D::canAppend(cedar::aux::ConstDataPtr data) const
 {
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+  cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+  cedar::aux::ConstUnitDataPtr unit_data = boost::dynamic_pointer_cast<cedar::aux::ConstUnitData>(data);
+  if (mat_data)
   {
-    return cedar::aux::math::getDimensionalityOf(mat_data->getData()) == 0;
+    return mat_data->getDimensionality() == 0;
+  }
+  else if (unit_data)
+  {
+    // no curves yet, can append with no problem!
+    if (this->mCurves.empty())
+    {
+      return true;
+    }
+    // otherwise, there's already a curve, need to make sure it has the same suffix.
+    else
+    {
+      if (this->mCurves.front()->mUnitData && this->mCurves.front()->mUnitData->getSuffix() == unit_data->getSuffix())
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
   }
   else
   {
@@ -258,7 +281,7 @@ void cedar::aux::gui::HistoryPlot0D::applyStyle(size_t lineId, QwtPlotCurve *pCu
 void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mCurves.clear();
-  this->doAppend(data, title);
+  this->append(data, title);
 
   this->startTimer(30);
 }
@@ -275,6 +298,10 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   if (this->mCurves[index]->mDoubleData)
   {
     val = this->mCurves[index]->mDoubleData->getData();
+  }
+  else if (this->mCurves[index]->mUnitData)
+  {
+    val = this->mCurves[index]->mUnitData->doubleValueForSuffix();
   }
   else if (this->mCurves[index]->mMatData)
   {
@@ -298,13 +325,14 @@ void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::ConstDataPtr
   this->mData = data;
   this->mDoubleData = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data);
   this->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+  this->mUnitData = boost::dynamic_pointer_cast<cedar::aux::ConstUnitData>(data);
 
-  if (!this->mDoubleData && !this->mMatData)
+  if (!this->mDoubleData && !this->mMatData && !this->mUnitData)
   {
     CEDAR_THROW
     (
       cedar::aux::gui::InvalidPlotData,
-      "Could not cast to cedar::aux::DoubleData or cedar::aux::MatData "
+      "Could not cast to cedar::aux::DoubleData, cedar::aux::MatData or cedar::aux::UnitData "
       "in cedar::aux::gui::HistoryPlot0D::CurveInfo::setData."
     );
   }
@@ -317,6 +345,11 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, con
   size_t index = this->mCurves.size() - 1;
 
   curve->setData(data);
+
+  if (curve->mUnitData)
+  {
+    this->mpPlot->setAxisTitle(QwtPlot::yLeft, QString::fromStdString(curve->mUnitData->getSuffix()));
+  }
 
   curve->mCurve = new QwtPlotCurve(QString::fromStdString(title));
   curve->mCurve->attach(this->mpPlot);

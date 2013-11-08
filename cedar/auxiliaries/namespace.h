@@ -39,6 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
+#include "cedar/units/AngularVelocity.h"
+#include "cedar/units/Velocity.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -52,6 +54,12 @@ namespace cedar
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
+    namespace allocationPolicies
+    {
+      template <typename ValueType> class Instantly;
+      template <typename ValueType> class OnDemand;
+    }
+    
     /*!@brief Namespace for implementation details you should not use. */
     namespace detail
     {
@@ -62,18 +70,21 @@ namespace cedar
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
+    CEDAR_DECLARE_AUX_CLASS(CommandLineParser);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(Lockable);
     CEDAR_DECLARE_AUX_CLASS(Settings);
 
     CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
+    CEDAR_DECLARE_AUX_CLASS(ThreadCollection);
     CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
-    //!@endcond
+    CEDAR_DECLARE_AUX_CLASS(Recorder);
+    CEDAR_DECLARE_AUX_CLASS(DataSpectator);
 
     template <class T> class Singleton;
 
@@ -83,7 +94,10 @@ namespace cedar
 
     template <class ClonedT, class ReturnedT> class Cloneable;
 
-    //!@cond SKIPPED_DOCUMENTATION
+    template <typename NodePayloadT = void*, typename EdgePayloadT = void*> class GraphTemplate;
+
+    typedef GraphTemplate<> Graph;
+
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
     CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrame);
@@ -94,6 +108,7 @@ namespace cedar
 
     //!@brief A type for identifying enum entries. Corresponds to the C++ enum int values for each enum entry.
     typedef unsigned int EnumId;
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Enum);
     CEDAR_DECLARE_AUX_CLASS(EnumBase);
@@ -118,6 +133,7 @@ namespace cedar
     //!@endcond
 
     //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(PluginProxy);
     CEDAR_DECLARE_AUX_CLASS(PluginDeclaration);
     CEDAR_DECLARE_AUX_CLASS(PluginDeclarationList);
     template <class BaseClassPtr> class PluginDeclarationBaseTemplate;
@@ -130,14 +146,18 @@ namespace cedar
     template <typename T> class NumericParameter;
     //!@brief a template class for vector parameters (of same type)
     template <typename T> class VectorParameter;
+    //!@brief A template class for parameters holding boost::units.
+    template <typename T> class UnitParameterTemplate;
     //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
+    //!@brief a template class for map parameters (of primitive type)
+    template <typename T> class MapParameter;
     //!@brief a template class for storing objects that are allocated dynamically.
     template <typename T> class ObjectParameterTemplate;
     //!@brief a template class for lists of objects of arbitrary type
     template <typename T> class ObjectListParameterTemplate;
     //!@brief a template class for maps of objects of arbitrary type
-    template <typename T> class ObjectMapParameterTemplate;
+    template <typename T, class AllocationPolicy> class ObjectMapParameterTemplate;
     //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.
@@ -174,6 +194,9 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
+
+    typedef MapParameter<std::string> StringMapParameter;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringMapParameter);
     //!@endcond
 
     //!@brief a parameter storing a valid directory
@@ -196,16 +219,27 @@ namespace cedar
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Data);
+
+    CEDAR_DECLARE_AUX_CLASS(UnitData);
     //!@endcond
 
     //!@brief a templated version of cedar::aux::Data
     template <typename T> class DataTemplate;
+
+    //!@brief a templated version of cedar::aux::UnitData
+    template <typename T> class UnitDataTemplate;
 
     //!@brief A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
 
     //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
     typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
+
+    typedef cedar::aux::UnitDataTemplate<cedar::unit::AngularVelocity> AngularVelocityData;
+    CEDAR_GENERATE_POINTER_TYPES(AngularVelocityData);
+
+    typedef cedar::aux::UnitDataTemplate<cedar::unit::Velocity> VelocityData;
+    CEDAR_GENERATE_POINTER_TYPES(VelocityData);
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(MatData);
@@ -222,18 +256,24 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(DimensionalityMismatchException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(DuplicateChannelNameException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
     CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
     CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
     CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
+    CEDAR_DECLARE_AUX_CLASS(InvalidPathException);
+    CEDAR_DECLARE_AUX_CLASS(MalformedConfigurationTreeException);
     CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
     CEDAR_DECLARE_AUX_CLASS(NotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(NotImplementedException);
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(ParseException);
+    CEDAR_DECLARE_AUX_CLASS(PluginException);
+    CEDAR_DECLARE_AUX_CLASS(PluginNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);
     CEDAR_DECLARE_AUX_CLASS(ResourceNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
@@ -241,13 +281,17 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownUnitSuffixException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
     CEDAR_DECLARE_AUX_CLASS(ThreadingErrorException);
+    CEDAR_DECLARE_AUX_CLASS(NotImplementedException);
+    CEDAR_DECLARE_AUX_CLASS(ThreadRunningExeption);
     //!@endcond
     
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Grabbable);
+    CEDAR_DECLARE_AUX_CLASS(Path);
     //!@endcond
 
     // Log related classes --------------------------------------------------------------------------------------------

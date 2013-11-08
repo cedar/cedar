@@ -49,6 +49,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <limits.h>
 #include <boost/regex.hpp>
 
 namespace cedar
@@ -265,6 +266,13 @@ namespace cedar
       return result;
     }
 
+    /*! @brief Returns a strint with all occurrences of needle removed from the given string haystack.
+     */
+    inline std::string erase(const std::string& haystack, const std::string& needle)
+    {
+      return replace(haystack, needle, "");
+    }
+
     /*!@brief Template function that converts an STL string to a simple data type.
      *
      * @param value The data value that will be converted to a string.
@@ -329,11 +337,12 @@ namespace cedar
       {
         if (string == "inf")
         {
-          return INFINITY;
+          //!@todo num_limits<>::has_infinity could help make this more generic/remove the need for double, float specialization
+          return std::numeric_limits<double>::infinity();
         }
         else if (string == "-inf")
         {
-          return -INFINITY;
+          return -std::numeric_limits<double>::infinity();
         }
         else
         {
@@ -358,11 +367,11 @@ namespace cedar
       {
         if (string == "inf")
         {
-          return INFINITY;
+          return std::numeric_limits<float>::infinity();
         }
         else if (string == "-inf")
         {
-          return -INFINITY;
+          return -std::numeric_limits<float>::infinity();
         }
         else
         {

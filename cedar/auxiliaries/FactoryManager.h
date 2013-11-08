@@ -49,6 +49,27 @@
 #include <set>
 
 
+//!@todo Does this deserve its own header? This problem might occur on multiple occasions
+namespace cedar
+{
+  namespace aux
+  {
+    // use template specialization to derive the const version of the base type pointer.
+    template<typename TPtr>
+    class ConstPtrProvider
+    {
+    };
+
+    // specialization for shared_ptr
+    template<typename T>
+    class ConstPtrProvider<boost::shared_ptr<T> >
+    {
+      public:
+        typedef boost::shared_ptr<const T> ConstBaseTypePtr;
+    };
+  }
+}
+
 /*!@brief A manager of factories.
  *
  * @tparam BaseTypePtr The type of pointer returned by the managed factories.
@@ -65,8 +86,15 @@ class cedar::aux::FactoryManager
 private:
   typedef typename boost::shared_ptr< cedar::aux::Factory<BaseTypePtr> > FactoryTypePtr;
   typedef typename BaseTypePtr::element_type BaseType;
+  typedef typename cedar::aux::ConstPtrProvider<BaseTypePtr>::ConstBaseTypePtr ConstBaseTypePtr;
 
   typedef std::map<std::string, std::vector<FactoryTypePtr> > CategoryMap;
+
+  struct FactoryRecord
+  {
+    FactoryTypePtr factory;
+    bool deprecated;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -103,9 +131,35 @@ public:
     }
 
     FactoryTypePtr factory(new cedar::aux::FactoryDerived<BaseTypePtr, TypePtr>());
-    mRegisteredFactories[used_type_name] = factory;
+    FactoryRecord factory_record;
+    factory_record.factory = factory;
+    factory_record.deprecated = false;
+    mRegisteredFactories[used_type_name] = factory_record;
 
     return true;
+  }
+
+  //! Deprecates the given class.
+  template <class TypePtr>
+  void deprecate()
+  {
+    std::string generated_name = this->getTypeKey<TypePtr>();
+    auto name_iter = mTypeNameMapping.find(generated_name);
+    if (name_iter == mTypeNameMapping.end())
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "No factory is known for the type \"" + generated_name + "\".");
+    }
+
+    const std::string& name = name_iter->second;
+
+    // check if typename exists
+    auto record_iter = mRegisteredFactories.find(name);
+    if (record_iter == mRegisteredFactories.end())
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "The type \"" + name + "\" is not registered.");
+    }
+
+    record_iter->second.deprecated = true;
   }
 
   //! Adds a deprecated name for the given type.
@@ -116,6 +170,7 @@ public:
     this->addDeprecatedName(class_id, deprecatedName);
   }
 
+  //! Adds a deprecated name for the given class id.
   void addDeprecatedName(const std::string classId, const std::string& deprecatedName)
   {
     auto iter = this->mDeprecatedNames.find(deprecatedName);
@@ -173,15 +228,25 @@ public:
       }
     }
 
-    return iter->second->allocate();
+    auto factory_record = iter->second;
+    if (factory_record.deprecated)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Allocating deprecated type \"" + typeName + "\".",
+        "cedar::aux::FactoryManager::allocate(const std::string& typeName)"
+      );
+    }
+
+    return factory_record.factory->allocate();
   }
 
   //!@brief look up the type id of an object
-  const std::string& getTypeId(BaseTypePtr object)
+  const std::string& getTypeId(ConstBaseTypePtr object) const
   {
     std::string generated_type_name = cedar::aux::objectTypeToString(object);
 
-    std::map<std::string, std::string>::iterator iter = mTypeNameMapping.find(generated_type_name);
+    std::map<std::string, std::string>::const_iterator iter = mTypeNameMapping.find(generated_type_name);
     if (iter == mTypeNameMapping.end())
     {
       CEDAR_THROW
@@ -199,12 +264,7 @@ public:
   //!@brief list all types registered at the factory manager
   void listTypes(std::vector<std::string>& types) const
   {
-    for
-    (
-      typename std::map<std::string, FactoryTypePtr>::const_iterator iter = this->mRegisteredFactories.begin();
-      iter != this->mRegisteredFactories.end();
-      ++iter
-    )
+    for(auto iter = this->mRegisteredFactories.begin(); iter != this->mRegisteredFactories.end(); ++iter)
     {
       types.push_back(iter->first);
     }
@@ -232,7 +292,7 @@ private:
 protected:
   // none yet
 private:
-  std::map<std::string, FactoryTypePtr> mRegisteredFactories;
+  std::map<std::string, FactoryRecord> mRegisteredFactories;
 
   std::map<std::string, std::string> mTypeNameMapping;
 
