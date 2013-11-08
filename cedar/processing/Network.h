@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/NetworkPath.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/units/Time.h"
 
@@ -206,7 +207,7 @@ public:
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<T> getElement(const std::string& name)
+  boost::shared_ptr<T> getElement(const cedar::proc::NetworkPath& name)
   {
     return boost::dynamic_pointer_cast<T>(this->getElement(name));
   }
@@ -214,7 +215,7 @@ public:
   /*!@brief Returns the element with the given name as a const pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<const T> getElement(const std::string& name) const
+  boost::shared_ptr<const T> getElement(const cedar::proc::NetworkPath& name) const
   {
     return boost::dynamic_pointer_cast<const T>(this->getElement(name));
   }
@@ -223,13 +224,13 @@ public:
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ElementPtr getElement(const std::string& name);
+  cedar::proc::ElementPtr getElement(const cedar::proc::NetworkPath& name);
 
   /*!@brief  Returns a const pointer to the element with the given name.
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ConstElementPtr getElement(const std::string& name) const;
+  cedar::proc::ConstElementPtr getElement(const cedar::proc::NetworkPath& name) const;
 
   /*!@brief Connects data slots of two cedar::proc::Connectable elements.
    *

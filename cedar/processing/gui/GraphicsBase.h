@@ -165,6 +165,9 @@ public:
   //!@brief set width of this GraphicsBase
   void setWidth(qreal width);
 
+  //!@brief Sets the bounds of the item.
+  void setBounds(const QRectF& rect);
+
   //!@brief add a Connection to this GraphicsBase
   void addConnection(Connection* pConnection);
 
@@ -259,6 +262,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  bool canResize() const;
+  
   //! Called whenever the item has been selected or deselected.
   virtual void itemSelected(bool selected);
 
@@ -311,6 +316,9 @@ private:
 
   //!@brief Whether the item snaps to the grid.
   bool mSnapToGrid;
+
+  //! Resize handle.
+  std::vector<cedar::proc::gui::ResizeHandle*> mpResizeHandles;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

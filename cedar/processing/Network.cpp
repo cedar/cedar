@@ -825,7 +825,7 @@ std::string cedar::proc::Network::getUniqueName(const std::string& unmodifiedNam
   return adjusted_name;
 }
 
-cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
+cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const cedar::proc::NetworkPath& name) const
 {
   ElementMap::const_iterator iter;
   std::string first;
@@ -862,7 +862,7 @@ cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string&
   }
 }
 
-cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name)
+cedar::proc::ElementPtr cedar::proc::Network::getElement(const cedar::proc::NetworkPath& name)
 {
   return boost::const_pointer_cast<Element>(static_cast<const Network*>(this)->getElement(name));
 }
