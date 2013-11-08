@@ -83,6 +83,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
+    CEDAR_DECLARE_AUX_CLASS(NetworkTimer);
     CEDAR_DECLARE_AUX_CLASS(Recorder);
     CEDAR_DECLARE_AUX_CLASS(DataSpectator);
 

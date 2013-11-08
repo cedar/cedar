@@ -404,8 +404,6 @@
    <addaction name="mpThreadsStartAll"/>
    <addaction name="mpThreadsStopAll"/>
    <addaction name="mpThreadsSingleStep"/>
-   <addaction name="mpActionResetRootNetwork"/>
-   <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
@@ -469,6 +467,9 @@
    </property>
   </action>
   <action name="mpThreadsStartAll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
      <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
@@ -481,6 +482,15 @@
    </property>
   </action>
   <action name="mpThreadsStopAll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
      <normaloff>:/cedar/auxiliaries/gui/stop.svg</normaloff>:/cedar/auxiliaries/gui/stop.svg</iconset>

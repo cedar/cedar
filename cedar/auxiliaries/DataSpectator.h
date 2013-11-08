@@ -39,7 +39,6 @@
 #define CEDAR_AUX_DATA_SPECTATOR_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 

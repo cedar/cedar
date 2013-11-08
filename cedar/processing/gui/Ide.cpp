@@ -63,6 +63,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/auxiliaries/NetworkTimer.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -87,7 +88,7 @@ mpBoostControl(NULL)
   // manually added components
   auto p_enable_custom_time_step = new QCheckBox();
   p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
-  this->mpToolBar->insertWidget(this->mpActionResetRootNetwork, p_enable_custom_time_step);
+  this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
   this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
@@ -97,14 +98,14 @@ mpBoostControl(NULL)
   this->mpCustomTimeStep->setMaximum(10000.0);
   this->mpCustomTimeStep->setDecimals(1);
   this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
-  this->mpToolBar->insertWidget(this->mpActionResetRootNetwork, this->mpCustomTimeStep);
+  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
 
   p_enable_custom_time_step->setChecked(false);
   this->mpCustomTimeStep->setEnabled(false);
 
   QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
 
-  this->mpToolBar->insertSeparator(this->mpActionResetRootNetwork);
+  this->mpToolBar->insertSeparator(this->mpActionRecord);
 
   // PlotGroupsComboBox, insert it before the displayplotgroup action
   this->mpPlotGroupsComboBox = new QComboBox;
@@ -327,6 +328,8 @@ void cedar::proc::gui::Ide::selectAll()
 
 void cedar::proc::gui::Ide::resetRootNetwork()
 {
+  //reset global timer @!todo should the time be reseted here?
+  //cedar::aux::NetworkTimerSingleton::getInstance()->reset();
   this->getLog()->outdateAllMessages();
   this->mNetwork->getNetwork()->reset();
 }
@@ -632,6 +635,10 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 
 void cedar::proc::gui::Ide::startThreads()
 {
+  this->mpThreadsStartAll->setChecked(true);
+  this->mpThreadsStopAll->setChecked(false);
+  //start global timer
+  cedar::aux::NetworkTimerSingleton::getInstance()->start();
   CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
   // calls this->mNetwork->getNetwork()->startTriggers()
   this->mStartThreadsCaller->start();
@@ -652,6 +659,10 @@ void cedar::proc::gui::Ide::stepThreads()
 
 void cedar::proc::gui::Ide::stopThreads()
 {
+  this->mpThreadsStartAll->setChecked(false);
+  this->mpThreadsStopAll->setChecked(true);
+  //stop global timer @!todo should the time be stoped here?
+  //cedar::aux::NetworkTimerSingleton::getInstance()->stop();
   CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
   // calls this->mNetwork->getNetwork()->stopTriggers()
   this->mStopThreadsCaller->start();
