@@ -42,7 +42,6 @@
 #define CEDAR_DYN_NEURAL_FIELD_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
@@ -55,6 +54,9 @@
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/dynamics/fields/NeuralField.fwd.h"
 
 // SYSTEM INCLUDES
 

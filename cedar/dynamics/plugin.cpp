@@ -36,9 +36,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/plugin.h"
-#include "cedar/dynamics/namespace.h"
-#include "cedar/dynamics/fields/NeuralField.h"
-#include "cedar/dynamics/fields/Preshape.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/Singleton.h"

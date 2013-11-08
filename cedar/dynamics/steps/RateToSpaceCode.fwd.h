@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,27 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        RateToSpaceCode.fwd.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 08
 
-    Description:
+    Description: Forward declaration file for the class cedar::dyn::RateToSpaceCode.
 
     Credits:
 
 ======================================================================================================================*/
 
-#include "cedar/processing/gui/IdeApplication.h"
+#ifndef CEDAR_DYN_RATE_TO_SPACE_CODE_FWD_H
+#define CEDAR_DYN_RATE_TO_SPACE_CODE_FWD_H
 
-int main(int argc, char** argv)
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+// CEDAR INCLUDES
+#include "cedar/dynamics/lib.h"
+
+// SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
+
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-  cedar::proc::gui::IdeApplication app (argc, argv);
-
-  return app.exec();
+  namespace dyn
+  {
+    CEDAR_DECLARE_DYN_CLASS(RateToSpaceCode);
+  }
 }
+
+//!@endcond
+
+#endif // CEDAR_DYN_RATE_TO_SPACE_CODE_FWD_H
+
