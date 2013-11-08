@@ -54,6 +54,7 @@ namespace cedar
     namespace sinks
     {
       //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_PROC_CLASS(GroupSink);
 #ifdef CEDAR_USE_YARP
       CEDAR_DECLARE_PROC_CLASS(NetWriter);
 #endif

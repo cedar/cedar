@@ -22,67 +22,64 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PromotedOwnedData.h
+    File:        GroupSource.h
 
     Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2012 01 31
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 11 08
 
-    Description:
+    Description: Header file for the class cedar::proc::sources::GroupSource.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PROMOTED_OWNED_DATA_H
-#define CEDAR_PROC_PROMOTED_OWNED_DATA_H
+#ifndef CEDAR_PROC_SOURCES_GROUP_SOURCE_H
+#define CEDAR_PROC_SOURCES_GROUP_SOURCE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/OwnedData.h"
+#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/sinks/namespace.h"
+#include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief A slot for data that is promoted to an outer network.
+
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::PromotedOwnedData : public cedar::proc::OwnedData
+class cedar::proc::sources::GroupSource : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PromotedOwnedData
-  (
-    cedar::proc::DataSlotPtr promotedSlot,
-    cedar::proc::Connectable* pParent
-  );
+  GroupSource();
 
   //!@brief Destructor
-  ~PromotedOwnedData();
+  virtual ~GroupSource();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::aux::DataPtr getData();
-
-  cedar::aux::ConstDataPtr getData() const;
-
-  //!@brief get the current validity of the promoted slot
-  VALIDITY getValidity() const;
-
-  //!@brief set the current validity at the promoted slot
-  void setValidity(VALIDITY validity);
-
-  //! get the full path of slot promotion as dot-concatenated string
-  std::string getPromotionPath() const;
+  void setAssociatedGroupSink(cedar::proc::sinks::GroupSinkPtr sink);
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setData(cedar::aux::DataPtr data);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -96,8 +93,18 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::DataSlotPtr mDataSlot;
-}; // class cedar::proc::PromotedOwnedData
+  cedar::proc::sinks::GroupSinkPtr mSink;
 
-#endif // CEDAR_PROC_PROMOTED_OWNED_DATA_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::sources::GroupSource
+
+#endif // CEDAR_PROC_SOURCES_GROUP_SOURCE_H
 

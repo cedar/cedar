@@ -191,6 +191,8 @@ public:
    */
   void add(std::list<cedar::proc::ElementPtr> elements);
 
+  void addConnector(const std::string& name, bool input);
+
   /*!@brief Duplicates an existing element.
    *
    * @param elementName Identifier of the existing element.
@@ -319,14 +321,6 @@ public:
    * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
    */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
-  
-  /*!@brief promote the given DataSlot to this network
-   */
-  void promoteSlot(DataSlotPtr promotedSlot);
-
-  /*!@brief promote the given DataSlot of this network
-   */
-  void demoteSlot(cedar::proc::DataRole::Id role, const std::string& name);
 
   /*!@brief This method lists all networks that are children of this network.
    */
@@ -483,9 +477,6 @@ private:
   //!@brief revalidates all outgoing connections of a slot
   void revalidateConnections(const std::string& sender);
 
-  //!@brief processes slot promotion
-  void processPromotedSlots();
-
   /*!@brief   Single-steps all triggers in this network with the given time step.
    *
    * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
@@ -530,8 +521,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief a vector of all promoted slots
-  cedar::aux::StringVectorParameterPtr _mPromotedSlots;
 
 }; // class cedar::proc::Network
 

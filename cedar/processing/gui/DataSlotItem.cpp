@@ -44,8 +44,6 @@
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/PromotedExternalData.h"
-#include "cedar/processing/PromotedOwnedData.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/Network.h"
@@ -233,44 +231,11 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
     menu.exec(event->screenPos());
     return;
   }
-  QAction* p_promote_action = menu.addAction("promote slot");
-  // no slot can be promoted to the root network
-  if
-  (
-    (this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->getNetwork())
-      || this->mSlot->isPromoted() || this->getNumberOfConnections() != 0
-  )
-  {
-    p_promote_action->setEnabled(false);
-  }
-  QAction *p_demote_action = menu.addAction("demote slot");
-  p_demote_action->setEnabled(false);
-  // no slot can be demoted, if it was not promoted before
-  if
-  (
-    (boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(this->mSlot)
-      || boost::dynamic_pointer_cast<cedar::proc::PromotedOwnedData>(this->mSlot))
-      && this->getNumberOfConnections() == 0
-  )
-  {
-    p_demote_action->setEnabled(true);
-  }
+
   QAction *a = menu.exec(event->screenPos());
 
   if (a == NULL)
     return;
-
-  if (a == p_promote_action)
-  {
-    // Promote in the underlying non-gui. This automatically sends a signal, which creates the GUI representation.
-    this->mSlot->getParentPtr()->getNetwork()->promoteSlot(this->mSlot);
-  }
-  if (a == p_demote_action)
-  {
-    // Demote in the underlying non-gui. This automatically sends a signal, which removes the GUI representation.
-    cedar::proc::Network* network = static_cast<cedar::proc::Network*>(this->mSlot->getParentPtr());
-    network->demoteSlot(this->mSlot->getRole(), this->mSlot->getName());
-  }
 }
 
 const std::string& cedar::proc::gui::DataSlotItem::getName() const

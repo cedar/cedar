@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,63 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        GroupSource.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 11 08
 
-    Description: Namespace file for cedar::proc::source.
+    Description: Source file for the class cedar::proc::sources::GroupSource.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_NAMESPACE_H
-#define CEDAR_PROC_SOURCES_NAMESPACE_H
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/processing/sources/GroupSource.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+cedar::proc::sources::GroupSource::GroupSource()
 {
-  namespace proc
-  {
-    /*!@brief Namespace for all sources in the processing framework. */
-    namespace sources
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(Boost);
-      CEDAR_DECLARE_PROC_CLASS(BoxInput);
-      CEDAR_DECLARE_PROC_CLASS(GrabberBase);
-      CEDAR_DECLARE_PROC_CLASS(GaussInput);
-      CEDAR_DECLARE_PROC_CLASS(GroupSource);
-      CEDAR_DECLARE_PROC_CLASS(Noise);
-      CEDAR_DECLARE_PROC_CLASS(Picture);
-      CEDAR_DECLARE_PROC_CLASS(Video);
-
-      CEDAR_DECLARE_PROC_CLASS(Camera);
-
-#ifdef CEDAR_USE_LIB_DC1394
-#endif
-
-#ifdef CEDAR_USE_YARP
-      CEDAR_DECLARE_PROC_CLASS(NetReader);
-#endif      
-      //!@endcond
-    }
-  }
 }
 
-#endif // CEDAR_PROC_SOURCES_NAMESPACE_H
+cedar::proc::sources::GroupSource::~GroupSource()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::GroupSource::setAssociatedGroupSink(cedar::proc::sinks::GroupSinkPtr sink)
+{
+  this->mSink = sink;
+}
+
+void cedar::proc::sources::GroupSource::compute(const cedar::proc::Arguments& arguments)
+{
+  // do nothing
+}

@@ -207,29 +207,14 @@ int main(int /* argc */, char** /* argv */)
     std::cout << "path to non-existing element not empty" << std::endl;
   }
 
-  // testing auto-promoting of slots with multiple incoming or outgoing connections (issue #270)
-  cedar::proc::NetworkPtr network_promote(new cedar::proc::Network());
-  network_promote->setName("root");
-  cedar::proc::NetworkPtr network_promoted_nested(new cedar::proc::Network());
-  network_promoted_nested->setName("nested");
-  std::list<cedar::proc::ElementPtr> to_add;
-  to_add.push_back(network_promoted_nested);
-  cedar::dyn::NeuralFieldPtr field_a(new cedar::dyn::NeuralField());
-  field_a->setName("field a");
-  to_add.push_back(field_a);
-  cedar::dyn::NeuralFieldPtr field_b(new cedar::dyn::NeuralField());
-  field_b->setName("field b");
-  to_add.push_back(field_b);
-  cedar::dyn::NeuralFieldPtr field_c(new cedar::dyn::NeuralField());
-  field_c->setName("field c");
-  to_add.push_back(field_c);
-  network_promote->add(to_add);
-  network_promote->connectSlots("field a.sigmoided activation", "field b.input");
-  network_promote->connectSlots("field a.sigmoided activation", "field c.input");
-  std::list<cedar::proc::ElementPtr> to_move;
-  to_move.push_back(field_a);
-  network_promoted_nested->add(to_move);
-
+  // testing network connectors
+  cedar::proc::NetworkPtr network_root(new cedar::proc::Network());
+  network_root->setName("root");
+  cedar::proc::NetworkPtr network_connector(new cedar::proc::Network());
+  network_connector->setName("nested");
+  network_root->add(network_connector);
+  network_connector->addConnector("input", true);
+  network_connector->addConnector("output", false);
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
