@@ -22,41 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        exceptions.h
+    File:        exceptions.fwd.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 21
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 08
 
-    Description:
+    Description: Forward declaration header for cedar::proc::gui exceptions
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_EXCEPTIONS_H
-#define CEDAR_PROC_GUI_EXCEPTIONS_H
+#ifndef CEDAR_PROC_GUI_EXCEPTIONS_FWD_H
+#define CEDAR_PROC_GUI_EXCEPTIONS_FWD_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ExceptionBase.h"
-
-// FORWARD DECLARATIONS
-#include "cedar/processing/gui/exceptions.fwd.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief This exception is thrown whenever a mode is not known to cedar.
- */
-class cedar::proc::gui::InvalidModeException : public cedar::aux::ExceptionBase
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-public:
-  InvalidModeException()
+  namespace proc
   {
+    namespace gui
+    {
+      class CEDAR_PROC_LIB_EXPORT InvalidModeException;
+    }
   }
-}; // class cedar::proc::InvalidModeException
+}
+//!@endcond
 
-#endif // CEDAR_PROC_GUI_EXCEPTIONS_H
+#endif // CEDAR_PROC_GUI_EXCEPTIONS_FWD_H

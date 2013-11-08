@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,41 +22,44 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        exceptions.h
+    File:        ConnectValidity.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 21
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 07
 
-    Description:
+    Description: File containing the cedar::proc::gui::ConnectValidity enumeration.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_EXCEPTIONS_H
-#define CEDAR_PROC_GUI_EXCEPTIONS_H
+#ifndef CEDAR_PROC_GUI_CONNECT_VALIDITY_H
+#define CEDAR_PROC_GUI_CONNECT_VALIDITY_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ExceptionBase.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/exceptions.fwd.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief This exception is thrown whenever a mode is not known to cedar.
- */
-class cedar::proc::gui::InvalidModeException : public cedar::aux::ExceptionBase
+namespace cedar
 {
-public:
-  InvalidModeException()
+  namespace proc
   {
+    namespace gui
+    {
+      enum ConnectValidity
+      {
+        CONNECT_YES,
+        CONNECT_ERROR,
+        CONNECT_WARNING,
+        CONNECT_NO,
+        CONNECT_UNKNOWN,
+        CONNECT_NOT_SET
+      };
+    }
   }
-}; // class cedar::proc::InvalidModeException
+}
 
-#endif // CEDAR_PROC_GUI_EXCEPTIONS_H
+#endif // CEDAR_PROC_GUI_CONNECT_VALIDITY_H

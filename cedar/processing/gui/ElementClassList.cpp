@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 #include "cedar/auxiliaries/casts.h"
 

@@ -43,8 +43,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_Ide.h"
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/LogInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
+#include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/gui/ElementClassList.fwd.h"
+#include "cedar/processing/gui/Ide.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>

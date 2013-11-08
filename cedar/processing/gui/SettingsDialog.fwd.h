@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,41 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        exceptions.h
+    File:        SettingsDialog.fwd.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 21
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 07
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::gui::SettingsDialog.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_EXCEPTIONS_H
-#define CEDAR_PROC_GUI_EXCEPTIONS_H
+#ifndef CEDAR_PROC_GUI_SETTINGS_DIALOG_FWD_H
+#define CEDAR_PROC_GUI_SETTINGS_DIALOG_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ExceptionBase.h"
-
-// FORWARD DECLARATIONS
-#include "cedar/processing/gui/exceptions.fwd.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-/*!@brief This exception is thrown whenever a mode is not known to cedar.
- */
-class cedar::proc::gui::InvalidModeException : public cedar::aux::ExceptionBase
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-public:
-  InvalidModeException()
+  namespace proc
   {
+    namespace gui
+    {
+      CEDAR_DECLARE_PROC_CLASS(SettingsDialog);
+    }
   }
-}; // class cedar::proc::InvalidModeException
+}
 
-#endif // CEDAR_PROC_GUI_EXCEPTIONS_H
+//!@endcond
+
+#endif // CEDAR_PROC_GUI_SETTINGS_DIALOG_FWD_H
+
