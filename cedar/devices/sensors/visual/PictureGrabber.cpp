@@ -189,11 +189,6 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
     }
     else
     {
-      cedar::aux::LogSingleton::getInstance()->debugMessage
-                                               (
-                                                 this->getName() + ": New file successfully read.",
-                                                 "cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()"
-                                               );
       setIsCreated(true);
       onGetSourceInfo(channel);
       emit pictureChanged();
@@ -213,21 +208,6 @@ void cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
 {
   const std::string name = this->getName();
   unsigned int num_channels = getNumChannels();
-
-  // create debug message
-  std::stringstream init_message;
-  init_message << "Initialize picture grabber with " << getNumChannels() << " channel(s) ...";
-
-  for(unsigned int channel = 0; channel < num_channels; ++channel)
-  {
-    init_message << std::endl << "\tChannel " << channel << ": capture from Picture: "
-                 << getPictureChannel(channel)->_mSourceFileName->getPath();
-  }
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             name + ": " + init_message.str(),
-                                             "cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()"
-                                           );
 
   // for every channel, read from image-file
   for (unsigned int channel = 0; channel < num_channels; ++channel)

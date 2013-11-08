@@ -91,6 +91,15 @@ public:
   //! Displays this connection in smart mode.
   void setSmartMode(bool smart);
 
+  //! Sets whether the connection is highlighted due to one of its owners being selected.
+  void setHighlightedBySelection(bool highlight);
+
+  //! Returns true if this is a trigger connection.
+  bool isTriggerConnection() const;
+
+  //! define a custom shape of this object, which doesn't add a filled region between line parts
+  QPainterPath shape() const;
+
 public slots:
   //!@brief update the position of this connection, depending on anchor points of source and target
   void update();
@@ -105,7 +114,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  QColor highlightColor(const QColor& source) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -125,6 +134,9 @@ private:
   cedar::proc::gui::ConnectValidity mValidity;
   //!@brief smart mode flag (i.e., automatically draw nice lines with corners)
   bool mSmartMode;
+
+  //! Whether or not to highlight the connection.
+  bool mHighlight;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H

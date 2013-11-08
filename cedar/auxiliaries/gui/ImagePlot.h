@@ -47,7 +47,6 @@
 #include <QLabel>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
 
 namespace cedar
@@ -192,8 +191,13 @@ public:
   void setLimits(double min, double max);
 
   /*!@brief Applies a color scale to a matrix.
+   *
+   * @param matrix Matrix to colorize
+   * @param limits Whether or not there are limits to the scaling.
+   * @param min    lower limit - if limits is true, values above this will be blacked out
+   * @param max    upper limit - if limits is true, values below this will be blacked out
    */
-  static cv::Mat colorizedMatrix(cv::Mat matrix);
+  static cv::Mat colorizedMatrix(cv::Mat matrix, bool limits = false, double min = 0.0, double max = 0.0);
 
   /*! Fills the gradient used for colorization into a QGradient
    */

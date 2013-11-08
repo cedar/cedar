@@ -38,7 +38,7 @@
   },
   "joints":
   {
-    "cedar.dev.robot.KinematicChain.Joint":
+    "cedar.dev.KinematicChain.Joint":
     {
       "angle limits":
       {
@@ -63,7 +63,7 @@
         "1.0"
       ]
     },
-    "cedar.dev.robot.KinematicChain.Joint":
+    "cedar.dev.KinematicChain.Joint":
     {
       "angle limits":
       {
@@ -88,7 +88,7 @@
         "0.0"
       ]
     },
-    "cedar.dev.robot.KinematicChain.Joint":
+    "cedar.dev.KinematicChain.Joint":
     {
       "angle limits":
       {
@@ -113,7 +113,7 @@
         "1.0"
       ]
     },
-    "cedar.dev.robot.KinematicChain.Joint":
+    "cedar.dev.KinematicChain.Joint":
     {
       "angle limits":
       {
@@ -138,7 +138,7 @@
         "0.0"
       ]
     },
-    "cedar.dev.robot.KinematicChain.Joint":
+    "cedar.dev.KinematicChain.Joint":
     {
       "angle limits":
       {
@@ -163,7 +163,7 @@
         "1.0"
       ]
     },
-    "cedar.dev.robot.KinematicChain.Joint":
+    "cedar.dev.KinematicChain.Joint":
     {
       "angle limits":
       {
@@ -188,7 +188,7 @@
         "0.0"
       ]
     },
-    "cedar.dev.robot.KinematicChain.Joint":
+    "cedar.dev.KinematicChain.Joint":
     {
       "angle limits":
       {

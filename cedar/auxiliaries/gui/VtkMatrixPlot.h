@@ -53,7 +53,6 @@
 #include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
 /*!@brief Base class for plots that can display matrices.
  *

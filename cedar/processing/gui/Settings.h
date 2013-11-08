@@ -157,13 +157,6 @@ public:
   //!@brief saves the UI settings
   void save();
 
-  //!@brief returns a list of all plugins that should be loaded on start-up
-  const std::set<std::string>& pluginsToLoad();
-  //!@brief adds a plugin to the list of plugins that are loaded on start-up
-  void addPluginToLoad(const std::string& path);
-  //!@brief removes a plugin from the list of plugins that are loaded on start-up
-  void removePluginToLoad(const std::string& path);
-
   //!@brief returns the settings concerning the docking behavior for the log widget
   DockSettingsPtr logSettings();
   //!@brief returns the settings concerning the docking behavior for the tools widget
@@ -177,9 +170,6 @@ public:
   void storeMainWindow(QMainWindow *pWindow);
   //!@brief restores a state of the main window
   void restoreMainWindow(QMainWindow *pWindow);
-
-  //!@brief returns the last directory, from which a plugin was loaded
-  cedar::aux::DirectoryParameterPtr lastPluginLoadDialogLocation();
 
   //!@brief returns the last directory, from which an architecture was loaded
   cedar::aux::DirectoryParameterPtr lastArchitectureLoadDialogDirectory();
@@ -235,6 +225,24 @@ public:
     return this->_mDataSlotScalingEnabled->getValue();
   }
 
+  //! Returns whether or not connections of selected steps should be highlighted.
+  inline bool getHighlightConnections() const
+  {
+    return this->_mHighlightConnections->getValue();
+  }
+
+  //! Returns whether or not deprecated steps should be displayed in the element list.
+  bool getElementListShowsDeprecated() const;
+
+  //! Sets whether or not deprecated steps should be displayed in the element list.
+  void setElementListShowsDeprecated(bool show);
+
+  //! Returns the parameter that stores whether element lists should show deprecated types.
+  cedar::aux::BoolParameterPtr getElementListShowsDeprecatedParameter() const
+  {
+    return this->_mElementListShowsDeprecated;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -263,9 +271,6 @@ protected:
   // none yet
 
 private:
-  //!@brief List of plugins that should be loaded on startup.
-  cedar::aux::StringSetParameterPtr mPluginsToLoad;
-
   //!@brief the settings concerning the docking behavior for the log widget
   DockSettingsPtr mLog;
 
@@ -284,9 +289,6 @@ private:
   //!@brief list of bytes coming from Qt (minimized, maximized, ...)
   cedar::aux::StringParameterPtr mMainWindowState;
 
-  //!@brief Directory, where the PluginLoadDialog is supposed to open.
-  cedar::aux::DirectoryParameterPtr mPluginLoadDialogLocation;
-
   //!@brief Directory, where the load dialog for architectures is supposed to open.
   cedar::aux::DirectoryParameterPtr mArchitectureLoadDialogDirectory;
 
@@ -302,6 +304,9 @@ private:
   //!@brief Disables or enables graphics item shadows.
   cedar::aux::BoolParameterPtr mSnapToGrid;
 
+  //!@brief Disables or enables highlighting of the connections of selected steps.
+  cedar::aux::BoolParameterPtr _mHighlightConnections;
+
   //! Default display mode for steps.
   cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;
 
@@ -316,6 +321,9 @@ private:
 
   //! Maximum number of entries in the recent files list.
   cedar::aux::UIntParameterPtr _mMaxFileHistorySize;
+
+  //! Whether or not the element list should display deprecated element types.
+  cedar::aux::BoolParameterPtr _mElementListShowsDeprecated;
 
 }; // class cedar::proc::gui::Settings
 
