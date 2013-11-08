@@ -160,6 +160,24 @@ public:
     return this->toString();
   }
 
+  //! Returns a section of the path
+  SelfType operator()(size_t start, size_t end = (getElementCount() - 1))
+  {
+    if (start >= this->getElementCount())
+    {
+      CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Invalid start index " + cedar::aux::toString(start) + " in path with " + cedar::aux::toString(this->getElementCount()) + " element(s).");
+    }
+
+    if (end >= this->getElementCount())
+    {
+      CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Invalid end index " + cedar::aux::toString(end) + " in path with " + cedar::aux::toString(this->getElementCount()) + " element(s).");
+    }
+
+    SelfType slice;
+    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.end() + end);
+    return slice;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
