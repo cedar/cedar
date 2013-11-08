@@ -47,7 +47,6 @@
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
-#include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
@@ -680,14 +679,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                   = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name
                   = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
-                if
-                (
-                  cedar::proc::ConstPromotedExternalDataPtr ptr
-                    = boost::dynamic_pointer_cast<const cedar::proc::PromotedExternalData>(p_data_target->getSlot())
-                )
-                {
-                  target_name = ptr->getParentPtr()->getName() + std::string(".") + p_data_target->getSlot()->getName();
-                }
                 CEDAR_DEBUG_ASSERT(dynamic_cast<cedar::proc::Element*>(p_source->getSlot()->getParentPtr()));
                 static_cast<cedar::proc::Element*>
                 (

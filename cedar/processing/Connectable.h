@@ -231,12 +231,6 @@ protected:
     this->removeSlot(DataRole::OUTPUT, name);
   }
 
-  //!@brief Declares a new promoted slot.
-  void declarePromotedData(DataSlotPtr promotedSlot);
-
-  //!@brief Removes a promoted slot.
-  void removePromotedData(DataRole::Id role, const std::string& name);
-
   //!@brief Sets the data pointer for the buffer called name.
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
 

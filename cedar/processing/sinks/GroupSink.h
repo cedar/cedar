@@ -22,75 +22,64 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PromotedExternalData.h
+    File:        GroupSink.h
 
     Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2012 01 31
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 11 08
 
-    Description:
+    Description: Header file for the class cedar::proc::sinks::GroupSink.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PROMOTED_EXTERNAL_DATA_H
-#define CEDAR_PROC_PROMOTED_EXTERNAL_DATA_H
+#ifndef CEDAR_PROC_SINKS_GROUP_SINK_H
+#define CEDAR_PROC_SINKS_GROUP_SINK_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/ExternalData.h"
+#include "cedar/processing/sinks/namespace.h"
+#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief A slot for data that is promoted to an outer network.
+
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::PromotedExternalData : public cedar::proc::ExternalData
+class cedar::proc::sinks::GroupSink : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friends
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::DataConnection;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PromotedExternalData
-  (
-    cedar::proc::DataSlotPtr promotedSlot,
-    cedar::proc::Connectable* pParent
-  );
+  GroupSink();
 
   //!@brief Destructor
-  ~PromotedExternalData();
+  virtual ~GroupSink();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::aux::DataPtr getData();
-
-  cedar::aux::ConstDataPtr getData() const;
-
-  //! get the full path of slot promotion as dot-concatenated string
-  std::string getPromotionPath() const;
-
-  //!@brief get the current validity of the promoted slot
-  VALIDITY getValidity() const;
-
-  //!@brief set the current validity at the promoted slot
-  void setValidity(VALIDITY validity);
-
-  void clear();
-
-  void removeData(cedar::aux::ConstDataPtr data);
+  void setAssociatedGroupSource(cedar::proc::sources::GroupSourcePtr source);
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setData(cedar::aux::DataPtr data);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -104,8 +93,18 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::DataSlotPtr mDataSlot;
-}; // class cedar::proc::PromotedExternalData
+  cedar::proc::sources::GroupSourcePtr mSource;
 
-#endif // CEDAR_PROC_PROMOTED_EXTERNAL_DATA_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::sinks::GroupSink
+
+#endif // CEDAR_PROC_SINKS_GROUP_SINK_H
 
