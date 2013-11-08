@@ -38,11 +38,13 @@
 #define CEDAR_DYN_PRESHAPE_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/dynamics/fields/Preshape.fwd.h"
 
 // SYSTEM INCLUDES
 
