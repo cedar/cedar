@@ -42,13 +42,14 @@
 #define CEDAR_PROC_GUI_GRAPHICS_BASE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/gui/Connection.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsItem>

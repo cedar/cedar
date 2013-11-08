@@ -51,6 +51,7 @@
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/ElementDeclaration.fwd.h"
 #include "cedar/processing/ElementDeclarationTemplate.fwd.h"
 

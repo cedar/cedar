@@ -38,8 +38,10 @@
 #define CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/ProjectionMappingParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QComboBox>

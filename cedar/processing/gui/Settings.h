@@ -38,7 +38,6 @@
 #define CEDAR_PROC_GUI_SETTINGS_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
@@ -46,7 +45,10 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Enum.h"
 #include "cedar/auxiliaries/EnumType.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/Settings.fwd.h"
+#include "cedar/processing/gui/UiSettings.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDockWidget>
