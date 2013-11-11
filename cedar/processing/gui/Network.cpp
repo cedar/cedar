@@ -59,6 +59,9 @@
 
 // SYSTEM INCLUDES
 #include <QEvent>
+#include <QMenu>
+#include <QAction>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QSet>
 #include <boost/property_tree/json_parser.hpp>
 #include <iostream>
@@ -1024,4 +1027,56 @@ void cedar::proc::gui::Network::displayPlotGroup(std::string plotGroupName)
   }
 
   this->readPlotList(plot_group->second);
+}
+
+void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ASSERT(p_scene);
+
+  QMenu menu;
+
+  if (this->scene()->selectedItems().size() > 1)
+  {
+    p_scene->networkGroupingContextMenuEvent(menu);
+    menu.exec(event->screenPos());
+    return;
+  }
+
+  QAction* p_add_input = menu.addAction("add input");
+  QAction* p_add_output = menu.addAction("add output");
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  QAction* p_remove_input = menu.addAction("remove input");
+  QAction* p_remove_output = menu.addAction("remove output");
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  p_scene->networkGroupingContextMenuEvent(menu);
+
+  QAction* a = menu.exec(event->screenPos());
+
+  if (a == NULL)
+    return;
+
+  // execute an action
+  if (a == p_add_input)
+  {
+    this->mNetwork->addConnector("input", true);
+  }
+
+  else if (a == p_add_output)
+  {
+    this->mNetwork->addConnector("output", false);
+  }
+
+  else if (a == p_remove_input)
+  {
+    this->mNetwork->removeConnector("input", true);
+  }
+
+  else if (a == p_remove_output)
+  {
+    this->mNetwork->removeConnector("output", false);
+  }
 }

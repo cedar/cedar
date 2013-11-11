@@ -45,10 +45,13 @@
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/NetworkPath.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/processing/Triggerable.h"
+#include "cedar/processing/sinks/namespace.h"
+#include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
-#include <QObject>
+#include <QThread>
 #include <vector>
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
@@ -62,7 +65,7 @@
  *        use the connect functions of this network. This ensures proper management of storage and deletion of all the
  *        elements in the network.
  */
-class cedar::proc::Network : public QObject, public cedar::proc::Connectable
+class cedar::proc::Network : public QThread, public cedar::proc::Connectable, public cedar::proc::Triggerable
 {
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,6 +101,11 @@ public:
   //! Const iterator type of the element map.
   typedef ElementMap::const_iterator ElementMapConstIterator;
 
+  typedef cedar::aux::MapParameter<bool> ConnectorMap;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConnectorMap);
+
+
+  friend class cedar::proc::sinks::GroupSink;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,7 +130,6 @@ public:
   {
     this->readConfiguration(root);
   }
-
 
   /*!@brief Writes the network to a configuration node.
    */
@@ -192,6 +199,8 @@ public:
   void add(std::list<cedar::proc::ElementPtr> elements);
 
   void addConnector(const std::string& name, bool input);
+
+  void removeConnector(const std::string& name, bool input);
 
   /*!@brief Duplicates an existing element.
    *
@@ -396,6 +405,15 @@ public:
   //! Reads the meta information from the given file and extracts the plugins required by the architecture.
   static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
 
+  void onTrigger
+       (
+         cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
+         cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
+       );
+
+  /*!@brief The wait method.
+   */
+  void waitForProcessing();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -484,6 +502,13 @@ private:
    */
   void stepTriggers(double stepTime);
 
+  void processConnectors();
+
+  void removeAllConnectors();
+
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
   void onNameChanged();
@@ -521,6 +546,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+   ConnectorMapPtr _mConnectors;
 
 }; // class cedar::proc::Network
 

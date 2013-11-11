@@ -39,19 +39,47 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/GroupSource.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr input_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::sources::GroupSource>
+      (
+        "Sources",
+        "cedar.processing.sources.GroupSource"
+      )
+    );
+    input_declaration->setIconPath(":/steps/group_source.svg");
+    input_declaration->setDescription("Do not use this.");
+
+    input_declaration->declare();
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::sources::GroupSource::GroupSource()
-:
-mData(new cedar::aux::Data())
 {
-  this->declareOutput("output", mData);
+  this->declareOutput("output", cedar::aux::DataPtr(new cedar::aux::Data()));
 }
 
 cedar::proc::sources::GroupSource::~GroupSource()
@@ -62,12 +90,13 @@ cedar::proc::sources::GroupSource::~GroupSource()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::sources::GroupSource::setAssociatedGroupSink(cedar::proc::sinks::GroupSinkPtr sink)
-{
-  this->mSink = sink;
-}
 
-void cedar::proc::sources::GroupSource::compute(const cedar::proc::Arguments& arguments)
+void cedar::proc::sources::GroupSource::compute(const cedar::proc::Arguments& /*arguments*/)
 {
   // do nothing
+}
+
+void cedar::proc::sources::GroupSource::setData(cedar::aux::DataPtr data)
+{
+  this->setOutput("output", data);
 }

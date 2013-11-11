@@ -42,7 +42,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sinks/namespace.h"
 #include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
@@ -72,8 +71,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setAssociatedGroupSink(cedar::proc::sinks::GroupSinkPtr sink);
   void compute(const cedar::proc::Arguments& arguments);
+  void setData(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,8 +92,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::sinks::GroupSinkPtr mSink;
-  cedar::aux::DataPtr mData;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

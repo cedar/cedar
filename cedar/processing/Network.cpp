@@ -105,9 +105,12 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::Network::Network()
+:
+Triggerable(false),
+_mConnectors(new ConnectorMap(this, "connectors"))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-
+  _mConnectors->setHidden(true);
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
@@ -680,19 +683,55 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
   {
     CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot use this name. It is already taken.");
   }
-  cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
-  cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
-  sink->setAssociatedGroupSource(source);
-  source->setAssociatedGroupSink(sink);
-  if (input)
+  // check if connector is in map of connectors
+  if (_mConnectors->find(name) != _mConnectors->end())
   {
-    this->getNetwork()->add(sink, name);
-    this->add(source, name);
+    // do nothing for now
   }
   else
   {
+    _mConnectors->set(name, input);
+  }
+
+  if (input)
+  {
+    this->declareInput(name, false);
+    cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
+    this->add(source, name);
+    this->connectTrigger(this->getFinishedTrigger(), source);
+  }
+  else
+  {
+    cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
     this->add(sink, name);
-    this->getNetwork()->add(source, name);
+    this->declareOutput(name, cedar::aux::DataPtr(new cedar::aux::Data()));
+  }
+}
+
+void cedar::proc::Network::removeConnector(const std::string& name, bool input)
+{
+  // check if connector is in map of connectors
+  auto it = _mConnectors->find(name);
+  if (it != _mConnectors->end())
+  {
+    CEDAR_ASSERT(it->second == input);
+    // here be comments
+    if (input)
+    {
+      this->disconnectTrigger(this->getFinishedTrigger(), this->getElement<cedar::proc::Triggerable>(name));
+      this->remove(this->getElement(name));
+      this->removeInputSlot(name);
+    }
+    else
+    {
+      this->remove(this->getElement(name));
+      this->removeOutputSlot(name);
+    }
+    _mConnectors->erase(it->first);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find the requested connector.");
   }
 }
 
@@ -1127,6 +1166,8 @@ void cedar::proc::Network::readFromV1
 {
   this->cedar::aux::Configurable::readConfiguration(root);
 
+  this->processConnectors();
+
   try
   {
     const cedar::aux::ConfigurationNode& steps = root.get_child("steps");
@@ -1185,6 +1226,14 @@ void cedar::proc::Network::writeSteps(cedar::aux::ConfigurationNode& steps) cons
     // if this is a step, write this to the configuration tree
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second))
     {
+      if
+      (
+        boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(step)
+          || boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(step)
+      )
+      {
+        continue;
+      }
       std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(step);
       cedar::aux::ConfigurationNode step_node;
       step->writeConfiguration(step_node);
@@ -1773,6 +1822,9 @@ const cedar::proc::Network::DataConnectionVector& cedar::proc::Network::getDataC
 
 void cedar::proc::Network::removeAll()
 {
+  // remove all connectors
+  this->removeAllConnectors();
+
   // read out all elements and call this->remove for each element
   std::vector<cedar::proc::ElementPtr> elements;
   for (ElementMapIterator it = mElements.begin(); it != mElements.end(); ++it)
@@ -1800,3 +1852,41 @@ void cedar::proc::Network::revalidateConnections(const std::string& sender)
   }
 }
 
+void cedar::proc::Network::processConnectors()
+{
+  for (auto it = _mConnectors->begin(); it != _mConnectors->end(); ++it)
+  {
+    this->addConnector(it->first, it->second);
+  }
+}
+
+void cedar::proc::Network::removeAllConnectors()
+{
+  while (!_mConnectors->empty())
+  {
+    this->removeConnector(_mConnectors->begin()->first, _mConnectors->begin()->second);
+  }
+}
+
+void cedar::proc::Network::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr trigger)
+{
+
+}
+
+void cedar::proc::Network::waitForProcessing()
+{
+  this->QThread::wait();
+}
+
+void cedar::proc::Network::inputConnectionChanged(const std::string& inputName)
+{
+  cedar::proc::sources::GroupSourcePtr source = this->getElement<cedar::proc::sources::GroupSource>(inputName);
+  if (this->getInput(inputName))
+  {
+    source->setData(boost::const_pointer_cast<cedar::aux::Data>(this->getInput(inputName)));
+  }
+  else
+  {
+    source->setData(cedar::aux::DataPtr(new cedar::aux::Data()));
+  }
+}
