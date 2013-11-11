@@ -42,7 +42,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sinks/namespace.h"
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
@@ -72,7 +71,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setAssociatedGroupSource(cedar::proc::sources::GroupSourcePtr source);
   void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -85,7 +83,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -93,7 +92,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::sources::GroupSourcePtr mSource;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

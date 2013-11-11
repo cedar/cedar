@@ -39,8 +39,41 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sinks/GroupSink.h"
+#include "cedar/processing/sources/GroupSource.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/Network.h"
+#include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr input_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::sinks::GroupSink>
+      (
+        "Sinks",
+        "cedar.processing.sinks.GroupSink"
+      )
+    );
+    input_declaration->setIconPath(":/steps/group_sink.svg");
+    input_declaration->setDescription("Do not use this.");
+
+    input_declaration->declare();
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,12 +92,25 @@ cedar::proc::sinks::GroupSink::~GroupSink()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::sinks::GroupSink::setAssociatedGroupSource(cedar::proc::sources::GroupSourcePtr source)
+void cedar::proc::sinks::GroupSink::compute(const cedar::proc::Arguments& /*arguments*/)
 {
-  this->mSource = source;
+  // nothing to do here!
 }
 
-void cedar::proc::sinks::GroupSink::compute(const cedar::proc::Arguments& arguments)
+void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& inputName)
 {
+  // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
+  CEDAR_DEBUG_ASSERT(inputName == "input");
+  if (cedar::aux::ConstDataPtr data = this->getInput("input"))
+  {
+    this->getNetwork()->setOutput(this->getName(), boost::const_pointer_cast<cedar::aux::Data>(data));
+  }
+  else
+  {
+    this->getNetwork()->setOutput(this->getName(), cedar::aux::DataPtr(new cedar::aux::Data()));
+    return;
+  }
 
+  // Finally, send data ...
+  this->onTrigger();
 }

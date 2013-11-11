@@ -183,6 +183,9 @@ public:
   std::list<std::string> getPlotGroupNames();
   void displayPlotGroup(std::string plotGroupName);
 
+  //!@brief handles events in the context menu
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+
 public slots:
   void stepRecordStateChanged();
 
