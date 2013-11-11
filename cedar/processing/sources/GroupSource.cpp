@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/GroupSource.h"
+#include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
 
@@ -47,7 +48,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::sources::GroupSource::GroupSource()
+:
+mData(new cedar::aux::Data())
 {
+  this->declareOutput("output", mData);
 }
 
 cedar::proc::sources::GroupSource::~GroupSource()

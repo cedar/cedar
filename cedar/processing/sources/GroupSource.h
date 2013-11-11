@@ -94,6 +94,7 @@ protected:
   // none yet
 private:
   cedar::proc::sinks::GroupSinkPtr mSink;
+  cedar::aux::DataPtr mData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
