@@ -48,6 +48,7 @@
 
 cedar::proc::sinks::GroupSink::GroupSink()
 {
+  this->declareInput("input", false);
 }
 
 cedar::proc::sinks::GroupSink::~GroupSink()
