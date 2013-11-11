@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/processing/sources/Boost.fwd.h"
 
 // SYSTEM INCLUDES

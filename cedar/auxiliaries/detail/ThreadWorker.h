@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ThreadWorker.cpp
+    File:        ThreadWorker.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Mon 07 Jan 2013 05:50:41 PM CET
+    Date:        Mon 07 Jan 2013 05:50:01 PM CET
 
     Description:
 
@@ -34,21 +34,54 @@
 
 =============================================================================*/
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/ThreadWorker.h"
+#ifndef CEDAR_THREADWORKER_H
+#define CEDAR_THREADWORKER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Log.h"
-#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
-cedar::aux::detail::ThreadWorker::~ThreadWorker() 
-{
-}
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/detail/ThreadWorker.fwd.h"
 
-void cedar::aux::detail::ThreadWorker::workSlot()
+// SYSTEM INCLUDES
+#include <string>
+#include <iostream>
+#include <QThread>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+
+/*!The worker base class that goes with ThreadWrapper
+ *
+ * Implementors should not use this.
+ *@see LoopedThread, CallFunctionInThread
+ */
+class cedar::aux::detail::ThreadWorker : public QObject
 {
-  work(); // children will have implemented their own work()
-  emit finishedWorking();
-}
+  Q_OBJECT
+
+  public:
+    //! destructor
+    virtual ~ThreadWorker();
+
+  private:
+    //! children will do the work, here
+    virtual void work() = 0;
+
+  public slots:
+    //! slot to start the work in the new thread
+    void workSlot();
+
+  signals:
+    //! slot that signals that work() has ended.
+    void finishedWorking();
+};
+
+
+#endif
 

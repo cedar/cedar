@@ -44,6 +44,9 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QReadWriteLock>

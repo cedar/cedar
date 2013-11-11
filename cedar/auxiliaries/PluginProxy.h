@@ -38,7 +38,10 @@
 #define CEDAR_AUX_PLUGIN_PROXY_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
+#include "cedar/auxiliaries/PluginProxy.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2/signal.hpp>

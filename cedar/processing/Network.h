@@ -46,6 +46,8 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.fwd.h"
 #include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Network.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"

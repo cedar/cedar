@@ -41,9 +41,9 @@
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/processing/steps/Resize.fwd.h"
 
 // SYSTEM INCLUDES

@@ -40,6 +40,9 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatrixIterator.fwd.h"
+
 // SYSTEM INCLUDES
 #include <vector>
 

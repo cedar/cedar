@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/dynamics/fields/Preshape.fwd.h"
 
 // SYSTEM INCLUDES

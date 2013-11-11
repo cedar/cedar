@@ -103,8 +103,6 @@ CEDAR_GENERATE_POINTER_TYPES(TestModuleDoubleConnection);
 
 int main(int, char**)
 {
-  using cedar::aux::LogFile;
-
   unsigned int errors = 0;
 
   std::cout << "Creating step declarations ... ";

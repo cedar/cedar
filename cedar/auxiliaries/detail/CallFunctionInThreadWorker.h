@@ -1,6 +1,7 @@
 /*=============================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet
+    Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,7 +23,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ThreadWorker.h
+    File:        CallFunctionInThreadWorker.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
@@ -34,19 +35,23 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_THREADWORKER_H
-#define CEDAR_THREADWORKER_H
+#ifndef CEDAR_CALL_FUN_THREADWORKER_H
+#define CEDAR_CALL_FUN_THREADWORKER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/detail/ThreadWorker.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+#include "cedar/auxiliaries/detail/CallFunctionInThreadWorker.fwd.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -54,30 +59,24 @@
 #include <QThread>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-/*!The worker base class that goes with ThreadWrapper
- *
- * Implementors should not use this.
- *@see LoopedThread, CallFunctionInThread
- */
-class cedar::aux::detail::ThreadWorker : public QObject
+//! the corresponding worker class for the CallFunctionInThread class
+class cedar::aux::detail::CallFunctionInThreadWorker : public cedar::aux::detail::ThreadWorker
 {
-  Q_OBJECT
-
-  public:
-    //! destructor
-    virtual ~ThreadWorker();
+  public: 
+    //! Constructor.
+    CallFunctionInThreadWorker(cedar::aux::CallFunctionInThread* wrapper);
 
   private:
-    //! children will do the work, here
-    virtual void work() = 0;
 
-  public slots:
-    //! slot to start the work in the new thread
-    void workSlot();
+  public:
+    //! Does the actual work.
+    void work(); // virtual in parent
 
-  signals:
-    //! slot that signals that work() has ended.
-    void finishedWorking();
+  public:
+
+  private:
+    //! Wrapper that contains the function to be called.
+    cedar::aux::CallFunctionInThread* mpWrapper;
 };
 
 

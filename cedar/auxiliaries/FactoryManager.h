@@ -38,11 +38,13 @@
 #define CEDAR_AUX_FACTORY_MANAGER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/Log.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/FactoryManager.fwd.h"
 
 // SYSTEM INCLUDES
 #include <map>

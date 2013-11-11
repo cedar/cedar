@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/processing/steps/ColorConversion.fwd.h"
 
 // SYSTEM INCLUDES

@@ -48,6 +48,8 @@
 #include "cedar/auxiliaries/namespace.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
 #include "cedar/processing/gui/Network.fwd.h"
 

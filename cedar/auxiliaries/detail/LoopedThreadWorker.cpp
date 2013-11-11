@@ -34,17 +34,15 @@
 
 =============================================================================*/
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/LoopedThreadWorker.h"
-#include "cedar/auxiliaries/LoopedThread.h"
-
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/detail/LoopedThreadWorker.h"
+#include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
+
 
 cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
 : mpWrapper(wrapper)

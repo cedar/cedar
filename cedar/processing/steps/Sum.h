@@ -41,6 +41,7 @@
 #include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/processing/steps/Sum.fwd.h"
 
 // SYSTEM INCLUDES

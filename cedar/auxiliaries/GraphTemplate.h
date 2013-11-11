@@ -41,7 +41,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/GraphTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 

@@ -43,6 +43,9 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Channel.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Data.fwd.h"
+
 // SYSTEM INCLUDES
 
 /*!@brief Base class for components of robots.

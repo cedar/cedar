@@ -41,6 +41,7 @@
 #include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Data.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Network.fwd.h"

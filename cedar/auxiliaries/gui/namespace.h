@@ -42,6 +42,12 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Singleton.fwd.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Data.fwd.h"
+#include "cedar/auxiliaries/Parameter.fwd.h"
+#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

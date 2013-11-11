@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/namespace.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/processing/steps/MatrixTypeConverter.fwd.h"
 
 // SYSTEM INCLUDES

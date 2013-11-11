@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/LogInterface.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"

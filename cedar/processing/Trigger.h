@@ -46,6 +46,7 @@
 #include "cedar/processing/Triggerable.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/Manager.fwd.h"
 

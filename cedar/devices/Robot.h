@@ -40,8 +40,10 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/devices/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/enable_shared_from_this.hpp>

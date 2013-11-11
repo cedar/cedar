@@ -41,5 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/BoolParameter.fwd.h"
+
 
 #endif // CEDAR_AUX_BOOL_PARAMETER_H

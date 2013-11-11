@@ -45,6 +45,9 @@
 #include "cedar/devices/Sensor.h"
 #include "cedar/devices/kteam/namespace.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+
 // SYSTEM INCLUDES
 #include <cv.h>
 

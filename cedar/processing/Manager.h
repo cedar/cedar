@@ -46,6 +46,8 @@
 #include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LoopedThread.fwd.h"
+#include "cedar/auxiliaries/PluginProxy.fwd.h"
 #include "cedar/processing/Manager.fwd.h"
 #include "cedar/processing/PluginDeclaration.fwd.h"
 

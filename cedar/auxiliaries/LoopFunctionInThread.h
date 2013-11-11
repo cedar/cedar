@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/LoopedThread.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LoopFunctionInThread.fwd.h"
 
 // SYSTEM INCLUDES
 #include <functional>

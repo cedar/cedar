@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/processing/steps/UnitConverter.fwd.h"
 
 // SYSTEM INCLUDES

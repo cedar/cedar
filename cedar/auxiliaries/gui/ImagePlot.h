@@ -43,6 +43,9 @@
 #include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/math/Limits.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QReadWriteLock>

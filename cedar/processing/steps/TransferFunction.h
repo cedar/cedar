@@ -44,10 +44,10 @@
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/processing/steps/TransferFunction.fwd.h"
 
 // SYSTEM INCLUDES

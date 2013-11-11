@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallFunctionInThreadWorker.cpp
+    File:        ThreadWorker.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
@@ -34,29 +34,18 @@
 
 =============================================================================*/
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/CallFunctionInThreadWorker.h"
-#include "cedar/auxiliaries/CallFunctionInThread.h"
-
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/detail/ThreadWorker.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
-cedar::aux::detail::CallFunctionInThreadWorker::CallFunctionInThreadWorker(cedar::aux::CallFunctionInThread *wrapper) 
-: mpWrapper(wrapper)
+cedar::aux::detail::ThreadWorker::~ThreadWorker() 
 {
 }
 
-void cedar::aux::detail::CallFunctionInThreadWorker::work()
+void cedar::aux::detail::ThreadWorker::workSlot()
 {
-  CEDAR_ASSERT( mpWrapper != NULL );
-
-  mpWrapper->call();
-
-  mpWrapper->requestStop();
-
-  return;
+  work(); // children will have implemented their own work()
+  emit finishedWorking();
 }
-
 

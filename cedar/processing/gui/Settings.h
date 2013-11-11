@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Enum.h"
 #include "cedar/auxiliaries/EnumType.h"

@@ -48,6 +48,7 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/BoolParameter.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 

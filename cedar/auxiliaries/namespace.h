@@ -45,133 +45,80 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <opencv2/opencv.hpp>
 
+//#warning Do not include this header any more. Use the new forward declaration headers instead!
+
+//#include "cedar/auxiliaries/BoolParameter.fwd.h"
+//#include "cedar/auxiliaries/BoolVectorParameter.fwd.h"
+//#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+//#include "cedar/auxiliaries/Cloneable.fwd.h"
+//#include "cedar/auxiliaries/CommandLineParser.fwd.h"
+//#include "cedar/auxiliaries/Configurable.fwd.h"
+//#include "cedar/auxiliaries/Data.fwd.h"
+//#include "cedar/auxiliaries/DataTemplate.fwd.h"
+//#include "cedar/auxiliaries/DataSpectator.fwd.h"
+//#include "cedar/auxiliaries/DeclarationManagerTemplate.fwd.h"
+//#include "cedar/auxiliaries/Enum.fwd.h"
+//#include "cedar/auxiliaries/EnumBase.fwd.h"
+//#include "cedar/auxiliaries/EnumType.fwd.h"
+//#include "cedar/auxiliaries/GraphTemplate.fwd.h"
+//#include "cedar/auxiliaries/Factory.fwd.h"
+//#include "cedar/auxiliaries/FactoryDerived.fwd.h"
+//#include "cedar/auxiliaries/FactoryManager.fwd.h"
+//#include "cedar/auxiliaries/IntrusivePtrBase.fwd.h"
+//#include "cedar/auxiliaries/ImageSetData.fwd.h"
+//#include "cedar/auxiliaries/LocalCoordinateFrame.fwd.h"
+//#include "cedar/auxiliaries/Lockable.fwd.h"
+//#include "cedar/auxiliaries/LogFile.fwd.h"
+//#include "cedar/auxiliaries/LoopedThread.fwd.h"
+//#include "cedar/auxiliaries/LoopFunctionInThread.fwd.h"
+//#include "cedar/auxiliaries/LoopMode.fwd.h"
+//#include "cedar/auxiliaries/MatrixIterator.fwd.h"
+//#include "cedar/auxiliaries/NamedConfigurable.fwd.h"
+//#include "cedar/auxiliaries/ObjectListParameter.fwd.h"
+//#include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
+//#include "cedar/auxiliaries/ObjectParameter.fwd.h"
+//#include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
+//#include "cedar/auxiliaries/Parameter.fwd.h"
+//#include "cedar/auxiliaries/ParameterTemplate.fwd.h"
+//#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
+//#include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
+//#include "cedar/auxiliaries/PluginDeclarationTemplate.fwd.h"
+//#include "cedar/auxiliaries/PluginProxy.fwd.h"
+//#include "cedar/auxiliaries/Recorder.fwd.h"
+//#include "cedar/auxiliaries/Settings.fwd.h"
+//#include "cedar/auxiliaries/Singleton.fwd.h"
+//#include "cedar/auxiliaries/StringParameter.fwd.h"
+//#include "cedar/auxiliaries/StringVectorParameter.fwd.h"
+//#include "cedar/auxiliaries/ThreadCollection.fwd.h"
+//#include "cedar/auxiliaries/ThreadWrapper.fwd.h"
+//#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+//#include "cedar/auxiliaries/detail/CallFunctionInThreadWorker.fwd.h"
+//#include "cedar/auxiliaries/detail/LoopedThreadWorker.fwd.h"
+//#include "cedar/auxiliaries/detail/ThreadWorker.fwd.h"
 
 namespace cedar
 {
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
-    namespace allocationPolicies
-    {
-      template <typename ValueType> class Instantly;
-      template <typename ValueType> class OnDemand;
-    }
-    
-    /*!@brief Namespace for implementation details you should not use. */
-    namespace detail
-    {
-      class ThreadWorker;
-      class LoopedThreadWorker;
-      class CallFunctionInThreadWorker;
-    }
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Configurable);
-    CEDAR_DECLARE_AUX_CLASS(CommandLineParser);
-    CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
-    CEDAR_DECLARE_AUX_CLASS(Lockable);
-    CEDAR_DECLARE_AUX_CLASS(Settings);
-
-    CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
-    CEDAR_DECLARE_AUX_CLASS(LoopedThread);
-    CEDAR_DECLARE_AUX_CLASS(ThreadCollection);
-    CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
-    CEDAR_DECLARE_AUX_CLASS(LoopFunctionInThread);
-    CEDAR_DECLARE_AUX_CLASS(LoopMode);
-    CEDAR_DECLARE_AUX_CLASS(UserData);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
-    CEDAR_DECLARE_AUX_CLASS(Recorder);
-    CEDAR_DECLARE_AUX_CLASS(DataSpectator);
-
-    template <class T> class Singleton;
-
-    template <typename T> class MovingAverage;
-
-    template <class ReturnedT> class CloneableBase;
-
-    template <class ClonedT, class ReturnedT> class Cloneable;
-
-    template <typename NodePayloadT = void*, typename EdgePayloadT = void*> class GraphTemplate;
-
-    typedef GraphTemplate<> Graph;
-
-    CEDAR_DECLARE_AUX_CLASS(LogFile);
-    CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
-    CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrame);
-    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame Object);
-    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame RigidBody);
-    CEDAR_DECLARE_AUX_CLASS(System);
-    //!@endcond
-
-    //!@brief A type for identifying enum entries. Corresponds to the C++ enum int values for each enum entry.
-    typedef unsigned int EnumId;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Enum);
-    CEDAR_DECLARE_AUX_CLASS(EnumBase);
-    //!@endcond
-    template <class T> class EnumType;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Arguments);
-    //!@endcond
-
-    template <class BaseTypePtr> class Factory;
-    template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
-    template <class BaseTypePtr> class FactoryManager;
-    template <class BaseTypePtr> class DeclarationManagerTemplate;
-
-    template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectParameter);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
-    //!@endcond
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(PluginProxy);
-    CEDAR_DECLARE_AUX_CLASS(PluginDeclaration);
-    CEDAR_DECLARE_AUX_CLASS(PluginDeclarationList);
-    template <class BaseClassPtr> class PluginDeclarationBaseTemplate;
-    template <class BaseClassPtr, class PluginClassPtr, class BaseClass> class PluginDeclarationTemplate;
-    //!@endcond
-
-    //!@brief a template class for parameters
-    template <typename T> class ParameterTemplate;
     //!@brief a template class for numeric parameters, having a minimum and maximum value
     template <typename T> class NumericParameter;
-    //!@brief a template class for vector parameters (of same type)
-    template <typename T> class VectorParameter;
     //!@brief A template class for parameters holding boost::units.
     template <typename T> class UnitParameterTemplate;
     //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
     //!@brief a template class for map parameters (of primitive type)
     template <typename T> class MapParameter;
-    //!@brief a template class for storing objects that are allocated dynamically.
-    template <typename T> class ObjectParameterTemplate;
     //!@brief a template class for lists of objects of arbitrary type
     template <typename T> class ObjectListParameterTemplate;
-    //!@brief a template class for maps of objects of arbitrary type
-    template <typename T, class AllocationPolicy> class ObjectMapParameterTemplate;
     //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.
     typedef NumericParameter<unsigned int> UIntParameter;
     //!@brief A concretization of NumericParameter for int values.
     typedef NumericParameter<int> IntParameter;
-    //!@brief A concretization of ParameterTemplate for strings.
-    typedef ParameterTemplate<std::string> StringParameter;
-    //!@brief A concretization of ParameterTemplate for booleans.
-    typedef ParameterTemplate<bool> BoolParameter;
-    //!@brief A concretization of VectorParameter for booleans.
-    typedef VectorParameter<bool> BoolVectorParameter;
-    //!@brief A concretization of VectorParameter for strings.
-    typedef VectorParameter<std::string> StringVectorParameter;
     //!@brief A concretization of NumericVectorParameter for double values.
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     //!@brief A concretization of NumericVectorParameter for unsigned int values.
@@ -184,14 +131,10 @@ namespace cedar
 
     // all intrusive smart pointers
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntVectorParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
 
@@ -214,26 +157,12 @@ namespace cedar
     //!@brief an intrusive pointer to a parameter containing a set of type string
     typedef boost::intrusive_ptr<StringSetParameter> StringSetParameterPtr;
 
-    //!@brief a better name for boost's property tree
-    typedef boost::property_tree::ptree ConfigurationNode;
-
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Data);
-
     CEDAR_DECLARE_AUX_CLASS(UnitData);
     //!@endcond
 
-    //!@brief a templated version of cedar::aux::Data
-    template <typename T> class DataTemplate;
-
     //!@brief a templated version of cedar::aux::UnitData
     template <typename T> class UnitDataTemplate;
-
-    //!@brief A concretization of DataTemplate for simple points (cv::Point).
-    typedef DataTemplate<cv::Point> CvPointData;
-
-    //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
-    typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
 
     typedef cedar::aux::UnitDataTemplate<cedar::unit::AngularVelocity> AngularVelocityData;
     CEDAR_GENERATE_POINTER_TYPES(AngularVelocityData);
@@ -242,10 +171,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES(VelocityData);
 
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(MatData);
     CEDAR_DECLARE_AUX_CLASS(DoubleData);
-    CEDAR_GENERATE_POINTER_TYPES(CvPointData);
-    CEDAR_GENERATE_POINTER_TYPES(ImageSetData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     CEDAR_DECLARE_AUX_CLASS(StereoImageData);
     /* exceptions */

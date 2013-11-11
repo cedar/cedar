@@ -41,5 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.fwd.h"
 
 #endif // CEDAR_AUX_STRING_VECTOR_PARAMETER_H

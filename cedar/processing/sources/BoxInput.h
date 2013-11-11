@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/processing/sources/BoxInput.fwd.h"
 
 // SYSTEM INCLUDES

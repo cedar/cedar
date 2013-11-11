@@ -41,22 +41,25 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ThreadWrapper.fwd.h"
+#include "cedar/auxiliaries/detail/ThreadWorker.fwd.h"
+
 // SYSTEM INCLUDES
-#include <string>
-#include <iostream>
-#include <climits>
 #include <QThread>
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QCoreApplication>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <string>
+#include <iostream>
+#include <climits>
 
 
 /*!@brief Base class for utility classes that start their own worker in a thread
