@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/IntVectorParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Data.fwd.h"

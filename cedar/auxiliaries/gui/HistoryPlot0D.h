@@ -47,6 +47,8 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/DoubleData.fwd.h"
+#include "cedar/auxiliaries/UnitData.fwd.h"
 
 // SYSTEM INCLUDES
 #include <qwt_plot.h>

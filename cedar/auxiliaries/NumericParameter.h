@@ -45,6 +45,9 @@
 #include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/math/Limits.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/NumericParameter.fwd.h"
+
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
 

@@ -41,6 +41,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 
 // FORWARD DECLARATIONS

@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/EnumBase.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS

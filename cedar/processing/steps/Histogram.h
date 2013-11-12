@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"

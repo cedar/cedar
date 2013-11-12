@@ -41,5 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.fwd.h"
 
 #endif // CEDAR_AUX_DOUBLE_PARAMETER_H

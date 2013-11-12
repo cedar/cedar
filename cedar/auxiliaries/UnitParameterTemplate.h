@@ -41,9 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/NumericParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/UnitParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/units/base_dimension.hpp>
@@ -318,7 +320,7 @@ namespace boost
  * @todo describe more.
  */
 template <class T>
-class cedar::aux::UnitParameterTemplate : public cedar::aux::NumericParameter<boost::units::quantity<T> >//public cedar::aux::ParameterTemplate<boost::units::quantity<T> >
+class cedar::aux::UnitParameterTemplate : public cedar::aux::NumericParameter<boost::units::quantity<T> >
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
