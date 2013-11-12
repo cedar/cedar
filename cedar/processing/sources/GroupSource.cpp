@@ -99,4 +99,5 @@ void cedar::proc::sources::GroupSource::compute(const cedar::proc::Arguments& /*
 void cedar::proc::sources::GroupSource::setData(cedar::aux::DataPtr data)
 {
   this->setOutput("output", data);
+  this->emitOutputPropertiesChangedSignal("output");
 }

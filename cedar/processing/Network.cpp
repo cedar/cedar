@@ -107,7 +107,7 @@ namespace
 cedar::proc::Network::Network()
 :
 Triggerable(false),
-_mConnectors(new ConnectorMap(this, "connectors"))
+_mConnectors(new ConnectorMap(this, "connectors", std::map<std::string, bool>()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mConnectors->setHidden(true);
@@ -1868,7 +1868,7 @@ void cedar::proc::Network::removeAllConnectors()
   }
 }
 
-void cedar::proc::Network::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr trigger)
+void cedar::proc::Network::onTrigger(cedar::proc::ArgumentsPtr /*args*/, cedar::proc::TriggerPtr /*trigger*/)
 {
 
 }
