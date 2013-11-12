@@ -258,7 +258,7 @@ bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEven
 //    }
 
     case QEvent::GraphicsSceneMouseRelease:
-      this->fitToContents();
+//      this->fitToContents();
       break;
 
     default:
@@ -930,7 +930,6 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
     {
       this->transformChildCoordinates(p_scene_element);
       p_scene_element->setParentItem(this);
-      this->fitToContents();
     }
   }
 }
