@@ -40,12 +40,14 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Settings.fwd.h"
 #include "cedar/auxiliaries/PluginProxy.fwd.h"
+#include "cedar/auxiliaries/StringSetParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2/signal.hpp>

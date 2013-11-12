@@ -45,6 +45,9 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/gui/ui_RobotManager.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Path.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QTreeWidgetItem>
 #include <QWidget>

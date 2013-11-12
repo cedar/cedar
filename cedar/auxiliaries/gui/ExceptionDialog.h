@@ -44,6 +44,9 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/ui_ExceptionDialog.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ExceptionBase.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QDialog>
 

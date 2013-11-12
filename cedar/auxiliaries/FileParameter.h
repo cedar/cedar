@@ -39,7 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/FileParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDir>

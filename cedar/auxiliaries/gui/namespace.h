@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/Data.fwd.h"
 #include "cedar/auxiliaries/Parameter.fwd.h"
 #include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+#include "cedar/auxiliaries/TypeHierarchyMap.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
