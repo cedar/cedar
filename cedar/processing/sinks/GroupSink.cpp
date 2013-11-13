@@ -105,14 +105,12 @@ void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& in
   {
     this->getNetwork()->setOutput(this->getName(), boost::const_pointer_cast<cedar::aux::Data>(data));
     this->getNetwork()->emitOutputPropertiesChangedSignal(this->getName());
+    // Finally, send data ...
+    this->onTrigger();
   }
   else
   {
     this->getNetwork()->setOutput(this->getName(), cedar::aux::DataPtr(new cedar::aux::Data()));
     this->getNetwork()->emitOutputPropertiesChangedSignal(this->getName());
-    return;
   }
-
-  // Finally, send data ...
-  this->onTrigger();
 }
