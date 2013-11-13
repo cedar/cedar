@@ -101,13 +101,6 @@ public:
    */
   cedar::proc::NetworkPtr getNetwork();
 
-  /*!@brief access the underlying cedar::proc::Network
-   */
-  CEDAR_DECLARE_DEPRECATED(inline cedar::proc::NetworkPtr network())
-  {
-    return this->getNetwork();
-  }
-
   //!@brief add all elements contained in this network to the scene
   void addElementsToScene();
 
