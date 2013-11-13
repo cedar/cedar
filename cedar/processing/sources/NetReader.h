@@ -42,7 +42,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/MatData.h"

@@ -44,7 +44,6 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatrixIterator.h"
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

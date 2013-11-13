@@ -41,10 +41,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#include "cedar/auxiliaries/VectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

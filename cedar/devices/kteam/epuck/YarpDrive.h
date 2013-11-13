@@ -43,7 +43,6 @@
 #ifdef CEDAR_USE_YARP
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/kteam/Drive.h"
 #include "cedar/devices/kteam/epuck/namespace.h"

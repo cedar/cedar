@@ -37,11 +37,6 @@
 #ifndef CEDAR_NAMESPACE_NET_H
 #define CEDAR_NAMESPACE_NET_H
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-
-// SYSTEM INCLUDES
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/defines.h"

@@ -45,7 +45,6 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/GraphicsBase.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"

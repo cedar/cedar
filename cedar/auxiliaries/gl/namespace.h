@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
