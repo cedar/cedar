@@ -44,7 +44,10 @@
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/ConnectorItem.h"
 #include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/sources/GroupSource.h"
+#include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/DataConnection.h"
@@ -240,6 +243,11 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
     default:
       return this->cedar::proc::gui::GraphicsBase::itemChange(change, value);
   }
+}
+
+void cedar::proc::gui::Network::sizeChanged()
+{
+  this->updateConnectorPositions();
 }
 
 bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
@@ -874,24 +882,70 @@ void cedar::proc::gui::Network::checkTriggerConnection
   }
 }
 
+void cedar::proc::gui::Network::updateConnectorPositions()
+{
+  qreal distance = 20;
+  qreal pad_side = 5;
+  QPointF start_dist(pad_side, 25);
+  QPointF direction(0, 1);
+
+  for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
+  {
+    auto connector = this->mConnectorSources.at(i);
+    connector->setPos(start_dist + direction * distance * static_cast<qreal>(i));
+  }
+
+  if (!this->mConnectorSinks.empty())
+  {
+    qreal connector_width = this->mConnectorSinks.front()->width();
+    start_dist.setX(this->width() - connector_width - pad_side);
+    for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
+    {
+      auto connector = this->mConnectorSinks.at(i);
+      connector->setPos(start_dist + direction * distance * static_cast<qreal>(i));
+    }
+  }
+}
+
 void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPtr element)
 {
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
   cedar::proc::gui::GraphicsBase* p_scene_element = NULL;
-  if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+
+  // if connector, add the corresponding item
+  if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element))
+  {
+    auto connector_item = new cedar::proc::gui::DataSlotItem(NULL, connector->getOutputSlot("output"));
+    this->mpScene->addItem(connector_item);
+    mConnectorSources.push_back(connector_item);
+    p_scene_element = connector_item;
+    current_type = "connector";
+  }
+  else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(element))
+  {
+    auto connector_item = new cedar::proc::gui::DataSlotItem(NULL, connector->getInputSlot("input"));
+    this->mpScene->addItem(connector_item);
+    mConnectorSinks.push_back(connector_item);
+    p_scene_element = connector_item;
+    current_type = "connector";
+  }
+  // if step, add a step item
+  else if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
   {
     this->mpScene->addProcessingStep(step, QPointF(0, 0));
     current_type = "step";
 
     p_scene_element = this->mpScene->getStepItemFor(step.get());
   }
+  // if network, add a new network item
   else if (cedar::proc::NetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::Network>(element))
   {
     this->mpScene->addNetwork(QPointF(0, 0), network);
     current_type = "network";
     p_scene_element = this->mpScene->getNetworkFor(network.get());
   }
+  // if the new element is a trigger, add a trigger item
   else if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
   {
     this->mpScene->addTrigger(trigger, QPointF(0, 0));
@@ -900,6 +954,7 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
   CEDAR_ASSERT(p_scene_element != NULL);
 
+  // if there is a configuration stored for the UI of the element, load it
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode>::iterator iter
     = this->mNextElementUiConfigurations.find(p_scene_element->getElement().get());
   if (iter != this->mNextElementUiConfigurations.end())
@@ -908,6 +963,7 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
     this->mNextElementUiConfigurations.erase(iter);
   }
 
+  // see if there is a configuration for the UI item stored in the network's ui node
   cedar::aux::ConfigurationNode& ui = this->getNetwork()->getLastReadUINode();
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {
@@ -923,6 +979,7 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
     }
   }
 
+  // if not a root network, properly add the item as a child
   if (this->mpScene && !this->isRootNetwork())
   {
     CEDAR_ASSERT(p_scene_element != NULL);
@@ -931,6 +988,11 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
       this->transformChildCoordinates(p_scene_element);
       p_scene_element->setParentItem(this);
     }
+  }
+
+  if (current_type == "connector")
+  {
+    this->updateConnectorPositions();
   }
 }
 
