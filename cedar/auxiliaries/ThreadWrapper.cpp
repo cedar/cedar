@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ThreadWrapper.h"
-#include "cedar/auxiliaries/ThreadWorker.h"
+#include "cedar/auxiliaries/detail/ThreadWorker.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/exceptions.h"

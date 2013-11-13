@@ -42,7 +42,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gl/gl.h"

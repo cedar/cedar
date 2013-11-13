@@ -41,7 +41,6 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/devices/Sensor.h"
 #include "cedar/devices/kteam/namespace.h"
 

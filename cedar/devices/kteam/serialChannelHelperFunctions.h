@@ -40,7 +40,6 @@
 #define CEDAR_DEV_KTEAM_SERIAL_CHANNEL_HELPER_FUNCTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/kteam/namespace.h"

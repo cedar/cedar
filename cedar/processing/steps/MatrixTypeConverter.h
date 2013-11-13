@@ -44,7 +44,6 @@
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"

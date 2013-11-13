@@ -44,7 +44,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/LoopedTrigger.fwd.h"

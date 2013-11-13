@@ -60,6 +60,7 @@
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
 #include <QMainWindow>
+#include <map>
 
 
 /*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Networks.

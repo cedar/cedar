@@ -42,7 +42,6 @@
 #define CEDAR_PROC_MANAGER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS

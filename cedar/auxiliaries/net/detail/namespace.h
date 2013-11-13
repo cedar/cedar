@@ -37,13 +37,20 @@
 #ifndef CEDAR_NAMESPACE_H
 #define CEDAR_NAMESPACE_H
 
+// CEDAR_CONFIGURATIONS
 #include "cedar/configuration.h"
-#include "cedar/auxiliaries/namespace.h"
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/lib.h"
+
+namespace cedar
+{
+  namespace aux
+  {
+    namespace net
+    {
+      namespace detail
+      {
         //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_AUX_CLASS(AbstractNetBase);
 

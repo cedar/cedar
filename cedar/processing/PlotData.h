@@ -42,7 +42,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/DataRole.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"

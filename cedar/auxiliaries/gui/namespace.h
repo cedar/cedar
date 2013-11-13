@@ -41,7 +41,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Singleton.fwd.h"
 
 // FORWARD DECLARATIONS

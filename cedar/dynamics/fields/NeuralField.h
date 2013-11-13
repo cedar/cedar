@@ -54,7 +54,6 @@
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/dynamics/fields/NeuralField.fwd.h"

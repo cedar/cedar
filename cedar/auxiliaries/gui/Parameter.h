@@ -43,7 +43,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

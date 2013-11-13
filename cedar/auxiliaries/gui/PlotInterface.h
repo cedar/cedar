@@ -39,10 +39,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
+#include <map>
 
 /*!@brief A unified interface for widgets that plot instances of cedar::proc::Data.
  */

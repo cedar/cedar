@@ -41,7 +41,6 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/UnitData.h"
 

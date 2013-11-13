@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
