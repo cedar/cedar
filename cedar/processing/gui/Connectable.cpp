@@ -79,6 +79,8 @@ mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT)
 
 cedar::proc::gui::Connectable::~Connectable()
 {
+  mSlotAddedConnection.disconnect();
+  mSlotRemovedConnection.disconnect();
 }
 
 cedar::proc::gui::Connectable::Decoration::Decoration
@@ -174,6 +176,13 @@ cedar::proc::ConstConnectablePtr cedar::proc::gui::Connectable::getConnectable()
 void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr connectable)
 {
   this->mConnectable = connectable;
+  mSlotAddedConnection.disconnect();
+  mSlotRemovedConnection.disconnect();
+
+  mSlotAddedConnection
+    = connectable->connectToSlotAdded(boost::bind(&cedar::proc::gui::Connectable::slotAdded, this, _1, _2));
+  mSlotRemovedConnection
+    = connectable->connectToSlotRemoved(boost::bind(&cedar::proc::gui::Connectable::slotRemoved, this, _1, _2));
 }
 
 void cedar::proc::gui::Connectable::updateDataSlotPositions()

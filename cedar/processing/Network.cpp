@@ -930,6 +930,11 @@ void cedar::proc::Network::connectTrigger(cedar::proc::TriggerPtr source, cedar:
 
 void cedar::proc::Network::disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
 {
+  this->disconnectSlot(connectable, slot);
+}
+
+void cedar::proc::Network::disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
+{
   std::vector<cedar::proc::DataConnectionPtr> connections;
   this->getDataConnections(connectable, slot, connections);
 
@@ -1680,8 +1685,11 @@ void cedar::proc::Network::getDataConnections(
     {
       if
       (
-        this->getElement<cedar::proc::Step>(con->getSource()->getParent()) == source
-          && con->getSource()->getName() == sourceDataName
+        (this->getElement<cedar::proc::Connectable>(con->getSource()->getParent()) == source
+          && con->getSource()->getName() == sourceDataName)
+        ||
+        (this->getElement<cedar::proc::Connectable>(con->getTarget()->getParent()) == source
+          && con->getTarget()->getName() == sourceDataName)
       )
       {
         connections.push_back(con);

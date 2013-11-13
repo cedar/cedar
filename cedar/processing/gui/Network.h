@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Network.h"
 
@@ -57,18 +57,10 @@
  *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
  *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
  */
-class cedar::proc::gui::Network : public QObject, public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::Network : public cedar::proc::gui::Connectable
 {
   Q_OBJECT
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // types
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief mapping from data slot names to their graphical representation
-  typedef std::map<std::string, cedar::proc::gui::DataSlotItem*> DataSlotNameMap;
-  //!@brief mapping from data role id to a map of all data slots fitting this id
-  typedef std::map<cedar::proc::DataRole::Id, DataSlotNameMap> DataSlotMap;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -262,9 +254,6 @@ private:
   //!@brief a main window
   QMainWindow *mpMainWindow;
 
-  //!@brief a map of all data slots of the current step
-  DataSlotMap mSlotMap;
-
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
 
@@ -276,7 +265,7 @@ private:
   std::vector<cedar::proc::gui::Network*> mpNetworksToAdd;
 
   //! Connection to Network's slot changed signal.
-  boost::signals2::connection mSlotConnection;
+//  boost::signals2::connection mSlotConnection;
   boost::signals2::connection mNewElementAddedConnection;
   boost::signals2::connection mElementRemovedConnection;
   boost::signals2::connection mTriggerConnectionChangedConnection;

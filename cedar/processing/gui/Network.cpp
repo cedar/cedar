@@ -81,7 +81,7 @@ cedar::proc::gui::Network::Network
   cedar::proc::NetworkPtr network
 )
 :
-GraphicsBase(width, height, GRAPHICS_GROUP_NETWORK),
+cedar::proc::gui::Connectable(width, height),
 mNetwork(network),
 mpScene(scene),
 mpMainWindow(pMainWindow),
@@ -97,6 +97,7 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
   }
 
   this->setElement(mNetwork);
+  this->setConnectable(mNetwork);
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
@@ -116,8 +117,8 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange))
   );
 
-  mSlotConnection
-    = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
+//  mSlotConnection
+//    = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
 
   mDataConnectionChangedConnection = mNetwork->connectToDataConnectionChanged
                                      (
@@ -147,17 +148,16 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
       );
 
   this->update();
-  this->checkSlots();
 }
 
 cedar::proc::gui::Network::~Network()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  if (mSlotConnection.connected())
-  {
-    mSlotConnection.disconnect();
-  }
+//  if (mSlotConnection.connected())
+//  {
+//    mSlotConnection.disconnect();
+//  }
   if (mNewElementAddedConnection.connected())
   {
     mNewElementAddedConnection.disconnect();
@@ -344,8 +344,6 @@ void cedar::proc::gui::Network::fitToContents()
     QGraphicsItem* p_item = *i;
     p_item->setPos(old_pos_local + p_item->pos());
   }
-
-  this->checkDataItems();
 
   // finally, also resize parent item if it is a network
   if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
@@ -600,90 +598,6 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
       cedar::aux::ConfigurationNode ui_node;
       p_network_item->writeScene(root, ui_node);
       network_node->second.add_child("ui", ui_node);
-    }
-  }
-}
-
-void cedar::proc::gui::Network::checkSlots()
-{
-  this->checkDataItems();
-}
-
-void cedar::proc::gui::Network::checkDataItems()
-{
-  qreal data_size = cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE;
-  qreal padding = cedar::proc::gui::StepItem::M_DATA_SLOT_PADDING;
-
-  std::map<cedar::proc::DataRole::Id, QPointF> add_origins;
-  std::map<cedar::proc::DataRole::Id, QPointF> add_directions;
-
-  add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -padding - data_size);
-  add_directions[cedar::proc::DataRole::BUFFER] = QPointF(1, 0);
-
-  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-2*padding - data_size, 0);
-  add_directions[cedar::proc::DataRole::INPUT] = QPointF(0, 1);
-
-  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + padding, 0);
-  add_directions[cedar::proc::DataRole::OUTPUT] = QPointF(0, 1);
-
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
-  {
-    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
-      continue;
-    for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); )
-    {
-      DataSlotNameMap::iterator current_iter = it;
-      ++it;
-      if (current_iter->second->getNumberOfConnections() == 0)
-      {
-        delete current_iter->second;
-        mSlotMap[*enum_it].erase(current_iter);
-      }
-    }
-
-    const QPointF& origin = add_origins[*enum_it];
-    const QPointF& direction = add_directions[*enum_it];
-    // move all preserved slots to the upper positions
-    qreal count = 0;
-    for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); ++it)
-    {
-      it->second->setPos(origin + count * direction * (data_size + padding));
-      count += static_cast<qreal>(1.0);
-    }
-    // now generate new entries for all slots that are not represented
-    try
-    {
-      const cedar::proc::Step::SlotMap& slotmap = this->mNetwork->getDataSlots(*enum_it);
-      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
-      {
-        cedar::proc::ConstDataSlotPtr slot = iter->second;
-        // check that there is no graphical representation yet
-        bool represented = false;
-        for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); ++it)
-        {
-          if (it->second->getSlot()->getName() == slot->getName())
-          {
-            represented = true;
-            break;
-          }
-        }
-        if (represented)
-        {
-          continue;
-        }
-        // get a non-const version of the data slot
-        cedar::proc::DataSlotPtr non_const_slot = this->mNetwork->getSlot(*enum_it, slot->getName());
-        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, non_const_slot);
-        p_item->setPos(origin + count * direction * (data_size + padding) );
-        mSlotMap[slot->getRole()][slot->getName()] = p_item;
-        count += static_cast<qreal>(1.0);
-      }
-    }
-    catch(const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 }

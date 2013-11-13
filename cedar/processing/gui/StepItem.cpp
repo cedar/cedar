@@ -148,8 +148,6 @@ cedar::proc::gui::StepItem::~StepItem()
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
-  mSlotAddedConnection.disconnect();
-  mSlotRemovedConnection.disconnect();
 
   if (this->scene())
   {
@@ -342,14 +340,6 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::emitStepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
-
-  mSlotAddedConnection.disconnect();
-  mSlotRemovedConnection.disconnect();
-
-  mSlotAddedConnection
-    = step->connectToSlotAdded(boost::bind(&cedar::proc::gui::StepItem::slotAdded, this, _1, _2));
-  mSlotRemovedConnection
-    = step->connectToSlotRemoved(boost::bind(&cedar::proc::gui::StepItem::slotRemoved, this, _1, _2));
 }
 
 void cedar::proc::gui::StepItem::updateIconGeometry()
