@@ -101,8 +101,9 @@ public:
   //! Const iterator type of the element map.
   typedef ElementMap::const_iterator ElementMapConstIterator;
 
-  typedef cedar::aux::MapParameter<bool> ConnectorMap;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConnectorMap);
+  typedef std::map<std::string, bool> ConnectorMap;
+  typedef cedar::aux::MapParameter<bool> ConnectorMapParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConnectorMapParameter);
 
 
   friend class cedar::proc::sinks::GroupSink;
@@ -414,6 +415,10 @@ public:
   /*!@brief The wait method.
    */
   void waitForProcessing();
+
+  const ConnectorMap& getConnectorMap();
+
+  bool hasConnector(const std::string& name) const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -546,7 +551,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-   ConnectorMapPtr _mConnectors;
+   ConnectorMapParameterPtr _mConnectors;
 
 }; // class cedar::proc::Network
 

@@ -107,7 +107,7 @@ namespace
 cedar::proc::Network::Network()
 :
 Triggerable(false),
-_mConnectors(new ConnectorMap(this, "connectors", std::map<std::string, bool>()))
+_mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mConnectors->setHidden(true);
@@ -1889,4 +1889,14 @@ void cedar::proc::Network::inputConnectionChanged(const std::string& inputName)
   {
     source->setData(cedar::aux::DataPtr(new cedar::aux::Data()));
   }
+}
+
+const cedar::proc::Network::ConnectorMap& cedar::proc::Network::getConnectorMap()
+{
+  return this->_mConnectors->getValue();
+}
+
+bool cedar::proc::Network::hasConnector(const std::string& name) const
+{
+  return (this->_mConnectors->find(name) != this->_mConnectors->end());
 }

@@ -64,6 +64,8 @@
 #include <QEvent>
 #include <QMenu>
 #include <QAction>
+#include <QInputDialog>
+#include <QMessageBox>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QSet>
 #include <boost/property_tree/json_parser.hpp>
@@ -1109,8 +1111,30 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  QAction* p_remove_input = menu.addAction("remove input");
-  QAction* p_remove_output = menu.addAction("remove output");
+  QMenu* p_remove_input_menu = menu.addMenu("remove input");
+  QMenu* p_remove_output_menu = menu.addMenu("remove output");
+  const cedar::proc::Network::ConnectorMap& connectors = this->getNetwork()->getConnectorMap();
+  for (auto it = connectors.begin(); it != connectors.end(); ++it)
+  {
+    if (it->second)
+    {
+      p_remove_input_menu->addAction(QString::fromStdString(it->first));
+    }
+    else
+    {
+      p_remove_output_menu->addAction(QString::fromStdString(it->first));
+    }
+  }
+  if (p_remove_input_menu->isEmpty())
+  {
+    QAction* none = p_remove_input_menu->addAction("none");
+    none->setEnabled(false);
+  }
+  if (p_remove_output_menu->isEmpty())
+  {
+    QAction* none = p_remove_output_menu->addAction("none");
+    none->setEnabled(false);
+  }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   p_scene->networkGroupingContextMenuEvent(menu);
@@ -1123,21 +1147,45 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
   // execute an action
   if (a == p_add_input)
   {
-    this->mNetwork->addConnector("input", true);
+    QString name = QInputDialog::getText(0, "Enter a name", "Name");
+    if (!name.isEmpty())
+    {
+      if (this->mNetwork->hasConnector(name.toStdString()))
+      {
+        QMessageBox::critical(0, "Name exists", "A connector of this name already exists.");
+      }
+      else
+      {
+        this->mNetwork->addConnector(name.toStdString(), true);
+      }
+    }
   }
 
   else if (a == p_add_output)
   {
-    this->mNetwork->addConnector("output", false);
+    QString name = QInputDialog::getText(0, "Enter a name", "Name");
+    if (!name.isEmpty())
+    {
+      if (this->mNetwork->hasConnector(name.toStdString()))
+      {
+        QMessageBox::critical(0, "Name exists", "A connector of this name already exists.");
+      }
+      else
+      {
+        this->mNetwork->addConnector(name.toStdString(), false);
+      }
+    }
   }
 
-  else if (a == p_remove_input)
+  else if (a->parentWidget() == p_remove_input_menu)
   {
-    this->mNetwork->removeConnector("input", true);
+    std::string name = a->text().toStdString();
+    this->mNetwork->removeConnector(name, true);
   }
 
-  else if (a == p_remove_output)
+  else if (a->parentWidget() == p_remove_output_menu)
   {
-    this->mNetwork->removeConnector("output", false);
+    std::string name = a->text().toStdString();
+    this->mNetwork->removeConnector(name, false);
   }
 }
