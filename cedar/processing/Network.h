@@ -287,7 +287,13 @@ public:
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
    */
-  void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+  CEDAR_DECLARE_DEPRECATED(void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot));
+
+  /*!@brief Deletes all connections from a given data slot.
+   * @param connectable The slot's parent.
+   * @param slot Identifier of the data slot.
+   */
+  void disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes the connection between source and target.
    */

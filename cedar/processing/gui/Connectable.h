@@ -221,6 +221,9 @@ private:
   //!@brief the represented step
   cedar::proc::ConnectablePtr mConnectable;
 
+  boost::signals2::connection mSlotAddedConnection;
+  boost::signals2::connection mSlotRemovedConnection;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
