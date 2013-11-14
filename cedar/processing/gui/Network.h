@@ -195,6 +195,8 @@ private:
 
   void checkDataItems();
 
+  void updateConnectorPositions();
+
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
@@ -215,6 +217,8 @@ private:
   void readPlotList(const cedar::aux::ConfigurationNode& node);
 
   void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
+
+  void sizeChanged();
 
 signals:
   //!@brief signal that is emitted when a boost signal is received
@@ -253,6 +257,12 @@ private:
 
   //!@brief a main window
   QMainWindow *mpMainWindow;
+
+  //!@brief a vector of all source connectors
+  std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
+
+  //!@brief a vector of all sink connectors
+  std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSinks;
 
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;

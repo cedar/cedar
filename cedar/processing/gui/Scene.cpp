@@ -647,6 +647,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
     return;
   }
 
+  //!@todo This needs to be reworked
   QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
   if (items.size() > 0)
   {
@@ -675,6 +676,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
               {
                 cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target);
+                //!@todo These paths should be determined from the slot itself, rather than made up here
                 std::string source_name
                   = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name
@@ -862,6 +864,7 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
 #ifdef DEBUG
     std::cout << "Could not find base item for element \"" << element->getName() << "\"" << std::endl;
 #endif // DEBUG
+    //!@todo This should not return null, but rather throw
     return NULL;
   }
   else

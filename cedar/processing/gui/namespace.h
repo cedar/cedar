@@ -59,6 +59,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT BoostControl;
       class CEDAR_PROC_LIB_EXPORT Connection;
       class CEDAR_PROC_LIB_EXPORT Connectable;
+      class CEDAR_PROC_LIB_EXPORT ConnectorItem;
       class CEDAR_PROC_LIB_EXPORT DataSlotItem;
       class CEDAR_PROC_LIB_EXPORT ElementClassList;
       class CEDAR_PROC_LIB_EXPORT GraphicsBase;
