@@ -261,6 +261,9 @@ protected:
   //! Sets the fill stype
   void setFillStyle(Qt::BrushStyle style, bool update = true);
 
+  //! Set whether or not this item is resizeable.
+  void setResizeable(bool resizeable);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -319,6 +322,9 @@ private:
 
   //!@brief Whether the item snaps to the grid.
   bool mSnapToGrid;
+
+  //! Whether or not resizing is allowed.
+  bool mResizeable;
 
   //! Resize handle.
   std::vector<cedar::proc::gui::ResizeHandle*> mpResizeHandles;
