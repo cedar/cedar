@@ -426,7 +426,7 @@ bool cedar::proc::Connectable::allInputsValid()
 
   for (SlotMap::iterator slot = slot_map.begin(); slot != slot_map.end(); ++slot)
   {
-    switch(this->getInputValidity(slot->second))
+    switch (this->getInputValidity(slot->second))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         // If the input is invalid, push its name into the list of invalid inputs.

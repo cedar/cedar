@@ -118,11 +118,11 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
 {
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(inputName == "input");
-
+  std::cout << "icc StaticGain" << std::endl;
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-  if(!this->mInput)
+  if (!this->mInput)
   {
     return;
   }
@@ -134,4 +134,5 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
 
   this->mOutput->copyAnnotationsFrom(this->mInput);
   this->emitOutputPropertiesChangedSignal("output");
+  std::cout << "icc StaticGain end" << std::endl;
 }

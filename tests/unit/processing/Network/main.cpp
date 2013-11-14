@@ -225,13 +225,11 @@ int main(int /* argc */, char** /* argv */)
 //  network_root->connectSlots("Gauss.Gauss input", "nested.another input");
   network_connector->connectSlots("input.output", "output.input");
 //  network_connector->connectSlots("another input.output", "another output.input");
-//  cedar::proc::steps::SumPtr sum(new cedar::proc::steps::Sum());
-//  network_root->add(sum, "sum");
-//  network_root->connectSlots("nested.output", "sum.terms");
+  cedar::proc::steps::SumPtr sum(new cedar::proc::steps::Sum());
+  network_root->add(sum, "sum");
+  network_root->connectSlots("nested.output", "sum.terms");
 //  network_root->connectSlots("nested.another output", "sum.terms");
-  gauss.reset();
-//  sum.reset();
-  network_connector.reset();
+  network_root->removeAll();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

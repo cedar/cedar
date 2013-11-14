@@ -103,13 +103,17 @@ void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& in
   CEDAR_DEBUG_ASSERT(inputName == "input");
   if (cedar::aux::ConstDataPtr data = this->getInput("input"))
   {
+    std::cout << "input changed + data" << std::endl;
     this->getNetwork()->setOutput(this->getName(), boost::const_pointer_cast<cedar::aux::Data>(data));
     this->getNetwork()->emitOutputPropertiesChangedSignal(this->getName());
     // Finally, send data ...
+    std::cout << "input changed + data, before trigger" << std::endl;
     this->onTrigger();
+    std::cout << "input changed + data, after trigger" << std::endl;
   }
   else
   {
+    std::cout << "input changed - data" << std::endl;
     this->getNetwork()->setOutput(this->getName(), cedar::aux::DataPtr(new cedar::aux::Data()));
     this->getNetwork()->emitOutputPropertiesChangedSignal(this->getName());
   }
