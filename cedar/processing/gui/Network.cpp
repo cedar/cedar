@@ -93,6 +93,7 @@ _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode())
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+  this->setResizeable(true);
 
   if (!mNetwork)
   {

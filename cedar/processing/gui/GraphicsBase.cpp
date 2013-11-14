@@ -81,6 +81,7 @@ mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
 mFillStyle(Qt::SolidPattern),
 mSnapToGrid(true),
+mResizeable(false),
 mWidth
 (
   new cedar::aux::DoubleParameter
@@ -125,6 +126,11 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::GraphicsBase::setResizeable(bool resizeable)
+{
+  this->mResizeable = resizeable;
+}
 
 void cedar::proc::gui::GraphicsBase::sizeChanged()
 {
@@ -612,7 +618,7 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
 bool cedar::proc::gui::GraphicsBase::canResize() const
 {
   // currently, only networks can be resized
-  return (this->mGroup & GRAPHICS_GROUP_NETWORK) > 0;
+  return this->mResizeable;
 }
 
 void cedar::proc::gui::GraphicsBase::updateConnections()
