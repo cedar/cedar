@@ -126,6 +126,11 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GraphicsBase::sizeChanged()
+{
+  // nothing to do
+}
+
 void cedar::proc::gui::GraphicsBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   this->paintFrame(painter, style, widget);
@@ -173,6 +178,7 @@ void cedar::proc::gui::GraphicsBase::setBounds(const QRectF& rect)
   // shift the position by the change from the old to the new bounding rect
   this->setPos(this->pos() - this->boundingRect().topLeft() + rect.topLeft());
 //  this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setHeight(qreal height)

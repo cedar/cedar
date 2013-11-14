@@ -43,6 +43,8 @@
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Network.h"
+#include "cedar/processing/sources/GroupSource.h"
+#include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
@@ -137,6 +139,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
                                     cedar::proc::gui::GraphicsBase* pTarget
                                   ) const
 {
+  //!@todo Much of this functionality should probably be in proc rather than proc::gui.
   if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::CONNECT_NO)
   {
     return cedar::proc::gui::CONNECT_NO;
@@ -176,6 +179,17 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
     return cedar::proc::gui::CONNECT_NO;
   }
 
+  // check if the source/target are connectors for networks
+  if
+  (
+    dynamic_cast<const cedar::proc::sources::GroupSource*>(this->getSlot()->getParentPtr())
+    ||
+    dynamic_cast<const cedar::proc::sinks::GroupSink*>(this->getSlot()->getParentPtr())
+  )
+  {
+    return cedar::proc::gui::CONNECT_YES;
+  }
+
   // a step cannot connect to itself
   if (this->mpStep == p_target_slot->mpStep)
   {
@@ -186,6 +200,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
       && p_target_slot->mSlot->getRole() == cedar::proc::DataRole::INPUT)
   {
     cedar::proc::DataSlot::VALIDITY validity = cedar::proc::DataSlot::VALIDITY_UNKNOWN;
+    //!@todo Unify with a connectable superclass
     if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_target))
     {
       validity = p_step_item->getStep()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
