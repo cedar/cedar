@@ -42,7 +42,7 @@
 #define CEDAR_COLLATED_TYPE_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.fwd.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 
 // PROJECT INCLUDES
@@ -53,10 +53,6 @@
 
 
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
 //!@cond SKIPPED_DOCUMENTATION
 
 /*!@brief templated wrapper of the to be transported data type. SPECIALIZE!
@@ -66,7 +62,7 @@ namespace cedar {
  * note that for once the member can be accessed directly (publicly)
  */
 template <typename T>
-struct MatrixTypeWrapper
+struct cedar::aux::net::detail::MatrixTypeWrapper
 {
   //---------------------------------------------------------------------------
   // members and typedefs
@@ -204,7 +200,6 @@ private:
 };
 
 //!@endcond
-} } } } // end namespaces
 
 
 // Spezialisierungen: ...

@@ -38,7 +38,7 @@
 #define CEDAR_COLLATED_NET_BASE_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetBase.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/interfaces/InterfaceOpenable.h"
 
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
@@ -52,18 +52,13 @@
 #include <stdlib.h>
 #include <iostream>
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
-
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
 template <typename T> 
-class CollatedNetBase : virtual protected InterfaceOpenable
+class cedar::aux::net::detail::CollatedNetBase : virtual protected InterfaceOpenable
 {
   //---------------------------------------------------------------------------
   // members
@@ -110,7 +105,5 @@ public:
 
 };
 //!@endcond
-
-} } } }  // end namespaces
 
 #endif
