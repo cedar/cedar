@@ -770,28 +770,72 @@ void cedar::proc::gui::Network::dataConnectionChanged
      )
 {
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
-  cedar::proc::gui::GraphicsBase* p_base_source
-    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(sourceName.toStdString()).get());
-  if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
+  //!@todo Write a getGraphicsItemFor(QString/std::string0 method in scene; also, maybe these items should be managed in gui::Network
+  auto element = this->getNetwork()->getElement(sourceName.toStdString());
+
+  // if the source is a group source, get its slot from the network
+  if (auto group_source = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element))
   {
-    source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
+    for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
+    {
+      auto connector_source = this->mConnectorSources.at(i);
+      if (connector_source->getSlot()->getParent() == sourceName.toStdString())
+      {
+        // should always be "output" on both sides as that is a defined name that never changes.
+        CEDAR_DEBUG_ASSERT(sourceSlot.toStdString() == connector_source->getName());
+        source_slot = connector_source;
+        break;
+      }
+    }
   }
-  else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base_source))
+  else
   {
-    source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
+    cedar::proc::gui::GraphicsBase* p_base_source = this->mpScene->getGraphicsItemFor(element.get());
+    //!@todo Unify with connectable interface
+    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
+    {
+      source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
+    }
+    //!@todo Is this case still relevant?
+    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base_source))
+    {
+      source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
+    }
   }
+
   CEDAR_ASSERT(source_slot);
 
   cedar::proc::gui::DataSlotItem* target_slot = NULL;
-  cedar::proc::gui::GraphicsBase* p_base
-    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(targetName.toStdString()).get());
-  if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
+  auto target = this->getNetwork()->getElement(targetName.toStdString());
+
+  // if the target is a group sink, get its slot from the network
+  if (auto group_source = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(target))
   {
-    target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
+    for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
+    {
+      auto connector_target = this->mConnectorSinks.at(i);
+      if (connector_target->getSlot()->getParent() == targetName.toStdString())
+      {
+        // should always be "output" on both sides as that is a defined name that never changes.
+        CEDAR_DEBUG_ASSERT(targetSlot.toStdString() == connector_target->getName());
+        target_slot = connector_target;
+        break;
+      }
+    }
   }
-  else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base))
+  else
   {
-    target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
+    cedar::proc::gui::GraphicsBase* p_base
+      = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(targetName.toStdString()).get());
+    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
+    {
+      target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
+    }
+    //!@todo Is this case still relevant?
+    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base))
+    {
+      target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
+    }
   }
   CEDAR_ASSERT(target_slot);
 
