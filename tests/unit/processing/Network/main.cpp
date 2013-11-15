@@ -49,7 +49,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/sources/GaussInput.h"
-#include "cedar/processing/steps/Sum.h"
+#include "cedar/processing/steps/StaticGain.h"
 #include "cedar/dynamics/fields/NeuralField.h"
 
 // SYSTEM INCLUDES
@@ -216,22 +216,16 @@ int main(int /* argc */, char** /* argv */)
   network_connector->setName("nested");
   network_root->add(network_connector);
   network_connector->addConnector("input", true);
-//  network_connector->addConnector("another input", true);
   network_connector->addConnector("output", false);
-//  network_connector->addConnector("another output", false);
   cedar::proc::sources::GaussInputPtr gauss(new cedar::proc::sources::GaussInput());
   network_root->add(gauss, "Gauss");
   network_root->connectSlots("Gauss.Gauss input", "nested.input");
-//  network_root->connectSlots("Gauss.Gauss input", "nested.another input");
   network_connector->connectSlots("input.output", "output.input");
-//  network_connector->connectSlots("another input.output", "another output.input");
-//  cedar::proc::steps::SumPtr sum(new cedar::proc::steps::Sum());
-//  network_root->add(sum, "sum");
-//  network_root->connectSlots("nested.output", "sum.terms");
-//  network_root->connectSlots("nested.another output", "sum.terms");
-  gauss.reset();
-//  sum.reset();
-  network_connector.reset();
+  cedar::proc::steps::StaticGainPtr gain(new cedar::proc::steps::StaticGain());
+  network_root->add(gain, "gain");
+  network_root->connectSlots("nested.output", "gain.input");
+  network_root->disconnectSlots("nested.output", "gain.input");
+  network_root->connectSlots("nested.output", "gain.input");
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

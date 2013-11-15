@@ -71,7 +71,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void compute(const cedar::proc::Arguments& arguments);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -83,6 +83,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  void compute(const cedar::proc::Arguments& arguments);
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
