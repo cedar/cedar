@@ -133,6 +133,29 @@ cedar::proc::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::proc::Network::getNewConnectorName(bool inputConnector) const
+{
+  std::string base = "input";
+  if (!inputConnector)
+  {
+    base = "output";
+  }
+
+  if (!this->hasConnector(base))
+  {
+    return base;
+  }
+
+  unsigned int ctr = 2;
+  while (this->hasConnector(base + " " + cedar::aux::toString(ctr)))
+  {
+    ++ctr;
+  }
+
+  return base + " " + cedar::aux::toString(ctr);
+}
+
+//!@todo This should be done in a separate class.
 std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Network::checkConsistency() const
 {
   std::vector<cedar::proc::ConsistencyIssuePtr> issues;
