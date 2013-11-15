@@ -120,12 +120,6 @@ public:
   //!@brief saves a configuration to a node
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
-  //! Returns the slot item of the given role and name.
-  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
-
-  //!@brief returns a map of all data slots of the same id
-  cedar::proc::gui::Network::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
-
   void disconnect();
 
   //! deals with changes to the network gui item

@@ -250,6 +250,8 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
 
 void cedar::proc::gui::Network::sizeChanged()
 {
+  this->cedar::proc::gui::Connectable::sizeChanged();
+
   this->updateConnectorPositions();
 }
 
@@ -378,6 +380,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   for (const_iterator it = elements.begin(); it != elements.end(); ++it)
   {
     cedar::proc::ElementPtr element;
+    //!@todo This if/else if stuff could probably be replaced by just casting to a common cedar::proc::gui::Element class.
     if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(*it))
     {
       element = p_step->getStep();
@@ -543,7 +546,7 @@ void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode
 
 void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
 {
-  for(auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
+  for (auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
   {
     it->second->writeOpenChildWidgets(node);
   }
@@ -611,49 +614,6 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
   }
 }
 
-cedar::proc::gui::DataSlotItem* cedar::proc::gui::Network::getSlotItem
-                                (
-                                  cedar::proc::DataRole::Id role, const std::string& name
-                                )
-{
-  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
-
-  if (role_map == this->mSlotMap.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "No slot items stored for role "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   );
-  }
-
-  DataSlotNameMap::iterator iter = role_map->second.find(name);
-  if (iter == role_map->second.end())
-  {
-    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
-                                                  "\" found for role "
-                                                  + cedar::proc::DataRole::type().get(role).prettyString()
-                                                  + " in Network for network \"" + this->mNetwork->getName() + "\"."
-                                                  );
-  }
-
-  return iter->second;
-}
-
-cedar::proc::gui::Network::DataSlotNameMap& cedar::proc::gui::Network::getSlotItems
-                                            (
-                                              cedar::proc::DataRole::Id role
-                                            )
-{
-  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
-
-  if (role_map == this->mSlotMap.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "Unknown role  "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   );
-  }
-  return role_map->second;
-}
-
 void cedar::proc::gui::Network::disconnect()
 {
 }
@@ -706,15 +666,9 @@ void cedar::proc::gui::Network::dataConnectionChanged
   else
   {
     cedar::proc::gui::GraphicsBase* p_base_source = this->mpScene->getGraphicsItemFor(element.get());
-    //!@todo Unify with connectable interface
-    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_base_source))
     {
-      source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
-    }
-    //!@todo Is this case still relevant?
-    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base_source))
-    {
-      source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
+      source_slot = connectable->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
     }
   }
 
@@ -742,14 +696,9 @@ void cedar::proc::gui::Network::dataConnectionChanged
   {
     cedar::proc::gui::GraphicsBase* p_base
       = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(targetName.toStdString()).get());
-    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_base))
     {
-      target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
-    }
-    //!@todo Is this case still relevant?
-    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base))
-    {
-      target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
+      target_slot = connectable->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
     }
   }
   CEDAR_ASSERT(target_slot);

@@ -168,11 +168,21 @@ public:
   //! Removes all effects of magnetization
   void demagnetizeSlots();
 
+  //! Returns the slot item of the given role and name.
+  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
+
+  //!@brief returns one of the data slots associated with this step
+  cedar::proc::gui::DataSlotItem const* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name) const;
+
+  //!@brief returns a map of all data slots of the same id
+  cedar::proc::gui::Connectable::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
+
+  const cedar::proc::gui::Connectable::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
   void slotAdded(cedar::proc::DataRole::Id role, const std::string& name);
 
   void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
@@ -185,12 +195,19 @@ protected:
   //! Updates the positions of the decoration items.
   void updateDecorationPositions();
 
+  //!@briefs adds graphical representations for all data items
+  void addDataItems();
+
+  void sizeChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! Updates the positions of the data slot items.
   void updateDataSlotPositions();
+
+  void itemSelected(bool selected);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -203,9 +220,6 @@ public:
   static const qreal M_DATA_SLOT_PADDING;
 
 protected:
-  //!@brief a map of all data slots of the current step
-  DataSlotMap mSlotMap;
-
   //! SvgItem displaying the connectable's icon
   QGraphicsSvgItem* mpIconDisplay;
 
@@ -218,6 +232,9 @@ protected:
   std::vector<DecorationPtr> mDecorations;
 
 private:
+  //!@brief a map of all data slots of the current step
+  DataSlotMap mSlotMap;
+
   //!@brief the represented step
   cedar::proc::ConnectablePtr mConnectable;
 
