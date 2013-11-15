@@ -81,6 +81,7 @@ namespace
 
 cedar::proc::sinks::GroupSink::GroupSink()
 {
+  this->setAutoLockInputsAndOutputs(false);
   this->declareInput("input", false);
 }
 

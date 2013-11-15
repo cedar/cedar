@@ -79,6 +79,7 @@ namespace
 
 cedar::proc::sources::GroupSource::GroupSource()
 {
+  this->setAutoLockInputsAndOutputs(false);
   this->declareOutput("output", cedar::aux::DataPtr(new cedar::aux::Data()));
 }
 

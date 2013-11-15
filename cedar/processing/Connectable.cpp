@@ -336,7 +336,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     }
     else
     {
-      this->lockAll(cedar::aux::LOCK_TYPE_READ);
+//      this->lockAll(cedar::aux::LOCK_TYPE_READ);
       auto external_data_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(slot);
       validity = cedar::proc::DataSlot::VALIDITY_VALID;
       for (unsigned int i = 0; i < external_data_slot->getDataCount(); ++i)
@@ -370,7 +370,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
             break;
         }
       }
-      this->unlockAll();
+//      this->unlockAll();
     }
 
     // assign the validity to the slot
@@ -589,18 +589,6 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInputCollection(const 
 
   return slot;
 }
-
-
-void cedar::proc::Connectable::declareBuffer(const std::string& name)
-{
-  this->declareData(DataRole::BUFFER, name, false);
-}
-
-void cedar::proc::Connectable::declareOutput(const std::string& name)
-{
-  this->declareData(DataRole::OUTPUT, name, false);
-}
-
 
 void cedar::proc::Connectable::makeInputCollection(const std::string& name, bool isCollection)
 {
@@ -828,7 +816,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
 /*!
  * @remarks This method is usually called by other framework parts rather than by the user. So only call it if you know
  *          what you are doing :)
- * @see     cedar::proc::Manager::connect.
  */
 void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
@@ -1001,4 +988,9 @@ void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::stri
     CEDAR_THROW(cedar::aux::InvalidNameException, "Tried to emit a signal from an output that does not exist.");
   }
   this->mOutputPropertiesChanged(this->getName() + "." + slot);
+}
+
+void cedar::proc::Connectable::callInputConnectionChanged(const std::string& slot)
+{
+  this->revalidateInputSlot(slot);
 }
