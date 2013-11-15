@@ -1104,34 +1104,19 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
     return;
 
   // execute an action
-  if (a == p_add_input)
+  if (a == p_add_input || a == p_add_output)
   {
-    QString name = QInputDialog::getText(0, "Enter a name", "Name");
+    QString default_name = QString::fromStdString(this->getNetwork()->getNewConnectorName(a == p_add_input));
+    QString name = QInputDialog::getText(0, "Enter a name", "Name", QLineEdit::Normal, default_name);
     if (!name.isEmpty())
     {
-      if (this->mNetwork->hasConnector(name.toStdString()))
+      if (this->getNetwork()->hasConnector(name.toStdString()))
       {
-        QMessageBox::critical(0, "Name exists", "A connector of this name already exists.");
+        QMessageBox::critical(NULL, "Name exists", "A connector of this name already exists.");
       }
       else
       {
-        this->mNetwork->addConnector(name.toStdString(), true);
-      }
-    }
-  }
-
-  else if (a == p_add_output)
-  {
-    QString name = QInputDialog::getText(0, "Enter a name", "Name");
-    if (!name.isEmpty())
-    {
-      if (this->mNetwork->hasConnector(name.toStdString()))
-      {
-        QMessageBox::critical(0, "Name exists", "A connector of this name already exists.");
-      }
-      else
-      {
-        this->mNetwork->addConnector(name.toStdString(), false);
+        this->getNetwork()->addConnector(name.toStdString(), (a == p_add_input));
       }
     }
   }
@@ -1139,12 +1124,12 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
   else if (a->parentWidget() == p_remove_input_menu)
   {
     std::string name = a->text().toStdString();
-    this->mNetwork->removeConnector(name, true);
+    this->getNetwork()->removeConnector(name, true);
   }
 
   else if (a->parentWidget() == p_remove_output_menu)
   {
     std::string name = a->text().toStdString();
-    this->mNetwork->removeConnector(name, false);
+    this->getNetwork()->removeConnector(name, false);
   }
 }
