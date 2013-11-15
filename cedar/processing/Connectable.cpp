@@ -336,7 +336,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     }
     else
     {
-      this->lockAll(cedar::aux::LOCK_TYPE_READ);
+//      this->lockAll(cedar::aux::LOCK_TYPE_READ);
       auto external_data_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(slot);
       validity = cedar::proc::DataSlot::VALIDITY_VALID;
       for (unsigned int i = 0; i < external_data_slot->getDataCount(); ++i)
@@ -370,7 +370,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
             break;
         }
       }
-      this->unlockAll();
+//      this->unlockAll();
     }
 
     // assign the validity to the slot
@@ -847,8 +847,15 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
 {
   this->setData(DataRole::OUTPUT, name, data);
 
+  //!@todo May want to move connections into data slots rather than the networks; then this case would not be necessary any more
+  auto network = this->getNetwork();
+  if (!network)
+  {
+    return;
+  }
+
   std::vector<cedar::proc::DataConnectionPtr> connections;
-  this->getNetwork()->getDataConnections
+  network->getDataConnections
   (
     boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
     name,

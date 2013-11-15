@@ -233,13 +233,15 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
 }
 
 /*! This method takes care of changing the step's name in the registry as well.
+ *
+ * @todo Unify in element using boost signals/slots
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
+  if (cedar::proc::NetworkPtr parent_network = this->getNetwork())
   {
     // update the name
-    boost::static_pointer_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
+    parent_network->updateObjectName(this);
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();

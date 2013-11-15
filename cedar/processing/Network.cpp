@@ -279,10 +279,10 @@ void cedar::proc::Network::stepTriggers(double timeStep)
 
 void cedar::proc::Network::onNameChanged()
 {
-  if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
+  if (auto parent_network = this->getNetwork())
   {
     // update the name in the parent network
-    boost::static_pointer_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
+    parent_network->updateObjectName(this);
   }
 }
 

@@ -100,9 +100,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
+private:
   //! the network this element is registered at
   cedar::proc::NetworkWeakPtr mRegisteredAt;
-private:
+
   //! Signal that is emitted whenever the element's network changes
   boost::signals2::signal<void()> mNetworkChanged;
 

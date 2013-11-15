@@ -101,16 +101,24 @@ void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& in
 {
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(inputName == "input");
+
+  // since the step may no longer be in a network upon deletion, we may not need to do anything.
+  cedar::proc::NetworkPtr network = this->getNetwork();
+  if (!network)
+  {
+    return;
+  }
+
   if (cedar::aux::ConstDataPtr data = this->getInput("input"))
   {
-    this->getNetwork()->setOutput(this->getName(), boost::const_pointer_cast<cedar::aux::Data>(data));
-    this->getNetwork()->emitOutputPropertiesChangedSignal(this->getName());
+    network->setOutput(this->getName(), boost::const_pointer_cast<cedar::aux::Data>(data));
+    network->emitOutputPropertiesChangedSignal(this->getName());
     // Finally, send data ...
     this->onTrigger();
   }
   else
   {
-    this->getNetwork()->setOutput(this->getName(), cedar::aux::DataPtr(new cedar::aux::Data()));
-    this->getNetwork()->emitOutputPropertiesChangedSignal(this->getName());
+    network->setOutput(this->getName(), cedar::aux::DataPtr(new cedar::aux::Data()));
+    network->emitOutputPropertiesChangedSignal(this->getName());
   }
 }
