@@ -425,6 +425,8 @@ public:
   const ConnectorMap& getConnectorMap();
 
   bool hasConnector(const std::string& name) const;
+
+  std::string getNewConnectorName(bool inputConnector) const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
