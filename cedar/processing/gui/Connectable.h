@@ -200,6 +200,12 @@ protected:
 
   void sizeChanged();
 
+  //! Assigns an offset for the input and output slots.
+  void setInputOutputSlotOffset(qreal offset);
+
+  //! Returns the offset for input and output slots.
+  qreal getInputOutputSlotOffset() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -232,6 +238,9 @@ protected:
   std::vector<DecorationPtr> mDecorations;
 
 private:
+  //! An offset to be added to in- and output slot positions.
+  qreal mInputOutputSlotOffset;
+
   //!@brief a map of all data slots of the current step
   DataSlotMap mSlotMap;
 

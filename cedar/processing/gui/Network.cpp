@@ -94,6 +94,7 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setResizeable(true);
+  this->setInputOutputSlotOffset(static_cast<qreal>(25));
 
   if (!mNetwork)
   {
@@ -794,26 +795,35 @@ void cedar::proc::gui::Network::checkTriggerConnection
 
 void cedar::proc::gui::Network::updateConnectorPositions()
 {
-  qreal distance = 20;
+//  qreal distance = 20;
   qreal pad_side = 5;
-  QPointF start_dist(pad_side, 25);
-  QPointF direction(0, 1);
+//  QPointF start_dist(pad_side, this->getInputOutputSlotOffset());
+//  QPointF direction(0, 1);
 
   for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
   {
-    auto connector = this->mConnectorSources.at(i);
-    connector->setPos(start_dist + direction * distance * static_cast<qreal>(i));
+    auto source = this->mConnectorSources.at(i);
+    auto slot_item = this->getSlotItem(cedar::proc::DataRole::INPUT, source->getSlot()->getParentPtr()->getName());
+    source->setPos(pad_side, slot_item->pos().y());
+    source->setWidth(slot_item->width());
+    source->setHeight(slot_item->height());
   }
 
-  if (!this->mConnectorSinks.empty())
+  qreal connector_max_width = 0;
+  for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
   {
-    qreal connector_width = this->mConnectorSinks.front()->width();
-    start_dist.setX(this->width() - connector_width - pad_side);
-    for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
-    {
-      auto connector = this->mConnectorSinks.at(i);
-      connector->setPos(start_dist + direction * distance * static_cast<qreal>(i));
-    }
+    auto sink = this->mConnectorSinks.at(i);
+    auto slot_item = this->getSlotItem(cedar::proc::DataRole::OUTPUT, sink->getSlot()->getParentPtr()->getName());
+    connector_max_width = std::max(connector_max_width, slot_item->width());
+  }
+
+  for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
+  {
+    auto sink = this->mConnectorSinks.at(i);
+    auto slot_item = this->getSlotItem(cedar::proc::DataRole::OUTPUT, sink->getSlot()->getParentPtr()->getName());
+    sink->setPos(this->width() - pad_side - connector_max_width, slot_item->pos().y());
+    sink->setWidth(slot_item->width());
+    sink->setHeight(slot_item->height());
   }
 }
 
