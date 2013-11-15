@@ -73,7 +73,8 @@ cedar::proc::gui::GraphicsBase
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE
 ),
 mpIconDisplay(NULL),
-mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT)
+mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
+mInputOutputSlotOffset(static_cast<qreal>(0.0))
 {
 }
 
@@ -124,6 +125,17 @@ cedar::proc::gui::Connectable::Decoration::Decoration
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connectable::setInputOutputSlotOffset(qreal offset)
+{
+  this->mInputOutputSlotOffset = offset;
+}
+
+qreal cedar::proc::gui::Connectable::getInputOutputSlotOffset() const
+{
+  return this->mInputOutputSlotOffset;
+}
+
 
 void cedar::proc::gui::Connectable::sizeChanged()
 {
@@ -237,8 +249,6 @@ void cedar::proc::gui::Connectable::addDataItems()
       continue;
 
     // populate step item list
-    mSlotMap[*enum_it] = DataSlotNameMap();
-
     try
     {
       const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(*enum_it);
@@ -260,6 +270,10 @@ void cedar::proc::gui::Connectable::addDataItems()
 void cedar::proc::gui::Connectable::addDataItemFor(cedar::proc::DataSlotPtr slot)
 {
   cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
+  if (this->mSlotMap.find(slot->getRole()) == this->mSlotMap.end())
+  {
+    mSlotMap[slot->getRole()] = DataSlotNameMap();
+  }
   mSlotMap[slot->getRole()][slot->getName()] = p_item;
 }
 
@@ -316,11 +330,11 @@ void cedar::proc::gui::Connectable::updateDataSlotPositions()
   add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -M_DATA_SLOT_PADDING - data_slot_size[cedar::proc::DataRole::BUFFER]);
 
   data_slot_size[cedar::proc::DataRole::INPUT] = M_BASE_DATA_SLOT_SIZE * style_factor;
-  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-M_DATA_SLOT_PADDING - data_slot_size[cedar::proc::DataRole::INPUT], 0);
+  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-M_DATA_SLOT_PADDING - data_slot_size[cedar::proc::DataRole::INPUT], this->getInputOutputSlotOffset());
   add_directions[cedar::proc::DataRole::INPUT] = QPointF(0, 1);
 
   data_slot_size[cedar::proc::DataRole::OUTPUT] = M_BASE_DATA_SLOT_SIZE * style_factor;
-  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + M_DATA_SLOT_PADDING, 0);
+  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + M_DATA_SLOT_PADDING, this->getInputOutputSlotOffset());
   add_directions[cedar::proc::DataRole::OUTPUT] = QPointF(0, 1);
 
   for (DataSlotMap::iterator role_it = mSlotMap.begin(); role_it != mSlotMap.end(); ++role_it)
