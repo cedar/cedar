@@ -200,10 +200,17 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
       && p_target_slot->mSlot->getRole() == cedar::proc::DataRole::INPUT)
   {
     cedar::proc::DataSlot::VALIDITY validity = cedar::proc::DataSlot::VALIDITY_UNKNOWN;
-    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_target))
+
+    // special case: group connectors don't have a target item (it is hidden)
+    if (p_target == NULL)
+    {
+      validity = cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+    else if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_target))
     {
       validity = connectable->getConnectable()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
+
 
     CEDAR_ASSERT(validity != cedar::proc::DataSlot::VALIDITY_UNKNOWN);
 
