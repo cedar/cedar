@@ -284,8 +284,20 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
 void cedar::proc::gui::DataSlotItem::generateTooltip()
 {
   QString tool_tip;
-  tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
-  tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
+  if
+  (
+    dynamic_cast<cedar::proc::sources::GroupSource*>(this->getSlot()->getParentPtr()) ||
+    dynamic_cast<cedar::proc::sinks::GroupSink*>(this->getSlot()->getParentPtr())
+  )
+  {
+    tool_tip += "network connector: ";
+    tool_tip += "<b>" + QString::fromStdString(this->getSlot()->getParentPtr()->getName()) + "</b>";
+  }
+  else
+  {
+    tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
+    tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
+  }
   if (this->mSlot->getData())
   {
     tool_tip += "<hr />";
