@@ -935,8 +935,8 @@ cedar::proc::gui::Network* cedar::proc::gui::Scene::addNetwork(const QPointF& po
                                                 (
                                                   this->mpMainWindow,
                                                   this,
-                                                  10,
-                                                  10,
+                                                  400,
+                                                  150,
                                                   network
                                                 );
 

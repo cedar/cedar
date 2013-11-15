@@ -70,8 +70,8 @@ public:
   (
     QMainWindow *pMainWindow,
     cedar::proc::gui::Scene* scene,
-    qreal width = 0,
-    qreal height = 0,
+    qreal width = static_cast<qreal>(250),
+    qreal height = static_cast<qreal>(250),
     cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
   );
 
