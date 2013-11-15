@@ -86,6 +86,9 @@ cedar::aux::LoopedThread()
   std::vector<cedar::dev::sensors::visual::GrabberChannelPtr> grabberchannels;
   grabberchannels.push_back(pChannel);
   this->init(grabberchannels);
+
+  this->connectToStartSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::processStop, this, _1));
 }
 
 
@@ -442,7 +445,7 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                            );
 }
 
-void cedar::dev::sensors::visual::Grabber::applyStop(bool)
+void cedar::dev::sensors::visual::Grabber::processStop(bool)
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
@@ -467,7 +470,7 @@ void cedar::dev::sensors::visual::Grabber::setIsGrabbing(bool isGrabbing)
   mpLockIsGrabbing->unlock();
 }
 
-void cedar::dev::sensors::visual::Grabber::applyStart()
+void cedar::dev::sensors::visual::Grabber::prepareStart()
 {
   mpLockIsGrabbing->lockForWrite();
   mIsGrabbing = true;

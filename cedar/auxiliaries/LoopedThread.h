@@ -249,10 +249,12 @@ public:
     return mpWorker->getLastTimeStepDuration();
   }
 
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
 protected:
+
 
   //----------------------------------------------------------------------------
   // private methods
@@ -270,8 +272,9 @@ private:
    */
   virtual void step(double time) = 0;
 
-  //! overwritten method. called when the thread finishes via stop().
-  void applyStop(bool suppressWarning);
+  //! slot called when the thread finishes via stop().
+  void processStop(bool suppressWarning);
+
 
 private slots:
   void modeChanged();

@@ -87,6 +87,9 @@ _mLoopMode
   QObject::connect(_mLoopMode.get(), SIGNAL(valueChanged()), this, SLOT(modeChanged()));
   // initially set available parameters
   this->modeChanged();
+
+  //this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this, _1));
 }
 
 cedar::aux::LoopedThread::~LoopedThread()
@@ -150,11 +153,10 @@ void cedar::aux::LoopedThread::singleStep()
   }
 }
 
-void cedar::aux::LoopedThread::applyStop(bool suppressWarning)
+void cedar::aux::LoopedThread::processStop(bool suppressWarning)
 {
   stopStatistics(suppressWarning);
 }
-
 
 void cedar::aux::LoopedThread::setStepSize(double stepSize)
 {

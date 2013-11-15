@@ -55,6 +55,9 @@ mpQueueLock(new QReadWriteLock()),
 mName(name)
 {
   this->setStepSize(recordIntv);
+
+  this->connectToStartSignal(boost::bind(&cedar::aux::DataSpectator::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::aux::DataSpectator::processStop, this, _1));
 }
 
 
@@ -73,7 +76,7 @@ void cedar::aux::DataSpectator::step(double)
   record();
 }
 
-void cedar::aux::DataSpectator::applyStart()
+void cedar::aux::DataSpectator::prepareStart()
 {
   mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" +
       boost::algorithm::replace_all_copy(mName," ","_") + ".csv";
@@ -81,7 +84,7 @@ void cedar::aux::DataSpectator::applyStart()
   writeHeader();
 }
 
-void cedar::aux::DataSpectator::applyStop(bool /* suppressWarning */)
+void cedar::aux::DataSpectator::processStop(bool /* suppressWarning */)
 {
   writeAllRecordData();
   
@@ -191,6 +194,7 @@ int cedar::aux::DataSpectator::getRecordIntervalTime() const
 
 void cedar::aux::DataSpectator::makeSnapshot()
 {
-  this->applyStart();
+  this->prepareStart();
   this->record();
 }
+

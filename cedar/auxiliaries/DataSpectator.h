@@ -92,11 +92,13 @@ public:
   //!@brief Gets the DataPtr.
   cedar::aux::ConstDataPtr getData() const;
 
-  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written.
-  void applyStart();
+  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written. @todo: this is only called when the thread is started
+  //!todo: should be private, docu is wrong
+  void prepareStart();
 
   //!@brief Stops the DataSpactator. Before stopping all RecordDatas in the queue will be written to disk.
-  void applyStop(bool suppressWarning);
+  //!todo: should be private, docu is wrong
+  void processStop(bool suppressWarning);
 
   //!@brief Gets the unique Name.
   const std::string& getName() const;
