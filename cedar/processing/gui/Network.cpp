@@ -84,7 +84,7 @@ cedar::proc::gui::Network::Network
   cedar::proc::NetworkPtr network
 )
 :
-cedar::proc::gui::Connectable(width, height),
+cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK),
 mNetwork(network),
 mpScene(scene),
 mpMainWindow(pMainWindow),
@@ -488,35 +488,38 @@ void cedar::proc::gui::Network::read(const std::string& source)
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
 
-  this->mNetwork->readConfiguration(root);
-  try
-  {
-    this->readConfiguration(root.get_child("ui generic"));
-  }
-  catch (boost::property_tree::ptree_bad_path& exc) // doesn't exist yet
-  {
-    //!TODO: this weaves control-flow logic into exceptions, that's not proper!
-    this->toggleSmartConnectionMode(false);
-  }
-  //update recorder icons
-  this->stepRecordStateChanged();
+  this->readConfiguration(root);
 }
 
-void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& root)
 {
-  this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
-  // restore plots that were open when architecture was last saved
-  auto plot_list = node.find("open plots");
-  if(plot_list != node.not_found())
+  this->mNetwork->readConfiguration(root);
+  this->cedar::proc::gui::Connectable::readConfiguration(root);
+
+  if (root.find("ui generic") != root.not_found())
   {
-    this->readPlotList(plot_list->second);
+    auto node = root.get_child("ui generic");
+    this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+    // restore plots that were open when architecture was last saved
+    auto plot_list = node.find("open plots");
+    if(plot_list != node.not_found())
+    {
+      this->readPlotList(plot_list->second);
+    }
+    // read defined plot groups
+    auto plot_groups = node.find("plot groups");
+    if(plot_groups != node.not_found())
+    {
+      this->mPlotGroupsNode = plot_groups->second;
+    }
   }
-  // read defined plot groups
-  auto plot_groups = node.find("plot groups");
-  if(plot_groups != node.not_found())
+  else
   {
-    this->mPlotGroupsNode = plot_groups->second;
+    this->toggleSmartConnectionMode(false);
   }
+
+  //update recorder icons
+  this->stepRecordStateChanged();
 }
 
 void cedar::proc::gui::Network::readPlotList(const cedar::aux::ConfigurationNode& node)
@@ -553,7 +556,7 @@ void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& 
 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
 {
-  auto elements = this->mNetwork->getElements();
+  auto elements = this->getNetwork()->getElements();
 
   for
   (
@@ -564,7 +567,18 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
   {
 
     cedar::proc::ElementPtr element = element_iter->second;
+
+    if
+    (
+      boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element)
+      || boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(element)
+    )
+    {
+      continue;
+    }
+
     cedar::proc::gui::GraphicsBase *p_item = this->mpScene->getGraphicsItemFor(element.get());
+    CEDAR_ASSERT(p_item != NULL);
 
     cedar::aux::ConfigurationNode node;
     switch (p_item->getGroup())
@@ -574,11 +588,6 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
         break;
 
       case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
-        if (p_item->parentItem() != NULL)
-        {
-          // only top-level triggers are saved; the ones docked to steps (e.g.) need no saving
-          continue;
-        }
         node.put("type", "trigger");
         break;
 
@@ -872,6 +881,17 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
   CEDAR_ASSERT(p_scene_element != NULL);
 
+  // if not a root network, properly add the item as a child
+  if (this->mpScene && !this->isRootNetwork())
+  {
+    CEDAR_ASSERT(p_scene_element != NULL);
+    if (p_scene_element->parentItem() != this)
+    {
+//      this->transformChildCoordinates(p_scene_element);
+      p_scene_element->setParentItem(this);
+    }
+  }
+
   // if there is a configuration stored for the UI of the element, load it
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode>::iterator iter
     = this->mNextElementUiConfigurations.find(p_scene_element->getElement().get());
@@ -882,29 +902,23 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
 
   // see if there is a configuration for the UI item stored in the network's ui node
-  cedar::aux::ConfigurationNode& ui = this->getNetwork()->getLastReadUINode();
-  for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
+  auto config = this->getNetwork()->getLastReadConfiguration();
+  auto ui_iter = config.find("ui");
+  if (ui_iter != config.not_found())
   {
-    const std::string& type = iter->second.get<std::string>("type");
-    if (type == current_type)
+    cedar::aux::ConfigurationNode& ui = ui_iter->second;
+    for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
     {
-      if (iter->second.get<std::string>(current_type) == element->getName())
+      const std::string& type = iter->second.get<std::string>("type");
+      if (type == current_type)
       {
-        p_scene_element->readConfiguration(iter->second);
-        ui.erase(iter);
-        break;
+        if (iter->second.get<std::string>(current_type) == element->getName())
+        {
+          p_scene_element->readConfiguration(iter->second);
+          ui.erase(iter);
+          break;
+        }
       }
-    }
-  }
-
-  // if not a root network, properly add the item as a child
-  if (this->mpScene && !this->isRootNetwork())
-  {
-    CEDAR_ASSERT(p_scene_element != NULL);
-    if (p_scene_element->parentItem() != this)
-    {
-      this->transformChildCoordinates(p_scene_element);
-      p_scene_element->setParentItem(this);
     }
   }
 

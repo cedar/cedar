@@ -63,13 +63,18 @@ const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectab
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Connectable::Connectable(qreal width, qreal height)
+cedar::proc::gui::Connectable::Connectable
+(
+  qreal width,
+  qreal height,
+  cedar::proc::gui::GraphicsBase::GraphicsGroup group
+)
 :
 cedar::proc::gui::GraphicsBase
 (
   width,
   height,
-  cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
+  group,
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE
 ),
 mpIconDisplay(NULL),

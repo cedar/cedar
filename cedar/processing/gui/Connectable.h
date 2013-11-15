@@ -138,7 +138,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Connectable(qreal width, qreal height);
+  Connectable(qreal width, qreal height, cedar::proc::gui::GraphicsBase::GraphicsGroup group);
 
   //!@brief Destructor
   virtual ~Connectable();

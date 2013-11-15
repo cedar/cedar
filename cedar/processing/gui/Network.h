@@ -178,7 +178,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
 
