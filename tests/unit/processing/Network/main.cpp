@@ -49,7 +49,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/sources/GaussInput.h"
-#include "cedar/processing/steps/Sum.h"
+#include "cedar/processing/steps/StaticGain.h"
 #include "cedar/dynamics/fields/NeuralField.h"
 
 // SYSTEM INCLUDES
@@ -225,11 +225,11 @@ int main(int /* argc */, char** /* argv */)
 //  network_root->connectSlots("Gauss.Gauss input", "nested.another input");
   network_connector->connectSlots("input.output", "output.input");
 //  network_connector->connectSlots("another input.output", "another output.input");
-  cedar::proc::steps::SumPtr sum(new cedar::proc::steps::Sum());
-  network_root->add(sum, "sum");
-  network_root->connectSlots("nested.output", "sum.terms");
-//  network_root->connectSlots("nested.another output", "sum.terms");
-  network_root->removeAll();
+  cedar::proc::steps::StaticGainPtr gain(new cedar::proc::steps::StaticGain());
+  network_root->add(gain, "gain");
+  network_root->connectSlots("nested.output", "gain.input");
+  network_connector->disconnectSlots("input.output", "output.input");
+  network_connector->connectSlots("input.output", "output.input");
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

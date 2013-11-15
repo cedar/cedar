@@ -1854,8 +1854,8 @@ void cedar::proc::Network::revalidateConnections(const std::string& sender)
   this->getDataConnections(this->getElement<Connectable>(child), output, connections);
   for (unsigned i = 0; i < connections.size(); ++i)
   {
-    cedar::proc::StepPtr sender = this->getElement<Step>(connections.at(i)->getSource()->getParent());
-    cedar::proc::StepPtr receiver = this->getElement<Step>(connections.at(i)->getTarget()->getParent());
+    cedar::proc::ConnectablePtr sender = this->getElement<Connectable>(connections.at(i)->getSource()->getParent());
+    cedar::proc::ConnectablePtr receiver = this->getElement<Connectable>(connections.at(i)->getTarget()->getParent());
     receiver->callInputConnectionChanged(connections.at(i)->getTarget()->getName());
   }
 }
@@ -1907,4 +1907,12 @@ const cedar::proc::Network::ConnectorMap& cedar::proc::Network::getConnectorMap(
 bool cedar::proc::Network::hasConnector(const std::string& name) const
 {
   return (this->_mConnectors->find(name) != this->_mConnectors->end());
+}
+
+void cedar::proc::Network::revalidateInputSlot(const std::string& slot)
+{
+  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  this->inputConnectionChanged(slot);
+  this->getInputValidity(slot);
 }

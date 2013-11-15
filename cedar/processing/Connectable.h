@@ -201,12 +201,6 @@ protected:
    */
   cedar::proc::DataSlotPtr declareInputCollection(const std::string& name);
 
-  //!@brief Declares a buffer slot.
-  CEDAR_DECLARE_DEPRECATED(void declareBuffer(const std::string& name));
-
-  //!@brief Declares an output slot.
-  CEDAR_DECLARE_DEPRECATED(void declareOutput(const std::string& name));
-
   //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
   cedar::proc::DataSlotPtr declareBuffer(const std::string& name, cedar::aux::DataPtr data);
 
@@ -365,6 +359,12 @@ protected:
    */
   void emitOutputPropertiesChangedSignal(const std::string& slot);
 
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  virtual void revalidateInputSlot(const std::string& slot) = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -421,6 +421,11 @@ private:
                                             cedar::proc::ConstDataSlotPtr slot,
                                             cedar::aux::ConstDataPtr data
                                           ) const;
+
+  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
+   *
+   */
+  void callInputConnectionChanged(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections

@@ -429,7 +429,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  void revalidateInputSlot(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
