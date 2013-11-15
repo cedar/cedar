@@ -101,15 +101,6 @@ public:
   //!@brief handles events in the context menu
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-  //!@brief returns one of the data slots associated with this step
-  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
-
-  //!@brief returns one of the data slots associated with this step
-  cedar::proc::gui::DataSlotItem const* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name) const;
-
-  //!@brief returns a map of all data slots of the same id
-  cedar::proc::gui::StepItem::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
-
   //!@brief reads a configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
   //!@brief saves a configuration to a node
@@ -169,9 +160,6 @@ private slots:
 private:
   void emitStepStateChanged();
 
-  //!@briefs adds graphical representations for all data items
-  void addDataItems();
-
   //!@brief Adds the decorations to the step.
   void addDecorations();
 
@@ -229,8 +217,6 @@ private:
   void updateIconGeometry();
 
   qreal getContentsPadding() const;
-
-  void itemSelected(bool selected);
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);

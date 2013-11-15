@@ -200,14 +200,9 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
       && p_target_slot->mSlot->getRole() == cedar::proc::DataRole::INPUT)
   {
     cedar::proc::DataSlot::VALIDITY validity = cedar::proc::DataSlot::VALIDITY_UNKNOWN;
-    //!@todo Unify with a connectable superclass
-    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_target))
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_target))
     {
-      validity = p_step_item->getStep()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
-    }
-    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_target))
-    {
-      validity = p_network_item->getNetwork()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
+      validity = connectable->getConnectable()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
 
     CEDAR_ASSERT(validity != cedar::proc::DataSlot::VALIDITY_UNKNOWN);
@@ -276,6 +271,7 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
       this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
     }
   }
+  //!@todo Can this be removed?
   if (mSlot->isPromoted())
   {
     this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_CROSS);

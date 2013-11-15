@@ -125,6 +125,85 @@ cedar::proc::gui::Connectable::Decoration::Decoration
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Connectable::sizeChanged()
+{
+  this->updateAttachedItems();
+}
+
+void cedar::proc::gui::Connectable::itemSelected(bool selected)
+{
+  for (auto role_iter = this->mSlotMap.begin(); role_iter != this->mSlotMap.end(); ++role_iter)
+  {
+    auto slot_map = role_iter->second;
+    for (auto slot_iter = slot_map.begin(); slot_iter != slot_map.end(); ++slot_iter)
+    {
+      auto slot = slot_iter->second;
+      slot->setHighlightedBySelection(selected);
+    }
+  }
+}
+
+const cedar::proc::gui::Connectable::DataSlotNameMap&
+  cedar::proc::gui::Connectable::getSlotItems
+  (
+    cedar::proc::DataRole::Id role
+  ) const
+{
+  auto role_map = this->mSlotMap.find(role);
+  if (role_map == this->mSlotMap.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::proc::InvalidRoleException,
+      "No slot items stored for role "
+      + cedar::proc::DataRole::type().get(role).prettyString()
+      + " in " + this->getConnectable()->getName() + "."
+    );
+  }
+  return role_map->second;
+}
+
+cedar::proc::gui::Connectable::DataSlotNameMap& cedar::proc::gui::Connectable::getSlotItems
+                                                (
+                                                  cedar::proc::DataRole::Id role
+                                                )
+{
+  return const_cast<cedar::proc::gui::Connectable::DataSlotNameMap&>
+         (
+           static_cast<cedar::proc::gui::Connectable const*>(this)->getSlotItems(role)
+         );
+}
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Connectable::getSlotItem
+                                (
+                                  cedar::proc::DataRole::Id role, const std::string& name
+                                )
+{
+  return const_cast<cedar::proc::gui::DataSlotItem*>
+         (
+           static_cast<cedar::proc::gui::Connectable const*>(this)->getSlotItem(role, name)
+         );
+}
+
+cedar::proc::gui::DataSlotItem const* cedar::proc::gui::Connectable::getSlotItem
+                                      (
+                                        cedar::proc::DataRole::Id role, const std::string& name
+                                      ) const
+{
+  auto role_map = this->getSlotItems(role);
+
+  auto iter = role_map.find(name);
+  if (iter == role_map.end())
+  {
+    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
+                                                  "\" found for role "
+                                                  + cedar::proc::DataRole::type().get(role).prettyString()
+                                                  + " in \"" + this->getConnectable()->getName() + "\"."
+                                                  );
+  }
+
+  return iter->second;
+}
 
 void cedar::proc::gui::Connectable::slotAdded(cedar::proc::DataRole::Id role, const std::string& name)
 {
@@ -146,6 +225,36 @@ void cedar::proc::gui::Connectable::slotRemoved(cedar::proc::DataRole::Id role, 
   p_item = name_iter->second;
   name_map.erase(name_iter);
   delete p_item;
+}
+
+void cedar::proc::gui::Connectable::addDataItems()
+{
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+      enum_it != cedar::proc::DataRole::type().list().end();
+      ++enum_it)
+  {
+    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
+      continue;
+
+    // populate step item list
+    mSlotMap[*enum_it] = DataSlotNameMap();
+
+    try
+    {
+      const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(*enum_it);
+      for (cedar::proc::Connectable::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      {
+        // use a non-const version of this slot
+        this->addDataItemFor(this->getConnectable()->getSlot(*enum_it, (*iter)->getName()));
+      }
+    }
+    catch (const cedar::proc::InvalidRoleException&)
+    {
+      // ok -- a step may not have any data for this role.
+    }
+  }
+
+  this->updateAttachedItems();
 }
 
 void cedar::proc::gui::Connectable::addDataItemFor(cedar::proc::DataSlotPtr slot)

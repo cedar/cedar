@@ -159,19 +159,6 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::StepItem::itemSelected(bool selected)
-{
-  for (auto role_iter = this->mSlotMap.begin(); role_iter != this->mSlotMap.end(); ++role_iter)
-  {
-    auto slot_map = role_iter->second;
-    for (auto slot_iter = slot_map.begin(); slot_iter != slot_map.end(); ++slot_iter)
-    {
-      auto slot = slot_iter->second;
-      slot->setHighlightedBySelection(selected);
-    }
-  }
-}
-
 void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
 {
   QString tool_tip
@@ -466,90 +453,6 @@ void cedar::proc::gui::StepItem::addDecorations()
   }
 
   this->updateDecorationPositions();
-}
-
-void cedar::proc::gui::StepItem::addDataItems()
-{
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
-  {
-    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
-      continue;
-
-    // populate step item list
-    mSlotMap[*enum_it] = DataSlotNameMap();
-
-    try
-    {
-      const cedar::proc::Step::SlotList& slotmap = this->getStep()->getOrderedDataSlots(*enum_it);
-      for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
-      {
-        // use a non-const version of this slot
-        this->addDataItemFor(this->getStep()->getSlot(*enum_it, (*iter)->getName()));
-      }
-    }
-    catch (const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
-    }
-  }
-
-  this->updateAttachedItems();
-}
-
-cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
-                                (
-                                  cedar::proc::DataRole::Id role, const std::string& name
-                                )
-{
-  return const_cast<cedar::proc::gui::DataSlotItem*>
-         (
-           static_cast<cedar::proc::gui::StepItem const*>(this)->getSlotItem(role, name)
-         );
-}
-
-cedar::proc::gui::DataSlotItem const* cedar::proc::gui::StepItem::getSlotItem
-                                      (
-                                        cedar::proc::DataRole::Id role,
-                                        const std::string& name
-                                      ) const
-{
-  DataSlotMap::const_iterator role_map = this->mSlotMap.find(role);
-
-  if (role_map == this->mSlotMap.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "No slot items stored for role "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   );
-  }
-
-  DataSlotNameMap::const_iterator iter = role_map->second.find(name);
-  if (iter == role_map->second.end())
-  {
-    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
-                                                  "\" found for role "
-                                                  + cedar::proc::DataRole::type().get(role).prettyString()
-                                                  + " in StepItem for step \"" + this->getStep()->getName() + "\"."
-                                                  );
-  }
-
-  return iter->second;
-}
-
-cedar::proc::gui::StepItem::DataSlotNameMap& cedar::proc::gui::StepItem::getSlotItems(
-                                                                             cedar::proc::DataRole::Id role
-                                                                           )
-{
-  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
-
-  if (role_map == this->mSlotMap.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "Unknown role  "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   );
-  }
-  return role_map->second;
 }
 
 void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu)
