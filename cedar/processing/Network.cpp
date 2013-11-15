@@ -1149,6 +1149,9 @@ void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode
 
 void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
 {
+  // remember the last configuration read (ui parts may need it)
+  this->mLastReadConfiguration = root;
+
   unsigned int format_version = 1; // default value is the current format
   try
   {
@@ -1163,11 +1166,6 @@ void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode
       "network reading",
       "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
     );
-  }
-  // store latest
-  if (root.find("ui") != root.not_found())
-  {
-    mLastReadUINode = root.find("ui")->second;
   }
   switch (format_version)
   {

@@ -95,7 +95,8 @@ cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step, QMainWindow* pMa
 cedar::proc::gui::Connectable
 (
   cedar::proc::gui::StepItem::mDefaultWidth,
-  cedar::proc::gui::StepItem::mDefaultHeight
+  cedar::proc::gui::StepItem::mDefaultHeight,
+  cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 ),
 mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow)
@@ -112,7 +113,8 @@ cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
 cedar::proc::gui::Connectable
 (
   cedar::proc::gui::StepItem::mDefaultWidth,
-  cedar::proc::gui::StepItem::mDefaultHeight
+  cedar::proc::gui::StepItem::mDefaultHeight,
+  cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 ),
 mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow)
