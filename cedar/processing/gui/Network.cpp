@@ -209,8 +209,6 @@ void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::st
 void cedar::proc::gui::Network::networkNameChanged()
 {
   this->mpNameDisplay->setPlainText(QString::fromStdString(this->getNetwork()->getName()));
-
-  this->fitToContents();
 }
 
 QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
@@ -358,10 +356,10 @@ void cedar::proc::gui::Network::fitToContents()
   }
 
   // finally, also resize parent item if it is a network
-  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
-  {
-    p_parent_network->fitToContents();
-  }
+//  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
+//  {
+//    p_parent_network->fitToContents();
+//  }
 }
 
 bool cedar::proc::gui::Network::isRootNetwork()
@@ -420,7 +418,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     this->addElement(this->mpScene->getGraphicsItemFor((*it).get()));
   }
   this->mHoldFitToContents = false;
-  this->fitToContents();
+//  this->fitToContents();
 }
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
@@ -436,10 +434,10 @@ const std::string& cedar::proc::gui::Network::getFileName() const
 
 void cedar::proc::gui::Network::addElementsToScene()
 {
-  if (!this->isRootNetwork())
-  {
-    this->fitToContents();
-  }
+//  if (!this->isRootNetwork())
+//  {
+//    this->fitToContents();
+//  }
 }
 
 void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
