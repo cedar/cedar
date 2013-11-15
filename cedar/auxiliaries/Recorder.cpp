@@ -59,6 +59,9 @@
 cedar::aux::Recorder::Recorder()
 {
   mProjectName = "Unnamed";
+
+  this->connectToStartSignal(boost::bind(&cedar::aux::Recorder::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::aux::Recorder::processStop, this, _1));
 }
 
 cedar::aux::Recorder::~Recorder()
@@ -138,7 +141,7 @@ void cedar::aux::Recorder::createOutputDirectory()
   boost::filesystem::create_directories(mOutputDirectory);
 }
 
-void cedar::aux::Recorder::applyStart()
+void cedar::aux::Recorder::prepareStart()
 {
   if (mDataSpectatorCollection.size() > 0)
   {
@@ -163,7 +166,7 @@ void cedar::aux::Recorder::applyStart()
   mDataSpectatorCollection.startAll();
 }
 
-void cedar::aux::Recorder::applyStop(bool /*suppressWarning*/)
+void cedar::aux::Recorder::processStop(bool /*suppressWarning*/)
 {
   //Stop all DataSpectators.They will automatically write all containing data to file.
   mDataSpectatorCollection.stopAll();
@@ -302,7 +305,7 @@ void cedar::aux::Recorder::takeSnapshot()
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    spec->applyStop(true);
+    spec->processStop(true);
   }
   this->mProjectName = oldName;
 }

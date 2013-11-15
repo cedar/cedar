@@ -139,10 +139,10 @@ private:
   void addListener(cedar::proc::TriggerablePtr triggerable);
 
   //! Called when the trigger is started.
-  void applyStart();
+  void prepareStart();
 
   //! Called when the trigger is started.
-  void applyStop(bool);
+  void processStop(bool);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

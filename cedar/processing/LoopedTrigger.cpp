@@ -101,6 +101,9 @@ mStarted(false)
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
+
+  this->connectToStartSignal(boost::bind(&cedar::proc::LoopedTrigger::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::proc::LoopedTrigger::processStop, this, _1));
 }
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
@@ -144,7 +147,7 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
   }
 }
 
-void cedar::proc::LoopedTrigger::applyStart()
+void cedar::proc::LoopedTrigger::prepareStart()
 {
   QMutexLocker locker(&mStartedMutex);
 
@@ -166,7 +169,7 @@ void cedar::proc::LoopedTrigger::applyStart()
   emit triggerStarted();
 }
 
-void cedar::proc::LoopedTrigger::applyStop(bool)
+void cedar::proc::LoopedTrigger::processStop(bool)
 {
   QMutexLocker locker(&mStartedMutex);
   if (!this->mStarted)

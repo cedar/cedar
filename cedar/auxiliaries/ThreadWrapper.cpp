@@ -250,7 +250,7 @@ void cedar::aux::ThreadWrapper::start()
       "Re-starting a not cleanly finished thread. Continuing.");
   }
 
-  applyStart(); // overridden by children
+  mStartSignal();
 
   // start the thread 
   mpThread->start();
@@ -261,16 +261,6 @@ void cedar::aux::ThreadWrapper::startedThreadSlot()
   // dummy slot. only here for debuggin purposes atm
 
   //std::cout << "called startedThread() for " << this << " thread: " << mpThread << std::endl;  
-}
-
-void cedar::aux::ThreadWrapper::applyStart()
-{
-  // virtual method. do your magic in the child class
-}
-
-void cedar::aux::ThreadWrapper::applyStop(bool)
-{
-  // virtual method. do your magic in the child class
 }
 
 void cedar::aux::ThreadWrapper::finishedWorkSlot()
@@ -381,7 +371,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
 
   if (isRunning())
   {
-    applyStop(suppressWarning);
+    mStopSignal(suppressWarning);
       // intentionally called while the thread may still be running. 
       // we need to guarantee that the worker class hasn't been destroyed, yet.
       // This is only possible here or in quittedThreadSlot(). 
@@ -445,5 +435,25 @@ bool cedar::aux::ThreadWrapper::stopRequested()
   QReadLocker locker(&mStopRequestedLock);
 	bool value = mStopRequested;
   return value;
+}
+
+boost::signals2::connection cedar::aux::ThreadWrapper::connectToStopSignal(boost::function<void (bool)> slot)
+{
+  return mStopSignal.connect(slot);
+}
+
+boost::signals2::connection cedar::aux::ThreadWrapper::connectToStartSignal(boost::function<void ()> slot)
+{
+  return mStartSignal.connect(slot);
+}
+
+void cedar::aux::ThreadWrapper::applyStart()
+{
+  // deprecated
+}
+
+void cedar::aux::ThreadWrapper::applyStop(bool)
+{
+  // deprecated
 }
 

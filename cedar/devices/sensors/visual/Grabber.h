@@ -659,14 +659,14 @@ private:
    *          To control the grabbing speed (i.e. the FPS) use
    *          setFramerate(), getFramerate() or getMeasuredFramerate()
    */
-  void applyStart();
+  void prepareStart();
 
   /*! @brief Stop the grabbing thread
    *
    *          This method invokes internally LoopedThread::stop() and does
    *          some cleanup like stopRecording or set the measured FPS to zero
    */
-  void applyStop(bool);
+  void processStop(bool);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -151,14 +151,16 @@ protected:
   *
   *              By calling start, every registered observer thread will automatically be started.
   *              Additionally all files will be created and filled with headers.
+  *!todo: docu is wrong, should be private, no?
   */
-  void applyStart();
+  void prepareStart();
 
   /*!@brief Stops the recorder thread.
    *
    *              By calling stop, the calling thread waits until all recorded data has been written to disk.
+   *!todo: docu is wrong, should be private, no?
    */
-  void applyStop(bool suppressWarning);
+  void processStop(bool suppressWarning);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
