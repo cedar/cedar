@@ -14,6 +14,7 @@ beneficial or even necessary.
 - @ref ProjectsWithCedar
 - @link ProcessingFrameworkTutorial Processing framework @endlink
 - @ref ConfigurableAndParameters
+- @link CommandLineParser cedar's command line parser@endlink
 @subsection AdvancedTutorials Advanced Tutorials
 - @ref LoggingWithCedar
 - @ref ProvidingCompatibility

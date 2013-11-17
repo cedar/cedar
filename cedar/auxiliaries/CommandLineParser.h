@@ -171,6 +171,12 @@ public:
    *        This method is called automatically if the --read-config-to-file argument is passed on the command line.
    *        The file read by this method should have the format written by --write-config-to-file or the
    *        writeConfigToFile method.
+   *
+   *        In addition, this function will parser include directives in the file being read. These take the form of a
+   *        json-list with the files to include, relative to the configuration file being read. Example:
+   *        @code
+   *  "include" : ["path1", "path2"]
+   *        @endcode
    */
   void readConfigFromFile(const cedar::aux::Path& path);
 
