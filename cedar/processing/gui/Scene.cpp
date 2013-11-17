@@ -47,6 +47,7 @@
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/StickyNode.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -303,6 +304,8 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
       QGraphicsScene::mouseMoveEvent(pMouseEvent);
       break;
   }
+  this->mousePosX = pMouseEvent->scenePos().x();
+  this->mousePosY = pMouseEvent->scenePos().y();
 }
 
 
@@ -529,6 +532,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
+  QAction *p_addSickyNode = menu.addAction("add sticky node");
+  menu.addSeparator();
   QAction *p_reset = menu.addAction("reset network");
 
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
@@ -539,6 +544,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     {
       p_ide->resetRootNetwork();
     }
+  }
+  if (a == p_addSickyNode)
+  {
+    this->addStickyNode();
   }
   else if (a != NULL)
   {
@@ -1029,4 +1038,9 @@ void cedar::proc::gui::Scene::selectNone()
   {
     selected_items.at(i)->setSelected(false);
   }
+}
+
+void cedar::proc::gui::Scene::addStickyNode()
+{
+  this->addItem(new cedar::proc::gui::StickyNode(mousePosX,mousePosY,this));
 }
