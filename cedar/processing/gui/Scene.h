@@ -332,6 +332,10 @@ private:
    */
   void removeNetworkItem(cedar::proc::gui::Network* pNetwork);
 
+  /*!brief Adds a sticky node to the current scene
+   */
+  void addStickyNode();
+
   void handleTriggerModeChange();
 
 private slots:
@@ -393,6 +397,8 @@ private:
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
   cedar::proc::gui::RecorderWidget *mpRecorderWidget;
+  int mousePosX;
+  int mousePosY;
 
 }; // class ProcessingScene
 
