@@ -1444,7 +1444,7 @@ void cedar::proc::Network::writeRecords(cedar::aux::ConfigurationNode& records) 
 void cedar::proc::Network::readRecords
      (
        const cedar::aux::ConfigurationNode& root,
-       std::vector<std::string>& exceptions
+       std::vector<std::string>&
      )
 {
   //clear all registered data

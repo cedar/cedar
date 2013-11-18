@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StickyNode.cpp
+    File:        StickyNote.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2013 07 01
 
-    Description: Implementation of the @em cedar::proc::gui::StickyNode class.
+    Description: Implementation of the @em cedar::proc::gui::StickyNote class.
 
     Credits:
 
@@ -36,10 +36,10 @@
 
 
 
-#include "StickyNode.h"
+#include "StickyNote.h"
 
 #include<QBrush>
-cedar::proc::gui::StickyNode::StickyNode(int x, int y, QGraphicsScene* pParent)
+cedar::proc::gui::StickyNote::StickyNote(int x, int y, QGraphicsScene* pParent)
 {
   this->pParent = pParent;
   color = Qt::yellow;
@@ -55,16 +55,16 @@ cedar::proc::gui::StickyNode::StickyNode(int x, int y, QGraphicsScene* pParent)
   setFlag(ItemIsFocusable);
 }
 
-cedar::proc::gui::StickyNode::~StickyNode()
+cedar::proc::gui::StickyNote::~StickyNote()
 {
-  delete mpProxy;
+
 }
-QRectF cedar::proc::gui::StickyNode::boundingRect() const
+QRectF cedar::proc::gui::StickyNote::boundingRect() const
 {
   return bound;
 }
 
-void cedar::proc::gui::StickyNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void cedar::proc::gui::StickyNote::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   QPalette p = text.palette();
   p.setColor(QPalette::Base,color);
@@ -83,9 +83,9 @@ void cedar::proc::gui::StickyNode::paint(QPainter *painter, const QStyleOptionGr
   painter->drawRoundedRect(rect,5,5);
 }
 
-void cedar::proc::gui::StickyNode::keyPressEvent(QKeyEvent* event)
+void cedar::proc::gui::StickyNote::keyPressEvent(QKeyEvent* event)
 {
-  if(isSelected() && event->key() ==  Qt::Key_Delete)
+  if (isSelected() && event->key() ==  Qt::Key_Delete)
   {
     pParent->removeItem(this);
   }
