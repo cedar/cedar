@@ -59,7 +59,7 @@ int test_basics()
 }
 
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char** /* argv */)
 {
   int errors = 0;
 
