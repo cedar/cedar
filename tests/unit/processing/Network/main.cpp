@@ -231,6 +231,8 @@ int main(int /* argc */, char** /* argv */)
   network_root->connectSlots("nested.output", "gain.input");
   network_connector->disconnectSlots("input.output", "output.input");
   network_connector->connectSlots("input.output", "output.input");
+  network_root->disconnectSlots("Gauss.Gauss input", "nested.input");
+  network_root->connectSlots("Gauss.Gauss input", "nested.input");
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

@@ -43,6 +43,7 @@
 #include "cedar/processing/OwnedData.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
@@ -813,8 +814,19 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
       this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
       data->setOwner(this);
     }
+    else
+    {
+      if (slot->getData())
+      {
+        auto lockset_handle = this->getLockSetForRole(role);
+        auto lockset = this->getLocks(lockset_handle);
+        for (auto iter = lockset.begin(); iter != lockset.end(); ++iter)
+        {
+          CEDAR_ASSERT(iter->first != &slot->getData()->getLock());
+        }
+      }
+    }
   }
-
   slot->setData(data);
 
   locker.unlock();
