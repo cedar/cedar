@@ -1061,8 +1061,3 @@ void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::stri
   }
   this->mOutputPropertiesChanged(this->getName() + "." + slot);
 }
-
-void cedar::proc::Connectable::callInputConnectionChanged(const std::string& slot)
-{
-  this->revalidateInputSlot(slot);
-}
