@@ -41,15 +41,20 @@
 #include<QBrush>
 cedar::proc::gui::StickyNote::StickyNote(int x, int y, QGraphicsScene* pParent)
 {
-  this->pParent = pParent;
-  color = Qt::yellow;
-  text.setFixedSize(180,80);
-  text.setFrameStyle(0);
-  bound =  QRectF(x,y,200,100);
+  //initialize
+  mScaling = false;
+  this->mpParent = pParent;
+  mColor = Qt::yellow;
+  mBound =  QRectF(x, y, 120, 70);
+
+  //initialize TextEdit Widget
+  mText.setFrameStyle(0);
+  mText.setFixedSize(100,50);
   mpProxy = new QGraphicsProxyWidget(this);
-  mpProxy->setWidget(&text);
-  mpProxy->setPos(x+10,y+10);
-  mpProxy->setFlag(ItemIsSelectable);
+  mpProxy->setWidget(&mText);
+  mpProxy->setPos(x + 10, y + 10);
+
+  //set flags
   setFlag(ItemIsMovable);
   setFlag(ItemIsSelectable);
   setFlag(ItemIsFocusable);
@@ -61,18 +66,36 @@ cedar::proc::gui::StickyNote::~StickyNote()
 }
 QRectF cedar::proc::gui::StickyNote::boundingRect() const
 {
-  return bound;
+  return mBound;
 }
 
 void cedar::proc::gui::StickyNote::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-  QPalette p = text.palette();
-  p.setColor(QPalette::Base,color);
-  text.setPalette(p);
-  QRectF rect = bound;
-  QBrush brush = color;
+  //coloring TextEdit Widget
+  QPalette p = mText.palette();
+  p.setColor(QPalette::Base,mColor);
+  mText.setPalette(p);
+  QBrush brush = mColor;
   painter->setBrush(brush);
-  if (this->isSelected() || mpProxy->isSelected())
+
+  //resize TextEdit Widget
+  mText.setFixedSize(mBound.width() - 20 , mBound.height() - 20);
+  mpProxy->setMaximumWidth(mBound.width() - 20 );
+  mpProxy->setMaximumHeight(mBound.height() - 20);
+
+  //set note to selected if TextEdit has focused
+  if (mText.hasFocus() )
+  {
+    QList<QGraphicsItem*> items = this->mpParent->selectedItems();
+    for (QGraphicsItem* item : items)
+    {
+      item->setSelected(false);
+    }
+    this->setSelected(true);
+  }
+
+  // change pen if the note is selected
+  if (this->isSelected())
   {
     painter->setPen(Qt::DashLine);
   }
@@ -80,16 +103,72 @@ void cedar::proc::gui::StickyNote::paint(QPainter *painter, const QStyleOptionGr
   {
     painter->setPen(Qt::SolidLine);
   }
-  painter->drawRoundedRect(rect,5,5);
+  painter->drawRoundedRect(mBound,5,5);
+
+  //draw scaling corner
+  QPointF ps[3];
+  ps[0]= QPointF(mBound.x()+mBound.width(),mBound.y()+mBound.height());
+  ps[1]= QPointF(mBound.x()+mBound.width()-10,mBound.y()+mBound.height());
+  ps[2]= QPointF(mBound.x()+mBound.width(),mBound.y()+mBound.height()-10);
+  painter->setBrush(Qt::black);
+  painter->drawPolygon(ps,3);
 }
 
 void cedar::proc::gui::StickyNote::keyPressEvent(QKeyEvent* event)
 {
   if (isSelected() && event->key() ==  Qt::Key_Delete)
   {
-    pParent->removeItem(this);
+    mpParent->removeItem(this);
   }
 
   QGraphicsItem::keyPressEvent(event);
 }
 
+void cedar::proc::gui::StickyNote::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+  int x = event->pos().x();
+  int y = event->pos().y();
+  if (x > mBound.x() + mBound.width() -8 && x < mBound.x() + mBound.width() + 8
+      && y > mBound.y() + mBound.height() - 8 && y < mBound.y() + mBound.height() + 8)
+  {
+      this->mScaling = true;
+  }
+  else
+  {
+    QGraphicsItem::mousePressEvent(event);
+  }
+}
+
+void cedar::proc::gui::StickyNote::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+  if (mScaling)
+  {
+    mScaling=false;
+  }
+  else
+  {
+    QGraphicsItem::mouseReleaseEvent(event);
+  }
+}
+
+void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
+  if (mScaling)
+  {
+    int newWidth = event->pos().x() - mBound.x();
+    int newHeight = event->pos().y() - mBound.y();
+    if (newHeight > 70)
+    {
+      mBound.setHeight(newHeight);
+    }
+    if (newWidth > 120)
+    {
+      mBound.setWidth(newWidth);
+    }
+    update();
+  }
+  else
+  {
+    QGraphicsItem::mouseMoveEvent(event);
+  }
+}

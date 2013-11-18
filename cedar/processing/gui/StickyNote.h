@@ -49,6 +49,7 @@
 #include <QWidget>
 #include <QTextEdit>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsSceneEvent>
 
 //!@brief A GUI class that creates a pane where the user can write a comment or note.
 class cedar::proc::gui::StickyNote: public QGraphicsItem
@@ -79,25 +80,37 @@ public:
   //!@brief Checks if an key was pressed.
   void keyPressEvent(QKeyEvent* event);
 
+  //!@brief Event when mouse is pressed on the note.
+  void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
+  //!@brief Event when mouse is released from the note.
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+  //!@brief Events when mouse is moved in the note.
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
   //!@brief The most outer rect.
-  QRectF bound;
+  QRectF mBound;
 
   //!@brief The text inside the note.
-  QTextEdit text;
+  QTextEdit mText;
 
   //!@brief A helper for storing QWidgets in a QGraphicsItem .
   QGraphicsProxyWidget *mpProxy;
 
   //!@brief The color of the note.
-  QColor color;
+  QColor mColor;
 
   //!@brief A reference to the parent scene.
-  QGraphicsScene* pParent;
+  QGraphicsScene* mpParent;
+
+  //!@brief flag that saves if the not is currently in scaling mode
+  bool mScaling;
 };
 
 #endif /* CEDAR_PROC_STICKYNODE_H_ */
