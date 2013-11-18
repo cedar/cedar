@@ -38,11 +38,14 @@
 #define CEDAR_AUX_GUI_PLOT_INTERFACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Data.fwd.h"
+#include "cedar/auxiliaries/gui/PlotInterface.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
+#include <map>
 
 /*!@brief A unified interface for widgets that plot instances of cedar::proc::Data.
  */

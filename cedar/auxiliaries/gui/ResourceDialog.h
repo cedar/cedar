@@ -41,9 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/ui_ResourceDialog.h"
 #include "cedar/auxiliaries/Path.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/ResourceDialog.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QFileIconProvider>

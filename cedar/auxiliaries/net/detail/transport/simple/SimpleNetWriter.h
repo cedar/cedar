@@ -40,7 +40,7 @@
 #define CEDAR_SIMPLE_NET_WRITER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetWriter.h"
 
 // PROJECT INCLUDES
@@ -52,19 +52,13 @@
 #include <stdlib.h>
 #include <iostream>
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
-
-
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief implements writing (RIAA over network) simple variable types
  *
  * use in Writer
  */
 template <typename T>
-class SimpleNetWriter : public AbstractNetWriter<T>
+class cedar::aux::net::detail::SimpleNetWriter : public AbstractNetWriter<T>
 {
   //---------------------------------------------------------------------------
   // members
@@ -145,6 +139,5 @@ public:
 };
 //!@endcond
 
-} } } } // end namespaces
 
 #endif

@@ -38,7 +38,7 @@
 #define CEDAR_AUX_GL_CYLINDER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Cylinder.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // PROJECT INCLUDES

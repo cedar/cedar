@@ -26,21 +26,25 @@
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2013 11 7
+    Date:        2013 11 07
 
     Description: Singleton class for a central time in the network.
 
     Credits:
 
 ======================================================================================================================*/
-//CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 
-//SYSTEM INCLUDES
+#ifndef CEDAR_AUX_NETWORK_TIMER_H
+#define CEDAR_AUX_NETWORK_TIMER_H
+
+// CEDAR INCLUDES
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/NetworkTimer.fwd.h"
+#include "cedar/auxiliaries/Singleton.fwd.h"
+
+// SYSTEM INCLUDES
 #include <QTime>
-
-#ifndef CEDAR_AUX_NETWORKTIMER_H_
-#define CEDAR_AUX_NETWORKTIMER_H_
 
 
 //@!brief Can start, stop and reset the network time and should be used as a central time giver in a network.
@@ -110,4 +114,4 @@ namespace cedar
   }
 }
 
-#endif /* CEDAR_AUX_NETWORKTIMER_H_ */
+#endif // CEDAR_AUX_NETWORK_TIMER_H

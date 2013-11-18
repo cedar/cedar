@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/exceptions.h"
 

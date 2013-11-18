@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
 #include "cedar/defines.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/intrusive_ptr.hpp>

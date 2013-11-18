@@ -45,7 +45,7 @@
 #define CEDAR_COLLATED_NET_YARP_PORTABLE_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/YARPCollatedPortable.fwd.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 
@@ -55,10 +55,6 @@
 #include <yarp/os/ConnectionReader.h>
 #include <yarp/os/ConnectionWriter.h>
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
 //!@cond SKIPPED_DOCUMENTATION
 
 
@@ -69,8 +65,8 @@ namespace cedar {
  * 
  */
 template<class T>
-class YARPCollatedPortable : public yarp::os::Portable,
-                            boost::noncopyable
+class cedar::aux::net::detail::YARPCollatedPortable : public yarp::os::Portable,
+                                                      boost::noncopyable
 {
     // TODO: seperate into Reader and Writer parts
 
@@ -218,8 +214,6 @@ public:
   }
 
 };
-
-} } } } // end namespaces
 
 //!@endcond
 #endif

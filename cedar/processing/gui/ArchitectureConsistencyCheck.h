@@ -41,9 +41,15 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/ui_ArchitectureConsistencyCheck.h"
-#include "cedar/processing/consistency/ConsistencyIssue.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
+#include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
+#include "cedar/processing/gui/View.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

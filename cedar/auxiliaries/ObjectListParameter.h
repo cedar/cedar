@@ -38,8 +38,10 @@
 #define CEDAR_AUX_OBJECT_LIST_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ObjectListParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2.hpp>

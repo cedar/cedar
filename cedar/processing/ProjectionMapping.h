@@ -38,7 +38,10 @@
 #define CEDAR_PROC_PROJECTION_MAPPING_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/ProjectionMapping.fwd.h"
+#include "cedar/processing/ProjectionMappingParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <map>

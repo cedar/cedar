@@ -41,7 +41,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/ColorValueRGBA.fwd.h"
 
 // SYSTEM INCLUDES
 

@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/LoopedTrigger.h"

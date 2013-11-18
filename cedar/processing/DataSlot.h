@@ -38,15 +38,23 @@
 #define CEDAR_PROC_DATA_SLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/namespace.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Data.fwd.h"
+#include "cedar/processing/DataSlot.fwd.h"
+#include "cedar/processing/DataConnection.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/PromotedExternalData.fwd.h"
+#include "cedar/processing/PromotedOwnedData.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/function.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/signal.hpp>
+
 
 /*!@brief This class represents data slots in connectable objects.
  *

@@ -40,7 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ui_PluginManagerDialog.h"
 
-#include "cedar/auxiliaries/gui/namespace.h"
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/PluginManagerDialog.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDialog>

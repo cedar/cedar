@@ -38,9 +38,11 @@
 #define CEDAR_PROC_STEPS_REMOVE_MEAN_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/RemoveMean.fwd.h"
 
 // SYSTEM INCLUDES
 

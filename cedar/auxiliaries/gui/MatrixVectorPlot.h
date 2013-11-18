@@ -42,9 +42,12 @@
 #ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 #include "cedar/auxiliaries/math/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/gui/MatrixVectorPlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

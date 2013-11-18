@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/namespace.h"
 #include "cedar/processing/typecheck/TypeCheck.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/typecheck/IsMatrix.fwd.h"
 
 // SYSTEM INCLUDES
 

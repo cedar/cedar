@@ -41,8 +41,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/CommandLineParser.fwd.h"
+#include "cedar/auxiliaries/Path.fwd.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

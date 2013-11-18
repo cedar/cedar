@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/typecheck/TypeCheck.h"
 #include "cedar/processing/typecheck/DerivedFrom.h"
 #include "cedar/processing/Step.h"
