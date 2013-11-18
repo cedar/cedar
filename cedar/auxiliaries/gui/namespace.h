@@ -37,142 +37,66 @@
 #ifndef CEDAR_AUX_GUI_NAMESPACE_H
 #define CEDAR_AUX_GUI_NAMESPACE_H
 
-#include "cedar/configuration.h"
+#warning Do not include this header any more. Use the new forward declaration headers instead.
 
-// CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
-#include "cedar/auxiliaries/Singleton.fwd.h"
-
-// FORWARD DECLARATIONS
-#include "cedar/auxiliaries/Data.fwd.h"
-#include "cedar/auxiliaries/Parameter.fwd.h"
-#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
-#include "cedar/auxiliaries/TypeHierarchyMap.fwd.h"
-
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-
-namespace cedar
-{
-  namespace aux
-  {
-    //!@brief Namespace for widget classes.
-    namespace gui
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(BaseWidget);
-      CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrameWidget);
-      CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrameWidget RigidBodyWidget);
-      CEDAR_DECLARE_AUX_CLASS(ObjectVisualizationWidget);
-      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualizationWidget RigidBodyVisualizationWidget);
-      CEDAR_DECLARE_AUX_CLASS(SceneWidget);
-      CEDAR_DECLARE_AUX_CLASS(Settings);
-      CEDAR_DECLARE_AUX_CLASS(Viewer);
-
-      class CEDAR_AUX_LIB_EXPORT PropertyPane;
-      CEDAR_DECLARE_AUX_CLASS(Parameter);
-
-      class CEDAR_AUX_LIB_EXPORT AccelerationParameter;
-      class CEDAR_AUX_LIB_EXPORT AngularVelocityParameter;
-      class CEDAR_AUX_LIB_EXPORT BoolParameter;
-      class CEDAR_AUX_LIB_EXPORT BoolVectorParameter;
-      class CEDAR_AUX_LIB_EXPORT DirectoryParameter;
-      class CEDAR_AUX_LIB_EXPORT DoubleParameter;
-      class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
-      class CEDAR_AUX_LIB_EXPORT EnumParameter;
-      class CEDAR_AUX_LIB_EXPORT FileParameter;
-      class CEDAR_AUX_LIB_EXPORT FrequencyParameter;
-      class CEDAR_AUX_LIB_EXPORT IntParameter;
-      class CEDAR_AUX_LIB_EXPORT IntVectorParameter;
-      class CEDAR_AUX_LIB_EXPORT LengthParameter;
-      class CEDAR_AUX_LIB_EXPORT ObjectParameter;
-      class CEDAR_AUX_LIB_EXPORT ObjectListParameter;
-      class CEDAR_AUX_LIB_EXPORT PlaneAngleParameter;
-      class CEDAR_AUX_LIB_EXPORT StringParameter;
-      class CEDAR_AUX_LIB_EXPORT TimeParameter;
-      class CEDAR_AUX_LIB_EXPORT UIntParameter;
-      class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
-      class CEDAR_AUX_LIB_EXPORT VelocityParameter;
-
-      class CEDAR_AUX_LIB_EXPORT ResourceDialog;
-
-      class CEDAR_AUX_LIB_EXPORT SettingsWidget;
-
-      class CEDAR_AUX_LIB_EXPORT ExceptionDialog;
-
-      class CEDAR_AUX_LIB_EXPORT Log;
-
-      template <typename ValueT, class WidgetT> class NumericWidgetPolicy;
-      template <typename ValueT, class WidgetT> class NumericParameter;
-
-      template <typename ValueT, class WidgetT> class VectorParameterAbstraction;
-      template <typename ValueT, class WidgetT, class Abstraction> class VectorParameter;
-
-      template <typename ValueT, class WidgetT> class NumericVectorParameterAbstraction;
-      template <typename ValueT, class WidgetT> class NumericVectorParameter;
-
-      /* Exceptions */
-      class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
-
-      class CEDAR_AUX_LIB_EXPORT PluginInfoDialog;
-      class CEDAR_AUX_LIB_EXPORT PluginManagerDialog;
-      //!@endcond
-
-      //! The factory for gui parameters.
-      typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
-
-      //!@brief singleton specialization for the parameter factory
-      typedef cedar::aux::Singleton<ParameterFactory> ParameterFactorySingleton;
-
-      /* Plotting related classes */
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(PlotManager);
-      CEDAR_DECLARE_AUX_CLASS(PlotDeclaration);
-      template <class DataType, class PlotType> class PlotDeclarationTemplate;
-
-      CEDAR_DECLARE_AUX_CLASS(ColorValueRGBA);
-      CEDAR_DECLARE_AUX_CLASS(ImagePlot);
-      CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
-      CEDAR_DECLARE_AUX_CLASS(DataPlotter);
-      CEDAR_DECLARE_AUX_CLASS(MatDataPlot);
-      CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
-      CEDAR_DECLARE_AUX_CLASS(PlotInterface);
-      CEDAR_DECLARE_AUX_CLASS(HistoryPlot1D);
-      CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
-      CEDAR_DECLARE_AUX_CLASS(MultiPlotInterface);
-      #ifdef CEDAR_USE_VTK
-        CEDAR_DECLARE_AUX_CLASS(VtkLinePlot);
-        CEDAR_DECLARE_AUX_CLASS(VtkMatrixPlot);
-        CEDAR_DECLARE_AUX_CLASS(VtkSurfacePlot);
-      #endif // CEDAR_USE_VTK
-      #ifdef CEDAR_USE_QWT
-        CEDAR_DECLARE_AUX_CLASS(QwtLinePlot);
-        CEDAR_DECLARE_DEPRECATED(typedef QwtLinePlot LinePlot);
-        CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
-        CEDAR_DECLARE_AUX_CLASS(MatrixVectorPlot);
-      #endif // CEDAR_USE_QWT
-      #ifdef CEDAR_USE_QWTPLOT3D
-        CEDAR_DECLARE_AUX_CLASS(QwtSurfacePlot);
-        CEDAR_DECLARE_DEPRECATED(typedef QwtSurfacePlot SurfacePlot);
-      #endif // CEDAR_USE_QWTPLOT3D
-      //!@endcond
-
-      //!@brief The manager for plot widgets
-      typedef
-          cedar::aux::TypeHierarchyMap
-          <
-            cedar::aux::Data,
-            std::vector<cedar::aux::gui::ConstPlotDeclarationPtr>
-          >
-          PlotDeclarationManager;
-
-      //!@brief singleton specialization for the plot delcaration manager
-      typedef cedar::aux::Singleton<PlotDeclarationManager> PlotDeclarationManagerSingleton;
-    }
-  }
-}
-
-// to prevent redefinitions
-#undef CEDAR_CLASS_PREFIX
+#include "cedar/auxiliaries/gui/AccelerationParameter.fwd.h"
+#include "cedar/auxiliaries/gui/AngularVelocityParameter.fwd.h"
+#include "cedar/auxiliaries/gui/BaseWidget.fwd.h"
+#include "cedar/auxiliaries/gui/BoolParameter.fwd.h"
+#include "cedar/auxiliaries/gui/BoolVectorParameter.fwd.h"
+#include "cedar/auxiliaries/gui/ColorValueRGBA.fwd.h"
+#include "cedar/auxiliaries/gui/DataPlotter.fwd.h"
+#include "cedar/auxiliaries/gui/DirectoryParameter.fwd.h"
+#include "cedar/auxiliaries/gui/DoubleParameter.fwd.h"
+#include "cedar/auxiliaries/gui/DoubleVectorParameter.fwd.h"
+#include "cedar/auxiliaries/gui/EnumParameter.fwd.h"
+#include "cedar/auxiliaries/gui/ExceptionDialog.fwd.h"
+#include "cedar/auxiliaries/gui/exceptions.fwd.h"
+#include "cedar/auxiliaries/gui/FileParameter.fwd.h"
+#include "cedar/auxiliaries/gui/FrequencyParameter.fwd.h"
+#include "cedar/auxiliaries/gui/HistoryPlot.fwd.h"
+#include "cedar/auxiliaries/gui/HistoryPlot0D.fwd.h"
+#include "cedar/auxiliaries/gui/HistoryPlot1D.fwd.h"
+#include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
+#include "cedar/auxiliaries/gui/IntParameter.fwd.h"
+#include "cedar/auxiliaries/gui/IntVectorParameter.fwd.h"
+#include "cedar/auxiliaries/gui/LengthParameter.fwd.h"
+#include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.fwd.h"
+#include "cedar/auxiliaries/gui/Log.fwd.h"
+#include "cedar/auxiliaries/gui/MatrixPlot.fwd.h"
+#include "cedar/auxiliaries/gui/MatrixSlicePlot3D.fwd.h"
+#include "cedar/auxiliaries/gui/MatrixVectorPlot.fwd.h"
+#include "cedar/auxiliaries/gui/MatDataPlot.fwd.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.fwd.h"
+#include "cedar/auxiliaries/gui/NumericParameter.fwd.h"
+#include "cedar/auxiliaries/gui/NumericVectorParameter.fwd.h"
+#include "cedar/auxiliaries/gui/ObjectListParameter.fwd.h"
+#include "cedar/auxiliaries/gui/ObjectParameter.fwd.h"
+#include "cedar/auxiliaries/gui/ObjectVisualizationWidget.fwd.h"
+#include "cedar/auxiliaries/gui/Parameter.fwd.h"
+#include "cedar/auxiliaries/gui/PlaneAngleParameter.fwd.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
+#include "cedar/auxiliaries/gui/PlotDeclarationManager.fwd.h"
+#include "cedar/auxiliaries/gui/PlotDeclarationTemplate.fwd.h"
+#include "cedar/auxiliaries/gui/PlotInterface.fwd.h"
+#include "cedar/auxiliaries/gui/PlotManager.fwd.h"
+#include "cedar/auxiliaries/gui/PluginInfoDialog.fwd.h"
+#include "cedar/auxiliaries/gui/PluginManagerDialog.fwd.h"
+#include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
+#include "cedar/auxiliaries/gui/QwtLinePlot.fwd.h"
+#include "cedar/auxiliaries/gui/ResourceDialog.fwd.h"
+#include "cedar/auxiliaries/gui/SceneWidget.fwd.h"
+#include "cedar/auxiliaries/gui/Settings.fwd.h"
+#include "cedar/auxiliaries/gui/SettingsWidget.fwd.h"
+#include "cedar/auxiliaries/gui/StringParameter.fwd.h"
+#include "cedar/auxiliaries/gui/TimeParameter.fwd.h"
+#include "cedar/auxiliaries/gui/UIntParameter.fwd.h"
+#include "cedar/auxiliaries/gui/UIntVectorParameter.fwd.h"
+#include "cedar/auxiliaries/gui/VectorParameter.fwd.h"
+#include "cedar/auxiliaries/gui/VelocityParameter.fwd.h"
+#include "cedar/auxiliaries/gui/Viewer.fwd.h"
+#include "cedar/auxiliaries/gui/VtkLinePlot.fwd.h"
+#include "cedar/auxiliaries/gui/VtkMatrixPlot.fwd.h"
+#include "cedar/auxiliaries/gui/VtkSurfacePlot.fwd.h"
 
 #endif // CEDAR_AUX_GUI_NAMESPACE_H

@@ -42,7 +42,6 @@
 #define CEDAR_PROC_SCENE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/Scene.fwd.h"
@@ -56,6 +55,7 @@
 #include "cedar/processing/gui/Network.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
+#include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>

@@ -38,8 +38,10 @@
 #define CEDAR_AUX_GUI_SETTINGS_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/ui_SettingsWidget.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/SettingsWidget.fwd.h"
 
 // SYSTEM INCLUDES
 
