@@ -46,13 +46,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::ConnectorItem::ConnectorItem(cedar::proc::sources::GroupSourcePtr source)
+cedar::proc::gui::ConnectorItem::ConnectorItem(cedar::proc::sources::GroupSourcePtr)
 :
 cedar::proc::gui::GraphicsBase(15, 15, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP)
 {
 }
 
-cedar::proc::gui::ConnectorItem::ConnectorItem(cedar::proc::sinks::GroupSinkPtr sink)
+cedar::proc::gui::ConnectorItem::ConnectorItem(cedar::proc::sinks::GroupSinkPtr)
 :
 cedar::proc::gui::GraphicsBase(15, 15, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP)
 {
