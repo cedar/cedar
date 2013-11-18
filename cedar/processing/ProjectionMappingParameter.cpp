@@ -36,11 +36,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/ProjectionMappingParameter.h"
+#include "cedar/processing/ProjectionMapping.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <climits>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

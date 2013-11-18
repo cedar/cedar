@@ -36,9 +36,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/RecorderWidget.h"
-#include "cedar/auxiliaries/Data.h"
-#include "cedar/processing/DataSlot.h"
 #include "cedar/processing/gui/RecorderProperty.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES

@@ -40,7 +40,6 @@
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gl/gl.h"
-#include "cedar/auxiliaries/gl/namespace.h"
 
 // SYSTEM INCLUDES
 

@@ -38,8 +38,10 @@
 #define CEDAR_AUX_MAT_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DataTemplate.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>

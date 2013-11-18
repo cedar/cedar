@@ -26,7 +26,7 @@
 
     Maintainer:  Kai Kuchenbecker
     Email:       Kai.Kuchenbecker@ini.rub.de
-    Date:        2013-07-31
+    Date:        2013 07 31
 
     Description:
 
@@ -37,14 +37,19 @@
 #ifndef CEDAR_PROC_GUI_PLOT_WIDGET_H
 #define CEDAR_PROC_GUI_PLOT_WIDGET_H
 
-// CEDAR INCLUDES
+// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#include "cedar/auxiliaries/gui/PlotInterface.h"
-#include "cedar/auxiliaries/gui/PlotDeclaration.h"
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/StepItem.h"    
+
+// CEDAR INCLUDES
+#include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/PlotWidget.fwd.h"
+#include "cedar/processing/gui/StepItem.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

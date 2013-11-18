@@ -42,8 +42,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/VectorParameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/NumericVectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
 

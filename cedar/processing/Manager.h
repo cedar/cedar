@@ -42,15 +42,19 @@
 #define CEDAR_PROC_MANAGER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LoopedThread.fwd.h"
+#include "cedar/auxiliaries/PluginProxy.fwd.h"
+#include "cedar/processing/Manager.fwd.h"
+#include "cedar/processing/PluginDeclaration.fwd.h"
+
 // SYSTEM INCLUDES
+#include <QObject>
 #include <map>
 #include <set>
 #include <vector>
-#include <QObject>
 
 
 /*!@brief A manager for processing architectures.

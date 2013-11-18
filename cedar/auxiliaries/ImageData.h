@@ -39,8 +39,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ImageData.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

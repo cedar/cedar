@@ -36,6 +36,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
 #include "cedar/auxiliaries/assert.h"

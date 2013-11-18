@@ -41,9 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/UnitData.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/UnitDataTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/units/io.hpp>
