@@ -725,9 +725,9 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
   }
   else
   {
-    this->declareSharedOutput(name, cedar::aux::DataPtr(new cedar::aux::Data()));
     cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
     this->add(sink, name);
+    this->declareSharedOutput(name, sink->getEmptyData());
   }
 }
 
@@ -1744,7 +1744,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
       (
         // check if this is the connection being erased
         iter != it &&
-        // if it isn't, check if it connects to the ssame target
+        // if it isn't, check if it connects to the same target
         (*iter)->connects
         (
           this->getElement<cedar::proc::Connectable>(source_name),
@@ -1918,7 +1918,7 @@ void cedar::proc::Network::inputConnectionChanged(const std::string& inputName)
   }
   else
   {
-    source->setData(cedar::aux::DataPtr(new cedar::aux::Data()));
+    source->resetData();
   }
 }
 

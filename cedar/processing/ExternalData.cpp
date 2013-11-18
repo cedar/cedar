@@ -165,7 +165,6 @@ void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data)
   {
     this->setData(data, 0);
   }
-  mExternalDataChanged();
 }
 
 void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data, unsigned int index)
