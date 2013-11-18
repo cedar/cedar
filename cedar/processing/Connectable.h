@@ -38,7 +38,6 @@
 #define CEDAR_PROC_CONNECTABLE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
@@ -46,6 +45,11 @@
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/Lockable.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2/connection.hpp>

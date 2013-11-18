@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
 
 // SYSTEM INCLUDES
 

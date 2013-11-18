@@ -44,7 +44,6 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
-#include "cedar/dynamics/namespace.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 

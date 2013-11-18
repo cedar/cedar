@@ -38,8 +38,10 @@
 #define CEDAR_PROC_EXTERNAL_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/DataSlot.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/ExternalData.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2/signal.hpp>

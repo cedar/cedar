@@ -38,7 +38,7 @@
 #define CEDAR_AUX_GUI_BASE_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/BaseWidget.fwd.h"
 
 // SYSTEM INCLUDES
 #include <string>

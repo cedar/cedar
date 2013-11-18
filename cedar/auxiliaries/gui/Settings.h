@@ -38,9 +38,11 @@
 #define CEDAR_AUX_GUI_SETTINGS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Settings.fwd.h"
 
 // SYSTEM INCLUDES
 

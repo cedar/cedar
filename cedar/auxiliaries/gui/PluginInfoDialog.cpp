@@ -44,6 +44,9 @@
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/assert.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/StringSetParameter.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QListWidget>
 #include <set>

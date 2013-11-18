@@ -40,8 +40,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/ExceptionBase.h"

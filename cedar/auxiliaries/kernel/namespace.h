@@ -38,8 +38,10 @@
 #define CEDAR_AUX_KERNEL_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/defines.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/FactoryManager.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

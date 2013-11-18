@@ -41,11 +41,13 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/MatData.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Threshold.fwd.h"
 
 // SYSTEM INCLUDES
 

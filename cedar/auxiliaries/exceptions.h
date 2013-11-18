@@ -42,11 +42,13 @@
 #define CEDAR_AUX_EXCEPTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/exceptions.fwd.h"
+
 // SYSTEM INCLUDES
-#include <opencv2/core/mat.hpp>
+#include <opencv2/opencv.hpp>
 
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */

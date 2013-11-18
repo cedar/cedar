@@ -42,8 +42,13 @@
 #ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/DoubleData.fwd.h"
+#include "cedar/auxiliaries/UnitData.fwd.h"
+#include "cedar/auxiliaries/gui/HistoryPlot0D.fwd.h"
 
 // SYSTEM INCLUDES
 #include <qwt_plot.h>

@@ -38,9 +38,8 @@
 #define CEDAR_NET_BLOCKING_READER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/namespace.h"
+#include "cedar/auxiliaries/net/BlockingReader.fwd.h"
 #include "cedar/auxiliaries/net/exceptions.h"
-#include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetReader.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetReader.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
@@ -51,10 +50,6 @@
 
 // SYSTEM INCLUDES
 
-
-namespace cedar {
-  namespace aux {
-    namespace net {
 
   //---------------------------------------------------------------------------
   // the unspecialized template class cannot be instantiated
@@ -99,7 +94,7 @@ namespace cedar {
  * @see: Reader, Writer
  */
 template <typename T>
-class BlockingReader
+class cedar::aux::net::BlockingReader
 {
    //!@brief The standard constructor will not load. Do not call it.
    BlockingReader()
@@ -131,6 +126,11 @@ class BlockingReader
    T read(); // just the declaration for doxygen
    
 };
+
+
+namespace cedar {
+  namespace aux {
+    namespace net {
 
 
   //---------------------------------------------------------------------------

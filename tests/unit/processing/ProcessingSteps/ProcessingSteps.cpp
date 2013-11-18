@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 // cedar includes
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Network.h"

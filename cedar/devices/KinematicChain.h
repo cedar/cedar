@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/defines.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Limits.h"
 #include "cedar/devices/namespace.h"

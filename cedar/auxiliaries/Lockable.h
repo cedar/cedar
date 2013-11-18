@@ -41,12 +41,15 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/threadingUtilities.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/LockType.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Lockable.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 #include <set>
+#include <map>
 
 /*!@brief Base class for strutures that can be locked in their entierety.
  *
