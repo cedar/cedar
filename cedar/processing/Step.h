@@ -286,10 +286,6 @@ protected:
    */
   void unlock() const;
 
-  /*!@brief Redetermines the validity for an input slot.
-   *
-   * @param slot The slot to revalidate.
-   */
   void revalidateInputSlot(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -339,11 +335,6 @@ private:
    * For a description of the method, see setAutoLockInputsAndOutputs(bool).
    */
   void unlockData() const;
-
-  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
-   *
-   */
-  void callInputConnectionChanged(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

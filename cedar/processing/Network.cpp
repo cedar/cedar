@@ -701,7 +701,7 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
   }
   if
   (
-    this->getNetwork()->nameExists(name) || this->nameExists(name)
+    this->nameExists(name)
   )
   {
     CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot use this name. It is already taken.");
@@ -1875,8 +1875,8 @@ void cedar::proc::Network::revalidateConnections(const std::string& sender)
   this->getDataConnections(this->getElement<Connectable>(child), output, connections);
   for (unsigned i = 0; i < connections.size(); ++i)
   {
-    cedar::proc::StepPtr sender = this->getElement<Step>(connections.at(i)->getSource()->getParent());
-    cedar::proc::StepPtr receiver = this->getElement<Step>(connections.at(i)->getTarget()->getParent());
+    cedar::proc::ConnectablePtr sender = this->getElement<Connectable>(connections.at(i)->getSource()->getParent());
+    cedar::proc::ConnectablePtr receiver = this->getElement<Connectable>(connections.at(i)->getTarget()->getParent());
     receiver->callInputConnectionChanged(connections.at(i)->getTarget()->getName());
   }
 }
