@@ -34,12 +34,13 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STICKYNODE_H_
-#define STICKYNODE_H_
+#ifndef CEDAR_PROC_STICKY_NOTE_H
+#define CEDAR_PROC_STICKY_NOTE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/StickyNote.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsItem>
@@ -100,4 +101,4 @@ private:
   QGraphicsScene* pParent;
 };
 
-#endif /* CEDAR_PROC_STICKYNODE_H_ */
+#endif // CEDAR_PROC_STICKY_NOTE_H
