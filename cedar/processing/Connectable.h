@@ -367,12 +367,6 @@ protected:
    */
   void emitOutputPropertiesChangedSignal(const std::string& slot);
 
-  /*!@brief Redetermines the validity for an input slot.
-   *
-   * @param slot The slot to revalidate.
-   */
-  virtual void revalidateInputSlot(const std::string& slot) = 0;
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
