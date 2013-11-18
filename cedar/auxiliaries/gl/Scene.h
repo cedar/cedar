@@ -38,7 +38,7 @@
 #define CEDAR_AUX_GL_SCENE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Scene.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // FORWARD DECLARATIONS

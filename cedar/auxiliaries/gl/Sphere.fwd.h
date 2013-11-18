@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,20 +22,23 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Sphere.fwd.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        2013 11 18
 
-    Description: Namespace file for cedar::aux::gl
+    Description: Forward declaration file for the class cedar::aux::gl::Sphere.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GL_NAMESPACE_H
-#define CEDAR_AUX_GL_NAMESPACE_H
+#ifndef CEDAR_AUX_GL_SPHERE_FWD_H
+#define CEDAR_AUX_GL_SPHERE_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
@@ -43,18 +46,19 @@
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
 
+//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
   {
-    /*!@brief Namespace for all gl classes. */
     namespace gl
     {
-      //!@cond SKIPPED_DOCUMENTATION
-#warning Do not include this header any more. Use the new forward declaration headers instead!
-      //!@endcond
+      CEDAR_DECLARE_AUX_CLASS(Sphere);
     }
   }
 }
 
-#endif // CEDAR_AUX_GL_NAMESPACE_H
+//!@endcond
+
+#endif // CEDAR_AUX_GL_SPHERE_FWD_H
+
