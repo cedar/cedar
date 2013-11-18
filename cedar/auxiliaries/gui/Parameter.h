@@ -42,7 +42,9 @@
 #define CEDAR_AUX_GUI_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
