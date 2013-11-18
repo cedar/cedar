@@ -209,6 +209,7 @@ int main(int /* argc */, char** /* argv */)
     std::cout << "path to non-existing element not empty" << std::endl;
   }
 
+  std::cout << "testing connectors" << std::endl;
   // testing network connectors
   cedar::proc::NetworkPtr network_root(new cedar::proc::Network());
   network_root->setName("root");
@@ -216,16 +217,22 @@ int main(int /* argc */, char** /* argv */)
   network_connector->setName("nested");
   network_root->add(network_connector);
   network_connector->addConnector("input", true);
+//  network_connector->addConnector("another input", true);
   network_connector->addConnector("output", false);
+//  network_connector->addConnector("another output", false);
   cedar::proc::sources::GaussInputPtr gauss(new cedar::proc::sources::GaussInput());
   network_root->add(gauss, "Gauss");
   network_root->connectSlots("Gauss.Gauss input", "nested.input");
+//  network_root->connectSlots("Gauss.Gauss input", "nested.another input");
   network_connector->connectSlots("input.output", "output.input");
+//  network_connector->connectSlots("another input.output", "another output.input");
   cedar::proc::steps::StaticGainPtr gain(new cedar::proc::steps::StaticGain());
   network_root->add(gain, "gain");
   network_root->connectSlots("nested.output", "gain.input");
-  network_root->disconnectSlots("nested.output", "gain.input");
-  network_root->connectSlots("nested.output", "gain.input");
+  network_connector->disconnectSlots("input.output", "output.input");
+  network_connector->connectSlots("input.output", "output.input");
+  network_root->disconnectSlots("Gauss.Gauss input", "nested.input");
+  network_root->connectSlots("Gauss.Gauss input", "nested.input");
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

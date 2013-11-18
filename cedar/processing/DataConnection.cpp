@@ -57,7 +57,7 @@ mTarget(target)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source));
+//  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source));
   try
   {
     // add the source data to target

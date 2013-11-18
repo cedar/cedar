@@ -376,7 +376,7 @@ public:
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()
   {
-    return this->mLastReadConfiguration;
+    return this->mLastReadUINode;
   }
 
   /*!@brief Remove all connections that connect up to a specified slot */
@@ -431,7 +431,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  void revalidateInputSlot(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -550,7 +554,7 @@ private:
   //! List of trigger connections in the network.
   TriggerConnectionVector mTriggerConnections;
 
-  cedar::aux::ConfigurationNode mLastReadConfiguration;
+  cedar::aux::ConfigurationNode mLastReadUINode;
 
   //!@brief connection to state changed signal of step
   std::map<std::string, boost::signals2::connection> mRevalidateConnections;
