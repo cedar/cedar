@@ -93,6 +93,10 @@ public:
    */
   cedar::proc::NetworkPtr getNetwork();
 
+  /*!@brief access the underlying cedar::proc::Network
+   */
+  cedar::proc::ConstNetworkPtr getNetwork() const;
+
   //!@brief add all elements contained in this network to the scene
   void addElementsToScene();
 
@@ -179,7 +183,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief write scene to a node
-  void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
+  void writeScene(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief Determines whether the network is the root network.
   bool isRootNetwork();

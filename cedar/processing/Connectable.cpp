@@ -76,6 +76,18 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Connectable::callInputConnectionChanged(const std::string& slot)
+{
+  this->revalidateInputSlot(slot);
+}
+
+void cedar::proc::Connectable::revalidateInputSlot(const std::string& slot)
+{
+  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  this->inputConnectionChanged(slot);
+  this->getInputValidity(slot);
+}
+
 void cedar::proc::Connectable::clearDataSlots()
 {
   for (auto role_iter = this->mSlotMaps.begin(); role_iter != this->mSlotMaps.end(); ++role_iter)
