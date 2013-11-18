@@ -453,6 +453,11 @@ cedar::proc::NetworkPtr cedar::proc::gui::Network::getNetwork()
   return this->mNetwork;
 }
 
+cedar::proc::ConstNetworkPtr cedar::proc::gui::Network::getNetwork() const
+{
+  return this->mNetwork;
+}
+
 void cedar::proc::gui::Network::write()
 {
   this->write(this->mFileName);
@@ -466,16 +471,7 @@ void cedar::proc::gui::Network::write(const std::string& destination)
   cedar::aux::ConfigurationNode root;
 
   this->mNetwork->writeConfiguration(root);
-
-  cedar::aux::ConfigurationNode scene;
-  this->writeScene(root, scene);
-
-  if (!scene.empty())
-    root.add_child("ui", scene);
-
-  cedar::aux::ConfigurationNode generic;
-  this->writeConfiguration(generic);
-  root.add_child("ui generic", generic);
+  this->writeConfiguration(root);
 
   write_json(destination, root);
 }
@@ -488,18 +484,16 @@ void cedar::proc::gui::Network::read(const std::string& source)
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
 
+  this->mNetwork->readConfiguration(root);
   this->readConfiguration(root);
 }
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& root)
 {
-  this->mNetwork->readConfiguration(root);
-  this->cedar::proc::gui::Connectable::readConfiguration(root);
-
   if (root.find("ui generic") != root.not_found())
   {
     auto node = root.get_child("ui generic");
-    this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+    this->cedar::proc::gui::Connectable::readConfiguration(node);
     // restore plots that were open when architecture was last saved
     auto plot_list = node.find("open plots");
     if(plot_list != node.not_found())
@@ -535,15 +529,21 @@ void cedar::proc::gui::Network::readPlotList(const cedar::aux::ConfigurationNode
 
 void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
-  root.put("network", this->mNetwork->getName());
+  this->writeScene(root);
+
+  cedar::aux::ConfigurationNode generic;
+
+  generic.put("network", this->mNetwork->getName());
   // add open plots to architecture
   cedar::aux::ConfigurationNode node;
   this->writeOpenPlotsTo(node);
-  root.put_child("open plots", node);
+  generic.put_child("open plots", node);
   // add plot groups to architecture
-  root.put_child("plot groups", this->mPlotGroupsNode);
+  generic.put_child("plot groups", this->mPlotGroupsNode);
 
-  this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
+  this->cedar::proc::gui::Connectable::writeConfiguration(generic);
+
+  root.add_child("ui generic", generic);
 }
 
 void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
@@ -554,8 +554,10 @@ void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& 
   }
 }
 
-void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
+void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) const
 {
+  cedar::aux::ConfigurationNode scene;
+
   auto elements = this->getNetwork()->getElements();
 
   for
@@ -565,7 +567,6 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
     ++element_iter
   )
   {
-
     cedar::proc::ElementPtr element = element_iter->second;
 
     if
@@ -602,24 +603,35 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
         continue;
     }
 
-    p_item->writeConfiguration(node);
-    scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+    if (p_item->getGroup() != cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK)
+    {
+      p_item->writeConfiguration(node);
+      scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+    }
 
+
+    // write UI information of the network item
     cedar::proc::NetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::Network>(element);
     cedar::proc::gui::Network *p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_item);
-
     if (network && p_network_item)
     {
       cedar::aux::ConfigurationNode::assoc_iterator networks_node = root.find("networks");
-      CEDAR_DEBUG_ASSERT(networks_node != scene.not_found());
-      cedar::aux::ConfigurationNode::assoc_iterator network_node = networks_node->second.find(network->getName());
-      CEDAR_DEBUG_ASSERT(network_node != networks_node->second.not_found());
+      CEDAR_DEBUG_ASSERT(networks_node != root.not_found());
 
-      cedar::aux::ConfigurationNode ui_node;
-      p_network_item->writeScene(root, ui_node);
-      network_node->second.add_child("ui", ui_node);
+      // check if there is already a node for the network; if not, add it
+      cedar::aux::ConfigurationNode::assoc_iterator network_node = networks_node->second.find(network->getName());
+      if (network_node == networks_node->second.not_found())
+      {
+        networks_node->second.add_child(network->getName(), cedar::aux::ConfigurationNode());
+        network_node = networks_node->second.find(network->getName());
+      }
+
+      p_network_item->writeConfiguration(network_node->second);
     }
   }
+
+  if (!scene.empty())
+    root.add_child("ui", scene);
 }
 
 void cedar::proc::gui::Network::disconnect()
@@ -902,21 +914,39 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
 
   // see if there is a configuration for the UI item stored in the network's ui node
-  auto config = this->getNetwork()->getLastReadConfiguration();
-  auto ui_iter = config.find("ui");
-  if (ui_iter != config.not_found())
+  if (current_type == "network")
   {
-    cedar::aux::ConfigurationNode& ui = ui_iter->second;
-    for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
+    auto config = this->getNetwork()->getLastReadConfiguration();
+    auto networks_iter = config.find("networks");
+    if (networks_iter != config.not_found())
     {
-      const std::string& type = iter->second.get<std::string>("type");
-      if (type == current_type)
+      auto network = cedar::aux::asserted_cast<cedar::proc::gui::Network*>(p_scene_element);
+      auto networks = networks_iter->second;
+      auto network_iter = networks.find(network->getNetwork()->getName());
+      if (network_iter != networks.not_found())
       {
-        if (iter->second.get<std::string>(current_type) == element->getName())
+        network->readConfiguration(network_iter->second);
+      }
+    }
+  }
+  else
+  {
+    auto config = this->getNetwork()->getLastReadConfiguration();
+    auto ui_iter = config.find("ui");
+    if (ui_iter != config.not_found())
+    {
+      cedar::aux::ConfigurationNode& ui = ui_iter->second;
+      for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
+      {
+        const std::string& type = iter->second.get<std::string>("type");
+        if (type == current_type)
         {
-          p_scene_element->readConfiguration(iter->second);
-          ui.erase(iter);
-          break;
+          if (iter->second.get<std::string>(current_type) == element->getName())
+          {
+            p_scene_element->readConfiguration(iter->second);
+            ui.erase(iter);
+            break;
+          }
         }
       }
     }
