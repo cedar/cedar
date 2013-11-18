@@ -41,7 +41,7 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.fwd.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gl/gl.h"
