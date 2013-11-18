@@ -70,8 +70,8 @@ public:
   (
     QMainWindow *pMainWindow,
     cedar::proc::gui::Scene* scene,
-    qreal width = 0,
-    qreal height = 0,
+    qreal width = static_cast<qreal>(250),
+    qreal height = static_cast<qreal>(250),
     cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
   );
 
@@ -119,12 +119,6 @@ public:
 
   //!@brief saves a configuration to a node
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
-
-  //! Returns the slot item of the given role and name.
-  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
-
-  //!@brief returns a map of all data slots of the same id
-  cedar::proc::gui::Network::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
 
   void disconnect();
 
@@ -184,7 +178,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
 

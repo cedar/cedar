@@ -77,6 +77,7 @@ cedar::proc::gui::Scene::Scene(cedar::proc::gui::View* peParentView, QObject *pP
 QGraphicsScene (pParent),
 mMode(MODE_SELECT),
 mTriggerMode(MODE_SHOW_ALL),
+mpDropTarget(NULL),
 mpeParentView(peParentView),
 mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
@@ -228,11 +229,31 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
   {
     pEvent->acceptProposedAction();
   }
+
+  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
+  if (p_item != this->mpDropTarget)
+  {
+    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(this->mpDropTarget))
+    {
+      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    }
+
+    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(p_item))
+    {
+      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+    }
+    this->mpDropTarget = p_item;
+  }
 }
 
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
+
+  // the drop target must be reset, even if something goes wrong; so: do it now by remembering the target in another
+  // variable.
+  auto drop_target = this->mpDropTarget;
+  this->mpDropTarget = NULL;
 
   if (tree)
   {
@@ -249,7 +270,14 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     {
       QPointF mapped = pEvent->scenePos();
       QString class_id = item->data(Qt::UserRole).toString();
-      this->addElement(class_id.toStdString(), mapped);
+      auto target_network = this->getRootNetwork()->getNetwork();
+      if (auto network = dynamic_cast<cedar::proc::gui::Network*>(drop_target))
+      {
+        network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+        target_network = network->getNetwork();
+        mapped -= network->scenePos();
+      }
+      this->createElement(target_network, class_id.toStdString(), mapped);
     }
   }
 }
@@ -810,20 +838,25 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem* p
   this->mElementMap.erase(mElementMap.find(pTrigger->getTrigger().get()));
 }
 
-cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
+cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
+                                                 (
+                                                   cedar::proc::NetworkPtr network,
+                                                   const std::string& classId,
+                                                   QPointF position
+                                                 )
 {
   std::vector<std::string> split_class_name;
   cedar::aux::split(classId, ".", split_class_name);
   CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
   std::string name = "new " + split_class_name.back();
 
-  std::string adjusted_name = mNetwork->getNetwork()->getUniqueName(name);
+  std::string adjusted_name = network->getUniqueName(name);
 
   try
   {
-    mNetwork->getNetwork()->create(classId, adjusted_name);
-    CEDAR_DEBUG_ASSERT(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get());
-    this->getGraphicsItemFor(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
+    network->create(classId, adjusted_name);
+    CEDAR_DEBUG_ASSERT(network->getElement<cedar::proc::Element>(adjusted_name).get());
+    this->getGraphicsItemFor(network->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
@@ -832,7 +865,7 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
     p_dialog->exec();
   }
 
-  return this->mNetwork->getNetwork()->getElement(adjusted_name);
+  return network->getElement(adjusted_name);
 }
 
 cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar::proc::Trigger* trigger)
@@ -902,8 +935,8 @@ cedar::proc::gui::Network* cedar::proc::gui::Scene::addNetwork(const QPointF& po
                                                 (
                                                   this->mpMainWindow,
                                                   this,
-                                                  10,
-                                                  10,
+                                                  400,
+                                                  150,
                                                   network
                                                 );
 

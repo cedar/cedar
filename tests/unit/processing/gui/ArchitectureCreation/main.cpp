@@ -80,11 +80,11 @@ int testArchitecture1(cedar::proc::gui::Ide *pIde)
   cedar::proc::NetworkPtr network = p_gui_network->getNetwork();
 
   // first, add some items to the scene
-  cedar::proc::ElementPtr field = p_scene->addElement("cedar.dynamics.NeuralField", QPointF(180, 240));
+  cedar::proc::ElementPtr field = p_scene->createElement(network, "cedar.dynamics.NeuralField", QPointF(180, 240));
   simulateEventLoop();
   /* cedar::proc::gui::StepItem* p_field_item = */p_scene->getStepItemFor(dynamic_cast<cedar::proc::Step*>(field.get()));
 
-  cedar::proc::ElementPtr gauss = p_scene->addElement("cedar.processing.sources.GaussInput", QPointF(-80, 240));
+  cedar::proc::ElementPtr gauss = p_scene->createElement(network, "cedar.processing.sources.GaussInput", QPointF(-80, 240));
   simulateEventLoop();
   /*cedar::proc::gui::StepItem* p_gauss_item = */p_scene->getStepItemFor(dynamic_cast<cedar::proc::Step*>(gauss.get()));
 
