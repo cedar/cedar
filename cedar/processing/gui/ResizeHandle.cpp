@@ -133,7 +133,7 @@ QVariant cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange change, c
     case ItemPositionChange:
     {
       qreal offset = M_HANDLE_SIZE / static_cast<qreal>(2.0);
-      QPointF center = new_value - this->mpResizedItem->pos() + QPointF(offset, offset);
+      QPointF center = new_value - this->mpResizedItem->scenePos() + QPointF(offset, offset);
       QRectF bounds = this->mpResizedItem->boundingRect();
 
       if (this->mPressed)
@@ -236,7 +236,7 @@ void cedar::proc::gui::ResizeHandle::updatePosition()
   }
 
   qreal offset = M_HANDLE_SIZE / static_cast<qreal>(2.0);
-  QPointF pos = this->mpResizedItem->pos() - QPointF(offset, offset);
+  QPointF pos = this->mpResizedItem->scenePos() - QPointF(offset, offset);
 
   switch (this->mDirection)
   {

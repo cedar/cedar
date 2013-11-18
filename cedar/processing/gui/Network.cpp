@@ -84,7 +84,7 @@ cedar::proc::gui::Network::Network
   cedar::proc::NetworkPtr network
 )
 :
-cedar::proc::gui::Connectable(width, height),
+cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK),
 mNetwork(network),
 mpScene(scene),
 mpMainWindow(pMainWindow),
@@ -94,6 +94,7 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setResizeable(true);
+  this->setInputOutputSlotOffset(static_cast<qreal>(25));
 
   if (!mNetwork)
   {
@@ -208,8 +209,6 @@ void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::st
 void cedar::proc::gui::Network::networkNameChanged()
 {
   this->mpNameDisplay->setPlainText(QString::fromStdString(this->getNetwork()->getName()));
-
-  this->fitToContents();
 }
 
 QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
@@ -250,6 +249,8 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
 
 void cedar::proc::gui::Network::sizeChanged()
 {
+  this->cedar::proc::gui::Connectable::sizeChanged();
+
   this->updateConnectorPositions();
 }
 
@@ -355,10 +356,10 @@ void cedar::proc::gui::Network::fitToContents()
   }
 
   // finally, also resize parent item if it is a network
-  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
-  {
-    p_parent_network->fitToContents();
-  }
+//  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
+//  {
+//    p_parent_network->fitToContents();
+//  }
 }
 
 bool cedar::proc::gui::Network::isRootNetwork()
@@ -378,6 +379,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   for (const_iterator it = elements.begin(); it != elements.end(); ++it)
   {
     cedar::proc::ElementPtr element;
+    //!@todo This if/else if stuff could probably be replaced by just casting to a common cedar::proc::gui::Element class.
     if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(*it))
     {
       element = p_step->getStep();
@@ -416,7 +418,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     this->addElement(this->mpScene->getGraphicsItemFor((*it).get()));
   }
   this->mHoldFitToContents = false;
-  this->fitToContents();
+//  this->fitToContents();
 }
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
@@ -432,10 +434,10 @@ const std::string& cedar::proc::gui::Network::getFileName() const
 
 void cedar::proc::gui::Network::addElementsToScene()
 {
-  if (!this->isRootNetwork())
-  {
-    this->fitToContents();
-  }
+//  if (!this->isRootNetwork())
+//  {
+//    this->fitToContents();
+//  }
 }
 
 void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
@@ -486,35 +488,38 @@ void cedar::proc::gui::Network::read(const std::string& source)
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
 
-  this->mNetwork->readConfiguration(root);
-  try
-  {
-    this->readConfiguration(root.get_child("ui generic"));
-  }
-  catch (boost::property_tree::ptree_bad_path& exc) // doesn't exist yet
-  {
-    //!TODO: this weaves control-flow logic into exceptions, that's not proper!
-    this->toggleSmartConnectionMode(false);
-  }
-  //update recorder icons
-  this->stepRecordStateChanged();
+  this->readConfiguration(root);
 }
 
-void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& root)
 {
-  this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
-  // restore plots that were open when architecture was last saved
-  auto plot_list = node.find("open plots");
-  if(plot_list != node.not_found())
+  this->mNetwork->readConfiguration(root);
+  this->cedar::proc::gui::Connectable::readConfiguration(root);
+
+  if (root.find("ui generic") != root.not_found())
   {
-    this->readPlotList(plot_list->second);
+    auto node = root.get_child("ui generic");
+    this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+    // restore plots that were open when architecture was last saved
+    auto plot_list = node.find("open plots");
+    if(plot_list != node.not_found())
+    {
+      this->readPlotList(plot_list->second);
+    }
+    // read defined plot groups
+    auto plot_groups = node.find("plot groups");
+    if(plot_groups != node.not_found())
+    {
+      this->mPlotGroupsNode = plot_groups->second;
+    }
   }
-  // read defined plot groups
-  auto plot_groups = node.find("plot groups");
-  if(plot_groups != node.not_found())
+  else
   {
-    this->mPlotGroupsNode = plot_groups->second;
+    this->toggleSmartConnectionMode(false);
   }
+
+  //update recorder icons
+  this->stepRecordStateChanged();
 }
 
 void cedar::proc::gui::Network::readPlotList(const cedar::aux::ConfigurationNode& node)
@@ -543,7 +548,7 @@ void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode
 
 void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
 {
-  for(auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
+  for (auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
   {
     it->second->writeOpenChildWidgets(node);
   }
@@ -551,7 +556,7 @@ void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& 
 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
 {
-  auto elements = this->mNetwork->getElements();
+  auto elements = this->getNetwork()->getElements();
 
   for
   (
@@ -562,7 +567,18 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
   {
 
     cedar::proc::ElementPtr element = element_iter->second;
+
+    if
+    (
+      boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element)
+      || boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(element)
+    )
+    {
+      continue;
+    }
+
     cedar::proc::gui::GraphicsBase *p_item = this->mpScene->getGraphicsItemFor(element.get());
+    CEDAR_ASSERT(p_item != NULL);
 
     cedar::aux::ConfigurationNode node;
     switch (p_item->getGroup())
@@ -572,11 +588,6 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
         break;
 
       case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
-        if (p_item->parentItem() != NULL)
-        {
-          // only top-level triggers are saved; the ones docked to steps (e.g.) need no saving
-          continue;
-        }
         node.put("type", "trigger");
         break;
 
@@ -609,49 +620,6 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
       network_node->second.add_child("ui", ui_node);
     }
   }
-}
-
-cedar::proc::gui::DataSlotItem* cedar::proc::gui::Network::getSlotItem
-                                (
-                                  cedar::proc::DataRole::Id role, const std::string& name
-                                )
-{
-  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
-
-  if (role_map == this->mSlotMap.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "No slot items stored for role "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   );
-  }
-
-  DataSlotNameMap::iterator iter = role_map->second.find(name);
-  if (iter == role_map->second.end())
-  {
-    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
-                                                  "\" found for role "
-                                                  + cedar::proc::DataRole::type().get(role).prettyString()
-                                                  + " in Network for network \"" + this->mNetwork->getName() + "\"."
-                                                  );
-  }
-
-  return iter->second;
-}
-
-cedar::proc::gui::Network::DataSlotNameMap& cedar::proc::gui::Network::getSlotItems
-                                            (
-                                              cedar::proc::DataRole::Id role
-                                            )
-{
-  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
-
-  if (role_map == this->mSlotMap.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "Unknown role  "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   );
-  }
-  return role_map->second;
 }
 
 void cedar::proc::gui::Network::disconnect()
@@ -706,15 +674,9 @@ void cedar::proc::gui::Network::dataConnectionChanged
   else
   {
     cedar::proc::gui::GraphicsBase* p_base_source = this->mpScene->getGraphicsItemFor(element.get());
-    //!@todo Unify with connectable interface
-    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_base_source))
     {
-      source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
-    }
-    //!@todo Is this case still relevant?
-    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base_source))
-    {
-      source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
+      source_slot = connectable->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
     }
   }
 
@@ -742,14 +704,9 @@ void cedar::proc::gui::Network::dataConnectionChanged
   {
     cedar::proc::gui::GraphicsBase* p_base
       = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(targetName.toStdString()).get());
-    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_base))
     {
-      target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
-    }
-    //!@todo Is this case still relevant?
-    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base))
-    {
-      target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
+      target_slot = connectable->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
     }
   }
   CEDAR_ASSERT(target_slot);
@@ -845,26 +802,35 @@ void cedar::proc::gui::Network::checkTriggerConnection
 
 void cedar::proc::gui::Network::updateConnectorPositions()
 {
-  qreal distance = 20;
+//  qreal distance = 20;
   qreal pad_side = 5;
-  QPointF start_dist(pad_side, 25);
-  QPointF direction(0, 1);
+//  QPointF start_dist(pad_side, this->getInputOutputSlotOffset());
+//  QPointF direction(0, 1);
 
   for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
   {
-    auto connector = this->mConnectorSources.at(i);
-    connector->setPos(start_dist + direction * distance * static_cast<qreal>(i));
+    auto source = this->mConnectorSources.at(i);
+    auto slot_item = this->getSlotItem(cedar::proc::DataRole::INPUT, source->getSlot()->getParentPtr()->getName());
+    source->setPos(pad_side, slot_item->pos().y());
+    source->setWidth(slot_item->width());
+    source->setHeight(slot_item->height());
   }
 
-  if (!this->mConnectorSinks.empty())
+  qreal connector_max_width = 0;
+  for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
   {
-    qreal connector_width = this->mConnectorSinks.front()->width();
-    start_dist.setX(this->width() - connector_width - pad_side);
-    for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
-    {
-      auto connector = this->mConnectorSinks.at(i);
-      connector->setPos(start_dist + direction * distance * static_cast<qreal>(i));
-    }
+    auto sink = this->mConnectorSinks.at(i);
+    auto slot_item = this->getSlotItem(cedar::proc::DataRole::OUTPUT, sink->getSlot()->getParentPtr()->getName());
+    connector_max_width = std::max(connector_max_width, slot_item->width());
+  }
+
+  for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
+  {
+    auto sink = this->mConnectorSinks.at(i);
+    auto slot_item = this->getSlotItem(cedar::proc::DataRole::OUTPUT, sink->getSlot()->getParentPtr()->getName());
+    sink->setPos(this->width() - pad_side - connector_max_width, slot_item->pos().y());
+    sink->setWidth(slot_item->width());
+    sink->setHeight(slot_item->height());
   }
 }
 
@@ -915,6 +881,17 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
   CEDAR_ASSERT(p_scene_element != NULL);
 
+  // if not a root network, properly add the item as a child
+  if (this->mpScene && !this->isRootNetwork())
+  {
+    CEDAR_ASSERT(p_scene_element != NULL);
+    if (p_scene_element->parentItem() != this)
+    {
+//      this->transformChildCoordinates(p_scene_element);
+      p_scene_element->setParentItem(this);
+    }
+  }
+
   // if there is a configuration stored for the UI of the element, load it
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode>::iterator iter
     = this->mNextElementUiConfigurations.find(p_scene_element->getElement().get());
@@ -925,29 +902,23 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
 
   // see if there is a configuration for the UI item stored in the network's ui node
-  cedar::aux::ConfigurationNode& ui = this->getNetwork()->getLastReadUINode();
-  for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
+  auto config = this->getNetwork()->getLastReadConfiguration();
+  auto ui_iter = config.find("ui");
+  if (ui_iter != config.not_found())
   {
-    const std::string& type = iter->second.get<std::string>("type");
-    if (type == current_type)
+    cedar::aux::ConfigurationNode& ui = ui_iter->second;
+    for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
     {
-      if (iter->second.get<std::string>(current_type) == element->getName())
+      const std::string& type = iter->second.get<std::string>("type");
+      if (type == current_type)
       {
-        p_scene_element->readConfiguration(iter->second);
-        ui.erase(iter);
-        break;
+        if (iter->second.get<std::string>(current_type) == element->getName())
+        {
+          p_scene_element->readConfiguration(iter->second);
+          ui.erase(iter);
+          break;
+        }
       }
-    }
-  }
-
-  // if not a root network, properly add the item as a child
-  if (this->mpScene && !this->isRootNetwork())
-  {
-    CEDAR_ASSERT(p_scene_element != NULL);
-    if (p_scene_element->parentItem() != this)
-    {
-      this->transformChildCoordinates(p_scene_element);
-      p_scene_element->setParentItem(this);
     }
   }
 
