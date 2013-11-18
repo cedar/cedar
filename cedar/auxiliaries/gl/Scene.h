@@ -40,7 +40,9 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
-#include "cedar/auxiliaries/gui/Viewer.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Viewer.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2/signal.hpp>

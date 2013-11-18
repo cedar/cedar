@@ -38,8 +38,10 @@
 #define CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/MultiPlotInterface.fwd.h"
 
 // SYSTEM INCLUDES
 

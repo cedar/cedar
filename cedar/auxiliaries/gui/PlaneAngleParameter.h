@@ -39,8 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericParameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/PlaneAngleParameter.h"
+
+#include "cedar/auxiliaries/gui/PlaneAngleParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>
