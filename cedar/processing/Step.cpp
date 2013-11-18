@@ -122,6 +122,13 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
+{
+  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
+  this->cedar::proc::Connectable::revalidateInputSlot(slot);
+}
+
 void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
   this->mpConnectionLock->lockForRead();
@@ -643,17 +650,4 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr argument
 bool cedar::proc::Step::isThreaded() const
 {
   return this->_mRunInThread->getValue();
-}
-
-void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
-{
-  this->revalidateInputSlot(slot);
-}
-
-void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
-{
-  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
-  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
-  this->inputConnectionChanged(slot);
-  this->getInputValidity(slot);
 }

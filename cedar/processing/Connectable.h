@@ -188,6 +188,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  virtual void revalidateInputSlot(const std::string& slot);
+
   /*!@brief Declares an input slot.
    * @param name name of the declared input
    * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the
@@ -421,6 +427,11 @@ private:
                                             cedar::proc::ConstDataSlotPtr slot,
                                             cedar::aux::ConstDataPtr data
                                           ) const;
+
+  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
+   *
+   */
+  void callInputConnectionChanged(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
