@@ -68,7 +68,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(PlotWidget);
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
       class CEDAR_PROC_LIB_EXPORT Scene;
-      class CEDAR_PROC_LIB_EXPORT StickyNode;
+      class CEDAR_PROC_LIB_EXPORT StickyNote;
       class CEDAR_PROC_LIB_EXPORT Settings;
       class CEDAR_PROC_LIB_EXPORT SettingsDialog;
       class CEDAR_PROC_LIB_EXPORT StepItem;

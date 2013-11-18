@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetworkTimer.h
+    File:        NetworkTimer.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
     Date:        2013 11 7
 
-    Description: Singleton class for a central time in the network network.
+    Description: Singleton class for a central time in the  network.
 
     Credits:
 
@@ -49,8 +49,8 @@ cedar::aux::NetworkTimer::~NetworkTimer()
 }
 void cedar::aux::NetworkTimer::start()
 {
-  //if timer on 0
-  if  (mStart==mStop)
+  // if timer on zero -> hold it on zero
+  if (mStart==mStop)
   {
     mStart = QTime::currentTime();
   }
@@ -72,7 +72,7 @@ void cedar::aux::NetworkTimer::stop()
 
 unsigned int cedar::aux::NetworkTimer::getTime()
 {
-  if(mRunning)
+  if (mRunning)
   {
     return mStart.msecsTo(QTime::currentTime());
   }

@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StickyNode.h
+    File:        StickyNote.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2013 07 01
 
-    Description: Header of the @em cedar::proc::gui::StickyNode class.
+    Description: Header of the @em cedar::proc::gui::StickyNote class.
 
     Credits:
 
@@ -50,33 +50,53 @@
 #include <QTextEdit>
 #include <QGraphicsProxyWidget>
 
-class cedar::proc::gui::StickyNode: public QGraphicsItem
+//!@brief A GUI class that creates a pane where the user can write a comment or note.
+class cedar::proc::gui::StickyNote: public QGraphicsItem
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
-  StickyNode(int x, int y, QGraphicsScene* pParent);
-  virtual ~StickyNode();
+  //!@brief the constructor
+  StickyNote(int x, int y, QGraphicsScene* pParent);
+
+  //!@brief the destructor
+  ~StickyNote();
 
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  //!@brief Returns the most outer rect of this element.
   QRectF boundingRect() const;
+
+  //!@brief Paints the sticky note.
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+  //!@brief Checks if an key was pressed.
   void keyPressEvent(QKeyEvent* event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  //!@brief The most outer rect.
   QRectF bound;
+
+  //!@brief The text inside the note.
   QTextEdit text;
+
+  //!@brief A helper for storing QWidgets in a QGraphicsItem .
   QGraphicsProxyWidget *mpProxy;
+
+  //!@brief The color of the note.
   QColor color;
+
+  //!@brief A reference to the parent scene.
   QGraphicsScene* pParent;
 };
 

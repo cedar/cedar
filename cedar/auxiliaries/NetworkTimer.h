@@ -28,7 +28,7 @@
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
     Date:        2013 11 7
 
-    Description: Singleton class for a central time in th network network.
+    Description: Singleton class for a central time in the network.
 
     Credits:
 
@@ -61,7 +61,7 @@ private:
   //!@brief The private constructor for singleton usage.
   NetworkTimer();
 public:
-  //!@brief The Destructor.
+  //!@brief The destructor.
   ~NetworkTimer();
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -334,7 +334,7 @@ private:
 
   /*!brief Adds a sticky node to the current scene
    */
-  void addStickyNode();
+  void addStickyNote();
 
   void handleTriggerModeChange();
 
@@ -397,8 +397,12 @@ private:
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
   cedar::proc::gui::RecorderWidget *mpRecorderWidget;
-  int mousePosX;
-  int mousePosY;
+
+  //! Saves the mouse x position in the scene
+  int mMousePosX;
+
+  //! Saves the mouse y position in the scene
+  int mMousePosY;
 
 }; // class ProcessingScene
 
