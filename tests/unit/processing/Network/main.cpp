@@ -209,6 +209,7 @@ int main(int /* argc */, char** /* argv */)
     std::cout << "path to non-existing element not empty" << std::endl;
   }
 
+  std::cout << "testing connectors" << std::endl;
   // testing network connectors
   cedar::proc::NetworkPtr network_root(new cedar::proc::Network());
   network_root->setName("root");

@@ -112,7 +112,17 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   slot_map.erase(slot_map_iter);
 
   // remove the slot's data from the lock set (if any)
-  if (slot->getData())
+  // (don't do this for data that is just shared)
+  bool not_shared = true;
+  if
+  (
+    boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot)
+      && boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot)->isShared()
+  )
+  {
+    not_shared = false;
+  }
+  if (slot->getData() && not_shared)
   {
     cedar::aux::LOCK_TYPE lock_type;
     switch (role)
@@ -336,7 +346,18 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     }
     else
     {
-//      this->lockAll(cedar::aux::LOCK_TYPE_READ);
+      bool skip_locking = false;
+      if (cedar::proc::OwnedDataPtr owned = boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot))
+      {
+        if (owned->isShared())
+        {
+          skip_locking = true;
+        }
+      }
+      if (!skip_locking)
+      {
+        this->lockAll(cedar::aux::LOCK_TYPE_READ);
+      }
       auto external_data_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(slot);
       validity = cedar::proc::DataSlot::VALIDITY_VALID;
       for (unsigned int i = 0; i < external_data_slot->getDataCount(); ++i)
@@ -370,7 +391,10 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
             break;
         }
       }
-//      this->unlockAll();
+      if (!skip_locking)
+      {
+        this->unlockAll();
+      }
     }
 
     // assign the validity to the slot
@@ -471,7 +495,7 @@ void cedar::proc::Connectable::checkMandatoryConnections()
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
                          (
-                           DataRole::Id role, const std::string& name, bool mandatory
+                           DataRole::Id role, const std::string& name, bool mandatory, bool isShared
                          )
 {
   QWriteLocker locker(this->mpConnectionLock);
@@ -528,7 +552,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
   }
   else
   {
-    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, mandatory));
+    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, isShared));
   }
   iter->second[name] = slot_ptr;
 
@@ -558,6 +582,20 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareOutput(const std::stri
   CEDAR_ASSERT(data.get() != NULL);
 
   cedar::proc::DataSlotPtr slot = this->declareData(cedar::proc::DataRole::OUTPUT, name);
+  this->setData(cedar::proc::DataRole::OUTPUT, name, data);
+
+  return slot;
+}
+
+cedar::proc::DataSlotPtr cedar::proc::Connectable::declareSharedOutput
+(
+  const std::string& name, cedar::aux::DataPtr data
+)
+{
+  // if you don't actually want to set data here, call a different function.
+  CEDAR_ASSERT(data.get() != NULL);
+
+  cedar::proc::DataSlotPtr slot = this->declareData(cedar::proc::DataRole::OUTPUT, name, true, true);
   this->setData(cedar::proc::DataRole::OUTPUT, name, data);
 
   return slot;
@@ -766,12 +804,15 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
     // remove old data from the lock set, if any
     //!@todo This will potentially cause trouble (in the shape of a deadlock) when called while locked.
     //!@todo Use signals/slots for this as well, as in the input case
-    if (slot->getData())
+    if (!cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(slot)->isShared())
     {
-      this->removeLock(slot->getData(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
+      if (slot->getData())
+      {
+        this->removeLock(slot->getData(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
+      }
+      this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
+      data->setOwner(this);
     }
-    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
-    data->setOwner(this);
   }
 
   slot->setData(data);

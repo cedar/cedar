@@ -727,7 +727,7 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
   {
     cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
     this->add(sink, name);
-    this->declareOutput(name, cedar::aux::DataPtr(new cedar::aux::Data()));
+    this->declareSharedOutput(name, cedar::aux::DataPtr(new cedar::aux::Data()));
   }
 }
 
