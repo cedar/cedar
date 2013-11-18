@@ -42,10 +42,13 @@
 #define CEDAR_PROC_GUI_NETWORK_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Network.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>

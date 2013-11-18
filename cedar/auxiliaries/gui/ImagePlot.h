@@ -38,10 +38,13 @@
 #define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 #include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/math/Limits.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>

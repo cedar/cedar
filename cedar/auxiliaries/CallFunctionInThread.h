@@ -41,14 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/detail/CallFunctionInThreadWorker.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
-#include "cedar/auxiliaries/CallFunctionInThreadWorker.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 
 // SYSTEM INCLUDES
 #include <string>

@@ -42,8 +42,10 @@
 #define CEDAR_AUX_DATA_TEMPLATE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Data.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/DataTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>

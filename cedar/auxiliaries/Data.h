@@ -42,9 +42,13 @@
 #define CEDAR_AUX_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/annotation/Annotation.h"
 #include "cedar/auxiliaries/annotation/Annotatable.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/Data.fwd.h"
+#include "cedar/auxiliaries/DataTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>

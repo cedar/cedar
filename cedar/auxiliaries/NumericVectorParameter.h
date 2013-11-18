@@ -45,6 +45,9 @@
 #include "cedar/auxiliaries/VectorParameter.h"
 #include "cedar/auxiliaries/math/Limits.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/NumericVectorParameter.fwd.h"
+
 // SYSTEM INCLUDES
 
 

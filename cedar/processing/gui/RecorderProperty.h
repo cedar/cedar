@@ -38,10 +38,12 @@
 #define CEDAR_PROC_GUI_RECORDER_PROPERTY_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/Data.h"
-#include "cedar/processing/DataSlot.h"
-#include "cedar/processing/gui/RecorderWidget.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/DataSlot.fwd.h"
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/gui/RecorderProperty.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

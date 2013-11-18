@@ -41,7 +41,7 @@
 #include "cedar/auxiliaries/NetworkTimer.h"
 
 // SYSTEM INCLUDES
-#include<boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 //------------------------------------------------------------------------------
 // constructors and destructor

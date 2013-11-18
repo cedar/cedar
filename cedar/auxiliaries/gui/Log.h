@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/LogInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Log.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QTabWidget>

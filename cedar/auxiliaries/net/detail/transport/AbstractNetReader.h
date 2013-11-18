@@ -45,8 +45,8 @@
 #define CEDAR_ABSTRACT_NET_READER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetBase.h"
+#include "cedar/auxiliaries/net/detail/transport/AbstractNetReader.fwd.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES

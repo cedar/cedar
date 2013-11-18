@@ -45,6 +45,9 @@
 #include "cedar/units/Velocity.h"
 #include "cedar/units/AngularVelocity.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/UnitDataTemplate.fwd.h"
+
 // SYSTEM INCLUDES
 
 /*!@brief An object of this class represents the locomotion of a mobile robot.

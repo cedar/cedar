@@ -43,7 +43,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
-#include "cedar/processing/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/DataRole.fwd.h"
 
 // SYSTEM INCLUDES
 

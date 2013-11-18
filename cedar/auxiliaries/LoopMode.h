@@ -38,8 +38,11 @@
 #define CEDAR_AUX_LOOP_MODE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/EnumBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LoopMode.fwd.h"
+#include "cedar/auxiliaries/EnumType.fwd.h"
 
 // SYSTEM INCLUDES
 

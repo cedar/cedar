@@ -42,11 +42,15 @@
 #define CEDAR_PROC_GUI_IDE_APPLICATION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Ide.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/Ide.fwd.h"
+#include "cedar/processing/gui/IdeApplication.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
+#include <QReadWriteLock>
 
 #ifdef CEDAR_COMPILER_MSVC
 #include <Windows.h>

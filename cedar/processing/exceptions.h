@@ -41,9 +41,14 @@
 #ifndef CEDAR_PROC_EXCEPTIONS_H
 #define CEDAR_PROC_EXCEPTIONS_H
 
-#include "cedar/processing/namespace.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/ExceptionBase.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/exceptions.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+
+// SYSTEMS INCLUDES
 #include <vector>
 #include <set>
 

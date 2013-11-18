@@ -39,11 +39,15 @@
 #ifndef CEDAR_AUX_THREADCOLLECTION_H_
 #define CEDAR_AUX_THREADCOLLECTION_H_
 
-#include "cedar/auxiliaries/namespace.h"
+// CEDAR INCLUDES
 
-//System includes
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ThreadCollection.fwd.h"
+#include "cedar/auxiliaries/ThreadWrapper.fwd.h"
+
+// SYSTEM INCLUDES
+#include <QReadWriteLock>
 #include <vector>
-#include <qreadwritelock.h>
 
 /*!@brief This class manages multiple threads.
  *            It provides some functions and tools for easily start, stop and access the threads.
@@ -98,7 +102,6 @@ public:
 private:
   std::vector<cedar::aux::ThreadWrapperPtr> mThreads;
   QReadWriteLock* mpListLock;
-
 };
 
 #endif /* CEDAR_AUX_THREADCOLLECTION_H_ */

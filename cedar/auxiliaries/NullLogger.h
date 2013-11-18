@@ -38,8 +38,11 @@
 #define CEDAR_AUX_NULL_LOGGER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/LogInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/NullLogger.fwd.h"
+
 
 // SYSTEM INCLUDES
 

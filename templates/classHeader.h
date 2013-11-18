@@ -43,6 +43,9 @@
 // CEDAR INCLUDES
 #include "<namespace path>/namespace.h"
 
+// FORWARD DECLARATIONS
+#include "<namespace path>/<class name>.fwd.h"
+
 // SYSTEM INCLUDES
 
 

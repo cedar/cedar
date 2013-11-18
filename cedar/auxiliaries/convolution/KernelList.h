@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/kernel/namespace.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
 #include <boost/signals2.hpp>
 #include <vector>
 

@@ -37,11 +37,13 @@
 #ifndef CEDAR_PROCESSING_STEPS_MATRIX_SLICE_H
 #define CEDAR_PROCESSING_STEPS_MATRIX_SLICE_H
 
-// LOCAL INCLUDES
-#include "cedar/processing/steps/namespace.h"
+// CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/MatrixSlice.fwd.h"
 
 // SYSTEM INCLUDES
 

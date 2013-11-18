@@ -39,8 +39,10 @@
 #define CEDAR_PROC_GUI_RECORDER_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/Step.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

@@ -38,13 +38,15 @@
 #define CEDAR_AUX_GUI_SCENE_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 #include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.h"
 #include "cedar/auxiliaries/gui/ObjectVisualizationWidget.h"
 #include "cedar/auxiliaries/gui/ui_SceneWidget.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/SceneWidget.fwd.h"
 
 // SYSTEM INCLUDES
 
