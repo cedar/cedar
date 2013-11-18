@@ -190,6 +190,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  virtual void revalidateInputSlot(const std::string& slot);
+
   /*!@brief Declares an input slot.
    * @param name name of the declared input
    * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the
