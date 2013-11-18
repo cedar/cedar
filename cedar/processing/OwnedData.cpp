@@ -50,10 +50,11 @@ cedar::proc::OwnedData::OwnedData(
                                    cedar::proc::DataRole::Id role,
                                    const std::string& name,
                                    cedar::proc::Connectable* pParent,
-                                   bool isMandatory
+                                   bool isShared
                                  )
 :
-cedar::proc::DataSlot(role, name, pParent, isMandatory)
+cedar::proc::DataSlot(role, name, pParent, true),
+mIsShared(isShared)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
@@ -94,4 +95,9 @@ cedar::aux::DataPtr cedar::proc::OwnedData::getData()
 cedar::aux::ConstDataPtr cedar::proc::OwnedData::getData() const
 {
   return this->mData;
+}
+
+bool cedar::proc::OwnedData::isShared() const
+{
+  return this->mIsShared;
 }

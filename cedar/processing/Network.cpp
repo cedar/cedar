@@ -725,9 +725,9 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
   }
   else
   {
-    this->declareOutput(name, cedar::aux::DataPtr(new cedar::aux::Data()));
     cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
     this->add(sink, name);
+    this->declareSharedOutput(name, sink->getEmptyData());
   }
 }
 
@@ -1149,9 +1149,6 @@ void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode
 
 void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
 {
-  // remember the last configuration read (ui parts may need it)
-  this->mLastReadConfiguration = root;
-
   unsigned int format_version = 1; // default value is the current format
   try
   {
@@ -1167,6 +1164,11 @@ void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode
       "Reading network",
       "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
     );
+  }
+  // store latest
+  if (root.find("ui") != root.not_found())
+  {
+    mLastReadUINode = root.find("ui")->second;
   }
   switch (format_version)
   {
@@ -1743,7 +1745,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
       (
         // check if this is the connection being erased
         iter != it &&
-        // if it isn't, check if it connects to the ssame target
+        // if it isn't, check if it connects to the same target
         (*iter)->connects
         (
           this->getElement<cedar::proc::Connectable>(source_name),
@@ -1917,7 +1919,7 @@ void cedar::proc::Network::inputConnectionChanged(const std::string& inputName)
   }
   else
   {
-    source->setData(cedar::aux::DataPtr(new cedar::aux::Data()));
+    source->resetData();
   }
 }
 
@@ -1929,4 +1931,12 @@ const cedar::proc::Network::ConnectorMap& cedar::proc::Network::getConnectorMap(
 bool cedar::proc::Network::hasConnector(const std::string& name) const
 {
   return (this->_mConnectors->find(name) != this->_mConnectors->end());
+}
+
+void cedar::proc::Network::revalidateInputSlot(const std::string& slot)
+{
+  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  this->inputConnectionChanged(slot);
+  this->getInputValidity(slot);
 }

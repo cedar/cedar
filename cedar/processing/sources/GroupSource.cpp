@@ -78,8 +78,12 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::sources::GroupSource::GroupSource()
+:
+mEmptyData(new cedar::aux::Data())
 {
-  this->declareOutput("output", cedar::aux::DataPtr(new cedar::aux::Data()));
+  this->setAutoLockInputsAndOutputs(false);
+  mEmptyData->setOwner(this);
+  this->declareSharedOutput("output", mEmptyData);
 }
 
 cedar::proc::sources::GroupSource::~GroupSource()
@@ -99,5 +103,11 @@ void cedar::proc::sources::GroupSource::compute(const cedar::proc::Arguments& /*
 void cedar::proc::sources::GroupSource::setData(cedar::aux::DataPtr data)
 {
   this->setOutput("output", data);
+  this->emitOutputPropertiesChangedSignal("output");
+}
+
+void cedar::proc::sources::GroupSource::resetData()
+{
+  this->setOutput("output", mEmptyData);
   this->emitOutputPropertiesChangedSignal("output");
 }

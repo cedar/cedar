@@ -80,7 +80,10 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::sinks::GroupSink::GroupSink()
+:
+mEmptyData(new cedar::aux::Data())
 {
+  this->setAutoLockInputsAndOutputs(false);
   this->declareInput("input", false);
 }
 
@@ -118,7 +121,12 @@ void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& in
   }
   else
   {
-    network->setOutput(this->getName(), cedar::aux::DataPtr(new cedar::aux::Data()));
+    network->setOutput(this->getName(), mEmptyData);
     network->emitOutputPropertiesChangedSignal(this->getName());
   }
+}
+
+cedar::aux::DataPtr cedar::proc::sinks::GroupSink::getEmptyData()
+{
+  return this->mEmptyData;
 }

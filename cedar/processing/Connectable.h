@@ -38,6 +38,7 @@
 #define CEDAR_PROC_CONNECTABLE_H
 
 // CEDAR INCLUDES
+#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/DataSlot.h"
@@ -63,6 +64,7 @@ class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux:
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Network;
   friend class cedar::proc::Step;
+  friend class cedar::proc::sources::GroupSource;
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
@@ -206,12 +208,6 @@ protected:
    * @remarks This is equivalent to calling declareInput(name, false) and makeInputCollection(name).
    */
   cedar::proc::DataSlotPtr declareInputCollection(const std::string& name);
-
-  //!@brief Declares a buffer slot.
-  CEDAR_DECLARE_DEPRECATED(void declareBuffer(const std::string& name));
-
-  //!@brief Declares an output slot.
-  CEDAR_DECLARE_DEPRECATED(void declareOutput(const std::string& name));
 
   //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
   cedar::proc::DataSlotPtr declareBuffer(const std::string& name, cedar::aux::DataPtr data);
@@ -382,7 +378,13 @@ private:
   bool hasSlot(DataRole::Id role, const std::string& name) const;
 
   //!@brief Declares a new piece of data in the connectable.
-  cedar::proc::DataSlotPtr declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+  cedar::proc::DataSlotPtr declareData
+                           (
+                             DataRole::Id role,
+                             const std::string& name,
+                             bool mandatory = true,
+                             bool isShared = false
+                           );
 
   /*!@brief Sets the data pointer for the slot of the given name and role.
    */
@@ -432,6 +434,9 @@ private:
    *
    */
   void callInputConnectionChanged(const std::string& slot);
+
+  //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
+  cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
