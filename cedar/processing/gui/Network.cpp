@@ -832,17 +832,37 @@ void cedar::proc::gui::Network::updateConnectorPositions()
   for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
   {
     auto sink = this->mConnectorSinks.at(i);
-    auto slot_item = this->getSlotItem(cedar::proc::DataRole::OUTPUT, sink->getSlot()->getParentPtr()->getName());
-    connector_max_width = std::max(connector_max_width, slot_item->width());
+    std::string slot_name = sink->getSlot()->getParentPtr()->getName();
+    try
+    {
+      auto slot_item = this->getSlotItem(cedar::proc::DataRole::OUTPUT, slot_name);
+      connector_max_width = std::max(connector_max_width, slot_item->width());
+    }
+    catch (const cedar::proc::InvalidRoleException&)
+    {
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+      (
+        "Warning: could not find network output slot for connector \""
+          + slot_name + "\". Slot item may not be positioned incorrectly in the scene.",
+        "void cedar::proc::gui::Network::updateConnectorPositions()"
+      );
+    }
   }
 
   for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
   {
     auto sink = this->mConnectorSinks.at(i);
-    auto slot_item = this->getSlotItem(cedar::proc::DataRole::OUTPUT, sink->getSlot()->getParentPtr()->getName());
-    sink->setPos(this->width() - pad_side - connector_max_width, slot_item->pos().y());
-    sink->setWidth(slot_item->width());
-    sink->setHeight(slot_item->height());
+    try
+    {
+      auto slot_item = this->getSlotItem(cedar::proc::DataRole::OUTPUT, sink->getSlot()->getParentPtr()->getName());
+      sink->setPos(this->width() - pad_side - connector_max_width, slot_item->pos().y());
+      sink->setWidth(slot_item->width());
+      sink->setHeight(slot_item->height());
+    }
+    catch (const cedar::proc::InvalidRoleException&)
+    {
+      //!@todo Quickfix; Why can this even happen?
+    }
   }
 }
 
