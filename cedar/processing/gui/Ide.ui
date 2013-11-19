@@ -223,8 +223,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>129</width>
-          <height>418</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -281,8 +281,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>427</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -469,7 +469,7 @@
   </action>
   <action name="mpThreadsStartAll">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
@@ -484,10 +484,10 @@
   </action>
   <action name="mpThreadsStopAll">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="enabled">
     <bool>true</bool>
