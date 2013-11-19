@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Element.h
+    File:        NetworkPath.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 17
+    Date:        2013 07 25
 
     Description:
 
@@ -34,69 +34,58 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_H
-#define CEDAR_PROC_ELEMENT_H
+#ifndef CEDAR_PROC_NETWORK_PATH_H
+#define CEDAR_PROC_NETWORK_PATH_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
-
-// FORWARD DECLARATIONS
-#include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/PathTemplate.h"
 
 // SYSTEM INCLUDES
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/signals2.hpp>
 
 
-/*!@brief Base class for Elements in a processing architecture.
+/*!@todo describe.
  *
- *        Each element is described by a name that uniquely identifies it within a processing module.
+ * @todo describe more.
  */
-class cedar::proc::Element
-:
-virtual public cedar::aux::NamedConfigurable,
-public boost::enable_shared_from_this<cedar::proc::Element>
+class cedar::proc::NetworkPath : public cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> >
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> > PathType;
+  typedef PathType::StringType String;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Element();
+  NetworkPath(const String& path = String());
 
-  //!@brief The destructor.
-  virtual ~Element();
+  NetworkPath(const char* path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::NetworkPtr network);
-
-  //!@brief get the network at which this element is registered
-  cedar::proc::NetworkPtr getNetwork();
-
-  //!@brief get the network at which this element is registered as const
-  cedar::proc::ConstNetworkPtr getNetwork() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! connects to network changed signal
-  inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
-  {
-    return this->mNetworkChanged.connect(slot);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void validateName(const std::string& newName) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,21 +93,18 @@ private:
 protected:
   // none yet
 private:
-  //! the network this element is registered at
-  cedar::proc::NetworkWeakPtr mRegisteredAt;
-
-  //! Signal that is emitted whenever the element's network changes
-  boost::signals2::signal<void()> mNetworkChanged;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::Element
+}; // class cedar::proc::NetworkPath
 
-#endif // CEDAR_PROC_ELEMENT_H
+#endif // CEDAR_PROC_NETWORK_PATH_H
 

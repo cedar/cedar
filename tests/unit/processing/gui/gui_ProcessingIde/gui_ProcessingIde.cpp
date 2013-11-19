@@ -80,10 +80,10 @@ int main(int argc, char** argv)
     cedar::proc::NetworkPtr network = p_gui_network->getNetwork();
 
     // first, add some items to the scene
-    cedar::proc::ElementPtr field_element = p_scene->addElement("cedar.dynamics.NeuralField", QPointF(180, 240));
+    cedar::proc::ElementPtr field_element = p_scene->createElement(network, "cedar.dynamics.NeuralField", QPointF(180, 240));
     simulateEventLoop();
 
-    cedar::proc::ElementPtr trigger_element = p_scene->addElement("cedar.processing.LoopedTrigger", QPointF(180, 240));
+    cedar::proc::ElementPtr trigger_element = p_scene->createElement(network, "cedar.processing.LoopedTrigger", QPointF(180, 240));
     simulateEventLoop();
 
     cedar::proc::LoopedTriggerPtr looped_trigger

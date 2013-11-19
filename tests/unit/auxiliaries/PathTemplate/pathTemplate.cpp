@@ -22,43 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        pathTemplate.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 08 01
 
-    Description: Namespace file for cedar::proc::source.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_NAMESPACE_H
-#define CEDAR_PROC_SOURCES_NAMESPACE_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/auxiliaries/PathTemplate.h"
 
 // SYSTEM INCLUDES
 
-#warning Do not include this header any more. Use cedar's new forward declaration headers instead.
+typedef cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> > PathType;
 
-#include "cedar/processing/sources/Boost.fwd.h"
-#include "cedar/processing/sources/BoxInput.fwd.h"
-#include "cedar/processing/sources/Camera.fwd.h"
-#include "cedar/processing/sources/GaussInput.fwd.h"
-#include "cedar/processing/sources/GrabberBase.fwd.h"
-#include "cedar/processing/sources/NetReader.fwd.h"
-#include "cedar/processing/sources/Noise.fwd.h"
-#include "cedar/processing/sources/Picture.fwd.h"
-#include "cedar/processing/sources/Video.fwd.h"
+#define TEST_ASSERTION(assertion) \
+  if(!(assertion)) \
+  { \
+    std::cout << "Test failed: " << #assertion << std::endl; \
+    ++errors; \
+  }
 
-#endif // CEDAR_PROC_SOURCES_NAMESPACE_H
+int main()
+{
+  int errors = 0;
+
+  {
+    PathType test_path;
+    test_path = "this.is.a.spartanic.test";
+    TEST_ASSERTION(test_path.getElementCount() == 5);
+  }
+
+  std::cout << "Test finished with " << errors << " error(s)." << std::endl;
+  return errors;
+}

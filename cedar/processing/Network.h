@@ -43,6 +43,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/NetworkPath.h"
+#include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
@@ -54,11 +56,12 @@
 #include "cedar/processing/Triggerable.fwd.h"
 #include "cedar/processing/TriggerConnection.fwd.h"
 #include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
+#include "cedar/processing/sinks/GroupSink.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
-#include <QObject>
+#include <QThread>
 #include <vector>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
@@ -70,7 +73,7 @@
  *        use the connect functions of this network. This ensures proper management of storage and deletion of all the
  *        elements in the network.
  */
-class cedar::proc::Network : public QObject, public cedar::proc::Connectable
+class cedar::proc::Network : public QThread, public cedar::proc::Connectable, public cedar::proc::Triggerable
 {
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,6 +109,12 @@ public:
   //! Const iterator type of the element map.
   typedef ElementMap::const_iterator ElementMapConstIterator;
 
+  typedef std::map<std::string, bool> ConnectorMap;
+  typedef cedar::aux::MapParameter<bool> ConnectorMapParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConnectorMapParameter);
+
+
+  friend class cedar::proc::sinks::GroupSink;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -130,7 +139,6 @@ public:
   {
     this->readConfiguration(root);
   }
-
 
   /*!@brief Writes the network to a configuration node.
    */
@@ -199,6 +207,10 @@ public:
    */
   void add(std::list<cedar::proc::ElementPtr> elements);
 
+  void addConnector(const std::string& name, bool input);
+
+  void removeConnector(const std::string& name, bool input);
+
   /*!@brief Duplicates an existing element.
    *
    * @param elementName Identifier of the existing element.
@@ -215,7 +227,7 @@ public:
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<T> getElement(const std::string& name)
+  boost::shared_ptr<T> getElement(const cedar::proc::NetworkPath& name)
   {
     return boost::dynamic_pointer_cast<T>(this->getElement(name));
   }
@@ -223,7 +235,7 @@ public:
   /*!@brief Returns the element with the given name as a const pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<const T> getElement(const std::string& name) const
+  boost::shared_ptr<const T> getElement(const cedar::proc::NetworkPath& name) const
   {
     return boost::dynamic_pointer_cast<const T>(this->getElement(name));
   }
@@ -232,13 +244,13 @@ public:
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ElementPtr getElement(const std::string& name);
+  cedar::proc::ElementPtr getElement(const cedar::proc::NetworkPath& name);
 
   /*!@brief  Returns a const pointer to the element with the given name.
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ConstElementPtr getElement(const std::string& name) const;
+  cedar::proc::ConstElementPtr getElement(const cedar::proc::NetworkPath& name) const;
 
   /*!@brief Connects data slots of two cedar::proc::Connectable elements.
    *
@@ -283,7 +295,13 @@ public:
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
    */
-  void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+  CEDAR_DECLARE_DEPRECATED(void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot));
+
+  /*!@brief Deletes all connections from a given data slot.
+   * @param connectable The slot's parent.
+   * @param slot Identifier of the data slot.
+   */
+  void disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes the connection between source and target.
    */
@@ -327,14 +345,6 @@ public:
    * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
    */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
-  
-  /*!@brief promote the given DataSlot to this network
-   */
-  void promoteSlot(DataSlotPtr promotedSlot);
-
-  /*!@brief promote the given DataSlot of this network
-   */
-  void demoteSlot(cedar::proc::DataRole::Id role, const std::string& name);
 
   /*!@brief This method lists all networks that are children of this network.
    */
@@ -372,9 +382,9 @@ public:
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
   //!@brief returns the last ui node that was read
-  cedar::aux::ConfigurationNode& getLastReadUINode()
+  cedar::aux::ConfigurationNode& getLastReadConfiguration()
   {
-    return this->mLastReadUINode;
+    return this->mLastReadConfiguration;
   }
 
   /*!@brief Remove all connections that connect up to a specified slot */
@@ -410,11 +420,30 @@ public:
   //! Reads the meta information from the given file and extracts the plugins required by the architecture.
   static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
 
+  void onTrigger
+       (
+         cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
+         cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
+       );
+
+  /*!@brief The wait method.
+   */
+  void waitForProcessing();
+
+  const ConnectorMap& getConnectorMap();
+
+  bool hasConnector(const std::string& name) const;
+
+  std::string getNewConnectorName(bool inputConnector) const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  void revalidateInputSlot(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -491,15 +520,19 @@ private:
   //!@brief revalidates all outgoing connections of a slot
   void revalidateConnections(const std::string& sender);
 
-  //!@brief processes slot promotion
-  void processPromotedSlots();
-
   /*!@brief   Single-steps all triggers in this network with the given time step.
    *
    * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
    *          all triggers are stopped.
    */
   void stepTriggers(double stepTime);
+
+  void processConnectors();
+
+  void removeAllConnectors();
+
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
@@ -529,7 +562,7 @@ private:
   //! List of trigger connections in the network.
   TriggerConnectionVector mTriggerConnections;
 
-  cedar::aux::ConfigurationNode mLastReadUINode;
+  cedar::aux::ConfigurationNode mLastReadConfiguration;
 
   //!@brief connection to state changed signal of step
   std::map<std::string, boost::signals2::connection> mRevalidateConnections;
@@ -538,8 +571,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief a vector of all promoted slots
-  cedar::aux::StringVectorParameterPtr _mPromotedSlots;
+   ConnectorMapParameterPtr _mConnectors;
 
 }; // class cedar::proc::Network
 

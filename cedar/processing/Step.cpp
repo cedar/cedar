@@ -123,6 +123,13 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
+{
+  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
+  this->cedar::proc::Connectable::revalidateInputSlot(slot);
+}
+
 void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
   this->mpConnectionLock->lockForRead();
@@ -234,13 +241,15 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
 }
 
 /*! This method takes care of changing the step's name in the registry as well.
+ *
+ * @todo Unify in element using boost signals/slots
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
+  if (cedar::proc::NetworkPtr parent_network = this->getNetwork())
   {
     // update the name
-    boost::static_pointer_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
+    parent_network->updateObjectName(this);
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();
@@ -642,17 +651,4 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr argument
 bool cedar::proc::Step::isThreaded() const
 {
   return this->_mRunInThread->getValue();
-}
-
-void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
-{
-  this->revalidateInputSlot(slot);
-}
-
-void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
-{
-  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
-  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
-  this->inputConnectionChanged(slot);
-  this->getInputValidity(slot);
 }

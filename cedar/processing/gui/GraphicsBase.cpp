@@ -43,6 +43,7 @@
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -80,6 +81,7 @@ mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
 mFillStyle(Qt::SolidPattern),
 mSnapToGrid(true),
+mResizeable(false),
 mWidth
 (
   new cedar::aux::DoubleParameter
@@ -110,11 +112,30 @@ mAllowedConnectTargets(canConnectTo)
 cedar::proc::gui::GraphicsBase::~GraphicsBase()
 {
   this->disconnect();
+
+  if (!this->mpResizeHandles.empty())
+  {
+    for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+    {
+      delete this->mpResizeHandles.at(i);
+    }
+    this->mpResizeHandles.clear();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::GraphicsBase::setResizeable(bool resizeable)
+{
+  this->mResizeable = resizeable;
+}
+
+void cedar::proc::gui::GraphicsBase::sizeChanged()
+{
+  // nothing to do
+}
 
 void cedar::proc::gui::GraphicsBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
@@ -151,6 +172,19 @@ void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
     default:
       CEDAR_THROW(cedar::aux::UnhandledValueException, "Unhandled shape in cedar::proc::gui::GraphicsBase::setBaseShape");
   }
+}
+
+void cedar::proc::gui::GraphicsBase::setBounds(const QRectF& rect)
+{
+  const QRectF& current_bounds = this->boundingRect();
+  qreal offset_w = current_bounds.width() - this->width();
+  qreal offset_h = current_bounds.height() - this->height();
+  this->mWidth->setValue(rect.width() - offset_w);
+  this->mHeight->setValue(rect.height() - offset_h);
+  // shift the position by the change from the old to the new bounding rect
+  this->setPos(this->pos() - this->boundingRect().topLeft() + rect.topLeft());
+//  this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
@@ -527,19 +561,64 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     case QGraphicsItem::ItemPositionHasChanged:
     {
       this->updateConnections();
+
+      for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+      {
+        this->mpResizeHandles.at(i)->updatePosition();
+      }
+
       break;
     }
-
+    
     case QGraphicsItem::ItemSelectedHasChanged:
     {
       this->itemSelected(value.toBool());
       break;
     }
 
+    case QGraphicsItem::ItemSelectedChange:
+    {
+      if (this->canResize())
+      {
+        if (value == true)
+        {
+          for (size_t i = 0; i < cedar::proc::gui::ResizeHandle::directions().size(); ++i)
+          {
+            this->mpResizeHandles.push_back
+            (
+              new cedar::proc::gui::ResizeHandle
+              (
+                this,
+                this->mpResizeHandles,
+                cedar::proc::gui::ResizeHandle::directions().at(i)
+              )
+            );
+          }
+        }
+        else
+        {
+          if (!this->mpResizeHandles.empty())
+          {
+            for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+            {
+              delete this->mpResizeHandles.at(i);
+            }
+            this->mpResizeHandles.clear();
+          }
+        }
+      }
+    }
+
     default:
       break;
   }
   return QGraphicsItem::itemChange(change, value);
+}
+
+bool cedar::proc::gui::GraphicsBase::canResize() const
+{
+  // currently, only networks can be resized
+  return this->mResizeable;
 }
 
 void cedar::proc::gui::GraphicsBase::updateConnections()

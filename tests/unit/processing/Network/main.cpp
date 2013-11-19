@@ -48,6 +48,8 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/processing/sources/GaussInput.h"
+#include "cedar/processing/steps/StaticGain.h"
 #include "cedar/dynamics/fields/NeuralField.h"
 
 // SYSTEM INCLUDES
@@ -207,29 +209,30 @@ int main(int /* argc */, char** /* argv */)
     std::cout << "path to non-existing element not empty" << std::endl;
   }
 
-  // testing auto-promoting of slots with multiple incoming or outgoing connections (issue #270)
-  cedar::proc::NetworkPtr network_promote(new cedar::proc::Network());
-  network_promote->setName("root");
-  cedar::proc::NetworkPtr network_promoted_nested(new cedar::proc::Network());
-  network_promoted_nested->setName("nested");
-  std::list<cedar::proc::ElementPtr> to_add;
-  to_add.push_back(network_promoted_nested);
-  cedar::dyn::NeuralFieldPtr field_a(new cedar::dyn::NeuralField());
-  field_a->setName("field a");
-  to_add.push_back(field_a);
-  cedar::dyn::NeuralFieldPtr field_b(new cedar::dyn::NeuralField());
-  field_b->setName("field b");
-  to_add.push_back(field_b);
-  cedar::dyn::NeuralFieldPtr field_c(new cedar::dyn::NeuralField());
-  field_c->setName("field c");
-  to_add.push_back(field_c);
-  network_promote->add(to_add);
-  network_promote->connectSlots("field a.sigmoided activation", "field b.input");
-  network_promote->connectSlots("field a.sigmoided activation", "field c.input");
-  std::list<cedar::proc::ElementPtr> to_move;
-  to_move.push_back(field_a);
-  network_promoted_nested->add(to_move);
-
+  std::cout << "testing connectors" << std::endl;
+  // testing network connectors
+  cedar::proc::NetworkPtr network_root(new cedar::proc::Network());
+  network_root->setName("root");
+  cedar::proc::NetworkPtr network_connector(new cedar::proc::Network());
+  network_connector->setName("nested");
+  network_root->add(network_connector);
+  network_connector->addConnector("input", true);
+//  network_connector->addConnector("another input", true);
+  network_connector->addConnector("output", false);
+//  network_connector->addConnector("another output", false);
+  cedar::proc::sources::GaussInputPtr gauss(new cedar::proc::sources::GaussInput());
+  network_root->add(gauss, "Gauss");
+  network_root->connectSlots("Gauss.Gauss input", "nested.input");
+//  network_root->connectSlots("Gauss.Gauss input", "nested.another input");
+  network_connector->connectSlots("input.output", "output.input");
+//  network_connector->connectSlots("another input.output", "another output.input");
+  cedar::proc::steps::StaticGainPtr gain(new cedar::proc::steps::StaticGain());
+  network_root->add(gain, "gain");
+  network_root->connectSlots("nested.output", "gain.input");
+  network_connector->disconnectSlots("input.output", "output.input");
+  network_connector->connectSlots("input.output", "output.input");
+  network_root->disconnectSlots("Gauss.Gauss input", "nested.input");
+  network_root->connectSlots("Gauss.Gauss input", "nested.input");
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

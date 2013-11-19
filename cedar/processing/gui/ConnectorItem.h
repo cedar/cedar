@@ -22,81 +22,68 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Element.h
+    File:        ConnectorItem.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 17
+    Date:        2013 11 12
 
-    Description:
+    Description: Header file for the class cedar::proc::gui::ConnectorItem.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_H
-#define CEDAR_PROC_ELEMENT_H
+#ifndef CEDAR_PROC_GUI_CONNECTOR_ITEM_H
+#define CEDAR_PROC_GUI_CONNECTOR_ITEM_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/sinks/namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/signals2.hpp>
 
 
-/*!@brief Base class for Elements in a processing architecture.
- *
- *        Each element is described by a name that uniquely identifies it within a processing module.
+/*!@brief A graphics item that corresponds to a connector.
  */
-class cedar::proc::Element
-:
-virtual public cedar::aux::NamedConfigurable,
-public boost::enable_shared_from_this<cedar::proc::Element>
+class cedar::proc::gui::ConnectorItem : public cedar::proc::gui::GraphicsBase
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Element();
+  ConnectorItem(cedar::proc::sources::GroupSourcePtr source);
 
-  //!@brief The destructor.
-  virtual ~Element();
+  ConnectorItem(cedar::proc::sinks::GroupSinkPtr sink);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::NetworkPtr network);
-
-  //!@brief get the network at which this element is registered
-  cedar::proc::NetworkPtr getNetwork();
-
-  //!@brief get the network at which this element is registered as const
-  cedar::proc::ConstNetworkPtr getNetwork() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! connects to network changed signal
-  inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
-  {
-    return this->mNetworkChanged.connect(slot);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void validateName(const std::string& newName) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,21 +91,18 @@ private:
 protected:
   // none yet
 private:
-  //! the network this element is registered at
-  cedar::proc::NetworkWeakPtr mRegisteredAt;
-
-  //! Signal that is emitted whenever the element's network changes
-  boost::signals2::signal<void()> mNetworkChanged;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::Element
+}; // class cedar::proc::gui::ConnectorItem
 
-#endif // CEDAR_PROC_ELEMENT_H
+#endif // CEDAR_PROC_GUI_CONNECTOR_ITEM_H
 

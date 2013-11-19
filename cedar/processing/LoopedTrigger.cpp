@@ -116,10 +116,12 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 
 /*! This method takes care of changing the step's name in the registry as well.
+ *
+ * @todo Solve this with boost signals/slots; that way, this can be moved to cedar::proc::Element
  */
 void cedar::proc::LoopedTrigger::onNameChanged()
 {
-  if (cedar::proc::NetworkPtr parent_network = this->mRegisteredAt.lock())
+  if (cedar::proc::NetworkPtr parent_network = this->getNetwork())
   {
     // update the name
     parent_network->updateObjectName(this);

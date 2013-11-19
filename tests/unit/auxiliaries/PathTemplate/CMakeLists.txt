@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2012 07 19
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 12 13
 #
 #   Description:
 #
@@ -34,8 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(PromotedConnections
-                    main.cpp
-                    ADDITIONAL_DEPENDENCIES
-                    cedardyn
-                    )
+cedar_add_unit_test(PathTemplate pathTemplate.cpp)

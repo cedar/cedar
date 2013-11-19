@@ -36,7 +36,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/OwnedData.h"
-#include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/Connectable.h"
@@ -58,7 +57,7 @@ mTarget(target)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source));
+//  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source));
   try
   {
     // add the source data to target
@@ -155,23 +154,12 @@ void cedar::proc::DataConnection::disconnect()
 
 cedar::proc::DataSlotPtr cedar::proc::DataConnection::getRealTarget() const
 {
-  cedar::proc::DataSlotPtr source = this->mSource.lock();
   cedar::proc::DataSlotPtr target = this->mTarget.lock();
 
-  // first make a check if pointers are valid for source and target
-  if (source && target)
+  // first make a check if pointer is valid for target
+  if (target)
   {
-    // remove the source data from target
-    cedar::proc::DataSlotPtr real_target = target;
-    while
-    (
-      cedar::proc::PromotedExternalDataPtr promoted
-        = boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(real_target)
-    )
-    {
-      real_target = promoted->mDataSlot;
-    }
-    return real_target;
+    return target;
   }
   else
   {

@@ -71,8 +71,6 @@ public boost::enable_shared_from_this<cedar::proc::DataSlot>
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
   friend class cedar::proc::Network;
-  friend class cedar::proc::PromotedExternalData;
-  friend class cedar::proc::PromotedOwnedData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
