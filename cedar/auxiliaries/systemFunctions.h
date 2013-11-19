@@ -38,7 +38,7 @@
 #define CEDAR_AUX_SYSTEM_FUNCTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
 #include <string>

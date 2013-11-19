@@ -55,7 +55,7 @@ endif(CEDAR_USE_QWTPLOT3D)
 cedar_add_library(cedaraux
   MOC_HEADERS
   ThreadWrapper.h
-  ThreadWorker.h
+  detail/ThreadWorker.h
   LoopedThread.h
   LocalCoordinateFrame.h
   gl/ObjectVisualization.h

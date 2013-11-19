@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Data.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/UnitData.fwd.h"
 
 // SYSTEM INCLUDES
 

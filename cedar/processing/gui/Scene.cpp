@@ -47,7 +47,7 @@
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
-#include "cedar/processing/gui/StickyNode.h"
+#include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -86,6 +86,8 @@ mpMainWindow(pMainWindow),
 mSnapToGrid(false),
 mpConfigurableWidget(NULL)
 {
+  mMousePosX = 0;
+  mMousePosY = 0;
   // connect signals/slots
   QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 }
@@ -304,8 +306,8 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
       QGraphicsScene::mouseMoveEvent(pMouseEvent);
       break;
   }
-  this->mousePosX = pMouseEvent->scenePos().x();
-  this->mousePosY = pMouseEvent->scenePos().y();
+  this->mMousePosX = pMouseEvent->scenePos().x();
+  this->mMousePosY = pMouseEvent->scenePos().y();
 }
 
 
@@ -532,7 +534,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
-  QAction *p_addSickyNode = menu.addAction("add sticky node");
+  QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
   QAction *p_reset = menu.addAction("reset network");
 
@@ -547,7 +549,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   }
   if (a == p_addSickyNode)
   {
-    this->addStickyNode();
+    this->addStickyNote();
   }
   else if (a != NULL)
   {
@@ -1040,7 +1042,7 @@ void cedar::proc::gui::Scene::selectNone()
   }
 }
 
-void cedar::proc::gui::Scene::addStickyNode()
+void cedar::proc::gui::Scene::addStickyNote()
 {
-  this->addItem(new cedar::proc::gui::StickyNode(mousePosX,mousePosY,this));
+  this->addItem(new cedar::proc::gui::StickyNote(mMousePosX, mMousePosY, this));
 }

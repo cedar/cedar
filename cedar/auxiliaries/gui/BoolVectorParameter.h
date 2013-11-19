@@ -42,7 +42,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/VectorParameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/BoolVectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QCheckBox>

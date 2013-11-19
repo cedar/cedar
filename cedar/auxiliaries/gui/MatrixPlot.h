@@ -42,8 +42,12 @@
 #define CEDAR_AUX_GUI_MATRIX_PLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/gui/ColorValueRGBA.fwd.h"
+#include "cedar/auxiliaries/gui/MatrixPlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

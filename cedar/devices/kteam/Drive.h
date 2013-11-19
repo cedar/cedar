@@ -41,6 +41,7 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/DifferentialDrive.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/units/Length.h"
 #include "cedar/units/Frequency.h"

@@ -37,15 +37,16 @@
 #ifndef CEDAR_PROC_STEPS_MASK_H
 #define CEDAR_PROC_STEPS_MASK_H
 
-// LOCAL INCLUDES
-#include "cedar/processing/steps/namespace.h"
-
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/Mask.fwd.h"
+
+// SYSTEM INCLUDES
 
 
 /*!@brief A class that copies an input to an output with a mask.

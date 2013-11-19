@@ -38,8 +38,12 @@
 #define CEDAR_AUX_CONV_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/defines.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Singleton.fwd.h"
+#include "cedar/auxiliaries/FactoryManager.fwd.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 

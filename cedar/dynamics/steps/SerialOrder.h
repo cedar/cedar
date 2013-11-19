@@ -38,12 +38,14 @@
 #define CEDAR_DYN_SERIAL_ORDER_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/dynamics/steps/SerialOrder.fwd.h"
 
 // SYSTEM INCLUDES
 

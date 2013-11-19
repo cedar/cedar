@@ -39,12 +39,13 @@
 #define CEDAR_AUX_RECORDER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/ThreadCollection.h"
 #include "cedar/auxiliaries/DataSpectator.h"
 
+// FORWARD DECLARATION
+#include "cedar/auxiliaries/Recorder.fwd.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

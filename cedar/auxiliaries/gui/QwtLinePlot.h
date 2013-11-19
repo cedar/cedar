@@ -46,9 +46,12 @@
 #ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 #include "cedar/auxiliaries/math/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/gui/QwtLinePlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -132,6 +135,7 @@ private:
 
     ~PlotSeries()
     {
+      mpCurve->detach();
     }
 
     //!@brief (Re-)initializes the x and y value arrays.

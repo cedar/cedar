@@ -41,7 +41,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Grabbable.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

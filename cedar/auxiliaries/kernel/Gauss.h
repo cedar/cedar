@@ -38,10 +38,13 @@
 #define CEDAR_AUX_KERNEL_GAUSS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/kernel/Gauss.fwd.h"
 
 // SYSTEM INCLUDES
 

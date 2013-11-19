@@ -44,7 +44,11 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
-#include "cedar/processing/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/GraphTemplate.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Manager.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>

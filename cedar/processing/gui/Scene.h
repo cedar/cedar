@@ -42,13 +42,25 @@
 #define CEDAR_PROC_SCENE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/Scene.fwd.h"
+#include "cedar/processing/gui/StepItem.fwd.h"
+#include "cedar/processing/gui/View.fwd.h"
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/gui/TriggerItem.fwd.h"
+#include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
 #include <QMainWindow>
+#include <map>
 
 
 /*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Networks.
@@ -334,7 +346,7 @@ private:
 
   /*!brief Adds a sticky node to the current scene
    */
-  void addStickyNode();
+  void addStickyNote();
 
   void handleTriggerModeChange();
 
@@ -397,8 +409,12 @@ private:
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
   cedar::proc::gui::RecorderWidget *mpRecorderWidget;
-  int mousePosX;
-  int mousePosY;
+
+  //! Saves the mouse x position in the scene
+  int mMousePosX;
+
+  //! Saves the mouse y position in the scene
+  int mMousePosY;
 
 }; // class ProcessingScene
 

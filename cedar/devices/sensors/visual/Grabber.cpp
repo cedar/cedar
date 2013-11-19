@@ -152,11 +152,6 @@ cedar::dev::sensors::visual::Grabber::~Grabber()
 
   if ((*it) == this)
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                            (
-                                              this->getName() + ": Deleted this grabber from list of all instances.",
-                                              "cedar::dev::sensors::visual::Grabber::~Grabber()"
-                                            );
     mInstances.erase(it);
   }
   cedar::aux::LogSingleton::getInstance()->freeing(this);
@@ -219,13 +214,8 @@ void cedar::dev::sensors::visual::Grabber::installCrashHandler()
 
 void cedar::dev::sensors::visual::Grabber::doCleanUp()
 {
-  if (! mCleanUpAlreadyDone)
+  if (!mCleanUpAlreadyDone)
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                             (
-                                              this->getName() + ": cleanup",
-                                               "cedar::dev::sensors::visual::Grabber::doCleanUp()"
-                                             );
     mCleanUpAlreadyDone = true;
 
     // stop LoopedThread

@@ -42,6 +42,10 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/DataSpectator.fwd.h"
+#include "cedar/auxiliaries/Recorder.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QTime>
 #include <string>

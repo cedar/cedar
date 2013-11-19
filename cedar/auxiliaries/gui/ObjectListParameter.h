@@ -38,10 +38,12 @@
 #define CEDAR_AUX_GUI_OBJECT_LIST_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/casts.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/ObjectListParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QComboBox>
