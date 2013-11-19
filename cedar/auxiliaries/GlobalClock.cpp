@@ -35,19 +35,19 @@
 ======================================================================================================================*/
 
 //CEDAR INCLUDES
-#include "cedar/auxiliaries/NetworkTimer.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
-cedar::aux::NetworkTimer::NetworkTimer()
+cedar::aux::GlobalClock::GlobalClock()
 :mRunning(false)
 {
   this->reset();
 }
 
-cedar::aux::NetworkTimer::~NetworkTimer()
+cedar::aux::GlobalClock::~GlobalClock()
 {
 
 }
-void cedar::aux::NetworkTimer::start()
+void cedar::aux::GlobalClock::start()
 {
   //if timer on 0
   if  (mStart==mStop)
@@ -57,20 +57,20 @@ void cedar::aux::NetworkTimer::start()
   mRunning = true;
 }
 
-void cedar::aux::NetworkTimer::reset()
+void cedar::aux::GlobalClock::reset()
 {
   mStart = QTime::currentTime();
   mStop = mStart;
 }
 
 
-void cedar::aux::NetworkTimer::stop()
+void cedar::aux::GlobalClock::stop()
 {
   mStop = QTime::currentTime();
   mRunning = false;
 }
 
-unsigned int cedar::aux::NetworkTimer::getTime()
+unsigned int cedar::aux::GlobalClock::getTime()
 {
   if(mRunning)
   {
