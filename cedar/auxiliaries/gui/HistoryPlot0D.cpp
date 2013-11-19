@@ -50,7 +50,7 @@
 #include "cedar/auxiliaries/UnitData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/NetworkTimer.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 #include <qwt_legend.h>
@@ -365,7 +365,7 @@ void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
     cedar::aux::gui::HistoryPlot0D::CurveInfoPtr curve = this->mpPlot->mCurves[curve_index];
 
     // update x value
-    unsigned int time = cedar::aux::NetworkTimerSingleton::getInstance()->getTime();
+    unsigned int time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
     curve->mXValues.push_back(time);
 
     while (curve->mXValues.size() > this->mpPlot->mMaxHistorySize)
