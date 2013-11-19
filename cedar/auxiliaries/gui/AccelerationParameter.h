@@ -39,10 +39,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericParameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/AccelerationParameter.h"
 #include "cedar/auxiliaries/LengthParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/AccelerationParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>

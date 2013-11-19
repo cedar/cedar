@@ -44,12 +44,18 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/EnumType.h"
+
+// FORWARD DECLARATION
+#include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/PlotWidget.fwd.h"
+#include "cedar/processing/gui/StepItem.fwd.h"
+#include "cedar/processing/gui/TriggerItem.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -218,11 +224,16 @@ public slots:
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
+  //!@brief handles name-change of the underlying step
+  void handleStepNameChanged();
+
   //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
   void removeChildWidget();
 
-  //! Closes all plots that were opened for this step.
+  //!@brief Closes all plots that were opened for this step.
   void closeAllPlots();
+
+  //!@brief toggles visibility of the plots this step has opened
   void toggleVisibilityOfPlots();
 
 

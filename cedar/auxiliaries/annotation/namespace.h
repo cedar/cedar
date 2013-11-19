@@ -46,25 +46,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include <opencv2/opencv.hpp>
 
+#warning Do not include this header any more. Use the new forward declaration headers instead.
 
-namespace cedar
-{
-  /*!@brief Namespace for all aux classes. */
-  namespace aux
-  {
-    namespace annotation
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Annotation);
-      CEDAR_DECLARE_AUX_CLASS(Annotatable);
-      CEDAR_DECLARE_AUX_CLASS(ColorSpace);
-      CEDAR_DECLARE_AUX_CLASS(Depth);
-      CEDAR_DECLARE_AUX_CLASS(Dimensions);
-      CEDAR_DECLARE_AUX_CLASS(DiscreteMetric);
-      CEDAR_DECLARE_AUX_CLASS(Disparity);
-      //!@endcond
-    }
-  }
-}
+#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
+#include "cedar/auxiliaries/annotation/Annotatable.fwd.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
+#include "cedar/auxiliaries/annotation/Depth.fwd.h"
+#include "cedar/auxiliaries/annotation/Dimensions.fwd.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.fwd.h"
+#include "cedar/auxiliaries/annotation/Disparity.fwd.h"
 
 #endif // CEDAR_AUX_ANNOTATIONS_NAMESPACE_H

@@ -38,10 +38,12 @@
 #define CEDAR_AUX_GUI_VIEWER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gl/Scene.fwd.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.fwd.h"
 #include "cedar/auxiliaries/Grabbable.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Viewer.fwd.h"
 
 // SYSTEM INCLUDES
 #include <qglviewer.h>

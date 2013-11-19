@@ -46,6 +46,7 @@
 #include <QTreeWidgetItem>
 #include <QDir>
 
+#include <boost/version.hpp>
 #if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
   #define BOOST_FILESYSTEM_VERSION 2
 #else

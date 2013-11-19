@@ -38,11 +38,13 @@
 #define CEDAR_AUX_LOCAL_COORDINATE_FRAME_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/units/Length.h"
 #include "cedar/units/PlaneAngle.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LocalCoordinateFrame.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>

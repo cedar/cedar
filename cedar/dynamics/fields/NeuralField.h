@@ -42,19 +42,22 @@
 #define CEDAR_DYN_NEURAL_FIELD_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/kernel/Gauss.fwd.h"
+#include "cedar/auxiliaries/kernel/Kernel.fwd.h"
+#include "cedar/dynamics/fields/NeuralField.fwd.h"
 
 // SYSTEM INCLUDES
 

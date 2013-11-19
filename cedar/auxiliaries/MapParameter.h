@@ -42,9 +42,11 @@
 #define CEDAR_AUX_MAP_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/exceptions.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MapParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <map>

@@ -43,7 +43,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericVectorParameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/UIntVectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>

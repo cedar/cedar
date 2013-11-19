@@ -43,14 +43,23 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/units/Time.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+#include "cedar/processing/TriggerConnection.fwd.h"
+#include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
+
 // SYSTEM INCLUDES
-#include <QObject>
-#include <vector>
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
+#include <QObject>
+#include <vector>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
@@ -77,6 +86,8 @@ public:
     CONNECTION_REMOVED,
   };
 
+ signals:
+  void stepNameChanged(const std::string& from, const std::string& to);
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------

@@ -42,8 +42,9 @@
 #define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/DeclarationRegistry.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/ElementClassList.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QListWidget>

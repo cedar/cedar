@@ -42,10 +42,13 @@
 #define CEDAR_PROC_GUI_NETWORK_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Network.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -177,14 +180,28 @@ public:
     return this->_mSmartMode->getValue();
   }
 
+  //! creates plot group of provided name containing all currently opened plots
   void addPlotGroup(std::string plotGroupName);
+
+  //! removes plot group of given name
   void removePlotGroup(std::string plotGroupName);
+
+  //! renames plot group of given name (from) to given name (to)
   void renamePlotGroup(std::string from, std::string to);
+  
+  //! returns the name of every plot group of this network
   std::list<std::string> getPlotGroupNames();
+
+  //! opens the given plot group
   void displayPlotGroup(std::string plotGroupName);
+
+  //! search and replace every occurance of 'from' with 'to' in the plot groups node
+  void changeStepName(const std::string& from, const std::string& to);
 
 public slots:
   void stepRecordStateChanged();
+
+  void handleStepNameChanged(const std::string& from, const std::string& to);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

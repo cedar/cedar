@@ -38,11 +38,13 @@
 #define CEDAR_AUX_OBJECT_LIST_PARAMETER_TEMPLATE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/assert.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
 

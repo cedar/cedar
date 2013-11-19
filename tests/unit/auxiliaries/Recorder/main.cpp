@@ -34,15 +34,16 @@
 
 ======================================================================================================================*/
 
-#include "cedar/processing/namespace.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
+// SYSTEM INCLUDES
 #include <iostream>
 #include <boost/shared_ptr.hpp>
-#include  <string>
+#include <string>
 
 unsigned int errors;
 

@@ -42,8 +42,12 @@
 #define CEDAR_PROC_GUI_CONNECTION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/ConnectValidity.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/Connection.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsPathItem>

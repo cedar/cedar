@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 #include "cedar/auxiliaries/casts.h"
 
@@ -109,7 +110,6 @@ void cedar::proc::gui::ElementClassList::rebuild()
 
 void cedar::proc::gui::ElementClassList::showList(const std::string& categoryName)
 {
-  using cedar::proc::Manager;
   using cedar::proc::ElementDeclarationPtr;
 
   this->mCategoryName = categoryName;

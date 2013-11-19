@@ -1444,7 +1444,7 @@ void cedar::proc::Network::writeRecords(cedar::aux::ConfigurationNode& records) 
 void cedar::proc::Network::readRecords
      (
        const cedar::aux::ConfigurationNode& root,
-       std::vector<std::string>& exceptions
+       std::vector<std::string>&
      )
 {
   //clear all registered data
@@ -1723,6 +1723,9 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
   {
     this->mSlotChanged();
   }
+
+  // inform gui network about name change
+  emit cedar::proc::Network::stepNameChanged(old_name, element->getName());
 }
 
 void cedar::proc::Network::getDataConnections(

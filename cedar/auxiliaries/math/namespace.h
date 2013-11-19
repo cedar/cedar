@@ -38,8 +38,6 @@
 #define CEDAR_AUX_MATH_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/Factory.h"
 #include "cedar/units/Length.h"

@@ -38,8 +38,10 @@
 #define CEDAR_AUX_TYPE_HIERARCHY_MAP_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/utilities.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/TypeHierarchyMap.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/enable_shared_from_this.hpp>

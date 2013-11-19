@@ -43,6 +43,7 @@
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Network.h"
+#include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -57,9 +58,9 @@
 #include <QMutexLocker>
 #include <QReadLocker>
 #include <QWriteLocker>
+#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <ctime>
-#include <opencv2/opencv.hpp>
 
 // MACROS
 // Enable to show information on locking/unlocking

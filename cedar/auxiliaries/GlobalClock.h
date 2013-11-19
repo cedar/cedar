@@ -33,15 +33,17 @@
     Credits:
 
 ======================================================================================================================*/
-//CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-
-//SYSTEM INCLUDES
-#include <QTime>
 
 #ifndef CEDAR_AUX_NETWORKTIMER_H_
 #define CEDAR_AUX_NETWORKTIMER_H_
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/Singleton.fwd.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/GlobalClock.fwd.h"
+
+// SYSTEM INCLUDES
+#include <QTime>
 
 //@!brief Can start, stop and reset the network time and should be used as a central time giver in a network.
 class cedar::aux::GlobalClock

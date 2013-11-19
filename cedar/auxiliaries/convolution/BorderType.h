@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
-
+#include <opencv2/imgproc/imgproc.hpp>
 
 /*!@brief An enum class for the different kinds of border handling in convolution methods.
  */

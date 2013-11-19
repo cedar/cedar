@@ -38,9 +38,11 @@
 #define CEDAR_AUX_SINGLETON_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/exceptions.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Singleton.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMutex>

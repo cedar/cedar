@@ -38,8 +38,10 @@
 #define CEDAR_PROC_PROMOTED_OWNED_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/OwnedData.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/PromotedOwnedData.fwd.h"
 
 // SYSTEM INCLUDES
 

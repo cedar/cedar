@@ -38,13 +38,15 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_H
-#define CEDAR_DYN_H
+#ifndef CEDAR_DYN_DYNAMICS_H
+#define CEDAR_DYN_DYNAMICS_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/units/Time.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/dynamics/Dynamics.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -98,4 +100,4 @@ private:
 
 }; // class cedar::dyn::Dynamics
 
-#endif // CEDAR_DYN_H
+#endif // CEDAR_DYN_DYNAMICS_H
