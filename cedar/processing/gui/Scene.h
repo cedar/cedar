@@ -166,7 +166,7 @@ public:
 
   /*!@brief Creates an element of the given classId at the specified position and adds it to the scene.
    */
-  cedar::proc::ElementPtr addElement(const std::string& classId, QPointF position);
+  cedar::proc::ElementPtr createElement(cedar::proc::NetworkPtr network, const std::string& classId, QPointF position);
 
   /*!@brief Adds a cedar::proc::gui::StepItem for the given cedar::proc::Step to the scene at the given position.
    */
@@ -376,6 +376,9 @@ private:
 
   //! The network displayed by the scene.
   cedar::proc::gui::NetworkPtr mNetwork;
+
+  //! Stores what graphics item receives a drop, if any.
+  QGraphicsItem* mpDropTarget;
 
   //! The view displaying the scene.
   cedar::proc::gui::View *mpeParentView;

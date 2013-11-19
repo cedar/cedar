@@ -58,7 +58,7 @@ public:
              cedar::proc::DataRole::Id role,
              const std::string& name,
              cedar::proc::Connectable* pParent,
-             bool isMandatory = true
+             bool isShared = false
            );
 
   //!@brief Destructor
@@ -73,6 +73,8 @@ public:
   cedar::aux::ConstDataPtr getData() const;
 
   void clear();
+
+  bool isShared() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,6 +95,7 @@ protected:
   // none yet
 private:
   cedar::aux::DataPtr mData;
+  bool mIsShared;
 }; // class cedar::proc::OwnedData
 
 #endif // CEDAR_PROC_OWNED_DATA_H

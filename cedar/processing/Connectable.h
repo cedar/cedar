@@ -50,6 +50,7 @@
 #include "cedar/processing/Network.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/sources/GroupSource.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2/connection.hpp>
@@ -67,6 +68,7 @@ class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux:
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Network;
   friend class cedar::proc::Step;
+  friend class cedar::proc::sources::GroupSource;
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
@@ -192,6 +194,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  virtual void revalidateInputSlot(const std::string& slot);
+
   /*!@brief Declares an input slot.
    * @param name name of the declared input
    * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the
@@ -204,12 +212,6 @@ protected:
    * @remarks This is equivalent to calling declareInput(name, false) and makeInputCollection(name).
    */
   cedar::proc::DataSlotPtr declareInputCollection(const std::string& name);
-
-  //!@brief Declares a buffer slot.
-  CEDAR_DECLARE_DEPRECATED(void declareBuffer(const std::string& name));
-
-  //!@brief Declares an output slot.
-  CEDAR_DECLARE_DEPRECATED(void declareOutput(const std::string& name));
 
   //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
   cedar::proc::DataSlotPtr declareBuffer(const std::string& name, cedar::aux::DataPtr data);
@@ -234,12 +236,6 @@ protected:
   {
     this->removeSlot(DataRole::OUTPUT, name);
   }
-
-  //!@brief Declares a new promoted slot.
-  void declarePromotedData(DataSlotPtr promotedSlot);
-
-  //!@brief Removes a promoted slot.
-  void removePromotedData(DataRole::Id role, const std::string& name);
 
   //!@brief Sets the data pointer for the buffer called name.
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
@@ -386,7 +382,13 @@ private:
   bool hasSlot(DataRole::Id role, const std::string& name) const;
 
   //!@brief Declares a new piece of data in the connectable.
-  cedar::proc::DataSlotPtr declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+  cedar::proc::DataSlotPtr declareData
+                           (
+                             DataRole::Id role,
+                             const std::string& name,
+                             bool mandatory = true,
+                             bool isShared = false
+                           );
 
   /*!@brief Sets the data pointer for the slot of the given name and role.
    */
@@ -431,6 +433,14 @@ private:
                                             cedar::proc::ConstDataSlotPtr slot,
                                             cedar::aux::ConstDataPtr data
                                           ) const;
+
+  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
+   *
+   */
+  void callInputConnectionChanged(const std::string& slot);
+
+  //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
+  cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections

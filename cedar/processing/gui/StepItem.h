@@ -44,7 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/EnumType.h"
@@ -59,15 +59,13 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
-#include <QGraphicsSvgItem>
 #include <QIcon>
-#include <QObject>
 #include <map>
 
 
 /*!@brief A representation of a cedar::proc::Step object in a cedar::proc::gui::Scene.
  */
-class cedar::proc::gui::StepItem : public QObject, public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::StepItem : public cedar::proc::gui::Connectable
 {
   Q_OBJECT
 
@@ -75,75 +73,6 @@ class cedar::proc::gui::StepItem : public QObject, public cedar::proc::gui::Grap
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::Network;
-  //--------------------------------------------------------------------------------------------------------------------
-  // types
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief mapping from data slot names to their graphical representation
-  typedef std::map<std::string, cedar::proc::gui::DataSlotItem*> DataSlotNameMap;
-
-  //!@brief mapping from data role id to a map of all data slots fitting this id
-  typedef std::map<cedar::proc::DataRole::Id, DataSlotNameMap> DataSlotMap;
-
-  //! Enum-class for the display mode of steps.
-  class DisplayMode
-  {
-    public:
-      //! the id of an enum entry
-      typedef cedar::aux::EnumId Id;
-
-    public:
-      /*! @brief Construct method that fills the enum.
-       *  @see cedar::aux::EnumBase
-       */
-      static void construct()
-      {
-        mType.type()->def(cedar::aux::Enum(ICON_AND_TEXT, "ICON_AND_TEXT", "icon and text"));
-        mType.type()->def(cedar::aux::Enum(ICON_ONLY, "ICON_ONLY", "icon only"));
-      }
-
-      //! @returns A const reference to the base enum object.
-      static const cedar::aux::EnumBase& type()
-      {
-        return *mType.type();
-      }
-
-      //! Display icon and text
-      static const Id ICON_AND_TEXT = 0;
-
-      //! Display an icon only
-      static const Id ICON_ONLY = 1;
-
-    private:
-      //! The base enum object.
-      static cedar::aux::EnumType<cedar::proc::gui::StepItem::DisplayMode> mType;
-  };
-
-private:
-  class Decoration
-  {
-    public:
-      Decoration(StepItem* pStep, const QString& icon, const QString& description, const QColor& bg = QColor(255, 255, 255));
-
-      ~Decoration()
-      {
-        delete mpIcon;
-        delete mpRectangle;
-      }
-
-      void setPosition(const QPointF& pos);
-
-      void setSize(double sizeFactor);
-
-    private:
-      QGraphicsSvgItem* mpIcon;
-
-      QGraphicsRectItem* mpRectangle;
-
-      QString mIconFile;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(Decoration);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -172,28 +101,16 @@ public:
   //!@brief return the represented step
   cedar::proc::StepPtr getStep();
 
+  //!@brief return the represented step
+  cedar::proc::ConstStepPtr getStep() const;
+
   //!@brief handles events in the context menu
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-
-  //!@brief returns one of the data slots associated with this step
-  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
-
-  //!@brief returns one of the data slots associated with this step
-  cedar::proc::gui::DataSlotItem const* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name) const;
-
-  //!@brief returns a map of all data slots of the same id
-  cedar::proc::gui::StepItem::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
 
   //!@brief reads a configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
   //!@brief saves a configuration to a node
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
-
-  //!@brief resets the internal step
-  void resetPointer()
-  {
-    mStep.reset();
-  }
 
   //!@brief helper function to remove all connections to other graphical elements
   void disconnect();
@@ -205,12 +122,6 @@ public:
     cedar::proc::gui::StepItem* pToItem,
     const std::string& toSlot
   ) const;
-
-  //! Resizes slots that are close to the mouse pointer in connection mode.
-  void magnetizeSlots(const QPointF& mousePositionInScene);
-
-  //! Removes all effects of magnetization
-  void demagnetizeSlots();
 
   //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
@@ -254,12 +165,6 @@ private slots:
 
 private:
   void emitStepStateChanged();
-
-  //!@briefs adds graphical representations for all data items
-  void addDataItems();
-
-  //!@brief adds graphical representations for all triggers contained in the step
-  void addTriggerItems();
 
   //!@brief Adds the decorations to the step.
   void addDecorations();
@@ -305,21 +210,6 @@ private:
   //! Sets the current display mode.
   void setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::Id mode);
 
-  //! Updates the positions of the data slot items.
-  void updateDataSlotPositions();
-
-  //! Updates the positions of the decoration items.
-  void updateDecorationPositions();
-
-  //! Updates the positions of all items attached to this one (decorations and data slots).
-  void updateAttachedItems();
-
-  void slotAdded(cedar::proc::DataRole::Id role, const std::string& name);
-
-  void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
-
-  void addDataItemFor(cedar::proc::DataSlotPtr slot);
-
   QWidget* createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position);
 
   QWidget* createDockWidget(const std::string& title, QWidget* pWidget);
@@ -333,8 +223,6 @@ private:
   void updateIconGeometry();
 
   qreal getContentsPadding() const;
-
-  void itemSelected(bool selected);
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
@@ -350,22 +238,9 @@ private slots:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //! The base size of data slots (modified by display mode and other factors).
-  static const qreal M_BASE_DATA_SLOT_SIZE;
-
-  //! Amount of padding between data slots.
-  static const qreal M_DATA_SLOT_PADDING;
-
 protected:
   // none yet
 private:
-  //!@brief the represented step
-  cedar::proc::StepPtr mStep;
-
-  //!@brief a map of all data slots of the current step
-  DataSlotMap mSlotMap;
-
   //!@brief a vector of all triggers of the current step
   std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
 
@@ -384,9 +259,6 @@ private:
   //! The height of newly created steps.
   static const qreal mDefaultHeight;
 
-  boost::signals2::connection mSlotAddedConnection;
-  boost::signals2::connection mSlotRemovedConnection;
-
   //!@brief the class id of the step
   cedar::aux::ConstPluginDeclarationPtr mClassId;
 
@@ -395,17 +267,6 @@ private:
 
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;
-
-  //!@brief The current display mode of the step.
-  cedar::proc::gui::StepItem::DisplayMode::Id mDisplayMode;
-
-  //! The decorations for this step.
-  std::vector<DecorationPtr> mDecorations;
-
-  //! SvgItem displaying the step's icon
-  QGraphicsSvgItem* mpIconDisplay;
-
-  DecorationPtr mpRecordedDecoration;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

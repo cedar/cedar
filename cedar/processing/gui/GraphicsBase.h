@@ -168,6 +168,9 @@ public:
   //!@brief set width of this GraphicsBase
   void setWidth(qreal width);
 
+  //!@brief Sets the bounds of the item.
+  void setBounds(const QRectF& rect);
+
   //!@brief add a Connection to this GraphicsBase
   void addConnection(Connection* pConnection);
 
@@ -220,6 +223,9 @@ public:
     return this->mElement;
   }
 
+  //! Can be implemented to react to changes of the items size.
+  virtual void sizeChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -258,10 +264,15 @@ protected:
   //! Sets the fill stype
   void setFillStyle(Qt::BrushStyle style, bool update = true);
 
+  //! Set whether or not this item is resizeable.
+  void setResizeable(bool resizeable);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  bool canResize() const;
+  
   //! Called whenever the item has been selected or deselected.
   virtual void itemSelected(bool selected);
 
@@ -314,6 +325,12 @@ private:
 
   //!@brief Whether the item snaps to the grid.
   bool mSnapToGrid;
+
+  //! Whether or not resizing is allowed.
+  bool mResizeable;
+
+  //! Resize handle.
+  std::vector<cedar::proc::gui::ResizeHandle*> mpResizeHandles;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
