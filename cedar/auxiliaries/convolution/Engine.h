@@ -44,6 +44,9 @@
 #include "cedar/auxiliaries/convolution/Mode.h"
 #include "cedar/auxiliaries/Configurable.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/kernel/Separable.fwd.h"
+
 // SYSTEM INCLUDES
 
 

@@ -38,8 +38,10 @@
 #define CEDAR_AUX_KERNEL_SEPARABLE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/kernel/Separable.fwd.h"
 
 // SYSTEM INCLUDES
 
