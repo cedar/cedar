@@ -1165,11 +1165,10 @@ void cedar::proc::Network::readConfiguration(const cedar::aux::ConfigurationNode
       "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
     );
   }
-  // store latest
-  if (root.find("ui") != root.not_found())
-  {
-    mLastReadUINode = root.find("ui")->second;
-  }
+  // make a copy of the configuration that was read -- the ui may need to read additional information from it
+  mLastReadConfiguration = root;
+
+  // select the proper format for reading the network
   switch (format_version)
   {
     default:
