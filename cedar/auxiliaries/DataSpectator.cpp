@@ -38,7 +38,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/DataSpectator.h"
 #include "cedar/auxiliaries/Recorder.h"
-#include "cedar/auxiliaries/NetworkTimer.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 #include<boost/algorithm/string/replace.hpp>
@@ -109,7 +109,7 @@ void cedar::aux::DataSpectator::record()
   //Create new recordData
   RecordData rec;
   rec.mData = data;
-  rec.mRecordTime = cedar::aux::NetworkTimerSingleton::getInstance()->getTime();
+  rec.mRecordTime = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   //Lock the Queue and push record Data
   QWriteLocker locker(mpQueueLock);
   mDataQueue.push_back(rec);
