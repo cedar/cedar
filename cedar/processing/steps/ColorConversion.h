@@ -42,12 +42,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
 #include "cedar/processing/steps/ColorConversion.fwd.h"
 
 // SYSTEM INCLUDES
