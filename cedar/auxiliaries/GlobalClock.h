@@ -44,7 +44,7 @@
 
 
 //@!brief Can start, stop and reset the network time and should be used as a central time giver in a network.
-class cedar::aux::NetworkTimer
+class cedar::aux::GlobalClock
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -52,17 +52,17 @@ class cedar::aux::NetworkTimer
   //--------------------------------------------------------------------------------------------------------------------
 
   // uses singleton template.
-  friend class cedar::aux::Singleton<NetworkTimer>;
+  friend class cedar::aux::Singleton<GlobalClock>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief The private constructor for singleton usage.
-  NetworkTimer();
+  GlobalClock();
 public:
   //!@brief The Destructor.
-  ~NetworkTimer();
+  ~GlobalClock();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -105,8 +105,8 @@ namespace cedar
 {
   namespace aux
   {
-    CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::NetworkTimer>);
-    typedef cedar::aux::Singleton<cedar::aux::NetworkTimer> NetworkTimerSingleton;
+    CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::GlobalClock>);
+    typedef cedar::aux::Singleton<cedar::aux::GlobalClock> GlobalClockSingleton;
   }
 }
 
