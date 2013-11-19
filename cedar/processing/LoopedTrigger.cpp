@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -151,6 +152,7 @@ void cedar::proc::LoopedTrigger::prepareStart()
 {
   QMutexLocker locker(&mStartedMutex);
 
+  cedar::aux::GlobalClockSingleton::getInstance()->start();
   if (this->mStarted)
   {
     return;
