@@ -206,11 +206,11 @@ void cedar::aux::gui::QwtLinePlot::applyStyle(cedar::aux::ConstDataPtr data, siz
   {
     pCurve->setStyle(QwtPlotCurve::NoCurve);
     QwtSymbol
-#if (QWT_VERSION >> 16) == 6
+#if (QWT_VERSION >= 0x060000)
     * // qwt 6.x expects a pointer
 #endif
       symbol
-#if (QWT_VERSION >> 16) == 6
+#if (QWT_VERSION >= 0x060000)
       = new QwtSymbol
 #endif
       (mLineSymbols.at(style_id), QBrush(mLineColors.at(color_id)), pen, QSize(10, 10));
@@ -281,10 +281,10 @@ void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
 
   plot_series->buildArrays(num);
 
-#if (QWT_VERSION >> 16) == 5
-  plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
-#elif (QWT_VERSION >> 16) == 6
+#if (QWT_VERSION >= 0x060000)
   plot_series->mpCurve->setRawSamples(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
+#elif (QWT_VERSION >= 0x050000)
+  plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
 #else
 #error unsupported qwt version
 #endif
@@ -537,15 +537,15 @@ void cedar::aux::gui::QwtLinePlot::conversionDone()
     PlotSeriesPtr series = this->mPlotSeriesVector.at(i);
 
     // choose the right function depending on the qwt version
-    #if (QWT_VERSION >> 16) == 5
-      series->mpCurve->setData
+    #if (QWT_VERSION >= 0x060000)
+      series->mpCurve->setRawSamples
       (
         &series->mXValues.at(0),
         &series->mYValues.at(0),
         static_cast<int>(series->mXValues.size())
       );
-    #elif (QWT_VERSION >> 16) == 6
-      series->mpCurve->setRawSamples
+    #elif (QWT_VERSION >= 0x050000)
+      series->mpCurve->setData
       (
         &series->mXValues.at(0),
         &series->mYValues.at(0),
