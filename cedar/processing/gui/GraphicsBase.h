@@ -50,6 +50,7 @@
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/gui/Connection.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/ResizeHandle.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsItem>

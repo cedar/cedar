@@ -41,7 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/ResizeHandle.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsRectItem>

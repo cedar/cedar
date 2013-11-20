@@ -42,9 +42,13 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/GraphicsBase.h"
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/DataSlot.fwd.h"
+#include "cedar/processing/gui/Connectable.fwd.h"
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
