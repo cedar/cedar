@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,38 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        FactoryManager.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 06 28
+    Date:        2013 11 18
 
-    Description: Namespace file for cedar::aux::annotations.
+    Description: Forward declaration file for the class cedar::aux::kernel::FactoryManager.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
-#define CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
+#ifndef CEDAR_AUX_KERNEL_FACTORY_MANAGER_FWD_H
+#define CEDAR_AUX_KERNEL_FACTORY_MANAGER_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
-#include "cedar/defines.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/FactoryManager.fwd.h"
+#include "cedar/auxiliaries/kernel/Kernel.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <opencv2/opencv.hpp>
 
-#warning Do not include this header any more. Use the new forward declaration headers instead.
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace kernel
+    {
+      typedef cedar::aux::FactoryManager<cedar::aux::kernel::KernelPtr> FactoryManager;
+    }
+  }
+}
 
-#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
-#include "cedar/auxiliaries/annotation/Annotatable.fwd.h"
-#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
-#include "cedar/auxiliaries/annotation/Depth.fwd.h"
-#include "cedar/auxiliaries/annotation/Dimensions.fwd.h"
-#include "cedar/auxiliaries/annotation/DiscreteMetric.fwd.h"
-#include "cedar/auxiliaries/annotation/Disparity.fwd.h"
+//!@endcond
 
-#endif // CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
+#endif // CEDAR_AUX_KERNEL_FACTORY_MANAGER_FWD_H
+

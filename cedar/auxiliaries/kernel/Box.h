@@ -38,10 +38,12 @@
 #define CEDAR_AUX_KERNEL_BOX_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/kernel/Box.fwd.h"
 
 // SYSTEM INCLUDES
 

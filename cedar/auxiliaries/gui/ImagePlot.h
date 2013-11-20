@@ -39,11 +39,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
-#include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/math/Limits.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
 #include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
 
 // SYSTEM INCLUDES
