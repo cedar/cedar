@@ -721,7 +721,8 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
     this->declareInput(name, false);
     cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
     this->add(source, name);
-    this->connectTrigger(this->getFinishedTrigger(), source);
+    // TODO
+//    this->connectTrigger(this->getFinishedTrigger(), source);
   }
   else
   {
@@ -741,7 +742,8 @@ void cedar::proc::Network::removeConnector(const std::string& name, bool input)
     // here be comments
     if (input)
     {
-      this->disconnectTrigger(this->getFinishedTrigger(), this->getElement<cedar::proc::Triggerable>(name));
+      // TODO
+//      this->disconnectTrigger(this->getFinishedTrigger(), this->getElement<cedar::proc::Triggerable>(name));
       this->remove(this->getElement(name));
       this->removeInputSlot(name);
     }
@@ -1899,9 +1901,18 @@ void cedar::proc::Network::removeAllConnectors()
   }
 }
 
-void cedar::proc::Network::onTrigger(cedar::proc::ArgumentsPtr /*args*/, cedar::proc::TriggerPtr /*trigger*/)
+void cedar::proc::Network::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr /* trigger */)
 {
+  for (auto iter = this->_mConnectors->begin(); iter != this->_mConnectors->end(); ++iter)
+  {
+    auto name = iter->first;
 
+    if (iter->second)
+    {
+      auto source = boost::static_pointer_cast<cedar::proc::sources::GroupSource>(this->getElement(name));
+      source->onTrigger(args);
+    }
+  }
 }
 
 void cedar::proc::Network::waitForProcessing()
