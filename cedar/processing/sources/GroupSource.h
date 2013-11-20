@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/Step.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/GroupSource.fwd.h"
 
 // SYSTEM INCLUDES
 

@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/NetworkPath.h"
+#include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/units/Time.h"
 
@@ -53,7 +54,6 @@
 #include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Network.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
-#include "cedar/processing/Triggerable.fwd.h"
 #include "cedar/processing/TriggerConnection.fwd.h"
 #include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 #include "cedar/processing/sinks/GroupSink.fwd.h"

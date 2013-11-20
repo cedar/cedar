@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sinks/namespace.h"
 #include "cedar/processing/Step.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/sinks/GroupSink.fwd.h"
 
 // SYSTEM INCLUDES
 

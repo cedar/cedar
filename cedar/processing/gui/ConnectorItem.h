@@ -44,8 +44,9 @@
 #include "cedar/processing/gui/GraphicsBase.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sinks/namespace.h"
+#include "cedar/processing/gui/ConnectorItem.fwd.h"
+#include "cedar/processing/sinks/GroupSink.fwd.h"
+#include "cedar/processing/sources/GroupSource.fwd.h"
 
 // SYSTEM INCLUDES
 

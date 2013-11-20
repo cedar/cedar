@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/PathTemplate.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/NetworkPath.fwd.h"
 
 // SYSTEM INCLUDES
 

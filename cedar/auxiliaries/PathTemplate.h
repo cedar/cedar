@@ -42,7 +42,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <vector>
