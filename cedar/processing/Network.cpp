@@ -721,8 +721,6 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
     this->declareInput(name, false);
     cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
     this->add(source, name);
-    // TODO
-//    this->connectTrigger(this->getFinishedTrigger(), source);
   }
   else
   {
@@ -742,8 +740,6 @@ void cedar::proc::Network::removeConnector(const std::string& name, bool input)
     // here be comments
     if (input)
     {
-      // TODO
-//      this->disconnectTrigger(this->getFinishedTrigger(), this->getElement<cedar::proc::Triggerable>(name));
       this->remove(this->getElement(name));
       this->removeInputSlot(name);
     }
