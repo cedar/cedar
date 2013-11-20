@@ -234,6 +234,27 @@ int main(int /* argc */, char** /* argv */)
   network_root->disconnectSlots("Gauss.Gauss input", "nested.input");
   network_root->connectSlots("Gauss.Gauss input", "nested.input");
 
+  std::cout << "testing moving elements between networks" << std::endl;
+  network_connector.reset();
+  network_root.reset();
+  network_root = cedar::proc::NetworkPtr(new cedar::proc::Network());
+  network_root->setName("root");
+  network_connector = cedar::proc::NetworkPtr(new cedar::proc::Network());
+  network_connector->setName("nested");
+  network_root->add(network_connector);
+  for (unsigned int i = 0; i < 4; ++i)
+  {
+    cedar::proc::steps::StaticGainPtr gain(new cedar::proc::steps::StaticGain());
+    network_root->add(gain, cedar::aux::toString(i));
+  }
+  network_root->connectSlots("0.output", "1.input");
+  network_root->connectSlots("1.output", "2.input");
+  network_root->connectSlots("2.output", "3.input");
+  std::list<cedar::proc::ElementPtr> list;
+  list.push_back(network_root->getElement("1"));
+  list.push_back(network_root->getElement("2"));
+  network_connector->add(list);
+  network_connector->disconnectSlots("1.output", "2.input");
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
