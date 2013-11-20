@@ -201,8 +201,8 @@ void cedar::aux::gui::QwtSurfacePlot::init()
                                             1.0
                                             ));
 
-  this->mPerspectives.push_back(Perspective("view 2",
-                                            45, 0, 45,
+  this->mPerspectives.push_back(Perspective("birds' eye view",
+                                            45, 0, -45,
                                             1, 1, 5,
                                             0.15, 0, 0,
                                             1.0
