@@ -97,68 +97,83 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   bool is_multiplot = false;
   std::vector<cedar::proc::ElementDeclaration::DataList::iterator> invalid_data;
 
-  for (auto it = mData.begin(); it != mData.end(); ++it)
+  // create lambda to either call in loop or just once, depending on slot_type
+
+  auto processSlot = [&](cedar::proc::DataSlotPtr slot, cedar::proc::PlotDataPtr data_item)
   {
-    auto deit = *it;
+    cedar::aux::DataPtr p_data = slot->getData();
+    const std::string& title = slot->getText();
+
+    if (p_data)
+    // skip slots that aren't set
+    {
+      // get the plot_class
+      std::string plot_declaration = data_item->getParameter<cedar::aux::StringParameter>("plotDeclaration")->getValue();
+      auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(p_data)->getData();
+      auto decl = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(p_data);
+      
+      for(auto declaration : declarations)
+      {
+        if(declaration->getClassName() == plot_declaration)
+        {
+          decl = declaration;
+          break;
+        }
+      }
+      if
+        // if no plotter exists or the declaration demands a different plotter or we cannot append
+        // the data to the current plotter, we have to create a new plotter and have it plot the data
+       (
+          mLabeledPlot.mpPlotter == NULL
+          || 
+            (
+              plot_declaration != ""
+              && mLabeledPlot.mpPlotDeclaration->getClassName() != plot_declaration
+            )
+          ||
+            !(
+              dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)
+              && static_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)->canAppend(p_data)
+            )
+        )
+      {
+        //count += createAndAddPlotToGrid(decl, p_data, title, row, column) ? 1 : 0;
+        count += createAndAddPlotToGrid(decl, p_data, title, 2 * (count / mColumns), count % mColumns) ? 1 : 0;
+      }
+      else
+      {
+        is_multiplot = tryAppendDataToPlot(p_data, title);
+      }
+    }
+    else
+    {
+      // mark for removal
+      invalid_data.push_back(it);
+    }
+  }
+
+  for (auto data_item : mData)
+  {
     try
     {
-      cedar::proc::DataSlotPtr slot = mStep->getSlot(deit->getParameter<cedar::aux::EnumParameter>("id")->getValue(), deit->getParameter<cedar::aux::StringParameter>("name")->getValue());
-      cedar::aux::DataPtr p_data = slot->getData();
-      const std::string& title = slot->getText();
+      cedar::proc::DataSlotPtr slot = mStep->getSlot(data_item->getParameter<cedar::aux::EnumParameter>("id")->getValue(), data_item->getParameter<cedar::aux::StringParameter>("name")->getValue());
 
-      int column = count % mColumns;
-      int row = 2 * (count / mColumns);
-
-      if (p_data)
-      // skip slots that aren't set
+      // input slots can be collections so check if that's the case
+      if(auto input_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalDataPtr>(slot) && input_slot->isCollection())
       {
-        // get the plot_class
-        std::string plot_declaration = deit->getParameter<cedar::aux::StringParameter>("plotDeclaration")->getValue();
-        auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(p_data)->getData();
-        auto decl = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(p_data);
-        
-        for(auto iter = declarations.begin(); iter != declarations.end(); ++iter)
+        for(auto i : input_slot->getDataCount())
         {
-          auto deIter = *iter;
-          if(deIter->getClassName() == plot_declaration)
-          {
-            decl = deIter;
-            break;
-          }
-        }
-        if
-          // if no plotter exists or the declaration demands a different plotter or we cannot append
-          // the data to the current plotter, we have to create a new plotter and have it plot the data
-         (
-            mLabeledPlot.mpPlotter == NULL
-            || 
-              (
-                plot_declaration != ""
-                && mLabeledPlot.mpPlotDeclaration->getClassName() != plot_declaration
-              )
-            ||
-              !(
-                dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)
-                && static_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)->canAppend(p_data)
-              )
-          )
-        {
-          count += createAndAddPlotToGrid(decl, p_data, title, row, column) ? 1 : 0;
-        }
-        else
-        {
-          is_multiplot = tryAppendDataToPlot(p_data, title);
+          processSlot(input_slot->getData(i), data_item);
         }
       }
       else
       {
-        // mark for removal
-        invalid_data.push_back(it);
+        processSlot(slot, data_item);
       }
     }
     catch (const cedar::proc::InvalidRoleException& e)
     {
-      if (!deit->getParameter<cedar::aux::BoolParameter>("ignoreIfMissing"))
+      if (!data_item->getParameter<cedar::aux::BoolParameter>("ignoreIfMissing"))
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
@@ -169,7 +184,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
     }
     catch (const cedar::aux::InvalidNameException& e)
     {
-      if (!deit->getParameter<cedar::aux::BoolParameter>("ignoreIfMissing"))
+      if (!data_item->getParameter<cedar::aux::BoolParameter>("ignoreIfMissing"))
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
@@ -180,9 +195,9 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
     }
   }
 
-  for(auto it = invalid_data.begin(); it != invalid_data.end(); ++it)
+  for(auto it : invalid_data)
   {
-    mData.erase(*it);
+    mData.erase(it);
   }
   // if there is only one plot and it is a multiplot, we need no label
   if (count == 1 && is_multiplot)
