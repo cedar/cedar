@@ -39,7 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/kernel/Kernel.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

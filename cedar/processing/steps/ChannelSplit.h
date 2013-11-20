@@ -42,10 +42,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/annotation/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
 #include "cedar/processing/steps/ChannelSplit.fwd.h"
 
 // SYSTEM INCLUDES

@@ -38,7 +38,6 @@
 #define CEDAR_AUX_KERNEL_KERNEL_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/IntVectorParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
@@ -46,6 +45,8 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Data.fwd.h"
 #include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/kernel/FactoryManager.fwd.h"
+#include "cedar/auxiliaries/kernel/Kernel.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

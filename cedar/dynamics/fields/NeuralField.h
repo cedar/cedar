@@ -50,12 +50,13 @@
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/kernel/Gauss.fwd.h"
+#include "cedar/auxiliaries/kernel/Kernel.fwd.h"
 #include "cedar/dynamics/fields/NeuralField.fwd.h"
 
 // SYSTEM INCLUDES
