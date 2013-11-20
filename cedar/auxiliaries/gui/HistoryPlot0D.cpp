@@ -403,15 +403,15 @@ void cedar::aux::gui::HistoryPlot0D::conversionDone()
     x_max = std::max(x_max, curve->mXArray.back());
 
     // choose the right function depending on the qwt version
-#if (QWT_VERSION >> 16) == 5
-    curve->mCurve->setData
+#if (QWT_VERSION >= 0x060000)
+    curve->mCurve->setRawSamples
     (
       &curve->mXArray.front(),
       &curve->mYArray.front(),
       static_cast<int>(curve->mXValues.size())
     );
-#elif (QWT_VERSION >> 16) == 6
-    curve->mCurve->setRawSamples
+#elif (QWT_VERSION >= 0x050000)
+    curve->mCurve->setData
     (
       &curve->mXArray.front(),
       &curve->mYArray.front(),

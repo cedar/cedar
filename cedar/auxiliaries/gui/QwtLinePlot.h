@@ -135,6 +135,7 @@ private:
 
     ~PlotSeries()
     {
+      mpCurve->detach();
     }
 
     //!@brief (Re-)initializes the x and y value arrays.
