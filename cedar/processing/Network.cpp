@@ -1723,6 +1723,9 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
   {
     this->mSlotChanged();
   }
+
+  // inform gui network about name change
+  emit cedar::proc::Network::stepNameChanged(old_name, element->getName());
 }
 
 void cedar::proc::Network::getDataConnections(

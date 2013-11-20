@@ -224,11 +224,16 @@ public slots:
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
+  //!@brief handles name-change of the underlying step
+  void handleStepNameChanged();
+
   //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
   void removeChildWidget();
 
-  //! Closes all plots that were opened for this step.
+  //!@brief Closes all plots that were opened for this step.
   void closeAllPlots();
+
+  //!@brief toggles visibility of the plots this step has opened
   void toggleVisibilityOfPlots();
 
 
