@@ -61,21 +61,6 @@
 class cedar::proc::gui::PlotWidget : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // constructors and destructor
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief The standard constructor.
-  PlotWidget(
-    cedar::proc::StepPtr step,
-    const cedar::proc::ElementDeclaration::DataList& data
-  );
-
-  //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 private:
@@ -95,19 +80,34 @@ private:
     };
     // members
     cedar::aux::gui::ConstPlotDeclarationPtr mpPlotDeclaration;
-    QLabel * mpLabel;
+    QLabel* mpLabel;
     cedar::aux::gui::PlotInterface* mpPlotter;
   };
+
+  typedef std::pair<cedar::aux::ConstDataPtr, LabeledPlot> PlotGridMapItem;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  PlotWidget(
+    cedar::proc::StepPtr step,
+    const cedar::proc::ElementDeclaration::DataList& data
+  );
+
+  //!@brief The standard destructor
+  ~PlotWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief get number of rows
-  int getRowCount();
+  int getRowCount() const;
 
   //!@brief get number of columns
-  int getColumnCount();
+  int getColumnCount() const;
 
   //!@brief write plot configuration to a configuration node
   void writeConfiguration(cedar::aux::ConfigurationNode& root);
@@ -131,10 +131,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Fills the Plot Widget's Grid Layout with Plots of the provided data-list
   void fillGridWithPlots();
-  bool createAndAddPlotToGrid(cedar::aux::gui::ConstPlotDeclarationPtr decl, cedar::aux::DataPtr pData, const std::string& title, int row, int column);
-  bool tryAppendDataToPlot(cedar::aux::DataPtr pData, const std::string& title);
-  void removePlotForExternalData(cedar::aux::ConstDataPtr data);
+  //!@brief creates a plot of the given data at a given slot, returns false if it created a new plot-widget, true if it appended to an existing one.
+  bool processSlot(cedar::aux::ConstDataPtr slot, cedar::proc::PlotDataPtr dataItem, const std::string& title);
+  bool createAndAddPlotToGrid(cedar::aux::gui::ConstPlotDeclarationPtr decl, cedar::aux::ConstDataPtr pData, const std::string& title);
+  bool tryAppendDataToPlot(cedar::aux::ConstDataPtr pData, const std::string& title);
+  //!@brief gets called if data is added to slot and adds a plot
+  void addPlotOfExternalData(cedar::aux::ConstDataPtr pData, cedar::proc::ExternalDataPtr slot, cedar::proc::PlotDataPtr dataItem);
+  //!@brief gets called if data is removed from a slot and removes the plot thereof
+  void removePlotOfExternalData(cedar::aux::ConstDataPtr pData, bool isMultiplot);
+  //!@brief returns the next free grid slot
+  std::tuple<int, int> usingNextFreeGridSlot();
   cedar::aux::ConfigurationNode serialize(const cedar::proc::ElementDeclaration::DataList& dataList) const;
 
 
@@ -146,10 +154,14 @@ protected:
 private:
   cedar::proc::ElementDeclaration::DataList mData;
   cedar::proc::StepPtr mStep;
-  LabeledPlot mLabeledPlot;
+  LabeledPlot mCurrentLabeledPlot;
   int mGridSpacing;
   int mColumns;
   QGridLayout* mpLayout;
+
+  std::vector<boost::signals2::connection> mSignalConnections;
+  std::map<cedar::aux::ConstDataPtr, LabeledPlot> mPlotGridMap;
+  std::list<std::tuple<int, int>> mFreeGridSlots;
 
 }; // cedar::proc::gui::PlotWidget
 
