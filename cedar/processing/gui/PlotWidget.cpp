@@ -158,12 +158,23 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
     {
       cedar::proc::DataSlotPtr slot = mStep->getSlot(data_item->getParameter<cedar::aux::EnumParameter>("id")->getValue(), data_item->getParameter<cedar::aux::StringParameter>("name")->getValue());
 
-      // input slots can be collections so check if that's the case
-      if(auto input_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalDataPtr>(slot) && input_slot->isCollection())
+      // we need to treat external data differently
+      if(auto input_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalDataPtr>(slot))
       {
+        // could check if it's a collection with input_slot->isCollection();
+        // but if it's not this loop should have just one iteration ...
         for(auto i : input_slot->getDataCount())
         {
           processSlot(input_slot->getData(i), data_item);
+          input_slot->connectToExternalDataRemoved
+          (
+            boost::bind
+            (
+              &cedar::proc::gui::PlotWidget::removePlotOfExternalData,
+              this,
+              _1
+            )
+          );
         }
       }
       else
@@ -272,6 +283,11 @@ int cedar::proc::gui::PlotWidget::getRowCount()
 {
   //we half the row count since we doubled it during construction (for labels)
   return mpLayout->rowCount() / 2;
+}
+
+void cedar::proc::gui::PlotWidget::removePlotForExternalData(cedar::aux::ConstDataPtr data)
+{
+  std::cout << "asdf" << std::endl;
 }
 
 void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationNode& root)
