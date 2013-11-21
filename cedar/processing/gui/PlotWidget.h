@@ -134,6 +134,7 @@ private:
   void fillGridWithPlots();
   bool createAndAddPlotToGrid(cedar::aux::gui::ConstPlotDeclarationPtr decl, cedar::aux::DataPtr pData, const std::string& title, int row, int column);
   bool tryAppendDataToPlot(cedar::aux::DataPtr pData, const std::string& title);
+  void removePlotForExternalData(cedar::aux::ConstDataPtr data);
   cedar::aux::ConfigurationNode serialize(const cedar::proc::ElementDeclaration::DataList& dataList) const;
 
 
