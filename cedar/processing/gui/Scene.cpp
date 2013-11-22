@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ElementClassList.h"
+#include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
@@ -339,12 +340,20 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
   // see if the mouse is moving some items
   if (pMouseEvent->button() == Qt::LeftButton)
   {
-    auto items = this->items(pMouseEvent->scenePos());
-    for (int i = 0; i < items.size(); ++i)
+    auto items = this->items(pMouseEvent->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder);
+    // this is only the case if an item under the mouse is selected
+    // (resize handles make an exception, they can be dragged without being selected)
+    if (items.size() > 0)
     {
-      if (items.at(i)->isSelected())
+      if (!dynamic_cast<cedar::proc::gui::ResizeHandle*>(items.at(0)))
       {
-        this->mDraggingItems = true;
+        for (int i = 0; i < items.size(); ++i)
+        {
+          if (items.at(i)->isSelected())
+          {
+            this->mDraggingItems = true;
+          }
+        }
       }
     }
   }
