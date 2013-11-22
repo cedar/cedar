@@ -408,7 +408,8 @@ bool cedar::proc::gui::Network::canAddAny(const QList<QGraphicsItem*>& items) co
 
 void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
 {
-  std::list<cedar::proc::ElementPtr> elems;
+  std::list<cedar::proc::ElementPtr> elements_to_move;
+  std::set<cedar::proc::ElementPtr> all_elements;
   for (auto it = elements.begin(); it != elements.end(); ++it)
   {
     cedar::proc::ElementPtr element;
@@ -416,6 +417,15 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(*it))
     {
       element = graphics_base->getElement();
+
+      auto children = graphics_base->children();
+      for (int i = 0; i < children.size(); ++i)
+      {
+        if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(children.at(i)))
+        {
+          all_elements.insert(graphics_child->getElement());
+        }
+      }
     }
     else if (dynamic_cast<cedar::proc::gui::Connection*>(*it))
     {
@@ -431,28 +441,50 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
       )
     }
     CEDAR_DEBUG_ASSERT(element);
-    elems.push_back(element);
+    elements_to_move.push_back(element);
+    all_elements.insert(element);
   }
   this->mHoldFitToContents = true;
 
-  // remember the items' scene positions
   std::map<cedar::proc::ElementPtr, QPointF> item_scene_pos;
-  for (auto it = elems.begin(); it != elems.end(); ++it)
+  std::map<cedar::proc::ElementPtr, cedar::aux::ConfigurationNode> item_configs;
+  for (auto it = all_elements.begin(); it != all_elements.end(); ++it)
   {
     auto element = *it;
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
+    // remember the item's scene positions
     item_scene_pos[element] = graphics_item->scenePos();
+
+    // remember the item's configuration
+    cedar::aux::ConfigurationNode config;
+    graphics_item->writeConfiguration(config);
+    item_configs[element] = config;
   }
 
-  this->getNetwork()->add(elems);
+  this->getNetwork()->add(elements_to_move);
 
-  // restore item positions
   for (auto it = item_scene_pos.begin(); it != item_scene_pos.end(); ++it)
   {
     auto element = it->first;
-    const QPointF& scene_pos = it->second;
+
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
-    graphics_item->setPos(this->mapFromScene(scene_pos));
+
+    // restore the item's configuration
+    // this has to be done before position restoration as it also reads the item's old position (but in the wrong
+    // reference frame)
+    auto config_it = item_configs.find(element);
+    CEDAR_DEBUG_ASSERT(config_it != item_configs.end());
+    graphics_item->readConfiguration(config_it->second);
+
+    // restore the item's position
+    const QPointF& scene_pos = it->second;
+    auto parent = graphics_item->parentItem();
+    if(parent == NULL)
+    {
+      parent = this;
+    }
+
+    graphics_item->setPos(parent->mapFromScene(scene_pos));
   }
 
   this->mHoldFitToContents = false;
