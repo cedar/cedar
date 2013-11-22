@@ -142,6 +142,9 @@ public:
   //!@brief get pen of the shape (e.g. to look up thickness of shape line)
   QPen getOutlinePen() const;
 
+  //! Returns the brush used for filling the item's shape
+  QBrush getOutlineBrush() const;
+
   //!@brief This method highlights this item according to how it can connect to the source.
   void highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource);
 
@@ -276,6 +279,9 @@ private:
   
   //! Called whenever the item has been selected or deselected.
   virtual void itemSelected(bool selected);
+
+  //! Draws the base shape of the item on the given painter
+  void drawShape(QPainter* painter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
