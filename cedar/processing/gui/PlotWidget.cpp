@@ -423,8 +423,8 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
     this->mpLayout->getItemPosition(index, &row, &col, &r_span, &c_span);
 
     // no idea if takeAt changes the indices of other items, to be safe take the plot first
-    labeled_plot.mpPlotter = this->mpLayout->takeAt(index + 1);
-    labeled_plot.mpLabel = this->mpLayout->takeAt(index);
+    labeled_plot.mpPlotter = dynamic_cast<cedar::aux::gui::PlotInterface*>(this->mpLayout->takeAt(index + 1));
+    labeled_plot.mpLabel = dynamic_cast<QLabel*>(this->mpLayout->takeAt(index));
 
     // store the slot at the end of the list of free slots
     mFreeGridSlots.push_back(std::make_tuple(row, col));
