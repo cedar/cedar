@@ -197,6 +197,23 @@ cedar::proc::gui::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Network::itemSceneHasChanged()
+{
+  this->addGuiItemsForNetwork();
+}
+
+void cedar::proc::gui::Network::addGuiItemsForNetwork()
+{
+  CEDAR_DEBUG_ASSERT(this->getNetwork());
+
+  auto elements = this->getNetwork()->getElements();
+  for (auto iter = elements.begin(); iter != elements.end(); ++iter)
+  {
+    auto element = iter->second;
+    this->processElementAddedSignal(element);
+  }
+}
+
 void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
 {
   std::string new_name = this->getNetwork()->duplicate(elementName, newName);
@@ -391,9 +408,8 @@ bool cedar::proc::gui::Network::canAddAny(const QList<QGraphicsItem*>& items) co
 
 void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
 {
-  typedef std::list<QGraphicsItem*>::const_iterator const_iterator;
   std::list<cedar::proc::ElementPtr> elems;
-  for (const_iterator it = elements.begin(); it != elements.end(); ++it)
+  for (auto it = elements.begin(); it != elements.end(); ++it)
   {
     cedar::proc::ElementPtr element;
     //!@todo This if/else if stuff could probably be replaced by just casting to a common cedar::proc::gui::Element class.

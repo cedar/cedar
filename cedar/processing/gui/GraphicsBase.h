@@ -243,6 +243,9 @@ protected:
   //!@brief deal with changes to this instance (e.g. position changes)
   QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
+  //! Called whenever the item is added to a scene.
+  virtual void itemSceneHasChanged();
+
   /*!@brief Sets the base shape of the item.
    *
    * @remarks This method should only be called during construction.

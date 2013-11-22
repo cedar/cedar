@@ -127,6 +127,11 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GraphicsBase::itemSceneHasChanged()
+{
+  // empty default implementation
+}
+
 void cedar::proc::gui::GraphicsBase::setResizeable(bool resizeable)
 {
   this->mResizeable = resizeable;
@@ -593,6 +598,13 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
           }
         }
       }
+      break;
+    }
+
+    case QGraphicsItem::ItemSceneHasChanged:
+    {
+      this->itemSceneHasChanged();
+      break;
     }
 
     default:
