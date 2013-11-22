@@ -574,17 +574,25 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
   // check old connections
 
   std::vector<DataConnectionInfo> data_connections;
+  std::vector<DataConnectionInfo> data_connections_incoming;
+  std::vector<DataConnectionInfo> data_connections_outgoing;
   std::vector<TriggerConnectionInfo> trigger_connections;
-  cedar::proc::NetworkPtr old_network;
+  // sanity check if all elements have the same parent network
+  cedar::proc::NetworkPtr old_network = (*(elements.begin()))->getNetwork();
   for
   (
     iterator it = elements.begin(); it != elements.end(); ++it
   )
   {
     // need two parentheses here because otherwise clang throws a warning
-    if ((old_network = (*(elements.begin()))->getNetwork()))
+    if (old_network != (*it)->getNetwork())
     {
-      break;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "You cannot move elements from different parent networks into network " + this->getName() + ".",
+        "cedar::proc::Network::addElements(std::list<cedar::proc::ElementPtr> elements)"
+      );
+      return;
     }
   }
   // remember all data connections between moved elements
@@ -597,10 +605,13 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
       ++it
     )
     {
+      // find connections that we have to restore after moving elements
       cedar::proc::ElementPtr source = old_network->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
       cedar::proc::ElementPtr target = old_network->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
       iterator source_it = std::find(elements.begin(), elements.end(), source);
       iterator target_it = std::find(elements.begin(), elements.end(), target);
+
+      // these connections connect elements that are moved
       if (source_it != elements.end() && target_it != elements.end())
       {
         // this connection must be stored (note that connections are automatically deleted if elements are removed)
@@ -613,6 +624,53 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
           )
         );
       }
+      // these connections now connect to the network input connector and to a moved element
+      if (source_it == elements.end() && target_it != elements.end())
+      {
+        std::string connector_name = this->getUniqueIdentifier((*target_it)->getName() + " input");
+        this->addConnector(connector_name, true);
+        data_connections_incoming.push_back
+        (
+          DataConnectionInfo
+          (
+            (*it)->getSource()->getParent() + "." + (*it)->getSource()->getName(),
+            this->getName() + "." + connector_name
+          )
+        );
+        data_connections.push_back
+        (
+          DataConnectionInfo
+          (
+            connector_name + "." + "output",
+            (*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName()
+          )
+        );
+      }
+
+      // these connections now connect from a moved element through a network output connector to external elements
+      if (source_it != elements.end() && target_it == elements.end())
+      {
+        std::string connector_name = this->getUniqueIdentifier((*source_it)->getName() + " output");
+        this->addConnector(connector_name, false);
+        data_connections_outgoing.push_back
+        (
+          DataConnectionInfo
+          (
+            this->getName() + "." + connector_name,
+            (*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName()
+          )
+        );
+        data_connections.push_back
+        (
+          DataConnectionInfo
+          (
+            (*it)->getSource()->getParent() + "." + (*it)->getSource()->getName(),
+            connector_name + "." + "input"
+          )
+        );
+      }
+
+
     }
   }
   // remember all trigger connections between moved elements
@@ -641,6 +699,17 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
   for (iterator it = elements.begin(); it != elements.end(); ++it)
   {
     this->add(*it);
+  }
+
+  // restore data connections in old network
+  for (unsigned int i = 0; i < data_connections_incoming.size(); ++i)
+  {
+    old_network->connectSlots(data_connections_incoming.at(i).from, data_connections_incoming.at(i).to);
+  }
+  // restore data connections in old network
+  for (unsigned int i = 0; i < data_connections_outgoing.size(); ++i)
+  {
+    old_network->connectSlots(data_connections_outgoing.at(i).from, data_connections_outgoing.at(i).to);
   }
 
   // restore data connections
@@ -775,11 +844,11 @@ std::string cedar::proc::Network::duplicate(const std::string& elementName, cons
     std::string modified_name;
     if (!newName.empty()) // desired name given
     {
-      modified_name = this->getUniqueName(newName);
+      modified_name = this->getUniqueIdentifier(newName);
     }
     else // default name
     {
-      modified_name = this->getUniqueName(elementName);
+      modified_name = this->getUniqueIdentifier(elementName);
     }
     // set unique name
     new_elem->setName(modified_name);
@@ -798,27 +867,27 @@ std::string cedar::proc::Network::duplicate(const std::string& elementName, cons
   }
 }
 
-std::string cedar::proc::Network::getUniqueName(const std::string& unmodifiedName) const
-{
-  std::string adjusted_name;
-  try
-  {
-    unsigned int new_id = 1;
-    adjusted_name = unmodifiedName;
-    while (this->getElement(adjusted_name))
-    {
-      std::stringstream str;
-      str << unmodifiedName << " " << new_id;
-      adjusted_name = str.str();
-      ++new_id;
-    }
-  }
-  catch(cedar::aux::InvalidNameException& exc)
-  {
-    // nothing to do here, name not duplicate, use this as a name
-  }
-  return adjusted_name;
-}
+//std::string cedar::proc::Network::getUniqueName(const std::string& unmodifiedName) const
+//{
+//  std::string adjusted_name;
+//  try
+//  {
+//    unsigned int new_id = 1;
+//    adjusted_name = unmodifiedName;
+//    while (this->getElement(adjusted_name))
+//    {
+//      std::stringstream str;
+//      str << unmodifiedName << " " << new_id;
+//      adjusted_name = str.str();
+//      ++new_id;
+//    }
+//  }
+//  catch(cedar::aux::InvalidNameException& exc)
+//  {
+//    // nothing to do here, name not duplicate, use this as a name
+//  }
+//  return adjusted_name;
+//}
 
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const cedar::proc::NetworkPath& name) const
 {

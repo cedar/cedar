@@ -222,7 +222,7 @@ public:
   /*!@brief unmodifiedName unmodified name, possibly non-unique in network
    * @return unique name created by attaching a number if name is already taken
    */
-  std::string getUniqueName(const std::string& unmodifiedName) const;
+  //std::string getUniqueName(const std::string& unmodifiedName) const;
 
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */

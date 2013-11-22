@@ -861,7 +861,7 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
   CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
   std::string name = "new " + split_class_name.back();
 
-  std::string adjusted_name = network->getUniqueName(name);
+  std::string adjusted_name = network->getUniqueIdentifier(name);
 
   try
   {

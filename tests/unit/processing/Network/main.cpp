@@ -132,7 +132,7 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "test duplication of steps" << std::endl;
   try
   {
-    std::string new_name = network->getUniqueName("stepB");
+    std::string new_name = network->getUniqueIdentifier("stepB");
     network->duplicate("stepB");
     network->getElement(new_name);
   }
@@ -255,6 +255,8 @@ int main(int /* argc */, char** /* argv */)
   list.push_back(network_root->getElement("2"));
   network_connector->add(list);
   network_connector->disconnectSlots("1.output", "2.input");
+  network_root->disconnectSlots("0.output", "nested.1 input");
+  network_root->disconnectSlots("nested.2 output", "3.input");
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
