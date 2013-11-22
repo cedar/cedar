@@ -418,12 +418,27 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     elems.push_back(element);
   }
   this->mHoldFitToContents = true;
-  this->getNetwork()->add(elems);
-  // move elements
-  for (std::list<cedar::proc::ElementPtr>::iterator it = elems.begin(); it != elems.end(); ++it)
+
+  // remember the items' scene positions
+  std::map<cedar::proc::ElementPtr, QPointF> item_scene_pos;
+  for (auto it = elems.begin(); it != elems.end(); ++it)
   {
-    this->transformChildCoordinates(this->mpScene->getGraphicsItemFor((*it).get()));
+    auto element = *it;
+    auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
+    item_scene_pos[element] = graphics_item->scenePos();
   }
+
+  this->getNetwork()->add(elems);
+
+  // restore item positions
+  for (auto it = item_scene_pos.begin(); it != item_scene_pos.end(); ++it)
+  {
+    auto element = it->first;
+    const QPointF& scene_pos = it->second;
+    auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
+    graphics_item->setPos(this->mapFromScene(scene_pos));
+  }
+
   this->mHoldFitToContents = false;
 //  this->fitToContents();
 }
