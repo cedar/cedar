@@ -380,17 +380,14 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   {
     cedar::proc::ElementPtr element;
     //!@todo This if/else if stuff could probably be replaced by just casting to a common cedar::proc::gui::Element class.
-    if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(*it))
+    if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(*it))
     {
-      element = p_step->getStep();
+      element = graphics_base->getElement();
     }
-    else if (cedar::proc::gui::TriggerItem* p_step = dynamic_cast<cedar::proc::gui::TriggerItem*>(*it))
+    else if (dynamic_cast<cedar::proc::gui::Connection*>(*it))
     {
-      element = p_step->getTrigger();
-    }
-    else if (cedar::proc::gui::Network* p_network = dynamic_cast<cedar::proc::gui::Network*>(*it))
-    {
-      element = p_network->getNetwork();
+      // connections are ignored, the underlying framework takes care of them
+      continue;
     }
     else
     {
@@ -400,22 +397,15 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
         "cedar::proc::gui::Network::addElements cannot handle this type of QGraphicsItem."
       )
     }
+    CEDAR_DEBUG_ASSERT(element);
     elems.push_back(element);
   }
   this->mHoldFitToContents = true;
   this->getNetwork()->add(elems);
   // move elements
-//  for (const_iterator i = elements.begin(); i != elements.end(); ++i)
-//  {
-//    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(*i))
-//    {
-//      // add to network
-//      this->addElement(p_element);
-//    }
-//  }
   for (std::list<cedar::proc::ElementPtr>::iterator it = elems.begin(); it != elems.end(); ++it)
   {
-    this->addElement(this->mpScene->getGraphicsItemFor((*it).get()));
+    this->transformChildCoordinates(this->mpScene->getGraphicsItemFor((*it).get()));
   }
   this->mHoldFitToContents = false;
 //  this->fitToContents();

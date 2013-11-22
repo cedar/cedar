@@ -551,17 +551,22 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
   typedef std::list<cedar::proc::ElementPtr>::const_iterator const_iterator;
   for (iterator it = elements.begin(); it != elements.end(); )
   {
-    try
+    // check if the name already exists
+    if (this->nameExists((*it)->getName()))
     {
-      this->getElement<cedar::proc::Element>((*it)->getName());
-      it = elements.erase(it);
+      // if so, output a warning ...
       cedar::aux::LogSingleton::getInstance()->warning
       (
         "An element of name " + (*it)->getName() + " already exists in network " + this->getName() + ".",
         "cedar::proc::Network::addElements(std::list<cedar::proc::ElementPtr> elements)"
       );
+
+      // ... and remove the element from the list of elements to be moved
+      //!@todo Can we deal with this in a better way than just ignoring the element? Maybe rename it?
+      it = elements.erase(it);
     }
-    catch(cedar::aux::InvalidNameException& exc)
+    // otherwise, continue to the next element
+    else
     {
       ++it;
     }
@@ -721,8 +726,6 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
     this->declareInput(name, false);
     cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
     this->add(source, name);
-    // TODO
-//    this->connectTrigger(this->getFinishedTrigger(), source);
   }
   else
   {
@@ -742,8 +745,6 @@ void cedar::proc::Network::removeConnector(const std::string& name, bool input)
     // here be comments
     if (input)
     {
-      // TODO
-//      this->disconnectTrigger(this->getFinishedTrigger(), this->getElement<cedar::proc::Triggerable>(name));
       this->remove(this->getElement(name));
       this->removeInputSlot(name);
     }
