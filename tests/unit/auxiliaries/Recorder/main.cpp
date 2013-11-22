@@ -41,7 +41,9 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 #include <iostream>
-#include <boost/shared_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/shared_ptr.hpp>
+#endif
 #include  <string>
 
 unsigned int errors;

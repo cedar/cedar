@@ -42,7 +42,9 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <boost/math/special_functions/round.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/math/special_functions/round.hpp>
+#endif
 #include <ios>
 
 //--------------------------------------------------------------------------------------------------------------------

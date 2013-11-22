@@ -49,8 +49,10 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif
 
 /*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
  *

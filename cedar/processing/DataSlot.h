@@ -43,10 +43,12 @@
 #include "cedar/processing/DataRole.h"
 
 // SYSTEM INCLUDES
-#include <boost/function.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/signals2/connection.hpp>
-#include <boost/signals2/signal.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/function.hpp>
+  #include <boost/enable_shared_from_this.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/signals2/signal.hpp>
+#endif
 
 /*!@brief This class represents data slots in connectable objects.
  *

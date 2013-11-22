@@ -46,7 +46,9 @@
 #include <QTableWidget>
 #include <QCheckBox>
 #include <QLabel>
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/connection.hpp>
+#endif
 
 
 /*!@brief A widget for displaying the parameters of configurables.

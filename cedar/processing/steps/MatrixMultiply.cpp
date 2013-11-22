@@ -124,11 +124,11 @@ void cedar::proc::steps::MatrixMultiply::inputConnectionChanged(const std::strin
 {
   if (inputName == "operand1")
   {
-    this->mInput1 = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->mInput1 = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   }
   else if (inputName == "operand2")
   {
-    this->mInput2 = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->mInput2 = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   }
 
   if (this->mInput1 && this->mInput2)

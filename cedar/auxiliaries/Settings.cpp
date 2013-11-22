@@ -42,7 +42,9 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <boost/property_tree/json_parser.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/json_parser.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

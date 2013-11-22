@@ -42,7 +42,9 @@
 #include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
-#include <boost/enable_shared_from_this.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/enable_shared_from_this.hpp>
+#endif
 #include <set>
 #include <queue>
 #include <iostream>

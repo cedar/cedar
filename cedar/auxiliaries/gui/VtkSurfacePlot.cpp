@@ -216,7 +216,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
 
   void cedar::aux::gui::VtkSurfacePlot::plot(cedar::aux::ConstDataPtr data, const std::string&)
   {
-    this->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+    this->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
     if (!this->mMatData)
     {
@@ -380,7 +380,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
 
   void cedar::aux::gui::VtkSurfacePlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
   {
-    mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+    mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
     if (!mMatData)
     {

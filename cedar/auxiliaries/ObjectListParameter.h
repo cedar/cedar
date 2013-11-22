@@ -42,7 +42,9 @@
 #include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif
 
 
 /*!@brief Base class for a parameter that reads a list of configurable objects from a file.

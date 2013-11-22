@@ -38,7 +38,9 @@
 #include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/filesystem.hpp>
+#endif
 #include <vector>
 #include <string>
 #include <iostream>

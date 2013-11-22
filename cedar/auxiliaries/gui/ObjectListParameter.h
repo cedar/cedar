@@ -46,7 +46,9 @@
 // SYSTEM INCLUDES
 #include <QComboBox>
 #include <QPushButton>
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif
 
 
 /*!@brief User interface representation of cedar::aux::ObjectListParameter.

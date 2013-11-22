@@ -42,9 +42,11 @@
 #include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
-#include <boost/function.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/function.hpp>
+#endif
 
 /*!@brief   A slot for data that is not owned by a Connectable.
  *

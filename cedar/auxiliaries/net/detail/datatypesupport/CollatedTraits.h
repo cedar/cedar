@@ -42,7 +42,9 @@
 #include "cedar/auxiliaries/net/detail/namespace.h"
 
 // PROJECT INCLUDES
-#include <boost/static_assert.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/static_assert.hpp>
+#endif
 
 // SYSTEM INCLUDES
 

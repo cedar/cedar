@@ -56,7 +56,9 @@
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QCoreApplication>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
+#endif
 
 
 /*!@brief Base class for utility classes that start their own worker in a thread

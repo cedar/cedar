@@ -42,8 +42,10 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+  #include <boost/property_tree/ptree.hpp>
+#endif
 #include <opencv2/opencv.hpp>
 
 

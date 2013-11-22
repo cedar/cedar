@@ -50,7 +50,9 @@
 #include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 #include <yarp/os/Network.h>
 
 // SYSTEM INCLUDES

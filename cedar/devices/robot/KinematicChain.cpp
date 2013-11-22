@@ -46,7 +46,9 @@
 #include "cedar/auxiliaries/exceptions.h" // for DuplicateNameException
 
 // SYSTEM INCLUDES
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 
 namespace
 {

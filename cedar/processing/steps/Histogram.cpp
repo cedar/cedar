@@ -46,7 +46,9 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <boost/make_shared.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/make_shared.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

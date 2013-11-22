@@ -52,7 +52,9 @@
 #include <QApplication>
 #include <QHeaderView>
 #include <QScrollBar>
-#include <boost/bind.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/bind.hpp>
+#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------

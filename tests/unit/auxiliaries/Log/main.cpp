@@ -44,7 +44,9 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <boost/shared_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/shared_ptr.hpp>
+#endif
 #include <string>
 
 class CustomLogger : public cedar::aux::LogInterface

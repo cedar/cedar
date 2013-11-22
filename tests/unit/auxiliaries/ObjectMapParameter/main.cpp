@@ -45,8 +45,10 @@
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+  #include <boost/filesystem.hpp>
+#endif
 
 
 // a test class with two parameters

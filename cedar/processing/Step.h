@@ -54,8 +54,10 @@
 #include <QThread>
 #include <QReadWriteLock>
 #include <QMutex>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/function.hpp>
+  #include <boost/bind.hpp>
+#endif
 #include <map>
 #include <set>
 

@@ -52,7 +52,9 @@
 #include <string>
 #include <iostream>
 #include <QThread>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
+#endif
 
 /*!The worker base class that goes with ThreadWrapper
  *

@@ -50,13 +50,18 @@
 #include <strsafe.h>
 #endif // CEDAR_OS_UNIX
 
-#include <boost/version.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/version.hpp>
+#endif
 #if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
   #define BOOST_FILESYSTEM_VERSION 2
 #else
   #define BOOST_FILESYSTEM_VERSION 3
 #endif
-#include <boost/filesystem.hpp>
+
+#ifndef Q_MOC_RUN
+  #include <boost/filesystem.hpp>
+#endif
 #include <signal.h>
 
 //----------------------------------------------------------------------------------------------------------------------
