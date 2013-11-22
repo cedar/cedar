@@ -59,14 +59,14 @@ cedar::proc::gui::PlotWidget::PlotWidget
     const cedar::proc::ElementDeclaration::DataList& data
 )
 :
-mData(data),
+mDataList(data),
 mStep(step),
 mCurrentLabeledPlot(NULL),
 mGridSpacing(2),
 mColumns(2),
 mpLayout(new QGridLayout())
 {  
-  if (mData.empty())
+  if (mDataList.empty())
   {
     return;
   }
@@ -93,7 +93,7 @@ cedar::proc::gui::PlotWidget::~PlotWidget()
     connection.disconnect();
   }
   mSignalConnections.clear();
-  mData.clear();
+  mDataList.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -150,9 +150,9 @@ bool cedar::proc::gui::PlotWidget::processSlot
   return is_multiplot;
 }
 
+// iterates of the dataslots given in mDataList, creates plots for the data and adds them to the grid
 void cedar::proc::gui::PlotWidget::fillGridWithPlots()
 {
-  // iterate over all data slots
   bool is_multiplot = false;
   std::string title;
   cedar::proc::ElementDeclaration::DataList invalid_data;
@@ -175,11 +175,16 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
       }
     };
 
-  for(auto data_item : mData)
+  // iterate over all data slots
+  for(auto data_item : mDataList)
   {
     try
     {
-      cedar::proc::DataSlotPtr p_slot = mStep->getSlot(data_item->getParameter<cedar::aux::EnumParameter>("id")->getValue(), data_item->getParameter<cedar::aux::StringParameter>("name")->getValue());
+      cedar::proc::DataSlotPtr p_slot = mStep->getSlot
+      (
+        data_item->getParameter<cedar::aux::EnumParameter>("id")->getValue(),
+        data_item->getParameter<cedar::aux::StringParameter>("name")->getValue()
+      );
       title = p_slot->getText();
 
       // we need to treat external data differently
@@ -228,7 +233,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
           )
         );
       }
-      else
+      else // internal data, no need to worry about changes in the slot. plot_widget lives as long as internal data lives
       {
         process_if_set(p_slot->getData(), data_item);
       }
@@ -257,9 +262,10 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
     }
   }
 
+  // remove empty slots from the datalist
   for(auto& invalid_data_item : invalid_data)
   {
-    mData.erase(std::remove(mData.begin(), mData.end(), invalid_data_item), mData.end());
+    mDataList.erase(std::remove(mDataList.begin(), mDataList.end(), invalid_data_item), mDataList.end());
   }
   // if there is only one plot and it is a multiplot, we need no label
   if (is_multiplot && mPlotGridMap.size() == 1)
@@ -270,6 +276,8 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   }
 }
 
+// returns the next free slot in the grid layout and marks it as taken IF it was previously freed
+// it doesn't mark it as taken if it is a 'brand new' slot
 std::tuple<int, int> cedar::proc::gui::PlotWidget::usingNextFreeGridSlot()
 {
   std::tuple<int, int> free_grid_slot;
@@ -280,8 +288,12 @@ std::tuple<int, int> cedar::proc::gui::PlotWidget::usingNextFreeGridSlot()
   }
   else
   {
-    int row = (this->mpLayout->count() / 2) * 2;
-    int col = (this->mpLayout->count() % 2);
+    // each plot consists of a separate label and widget below the label,
+    // i.e. for every plot we add 2 items to the grid in the same column
+    // therefore we calculate the next free 'cell' like this
+    int row = ((this->mpLayout->count() / 2) / this->mColumns) * 2;
+    // notice that we're dealing with int and thus the / 2 and * 2 don't negate each other!
+    int col = ((this->mpLayout->count() / 2) % this->mColumns);
     free_grid_slot = std::make_tuple(row, col);
   }
 
@@ -367,10 +379,8 @@ void cedar::proc::gui::PlotWidget::addPlotOfExternalData
 )
 {
   if(slot->hasData(pData))
-    // else, something weird happened..
   {
-    // the pData should be in the last slot..
-    processSlot(slot->getData(slot->getDataCount() - 1), dataItem, slot->getText());
+    processSlot(pData, dataItem, slot->getText());
   }
 }
 
@@ -409,12 +419,14 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
     // remove the widget from the grid, and mark that slot as free
     auto index = this->mpLayout->indexOf(labeled_plot.mpLabel);
     int row, col, r_span, c_span;
+    // get row and column of the label
     this->mpLayout->getItemPosition(index, &row, &col, &r_span, &c_span);
 
-    this->mpLayout->removeWidget(labeled_plot.mpPlotter);
-    this->mpLayout->removeWidget(labeled_plot.mpLabel);
+    // no idea if takeAt changes the indices of other items, to be safe take the plot first
+    labeled_plot.mpPlotter = this->mpLayout->takeAt(index + 1);
+    labeled_plot.mpLabel = this->mpLayout->takeAt(index);
 
-    // store the slot
+    // store the slot at the end of the list of free slots
     mFreeGridSlots.push_back(std::make_tuple(row, col));
 
     // free the old plot and label
@@ -426,6 +438,7 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
   }
 }
 
+// save this plot_widget in configuration node
 void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
   root.put("step", this->mStep->getName());
@@ -433,9 +446,10 @@ void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationN
   root.put("position_y", this->parentWidget()->y());
   root.put("width", this->parentWidget()->width());
   root.put("height", this->parentWidget()->height());
-  root.put_child("data_list", serialize(this->mData));
+  root.put_child("data_list", serialize(this->mDataList));
 }
 
+// serialize the datalist for storing it in a configuration node
 cedar::aux::ConfigurationNode cedar::proc::gui::PlotWidget::serialize(const cedar::proc::ElementDeclaration::DataList& dataList) const
 {
   cedar::aux::ConfigurationNode serialized_data;
@@ -450,6 +464,7 @@ cedar::aux::ConfigurationNode cedar::proc::gui::PlotWidget::serialize(const ceda
   return serialized_data;
 }
 
+// restore plotwidget from a configuration node and add it to the respective step
 void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::StepItem* pStepItem)
 {
   int width = node.get<int>("width");

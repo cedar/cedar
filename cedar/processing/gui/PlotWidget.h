@@ -55,6 +55,11 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QLabel>
+#include <map>
+#include <vector>
+#include <string>
+#include <list>
+#include <tuple>
 
 /*!@todo Document this.
  */
@@ -84,7 +89,7 @@ private:
     cedar::aux::gui::PlotInterface* mpPlotter;
   };
 
-  typedef std::pair<cedar::aux::ConstDataPtr, LabeledPlot> PlotGridMapItem;
+  typedef std::tuple<cedar::aux::ConstDataPtr, LabeledPlot> PlotGridMapItem;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -152,7 +157,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::ElementDeclaration::DataList mData;
+  cedar::proc::ElementDeclaration::DataList mDataList;
   cedar::proc::StepPtr mStep;
   LabeledPlot mCurrentLabeledPlot;
   int mGridSpacing;
