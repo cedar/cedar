@@ -392,22 +392,28 @@ const cedar::proc::gui::GraphicsBase::GraphicsGroup& cedar::proc::gui::GraphicsB
   return this->mGroup;
 }
 
-QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
+QBrush cedar::proc::gui::GraphicsBase::getTargetGroupBrush()
 {
   QBrush brush;
+  brush.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+  brush.setStyle(Qt::BDiagPattern);
+  return brush;
+}
+
+QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
+{
   switch (this->mHighlightMode)
   {
     case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
-      brush.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
-      brush.setStyle(Qt::BDiagPattern);
-      break;
+      return cedar::proc::gui::GraphicsBase::getTargetGroupBrush();
 
     default:
     case HIGHLIGHTMODE_NONE:
+      QBrush brush;
       brush.setColor(this->mFillColor);
       brush.setStyle(this->mFillStyle);
+      return brush;
   }
-  return brush;
 }
 
 QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const

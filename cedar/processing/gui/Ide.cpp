@@ -380,17 +380,6 @@ void cedar::proc::gui::Ide::showSettingsDialog()
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 {
   this->mpProcessingDrawer->getScene()->setSnapToGrid(triggered);
-
-  if (triggered)
-  {
-    QBrush grid(Qt::CrossPattern);
-    grid.setColor(QColor(230, 230, 230));
-    this->mpProcessingDrawer->getScene()->setBackgroundBrush(grid);
-  }
-  else
-  {
-    this->mpProcessingDrawer->getScene()->setBackgroundBrush(Qt::white);
-  }
 }
 
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)

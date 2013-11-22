@@ -167,6 +167,22 @@ bool cedar::proc::gui::Scene::getSnapToGrid() const
 void cedar::proc::gui::Scene::setSnapToGrid(bool snap)
 {
   this->mSnapToGrid = snap;
+
+  this->resetBackgroundColor();
+}
+
+void cedar::proc::gui::Scene::resetBackgroundColor()
+{
+  if (this->mSnapToGrid)
+  {
+    QBrush grid(Qt::CrossPattern);
+    grid.setColor(QColor(230, 230, 230));
+    this->setBackgroundBrush(grid);
+  }
+  else
+  {
+    this->setBackgroundBrush(Qt::white);
+  }
 }
 
 void cedar::proc::gui::Scene::reset()
@@ -352,52 +368,64 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
 
   if (this->mDraggingItems)
   {
-    auto items = this->items(pMouseEvent->scenePos());
+    this->highlightTargetGroups(pMouseEvent->scenePos());
+  }
+}
 
-    auto old_drop_target = mpDropTarget;
-    mpDropTarget = NULL;
-    for (int i = 0; i < items.size(); ++i)
+void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition)
+{
+  auto items_under_mouse = this->items(mousePosition);
+  auto selected = this->selectedItems();
+
+  // remember the old drop target ...
+  auto old_drop_target = mpDropTarget;
+
+  // ... reset the current one ...
+  mpDropTarget = NULL;
+  mTargetGroup.reset();
+  bool potential_target_network_found = false;
+
+  // ... and look for a new one
+  for (int i = 0; i < items_under_mouse.size(); ++i)
+  {
+    if (items_under_mouse.at(i)->isSelected())
     {
-      if (items.at(i)->isSelected())
-      {
-        // if selected, the item is one of the networks being moved; thus, ignore it
-        continue;
-      }
-      if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(items.at(i)))
-      {
-        bool highlight = false;
+      // if selected, the item is one of the networks being moved; thus, ignore it
+      continue;
+    }
+    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(items_under_mouse.at(i)))
+    {
+      potential_target_network_found = true;
 
-        // check if there is an item that is not in the potential target network yet
-        auto items = this->selectedItems();
-        for (int i = 0; i < items.size(); ++i)
-        {
-          //!@todo This should cast to a cedar::proc::gui::Element class.
-          if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(items.at(i)))
-          {
-            if (connectable->getConnectable()->getNetwork() != network_item->getNetwork())
-            {
-              highlight = true;
-            }
-          }
-        }
-
-        // if there is, highlight the target network
-        if (highlight)
-        {
-          mpDropTarget = network_item;
-          network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-          break;
-        }
+      // check if there is an item that is not in the target network yet, highlight the target network
+      if (network_item->canAddAny(selected))
+      {
+        mpDropTarget = network_item;
+        mTargetGroup = network_item->getNetwork();
+        network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+        break;
       }
     }
+  }
 
-    // disable highlighting of the old drop target if the target has changed or there is no target any more
-    if ((mpDropTarget == NULL && old_drop_target != NULL) || old_drop_target != mpDropTarget)
+  this->resetBackgroundColor();
+
+  // disable highlighting of the old drop target if the target has changed or there is no target any more
+  if ((mpDropTarget == NULL && old_drop_target != NULL) || old_drop_target != mpDropTarget)
+  {
+    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(old_drop_target))
     {
-      if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(old_drop_target))
-      {
-        network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      }
+      network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    }
+  }
+
+  // if no target network was found, the step(s) should be added to the root network; thus, highlight it
+  if (!potential_target_network_found)
+  {
+    if (this->mNetwork->canAddAny(selected))
+    {
+      this->setBackgroundBrush(cedar::proc::gui::GraphicsBase::getTargetGroupBrush());
+      this->mTargetGroup = this->mNetwork->getNetwork();
     }
   }
 }
@@ -418,11 +446,21 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   }
 
   this->mDraggingItems = false;
-  if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(mpDropTarget))
+  if (mTargetGroup)
   {
-    network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-    network_item->addElements(this->selectedItems().toStdList());
+    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(mpDropTarget))
+    {
+      network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      network_item->addElements(this->selectedItems().toStdList());
+    }
+    else
+    {
+      this->mNetwork->addElements(this->selectedItems().toStdList());
+    }
   }
+
+  mTargetGroup.reset();
+  this->resetBackgroundColor();
   mpDropTarget = NULL;
 }
 

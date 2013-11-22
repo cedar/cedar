@@ -92,6 +92,9 @@ public:
   //!@brief read network from given file
   void read(const std::string& source);
 
+  //! Checks if any connectables in the given list can be added to this group. Non-connectables are ignored.
+  bool canAddAny(const QList<QGraphicsItem*>& items) const;
+
   /*!@brief access the underlying cedar::proc::Network
    */
   cedar::proc::NetworkPtr getNetwork();

@@ -230,6 +230,9 @@ public:
   //! Can be implemented to react to changes of the items size.
   virtual void sizeChanged();
 
+  //! Returns the brush used for highlighting potential target groups.
+  static QBrush getTargetGroupBrush();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

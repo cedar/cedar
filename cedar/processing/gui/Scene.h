@@ -350,6 +350,11 @@ private:
 
   void handleTriggerModeChange();
 
+  //! Responsible for highlighting group targets when the mouse is dragging items around.
+  void highlightTargetGroups(const QPointF& mousePosition);
+
+  void resetBackgroundColor();
+
 private slots:
   void promoteElementToExistingGroup();
 
@@ -379,6 +384,9 @@ private:
 
   //! Stores what graphics item receives a drop, if any.
   QGraphicsItem* mpDropTarget;
+
+  //! Group into which the items currently being moved would be added
+  cedar::proc::NetworkPtr mTargetGroup;
 
   //! The view displaying the scene.
   cedar::proc::gui::View *mpeParentView;

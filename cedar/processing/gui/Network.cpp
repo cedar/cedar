@@ -372,6 +372,23 @@ void cedar::proc::gui::Network::transformChildCoordinates(cedar::proc::gui::Grap
   pItem->setPos(this->mapFromItem(pItem, QPointF(0, 0)));
 }
 
+bool cedar::proc::gui::Network::canAddAny(const QList<QGraphicsItem*>& items) const
+{
+  for (int i = 0; i < items.size(); ++i)
+  {
+    //!@todo This should cast to a cedar::proc::gui::Element class.
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(items.at(i)))
+    {
+      if (connectable->getConnectable()->getNetwork() != this->getNetwork())
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
 {
   typedef std::list<QGraphicsItem*>::const_iterator const_iterator;
