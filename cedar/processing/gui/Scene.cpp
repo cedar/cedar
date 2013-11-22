@@ -374,7 +374,7 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
 
 void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition)
 {
-  auto items_under_mouse = this->items(mousePosition);
+  auto items_under_mouse = this->items(mousePosition, Qt::IntersectsItemShape, Qt::DescendingOrder);
   auto selected = this->selectedItems();
 
   // remember the old drop target ...
@@ -403,8 +403,11 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
         mpDropTarget = network_item;
         mTargetGroup = network_item->getNetwork();
         network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-        break;
       }
+
+      // We only look at the first network item; the ones below it (cf descending sort order above) we do not care
+      // about.
+      break;
     }
   }
 
