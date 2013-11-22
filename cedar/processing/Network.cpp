@@ -468,11 +468,6 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
       ++trigger_con;
     }
   }
-  // now, if the removed element is a network, delete all its children
-  if (cedar::proc::NetworkPtr network = this->getElement<cedar::proc::Network>(element->getName()))
-  {
-    network->removeAll();
-  }
 
   cedar::proc::Network::ElementMap::iterator it = mElements.find(element->getName());
   if (it != this->mElements.end())
