@@ -84,7 +84,8 @@ mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
 mpMainWindow(pMainWindow),
 mSnapToGrid(false),
-mpConfigurableWidget(NULL)
+mpConfigurableWidget(NULL),
+mDraggingItems(false)
 {
   mMousePosX = 0;
   mMousePosY = 0;
@@ -318,6 +319,19 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
       this->connectModeProcessMousePress(pMouseEvent);
       break;
   }
+
+  // see if the mouse is moving some items
+  if (pMouseEvent->button() == Qt::LeftButton)
+  {
+    auto items = this->items(pMouseEvent->scenePos());
+    for (int i = 0; i < items.size(); ++i)
+    {
+      if (items.at(i)->isSelected())
+      {
+        this->mDraggingItems = true;
+      }
+    }
+  }
 }
 
 void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent)
@@ -335,6 +349,57 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
   }
   this->mMousePosX = pMouseEvent->scenePos().x();
   this->mMousePosY = pMouseEvent->scenePos().y();
+
+  if (this->mDraggingItems)
+  {
+    auto items = this->items(pMouseEvent->scenePos());
+
+    auto old_drop_target = mpDropTarget;
+    mpDropTarget = NULL;
+    for (int i = 0; i < items.size(); ++i)
+    {
+      if (items.at(i)->isSelected())
+      {
+        // if selected, the item is one of the networks being moved; thus, ignore it
+        continue;
+      }
+      if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(items.at(i)))
+      {
+        bool highlight = false;
+
+        // check if there is an item that is not in the potential target network yet
+        auto items = this->selectedItems();
+        for (int i = 0; i < items.size(); ++i)
+        {
+          //!@todo This should cast to a cedar::proc::gui::Element class.
+          if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(items.at(i)))
+          {
+            if (connectable->getConnectable()->getNetwork() != network_item->getNetwork())
+            {
+              highlight = true;
+            }
+          }
+        }
+
+        // if there is, highlight the target network
+        if (highlight)
+        {
+          mpDropTarget = network_item;
+          network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+          break;
+        }
+      }
+    }
+
+    // disable highlighting of the old drop target if the target has changed or there is no target any more
+    if ((mpDropTarget == NULL && old_drop_target != NULL) || old_drop_target != mpDropTarget)
+    {
+      if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(old_drop_target))
+      {
+        network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+    }
+  }
 }
 
 
@@ -351,6 +416,14 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       this->connectModeProcessMouseRelease(pMouseEvent);
       break;
   }
+
+  this->mDraggingItems = false;
+  if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(mpDropTarget))
+  {
+    network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    network_item->addElements(this->selectedItems().toStdList());
+  }
+  mpDropTarget = NULL;
 }
 
 void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& /*menu*/)
