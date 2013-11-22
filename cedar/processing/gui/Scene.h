@@ -419,6 +419,9 @@ private:
   //! Saves the mouse y position in the scene
   int mMousePosY;
 
+  //! Whether or not the mouse is currently dragging items in the scene
+  bool mDraggingItems;
+
 }; // class ProcessingScene
 
 #endif // CEDAR_PROC_SCENE_H
