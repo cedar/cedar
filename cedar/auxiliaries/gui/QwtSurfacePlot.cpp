@@ -194,19 +194,27 @@ void cedar::aux::gui::QwtSurfacePlot::plot(cedar::aux::ConstDataPtr data, const 
 
 void cedar::aux::gui::QwtSurfacePlot::init()
 {
-  this->mPerspectives.push_back(Perspective("default",
+  this->mPerspectives.push_back(Perspective("top-down",
                                             90, 0, -90,
                                             1, 1, 5,
                                             0.15, 0, 0,
                                             1.0
                                             ));
 
-  this->mPerspectives.push_back(Perspective("birds' eye view",
+  this->mPerspectives.push_back(Perspective("bird's eye view",
+                                            45, 0, 225,
+                                            1, 1, 5,
+                                            0.15, 0, 0,
+                                            1.0
+                                            ));
+
+  this->mPerspectives.push_back(Perspective("bird's eye view (rotated)",
                                             45, 0, -45,
                                             1, 1, 5,
                                             0.15, 0, 0,
                                             1.0
                                             ));
+
   // create a new layout for the widget
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
