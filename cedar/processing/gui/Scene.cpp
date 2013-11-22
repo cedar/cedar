@@ -371,6 +371,7 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
         auto items = this->selectedItems();
         for (int i = 0; i < items.size(); ++i)
         {
+          //!@todo This should cast to a cedar::proc::gui::Element class.
           if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(items.at(i)))
           {
             if (connectable->getConnectable()->getNetwork() != network_item->getNetwork())
@@ -420,6 +421,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(mpDropTarget))
   {
     network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    network_item->addElements(this->selectedItems().toStdList());
   }
   mpDropTarget = NULL;
 }
