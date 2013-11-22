@@ -392,6 +392,24 @@ const cedar::proc::gui::GraphicsBase::GraphicsGroup& cedar::proc::gui::GraphicsB
   return this->mGroup;
 }
 
+QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
+{
+  QBrush brush;
+  switch (this->mHighlightMode)
+  {
+    case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
+      brush.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+      brush.setStyle(Qt::BDiagPattern);
+      break;
+
+    default:
+    case HIGHLIGHTMODE_NONE:
+      brush.setColor(this->mFillColor);
+      brush.setStyle(this->mFillStyle);
+  }
+  return brush;
+}
+
 QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
 {
   QPen pen;
@@ -399,49 +417,58 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
   {
     pen.setStyle(Qt::DashLine);
   }
-  pen.setColor(this->mOutlineColor);
+
+  if (this->mHighlightMode != HIGHLIGHTMODE_NONE)
+  {
+    pen.setWidthF(2);
+  }
+  // determine what pen to use for highlighting
+  switch (this->mHighlightMode)
+  {
+    case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
+    case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+      break;
+
+    case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorError);
+      break;
+
+    case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
+      break;
+
+    default:
+    case HIGHLIGHTMODE_NONE:
+      pen.setColor(this->mOutlineColor);
+  }
+
   return pen;
 }
 
-
 void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-  painter->save();
-
-  QRectF bounds(QPointF(0, 0), QSizeF(this->width(), this->height()));
-  qreal roundedness = 4;
-
   // draw the base shape
   if (mDrawBackground)
   {
     painter->save();
-    painter->setPen(QPen(Qt::NoPen));
-    QBrush brush;
-    brush.setColor(this->mFillColor);
-    brush.setStyle(this->mFillStyle);
-    painter->setBrush(brush);
-    switch (this->mShape)
-    {
-      case BASE_SHAPE_RECT:
-        painter->drawRoundedRect(bounds, roundedness, roundedness);
-        break;
+    painter->setPen(this->getOutlinePen());
+    painter->setBrush(this->getOutlineBrush());
 
-      case BASE_SHAPE_ROUND:
-        painter->drawEllipse(bounds);
-        break;
+    this->drawShape(painter);
 
-      case BASE_SHAPE_DIAMOND:
-      case BASE_SHAPE_CROSS:
-        painter->drawPath(mPath);
-        break;
-    }
     painter->restore();
   }
+}
 
+void cedar::proc::gui::GraphicsBase::drawShape(QPainter* painter)
+{
+  const qreal roundedness = static_cast<qreal>(4);
+  QRectF bounds(QPointF(0, 0), QSizeF(this->width(), this->height()));
+
+  // draw the base shape
   if (mDrawBackground)
   {
-    painter->save();
-    painter->setPen(this->getOutlinePen());
     switch (this->mShape)
     {
       case BASE_SHAPE_RECT:
@@ -457,56 +484,9 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         painter->drawPath(mPath);
         break;
     }
-    painter->restore();
   }
-
-  // draw the highlight
-  if (this->mHighlightMode != HIGHLIGHTMODE_NONE)
-  {
-    // determine what pen to use for highlighting
-    QPen highlight_pen;
-    highlight_pen.setWidthF(2);
-    switch (this->mHighlightMode)
-    {
-      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
-      case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
-        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
-        break;
-
-      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
-        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorError);
-        break;
-
-      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
-        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
-        break;
-
-      default:
-        break;
-    }
-
-    // draw the shape using the hightlight pen
-    QRectF highlight_bounds(QPointF(1, 1), QSizeF(this->width() - 1, this->height() - 1));
-    painter->setPen(highlight_pen);
-    switch (this->mShape)
-    {
-      case BASE_SHAPE_RECT:
-        painter->drawRoundedRect(highlight_bounds, roundedness, roundedness);
-        break;
-
-      case BASE_SHAPE_ROUND:
-        painter->drawEllipse(highlight_bounds);
-        break;
-
-      case BASE_SHAPE_DIAMOND:
-      case BASE_SHAPE_CROSS:
-        painter->drawPath(mPath);
-        break;
-    }
-  }
-
-  painter->restore();
 }
+
 
 const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity validity)
 {
