@@ -54,7 +54,9 @@
 #include <string>
 #include <iostream>
 #include <QThread>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
+#endif
 
 //! the corresponding worker class for the LoopedThread class
 class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::ThreadWorker

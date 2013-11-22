@@ -46,7 +46,9 @@
 #include "cedar/auxiliaries/PluginDeclaration.h"
 
 // SYSTEM INCLUDES
-#include <boost/enable_shared_from_this.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/enable_shared_from_this.hpp>
+#endif
 
 
 /*!@brief A class used for declaring a plot to the plot manager.

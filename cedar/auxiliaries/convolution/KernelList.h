@@ -42,7 +42,9 @@
 #include "cedar/auxiliaries/kernel/namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif
 #include <vector>
 
 /*!@brief This is a structure for storing a list of kernels.

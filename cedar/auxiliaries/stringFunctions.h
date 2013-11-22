@@ -46,8 +46,10 @@
 #include "cedar/version.h"
 
 // SYSTEM INCLUDES
-#include <boost/lexical_cast.hpp>
-#include <boost/regex.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+  #include <boost/regex.hpp>
+#endif
 #include <vector>
 #include <string>
 #include <sstream>

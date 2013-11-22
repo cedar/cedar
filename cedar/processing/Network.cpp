@@ -63,7 +63,9 @@
 #include "cedar/processing/consistency/LoopedStepNotConnected.h"
 
 // SYSTEM INCLUDES
-#include <boost/make_shared.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/make_shared.hpp>
+#endif
 #include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------

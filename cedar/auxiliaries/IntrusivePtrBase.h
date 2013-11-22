@@ -45,8 +45,10 @@
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/intrusive_ptr.hpp>
-#include <boost/detail/atomic_count.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/intrusive_ptr.hpp>
+  #include <boost/detail/atomic_count.hpp>
+#endif
 
 void CEDAR_AUX_LIB_EXPORT intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
 void CEDAR_AUX_LIB_EXPORT intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);

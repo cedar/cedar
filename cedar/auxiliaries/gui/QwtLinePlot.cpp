@@ -52,7 +52,9 @@
 #include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 
 // SYSTEM INCLUDES
-#include <boost/numeric/conversion/bounds.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/numeric/conversion/bounds.hpp>
+#endif
 #include <qwt_legend.h>
 #include <qwt_scale_div.h>
 #include <qwt_symbol.h>

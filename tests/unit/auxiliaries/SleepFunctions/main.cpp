@@ -41,7 +41,9 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
+#endif
 #include <iostream>
 #include <time.h>
 #include <vector>

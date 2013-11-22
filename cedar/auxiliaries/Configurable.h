@@ -54,11 +54,13 @@
 #include <ostream> // for write_csv()
 #include <iomanip> // for write_csv()
 #include <iostream> // for write_csv() debugging
-#include <boost/next_prior.hpp> // for write_csv()
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/next_prior.hpp> // for write_csv()
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/function.hpp>
+  #include <boost/noncopyable.hpp>
+#endif
 
 /*!@brief An interface for classes that can store and load parameters from files.
  *

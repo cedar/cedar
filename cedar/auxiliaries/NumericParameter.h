@@ -46,7 +46,9 @@
 #include "cedar/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
-#include <boost/numeric/conversion/bounds.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/numeric/conversion/bounds.hpp>
+#endif
 
 
 /*!@brief A base class template for numeric parameters.

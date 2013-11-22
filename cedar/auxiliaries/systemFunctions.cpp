@@ -40,8 +40,10 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <boost/date_time.hpp>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time.hpp>
+  #include <boost/filesystem.hpp>
+#endif
 #include <cstdlib>
 
 #if defined CEDAR_OS_UNIX

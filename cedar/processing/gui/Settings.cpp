@@ -45,7 +45,9 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
-#include <boost/property_tree/json_parser.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/json_parser.hpp>
+#endif
 #include <QMainWindow>
 
 cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode>
