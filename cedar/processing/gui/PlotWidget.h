@@ -89,7 +89,7 @@ private:
     cedar::aux::gui::PlotInterface* mpPlotter;
   };
 
-  typedef std::tuple<cedar::aux::ConstDataPtr, LabeledPlot> PlotGridMapItem;
+  typedef std::pair<cedar::aux::ConstDataPtr, LabeledPlot> PlotGridMapItem;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
