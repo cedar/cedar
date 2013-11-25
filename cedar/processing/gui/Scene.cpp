@@ -1029,7 +1029,14 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
       return mNetwork.get();
     }
 #ifdef DEBUG
-    std::cout << "Could not find base item for element \"" << element->getName() << "\"" << std::endl;
+    if (element)
+    {
+      std::cout << "Could not find base item for element \"" << element->getName() << "\"" << std::endl;
+    }
+    else
+    {
+      std::cout << "Element is a null-pointer." << std::endl;
+    }
 #endif // DEBUG
     //!@todo This should not return null, but rather throw
     return NULL;
