@@ -451,6 +451,12 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   for (auto it = all_elements.begin(); it != all_elements.end(); ++it)
   {
     auto element = *it;
+
+    if (element == NULL)
+    {
+      continue;
+    }
+
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
     // remember the item's scene positions
     item_scene_pos[element] = graphics_item->scenePos();
