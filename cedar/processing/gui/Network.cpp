@@ -508,6 +508,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
 
   this->mHoldFitToContents = false;
 //  this->fitToContents();
+  this->resizeToIncludeContents();
 }
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
@@ -1076,6 +1077,22 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
     this->updateConnectorPositions();
   }
 }
+
+void cedar::proc::gui::Network::resizeToIncludeContents()
+{
+  QRectF bounds = this->childrenBoundingRect();
+
+  if (this->width() < bounds.width())
+  {
+    this->setWidth(bounds.width());
+  }
+
+  if (this->height() < bounds.height())
+  {
+    this->setHeight(bounds.height());
+  }
+}
+
 
 void cedar::proc::gui::Network::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
 {
