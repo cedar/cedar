@@ -283,6 +283,21 @@ std::tuple<int, int> cedar::proc::gui::PlotWidget::usingNextFreeGridSlot()
   std::tuple<int, int> free_grid_slot;
   if(this->mFreeGridSlots.size() > 0)
   {
+    this->mFreeGridSlots.sort([](std::tuple<int, int> a, std::tuple<int, int> b)
+      {
+        // true if a goes before b, false otherwise
+        if(std::get<0>(a) > std::get<0>(b))
+        {
+          return false;
+        }
+        if(std::get<0>(a) == std::get<0>(b) && std::get<1>(a) > std::get<1>(b))
+        {
+          return false;
+        }
+
+        return  true;
+      }
+    );
     free_grid_slot = this->mFreeGridSlots.front();
     this->mFreeGridSlots.pop_front();
   }
