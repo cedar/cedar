@@ -1066,9 +1066,45 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
 }
 
+void cedar::proc::gui::Network::removeConnectorItem(bool isSource, const std::string& name)
+{
+  auto p_list = &mConnectorSources;
+  if (!isSource)
+  {
+    p_list = &mConnectorSinks;
+  }
+
+  for (size_t i = 0; i < p_list->size(); ++i)
+  {
+    auto p_data_slot = p_list->at(i);
+    if (p_data_slot->getSlot()->getParentPtr()->getName() == name)
+    {
+      p_list->erase(p_list->begin() + i);
+      delete p_data_slot;
+      return;
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find connector for data slot \"" + name + "\".");
+}
+
 void cedar::proc::gui::Network::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
-  delete this->mpScene->getGraphicsItemFor(element.get());
+
+  if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
+  {
+    this->removeConnectorItem(true, element->getName());
+  }
+  else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::ConstGroupSink>(element))
+  {
+    this->removeConnectorItem(false, element->getName());
+  }
+  else
+  {
+    auto gui_element = this->mpScene->getGraphicsItemFor(element.get());
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(gui_element != NULL);
+    delete gui_element;
+  }
 }
 
 void cedar::proc::gui::Network::toggleSmartConnectionMode()

@@ -228,6 +228,8 @@ private:
 
   void itemSceneHasChanged();
 
+  void removeConnectorItem(bool isSource, const std::string& name);
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange);

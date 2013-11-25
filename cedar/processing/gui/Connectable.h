@@ -210,13 +210,13 @@ protected:
   //! Returns the offset for input and output slots.
   qreal getInputOutputSlotOffset() const;
 
+  //! Updates the positions of the data slot items.
+  void updateDataSlotPositions();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Updates the positions of the data slot items.
-  void updateDataSlotPositions();
-
   void itemSelected(bool selected);
 
   //--------------------------------------------------------------------------------------------------------------------
