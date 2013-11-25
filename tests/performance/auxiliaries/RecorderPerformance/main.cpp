@@ -42,9 +42,11 @@
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/testingUtilities/measurementFunctions.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/Settings.h"
 
 //SYSTEM INCLUDES
 #include <iostream>
+#include<boost/filesystem.hpp>
 
 // global variables
 int errors = 0;
@@ -68,9 +70,15 @@ void record()
   cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr3,timestep ,"Mat3");
 
 
+  //Rename PerformanceTest Folder
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName("PerformanceTest");
+
   cedar::aux::RecorderSingleton::getInstance()->start();
   cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
   cedar::aux::RecorderSingleton::getInstance()->stop();
+
+  std::string path = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory();
+  boost::filesystem::remove_all(cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()+"/PerformanceTest");
 
 
 }

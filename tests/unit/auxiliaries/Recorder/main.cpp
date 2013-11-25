@@ -39,11 +39,13 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
+#include <boost/filesystem.hpp>
 #ifndef Q_MOC_RUN
-  #include <boost/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #endif
 #include <string>
 
@@ -84,6 +86,9 @@ void run_test()
   cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr3,timestep ,"Mat3");
   cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr2,timestep ,"Mat4");
 
+  //Rename UnitTest Folder
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName("UnitTest");
+
   //Start Recorder - wait 5 secs -stop Recorder
   cedar::aux::RecorderSingleton::getInstance()->start();
   cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
@@ -96,7 +101,11 @@ void run_test()
     errors++;
     std::cout<<filename<<" can not be found"<<std::endl;
   }
-
+  else
+  {
+    std::string path = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory();
+    boost::filesystem::remove_all(cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()+"/UnitTest");
+  }
 }
 
 
