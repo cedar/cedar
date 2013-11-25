@@ -109,8 +109,11 @@ public:
   //!@brief get the current file, to which the network configuration can be saved
   const std::string& getFileName() const;
 
-  //!@brief Resizes the network to fit all its contents.
+  //!@brief Resizes the network to exactly fit all its contents.
   void fitToContents();
+
+  //! Resizes the network if its contents are larger than its bounds.
+  void resizeToIncludeContents();
 
   //!@brief Adds an element to the network.
   void addElement(cedar::proc::gui::GraphicsBase *pElement);
