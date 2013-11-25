@@ -423,7 +423,13 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
       {
         if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(children.at(i)))
         {
-          all_elements.insert(graphics_child->getElement());
+          auto element = graphics_child->getElement();
+          // some objects such as data slots may not have an element
+          //!@todo Cast to a common superclass, proc::gui::Element here.
+          if (element != NULL)
+          {
+            all_elements.insert(element);
+          }
         }
       }
     }
@@ -451,11 +457,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   for (auto it = all_elements.begin(); it != all_elements.end(); ++it)
   {
     auto element = *it;
-
-    if (element == NULL)
-    {
-      continue;
-    }
+    CEDAR_DEBUG_ASSERT(element != NULL);
 
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
     // remember the item's scene positions
