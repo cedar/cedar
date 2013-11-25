@@ -188,6 +188,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! Adds all the steps already in the network
+  void addGuiItemsForNetwork();
+
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root) const;
 
@@ -222,6 +225,8 @@ private:
   void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
 
   void sizeChanged();
+
+  void itemSceneHasChanged();
 
 signals:
   //!@brief signal that is emitted when a boost signal is received
