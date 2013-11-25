@@ -168,7 +168,8 @@ private:
 
   std::vector<boost::signals2::connection> mSignalConnections;
   std::map<cedar::aux::ConstDataPtr, LabeledPlot> mPlotGridMap;
-  std::list<std::tuple<int, int>> mFreeGridSlots;
+  //!@brief tuples are of this structure: <row, col>
+  std::list<std::tuple<int, int>> mFreeGridSlots; 
 
 }; // cedar::proc::gui::PlotWidget
 
