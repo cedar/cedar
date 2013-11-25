@@ -416,26 +416,28 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
   {
     auto& labeled_plot = plot_grid_map_item->second;
 
-    // remove the widget from the grid, and mark that slot as free
+    // get the slot the plot occupies and mark that slot as free
     auto index = this->mpLayout->indexOf(labeled_plot.mpLabel);
     int row, col, r_span, c_span;
     // get row and column of the label
     this->mpLayout->getItemPosition(index, &row, &col, &r_span, &c_span);
-
-    // no idea if takeAt changes the indices of other items, to be safe take the plot first
-    labeled_plot.mpPlotter = dynamic_cast<cedar::aux::gui::PlotInterface*>(this->mpLayout->takeAt(index + 1));
-    labeled_plot.mpLabel = dynamic_cast<QLabel*>(this->mpLayout->takeAt(index));
-
     // store the slot at the end of the list of free slots
     mFreeGridSlots.push_back(std::make_tuple(row, col));
 
-    // free the old plot and label
-    delete labeled_plot.mpPlotter;
-    delete labeled_plot.mpLabel;
-
+    // now remove the widgets
+    remove_qgridlayout_widget(labeled_plot.mpLabel);
+    remove_qgridlayout_widget(labeled_plot.mpPlotter);
     // remove the entry that maps the data to the now removed plot
     this->mPlotGridMap.erase(plot_grid_map_item);
   }
+}
+
+void cedar::proc::gui::PlotWidget::remove_qgridlayout_widget(QWidget* widget)
+{
+  // removes a qidget from the layout, you're welcome to find a better way
+  widget->hide();
+  // call to removeWidget deletes the allocated memory
+  this->mpLayout->removeWidget(widget);
 }
 
 // save this plot_widget in configuration node

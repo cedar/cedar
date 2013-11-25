@@ -150,6 +150,8 @@ private:
   std::tuple<int, int> usingNextFreeGridSlot();
   cedar::aux::ConfigurationNode serialize(const cedar::proc::ElementDeclaration::DataList& dataList) const;
 
+  //!@brief removes a widget from the grid layout
+  void remove_qgridlayout_widget(QWidget* widget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
