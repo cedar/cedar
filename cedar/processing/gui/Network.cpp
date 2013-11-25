@@ -501,6 +501,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
 {
+  //!@todo Does this method do what its name suggests? If so, it should call addElements with a list containing only the given element.
   // reset parent item
   pElement->setParentItem(0);
 }
@@ -512,6 +513,7 @@ const std::string& cedar::proc::gui::Network::getFileName() const
 
 void cedar::proc::gui::Network::addElementsToScene()
 {
+  //!@todo Can this method be removed?
 //  if (!this->isRootNetwork())
 //  {
 //    this->fitToContents();
@@ -520,6 +522,7 @@ void cedar::proc::gui::Network::addElementsToScene()
 
 void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
 {
+  //!@todo Why doesn't this use QGraphicsItem->scene() instead?
   // currently, switching the scene is not supported.
   CEDAR_ASSERT(this->mpScene == pScene || this->mpScene == NULL);
 
@@ -611,6 +614,7 @@ void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode
 
   cedar::aux::ConfigurationNode generic;
 
+  //!@todo Does the name/network thing actually do anything, or can it be removed?
   generic.put("network", this->mNetwork->getName());
   // add open plots to architecture
   cedar::aux::ConfigurationNode node;
