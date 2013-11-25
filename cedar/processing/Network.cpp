@@ -911,6 +911,11 @@ void cedar::proc::Network::removeConnector(const std::string& name, bool input)
     }
     else
     {
+      this->removeAllConnectionsFromSlot(this->getElement<cedar::proc::Connectable>(name)->getInputSlot("input"));
+      if (this->getNetwork())
+      {
+        this->getNetwork()->removeAllConnectionsFromSlot(this->getOutputSlot(name));
+      }
       this->remove(this->getElement(name));
       this->removeOutputSlot(name);
     }
@@ -2225,6 +2230,7 @@ void cedar::proc::Network::deleteConnectorsAlongConnection(cedar::proc::DataConn
       }
       connectors_removed_later[sink->getName()] = false;
     }
+    connection->disconnect();
     for (auto it = connectors_removed_later.begin(); it != connectors_removed_later.end(); ++it)
     {
       std::cout << "Removing connector: " << it->first << std::endl;
