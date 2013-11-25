@@ -334,6 +334,8 @@ bool cedar::proc::gui::PlotWidget::createAndAddPlotToGrid
     mCurrentLabeledPlot.mpPlotter->plot(pData, title);
     mpLayout->addWidget(mCurrentLabeledPlot.mpPlotter, row + 1, column);
     mpLayout->setRowStretch(row + 1, 1);
+    // set column stretch in case the number of columns changed
+    mpLayout->setColumnStretch(column, 1);
     // store the LabeledPlot in the PlotGridMap
     mPlotGridMap.insert(PlotGridMapItem(pData, mCurrentLabeledPlot));
   }
