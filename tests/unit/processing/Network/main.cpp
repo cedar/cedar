@@ -255,8 +255,10 @@ int main(int /* argc */, char** /* argv */)
   list.push_back(network_root->getElement("2"));
   network_connector->add(list);
   network_connector->disconnectSlots("1.output", "2.input");
-  network_root->disconnectSlots("0.output", "nested.1 input");
-  network_root->disconnectSlots("nested.2 output", "3.input");
+  list.erase(list.begin());
+  network_root->add(list);
+//  network_root->disconnectSlots("0.output", "nested.1 input");
+//  network_root->disconnectSlots("nested.2 output", "3.input");
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;

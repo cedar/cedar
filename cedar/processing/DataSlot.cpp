@@ -164,22 +164,12 @@ bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) co
   return (parent.get() == mpParent);
 }
 
-void cedar::proc::DataSlot::promote()
-{
-  this->mIsPromoted = true;
-}
-
-void cedar::proc::DataSlot::demote()
-{
-  this->mIsPromoted = false;
-}
-
-bool cedar::proc::DataSlot::isPromoted() const
-{
-  return this->mIsPromoted;
-}
-
 void cedar::proc::DataSlot::setName(const std::string& name)
 {
   this->mName = name;
+}
+
+void cedar::proc::DataSlot::deleteParentPointer()
+{
+  this->mpParent = NULL;
 }
