@@ -189,7 +189,7 @@ public:
 protected:
   void slotAdded(cedar::proc::DataRole::Id role, const std::string& name);
 
-  void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
+  virtual void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
@@ -210,13 +210,13 @@ protected:
   //! Returns the offset for input and output slots.
   qreal getInputOutputSlotOffset() const;
 
+  //! Updates the positions of the data slot items.
+  void updateDataSlotPositions();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Updates the positions of the data slot items.
-  void updateDataSlotPositions();
-
   void itemSelected(bool selected);
 
   //--------------------------------------------------------------------------------------------------------------------

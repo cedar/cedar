@@ -182,7 +182,7 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -227,6 +227,8 @@ private:
   void sizeChanged();
 
   void itemSceneHasChanged();
+
+  void removeConnectorItem(bool isSource, const std::string& name);
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

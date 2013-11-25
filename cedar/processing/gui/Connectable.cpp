@@ -242,6 +242,8 @@ void cedar::proc::gui::Connectable::slotRemoved(cedar::proc::DataRole::Id role, 
   p_item = name_iter->second;
   name_map.erase(name_iter);
   delete p_item;
+
+  this->updateDataSlotPositions();
 }
 
 void cedar::proc::gui::Connectable::addDataItems()

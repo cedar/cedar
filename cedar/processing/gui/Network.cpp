@@ -423,7 +423,13 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
       {
         if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(children.at(i)))
         {
-          all_elements.insert(graphics_child->getElement());
+          auto child_element = graphics_child->getElement();
+          // some objects such as data slots may not have an element
+          //!@todo Cast to a common superclass, proc::gui::Element here.
+          if (child_element)
+          {
+            all_elements.insert(child_element);
+          }
         }
       }
     }
@@ -451,11 +457,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   for (auto it = all_elements.begin(); it != all_elements.end(); ++it)
   {
     auto element = *it;
-
-    if (element == NULL)
-    {
-      continue;
-    }
+    CEDAR_DEBUG_ASSERT(element != NULL);
 
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
     // remember the item's scene positions
@@ -499,6 +501,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
 {
+  //!@todo Does this method do what its name suggests? If so, it should call addElements with a list containing only the given element.
   // reset parent item
   pElement->setParentItem(0);
 }
@@ -510,6 +513,7 @@ const std::string& cedar::proc::gui::Network::getFileName() const
 
 void cedar::proc::gui::Network::addElementsToScene()
 {
+  //!@todo Can this method be removed?
 //  if (!this->isRootNetwork())
 //  {
 //    this->fitToContents();
@@ -518,6 +522,7 @@ void cedar::proc::gui::Network::addElementsToScene()
 
 void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
 {
+  //!@todo Why doesn't this use QGraphicsItem->scene() instead?
   // currently, switching the scene is not supported.
   CEDAR_ASSERT(this->mpScene == pScene || this->mpScene == NULL);
 
@@ -609,6 +614,7 @@ void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode
 
   cedar::aux::ConfigurationNode generic;
 
+  //!@todo Does the name/network thing actually do anything, or can it be removed?
   generic.put("network", this->mNetwork->getName());
   // add open plots to architecture
   cedar::aux::ConfigurationNode node;
@@ -692,7 +698,13 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) 
     if (network && p_network_item)
     {
       cedar::aux::ConfigurationNode::assoc_iterator networks_node = root.find("networks");
-      CEDAR_DEBUG_ASSERT(networks_node != root.not_found());
+      if (networks_node == root.not_found())
+      {
+        cedar::aux::ConfigurationNode networks;
+        root.put_child("networks", networks);
+        networks_node = root.find("networks");
+        CEDAR_DEBUG_ASSERT(networks_node != root.not_found());
+      }
 
       // check if there is already a node for the network; if not, add it
       cedar::aux::ConfigurationNode::assoc_iterator network_node = networks_node->second.find(network->getName());
@@ -1054,9 +1066,52 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
 }
 
+void cedar::proc::gui::Network::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
+{
+  this->cedar::proc::gui::Connectable::slotRemoved(role, name);
+
+  this->updateConnectorPositions();
+}
+
+void cedar::proc::gui::Network::removeConnectorItem(bool isSource, const std::string& name)
+{
+  auto p_list = &mConnectorSources;
+  if (!isSource)
+  {
+    p_list = &mConnectorSinks;
+  }
+
+  for (size_t i = 0; i < p_list->size(); ++i)
+  {
+    auto p_data_slot = p_list->at(i);
+    if (p_data_slot->getSlot()->getParentPtr()->getName() == name)
+    {
+      p_list->erase(p_list->begin() + i);
+      delete p_data_slot;
+      return;
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find connector for data slot \"" + name + "\".");
+}
+
 void cedar::proc::gui::Network::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
-  delete this->mpScene->getGraphicsItemFor(element.get());
+
+  if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
+  {
+    this->removeConnectorItem(true, element->getName());
+  }
+  else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::ConstGroupSink>(element))
+  {
+    this->removeConnectorItem(false, element->getName());
+  }
+  else
+  {
+    auto gui_element = this->mpScene->getGraphicsItemFor(element.get());
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(gui_element != NULL);
+    delete gui_element;
+  }
 }
 
 void cedar::proc::gui::Network::toggleSmartConnectionMode()
