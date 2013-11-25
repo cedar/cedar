@@ -409,7 +409,7 @@ bool cedar::proc::gui::Network::canAddAny(const QList<QGraphicsItem*>& items) co
 void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
 {
   std::list<cedar::proc::ElementPtr> elements_to_move;
-  std::set<cedar::proc::ElementPtr> all_elements;
+  std::list<cedar::proc::ElementPtr> all_elements;
   for (auto it = elements.begin(); it != elements.end(); ++it)
   {
     cedar::proc::ElementPtr element;
@@ -418,17 +418,26 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     {
       element = graphics_base->getElement();
 
-      auto children = graphics_base->children();
-      for (int i = 0; i < children.size(); ++i)
+      std::vector<QGraphicsItem*> items;
+      items.push_back(graphics_base);
+      while (!items.empty())
       {
-        if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(children.at(i)))
+        auto item = *items.begin();
+        items.erase(items.begin());
+
+        if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
         {
           auto child_element = graphics_child->getElement();
           // some objects such as data slots may not have an element
           //!@todo Cast to a common superclass, proc::gui::Element here.
           if (child_element)
           {
-            all_elements.insert(child_element);
+            all_elements.push_back(child_element);
+
+            for (int i = 0; i < graphics_child->childItems().size(); ++i)
+            {
+              items.push_back(graphics_child->childItems().at(i));
+            }
           }
         }
       }
@@ -448,8 +457,9 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     }
     CEDAR_DEBUG_ASSERT(element);
     elements_to_move.push_back(element);
-    all_elements.insert(element);
+    all_elements.push_back(element);
   }
+  //!@todo This member can probably be removed
   this->mHoldFitToContents = true;
 
   std::map<cedar::proc::ElementPtr, QPointF> item_scene_pos;
@@ -471,9 +481,9 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
 
   this->getNetwork()->add(elements_to_move);
 
-  for (auto it = item_scene_pos.begin(); it != item_scene_pos.end(); ++it)
+  for (auto it = all_elements.begin(); it != all_elements.end(); ++it)
   {
-    auto element = it->first;
+    auto element = *it;
 
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
 
@@ -485,7 +495,8 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     graphics_item->readConfiguration(config_it->second);
 
     // restore the item's position
-    const QPointF& scene_pos = it->second;
+    CEDAR_DEBUG_ASSERT(item_scene_pos.find(element) != item_scene_pos.end());
+    const QPointF& scene_pos = item_scene_pos[element];
     auto parent = graphics_item->parentItem();
     if(parent == NULL)
     {
