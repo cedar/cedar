@@ -222,7 +222,7 @@ public:
   /*!@brief unmodifiedName unmodified name, possibly non-unique in network
    * @return unique name created by attaching a number if name is already taken
    */
-  //std::string getUniqueName(const std::string& unmodifiedName) const;
+  CEDAR_DECLARE_DEPRECATED(std::string getUniqueName(const std::string& unmodifiedName) const);
 
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
@@ -318,6 +318,12 @@ public:
                            const std::string& sourceDataName,
                            std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
+
+  void getDataConnections(
+                           cedar::proc::ConstConnectablePtr source,
+                           const std::string& sourceDataName,
+                           std::vector<cedar::proc::ConstDataConnectionPtr>& connections
+                         ) const;
 
   /*!@brief access the vector of data connections
    */
@@ -435,6 +441,11 @@ public:
   bool hasConnector(const std::string& name) const;
 
   std::string getNewConnectorName(bool inputConnector) const;
+
+  bool contains(cedar::proc::ConstElementPtr element) const;
+
+  bool isRoot() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -533,6 +544,15 @@ private:
 
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
+
+  std::vector<std::string> getRealTargets
+                           (
+                             cedar::proc::ConstDataConnectionPtr connection,
+                             cedar::proc::ConstNetworkPtr target_network
+                           ) const;
+
+
+  void deleteConnectorsAlongConnection(cedar::proc::DataConnectionPtr connection);
 
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
