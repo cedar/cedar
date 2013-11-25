@@ -189,7 +189,7 @@ public:
 protected:
   void slotAdded(cedar::proc::DataRole::Id role, const std::string& name);
 
-  void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
+  virtual void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
