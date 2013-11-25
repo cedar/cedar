@@ -694,7 +694,13 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) 
     if (network && p_network_item)
     {
       cedar::aux::ConfigurationNode::assoc_iterator networks_node = root.find("networks");
-      CEDAR_DEBUG_ASSERT(networks_node != root.not_found());
+      if (networks_node == root.not_found())
+      {
+        cedar::aux::ConfigurationNode networks;
+        root.put_child("networks", networks);
+        networks_node = root.find("networks");
+        CEDAR_DEBUG_ASSERT(networks_node != root.not_found());
+      }
 
       // check if there is already a node for the network; if not, add it
       cedar::aux::ConfigurationNode::assoc_iterator network_node = networks_node->second.find(network->getName());
