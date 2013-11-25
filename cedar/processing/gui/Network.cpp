@@ -1066,6 +1066,13 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
 }
 
+void cedar::proc::gui::Network::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
+{
+  this->cedar::proc::gui::Connectable::slotRemoved(role, name);
+
+  this->updateConnectorPositions();
+}
+
 void cedar::proc::gui::Network::removeConnectorItem(bool isSource, const std::string& name)
 {
   auto p_list = &mConnectorSources;
