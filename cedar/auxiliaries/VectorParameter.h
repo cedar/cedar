@@ -299,7 +299,20 @@ public:
       return;
     }
 
+    // make sure the defaults vector is at least as big as the current vector
+    this->mDefaults.resize(std::max(this->mDefaults.size(), this->mValues.size()));
+    for (size_t i = 0; i < this->mValues.size(); ++i)
+    {
+      this->mDefaults.at(i) = this->mValues.at(i);
+    }
+
     this->mValues.resize(size, value);
+
+    // restore previous value
+    for (size_t i = 0; i < this->mValues.size() && i < this->mDefaults.size(); ++i)
+    {
+      this->mValues.at(i) = this->mDefaults.at(i);
+    }
 
     if (!blockSignal)
     {
