@@ -130,6 +130,7 @@ public:
   void clearMarkers();
 
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
   //!@brief Returns the limits of the x axis.
   cedar::aux::math::Limits<double> getXLimits() const;
@@ -152,6 +153,7 @@ private:
   void buildArrays(PlotSeriesPtr series, unsigned int new_size);
 
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   //!@brief Applies a plot style to a given curve.
   static void applyStyle(size_t lineId, QwtPlotCurve *pCurve);

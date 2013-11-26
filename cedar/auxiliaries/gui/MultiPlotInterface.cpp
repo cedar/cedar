@@ -58,6 +58,12 @@ void cedar::aux::gui::MultiPlotInterface::append(cedar::aux::ConstDataPtr data, 
   this->doAppend(data, title);
 }
 
+void cedar::aux::gui::MultiPlotInterface::detach(cedar::aux::ConstDataPtr data)
+{
+  this->mDataMap.erase(this->mDataMap.find(data));
+  this->doDetach(data);
+}
+
 const cedar::aux::gui::MultiPlotInterface::DataMap& cedar::aux::gui::MultiPlotInterface::getDataMap() const
 {
   return this->mDataMap;

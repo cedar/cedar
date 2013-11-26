@@ -83,7 +83,7 @@ boost::posix_time::ptime cedar::aux::gui::HistoryPlot0D::mPlotStartTime = boost:
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(NULL)
+mpCurrentPlotWidget(nullptr)
 {
   this->init();
 }
@@ -91,7 +91,7 @@ mpCurrentPlotWidget(NULL)
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(NULL)
+mpCurrentPlotWidget(nullptr)
 {
   this->init();
   this->plot(data, title);
@@ -104,7 +104,7 @@ cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
     this->mpWorkerThread->quit();
     this->mpWorkerThread->wait();
     delete this->mpWorkerThread;
-    this->mpWorkerThread = NULL;
+    this->mpWorkerThread = nullptr;
   }
 }
 
@@ -129,10 +129,10 @@ void cedar::aux::gui::HistoryPlot0D::contextMenuEvent(QContextMenuEvent *pEvent)
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
-  p_legend->setChecked(this->mpPlot->legend() != NULL);
+  p_legend->setChecked(this->mpPlot->legend() != nullptr);
 
   QAction *p_action = menu.exec(pEvent->globalPos());
-  if (p_action == NULL)
+  if (p_action == nullptr)
   {
     return;
   }
@@ -153,7 +153,7 @@ void cedar::aux::gui::HistoryPlot0D::showLegend(bool show)
   {
     // show legend
     auto p_legend = this->mpPlot->legend();
-    if (p_legend == NULL)
+    if (p_legend == nullptr)
     {
       p_legend = new QwtLegend();
       p_legend->setFrameStyle(QFrame::Box);
@@ -205,6 +205,22 @@ bool cedar::aux::gui::HistoryPlot0D::canAppend(cedar::aux::ConstDataPtr data) co
   {
     return false;
   }
+}
+
+bool cedar::aux::gui::HistoryPlot0D::canDetach(cedar::aux::ConstDataPtr data) const
+{
+  if(this->mpPlot != nullptr && this->mCurves.size() > 1)
+  {
+    for(auto curve : this->mCurves)
+    {
+      if(curve->mData == data)
+      {
+        return true;
+      }
+    }
+  }
+  
+  return false;
 }
 
 void cedar::aux::gui::HistoryPlot0D::init()
@@ -355,6 +371,19 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, con
   curve->mCurve = new QwtPlotCurve(QString::fromStdString(title));
   curve->mCurve->attach(this->mpPlot);
   this->applyStyle(index, curve->mCurve);
+}
+
+void cedar::aux::gui::HistoryPlot0D::doDetach(cedar::aux::ConstDataPtr data)
+{
+  for(auto it = this->mCurves.begin(); it != this->mCurves.end(); ++it)
+  {
+    auto curve = *it;
+    if(curve->mData == data)
+    {
+      curve->mCurve->detach();
+      this->mCurves.erase(it);
+    }
+  }
 }
 
 //!@cond SKIPPED_DOCUMENTATION

@@ -93,6 +93,7 @@ public:
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
 public slots:
   /*!@brief Reacts to a change in the plotted data.
@@ -112,6 +113,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

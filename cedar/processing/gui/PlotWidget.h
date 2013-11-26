@@ -76,7 +76,8 @@ private:
     :
     mpPlotDeclaration(pPlotDecl),
     mpLabel(pLabel),
-    mpPlotter(NULL)
+    mpPlotter(nullptr),
+    mIsMultiPlot(false)
     {
       if(mpPlotDeclaration)
       {
@@ -87,9 +88,12 @@ private:
     cedar::aux::gui::ConstPlotDeclarationPtr mpPlotDeclaration;
     QLabel* mpLabel;
     cedar::aux::gui::PlotInterface* mpPlotter;
+    bool mIsMultiPlot;
   };
 
-  typedef std::pair<cedar::aux::ConstDataPtr, LabeledPlot> PlotGridMapItem;
+  CEDAR_GENERATE_POINTER_TYPES(LabeledPlot);
+
+  typedef std::pair<cedar::aux::ConstDataPtr, LabeledPlotPtr> PlotGridMapItem;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -139,13 +143,13 @@ private:
   //!@brief Fills the Plot Widget's Grid Layout with Plots of the provided data-list
   void fillGridWithPlots();
   //!@brief creates a plot of the given data at a given slot, returns false if it created a new plot-widget, true if it appended to an existing one.
-  bool processSlot(cedar::aux::ConstDataPtr slot, cedar::proc::PlotDataPtr dataItem, const std::string& title);
-  bool createAndAddPlotToGrid(cedar::aux::gui::ConstPlotDeclarationPtr decl, cedar::aux::ConstDataPtr pData, const std::string& title);
-  bool tryAppendDataToPlot(cedar::aux::ConstDataPtr pData, const std::string& title);
+  void processSlot(cedar::aux::ConstDataPtr slot, cedar::proc::PlotDataPtr dataItem, const std::string& title);
+  void createAndAddPlotToGrid(cedar::aux::gui::ConstPlotDeclarationPtr decl, cedar::aux::ConstDataPtr pData, const std::string& title);
+  void tryAppendDataToPlot(cedar::aux::ConstDataPtr pData, const std::string& title, LabeledPlotPtr currentLabeledPlot);
   //!@brief gets called if data is added to slot and adds a plot
   void addPlotOfExternalData(cedar::aux::ConstDataPtr pData, cedar::proc::ExternalDataPtr slot, cedar::proc::PlotDataPtr dataItem);
   //!@brief gets called if data is removed from a slot and removes the plot thereof
-  void removePlotOfExternalData(cedar::aux::ConstDataPtr pData, bool isMultiplot);
+  void removePlotOfExternalData(cedar::aux::ConstDataPtr pData);
   //!@brief returns the next free grid slot
   std::tuple<int, int> usingNextFreeGridSlot();
   cedar::aux::ConfigurationNode serialize(const cedar::proc::ElementDeclaration::DataList& dataList) const;
@@ -161,13 +165,12 @@ protected:
 private:
   cedar::proc::ElementDeclaration::DataList mDataList;
   cedar::proc::StepPtr mStep;
-  LabeledPlot mCurrentLabeledPlot;
   int mGridSpacing;
   int mColumns;
   QGridLayout* mpLayout;
 
   std::vector<boost::signals2::connection> mSignalConnections;
-  std::map<cedar::aux::ConstDataPtr, LabeledPlot> mPlotGridMap;
+  std::map<cedar::aux::ConstDataPtr, LabeledPlotPtr> mPlotGridMap;
   //!@brief tuples are of this structure: <row, col>
   std::list<std::tuple<int, int>> mFreeGridSlots; 
 

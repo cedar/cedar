@@ -295,6 +295,37 @@ void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   this->startTimer(30);
 }
 
+bool cedar::aux::gui::QwtLinePlot::canDetach(cedar::aux::ConstDataPtr data) const
+{
+  if(this->mpPlot != nullptr && this->mPlotSeriesVector.size() > 1)
+  {
+    for(auto plot_series : this->mPlotSeriesVector)
+    {
+      if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data)
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+void cedar::aux::gui::QwtLinePlot::doDetach(cedar::aux::ConstDataPtr data)
+{
+  for(auto it = mPlotSeriesVector.begin(); it != mPlotSeriesVector.end(); ++it)
+  { 
+    auto plot_series = *it;
+    if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data)
+    {
+      mpLock->lockForWrite();
+      plot_series->mpCurve->detach();
+      mPlotSeriesVector.erase(it);
+      mpLock->unlock();
+    }
+  }
+}
+
 void cedar::aux::gui::QwtLinePlot::attachMarker(QwtPlotMarker *pMarker)
 {
   pMarker->attach(this->mpPlot);

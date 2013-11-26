@@ -181,7 +181,10 @@ public:
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
+  //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  //!@brief Check if the given data can be detached from the plot.
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -202,6 +205,7 @@ private:
   void init();
 
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   double getDataValue(size_t index);
 

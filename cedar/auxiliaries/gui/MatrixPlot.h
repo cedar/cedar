@@ -88,8 +88,10 @@ public:
 public:
   //!@brief display a MatData
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
+  //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  //!@brief Check if the given data can be detached from the plot.
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
   //!@brief return vector of standard colors
   static const std::vector<cedar::aux::gui::ColorValueRGBA>& getStandardColorVector();
@@ -112,6 +114,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
