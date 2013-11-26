@@ -307,6 +307,7 @@ void cedar::aux::gui::MatrixPlot::processChangedData()
     {
       // first, recover data from multiplot
       cedar::aux::gui::MultiPlotInterface::DataMap map = p_multi->getDataMap();
+      //QWriteLocker map_locker(p_multi->getLock());
       auto iter = map.begin();
       if (iter != map.end())
       {
@@ -319,6 +320,7 @@ void cedar::aux::gui::MatrixPlot::processChangedData()
           }
         }
       }
+      //map_locker.unlock();
     }
     else
     {

@@ -108,6 +108,8 @@ cedar::aux::gui::QwtLinePlot::~QwtLinePlot()
     this->mpWorkerThread = NULL;
   }
 
+  this->mPlotSeriesVector.clear();
+
   if (mpLock)
   {
     delete mpLock;
@@ -313,17 +315,12 @@ bool cedar::aux::gui::QwtLinePlot::canDetach(cedar::aux::ConstDataPtr data) cons
 
 void cedar::aux::gui::QwtLinePlot::doDetach(cedar::aux::ConstDataPtr data)
 {
-  for(auto it = mPlotSeriesVector.begin(); it != mPlotSeriesVector.end(); ++it)
-  { 
-    auto plot_series = *it;
-    if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data)
-    {
-      mpLock->lockForWrite();
-      plot_series->mpCurve->detach();
-      mPlotSeriesVector.erase(it);
-      mpLock->unlock();
-    }
-  }
+  mpLock->lockForWrite();
+  auto new_end = std::remove_if(mPlotSeriesVector.begin(), mPlotSeriesVector.end(), [&](PlotSeriesPtr plot_series){
+    return (boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data);
+  });
+  mPlotSeriesVector.erase(new_end, mPlotSeriesVector.end());
+  mpLock->unlock();
 }
 
 void cedar::aux::gui::QwtLinePlot::attachMarker(QwtPlotMarker *pMarker)

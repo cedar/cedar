@@ -80,6 +80,7 @@ private:
 
     ~PlotSeries()
     {
+      mpCurve->detach();
     }
 
     //!@brief the displayed data

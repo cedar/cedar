@@ -123,6 +123,11 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
     {
     }
 
+    ~CurveInfo()
+    {
+      mCurve->detach();
+    }
+
     void setData(cedar::aux::ConstDataPtr data);
 
     double getDataValue() const;

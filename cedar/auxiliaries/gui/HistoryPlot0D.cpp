@@ -106,6 +106,8 @@ cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
     delete this->mpWorkerThread;
     this->mpWorkerThread = nullptr;
   }
+
+  this->mCurves.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -375,15 +377,10 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, con
 
 void cedar::aux::gui::HistoryPlot0D::doDetach(cedar::aux::ConstDataPtr data)
 {
-  for(auto it = this->mCurves.begin(); it != this->mCurves.end(); ++it)
-  {
-    auto curve = *it;
-    if(curve->mData == data)
-    {
-      curve->mCurve->detach();
-      this->mCurves.erase(it);
-    }
-  }
+  auto new_end = std::remove_if(mCurves.begin(), mCurves.end(), [&](CurveInfoPtr curve_info){
+    return (curve_info->mData == data);
+  });
+  mCurves.erase(new_end, mCurves.end());
 }
 
 //!@cond SKIPPED_DOCUMENTATION
