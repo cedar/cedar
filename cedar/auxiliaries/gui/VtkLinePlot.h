@@ -133,14 +133,18 @@ class cedar::aux::gui::VtkLinePlot : public cedar::aux::gui::MultiPlotInterface
 private:
   struct PlotSeries
   {
-    PlotSeries()
+    PlotSeries(vtkSmartPointer<vtkTable> table, vtkSmartPointer<vtkChartXY> chart)
     :
-    mpCurve(NULL)
+    mpCurve(NULL),
+    mpChart(chart),
+    mpVtkTable(table)
     {
     }
 
     ~PlotSeries()
     {
+      mpChart->RemovePlotInstance(mpCurve);
+      mpVtkTable->RemoveColumnByName(mYColumnName.c_str());
     }
 
     //!@brief (Re-)initializes the x and y value arrays.
@@ -150,6 +154,7 @@ private:
     cedar::aux::ConstMatDataPtr mMatData;
     //!@brief a curve inside the plot
     vtkPlot* mpCurve;
+    vtkWeakPointer<vtkChartXY> mpChart;
     vtkWeakPointer<vtkTable> mpVtkTable;
     //!@brief reference to the x values of the plot, currently the same for all plots
     vtkIdType mXColumn;

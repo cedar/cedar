@@ -414,7 +414,15 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
 
   if(labeled_plot->mIsMultiPlot)
   {
-    cedar::aux::asserted_cast<cedar::aux::gui::MultiPlotInterface*>(labeled_plot->mpPlotter)->detach(pData);
+    auto multi_plotter = cedar::aux::asserted_cast<cedar::aux::gui::MultiPlotInterface*>(labeled_plot->mpPlotter);
+    if(multi_plotter->canDetach(pData))
+    {
+      multi_plotter->detach(pData);
+    }
+    else
+    { // really this should never happen.
+      CEDAR_THROW(cedar::aux::ExceptionBase, "Invalid internal state. Not a multiplot.");
+    }
   }
   else
   {

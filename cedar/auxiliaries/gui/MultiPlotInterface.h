@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/gui/MultiPlotInterface.fwd.h"
 
 // SYSTEM INCLUDES
-
+#include <QReadWriteLock>
 
 /*!@brief An interface that indicates that a plot is capable of plotting more than one data object at a time.
  */
@@ -89,7 +89,6 @@ public:
   //!@brief Returns a map of data associated with its title.
   //!@todo Rename this to getDataNameMap?
   const DataMap& getDataMap() const;
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

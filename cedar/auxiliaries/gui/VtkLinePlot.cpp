@@ -105,6 +105,8 @@ cedar::aux::gui::VtkLinePlot::~VtkLinePlot()
     this->mpWorkerThread = nullptr;
   }
 
+  this->mPlotSeriesVector.clear();
+
   if (mpLock)
   {
     delete mpLock;
@@ -234,8 +236,7 @@ bool cedar::aux::gui::VtkLinePlot::canAppend(cedar::aux::ConstDataPtr data) cons
 
 void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const std::string&)
 {
-  PlotSeriesPtr plot_series(new PlotSeries());
-  plot_series->mpVtkTable = this->mpVtkTable;
+  PlotSeriesPtr plot_series(new PlotSeries(mpVtkTable, mpChart));
 
   size_t line_id = mPlotSeriesVector.size();
   plot_series->mXColumn = 0;
@@ -314,19 +315,17 @@ bool cedar::aux::gui::VtkLinePlot::canDetach(cedar::aux::ConstDataPtr data) cons
 
 void cedar::aux::gui::VtkLinePlot::doDetach(cedar::aux::ConstDataPtr data)
 {
+  QWriteLocker locker(mpLock);
   for(auto it = mPlotSeriesVector.begin(); it != mPlotSeriesVector.end(); ++it)
   { 
     auto plot_series = *it;
     if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data)
     {
-      QWriteLocker locker(mpLock);
-      mpChart->RemovePlotInstance(plot_series->mpCurve);
-      mpVtkTable->RemoveColumnByName(plot_series->mYColumnName.c_str());
       mPlotSeriesVector.erase(it);
-      locker.unlock();
       break;
     }
   }
+  locker.unlock();
 }
 
 void cedar::aux::gui::VtkLinePlot::PlotSeries::buildXAxis(unsigned int new_size)
