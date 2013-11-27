@@ -119,16 +119,9 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
   //--------------------------------------------------------------------------------------------------------------------
   struct CurveInfo
   {
-    CurveInfo()
-    :
-    mCurve(NULL)
-    {
-    }
+    CurveInfo();
 
-    ~CurveInfo()
-    {
-      mCurve->detach();
-    }
+    ~CurveInfo();
 
     void setData(cedar::aux::ConstDataPtr data);
 
