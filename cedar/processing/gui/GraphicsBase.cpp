@@ -62,6 +62,9 @@ const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40)
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(0, 76, 249);
 
+const QColor cedar::proc::gui::GraphicsBase::mColorGroupBeingLeft = QColor::fromRgb(200, 200, 200);
+const QColor cedar::proc::gui::GraphicsBase::mColorTargetGroup = QColor::fromRgb(125, 125, 255);
+
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
 
@@ -400,7 +403,7 @@ const cedar::proc::gui::GraphicsBase::GraphicsGroup& cedar::proc::gui::GraphicsB
 QBrush cedar::proc::gui::GraphicsBase::getTargetGroupBrush()
 {
   QBrush brush;
-  brush.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+  brush.setColor(mColorTargetGroup);
   brush.setStyle(Qt::BDiagPattern);
   return brush;
 }
@@ -408,7 +411,7 @@ QBrush cedar::proc::gui::GraphicsBase::getTargetGroupBrush()
 QBrush cedar::proc::gui::GraphicsBase::getLeavingGroupBrush()
 {
   QBrush brush;
-  brush.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
+  brush.setColor(mColorGroupBeingLeft);
   brush.setStyle(Qt::BDiagPattern);
   return brush;
 }
@@ -448,8 +451,11 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
   switch (this->mHighlightMode)
   {
     case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
-    case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
       pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+      break;
+
+    case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mColorTargetGroup);
       break;
 
     case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
@@ -457,6 +463,9 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
       break;
 
     case HIGHLIGHTMODE_GROUP_MEMBER_LEAVING:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mColorGroupBeingLeft);
+      break;
+
     case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
       pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
       break;
