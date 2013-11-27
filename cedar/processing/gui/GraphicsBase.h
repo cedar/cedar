@@ -315,6 +315,12 @@ public:
   static const QColor mValidityColorError;
   //!@brief color for state "unknown"
   static const QColor mValidityColorUnknown;
+
+  //! Color for groups being left
+  static const QColor mColorGroupBeingLeft;
+
+  //! Color for target groups
+  static const QColor mColorTargetGroup;
   
   //!@brief color for outline
   static const QColor mDefaultOutlineColor;
