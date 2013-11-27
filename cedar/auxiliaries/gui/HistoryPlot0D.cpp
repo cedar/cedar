@@ -97,6 +97,12 @@ mpCurrentPlotWidget(nullptr)
   this->plot(data, title);
 }
 
+cedar::aux::gui::HistoryPlot0D::CurveInfo::CurveInfo()
+:
+mCurve(NULL)
+{
+}
+
 cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
 {
   if (this->mpWorkerThread)
@@ -108,6 +114,14 @@ cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
   }
 
   this->mCurves.clear();
+}
+
+cedar::aux::gui::HistoryPlot0D::CurveInfo::~CurveInfo()
+{
+  if (mCurve != NULL)
+  {
+    mCurve->detach();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
