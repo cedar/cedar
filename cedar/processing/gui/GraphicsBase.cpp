@@ -526,6 +526,17 @@ void cedar::proc::gui::GraphicsBase::itemSelected(bool)
   // empty default implementation
 }
 
+void cedar::proc::gui::GraphicsBase::itemSelectedChanged(bool selected)
+{
+  // if the item was deselected, it is not part of the list of selected items; thus, remove its handles
+  if (!selected)
+  {
+    this->updateResizeHandles(false);
+  }
+
+  this->itemSelected(selected);
+}
+
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
   qreal grid_size = 8.0;
@@ -563,41 +574,7 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     
     case QGraphicsItem::ItemSelectedHasChanged:
     {
-      this->itemSelected(value.toBool());
-      break;
-    }
-
-    case QGraphicsItem::ItemSelectedChange:
-    {
-      if (this->canResize())
-      {
-        if (value == true)
-        {
-          for (size_t i = 0; i < cedar::proc::gui::ResizeHandle::directions().size(); ++i)
-          {
-            this->mpResizeHandles.push_back
-            (
-              new cedar::proc::gui::ResizeHandle
-              (
-                this,
-                this->mpResizeHandles,
-                cedar::proc::gui::ResizeHandle::directions().at(i)
-              )
-            );
-          }
-        }
-        else
-        {
-          if (!this->mpResizeHandles.empty())
-          {
-            for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
-            {
-              delete this->mpResizeHandles.at(i);
-            }
-            this->mpResizeHandles.clear();
-          }
-        }
-      }
+      this->itemSelectedChanged(value.toBool());
       break;
     }
 
@@ -611,6 +588,36 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
       break;
   }
   return QGraphicsItem::itemChange(change, value);
+}
+
+void cedar::proc::gui::GraphicsBase::updateResizeHandles(bool show)
+{
+  if (this->canResize() && show)
+  {
+    for (size_t i = 0; i < cedar::proc::gui::ResizeHandle::directions().size(); ++i)
+    {
+      this->mpResizeHandles.push_back
+      (
+        new cedar::proc::gui::ResizeHandle
+        (
+          this,
+          this->mpResizeHandles,
+          cedar::proc::gui::ResizeHandle::directions().at(i)
+        )
+      );
+    }
+  }
+  else
+  {
+    if (!this->mpResizeHandles.empty())
+    {
+      for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+      {
+        delete this->mpResizeHandles.at(i);
+      }
+      this->mpResizeHandles.clear();
+    }
+  }
 }
 
 bool cedar::proc::gui::GraphicsBase::canResize() const

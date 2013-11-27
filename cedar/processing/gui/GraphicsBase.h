@@ -51,6 +51,7 @@
 #include "cedar/processing/gui/Connection.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 #include "cedar/processing/gui/ResizeHandle.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsItem>
@@ -65,6 +66,11 @@
  */
 class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::Configurable
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::Scene;
+
   //--------------------------------------------------------------------------------------------------------------------
   // static constants
   //--------------------------------------------------------------------------------------------------------------------
@@ -281,6 +287,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void itemSelectedChanged(bool selected);
+
+  void updateResizeHandles(bool show);
+
   bool canResize() const;
   
   //! Called whenever the item has been selected or deselected.
