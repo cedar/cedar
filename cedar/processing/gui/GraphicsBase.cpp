@@ -405,12 +405,23 @@ QBrush cedar::proc::gui::GraphicsBase::getTargetGroupBrush()
   return brush;
 }
 
+QBrush cedar::proc::gui::GraphicsBase::getLeavingGroupBrush()
+{
+  QBrush brush;
+  brush.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
+  brush.setStyle(Qt::BDiagPattern);
+  return brush;
+}
+
 QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
 {
   switch (this->mHighlightMode)
   {
     case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
       return cedar::proc::gui::GraphicsBase::getTargetGroupBrush();
+
+    case HIGHLIGHTMODE_GROUP_MEMBER_LEAVING:
+      return cedar::proc::gui::GraphicsBase::getLeavingGroupBrush();
 
     default:
     case HIGHLIGHTMODE_NONE:
@@ -445,6 +456,7 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
       pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorError);
       break;
 
+    case HIGHLIGHTMODE_GROUP_MEMBER_LEAVING:
     case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
       pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
       break;
