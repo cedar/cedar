@@ -61,7 +61,9 @@
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/enable_shared_from_this.hpp>
+#endif
 
 
 /*! @brief Additional data of a camera channel */

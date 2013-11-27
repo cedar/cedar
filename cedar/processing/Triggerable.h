@@ -50,7 +50,9 @@
 #include <QObject>
 #include <QMutex>
 #include <QReadWriteLock>
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif
 #include <set>
 
 /*!@brief Interface for all classes that can be triggered.

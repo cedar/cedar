@@ -56,10 +56,12 @@
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QCoreApplication>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
-#include <boost/function.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/function.hpp>
+#endif
 #include <string>
 #include <iostream>
 #include <climits>

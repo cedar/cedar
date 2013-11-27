@@ -71,7 +71,9 @@
 #include <QFileDialog>
 #include <QDialogButtonBox>
 #include <QInputDialog>
-#include <boost/property_tree/detail/json_parser_error.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/detail/json_parser_error.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

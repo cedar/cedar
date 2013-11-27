@@ -42,7 +42,9 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/filesystem.hpp>
+#endif
 
 
 /*!

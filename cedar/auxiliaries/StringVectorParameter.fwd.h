@@ -47,7 +47,6 @@
 #include "cedar/auxiliaries/VectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

@@ -45,7 +45,9 @@
 // SYSTEM INCLUDES
 #include <QApplication>
 #include <QMainWindow>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/filesystem.hpp>
+#endif
 #include <iostream>
 
 int main(int argc, char** argv)

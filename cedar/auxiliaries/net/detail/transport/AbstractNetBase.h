@@ -56,7 +56,9 @@
 
 // PROJECT INCLUDES
 #include <yarp/os/Network.h>
-#include <boost/utility.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/utility.hpp>
+#endif
 
 
 // SYSTEM INCLUDES

@@ -50,7 +50,9 @@
 #include "cedar/processing/sources/Boost.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif
 
 
 /*!@brief A widget for conveniently controlling the boosts in a network.

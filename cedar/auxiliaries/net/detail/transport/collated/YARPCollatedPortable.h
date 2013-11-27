@@ -50,7 +50,9 @@
 #include "cedar/auxiliaries/net/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <boost/utility.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/utility.hpp>
+#endif
 #include <yarp/os/Portable.h>
 #include <yarp/os/ConnectionReader.h>
 #include <yarp/os/ConnectionWriter.h>
