@@ -56,10 +56,12 @@
 #include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
 #include <QObject>
 #include <vector>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *

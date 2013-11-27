@@ -247,7 +247,7 @@ void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   QWriteLocker locker(mpLock);
   mPlotSeriesVector.push_back(plot_series);
 
-  plot_series->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  plot_series->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!plot_series->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,

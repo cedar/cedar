@@ -44,8 +44,10 @@
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+  #include <boost/filesystem.hpp>
+#endif
 
 
 class TestClassOne : public cedar::aux::Configurable

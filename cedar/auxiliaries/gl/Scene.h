@@ -45,8 +45,10 @@
 #include "cedar/auxiliaries/gui/Viewer.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif
 #include <string>
 #include <QList>
 
