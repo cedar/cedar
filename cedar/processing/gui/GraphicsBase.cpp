@@ -475,6 +475,18 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   if (mDrawBackground)
   {
     painter->save();
+    QBrush brush = this->getOutlineBrush();
+
+    // for non-solid patterns, we draw a white background
+    if (brush.style() != Qt::SolidPattern)
+    {
+      QBrush solid_background(Qt::white);
+      painter->setBrush(solid_background);
+      QPen invisible_pen(Qt::NoPen);
+      painter->setPen(invisible_pen);
+      this->drawShape(painter);
+    }
+
     painter->setPen(this->getOutlinePen());
     painter->setBrush(this->getOutlineBrush());
 
