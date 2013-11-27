@@ -128,7 +128,7 @@ public:
    */
   bool isObjectInstanceOf(BaseClassPtr pointer) const
   {
-    return boost::dynamic_pointer_cast<PluginClass>(pointer);
+    return !!boost::dynamic_pointer_cast<PluginClass>(pointer);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -43,6 +43,9 @@
 #include "cedar/units/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
 
 /*! Defined to indicate that the new unit framework is in effect. This can be used to keep software compatible with
  *  multiple versions of cedar.

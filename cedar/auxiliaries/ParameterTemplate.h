@@ -50,8 +50,9 @@
 #include "cedar/auxiliaries/ParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/function.hpp>
-
+#ifndef Q_MOC_RUN
+  #include <boost/function.hpp>
+#endif
 
 /*!@brief  A generic template for parameters stored in a cedar::aux::Configurable.
  *

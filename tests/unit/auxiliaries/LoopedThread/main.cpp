@@ -43,7 +43,9 @@
 
 #include <QCoreApplication>
 
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 
 // global variables
 int errors = 0;
