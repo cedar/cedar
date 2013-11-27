@@ -131,12 +131,21 @@ void cedar::proc::gui::Scene::itemSelected()
   using cedar::proc::Step;
   using cedar::proc::Manager;
 
+  // either show the resize handles if only one item is selected, or hide them if more than one is selected
+  auto selected_items = this->selectedItems();
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+    if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
+    {
+      // resize handles are only shown when a single item is selected
+      graphics_base->updateResizeHandles(selected_items.size() == 1);
+    }
+  }
+
   if (this->mpConfigurableWidget == NULL || this->mpRecorderWidget == NULL)
   {
     return;
   }
-
-  QList<QGraphicsItem *> selected_items = this->selectedItems();
 
   if (selected_items.size() == 1)
   {
