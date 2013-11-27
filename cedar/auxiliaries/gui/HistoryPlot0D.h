@@ -53,7 +53,9 @@
 // SYSTEM INCLUDES
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
-#include <boost/date_time.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time.hpp>
+#endif
 #include <deque>
 
 //!@cond SKIPPED_DOCUMENTATION

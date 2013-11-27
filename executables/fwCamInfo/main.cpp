@@ -45,7 +45,9 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <dc1394/dc1394.h>
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 
 
 /*! A short program to display informations and capabilities of the properties of a given camera on the firewire bus

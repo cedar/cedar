@@ -57,8 +57,10 @@
 #endif // CEDAR_USE_LIB_DC1394
 
 // SYSTEM INCLUDES
-#include <boost/lexical_cast.hpp>
-#include <boost/math/special_functions/round.hpp> // rounding from double to int in cv::VideoCapture get and set methods
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+  #include <boost/math/special_functions/round.hpp> // rounding from double to int in cv::VideoCapture get and set methods
+#endif
 #include <QWriteLocker>
 
 //----------------------------------------------------------------------------------------------------------------------

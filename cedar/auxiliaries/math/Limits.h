@@ -52,7 +52,9 @@
 #include "cedar/units/Velocity.h"
 
 // SYSTEM INCLUDES
-#include <boost/numeric/conversion/bounds.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/numeric/conversion/bounds.hpp>
+#endif
 #include <limits>
 #include <iostream>
 #include <boost/units/base_dimension.hpp>

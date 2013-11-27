@@ -47,9 +47,11 @@
 #include <QReadLocker>
 #include <QReadWriteLock>
 #include <QDateTime>
-#include <boost/filesystem.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/pointer_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/filesystem.hpp>
+  #include <boost/date_time/posix_time/posix_time.hpp>
+  #include <boost/pointer_cast.hpp>
+#endif
 #include <limits>
 
 //------------------------------------------------------------------------------

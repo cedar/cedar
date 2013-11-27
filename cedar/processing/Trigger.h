@@ -52,7 +52,9 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
-#include <boost/enable_shared_from_this.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/enable_shared_from_this.hpp>
+#endif
 #include <vector>
 
 /*!@brief A base class for all sorts of Trigger. Trigger provides a generic interface for the trigger concept in cedar.

@@ -50,11 +50,13 @@
 #include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/next_prior.hpp>
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/next_prior.hpp>
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/function.hpp>
+  #include <boost/noncopyable.hpp>
+#endif // Q_MOC_RUN
 #include <map>
 #include <list>
 #include <fstream>

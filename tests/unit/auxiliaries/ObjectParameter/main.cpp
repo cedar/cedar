@@ -43,8 +43,10 @@
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+  #include <boost/filesystem.hpp>
+#endif
 
 //!@todo Test setting of the default value
 

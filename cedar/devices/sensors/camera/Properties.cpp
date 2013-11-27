@@ -48,7 +48,9 @@
 #include "cedar/devices/sensors/camera/enums/Decoding.h"
 
 // SYSTEM INCLUDES
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
