@@ -241,6 +241,8 @@ private:
 
   void removeConnectorItem(bool isSource, const std::string& name);
 
+  qreal getIconSizeForCurrentMode() const;
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange);
@@ -262,6 +264,12 @@ private slots:
        );
 
   void updateCollapsedness();
+
+  //! Updates the position(s) and size(s) of the texts attached to this network.
+  void updateTextBounds();
+
+  //! Updates the position and size of the icon.
+  void updateIconBounds();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -315,6 +323,12 @@ private:
 
   //! The vertical offset for data slots in the network used when the network is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;
+
+  //! The size of the icon in the expanded mode.
+  static const qreal M_EXPANDED_ICON_SIZE;
+
+  //! The size of the icon in the collapsed mode.
+  static const qreal M_COLLAPSED_ICON_SIZE;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

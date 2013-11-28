@@ -77,6 +77,9 @@
 
 const qreal cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET = static_cast<qreal>(25);
 
+const qreal cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE = static_cast<qreal>(20);
+const qreal cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::mIconSize;
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -98,12 +101,10 @@ mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
 _mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
-_mUncollapsedWidth(new cedar::aux::DoubleParameter(this, "uncollapsed width", 0)),
-_mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 0))
+_mUncollapsedWidth(new cedar::aux::DoubleParameter(this, "uncollapsed width", width)),
+_mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", height))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  this->setResizeable(true);
-  this->setInputOutputSlotOffset(cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET);
 
   if (!mNetwork)
   {
@@ -119,6 +120,10 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 
   mpNameDisplay = new QGraphicsTextItem(this);
   this->networkNameChanged();
+
+
+  this->setCollapsed(false);
+  this->updateCollapsedness();
 
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
@@ -233,7 +238,18 @@ void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::st
 
 void cedar::proc::gui::Network::networkNameChanged()
 {
-  this->mpNameDisplay->setPlainText(QString::fromStdString(this->getNetwork()->getName()));
+  this->mpNameDisplay->setTextWidth(this->width());
+  QString name = QString::fromStdString(this->getNetwork()->getName());
+  if (this->isCollapsed())
+  {
+    this->mpNameDisplay->setHtml(name);
+  }
+  else
+  {
+    this->mpNameDisplay->setHtml("<center>" + name + "</center>");
+  }
+
+  this->updateTextBounds();
 }
 
 QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
@@ -276,8 +292,56 @@ void cedar::proc::gui::Network::sizeChanged()
 {
   this->cedar::proc::gui::Connectable::sizeChanged();
 
+  this->updateTextBounds();
+  this->updateIconBounds();
   this->updateConnectorPositions();
 }
+
+void cedar::proc::gui::Network::updateTextBounds()
+{
+  qreal bounds_factor = static_cast<qreal>(2);
+  if (this->isCollapsed())
+  {
+    bounds_factor = static_cast<qreal>(1);
+  }
+  this->mpNameDisplay->setTextWidth
+  (
+    std::max
+    (
+      static_cast<qreal>(50),
+      this->width() - bounds_factor * this->getIconSizeForCurrentMode()
+    )
+  );
+
+  this->mpNameDisplay->setX(this->getIconSizeForCurrentMode());
+}
+
+qreal cedar::proc::gui::Network::getIconSizeForCurrentMode() const
+{
+  if (this->isCollapsed())
+  {
+    return cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE;
+  }
+  else
+  {
+    return cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE;
+  }
+}
+
+void cedar::proc::gui::Network::updateIconBounds()
+{
+  qreal padding = static_cast<qreal>(2);
+  if (this->isCollapsed())
+  {
+    qreal y = (this->height() - cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE) / static_cast<qreal>(2);
+    this->setIconBounds(padding, y, cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE - 2 * padding);
+  }
+  else
+  {
+    this->setIconBounds(padding, padding, cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE - 2 * padding);
+  }
+}
+
 
 bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
 {
@@ -1357,13 +1421,17 @@ void cedar::proc::gui::Network::updateCollapsedness()
     this->mConnectorSources.at(i)->setVisible(!collapse);
   }
 
+  // update the text of the network
+  this->networkNameChanged();
+
   if (collapse)
   {
     this->_mUncollapsedWidth->setValue(this->width());
     this->_mUncollapsedHeight->setValue(this->height());
     this->setInputOutputSlotOffset(static_cast<qreal>(0));
     //!@todo Same size as processing steps/adapt to the number of inputs, outputs?
-    this->setSize(200, 100);
+    this->setSize(cedar::proc::gui::StepItem::mDefaultWidth, cedar::proc::gui::StepItem::mDefaultHeight);
+
   }
   else
   {
