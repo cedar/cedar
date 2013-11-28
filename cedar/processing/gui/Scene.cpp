@@ -131,12 +131,21 @@ void cedar::proc::gui::Scene::itemSelected()
   using cedar::proc::Step;
   using cedar::proc::Manager;
 
+  // either show the resize handles if only one item is selected, or hide them if more than one is selected
+  auto selected_items = this->selectedItems();
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+    if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
+    {
+      // resize handles are only shown when a single item is selected
+      graphics_base->updateResizeHandles(selected_items.size() == 1);
+    }
+  }
+
   if (this->mpConfigurableWidget == NULL || this->mpRecorderWidget == NULL)
   {
     return;
   }
-
-  QList<QGraphicsItem *> selected_items = this->selectedItems();
 
   if (selected_items.size() == 1)
   {
@@ -392,7 +401,8 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   // ... reset the current one ...
   mpDropTarget = NULL;
   mTargetGroup.reset();
-  bool potential_target_network_found = false;
+  bool potential_target_network_found = true;
+  bool target_is_root_network = true;
 
   // ... and look for a new one
   for (int i = 0; i < items_under_mouse.size(); ++i)
@@ -404,7 +414,7 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
     }
     if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(items_under_mouse.at(i)))
     {
-      potential_target_network_found = true;
+      target_is_root_network = false;
 
       // check if there is an item that is not in the target network yet, highlight the target network
       if (network_item->canAddAny(selected))
@@ -412,6 +422,10 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
         mpDropTarget = network_item;
         mTargetGroup = network_item->getNetwork();
         network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+      }
+      else
+      {
+        potential_target_network_found = false;
       }
 
       // We only look at the first network item; the ones below it (cf descending sort order above) we do not care
@@ -421,6 +435,37 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   }
 
   this->resetBackgroundColor();
+
+  // highlight the source groups
+  if (potential_target_network_found)
+  {
+    for (int i = 0; i < selected.size(); ++i)
+    {
+      auto item = selected.at(i);
+      if (item->parentItem())
+      {
+        if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+        {
+          network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_GROUP_MEMBER_LEAVING);
+        }
+      }
+      else if (!target_is_root_network) // items without a parent are in the root network
+      {
+        this->setBackgroundBrush(cedar::proc::gui::GraphicsBase::getLeavingGroupBrush());
+      }
+    }
+  }
+  else
+  {
+    for (int i = 0; i < selected.size(); ++i)
+    {
+      auto item = selected.at(i);
+      if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+      {
+        network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+    }
+  }
 
   // disable highlighting of the old drop target if the target has changed or there is no target any more
   if ((mpDropTarget == NULL && old_drop_target != NULL) || old_drop_target != mpDropTarget)
@@ -432,7 +477,7 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   }
 
   // if no target network was found, the step(s) should be added to the root network; thus, highlight it
-  if (!potential_target_network_found)
+  if (target_is_root_network)
   {
     if (this->mNetwork->canAddAny(selected))
     {
@@ -458,6 +503,18 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   }
 
   this->mDraggingItems = false;
+
+  // reset highlighting of the networks from which the items are being removed
+  auto selected = this->selectedItems();
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    auto item = selected.at(i);
+    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+    {
+      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    }
+  }
+
   if (mTargetGroup)
   {
     if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(mpDropTarget))
@@ -470,6 +527,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       this->mNetwork->addElements(this->selectedItems().toStdList());
     }
   }
+
 
   mTargetGroup.reset();
   this->resetBackgroundColor();

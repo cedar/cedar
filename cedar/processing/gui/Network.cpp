@@ -72,6 +72,15 @@
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+const qreal cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET = static_cast<qreal>(25);
+
+const qreal cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE = static_cast<qreal>(20);
+const qreal cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::mIconSize;
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -90,11 +99,12 @@ mpScene(scene),
 mpMainWindow(pMainWindow),
 mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
-mPlotGroupsNode(cedar::aux::ConfigurationNode())
+mPlotGroupsNode(cedar::aux::ConfigurationNode()),
+_mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
+_mUncollapsedWidth(new cedar::aux::DoubleParameter(this, "uncollapsed width", width)),
+_mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", height))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  this->setResizeable(true);
-  this->setInputOutputSlotOffset(static_cast<qreal>(25));
 
   if (!mNetwork)
   {
@@ -111,6 +121,10 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
   mpNameDisplay = new QGraphicsTextItem(this);
   this->networkNameChanged();
 
+
+  this->setCollapsed(false);
+  this->updateCollapsedness();
+
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
@@ -121,9 +135,6 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
     this,
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange))
   );
-
-//  mSlotConnection
-//    = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
 
   mDataConnectionChangedConnection = mNetwork->connectToDataConnectionChanged
                                      (
@@ -151,6 +162,8 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
       (
         boost::bind(&cedar::proc::gui::Network::processElementRemovedSignal, this, _1)
       );
+
+  this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
   this->update();
 }
@@ -225,7 +238,18 @@ void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::st
 
 void cedar::proc::gui::Network::networkNameChanged()
 {
-  this->mpNameDisplay->setPlainText(QString::fromStdString(this->getNetwork()->getName()));
+  this->mpNameDisplay->setTextWidth(this->width());
+  QString name = QString::fromStdString(this->getNetwork()->getName());
+  if (this->isCollapsed())
+  {
+    this->mpNameDisplay->setHtml(name);
+  }
+  else
+  {
+    this->mpNameDisplay->setHtml("<center>" + name + "</center>");
+  }
+
+  this->updateTextBounds();
 }
 
 QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
@@ -268,8 +292,56 @@ void cedar::proc::gui::Network::sizeChanged()
 {
   this->cedar::proc::gui::Connectable::sizeChanged();
 
+  this->updateTextBounds();
+  this->updateIconBounds();
   this->updateConnectorPositions();
 }
+
+void cedar::proc::gui::Network::updateTextBounds()
+{
+  qreal bounds_factor = static_cast<qreal>(2);
+  if (this->isCollapsed())
+  {
+    bounds_factor = static_cast<qreal>(1);
+  }
+  this->mpNameDisplay->setTextWidth
+  (
+    std::max
+    (
+      static_cast<qreal>(50),
+      this->width() - bounds_factor * this->getIconSizeForCurrentMode()
+    )
+  );
+
+  this->mpNameDisplay->setX(this->getIconSizeForCurrentMode());
+}
+
+qreal cedar::proc::gui::Network::getIconSizeForCurrentMode() const
+{
+  if (this->isCollapsed())
+  {
+    return cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE;
+  }
+  else
+  {
+    return cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE;
+  }
+}
+
+void cedar::proc::gui::Network::updateIconBounds()
+{
+  qreal padding = static_cast<qreal>(2);
+  if (this->isCollapsed())
+  {
+    qreal y = (this->height() - cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE) / static_cast<qreal>(2);
+    this->setIconBounds(padding, y, cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE - 2 * padding);
+  }
+  else
+  {
+    this->setIconBounds(padding, padding, cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE - 2 * padding);
+  }
+}
+
 
 bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
 {
@@ -409,7 +481,7 @@ bool cedar::proc::gui::Network::canAddAny(const QList<QGraphicsItem*>& items) co
 void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
 {
   std::list<cedar::proc::ElementPtr> elements_to_move;
-  std::set<cedar::proc::ElementPtr> all_elements;
+  std::list<cedar::proc::ElementPtr> all_elements;
   for (auto it = elements.begin(); it != elements.end(); ++it)
   {
     cedar::proc::ElementPtr element;
@@ -418,17 +490,26 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     {
       element = graphics_base->getElement();
 
-      auto children = graphics_base->children();
-      for (int i = 0; i < children.size(); ++i)
+      std::vector<QGraphicsItem*> items;
+      items.push_back(graphics_base);
+      while (!items.empty())
       {
-        if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(children.at(i)))
+        auto item = *items.begin();
+        items.erase(items.begin());
+
+        if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
         {
           auto child_element = graphics_child->getElement();
           // some objects such as data slots may not have an element
           //!@todo Cast to a common superclass, proc::gui::Element here.
           if (child_element)
           {
-            all_elements.insert(child_element);
+            all_elements.push_back(child_element);
+
+            for (int i = 0; i < graphics_child->childItems().size(); ++i)
+            {
+              items.push_back(graphics_child->childItems().at(i));
+            }
           }
         }
       }
@@ -448,8 +529,9 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     }
     CEDAR_DEBUG_ASSERT(element);
     elements_to_move.push_back(element);
-    all_elements.insert(element);
+    all_elements.push_back(element);
   }
+  //!@todo This member can probably be removed
   this->mHoldFitToContents = true;
 
   std::map<cedar::proc::ElementPtr, QPointF> item_scene_pos;
@@ -471,9 +553,9 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
 
   this->getNetwork()->add(elements_to_move);
 
-  for (auto it = item_scene_pos.begin(); it != item_scene_pos.end(); ++it)
+  for (auto it = all_elements.begin(); it != all_elements.end(); ++it)
   {
-    auto element = it->first;
+    auto element = *it;
 
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
 
@@ -485,7 +567,8 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     graphics_item->readConfiguration(config_it->second);
 
     // restore the item's position
-    const QPointF& scene_pos = it->second;
+    CEDAR_DEBUG_ASSERT(item_scene_pos.find(element) != item_scene_pos.end());
+    const QPointF& scene_pos = item_scene_pos[element];
     auto parent = graphics_item->parentItem();
     if(parent == NULL)
     {
@@ -497,6 +580,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
 
   this->mHoldFitToContents = false;
 //  this->fitToContents();
+  this->resizeToIncludeContents();
 }
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
@@ -1066,6 +1150,22 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
 }
 
+void cedar::proc::gui::Network::resizeToIncludeContents()
+{
+  QRectF bounds = this->childrenBoundingRect();
+
+  if (this->width() < bounds.width())
+  {
+    this->setWidth(bounds.width());
+  }
+
+  if (this->height() < bounds.height())
+  {
+    this->setHeight(bounds.height());
+  }
+}
+
+
 void cedar::proc::gui::Network::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
 {
   this->cedar::proc::gui::Connectable::slotRemoved(role, name);
@@ -1217,6 +1317,13 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
     return;
   }
 
+  QAction* p_collapse = menu.addAction("collapse");
+  p_collapse->setCheckable(true);
+  p_collapse->setChecked(this->isCollapsed());
+  this->connect(p_collapse, SIGNAL(toggled(bool)), SLOT(setCollapsed(bool)));
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
   QAction* p_add_input = menu.addAction("add input");
   QAction* p_add_output = menu.addAction("add output");
 
@@ -1284,4 +1391,53 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
     std::string name = a->text().toStdString();
     this->getNetwork()->removeConnector(name, false);
   }
+}
+
+void cedar::proc::gui::Network::setCollapsed(bool collapsed)
+{
+  this->_mIsCollapsed->setValue(collapsed);
+}
+
+void cedar::proc::gui::Network::updateCollapsedness()
+{
+  bool collapse = this->isCollapsed();
+  auto children = this->childItems();
+  for (int i = 0; i < children.size(); ++i)
+  {
+    auto child = children.at(i);
+    if (auto element = dynamic_cast<cedar::proc::gui::Connectable*>(child))
+    {
+      element->setVisible(!collapse);
+    }
+  }
+
+  for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
+  {
+    this->mConnectorSinks.at(i)->setVisible(!collapse);
+  }
+
+  for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
+  {
+    this->mConnectorSources.at(i)->setVisible(!collapse);
+  }
+
+  // update the text of the network
+  this->networkNameChanged();
+
+  if (collapse)
+  {
+    this->_mUncollapsedWidth->setValue(this->width());
+    this->_mUncollapsedHeight->setValue(this->height());
+    this->setInputOutputSlotOffset(static_cast<qreal>(0));
+    //!@todo Same size as processing steps/adapt to the number of inputs, outputs?
+    this->setSize(cedar::proc::gui::StepItem::mDefaultWidth, cedar::proc::gui::StepItem::mDefaultHeight);
+
+  }
+  else
+  {
+    this->setInputOutputSlotOffset(cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET);
+    this->setSize(this->_mUncollapsedWidth->getValue(), this->_mUncollapsedHeight->getValue());
+  }
+
+  this->setResizeable(!collapse);
 }

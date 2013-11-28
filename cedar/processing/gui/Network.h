@@ -109,8 +109,11 @@ public:
   //!@brief get the current file, to which the network configuration can be saved
   const std::string& getFileName() const;
 
-  //!@brief Resizes the network to fit all its contents.
+  //!@brief Resizes the network to exactly fit all its contents.
   void fitToContents();
+
+  //! Resizes the network if its contents are larger than its bounds.
+  void resizeToIncludeContents();
 
   //!@brief Adds an element to the network.
   void addElement(cedar::proc::gui::GraphicsBase *pElement);
@@ -175,8 +178,16 @@ public:
   //!@brief handles events in the context menu
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  //! Returns whether or not this network is collapsed.
+  bool isCollapsed() const
+  {
+    return this->_mIsCollapsed->getValue();
+  }
+
 public slots:
   void stepRecordStateChanged();
+
+  void setCollapsed(bool collapsed);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -230,6 +241,8 @@ private:
 
   void removeConnectorItem(bool isSource, const std::string& name);
 
+  qreal getIconSizeForCurrentMode() const;
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange);
@@ -249,6 +262,14 @@ private slots:
          QString targetSlot,
          cedar::proc::Network::ConnectionChange change
        );
+
+  void updateCollapsedness();
+
+  //! Updates the position(s) and size(s) of the texts attached to this network.
+  void updateTextBounds();
+
+  //! Updates the position and size of the icon.
+  void updateIconBounds();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -300,9 +321,30 @@ private:
   //! Configuration of the next element that is added to the scene.
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
+  //! The vertical offset for data slots in the network used when the network is expanded.
+  static const qreal M_EXPANDED_SLOT_OFFSET;
+
+  //! The size of the icon in the expanded mode.
+  static const qreal M_EXPANDED_ICON_SIZE;
+
+  //! The size of the icon in the collapsed mode.
+  static const qreal M_COLLAPSED_ICON_SIZE;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+private:
   cedar::aux::BoolParameterPtr _mSmartMode;
 
   cedar::aux::ConfigurationNode mPlotGroupsNode;
+
+  cedar::aux::BoolParameterPtr _mIsCollapsed;
+
+  //! Width of the network in its uncollapsed state.
+  cedar::aux::DoubleParameterPtr _mUncollapsedWidth;
+
+  //! Height of the network in its uncollapsed state.
+  cedar::aux::DoubleParameterPtr _mUncollapsedHeight;
 
 }; // class cedar::proc::gui::NetworkFile
 

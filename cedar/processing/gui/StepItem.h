@@ -259,9 +259,6 @@ private:
   //! The height of newly created steps.
   static const qreal mDefaultHeight;
 
-  //!@brief the class id of the step
-  cedar::aux::ConstPluginDeclarationPtr mClassId;
-
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
 

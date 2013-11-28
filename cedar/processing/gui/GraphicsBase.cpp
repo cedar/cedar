@@ -40,12 +40,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/GraphicsBase.h"
-#include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Network.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
@@ -61,6 +58,9 @@ const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(170, 218, 24);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(0, 76, 249);
+
+const QColor cedar::proc::gui::GraphicsBase::mColorGroupBeingLeft = QColor::fromRgb(200, 200, 200);
+const QColor cedar::proc::gui::GraphicsBase::mColorTargetGroup = QColor::fromRgb(125, 125, 255);
 
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
@@ -135,6 +135,8 @@ void cedar::proc::gui::GraphicsBase::itemSceneHasChanged()
 void cedar::proc::gui::GraphicsBase::setResizeable(bool resizeable)
 {
   this->mResizeable = resizeable;
+
+  this->clearResizeHandles();
 }
 
 void cedar::proc::gui::GraphicsBase::sizeChanged()
@@ -196,12 +198,22 @@ void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
 {
   this->mHeight->setValue(static_cast<double>(height));
   this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setWidth(qreal width)
 {
   this->mWidth->setValue(static_cast<double>(width));
   this->update();
+  this->sizeChanged();
+}
+
+void cedar::proc::gui::GraphicsBase::setSize(qreal width, qreal height)
+{
+  this->mHeight->setValue(static_cast<double>(height));
+  this->mWidth->setValue(static_cast<double>(width));
+  this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setOutlineColor(const QColor& color)
@@ -400,7 +412,15 @@ const cedar::proc::gui::GraphicsBase::GraphicsGroup& cedar::proc::gui::GraphicsB
 QBrush cedar::proc::gui::GraphicsBase::getTargetGroupBrush()
 {
   QBrush brush;
-  brush.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+  brush.setColor(mColorTargetGroup);
+  brush.setStyle(Qt::BDiagPattern);
+  return brush;
+}
+
+QBrush cedar::proc::gui::GraphicsBase::getLeavingGroupBrush()
+{
+  QBrush brush;
+  brush.setColor(mColorGroupBeingLeft);
   brush.setStyle(Qt::BDiagPattern);
   return brush;
 }
@@ -411,6 +431,9 @@ QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
   {
     case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
       return cedar::proc::gui::GraphicsBase::getTargetGroupBrush();
+
+    case HIGHLIGHTMODE_GROUP_MEMBER_LEAVING:
+      return cedar::proc::gui::GraphicsBase::getLeavingGroupBrush();
 
     default:
     case HIGHLIGHTMODE_NONE:
@@ -437,12 +460,19 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
   switch (this->mHighlightMode)
   {
     case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
-    case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
       pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+      break;
+
+    case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mColorTargetGroup);
       break;
 
     case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
       pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorError);
+      break;
+
+    case HIGHLIGHTMODE_GROUP_MEMBER_LEAVING:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mColorGroupBeingLeft);
       break;
 
     case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
@@ -463,6 +493,18 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   if (mDrawBackground)
   {
     painter->save();
+    QBrush brush = this->getOutlineBrush();
+
+    // for non-solid patterns, we draw a white background
+    if (brush.style() != Qt::SolidPattern)
+    {
+      QBrush solid_background(Qt::white);
+      painter->setBrush(solid_background);
+      QPen invisible_pen(Qt::NoPen);
+      painter->setPen(invisible_pen);
+      this->drawShape(painter);
+    }
+
     painter->setPen(this->getOutlinePen());
     painter->setBrush(this->getOutlineBrush());
 
@@ -526,6 +568,17 @@ void cedar::proc::gui::GraphicsBase::itemSelected(bool)
   // empty default implementation
 }
 
+void cedar::proc::gui::GraphicsBase::itemSelectedChanged(bool selected)
+{
+  // if the item was deselected, it is not part of the list of selected items; thus, remove its handles
+  if (!selected)
+  {
+    this->updateResizeHandles(false);
+  }
+
+  this->itemSelected(selected);
+}
+
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
   qreal grid_size = 8.0;
@@ -563,41 +616,7 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     
     case QGraphicsItem::ItemSelectedHasChanged:
     {
-      this->itemSelected(value.toBool());
-      break;
-    }
-
-    case QGraphicsItem::ItemSelectedChange:
-    {
-      if (this->canResize())
-      {
-        if (value == true)
-        {
-          for (size_t i = 0; i < cedar::proc::gui::ResizeHandle::directions().size(); ++i)
-          {
-            this->mpResizeHandles.push_back
-            (
-              new cedar::proc::gui::ResizeHandle
-              (
-                this,
-                this->mpResizeHandles,
-                cedar::proc::gui::ResizeHandle::directions().at(i)
-              )
-            );
-          }
-        }
-        else
-        {
-          if (!this->mpResizeHandles.empty())
-          {
-            for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
-            {
-              delete this->mpResizeHandles.at(i);
-            }
-            this->mpResizeHandles.clear();
-          }
-        }
-      }
+      this->itemSelectedChanged(value.toBool());
       break;
     }
 
@@ -611,6 +630,38 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
       break;
   }
   return QGraphicsItem::itemChange(change, value);
+}
+
+void cedar::proc::gui::GraphicsBase::updateResizeHandles(bool show)
+{
+  if (this->canResize() && show)
+  {
+    for (size_t i = 0; i < cedar::proc::gui::ResizeHandle::directions().size(); ++i)
+    {
+      this->mpResizeHandles.push_back
+      (
+        new cedar::proc::gui::ResizeHandle
+        (
+          this,
+          this->mpResizeHandles,
+          cedar::proc::gui::ResizeHandle::directions().at(i)
+        )
+      );
+    }
+  }
+  else
+  {
+    this->clearResizeHandles();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::clearResizeHandles()
+{
+  for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+  {
+    delete this->mpResizeHandles.at(i);
+  }
+  this->mpResizeHandles.clear();
 }
 
 bool cedar::proc::gui::GraphicsBase::canResize() const
