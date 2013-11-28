@@ -49,14 +49,13 @@
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
 #include <QGraphicsSvgItem>
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brie A gui base class for all items that represent cedar::proc::Connectables.
  */
 class cedar::proc::gui::Connectable : public QObject, public cedar::proc::gui::GraphicsBase
 {
@@ -213,6 +212,9 @@ protected:
   //! Updates the positions of the data slot items.
   void updateDataSlotPositions();
 
+  //! Sets the size and position of the icon display. The icon will, at most, be size x size.
+  void setIconBounds(const qreal& x, const qreal& y, const qreal& size);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -232,6 +234,9 @@ public:
 protected:
   //! SvgItem displaying the connectable's icon
   QGraphicsSvgItem* mpIconDisplay;
+
+  //!@brief the class id of the step
+  cedar::aux::ConstPluginDeclarationPtr mClassId;
 
   //!@brief The current display mode of the step.
   cedar::proc::gui::Connectable::DisplayMode::Id mDisplayMode;
