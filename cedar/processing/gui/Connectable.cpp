@@ -42,7 +42,10 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
 
 // SYSTEM INCLUDES
 
@@ -130,6 +133,20 @@ cedar::proc::gui::Connectable::Decoration::Decoration
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connectable::setIconBounds(const qreal& x, const qreal& y, const qreal& size)
+{
+  if (this->mpIconDisplay == NULL)
+  {
+    return;
+  }
+
+  this->mpIconDisplay->setPos(x, y);
+  qreal w = this->mpIconDisplay->boundingRect().width();
+  qreal h = this->mpIconDisplay->boundingRect().width();
+  qreal major = std::max(w, h);
+  this->mpIconDisplay->setScale(size / major);
+}
 
 void cedar::proc::gui::Connectable::setInputOutputSlotOffset(qreal offset)
 {
@@ -308,6 +325,23 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   this->mConnectable = connectable;
   mSlotAddedConnection.disconnect();
   mSlotRemovedConnection.disconnect();
+
+
+  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getConnectable());
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId))
+  cedar::proc::ConstElementDeclarationPtr elem_decl
+    = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
+
+  if (this->mpIconDisplay != NULL)
+  {
+    delete this->mpIconDisplay;
+    this->mpIconDisplay = NULL;
+  }
+  this->mpIconDisplay = new QGraphicsSvgItem(elem_decl->determinedIconPath(), this);
+
+
+  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
+  this->mpIconDisplay->setCacheMode(QGraphicsItem::NoCache);
 
   mSlotAddedConnection
     = connectable->connectToSlotAdded(boost::bind(&cedar::proc::gui::Connectable::slotAdded, this, _1, _2));

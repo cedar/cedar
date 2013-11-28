@@ -51,6 +51,7 @@
 #include "cedar/processing/gui/Connection.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 #include "cedar/processing/gui/ResizeHandle.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsItem>
@@ -65,6 +66,11 @@
  */
 class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::Configurable
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::Scene;
+
   //--------------------------------------------------------------------------------------------------------------------
   // static constants
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,7 +97,8 @@ public:
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET,
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING,
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR,
-    HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER
+    HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER,
+    HIGHLIGHTMODE_GROUP_MEMBER_LEAVING
   };
 
   //!@brief enum  of base shapes for GraphicsBase
@@ -172,6 +179,9 @@ public:
   //!@brief set width of this GraphicsBase
   void setWidth(qreal width);
 
+  //! Sets the size (width and height) of the object.
+  void setSize(qreal width, qreal height);
+
   //!@brief Sets the bounds of the item.
   void setBounds(const QRectF& rect);
 
@@ -233,6 +243,9 @@ public:
   //! Returns the brush used for highlighting potential target groups.
   static QBrush getTargetGroupBrush();
 
+  //! Returns the brush used for highlighting when one of the child items is potentially leaving. :(
+  static QBrush getLeavingGroupBrush();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -281,6 +294,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void itemSelectedChanged(bool selected);
+
+  void updateResizeHandles(bool show);
+
+  void clearResizeHandles();
+
   bool canResize() const;
   
   //! Called whenever the item has been selected or deselected.
@@ -301,6 +320,12 @@ public:
   static const QColor mValidityColorError;
   //!@brief color for state "unknown"
   static const QColor mValidityColorUnknown;
+
+  //! Color for groups being left
+  static const QColor mColorGroupBeingLeft;
+
+  //! Color for target groups
+  static const QColor mColorTargetGroup;
   
   //!@brief color for outline
   static const QColor mDefaultOutlineColor;

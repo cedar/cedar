@@ -49,8 +49,6 @@
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -306,21 +304,6 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->setElement(step);
   this->setConnectable(step);
 
-  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getStep());
-  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId))
-  cedar::proc::ConstElementDeclarationPtr elem_decl
-    = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
-
-  if (this->mpIconDisplay != NULL)
-  {
-    delete this->mpIconDisplay;
-    this->mpIconDisplay = NULL;
-  }
-  this->mpIconDisplay = new QGraphicsSvgItem(elem_decl->determinedIconPath(), this);
-
-  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
-  this->mpIconDisplay->setCacheMode(QGraphicsItem::NoCache);
-
   this->updateIconGeometry();
 
   this->addDataItems();
@@ -332,18 +315,8 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 
 void cedar::proc::gui::StepItem::updateIconGeometry()
 {
-  if (this->mpIconDisplay == NULL)
-  {
-    return;
-  }
-
   qreal padding = this->getContentsPadding();
-  this->mpIconDisplay->setPos(padding, padding);
-  qreal dest = static_cast<qreal>(this->mIconSize);
-  qreal w = this->mpIconDisplay->boundingRect().width();
-  qreal h = this->mpIconDisplay->boundingRect().width();
-  qreal major = std::max(w, h);
-  this->mpIconDisplay->setScale(dest / major);
+  this->setIconBounds(padding, padding, static_cast<qreal>(this->mIconSize));
 }
 
 void cedar::proc::gui::StepItem::emitStepStateChanged()
