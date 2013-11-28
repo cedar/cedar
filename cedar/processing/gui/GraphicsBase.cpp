@@ -138,6 +138,8 @@ void cedar::proc::gui::GraphicsBase::itemSceneHasChanged()
 void cedar::proc::gui::GraphicsBase::setResizeable(bool resizeable)
 {
   this->mResizeable = resizeable;
+
+  this->clearResizeHandles();
 }
 
 void cedar::proc::gui::GraphicsBase::sizeChanged()
@@ -199,12 +201,22 @@ void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
 {
   this->mHeight->setValue(static_cast<double>(height));
   this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setWidth(qreal width)
 {
   this->mWidth->setValue(static_cast<double>(width));
   this->update();
+  this->sizeChanged();
+}
+
+void cedar::proc::gui::GraphicsBase::setSize(qreal width, qreal height)
+{
+  this->mHeight->setValue(static_cast<double>(height));
+  this->mWidth->setValue(static_cast<double>(width));
+  this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setOutlineColor(const QColor& color)
@@ -642,15 +654,17 @@ void cedar::proc::gui::GraphicsBase::updateResizeHandles(bool show)
   }
   else
   {
-    if (!this->mpResizeHandles.empty())
-    {
-      for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
-      {
-        delete this->mpResizeHandles.at(i);
-      }
-      this->mpResizeHandles.clear();
-    }
+    this->clearResizeHandles();
   }
+}
+
+void cedar::proc::gui::GraphicsBase::clearResizeHandles()
+{
+  for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+  {
+    delete this->mpResizeHandles.at(i);
+  }
+  this->mpResizeHandles.clear();
 }
 
 bool cedar::proc::gui::GraphicsBase::canResize() const
