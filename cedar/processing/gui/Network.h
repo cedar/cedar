@@ -178,8 +178,16 @@ public:
   //!@brief handles events in the context menu
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  //! Returns whether or not this network is collapsed.
+  bool isCollapsed() const
+  {
+    return this->_mIsCollapsed->getValue();
+  }
+
 public slots:
   void stepRecordStateChanged();
+
+  void setCollapsed(bool collapsed);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -253,6 +261,8 @@ private slots:
          cedar::proc::Network::ConnectionChange change
        );
 
+  void updateCollapsedness();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -303,9 +313,24 @@ private:
   //! Configuration of the next element that is added to the scene.
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
+  //! The vertical offset for data slots in the network used when the network is expanded.
+  static const qreal M_EXPANDED_SLOT_OFFSET;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+private:
   cedar::aux::BoolParameterPtr _mSmartMode;
 
   cedar::aux::ConfigurationNode mPlotGroupsNode;
+
+  cedar::aux::BoolParameterPtr _mIsCollapsed;
+
+  //! Width of the network in its uncollapsed state.
+  cedar::aux::DoubleParameterPtr _mUncollapsedWidth;
+
+  //! Height of the network in its uncollapsed state.
+  cedar::aux::DoubleParameterPtr _mUncollapsedHeight;
 
 }; // class cedar::proc::gui::NetworkFile
 

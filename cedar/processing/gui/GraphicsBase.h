@@ -179,6 +179,9 @@ public:
   //!@brief set width of this GraphicsBase
   void setWidth(qreal width);
 
+  //! Sets the size (width and height) of the object.
+  void setSize(qreal width, qreal height);
+
   //!@brief Sets the bounds of the item.
   void setBounds(const QRectF& rect);
 
@@ -294,6 +297,8 @@ private:
   void itemSelectedChanged(bool selected);
 
   void updateResizeHandles(bool show);
+
+  void clearResizeHandles();
 
   bool canResize() const;
   

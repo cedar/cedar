@@ -72,6 +72,12 @@
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+const qreal cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET = static_cast<qreal>(25);
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -90,11 +96,14 @@ mpScene(scene),
 mpMainWindow(pMainWindow),
 mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
-mPlotGroupsNode(cedar::aux::ConfigurationNode())
+mPlotGroupsNode(cedar::aux::ConfigurationNode()),
+_mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
+_mUncollapsedWidth(new cedar::aux::DoubleParameter(this, "uncollapsed width", 0)),
+_mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 0))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setResizeable(true);
-  this->setInputOutputSlotOffset(static_cast<qreal>(25));
+  this->setInputOutputSlotOffset(cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET);
 
   if (!mNetwork)
   {
@@ -122,9 +131,6 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange))
   );
 
-//  mSlotConnection
-//    = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
-
   mDataConnectionChangedConnection = mNetwork->connectToDataConnectionChanged
                                      (
                                        boost::bind(&cedar::proc::gui::Network::checkDataConnection, this, _1, _2, _3)
@@ -151,6 +157,8 @@ mPlotGroupsNode(cedar::aux::ConfigurationNode())
       (
         boost::bind(&cedar::proc::gui::Network::processElementRemovedSignal, this, _1)
       );
+
+  this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
   this->update();
 }
@@ -1245,6 +1253,13 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
     return;
   }
 
+  QAction* p_collapse = menu.addAction("collapse");
+  p_collapse->setCheckable(true);
+  p_collapse->setChecked(this->isCollapsed());
+  this->connect(p_collapse, SIGNAL(toggled(bool)), SLOT(setCollapsed(bool)));
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
   QAction* p_add_input = menu.addAction("add input");
   QAction* p_add_output = menu.addAction("add output");
 
@@ -1312,4 +1327,49 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
     std::string name = a->text().toStdString();
     this->getNetwork()->removeConnector(name, false);
   }
+}
+
+void cedar::proc::gui::Network::setCollapsed(bool collapsed)
+{
+  this->_mIsCollapsed->setValue(collapsed);
+}
+
+void cedar::proc::gui::Network::updateCollapsedness()
+{
+  bool collapse = this->isCollapsed();
+  auto children = this->childItems();
+  for (int i = 0; i < children.size(); ++i)
+  {
+    auto child = children.at(i);
+    if (auto element = dynamic_cast<cedar::proc::gui::Connectable*>(child))
+    {
+      element->setVisible(!collapse);
+    }
+  }
+
+  for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
+  {
+    this->mConnectorSinks.at(i)->setVisible(!collapse);
+  }
+
+  for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
+  {
+    this->mConnectorSources.at(i)->setVisible(!collapse);
+  }
+
+  if (collapse)
+  {
+    this->_mUncollapsedWidth->setValue(this->width());
+    this->_mUncollapsedHeight->setValue(this->height());
+    this->setInputOutputSlotOffset(static_cast<qreal>(0));
+    //!@todo Same size as processing steps/adapt to the number of inputs, outputs?
+    this->setSize(200, 100);
+  }
+  else
+  {
+    this->setInputOutputSlotOffset(cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET);
+    this->setSize(this->_mUncollapsedWidth->getValue(), this->_mUncollapsedHeight->getValue());
+  }
+
+  this->setResizeable(!collapse);
 }
