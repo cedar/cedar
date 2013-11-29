@@ -387,15 +387,24 @@ void cedar::proc::steps::Projection::expandMDtoND()
     input_index.push_back(0);
   }
 
+  auto mapping = _mDimensionMappings->getValue();
+  unsigned int number_of_mappings = mapping->getNumberOfMappings();
+  unsigned int i = 0;
+  // do this lookup only once, assuming that mapping does not change at run time...
+  mMappingLookup.resize(number_of_mappings);
+  for (i = 0; i < number_of_mappings; ++i)
+  {
+    mMappingLookup.at(i) = mapping->lookUp(i);
+  }
   do
   {
     // get index pointing to the current element in the output matrix
     const std::vector<int>& output_index = output_iterator.getCurrentIndexVector();
 
     // compute the corresponding index in the input matrix
-    for (unsigned int i = 0; i < _mDimensionMappings->getValue()->getNumberOfMappings(); ++i)
+    for (i = 0; i < number_of_mappings; ++i)
     {
-      input_index[i] = output_index.at(_mDimensionMappings->getValue()->lookUp(i));
+      input_index[i] = output_index.at(mMappingLookup.at(i));
     }
 
     // copy the activation value in the input matrix to the corresponding output matrix

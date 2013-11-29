@@ -243,6 +243,9 @@ private:
   cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
   //!@brief type of compression used when reducing the dimensionality (maximum, minimum, average, sum)
   cedar::aux::EnumParameterPtr _mCompressionType;
+
+  //!@brief a lookup table for mappings
+  std::vector<unsigned int> mMappingLookup;
 }; // class cedar::proc::steps::Projection
 
 #endif // CEDAR_PROC_STEPS_PROJECTION_H
