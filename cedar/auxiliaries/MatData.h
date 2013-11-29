@@ -38,8 +38,10 @@
 #define CEDAR_AUX_MAT_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DataTemplate.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -99,6 +101,18 @@ public:
   inline int getCvType() const
   {
     return this->getData().type();
+  }
+
+  void copyValueFrom(cedar::aux::ConstDataPtr data)
+  {
+    if (ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<ConstMatData>(data))
+    {
+      this->setData(mat_data_ptr->getData().clone());
+    }
+    else
+    {
+      CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot cast given data to matrix data.");
+    }
   }
 
   //! Checks if the matrix is empty.

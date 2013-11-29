@@ -41,14 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/detail/LoopedThreadWorker.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
-#include "cedar/auxiliaries/LoopedThreadWorker.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LoopedThread.fwd.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -251,10 +253,12 @@ public:
     return mpWorker->getLastTimeStepDuration();
   }
 
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
 protected:
+
 
   //----------------------------------------------------------------------------
   // private methods
@@ -272,8 +276,9 @@ private:
    */
   virtual void step(double time) = 0;
 
-  //! overwritten method. called when the thread finishes via stop().
-  void applyStop(bool suppressWarning);
+  //! slot called when the thread finishes via stop().
+  void processStop(bool suppressWarning);
+
 
 private slots:
   void modeChanged();

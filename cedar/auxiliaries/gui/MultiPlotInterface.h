@@ -38,11 +38,13 @@
 #define CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 
-// SYSTEM INCLUDES
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/MultiPlotInterface.fwd.h"
 
+// SYSTEM INCLUDES
+#include <QReadWriteLock>
 
 /*!@brief An interface that indicates that a plot is capable of plotting more than one data object at a time.
  */
@@ -52,7 +54,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief a map that stores data and associated names/titles of their plots
+  //!@brief Map from data to strings. Used to associate data with its title.
   typedef std::map<cedar::aux::ConstDataPtr, std::string> DataMap;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -75,9 +77,18 @@ public:
   //!@brief check if given data can be appended to a plot
   virtual bool canAppend(cedar::aux::ConstDataPtr data) const = 0;
 
-  //!@brief returns the data map
-  const DataMap& getDataMap() const;
+  /*!@brief Detach the given data from the plot.
+   *
+   * @param data  The data to detach.
+   */
+  void detach(cedar::aux::ConstDataPtr data);
 
+  //!@brief check if given data can be detached from the plot
+  virtual bool canDetach(cedar::aux::ConstDataPtr data) const = 0;
+
+  //!@brief Returns a map of data associated with its title.
+  //!@todo Rename this to getDataNameMap?
+  const DataMap& getDataMap() const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,6 +102,8 @@ private:
   //! Actual implementation of the appending is deferred to the sub-classes.
   virtual void doAppend(cedar::aux::ConstDataPtr data, const std::string& title) = 0;
 
+  //! Actual implementation of the detaching is deferred to the sub-classes.
+  virtual void doDetach(cedar::aux::ConstDataPtr data) = 0;
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

@@ -42,11 +42,14 @@
 #define CEDAR_PROC_DECLARATION_REGISTRY_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
-#include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/assert.h"
+
+// FORWARD DECLARATIONS
+//!@todo The next two includes should probably be forward declaration includes.
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
+#include "cedar/processing/Element.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -62,14 +65,14 @@ namespace cedar
 
     //! Sinleton of the element manager.
     typedef
-      cedar::aux::Singleton<ElementManager>
+      cedar::aux::Singleton<cedar::proc::ElementManager>
       ElementManagerSingleton;
   }
 
   namespace aux
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<ElementManager>);
+    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<cedar::proc::ElementManager>);
     //!@endcond
   }
 }

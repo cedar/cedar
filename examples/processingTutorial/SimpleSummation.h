@@ -39,7 +39,9 @@
 
 // CEDAR INCLUDES
 #include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
-#include <cedar/auxiliaries/namespace.h> // forward declaration of all classes in cedar::aux
+
+// FORWARD DECLARATIONS
+#include <cedar/auxiliaries/MatData.fwd.h>
 
 // SYSTEM INCLUDES
 

@@ -39,17 +39,19 @@
 #define CEDAR_AUX_RECORDER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/ThreadCollection.h"
 #include "cedar/auxiliaries/DataSpectator.h"
 
+// FORWARD DECLARATION
+#include "cedar/auxiliaries/Recorder.fwd.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <list>
 #include <vector>
+#include <map>
 #include <string>
 #include <QReadWriteLock>
 #include <QTime>
@@ -102,14 +104,16 @@ public:
   //!@brief Unregister all DataPtr.
   void clear();
 
-  //!@brief Sets the directory the recorded data will be written to.
-  void setOutputDirectory(const std::string& path);
+  //!brief Takes a snapshot of all registered DataPtr
+  void takeSnapshot();
+
+  /*!@brief Sets the directory the recorded data will be written to.
+   *            If @param name is a full path the function will extract the stem of the filename.
+   */
+  void setRecordedProjectName(const std::string& name);
 
   //!@brief Gets the OutputDirectory
   const std::string& getOutputDirectory() const;
-
-  //!@brief Returns the elapsed time in ms since the REcorder thread has been started.
-  int getTimeStamp() const;
 
   /*!@brief Change the record interval of 'name'
    *          If 'name' is not a registered it will throw an UnknownNameExeption.
@@ -120,8 +124,6 @@ public:
    *         It will return -1 if name was not registered
    */
   unsigned int getRecordIntervalTime(const std::string& name) const;
-
-
 
   /*!@brief Returns the specified record interval of the DataPtr in ms.
    *         It will return -1 if name was not registered
@@ -138,6 +140,10 @@ public:
 
   //!@brief Changes the name of the DataPtr.
   void renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName);
+
+  //!@brief Returns all registered DataPtr by name and their record interval
+  std::map<std::string, int> getRegisteredData() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -146,14 +152,16 @@ protected:
   *
   *              By calling start, every registered observer thread will automatically be started.
   *              Additionally all files will be created and filled with headers.
+  *!todo: docu is wrong, should be private, no?
   */
-  void applyStart();
+  void prepareStart();
 
   /*!@brief Stops the recorder thread.
    *
    *              By calling stop, the calling thread waits until all recorded data has been written to disk.
+   *!todo: docu is wrong, should be private, no?
    */
-  void applyStop(bool suppressWarning);
+  void processStop(bool suppressWarning);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -179,8 +187,9 @@ private:
   //!@brief The output directory.
   std::string mOutputDirectory;
 
-  //!@brief Counts the time from when the recorder is started.
-  QTime mStartTime;
+  //!@brief The name of the project that will be recorded
+  std::string mProjectName;
+
 };
 
 

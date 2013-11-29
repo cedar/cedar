@@ -37,13 +37,16 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/RecorderProperty.h"
+#include "cedar/processing/gui/RecorderWidget.h"
+#include "cedar/processing/DataSlot.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
 
-cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName, cedar::proc::DataSlotPtr slot)
+cedar::proc::gui::RecorderProperty::RecorderProperty(cedar::proc::gui::RecorderWidget* parent, const std::string& stepName, cedar::proc::DataSlotPtr slot)
 {
+  this->mRecorderWidget = parent;
   //Get slot properties.
   mStepName = stepName;
   mName = slot->getName();
@@ -109,7 +112,8 @@ void cedar::proc::gui::RecorderProperty::registerRecordData(int status)
   {
     cedar::aux::RecorderSingleton::getInstance()->unregisterData(mStepName + "_" + mName); 
     mStepSize->setEnabled(false);
-  }   
+  }
+  mRecorderWidget->emitStepRegisteredinRecorder();
 }
 
 void cedar::proc::gui::RecorderProperty::updateStepSize(int value)

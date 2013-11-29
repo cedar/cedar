@@ -38,9 +38,11 @@
 #define CEDAR_AUX_ENUM_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/EnumBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/EnumParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <set>

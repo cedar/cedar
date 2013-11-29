@@ -55,6 +55,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -82,7 +83,8 @@ mNetwork(network),
 mpScene(scene),
 mpMainWindow(pMainWindow),
 mHoldFitToContents(false),
-_mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
+_mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
+mPlotGroupsNode(cedar::aux::ConfigurationNode())
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -103,6 +105,13 @@ _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
+  QObject::connect
+  (
+    this,
+    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange)),
+    this,
+    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange))
+  );
 
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
@@ -133,6 +142,14 @@ _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
       (
         boost::bind(&cedar::proc::gui::Network::processElementRemovedSignal, this, _1)
       );
+
+  QObject::connect
+  (
+    this->mNetwork.get(),
+    SIGNAL(stepNameChanged(const std::string&, const std::string&)),
+    this,
+    SLOT(handleStepNameChanged(const std::string&, const std::string&))
+  );
 
   this->update();
   this->checkSlots();
@@ -440,6 +457,7 @@ void cedar::proc::gui::Network::write()
 void cedar::proc::gui::Network::write(const std::string& destination)
 {
   this->mFileName = destination;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
 
@@ -461,6 +479,7 @@ void cedar::proc::gui::Network::write(const std::string& destination)
 void cedar::proc::gui::Network::read(const std::string& source)
 {
   this->mFileName = source;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
@@ -475,39 +494,57 @@ void cedar::proc::gui::Network::read(const std::string& source)
     //!TODO: this weaves control-flow logic into exceptions, that's not proper!
     this->toggleSmartConnectionMode(false);
   }
+  //update recorder icons
+  this->stepRecordStateChanged();
 }
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+  // restore plots that were open when architecture was last saved
   auto plot_list = node.find("open plots");
   if(plot_list != node.not_found())
   {
-    this->readOpenPlots(plot_list->second);
+    this->readPlotList(plot_list->second);
+  }
+  // read defined plot groups
+  auto plot_groups = node.find("plot groups");
+  if(plot_groups != node.not_found())
+  {
+    this->mPlotGroupsNode = plot_groups->second;
   }
 }
 
-void cedar::proc::gui::Network::readOpenPlots(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::gui::Network::readPlotList(const cedar::aux::ConfigurationNode& node)
 {
-  for(auto it = node.begin(); it != node.end(); ++it)
+  for(auto it : node)
   {
-    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it->second);
+    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     auto step = this->getNetwork()->getElement<cedar::proc::Step>(step_name);
     auto step_item = this->mpScene->getStepItemFor(step.get());
-    cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it->second, step_item);
+    cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
   }
 }
 
 void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   root.put("network", this->mNetwork->getName());
+  // add open plots to architecture
   cedar::aux::ConfigurationNode node;
-  for(auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
-  {
-    it->second->writeOpenChildWidgets(node);
-  }
+  this->writeOpenPlotsTo(node);
   root.put_child("open plots", node);
+  // add plot groups to architecture
+  root.put_child("plot groups", this->mPlotGroupsNode);
+
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
+}
+
+void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
+{
+  for(auto step_map_item : this->mpScene->getStepMap())
+  {
+    step_map_item.second->writeOpenChildWidgets(node);
+  }
 }
 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
@@ -710,29 +747,48 @@ void cedar::proc::gui::Network::checkDataConnection
        cedar::proc::Network::ConnectionChange change
      )
 {
+  emit signalDataConnectionChange
+       (
+         QString::fromStdString(source->getParent()),
+         QString::fromStdString(source->getName()),
+         QString::fromStdString(target->getParent()),
+         QString::fromStdString(target->getName()),
+         change
+       );
+}
+
+void cedar::proc::gui::Network::dataConnectionChanged
+     (
+       QString sourceName,
+       QString sourceSlot,
+       QString targetName,
+       QString targetSlot,
+       cedar::proc::Network::ConnectionChange change
+     )
+{
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
   cedar::proc::gui::GraphicsBase* p_base_source
-    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(source->getParent()).get());
+    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(sourceName.toStdString()).get());
   if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
   {
-    source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+    source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
   }
   else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base_source))
   {
-    source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+    source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, sourceSlot.toStdString());
   }
   CEDAR_ASSERT(source_slot);
 
   cedar::proc::gui::DataSlotItem* target_slot = NULL;
   cedar::proc::gui::GraphicsBase* p_base
-    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(target->getParent()).get());
+    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(targetName.toStdString()).get());
   if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
   {
-    target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+    target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
   }
   else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base))
   {
-    target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+    target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
   }
   CEDAR_ASSERT(target_slot);
 
@@ -900,6 +956,121 @@ void cedar::proc::gui::Network::toggleSmartConnectionMode()
     if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
       con->setSmartMode(smart);
+    }
+  }
+}
+
+void cedar::proc::gui::Network::stepRecordStateChanged()
+{
+	std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> steps = this->mpScene->getStepMap();
+
+	for (auto iter = steps.begin(); iter != steps.end(); ++iter)
+	{
+		iter->second->setRecorded(iter->first->isRecorded());
+	}
+}
+
+void cedar::proc::gui::Network::handleStepNameChanged(const std::string& from, const std::string& to)
+{
+  this->changeStepName(from, to);
+}
+
+void cedar::proc::gui::Network::addPlotGroup(std::string plotGroupName)
+{
+  cedar::aux::ConfigurationNode node;
+  this->writeOpenPlotsTo(node);
+  this->mPlotGroupsNode.put_child(plotGroupName, node);
+}
+
+void cedar::proc::gui::Network::removePlotGroup(std::string plotGroupName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Network::removePlotGroup could not remove plot group. Does not exist."
+    );
+  }
+
+  this->mPlotGroupsNode.erase(mPlotGroupsNode.to_iterator(plot_group));
+}
+
+void cedar::proc::gui::Network::renamePlotGroup(std::string from, std::string to)
+{
+  auto plot_group = this->mPlotGroupsNode.find(from);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Network::renamePlotGroup could not rename plot group. Does not exist."
+    );
+  }
+  // rename
+  cedar::aux::ConfigurationNode node = plot_group->second;
+  this->mPlotGroupsNode.erase(mPlotGroupsNode.to_iterator(plot_group));
+  this->mPlotGroupsNode.put_child(to, node);
+  //maybe just do: plot_group->first = to;
+}
+
+std::list<std::string> cedar::proc::gui::Network::getPlotGroupNames()
+{
+  std::list<std::string> plot_group_names;
+  for(auto node : mPlotGroupsNode)
+  {
+    plot_group_names.push_back(node.first);
+  }
+
+  return plot_group_names;
+}
+
+void cedar::proc::gui::Network::displayPlotGroup(std::string plotGroupName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Network::displayPlotGroup could not display plot group. Does not exist."
+    );
+  }
+
+  this->readPlotList(plot_group->second);
+}
+
+void cedar::proc::gui::Network::changeStepName(const std::string& from, const std::string& to)
+{
+  /* plot groups are structured like this:
+    {
+      group#1_name :
+      [
+        { step: name,
+          position, plot info, etc. 
+        },
+        {
+          step: name, 
+          ...
+        },
+        ...
+      ],
+      group#2_name :
+      ...
+    }
+
+    we have to search and replace the old step name in every step for every group
+  */
+  for(auto& plot_group : this->mPlotGroupsNode)
+  {
+    for(auto& plot : plot_group.second)
+    {
+      auto name = plot.second.get<std::string>("step");
+      if(name == from)
+      {
+        auto node = plot.second.put("step", to);
+      }
     }
   }
 }

@@ -14,9 +14,11 @@ beneficial or even necessary.
 - @ref ProjectsWithCedar
 - @link ProcessingFrameworkTutorial Processing framework @endlink
 - @ref ConfigurableAndParameters
+- @link CommandLineParser cedar's command line parser@endlink
 @subsection AdvancedTutorials Advanced Tutorials
 - @ref LoggingWithCedar
 - @ref ProvidingCompatibility
+- @link PluginsInCode Loading plugins @endlink
 
 @section ProgrammingConcepts Programming Concepts
 In the following pages you can find out about general programming concepts we used throughout the framework. If you are

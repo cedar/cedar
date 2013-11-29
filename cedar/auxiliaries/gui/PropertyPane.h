@@ -38,9 +38,12 @@
 #define CEDAR_AUX_GUI_PROPERTY_PANE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Configurable.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Parameter.fwd.h"
+#include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QTableWidget>

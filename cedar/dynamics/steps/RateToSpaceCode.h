@@ -38,11 +38,14 @@
 #define CEDAR_DYN_RATE_TO_SPACE_CODE_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/dynamics/steps/RateToSpaceCode.fwd.h"
 
 // SYSTEM INCLUDES
 

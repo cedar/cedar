@@ -43,8 +43,17 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/units/Time.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+#include "cedar/processing/TriggerConnection.fwd.h"
+#include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -79,6 +88,8 @@ public:
     CONNECTION_REMOVED,
   };
 
+ signals:
+  void stepNameChanged(const std::string& from, const std::string& to);
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -400,6 +411,9 @@ public:
   //! Returns a list of all the looped triggers in this network.
   std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
 
+  //! Reads the meta information from the given file and extracts the plugins required by the architecture.
+  static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -441,6 +455,14 @@ private:
   /*!@brief Writes the triggers in the network to the configuration node.
    */
   void writeTriggers(cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Writes the steps that are registered in the recorder in the network to the configuration node.
+   */
+  void writeRecords(cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Reads the slots that should be registered in the recorder.
+  */
+  void readRecords(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Reads networks from a configuration node and adds them to the parent network.
    */

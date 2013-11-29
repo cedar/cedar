@@ -52,6 +52,7 @@
   #include <boost/date_time/posix_time/posix_time.hpp>
   #include <boost/pointer_cast.hpp>
 #endif
+#include <limits>
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,7 +60,10 @@
 
 cedar::aux::Recorder::Recorder()
 {
-  mOutputDirectory = "Unknown";
+  mProjectName = "Unnamed";
+
+  this->connectToStartSignal(boost::bind(&cedar::aux::Recorder::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::aux::Recorder::processStop, this, _1));
 }
 
 cedar::aux::Recorder::~Recorder()
@@ -120,11 +124,6 @@ void cedar::aux::Recorder::unregisterData(const std::string& name)
 
 void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 {
-  //throw exception if running
-  if (this->isRunning())
-  {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
-  }
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); ++i)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
@@ -139,12 +138,12 @@ void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 
 void cedar::aux::Recorder::createOutputDirectory()
 {
-  mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspace()
-                       + "/" + QDateTime::currentDateTime().toString("yy.MM.dd hh-mm-ss").toStdString();
+  mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
+                       + "/"+mProjectName+"/recording_" + QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
   boost::filesystem::create_directories(mOutputDirectory);
 }
 
-void cedar::aux::Recorder::applyStart()
+void cedar::aux::Recorder::prepareStart()
 {
   if (mDataSpectatorCollection.size() > 0)
   {
@@ -152,12 +151,9 @@ void cedar::aux::Recorder::applyStart()
     this->createOutputDirectory();
   }
 
-  //start the timer.
-  mStartTime.start();
-
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
-  //!@todo Use std::numeric_limits<int> for this
-  int min = 1000;
+  //!@todo std::numeric_limits<int>::max() will lock the GUI!!!!
+  int min = 1000;// std::numeric_limits<int>::max() ;
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
@@ -172,7 +168,7 @@ void cedar::aux::Recorder::applyStart()
   mDataSpectatorCollection.startAll();
 }
 
-void cedar::aux::Recorder::applyStop(bool /*suppressWarning*/)
+void cedar::aux::Recorder::processStop(bool /*suppressWarning*/)
 {
   //Stop all DataSpectators.They will automatically write all containing data to file.
   mDataSpectatorCollection.stopAll();
@@ -192,7 +188,7 @@ void cedar::aux::Recorder::clear()
 }
 
 
-void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
+void cedar::aux::Recorder::setRecordedProjectName(const std::string& name)
 {
   //throw exception if running
   if (isRunning())
@@ -200,17 +196,12 @@ void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change output directory while recorder is running");
   }
 
-  this->mOutputDirectory = path;
+  this->mProjectName = boost::filesystem::path(name).stem().string();
 }
 
 const std::string& cedar::aux::Recorder::getOutputDirectory() const
 {
   return this->mOutputDirectory;
-}
-
-int cedar::aux::Recorder::getTimeStamp() const
-{
-  return mStartTime.elapsed();
 }
 
 void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, unsigned int recordIntv)
@@ -301,4 +292,34 @@ void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, c
       spec->setName(newName);
     }
   }
+}
+
+void cedar::aux::Recorder::takeSnapshot()
+{
+  std::string oldName = this->mProjectName;
+  this->mProjectName = oldName+"/Snapshots";
+  this->createOutputDirectory();
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    spec->makeSnapshot();
+  }
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    spec->processStop(true);
+  }
+  this->mProjectName = oldName;
+}
+
+std::map<std::string, int> cedar::aux::Recorder::getRegisteredData() const
+{
+  std::map<std::string, int> registeredData;
+
+  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    registeredData[spec->getName()] = spec->getRecordIntervalTime();
+  }
+  return registeredData;
 }

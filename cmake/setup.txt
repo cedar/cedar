@@ -109,7 +109,9 @@ if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
   add_definitions(-std=gnu++0x)
 elseif (MSVC)
-  add_definitions(-W2)
+  add_definitions(-W2 -D_SCL_SECURE_NO_WARNINGS)
+  # Allow sorting projects into subfodlers (to make solutions more usable)
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 # add definitions for clang
@@ -121,6 +123,7 @@ add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
 if (WIN32)
   set(CMAKE_DEBUG_POSTFIX "d") # TODO for linux too?
+  add_definitions(-DWIN32_LEAN_AND_MEAN)
 endif (WIN32)
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)

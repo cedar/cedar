@@ -38,7 +38,7 @@
 #define CEDAR_AUX_SYSTEM_FUNCTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -69,6 +69,13 @@ namespace cedar
      *
      */
     CEDAR_AUX_LIB_EXPORT std::string locateResource(const std::string& resourcePath);
+
+    /*!@brief   Lists all the paths that are searched for resources.
+     *
+     *          Paths will be searched in their order in the vector, i.e., the system first looks in paths[0], then
+     *          paths[1] and so on.
+     */
+    CEDAR_AUX_LIB_EXPORT std::vector<std::string> listResourcePaths();
 
     /*!@brief This function opens a crash report file in a standardized location.
      */

@@ -86,6 +86,9 @@ cedar::aux::LoopedThread()
   std::vector<cedar::dev::sensors::visual::GrabberChannelPtr> grabberchannels;
   grabberchannels.push_back(pChannel);
   this->init(grabberchannels);
+
+  this->connectToStartSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::processStop, this, _1));
 }
 
 
@@ -149,11 +152,6 @@ cedar::dev::sensors::visual::Grabber::~Grabber()
 
   if ((*it) == this)
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                            (
-                                              this->getName() + ": Deleted this grabber from list of all instances.",
-                                              "cedar::dev::sensors::visual::Grabber::~Grabber()"
-                                            );
     mInstances.erase(it);
   }
   cedar::aux::LogSingleton::getInstance()->freeing(this);
@@ -216,13 +214,8 @@ void cedar::dev::sensors::visual::Grabber::installCrashHandler()
 
 void cedar::dev::sensors::visual::Grabber::doCleanUp()
 {
-  if (! mCleanUpAlreadyDone)
+  if (!mCleanUpAlreadyDone)
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                             (
-                                              this->getName() + ": cleanup",
-                                               "cedar::dev::sensors::visual::Grabber::doCleanUp()"
-                                             );
     mCleanUpAlreadyDone = true;
 
     // stop LoopedThread
@@ -442,7 +435,7 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                            );
 }
 
-void cedar::dev::sensors::visual::Grabber::applyStop(bool)
+void cedar::dev::sensors::visual::Grabber::processStop(bool)
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
@@ -467,7 +460,7 @@ void cedar::dev::sensors::visual::Grabber::setIsGrabbing(bool isGrabbing)
   mpLockIsGrabbing->unlock();
 }
 
-void cedar::dev::sensors::visual::Grabber::applyStart()
+void cedar::dev::sensors::visual::Grabber::prepareStart()
 {
   mpLockIsGrabbing->lockForWrite();
   mIsGrabbing = true;

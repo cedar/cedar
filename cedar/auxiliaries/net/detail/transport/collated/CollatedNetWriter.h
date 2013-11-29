@@ -44,7 +44,7 @@
 #define CEDAR_COLLATED_NET_WRITER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetBase.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/YARPCollatedPortable.h"
@@ -60,19 +60,13 @@
 #include <stdlib.h>
 #include <iostream>
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
-
-
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief implementation of matrix-over-network writer
  *
  * @see CollatedNetReader
  */
 template <typename T>
-class CollatedNetWriter : public CollatedNetBase<T>,
+class cedar::aux::net::detail::CollatedNetWriter : public CollatedNetBase<T>,
                           public AbstractNetWriter<T>
 {
   //---------------------------------------------------------------------------
@@ -144,7 +138,5 @@ public:
 
 };
 //!@endcond
-
-} } } } // end namespaces
 
 #endif

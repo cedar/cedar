@@ -40,16 +40,20 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ElementClassList.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <QContextMenuEvent>
 #include <QApplication>
 #include <QResource>
 #include <QPainter>
 #include <QPixmap>
 #include <QIcon>
+#include <QMenu>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,6 +69,14 @@ QListWidget(pParent)
   this->setResizeMode(QListView::Adjust);
   this->setDragEnabled(true);
   this->setIconSize(QSize(40, 40));
+
+  QObject::connect
+  (
+    cedar::proc::gui::SettingsSingleton::getInstance()->getElementListShowsDeprecatedParameter().get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(rebuild())
+  );
 }
 
 cedar::proc::gui::ElementClassList::~ElementClassList()
@@ -75,10 +87,33 @@ cedar::proc::gui::ElementClassList::~ElementClassList()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementManager::BasePluginList& entries)
+void cedar::proc::gui::ElementClassList::contextMenuEvent(QContextMenuEvent* pEvent)
 {
-  using cedar::proc::Manager;
+  QMenu context_menu(this);
+  auto action = context_menu.addAction("show deprecated steps");
+  action->setCheckable(true);
+  action->setChecked(cedar::proc::gui::SettingsSingleton::getInstance()->getElementListShowsDeprecated());
+  QObject::connect(action, SIGNAL(toggled(bool)), this, SLOT(showDeprecatedSteps(bool)));
+
+  context_menu.exec(pEvent->globalPos());
+}
+
+void cedar::proc::gui::ElementClassList::showDeprecatedSteps(bool show)
+{
+  cedar::proc::gui::SettingsSingleton::getInstance()->setElementListShowsDeprecated(show);
+}
+
+void cedar::proc::gui::ElementClassList::rebuild()
+{
+  this->showList(this->mCategoryName);
+}
+
+void cedar::proc::gui::ElementClassList::showList(const std::string& categoryName)
+{
   using cedar::proc::ElementDeclarationPtr;
+
+  this->mCategoryName = categoryName;
+  auto entries = ElementManagerSingleton::getInstance()->getCategoryEntries(this->mCategoryName);
 
   this->clear();
 
@@ -89,7 +124,6 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementMana
     CEDAR_ASSERT(elem_decl);
 
     std::string only_class_name = class_id->getClassNameWithoutNamespace();
-//    std::string namespace_name = class_id->getNamespaceName();
 
     QString label = QString::fromStdString(only_class_name);
     QListWidgetItem *p_item = new QListWidgetItem(label);
@@ -107,6 +141,10 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementMana
 
     if (class_id->isDeprecated())
     {
+      if (!cedar::proc::gui::SettingsSingleton::getInstance()->getElementListShowsDeprecated())
+      {
+        continue;
+      }
       decorations.push_back(":/cedar/auxiliaries/gui/warning.svg");
     }
 

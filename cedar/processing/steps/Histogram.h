@@ -41,13 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Histogram.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -62,18 +65,19 @@ class cedar::proc::steps::Histogram : public cedar::proc::Step
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Enum that determines how the histogram is normalized.
+  /*! Enumeration class for the different types of normalizations.
    */
   class Normalization
   {
     public:
-      //!@brief enum id
+      //! Type id of the enumeration.
       typedef cedar::aux::EnumId Id;
-      //!@brief enum pointer
+
+      //! Pointer type of the base class.
       typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
     public:
-      //!@brief construct the enum
+      //! Registers the enum values.
       static void construct()
       {
         mType.type()->def(cedar::aux::Enum(None, "None"));
@@ -81,24 +85,26 @@ public:
         mType.type()->def(cedar::aux::Enum(Maximum, "Maximum"));
       }
 
-      //!@brief returns type
+      //! Returns the enumeration type.
       static const cedar::aux::EnumBase& type()
       {
         return *mType.type();
       }
 
-      //!@brief returns type pointer
+      //! Returns a pointer to an enumeration type.
       static const TypePtr& typePtr()
       {
         return mType.type();
       }
 
     public:
-      //!@brief enum value for no normalization
+      //! No normalization.
       static const Id None = 0;
-      //!@brief enum value for normalization using the image size
+
+      //! Normalization by image size.
       static const Id ImageSize = 1;
-      //!@brief enum value for normalization using the maximum of all pixel values
+
+      //! Normalization by the maximum value of the histogram.
       static const Id Maximum = 2;
 
     private:

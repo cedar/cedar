@@ -41,24 +41,30 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ThreadWrapper.fwd.h"
+#include "cedar/auxiliaries/detail/ThreadWorker.fwd.h"
+
 // SYSTEM INCLUDES
-#include <string>
-#include <iostream>
-#include <climits>
 #include <QThread>
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QCoreApplication>
 #ifndef Q_MOC_RUN
   #include <boost/date_time/posix_time/posix_time_types.hpp>
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/function.hpp>
 #endif
+#include <string>
+#include <iostream>
+#include <climits>
 
 
 /*!@brief Base class for utility classes that start their own worker in a thread
@@ -109,7 +115,7 @@ public:
    *
    *@param timeout: a value != 0 will abort waiting on the worker thread after
    *        the timeout-period. Use with caution.
-   *@param suppressWarning: will be passed to applyStop()
+   *@param suppressWarning: will be passed to the signal StopSignal
    * @see requestStop()
    */
   void stop(unsigned int timeout = UINT_MAX, bool suppressWarning = false); 
@@ -160,6 +166,29 @@ public:
     return ret;
   }
 
+  /*! connect to the signal that is sent when the thread will stop
+   *
+   * The signal is:
+   * Called in context of the holding thread. 
+   * The thread (and worker) may still be executing, but the requestStop
+   * has been set.
+   * Blocks the caller of requestStop(), but not the thread.
+   *
+   * Preconditions: the worker exists and its pointer is still valid.
+   */
+  boost::signals2::connection connectToStopSignal(boost::function<void (bool suppressWarning)> slot);
+
+  /*! connect to the signal that is sent when the thread will start
+   *
+   * The signal is:
+   * Called in context of the holding thread. 
+   * Called before the thread does anything else.
+   * Initially blocks the first run of the custom thread.
+   *
+   * Preconditions: the worker exists and its pointer is still valid.
+   */
+  boost::signals2::connection connectToStartSignal(boost::function<void ()> slot);
+
 public slots:
   //! slot called when thread finishes. context: the new thread
   void quittedThreadSlot(); 
@@ -191,23 +220,16 @@ private:
    */
   virtual cedar::aux::detail::ThreadWorker* resetWorker() = 0;
 
-  /*! you may override in child. is called when a thread is about to finish
-   *
-   * Called in context of the holding thread. 
-   * The thread (and worker) may still be executing, but the requestStop
-   * has been set.
-   *
-   * Preconditions: the worker exists and its pointer is still valid.
+  /*! deprecated: please use conntetToStopSignal
+   *@todo: remove in future version
    */
-  virtual void applyStop(bool suppressWarning); 
+  CEDAR_DECLARE_DEPRECATED(virtual void applyStop(bool suppressWarning));
 
-  /*! you may override in child. is called when a thread is about to start
-   *
-   * Called in context of the holding thread. 
-   *
-   * Preconditions: the worker exists and its pointer is still valid.
+  /*! deprecated: please use conntetToStopSignal
+   *@todo: remove in future version
    */
-  virtual void applyStart();
+  CEDAR_DECLARE_DEPRECATED(virtual void applyStart());
+
 
   //! is the worker (still) in memory? thread-un-safe
   bool validWorker() const;
@@ -244,6 +266,11 @@ private:
   //! keep a raw pointer of my worker
   cedar::aux::detail::ThreadWorker* mpWorker;
     // inentionally a raw pointer. will be destroyed via QT's deleteLater()
+
+  //! signal for thread has been stopped
+  boost::signals2::signal<void (bool suppressWarning)> mStopSignal;
+  //! signal for thread will start
+  boost::signals2::signal<void ()> mStartSignal;
 
 }; // class cedar::aux::ThreadWrapper
 

@@ -28,7 +28,7 @@
     Email:       <email address>
     Date:        <creation date YYYY MM DD>
 
-    Description:
+    Description: Header file for the class <full class name>.
 
     Credits:
 
@@ -42,6 +42,9 @@
 
 // CEDAR INCLUDES
 #include "<namespace path>/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "<namespace path>/<class name>.fwd.h"
 
 // SYSTEM INCLUDES
 

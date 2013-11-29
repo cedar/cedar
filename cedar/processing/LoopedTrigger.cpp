@@ -46,7 +46,9 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -96,11 +98,13 @@ cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& na
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
 mWait(new cedar::aux::BoolParameter(this, "wait", true)),
-mStarting(false),
-mStopping(false)
+mStarted(false)
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
+
+  this->connectToStartSignal(boost::bind(&cedar::proc::LoopedTrigger::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::proc::LoopedTrigger::processStop, this, _1));
 }
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
@@ -144,16 +148,17 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
   }
 }
 
-void cedar::proc::LoopedTrigger::applyStart()
+void cedar::proc::LoopedTrigger::prepareStart()
 {
-  QMutexLocker locker(&mStartingMutex);
+  QMutexLocker locker(&mStartedMutex);
 
-  if (this->isRunning() || mStarting)
+  cedar::aux::GlobalClockSingleton::getInstance()->start();
+  if (this->mStarted)
   {
     return;
   }
 
-  mStarting = true;
+  this->mStarted = true;
   locker.unlock();
 
   emit triggerStarting();
@@ -162,23 +167,19 @@ void cedar::proc::LoopedTrigger::applyStart()
   {
     this->mListeners.at(i)->callOnStart();
   }
-  CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
 
   emit triggerStarted();
-
-  locker.relock();
-  mStarting = false;
 }
 
-void cedar::proc::LoopedTrigger::applyStop(bool)
+void cedar::proc::LoopedTrigger::processStop(bool)
 {
-  QMutexLocker locker(&mStoppingMutex);
-  if (!this->isRunning() || mStopping)
+  QMutexLocker locker(&mStartedMutex);
+  if (!this->mStarted)
   {
     return;
   }
 
-  mStopping = true;
+  mStarted = false;
   locker.unlock();
 
   emit triggerStopping();
@@ -189,16 +190,24 @@ void cedar::proc::LoopedTrigger::applyStop(bool)
   }
 
   emit triggerStopped();
-
-  locker.relock();
-  mStopping = false;
 }
 
+//!@todo this should take a cedar::unit::Time as argument
 void cedar::proc::LoopedTrigger::step(double time)
 {
-  cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));
+  cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime
+                                          (
+                                            cedar::unit::Time(time * cedar::unit::milli * cedar::unit::seconds)
+                                          )
+                                     );
 
-  this->trigger(arguments);
+  //!@todo Is this right?
+  auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
+  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  {
+    this->mListeners.at(i)->onTrigger(arguments, this_ptr);
+  }
+//  this->trigger(arguments);
 
   if (this->mWait->getValue())
   {

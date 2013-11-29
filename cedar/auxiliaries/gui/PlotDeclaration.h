@@ -38,12 +38,16 @@
 #define CEDAR_AUX_GUI_PLOT_DECLARATION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/PlotInterface.fwd.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
+#include "cedar/auxiliaries/gui/PlotDeclarationManager.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -82,6 +86,11 @@ public:
 
   //!@brief allocates a new plot
   virtual cedar::aux::gui::PlotInterface* createPlot() const = 0;
+
+  std::string getPluginType() const
+  {
+    return "plot";
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

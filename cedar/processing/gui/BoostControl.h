@@ -41,10 +41,13 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/ui_BoostControl.h"
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/sources/Boost.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN

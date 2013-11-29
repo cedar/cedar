@@ -38,9 +38,8 @@
 #define CEDAR_NET_WRITER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/namespace.h"
+#include "cedar/auxiliaries/net/Writer.fwd.h"
 #include "cedar/auxiliaries/net/exceptions.h"
-#include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/std/StringHelper.h"
 #include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
@@ -52,11 +51,6 @@
 #endif
 
 // SYSTEM INCLUDES
-
-
-namespace cedar {
-  namespace aux {
-    namespace net {
 
   //---------------------------------------------------------------------------
   // the unspecialized template class cannot be instantiated
@@ -95,7 +89,7 @@ namespace cedar {
  * @see: Reader, NetBlockingReader
  */
 template <typename T>
-class Writer
+class cedar::aux::net::Writer
 {
    //!@brief The standard constructor will not load. Do not call it.
   Writer()
@@ -121,6 +115,12 @@ class Writer
    */
   void write(T data); // just the declaration for doxygen
 };
+
+
+
+namespace cedar {
+  namespace aux {
+    namespace net {
 
 
   //---------------------------------------------------------------------------

@@ -36,10 +36,12 @@
 
 
 // CEDAR INCLUDES
-#include "DataSpectator.h"
-#include "Recorder.h"
+#include "cedar/auxiliaries/DataSpectator.h"
+#include "cedar/auxiliaries/Recorder.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
+#include <boost/algorithm/string/replace.hpp>
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -53,6 +55,9 @@ mpQueueLock(new QReadWriteLock()),
 mName(name)
 {
   this->setStepSize(recordIntv);
+
+  this->connectToStartSignal(boost::bind(&cedar::aux::DataSpectator::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::aux::DataSpectator::processStop, this, _1));
 }
 
 
@@ -71,14 +76,15 @@ void cedar::aux::DataSpectator::step(double)
   record();
 }
 
-void cedar::aux::DataSpectator::applyStart()
+void cedar::aux::DataSpectator::prepareStart()
 {
-  mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" + mName;
+  mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" +
+      boost::algorithm::replace_all_copy(mName," ","_") + ".csv";
   mOutputStream.open(mOutputPath, std::ios::out | std::ios::app);
   writeHeader();
 }
 
-void cedar::aux::DataSpectator::applyStop(bool /* suppressWarning */)
+void cedar::aux::DataSpectator::processStop(bool /* suppressWarning */)
 {
   writeAllRecordData();
   
@@ -103,7 +109,7 @@ void cedar::aux::DataSpectator::record()
   //Create new recordData
   RecordData rec;
   rec.mData = data;
-  rec.mRecordTime = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
+  rec.mRecordTime = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   //Lock the Queue and push record Data
   QWriteLocker locker(mpQueueLock);
   mDataQueue.push_back(rec);
@@ -185,3 +191,10 @@ int cedar::aux::DataSpectator::getRecordIntervalTime() const
 {
   return this->getStepSize();
 }
+
+void cedar::aux::DataSpectator::makeSnapshot()
+{
+  this->prepareStart();
+  this->record();
+}
+

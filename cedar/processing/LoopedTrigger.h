@@ -42,10 +42,11 @@
 #define CEDAR_PROC_LOOPED_TRIGGER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/LoopedTrigger.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -139,10 +140,10 @@ private:
   void addListener(cedar::proc::TriggerablePtr triggerable);
 
   //! Called when the trigger is started.
-  void applyStart();
+  void prepareStart();
 
   //! Called when the trigger is started.
-  void applyStop(bool);
+  void processStop(bool);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -164,16 +165,10 @@ private:
   cedar::aux::BoolParameterPtr mWait;
 
   //! Used to prevent multiple start calls to the trigger.
-  bool mStarting;
+  bool mStarted;
 
   //! Used to prevent multiple start calls to the trigger.
-  QMutex mStartingMutex;
-
-  //! Used to prevent multiple start calls to the trigger.
-  bool mStopping;
-
-  //! Used to prevent multiple start calls to the trigger.
-  QMutex mStoppingMutex;
+  QMutex mStartedMutex;
 
 }; // class cedar::proc::LoopedTrigger
 

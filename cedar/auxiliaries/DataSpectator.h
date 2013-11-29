@@ -42,6 +42,10 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/DataSpectator.fwd.h"
+#include "cedar/auxiliaries/Recorder.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QTime>
 #include <string>
@@ -92,11 +96,13 @@ public:
   //!@brief Gets the DataPtr.
   cedar::aux::ConstDataPtr getData() const;
 
-  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written.
-  void applyStart();
+  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written. @todo: this is only called when the thread is started
+  //!todo: should be private, docu is wrong
+  void prepareStart();
 
   //!@brief Stops the DataSpactator. Before stopping all RecordDatas in the queue will be written to disk.
-  void applyStop(bool suppressWarning);
+  //!todo: should be private, docu is wrong
+  void processStop(bool suppressWarning);
 
   //!@brief Gets the unique Name.
   const std::string& getName() const;
@@ -106,6 +112,10 @@ public:
 
   //!@brief Returns the record interval for this DataPtr.
   int getRecordIntervalTime() const;
+
+  //!@brief Makes a snapshot of the data.
+  void makeSnapshot();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -38,16 +38,19 @@
 #define CEDAR_PROC_GUI_RECORDER_PROPERTY_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/Data.h"
-#include "cedar/processing/DataSlot.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/DataSlot.fwd.h"
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/gui/RecorderProperty.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
 #include <QSpinBox>
 #include <QCheckBox>
 
-/*!@todo Documentation
+/*!@brief With help if this class, the user is able to register,unregister and edit single DataSlots in the Recorder.
  */
 class cedar::proc::gui::RecorderProperty : public QHBoxLayout
 {
@@ -61,7 +64,7 @@ class cedar::proc::gui::RecorderProperty : public QHBoxLayout
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The public constructor.
-  RecorderProperty(const std::string& stepName, cedar::proc::DataSlotPtr slot);
+  RecorderProperty(cedar::proc::gui::RecorderWidget* parent, const std::string& stepName, cedar::proc::DataSlotPtr slot);
 
   //!@brief The public destructor. 
   ~RecorderProperty();
@@ -98,6 +101,9 @@ private:
 
   //!@brief Stores the record interval of the slot. Is changed by the mStepSize spin box.
   unsigned int mStepSizeValue;
+
+  //!@brief A pointer that leads to the RecorderWidget;
+  cedar::proc::gui::RecorderWidget* mRecorderWidget;
 };
 
 #endif // CEDAR_PROC_GUI_RECORDER_PROPERTY_H

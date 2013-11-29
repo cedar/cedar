@@ -46,8 +46,11 @@
 #ifdef CEDAR_USE_QWTPLOT3D
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/gui/QwtSurfacePlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

@@ -42,8 +42,9 @@
 #define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/DeclarationRegistry.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/ElementClassList.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QListWidget>
@@ -74,19 +75,22 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const cedar::proc::ElementManager::BasePluginList& entries);
+  void showList(const std::string& categoryName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! Opens up the context menu.
+  void contextMenuEvent(QContextMenuEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void showDeprecatedSteps(bool show);
+
+  void rebuild();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -94,7 +98,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  std::string mCategoryName;
 
 }; // class ElementClassList
 

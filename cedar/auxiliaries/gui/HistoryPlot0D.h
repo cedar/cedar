@@ -42,8 +42,13 @@
 #ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/DoubleData.fwd.h"
+#include "cedar/auxiliaries/UnitData.fwd.h"
+#include "cedar/auxiliaries/gui/HistoryPlot0D.fwd.h"
 
 // SYSTEM INCLUDES
 #include <qwt_plot.h>
@@ -114,11 +119,9 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
   //--------------------------------------------------------------------------------------------------------------------
   struct CurveInfo
   {
-    CurveInfo()
-    :
-    mCurve(NULL)
-    {
-    }
+    CurveInfo();
+
+    ~CurveInfo();
 
     void setData(cedar::aux::ConstDataPtr data);
 
@@ -128,10 +131,14 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
     cedar::aux::ConstDataPtr mData;
 
     //! The data of this curve, as double data
+    //!@todo Can this be removed? I think that by now, double data inherits MatData...
     cedar::aux::ConstDoubleDataPtr mDoubleData;
 
     //! The data of this curve, as matrix data
     cedar::aux::ConstMatDataPtr mMatData;
+
+    //! The data of this curve, as matrix data
+    cedar::aux::ConstUnitDataPtr mUnitData;
 
     //! The qwt curve
     QwtPlotCurve* mCurve;
@@ -174,7 +181,10 @@ public:
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
+  //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  //!@brief Check if the given data can be detached from the plot.
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -195,6 +205,7 @@ private:
   void init();
 
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   double getDataValue(size_t index);
 

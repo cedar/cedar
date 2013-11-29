@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
@@ -77,15 +76,12 @@
  *  some precompiler macros are also defined here
  */
 
+
 /* epsilon surrounding for near zero values */
 #ifndef EQN_EPS
 #define EQN_EPS 1e-9
 #endif
 
-//#ifndef IsZero
-//CEDAR_DECLARE_DEPRECATE_MACRO(IsZero)
-//#define IsZero(x) (IsZero_MACRO(),(x) > -EQN_EPS && (x) < EQN_EPS)
-//#endif
 namespace cedar
 {
   namespace aux

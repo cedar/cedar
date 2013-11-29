@@ -47,6 +47,7 @@
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -85,6 +86,8 @@ mpMainWindow(pMainWindow),
 mSnapToGrid(false),
 mpConfigurableWidget(NULL)
 {
+  mMousePosX = 0;
+  mMousePosY = 0;
   // connect signals/slots
   QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 }
@@ -151,7 +154,7 @@ void cedar::proc::gui::Scene::itemSelected()
   else
   {
     this->mpConfigurableWidget->resetContents();
-    this->mpRecorderWidget->resetContents();
+    this->mpRecorderWidget->clearLayout();
   }
 }
 
@@ -201,6 +204,7 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
 void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
+  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
 }
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
@@ -302,6 +306,8 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
       QGraphicsScene::mouseMoveEvent(pMouseEvent);
       break;
   }
+  this->mMousePosX = pMouseEvent->scenePos().x();
+  this->mMousePosY = pMouseEvent->scenePos().y();
 }
 
 
@@ -528,6 +534,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
+  QAction *p_addSickyNode = menu.addAction("add sticky note");
+  menu.addSeparator();
   QAction *p_reset = menu.addAction("reset network");
 
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
@@ -538,6 +546,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     {
       p_ide->resetRootNetwork();
     }
+  }
+  if (a == p_addSickyNode)
+  {
+    this->addStickyNote();
   }
   else if (a != NULL)
   {
@@ -966,10 +978,6 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
-
-  //unregister this step in th recorder
-  //!@todo This is misplaced. If a step needs to be unregistered, that should happen in the destructor of proc::Step.
-  this->mpRecorderWidget->unregister(pStep->getStep());
 }
 
 cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()
@@ -1032,4 +1040,9 @@ void cedar::proc::gui::Scene::selectNone()
   {
     selected_items.at(i)->setSelected(false);
   }
+}
+
+void cedar::proc::gui::Scene::addStickyNote()
+{
+  this->addItem(new cedar::proc::gui::StickyNote(mMousePosX, mMousePosY, this));
 }
