@@ -37,9 +37,11 @@
 
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 #include <cstdlib>
 #include <iostream>
+#include <random>
 
 #include <QCoreApplication>
 
@@ -61,21 +63,28 @@ private:
 public:
 
   //!@brief constructor
-  MyTestThread(double stepSize, bool delay = false) : LoopedThread(stepSize) 
+  MyTestThread(cedar::unit::Time stepSize, bool delay = false) : LoopedThread(stepSize)
   {
     mArtificialDelay = delay;
     srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
   }
 
-  void step(double time)
+  void step(cedar::unit::Time time)
   {
     boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
     std::cout << "current time (sec/usec): " << now.time_of_day().seconds()
               << " / " << now.time_of_day().total_microseconds() % 1000000
               << " (time in step(): " << time << ")" << std::endl;
-    if ( mArtificialDelay )
+
+    if (mArtificialDelay)
     {
-      usleep( rand() % (3 * static_cast<int>(this->getStepSize()) * 1000));
+      cedar::unit::Time milli_second(1.0 * cedar::unit::milli * cedar::unit::second);
+
+      std::default_random_engine generator;
+      std::uniform_real_distribution<double> distribution(0.0, 3.0 * this->getStepSize() / milli_second);
+
+      cedar::unit::Time sleep_time(distribution(generator) * cedar::unit::milli * cedar::unit::seconds);
+      cedar::aux::sleep(sleep_time);
     }
   }
 
@@ -105,9 +114,9 @@ class CountingThread : public cedar::aux::LoopedThread
     //!@brief constructor
     CountingThread
     (
-      double stepSize,
-      double idleTime,
-      double simulatedTime,
+      cedar::unit::Time stepSize,
+      cedar::unit::Time idleTime,
+      cedar::unit::Time simulatedTime,
       cedar::aux::LoopMode::Id mode
     )
     :
@@ -116,7 +125,7 @@ class CountingThread : public cedar::aux::LoopedThread
     {
     }
 
-    void step(double /* time */)
+    void step(cedar::unit::Time /* time */)
     {
       ++mCounter;
       usleep(100);
@@ -129,9 +138,9 @@ class CountingThread : public cedar::aux::LoopedThread
 
 int testConfiguration
     (
-      double stepSize,
-      double idleTime,
-      double simulatedTime,
+        cedar::unit::Time stepSize,
+        cedar::unit::Time idleTime,
+        cedar::unit::Time simulatedTime,
       cedar::aux::LoopMode::Id mode
     )
 {
@@ -140,7 +149,7 @@ int testConfiguration
   CountingThread thread(stepSize, idleTime, simulatedTime, mode);
 
   thread.start();
-  thread.wait(1000);
+  thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
   // the thread should at least run for two iterations
   if (thread.mCounter < 2)
   {
@@ -150,7 +159,7 @@ int testConfiguration
     ++errors;
   }
   thread.stop();
-  thread.wait(1000);
+  thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
   if (thread.isRunning())
   {
     std::cout << "ERROR: the thread didn't exit properly." << std::endl;
@@ -164,14 +173,13 @@ int testConfiguration
 
 void runTests()
 {
-  double timeInterval = 100.0;  // milliseconds
-  MyTestThread thread(timeInterval);
+  MyTestThread thread(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds));
   //thread.useFixedStepSize(false);
   //thread.setSimulatedTime(50);
 
   std::cout << "Starting a thread and let it run for 1 seconds ..." << std::endl;
   thread.start();
-  thread.wait(1000);
+  thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
   if (thread.isRunning())
@@ -204,7 +212,7 @@ void runTests()
   std::cout << "Starting thread again with an artificially unreliable execution time ..." << std::endl;
   thread.setArtificalDelay(true);
   thread.start();
-  thread.wait(1000);
+  thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
 
@@ -212,13 +220,19 @@ void runTests()
 
   std::cout << std::endl;
   std::cout << "Starting thread again with step size 0 for one millisecond ..." << std::endl;
-  thread.setStepSize(0);
+  thread.setStepSize(cedar::unit::Time(0.0 * cedar::unit::second));
   thread.start();
-  thread.wait(1);
+  thread.wait(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second));
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
 
-  errors += testConfiguration(0.0, 0.01, 1, cedar::aux::LoopMode::Fixed);
+  errors += testConfiguration
+            (
+              cedar::unit::Time(0.0 * cedar::unit::milli * cedar::unit::second),
+              cedar::unit::Time(0.01 * cedar::unit::milli * cedar::unit::second),
+              cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second),
+              cedar::aux::LoopMode::Fixed
+            );
 
   std::cout << "Test finished, there were " << errors << " error(s)." << std::endl;
 }
@@ -239,5 +253,3 @@ int main(int argc, char* argv[])
 
   return errors;
 }
-
-

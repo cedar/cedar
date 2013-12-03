@@ -390,7 +390,7 @@ double cedar::dev::sensors::visual::Grabber::getMeasuredFramerate() const
 
 double cedar::dev::sensors::visual::Grabber::getFramerate() const
 {
-  double fps = 1000. / LoopedThread::getStepSize();
+  double fps = cedar::unit::Time(1.0 * cedar::unit::second) / LoopedThread::getStepSize();
   return fps;
 }
 
@@ -410,9 +410,10 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                              );
   }
   // cycle time in ms: 1000ms/frames_per_second
-  double milliseconds = 1000. / fps;
+  cedar::unit::Time one_second(1.0 * cedar::unit::second);
+  cedar::unit::Time cycle_time(one_second / fps);
 
-  LoopedThread::setStepSize(milliseconds);        // change speed in thread
+  LoopedThread::setStepSize(cycle_time);        // change speed in thread
 
   if (wasRunning)
   {
@@ -907,7 +908,7 @@ bool cedar::dev::sensors::visual::Grabber::isRecording() const
   return mRecording;
 }
 
-void cedar::dev::sensors::visual::Grabber::step(double)
+void cedar::dev::sensors::visual::Grabber::step(cedar::unit::Time)
 {
   // if something went wrong on grabbing,
   // an exception is being thrown in the grab function

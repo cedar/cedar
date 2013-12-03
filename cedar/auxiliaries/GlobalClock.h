@@ -38,6 +38,7 @@
 #define CEDAR_AUX_NETWORKTIMER_H_
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Singleton.fwd.h"
+#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/GlobalClock.fwd.h"
@@ -80,7 +81,8 @@ public:
   void stop();
 
   //!@brief Returns the elapsed time since timer has started
-  unsigned int getTime();
+  //!@todo make this const?
+  cedar::unit::Time getTime();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

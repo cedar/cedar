@@ -36,6 +36,8 @@
 
 //CEDAR INCLUDES
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 cedar::aux::GlobalClock::GlobalClock()
 :mRunning(false)
@@ -70,13 +72,24 @@ void cedar::aux::GlobalClock::stop()
   mRunning = false;
 }
 
-unsigned int cedar::aux::GlobalClock::getTime()
+cedar::unit::Time cedar::aux::GlobalClock::getTime()
 {
   if(mRunning)
   {
-    return mStart.msecsTo(QTime::currentTime());
+    cedar::unit::Time time
+                      (
+                        static_cast<float>(mStart.msecsTo(QTime::currentTime()))
+                        * cedar::unit::milli * cedar::unit::seconds
+                      );
+    return time;
   }
-  return mStart.msecsTo(mStop);
+
+  cedar::unit::Time time
+                    (
+                      static_cast<float>(mStart.msecsTo(mStop))
+                      * cedar::unit::milli * cedar::unit::seconds
+                    );
+  return time;
 }
 
 

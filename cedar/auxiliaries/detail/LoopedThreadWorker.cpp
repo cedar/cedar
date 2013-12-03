@@ -61,7 +61,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
   // we do not want to change the step size while running
   boost::posix_time::time_duration step_size
-    = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * mpWrapper->getStepSize() + 0.5));//mStepSize;
+    = boost::posix_time::microseconds(static_cast<unsigned int>(1000.0 * (mpWrapper->getStepSize()/cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second)) + 0.5));//mStepSize;
   initStatistics();
 
   // which mode?
@@ -79,11 +79,12 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         setLastTimeStepStart( getLastTimeStepEnd() );
         setLastTimeStepEnd( boost::posix_time::microsec_clock::universal_time() );
         time_difference = getLastTimeStepEnd() - getLastTimeStepStart();
+        cedar::unit::Time time_difference_milli(time_difference.total_microseconds() * 0.001 * cedar::unit::milli * cedar::unit::seconds);
         
-        mpWrapper->step(time_difference.total_microseconds() * 0.001);
-        double time = mpWrapper->getIdleTimeParameter();
-        cedar::unit::Time milliseconds(time * cedar::unit::milli * cedar::unit::seconds);
-        cedar::aux::sleep(milliseconds);
+        mpWrapper->step(time_difference_milli);
+
+        cedar::unit::Time idle_time = mpWrapper->getIdleTimeParameter();
+        cedar::aux::sleep(idle_time);
       }
       break;
     }
@@ -92,9 +93,8 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       while (!safeStopRequested())
       {
         mpWrapper->step(mpWrapper->getSimulatedTimeParameter());
-        double time = mpWrapper->getIdleTimeParameter();
-        cedar::unit::Time milliseconds(time * cedar::unit::milli * cedar::unit::seconds);
-        cedar::aux::sleep(milliseconds);
+        cedar::unit::Time idle_time = mpWrapper->getIdleTimeParameter();
+        cedar::aux::sleep(idle_time);
       }
       break;
     }
@@ -150,7 +150,8 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         updateStatistics(full_steps_taken);
 
         // call step function
-        mpWrapper->step(full_steps_taken * step_size.total_microseconds() * 0.001);
+        cedar::unit::Time step_time(full_steps_taken * step_size.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
+        mpWrapper->step(step_time);
 
         if (safeStopRequested())
           break;
@@ -202,7 +203,8 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         updateStatistics(steps_taken);
 
         // call step function
-        mpWrapper->step(steps_taken * step_size.total_microseconds() * 0.001);
+        cedar::unit::Time step_time(steps_taken * step_size.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
+        mpWrapper->step(step_time);
 
         if (safeStopRequested()) // a lot can happen in a step() //!@todo locking
           break;

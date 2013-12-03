@@ -53,7 +53,7 @@ cedar::aux::LoopFunctionInThread* loop;
 
 #define MAX_LOOPS 5
 
-void loopedFun(double)
+void loopedFun(cedar::unit::Time)
 {
   count_loops++;
 
@@ -64,10 +64,15 @@ void loopedFun(double)
 void runTests()
 {
   loop = new cedar::aux::LoopFunctionInThread(loopedFun);
-  loop->setStepSize(100);
+
+  using namespace cedar::unit;
+  Time step_size(100.0 * milli * seconds);
+  loop->setStepSize(step_size);
 
   loop->start();
-  loop->wait(2000);
+
+  Time waiting_time(2.0 * seconds);
+  loop->wait(waiting_time);
 
   if (count_loops != MAX_LOOPS)
     errors++;
