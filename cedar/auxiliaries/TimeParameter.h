@@ -88,6 +88,12 @@ namespace cedar
       return cedar::aux::findUnit(postFix, map);
     }
 
+    template <>
+    inline std::string getDefaultUnit<cedar::unit::Time::unit_type>()
+    {
+      return "ms";
+    }
+
     // Generate types for the length parameter.
     typedef cedar::aux::UnitParameterTemplate<cedar::unit::Time::unit_type> TimeParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TimeParameter);
