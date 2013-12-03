@@ -506,7 +506,7 @@ protected:
    *
    *  For details have a look at cedar::aux::LoopedThread
    */
-  void step(double time);
+  void step(cedar::unit::Time time);
 
   /*! @brief Call this method at the beginning of the destructor in the derived class
    *

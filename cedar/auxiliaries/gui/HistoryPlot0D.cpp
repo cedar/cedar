@@ -51,6 +51,8 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <qwt_legend.h>
@@ -365,7 +367,10 @@ void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
     cedar::aux::gui::HistoryPlot0D::CurveInfoPtr curve = this->mpPlot->mCurves[curve_index];
 
     // update x value
-    unsigned int time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+    using namespace cedar::unit;
+    Time time_quantity = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+    unsigned int time = static_cast<unsigned int>(time_quantity / Time(1.0 * milli * second));
+
     curve->mXValues.push_back(time);
 
     while (curve->mXValues.size() > this->mpPlot->mMaxHistorySize)

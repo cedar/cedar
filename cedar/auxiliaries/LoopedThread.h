@@ -48,11 +48,12 @@
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
+#include "cedar/units/prefixes.h"
+#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/LoopedThread.fwd.h"
-
-// SYSTEM INCLUDES
+#include "cedar/auxiliaries/TimeParameter.h"
 #include <string>
 #include <iostream>
 #include <QThread>
@@ -139,9 +140,9 @@ public:
    */
   LoopedThread
   (
-    double stepSize = 1.0,
-    double idleTime = 0.01,
-    double simulatedTime = 1.0,
+    cedar::unit::Time stepSize = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
+    cedar::unit::Time  idleTime = cedar::unit::Time(0.01 * cedar::unit::milli * cedar::unit::seconds),
+    cedar::unit::Time  simulatedTime = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds),
     cedar::aux::EnumId mode = cedar::aux::LoopMode::Fixed
   );
 
@@ -167,7 +168,7 @@ public:
    *
    * @param stepSize the new step size in milliseconds
    */
-  void setStepSize(double stepSize);
+  void setStepSize(cedar::unit::Time stepSize);
 
   /*!@brief Sets a new idle time.
    *
@@ -177,7 +178,7 @@ public:
    *
    * @param idleTime the new idle time in milliseconds
    */
-  void setIdleTime(double idleTime = 0.01);
+  void setIdleTime(cedar::unit::Time idleTime = cedar::unit::Time(0.01 * cedar::unit::milli * cedar::unit::seconds));
 
   /*!@brief Sets a simulated time to be used in step().
    *
@@ -188,38 +189,45 @@ public:
    *
    * @param simulatedTime the desired simulated step size in milliseconds
    */
-  void setSimulatedTime(double simulatedTime = 0.0);
+  void setSimulatedTime(cedar::unit::Time simulatedTime
+                          = cedar::unit::Time(0.0 * cedar::unit::milli * cedar::unit::seconds));
 
   //! get the duration of the fixed trigger step
-  inline double getStepSize() const
+  inline cedar::unit::Time getStepSize() const
   {
     QReadLocker locker(this->_mStepSize->getLock());
-		double value = this->_mStepSize->getValue();
-    return value;
+    // make a copy of the step time
+    // otherwise the lock would unlock before the return statement
+    cedar::unit::Time step_size = this->_mStepSize->getValue();
+    return step_size;
   }
 
   //! get the duration of the fixed trigger step
-  inline double getStepSize() 
+  inline cedar::unit::Time getStepSize()
   {
     QReadLocker locker(this->_mStepSize->getLock());
-		double value = this->_mStepSize->getValue();
-    return value;
+    // make a copy of the step time
+    // otherwise the lock would unlock before the return statement
+    cedar::unit::Time step_size = this->_mStepSize->getValue();
+    return step_size;
   }
 
   //! get the idle time that is used in-between sending trigger signals
-  inline double getIdleTimeParameter() const
+  inline cedar::unit::Time getIdleTimeParameter() const
   {
     QReadLocker locker(this->_mIdleTime->getLock());
-		double value = this->_mIdleTime->getValue();
-    return value;
+    // make a copy of the step time
+    // otherwise the lock would unlock before the return statement
+    cedar::unit::Time idle_time = this->_mIdleTime->getValue();
+    return idle_time;
   }
 
   //! get the duration of the simulated time step
-  inline double getSimulatedTimeParameter() const
+  inline cedar::unit::Time getSimulatedTimeParameter() const
   {
     QReadLocker locker(this->_mSimulatedTime->getLock());
-		double value = this->_mSimulatedTime->getValue();
-    return value;
+    cedar::unit::Time simulated_time = this->_mSimulatedTime->getValue();
+    return simulated_time;
   }
 
   //! get the loop mode
@@ -272,7 +280,7 @@ private:
    *
    * @param time length of the time step to be calculated in milliseconds
    */
-  virtual void step(double time) = 0;
+  virtual void step(cedar::unit::Time time) = 0;
 
   //! slot called when the thread finishes via stop().
   void processStop(bool suppressWarning);
@@ -298,13 +306,13 @@ protected:
 private:
 
   //!@brief desired length of a single step, in milliseconds
-  cedar::aux::DoubleParameterPtr _mStepSize;
+  cedar::aux::TimeParameterPtr _mStepSize;
 
   //! parameter version of mIdleTime
-  cedar::aux::DoubleParameterPtr _mIdleTime;
+  cedar::aux::TimeParameterPtr _mIdleTime;
 
   //! parameter version of mSimulatedTime
-  cedar::aux::DoubleParameterPtr _mSimulatedTime;
+  cedar::aux::TimeParameterPtr _mSimulatedTime;
 
   //! The loop mode of the trigger
   cedar::aux::EnumParameterPtr _mLoopMode;

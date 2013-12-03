@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/DataSpectator.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <boost/algorithm/string/replace.hpp>
@@ -47,14 +48,19 @@
 // constructors and destructor
 //------------------------------------------------------------------------------
 
-cedar::aux::DataSpectator::DataSpectator(cedar::aux::ConstDataPtr toSpectate, int recordIntv, const std::string& name)
+cedar::aux::DataSpectator::DataSpectator
+(
+  cedar::aux::ConstDataPtr toSpectate,
+  cedar::unit::Time recordIntervall,
+  const std::string& name
+)
 :
 mData(toSpectate),
 mpOfstreamLock(new QReadWriteLock()),
 mpQueueLock(new QReadWriteLock()),
 mName(name)
 {
-  this->setStepSize(recordIntv);
+  this->setStepSize(recordIntervall);
 
   this->connectToStartSignal(boost::bind(&cedar::aux::DataSpectator::prepareStart, this));
   this->connectToStopSignal(boost::bind(&cedar::aux::DataSpectator::processStop, this, _1));
@@ -71,7 +77,7 @@ cedar::aux::DataSpectator::~DataSpectator()
   delete mpQueueLock;
 }
 
-void cedar::aux::DataSpectator::step(double)
+void cedar::aux::DataSpectator::step(cedar::unit::Time)
 {
   record();
 }
@@ -118,7 +124,7 @@ void cedar::aux::DataSpectator::record()
 void cedar::aux::DataSpectator::writeFirstRecordData()
 {
   // thread context: called from Recorder's thread.
-  /* This function uses a lot of locks. It is important to dont lock the queue during the serialization(takes 25-30ms)
+  /* This function uses a lot of locks. It is important to don't lock the queue during the serialization (takes 25-30ms)
    * to not block the record function for pushing new RecordData into the queue.
    */
   unsigned int size;
@@ -187,7 +193,7 @@ cedar::aux::ConstDataPtr cedar::aux::DataSpectator::getData() const
   return this->mData;
 }
 
-int cedar::aux::DataSpectator::getRecordIntervalTime() const
+cedar::unit::Time cedar::aux::DataSpectator::getRecordIntervalTime() const
 {
   return this->getStepSize();
 }
@@ -197,4 +203,3 @@ void cedar::aux::DataSpectator::makeSnapshot()
   this->prepareStart();
   this->record();
 }
-
