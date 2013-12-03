@@ -658,7 +658,7 @@ void cedar::proc::gui::Network::checkDataItems()
       count += static_cast<qreal>(1.0);
     }
     // now generate new entries for all slots that are not represented
-    try
+    if (this->mNetwork->hasRole(*enum_it))
     {
       const cedar::proc::Step::SlotMap& slotmap = this->mNetwork->getDataSlots(*enum_it);
       for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
@@ -685,10 +685,6 @@ void cedar::proc::gui::Network::checkDataItems()
         mSlotMap[slot->getRole()][slot->getName()] = p_item;
         count += static_cast<qreal>(1.0);
       }
-    }
-    catch(const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 }
