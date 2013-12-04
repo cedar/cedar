@@ -330,7 +330,7 @@ int main(int , char **)
   }
 
   //delete configfile
-  boost::filesystem::remove(CONFIG_FILE_NAME);
+  //boost::filesystem::remove(CONFIG_FILE_NAME);
 
   return errors;
 }

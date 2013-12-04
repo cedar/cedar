@@ -46,6 +46,8 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ThreadWrapper.fwd.h"
@@ -156,12 +158,11 @@ public:
 
     if (isValidThread())
     {
-      cedar::unit::Time second(1.0 * cedar::unit::second);
-      int time_int = static_cast<int>(time / second);
+      cedar::unit::Time milli_second(1.0 * cedar::unit::milli * cedar::unit::second);
+      int time_int = static_cast<int>(time / milli_second);
+
+      // QThread.wait() takes an integer in milliseconds
       ret = mpThread->wait(time_int);
-    }
-    else
-    {
     }
 
     return ret;

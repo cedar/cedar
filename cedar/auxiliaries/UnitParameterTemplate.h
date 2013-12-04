@@ -264,7 +264,7 @@ namespace cedar
         // remove white space at the beginning and end of the string
         norm_str = cedar::aux::regexReplace(norm_str, "(^\\s+|\\s+$)", "");
 
-        size_t delim = norm_str.find_first_not_of("-0123456789.");
+        size_t delim = norm_str.find_first_not_of("-0123456789.e");
         std::string number_str = norm_str.substr(0, delim);
         std::string unit_str = norm_str.substr(delim);
 
