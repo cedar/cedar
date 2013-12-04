@@ -96,10 +96,10 @@ public:
    */
   void registerData(cedar::aux::ConstDataPtr toSpectate, cedar::unit::Time recordInterval, const std::string& name);
 
-  //!@brief Used to unregister a DataPtr to stop him from beeing recorded.
+  //!@brief Used to unregister a DataPtr to stop him from being recorded.
   void unregisterData(const std::string& name);
 
-  //!@brief Used to unregister a DataPtr to stop him from beeing recorded.
+  //!@brief Used to unregister a DataPtr to stop him from being recorded.
    void unregisterData(cedar::aux::ConstDataPtr);
 
   //!@brief Unregister all DataPtr.
@@ -121,13 +121,15 @@ public:
    */
   void setRecordIntervalTime(const std::string& name, cedar::unit::Time recordInterval);
 
-  /*!@brief Returns the specified record interval of the DataPtr 'name' in ms.
+  /*!@brief Returns the specified record interval of the DataPtr 'name'.
    *         It will return -1 if name was not registered
+   *         @todo this should throw an exception instead
    */
   cedar::unit::Time getRecordIntervalTime(const std::string& name) const;
 
-  /*!@brief Returns the specified record interval of the DataPtr in ms.
+  /*!@brief Returns the specified record interval of the DataPtr.
    *         It will return -1 if name was not registered
+   *         @todo this should throw an exception instead
    */
   cedar::unit::Time getRecordIntervalTime(cedar::aux::ConstDataPtr data) const;
 

@@ -84,9 +84,9 @@ private:
 public:
   ~DataSpectator();
 private:
-  /*!@brief The private Constructor. Can only called by friend classes such as cedar::aux::Recorder. recordIntv should
-   * be passed in ms. name is a unique name for this DataPtr, so a file with this name can be created in the output
-   * dictionary.*/
+  /*!@brief The private Constructor. Can only called by friend classes such as cedar::aux::Recorder. name is a unique
+   * name for this DataPtr, so a file with this name can be created in the output dictionary.
+   */
   DataSpectator(cedar::aux::ConstDataPtr toSpectate, cedar::unit::Time recordInterval, const std::string& name);
 
 
