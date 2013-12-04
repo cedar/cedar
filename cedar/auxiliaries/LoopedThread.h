@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
-#include "cedar/auxiliaries/TimeParameter.h
+#include "cedar/auxiliaries/TimeParameter.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/units/Time.h"
 
