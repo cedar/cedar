@@ -128,9 +128,8 @@ class CountingThread : public cedar::aux::LoopedThread
     void step(cedar::unit::Time /* time */)
     {
       ++mCounter;
-      usleep(100);
+      cedar::aux::sleep(cedar::unit::Time(0.1 * cedar::unit::milli * cedar::unit::seconds));;
     }
-
 
     unsigned int mCounter;
 };
