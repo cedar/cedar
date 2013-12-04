@@ -44,6 +44,7 @@
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/RecorderProperty.fwd.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -100,7 +101,7 @@ private:
   cedar::aux::ConstDataPtr mData;
 
   //!@brief Stores the record interval of the slot. Is changed by the mStepSize spin box.
-  unsigned int mStepSizeValue;
+  cedar::unit::Time mStepSizeValue;
 
   //!@brief A pointer that leads to the RecorderWidget;
   cedar::proc::gui::RecorderWidget* mRecorderWidget;

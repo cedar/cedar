@@ -38,6 +38,8 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QWriteLocker>
@@ -48,28 +50,40 @@
 //------------------------------------------------------------------------------
 cedar::aux::LoopedThread::LoopedThread
 (
-  double stepSize,
-  double idleTime,
-  double simulatedTime,
+  cedar::unit::Time stepSize,
+  cedar::unit::Time idleTime,
+  cedar::unit::Time simulatedTime,
   cedar::aux::EnumId mode
 )
 :
 _mStepSize
 (
-  new cedar::aux::DoubleParameter(this, "step size", stepSize, cedar::aux::DoubleParameter::LimitType::fromLower(1.0))
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "step size",
+        stepSize,
+        cedar::aux::TimeParameter::LimitType::fromLower(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))
+      )
 ),
 _mIdleTime
 (
-  new cedar::aux::DoubleParameter(this, "idle time", idleTime, cedar::aux::DoubleParameter::LimitType::positiveZero())
+  new cedar::aux::TimeParameter
+      (
+        this,
+        "idle time",
+        idleTime,
+        cedar::aux::TimeParameter::LimitType::positiveZero()
+      )
 ),
 _mSimulatedTime
 (
-  new cedar::aux::DoubleParameter
+  new cedar::aux::TimeParameter
       (
         this,
         "simulated time",
         simulatedTime,
-        cedar::aux::DoubleParameter::LimitType::positive()
+        cedar::aux::TimeParameter::LimitType::positive()
       )
 ),
 _mLoopMode
@@ -106,7 +120,7 @@ void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
 
   unsigned long numberOfSteps = mpWorker->getNumberOfSteps();
 
-  if (suppressWarning == false && numberOfSteps > 1.01 && getSimulatedTimeParameter() <= 0.0)
+  if (suppressWarning == false && numberOfSteps > 1.01 && getSimulatedTimeParameter() <= cedar::unit::Time(0.0 * cedar::unit::seconds))
   {
     std::string message = "The system was not fast enough to stay to scheduled thread timing. ";
     message += "Consider using a larger step size.\n";
@@ -158,21 +172,21 @@ void cedar::aux::LoopedThread::processStop(bool suppressWarning)
   stopStatistics(suppressWarning);
 }
 
-void cedar::aux::LoopedThread::setStepSize(double stepSize)
+void cedar::aux::LoopedThread::setStepSize(cedar::unit::Time stepSize)
 {
   QWriteLocker locker(this->_mStepSize->getLock());
 
   this->_mStepSize->setValue(stepSize);
 }
 
-void cedar::aux::LoopedThread::setIdleTime(double idleTime)
+void cedar::aux::LoopedThread::setIdleTime(cedar::unit::Time idleTime)
 {
   QWriteLocker locker(_mIdleTime->getLock());
 
   _mIdleTime->setValue(idleTime);
 }
 
-void cedar::aux::LoopedThread::setSimulatedTime(double simulatedTime)
+void cedar::aux::LoopedThread::setSimulatedTime(cedar::unit::Time simulatedTime)
 {
   QWriteLocker locker(_mSimulatedTime->getLock());
 

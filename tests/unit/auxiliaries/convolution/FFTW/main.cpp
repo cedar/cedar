@@ -59,10 +59,10 @@ class Convolve3DTestThread : public cedar::aux::LoopedThread
     mFftw(new cedar::aux::conv::FFTW())
     {
       // step once to create the plan
-      this->step(0.0);
+      this->step(cedar::unit::Time(0.0 * cedar::unit::seconds));
     }
 
-    void step(double)
+    void step(cedar::unit::Time)
     {
       int sizes_3D[3] = {31, 20, 57};
       int sizes_kernel_3D[3] = {5, 4, 16};

@@ -60,6 +60,8 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 
 #include "cedar/processing/consistency/LoopedStepNotConnected.h"
@@ -247,7 +249,7 @@ void cedar::proc::Network::stopTriggers(bool wait)
 void cedar::proc::Network::stepTriggers()
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
-  double time_step = std::numeric_limits<double>::max();
+  cedar::unit::Time time_step(std::numeric_limits<double>::max() * cedar::unit::milli * cedar::unit::second);
   // find the shortest time step of all triggers
   for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
   {
@@ -261,13 +263,7 @@ void cedar::proc::Network::stepTriggers()
   this->stepTriggers(time_step);
 }
 
-void cedar::proc::Network::stepTriggers(cedar::unit::Time stepTime)
-{
-  double time_milli = stepTime / cedar::unit::seconds * 1000;
-  this->stepTriggers(time_milli);
-}
-
-void cedar::proc::Network::stepTriggers(double timeStep)
+void cedar::proc::Network::stepTriggers(cedar::unit::Time timeStep)
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
   // step all triggers with this time step
@@ -1435,11 +1431,11 @@ void cedar::proc::Network::readTriggers
 
 void cedar::proc::Network::writeRecords(cedar::aux::ConfigurationNode& records) const
 {
-  std::map<std::string, int> dataMap = cedar::aux::RecorderSingleton::getInstance()->getRegisteredData();
+  std::map<std::string, cedar::unit::Time> dataMap = cedar::aux::RecorderSingleton::getInstance()->getRegisteredData();
   for (auto iter = dataMap.begin(); iter != dataMap.end(); ++iter)
   {
-    cedar::aux::ConfigurationNode recorder_node(std::to_string(iter->second));
-    records.push_back(cedar::aux::ConfigurationNode::value_type(iter->first,recorder_node));
+    cedar::aux::ConfigurationNode recorder_node(cedar::aux::toString<cedar::unit::Time>(iter->second));
+    records.push_back(cedar::aux::ConfigurationNode::value_type(iter->first, recorder_node));
   }
 }
 
@@ -1452,12 +1448,12 @@ void cedar::proc::Network::readRecords
   //clear all registered data
   cedar::aux::RecorderSingleton::getInstance()->clear();
   //create a new map to get a better data structure
-  std::map<std::string, int> data;
+  std::map<std::string, cedar::unit::Time> data;
   for (cedar::aux::ConfigurationNode::const_iterator node_iter = root.begin();
        node_iter != root.end();
        ++node_iter)
   {
-      data[node_iter->first] = root.get<int>(node_iter->first);
+      data[node_iter->first] = root.get<cedar::unit::Time>(node_iter->first);
   }
 
   // check for every slot if it is to register or not

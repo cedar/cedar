@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 
@@ -60,7 +61,7 @@ cedar::aux::LoopFunctionInThread::~LoopFunctionInThread()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::LoopFunctionInThread::step(double timeStep)
+void cedar::aux::LoopFunctionInThread::step(cedar::unit::Time timeStep)
 {
   mFunction(timeStep);
 }

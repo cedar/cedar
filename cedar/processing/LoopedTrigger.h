@@ -69,7 +69,10 @@ class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0, const std::string& name = "");
+  LoopedTrigger(
+                 cedar::unit::Time stepSize = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second),
+                 const std::string& name = ""
+               );
 
   //!@brief Destructor
   virtual ~LoopedTrigger();
@@ -80,7 +83,7 @@ public:
 public:
   /*!@brief Step method implemented from the superclass.
    */
-  void step(double time);
+  void step(cedar::unit::Time time);
 
   /*!@brief Starts the trigger loop.
    *

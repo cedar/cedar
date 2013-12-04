@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/LoopFunctionInThread.fwd.h"
@@ -72,7 +73,7 @@ public:
   //----------------------------------------------------------------------------
 
   //! the type we use to store function calls
-  typedef std::function<void(double)> FunctionType;
+  typedef std::function<void(cedar::unit::Time)> FunctionType;
 
   //----------------------------------------------------------------------------
   // constructors and destructor
@@ -99,7 +100,7 @@ public:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  void step(double time);
+  void step(cedar::unit::Time time);
 
   //----------------------------------------------------------------------------
   // members
