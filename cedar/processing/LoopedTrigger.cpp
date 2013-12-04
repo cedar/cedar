@@ -93,7 +93,7 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& name)
+cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std::string& name)
 :
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
@@ -193,13 +193,9 @@ void cedar::proc::LoopedTrigger::processStop(bool)
 }
 
 //!@todo this should take a cedar::unit::Time as argument
-void cedar::proc::LoopedTrigger::step(double time)
+void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 {
-  cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime
-                                          (
-                                            cedar::unit::Time(time * cedar::unit::milli * cedar::unit::seconds)
-                                          )
-                                     );
+  cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time));
 
   //!@todo Is this right?
   auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());

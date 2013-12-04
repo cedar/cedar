@@ -498,13 +498,6 @@ private:
   //!@brief processes slot promotion
   void processPromotedSlots();
 
-  /*!@brief   Single-steps all triggers in this network with the given time step.
-   *
-   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
-   *          all triggers are stopped.
-   */
-  void stepTriggers(double stepTime);
-
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
   void onNameChanged();
