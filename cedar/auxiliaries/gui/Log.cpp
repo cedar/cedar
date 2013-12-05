@@ -155,6 +155,13 @@ void cedar::aux::gui::Log::updatePaneCurrentness(QTableWidget* pPane)
   int delta_high = -5;
   int delta_low = -1;
 
+  // check for maximum amount of log messages
+  unsigned int max_messages = cedar::aux::SettingsSingleton::getInstance()->getMaximalNumberOfLogEntries();
+  while (static_cast<unsigned int>(pPane->rowCount()) > max_messages)
+  {
+    pPane->removeRow(0);
+  }
+
   //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
   for (int i = 0; i < pPane->rowCount(); ++i)
   {
