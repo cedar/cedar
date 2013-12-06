@@ -147,6 +147,12 @@ public:
     return this->mpScene;
   }
 
+  //! get the scene in which this network is embedded
+  cedar::proc::gui::Scene* getScene() const
+  {
+    return this->mpScene;
+  }
+
   /*!@brief Sets the ui configuration for the element when it is added to the network.
    */
   inline void setNextElementUiConfiguration
@@ -242,6 +248,9 @@ private:
   void removeConnectorItem(bool isSource, const std::string& name);
 
   qreal getIconSizeForCurrentMode() const;
+
+  //!@todo Should return cedar::proc::gui::Element
+  cedar::proc::gui::GraphicsBase* getUiElementFor(cedar::proc::ElementPtr element) const;
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

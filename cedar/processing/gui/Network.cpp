@@ -227,12 +227,25 @@ void cedar::proc::gui::Network::addGuiItemsForNetwork()
   }
 }
 
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Network::getUiElementFor(cedar::proc::ElementPtr element) const
+{
+  return this->getScene()->getGraphicsItemFor(element.get());
+}
+
+
 void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
 {
+  auto to_duplicate = this->getNetwork()->getElement(elementName);
+  auto to_duplicate_ui = this->getUiElementFor(to_duplicate);
+
+  cedar::aux::ConfigurationNode conf;
+  to_duplicate_ui->writeConfiguration(conf);
+
   std::string new_name = this->getNetwork()->duplicate(elementName, newName);
 
   auto duplicate = this->getNetwork()->getElement(new_name);
-  auto duplicate_ui = this->getScene()->getGraphicsItemFor(duplicate.get());
+  auto duplicate_ui = this->getUiElementFor(duplicate);
+  duplicate_ui->readConfiguration(conf);
   duplicate_ui->setPos(scenePos);
 }
 
@@ -668,13 +681,13 @@ void cedar::proc::gui::Network::readConfiguration(const cedar::aux::Configuratio
     this->cedar::proc::gui::Connectable::readConfiguration(node);
     // restore plots that were open when architecture was last saved
     auto plot_list = node.find("open plots");
-    if(plot_list != node.not_found())
+    if (plot_list != node.not_found())
     {
       this->readPlotList(plot_list->second);
     }
     // read defined plot groups
     auto plot_groups = node.find("plot groups");
-    if(plot_groups != node.not_found())
+    if (plot_groups != node.not_found())
     {
       this->mPlotGroupsNode = plot_groups->second;
     }
