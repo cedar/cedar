@@ -295,6 +295,12 @@ void cedar::proc::gui::Network::sizeChanged()
   this->updateTextBounds();
   this->updateIconBounds();
   this->updateConnectorPositions();
+
+  if (!this->isCollapsed())
+  {
+    this->_mUncollapsedWidth->setValue(this->width());
+    this->_mUncollapsedHeight->setValue(this->height());
+  }
 }
 
 void cedar::proc::gui::Network::updateTextBounds()
@@ -580,6 +586,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
 
   this->mHoldFitToContents = false;
 //  this->fitToContents();
+
   this->resizeToIncludeContents();
 }
 
@@ -1148,20 +1155,28 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   {
     this->updateConnectorPositions();
   }
+
+  if (this->isCollapsed())
+  {
+    p_scene_element->hide();
+  }
 }
 
 void cedar::proc::gui::Network::resizeToIncludeContents()
 {
-  QRectF bounds = this->childrenBoundingRect();
-
-  if (this->width() < bounds.width())
+  if (!this->isCollapsed())
   {
-    this->setWidth(bounds.width());
-  }
+    QRectF bounds = this->childrenBoundingRect();
 
-  if (this->height() < bounds.height())
-  {
-    this->setHeight(bounds.height());
+    if (this->width() < bounds.width())
+    {
+      this->setWidth(bounds.width());
+    }
+
+    if (this->height() < bounds.height())
+    {
+      this->setHeight(bounds.height());
+    }
   }
 }
 
@@ -1426,8 +1441,6 @@ void cedar::proc::gui::Network::updateCollapsedness()
 
   if (collapse)
   {
-    this->_mUncollapsedWidth->setValue(this->width());
-    this->_mUncollapsedHeight->setValue(this->height());
     this->setInputOutputSlotOffset(static_cast<qreal>(0));
     //!@todo Same size as processing steps/adapt to the number of inputs, outputs?
     this->setSize(cedar::proc::gui::StepItem::mDefaultWidth, cedar::proc::gui::StepItem::mDefaultHeight);
