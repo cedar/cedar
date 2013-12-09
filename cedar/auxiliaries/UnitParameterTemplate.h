@@ -145,6 +145,12 @@ namespace cedar
       CEDAR_THROW(cedar::aux::UnknownUnitSuffixException, "Could not find unit for suffix \"" + postFix + "\".");
     }
 
+    template <typename UnitType> // unit type is, e.g., cedar::aux::TimeUnit::unit_type
+    std::string getDefaultUnit()
+    {
+      return "";
+    }
+
     /*!
      * @remarks Ignores the exponents in the string, the calling function has to take care of this.
      */
@@ -264,9 +270,17 @@ namespace cedar
         // remove white space at the beginning and end of the string
         norm_str = cedar::aux::regexReplace(norm_str, "(^\\s+|\\s+$)", "");
 
-        size_t delim = norm_str.find_first_not_of("-0123456789.");
+        size_t delim = norm_str.find_first_not_of("-0123456789.e");
         std::string number_str = norm_str.substr(0, delim);
-        std::string unit_str = norm_str.substr(delim);
+        std::string unit_str;
+        if (delim != std::string::npos)
+        {
+          unit_str = norm_str.substr(delim);
+        }
+        else
+        {
+          unit_str = getDefaultUnit<T>();
+        }
 
         //!@todo Proper exceptions
         CEDAR_ASSERT(!number_str.empty());

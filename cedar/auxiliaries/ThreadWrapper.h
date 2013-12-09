@@ -46,6 +46,8 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ThreadWrapper.fwd.h"
@@ -65,6 +67,7 @@
 #include <string>
 #include <iostream>
 #include <climits>
+#include <limits>
 
 
 /*!@brief Base class for utility classes that start their own worker in a thread
@@ -108,7 +111,7 @@ public:
    * be silently aborted.
    *
    * Note, the method can be made in a pseudo-non-blocking way if
-   * timeout is set to a rediculously small interval, but the preferred
+   * timeout is set to a ridiculously small interval, but the preferred
    * way is to use requestStop() for this.
    * For stopping the thread from the thread's own context, it is also preferred
    * to use requestStop().
@@ -151,16 +154,17 @@ public:
 
 
   //! wait for the thread to finish. The calling thread will pause!
-  inline bool wait(unsigned long time = ULONG_MAX)
+  inline bool wait(cedar::unit::Time time = std::numeric_limits<double>::max() * cedar::unit::seconds)
   {
     bool ret = false;
 
     if (isValidThread())
     {
-      ret = mpThread->wait(time);
-    }
-    else
-    {
+      cedar::unit::Time milli_second(1.0 * cedar::unit::milli * cedar::unit::second);
+      int time_int = static_cast<int>(time / milli_second);
+
+      // QThread.wait() takes an integer in milliseconds
+      ret = mpThread->wait(time_int);
     }
 
     return ret;

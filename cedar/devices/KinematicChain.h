@@ -605,7 +605,7 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  void step(double time);
+  void step(cedar::unit::Time time);
   void init();
   void initializeFromJointList();
   void applyAngleLimits(cv::Mat& angles);

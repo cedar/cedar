@@ -48,6 +48,8 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -81,7 +83,7 @@ public:
 
 private:
   // step function calculating and passing the movement command for each time step
-  void step(double)
+  void step(cedar::unit::Time)
   {
     // update state variables
     mpArm->updateTransformations();
@@ -242,7 +244,7 @@ int main(int argc, char **argv)
 
   // create the worker thread
   WorkerThread worker(arm, target);
-  worker.setStepSize(10);
+  worker.setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
 
   // start everything
   arm->start();
