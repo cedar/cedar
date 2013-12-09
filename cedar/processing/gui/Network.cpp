@@ -56,10 +56,12 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/processing/gui/StickyNote.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
 #include <QSet>
+#include <QList>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
 #endif
@@ -494,6 +496,8 @@ void cedar::proc::gui::Network::read(const std::string& source)
     //!TODO: this weaves control-flow logic into exceptions, that's not proper!
     this->toggleSmartConnectionMode(false);
   }
+  //read sticky notes
+  this->readStickyNotes(root.get_child("ui"));
   //update recorder icons
   this->stepRecordStateChanged();
 }
@@ -549,6 +553,20 @@ void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& 
 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
 {
+  std::vector<cedar::proc::gui::StickyNote*> stickyNotes = this->mpScene->getStickyNotes();
+  std::cout << stickyNotes.size() << std::endl;
+  for(cedar::proc::gui::StickyNote* note : stickyNotes)
+  {
+    cedar::aux::ConfigurationNode node;
+    node.put("type","stickyNote");
+    QRectF rect = note->boundingRect();
+    node.put("width",rect.width());
+    node.put("height",rect.height());
+    node.put("x",rect.x());
+    node.put("y",rect.y());
+    node.put("text",note->getText());
+    scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+  }
   auto elements = this->mNetwork->getElements();
 
   for
@@ -1071,6 +1089,25 @@ void cedar::proc::gui::Network::changeStepName(const std::string& from, const st
       {
         auto node = plot.second.put("step", to);
       }
+    }
+  }
+}
+
+
+void cedar::proc::gui::Network::readStickyNotes(cedar::aux::ConfigurationNode& node)
+{
+
+  for (cedar::aux::ConfigurationNode::iterator iter = node.begin(); iter != node.end(); ++iter)
+  {
+    const std::string& type = iter->second.get<std::string>("type");
+    if (type == "stickyNote")
+    {
+      int x = iter->second.get<int>("x");
+      int y = iter->second.get<int>("y");
+      int witdh = iter->second.get<int>("width");
+      int height = iter->second.get<int>("height");
+      const std::string& text = iter->second.get<std::string>("text");
+      this->mpScene->addStickyNote(x, y, witdh, height, text);
     }
   }
 }

@@ -42,12 +42,12 @@
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
-#include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -179,6 +179,7 @@ void cedar::proc::gui::Scene::reset()
   this->mTriggerMap.clear();
   this->mNetworkMap.clear();
   this->mElementMap.clear();
+  this->mStickyNotes.clear();
 }
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
@@ -1041,8 +1042,33 @@ void cedar::proc::gui::Scene::selectNone()
     selected_items.at(i)->setSelected(false);
   }
 }
-
 void cedar::proc::gui::Scene::addStickyNote()
 {
-  this->addItem(new cedar::proc::gui::StickyNote(mMousePosX, mMousePosY, this));
+  this->addStickyNote(mMousePosX, mMousePosY, 120, 70, "");
+}
+
+void cedar::proc::gui::Scene::addStickyNote(int x, int y, int witdh, int height, std::string text)
+{
+  cedar::proc::gui::StickyNote* note = new cedar::proc::gui::StickyNote(this, x, y, witdh, height, text);
+  mStickyNotes.push_back(note);
+  this->addItem(note);
+}
+
+
+void cedar::proc::gui::Scene::removeStickyNote(StickyNote* note)
+{
+  for (auto it = mStickyNotes.begin(); it != mStickyNotes.end(); it++)
+  {
+    if ((*it) == note)
+    {
+      mStickyNotes.erase(it);
+      break;
+    }
+  }
+  this->removeItem(note);
+}
+
+const std::vector<cedar::proc::gui::StickyNote* > cedar::proc::gui::Scene::getStickyNotes() const
+{
+  return this->mStickyNotes;
 }

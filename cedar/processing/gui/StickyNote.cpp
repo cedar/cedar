@@ -39,13 +39,19 @@
 #include "StickyNote.h"
 
 #include<QBrush>
-cedar::proc::gui::StickyNote::StickyNote(int x, int y, QGraphicsScene* pParent)
+cedar::proc::gui::StickyNote::StickyNote(
+    cedar::proc::gui::Scene* pParent,
+    int x,
+    int y,
+    int width,
+    int height,
+    std::string text)
 {
   //initialize
   mScaling = false;
   this->mpParent = pParent;
   mColor = Qt::yellow;
-  mBound =  QRectF(x, y, 120, 70);
+  mBound =  QRectF(x, y, width, height);
 
   //initialize TextEdit Widget
   mText.setFrameStyle(0);
@@ -53,6 +59,7 @@ cedar::proc::gui::StickyNote::StickyNote(int x, int y, QGraphicsScene* pParent)
   mpProxy = new QGraphicsProxyWidget(this);
   mpProxy->setWidget(&mText);
   mpProxy->setPos(x + 10, y + 10);
+  mText.setPlainText(QString(text.c_str()));
 
   //set flags
   setFlag(ItemIsMovable);
@@ -118,7 +125,7 @@ void cedar::proc::gui::StickyNote::keyPressEvent(QKeyEvent* event)
 {
   if (isSelected() && event->key() ==  Qt::Key_Delete)
   {
-    mpParent->removeItem(this);
+    mpParent->removeStickyNote(this);
   }
 
   QGraphicsItem::keyPressEvent(event);
@@ -171,4 +178,18 @@ void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* even
   {
     QGraphicsItem::mouseMoveEvent(event);
   }
+}
+
+
+std::string cedar::proc::gui::StickyNote::getText() const
+{
+  return this->mText.toPlainText().toStdString();
+}
+
+void cedar::proc::gui::StickyNote::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+{
+  std::cout << "here" << std::endl;
+  mBound.setX(event->scenePos().x());
+  mBound.setY(event->scenePos().y());
+  QGraphicsItem::dragMoveEvent(event);
 }

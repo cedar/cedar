@@ -247,6 +247,8 @@ private:
 
   void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
 
+  void readStickyNotes(cedar::aux::ConfigurationNode& node);
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange);
