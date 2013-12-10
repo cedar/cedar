@@ -554,7 +554,7 @@ void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
 {
   std::vector<cedar::proc::gui::StickyNote*> stickyNotes = this->mpScene->getStickyNotes();
-  std::cout << stickyNotes.size() << std::endl;
+
   for(cedar::proc::gui::StickyNote* note : stickyNotes)
   {
     cedar::aux::ConfigurationNode node;
@@ -562,8 +562,8 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
     QRectF rect = note->boundingRect();
     node.put("width",rect.width());
     node.put("height",rect.height());
-    node.put("x",rect.x());
-    node.put("y",rect.y());
+    node.put("x",note->scenePos().x());
+    node.put("y",note->scenePos().y());
     node.put("text",note->getText());
     scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
   }
