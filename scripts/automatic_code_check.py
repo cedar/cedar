@@ -54,15 +54,22 @@ class IssueList:
     self._issues[filename].append(issue)
     
   def write_issues(self, issue_file):
+    issue_count = 0
     with open(issue_file, "w") as f:
-      for file, issues in self._issues.items():
+      for file in sorted(self._issues.keys()):
+        issues = self._issues[file]
         if len(issues) > 0:
           f.write(file + "\n\n")
           for issue in issues:
             self._write_issue(f, issue + "\n")
+            issue_count += 1
           f.write("\n\n")
+          
+      if issue_count == 0:
+        f.write("No issues found. Hooray!")       
       
-    print "Issues written to \"" + issue_file + "\"."
+    print issue_count, "issues written to \"" + issue_file + "\"."
+    
 
   def _write_issue(self, issues_out, issue_description):
     issues_out.write("[ ] " + str(issue_description))
@@ -75,6 +82,17 @@ issues = IssueList()
 #
 def get_header(filename):
   return ".".join(filename.split('.')[:-1]) + ".h"
+  
+#
+# preprocesses c++ file contents (removes all comments and block-comments
+# 
+block_comment = re.compile(r'(\/\*.*?\*\/)', re.DOTALL)
+inline_comment = re.compile(r'(\/\/.*?)$', re.MULTILINE)
+
+def preprocess(source):
+  no_blocks = block_comment.sub("", source)
+  no_comments = inline_comment.sub("", no_blocks)
+  return no_comments
 
 #
 # checks if all the std headers are included where they should be.
@@ -84,7 +102,17 @@ std_class_headers = {
                       "cout": "iostream",
                       "endl": "iostream",
                       "cerr": "iostream",
-                      "stringstream": "sstream"
+                      "stringstream": "sstream",
+                      "function": "functional",
+                      "ifstream": "fstream",
+                      "ofstream": "fstream",
+                      "multiset": "set",
+                      "pair": "utility",
+                      "min": "algorithm",
+                      "max": "algorithm",
+                      "istringstream": "sstream",
+                      "ostringstream": "sstream",
+                      "get": "tuple"
                     }
 def check_std_headers(filename, file_contents):
   matches = set(std_use_regex.findall(file_contents))
@@ -108,15 +136,13 @@ def check_std_headers(filename, file_contents):
       file_header = get_header(filename)
       #print "also checking header", file_header
       with open(file_header, "r") as f_header: 
-        contents = f_header.read()
+        contents = preprocess(f_header.read())
         include = include_re.search(contents)
         if not include is None:
           header_found = True
     
     if header_found == False:
-      issues.add_issue(filename, "The stl class std::" + classname + " is used without including \"" + header + "\".")
-    else:
-      print "header found!"
+      issues.add_issue(filename, "The stl class/function std::" + classname + " is used without including \"" + header + "\".")
 
 #
 #
@@ -130,7 +156,7 @@ def check_file(filename):
   print "Checking file", filename.split("cedar")[-1]
   
   with open(filename, "r") as f:
-    file_contents = f.read()
+    file_contents = preprocess(f.read())
     check_std_headers(filename, file_contents)
     
 def check_directory(directory):
