@@ -70,15 +70,25 @@ class IssueList:
 issues = IssueList()
 
   
-
+#
+# returns the header corresponding to a cpp file
+#
+def get_header(filename):
+  return ".".join(filename.split('.')[:-1]) + ".h"
 
 #
 # checks if all the std headers are included where they should be.
 #
 std_use_regex = re.compile(r"std\:\:([a-zA-Z]+)[ \<]")
-std_class_headers = {"cout": "iostream", "endl": "iostream"}
+std_class_headers = {
+                      "cout": "iostream",
+                      "endl": "iostream",
+                      "cerr": "iostream",
+                      "stringstream": "sstream"
+                    }
 def check_std_headers(filename, file_contents):
   matches = set(std_use_regex.findall(file_contents))
+  filetype = filename.split('.')[-1]
   for classname in matches:
     # determine the header for the class
     if classname in std_class_headers:
@@ -87,10 +97,26 @@ def check_std_headers(filename, file_contents):
       header = classname
     
     # see if the header is being included
-    include = re.match(r"^\s*#\s*include\s*[\<\]" + header + "[\>\"]", file_contents)
+    include_re = re.compile(r'\s*#\s*include\s*[\<\"]' + header + r'[\>\"]')
+    include = include_re.search(file_contents)
     
+    header_found = True
     if include is None:
+      header_found = False
+      
+    if not header_found and filetype == "cpp":
+      file_header = get_header(filename)
+      #print "also checking header", file_header
+      with open(file_header, "r") as f_header: 
+        contents = f_header.read()
+        include = include_re.search(contents)
+        if not include is None:
+          header_found = True
+    
+    if header_found == False:
       issues.add_issue(filename, "The stl class std::" + classname + " is used without including \"" + header + "\".")
+    else:
+      print "header found!"
 
 #
 #
@@ -101,7 +127,7 @@ def check_file(filename):
   if match is None:
     return
 
-  print "Checking file", filename.split(os.sep)[-1], "(of type", match.group(1) + ")"
+  print "Checking file", filename.split("cedar")[-1]
   
   with open(filename, "r") as f:
     file_contents = f.read()

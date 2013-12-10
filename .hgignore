@@ -75,3 +75,5 @@ syntax: regexp
 ^resources/meshes/PowerCube110$
 syntax: regexp
 ^resources/meshes/PowerCubeWrist90$
+syntax: regexp
+^scripts/issues\.txt$
