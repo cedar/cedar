@@ -167,12 +167,6 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
     return cedar::proc::gui::CONNECT_NO;
   }
 
-  // ... is this a promoted item?
-  if (p_target_slot->getSlot()->isPromoted())
-  {
-    return cedar::proc::gui::CONNECT_NO;
-  }
-
   // ... source and target are not in the same network
   if (this->getSlot()->getParentPtr()->getNetwork() != p_target_slot->getSlot()->getParentPtr()->getNetwork())
   {
@@ -277,11 +271,6 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
     {
       this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
     }
-  }
-  //!@todo Can this be removed?
-  if (mSlot->isPromoted())
-  {
-    this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_CROSS);
   }
   this->paintFrame(painter, style, widget);
 

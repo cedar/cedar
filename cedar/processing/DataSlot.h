@@ -157,15 +157,6 @@ public:
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 
-  //! promote this slot
-  void promote();
-
-  //! demote this slot
-  void demote();
-
-  //! states if this slot is promoted
-  bool isPromoted() const;
-
   //!@brief get the pointer of this slot's parent
   cedar::proc::Connectable* getParentPtr();
 
@@ -215,6 +206,8 @@ private:
 
   //! Returns the type check function object for this slot.
   const TypeCheckFunction& getCheck() const;
+
+  void deleteParentPointer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
