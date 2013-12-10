@@ -926,6 +926,7 @@ void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::Co
   cedar::proc::ExternalDataPtr slot = this->getInputSlot(name);
   // the slot for name should always be found
   CEDAR_ASSERT(slot);
+  //!@todo Move this distinction to DataSlot or one of its derivatives
   if (slot->isCollection())
   {
     slot->removeData(data);
