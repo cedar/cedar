@@ -111,7 +111,6 @@ void cedar::proc::DataConnection::disconnect()
 {
   if (!mAlreadyDisconnected)
   {
-    std::cout << "Deleting " << this->getSource()->getName() << " " << this->getTarget()->getName() << std::endl;
     if (cedar::proc::DataSlotPtr source = this->mSource.lock())
     {
       try
@@ -150,7 +149,6 @@ void cedar::proc::DataConnection::disconnect()
         }
       }
     }
-    std::cout << "Deleting " << this->getSource()->getName() << " " << this->getTarget()->getName() << " done" << std::endl;
     mAlreadyDisconnected = true;
   }
 }
