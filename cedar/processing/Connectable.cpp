@@ -865,7 +865,7 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
   this->setData(DataRole::OUTPUT, name, data);
 
   std::vector<cedar::proc::DataConnectionPtr> connections;
-  this->getNetwork()->getDataConnections
+  this->getNetwork()->getDataConnectionsFrom
   (
     boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
     name,
