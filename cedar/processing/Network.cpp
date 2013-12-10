@@ -730,7 +730,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   std::string instanceName = element->getName();
   if (instanceName.empty())
   {
-    CEDAR_THROW(cedar::aux::InvalidNameException, "no name present for given element in this module")
+    CEDAR_THROW(cedar::aux::InvalidNameException, "Cannot add an element that has an empty name.");
   }
   else if (mElements.find(instanceName) != mElements.end())
   {
@@ -738,7 +738,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
     (
       cedar::proc::DuplicateNameException,
       "Duplicate element name entry \"" + instanceName + "\" in network \"" + this->getName() + "\""
-    )
+    );
   }
   else
   {
@@ -766,14 +766,15 @@ void cedar::proc::Network::addConnector(const std::string& name, bool input)
   // find out if this is the root network
   if (!this->getNetwork())
   {
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find a parent group, exiting...");
+    //!@todo A not found exception doesn't seem fitting here ...
+    CEDAR_THROW(cedar::aux::NotFoundException, "Cannot add a connector: group doesn't have a parent.");
   }
   if
   (
     this->nameExists(name)
   )
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot use this name. It is already taken.");
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name + "\". It is already taken.");
   }
   // check if connector is in map of connectors
   if (_mConnectors->find(name) != _mConnectors->end())
@@ -827,31 +828,11 @@ void cedar::proc::Network::removeConnector(const std::string& name, bool input)
 
 std::string cedar::proc::Network::duplicate(const std::string& elementName, const std::string& newName)
 {
+  cedar::proc::ElementPtr elem;
   try
   {
     // determine class
-    cedar::proc::ElementPtr elem = this->getElement(elementName);
-    std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(elem);
-    // allocate object
-    cedar::proc::ElementPtr new_elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_name);
-    // copy configuration tree
-    new_elem->copyFrom(elem);
-    // get unique name
-    std::string modified_name;
-    if (!newName.empty()) // desired name given
-    {
-      modified_name = this->getUniqueIdentifier(newName);
-    }
-    else // default name
-    {
-      modified_name = this->getUniqueIdentifier(elementName);
-    }
-    // set unique name
-    new_elem->setName(modified_name);
-    // add to network
-    this->add(new_elem);
-
-    return modified_name;
+    elem = this->getElement(elementName);
   }
   catch (cedar::aux::InvalidNameException& exc)
   {
@@ -861,6 +842,28 @@ std::string cedar::proc::Network::duplicate(const std::string& elementName, cons
       "cannot duplicate element of name " + elementName + ", it does not exist in network" + this->getName()
     )
   }
+
+  std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(elem);
+  // allocate object
+  cedar::proc::ElementPtr new_elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_name);
+  // copy configuration tree
+  new_elem->copyFrom(elem);
+  // get unique name
+  std::string modified_name;
+  if (!newName.empty()) // desired name given
+  {
+    modified_name = this->getUniqueIdentifier(newName);
+  }
+  else // default name
+  {
+    modified_name = this->getUniqueIdentifier(elementName);
+  }
+  // set unique name
+  new_elem->setName(modified_name);
+  // add to network
+  this->add(new_elem);
+
+  return modified_name;
 }
 
 //std::string cedar::proc::Network::getUniqueName(const std::string& unmodifiedName) const
