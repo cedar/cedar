@@ -132,7 +132,10 @@ void cedar::proc::gui::StickyNote::mousePressEvent(QGraphicsSceneMouseEvent* eve
   {
       this->mScaling = true;
   }
-   cedar::proc::gui::GraphicsBase::mousePressEvent(event);
+  else
+  {
+    cedar::proc::gui::GraphicsBase::mousePressEvent(event);
+  }
 }
 
 void cedar::proc::gui::StickyNote::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -141,7 +144,10 @@ void cedar::proc::gui::StickyNote::mouseReleaseEvent(QGraphicsSceneMouseEvent* e
   {
     mScaling=false;
   }
-  cedar::proc::gui::GraphicsBase::mouseReleaseEvent(event);
+  else
+  {
+    cedar::proc::gui::GraphicsBase::mouseReleaseEvent(event);
+  }
 }
 
 void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
@@ -160,7 +166,10 @@ void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* even
     }
     update();
   }
-  cedar::proc::gui::GraphicsBase::mouseMoveEvent(event);
+  else
+  {
+    cedar::proc::gui::GraphicsBase::mouseMoveEvent(event);
+  }
 }
 
 
