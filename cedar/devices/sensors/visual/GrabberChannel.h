@@ -47,7 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-
+#include <string>
 
 
 //! @brief Class to store all channel related stuff inside

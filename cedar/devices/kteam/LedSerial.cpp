@@ -46,6 +46,8 @@
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <sstream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration

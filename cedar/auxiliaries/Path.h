@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <deque>
+#include <string>
 
 
 /*!@brief A class for representing paths to files and directories.

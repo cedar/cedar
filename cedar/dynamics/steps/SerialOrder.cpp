@@ -50,10 +50,10 @@
 
 // SYSTEM INCLUDES
 #include <iostream>
-#include <vector>
 #ifndef Q_MOC_RUN
   #include <boost/make_shared.hpp>
 #endif
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

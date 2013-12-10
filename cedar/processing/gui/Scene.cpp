@@ -70,6 +70,8 @@
 #include <QSvgGenerator>
 #include <QToolTip>
 #include <iostream>
+#include <set>
+#include <list>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

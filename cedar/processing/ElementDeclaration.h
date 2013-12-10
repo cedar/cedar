@@ -59,6 +59,7 @@
 #include <QIcon>
 #include <QResource>
 #include <vector>
+#include <string>
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to

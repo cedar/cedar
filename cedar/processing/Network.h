@@ -62,6 +62,10 @@
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
 #endif
+#include <map>
+#include <set>
+#include <list>
+#include <string>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *

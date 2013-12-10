@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <map>
 
 /*!@brief An interface that indicates that a plot is capable of plotting more than one data object at a time.
  */

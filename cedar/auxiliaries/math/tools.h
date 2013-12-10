@@ -46,6 +46,8 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <type_traits>
+#include <vector>
+#include <string>
 
 #if defined CEDAR_COMPILER_MSVC && _MSC_VER < 1600 // MSVC with a version greater than 1600 should come with the stdint header.
   typedef __int8 int8_t;

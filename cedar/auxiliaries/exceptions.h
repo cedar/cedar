@@ -49,6 +49,8 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <string>
+#include <vector>
 
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */

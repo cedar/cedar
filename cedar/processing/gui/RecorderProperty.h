@@ -50,6 +50,7 @@
 #include <QHBoxLayout>
 #include <QSpinBox>
 #include <QCheckBox>
+#include <string>
 
 /*!@brief With help if this class, the user is able to register,unregister and edit single DataSlots in the Recorder.
  */

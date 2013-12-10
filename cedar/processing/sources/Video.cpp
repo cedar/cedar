@@ -45,6 +45,8 @@
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
+#include <sstream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

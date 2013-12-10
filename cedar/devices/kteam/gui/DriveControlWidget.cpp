@@ -40,6 +40,7 @@
 #include "cedar/units/Velocity.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

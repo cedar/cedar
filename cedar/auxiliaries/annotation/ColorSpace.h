@@ -48,6 +48,8 @@
 #include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 /*!@brief An annotation that indicates a certain color space.
  *

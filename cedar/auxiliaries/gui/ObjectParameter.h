@@ -51,6 +51,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif
+#include <string>
 
 
 //!@brief User interface representation of cedar::aux::ObjectListParameter.

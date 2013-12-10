@@ -46,6 +46,8 @@
 #include "cedar/devices/kteam/SerialChannel.h"
 
 // SYSTEM INCLUDES
+#include <sstream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration

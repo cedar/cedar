@@ -62,6 +62,7 @@
   #include <boost/math/special_functions/round.hpp> // rounding from double to int in cv::VideoCapture get and set methods
 #endif
 #include <QWriteLocker>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

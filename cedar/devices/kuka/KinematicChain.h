@@ -51,6 +51,7 @@
 // SYSTEM INCLUDES
 #include <fri/friremote.h>
 #include <QReadWriteLock>
+#include <vector>
 
 
 /*!@brief kinematic chain interface for the KUKA LBR

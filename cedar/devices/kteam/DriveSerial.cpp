@@ -43,7 +43,8 @@
 #include "cedar/units/Frequency.h"
 
 // SYSTEM INCLUDES
-#include <vector>
+#include <sstream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration

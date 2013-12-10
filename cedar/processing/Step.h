@@ -62,6 +62,8 @@
 #endif
 #include <map>
 #include <set>
+#include <utility>
+#include <vector>
 
 
 /*!@brief This class represents a processing step in the processing framework.

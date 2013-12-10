@@ -47,6 +47,8 @@
   #include <boost/shared_ptr.hpp>
 #endif
 #include <typeinfo>
+#include <vector>
+#include <string>
 
 #ifdef CEDAR_COMPILER_MSVC
   #define NOMINMAX // don't add min and max macros!

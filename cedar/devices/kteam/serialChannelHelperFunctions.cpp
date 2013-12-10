@@ -44,6 +44,7 @@
 #include "cedar/devices/Channel.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 cedar::dev::kteam::SerialChannelPtr convertToSerialChannel(cedar::dev::ChannelPtr channel)
 {

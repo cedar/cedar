@@ -41,6 +41,7 @@
 #include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration

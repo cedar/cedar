@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/annotation/Depth.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 /*!@brief An annotation that indicates depth data.
  */

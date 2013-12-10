@@ -56,6 +56,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration

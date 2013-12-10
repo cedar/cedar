@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/ConsoleLog.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief An interface for classes that redirect log outputs to the console.

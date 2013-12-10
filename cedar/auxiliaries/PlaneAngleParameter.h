@@ -42,6 +42,8 @@
 #include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
+#include <map>
+
 
 namespace cedar
 {

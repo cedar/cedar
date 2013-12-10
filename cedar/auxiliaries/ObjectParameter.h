@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/ObjectParameter.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A parameter that can store objects of dynamically determined type.
