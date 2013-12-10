@@ -54,7 +54,7 @@ cedar::aux::Settings::Settings()
 :
 cedar::aux::Configurable(),
 _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false)),
-_mMaximalNumberOfLogEntries(new cedar::aux::UIntParameter(this, "maximal number of log entries", 200))
+_mMaximumNumberOfLogEntries(new cedar::aux::UIntParameter(this, "maximal number of log entries", 200))
 {
   _mRecorderWorkspace = new cedar::aux::DirectoryParameter
                        (
@@ -139,12 +139,12 @@ bool cedar::aux::Settings::getMemoryDebugOutput() const
   return this->_mMemoryDebugOutput->getValue();
 }
 
-unsigned int cedar::aux::Settings::getMaximalNumberOfLogEntries() const
+unsigned int cedar::aux::Settings::getMaximumNumberOfLogEntries() const
 {
-  return this->_mMaximalNumberOfLogEntries->getValue();
+  return this->_mMaximumNumberOfLogEntries->getValue();
 }
 
 cedar::aux::UIntParameterPtr cedar::aux::Settings::getMaximalNumberOfLogEntriesParameter() const
 {
-  return this->_mMaximalNumberOfLogEntries;
+  return this->_mMaximumNumberOfLogEntries;
 }

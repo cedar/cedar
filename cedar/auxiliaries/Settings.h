@@ -89,7 +89,7 @@ public:
   cedar::aux::DirectoryParameterPtr getRecorderWorkspaceParameter() const;
 
   //! Whether or not memory output is generated.
-  unsigned int getMaximalNumberOfLogEntries() const;
+  unsigned int getMaximumNumberOfLogEntries() const;
 
   cedar::aux::UIntParameterPtr getMaximalNumberOfLogEntriesParameter() const;
 
@@ -122,7 +122,7 @@ protected:
 
   //!@brief Parameter representing the maximum number of log entries
   //!@todo this should be moved to aux::gui::Settings once unstable is merged
-  cedar::aux::UIntParameterPtr _mMaximalNumberOfLogEntries;
+  cedar::aux::UIntParameterPtr _mMaximumNumberOfLogEntries;
 
   //!@brief Parameter representing where recorded files will be saved.
   cedar::aux::DirectoryParameterPtr _mRecorderWorkspace;
