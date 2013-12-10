@@ -579,14 +579,6 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
     // look at first item
     QGraphicsItem* current_item = delete_stack.back();
 
-    //SZ: the gui should not be responsible for deleting children!
-//    QList<QGraphicsItem*> children = current_item->childItems();
-//    if (children.size() != 0)
-//    {
-//      // add all children to a separate stack
-//      this->deleteElements(children);
-//    }
-
     // now delete the current element
     deleteElement(current_item);
     delete_stack.pop_back();

@@ -306,7 +306,6 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 
   this->updateIconGeometry();
 
-  this->addDataItems();
   this->addDecorations();
 
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::emitStepStateChanged, this));

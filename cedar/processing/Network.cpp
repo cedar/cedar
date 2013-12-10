@@ -769,7 +769,6 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
     else // old and new network have a common parent, try to find it
     {
       // this should never be root, but just in case!
-      std::cout << this->getName() << " " << this->getNetwork()->getName() << std::endl;
       CEDAR_ASSERT(!this->isRoot());
       common_parent = this->getNetwork();
       while (!common_parent->contains(old_network))
@@ -778,7 +777,6 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
         CEDAR_ASSERT(!common_parent->isRoot());
         common_parent = common_parent->getNetwork();
       }
-      std::cout << "going through parent " << common_parent->getName() << std::endl;
     }
   }
   // remember all trigger connections between moved elements
@@ -2028,9 +2026,6 @@ const cedar::proc::Network::DataConnectionVector& cedar::proc::Network::getDataC
 
 void cedar::proc::Network::removeAll()
 {
-  // remove all connectors
-  this->removeAllConnectors();
-
   // read out all elements and call this->remove for each element
   std::vector<cedar::proc::ElementPtr> elements;
   for (ElementMapIterator it = mElements.begin(); it != mElements.end(); ++it)
