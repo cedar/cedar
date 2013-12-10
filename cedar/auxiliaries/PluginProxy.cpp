@@ -288,11 +288,11 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, c
   plugin_filename = "lib";
   plugin_filename += pluginName;
   plugin_filename += ".so";
-#elif CEDAR_OS_APPLE
+#elif defined CEDAR_OS_APPLE
   plugin_filename = "lib";
   plugin_filename += pluginName;
   plugin_filename += ".dylib";
-#elif CEDAR_OS_WINDOWS
+#elif defined CEDAR_OS_WINDOWS
   plugin_filename += pluginName;
   plugin_filename += ".dll";
 #endif
