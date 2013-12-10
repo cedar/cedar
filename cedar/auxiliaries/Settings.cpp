@@ -53,9 +53,10 @@
 cedar::aux::Settings::Settings()
 :
 cedar::aux::Configurable(),
-_mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false))
+_mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false)),
+_mMaximumNumberOfLogEntries(new cedar::aux::UIntParameter(this, "maximal number of log entries", 200))
 {
-  mRecorderWorkspace = new cedar::aux::DirectoryParameter
+  _mRecorderWorkspace = new cedar::aux::DirectoryParameter
                        (
                          this,
                          "recorder output directory",
@@ -99,12 +100,12 @@ cedar::aux::Settings::~Settings()
 
 cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspaceParameter() const
 {
-  return this->mRecorderWorkspace;
+  return this->_mRecorderWorkspace;
 }
 
 std::string cedar::aux::Settings::getRecorderWorkspace() const
 {
-  return this->mRecorderWorkspace->getValue().absolutePath().toStdString();
+  return this->_mRecorderWorkspace->getValue().absolutePath().toStdString();
 }
 
 void cedar::aux::Settings::load()
@@ -133,7 +134,17 @@ void cedar::aux::Settings::save()
   }
 }
 
-bool cedar::aux::Settings::getMemoryDebugOutput()
+bool cedar::aux::Settings::getMemoryDebugOutput() const
 {
   return this->_mMemoryDebugOutput->getValue();
+}
+
+unsigned int cedar::aux::Settings::getMaximumNumberOfLogEntries() const
+{
+  return this->_mMaximumNumberOfLogEntries->getValue();
+}
+
+cedar::aux::UIntParameterPtr cedar::aux::Settings::getMaximalNumberOfLogEntriesParameter() const
+{
+  return this->_mMaximumNumberOfLogEntries;
 }
