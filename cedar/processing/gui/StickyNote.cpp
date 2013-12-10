@@ -93,17 +93,6 @@ void cedar::proc::gui::StickyNote::paint(QPainter *painter, const QStyleOptionGr
   mpProxy->setMaximumWidth(mBound.width() - 20 );
   mpProxy->setMaximumHeight(mBound.height() - 20);
 
-  //set note to selected if TextEdit has focused
-  if (false)//mText.hasFocus() )
-  {
-    QList<QGraphicsItem*> items = this->mpParent->selectedItems();
-    for (QGraphicsItem* item : items)
-    {
-      item->setSelected(false);
-    }
-    this->setSelected(true);
-  }
-
   // change pen if the note is selected
   if (this->isSelected())
   {
@@ -143,9 +132,7 @@ void cedar::proc::gui::StickyNote::mousePressEvent(QGraphicsSceneMouseEvent* eve
   {
       this->mScaling = true;
   }
-  {
-    cedar::proc::gui::GraphicsBase::mousePressEvent(event);
-  }
+   cedar::proc::gui::GraphicsBase::mousePressEvent(event);
 }
 
 void cedar::proc::gui::StickyNote::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -154,10 +141,7 @@ void cedar::proc::gui::StickyNote::mouseReleaseEvent(QGraphicsSceneMouseEvent* e
   {
     mScaling=false;
   }
-  else
-  {
-    cedar::proc::gui::GraphicsBase::mouseReleaseEvent(event);
-  }
+  cedar::proc::gui::GraphicsBase::mouseReleaseEvent(event);
 }
 
 void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
@@ -176,10 +160,7 @@ void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* even
     }
     update();
   }
-  else
-  {
-    cedar::proc::gui::GraphicsBase::mouseMoveEvent(event);
-  }
+  cedar::proc::gui::GraphicsBase::mouseMoveEvent(event);
 }
 
 
