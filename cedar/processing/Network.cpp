@@ -338,6 +338,7 @@ const cedar::proc::Network::ElementMap& cedar::proc::Network::getElements() cons
   return this->mElements;
 }
 
+//!@todo This is (probably) redundant with disconnectOutput/InputSlot
 void cedar::proc::Network::removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot)
 {
   for
@@ -956,16 +957,27 @@ void cedar::proc::Network::connectTrigger(cedar::proc::TriggerPtr source, cedar:
   );
 }
 
-void cedar::proc::Network::disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
+void cedar::proc::Network::disconnectSlots(const std::vector<cedar::proc::DataConnectionPtr>& connections)
 {
-  std::vector<cedar::proc::DataConnectionPtr> connections;
-  this->getDataConnections(connectable, slot, connections);
-
   for (size_t i = 0; i < connections.size(); ++i)
   {
     cedar::proc::DataConnectionPtr connection = connections[i];
     this->disconnectSlots(connection->getSource(), connection->getTarget());
   }
+}
+
+void cedar::proc::Network::disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
+{
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  this->getDataConnectionsFrom(connectable, slot, connections);
+  this->disconnectSlots(connections);
+}
+
+void cedar::proc::Network::disconnectInputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
+{
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  this->getDataConnectionsTo(connectable, slot, connections);
+  this->disconnectSlots(connections);
 }
 
 void cedar::proc::Network::disconnectSlots(const std::string& source, const std::string& target)
@@ -1732,6 +1744,15 @@ void cedar::proc::Network::getDataConnections(
                                                std::vector<cedar::proc::DataConnectionPtr>& connections
                                              )
 {
+  this->getDataConnectionsFrom(source, sourceDataName, connections);
+}
+
+void cedar::proc::Network::getDataConnectionsFrom(
+                                                   cedar::proc::ConnectablePtr source,
+                                                   const std::string& sourceDataSlotName,
+                                                   std::vector<cedar::proc::DataConnectionPtr>& connections
+                                                 )
+{
   connections.clear();
   for (size_t i = 0; i < this->mDataConnections.size(); ++i)
   {
@@ -1741,7 +1762,31 @@ void cedar::proc::Network::getDataConnections(
       if
       (
         this->getElement<cedar::proc::Step>(con->getSource()->getParent()) == source
-          && con->getSource()->getName() == sourceDataName
+          && con->getSource()->getName() == sourceDataSlotName
+      )
+      {
+        connections.push_back(con);
+      }
+    }
+  }
+}
+
+void cedar::proc::Network::getDataConnectionsTo(
+                                                 cedar::proc::ConnectablePtr target,
+                                                 const std::string& targetDataSlotName,
+                                                 std::vector<cedar::proc::DataConnectionPtr>& connections
+                                               )
+{
+  connections.clear();
+  for (size_t i = 0; i < this->mDataConnections.size(); ++i)
+  {
+    // check if con is a valid pointer - during deletion of a step, some deleted connections are still in this list
+    if (cedar::proc::DataConnectionPtr con = this->mDataConnections.at(i))
+    {
+      if
+      (
+        this->getElement<cedar::proc::Step>(con->getTarget()->getParent()) == target
+          && con->getTarget()->getName() == targetDataSlotName
       )
       {
         connections.push_back(con);
@@ -2035,7 +2080,7 @@ void cedar::proc::Network::revalidateConnections(const std::string& sender)
   std::string output;
   cedar::aux::splitLast(sender, ".", child, output);
   std::vector<cedar::proc::DataConnectionPtr> connections;
-  this->getDataConnections(this->getElement<Connectable>(child), output, connections);
+  this->getDataConnectionsFrom(this->getElement<Connectable>(child), output, connections);
   for (unsigned i = 0; i < connections.size(); ++i)
   {
     cedar::proc::StepPtr sender = this->getElement<Step>(connections.at(i)->getSource()->getParent());

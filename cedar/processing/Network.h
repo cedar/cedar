@@ -283,11 +283,21 @@ public:
    */
   void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
 
+  /*!@brief Deletes the connections in the list.
+   */
+  void disconnectSlots(const std::vector<cedar::proc::DataConnectionPtr>& connections);
+
   /*!@brief Deletes all connections from a given data slot.
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
    */
   void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+
+    /*!@brief Deletes all connections to the given data slot.
+     * @param connectable The slot's parent.
+     * @param slot Identifier of the data slot.
+     */
+  void disconnectInputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes the connection between source and target.
    */
@@ -299,11 +309,35 @@ public:
    * @param sourceDataName The name of the slot from which to look list outgoing connections.
    * @param connections    Vector into which the connections are written.
    */
-  void getDataConnections(
+  CEDAR_DECLARE_DEPRECATED(void getDataConnections(
                            cedar::proc::ConnectablePtr source,
                            const std::string& sourceDataName,
                            std::vector<cedar::proc::DataConnectionPtr>& connections
+                         ));
+
+  /*!@brief Writes all the connections originating from a source connectable into a vector.
+   *
+   * @param source             The connectable source.
+   * @param sourceDataSlotName The name of the slot from which to look list outgoing connections.
+   * @param connections        Vector into which the connections are written.
+   */
+  void getDataConnectionsFrom(
+                           cedar::proc::ConnectablePtr source,
+                           const std::string& sourceDataSlotName,
+                           std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
+
+  /*!@brief Writes all the connections ending at a target connectable into a vector.
+   *
+   * @param source             The connectable target.
+   * @param sourceDataSlotName The name of the slot at which connections end.
+   * @param connections        Vector into which the connections are written.
+   */
+  void getDataConnectionsTo(
+                             cedar::proc::ConnectablePtr target,
+                             const std::string& targetDataSlotName,
+                             std::vector<cedar::proc::DataConnectionPtr>& connections
+                           );
 
   /*!@brief access the vector of data connections
    */

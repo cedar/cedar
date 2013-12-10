@@ -86,7 +86,7 @@ public:
   void save();
 
   //! Whether or not memory output is generated.
-  bool getMemoryDebugOutput();
+  bool getMemoryDebugOutput() const;
 
   //!@brief Returns the directory where the recorder will save the recorded files.
   std::string getRecorderOutputDirectory() const;
@@ -215,7 +215,7 @@ protected:
   cedar::aux::BoolParameterPtr _mMemoryDebugOutput;
 
   //!@brief Parameter representing where recorded files will be saved.
-  cedar::aux::DirectoryParameterPtr mRecorderWorkspace;
+  cedar::aux::DirectoryParameterPtr _mRecorderWorkspace;
 
   //!@brief List of plugins that should be loaded on startup.
   cedar::aux::StringSetParameterPtr _mPluginsToLoad;
