@@ -343,6 +343,7 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
   this->mpIconDisplay->setCacheMode(QGraphicsItem::NoCache);
 
+  this->addDataItems();
   mSlotAddedConnection
     = connectable->connectToSlotAdded(boost::bind(&cedar::proc::gui::Connectable::slotAdded, this, _1, _2));
   mSlotRemovedConnection
