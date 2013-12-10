@@ -38,6 +38,7 @@
 #define CEDAR_PROC_STICKY_NOTE_H
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Scene.h"
 
 // FORWARD DECLARATIONS
@@ -54,7 +55,7 @@
 #include <QGraphicsSceneEvent>
 
 //!@brief A GUI class that creates a pane where the user can write a comment or note.
-class cedar::proc::gui::StickyNote: public QGraphicsItem
+class cedar::proc::gui::StickyNote: public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -91,9 +92,9 @@ public:
   //!@brief Events when mouse is moved in the note.
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
-  void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
 
   std::string getText() const;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
