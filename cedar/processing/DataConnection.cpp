@@ -53,7 +53,8 @@
 cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
 :
 mSource(source),
-mTarget(target)
+mTarget(target),
+mAlreadyDisconnected(false)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -108,43 +109,47 @@ cedar::proc::DataConnection::~DataConnection()
 
 void cedar::proc::DataConnection::disconnect()
 {
-  if (cedar::proc::DataSlotPtr source = this->mSource.lock())
+  if (!mAlreadyDisconnected)
   {
-    try
+    if (cedar::proc::DataSlotPtr source = this->mSource.lock())
     {
-      cedar::proc::DataSlotPtr real_target = this->getRealTarget();
-      this->getRealTarget()->getParentPtr()->freeInput(real_target->getName(), source->getData());
-    }
-    catch (cedar::proc::ConnectionMemberDeletedException)
-    {
-      // ok
-    }
-    catch (cedar::aux::ExceptionBase& exc)
-    {
-      // we ignore exceptions during this destructor, but notify the user
-      if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+      try
       {
-        p_triggerable->setState
-        (
-          cedar::proc::Triggerable::STATE_EXCEPTION,
-          "An exception occured during removing a connection: "
-          + exc.getMessage()
-        );
+        cedar::proc::DataSlotPtr real_target = this->getRealTarget();
+        this->getRealTarget()->getParentPtr()->freeInput(real_target->getName(), source->getData());
+      }
+      catch (cedar::proc::ConnectionMemberDeletedException)
+      {
+        // ok
+      }
+      catch (cedar::aux::ExceptionBase& exc)
+      {
+        // we ignore exceptions during this destructor, but notify the user
+        if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+        {
+          p_triggerable->setState
+          (
+            cedar::proc::Triggerable::STATE_EXCEPTION,
+            "An exception occured during removing a connection: "
+            + exc.getMessage()
+          );
+        }
+      }
+      catch (std::exception& exc)
+      {
+        // we ignore exceptions during this destructor, but notify the user
+        if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
+        {
+          p_triggerable->setState
+          (
+            cedar::proc::Triggerable::STATE_EXCEPTION,
+            "An exception occured during removing a connection: "
+            + std::string(exc.what())
+          );
+        }
       }
     }
-    catch (std::exception& exc)
-    {
-      // we ignore exceptions during this destructor, but notify the user
-      if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
-      {
-        p_triggerable->setState
-        (
-          cedar::proc::Triggerable::STATE_EXCEPTION,
-          "An exception occured during removing a connection: "
-          + std::string(exc.what())
-        );
-      }
-    }
+    mAlreadyDisconnected = true;
   }
 }
 
