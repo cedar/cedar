@@ -41,8 +41,9 @@
 #include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 
-
 // SYSTEM INCLUDES
+#include <string>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

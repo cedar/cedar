@@ -50,6 +50,7 @@
 #include "cedar/processing/steps/Projection.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Processing step, which projects neuronal activation between processing steps of different dimensionality.

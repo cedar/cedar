@@ -44,6 +44,9 @@
 
 // SYSTEM INCLUDES
 #include <signal.h>
+#include <exception>
+#include <sstream>
+#include <iostream>
 
 
 //----------------------------------------------------------------------------------------------------------------------

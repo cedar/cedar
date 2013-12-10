@@ -47,6 +47,8 @@
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@todo describe.

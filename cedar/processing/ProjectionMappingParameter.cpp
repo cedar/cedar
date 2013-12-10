@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
+#include <map>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

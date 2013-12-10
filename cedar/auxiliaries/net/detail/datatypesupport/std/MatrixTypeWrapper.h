@@ -41,7 +41,7 @@
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 
 // SYSTEM INCLUDES
-
+#include <string>
 
 
 

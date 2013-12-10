@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <string>
 
 /*!@brief Data containing matrices.
  */

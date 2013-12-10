@@ -51,6 +51,7 @@
 #endif
 
 // SYSTEM INCLUDES
+#include <string>
 
   //---------------------------------------------------------------------------
   // the unspecialized template class cannot be instantiated

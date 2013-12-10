@@ -48,6 +48,8 @@
 #include <boost/utility.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <istream>
+#include <sstream>
 
 
 #undef DEBUG_VERBOSE

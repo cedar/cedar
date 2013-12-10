@@ -53,6 +53,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

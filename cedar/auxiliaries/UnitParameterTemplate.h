@@ -48,14 +48,20 @@
 #include "cedar/auxiliaries/UnitParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/base_dimension.hpp>
-#include <boost/units/derived_dimension.hpp>
-#include <boost/units/get_dimension.hpp>
-#include <boost/units/quantity.hpp>
-#include <boost/units/pow.hpp>
-#include <boost/units/systems/si/dimensionless.hpp>
-#include <boost/units/io.hpp>
-#include <boost/static_assert.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/units/base_dimension.hpp>
+  #include <boost/units/derived_dimension.hpp>
+  #include <boost/units/get_dimension.hpp>
+  #include <boost/units/quantity.hpp>
+  #include <boost/units/pow.hpp>
+  #include <boost/units/systems/si/dimensionless.hpp>
+  #include <boost/units/io.hpp>
+  #include <boost/static_assert.hpp>
+#endif // Q_MOC_RUN
+#include <map>
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace cedar
 {

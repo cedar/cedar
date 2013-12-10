@@ -35,10 +35,14 @@
 ======================================================================================================================*/
 
 
-
+// CEDAR INCLUDES
 #include "StickyNote.h"
 
+// SYSTEM INCLUDES
 #include<QBrush>
+#include <iostream>
+
+
 cedar::proc::gui::StickyNote::StickyNote(
     cedar::proc::gui::Scene* pParent,
     int x,

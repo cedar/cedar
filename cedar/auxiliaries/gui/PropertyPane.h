@@ -52,6 +52,9 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2/connection.hpp>
 #endif
+#include <vector>
+#include <string>
+#include <map>
 
 
 /*!@brief A widget for displaying the parameters of configurables.

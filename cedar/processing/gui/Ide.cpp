@@ -74,6 +74,10 @@
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/detail/json_parser_error.hpp>
 #endif
+#include <vector>
+#include <set>
+#include <list>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

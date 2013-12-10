@@ -49,6 +49,7 @@
 #include <QLabel>
 #include <QFileDialog>
 #include <QToolTip>
+#include <vector>
 #include <set>
 
 #define PLUGIN_MANAGER_STARTUP_LOAD_ROW 0

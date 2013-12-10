@@ -49,6 +49,7 @@
   #include <boost/signals2/connection.hpp>
   #include <boost/function.hpp>
 #endif
+#include <vector>
 
 /*!@brief   A slot for data that is not owned by a Connectable.
  *

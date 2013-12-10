@@ -49,6 +49,7 @@
 #include <qglviewer.h>
 #include <QList>
 #include <QReadWriteLock>
+#include <string>
 
 /*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
  *

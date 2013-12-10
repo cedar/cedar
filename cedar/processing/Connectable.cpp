@@ -50,6 +50,8 @@
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <string>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

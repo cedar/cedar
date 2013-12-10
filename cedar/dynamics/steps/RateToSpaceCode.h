@@ -48,6 +48,7 @@
 #include "cedar/dynamics/steps/RateToSpaceCode.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A step that converts rate code to space code.

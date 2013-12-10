@@ -49,6 +49,8 @@
 #include "cedar/processing/steps/ChannelSplit.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@brief A processing step that converts an image from one color space to another.

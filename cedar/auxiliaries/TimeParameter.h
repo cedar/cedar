@@ -42,6 +42,8 @@
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
+#include <string>
+#include <map>
 
 namespace cedar
 {

@@ -55,7 +55,11 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
-#endif
+#endif // Q_MOC_RUN
+#include <map>
+#include <vector>
+#include <string>
+#include <list>
 
 /*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
  *

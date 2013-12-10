@@ -48,6 +48,7 @@
 
 // SYSTEM INCLUDES
 #include <QListWidget>
+#include <string>
 
 /*!@brief A widget showing a list of steps that can be dragged into the architecture area.
  *

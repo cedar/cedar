@@ -49,6 +49,8 @@
 #include "cedar/auxiliaries/LogInterface.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 //!@brief A class for logging messages in a file.
 class cedar::aux::Log

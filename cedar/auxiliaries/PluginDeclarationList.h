@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 // definitions used for loading a list from a plugin.
 # ifdef __cplusplus

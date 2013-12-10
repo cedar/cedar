@@ -49,8 +49,9 @@
 // SYSTEM INCLUDES
 #include <QObject>
 #include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
+#include <opencv2/opencv.hpp>
+#include <vector>
 
 /*!@brief Provides the geometry of a rigid object
  *

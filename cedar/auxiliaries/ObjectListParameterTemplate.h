@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A parameter that reads a list of configurable objects from a file.

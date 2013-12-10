@@ -50,6 +50,7 @@
 #include "cedar/devices/NetworkChannel.h"
 
 // SYSTEM INCLUDES
+#include <map>
 
 /*!@brief Communication channel for a component or device over Yarp.
  *

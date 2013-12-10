@@ -74,6 +74,8 @@
 #include <iostream>
 #include <QMessageBox>
 #include <QPushButton>
+#include <string>
+#include <set>
 
 
 //----------------------------------------------------------------------------------------------------------------------

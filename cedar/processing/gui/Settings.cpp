@@ -49,6 +49,10 @@
   #include <boost/property_tree/json_parser.hpp>
 #endif
 #include <QMainWindow>
+#include <vector>
+#include <iostream>
+#include <string>
+
 
 cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode>
   cedar::proc::gui::Settings::StepDisplayMode::mType("cedar::proc::gui::Settings::StepDisplayMode::");

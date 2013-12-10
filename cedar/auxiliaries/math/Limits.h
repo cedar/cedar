@@ -55,13 +55,14 @@
 #ifndef Q_MOC_RUN
   #include <boost/numeric/conversion/bounds.hpp>
 #endif
-#include <limits>
-#include <iostream>
 #include <boost/units/base_dimension.hpp>
 #include <boost/units/derived_dimension.hpp>
 #include <boost/units/get_dimension.hpp>
 #include <boost/units/quantity.hpp>
 #include <boost/units/io.hpp>
+#include <limits>
+#include <iostream>
+#include <vector>
 
 namespace cedar
 {
