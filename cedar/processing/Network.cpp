@@ -860,11 +860,6 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
 
 void cedar::proc::Network::addConnector(const std::string& name, bool input)
 {
-  // find out if this is the root network
-  if (!this->getNetwork())
-  {
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find a parent group, exiting...");
-  }
   if
   (
     this->nameExists(name)
