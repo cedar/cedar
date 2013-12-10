@@ -56,6 +56,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 /*!@brief Matrix plot that can display 1D matrices (i.e. vectors) as vectors.
  */

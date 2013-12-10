@@ -53,6 +53,7 @@
 #include <set>
 #include <map>
 #include <vector>
+#include <string>
 
 /*!@brief A class for conveniently parsing options from a command line.
  *

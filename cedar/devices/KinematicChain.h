@@ -52,6 +52,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
+#include <map>
 
 /*!@brief Interface for a chain of joints
  *

@@ -52,6 +52,7 @@
 #include <QObject>
 #include <QReadWriteLock>
 #include <set>
+#include <string>
 
 
 /*!@brief Base class for all parameters.

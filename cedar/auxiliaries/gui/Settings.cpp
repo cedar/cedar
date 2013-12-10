@@ -43,6 +43,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/filesystem.hpp>
 #include <QMainWindow>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -47,6 +47,8 @@
 #include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <map>
 
 /*!@brief Base class for components of robots.
  */

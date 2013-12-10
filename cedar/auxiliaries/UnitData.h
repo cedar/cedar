@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/UnitData.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@todo describe.

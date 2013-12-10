@@ -56,6 +56,8 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
+#include <vector>
+#include <string>
 
 /*! @class cedar::dev::sensors::visual::Grabber
  *  @brief This is the base class for all grabber.

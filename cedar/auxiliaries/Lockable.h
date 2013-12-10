@@ -50,6 +50,8 @@
 #include <QReadWriteLock>
 #include <set>
 #include <map>
+#include <utility>
+#include <vector>
 
 /*!@brief Base class for strutures that can be locked in their entierety.
  *

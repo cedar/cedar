@@ -60,6 +60,9 @@
 #endif // __LINUX__
 
 #include <QMutexLocker>
+#include <algorithm>
+#include <vector>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

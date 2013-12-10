@@ -60,6 +60,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

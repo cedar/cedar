@@ -49,6 +49,8 @@
 // SYSTEM INCLUDES
 #include <map>
 #include <set>
+#include <vector>
+#include <string>
 
 
 //!@todo Does this deserve its own header? This problem might occur on multiple occasions

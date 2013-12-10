@@ -41,8 +41,9 @@
 #include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
- #include <QTextStream>
- #include <QFile>
+#include <QTextStream>
+#include <QFile>
+#include <iostream>
 
 const float cedar::aux::gl::ObjectVisualization::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
 

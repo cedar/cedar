@@ -61,6 +61,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <ctime>
+#include <string>
 
 // MACROS
 // Enable to show information on locking/unlocking

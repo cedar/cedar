@@ -50,6 +50,8 @@
 #include <set>
 #include <queue>
 #include <iostream>
+#include <map>
+#include <string>
 
 /*!@brief   A structure capable of representing parts of the inheritance sturcture between types.
  *

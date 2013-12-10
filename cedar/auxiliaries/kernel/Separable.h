@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/kernel/Separable.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 //!@brief Meta class to derive separable kernels when implementing kernels.
 class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel

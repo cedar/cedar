@@ -48,6 +48,8 @@
 #include "cedar/auxiliaries/annotation/Dimensions.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
+#include <vector>
 
 /*!@brief An annotation that provides labels and descriptions for dimensions.
  *

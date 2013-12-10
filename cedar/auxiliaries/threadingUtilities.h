@@ -41,8 +41,9 @@
 #include "cedar/auxiliaries/LockType.h"
 
 // SYSTEM INCLUDES
-#include <set>
 #include <QReadWriteLock>
+#include <utility>
+#include <set>
 
 namespace cedar
 {

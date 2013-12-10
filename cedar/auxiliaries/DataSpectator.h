@@ -51,6 +51,7 @@
 #include <QTime>
 #include <string>
 #include <fstream>
+#include <list>
 
 /*!@brief The Recorder uses this class to observe the registered DataPtr.
  *        This class copies the observed DataPtr in each time step and stores the copy in a queue together with time

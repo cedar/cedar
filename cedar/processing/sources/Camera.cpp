@@ -47,6 +47,7 @@
 #include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

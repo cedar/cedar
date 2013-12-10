@@ -66,6 +66,8 @@
 #include <vtkPen.h>
 #include <vtkNew.h>
 #include <QVTKWidget.h>
+#include <vector>
+#include <string>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

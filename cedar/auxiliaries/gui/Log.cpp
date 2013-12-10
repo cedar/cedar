@@ -49,6 +49,7 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QMenu>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

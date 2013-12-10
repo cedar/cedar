@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QWidget>
+#include <vector>
 
 
 /*!@brief Widget that alerts users about potential flaws in their architecture

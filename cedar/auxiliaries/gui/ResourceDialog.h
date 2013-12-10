@@ -49,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <QFileIconProvider>
+#include <vector>
 
 
 /*!@todo describe.

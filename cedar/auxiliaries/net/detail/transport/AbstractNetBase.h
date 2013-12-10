@@ -59,6 +59,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/utility.hpp>
 #endif
+#include <string>
 
 
 // SYSTEM INCLUDES

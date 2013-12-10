@@ -54,6 +54,7 @@
   #include <boost/signals2.hpp>
 #endif
 #include <set>
+#include <string>
 
 /*!@brief Interface for all classes that can be triggered.
  */

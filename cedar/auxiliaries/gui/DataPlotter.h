@@ -51,6 +51,7 @@
 
 // SYSTEM INCLUDES
 #include <QDockWidget>
+#include <string>
 
 /*!@brief Base class for a dockable plot.
  *

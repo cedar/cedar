@@ -46,6 +46,7 @@
 #include "cedar/processing/steps/MatrixSlice.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Processing step that extracts a slice of a matrix.

@@ -64,6 +64,8 @@
 #include <ostream>
 #include <iomanip>
 #include <iostream>
+#include <vector>
+#include <set>
 
 /*!@brief An interface for classes that can store and load parameters from files.
  *

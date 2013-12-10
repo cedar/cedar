@@ -49,6 +49,7 @@
 #include "cedar/processing/Triggerable.fwd.h"
 
 // SYSTEMS INCLUDES
+#include <string>
 #include <vector>
 #include <set>
 

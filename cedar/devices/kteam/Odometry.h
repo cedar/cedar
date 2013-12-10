@@ -44,6 +44,7 @@
 #include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief The kinematics model of a differential drive robot with encoders.

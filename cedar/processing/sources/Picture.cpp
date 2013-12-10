@@ -45,8 +45,10 @@
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/math/tools.h"
 
-
 // SYSTEM INCLUDES
+#include <sstream>
+#include <string>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
