@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -79,13 +80,18 @@ public:
   void save();
 
   //! Whether or not memory output is generated.
-  bool getMemoryDebugOutput();
+  bool getMemoryDebugOutput() const;
 
   //!@todo Documentation; also, this should be called getRecorderOutputDirectory()
   std::string getRecorderWorkspace() const;
 
   //! Returns the parameter that contains the recorder's output directory.
   cedar::aux::DirectoryParameterPtr getRecorderWorkspaceParameter() const;
+
+  //! Whether or not memory output is generated.
+  unsigned int getMaximumNumberOfLogEntries() const;
+
+  cedar::aux::UIntParameterPtr getMaximalNumberOfLogEntriesParameter() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -114,8 +120,12 @@ protected:
   //!@brief Parameter representing the plugin workspace.
   cedar::aux::BoolParameterPtr _mMemoryDebugOutput;
 
+  //!@brief Parameter representing the maximum number of log entries
+  //!@todo this should be moved to aux::gui::Settings once unstable is merged
+  cedar::aux::UIntParameterPtr _mMaximumNumberOfLogEntries;
+
   //!@brief Parameter representing where recorded files will be saved.
-  cedar::aux::DirectoryParameterPtr mRecorderWorkspace;
+  cedar::aux::DirectoryParameterPtr _mRecorderWorkspace;
 
 private:
   // none yet
