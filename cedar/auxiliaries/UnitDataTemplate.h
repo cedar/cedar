@@ -48,7 +48,10 @@
 #include "cedar/auxiliaries/UnitDataTemplate.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/io.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/units/io.hpp>
+#endif // Q_MOC_RUN
+#include <string>
 
 
 /*!@todo describe.

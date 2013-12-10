@@ -65,6 +65,9 @@
   #include <boost/make_shared.hpp>
 #endif
 #include <QApplication>
+#include <vector>
+#include <set>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

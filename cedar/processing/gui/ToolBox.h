@@ -51,6 +51,7 @@
 #include <QGridLayout>
 #include <QToolButton>
 #include <map>
+#include <string>
 
 
 /*!@brief This is a base class for widgets that contain little boxes that represent some tools.

@@ -57,6 +57,7 @@
   #include <boost/date_time.hpp>
 #endif
 #include <deque>
+#include <vector>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

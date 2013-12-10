@@ -59,6 +59,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string>
 
 namespace cedar {
   namespace aux {

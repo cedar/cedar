@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/NumericVectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A template for parameters that are vectors of numbers.

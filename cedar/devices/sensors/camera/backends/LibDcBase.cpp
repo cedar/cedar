@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

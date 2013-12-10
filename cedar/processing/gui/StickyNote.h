@@ -52,6 +52,7 @@
 #include <QTextEdit>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsSceneEvent>
+#include <string>
 
 //!@brief A GUI class that creates a pane where the user can write a comment or note.
 class cedar::proc::gui::StickyNote: public QGraphicsItem

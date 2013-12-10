@@ -47,6 +47,9 @@
 
 // SYSTEM INCLUDES
 #include <boost/signals2.hpp>
+#include <map>
+#include <vector>
+#include <string>
 
 
 /*!@todo describe.

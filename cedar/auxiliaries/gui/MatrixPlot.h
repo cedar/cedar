@@ -53,6 +53,8 @@
 #include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
+#include <vector>
+#include <string>
 
 /*!@brief Base class for plots that can display matrices.
  *

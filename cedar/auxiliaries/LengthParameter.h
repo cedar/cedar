@@ -42,6 +42,7 @@
 #include "cedar/units/Length.h"
 
 // SYSTEM INCLUDES
+#include <map>
 
 namespace cedar
 {

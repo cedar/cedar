@@ -50,6 +50,7 @@
 #include "cedar/auxiliaries/PluginDeclarationTemplate.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@todo describe.

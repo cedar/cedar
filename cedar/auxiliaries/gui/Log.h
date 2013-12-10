@@ -50,6 +50,7 @@
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QGraphicsSceneContextMenuEvent>
+#include <map>
 
 
 /*!@brief A default log widget.

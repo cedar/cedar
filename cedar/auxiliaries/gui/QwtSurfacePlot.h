@@ -60,6 +60,8 @@
 #include <qwtplot3d/qwt3d_function.h>
 #include <qwtplot3d/qwt3d_plot3d.h>
 #include <qwtplot3d/qwt3d_io.h>
+#include <vector>
+#include <string>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

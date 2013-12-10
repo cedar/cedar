@@ -52,6 +52,9 @@
 // SYSTEM INCLUDES
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
+#include <vector>
+#include <string>
+#include <set>
 
 /*!@brief A singleton class for storing user-specific parameters related to the auxiliary library of cedar.
  */

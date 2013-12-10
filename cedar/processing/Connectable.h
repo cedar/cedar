@@ -56,6 +56,7 @@
   #include <boost/signals2/connection.hpp>
 #endif
 #include <vector>
+#include <map>
 
 /*!@brief   An interface for classes that have data slots that can be connected.
  *

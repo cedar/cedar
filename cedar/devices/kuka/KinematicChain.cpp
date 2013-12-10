@@ -48,6 +48,7 @@
 #include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
+#include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

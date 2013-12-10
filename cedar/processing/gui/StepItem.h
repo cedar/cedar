@@ -62,6 +62,8 @@
 #include <QGraphicsSvgItem>
 #include <QIcon>
 #include <QObject>
+#include <utility>
+#include <vector>
 #include <map>
 
 

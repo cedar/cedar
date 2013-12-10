@@ -49,6 +49,9 @@
 #include <cstdio>
 #include <map>
 #include <string>
+#include <set>
+#include <sstream>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

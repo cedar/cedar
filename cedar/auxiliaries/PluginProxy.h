@@ -47,6 +47,9 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
 #include <string>
+#include <map>
+#include <iostream>
+#include <vector>
 
 #ifdef CEDAR_OS_WINDOWS
 #include <Windows.h>

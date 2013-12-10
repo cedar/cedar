@@ -43,6 +43,7 @@
 // SYSTEM INCLUDES
 #include <string>
 #include <fstream>
+#include <vector>
 
 
 namespace cedar

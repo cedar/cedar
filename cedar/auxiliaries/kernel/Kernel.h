@@ -52,6 +52,7 @@
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
 #include <QObject>
+#include <vector>
 
 /*!@brief Meta class to derive from when implementing kernels.
  *

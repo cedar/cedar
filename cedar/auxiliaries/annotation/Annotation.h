@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/annotation/Annotation.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief Base class for annotations.

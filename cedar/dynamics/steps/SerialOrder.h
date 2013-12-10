@@ -48,6 +48,7 @@
 #include "cedar/dynamics/steps/SerialOrder.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A step that implements the serial order architecture. See the following publication for a detailed description

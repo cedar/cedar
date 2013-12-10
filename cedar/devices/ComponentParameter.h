@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief A parameter that holds a pointer to a component of a device.

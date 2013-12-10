@@ -47,6 +47,8 @@
 #include "cedar/processing/steps/Resize.fwd.h"
 
 // SYSTEM INCLUDES
+#include <utility>
+#include <vector>
 
 
 /*!@brief   A processing step that resizes a matrix.

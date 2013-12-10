@@ -72,6 +72,7 @@
 	#include <boost/property_tree/json_parser.hpp>
 #endif
 #include <algorithm>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

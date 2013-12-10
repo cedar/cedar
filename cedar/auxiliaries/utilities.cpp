@@ -52,6 +52,7 @@
   #include <Dbghelp.h>
   #pragma comment(lib, "Dbghelp.lib")
 #endif // CEDAR_COMPILER_MSVC
+#include <iostream>
 
 
 std::string cedar::aux::unmangleName(const std::type_info& typeinfo)

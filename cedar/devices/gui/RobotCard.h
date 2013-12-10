@@ -52,6 +52,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <boost/signals2.hpp>
+#include <string>
 
 
 /*!@brief A class that displays an icon in the RobotCard widget.

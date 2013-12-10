@@ -43,6 +43,9 @@
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 
+// SYSTEM INCLUDES
+#include <algorithm>
+
 
 cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
 : mpWrapper(wrapper)
