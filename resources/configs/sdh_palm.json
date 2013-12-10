@@ -1,0 +1,61 @@
+{
+	"name": "SDH palm",
+	"root coordinate frame":
+	{
+		"initial translation":
+		[
+			"0.0",
+			"0.0",
+			"0.0"
+		],
+		"initial rotation":
+		[
+			"1.0", "0.0", "0.0",
+			"0.0", "1.0", "0.0",
+			"0.0", "0.0", "1.0"
+		]
+	},
+	"end-effector coordinate frame":
+	{
+		"initial translation":
+		[
+			"0.0",
+			"0.0",
+			"0.1"
+		],
+		"initial rotation":
+		[
+			"1.0", "0.0", "0.0",
+			"0.0", "1.0", "0.0",
+			"0.0", "0.0", "1.0"
+	]
+	},
+    "joints":
+    {
+        "cedar.dev.KinematicChain.Joint":
+        {
+	"angle limits":
+	        {
+				"lower limit": "-3.1415927",
+				"upper limit": "3.1415927"
+			},
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
+			},
+			"position":
+			[
+				"0.0", 
+				"0.0",
+				"0.0"
+			],
+			"axis":
+			[
+				"0.0", 
+				"1.0",
+				"0.0"
+			]
+		}
+	}
+}
