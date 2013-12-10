@@ -289,7 +289,7 @@ void cedar::dev::SerialChannel::readCompleted
   {
     // Bug in OS X, it might be necessary to repeat the setup
     // http://osdir.com/ml/lib.boost.asio.user/2008-08/msg00004.html
-    setupReceiver();
+    // non-existant: setupReceiver();
 
     return;
   }
