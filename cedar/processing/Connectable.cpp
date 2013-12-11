@@ -96,23 +96,61 @@ void cedar::proc::Connectable::clearDataSlots()
 
 void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& name)
 {
-  QWriteLocker locker(this->mpConnectionLock);
-  std::map<DataRole::Id, SlotMap>::iterator map_iter;
+  QReadLocker read_locker(this->mpConnectionLock);
 
-  map_iter = this->mSlotMaps.find(role);
+  auto map_iter = this->mSlotMaps.find(role);
   if (map_iter == this->mSlotMaps.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "The step has not slots of the given role.");
+    CEDAR_THROW
+    (
+      cedar::proc::InvalidRoleException,
+      "The connectable \"" + this->getName() + "\" has not slots of the given role."
+    );
   }
 
   SlotMap& slot_map = map_iter->second;
-  SlotMap::iterator slot_map_iter = slot_map.find(name);
+  auto slot_map_iter = slot_map.find(name);
   if (slot_map_iter == slot_map.end())
   {
-    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot of the name \"" + name + "\" found.");
+    CEDAR_THROW
+    (
+      cedar::aux::InvalidNameException,
+      "No slot of the name \"" + name + "\" was found in \"" + this->getName() + "\"."
+    );
   }
 
   cedar::proc::DataSlotPtr slot = slot_map_iter->second;
+
+  read_locker.unlock();
+
+  // first, disconnect all connections from the slot
+  if (this->getNetwork())
+  {
+    switch (role)
+    {
+      case cedar::proc::DataRole::INPUT:
+        this->getNetwork()->disconnectInputSlot
+                            (
+                              boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
+                            );
+        break;
+
+      case cedar::proc::DataRole::OUTPUT:
+        this->getNetwork()->disconnectOutputSlot
+                            (
+                              boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
+                            );
+        break;
+
+      default:
+        // nothing to do for other types
+        break;
+    }
+  }
+
+
+  // then, actually remove the slot
+  QWriteLocker locker(this->mpConnectionLock);
   slot_map.erase(slot_map_iter);
 
   // remove the slot's data from the lock set (if any)
@@ -155,30 +193,6 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   }
 
   locker.unlock();
-
-  if (this->getNetwork())
-  {
-    switch (role)
-    {
-      case cedar::proc::DataRole::INPUT:
-        this->getNetwork()->disconnectInputSlot
-                            (
-                              boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
-                            );
-        break;
-
-      case cedar::proc::DataRole::OUTPUT:
-        this->getNetwork()->disconnectOutputSlot
-                            (
-                              boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
-                            );
-        break;
-
-      default:
-        // nothing to do for other types
-        break;
-    }
-  }
 
   this->mSlotRemoved(role, name);
 }
