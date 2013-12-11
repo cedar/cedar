@@ -369,8 +369,7 @@ void cedar::proc::gui::GraphicsBase::setHighlightMode(cedar::proc::gui::Graphics
 
 QRectF cedar::proc::gui::GraphicsBase::boundingRect() const
 {
-  qreal padding = static_cast<qreal>(1.0);
-  return QRectF(QPointF(-padding, -padding), QSizeF(this->width() + padding, this->height() + padding));
+  return QRectF(QPointF(0, 0), QSizeF(this->width(), this->height()));
 }
 
 bool cedar::proc::gui::GraphicsBase::canConnect() const
