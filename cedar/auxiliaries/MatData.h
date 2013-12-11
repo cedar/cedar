@@ -125,7 +125,7 @@ public:
 
   //! Returns the value of the contained (two-dimensional) matrix at the given location
   template <typename ReturnT>
-  ReturnT getValue(int row, int col)
+  ReturnT getValue(int row, int col) const
   {
     cedar::aux::math::getMatrixEntry<ReturnT>(this->getData(), row, col);
   }
