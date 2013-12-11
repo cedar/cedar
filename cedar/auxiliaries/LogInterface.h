@@ -38,7 +38,10 @@
 #define CEDAR_AUX_LOG_INTERFACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/LogLevel.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LogInterface.fwd.h"
 
 // SYSTEM INCLUDES
 

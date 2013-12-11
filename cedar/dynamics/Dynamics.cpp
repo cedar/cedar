@@ -44,7 +44,6 @@
 #include "cedar/processing/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

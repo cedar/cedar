@@ -65,6 +65,7 @@
 #include <QLinearGradient>
 #include <QPalette>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
@@ -221,7 +222,7 @@ void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double m
   double log = std::log10(diff);
   if (log < 0)
   {
-    precision = std::max(precision, static_cast<int>(std::round(std::abs(log))));
+    precision = std::max(precision, static_cast<int>(cedar::aux::math::round(std::abs(log))));
   }
   this->mpMin->setText(QString("%1").arg(min, 0, 'g', precision));
   this->mpMax->setText(QString("%1").arg(max, 0, 'g', precision));

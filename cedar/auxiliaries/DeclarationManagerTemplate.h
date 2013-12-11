@@ -41,11 +41,19 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Log.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/DeclarationManagerTemplate.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
+#include "cedar/auxiliaries/PluginDeclarationTemplate.fwd.h"
+
 // SYSTEM INCLUDES
+#include <map>
+#include <vector>
+#include <set>
+#include <string>
 
 /*!@brief A template for manager of plugin declarations.
  *

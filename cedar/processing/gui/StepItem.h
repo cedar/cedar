@@ -44,18 +44,26 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/EnumType.h"
+
+// FORWARD DECLARATION
+#include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/PlotWidget.fwd.h"
+#include "cedar/processing/gui/StepItem.fwd.h"
+#include "cedar/processing/gui/TriggerItem.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
 #include <QGraphicsSvgItem>
 #include <QIcon>
 #include <QObject>
+#include <utility>
+#include <vector>
 #include <map>
 
 
@@ -208,6 +216,8 @@ public:
 
   //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
+  //!@brief Sets a Decoration that shows that the step is registered in the recorder
+  void setRecorded(bool status);
 
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
@@ -216,11 +226,18 @@ public slots:
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
+  //!@brief handles name-change of the underlying step
+  void handleStepNameChanged();
+
   //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
   void removeChildWidget();
 
-  //!@brief closes all plots
+  //!@brief Closes all plots that were opened for this step.
   void closeAllPlots();
+
+  //!@brief toggles visibility of the plots this step has opened
+  void toggleVisibilityOfPlots();
+
 
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
@@ -394,6 +411,8 @@ private:
 
   //! SvgItem displaying the step's icon
   QGraphicsSvgItem* mpIconDisplay;
+
+  DecorationPtr mpRecordedDecoration;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

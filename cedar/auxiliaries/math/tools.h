@@ -40,13 +40,14 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <type_traits>
+#include <vector>
+#include <string>
 
 #if defined CEDAR_COMPILER_MSVC && _MSC_VER < 1600 // MSVC with a version greater than 1600 should come with the stdint header.
   typedef __int8 int8_t;
@@ -77,15 +78,12 @@
  *  some precompiler macros are also defined here
  */
 
+
 /* epsilon surrounding for near zero values */
 #ifndef EQN_EPS
 #define EQN_EPS 1e-9
 #endif
 
-//#ifndef IsZero
-//CEDAR_DECLARE_DEPRECATE_MACRO(IsZero)
-//#define IsZero(x) (IsZero_MACRO(),(x) > -EQN_EPS && (x) < EQN_EPS)
-//#endif
 namespace cedar
 {
   namespace aux

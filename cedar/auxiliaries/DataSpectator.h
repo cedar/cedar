@@ -41,11 +41,17 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/units/Time.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/DataSpectator.fwd.h"
+#include "cedar/auxiliaries/Recorder.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QTime>
 #include <string>
 #include <fstream>
+#include <list>
 
 /*!@brief The Recorder uses this class to observe the registered DataPtr.
  *        This class copies the observed DataPtr in each time step and stores the copy in a queue together with time
@@ -69,7 +75,7 @@ private:
   //!@brief A data structure to store all the DataPtr with time stamp (in ms) in a list.
   struct RecordData
   {
-    unsigned int mRecordTime;
+    cedar::unit::Time mRecordTime;
     cedar::aux::DataPtr mData;
   };
 
@@ -79,10 +85,10 @@ private:
 public:
   ~DataSpectator();
 private:
-  /*!@brief The private Constructor. Can only called by friend classes such as cedar::aux::Recorder. recordIntv should
-   * be passed in ms. name is a unique name for this DataPtr, so a file with this name can be created in the output
-   * dictionary.*/
-  DataSpectator(cedar::aux::ConstDataPtr toSpectate, int recordIntv, const std::string& name);
+  /*!@brief The private Constructor. Can only called by friend classes such as cedar::aux::Recorder. name is a unique
+   * name for this DataPtr, so a file with this name can be created in the output dictionary.
+   */
+  DataSpectator(cedar::aux::ConstDataPtr toSpectate, cedar::unit::Time recordInterval, const std::string& name);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -92,11 +98,13 @@ public:
   //!@brief Gets the DataPtr.
   cedar::aux::ConstDataPtr getData() const;
 
-  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written.
-  void applyStart();
+  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written. @todo: this is only called when the thread is started
+  //!todo: should be private, docu is wrong
+  void prepareStart();
 
   //!@brief Stops the DataSpactator. Before stopping all RecordDatas in the queue will be written to disk.
-  void applyStop(bool suppressWarning);
+  //!todo: should be private, docu is wrong
+  void processStop(bool suppressWarning);
 
   //!@brief Gets the unique Name.
   const std::string& getName() const;
@@ -105,7 +113,11 @@ public:
   void setName(const std::string& name);
 
   //!@brief Returns the record interval for this DataPtr.
-  int getRecordIntervalTime() const;
+  cedar::unit::Time getRecordIntervalTime() const;
+
+  //!@brief Makes a snapshot of the data.
+  void makeSnapshot();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -117,7 +129,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief Calls record() each time step. Inherited from Looped Thread.
-  void step(double time);
+  void step(cedar::unit::Time time);
 
   //!@brief Writes the header for the DataPtr to the output file.
   void writeHeader();

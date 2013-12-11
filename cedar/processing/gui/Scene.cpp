@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Network.h"
@@ -69,6 +70,8 @@
 #include <QSvgGenerator>
 #include <QToolTip>
 #include <iostream>
+#include <set>
+#include <list>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -85,6 +88,8 @@ mpMainWindow(pMainWindow),
 mSnapToGrid(false),
 mpConfigurableWidget(NULL)
 {
+  mMousePosX = 0;
+  mMousePosY = 0;
   // connect signals/slots
   QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 }
@@ -151,7 +156,7 @@ void cedar::proc::gui::Scene::itemSelected()
   else
   {
     this->mpConfigurableWidget->resetContents();
-    this->mpRecorderWidget->resetContents();
+    this->mpRecorderWidget->clearLayout();
   }
 }
 
@@ -176,6 +181,7 @@ void cedar::proc::gui::Scene::reset()
   this->mTriggerMap.clear();
   this->mNetworkMap.clear();
   this->mElementMap.clear();
+  this->mStickyNotes.clear();
 }
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
@@ -201,6 +207,7 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
 void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
+  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
 }
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
@@ -302,6 +309,8 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
       QGraphicsScene::mouseMoveEvent(pMouseEvent);
       break;
   }
+  this->mMousePosX = pMouseEvent->scenePos().x();
+  this->mMousePosY = pMouseEvent->scenePos().y();
 }
 
 
@@ -528,6 +537,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
+  QAction *p_addSickyNode = menu.addAction("add sticky note");
+  menu.addSeparator();
   QAction *p_reset = menu.addAction("reset network");
 
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
@@ -538,6 +549,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     {
       p_ide->resetRootNetwork();
     }
+  }
+  if (a == p_addSickyNode)
+  {
+    this->addStickyNote();
   }
   else if (a != NULL)
   {
@@ -966,10 +981,6 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
-
-  //unregister this step in th recorder
-  //!@todo This is misplaced. If a step needs to be unregistered, that should happen in the destructor of proc::Step.
-  this->mpRecorderWidget->unregister(pStep->getStep());
 }
 
 cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()
@@ -1032,4 +1043,34 @@ void cedar::proc::gui::Scene::selectNone()
   {
     selected_items.at(i)->setSelected(false);
   }
+}
+void cedar::proc::gui::Scene::addStickyNote()
+{
+  this->addStickyNote(mMousePosX, mMousePosY, 120, 70, "");
+}
+
+void cedar::proc::gui::Scene::addStickyNote(int x, int y, int witdh, int height, std::string text)
+{
+  cedar::proc::gui::StickyNote* note = new cedar::proc::gui::StickyNote(this, x, y, witdh, height, text);
+  mStickyNotes.push_back(note);
+  this->addItem(note);
+}
+
+
+void cedar::proc::gui::Scene::removeStickyNote(StickyNote* note)
+{
+  for (auto it = mStickyNotes.begin(); it != mStickyNotes.end(); it++)
+  {
+    if ((*it) == note)
+    {
+      mStickyNotes.erase(it);
+      break;
+    }
+  }
+  this->removeItem(note);
+}
+
+const std::vector<cedar::proc::gui::StickyNote* > cedar::proc::gui::Scene::getStickyNotes() const
+{
+  return this->mStickyNotes;
 }

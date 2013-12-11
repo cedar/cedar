@@ -38,10 +38,13 @@
 #define CEDAR_PROC_STEPS_MATRIX_MULTIPLY_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/MatrixMultiply.fwd.h"
 
 // SYSTEM INCLUDES
 

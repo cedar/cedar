@@ -36,8 +36,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/steps/Projection.h"
+#include "cedar/processing/ProjectionMapping.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Arguments.h"

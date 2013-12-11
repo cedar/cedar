@@ -20,6 +20,8 @@
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -235,7 +237,7 @@ int main(int argc, char* argv[])
         std::cout << "." << std::flush;
       }
     }
-    cedar::aux::sleep(cedar::unit::Milliseconds(100));
+    cedar::aux::sleep(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::second));
   }
 
   std::cout << std::endl;

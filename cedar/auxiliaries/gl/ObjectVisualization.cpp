@@ -35,15 +35,15 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
- #include <QTextStream>
- #include <QFile>
+#include <QTextStream>
+#include <QFile>
+#include <iostream>
 
 const float cedar::aux::gl::ObjectVisualization::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
 

@@ -46,13 +46,14 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/annotation/DiscreteMetric.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
-#include <vector>
 #ifndef Q_MOC_RUN
   #include <boost/make_shared.hpp>
 #endif
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -354,7 +355,7 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
       d_dot -= this->mCosSignalInput->getData();
     }
 
-    d += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_dot;
+    d += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_dot;
 
     cv::Mat& dm = this->mMemoryNodes.at(i)->getData();
     const float& hm = this->_mMemoryNodeRestingLevel->getValue();
@@ -367,7 +368,7 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
                     + c5 * (sum_of_memory_outputs - f_dm)
                     + c6 * f_d;
 
-    dm += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * dm_dot;
+    dm += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * dm_dot;
 
     // save a copy of the output in the buffer
     //!@todo this is only needed because we don't have any nice way to plot all the discrete values yet

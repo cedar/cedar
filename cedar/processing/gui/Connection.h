@@ -42,8 +42,12 @@
 #define CEDAR_PROC_GUI_CONNECTION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/ConnectValidity.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/Connection.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsPathItem>
@@ -96,6 +100,9 @@ public:
 
   //! Returns true if this is a trigger connection.
   bool isTriggerConnection() const;
+
+  //! define a custom shape of this object, which doesn't add a filled region between line parts
+  QPainterPath shape() const;
 
 public slots:
   //!@brief update the position of this connection, depending on anchor points of source and target

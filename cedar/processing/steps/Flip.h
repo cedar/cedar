@@ -38,10 +38,13 @@
 #define CEDAR_PROC_STEPS_FLIP_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/BoolVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Flip.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -67,19 +70,19 @@ public:
 public slots:
   //!@brief this slot triggers the step and is called every time a parameter changes
   void flipDirectionsChanged();
+
+  /*! Returns whether the given dimension is set to be flipped.
+   *
+   * @throws cedar::aux::IndexOutOfRangeException if the dimension exceeds the dimension of the input.
+   */
+  bool isDimensionFlipped(unsigned int dimension) const
+       throw (cedar::aux::IndexOutOfRangeException, cedar::aux::FailedAssertionException);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
-
-  //!@brief Determines whether the data item can be connected to the slot.
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::ConstDataPtr data
-                                  ) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -87,6 +90,11 @@ protected:
 private:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
+
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  void flip2D(cv::Mat input, cv::Mat& output, bool flipFirst, bool flipSecond) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -98,15 +106,14 @@ protected:
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
 private:
+  void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Should this step flip along the first dimension?
-  cedar::aux::BoolParameterPtr _mFlipFirstDimension;
-  //!@brief Should this step flip along the second dimension?
-  cedar::aux::BoolParameterPtr _mFlipSecondDimension;
+  //! Vector of bools allowing the user to select which dimensions are to be flipped.
+  cedar::aux::BoolVectorParameterPtr _mFlipDimensions;
 
 private:
 

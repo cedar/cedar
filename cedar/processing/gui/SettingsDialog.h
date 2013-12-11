@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/ui_SettingsDialog.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/SettingsDialog.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDialog>

@@ -38,10 +38,13 @@
 #define CEDAR_DYN_SPACE_TO_RATE_CODE_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/TimeParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/dynamics/steps/SpaceToRateCode.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -90,13 +93,13 @@ public:
   }
 
   //!@brief convenience function for accessing tau
-  inline double getTau() const
+  inline const cedar::unit::Time& getTau() const
   {
     return this->_mTau->getValue();
   }
 
   //!@brief convenience function for setting tau
-  inline void setTau(double tau)
+  inline void setTau(const cedar::unit::Time& tau)
   {
     this->_mTau->setValue(tau);
   }
@@ -155,7 +158,7 @@ protected:
   cedar::aux::DoubleParameterPtr _mUpperLimit;
   
   //!@brief the relaxation parameter of the dynamical system
-  cedar::aux::DoubleParameterPtr _mTau;
+  cedar::aux::TimeParameterPtr _mTau;
 
 private:
 

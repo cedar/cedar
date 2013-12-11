@@ -38,7 +38,7 @@
 #define CEDAR_AUX_GL_SPHERE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Sphere.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES

@@ -38,7 +38,6 @@
 #define CEDAR_PROC_CONNECTABLE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
@@ -47,11 +46,17 @@
 #include "cedar/auxiliaries/Lockable.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/Step.fwd.h"
+
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/signals2/connection.hpp>
 #endif
 #include <vector>
+#include <map>
 
 /*!@brief   An interface for classes that have data slots that can be connected.
  *
@@ -98,9 +103,9 @@ public:
   //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
-  //!@brief Returns if Connectable has data of a specific role.
-  //!@param role the specified role
-  bool hasRole(DataRole::Id role);
+  //!@brief Returns whether this connectable has a slot of the given role.
+  //!@todo Rename this to hasSlotForRole.
+  bool hasRole(cedar::proc::DataRole::Id role) const;
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
@@ -360,6 +365,10 @@ protected:
 
     return iter->second;
   }
+
+  /*!@brief Removes all declared data slots.
+   */
+  void clearDataSlots();
 
   /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
    *        changed.

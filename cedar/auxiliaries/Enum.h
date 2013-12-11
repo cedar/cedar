@@ -38,7 +38,9 @@
 #define CEDAR_AUX_ENUM_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Enum.fwd.h"
 
 // SYSTEM INCLUDES
 #include <map>

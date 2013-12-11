@@ -47,13 +47,16 @@ endif(CEDAR_USE_LIB_DC1394)
 
 cedar_add_library(cedardev
                   MOC_HEADERS
-                  robot/gui/KinematicChainWidget.h
-                  robot/gui/KinematicChainMonitorWidget.h
-                  robot/gui/KinematicChainCommandWidget.h
-                  robot/gui/MountedCameraViewer.h
+                  SerialChannel.h
+                  Odometry.h
+                  gui/KinematicChainWidget.h
+                  gui/KinematicChainMonitorWidget.h
+                  gui/KinematicChainCommandWidget.h
+                  gui/ComponentParameter.h
+                  gui/RobotManager.h
+                  gui/RobotCard.h
+                  gui/MountedCameraViewer.h
                   kteam/gui/DriveControlWidget.h
-                  communication/SerialCommunication.h
-                  communication/gui/CommunicationWidget.h
                   sensors/visual/VideoGrabber.h
                   sensors/visual/PictureGrabber.h
                   sensors/camera/Grabber.h
@@ -61,6 +64,8 @@ cedar_add_library(cedardev
                   sensors/camera/CamProperty.h
                   sensors/camera/Properties.h
                   ${kuka_moc_files}
+				  RESOURCES
+				  gui/cedar_dev_gui_icons.qrc
                   LINK_LIBRARIES
                   cedaraux
                   ${linked_libs}

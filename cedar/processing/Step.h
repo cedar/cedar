@@ -42,13 +42,15 @@
 #define CEDAR_PROC_STEP_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/units/Time.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/BoolParameter.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QThread>
@@ -60,6 +62,8 @@
 #endif
 #include <map>
 #include <set>
+#include <utility>
+#include <vector>
 
 
 /*!@brief This class represents a processing step in the processing framework.
@@ -126,7 +130,7 @@ public:
 
   /*!@brief Sets the arguments used by the next execution of the run function.
    */
-  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments);
+  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
@@ -189,6 +193,8 @@ public:
   {
     return this->mBusy;
   }
+
+  bool isRecorded() const;
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -345,6 +351,7 @@ private:
    *
    */
   void callInputConnectionChanged(const std::string& slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -361,6 +368,9 @@ private:
   //!@brief The arguments for the next cedar::proc::Step::compute call.
   ConstArgumentsPtr mNextArguments;
 
+  //! Whether or not subseqent steps should be triggered after the next arguments have been processed.
+  bool mTriggerSubsequent;
+
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 
@@ -368,13 +378,13 @@ private:
   ActionMap mActions;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mMovingAverageIterationTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mMovingAverageIterationTime;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mLockingTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mLockingTime;
 
   //!@brief Moving average of the time between compute calls.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mRoundTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mRoundTime;
 
   clock_t mLastComputeCall;
 

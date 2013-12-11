@@ -42,7 +42,6 @@
 #define CEDAR_PROC_ELEMENT_DECLARATION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/PlotData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -51,10 +50,16 @@
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/ElementDeclaration.fwd.h"
+#include "cedar/processing/ElementDeclarationTemplate.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QIcon>
 #include <QResource>
 #include <vector>
+#include <string>
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
@@ -119,6 +124,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  std::string getPluginType() const
+  {
+    return "processing step";
+  }
+
   //!@brief set path to icon included in the graphical representation of this element
   void setIconPath(const std::string& path)
   {
@@ -247,6 +257,8 @@ private:
 
 
 /*!@brief This is a template class for comfortably generating element declarations.
+ *
+ * @todo This class should get its own header file
  */
 template <class DerivedClass>
 class cedar::proc::ElementDeclarationTemplate

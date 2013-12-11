@@ -39,18 +39,18 @@
 #ifndef CEDAR_PROC_STEPS_TRANSFER_FUNCTION_H
 #define CEDAR_PROC_STEPS_TRANSFER_FUNCTION_H
 
-// LOCAL INCLUDES
-#include "cedar/processing/steps/namespace.h"
-
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/Step.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/TransferFunction.fwd.h"
+
+// SYSTEM INCLUDES
 
 
 /*!@brief Applies a transfer function to its input.
