@@ -685,7 +685,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
     {
       for
       (
-        cedar::proc::Network::DataConnectionVector::const_iterator it = old_network->getDataConnections().begin();
+        cedar::proc::Network::DataConnectionVector::iterator it = old_network->mDataConnections.begin();
         it != old_network->getDataConnections().end();
         ++it
       )
@@ -693,21 +693,41 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
         // find connections that we have to restore after moving elements
         cedar::proc::ElementPtr source = old_network->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
         cedar::proc::ElementPtr target = old_network->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
-        iterator source_it = std::find(elements.begin(), elements.end(), source);
-        iterator target_it = std::find(elements.begin(), elements.end(), target);
+        auto source_it = std::find(elements.begin(), elements.end(), source);
+        auto target_it = std::find(elements.begin(), elements.end(), target);
+
+        cedar::proc::DataSlotPtr source_slot = (*it)->getSource();
+        std::vector<cedar::proc::DataSlotPtr> target_slots;
 
         // these connections connect elements that are moved
         if (source_it != elements.end() || target_it != elements.end())
         {
           // this connection must be stored (note that connections are automatically deleted if elements are removed)
-          data_connections.push_back
-          (
-            DataConnectionInfo
+          if (source_it == elements.end())
+          {
+            source_slot = old_network->getRealSource(*it, boost::dynamic_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
+            target_slots.push_back((*it)->getTarget());
+          }
+          else if (target_it == elements.end())
+          {
+            auto more_slots = old_network->getRealTargets(*it, boost::dynamic_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
+            target_slots.insert(target_slots.end(), more_slots.begin(), more_slots.end());
+          }
+          else
+          {
+            target_slots.push_back((*it)->getTarget());
+          }
+          for (unsigned i = 0; i < target_slots.size(); ++i)
+          {
+            data_connections.push_back
             (
-              (*it)->getSource(),
-              (*it)->getTarget()
-            )
-          );
+              DataConnectionInfo
+              (
+                source_slot,
+                target_slots.at(i)
+              )
+            );
+          }
         }
       }
     }
@@ -2112,28 +2132,57 @@ std::vector<cedar::proc::DataSlotPtr> cedar::proc::Network::getRealTargets
   std::vector<cedar::proc::DataSlotPtr> real_targets;
   if (this != targetNetwork.get())
   {
-    std::vector<cedar::proc::DataConnectionPtr> connections;
-    this->getNetwork()->getDataConnections
-                        (
-                          boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
-                          connection->getTarget()->getParent(),
-                          connections
-                        );
-    for (unsigned int i = 0; i < connections.size(); ++i)
+    if (this->contains(targetNetwork)) // going down the hierarchy
     {
       if
       (
         cedar::proc::StepPtr step
-          = this->getNetwork()->getElement<cedar::proc::Step>(connections.at(0)->getTarget()->getParent())
+          = this->getElement<cedar::proc::Step>(connection->getTarget()->getParent())
       )
       {
-        real_targets.push_back(step->getInputSlot(connections.at(i)->getTarget()->getName()));
+        real_targets.push_back(step->getInputSlot(connection->getTarget()->getName()));
       }
       else
       {
-        std::vector<cedar::proc::DataSlotPtr> more_targets
-          = this->getNetwork()->getRealTargets(connections.at(i), targetNetwork);
-        real_targets.insert(real_targets.end(), more_targets.begin(), more_targets.end());
+        std::vector<cedar::proc::DataConnectionPtr> connections;
+        cedar::proc::NetworkPtr nested = this->getElement<cedar::proc::Network>(connection->getTarget()->getParent());
+        nested->getDataConnections
+                (
+                  nested->getElement<cedar::proc::Step>(connection->getTarget()->getName()),
+                  "output",
+                  connections
+                );
+        for (unsigned int i = 0; i < connections.size(); ++i)
+        {
+          auto more_targets = nested->getRealTargets(connections.at(i), targetNetwork);
+          real_targets.insert(real_targets.end(), more_targets.begin(), more_targets.end());
+        }
+      }
+    }
+    else
+    {
+      std::vector<cedar::proc::DataConnectionPtr> connections;
+      this->getNetwork()->getDataConnections
+                          (
+                            boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
+                            connection->getTarget()->getParent(),
+                            connections
+                          );
+      for (unsigned int i = 0; i < connections.size(); ++i)
+      {
+        if
+        (
+          cedar::proc::StepPtr step
+            = this->getNetwork()->getElement<cedar::proc::Step>(connections.at(0)->getTarget()->getParent())
+        )
+        {
+          real_targets.push_back(step->getInputSlot(connections.at(i)->getTarget()->getName()));
+        }
+        else
+        {
+          auto more_targets = this->getNetwork()->getRealTargets(connections.at(i), targetNetwork);
+          real_targets.insert(real_targets.end(), more_targets.begin(), more_targets.end());
+        }
       }
     }
   }
@@ -2152,25 +2201,52 @@ cedar::proc::DataSlotPtr cedar::proc::Network::getRealSource
 {
   if (this != targetNetwork.get())
   {
-    std::vector<cedar::proc::DataConnectionPtr> connections;
-    this->getNetwork()->getDataConnections
-                        (
-                          boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
-                          connection->getSource()->getParent(),
-                          connections
-                        );
-    CEDAR_ASSERT(connections.size() == 1);
-    if
-    (
-      cedar::proc::StepPtr step
-        = this->getNetwork()->getElement<cedar::proc::Step>(connections.at(0)->getSource()->getParent())
-    )
+    if (this->contains(targetNetwork)) // going down the hierarchy
     {
-      return step->getOutputSlot(connections.at(0)->getSource()->getName());
+      if
+      (
+        cedar::proc::StepPtr step
+          = this->getElement<cedar::proc::Step>(connection->getSource()->getParent())
+      )
+      {
+        return step->getOutputSlot(connection->getSource()->getName());
+      }
+      else
+      {
+        std::vector<cedar::proc::DataConnectionPtr> connections;
+        cedar::proc::NetworkPtr nested = this->getElement<cedar::proc::Network>(connection->getSource()->getParent());
+        nested->getDataConnections
+                (
+                  nested->getElement<cedar::proc::Step>(connection->getSource()->getName()),
+                  "input",
+                  connections
+                );
+        CEDAR_ASSERT(connections.size() == 1);
+        return nested->getRealSource(connections.at(0), targetNetwork);
+      }
     }
-    else
+    else // going up the hierarchy
     {
-      return this->getNetwork()->getRealSource(connections.at(0), targetNetwork);
+      std::vector<cedar::proc::DataConnectionPtr> connections;
+      this->getNetwork()->getDataConnections
+                          (
+                            boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
+                            connection->getSource()->getParent(),
+                            connections
+                          );
+      CEDAR_ASSERT(connections.size() == 1);
+      if
+      (
+        cedar::proc::StepPtr step
+          = this->getNetwork()->getElement<cedar::proc::Step>(connections.at(0)->getSource()->getParent())
+      )
+      {
+        return step->getOutputSlot(connections.at(0)->getSource()->getName());
+      }
+      else
+      {
+        return this->getNetwork()->getRealSource(connections.at(0), targetNetwork);
+      }
     }
   }
   else
