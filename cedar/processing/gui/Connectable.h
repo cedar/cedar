@@ -182,6 +182,10 @@ public:
 
   const cedar::proc::gui::Connectable::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role) const;
 
+public slots:
+  void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
+  void reactToSlotAdded(cedar::proc::DataRole::Id role, QString name);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -221,6 +225,9 @@ protected:
 private:
   void itemSelected(bool selected);
 
+signals:
+  void reactToSlotRemovedSignal(cedar::proc::DataRole::Id role, QString name);
+  void reactToSlotAddedSignal(cedar::proc::DataRole::Id role, QString name);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
