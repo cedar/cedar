@@ -259,6 +259,13 @@ public:
    */
   void connectSlots(const std::string& source, const std::string& target);
 
+  /*!@brief Connects data slots of two cedar::proc::Connectable elements.
+   *
+   * @param source Source data slot.
+   * @param target Target data slot.
+   */
+  void connectSlots(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target);
+
   /*!@brief Connects a cedar::proc::Trigger to a cedar::proc::Triggerable.
    *
    *        When the two elements are connected successfully, then target's onTrigger method is called every time source
@@ -312,6 +319,7 @@ public:
    * @param source         The connectable source.
    * @param sourceDataName The name of the slot from which to look list outgoing connections.
    * @param connections    Vector into which the connections are written.
+   * @todo there is a const version of this function with duplicated code - not trivial since vector is const as well
    */
   void getDataConnections(
                            cedar::proc::ConnectablePtr source,
@@ -545,14 +553,22 @@ private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
-  std::vector<std::string> getRealTargets
+  std::vector<cedar::proc::DataSlotPtr> getRealTargets
+                                        (
+                                          cedar::proc::DataConnectionPtr connection,
+                                          cedar::proc::ConstNetworkPtr targetNetwork
+                                        );
+
+  cedar::proc::DataSlotPtr getRealSource
                            (
-                             cedar::proc::ConstDataConnectionPtr connection,
-                             cedar::proc::ConstNetworkPtr target_network
-                           ) const;
+                             cedar::proc::DataConnectionPtr connection,
+                             cedar::proc::ConstNetworkPtr targetNetwork
+                           );
 
 
-  void deleteConnectorsAlongConnection(cedar::proc::DataConnectionPtr connection);
+  void deleteConnectorsAlongConnection(cedar::proc::DataConnectionPtr connection, cedar::proc::ConstNetworkPtr targetNetwork);
+
+  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
