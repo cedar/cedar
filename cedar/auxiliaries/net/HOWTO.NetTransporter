@@ -1,0 +1,186 @@
+SIMPLE USE CASES:
+=================
+(see a complete example at the end of the file)
+
+I want to write data over the network:
+--------------------------------------
+
+#include <auxiliaries/net/Writer.h>
+
+  cv::Mat mat= ...; // we will send this matrix over the network
+  cedar::aux::net::Writer<cv::Mat> writer("mychannel"); // this is our writer class
+
+  // ...
+
+  writer.write(mat);
+
+
+I want to read the same data from the network:
+----------------------------------------------
+
+#include <auxiliaries/net/Reader.h>
+  
+  cv::Mat mat;
+  cedar::aux::net::Reader<cv::Mat> reader("mychannel");
+
+  mat= reader.read();
+
+  // Please make sure that your Writer and Reader use the same
+  // 'channel'!
+
+
+
+Please adhere to the complete examples at the end of this file for
+truly robust real-life code.
+
+FAQ:
+====
+
+Question: What datatypesupport are supported?
+---------------------------------------
+
+As you can see the Readers and Writers are template classes. They
+can only be used with variable types for which support has been programmed
+in. These are at the moment:
+
+  - int, char, short, long (all also unsigned), float, double, bool
+  - cv::Mat
+  - cv::Mat_<float> 
+  - std::string
+  - ... more to be added at your request ...
+
+
+Question: How does the transport work?
+--------------------------------------
+
+The Writer/Readers use the YARP library internally, but are designed
+to transparently wrap around YARP, so you don't need to worry about YARP.
+
+Note, that if you will need an additional 'yarp server' started. It is
+adviseable to have just one dedicated 'yarp server' running for your local
+network, as conflicts may appear otherwise.
+
+At the moment, we use mcast as network protocoll. Even for machine-local
+transport. Note: Mcast ist a stateless protocoll, so messages may be lost.
+This is a intentional trade-off.
+
+
+Question: When does my data leave the machine/arrive?
+-----------------------------------------------------
+
+The Writer and Reader are internally buffered, which means that
+the read() and write() functions may(!) return before the data has actually
+left the machine or may be buffered until you call read() to get the data.
+
+The readers especially only have a buffer-size of one and will only
+hold the newest arrived data.
+
+Question: The unit tests for the YARP net transporter fail!
+------------------------------------------------------------
+
+Do you have a YARP nameserver running? You need to set one up.
+
+Also, try this in a console:
+  yarp conf --clean
+  yarp detect --write
+
+
+Question: The 'channel's I define are not the ones I see YARP using
+-------------------------------------------------------------------
+You have to pass a 'channel'-name-string to the constructors of the
+Writer/Reader. These are also called 'ports's in YARP nomenclature.
+
+The Writer/Reader classes internally rename your 'channels', adding
+prefixes and suffixes to administer the different dispersed readers that
+listen to a YARP port.
+
+YARP does internally resolve port naming conflicts (of Readers).
+
+
+Question: What different types of readers are there:
+----------------------------------------------------
+The BlockingReader ... class blocks the execution of your code until
+                      input arrives over its channel, while the ...
+    Reader         ... class (Reader.h) does not block, 
+                      but will throw an
+                      NetUnexpectedDataException when there is no
+                      data available. See below.
+
+
+Question: What about exceptions:
+--------------------------------
+The readers may throw the following exceptions which you may want to
+catch and react to in your code:
+
+#include <auxiliaries/net/exceptions.h>
+
+  NetUnexpectedDataException: Will be thrown when there was no data
+      on the channel (for the non-blocking Reader only)
+      OR some transmission error occurred. It signals you that the
+      return value of read() is unuseable.
+      You will want to catch this to write robust code.
+
+  NetWaitingForWriterException: Will be thrown if you read the
+      reader class before the (remote) writer class was instantiated
+      (i.e. we cannot connect channels/ports yet).
+      You will want to catch this to implement a polling behaviour to 
+      wait for the writer channel.
+
+Both reader and writer will throw:
+
+  NetMissingRessourceException: Which will typically be thrown if 
+      YARP could not be initialized properly.
+
+A COMPLETE EXAMPLE:
+===================
+
+#include <auxiliaries/net/Writer.h>
+#include <auxiliaries/net/BlockingReader.h>
+#include <auxiliaries/net/exceptions.h>
+
+  // ...
+
+  // instantiate reader class
+  try 
+  {
+    cedar::aux::net::Reader<cv::Mat> reader("mychannel");
+  }
+  catch (cedar::aux::net::NetMissingRessourceException &e)
+  {
+    // somehow YARP doesnt work ... :( typically fatal.
+    exit(1);
+  }
+
+  // ...
+
+  // read the data over the network
+  while (1)
+  {
+    try
+    {
+      mat= reader.read(); // note: we don't use a blocking reader
+    }
+    catch (cedar::aux::net::NetWaitingForWriterException &e)
+    {
+      // wait for remote writer to be initialized ...
+      sleep(2); // 2 seconds
+      continue;
+    }
+    catch (cedar::aux::net::NetUnexpectedDataException &e)
+    {
+      // invalid or corrupted data, ignore
+      // OR no new valid data yet
+      
+      break; // mat is unuseable, mark it as such somehow in your code
+    }
+    catch (cedar::aux::net::NetMissingRessourceException &e)
+    {
+      // somehow YARP doesnt work ... :( typically fatal.
+      exit(1);
+    }
+
+    break; // mat holds the valid new result
+  }
+
+
+
