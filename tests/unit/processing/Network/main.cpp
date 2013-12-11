@@ -257,8 +257,29 @@ int main(int /* argc */, char** /* argv */)
   network_connector->disconnectSlots("1.output", "2.input");
   list.erase(list.begin());
   network_root->add(list);
-//  network_root->disconnectSlots("0.output", "nested.1 input");
-//  network_root->disconnectSlots("nested.2 output", "3.input");
+
+  // next test
+  network_connector.reset();
+  network_root.reset();
+  network_root = cedar::proc::NetworkPtr(new cedar::proc::Network());
+  network_root->setName("root");
+  network_connector = cedar::proc::NetworkPtr(new cedar::proc::Network());
+  network_connector->setName("nested");
+  cedar::proc::NetworkPtr network_connector_2(new cedar::proc::Network());
+  network_connector_2->setName("nested 2");
+  network_root->add(network_connector);
+  network_connector->add(network_connector_2);
+  cedar::proc::steps::StaticGainPtr gain_out(new cedar::proc::steps::StaticGain());
+  network_root->add(gain_out, "out");
+  cedar::proc::steps::StaticGainPtr gain_in(new cedar::proc::steps::StaticGain());
+  network_root->add(gain_in, "in");
+  network_root->connectSlots("out.output", "in.input");
+  list.clear();
+  list.push_back(gain_out);
+  network_connector_2->add(list);
+  network_connector->add(list);
+  network_root->add(list);
+
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;

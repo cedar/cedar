@@ -84,6 +84,19 @@ mpIconDisplay(NULL),
 mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mInputOutputSlotOffset(static_cast<qreal>(0.0))
 {
+  this->connect
+        (
+          this,
+          SIGNAL(reactToSlotRemovedSignal(cedar::proc::DataRole::Id, QString)),
+          SLOT(reactToSlotRemoved(cedar::proc::DataRole::Id, QString))
+        );
+
+  this->connect
+        (
+          this,
+          SIGNAL(reactToSlotAddedSignal(cedar::proc::DataRole::Id, QString)),
+          SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString))
+        );
 }
 
 cedar::proc::gui::Connectable::~Connectable()
@@ -241,11 +254,21 @@ cedar::proc::gui::DataSlotItem const* cedar::proc::gui::Connectable::getSlotItem
 
 void cedar::proc::gui::Connectable::slotAdded(cedar::proc::DataRole::Id role, const std::string& name)
 {
-  this->addDataItemFor(this->getConnectable()->getSlot(role, name));
+  emit reactToSlotAddedSignal(role, QString::fromStdString(name));
+}
+
+void cedar::proc::gui::Connectable::reactToSlotAdded(cedar::proc::DataRole::Id role, QString name)
+{
+  this->addDataItemFor(this->getConnectable()->getSlot(role, name.toStdString()));
   this->updateAttachedItems();
 }
 
 void cedar::proc::gui::Connectable::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
+{
+  emit reactToSlotRemovedSignal(role, QString::fromStdString(name));
+}
+
+void cedar::proc::gui::Connectable::reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name)
 {
   cedar::proc::gui::DataSlotItem* p_item = NULL;
 
@@ -253,7 +276,7 @@ void cedar::proc::gui::Connectable::slotRemoved(cedar::proc::DataRole::Id role, 
   CEDAR_ASSERT(iter != this->mSlotMap.end());
 
   DataSlotNameMap& name_map = iter->second;
-  DataSlotNameMap::iterator name_iter = name_map.find(name);
+  DataSlotNameMap::iterator name_iter = name_map.find(name.toStdString());
 
   CEDAR_ASSERT(name_iter != name_map.end());
   p_item = name_iter->second;
