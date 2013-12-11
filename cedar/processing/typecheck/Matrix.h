@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,53 +22,68 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Normalization.h
+    File:        Matrix.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 10 18
+    Date:        2013 12 11
 
-    Description:
+    Description: Header file for the class cedar::proc::typecheck::Matrix.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_NORMALIZATION_H
-#define CEDAR_PROC_STEPS_NORMALIZATION_H
+#ifndef CEDAR_PROC_TYPECHECK_MATRIX_H
+#define CEDAR_PROC_TYPECHECK_MATRIX_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/typecheck/TypeCheck.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/processing/steps/Normalization.fwd.h"
+#include "cedar/processing/typecheck/Matrix.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief A step that normalizes its input according to a user-selected method.
+/*!@brief Typecheck that can perform various checks on a matrix.
+ *
+ *        Commonly, this is intended to test for combinations of matrix attributes, e.g., certain types and
+ *        dimensionalities.
  */
-class cedar::proc::steps::Normalization : public cedar::proc::Step
+class cedar::proc::typecheck::Matrix : public cedar::proc::typecheck::TypeCheck
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Normalization();
+  Matrix();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //! Add an accepted dimensionality. By default, all dimensionalities are accepted.
+  void addAcceptedDimensionality(unsigned int dimensionality);
+
+  //! Adds a range of dimensionalities to be accepted by the check.
+  void addAcceptedDimensionalityRange(unsigned int lowest, unsigned int highest);
+
+  //! Add an accepted matrix type. By default, all dimensionalities are accepted.
+  void addAcceptedType(int type);
+
+  //! Sets whether the matrix can be empty
+  void acceptsEmptyMatrix(bool accepts);
+
+  //! Performs the actual check.
+  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -80,38 +95,19 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-
-  void inputConnectionChanged(const std::string& inputName);
-
-private slots:
-  void normalizationTypeChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
-  // inputs
-  //! The input matrix
-  cedar::aux::ConstMatDataPtr mImage;
+  std::vector<unsigned int> mAcceptedDimensionalities;
 
-  // outputs
-  //! The normalized input.
-  cedar::aux::MatDataPtr mNormalizedImage;
+  std::vector<int> mAcceptedTypes;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+  bool mAcceptsEmptyMatrix;
 
-private:
-  //! The normalization type.
-  cedar::aux::EnumParameterPtr mNormalizationType;
+}; // class cedar::proc::typecheck::Matrix
 
-}; // class cedar::proc::steps::Normalization
+#endif // CEDAR_PROC_TYPECHECK_MATRIX_H
 
-#endif // CEDAR_PROC_STEPS_NORMALIZATION_H

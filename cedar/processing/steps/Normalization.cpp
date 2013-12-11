@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Normalization.h"
 #include "cedar/processing/steps/NormalizationType.h"
+#include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -96,7 +97,8 @@ mNormalizationType
 {
   QObject::connect(this->mNormalizationType.get(), SIGNAL(valueChanged()), this, SLOT(normalizationTypeChanged()));
 
-  this->declareInput("input");
+  auto input_slot = this->declareInput("input");
+  input_slot->setCheck(cedar::proc::typecheck::IsMatrix());
 
   this->declareOutput("normalized input", mNormalizedImage);
 }
@@ -147,20 +149,4 @@ void cedar::proc::steps::Normalization::compute(const cedar::proc::Arguments&)
     norm = 1.0;
   }
   input.convertTo(normalized_image, CV_32F, 1.0 / norm);
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Normalization::determineInputValidity
-                                (
-                                  cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data
-                                )
-                                const
-{
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
-  {
-    if (!mat_data->isEmpty())
-    {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
-    }
-  }
-  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
