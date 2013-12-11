@@ -145,6 +145,12 @@ macro(cedar_project_add_target)
   set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated_project_files)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
   
+  foreach (header ${moc_headers})
+    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${header}")
+      message(WARNING "Could not find moc file ${header}. Check the path in the project's root CMakeLists.txt")
+    endif()
+  endforeach()
+  
   qt_add_resources(compiled_resource_paths ${project_resources})
   qt_wrap_cpp(moc_headers ${moc_headers})
   qt_wrap_ui(forms ${project_forms})
