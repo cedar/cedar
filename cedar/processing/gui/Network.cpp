@@ -309,6 +309,7 @@ void cedar::proc::gui::Network::sizeChanged()
   this->updateIconBounds();
   this->updateConnectorPositions();
 
+  // remember the current size for restoring it later
   if (!this->isCollapsed())
   {
     this->_mUncollapsedWidth->setValue(this->width());
@@ -388,15 +389,16 @@ bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEven
   return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
 }
 
-void cedar::proc::gui::Network::fitToContents()
+void cedar::proc::gui::Network::fitToContents(bool grow)
 {
-  //!@todo This function should take the grid size into account!
-  if (mHoldFitToContents)
+  if (this->isCollapsed() || this->scene() == NULL || mHoldFitToContents)
   {
     return;
   }
 
-  qreal padding_top = static_cast<qreal>(2.0);
+  //!@todo This function should take the grid size into account!
+
+  qreal padding_top = static_cast<qreal>(5.0);
   qreal padding_bottom = static_cast<qreal>(5.0);
   qreal padding_left = static_cast<qreal>(5.0);
   qreal padding_right = static_cast<qreal>(5.0);
@@ -415,14 +417,12 @@ void cedar::proc::gui::Network::fitToContents()
   for (QSet<QGraphicsItem*>::iterator i = children.begin(); i != children.end(); ++i)
   {
     QGraphicsItem* p_item = *i;
-    if (dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_item) || p_item == this->mpNameDisplay)
+    if (!dynamic_cast<cedar::proc::gui::Connectable*>(p_item))
     {
       continue;
     }
 
-    QRectF item_bounds = p_item->boundingRect();
-    item_bounds |= p_item->childrenBoundingRect();
-    item_bounds = p_item->mapRectToParent(item_bounds);
+    QRectF item_bounds = p_item->mapRectToParent(p_item->boundingRect());
 
     if (bounds.isEmpty())
     {
@@ -438,21 +438,15 @@ void cedar::proc::gui::Network::fitToContents()
   // adjust the bow by the paddings specified above
   bounds.adjust(-padding_left, -padding_top, padding_right, padding_bottom);
 
-  // extend the bounds to also fit the text properly
-  const QRectF& label_bounds = this->mpNameDisplay->boundingRect();
-  bounds.setTop(bounds.top() - label_bounds.height());
-  bounds.setWidth(std::max(bounds.width(), label_bounds.width()));
-
-  // move the name display
-  this->mpNameDisplay->setPos(bounds.topLeft());
+  if (grow)
+  {
+    bounds |= this->boundingRect();
+  }
 
   // apply the new bounding box
-  this->setWidth(bounds.width());
-  this->setHeight(bounds.height());
   QPointF old_pos_scene = this->scenePos();
-  QPointF new_pos = this->pos() + bounds.topLeft();
-
-  this->setPos(new_pos);
+  this->setPos(this->pos() + bounds.topLeft());
+  this->setSize(bounds.width(), bounds.height());
 
   // setting a new position moves the children, thus, transform them back to keep their original positions
   QPointF old_pos_local = this->mapFromScene(old_pos_scene);
@@ -460,14 +454,18 @@ void cedar::proc::gui::Network::fitToContents()
   for (QSet<QGraphicsItem*>::iterator i = children.begin(); i != children.end(); ++i)
   {
     QGraphicsItem* p_item = *i;
+    if (!dynamic_cast<cedar::proc::gui::Connectable*>(p_item))
+    {
+      continue;
+    }
     p_item->setPos(old_pos_local + p_item->pos());
   }
 
   // finally, also resize parent item if it is a network
-//  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
-//  {
-//    p_parent_network->fitToContents();
-//  }
+  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
+  {
+    p_parent_network->fitToContents(grow);
+  }
 }
 
 bool cedar::proc::gui::Network::isRootNetwork()
@@ -598,9 +596,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   }
 
   this->mHoldFitToContents = false;
-//  this->fitToContents();
-
-  this->resizeToIncludeContents();
+  this->fitToContents(true);
 }
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
@@ -1174,25 +1170,6 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
     p_scene_element->hide();
   }
 }
-
-void cedar::proc::gui::Network::resizeToIncludeContents()
-{
-  if (!this->isCollapsed())
-  {
-    QRectF bounds = this->childrenBoundingRect();
-
-    if (this->width() < bounds.width())
-    {
-      this->setWidth(bounds.width());
-    }
-
-    if (this->height() < bounds.height())
-    {
-      this->setHeight(bounds.height());
-    }
-  }
-}
-
 
 void cedar::proc::gui::Network::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
 {
