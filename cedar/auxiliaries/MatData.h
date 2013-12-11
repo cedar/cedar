@@ -127,7 +127,7 @@ public:
   template <typename ReturnT>
   ReturnT getValue(int row, int col) const
   {
-    cedar::aux::math::getMatrixEntry<ReturnT>(this->getData(), row, col);
+    return cedar::aux::math::getMatrixEntry<ReturnT>(this->getData(), row, col);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
