@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Element.h
+    File:        ResizeHandle.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 17
+    Date:        2013 07 05
 
     Description:
 
@@ -34,71 +34,75 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_H
-#define CEDAR_PROC_ELEMENT_H
+#ifndef CEDAR_PROC_GUI_RESIZE_HANDLE_H
+#define CEDAR_PROC_GUI_RESIZE_HANDLE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/ResizeHandle.fwd.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/enable_shared_from_this.hpp>
-  #include <boost/signals2.hpp>
-#endif
+#include <QGraphicsRectItem>
 
 
-/*!@brief Base class for Elements in a processing architecture.
+/*!@todo describe.
  *
- *        Each element is described by a name that uniquely identifies it within a processing module.
+ * @todo describe more.
  */
-class cedar::proc::Element
-:
-virtual public cedar::aux::NamedConfigurable,
-public boost::enable_shared_from_this<cedar::proc::Element>
+class cedar::proc::gui::ResizeHandle : public QGraphicsRectItem
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  enum Direction
+  {
+    NORTH_EAST,
+    NORTH_WEST,
+    SOUTH_EAST,
+    SOUTH_WEST
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Element();
-
-  //!@brief The destructor.
-  virtual ~Element();
+  ResizeHandle
+  (
+    cedar::proc::gui::GraphicsBase* pResizedItem,
+    const std::vector<cedar::proc::gui::ResizeHandle*>& otherHandles,
+    Direction direction = SOUTH_EAST
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::NetworkPtr network);
+  void updatePosition();
 
-  //!@brief get the network at which this element is registered
-  cedar::proc::NetworkPtr getNetwork();
-
-  //!@brief get the network at which this element is registered as const
-  cedar::proc::ConstNetworkPtr getNetwork() const;
+  static const std::vector<cedar::proc::gui::ResizeHandle::Direction>& directions();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! connects to network changed signal
-  inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
-  {
-    return this->mNetworkChanged.connect(slot);
-  }
+  void mousePressEvent(QGraphicsSceneMouseEvent* pEvent);
+
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent* pEvent);
+
+  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void validateName(const std::string& newName) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -106,21 +110,18 @@ private:
 protected:
   // none yet
 private:
-  //! the network this element is registered at
-  cedar::proc::NetworkWeakPtr mRegisteredAt;
+  cedar::proc::gui::GraphicsBase* mpResizedItem;
 
-  //! Signal that is emitted whenever the element's network changes
-  boost::signals2::signal<void()> mNetworkChanged;
+  bool mPressed;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
+  const std::vector<cedar::proc::gui::ResizeHandle*>& mOtherHandles;
 
-private:
-  // none yet
+  Direction mDirection;
 
-}; // class cedar::proc::Element
+  static const QSizeF M_MINIMUM_SIZE;
 
-#endif // CEDAR_PROC_ELEMENT_H
+  static const qreal M_HANDLE_SIZE;
+}; // class cedar::proc::gui::ResizeHandle
+
+#endif // CEDAR_PROC_GUI_RESIZE_HANDLE_H
 

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        Step.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 07 19
+    Date:        2013 01 07
 
     Description: 
 
@@ -35,43 +35,38 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/fields/NeuralField.h"
-#include "cedar/processing/steps/StaticGain.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/NetworkPath.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 
-int main(int, char**)
+int test_basics()
 {
-  // the number of errors encountered in this test
   int errors = 0;
-  
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
 
-  cedar::dyn::NeuralFieldPtr field(new cedar::dyn::NeuralField());
-  cedar::proc::steps::StaticGainPtr static_gain(new cedar::proc::steps::StaticGain());
+  cedar::proc::NetworkPath path = "network1.network2.elementName";
 
-  std::string field_output_name = field->getDataSlots(cedar::proc::DataRole::OUTPUT).begin()->second->getName();
-  std::string static_gain_input_name = static_gain->getDataSlots(cedar::proc::DataRole::INPUT).begin()->second->getName();
-  std::cout << "Field output name determined as: " << field_output_name << std::endl;
-  std::cout << "Gain input name determined as: " << static_gain_input_name << std::endl;
-
-  network->add(field, "field");
-  network->add(static_gain, "gain");
-
-  network->connectSlots("field." + field_output_name, "gain." + static_gain_input_name);
-
-  cedar::proc::NetworkPtr subnetwork (new cedar::proc::Network());
-  network->add(subnetwork, "subnetwork");
-  std::list<cedar::proc::ElementPtr> elements;
-  elements.push_back(field);
-  subnetwork->add(elements);
-
-  std::cout << "test finished, there were " << errors << " errors" << std::endl;
-  if (errors > 255)
+  if (path.getElementCount() != 3)
   {
-    errors = 255;
+    std::cout << "Path doesn't have the right amount of elements." << std::endl;
+    ++errors;
   }
+
+  std::cout << "Path as string: \"" << path << "\"" << std::endl;
+
+  std::cout << "test_basics() finished with " << errors << " error(s)." << std::endl;
   return errors;
 }
+
+
+int main(int /* argc */, char** /* argv */)
+{
+  int errors = 0;
+
+  errors += test_basics();
+
+  std::cout << "Test finished with " << errors << " error(s)." << std::endl;
+  return errors;
+}
+
+

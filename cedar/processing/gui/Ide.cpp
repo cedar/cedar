@@ -386,17 +386,6 @@ void cedar::proc::gui::Ide::showSettingsDialog()
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 {
   this->mpProcessingDrawer->getScene()->setSnapToGrid(triggered);
-
-  if (triggered)
-  {
-    QBrush grid(Qt::CrossPattern);
-    grid.setColor(QColor(230, 230, 230));
-    this->mpProcessingDrawer->getScene()->setBackgroundBrush(grid);
-  }
-  else
-  {
-    this->mpProcessingDrawer->getScene()->setBackgroundBrush(Qt::white);
-  }
 }
 
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
@@ -595,12 +584,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
   {
     // look at first item
     QGraphicsItem* current_item = delete_stack.back();
-    QList<QGraphicsItem*> children = current_item->childItems();
-    if (children.size() != 0)
-    {
-      // add all children to a separate stack
-      this->deleteElements(children);
-    }
+
     // now delete the current element
     deleteElement(current_item);
     delete_stack.pop_back();

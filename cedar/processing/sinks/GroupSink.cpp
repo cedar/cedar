@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,30 +22,29 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StaticGain.cpp
+    File:        GroupSink.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 10 28
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 11 08
 
-    Description:
+    Description: Source file for the class cedar::proc::sinks::GroupSink.
 
     Credits:
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/processing/steps/StaticGain.h"
-#include "cedar/processing/typecheck/IsMatrix.h"
-#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/sinks/GroupSink.h"
+#include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/processing/Network.h"
+#include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
-#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -57,21 +56,18 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr declaration
+    ElementDeclarationPtr input_declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::StaticGain>
+      new ElementDeclarationTemplate<cedar::proc::sinks::GroupSink>
       (
-        "Utilities",
-        "cedar.processing.StaticGain"
+        "Sinks",
+        "cedar.processing.sinks.GroupSink"
       )
     );
-    declaration->setIconPath(":/steps/static_gain.svg");
-    declaration->setDescription
-    (
-      "Multiplies a matrix with a scalar value that can be set as a parameter."
-    );
+    input_declaration->setIconPath(":/steps/group_sink.svg");
+    input_declaration->setDescription("Do not use this.");
 
-    declaration->declare();
+    input_declaration->declare();
 
     return true;
   }
@@ -82,56 +78,55 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::steps::StaticGain::StaticGain()
+
+cedar::proc::sinks::GroupSink::GroupSink()
 :
-// outputs
-mOutput(new cedar::aux::MatData(cv::Mat())),
-// parameters
-_mGainFactor(new cedar::aux::DoubleParameter(this, "gain factor", 1.0, -10000.0, 10000.0))
+mEmptyData(new cedar::aux::Data())
 {
-  // declare all data
-  cedar::proc::DataSlotPtr input = this->declareInput("input");
-  this->declareOutput("output", mOutput);
-
-  input->setCheck(cedar::proc::typecheck::IsMatrix());
-
-  // connect the parameter's change signal
-  QObject::connect(_mGainFactor.get(), SIGNAL(valueChanged()), this, SLOT(gainChanged()));
+  this->setAutoLockInputsAndOutputs(false);
+  this->declareInput("input", false);
 }
+
+cedar::proc::sinks::GroupSink::~GroupSink()
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::StaticGain::compute(const cedar::proc::Arguments&)
+void cedar::proc::sinks::GroupSink::compute(const cedar::proc::Arguments& /*arguments*/)
 {
-  // the result is simply input * gain.
-  this->mOutput->setData(this->mInput->getData() * this->_mGainFactor->getValue());
+  // nothing to do here!
 }
 
-void cedar::proc::steps::StaticGain::gainChanged()
-{
-  // when the gain changes, the output needs to be recalculated.
-  this->onTrigger();
-}
-
-void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& inputName)
 {
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
-  // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
-
-  if (!this->mInput)
+  // since the step may no longer be in a network upon deletion, we may not need to do anything.
+  cedar::proc::NetworkPtr network = this->getNetwork();
+  if (!network)
   {
     return;
   }
 
-  // Let's get a reference to the input matrix.
-  const cv::Mat& input = this->mInput->getData();
-  // Make a copy to create a matrix of the same type, dimensions, ...
-  this->mOutput->setData(input.clone());
+  if (cedar::aux::ConstDataPtr data = this->getInput("input"))
+  {
+    network->setOutput(this->getName(), boost::const_pointer_cast<cedar::aux::Data>(data));
+    network->emitOutputPropertiesChangedSignal(this->getName());
+    // Finally, send data ...
+    this->onTrigger();
+  }
+  else
+  {
+    network->setOutput(this->getName(), mEmptyData);
+    network->emitOutputPropertiesChangedSignal(this->getName());
+  }
+}
 
-  this->mOutput->copyAnnotationsFrom(this->mInput);
-  this->emitOutputPropertiesChangedSignal("output");
+cedar::aux::DataPtr cedar::proc::sinks::GroupSink::getEmptyData()
+{
+  return this->mEmptyData;
 }
