@@ -47,6 +47,7 @@
 #include "cedar/processing/typecheck/Matrix.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Typecheck that can perform various checks on a matrix.
