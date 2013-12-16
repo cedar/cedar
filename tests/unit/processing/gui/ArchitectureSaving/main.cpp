@@ -80,7 +80,7 @@ int testSaving(cedar::proc::gui::Ide *pIde)
   cedar::proc::NetworkPtr network = p_gui_network->getNetwork();
 
   // first, add some items to the scene
-  cedar::proc::ElementPtr field = p_scene->addElement("cedar.dynamics.NeuralField", QPointF(180, 240));
+  cedar::proc::ElementPtr field = p_scene->createElement(network, "cedar.dynamics.NeuralField", QPointF(180, 240));
 
   cedar::proc::gui::GraphicsBase* p_field_item = p_scene->getGraphicsItemFor(field.get());
 

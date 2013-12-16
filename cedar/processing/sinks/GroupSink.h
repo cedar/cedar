@@ -22,83 +22,73 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Element.h
+    File:        GroupSink.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 17
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 11 08
 
-    Description:
+    Description: Header file for the class cedar::proc::sinks::GroupSink.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_H
-#define CEDAR_PROC_ELEMENT_H
+#ifndef CEDAR_PROC_SINKS_GROUP_SINK_H
+#define CEDAR_PROC_SINKS_GROUP_SINK_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/sinks/GroupSink.fwd.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/enable_shared_from_this.hpp>
-  #include <boost/signals2.hpp>
-#endif
 
 
-/*!@brief Base class for Elements in a processing architecture.
+/*!@todo describe.
  *
- *        Each element is described by a name that uniquely identifies it within a processing module.
+ * @todo describe more.
  */
-class cedar::proc::Element
-:
-virtual public cedar::aux::NamedConfigurable,
-public boost::enable_shared_from_this<cedar::proc::Element>
+class cedar::proc::sinks::GroupSink : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Element();
+  GroupSink();
 
-  //!@brief The destructor.
-  virtual ~Element();
+  //!@brief Destructor
+  virtual ~GroupSink();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::NetworkPtr network);
-
-  //!@brief get the network at which this element is registered
-  cedar::proc::NetworkPtr getNetwork();
-
-  //!@brief get the network at which this element is registered as const
-  cedar::proc::ConstNetworkPtr getNetwork() const;
+  cedar::aux::DataPtr getEmptyData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! connects to network changed signal
-  inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
-  {
-    return this->mNetworkChanged.connect(slot);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void validateName(const std::string& newName) const;
+
+  void compute(const cedar::proc::Arguments& arguments);
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -106,21 +96,18 @@ private:
 protected:
   // none yet
 private:
-  //! the network this element is registered at
-  cedar::proc::NetworkWeakPtr mRegisteredAt;
-
-  //! Signal that is emitted whenever the element's network changes
-  boost::signals2::signal<void()> mNetworkChanged;
+  cedar::aux::DataPtr mEmptyData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::Element
+}; // class cedar::proc::sinks::GroupSink
 
-#endif // CEDAR_PROC_ELEMENT_H
+#endif // CEDAR_PROC_SINKS_GROUP_SINK_H
 

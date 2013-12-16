@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ElementClassList.h"
+#include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/StickyNote.h"
@@ -48,7 +49,6 @@
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
-#include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
@@ -81,12 +81,14 @@ cedar::proc::gui::Scene::Scene(cedar::proc::gui::View* peParentView, QObject *pP
 QGraphicsScene (pParent),
 mMode(MODE_SELECT),
 mTriggerMode(MODE_SHOW_ALL),
+mpDropTarget(NULL),
 mpeParentView(peParentView),
 mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
 mpMainWindow(pMainWindow),
 mSnapToGrid(false),
-mpConfigurableWidget(NULL)
+mpConfigurableWidget(NULL),
+mDraggingItems(false)
 {
   mMousePosX = 0;
   mMousePosY = 0;
@@ -131,12 +133,21 @@ void cedar::proc::gui::Scene::itemSelected()
   using cedar::proc::Step;
   using cedar::proc::Manager;
 
+  // either show the resize handles if only one item is selected, or hide them if more than one is selected
+  auto selected_items = this->selectedItems();
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+    if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
+    {
+      // resize handles are only shown when a single item is selected
+      graphics_base->updateResizeHandles(selected_items.size() == 1);
+    }
+  }
+
   if (this->mpConfigurableWidget == NULL || this->mpRecorderWidget == NULL)
   {
     return;
   }
-
-  QList<QGraphicsItem *> selected_items = this->selectedItems();
 
   if (selected_items.size() == 1)
   {
@@ -168,6 +179,22 @@ bool cedar::proc::gui::Scene::getSnapToGrid() const
 void cedar::proc::gui::Scene::setSnapToGrid(bool snap)
 {
   this->mSnapToGrid = snap;
+
+  this->resetBackgroundColor();
+}
+
+void cedar::proc::gui::Scene::resetBackgroundColor()
+{
+  if (this->mSnapToGrid)
+  {
+    QBrush grid(Qt::CrossPattern);
+    grid.setColor(QColor(230, 230, 230));
+    this->setBackgroundBrush(grid);
+  }
+  else
+  {
+    this->setBackgroundBrush(Qt::white);
+  }
 }
 
 void cedar::proc::gui::Scene::reset()
@@ -235,11 +262,31 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
   {
     pEvent->acceptProposedAction();
   }
+
+  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
+  if (p_item != this->mpDropTarget)
+  {
+    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(this->mpDropTarget))
+    {
+      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    }
+
+    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(p_item))
+    {
+      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+    }
+    this->mpDropTarget = p_item;
+  }
 }
 
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
+
+  // the drop target must be reset, even if something goes wrong; so: do it now by remembering the target in another
+  // variable.
+  auto drop_target = this->mpDropTarget;
+  this->mpDropTarget = NULL;
 
   if (tree)
   {
@@ -256,7 +303,14 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     {
       QPointF mapped = pEvent->scenePos();
       QString class_id = item->data(Qt::UserRole).toString();
-      this->addElement(class_id.toStdString(), mapped);
+      auto target_network = this->getRootNetwork()->getNetwork();
+      if (auto network = dynamic_cast<cedar::proc::gui::Network*>(drop_target))
+      {
+        network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+        target_network = network->getNetwork();
+        mapped -= network->scenePos();
+      }
+      this->createElement(target_network, class_id.toStdString(), mapped);
     }
   }
 }
@@ -294,6 +348,27 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
       this->connectModeProcessMousePress(pMouseEvent);
       break;
   }
+
+  // see if the mouse is moving some items
+  if (pMouseEvent->button() == Qt::LeftButton)
+  {
+    auto items = this->items(pMouseEvent->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder);
+    // this is only the case if an item under the mouse is selected
+    // (resize handles make an exception, they can be dragged without being selected)
+    if (items.size() > 0)
+    {
+      if (!dynamic_cast<cedar::proc::gui::ResizeHandle*>(items.at(0)))
+      {
+        for (int i = 0; i < items.size(); ++i)
+        {
+          if (items.at(i)->isSelected())
+          {
+            this->mDraggingItems = true;
+          }
+        }
+      }
+    }
+  }
 }
 
 void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent)
@@ -311,6 +386,108 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
   }
   this->mMousePosX = pMouseEvent->scenePos().x();
   this->mMousePosY = pMouseEvent->scenePos().y();
+
+  if (this->mDraggingItems)
+  {
+    this->highlightTargetGroups(pMouseEvent->scenePos());
+  }
+}
+
+void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition)
+{
+  auto items_under_mouse = this->items(mousePosition, Qt::IntersectsItemShape, Qt::DescendingOrder);
+  auto selected = this->selectedItems();
+
+  // remember the old drop target ...
+  auto old_drop_target = mpDropTarget;
+
+  // ... reset the current one ...
+  mpDropTarget = NULL;
+  mTargetGroup.reset();
+  bool potential_target_network_found = true;
+  bool target_is_root_network = true;
+
+  // ... and look for a new one
+  for (int i = 0; i < items_under_mouse.size(); ++i)
+  {
+    if (items_under_mouse.at(i)->isSelected())
+    {
+      // if selected, the item is one of the networks being moved; thus, ignore it
+      continue;
+    }
+    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(items_under_mouse.at(i)))
+    {
+      target_is_root_network = false;
+
+      // check if there is an item that is not in the target network yet, highlight the target network
+      if (network_item->canAddAny(selected))
+      {
+        mpDropTarget = network_item;
+        mTargetGroup = network_item->getNetwork();
+        network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+      }
+      else
+      {
+        potential_target_network_found = false;
+      }
+
+      // We only look at the first network item; the ones below it (cf descending sort order above) we do not care
+      // about.
+      break;
+    }
+  }
+
+  this->resetBackgroundColor();
+
+  // highlight the source groups
+  if (potential_target_network_found)
+  {
+    for (int i = 0; i < selected.size(); ++i)
+    {
+      auto item = selected.at(i);
+      if (item->parentItem())
+      {
+        if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+        {
+          network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_GROUP_MEMBER_LEAVING);
+        }
+      }
+      else if (!target_is_root_network) // items without a parent are in the root network
+      {
+        this->setBackgroundBrush(cedar::proc::gui::GraphicsBase::getLeavingGroupBrush());
+      }
+    }
+  }
+  else
+  {
+    for (int i = 0; i < selected.size(); ++i)
+    {
+      auto item = selected.at(i);
+      if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+      {
+        network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+    }
+  }
+
+  // disable highlighting of the old drop target if the target has changed or there is no target any more
+  if ((mpDropTarget == NULL && old_drop_target != NULL) || old_drop_target != mpDropTarget)
+  {
+    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(old_drop_target))
+    {
+      network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    }
+  }
+
+  // if no target network was found, the step(s) should be added to the root network; thus, highlight it
+  if (target_is_root_network)
+  {
+    if (this->mNetwork->canAddAny(selected))
+    {
+      this->setBackgroundBrush(cedar::proc::gui::GraphicsBase::getTargetGroupBrush());
+      this->mTargetGroup = this->mNetwork->getNetwork();
+    }
+  }
 }
 
 
@@ -327,6 +504,37 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       this->connectModeProcessMouseRelease(pMouseEvent);
       break;
   }
+
+  this->mDraggingItems = false;
+
+  // reset highlighting of the networks from which the items are being removed
+  auto selected = this->selectedItems();
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    auto item = selected.at(i);
+    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+    {
+      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    }
+  }
+
+  if (mTargetGroup)
+  {
+    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(mpDropTarget))
+    {
+      network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      network_item->addElements(this->selectedItems().toStdList());
+    }
+    else
+    {
+      this->mNetwork->addElements(this->selectedItems().toStdList());
+    }
+  }
+
+
+  mTargetGroup.reset();
+  this->resetBackgroundColor();
+  mpDropTarget = NULL;
 }
 
 void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& /*menu*/)
@@ -662,6 +870,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
     return;
   }
 
+  //!@todo This needs to be reworked
   QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
   if (items.size() > 0)
   {
@@ -690,18 +899,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
               {
                 cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target);
+                //!@todo These paths should be determined from the slot itself, rather than made up here
                 std::string source_name
                   = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name
                   = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
-                if
-                (
-                  cedar::proc::ConstPromotedExternalDataPtr ptr
-                    = boost::dynamic_pointer_cast<const cedar::proc::PromotedExternalData>(p_data_target->getSlot())
-                )
-                {
-                  target_name = ptr->getParentPtr()->getName() + std::string(".") + p_data_target->getSlot()->getName();
-                }
                 CEDAR_DEBUG_ASSERT(dynamic_cast<cedar::proc::Element*>(p_source->getSlot()->getParentPtr()));
                 static_cast<cedar::proc::Element*>
                 (
@@ -831,20 +1033,25 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem* p
   this->mElementMap.erase(mElementMap.find(pTrigger->getTrigger().get()));
 }
 
-cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
+cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
+                                                 (
+                                                   cedar::proc::NetworkPtr network,
+                                                   const std::string& classId,
+                                                   QPointF position
+                                                 )
 {
   std::vector<std::string> split_class_name;
   cedar::aux::split(classId, ".", split_class_name);
   CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
   std::string name = "new " + split_class_name.back();
 
-  std::string adjusted_name = mNetwork->getNetwork()->getUniqueName(name);
+  std::string adjusted_name = network->getUniqueIdentifier(name);
 
   try
   {
-    mNetwork->getNetwork()->create(classId, adjusted_name);
-    CEDAR_DEBUG_ASSERT(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get());
-    this->getGraphicsItemFor(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
+    network->create(classId, adjusted_name);
+    CEDAR_DEBUG_ASSERT(network->getElement<cedar::proc::Element>(adjusted_name).get());
+    this->getGraphicsItemFor(network->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
@@ -853,7 +1060,7 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
     p_dialog->exec();
   }
 
-  return this->mNetwork->getNetwork()->getElement(adjusted_name);
+  return network->getElement(adjusted_name);
 }
 
 cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar::proc::Trigger* trigger)
@@ -883,8 +1090,16 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
       return mNetwork.get();
     }
 #ifdef DEBUG
-    std::cout << "Could not find base item for element \"" << element->getName() << "\"" << std::endl;
+    if (element)
+    {
+      std::cout << "Could not find base item for element \"" << element->getName() << "\"" << std::endl;
+    }
+    else
+    {
+      std::cout << "Element is a null-pointer." << std::endl;
+    }
 #endif // DEBUG
+    //!@todo This should not return null, but rather throw
     return NULL;
   }
   else
@@ -922,8 +1137,8 @@ cedar::proc::gui::Network* cedar::proc::gui::Scene::addNetwork(const QPointF& po
                                                 (
                                                   this->mpMainWindow,
                                                   this,
-                                                  10,
-                                                  10,
+                                                  400,
+                                                  150,
                                                   network
                                                 );
 

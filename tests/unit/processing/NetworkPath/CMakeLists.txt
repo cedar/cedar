@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Stephan Zibner
-#   Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2012 01 31
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2013 01 07
 #
 #   Description:
 #
@@ -34,6 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(PromotedData
-                    main.cpp
+cedar_add_unit_test(NetworkPath
+                    NetworkPath.cpp
                     )
