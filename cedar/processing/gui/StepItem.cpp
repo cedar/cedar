@@ -278,7 +278,7 @@ void cedar::proc::gui::StepItem::handleStepNameChanged()
 {
   this->redraw();
   // change title of child widgets
-  QString step_name = QString::fromStdString(this->mStep->getName());
+  QString step_name = QString::fromStdString(this->getConnectable()->getName());
   for(auto childWidget : mChildWidgets)
   {
     childWidget->setWindowTitle(step_name);
