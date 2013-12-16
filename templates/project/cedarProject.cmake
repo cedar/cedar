@@ -55,6 +55,10 @@ endif()
 
 include("project.conf")
 
+if (CMAKE_BUILD_TYPE MATCHES "debug")
+  add_definitions(-DDEBUG)
+endif()
+
 if (DEBUG_CEDAR_BUILD_SYSTEM)
   message ("  >> cedar home is set to ${CEDAR_HOME}")
 endif(DEBUG_CEDAR_BUILD_SYSTEM)
