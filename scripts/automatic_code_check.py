@@ -230,11 +230,14 @@ def check_std_headers(filename, file_contents, preprocessed_contents, ):
     if not header_found and filetype == "cpp":
       file_header = get_header(filename)
       #print "also checking header", file_header
-      with open(file_header, "r") as f_header: 
-        contents = preprocess(f_header.read())
-        include = include_re.search(contents)
-        if not include is None:
-          header_found = True
+      try:
+        with open(file_header, "r") as f_header: 
+          contents = preprocess(f_header.read())
+          include = include_re.search(contents)
+          if not include is None:
+            header_found = True
+      except IOError:
+        pass # ok: if the header file doesn't exist, we don't care about it.
     
     if header_found == False:
       issues.add_issue(filename, IssueC0001(classname, header))
