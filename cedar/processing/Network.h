@@ -313,14 +313,16 @@ public:
   /*!@brief Deletes all connections from a given data slot.
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
+   *
+   * @todo check for duplicate functions
    */
-  CEDAR_DECLARE_DEPRECATED(void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot));
+  void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes all connections from a given data slot.
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
    */
-  void disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+  //void disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
     /*!@brief Deletes all connections to the given data slot.
      * @param connectable The slot's parent.
@@ -588,12 +590,14 @@ private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
+  //!@todo a lot of duplicate code here and in getRealSource - investigate!
   std::vector<cedar::proc::DataSlotPtr> getRealTargets
                                         (
                                           cedar::proc::DataConnectionPtr connection,
                                           cedar::proc::ConstNetworkPtr targetNetwork
                                         );
 
+  //!@todo a lot of duplicate code here and in getRealTargets - investigate!
   cedar::proc::DataSlotPtr getRealSource
                            (
                              cedar::proc::DataConnectionPtr connection,

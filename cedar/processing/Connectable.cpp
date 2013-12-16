@@ -198,14 +198,6 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     CEDAR_THROW(cedar::proc::InvalidRoleException, "The step has not slots of the given role.");
   }
 
-
-  if (this->getNetwork())
-  {
-    this->getNetwork()->disconnectSlot
-                        (
-                          boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
-                        );
-  }
   slot->deleteParentPointer();
   SlotList& slot_list = list_iter->second;
   SlotList::iterator slot_list_iter;
