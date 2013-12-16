@@ -210,7 +210,11 @@ private:
   //! Returns the type check function object for this slot.
   const TypeCheckFunction& getCheck() const;
 
-  void deleteParentPointer();
+  //!@brief deprecated due to bad name, see resetParentPointer
+  CEDAR_DECLARE_DEPRECATED(void deleteParentPointer());
+
+  //!@brief sets the parent pointer to NULL
+  void resetParentPointer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

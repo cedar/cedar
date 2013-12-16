@@ -115,7 +115,7 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     CEDAR_THROW
     (
       cedar::proc::InvalidRoleException,
-      "The connectable \"" + this->getName() + "\" has not slots of the given role."
+      "The connectable \"" + this->getName() + "\" has no slots of the given role."
     );
   }
 
@@ -159,7 +159,6 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     }
   }
 
-
   // then, actually remove the slot
   QWriteLocker locker(this->mpConnectionLock);
   slot_map.erase(slot_map_iter);
@@ -190,15 +189,15 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     this->removeLock(slot->getData(), lock_type, this->getLockSetForRole(role));
   }
 
+  // also delete the slot from the ordered list of slots
   std::map<DataRole::Id, SlotList>::iterator list_iter;
   list_iter = this->mDataConnectionsOrder.find(role);
 
   if (list_iter == this->mDataConnectionsOrder.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "The step has not slots of the given role.");
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "The step has no slots of the given role.");
   }
 
-  slot->deleteParentPointer();
   SlotList& slot_list = list_iter->second;
   SlotList::iterator slot_list_iter;
 
@@ -214,6 +213,8 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     }
   }
 
+  // finally, reset the parent pointer in case of the slot floating around somewhere
+  slot->resetParentPointer();
   locker.unlock();
 
   this->mSlotRemoved(role, name);
