@@ -543,6 +543,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
 
+  //!@todo Instead of this structure, connect each action with an appropriate slot.
   if (a == p_reset)
   {
     if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
@@ -550,7 +551,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
       p_ide->resetRootNetwork();
     }
   }
-  if (a == p_addSickyNode)
+  else if (a == p_addSickyNode)
   {
     this->addStickyNote();
   }
