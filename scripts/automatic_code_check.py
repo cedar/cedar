@@ -39,9 +39,38 @@
 
 import os
 import re
+import argparse
 
 
 cedar_home = os.path.realpath(__file__ + "/../..")
+base_directory = cedar_home
+
+issue_type_compatibility = 'C'
+
+class Issue:
+  def __init__(self, issue_type, issue_no, description, line = None, column = None):
+    self._type = issue_type
+    self._number = issue_no
+    self._description = description
+
+  def __str__(self):
+    return self._type + ('%04i:' % self._number) + " " + self._description
+    
+class IssueC0001 (Issue):
+  def __init__(self, stl_class, stl_header):
+    Issue.__init__(self, 
+                   issue_type_compatibility, 1,
+                   "The stl class/function std::" + stl_class + " is used without including \"" + stl_header + "\"."
+                   )
+
+class IssueC0002 (Issue):
+  def __init__(self, line, column, boost_call):
+    replacements = {"shared_dynamic_cast": "dynamic_pointer_cast"}
+    Issue.__init__(self, 
+                   issue_type_compatibility, 2,
+                   "In line " + str(line) + ", col. " + str(column) + ": Replace the function boost::" + boost_call + " by " + replacements[boost_call] + "."
+                   )
+                   
 
 class IssueList:
   def __init__(self):
@@ -56,25 +85,64 @@ class IssueList:
   def write_issues(self, issue_file):
     issue_count = 0
     with open(issue_file, "w") as f:
+      f.write("For detailed documentation of the issues, see IssueDocumentation.md.\n\n")
+    
       for file in sorted(self._issues.keys()):
         issues = self._issues[file]
         if len(issues) > 0:
           f.write(file + "\n\n")
           for issue in issues:
-            self._write_issue(f, issue + "\n")
+            self._write_issue(f, issue)
             issue_count += 1
           f.write("\n\n")
           
       if issue_count == 0:
-        f.write("No issues found. Hooray!")       
+        f.write("No issues found. Hooray!")  
       
-    print issue_count, "issues written to \"" + issue_file + "\"."
+    print issue_count, "issue(s) written to \"" + issue_file + "\"."
     
 
-  def _write_issue(self, issues_out, issue_description):
-    issues_out.write("[ ] " + str(issue_description))
+  def _write_issue(self, issues_out, issue):
+    issues_out.write("[ ] " + str(issue) + "\n")
 
 issues = IssueList()
+
+
+class REBasedCheck:
+  def __init__(self, re, use_preprocessed = True):
+    self._use_preprocessed = use_preprocessed
+    self._re = re
+    
+  def check(self, issues, filename, file_contents, preprocessed_contents):
+    if self._use_preprocessed:
+      contents = preprocessed_contents
+    else:
+      contents = file_contents
+      
+    current_pos = 0
+    while True:
+      m = self._re.search(file_contents, current_pos)
+      if m is None:
+        break
+        
+      current_pos = m.end()
+      lines = contents[:m.start()].split("\n")
+      line_no = len(lines)
+      col_no = len(lines[-1]) + 1
+      
+      self._found(issues, filename, line_no, col_no, m)
+
+    
+class CheckC0001 (REBasedCheck):
+  def __init__(self):
+    REBasedCheck.__init__(self,
+                          re = re.compile(r'boost\:\:(shared_dynamic_cast)'),
+                          use_preprocessed = True
+                          )
+
+  def _found(self, issues, filename, line, column, match):
+    issues.add_issue(filename, IssueC0002(line, column, match.group(1)))
+    
 
   
 #
@@ -84,18 +152,45 @@ def get_header(filename):
   return ".".join(filename.split('.')[:-1]) + ".h"
   
 #
-# preprocesses c++ file contents (removes all comments and block-comments
+# preprocesses c++ file contents (replaces all comments and block-comments by spaces)
 # 
-block_comment = re.compile(r'(\/\*.*?\*\/)', re.DOTALL)
-inline_comment = re.compile(r'(\/\/.*?)$', re.MULTILINE)
-
 def preprocess(source):
-  no_blocks = block_comment.sub("", source)
-  no_comments = inline_comment.sub("", no_blocks)
+  plain, comment_begin, in_line_comment, in_block_comment = (0, 1, 2, 3)
+  state = plain
+  no_comments = list(source)
+  for i in range(len(source)):
+    if state == plain:
+      if source[i] == '/':
+        state = comment_begin
+        
+    elif state == comment_begin:
+      if source[i] == '/':
+        state = in_line_comment
+      elif source[i] == '*':
+        state = in_block_comment
+      else:
+        state = plain
+
+      if state != plain:
+        no_comments[i - 1] = ' ';
+        no_comments[i] = ' ';
+        
+    elif state in (in_line_comment, in_block_comment):
+      if state == in_line_comment and source[i] == '\n':
+        state = plain
+      if state == in_block_comment and source[i] == '*' and len(source) > i + 1 and source[i + 1] == '/':
+        no_comments[i] = ' '
+        no_comments[i + 1] = ' '
+        state = plain
+      elif source[i] != '\n':
+        no_comments[i] = ' '
+  
+  assert len(no_comments) == len(source)
+  no_comments = "".join(no_comments)
   return no_comments
 
 #
-# checks if all the std headers are included where they should be.
+# Tests for C0001: checks if all the std headers are included where they should be.
 #
 std_use_regex = re.compile(r"std\:\:([a-zA-Z]+)[ \<]")
 std_class_headers = {
@@ -114,8 +209,8 @@ std_class_headers = {
                       "ostringstream": "sstream",
                       "get": "tuple"
                     }
-def check_std_headers(filename, file_contents):
-  matches = set(std_use_regex.findall(file_contents))
+def check_std_headers(filename, file_contents, preprocessed_contents, ):
+  matches = set(std_use_regex.findall(preprocessed_contents))
   filetype = filename.split('.')[-1]
   for classname in matches:
     # determine the header for the class
@@ -126,7 +221,7 @@ def check_std_headers(filename, file_contents):
     
     # see if the header is being included
     include_re = re.compile(r'\s*#\s*include\s*[\<\"]' + header + r'[\>\"]')
-    include = include_re.search(file_contents)
+    include = include_re.search(preprocessed_contents)
     
     header_found = True
     if include is None:
@@ -142,7 +237,15 @@ def check_std_headers(filename, file_contents):
           header_found = True
     
     if header_found == False:
-      issues.add_issue(filename, "The stl class/function std::" + classname + " is used without including \"" + header + "\".")
+      issues.add_issue(filename, IssueC0001(classname, header))
+
+#
+# Tests for C0002: Checks if boost::shared_dynamic_cast is used
+#
+def check_deprecated_boost_casts(filename, file_contents, preprocessed_contents):
+  check = CheckC0001()
+  check.check(issues, filename, file_contents, preprocessed_contents)
+  
 
 #
 #
@@ -153,11 +256,14 @@ def check_file(filename):
   if match is None:
     return
 
-  print "Checking file", filename.split("cedar")[-1]
+  print "Checking file", filename.split(base_directory)[-1]
   
   with open(filename, "r") as f:
-    file_contents = preprocess(f.read())
-    check_std_headers(filename, file_contents)
+    file_contents = f.read()
+    preprocessed_contents = preprocess(file_contents)
+    check_std_headers(filename, file_contents, preprocessed_contents)
+    check_deprecated_boost_casts(filename, file_contents, preprocessed_contents)
+    
     
 def check_directory(directory):
   files = os.listdir(directory)
@@ -172,14 +278,23 @@ def check_directory(directory):
 #
 #
 #
-def check_all():
-  check_directory(cedar_home + os.sep + "cedar")
+def check_all(directory):
+  check_directory(directory)
   
 #
 #
 #
 if __name__ == "__main__":
-  # todo: read from command line which 
-  check_all()
-  issues.write_issues("issues.txt")
+  parser = argparse.ArgumentParser(description='Checks code for style and other issues.')
+  parser.add_argument('--input-directory', dest='input_directory', action='store',
+                     default=cedar_home + os.sep + "cedar",
+                     help='Specify the directory in which files should be checked.')
+                     
+  parser.add_argument('--output', dest='output', action='store',
+                     default="issues.txt",
+                     help='Specify the file to which the issues are to be written.')
+
+  args = parser.parse_args()
+  check_all(args.input_directory)
+  issues.write_issues(args.output)
   print "Done."
