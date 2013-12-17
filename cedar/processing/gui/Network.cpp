@@ -710,7 +710,10 @@ void cedar::proc::gui::Network::readConfiguration(const cedar::aux::Configuratio
   }
 
   //read sticky notes
-  this->readStickyNotes(root.get_child("ui"));
+  if (root.find("ui") != root.not_found())
+  {
+    this->readStickyNotes(root.get_child("ui"));
+  }
   //update recorder icons
   this->stepRecordStateChanged();
 }
