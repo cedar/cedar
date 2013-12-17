@@ -590,22 +590,19 @@ private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
-  //!@todo a lot of duplicate code here and in getRealSource - investigate!
   std::vector<cedar::proc::DataSlotPtr> getRealTargets
                                         (
-                                          cedar::proc::DataConnectionPtr connection,
+                                          cedar::proc::DataSlotPtr slot,
                                           cedar::proc::ConstNetworkPtr targetNetwork
                                         );
 
-  //!@todo a lot of duplicate code here and in getRealTargets - investigate!
   cedar::proc::DataSlotPtr getRealSource
                            (
-                             cedar::proc::DataConnectionPtr connection,
+                             cedar::proc::DataSlotPtr slot,
                              cedar::proc::ConstNetworkPtr targetNetwork
                            );
 
-
-  void deleteConnectorsAlongConnection(cedar::proc::DataConnectionPtr connection, cedar::proc::ConstNetworkPtr targetNetwork);
+  static void deleteConnectorsAlongConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
