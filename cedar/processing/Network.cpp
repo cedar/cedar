@@ -1058,11 +1058,6 @@ void cedar::proc::Network::disconnectSlots(const std::vector<cedar::proc::DataCo
   for (size_t i = 0; i < connections.size(); ++i)
   {
     cedar::proc::DataConnectionPtr connection = connections[i];
-    std::cout << "Removing connection between: "
-              << connection->getSource()->getParent() << "." << connection->getSource()->getName()
-              << " and "
-              << connection->getTarget()->getParent() << "." << connection->getTarget()->getName()
-              << std::endl;
     this->disconnectSlots(connection->getSource(), connection->getTarget());
   }
 }
