@@ -73,6 +73,8 @@
 #include <iostream>
 #include <QMessageBox>
 #include <QPushButton>
+#include <string>
+#include <set>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -272,6 +274,17 @@ void cedar::proc::gui::StepItem::updateStepState()
   this->update();
 }
 
+void cedar::proc::gui::StepItem::handleStepNameChanged()
+{
+  this->redraw();
+  // change title of child widgets
+  QString step_name = QString::fromStdString(this->getConnectable()->getName());
+  for(auto childWidget : mChildWidgets)
+  {
+    childWidget->setWindowTitle(step_name);
+  }
+}
+
 void cedar::proc::gui::StepItem::redraw()
 {
   this->update();
@@ -309,7 +322,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addDecorations();
 
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::emitStepStateChanged, this));
-  QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
+  QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(handleStepNameChanged()));
 }
 
 void cedar::proc::gui::StepItem::updateIconGeometry()
@@ -1045,10 +1058,10 @@ void cedar::proc::gui::StepItem::handleExternalActionButtons()
 
 void cedar::proc::gui::StepItem::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
 {
-  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  for (auto childWidget : mChildWidgets)
   {
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
-    QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(*it)->widget();
+    QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
     // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
     if(cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
     {
@@ -1074,17 +1087,17 @@ void cedar::proc::gui::StepItem::closeAllPlots()
 
 void cedar::proc::gui::StepItem::toggleVisibilityOfPlots()
 {
-  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  for (auto childWidget : mChildWidgets)
   {
-    (*it)->setVisible(!(*it)->isVisible());
+    childWidget->setVisible(!childWidget->isVisible());
   }
 }
 
 void cedar::proc::gui::StepItem::closeAllChildWidgets()
 {
-  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  for (auto childWidget : mChildWidgets)
   {
-    (*it)->close();
+    childWidget->close();
   }
   // mChildWidgets is emptied through close event.
 }

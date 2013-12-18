@@ -59,6 +59,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string>
 
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief implementation of matrix-over-network writer

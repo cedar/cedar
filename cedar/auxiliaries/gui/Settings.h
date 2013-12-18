@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/Settings.fwd.h"
@@ -99,6 +100,11 @@ public:
     this->mWritingDisabled = disable;
   }
 
+  //! Whether or not memory output is generated.
+  unsigned int getMaximumNumberOfLogEntries() const;
+
+  cedar::aux::UIntParameterPtr getMaximalNumberOfLogEntriesParameter() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -127,6 +133,10 @@ protected:
   // none yet
 
 private:
+  //!@brief Parameter representing the maximum number of log entries
+  //!@todo this should be moved to aux::gui::Settings once unstable is merged
+  cedar::aux::UIntParameterPtr _mMaximumNumberOfLogEntries;
+
   //!@brief Directory, where the PluginLoadDialog is supposed to open.
   cedar::aux::DirectoryParameterPtr _mPluginLoadDialogLocation;
 

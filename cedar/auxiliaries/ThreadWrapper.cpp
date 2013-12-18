@@ -45,7 +45,9 @@
 #include <QWriteLocker>
 #include <QReadLocker>
 #include <QMutexLocker>
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 
 //------------------------------------------------------------------------------
 // constructors and destructor

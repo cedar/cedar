@@ -51,6 +51,7 @@
 #include <QLabel>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 
 namespace cedar

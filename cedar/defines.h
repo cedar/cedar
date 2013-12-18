@@ -47,8 +47,10 @@
 #include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/shared_ptr.hpp>
+  #include <boost/weak_ptr.hpp>
+#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------

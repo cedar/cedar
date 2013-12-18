@@ -42,6 +42,8 @@
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
+#include <string>
+#include <map>
 
 namespace cedar
 {
@@ -86,6 +88,12 @@ namespace cedar
       }
 
       return cedar::aux::findUnit(postFix, map);
+    }
+
+    template <>
+    inline std::string getDefaultUnit<cedar::unit::Time::unit_type>()
+    {
+      return "ms";
     }
 
     // Generate types for the length parameter.

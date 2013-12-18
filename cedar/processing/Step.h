@@ -56,10 +56,14 @@
 #include <QThread>
 #include <QReadWriteLock>
 #include <QMutex>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/function.hpp>
+  #include <boost/bind.hpp>
+#endif
 #include <map>
 #include <set>
+#include <utility>
+#include <vector>
 
 
 /*!@brief This class represents a processing step in the processing framework.

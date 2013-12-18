@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

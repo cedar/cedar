@@ -66,6 +66,8 @@
 #include <vtkPen.h>
 #include <vtkNew.h>
 #include <QVTKWidget.h>
+#include <vector>
+#include <string>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
@@ -133,14 +135,18 @@ class cedar::aux::gui::VtkLinePlot : public cedar::aux::gui::MultiPlotInterface
 private:
   struct PlotSeries
   {
-    PlotSeries()
+    PlotSeries(vtkSmartPointer<vtkTable> table, vtkSmartPointer<vtkChartXY> chart)
     :
-    mpCurve(NULL)
+    mpCurve(NULL),
+    mpChart(chart),
+    mpVtkTable(table)
     {
     }
 
     ~PlotSeries()
     {
+      mpChart->RemovePlotInstance(mpCurve);
+      mpVtkTable->RemoveColumnByName(mYColumnName.c_str());
     }
 
     //!@brief (Re-)initializes the x and y value arrays.
@@ -150,11 +156,11 @@ private:
     cedar::aux::ConstMatDataPtr mMatData;
     //!@brief a curve inside the plot
     vtkPlot* mpCurve;
+    vtkWeakPointer<vtkChartXY> mpChart;
     vtkWeakPointer<vtkTable> mpVtkTable;
     //!@brief reference to the x values of the plot, currently the same for all plots
     vtkIdType mXColumn;
-    //!@brief references to the y values of the plot
-    vtkIdType mYColumn;
+    //!@brief references to the y values of the plot by Name
     std::string mYColumnName;
   };
 
@@ -213,6 +219,7 @@ public:
   void timerEvent(QTimerEvent* pEvent);
 
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -231,6 +238,7 @@ private:
   void init();
 
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   //!@brief Applies a plot style to a given curve.
   static void applyStyle(size_t lineId, vtkPlot* pCurve);

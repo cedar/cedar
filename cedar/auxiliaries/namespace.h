@@ -42,7 +42,10 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+  #include <boost/property_tree/ptree.hpp>
+#endif
 #include <opencv2/opencv.hpp>
 
 #warning Do not include this header any more. Use the new forward declaration headers instead!
@@ -67,6 +70,7 @@
 #include "cedar/auxiliaries/EnumParameter.fwd.h"
 #include "cedar/auxiliaries/EnumType.fwd.h"
 #include "cedar/auxiliaries/exceptions.fwd.h"
+#include "cedar/auxiliaries/GlobalClock.fwd.h"
 #include "cedar/auxiliaries/Grabbable.fwd.h"
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/auxiliaries/Factory.fwd.h"

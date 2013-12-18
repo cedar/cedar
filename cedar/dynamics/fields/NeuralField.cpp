@@ -60,9 +60,14 @@
 
 // SYSTEM INCLUDES
 #include <iostream>
-#include <boost/lexical_cast.hpp>
-#include <boost/make_shared.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+  #include <boost/make_shared.hpp>
+#endif
 #include <QApplication>
+#include <vector>
+#include <set>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

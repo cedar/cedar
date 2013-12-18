@@ -59,6 +59,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/processing/gui/StickyNote.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -68,7 +69,10 @@
 #include <QMessageBox>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QSet>
-#include <boost/property_tree/json_parser.hpp>
+#include <QList>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/json_parser.hpp>
+#endif
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -164,6 +168,14 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
       );
 
   this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
+
+  QObject::connect
+  (
+    this->mNetwork.get(),
+    SIGNAL(stepNameChanged(const std::string&, const std::string&)),
+    this,
+    SLOT(handleStepNameChanged(const std::string&, const std::string&))
+  );
 
   this->update();
 }
@@ -693,18 +705,23 @@ void cedar::proc::gui::Network::readConfiguration(const cedar::aux::Configuratio
     this->toggleSmartConnectionMode(false);
   }
 
+  //read sticky notes
+  if (root.find("ui") != root.not_found())
+  {
+    this->readStickyNotes(root.get_child("ui"));
+  }
   //update recorder icons
   this->stepRecordStateChanged();
 }
 
 void cedar::proc::gui::Network::readPlotList(const cedar::aux::ConfigurationNode& node)
 {
-  for(auto it = node.begin(); it != node.end(); ++it)
+  for (auto it : node)
   {
-    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it->second);
+    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     auto step = this->getNetwork()->getElement<cedar::proc::Step>(step_name);
     auto step_item = this->mpScene->getStepItemFor(step.get());
-    cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it->second, step_item);
+    cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
   }
 }
 
@@ -730,15 +747,30 @@ void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode
 
 void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
 {
-  for (auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
+  for (auto step_map_item : this->mpScene->getStepMap())
   {
-    it->second->writeOpenChildWidgets(node);
+    step_map_item.second->writeOpenChildWidgets(node);
   }
 }
 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) const
 {
   cedar::aux::ConfigurationNode scene;
+  
+  std::vector<cedar::proc::gui::StickyNote*> stickyNotes = this->mpScene->getStickyNotes();
+
+  for(cedar::proc::gui::StickyNote* note : stickyNotes)
+  {
+    cedar::aux::ConfigurationNode node;
+    node.put("type","stickyNote");
+    QRectF rect = note->boundingRect();
+    node.put("width",rect.width());
+    node.put("height",rect.height());
+    node.put("x",note->scenePos().x());
+    node.put("y",note->scenePos().y());
+    node.put("text",note->getText());
+    scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+  }
 
   auto elements = this->getNetwork()->getElements();
 
@@ -1246,6 +1278,11 @@ void cedar::proc::gui::Network::stepRecordStateChanged()
 	}
 }
 
+void cedar::proc::gui::Network::handleStepNameChanged(const std::string& from, const std::string& to)
+{
+  this->changeStepName(from, to);
+}
+
 void cedar::proc::gui::Network::addPlotGroup(std::string plotGroupName)
 {
   cedar::aux::ConfigurationNode node;
@@ -1289,9 +1326,9 @@ void cedar::proc::gui::Network::renamePlotGroup(std::string from, std::string to
 std::list<std::string> cedar::proc::gui::Network::getPlotGroupNames()
 {
   std::list<std::string> plot_group_names;
-  for(auto it = this->mPlotGroupsNode.begin(); it != this->mPlotGroupsNode.end(); ++it)
+  for (auto node : mPlotGroupsNode)
   {
-    plot_group_names.push_back(it->first);
+    plot_group_names.push_back(node.first);
   }
 
   return plot_group_names;
@@ -1447,4 +1484,56 @@ void cedar::proc::gui::Network::updateCollapsedness()
   }
 
   this->setResizeable(!collapse);
+}
+
+void cedar::proc::gui::Network::changeStepName(const std::string& from, const std::string& to)
+{
+  /* plot groups are structured like this:
+    {
+      group#1_name :
+      [
+        { step: name,
+          position, plot info, etc. 
+        },
+        {
+          step: name, 
+          ...
+        },
+        ...
+      ],
+      group#2_name :
+      ...
+    }
+
+    we have to search and replace the old step name in every step for every group
+  */
+  for(auto& plot_group : this->mPlotGroupsNode)
+  {
+    for(auto& plot : plot_group.second)
+    {
+      auto name = plot.second.get<std::string>("step");
+      if(name == from)
+      {
+        auto node = plot.second.put("step", to);
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Network::readStickyNotes(const cedar::aux::ConfigurationNode& node)
+{
+
+  for (auto iter = node.begin(); iter != node.end(); ++iter)
+  {
+    const std::string& type = iter->second.get<std::string>("type");
+    if (type == "stickyNote")
+    {
+      int x = iter->second.get<int>("x");
+      int y = iter->second.get<int>("y");
+      int witdh = iter->second.get<int>("width");
+      int height = iter->second.get<int>("height");
+      const std::string& text = iter->second.get<std::string>("text");
+      this->mpScene->addStickyNote(x, y, witdh, height, text);
+    }
+  }
 }

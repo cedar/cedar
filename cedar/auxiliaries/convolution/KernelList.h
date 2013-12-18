@@ -45,7 +45,9 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif
 #include <vector>
 
 /*!@brief This is a structure for storing a list of kernels.

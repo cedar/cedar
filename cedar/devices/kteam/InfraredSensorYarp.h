@@ -50,6 +50,7 @@
 #include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief Infrared sensor, which communicates over a yarp channel.

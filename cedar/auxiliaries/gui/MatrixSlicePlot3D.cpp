@@ -53,6 +53,7 @@
 #include <QReadLocker>
 #include <QWriteLocker>
 #include <QKeyEvent>
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

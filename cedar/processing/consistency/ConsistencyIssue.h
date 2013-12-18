@@ -46,6 +46,7 @@
 #include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief Base class for consistency issues.

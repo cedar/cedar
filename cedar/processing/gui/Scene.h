@@ -56,11 +56,14 @@
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
 #include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
+#include "cedar/processing/gui/StickyNote.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
 #include <QMainWindow>
 #include <map>
+#include <vector>
+#include <string>
 
 
 /*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Networks.
@@ -296,6 +299,17 @@ public:
   //! deselect all items
   void selectNone();
 
+  /*!brief Adds a sticky node to the current scene
+   */
+  void addStickyNote();
+  void addStickyNote(int x, int y, int witdh, int height, std::string text);
+
+  //! Removes a sticky note
+  void removeStickyNote(StickyNote* note);
+
+  // Gets all sticky notes
+  const std::vector<cedar::proc::gui::StickyNote* > getStickyNotes() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -343,10 +357,6 @@ private:
   /*!@brief Removes a given network item from the scene.
    */
   void removeNetworkItem(cedar::proc::gui::Network* pNetwork);
-
-  /*!brief Adds a sticky node to the current scene
-   */
-  void addStickyNote();
 
   void handleTriggerModeChange();
 
@@ -408,6 +418,9 @@ private:
 
   //! Map of all the elements.
   ElementMap mElementMap;
+
+  //! List of all sticky notes
+  std::vector<cedar::proc::gui::StickyNote*> mStickyNotes;
 
   //! The main window containing the scene.
   QMainWindow *mpMainWindow;

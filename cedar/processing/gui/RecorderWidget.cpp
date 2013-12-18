@@ -47,6 +47,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QHBoxLayout>
+#include <vector>
 
 
 cedar::proc::gui::RecorderWidget::RecorderWidget()

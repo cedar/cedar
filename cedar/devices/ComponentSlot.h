@@ -48,6 +48,9 @@
 
 // SYSTEM INCLUDES
 #include <boost/enable_shared_from_this.hpp>
+#include <vector>
+#include <string>
+#include <map>
 
 /*!@brief Slot for a single robot component.
  *

@@ -46,7 +46,9 @@
 #include <iostream>
 #include <math.h>
 #include <limits.h>
-#include <boost/static_assert.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/static_assert.hpp>
+#endif
 
 std::string cedar::aux::math::matrixTypeToString(const cv::Mat& matrix)
 {

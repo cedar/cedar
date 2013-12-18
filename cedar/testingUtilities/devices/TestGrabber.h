@@ -48,6 +48,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <string>
 
 /*! @class cedar::test::dev::TestGrabber
  *

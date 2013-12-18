@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 //////////////// OPENCV SPECIALIZATION of our traits class

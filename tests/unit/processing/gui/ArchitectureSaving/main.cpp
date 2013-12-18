@@ -56,7 +56,9 @@
 
 // SYSTEM INCLUDES
 #include <QApplication>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/filesystem.hpp>
+#endif
 #include <iostream>
 
 void simulateEventLoop()

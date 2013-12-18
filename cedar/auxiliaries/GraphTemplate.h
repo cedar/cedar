@@ -46,6 +46,9 @@
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 
 // SYSTEM INCLUDES
+#include <map>
+#include <vector>
+#include <set>
 
 
 /*!@brief A generic graph implementation.

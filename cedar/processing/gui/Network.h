@@ -49,11 +49,18 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/auxiliaries/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif // Q_MOC_RUN
+#include <map>
+#include <vector>
+#include <string>
+#include <list>
 
 /*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
  *
@@ -175,10 +182,19 @@ public:
     return this->_mSmartMode->getValue();
   }
 
+  //! creates plot group of provided name containing all currently opened plots
   void addPlotGroup(std::string plotGroupName);
+
+  //! removes plot group of given name
   void removePlotGroup(std::string plotGroupName);
+
+  //! renames plot group of given name (from) to given name (to)
   void renamePlotGroup(std::string from, std::string to);
+  
+  //! returns the name of every plot group of this network
   std::list<std::string> getPlotGroupNames();
+
+  //! opens the given plot group
   void displayPlotGroup(std::string plotGroupName);
 
   //!@brief handles events in the context menu
@@ -190,10 +206,15 @@ public:
     return this->_mIsCollapsed->getValue();
   }
 
+  //! search and replace every occurance of 'from' with 'to' in the plot groups node
+  void changeStepName(const std::string& from, const std::string& to);
+
 public slots:
   void stepRecordStateChanged();
 
   void setCollapsed(bool collapsed);
+
+  void handleStepNameChanged(const std::string& from, const std::string& to);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -251,6 +272,8 @@ private:
 
   //!@todo Should return cedar::proc::gui::Element
   cedar::proc::gui::GraphicsBase* getUiElementFor(cedar::proc::ElementPtr element) const;
+
+  void readStickyNotes(const cedar::aux::ConfigurationNode& node);
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

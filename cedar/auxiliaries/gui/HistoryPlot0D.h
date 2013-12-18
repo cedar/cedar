@@ -53,8 +53,11 @@
 // SYSTEM INCLUDES
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
-#include <boost/date_time.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time.hpp>
+#endif
 #include <deque>
+#include <vector>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
@@ -117,11 +120,9 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
   //--------------------------------------------------------------------------------------------------------------------
   struct CurveInfo
   {
-    CurveInfo()
-    :
-    mCurve(NULL)
-    {
-    }
+    CurveInfo();
+
+    ~CurveInfo();
 
     void setData(cedar::aux::ConstDataPtr data);
 
@@ -181,7 +182,10 @@ public:
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
+  //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  //!@brief Check if the given data can be detached from the plot.
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -202,6 +206,7 @@ private:
   void init();
 
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   double getDataValue(size_t index);
 

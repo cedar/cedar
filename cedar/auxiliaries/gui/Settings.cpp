@@ -43,6 +43,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/filesystem.hpp>
 #include <QMainWindow>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -50,7 +51,8 @@
 
 cedar::aux::gui::Settings::Settings()
 :
-mWritingDisabled(false)
+mWritingDisabled(false),
+_mMaximumNumberOfLogEntries(new cedar::aux::UIntParameter(this, "maximal number of log entries", 200))
 {
   this->_mPluginLoadDialogLocation = new cedar::aux::DirectoryParameter
                                      (
@@ -117,4 +119,14 @@ void cedar::aux::gui::Settings::load()
       "void cedar::aux::gui::Settings::load()"
     );
   }
+}
+
+unsigned int cedar::aux::gui::Settings::getMaximumNumberOfLogEntries() const
+{
+  return this->_mMaximumNumberOfLogEntries->getValue();
+}
+
+cedar::aux::UIntParameterPtr cedar::aux::gui::Settings::getMaximalNumberOfLogEntriesParameter() const
+{
+  return this->_mMaximumNumberOfLogEntries;
 }

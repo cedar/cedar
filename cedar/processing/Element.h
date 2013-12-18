@@ -46,8 +46,10 @@
 #include "cedar/processing/Network.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/signals2.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/enable_shared_from_this.hpp>
+  #include <boost/signals2.hpp>
+#endif
 
 
 /*!@brief Base class for Elements in a processing architecture.

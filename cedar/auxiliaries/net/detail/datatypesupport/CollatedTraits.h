@@ -42,9 +42,12 @@
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.fwd.h"
 
 // PROJECT INCLUDES
-#include <boost/static_assert.hpp>
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/static_assert.hpp>
+#endif
+#include <string>
 
 //!@cond SKIPPED_DOCUMENTATION
 

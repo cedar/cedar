@@ -52,6 +52,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string>
 
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief implements reading (RIAA over network) simple variable types

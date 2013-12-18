@@ -50,6 +50,8 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QObject>
+#include <vector>
+#include <set>
 
 
 /*!@brief   Base class for convolution engines.

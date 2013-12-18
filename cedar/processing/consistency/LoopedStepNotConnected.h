@@ -50,6 +50,7 @@
 #include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief A consistency issue that indicates a looped step that is not connected to a looped trigger.

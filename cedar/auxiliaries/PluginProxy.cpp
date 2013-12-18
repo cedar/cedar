@@ -51,13 +51,18 @@
 #include <strsafe.h>
 #endif // CEDAR_OS_UNIX
 
-#include <boost/version.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/version.hpp>
+#endif
 #if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
   #define BOOST_FILESYSTEM_VERSION 2
 #else
   #define BOOST_FILESYSTEM_VERSION 3
 #endif
-#include <boost/filesystem.hpp>
+
+#ifndef Q_MOC_RUN
+  #include <boost/filesystem.hpp>
+#endif
 #include <signal.h>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -283,11 +288,11 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, c
   plugin_filename = "lib";
   plugin_filename += pluginName;
   plugin_filename += ".so";
-#elif CEDAR_OS_APPLE
+#elif defined CEDAR_OS_APPLE
   plugin_filename = "lib";
   plugin_filename += pluginName;
   plugin_filename += ".dylib";
-#elif CEDAR_OS_WINDOWS
+#elif defined CEDAR_OS_WINDOWS
   plugin_filename += pluginName;
   plugin_filename += ".dll";
 #endif

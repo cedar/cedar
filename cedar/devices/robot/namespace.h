@@ -22,62 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetworkTimer.cpp
+    File:        namespace.h
 
-    Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2013 11 7
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2010 08 30
 
-    Description: Singleton class for a central time in the  network.
+    Description: Namespace file for cedar::dev::robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-//CEDAR INCLUDES
-#include "cedar/auxiliaries/NetworkTimer.h"
+#ifndef CEDAR_DEV_ROBOT_NAMESPACE_H
+#define CEDAR_DEV_ROBOT_NAMESPACE_H
 
-cedar::aux::NetworkTimer::NetworkTimer()
-:mRunning(false)
-{
-  this->reset();
-}
+// CEDAR INCLUDES
+#include "cedar/devices/lib.h"
 
-cedar::aux::NetworkTimer::~NetworkTimer()
-{
+// SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
 
-}
-void cedar::aux::NetworkTimer::start()
+namespace cedar
 {
-  // if timer on zero -> hold it on zero
-  if (mStart==mStop)
+  namespace dev
   {
-    mStart = QTime::currentTime();
+    /*! @brief Namespace for all robot interfaces. */
+    namespace robot
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_DEV_CLASS(Component);
+      CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);
+      CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
+      CEDAR_DECLARE_DEV_CLASS(Locomotion);
+      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+      CEDAR_DECLARE_DEV_CLASS(Odometry);
+      CEDAR_DECLARE_DEV_CLASS(Robot);
+      CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+      //!@endcond
+    }
   }
-  mRunning = true;
 }
 
-void cedar::aux::NetworkTimer::reset()
-{
-  mStart = QTime::currentTime();
-  mStop = mStart;
-}
-
-
-void cedar::aux::NetworkTimer::stop()
-{
-  mStop = QTime::currentTime();
-  mRunning = false;
-}
-
-unsigned int cedar::aux::NetworkTimer::getTime()
-{
-  if (mRunning)
-  {
-    return mStart.msecsTo(QTime::currentTime());
-  }
-  return mStart.msecsTo(mStop);
-}
-
-
-
+#endif // CEDAR_DEV_ROBOT_NAMESPACE_H

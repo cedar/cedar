@@ -171,5 +171,10 @@ void cedar::proc::DataSlot::setName(const std::string& name)
 
 void cedar::proc::DataSlot::deleteParentPointer()
 {
+  this->resetParentPointer();
+}
+
+void cedar::proc::DataSlot::resetParentPointer()
+{
   this->mpParent = NULL;
 }

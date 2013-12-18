@@ -48,7 +48,9 @@
 // SYSTEM INCLUDES
 #include <QApplication>
 #include <opencv2/opencv.hpp>
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 #include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------

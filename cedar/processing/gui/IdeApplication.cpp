@@ -58,6 +58,7 @@
 #else
   #error Please implement signal handling for your compiler.
 #endif // CEDAR_COMPILER_GCC
+#include <iostream>
 
 #define CATCH_EXCEPTIONS_IN_GUI
 

@@ -39,12 +39,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <string>
 
 /*!@brief Data containing matrices.
  */
@@ -119,6 +121,13 @@ public:
   bool isEmpty() const
   {
     return this->getData().empty();
+  }
+
+  //! Returns the value of the contained (two-dimensional) matrix at the given location
+  template <typename ReturnT>
+  ReturnT getValue(int row, int col) const
+  {
+    return cedar::aux::math::getMatrixEntry<ReturnT>(this->getData(), row, col);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

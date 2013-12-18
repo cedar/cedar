@@ -39,10 +39,16 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/Settings.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
-#include <boost/shared_ptr.hpp>
+#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/shared_ptr.hpp>
+#endif
 #include <string>
 
 unsigned int errors;
@@ -62,7 +68,7 @@ void run_test()
   cv::Mat mat2(3, sz, CV_8S, cv::Scalar::all(-42));
   cv::Mat mat3(100,100,CV_8UC3);
 
-  int timestep =  200;
+  cedar::unit::Time timestep(200.0 * cedar::unit::milli * cedar::unit::seconds);
 
 
   if(cedar::aux::RecorderSingleton::getInstance().get()==0)
@@ -77,10 +83,13 @@ void run_test()
   cedar::aux::MatDataPtr dataPtr3 = cedar::aux::MatDataPtr( new cedar::aux::MatData( mat3));
 
   //Registering DataPtr
-  cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr,timestep ,"Mat1");
-  cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr2,timestep ,"Mat2");
-  cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr3,timestep ,"Mat3");
-  cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr2,timestep ,"Mat4");
+  cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr, timestep, "Mat1");
+  cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr2, timestep, "Mat2");
+  cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr3, timestep, "Mat3");
+  cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr2, timestep, "Mat4");
+
+  //Rename UnitTest Folder
+  cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName("UnitTest");
 
   //Start Recorder - wait 5 secs -stop Recorder
   cedar::aux::RecorderSingleton::getInstance()->start();
@@ -94,7 +103,11 @@ void run_test()
     errors++;
     std::cout<<filename<<" can not be found"<<std::endl;
   }
-
+  else
+  {
+    std::string path = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory();
+    boost::filesystem::remove_all(cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()+"/UnitTest");
+  }
 }
 
 

@@ -49,6 +49,7 @@
 #include <QColor>
 #include <QPalette>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter

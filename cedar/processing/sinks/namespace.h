@@ -44,6 +44,10 @@
 
 // SYSTEM INCLUDES
 
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
+
 #warning Do not include this header any more. Use the new forward declaration headers instead.
 
 #include "cedar/processing/sinks/NetWriter.fwd.h"

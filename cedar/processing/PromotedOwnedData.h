@@ -44,6 +44,7 @@
 #include "cedar/processing/PromotedOwnedData.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 /*!@brief A slot for data that is promoted to an outer network.
  */

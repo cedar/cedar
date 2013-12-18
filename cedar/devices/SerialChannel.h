@@ -48,6 +48,7 @@
 #include <QObject>
 #include <boost/utility.hpp>
 #include <boost/asio.hpp>
+#include <string>
 
 
 //!@brief Channel to serial devies, based on Boost ASIO.

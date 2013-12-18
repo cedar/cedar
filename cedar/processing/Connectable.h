@@ -53,8 +53,11 @@
 #include "cedar/processing/sources/GroupSource.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/connection.hpp>
+#endif
 #include <vector>
+#include <map>
 
 /*!@brief   An interface for classes that have data slots that can be connected.
  *

@@ -56,6 +56,7 @@
 // SYSTEM INCLUDES
 #include <QGraphicsItem>
 #include <QPen>
+#include <vector>
 
 
 /*!@brief Base class for graphical items in a processing scene.

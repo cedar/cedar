@@ -63,7 +63,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
-#include "cedar/auxiliaries/NetworkTimer.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -71,7 +71,13 @@
 #include <QFileDialog>
 #include <QDialogButtonBox>
 #include <QInputDialog>
-#include <boost/property_tree/detail/json_parser_error.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/detail/json_parser_error.hpp>
+#endif
+#include <vector>
+#include <set>
+#include <list>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -329,7 +335,7 @@ void cedar::proc::gui::Ide::selectAll()
 void cedar::proc::gui::Ide::resetRootNetwork()
 {
   //reset global timer @!todo should the time be reseted here?
-  //cedar::aux::NetworkTimerSingleton::getInstance()->reset();
+  //cedar::aux::GlobalClockSingleton::getInstance()->reset();
   this->getLog()->outdateAllMessages();
   this->mNetwork->getNetwork()->reset();
 }
@@ -622,7 +628,7 @@ void cedar::proc::gui::Ide::startThreads()
   this->mpThreadsStartAll->setChecked(true);
   this->mpThreadsStopAll->setChecked(false);
   //start global timer
-  cedar::aux::NetworkTimerSingleton::getInstance()->start();
+  cedar::aux::GlobalClockSingleton::getInstance()->start();
   CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
   // calls this->mNetwork->getNetwork()->startTriggers()
   this->mStartThreadsCaller->start();
@@ -646,7 +652,7 @@ void cedar::proc::gui::Ide::stopThreads()
   this->mpThreadsStartAll->setChecked(false);
   this->mpThreadsStopAll->setChecked(true);
   //stop global timer @!todo should the time be stoped here?
-  //cedar::aux::NetworkTimerSingleton::getInstance()->stop();
+  //cedar::aux::GlobalClockSingleton::getInstance()->stop();
   CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
   // calls this->mNetwork->getNetwork()->stopTriggers()
   this->mStopThreadsCaller->start();
