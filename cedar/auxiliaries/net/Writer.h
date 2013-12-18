@@ -46,9 +46,12 @@
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
 
 // PROJECT INCLUDES
-#include <boost/static_assert.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/static_assert.hpp>
+#endif
 
 // SYSTEM INCLUDES
+#include <string>
 
   //---------------------------------------------------------------------------
   // the unspecialized template class cannot be instantiated

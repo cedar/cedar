@@ -50,7 +50,9 @@
 #include "cedar/auxiliaries/UnitData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/NetworkTimer.h"
+#include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <qwt_legend.h>
@@ -83,7 +85,7 @@ boost::posix_time::ptime cedar::aux::gui::HistoryPlot0D::mPlotStartTime = boost:
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(NULL)
+mpCurrentPlotWidget(nullptr)
 {
   this->init();
 }
@@ -91,10 +93,16 @@ mpCurrentPlotWidget(NULL)
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(NULL)
+mpCurrentPlotWidget(nullptr)
 {
   this->init();
   this->plot(data, title);
+}
+
+cedar::aux::gui::HistoryPlot0D::CurveInfo::CurveInfo()
+:
+mCurve(NULL)
+{
 }
 
 cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
@@ -104,7 +112,17 @@ cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
     this->mpWorkerThread->quit();
     this->mpWorkerThread->wait();
     delete this->mpWorkerThread;
-    this->mpWorkerThread = NULL;
+    this->mpWorkerThread = nullptr;
+  }
+
+  this->mCurves.clear();
+}
+
+cedar::aux::gui::HistoryPlot0D::CurveInfo::~CurveInfo()
+{
+  if (mCurve != NULL)
+  {
+    mCurve->detach();
   }
 }
 
@@ -129,10 +147,10 @@ void cedar::aux::gui::HistoryPlot0D::contextMenuEvent(QContextMenuEvent *pEvent)
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
-  p_legend->setChecked(this->mpPlot->legend() != NULL);
+  p_legend->setChecked(this->mpPlot->legend() != nullptr);
 
   QAction *p_action = menu.exec(pEvent->globalPos());
-  if (p_action == NULL)
+  if (p_action == nullptr)
   {
     return;
   }
@@ -153,7 +171,7 @@ void cedar::aux::gui::HistoryPlot0D::showLegend(bool show)
   {
     // show legend
     auto p_legend = this->mpPlot->legend();
-    if (p_legend == NULL)
+    if (p_legend == nullptr)
     {
       p_legend = new QwtLegend();
       p_legend->setFrameStyle(QFrame::Box);
@@ -205,6 +223,22 @@ bool cedar::aux::gui::HistoryPlot0D::canAppend(cedar::aux::ConstDataPtr data) co
   {
     return false;
   }
+}
+
+bool cedar::aux::gui::HistoryPlot0D::canDetach(cedar::aux::ConstDataPtr data) const
+{
+  if(this->mpPlot != nullptr && this->mCurves.size() > 1)
+  {
+    for(auto curve : this->mCurves)
+    {
+      if(curve->mData == data)
+      {
+        return true;
+      }
+    }
+  }
+  
+  return false;
 }
 
 void cedar::aux::gui::HistoryPlot0D::init()
@@ -357,6 +391,14 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, con
   this->applyStyle(index, curve->mCurve);
 }
 
+void cedar::aux::gui::HistoryPlot0D::doDetach(cedar::aux::ConstDataPtr data)
+{
+  auto new_end = std::remove_if(mCurves.begin(), mCurves.end(), [&](CurveInfoPtr curve_info){
+    return (curve_info->mData == data);
+  });
+  mCurves.erase(new_end, mCurves.end());
+}
+
 //!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
 {
@@ -365,7 +407,10 @@ void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
     cedar::aux::gui::HistoryPlot0D::CurveInfoPtr curve = this->mpPlot->mCurves[curve_index];
 
     // update x value
-    unsigned int time = cedar::aux::NetworkTimerSingleton::getInstance()->getTime();
+    using namespace cedar::unit;
+    Time time_quantity = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+    unsigned int time = static_cast<unsigned int>(time_quantity / Time(1.0 * milli * second));
+
     curve->mXValues.push_back(time);
 
     while (curve->mXValues.size() > this->mpPlot->mMaxHistorySize)
@@ -403,15 +448,15 @@ void cedar::aux::gui::HistoryPlot0D::conversionDone()
     x_max = std::max(x_max, curve->mXArray.back());
 
     // choose the right function depending on the qwt version
-#if (QWT_VERSION >> 16) == 5
-    curve->mCurve->setData
+#if (QWT_VERSION >= 0x060000)
+    curve->mCurve->setRawSamples
     (
       &curve->mXArray.front(),
       &curve->mYArray.front(),
       static_cast<int>(curve->mXValues.size())
     );
-#elif (QWT_VERSION >> 16) == 6
-    curve->mCurve->setRawSamples
+#elif (QWT_VERSION >= 0x050000)
+    curve->mCurve->setData
     (
       &curve->mXArray.front(),
       &curve->mYArray.front(),

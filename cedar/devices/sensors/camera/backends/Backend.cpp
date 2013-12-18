@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <QWriteLocker>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -48,6 +48,7 @@
 #include "cedar/dynamics/steps/RateMatrixToSpaceCode.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A step that converts a 2-dimensional matrix of rate code values to a 3-dimensional matrix of space code.

@@ -49,7 +49,9 @@
 #include "cedar/auxiliaries/gui/PlotDeclarationTemplate.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 #include <set>
+#include <map>
 
 /*!@brief A manager for different types of plots
  *

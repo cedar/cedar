@@ -44,8 +44,11 @@
 #include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
+#include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -102,8 +105,12 @@ void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::Confi
   copyFromFRI();
 
   //set step size and idle time for the looped thread
-  setStepSize(12.0);
-  setIdleTime(0.01);
+  cedar::unit::Time step_size(12.0 * cedar::unit::milli * cedar::unit::seconds);
+  setStepSize(step_size);
+
+  cedar::unit::Time idle_time(0.01 * cedar::unit::milli * cedar::unit::seconds);
+  setIdleTime(idle_time);
+
   //start the thread
   start();
 

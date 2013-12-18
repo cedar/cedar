@@ -50,6 +50,8 @@
 #include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@brief Yarp implementation of an epuck drive.

@@ -44,6 +44,7 @@
 #include "cedar/processing/gui/PropertyPane.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief A widget for displaying the parameters of configurables.

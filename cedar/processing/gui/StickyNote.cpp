@@ -35,24 +35,38 @@
 ======================================================================================================================*/
 
 
-
+// CEDAR INCLUDES
 #include "StickyNote.h"
 
+// SYSTEM INCLUDES
 #include<QBrush>
-cedar::proc::gui::StickyNote::StickyNote(int x, int y, QGraphicsScene* pParent)
+#include <iostream>
+
+
+cedar::proc::gui::StickyNote::StickyNote(
+    cedar::proc::gui::Scene* pParent,
+    int x,
+    int y,
+    int width,
+    int height,
+    std::string text)
+:
+cedar::proc::gui::GraphicsBase(width,height)
 {
   //initialize
   mScaling = false;
   this->mpParent = pParent;
   mColor = Qt::yellow;
-  mBound =  QRectF(x, y, 120, 70);
+  mBound =  QRectF(0, 0, width, height);
+  this->setPos(x,y);
 
   //initialize TextEdit Widget
   mText.setFrameStyle(0);
-  mText.setFixedSize(100,50);
+  mText.setFixedSize(width-20,height-20);
   mpProxy = new QGraphicsProxyWidget(this);
   mpProxy->setWidget(&mText);
-  mpProxy->setPos(x + 10, y + 10);
+  mpProxy->setPos(10, 10);
+  mText.setPlainText(QString(text.c_str()));
 
   //set flags
   setFlag(ItemIsMovable);
@@ -83,17 +97,6 @@ void cedar::proc::gui::StickyNote::paint(QPainter *painter, const QStyleOptionGr
   mpProxy->setMaximumWidth(mBound.width() - 20 );
   mpProxy->setMaximumHeight(mBound.height() - 20);
 
-  //set note to selected if TextEdit has focused
-  if (mText.hasFocus() )
-  {
-    QList<QGraphicsItem*> items = this->mpParent->selectedItems();
-    for (QGraphicsItem* item : items)
-    {
-      item->setSelected(false);
-    }
-    this->setSelected(true);
-  }
-
   // change pen if the note is selected
   if (this->isSelected())
   {
@@ -118,10 +121,10 @@ void cedar::proc::gui::StickyNote::keyPressEvent(QKeyEvent* event)
 {
   if (isSelected() && event->key() ==  Qt::Key_Delete)
   {
-    mpParent->removeItem(this);
+    mpParent->removeStickyNote(this);
   }
 
-  QGraphicsItem::keyPressEvent(event);
+  cedar::proc::gui::GraphicsBase::keyPressEvent(event);
 }
 
 void cedar::proc::gui::StickyNote::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -135,7 +138,7 @@ void cedar::proc::gui::StickyNote::mousePressEvent(QGraphicsSceneMouseEvent* eve
   }
   else
   {
-    QGraphicsItem::mousePressEvent(event);
+    cedar::proc::gui::GraphicsBase::mousePressEvent(event);
   }
 }
 
@@ -147,7 +150,7 @@ void cedar::proc::gui::StickyNote::mouseReleaseEvent(QGraphicsSceneMouseEvent* e
   }
   else
   {
-    QGraphicsItem::mouseReleaseEvent(event);
+    cedar::proc::gui::GraphicsBase::mouseReleaseEvent(event);
   }
 }
 
@@ -169,6 +172,13 @@ void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* even
   }
   else
   {
-    QGraphicsItem::mouseMoveEvent(event);
+    cedar::proc::gui::GraphicsBase::mouseMoveEvent(event);
   }
 }
+
+
+std::string cedar::proc::gui::StickyNote::getText() const
+{
+  return this->mText.toPlainText().toStdString();
+}
+

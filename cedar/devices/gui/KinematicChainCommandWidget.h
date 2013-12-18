@@ -48,6 +48,7 @@
 #include <QComboBox>
 #include <QWidget>
 #include <QDoubleSpinBox>
+#include <vector>
 
 //!@brief A simple widget to command single joints
 class cedar::dev::gui::KinematicChainCommandWidget

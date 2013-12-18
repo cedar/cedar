@@ -51,6 +51,7 @@
 // SYSTEM INCLUDES
 #include <QTreeWidgetItem>
 #include <QWidget>
+#include <string>
 
 
 /*!@brief A gui for the manager of robot instances.

@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <string>
 #include <typeinfo>
 
 

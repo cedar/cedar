@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Flip.h"
+#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -89,7 +90,11 @@ mOutput(new cedar::aux::MatData(cv::Mat())),
 _mFlipDimensions(new cedar::aux::BoolVectorParameter(this, "flipped dimensions", 2, true))
 {
   // declare all data
-  this->declareInput("input");
+  auto input_slot = this->declareInput("input");
+  cedar::proc::typecheck::Matrix check;
+  check.addAcceptedDimensionalityRange(1, 3);
+  input_slot->setCheck(check);
+
   this->declareOutput("output", mOutput);
   QObject::connect(_mFlipDimensions.get(), SIGNAL(valueChanged()), this, SLOT(flipDirectionsChanged()));
 }
@@ -235,29 +240,6 @@ void cedar::proc::steps::Flip::flip2D(cv::Mat input, cv::Mat& output, bool flipF
   }
 
   cv::flip(input, output, flip_code);
-}
-
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Flip::determineInputValidity
-                                (
-                                  cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::ConstDataPtr data
-                                ) const
-{
-  // First, let's make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
-  {
-    // Mat data is accepted, but only one- and two-dimensional matrices.
-    unsigned int dim = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-    if (dim >= 1 && dim <= 3)
-    {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
-    }
-  }
-  // Everything else is rejected.
-  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::proc::steps::Flip::inputConnectionChanged(const std::string& inputName)

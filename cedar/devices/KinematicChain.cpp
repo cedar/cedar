@@ -47,7 +47,10 @@
 #include "cedar/auxiliaries/exceptions.h" // for DuplicateNameException
 
 // SYSTEM INCLUDES
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
+#include <algorithm>
 
 namespace
 {
@@ -473,8 +476,10 @@ bool cedar::dev::KinematicChain::setJointAccelerations(const cv::Mat& accelerati
   return false;
 }
 
-void cedar::dev::KinematicChain::step(double time)
+void cedar::dev::KinematicChain::step(cedar::unit::Time time)
 {
+  double time_value = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
+
   if (mUseCurrentHardwareValues)
   {
     mJointVelocities = getCachedJointVelocities();
@@ -482,7 +487,7 @@ void cedar::dev::KinematicChain::step(double time)
 
   {
     QWriteLocker locker(&mVelocitiesLock);
-    mJointVelocities += getCachedJointAccelerations() * ( time / 1000.0 );
+    mJointVelocities += getCachedJointAccelerations() * time_value / 1000.0;
   }
 
   applyVelocityLimits(mJointVelocities);
@@ -499,7 +504,7 @@ void cedar::dev::KinematicChain::step(double time)
 
   {
     QWriteLocker locker(&mAnglesLock);
-    mJointAngles += getCachedJointVelocities() * ( time / 1000.0 );
+    mJointAngles += getCachedJointVelocities() * ( time_value / 1000.0 );
   }
 
   applyAngleLimits(mJointAngles);

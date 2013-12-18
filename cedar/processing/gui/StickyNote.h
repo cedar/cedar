@@ -38,6 +38,8 @@
 #define CEDAR_PROC_STICKY_NOTE_H
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Scene.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/StickyNote.fwd.h"
@@ -51,9 +53,10 @@
 #include <QTextEdit>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsSceneEvent>
+#include <string>
 
 //!@brief A GUI class that creates a pane where the user can write a comment or note.
-class cedar::proc::gui::StickyNote: public QGraphicsItem
+class cedar::proc::gui::StickyNote: public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -61,7 +64,7 @@ class cedar::proc::gui::StickyNote: public QGraphicsItem
 
 public:
   //!@brief the constructor
-  StickyNote(int x, int y, QGraphicsScene* pParent);
+  StickyNote(cedar::proc::gui::Scene* pParent, int x, int y, int width = 120, int height = 70, std::string text = "");
 
   //!@brief the destructor
   ~StickyNote();
@@ -90,6 +93,10 @@ public:
   //!@brief Events when mouse is moved in the note.
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
+
+  std::string getText() const;
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,7 +115,7 @@ private:
   QColor mColor;
 
   //!@brief A reference to the parent scene.
-  QGraphicsScene* mpParent;
+  cedar::proc::gui::Scene* mpParent;
 
   //!@brief flag that saves if the not is currently in scaling mode
   bool mScaling;

@@ -53,7 +53,9 @@
 
 // SYSTEM INCLUDES
 #include <iostream>
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

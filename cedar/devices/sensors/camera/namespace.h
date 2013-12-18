@@ -46,7 +46,10 @@
 #include "cedar/auxiliaries/SetParameter.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
+#include <map>
 
 namespace cedar
 {

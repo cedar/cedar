@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <QDialog>
+#include <string>
 
 
 /*!@brief A widget for managing plugins.

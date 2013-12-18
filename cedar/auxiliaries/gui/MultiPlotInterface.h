@@ -44,7 +44,8 @@
 #include "cedar/auxiliaries/gui/MultiPlotInterface.fwd.h"
 
 // SYSTEM INCLUDES
-
+#include <QReadWriteLock>
+#include <map>
 
 /*!@brief An interface that indicates that a plot is capable of plotting more than one data object at a time.
  */
@@ -77,10 +78,18 @@ public:
   //!@brief check if given data can be appended to a plot
   virtual bool canAppend(cedar::aux::ConstDataPtr data) const = 0;
 
+  /*!@brief Detach the given data from the plot.
+   *
+   * @param data  The data to detach.
+   */
+  void detach(cedar::aux::ConstDataPtr data);
+
+  //!@brief check if given data can be detached from the plot
+  virtual bool canDetach(cedar::aux::ConstDataPtr data) const = 0;
+
   //!@brief Returns a map of data associated with its title.
   //!@todo Rename this to getDataNameMap?
   const DataMap& getDataMap() const;
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,6 +103,8 @@ private:
   //! Actual implementation of the appending is deferred to the sub-classes.
   virtual void doAppend(cedar::aux::ConstDataPtr data, const std::string& title) = 0;
 
+  //! Actual implementation of the detaching is deferred to the sub-classes.
+  virtual void doDetach(cedar::aux::ConstDataPtr data) = 0;
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

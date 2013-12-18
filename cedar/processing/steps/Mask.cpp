@@ -158,7 +158,7 @@ void cedar::proc::steps::Mask::inputConnectionChanged(const std::string& inputNa
 {
   cedar::proc::ConstExternalDataPtr slot = this->getInputSlot(inputName);
   cv::Mat in_mat;
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(slot->getData()))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(slot->getData()))
   {
     in_mat = mat_data->getData();
     if (inputName == "input")

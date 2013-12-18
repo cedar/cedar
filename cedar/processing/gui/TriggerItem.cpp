@@ -67,6 +67,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsDropShadowEffect>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

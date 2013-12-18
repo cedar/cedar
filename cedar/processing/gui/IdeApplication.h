@@ -56,6 +56,8 @@
 #include <Windows.h>
 #endif // CEDAR_COMPILER_MSVC
 
+#include <string>
+
 
 /*!@brief The application for the processingIde.
  */

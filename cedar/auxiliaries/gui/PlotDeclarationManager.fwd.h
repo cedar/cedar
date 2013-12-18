@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar

@@ -26,29 +26,28 @@
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2013 11 07
+    Date:        2013 11 7
 
-    Description: Singleton class for a central time in the network.
+    Description: Singleton class for a central time in th network network.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_NETWORK_TIMER_H
-#define CEDAR_AUX_NETWORK_TIMER_H
-
+#ifndef CEDAR_AUX_NETWORKTIMER_H_
+#define CEDAR_AUX_NETWORKTIMER_H_
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Singleton.fwd.h"
+#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/NetworkTimer.fwd.h"
-#include "cedar/auxiliaries/Singleton.fwd.h"
+#include "cedar/auxiliaries/GlobalClock.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QTime>
 
-
 //@!brief Can start, stop and reset the network time and should be used as a central time giver in a network.
-class cedar::aux::NetworkTimer
+class cedar::aux::GlobalClock
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -56,17 +55,17 @@ class cedar::aux::NetworkTimer
   //--------------------------------------------------------------------------------------------------------------------
 
   // uses singleton template.
-  friend class cedar::aux::Singleton<NetworkTimer>;
+  friend class cedar::aux::Singleton<GlobalClock>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief The private constructor for singleton usage.
-  NetworkTimer();
+  GlobalClock();
 public:
-  //!@brief The destructor.
-  ~NetworkTimer();
+  //!@brief The Destructor.
+  ~GlobalClock();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -82,7 +81,8 @@ public:
   void stop();
 
   //!@brief Returns the elapsed time since timer has started
-  unsigned int getTime();
+  //!@todo make this const?
+  cedar::unit::Time getTime();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -109,9 +109,9 @@ namespace cedar
 {
   namespace aux
   {
-    CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::NetworkTimer>);
-    typedef cedar::aux::Singleton<cedar::aux::NetworkTimer> NetworkTimerSingleton;
+    CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::GlobalClock>);
+    typedef cedar::aux::Singleton<cedar::aux::GlobalClock> GlobalClockSingleton;
   }
 }
 
-#endif // CEDAR_AUX_NETWORK_TIMER_H
+#endif /* CEDAR_AUX_NETWORKTIMER_H_ */

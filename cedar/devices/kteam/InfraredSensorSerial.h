@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
+//!@todo Old-style opencv include?
 #include <cv.h>
 
 

@@ -47,6 +47,8 @@
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
+#include <map>
+
 
 namespace cedar
 {

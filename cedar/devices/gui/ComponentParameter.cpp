@@ -56,6 +56,7 @@
 #include <QDialog>
 #include <QTreeWidget>
 #include <QDialogButtonBox>
+#include <string>
 
 
 //----------------------------------------------------------------------------------------------------------------------

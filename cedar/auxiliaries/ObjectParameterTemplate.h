@@ -46,6 +46,8 @@
 #include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@brief A parameter that can hold an object whose type is determined dynamically by user input.

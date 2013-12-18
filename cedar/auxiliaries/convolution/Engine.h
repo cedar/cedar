@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/kernel/Separable.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Base class for convolution engines.

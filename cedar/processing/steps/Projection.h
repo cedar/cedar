@@ -50,6 +50,7 @@
 #include "cedar/processing/steps/Projection.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Processing step, which projects neuronal activation between processing steps of different dimensionality.
@@ -243,6 +244,9 @@ private:
   cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
   //!@brief type of compression used when reducing the dimensionality (maximum, minimum, average, sum)
   cedar::aux::EnumParameterPtr _mCompressionType;
+
+  //!@brief a lookup table for mappings
+  std::vector<unsigned int> mMappingLookup;
 }; // class cedar::proc::steps::Projection
 
 #endif // CEDAR_PROC_STEPS_PROJECTION_H

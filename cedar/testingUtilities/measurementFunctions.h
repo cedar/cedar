@@ -44,6 +44,8 @@
 #include "cedar/testingUtilities/namespace.h"
 
 // CEDAR INCLUDES
+#include <functional>
+#include <string>
 
 // SYSTEM INCLUDES
 namespace cedar

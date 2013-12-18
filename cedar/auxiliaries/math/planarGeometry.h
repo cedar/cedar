@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 namespace cedar

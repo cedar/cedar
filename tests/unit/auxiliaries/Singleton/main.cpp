@@ -40,7 +40,9 @@
 
 // SYSTEM INCLUDES
 #include <string>
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
 
 
 class TestClass

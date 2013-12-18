@@ -52,6 +52,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
+#include <map>
 
 /*!@brief Interface for a chain of joints
  *
@@ -605,7 +606,7 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  void step(double time);
+  void step(cedar::unit::Time time);
   void init();
   void initializeFromJointList();
   void applyAngleLimits(cv::Mat& angles);

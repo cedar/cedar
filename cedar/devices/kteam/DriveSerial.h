@@ -43,6 +43,7 @@
 #include "cedar/devices/kteam/namespace.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Add description.

@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/kernel/Gauss.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A class for a convolution kernel that has the shape of a Gaussian distribution.

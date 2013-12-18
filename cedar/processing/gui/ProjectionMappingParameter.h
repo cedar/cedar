@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <QComboBox>
+#include <vector>
 
 
 /*!@brief GUI elements for the projection mapping parameter.

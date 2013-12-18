@@ -50,6 +50,10 @@
 #include "cedar/auxiliaries/PluginDeclarationTemplate.fwd.h"
 
 // SYSTEM INCLUDES
+#include <map>
+#include <vector>
+#include <set>
+#include <string>
 
 /*!@brief A template for manager of plugin declarations.
  *

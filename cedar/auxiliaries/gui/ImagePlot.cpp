@@ -65,6 +65,7 @@
 #include <QLinearGradient>
 #include <QPalette>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration

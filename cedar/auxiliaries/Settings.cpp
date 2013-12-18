@@ -43,7 +43,9 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <boost/property_tree/json_parser.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/json_parser.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -54,12 +56,12 @@ cedar::aux::Settings::Settings()
 cedar::aux::Configurable(),
 _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", false))
 {
-  mRecorderWorkspace = new cedar::aux::DirectoryParameter
-                       (
-                         this,
-                         "recorder output directory",
-                         cedar::aux::getUserHomeDirectory() + "/cedarRecordings/"
-                       );
+  _mRecorderWorkspace = new cedar::aux::DirectoryParameter
+                        (
+                          this,
+                          "recorder output directory",
+                          cedar::aux::getUserHomeDirectory() + "/cedarRecordings/"
+                        );
 
   cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
   this->addConfigurableChild("plugins", plugins);
@@ -122,12 +124,12 @@ cedar::aux::Settings::~Settings()
 
 cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspaceParameter() const
 {
-  return this->mRecorderWorkspace;
+  return this->_mRecorderWorkspace;
 }
 
 std::string cedar::aux::Settings::getRecorderOutputDirectory() const
 {
-  return this->mRecorderWorkspace->getValue().absolutePath().toStdString();
+  return this->_mRecorderWorkspace->getValue().absolutePath().toStdString();
 }
 
 void cedar::aux::Settings::swapPluginSearchPaths(unsigned int first, unsigned int second)
@@ -297,7 +299,7 @@ void cedar::aux::Settings::save()
   }
 }
 
-bool cedar::aux::Settings::getMemoryDebugOutput()
+bool cedar::aux::Settings::getMemoryDebugOutput() const
 {
   return this->_mMemoryDebugOutput->getValue();
 }

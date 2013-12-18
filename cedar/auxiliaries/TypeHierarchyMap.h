@@ -44,10 +44,14 @@
 #include "cedar/auxiliaries/TypeHierarchyMap.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/enable_shared_from_this.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/enable_shared_from_this.hpp>
+#endif
 #include <set>
 #include <queue>
 #include <iostream>
+#include <map>
+#include <string>
 
 /*!@brief   A structure capable of representing parts of the inheritance sturcture between types.
  *

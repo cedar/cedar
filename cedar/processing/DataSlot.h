@@ -50,10 +50,13 @@
 #include "cedar/processing/PromotedOwnedData.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/function.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/signals2/connection.hpp>
-#include <boost/signals2/signal.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/function.hpp>
+  #include <boost/enable_shared_from_this.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/signals2/signal.hpp>
+#endif
+#include <string>
 
 
 /*!@brief This class represents data slots in connectable objects.
@@ -207,7 +210,11 @@ private:
   //! Returns the type check function object for this slot.
   const TypeCheckFunction& getCheck() const;
 
-  void deleteParentPointer();
+  //!@brief deprecated due to bad name, see resetParentPointer
+  CEDAR_DECLARE_DEPRECATED(void deleteParentPointer());
+
+  //!@brief sets the parent pointer to NULL
+  void resetParentPointer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

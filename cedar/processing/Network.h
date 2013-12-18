@@ -59,10 +59,16 @@
 #include "cedar/processing/sinks/GroupSink.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
 #include <QThread>
 #include <vector>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif
+#include <map>
+#include <set>
+#include <list>
+#include <string>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
@@ -89,6 +95,8 @@ public:
     CONNECTION_REMOVED,
   };
 
+ signals:
+  void stepNameChanged(const std::string& from, const std::string& to);
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -298,17 +306,29 @@ public:
    */
   void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
 
+  /*!@brief Deletes the connections in the list.
+   */
+  void disconnectSlots(const std::vector<cedar::proc::DataConnectionPtr>& connections);
+
   /*!@brief Deletes all connections from a given data slot.
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
+   *
+   * @todo check for duplicate functions
    */
-  CEDAR_DECLARE_DEPRECATED(void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot));
+  void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes all connections from a given data slot.
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
    */
-  void disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+  //void disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+
+    /*!@brief Deletes all connections to the given data slot.
+     * @param connectable The slot's parent.
+     * @param slot Identifier of the data slot.
+     */
+  void disconnectInputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes the connection between source and target.
    */
@@ -326,12 +346,36 @@ public:
                            const std::string& sourceDataName,
                            std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
-
+                         
   void getDataConnections(
                            cedar::proc::ConstConnectablePtr source,
                            const std::string& sourceDataName,
                            std::vector<cedar::proc::ConstDataConnectionPtr>& connections
                          ) const;
+
+  /*!@brief Writes all the connections originating from a source connectable into a vector.
+   *
+   * @param source             The connectable source.
+   * @param sourceDataSlotName The name of the slot from which to look list outgoing connections.
+   * @param connections        Vector into which the connections are written.
+   */
+  void getDataConnectionsFrom(
+                           cedar::proc::ConnectablePtr source,
+                           const std::string& sourceDataSlotName,
+                           std::vector<cedar::proc::DataConnectionPtr>& connections
+                         );
+
+  /*!@brief Writes all the connections ending at a target connectable into a vector.
+   *
+   * @param source             The connectable target.
+   * @param sourceDataSlotName The name of the slot at which connections end.
+   * @param connections        Vector into which the connections are written.
+   */
+  void getDataConnectionsTo(
+                             cedar::proc::ConnectablePtr target,
+                             const std::string& targetDataSlotName,
+                             std::vector<cedar::proc::DataConnectionPtr>& connections
+                           );
 
   /*!@brief access the vector of data connections
    */
@@ -402,7 +446,7 @@ public:
   }
 
   /*!@brief Remove all connections that connect up to a specified slot */
-  void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
+//  void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
 
   //!@brief Starts all triggers in this network (that haven't been started yet).
   void startTriggers(bool wait = false);
@@ -539,13 +583,6 @@ private:
   //!@brief revalidates all outgoing connections of a slot
   void revalidateConnections(const std::string& sender);
 
-  /*!@brief   Single-steps all triggers in this network with the given time step.
-   *
-   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
-   *          all triggers are stopped.
-   */
-  void stepTriggers(double stepTime);
-
   void processConnectors();
 
   void removeAllConnectors();
@@ -555,18 +592,17 @@ private:
 
   std::vector<cedar::proc::DataSlotPtr> getRealTargets
                                         (
-                                          cedar::proc::DataConnectionPtr connection,
+                                          cedar::proc::DataSlotPtr slot,
                                           cedar::proc::ConstNetworkPtr targetNetwork
                                         );
 
   cedar::proc::DataSlotPtr getRealSource
                            (
-                             cedar::proc::DataConnectionPtr connection,
+                             cedar::proc::DataSlotPtr slot,
                              cedar::proc::ConstNetworkPtr targetNetwork
                            );
 
-
-  void deleteConnectorsAlongConnection(cedar::proc::DataConnectionPtr connection, cedar::proc::ConstNetworkPtr targetNetwork);
+  static void deleteConnectorsAlongConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 

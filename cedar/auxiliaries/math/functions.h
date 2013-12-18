@@ -42,6 +42,7 @@
 
 // SYSTEM INCLUDES
 #include <math.h>
+#include <vector>
 
 namespace cedar
 {

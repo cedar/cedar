@@ -46,7 +46,9 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <dc1394/dc1394.h>
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 
 /*! A short program to search and list all available cameras with their GUID's on the firewire bus
  */

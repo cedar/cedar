@@ -80,8 +80,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr) const;
-
   void compute(const cedar::proc::Arguments&);
 
   void inputConnectionChanged(const std::string& inputName);

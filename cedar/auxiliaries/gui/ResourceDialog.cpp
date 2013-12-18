@@ -45,6 +45,7 @@
 // SYSTEM INCLUDES
 #include <QTreeWidgetItem>
 #include <QDir>
+#include <string>
 
 #include <boost/version.hpp>
 #if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
