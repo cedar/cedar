@@ -97,6 +97,14 @@ namespace cedar
       //! returns the value of the global minimum of a matrix
       CEDAR_AUX_LIB_EXPORT double min(const cv::Mat matrix);
 
+      /*! Flips a matrix of up to 3 dimensions.
+       * @param flipped Matrix to which the result is written. Should be initialized to the proper size (same size as input).
+       */
+      CEDAR_AUX_LIB_EXPORT void flip(const cv::Mat& toFlip, cv::Mat& flipped, const std::vector<bool>& flippedDimensions);
+
+      //! Flips a matrix of up to 3 dimensions.
+      CEDAR_AUX_LIB_EXPORT cv::Mat flip(const cv::Mat& toFlip, const std::vector<bool>& flippedDimensions);
+
       //! Returns the index of the global maximum of a matrix.
       CEDAR_AUX_LIB_EXPORT unsigned int maxIndex1D(const cv::Mat matrix);
 

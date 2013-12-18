@@ -50,6 +50,107 @@
   #include <boost/static_assert.hpp>
 #endif
 
+namespace cedar
+{
+  namespace aux
+  {
+    namespace math
+    {
+      //! Internal helper function for cedar::aux::math::flip.
+      void flip2D(cv::Mat input, cv::Mat& output, bool flipFirst, bool flipSecond)
+      {
+        int flip_code;
+        if (flipFirst && flipSecond)
+        {
+          flip_code = -1;
+        }
+        else if (flipFirst)
+        {
+          flip_code = 0;
+        }
+        else if (flipSecond)
+        {
+          flip_code = 1;
+        }
+        else // nothing to do
+        {
+          input.copyTo(output);
+          return;
+        }
+
+        cv::flip(input, output, flip_code);
+      }
+    }
+  }
+}
+
+void cedar::aux::math::flip(const cv::Mat& toFlip, cv::Mat& flipped, const std::vector<bool>& flippedDimensions)
+{
+  auto input_dim = cedar::aux::math::getDimensionalityOf(toFlip);
+  if (input_dim <= 2)
+  {
+    bool flip_first = false;
+    if (input_dim > 0)
+    {
+      flip_first = flippedDimensions.at(0);
+    }
+    bool flip_second = false;
+    if (input_dim > 1)
+    {
+      flip_second = flippedDimensions.at(1);
+    }
+
+    cedar::aux::math::flip2D(toFlip, flipped, flip_first, flip_second);
+  }
+  else if (input_dim <= 3)
+  {
+    int start, diff;
+
+    CEDAR_DEBUG_ASSERT(toFlip.dims == 3);
+    CEDAR_DEBUG_ASSERT(flipped.dims == 3);
+
+    if (flippedDimensions.at(2))
+    {
+      start = toFlip.size[2] - 1;
+      diff = -1;
+    }
+    else
+    {
+      start = 0;
+      diff = 1;
+    }
+
+    cv::Range src_range[3], dst_range[3];
+    src_range[0] = cv::Range::all();
+    src_range[1] = cv::Range::all();
+    dst_range[0] = cv::Range::all();
+    dst_range[1] = cv::Range::all();
+    for (int d3 = 0; d3 < toFlip.size[2]; ++d3)
+    {
+      src_range[2] = cv::Range(d3, d3 + 1);
+      int dest_d3 = start + d3 * diff;
+      dst_range[2] = cv::Range(dest_d3, dest_d3 + 1);
+
+      cv::Mat input_slice = toFlip(src_range).clone();
+      input_slice.copySize(cv::Mat(toFlip.size[0], toFlip.size[1], toFlip.type()));
+      cv::Mat output_slice(toFlip.size[0], toFlip.size[1], toFlip.type());
+
+      cedar::aux::math::flip2D(input_slice, output_slice, flippedDimensions.at(0), flippedDimensions.at(1));
+      cv::Mat output_slice_clone = flipped(dst_range).clone();
+      output_slice.copySize(output_slice_clone);
+
+      flipped(dst_range) = 1.0 * output_slice;
+    }
+  }
+}
+
+cv::Mat cedar::aux::math::flip(const cv::Mat& toFlip, const std::vector<bool>& flippedDimensions)
+{
+  cv::Mat result = 0.0 * toFlip.clone();
+  cedar::aux::math::flip(toFlip, result, flippedDimensions);
+  return result;
+}
+
 std::string cedar::aux::math::matrixTypeToString(const cv::Mat& matrix)
 {
   switch (matrix.type())

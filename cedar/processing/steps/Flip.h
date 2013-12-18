@@ -94,8 +94,6 @@ private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
-  void flip2D(cv::Mat input, cv::Mat& output, bool flipFirst, bool flipSecond) const;
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
