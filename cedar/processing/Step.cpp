@@ -247,7 +247,7 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (cedar::proc::NetworkPtr parent_network = this->getNetwork())
+  if (cedar::proc::GroupPtr parent_network = this->getGroup())
   {
     // update the name
     parent_network->updateObjectName(this);

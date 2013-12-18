@@ -62,9 +62,9 @@
 #include <string>
 #include <list>
 
-/*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
+/*!@brief The representation of a cedar::proc::Group in a cedar::proc::gui::Scene.
  *
- *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
+ *        This class takes care of loading cedar::proc::Groups in a manner that allows them to be added into
  *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
  */
 class cedar::proc::gui::Network : public cedar::proc::gui::Connectable
@@ -82,7 +82,7 @@ public:
     cedar::proc::gui::Scene* scene,
     qreal width = static_cast<qreal>(250),
     qreal height = static_cast<qreal>(250),
-    cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
+    cedar::proc::GroupPtr network = cedar::proc::GroupPtr()
   );
 
   //!@brief Destructor
@@ -102,13 +102,13 @@ public:
   //! Checks if any connectables in the given list can be added to this group. Non-connectables are ignored.
   bool canAddAny(const QList<QGraphicsItem*>& items) const;
 
-  /*!@brief access the underlying cedar::proc::Network
+  /*!@brief access the underlying cedar::proc::Group
    */
-  cedar::proc::NetworkPtr getNetwork();
+  cedar::proc::GroupPtr getNetwork();
 
-  /*!@brief access the underlying cedar::proc::Network
+  /*!@brief access the underlying cedar::proc::Group
    */
-  cedar::proc::ConstNetworkPtr getNetwork() const;
+  cedar::proc::ConstGroupPtr getNetwork() const;
 
   //!@brief add all elements contained in this network to the scene
   void addElementsToScene();
@@ -249,7 +249,7 @@ private:
        (
          cedar::proc::ConstDataSlotPtr source,
          cedar::proc::ConstDataSlotPtr target,
-         cedar::proc::Network::ConnectionChange change
+         cedar::proc::Group::ConnectionChange change
        );
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
@@ -277,7 +277,7 @@ private:
 
 signals:
   //!@brief signal that is emitted when a boost signal is received
-  void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange);
+  void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
 
 private slots:
   //!@brief Updates the label of the network.
@@ -292,7 +292,7 @@ private slots:
          QString sourceSlot,
          QString targetName,
          QString targetSlot,
-         cedar::proc::Network::ConnectionChange change
+         cedar::proc::Group::ConnectionChange change
        );
 
   void updateCollapsedness();
@@ -310,7 +310,7 @@ protected:
   // none yet
 private:
   //!@brief represented network
-  cedar::proc::NetworkPtr mNetwork;
+  cedar::proc::GroupPtr mNetwork;
 
   //!@brief a scene, which displays the elements contained in this network
   cedar::proc::gui::Scene* mpScene;

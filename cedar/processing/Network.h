@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Network.h
+    File:        Group.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_NETWORK_H
-#define CEDAR_PROC_NETWORK_H
+#ifndef CEDAR_PROC_GROUP_H
+#define CEDAR_PROC_GROUP_H
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
@@ -72,14 +72,14 @@
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
- *        The network is at the heart of the processing framework. It is used for loading and writing architectures, and
+ *        The group is at the heart of the processing framework. It is used for loading and writing architectures, and
  *        holds a list of elements (e.g., steps, triggers) and the connections between them.
  *
- *        Whenever you want to connect up a number of processing steps, you should first add them to a network and then
- *        use the connect functions of this network. This ensures proper management of storage and deletion of all the
- *        elements in the network.
+ *        Whenever you want to connect up a number of processing steps, you should first add them to a group and then
+ *        use the connect functions of this group. This ensures proper management of storage and deletion of all the
+ *        elements in the group.
  */
-class cedar::proc::Network : public QThread, public cedar::proc::Connectable, public cedar::proc::Triggerable
+class cedar::proc::Group : public QThread, public cedar::proc::Connectable, public cedar::proc::Triggerable
 {
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,16 +128,16 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Network();
+  Group();
 
   //!@brief The destructor.
-  ~Network();
+  ~Group();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Reads the network from a configuration node.
+  /*!@brief Reads the group from a configuration node.
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& root);
 
@@ -148,7 +148,7 @@ public:
     this->readConfiguration(root);
   }
 
-  /*!@brief Writes the network to a configuration node.
+  /*!@brief Writes the group to a configuration node.
    */
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
@@ -159,9 +159,9 @@ public:
     this->writeConfiguration(root);
   }
 
-  /*!@brief Reads the network from a given json file.
+  /*!@brief Reads the group from a given json file.
    *
-   *        This file must have the same format as the one output by cedar::proc::Network::writeFile.
+   *        This file must have the same format as the one output by cedar::proc::Group::writeFile.
    *
    * @deprecated Use readJson (from cedar::aux::Configurable)
    */
@@ -170,7 +170,7 @@ public:
     this->readJson(filename);
   }
 
-  /*!@brief Writes the network to a given json file.
+  /*!@brief Writes the group to a given json file.
    *
    * @deprecated Use writeJson (from cedar::aux::Configurable)
    */
@@ -179,13 +179,13 @@ public:
     this->writeJson(filename);
   }
 
-  /*!@brief Removes an element from the network.
+  /*!@brief Removes an element from the group.
    *
    * @remark Before calling this function, you should remove all connections to the element.
    */
   void remove(cedar::proc::ConstElementPtr element);
 
-  /*!@brief calls remove() for every element of the network
+  /*!@brief calls remove() for every element of the group
    */
   void removeAll();
 
@@ -196,18 +196,18 @@ public:
    */
   void create(std::string className, std::string instanceName);
 
-  /*!@brief Adds a given element to the network under the instanceName.
+  /*!@brief Adds a given element to the group under the instanceName.
    *
    * @param element      Pointer to the element to be added.
    * @param instanceName Name to be given to the instance.
    */
   void add(cedar::proc::ElementPtr element, std::string instanceName);
 
-  /*!@brief    Adds a given element to the network.
+  /*!@brief    Adds a given element to the group.
    *
-   * @param    element The element to add to the network.
+   * @param    element The element to add to the group.
    *
-   * @remarks  The element is assumed to have a valid name, and this name is used to identify it within the network.
+   * @remarks  The element is assumed to have a valid name, and this name is used to identify it within the group.
    */
   void add(cedar::proc::ElementPtr element);
 
@@ -227,7 +227,7 @@ public:
    */
   std::string duplicate(const std::string& elementName, const std::string& newName = "");
 
-  /*!@brief unmodifiedName unmodified name, possibly non-unique in network
+  /*!@brief unmodifiedName unmodified name, possibly non-unique in group
    * @return unique name created by attaching a number if name is already taken
    */
   CEDAR_DECLARE_DEPRECATED(std::string getUniqueName(const std::string& unmodifiedName) const);
@@ -379,9 +379,9 @@ public:
 
   /*!@brief access the vector of data connections
    */
-  const cedar::proc::Network::DataConnectionVector& getDataConnections() const;
+  const cedar::proc::Group::DataConnectionVector& getDataConnections() const;
 
-  /*!@brief Returns a const reference to the map of names to elements stored in the network.
+  /*!@brief Returns a const reference to the map of names to elements stored in the group.
    */
   const ElementMap& getElements() const;
 
@@ -395,7 +395,7 @@ public:
    */
   void updateObjectName(cedar::proc::Element* object);
 
-  /*!@brief Sends a reset command to all connectable elements in the network.
+  /*!@brief Sends a reset command to all connectable elements in the group.
    */
   void reset();
 
@@ -404,9 +404,9 @@ public:
    */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
 
-  /*!@brief This method lists all networks that are children of this network.
+  /*!@brief This method lists all groups that are children of this group.
    */
-  void listSubnetworks(std::set<cedar::proc::ConstNetworkPtr>& subnetworks) const;
+  void listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const;
 
   /*!@brief Returns a unique identifier containing the given string.
    *
@@ -415,7 +415,7 @@ public:
    */
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
-  //!@brief Checks whether a name exists in the network.
+  //!@brief Checks whether a name exists in the group.
   bool nameExists(const std::string& name) const;
 
   //!@brief Register a function pointer to react to a changing trigger connection
@@ -427,7 +427,7 @@ public:
   //!@brief Register a function pointer to react to a changing data connection
   boost::signals2::connection connectToDataConnectionChanged
   (
-    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Network::ConnectionChange)> slot
+    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Group::ConnectionChange)> slot
   );
 
   //!@brief Register a function pointer to react to adding an element
@@ -448,31 +448,31 @@ public:
   /*!@brief Remove all connections that connect up to a specified slot */
 //  void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
 
-  //!@brief Starts all triggers in this network (that haven't been started yet).
+  //!@brief Starts all triggers in this group (that haven't been started yet).
   void startTriggers(bool wait = false);
 
-  //!@brief Stops all running triggers in this network.
+  //!@brief Stops all running triggers in this group.
   void stopTriggers(bool wait = false);
 
-  /*!@brief   Single-steps all triggers in this network.
+  /*!@brief   Single-steps all triggers in this group.
    *
    *          The step time is in this case automatically determined by using the smallest step time of all triggers in
-   *          the network.
+   *          the group.
    *
    * @see     stepTriggers(double).
    */
   void stepTriggers();
 
-  /*!@brief   Single-steps all triggers in this network with the given time step.
+  /*!@brief   Single-steps all triggers in this group with the given time step.
    *
    * @see     stepTriggers(double).
    */
   void stepTriggers(cedar::unit::Time stepTime);
 
-  //! Returns a list of issues in the network.
+  //! Returns a list of issues in the group.
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
 
-  //! Returns a list of all the looped triggers in this network.
+  //! Returns a list of all the looped triggers in this group.
   std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
 
   //! Reads the meta information from the given file and extracts the plugins required by the architecture.
@@ -512,7 +512,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Reads the network from a configuration node and writes all exceptions into the given vector.
+  /*!@brief Reads the group from a configuration node and writes all exceptions into the given vector.
    */
   void readConfiguration
   (
@@ -520,7 +520,7 @@ private:
     std::vector<std::string>& exceptions
   );
 
-  /*!@brief Reads the network from a configuration node using the first version of the format.
+  /*!@brief Reads the group from a configuration node using the first version of the format.
    */
   void readFromV1(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
@@ -528,23 +528,23 @@ private:
    */
   void writeMetaData(cedar::aux::ConfigurationNode& root) const;
 
-  /*!@brief Reads steps from the configuration node and adds them to the network.
+  /*!@brief Reads steps from the configuration node and adds them to the group.
    */
   void readSteps(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
-  /*!@brief Writes the steps in the network to the configuration node.
+  /*!@brief Writes the steps in the group to the configuration node.
    */
   void writeSteps(cedar::aux::ConfigurationNode& root) const;
 
-  /*!@brief Reads triggers from a configuration node and adds them to the network.
+  /*!@brief Reads triggers from a configuration node and adds them to the group.
    */
   void readTriggers(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
-  /*!@brief Writes the triggers in the network to the configuration node.
+  /*!@brief Writes the triggers in the group to the configuration node.
    */
   void writeTriggers(cedar::aux::ConfigurationNode& root) const;
 
-  /*!@brief Writes the steps that are registered in the recorder in the network to the configuration node.
+  /*!@brief Writes the steps that are registered in the recorder in the group to the configuration node.
    */
   void writeRecords(cedar::aux::ConfigurationNode& root) const;
 
@@ -552,32 +552,32 @@ private:
   */
   void readRecords(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
-  /*!@brief Reads networks from a configuration node and adds them to the parent network.
+  /*!@brief Reads groups from a configuration node and adds them to the parent group.
    */
-  void readNetworks(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
+  void readGroups(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
-  /*!@brief Writes the child networks in the network to the configuration node.
+  /*!@brief Writes the child groups in the group to the configuration node.
    */
-  void writeNetworks(cedar::aux::ConfigurationNode& root) const;
+  void writeGroups(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Writes a data connection to the configuration node.
    */
   void writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection) const;
 
-  /*!@brief Reads data connections from a configuration node and adds them to the network.
+  /*!@brief Reads data connections from a configuration node and adds them to the group.
    */
   void readDataConnections(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
-  /*!@brief Writes the data connections in the network to the configuration node.
+  /*!@brief Writes the data connections in the group to the configuration node.
    */
   void writeDataConnections(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
    * @returns return the next iterator
    */
-  cedar::proc::Network::DataConnectionVector::iterator removeDataConnection
+  cedar::proc::Group::DataConnectionVector::iterator removeDataConnection
                                                        (
-                                                         cedar::proc::Network::DataConnectionVector::iterator it
+                                                         cedar::proc::Group::DataConnectionVector::iterator it
                                                        );
 
   //!@brief revalidates all outgoing connections of a slot
@@ -593,13 +593,13 @@ private:
   std::vector<cedar::proc::DataSlotPtr> getRealTargets
                                         (
                                           cedar::proc::DataSlotPtr slot,
-                                          cedar::proc::ConstNetworkPtr targetNetwork
+                                          cedar::proc::ConstGroupPtr targetGroup
                                         );
 
   cedar::proc::DataSlotPtr getRealSource
                            (
                              cedar::proc::DataSlotPtr slot,
-                             cedar::proc::ConstNetworkPtr targetNetwork
+                             cedar::proc::ConstGroupPtr targetGroup
                            );
 
   static void deleteConnectorsAlongConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
@@ -607,7 +607,7 @@ private:
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
 private slots:
-  //!@brief Takes care of updating the network's name in the parent's map.
+  //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -618,20 +618,20 @@ protected:
   //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
   boost::signals2::signal<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> mTriggerConnectionChanged;
   //!@brief a boost signal that is emitted if a data connection changes (added/removed/changed)
-  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Network::ConnectionChange)> mDataConnectionChanged;
-  //!@brief a boost signal that is emitted if an element is added to the network
+  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Group::ConnectionChange)> mDataConnectionChanged;
+  //!@brief a boost signal that is emitted if an element is added to the group
   boost::signals2::signal<void (cedar::proc::ElementPtr)> mNewElementAddedSignal;
-  //!@brief a boost signal that is emitted if an element is removed from the network
+  //!@brief a boost signal that is emitted if an element is removed from the group
   boost::signals2::signal<void (cedar::proc::ConstElementPtr)> mElementRemovedSignal;
 
 private:
   //! Map associating element names to elements.
   ElementMap mElements;
 
-  //! List of data connections in the network.
+  //! List of data connections in the group.
   DataConnectionVector mDataConnections;
 
-  //! List of trigger connections in the network.
+  //! List of trigger connections in the group.
   TriggerConnectionVector mTriggerConnections;
 
   cedar::aux::ConfigurationNode mLastReadConfiguration;
@@ -645,6 +645,6 @@ private:
 protected:
    ConnectorMapParameterPtr _mConnectors;
 
-}; // class cedar::proc::Network
+}; // class cedar::proc::Group
 
-#endif // CEDAR_PROC_NETWORK_H
+#endif // CEDAR_PROC_GROUP_H

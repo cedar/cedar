@@ -94,7 +94,7 @@ cedar::proc::gui::Network::Network
   cedar::proc::gui::Scene* scene,
   qreal width,
   qreal height,
-  cedar::proc::NetworkPtr network
+  cedar::proc::GroupPtr network
 )
 :
 cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK),
@@ -112,7 +112,7 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 
   if (!mNetwork)
   {
-    mNetwork = cedar::proc::NetworkPtr(new cedar::proc::Network());
+    mNetwork = cedar::proc::GroupPtr(new cedar::proc::Group());
   }
 
   this->setElement(mNetwork);
@@ -135,9 +135,9 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
   QObject::connect
   (
     this,
-    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange)),
+    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange)),
     this,
-    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange))
+    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
 
   mDataConnectionChangedConnection = mNetwork->connectToDataConnectionChanged
@@ -614,7 +614,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
       auto connections = network_item->getNetwork()->getDataConnections();
       for (auto connection : connections)
       {
-        network_item->checkDataConnection(connection->getSource(), connection->getTarget(), cedar::proc::Network::CONNECTION_ADDED);
+        network_item->checkDataConnection(connection->getSource(), connection->getTarget(), cedar::proc::Group::CONNECTION_ADDED);
       }
     }
   }
@@ -653,12 +653,12 @@ void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
   this->mpScene = pScene;
 }
 
-cedar::proc::NetworkPtr cedar::proc::gui::Network::getNetwork()
+cedar::proc::GroupPtr cedar::proc::gui::Network::getNetwork()
 {
   return this->mNetwork;
 }
 
-cedar::proc::ConstNetworkPtr cedar::proc::gui::Network::getNetwork() const
+cedar::proc::ConstGroupPtr cedar::proc::gui::Network::getNetwork() const
 {
   return this->mNetwork;
 }
@@ -788,7 +788,7 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) 
 
   for
   (
-    cedar::proc::Network::ElementMap::const_iterator element_iter = elements.begin();
+    cedar::proc::Group::ElementMap::const_iterator element_iter = elements.begin();
     element_iter != elements.end();
     ++element_iter
   )
@@ -837,7 +837,7 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) 
 
 
     // write UI information of the network item
-    cedar::proc::NetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::Network>(element);
+    cedar::proc::GroupPtr network = boost::dynamic_pointer_cast<cedar::proc::Group>(element);
     cedar::proc::gui::Network *p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_item);
     if (network && p_network_item)
     {
@@ -874,7 +874,7 @@ void cedar::proc::gui::Network::checkDataConnection
      (
        cedar::proc::ConstDataSlotPtr source,
        cedar::proc::ConstDataSlotPtr target,
-       cedar::proc::Network::ConnectionChange change
+       cedar::proc::Group::ConnectionChange change
      )
 {
   emit signalDataConnectionChange
@@ -893,7 +893,7 @@ void cedar::proc::gui::Network::dataConnectionChanged
        QString sourceSlot,
        QString targetName,
        QString targetSlot,
-       cedar::proc::Network::ConnectionChange change
+       cedar::proc::Group::ConnectionChange change
      )
 {
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
@@ -957,13 +957,13 @@ void cedar::proc::gui::Network::dataConnectionChanged
 
   switch (change)
   {
-    case cedar::proc::Network::CONNECTION_ADDED:
+    case cedar::proc::Group::CONNECTION_ADDED:
     {
       cedar::proc::gui::Connection* p_con = source_slot->connectTo(target_slot);
       p_con->setSmartMode(this->getSmartConnection());
       break;
     }
-    case cedar::proc::Network::CONNECTION_REMOVED:
+    case cedar::proc::Group::CONNECTION_REMOVED:
     {
       QList<QGraphicsItem*> items = this->mpScene->items();
       for (int i = 0; i < items.size(); ++i)
@@ -1130,7 +1130,7 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
     p_scene_element = this->mpScene->getStepItemFor(step.get());
   }
   // if network, add a new network item
-  else if (cedar::proc::NetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::Network>(element))
+  else if (cedar::proc::GroupPtr network = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
   {
     this->mpScene->addNetwork(QPointF(0, 0), network);
     current_type = "network";
@@ -1389,7 +1389,7 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
 
   QMenu* p_remove_input_menu = menu.addMenu("remove input");
   QMenu* p_remove_output_menu = menu.addMenu("remove output");
-  const cedar::proc::Network::ConnectorMap& connectors = this->getNetwork()->getConnectorMap();
+  const cedar::proc::Group::ConnectorMap& connectors = this->getNetwork()->getConnectorMap();
   for (auto it = connectors.begin(); it != connectors.end(); ++it)
   {
     if (it->second)

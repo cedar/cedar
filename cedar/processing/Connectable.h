@@ -69,7 +69,7 @@ class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux:
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
   friend class cedar::proc::Step;
   friend class cedar::proc::sources::GroupSource;
   //--------------------------------------------------------------------------------------------------------------------

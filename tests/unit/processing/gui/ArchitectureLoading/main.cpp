@@ -64,7 +64,7 @@ int verifyArchitecture1(cedar::proc::gui::Ide *pIde)
 
   cedar::proc::gui::View *p_view = pIde->getArchitectureView();
   cedar::proc::gui::Scene *p_scene = p_view->getScene();
-  cedar::proc::NetworkPtr network = p_scene->getRootNetwork()->getNetwork();
+  cedar::proc::GroupPtr network = p_scene->getRootNetwork()->getNetwork();
 
   cedar::proc::TriggerPtr trigger;
   cedar::proc::gui::TriggerItem *p_trigger = NULL;

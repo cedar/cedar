@@ -84,7 +84,7 @@ void run_test()
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Setup1.json ... ";
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   network->readJson("Setup1.json");
   std::cout << "done." << std::endl;
 

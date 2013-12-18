@@ -78,7 +78,7 @@ class EmptyMatrixProvider : public cedar::proc::Step
 CEDAR_GENERATE_POINTER_TYPES(EmptyMatrixProvider);
 
 
-unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr testStep)
+unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testStep)
 {
   // try connecting steps of different types
   unsigned int i = 0;
@@ -171,7 +171,7 @@ int main(int, char**)
   for (auto declaration_iter = declarations.begin(); declaration_iter != declarations.end(); ++declaration_iter)
   {
     cedar::aux::ConstPluginDeclarationPtr declaration = *declaration_iter;
-    cedar::proc::NetworkPtr network(new cedar::proc::Network());
+    cedar::proc::GroupPtr network(new cedar::proc::Group());
     cedar::proc::ElementPtr elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
     {

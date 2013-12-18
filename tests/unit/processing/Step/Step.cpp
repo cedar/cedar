@@ -130,7 +130,7 @@ int testStartingStopping()
 {
   int errors = 0;
 
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   StartStopTesterPtr step1(new StartStopTester());
   StartStopTesterPtr step2(new StartStopTester());
   StartStopTesterPtr step3(new StartStopTester());

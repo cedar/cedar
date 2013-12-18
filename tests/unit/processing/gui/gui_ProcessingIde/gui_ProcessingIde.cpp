@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     cedar::proc::gui::View *p_view = p_ide->getArchitectureView();
     cedar::proc::gui::Scene *p_scene = p_view->getScene();
     cedar::proc::gui::NetworkPtr p_gui_network = p_scene->getRootNetwork();
-    cedar::proc::NetworkPtr network = p_gui_network->getNetwork();
+    cedar::proc::GroupPtr network = p_gui_network->getNetwork();
 
     // first, add some items to the scene
     cedar::proc::ElementPtr field_element = p_scene->createElement(network, "cedar.dynamics.NeuralField", QPointF(180, 240));

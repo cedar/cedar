@@ -67,7 +67,7 @@ int main(int /* argc */, char** /* argv */)
   unsigned int errors = 0;
 
   std::cout << "Creating network." << std::endl;
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  cedar::proc::GroupPtr network (new cedar::proc::Group());
 
   std::cout << "Creating step." << std::endl;
   StepTestPtr step (new StepTest());

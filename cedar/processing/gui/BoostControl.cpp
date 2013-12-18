@@ -79,7 +79,7 @@ cedar::proc::gui::BoostControl::~BoostControl()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::BoostControl::setNetwork(cedar::proc::NetworkPtr network)
+void cedar::proc::gui::BoostControl::setNetwork(cedar::proc::GroupPtr network)
 {
   if (this->mNetwork)
   {

@@ -73,7 +73,7 @@ void run_test()
   global_errors = 0;
 
   std::cout << "Reading network.json ... " << std::endl;
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   network->readJson("network.json");
   std::cout << "done." << std::endl;
 

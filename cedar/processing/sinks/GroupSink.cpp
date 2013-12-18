@@ -106,7 +106,7 @@ void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& in
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // since the step may no longer be in a network upon deletion, we may not need to do anything.
-  cedar::proc::NetworkPtr network = this->getNetwork();
+  cedar::proc::GroupPtr network = this->getNetwork();
   if (!network)
   {
     return;

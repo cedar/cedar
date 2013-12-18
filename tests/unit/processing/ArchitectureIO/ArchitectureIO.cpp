@@ -124,7 +124,7 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Creating network ... " << std::endl;
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  cedar::proc::GroupPtr network (new cedar::proc::Group());
 
   std::cout << "Creating step1 ... ";
   TestModulePtr step1 (new TestModule("step1"));
@@ -170,7 +170,7 @@ int main(int, char**)
   network->connectSlots("doubleStep1.output2", "doubleStep2.input2");
   std::cout << "done." << std::endl;
 
-  std::cout << "Network creation completed." << std::endl;
+  std::cout << "Group creation completed." << std::endl;
 
   std::cout << "Triggering ... ";
   trigger->trigger();
@@ -217,7 +217,7 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Loading network ... ";
-  network = cedar::proc::NetworkPtr(new cedar::proc::Network());
+  network = cedar::proc::GroupPtr(new cedar::proc::Group());
   network->readJson("architecture1.json");
   std::cout << "done." << std::endl;
 

@@ -462,7 +462,7 @@ void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
                               (
                                 new cedar::aux::CallFunctionInThread
                                 (
-                                  boost::bind(&cedar::proc::Network::startTriggers, this->mNetwork->getNetwork(), true)
+                                  boost::bind(&cedar::proc::Group::startTriggers, this->mNetwork->getNetwork(), true)
                                 )
                               );
 
@@ -470,7 +470,7 @@ void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
                              (
                                new cedar::aux::CallFunctionInThread
                                (
-                                 boost::bind(&cedar::proc::Network::stopTriggers, this->mNetwork->getNetwork(), true)
+                                 boost::bind(&cedar::proc::Group::stopTriggers, this->mNetwork->getNetwork(), true)
                                )
                              );
 }
@@ -735,7 +735,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
                                            );
 
   // check if all required plugins are loaded
-  auto required_plugins = cedar::proc::Network::getRequiredPlugins(file.toStdString());
+  auto required_plugins = cedar::proc::Group::getRequiredPlugins(file.toStdString());
   std::set<std::string> plugins_not_found;
   std::set<std::string> plugins_not_loaded;
   for (auto iter = required_plugins.begin(); iter != required_plugins.end(); ++iter)

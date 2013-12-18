@@ -76,13 +76,22 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::NetworkPtr network);
+  CEDAR_DECLARE_DEPRECATED(void setNetwork(cedar::proc::GroupPtr network));
+
+  //!@brief sets the group at which this element is registered
+  void setGroup(cedar::proc::GroupPtr group);
 
   //!@brief get the network at which this element is registered
-  cedar::proc::NetworkPtr getNetwork();
+  CEDAR_DECLARE_DEPRECATED(cedar::proc::GroupPtr getNetwork());
 
   //!@brief get the network at which this element is registered as const
-  cedar::proc::ConstNetworkPtr getNetwork() const;
+  CEDAR_DECLARE_DEPRECATED(cedar::proc::ConstGroupPtr getNetwork() const);
+
+  //!@brief get the group at which this element is registered
+  cedar::proc::GroupPtr getGroup();
+
+  //!@brief get the group at which this element is registered as const
+  cedar::proc::ConstGroupPtr getGroup() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -91,7 +100,7 @@ protected:
   //! connects to network changed signal
   inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
   {
-    return this->mNetworkChanged.connect(slot);
+    return this->mGroupChanged.connect(slot);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,10 +116,10 @@ protected:
   // none yet
 private:
   //! the network this element is registered at
-  cedar::proc::NetworkWeakPtr mRegisteredAt;
+  cedar::proc::GroupWeakPtr mRegisteredAt;
 
   //! Signal that is emitted whenever the element's network changes
-  boost::signals2::signal<void()> mNetworkChanged;
+  boost::signals2::signal<void()> mGroupChanged;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

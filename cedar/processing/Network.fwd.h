@@ -53,7 +53,7 @@ namespace cedar
 {
   namespace proc
   {
-    CEDAR_DECLARE_PROC_CLASS(Network);
+    CEDAR_DECLARE_PROC_CLASS(Group);
   }
 }
 

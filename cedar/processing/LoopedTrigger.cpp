@@ -122,7 +122,7 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
  */
 void cedar::proc::LoopedTrigger::onNameChanged()
 {
-  if (cedar::proc::NetworkPtr parent_network = this->getNetwork())
+  if (cedar::proc::GroupPtr parent_network = this->getGroup())
   {
     // update the name
     parent_network->updateObjectName(this);

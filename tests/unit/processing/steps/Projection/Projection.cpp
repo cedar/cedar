@@ -54,7 +54,7 @@
  * @param network the network our projection is a part of
  * @param state the state the projection should be in
  */
-bool checkProjectionState(cedar::proc::NetworkPtr& network, cedar::proc::Triggerable::State state)
+bool checkProjectionState(cedar::proc::GroupPtr& network, cedar::proc::Triggerable::State state)
 {
   cedar::proc::steps::ProjectionPtr projection = network->getElement<cedar::proc::steps::Projection>("new Projection");
   if (projection->getState() == state)
@@ -70,7 +70,7 @@ bool checkProjectionState(cedar::proc::NetworkPtr& network, cedar::proc::Trigger
  * @param network the network that is to be stepped
  * @param numberOfErrors counter for the number of errors
  */
-void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int& numberOfErrors)
+void stepArchitecture(cedar::proc::GroupPtr& network, unsigned int& numberOfErrors)
 {
   try
   {
@@ -101,7 +101,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int& nu
 {
   std::cout << "Checking file \"" << configurationFile << "\" (valid)" << std::endl;
 
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   network->readJson(configurationFile);
 
   // if the projection is in an invalid state, increase the error count
@@ -123,7 +123,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int& nu
 void checkInvalidProjection(const std::string& configurationFile, unsigned int& numberOfErrors)
 {
   std::cout << "Checking file \"" << configurationFile << "\" (invalid)" << std::endl;
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   network->readJson(configurationFile);
 
   if (!checkProjectionState(network, cedar::proc::Triggerable::STATE_EXCEPTION))

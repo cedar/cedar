@@ -161,7 +161,7 @@ void insert_triggered_children(TriggerTestPtr step, std::set<TriggerTestPtr>& tr
   }
 }
 
-void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
+void test_step(cedar::proc::GroupPtr network, TriggerTestPtr step)
 {
   // build a list of all steps triggered by the one being checked
   std::set<TriggerTestPtr> triggered;
@@ -265,10 +265,10 @@ void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
   }
 }
 
-void test_network(cedar::proc::NetworkPtr network)
+void test_network(cedar::proc::GroupPtr network)
 {
-  using cedar::proc::Network;
-  using cedar::proc::NetworkPtr;
+  using cedar::proc::Group;
+  using cedar::proc::GroupPtr;
 
   for (auto iter = network->getElements().begin(); iter != network->getElements().end(); ++iter)
   {
@@ -283,15 +283,15 @@ void test_network(cedar::proc::NetworkPtr network)
 
 void run_test()
 {
-  using cedar::proc::Network;
-  using cedar::proc::NetworkPtr;
+  using cedar::proc::Group;
+  using cedar::proc::GroupPtr;
 
   {
     std::cout << "==================================" << std::endl;
     std::cout << " Checking network configuration 1" << std::endl;
     std::cout << "==================================" << std::endl << std::endl;
 
-    NetworkPtr network(new Network());
+    GroupPtr network(new Group());
     network->add(boost::make_shared<TriggerTest>(), "step1");
     network->add(boost::make_shared<TriggerTest>(), "step2");
     network->add(boost::make_shared<TriggerTest>(), "step3");

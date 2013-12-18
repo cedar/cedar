@@ -82,7 +82,7 @@ public:
 public:
   /*!@brief Sets the network whose boosts are controlled by this widget.
    */
-  void setNetwork(cedar::proc::NetworkPtr network);
+  void setNetwork(cedar::proc::GroupPtr network);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -126,7 +126,7 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::proc::NetworkPtr mNetwork;
+  cedar::proc::GroupPtr mNetwork;
 
   boost::signals2::connection mElementAddedConnection;
 

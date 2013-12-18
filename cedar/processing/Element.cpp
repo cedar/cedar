@@ -57,21 +57,36 @@ cedar::proc::Element::~Element()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::Element::setNetwork(cedar::proc::NetworkPtr network)
+void cedar::proc::Element::setNetwork(cedar::proc::GroupPtr network)
 {
-  // set the parent registry
-  this->mRegisteredAt = network;
-
-  // emit signal
-  this->mNetworkChanged();
+  this->setGroup(network);
 }
 
-cedar::proc::NetworkPtr cedar::proc::Element::getNetwork()
+cedar::proc::GroupPtr cedar::proc::Element::getNetwork()
+{
+  return this->getGroup();
+}
+
+cedar::proc::ConstGroupPtr cedar::proc::Element::getNetwork() const
+{
+  return this->getGroup();
+}
+
+void cedar::proc::Element::setGroup(cedar::proc::GroupPtr group)
+{
+  // set the parent registry
+  this->mRegisteredAt = group;
+
+  // emit signal
+  this->mGroupChanged();
+}
+
+cedar::proc::GroupPtr cedar::proc::Element::getGroup()
 {
   return this->mRegisteredAt.lock();
 }
 
-cedar::proc::ConstNetworkPtr cedar::proc::Element::getNetwork() const
+cedar::proc::ConstGroupPtr cedar::proc::Element::getGroup() const
 {
   return this->mRegisteredAt.lock();
 }
@@ -83,14 +98,14 @@ void cedar::proc::Element::validateName(const std::string& newName) const
     CEDAR_THROW(cedar::aux::ValidationFailedException, "This name contains an invalid character (\".\")");
   }
 
-  if (cedar::proc::ConstNetworkPtr network = this->getNetwork())
+  if (cedar::proc::ConstGroupPtr network = this->getGroup())
   {
     if (network->nameExists(newName))
     {
       CEDAR_THROW
       (
         cedar::aux::ValidationFailedException,
-        "There is already an element of this name in this element's network."
+        "There is already an element of this name in this element's group."
       );
     }
   }
