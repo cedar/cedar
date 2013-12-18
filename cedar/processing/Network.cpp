@@ -743,11 +743,6 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
   // remove connectors
   for (unsigned int i = 0; i < data_connections.size(); ++i)
   {
-    std::cout << "Deleting connectors between: "
-              << data_connections.at(i).from->getParent() << "." << data_connections.at(i).from->getName()
-              << " to "
-              << data_connections.at(i).to->getParent() << "." << data_connections.at(i).to->getName()
-              << std::endl;
     cedar::proc::Network::deleteConnectorsAlongConnection(data_connections.at(i).from, data_connections.at(i).to);
   }
 
@@ -760,11 +755,6 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
   // restore data connections
   for (unsigned int i = 0; i < data_connections.size(); ++i)
   {
-    std::cout << "Re-establishing connection between: "
-              << data_connections.at(i).from->getParent() << "." << data_connections.at(i).from->getName()
-              << " to "
-              << data_connections.at(i).to->getParent() << "." << data_connections.at(i).to->getName()
-              << std::endl;
     cedar::proc::Network::connectAcrossGroups(data_connections.at(i).from, data_connections.at(i).to);
   }
 
@@ -854,11 +844,9 @@ void cedar::proc::Network::removeConnector(const std::string& name, bool input)
     // here be comments
     if (input)
     {
-      //this->removeAllConnectionsFromSlot(this->getElement<cedar::proc::Connectable>(name)->getOutputSlot("output"));
       this->disconnectOutputSlot(this->getElement<cedar::proc::Connectable>(name), "output");
       if (this->getNetwork())
       {
-//        this->getNetwork()->removeAllConnectionsFromSlot(this->getInputSlot(name));
           this->getNetwork()->disconnectInputSlot
                               (
                                 boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
@@ -870,22 +858,18 @@ void cedar::proc::Network::removeConnector(const std::string& name, bool input)
     }
     else
     {
-//      this->removeAllConnectionsFromSlot(this->getElement<cedar::proc::Connectable>(name)->getInputSlot("input"));
-      this->disconnectInputSlot(this->getElement<cedar::proc::Connectable>(name), "input");
       if (this->getNetwork())
       {
-        std::cout << "Removing all connections from connector " << it->first << std::endl;
-//        this->getNetwork()->removeAllConnectionsFromSlot(this->getOutputSlot(name));
           this->getNetwork()->disconnectOutputSlot
                               (
                                 boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
                                 name
                               );
+      this->disconnectInputSlot(this->getElement<cedar::proc::Connectable>(name), "input");
       }
       this->remove(this->getElement(name));
       this->removeOutputSlot(name);
     }
-    std::cout << "Removing connector " << it->first << std::endl;
     _mConnectors->erase(it->first);
   }
   else
@@ -1571,9 +1555,9 @@ void cedar::proc::Network::readRecords
        std::vector<std::string>& /* exceptions */
      )
 {
-  //clear all registered data
+  // clear all registered data
   cedar::aux::RecorderSingleton::getInstance()->clear();
-  //create a new map to get a better data structure
+  // create a new map to get a better data structure
   std::map<std::string, cedar::unit::Time> data;
   for (cedar::aux::ConfigurationNode::const_iterator node_iter = root.begin();
        node_iter != root.end();
