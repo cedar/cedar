@@ -361,70 +361,79 @@ const cedar::proc::Network::ElementMap& cedar::proc::Network::getElements() cons
 }
 
 //!@todo This is (probably) redundant with disconnectOutput/InputSlot
-void cedar::proc::Network::removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot)
-{
-  for
-  (
-    cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
-    data_con != mDataConnections.end();
-    // empty
-  )
-  {
-    if ((*data_con)->getSource() == slot
-        || (*data_con)->getTarget() == slot)
-    {
-      mDataConnectionChanged
-      (
-        this->getElement<cedar::proc::Connectable>
-        (
-          (*data_con)->getSource()->getParent())->getOutputSlot((*data_con)->getSource()->getName()
-        ),
-        this->getElement<cedar::proc::Connectable>
-        (
-          (*data_con)->getTarget()->getParent())->getInputSlot((*data_con)->getTarget()->getName()
-        ),
-        cedar::proc::Network::CONNECTION_REMOVED
-      );
-      data_con = this->removeDataConnection(data_con);
-    }
-    else
-    {
-      ++data_con;
-    }
-  }
-}
+//void cedar::proc::Network::removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot)
+//{
+//  for
+//  (
+//    cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
+//    data_con != mDataConnections.end();
+//    // empty
+//  )
+//  {
+//    if ((*data_con)->getSource() == slot
+//        || (*data_con)->getTarget() == slot)
+//    {
+//      mDataConnectionChanged
+//      (
+//        this->getElement<cedar::proc::Connectable>
+//        (
+//          (*data_con)->getSource()->getParent())->getOutputSlot((*data_con)->getSource()->getName()
+//        ),
+//        this->getElement<cedar::proc::Connectable>
+//        (
+//          (*data_con)->getTarget()->getParent())->getInputSlot((*data_con)->getTarget()->getName()
+//        ),
+//        cedar::proc::Network::CONNECTION_REMOVED
+//      );
+//      data_con = this->removeDataConnection(data_con);
+//    }
+//    else
+//    {
+//      ++data_con;
+//    }
+//  }
+//}
 
 void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
 {
   // first, delete all data connections to and from this Element
-  for (
-        cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
-        data_con != mDataConnections.end();
-        // empty
-      )
+  std::vector<cedar::proc::DataConnectionPtr> delete_later;
+  for
+  (
+//    cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
+//    data_con != mDataConnections.end();
+//    // empty
+//    ++data_con
+      auto data_con : mDataConnections
+  )
   {
-    if ((*data_con)->getSource()->isParent(boost::dynamic_pointer_cast<const cedar::proc::Connectable>(element))
-        || (*data_con)->getTarget()->isParent(boost::dynamic_pointer_cast<const cedar::proc::Connectable>(element)))
+    if
+    (
+      data_con->getSource()->isParent(boost::dynamic_pointer_cast<const cedar::proc::Connectable>(element))
+        || data_con->getTarget()->isParent(boost::dynamic_pointer_cast<const cedar::proc::Connectable>(element))
+    )
     {
-      mDataConnectionChanged
-      (
-        this->getElement<cedar::proc::Connectable>
-        (
-          (*data_con)->getSource()->getParent()
-        )->getOutputSlot((*data_con)->getSource()->getName() ),
-        this->getElement<cedar::proc::Connectable>
-        (
-          (*data_con)->getTarget()->getParent()
-        )->getInputSlot((*data_con)->getTarget()->getName()),
-        cedar::proc::Network::CONNECTION_REMOVED
-      );
-      data_con = this->removeDataConnection(data_con);
+//      mDataConnectionChanged
+//      (
+//        this->getElement<cedar::proc::Connectable>
+//        (
+//          (*data_con)->getSource()->getParent()
+//        )->getOutputSlot((*data_con)->getSource()->getName() ),
+//        this->getElement<cedar::proc::Connectable>
+//        (
+//          (*data_con)->getTarget()->getParent()
+//        )->getInputSlot((*data_con)->getTarget()->getName()),
+//        cedar::proc::Network::CONNECTION_REMOVED
+//      );
+//      data_con = this->removeDataConnection(data_con);
+      delete_later.push_back(data_con);
     }
-    else
-    {
-      ++data_con;
-    }
+//    else
+//    {
+//      ++data_con;
+//    }
   }
+  this->disconnectSlots(delete_later);
 
   // then, delete all trigger connections to and from this Element
   for (
@@ -622,14 +631,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
         if (source_it != elements.end() && target_it != elements.end())
         {
           // this connection must be stored (note that connections are automatically deleted if elements are removed)
-          data_connections.push_back
-          (
-            DataConnectionInfo
-            (
-              (*it)->getSource(),
-              (*it)->getTarget()
-            )
-          );
+          data_connections.push_back(DataConnectionInfo((*it)->getSource(), (*it)->getTarget()));
         }
         // the target is not in this network
         else if (source_it != elements.end() && target_it == elements.end())
@@ -643,14 +645,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
           slots_deleted_later.push_back(*it);
           for (unsigned int i = 0; i < targets.size(); ++i)
           {
-            data_connections.push_back
-            (
-              DataConnectionInfo
-              (
-                (*it)->getSource(),
-                targets.at(i)
-              )
-            );
+            data_connections.push_back(DataConnectionInfo((*it)->getSource(), targets.at(i)));
           }
         }
         // the source is not in this network
@@ -662,24 +657,9 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
                              (*it)->getTarget(),
                              boost::static_pointer_cast<cedar::proc::ConstNetwork>(this->shared_from_this())
                            );
-          data_connections.push_back
-          (
-            DataConnectionInfo
-            (
-              source_slot,
-              (*it)->getTarget()
-            )
-          );
+          data_connections.push_back(DataConnectionInfo(source_slot, (*it)->getTarget()));
         }
       }
-//      for (auto it = slots_deleted_later.begin(); it != slots_deleted_later.end(); ++it)
-//      {
-//        old_network->deleteConnectorsAlongConnection
-//                     (
-//                       *it,
-//                       boost::static_pointer_cast<cedar::proc::ConstNetwork>(this->shared_from_this())
-//                     );
-//      }
     }
     else if (old_network->contains(this->shared_from_this())) // old group contains new group - moving down the hierarchy
     {
@@ -706,13 +686,11 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
           // this connection must be stored (note that connections are automatically deleted if elements are removed)
           if (source_it == elements.end())
           {
-//            source_slot = old_network->getRealSource(*it, boost::dynamic_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
             source_slot = old_network->getRealSource((*it)->getTarget(), boost::dynamic_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
             target_slots.push_back((*it)->getTarget());
           }
           else if (target_it == elements.end())
           {
-//            auto more_slots = old_network->getRealTargets(*it, boost::dynamic_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
             auto more_slots = old_network->getRealTargets((*it)->getSource(), boost::dynamic_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
             target_slots.insert(target_slots.end(), more_slots.begin(), more_slots.end());
           }
@@ -722,14 +700,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
           }
           for (unsigned i = 0; i < target_slots.size(); ++i)
           {
-            data_connections.push_back
-            (
-              DataConnectionInfo
-              (
-                source_slot,
-                target_slots.at(i)
-              )
-            );
+            data_connections.push_back(DataConnectionInfo(source_slot, target_slots.at(i)));
           }
         }
       }
@@ -883,24 +854,38 @@ void cedar::proc::Network::removeConnector(const std::string& name, bool input)
     // here be comments
     if (input)
     {
-      this->removeAllConnectionsFromSlot(this->getElement<cedar::proc::Connectable>(name)->getOutputSlot("output"));
+      //this->removeAllConnectionsFromSlot(this->getElement<cedar::proc::Connectable>(name)->getOutputSlot("output"));
+      this->disconnectOutputSlot(this->getElement<cedar::proc::Connectable>(name), "output");
       if (this->getNetwork())
       {
-        this->getNetwork()->removeAllConnectionsFromSlot(this->getInputSlot(name));
+//        this->getNetwork()->removeAllConnectionsFromSlot(this->getInputSlot(name));
+          this->getNetwork()->disconnectInputSlot
+                              (
+                                boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
+                                name
+                              );
       }
       this->remove(this->getElement(name));
       this->removeInputSlot(name);
     }
     else
     {
-      this->removeAllConnectionsFromSlot(this->getElement<cedar::proc::Connectable>(name)->getInputSlot("input"));
+//      this->removeAllConnectionsFromSlot(this->getElement<cedar::proc::Connectable>(name)->getInputSlot("input"));
+      this->disconnectInputSlot(this->getElement<cedar::proc::Connectable>(name), "input");
       if (this->getNetwork())
       {
-        this->getNetwork()->removeAllConnectionsFromSlot(this->getOutputSlot(name));
+        std::cout << "Removing all connections from connector " << it->first << std::endl;
+//        this->getNetwork()->removeAllConnectionsFromSlot(this->getOutputSlot(name));
+          this->getNetwork()->disconnectOutputSlot
+                              (
+                                boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
+                                name
+                              );
       }
       this->remove(this->getElement(name));
       this->removeOutputSlot(name);
     }
+    std::cout << "Removing connector " << it->first << std::endl;
     _mConnectors->erase(it->first);
   }
   else
@@ -1041,17 +1026,8 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   }
 
   // create connection
-  mDataConnections.push_back
-  (
-    cedar::proc::DataConnectionPtr
-    (
-      new DataConnection
-      (
-        source_slot,
-        target_slot
-      )
-    )
-  );
+  mDataConnections.push_back(cedar::proc::DataConnectionPtr(new DataConnection(source_slot, target_slot)));
+
   CEDAR_DEBUG_ASSERT(p_target);
   if (!p_target->isLooped())
   {
@@ -1098,6 +1074,11 @@ void cedar::proc::Network::disconnectSlots(const std::vector<cedar::proc::DataCo
   for (size_t i = 0; i < connections.size(); ++i)
   {
     cedar::proc::DataConnectionPtr connection = connections[i];
+    std::cout << "Removing connection between: "
+              << connection->getSource()->getParent() << "." << connection->getSource()->getName()
+              << " and "
+              << connection->getTarget()->getParent() << "." << connection->getTarget()->getName()
+              << std::endl;
     this->disconnectSlots(connection->getSource(), connection->getTarget());
   }
 }
@@ -1166,12 +1147,7 @@ void cedar::proc::Network::disconnectTrigger(cedar::proc::TriggerPtr source, ced
     if ((*it)->equals(source, target))
     {
       mTriggerConnections.erase(it);
-      mTriggerConnectionChanged
-      (
-        source,
-        target,
-        false
-      );
+      mTriggerConnectionChanged(source, target, false);
       return;
     }
   }
@@ -2340,7 +2316,7 @@ void cedar::proc::Network::deleteConnectorsAlongConnection(cedar::proc::DataSlot
     cedar::proc::DataSlotPtr new_target;
     if (auto group_source = group->getElement<cedar::proc::sources::GroupSource>(current_source->getParent()))
     {
-      new_target = group->getInputSlot(source->getParent());
+      new_target = group->getInputSlot(current_source->getParent());
       cedar::proc::Network::deleteConnectorsAlongConnection(source, new_target);
 
       // then, clean up connection and connector
