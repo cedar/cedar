@@ -1169,6 +1169,10 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   {
     p_scene_element->hide();
   }
+  else
+  {
+    this->fitToContents(true);
+  }
 }
 
 void cedar::proc::gui::Network::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
