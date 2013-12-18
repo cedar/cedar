@@ -156,7 +156,7 @@ public:
   void freeInput(const std::string& name, cedar::aux::ConstDataPtr data);
 
   //!@brief Returns a specific data pointer stored in this Connectable.
-  cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
+  cedar::aux::ConstDataPtr getData(DataRole::Id role, const std::string& name) const;
 
   /*! @brief Checks the validity of a slot.
    *
@@ -384,6 +384,9 @@ private:
   //!@brief Checks if the connectable has a slot with the given role and name.
   bool hasSlot(DataRole::Id role, const std::string& name) const;
 
+  //! Renames a slot.
+  void renameSlot(DataRole::Id role, const std::string& oldName, const std::string& newName);
+
   //!@brief Declares a new piece of data in the connectable.
   cedar::proc::DataSlotPtr declareData
                            (
@@ -413,9 +416,6 @@ private:
    */
   void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet);
 
-  //!@brief Returns the map of data slots for a given role (the non-const version of getDataSlots(DataRole::Id role)).
-  cedar::proc::Connectable::SlotMap& getSlotMap(DataRole::Id role);
-
 
   //!@brief Returns the map of data slots for a given role.
   cedar::proc::Connectable::SlotList& getSlotList(DataRole::Id role);
@@ -444,6 +444,18 @@ private:
 
   //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
   cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);
+
+  //! Returns the slot map for the given role. If none exists, throws an exception.
+  SlotMap& getSlotMap(cedar::proc::DataRole::Id role);
+
+  //! Returns the slot map for the given role. If none exists, throws an exception.
+  const SlotMap& getSlotMap(cedar::proc::DataRole::Id role) const;
+
+  //! Returns an iterator to the slot. Throws if the slot is not found.
+  SlotMap::iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name);
+
+  //! Returns an iterator to the slot. Throws if the slot is not found.
+  SlotMap::const_iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
