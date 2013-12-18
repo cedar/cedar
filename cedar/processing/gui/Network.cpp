@@ -582,10 +582,8 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
 
   this->getNetwork()->add(elements_to_move);
 
-  for (auto it = all_elements.begin(); it != all_elements.end(); ++it)
+  for (auto element : all_elements)
   {
-    auto element = *it;
-
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
 
     // restore the item's configuration
@@ -605,6 +603,20 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     }
 
     graphics_item->setPos(parent->mapFromScene(scene_pos));
+  }
+
+  for (auto element : all_elements)
+  {
+    auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
+    // if this is a network, restore all connections
+    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(graphics_item))
+    {
+      auto connections = network_item->getNetwork()->getDataConnections();
+      for (auto connection : connections)
+      {
+        network_item->checkDataConnection(connection->getSource(), connection->getTarget(), cedar::proc::Network::CONNECTION_ADDED);
+      }
+    }
   }
 
   this->mHoldFitToContents = false;
