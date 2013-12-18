@@ -210,6 +210,23 @@ int main(int /* argc */, char** /* argv */)
   }
 
   std::cout << "testing connectors" << std::endl;
+
+  // testing a bug
+  cedar::proc::NetworkPtr network_upper(new cedar::proc::Network());
+  network_upper->setName("root");
+  cedar::proc::NetworkPtr network_lower(new cedar::proc::Network());
+  network_lower->setName("nested");
+  network_upper->add(network_lower);
+  cedar::proc::steps::StaticGainPtr gain_lower(new cedar::proc::steps::StaticGain());
+  cedar::proc::steps::StaticGainPtr gain_upper(new cedar::proc::steps::StaticGain());
+  network_upper->add(gain_lower, "gain lower");
+  network_upper->add(gain_upper, "gain upper");
+  network_upper->connectSlots("gain lower.output", "gain upper.input");
+  std::list<cedar::proc::ElementPtr> to_move;
+  to_move.push_back(gain_lower);
+  network_lower->add(to_move);
+  network_upper->add(to_move);
+
   // testing network connectors
   cedar::proc::NetworkPtr network_root(new cedar::proc::Network());
   network_root->setName("root");
@@ -217,15 +234,11 @@ int main(int /* argc */, char** /* argv */)
   network_connector->setName("nested");
   network_root->add(network_connector);
   network_connector->addConnector("input", true);
-//  network_connector->addConnector("another input", true);
   network_connector->addConnector("output", false);
-//  network_connector->addConnector("another output", false);
   cedar::proc::sources::GaussInputPtr gauss(new cedar::proc::sources::GaussInput());
   network_root->add(gauss, "Gauss");
   network_root->connectSlots("Gauss.Gauss input", "nested.input");
-//  network_root->connectSlots("Gauss.Gauss input", "nested.another input");
   network_connector->connectSlots("input.output", "output.input");
-//  network_connector->connectSlots("another input.output", "another output.input");
   cedar::proc::steps::StaticGainPtr gain(new cedar::proc::steps::StaticGain());
   network_root->add(gain, "gain");
   network_root->connectSlots("nested.output", "gain.input");
