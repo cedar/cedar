@@ -608,16 +608,26 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
 
   cedar::proc::DataSlotPtr slot_ptr;
   // finally, insert a new data slot with the given parameters
-  //!@todo Don't just connect for inputs; rather, use a unified interface
   if (role == cedar::proc::DataRole::INPUT)
   {
-    cedar::proc::ExternalDataPtr ext_slot_ptr(new cedar::proc::ExternalData(role, name, this, mandatory));
-    mSlotConnection
-      = ext_slot_ptr->connectToExternalDataChanged
-                      (
-                        boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
-                      );
-    slot_ptr = ext_slot_ptr;
+    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this, mandatory));
+    mSlotConnection = slot_ptr->connectToDataChangedSignal
+                                (
+                                  boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
+                                );
+
+    //!@todo Don't just connect for inputs; rather, use a unified interface
+    slot_ptr->connectToDataRemovedSignal
+    (
+      boost::bind
+      (
+        &cedar::proc::Connectable::removeLock,
+        this,
+        _1,
+        cedar::aux::LOCK_TYPE_READ,
+        this->getLockSetForRole(DataRole::INPUT)
+      )
+    );
   }
   else
   {
@@ -672,21 +682,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareSharedOutput
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
-  cedar::proc::DataSlotPtr slot = this->declareData(DataRole::INPUT, name, mandatory);
-
-  this->getInputSlot(name)->connectToExternalDataRemoved
-  (
-    boost::bind
-    (
-      &cedar::proc::Connectable::removeLock,
-      this,
-      _1,
-      cedar::aux::LOCK_TYPE_READ,
-      this->getLockSetForRole(DataRole::INPUT)
-    )
-  );
-
-  return slot;
+  return this->declareData(DataRole::INPUT, name, mandatory);
 }
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInputCollection(const std::string& name)

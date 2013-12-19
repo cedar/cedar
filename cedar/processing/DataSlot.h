@@ -39,15 +39,16 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/DataRole.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/Data.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/PromotedExternalData.fwd.h"
 #include "cedar/processing/PromotedOwnedData.fwd.h"
+#include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -154,9 +155,6 @@ public:
   //!@brief set the current validity of this slot
   virtual void setValidity(VALIDITY validity);
 
-  //!@brief Removes all data from the slot.
-  virtual void clear() = 0;
-
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 
@@ -184,23 +182,48 @@ public:
    */
   cedar::proc::DataSlot::VALIDITY checkValidityOf(cedar::aux::ConstDataPtr data) const;
 
-  //! connect to the validity changed signal
-  inline boost::signals2::connection connectToValidityChangedSignal
-                                     (
-                                       boost::function<void ()> slot
-                                     )
-  {
-    return this->mValidityChanged.connect(slot);
-  }
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals and slots
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(ValidityChanged, void());
+public:
+  CEDAR_DECLARE_SIGNAL(DataChanged, void());
+public:
+  CEDAR_DECLARE_SIGNAL(DataSet, void(cedar::aux::ConstDataPtr data));
+public:
+  CEDAR_DECLARE_SIGNAL(DataRemoved, void(cedar::aux::ConstDataPtr data));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief set the internal DataPtr managed by this slot
-  virtual void setData(cedar::aux::DataPtr data) = 0;
+  //! Set the internal DataPtr of this slot.
+  void setData(cedar::aux::DataPtr data);
 
-  virtual void removeData(cedar::aux::ConstDataPtr data) = 0;
+  //! Remove the DataPtr from this slot. Child classes decide how to handle this.
+  void removeData(cedar::aux::ConstDataPtr data);
+
+  //! Clears all data in the slot.
+  void clear();
+
+  //! Emits the DataChanged signal.
+  void emitDataChanged()
+  {
+    this->signalDataChanged();
+  }
+
+  //! Emits the DataAdded signal.
+  void emitDataSet(cedar::aux::ConstDataPtr data)
+  {
+    this->signalDataSet(data);
+  }
+
+  //! Emits the DataRemoved signal.
+  void emitDataRemoved(cedar::aux::ConstDataPtr data)
+  {
+    this->signalDataRemoved(data);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -218,15 +241,21 @@ private:
   //!@brief sets the parent pointer to NULL
   void resetParentPointer();
 
+  //! To be overridden by child classes.
+  virtual void setDataInternal(cedar::aux::DataPtr data) = 0;
+
+  //! To be overridden by child classes.
+  virtual void removeDataInternal(cedar::aux::ConstDataPtr data) = 0;
+
+  //!@brief Removes all data from the slot.
+  virtual void clearInternal() = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! The parent that owns the slot.
   cedar::proc::Connectable* mpParent;
-
-  //! Signal that is emitted when the validity of the data slot changes.
-  boost::signals2::signal<void ()> mValidityChanged;
 
 private:
   //!@brief flag if this slot must be connected

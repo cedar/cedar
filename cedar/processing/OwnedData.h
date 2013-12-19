@@ -72,7 +72,6 @@ public:
 
   cedar::aux::ConstDataPtr getData() const;
 
-  void clear();
 
   bool isShared() const;
 
@@ -80,15 +79,17 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setData(cedar::aux::DataPtr data);
-
-  void removeData(cedar::aux::ConstDataPtr data);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void clearInternal();
+
+  void setDataInternal(cedar::aux::DataPtr data);
+
+  void removeDataInternal(cedar::aux::ConstDataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
