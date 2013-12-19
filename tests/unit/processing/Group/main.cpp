@@ -42,12 +42,14 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/processing/sources/GaussInput.h"
+#include "cedar/processing/steps/StaticGain.h"
 #include "cedar/dynamics/fields/NeuralField.h"
 
 // SYSTEM INCLUDES
@@ -80,7 +82,7 @@ CEDAR_GENERATE_POINTER_TYPES(TestModule);
 
 int main(int /* argc */, char** /* argv */)
 {
-  using cedar::proc::Network;
+  using cedar::proc::Group;
   using cedar::proc::StepPtr;
   using cedar::proc::Step;
 
@@ -98,7 +100,7 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Sample.json ... ";
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   network->readJson("Sample.json");
   std::cout << "done." << std::endl;
 
@@ -130,7 +132,7 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "test duplication of steps" << std::endl;
   try
   {
-    std::string new_name = network->getUniqueName("stepB");
+    std::string new_name = network->getUniqueIdentifier("stepB");
     network->duplicate("stepB");
     network->getElement(new_name);
   }
@@ -153,17 +155,17 @@ int main(int /* argc */, char** /* argv */)
 
   // test nested networks
   std::cout << "Test nested network." << std::endl;
-  cedar::proc::NetworkPtr network_parent(new cedar::proc::Network());
+  cedar::proc::GroupPtr network_parent(new cedar::proc::Group());
   TestModulePtr step_parent (new TestModule());
   network_parent->add(step_parent, "parent step");
-  cedar::proc::NetworkPtr network_child(new cedar::proc::Network());
+  cedar::proc::GroupPtr network_child(new cedar::proc::Group());
   network_child->setName("network child");
   TestModulePtr step_child (new TestModule());
   network_child->add(step_child, "child step");
   cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger());
   network_child->add(trigger, "looped_trigger");
   network_child->connectTrigger(trigger, step_child);
-  cedar::proc::NetworkPtr network_grand_child(new cedar::proc::Network());
+  cedar::proc::GroupPtr network_grand_child(new cedar::proc::Group());
   network_grand_child->setName("network grand child");
   network_child->add(network_grand_child);
   network_parent->add(network_child);
@@ -171,12 +173,12 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "Write nested network." << std::endl;
   network_parent->writeJson("Nested.json");
   std::cout << "Read nested network." << std::endl;
-  cedar::proc::NetworkPtr network_nested(new cedar::proc::Network());
+  cedar::proc::GroupPtr network_nested(new cedar::proc::Group());
   network_nested->readJson("Nested.json");
 
-  std::cout << "testing Network::getElement for nested networks" << std::endl;
+  std::cout << "testing Group::getElement for nested networks" << std::endl;
   network_nested->getElement<Step>("parent step");
-  if (network_nested->getElement<Network>("network child")->getElement<Step>("child step")->getName() != "child step")
+  if (network_nested->getElement<Group>("network child")->getElement<Step>("child step")->getName() != "child step")
   {
     ++errors;
     std::cout << "child step was not found in nested network" << std::endl;
@@ -186,13 +188,13 @@ int main(int /* argc */, char** /* argv */)
     ++errors;
     std::cout << "child step was not found in nested network using dot notation" << std::endl;
   }
-  if (network_nested->getElement<Network>("network child.network grand child")->getName() != "network grand child")
+  if (network_nested->getElement<Group>("network child.network grand child")->getName() != "network grand child")
   {
     ++errors;
     std::cout << "child step was not found in nested network using dot notation" << std::endl;
   }
 
-  std::cout << "testing Network::findPath" << std::endl;
+  std::cout << "testing Group::findPath" << std::endl;
   if (network_nested->findPath(network_nested->getElement<Step>("network child.child step")) != "network child.child step")
   {
     ++errors;
@@ -207,29 +209,89 @@ int main(int /* argc */, char** /* argv */)
     std::cout << "path to non-existing element not empty" << std::endl;
   }
 
-  // testing auto-promoting of slots with multiple incoming or outgoing connections (issue #270)
-  cedar::proc::NetworkPtr network_promote(new cedar::proc::Network());
-  network_promote->setName("root");
-  cedar::proc::NetworkPtr network_promoted_nested(new cedar::proc::Network());
-  network_promoted_nested->setName("nested");
-  std::list<cedar::proc::ElementPtr> to_add;
-  to_add.push_back(network_promoted_nested);
-  cedar::dyn::NeuralFieldPtr field_a(new cedar::dyn::NeuralField());
-  field_a->setName("field a");
-  to_add.push_back(field_a);
-  cedar::dyn::NeuralFieldPtr field_b(new cedar::dyn::NeuralField());
-  field_b->setName("field b");
-  to_add.push_back(field_b);
-  cedar::dyn::NeuralFieldPtr field_c(new cedar::dyn::NeuralField());
-  field_c->setName("field c");
-  to_add.push_back(field_c);
-  network_promote->add(to_add);
-  network_promote->connectSlots("field a.sigmoided activation", "field b.input");
-  network_promote->connectSlots("field a.sigmoided activation", "field c.input");
-  std::list<cedar::proc::ElementPtr> to_move;
-  to_move.push_back(field_a);
-  network_promoted_nested->add(to_move);
+  std::cout << "testing connectors" << std::endl;
 
+  // testing a bug
+  cedar::proc::GroupPtr network_upper(new cedar::proc::Group());
+  network_upper->setName("root");
+  cedar::proc::GroupPtr network_lower(new cedar::proc::Group());
+  network_lower->setName("nested");
+  network_upper->add(network_lower);
+  cedar::proc::steps::StaticGainPtr gain_lower(new cedar::proc::steps::StaticGain());
+  cedar::proc::steps::StaticGainPtr gain_upper(new cedar::proc::steps::StaticGain());
+  network_upper->add(gain_lower, "gain lower");
+  network_upper->add(gain_upper, "gain upper");
+  network_upper->connectSlots("gain lower.output", "gain upper.input");
+  std::list<cedar::proc::ElementPtr> to_move;
+  to_move.push_back(gain_lower);
+  network_lower->add(to_move);
+  network_upper->add(to_move);
+
+  // testing network connectors
+  cedar::proc::GroupPtr network_root(new cedar::proc::Group());
+  network_root->setName("root");
+  cedar::proc::GroupPtr network_connector(new cedar::proc::Group());
+  network_connector->setName("nested");
+  network_root->add(network_connector);
+  network_connector->addConnector("input", true);
+  network_connector->addConnector("output", false);
+  cedar::proc::sources::GaussInputPtr gauss(new cedar::proc::sources::GaussInput());
+  network_root->add(gauss, "Gauss");
+  network_root->connectSlots("Gauss.Gauss input", "nested.input");
+  network_connector->connectSlots("input.output", "output.input");
+  cedar::proc::steps::StaticGainPtr gain(new cedar::proc::steps::StaticGain());
+  network_root->add(gain, "gain");
+  network_root->connectSlots("nested.output", "gain.input");
+  network_connector->disconnectSlots("input.output", "output.input");
+  network_connector->connectSlots("input.output", "output.input");
+  network_root->disconnectSlots("Gauss.Gauss input", "nested.input");
+  network_root->connectSlots("Gauss.Gauss input", "nested.input");
+
+  std::cout << "testing moving elements between networks" << std::endl;
+  network_connector.reset();
+  network_root.reset();
+  network_root = cedar::proc::GroupPtr(new cedar::proc::Group());
+  network_root->setName("root");
+  network_connector = cedar::proc::GroupPtr(new cedar::proc::Group());
+  network_connector->setName("nested");
+  network_root->add(network_connector);
+  for (unsigned int i = 0; i < 4; ++i)
+  {
+    cedar::proc::steps::StaticGainPtr gain(new cedar::proc::steps::StaticGain());
+    network_root->add(gain, cedar::aux::toString(i));
+  }
+  network_root->connectSlots("0.output", "1.input");
+  network_root->connectSlots("1.output", "2.input");
+  network_root->connectSlots("2.output", "3.input");
+  std::list<cedar::proc::ElementPtr> list;
+  list.push_back(network_root->getElement("1"));
+  list.push_back(network_root->getElement("2"));
+  network_connector->add(list);
+  network_connector->disconnectSlots("1.output", "2.input");
+  list.erase(list.begin());
+  network_root->add(list);
+
+  // next test
+  network_connector.reset();
+  network_root.reset();
+  network_root = cedar::proc::GroupPtr(new cedar::proc::Group());
+  network_root->setName("root");
+  network_connector = cedar::proc::GroupPtr(new cedar::proc::Group());
+  network_connector->setName("nested");
+  cedar::proc::GroupPtr network_connector_2(new cedar::proc::Group());
+  network_connector_2->setName("nested 2");
+  network_root->add(network_connector);
+  network_connector->add(network_connector_2);
+  cedar::proc::steps::StaticGainPtr gain_out(new cedar::proc::steps::StaticGain());
+  network_root->add(gain_out, "out");
+  cedar::proc::steps::StaticGainPtr gain_in(new cedar::proc::steps::StaticGain());
+  network_root->add(gain_in, "in");
+  network_root->connectSlots("out.output", "in.input");
+  list.clear();
+  list.push_back(gain_out);
+  network_connector_2->add(list);
+  network_connector->add(list);
+  network_root->add(list);
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

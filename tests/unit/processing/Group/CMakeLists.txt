@@ -24,9 +24,13 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2012 07 19
+#   Maintainer:  Oliver Lomp,
+#                Mathis Richter,
+#                Stephan Zibner
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+#                mathis.richter@ini.ruhr-uni-bochum.de,
+#                stephan.zibner@ini.ruhr-uni-bochum.de
+#   Date:        2011 05 23
 #
 #   Description:
 #
@@ -34,8 +38,8 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(PromotedConnections
+cedar_add_unit_test(Group
                     main.cpp
                     ADDITIONAL_DEPENDENCIES
                     cedardyn
-                    )
+                   )

@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/Data.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/PromotedExternalData.fwd.h"
 #include "cedar/processing/PromotedOwnedData.fwd.h"
@@ -73,9 +73,7 @@ public boost::enable_shared_from_this<cedar::proc::DataSlot>
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
-  friend class cedar::proc::Network;
-  friend class cedar::proc::PromotedExternalData;
-  friend class cedar::proc::PromotedOwnedData;
+  friend class cedar::proc::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -162,15 +160,6 @@ public:
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 
-  //! promote this slot
-  void promote();
-
-  //! demote this slot
-  void demote();
-
-  //! states if this slot is promoted
-  bool isPromoted() const;
-
   //!@brief get the pointer of this slot's parent
   cedar::proc::Connectable* getParentPtr();
 
@@ -211,6 +200,8 @@ protected:
   //!@brief set the internal DataPtr managed by this slot
   virtual void setData(cedar::aux::DataPtr data) = 0;
 
+  virtual void removeData(cedar::aux::ConstDataPtr data) = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -220,6 +211,12 @@ private:
 
   //! Returns the type check function object for this slot.
   const TypeCheckFunction& getCheck() const;
+
+  //!@brief deprecated due to bad name, see resetParentPointer
+  CEDAR_DECLARE_DEPRECATED(void deleteParentPointer());
+
+  //!@brief sets the parent pointer to NULL
+  void resetParentPointer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
