@@ -520,9 +520,9 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   mSlotRemovedConnection.disconnect();
 
   mSlotAddedConnection
-    = step->connectToSlotAdded(boost::bind(&cedar::proc::gui::StepItem::slotAdded, this, _1, _2));
+    = step->connectToSlotAddedSignal(boost::bind(&cedar::proc::gui::StepItem::slotAdded, this, _1, _2));
   mSlotRemovedConnection
-    = step->connectToSlotRemoved(boost::bind(&cedar::proc::gui::StepItem::slotRemoved, this, _1, _2));
+    = step->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::StepItem::slotRemoved, this, _1, _2));
 }
 
 void cedar::proc::gui::StepItem::updateIconGeometry()

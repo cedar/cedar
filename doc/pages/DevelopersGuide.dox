@@ -18,6 +18,7 @@ In the following pages you can find out about general programming concepts we us
 - @link ThreadingConcept Threads and dynamics @endlink
 - @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
 - @link UnitsConcept Physical units @endlink
+- @link BoostSignalsWrapper cedar's helper functions for boost signals @endlink
 - @ref EnumConcept
 
 @section BugFixing Bug Fixing

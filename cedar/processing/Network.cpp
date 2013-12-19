@@ -761,7 +761,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
   {
     this->mRevalidateConnections[connectable->getName()]
-      = connectable->connectToOutputPropertiesChanged(boost::bind(&cedar::proc::Network::revalidateConnections, this, _1));
+      = connectable->connectToOutputPropertiesChangedSignal(boost::bind(&cedar::proc::Network::revalidateConnections, this, _1));
   }
 }
 
