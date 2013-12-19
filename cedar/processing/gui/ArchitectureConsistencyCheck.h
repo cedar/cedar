@@ -44,7 +44,7 @@
 #include "cedar/processing/gui/ui_ArchitectureConsistencyCheck.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/Network.fwd.h"

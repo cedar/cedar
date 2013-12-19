@@ -22,24 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Network.h
+    File:        Group.fwd.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 05
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::Group.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_NETWORK_H
-#define CEDAR_PROC_NETWORK_H
+#ifndef CEDAR_PROC_GROUP_FWD_H
+#define CEDAR_PROC_GROUP_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -52,7 +48,16 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-#warning cedar::proc::Network was renamed to cedar::proc::Group. Please include Group.h instead of this header.
-#include "cedar/processing/Group.h"
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace proc
+  {
+    CEDAR_DECLARE_PROC_CLASS(Group);
+  }
+}
 
-#endif // CEDAR_PROC_GROUP_H
+//!@endcond
+
+#endif // CEDAR_PROC_GROUP_FWD_H
+

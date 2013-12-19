@@ -44,7 +44,7 @@
 // PROJECT INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

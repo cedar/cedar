@@ -545,18 +545,18 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
           std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
           std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
           // delete connection in network of source
-          source->getSlot()->getParentPtr()->getNetwork()->disconnectSlots(source_slot, target_slot);
+          source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
         }
       }
       else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
       {
         if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
         {
-          source->getTrigger()->getNetwork()->disconnectTrigger(source->getTrigger(), target->getStep());
+          source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getStep());
         }
         else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
         {
-          source->getTrigger()->getNetwork()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+          source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
         }
       }
       else
@@ -598,19 +598,19 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
   {
     this->mpPropertyTable->resetContents();
     p_drawer->hide();
-    p_drawer->getStep()->getNetwork()->remove(p_drawer->getStep());
+    p_drawer->getStep()->getGroup()->remove(p_drawer->getStep());
   }
   // delete trigger
   else if (cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(pItem))
   {
     p_trigger_drawer->hide();
-    p_trigger_drawer->getTrigger()->getNetwork()->remove(p_trigger_drawer->getTrigger());
+    p_trigger_drawer->getTrigger()->getGroup()->remove(p_trigger_drawer->getTrigger());
   }
   // delete network
   else if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(pItem))
   {
     p_network_drawer->hide();
-    p_network_drawer->getNetwork()->getNetwork()->remove(p_network_drawer->getNetwork());
+    p_network_drawer->getNetwork()->getGroup()->remove(p_network_drawer->getNetwork());
   }
   else
   {

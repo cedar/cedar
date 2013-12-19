@@ -37,7 +37,7 @@
 // cedar includes
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/MatData.h"

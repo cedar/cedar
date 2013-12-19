@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DataSlot.h"

@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/steps/Projection.h"

@@ -497,7 +497,7 @@ bool cedar::proc::gui::Network::canAddAny(const QList<QGraphicsItem*>& items) co
     //!@todo This should cast to a cedar::proc::gui::Element class.
     if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(items.at(i)))
     {
-      if (connectable->getConnectable()->getNetwork() != this->getNetwork())
+      if (connectable->getConnectable()->getGroup() != this->getNetwork())
       {
         return true;
       }

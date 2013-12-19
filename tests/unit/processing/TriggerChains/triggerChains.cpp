@@ -37,7 +37,7 @@
 // LOCAL INCLUDES
 
 // CEDAR INCLUDES
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/DataTemplate.h"

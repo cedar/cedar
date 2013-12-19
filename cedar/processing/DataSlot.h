@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/Data.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/PromotedExternalData.fwd.h"
 #include "cedar/processing/PromotedOwnedData.fwd.h"

@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/ObjectParameter.h"

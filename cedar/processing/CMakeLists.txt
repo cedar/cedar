@@ -93,7 +93,7 @@ cedar_add_library(cedarproc
   sources/Camera.h
   steps/Projection.h
   steps/Resize.h
-  Network.h
+  Group.h
   Step.h
   LoopedTrigger.h
   ${libdc_moc_headers}

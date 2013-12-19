@@ -47,7 +47,7 @@
 #include "cedar/auxiliaries/threadingUtilities.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 #include "cedar/processing/sources/GroupSource.fwd.h"
