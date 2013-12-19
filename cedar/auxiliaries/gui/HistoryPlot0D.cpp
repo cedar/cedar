@@ -258,6 +258,13 @@ void cedar::aux::gui::HistoryPlot0D::applyStyle(size_t lineId, QwtPlotCurve *pCu
 void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mCurves.clear();
+  if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+  {
+    if (mat_data->getData().channels() != 1)
+    {
+      CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot plot data with more than one channel.");
+    }
+  }
   this->append(data, title);
 
   this->startTimer(30);
