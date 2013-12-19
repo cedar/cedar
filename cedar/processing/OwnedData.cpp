@@ -70,6 +70,13 @@ cedar::proc::OwnedData::~OwnedData()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::OwnedData::removeData(cedar::aux::ConstDataPtr data)
+{
+  // should always remove the data actually in this slot.
+  CEDAR_NON_CRITICAL_ASSERT(this->mData == data);
+  this->clear();
+}
+
 void cedar::proc::OwnedData::clear()
 {
   this->mData.reset();

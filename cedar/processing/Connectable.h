@@ -402,7 +402,7 @@ private:
 
   /*!@brief Sets the data pointer of the slot with the given name and role to zero.
    */
-  void freeData(DataRole::Id role, const std::string& name);
+  void freeData(DataRole::Id role, cedar::aux::ConstDataPtr data, const std::string& name);
 
   /*!@brief (Re-)Checks that all mandatory connections are actually set to non-zero data.
    *

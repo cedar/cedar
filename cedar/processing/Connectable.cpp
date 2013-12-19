@@ -387,6 +387,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::checkInputValidity
   }
 }
 
+//!@todo Give this method a better name: it doesn't just return the validity, it also re-determines it if necessary
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar::proc::DataSlotPtr slot)
 {
   // if the validty is indetermined (unknown), try to find it out
@@ -827,16 +828,6 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   this->checkMandatoryConnections();
 }
 
-//!@todo This method should not be needed
-void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& name)
-{
-  QWriteLocker locker(this->mpConnectionLock);
-  this->getSlot(role, name)->clear();
-  locker.unlock();
-
-  this->checkMandatoryConnections();
-}
-
 /*!
  * @remarks This method is usually called by other framework parts rather than by the user. So only call it if you know
  *          what you are doing :)
@@ -882,32 +873,37 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
   }
 }
 
+void cedar::proc::Connectable::freeData(DataRole::Id role, cedar::aux::ConstDataPtr data, const std::string& name)
+{
+  QWriteLocker locker(this->mpConnectionLock);
+
+  auto slot = this->getSlot(role, name);
+  if (!data)
+  {
+    data = slot->getData();
+  }
+  locker.unlock();
+
+  slot->removeData(data);
+
+  this->checkMandatoryConnections();
+}
+
 void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::ConstDataPtr data)
 {
-  cedar::proc::ExternalDataPtr slot = this->getInputSlot(name);
-  // the slot for name should always be found
-  CEDAR_ASSERT(slot);
-  //!@todo Move this distinction to DataSlot or one of its derivatives
-  if (slot->isCollection())
-  {
-    slot->removeData(data);
-  }
-  else
-  {
-    this->freeData(DataRole::INPUT, name);
-  }
+  this->freeData(DataRole::INPUT, data, name);
 
   this->inputConnectionChanged(name);
 }
 
 void cedar::proc::Connectable::freeBuffer(const std::string& name)
 {
-  this->freeData(DataRole::BUFFER, name);
+  this->freeData(DataRole::BUFFER, cedar::aux::ConstDataPtr(), name);
 }
 
 void cedar::proc::Connectable::freeOutput(const std::string& name)
 {
-  this->freeData(DataRole::OUTPUT, name);
+  this->freeData(DataRole::OUTPUT, cedar::aux::ConstDataPtr(), name);
 }
 
 cedar::aux::ConstDataPtr cedar::proc::Connectable::getInput(const std::string& name) const

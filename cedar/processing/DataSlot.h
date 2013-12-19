@@ -200,6 +200,8 @@ protected:
   //!@brief set the internal DataPtr managed by this slot
   virtual void setData(cedar::aux::DataPtr data) = 0;
 
+  virtual void removeData(cedar::aux::ConstDataPtr data) = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
