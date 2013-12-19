@@ -145,6 +145,7 @@ void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& 
 
   if (this->mInput)
   {
+    this->mOutput->copyAnnotationsFrom(this->mInput);
     this->updateDimensionality();
   }
 }
