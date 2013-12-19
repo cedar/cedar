@@ -44,7 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"

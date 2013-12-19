@@ -48,7 +48,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -168,7 +168,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
   }
 
   // ... source and target are not in the same network
-  if (this->getSlot()->getParentPtr()->getNetwork() != p_target_slot->getSlot()->getParentPtr()->getNetwork())
+  if (this->getSlot()->getParentPtr()->getGroup() != p_target_slot->getSlot()->getParentPtr()->getGroup())
   {
     return cedar::proc::gui::CONNECT_NO;
   }

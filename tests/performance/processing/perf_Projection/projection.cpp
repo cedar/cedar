@@ -40,7 +40,7 @@
 #include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/testingUtilities/measurementFunctions.h"
 
 // SYSTEM INCLUDES

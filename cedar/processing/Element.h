@@ -43,7 +43,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN

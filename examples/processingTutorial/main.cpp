@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-#include <cedar/processing/Network.h>
+#include <cedar/processing/Group.h>
 #include <cedar/processing/sources/GaussInput.h>
 #include "SimpleSummation.h" // header for the class we have written above
 

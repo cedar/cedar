@@ -41,7 +41,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/OwnedData.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -173,20 +173,20 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   read_locker.unlock();
 
   // first, disconnect all connections from the slot
-  if (this->getNetwork())
+  if (this->getGroup())
   {
     //!@todo Can the two methods below be unified into a single disconnectSlot(role, ...) method in Group?
     switch (role)
     {
       case cedar::proc::DataRole::INPUT:
-        this->getNetwork()->disconnectInputSlot
+        this->getGroup()->disconnectInputSlot
                             (
                               boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
                             );
         break;
 
       case cedar::proc::DataRole::OUTPUT:
-        this->getNetwork()->disconnectOutputSlot
+        this->getGroup()->disconnectOutputSlot
                             (
                               boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
                             );
@@ -859,7 +859,7 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
   this->setData(DataRole::OUTPUT, name, data);
 
   //!@todo May want to move connections into data slots rather than the networks; then this case would not be necessary any more
-  auto network = this->getNetwork();
+  auto network = this->getGroup();
   if (!network)
   {
     return;

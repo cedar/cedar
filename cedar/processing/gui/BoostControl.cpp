@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/sources/Boost.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Element.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"

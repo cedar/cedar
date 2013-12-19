@@ -45,7 +45,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
 #include "cedar/processing/sources/Boost.fwd.h"
 

@@ -43,7 +43,7 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/consistency/LoopedStepNotConnected.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/auxiliaries/assert.h"
 

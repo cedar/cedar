@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Element.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 
 // SYSTEM INCLUDES
 

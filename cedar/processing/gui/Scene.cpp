@@ -642,7 +642,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
 
   if (p_base)
   {
-    new_parent_group = p_base->getElement()->getNetwork();
+    new_parent_group = p_base->getElement()->getGroup();
   }
   else
   {
@@ -655,7 +655,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   {
     if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(i)))
     {
-      if (new_parent_group != p_element->getNetwork()->getNetwork())
+      if (new_parent_group != p_element->getNetwork()->getGroup())
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
@@ -671,7 +671,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
     }
     else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(i)))
     {
-      if (new_parent_group != p_element->getStep()->getNetwork())
+      if (new_parent_group != p_element->getStep()->getGroup())
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
@@ -687,7 +687,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
     }
     else if (cedar::proc::gui::TriggerItem *p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(i)))
     {
-      if (new_parent_group != p_element->getTrigger()->getNetwork())
+      if (new_parent_group != p_element->getTrigger()->getGroup())
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
@@ -908,7 +908,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 static_cast<cedar::proc::Element*>
                 (
                   p_source->getSlot()->getParentPtr()
-                )->getNetwork()->connectSlots(source_name, target_name);
+                )->getGroup()->connectSlots(source_name, target_name);
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
             }
@@ -927,14 +927,14 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
               {
                 cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
-                source->getTrigger()->getNetwork()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
+                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
                 break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
               }
 
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
               {
                 cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
-                source->getTrigger()->getNetwork()->connectTrigger(source->getTrigger(), p_step_item->getStep());
+                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_step_item->getStep());
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 

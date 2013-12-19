@@ -48,7 +48,7 @@
 #include "cedar/processing/gui/StepItem.fwd.h"
 #include "cedar/processing/gui/View.fwd.h"
 #include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
