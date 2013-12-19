@@ -269,9 +269,6 @@ private:
   boost::signals2::scoped_connection mSlotAddedConnection;
   boost::signals2::scoped_connection mSlotRemovedConnection;
 
-  //!@brief the class id of the step
-  cedar::aux::ConstPluginDeclarationPtr mClassId;
-
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
 
