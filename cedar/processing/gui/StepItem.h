@@ -52,7 +52,7 @@
 // FORWARD DECLARATION
 #include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
-#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/PlotWidget.fwd.h"
 #include "cedar/processing/gui/StepItem.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
@@ -74,7 +74,7 @@ class cedar::proc::gui::StepItem : public cedar::proc::gui::Connectable
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::gui::Network;
+  friend class cedar::proc::gui::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

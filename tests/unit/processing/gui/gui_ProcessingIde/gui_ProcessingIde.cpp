@@ -40,7 +40,7 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/LoopedTrigger.h"
 
@@ -76,8 +76,8 @@ int main(int argc, char** argv)
 
     cedar::proc::gui::View *p_view = p_ide->getArchitectureView();
     cedar::proc::gui::Scene *p_scene = p_view->getScene();
-    cedar::proc::gui::NetworkPtr p_gui_network = p_scene->getRootNetwork();
-    cedar::proc::GroupPtr network = p_gui_network->getNetwork();
+    cedar::proc::gui::GroupPtr p_gui_network = p_scene->getRootGroup();
+    cedar::proc::GroupPtr network = p_gui_network->getGroup();
 
     // first, add some items to the scene
     cedar::proc::ElementPtr field_element = p_scene->createElement(network, "cedar.dynamics.NeuralField", QPointF(180, 240));

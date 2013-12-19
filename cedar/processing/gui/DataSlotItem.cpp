@@ -42,7 +42,7 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/DataSlot.h"
@@ -238,7 +238,6 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
 
   if (this->scene()->selectedItems().size() > 1)
   {
-    p_scene->networkGroupingContextMenuEvent(menu);
     menu.exec(event->screenPos());
     return;
   }
