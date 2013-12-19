@@ -394,7 +394,7 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
       try
       {
         source_trigger = this->getElement<cedar::proc::Trigger>((*trigger_con)->getSourceTrigger()->getName());
-        mTriggerConnectionChanged
+        this->signalTriggerConnectionChanged
         (
           source_trigger,
           this->getElement<cedar::proc::Triggerable>
@@ -429,14 +429,14 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
     // disconnect from revalidation signal
     if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(it->second))
     {
-      this->mRevalidateConnections[connectable->getName()].disconnect();
-      std::map<std::string, boost::signals2::connection>::iterator conn_it
-        = this->mRevalidateConnections.find(connectable->getName());
+      //!@todo Can this be made easier by using scoped_connections?
+      auto conn_it = this->mRevalidateConnections.find(connectable->getName());
+      conn_it->second.disconnect();
       this->mRevalidateConnections.erase(conn_it);
     }
     mElements.erase(it);
   }
-  this->mElementRemovedSignal(element);
+  this->signalElementRemoved(element);
 }
 
 void cedar::proc::Group::create(std::string className, std::string instanceName)
@@ -736,7 +736,7 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
   }
   element->setGroup(boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
 
-  this->mNewElementAddedSignal(element);
+  this->signalNewElementAdded(element);
 
   // connect to revalidation signal
   if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
@@ -973,7 +973,7 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
     p_target->onTrigger();
   }
   // inform any interested listeners of this new connection
-  mDataConnectionChanged
+  this->signalDataConnectionChanged
   (
     this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot_name),
     this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot_name),
@@ -990,7 +990,7 @@ void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::p
   }
   // create connection
   mTriggerConnections.push_back(cedar::proc::TriggerConnectionPtr(new TriggerConnection(source, target)));
-  mTriggerConnectionChanged
+  this->signalTriggerConnectionChanged
   (
     source,
     target,
@@ -1052,7 +1052,7 @@ void cedar::proc::Group::disconnectSlots
     {
       this->removeDataConnection(it);
       // inform any interested listeners of this removed connection
-      mDataConnectionChanged(sourceSlot, targetSlot, cedar::proc::Group::CONNECTION_REMOVED);
+      this->signalDataConnectionChanged(sourceSlot, targetSlot, cedar::proc::Group::CONNECTION_REMOVED);
       return;
     }
   }
@@ -1070,8 +1070,8 @@ void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar
   {
     if ((*it)->equals(source, target))
     {
-      mTriggerConnections.erase(it);
-      mTriggerConnectionChanged(source, target, false);
+      this->mTriggerConnections.erase(it);
+      this->signalTriggerConnectionChanged(source, target, false);
       return;
     }
   }
@@ -1748,7 +1748,7 @@ void cedar::proc::Group::updateObjectName(cedar::proc::Element* object)
   bool slots_changed = false;
   if (slots_changed)
   {
-    this->mSlotChanged();
+    this->signalSlotChanged();
   }
 
   // inform gui group about name change
@@ -1946,43 +1946,6 @@ std::string cedar::proc::Group::findPath(cedar::proc::ConstElementPtr findMe) co
     }
   }
   return std::string("");
-}
-
-boost::signals2::connection cedar::proc::Group::connectToSlotChangedSignal(boost::function<void ()> slot)
-{
-  return mSlotChanged.connect(slot);
-}
-
-boost::signals2::connection cedar::proc::Group::connectToTriggerConnectionChanged
-                            (
-                              boost::function<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> slot
-                            )
-{
-  return mTriggerConnectionChanged.connect(slot);
-}
-
-boost::signals2::connection cedar::proc::Group::connectToDataConnectionChanged
-                            (
-                              boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Group::ConnectionChange)> slot
-                            )
-{
-  return mDataConnectionChanged.connect(slot);
-}
-
-boost::signals2::connection cedar::proc::Group::connectToNewElementAddedSignal
-                            (
-                              boost::function<void (cedar::proc::ElementPtr)> slot
-                            )
-{
-  return mNewElementAddedSignal.connect(slot);
-}
-
-boost::signals2::connection cedar::proc::Group::connectToElementRemovedSignal
-                            (
-                              boost::function<void (cedar::proc::ConstElementPtr)> slot
-                            )
-{
-  return mElementRemovedSignal.connect(slot);
 }
 
 const cedar::proc::Group::DataConnectionVector& cedar::proc::Group::getDataConnections() const

@@ -46,6 +46,7 @@
 #include "cedar/processing/NetworkPath.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
@@ -418,27 +419,6 @@ public:
   //!@brief Checks whether a name exists in the group.
   bool nameExists(const std::string& name) const;
 
-  //!@brief Register a function pointer to react to a changing trigger connection
-  boost::signals2::connection connectToTriggerConnectionChanged
-  (
-    boost::function<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> slot
-  );
-
-  //!@brief Register a function pointer to react to a changing data connection
-  boost::signals2::connection connectToDataConnectionChanged
-  (
-    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Group::ConnectionChange)> slot
-  );
-
-  //!@brief Register a function pointer to react to adding an element
-  boost::signals2::connection connectToNewElementAddedSignal(boost::function<void (cedar::proc::ElementPtr)> slot);
-
-  //!@brief Register a function pointer to react to removing an element
-  boost::signals2::connection connectToElementRemovedSignal(boost::function<void (cedar::proc::ConstElementPtr)> slot);
-
-  //!@brief Register a function pointer to react to changes in slots
-  boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
-
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()
   {
@@ -610,19 +590,33 @@ private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
   //--------------------------------------------------------------------------------------------------------------------
+  // signals and slots
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief a boost signal that is emitted if a change in slot takes place
+  CEDAR_DECLARE_SIGNAL(SlotChanged, void());
+
+public:
+  //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
+  CEDAR_DECLARE_SIGNAL(TriggerConnectionChanged, void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool));
+
+public:
+  //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
+  CEDAR_DECLARE_SIGNAL(DataConnectionChanged, void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Group::ConnectionChange));
+
+public:
+  //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
+  CEDAR_DECLARE_SIGNAL(NewElementAdded, void (cedar::proc::ElementPtr));
+
+public:
+  //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
+  CEDAR_DECLARE_SIGNAL(ElementRemoved, void (cedar::proc::ConstElementPtr));
+
+  //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief a boost signal that is emitted if a change in slot takes place
-  boost::signals2::signal<void ()> mSlotChanged;
-  //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
-  boost::signals2::signal<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> mTriggerConnectionChanged;
-  //!@brief a boost signal that is emitted if a data connection changes (added/removed/changed)
-  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Group::ConnectionChange)> mDataConnectionChanged;
-  //!@brief a boost signal that is emitted if an element is added to the group
-  boost::signals2::signal<void (cedar::proc::ElementPtr)> mNewElementAddedSignal;
-  //!@brief a boost signal that is emitted if an element is removed from the group
-  boost::signals2::signal<void (cedar::proc::ConstElementPtr)> mElementRemovedSignal;
+  // none yet
 
 private:
   //! Map associating element names to elements.
