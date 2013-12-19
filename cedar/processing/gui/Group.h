@@ -275,6 +275,11 @@ private:
 
   void readStickyNotes(const cedar::aux::ConfigurationNode& node);
 
+  /*!@brief this function emits a connection added signal for all connections in the underlying network.
+   * It can be used to restore connections after moving or duplicating groups
+   */
+  void restoreConnections();
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
