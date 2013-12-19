@@ -38,7 +38,7 @@
 #include "cedar/processing/typecheck/TypeCheck.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -164,22 +164,17 @@ bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) co
   return (parent.get() == mpParent);
 }
 
-void cedar::proc::DataSlot::promote()
-{
-  this->mIsPromoted = true;
-}
-
-void cedar::proc::DataSlot::demote()
-{
-  this->mIsPromoted = false;
-}
-
-bool cedar::proc::DataSlot::isPromoted() const
-{
-  return this->mIsPromoted;
-}
-
 void cedar::proc::DataSlot::setName(const std::string& name)
 {
   this->mName = name;
+}
+
+void cedar::proc::DataSlot::deleteParentPointer()
+{
+  this->resetParentPointer();
+}
+
+void cedar::proc::DataSlot::resetParentPointer()
+{
+  this->mpParent = NULL;
 }

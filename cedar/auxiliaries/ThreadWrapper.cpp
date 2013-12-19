@@ -302,8 +302,6 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
     // (this is a fall-back, if the thread was destroyed by any other means)
     if (mGeneralAccessLock.tryLock())
     {
-      //std::cout << "deleting thread: " << mpThread << " ( current thread: " << QThread::currentThread() << ") in: " << this << std::endl;
-
       scheduleThreadDeletion();
 
       mGeneralAccessLock.unlock();

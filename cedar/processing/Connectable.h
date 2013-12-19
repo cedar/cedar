@@ -48,9 +48,10 @@
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/sources/GroupSource.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -66,8 +67,9 @@ class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux:
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
   friend class cedar::proc::Step;
+  friend class cedar::proc::sources::GroupSource;
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
@@ -152,7 +154,7 @@ public:
   void freeInput(const std::string& name, cedar::aux::ConstDataPtr data);
 
   //!@brief Returns a specific data pointer stored in this Connectable.
-  cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
+  cedar::aux::ConstDataPtr getData(DataRole::Id role, const std::string& name) const;
 
   /*! @brief Checks the validity of a slot.
    *
@@ -193,6 +195,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  virtual void revalidateInputSlot(const std::string& slot);
+
   /*!@brief Declares an input slot.
    * @param name name of the declared input
    * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the
@@ -205,12 +213,6 @@ protected:
    * @remarks This is equivalent to calling declareInput(name, false) and makeInputCollection(name).
    */
   cedar::proc::DataSlotPtr declareInputCollection(const std::string& name);
-
-  //!@brief Declares a buffer slot.
-  CEDAR_DECLARE_DEPRECATED(void declareBuffer(const std::string& name));
-
-  //!@brief Declares an output slot.
-  CEDAR_DECLARE_DEPRECATED(void declareOutput(const std::string& name));
 
   //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
   cedar::proc::DataSlotPtr declareBuffer(const std::string& name, cedar::aux::DataPtr data);
@@ -235,12 +237,6 @@ protected:
   {
     this->removeSlot(DataRole::OUTPUT, name);
   }
-
-  //!@brief Declares a new promoted slot.
-  void declarePromotedData(DataSlotPtr promotedSlot);
-
-  //!@brief Removes a promoted slot.
-  void removePromotedData(DataRole::Id role, const std::string& name);
 
   //!@brief Sets the data pointer for the buffer called name.
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
@@ -386,8 +382,17 @@ private:
   //!@brief Checks if the connectable has a slot with the given role and name.
   bool hasSlot(DataRole::Id role, const std::string& name) const;
 
+  //! Renames a slot.
+  void renameSlot(DataRole::Id role, const std::string& oldName, const std::string& newName);
+
   //!@brief Declares a new piece of data in the connectable.
-  cedar::proc::DataSlotPtr declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+  cedar::proc::DataSlotPtr declareData
+                           (
+                             DataRole::Id role,
+                             const std::string& name,
+                             bool mandatory = true,
+                             bool isShared = false
+                           );
 
   /*!@brief Sets the data pointer for the slot of the given name and role.
    */
@@ -395,7 +400,7 @@ private:
 
   /*!@brief Sets the data pointer of the slot with the given name and role to zero.
    */
-  void freeData(DataRole::Id role, const std::string& name);
+  void freeData(DataRole::Id role, cedar::aux::ConstDataPtr data, const std::string& name);
 
   /*!@brief (Re-)Checks that all mandatory connections are actually set to non-zero data.
    *
@@ -408,9 +413,6 @@ private:
   /*!@brief Removed the lock from this cedar::aux::Lockable.
    */
   void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet);
-
-  //!@brief Returns the map of data slots for a given role (the non-const version of getDataSlots(DataRole::Id role)).
-  cedar::proc::Connectable::SlotMap& getSlotMap(DataRole::Id role);
 
 
   //!@brief Returns the map of data slots for a given role.
@@ -432,6 +434,26 @@ private:
                                             cedar::proc::ConstDataSlotPtr slot,
                                             cedar::aux::ConstDataPtr data
                                           ) const;
+
+  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
+   *
+   */
+  void callInputConnectionChanged(const std::string& slot);
+
+  //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
+  cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);
+
+  //! Returns the slot map for the given role. If none exists, throws an exception.
+  SlotMap& getSlotMap(cedar::proc::DataRole::Id role);
+
+  //! Returns the slot map for the given role. If none exists, throws an exception.
+  const SlotMap& getSlotMap(cedar::proc::DataRole::Id role) const;
+
+  //! Returns an iterator to the slot. Throws if the slot is not found.
+  SlotMap::iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name);
+
+  //! Returns an iterator to the slot. Throws if the slot is not found.
+  SlotMap::const_iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections

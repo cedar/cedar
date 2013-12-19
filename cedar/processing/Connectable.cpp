@@ -41,10 +41,9 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/OwnedData.h"
-#include "cedar/processing/PromotedExternalData.h"
-#include "cedar/processing/PromotedOwnedData.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
@@ -79,12 +78,25 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Connectable::callInputConnectionChanged(const std::string& slot)
+{
+  this->revalidateInputSlot(slot);
+}
+
+void cedar::proc::Connectable::revalidateInputSlot(const std::string& slot)
+{
+  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  this->inputConnectionChanged(slot);
+  this->getInputValidity(slot);
+}
+
+//!@todo This should be called removeAllDataSlots
 void cedar::proc::Connectable::clearDataSlots()
 {
-  for (auto role_iter = this->mSlotMaps.begin(); role_iter != this->mSlotMaps.end(); ++role_iter)
+  for (auto& slot_map_iter : this->mSlotMaps)
   {
-    cedar::proc::DataRole::Id role = role_iter->first;
-    const SlotMap& slot_map = role_iter->second;
+    cedar::proc::DataRole::Id role = slot_map_iter.first;
+    const SlotMap& slot_map = slot_map_iter.second;
 
     while (!slot_map.empty())
     {
@@ -94,21 +106,32 @@ void cedar::proc::Connectable::clearDataSlots()
   }
 }
 
-void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& name)
+cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getSlotMap(cedar::proc::DataRole::Id role)
 {
-  QReadLocker read_locker(this->mpConnectionLock);
+  return const_cast<cedar::proc::Connectable::SlotMap&>
+         (
+           static_cast<const cedar::proc::Connectable*>(this)->getSlotMap(role)
+         );
+}
 
+const cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getSlotMap(cedar::proc::DataRole::Id role) const
+{
   auto map_iter = this->mSlotMaps.find(role);
   if (map_iter == this->mSlotMaps.end())
   {
     CEDAR_THROW
     (
       cedar::proc::InvalidRoleException,
-      "The connectable \"" + this->getName() + "\" has not slots of the given role."
+      "The connectable \"" + this->getName() + "\" has no slots of the given role."
     );
   }
+  return map_iter->second;
+}
 
-  SlotMap& slot_map = map_iter->second;
+cedar::proc::Connectable::SlotMap::iterator
+  cedar::proc::Connectable::findSlot(cedar::proc::DataRole::Id role, const std::string& name)
+{
+  SlotMap& slot_map = this->getSlotMap(role);
   auto slot_map_iter = slot_map.find(name);
   if (slot_map_iter == slot_map.end())
   {
@@ -118,25 +141,52 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
       "No slot of the name \"" + name + "\" was found in \"" + this->getName() + "\"."
     );
   }
+  return slot_map_iter;
+}
+
+cedar::proc::Connectable::SlotMap::const_iterator
+  cedar::proc::Connectable::findSlot(cedar::proc::DataRole::Id role, const std::string& name) const
+{
+  const SlotMap& slot_map = this->getSlotMap(role);
+  auto slot_map_iter = slot_map.find(name);
+  if (slot_map_iter == slot_map.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::InvalidNameException,
+      "No slot of the name \"" + name + "\" was found in \"" + this->getName() + "\"."
+    );
+  }
+  return slot_map_iter;
+}
+
+void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& name)
+{
+  QReadLocker read_locker(this->mpConnectionLock);
+
+  SlotMap& slot_map = this->getSlotMap(role);
+
+  auto slot_map_iter = this->findSlot(role, name);
 
   cedar::proc::DataSlotPtr slot = slot_map_iter->second;
 
   read_locker.unlock();
 
   // first, disconnect all connections from the slot
-  if (this->getNetwork())
+  if (this->getGroup())
   {
+    //!@todo Can the two methods below be unified into a single disconnectSlot(role, ...) method in Group?
     switch (role)
     {
       case cedar::proc::DataRole::INPUT:
-        this->getNetwork()->disconnectInputSlot
+        this->getGroup()->disconnectInputSlot
                             (
                               boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
                             );
         break;
 
       case cedar::proc::DataRole::OUTPUT:
-        this->getNetwork()->disconnectOutputSlot
+        this->getGroup()->disconnectOutputSlot
                             (
                               boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
                             );
@@ -148,13 +198,23 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     }
   }
 
-
   // then, actually remove the slot
   QWriteLocker locker(this->mpConnectionLock);
   slot_map.erase(slot_map_iter);
 
   // remove the slot's data from the lock set (if any)
-  if (slot->getData())
+  // (don't do this for data that is just shared)
+  bool not_shared = true;
+  if
+  (
+    boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot)
+      && boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot)->isShared()
+  )
+  {
+    not_shared = false;
+  }
+  //!@todo Can this be solved via signals/slots in dataSlot?
+  if (slot->getData() && not_shared)
   {
     cedar::aux::LOCK_TYPE lock_type;
     switch (role)
@@ -169,12 +229,13 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     this->removeLock(slot->getData(), lock_type, this->getLockSetForRole(role));
   }
 
+  // also delete the slot from the ordered list of slots
   std::map<DataRole::Id, SlotList>::iterator list_iter;
   list_iter = this->mDataConnectionsOrder.find(role);
 
   if (list_iter == this->mDataConnectionsOrder.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "The step has not slots of the given role.");
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "The step has no slots of the given role.");
   }
 
   SlotList& slot_list = list_iter->second;
@@ -192,6 +253,8 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     }
   }
 
+  // finally, reset the parent pointer in case of the slot floating around somewhere
+  slot->resetParentPointer();
   locker.unlock();
 
   this->signalSlotRemoved(role, name);
@@ -216,47 +279,28 @@ bool cedar::proc::Connectable::ownsDataOf(cedar::proc::ConstOwnedDataPtr slot) c
 {
   QReadLocker locker(this->mpConnectionLock);
 
-  // iterate over all buffers
-  std::map<DataRole::Id, SlotMap>::const_iterator map_iter = this->mSlotMaps.find(cedar::proc::DataRole::BUFFER);
-  if (map_iter != this->mSlotMaps.end())
-  {
-    for (SlotMap::const_iterator slot_iter = map_iter->second.begin(); slot_iter != map_iter->second.end(); ++slot_iter)
-    {
-      if (slot_iter->second->getData() == slot->getData())
-      {
-        return true;
-      }
-    }
-  }
+  // only the following slot types own data
+  std::vector<DataRole::Id> owners;
+  owners.push_back(cedar::proc::DataRole::BUFFER);
+  owners.push_back(cedar::proc::DataRole::OUTPUT);
 
-  // iterate over all outputs
-  map_iter = mSlotMaps.find(cedar::proc::DataRole::OUTPUT);
-  if (map_iter != this->mSlotMaps.end())
+  for (auto role : owners)
   {
-    for (SlotMap::const_iterator slot_iter = map_iter->second.begin(); slot_iter != map_iter->second.end(); ++slot_iter)
+    std::map<DataRole::Id, SlotMap>::const_iterator map_iter = this->mSlotMaps.find(role);
+    if (map_iter != this->mSlotMaps.end())
     {
-      if (slot_iter->second->getData() == slot->getData())
+      for (SlotMap::const_iterator slot_iter = map_iter->second.begin(); slot_iter != map_iter->second.end(); ++slot_iter)
       {
-        return true;
+        if (slot_iter->second->getData() == slot->getData())
+        {
+          return true;
+        }
       }
     }
   }
 
   return false;
 }
-
-cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getSlotMap(DataRole::Id role)
-{
-  std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
-  if (iter == this->mSlotMaps.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException, "Role "
-                                                   + DataRole::type().get(role).name()
-                                                   + " not found in cedar::proc::Connectable::getData(DataRole::Id).");
-  }
-  return iter->second;
-}
-
 
 const cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(DataRole::Id role) const
 {
@@ -343,6 +387,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::checkInputValidity
   }
 }
 
+//!@todo Give this method a better name: it doesn't just return the validity, it also re-determines it if necessary
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar::proc::DataSlotPtr slot)
 {
   // if the validty is indetermined (unknown), try to find it out
@@ -369,7 +414,18 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     }
     else
     {
-      this->lockAll(cedar::aux::LOCK_TYPE_READ);
+      bool skip_locking = false;
+      if (cedar::proc::OwnedDataPtr owned = boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot))
+      {
+        if (owned->isShared())
+        {
+          skip_locking = true;
+        }
+      }
+      if (!skip_locking)
+      {
+        this->lockAll(cedar::aux::LOCK_TYPE_READ);
+      }
       auto external_data_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(slot);
       validity = cedar::proc::DataSlot::VALIDITY_VALID;
       for (unsigned int i = 0; i < external_data_slot->getDataCount(); ++i)
@@ -403,7 +459,10 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
             break;
         }
       }
-      this->unlockAll();
+      if (!skip_locking)
+      {
+        this->unlockAll();
+      }
     }
 
     // assign the validity to the slot
@@ -459,7 +518,7 @@ bool cedar::proc::Connectable::allInputsValid()
 
   for (SlotMap::iterator slot = slot_map.begin(); slot != slot_map.end(); ++slot)
   {
-    switch(this->getInputValidity(slot->second))
+    switch (this->getInputValidity(slot->second))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         // If the input is invalid, push its name into the list of invalid inputs.
@@ -504,7 +563,7 @@ void cedar::proc::Connectable::checkMandatoryConnections()
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
                          (
-                           DataRole::Id role, const std::string& name, bool mandatory
+                           DataRole::Id role, const std::string& name, bool mandatory, bool isShared
                          )
 {
   QWriteLocker locker(this->mpConnectionLock);
@@ -549,6 +608,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
 
   cedar::proc::DataSlotPtr slot_ptr;
   // finally, insert a new data slot with the given parameters
+  //!@todo Don't just connect for inputs; rather, use a unified interface
   if (role == cedar::proc::DataRole::INPUT)
   {
     cedar::proc::ExternalDataPtr ext_slot_ptr(new cedar::proc::ExternalData(role, name, this, mandatory));
@@ -561,7 +621,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
   }
   else
   {
-    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, mandatory));
+    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, isShared));
   }
   iter->second[name] = slot_ptr;
 
@@ -596,6 +656,20 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareOutput(const std::stri
   return slot;
 }
 
+cedar::proc::DataSlotPtr cedar::proc::Connectable::declareSharedOutput
+(
+  const std::string& name, cedar::aux::DataPtr data
+)
+{
+  // if you don't actually want to set data here, call a different function.
+  CEDAR_ASSERT(data.get() != NULL);
+
+  cedar::proc::DataSlotPtr slot = this->declareData(cedar::proc::DataRole::OUTPUT, name, true, true);
+  this->setData(cedar::proc::DataRole::OUTPUT, name, data);
+
+  return slot;
+}
+
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
   cedar::proc::DataSlotPtr slot = this->declareData(DataRole::INPUT, name, mandatory);
@@ -623,18 +697,6 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInputCollection(const 
   return slot;
 }
 
-
-void cedar::proc::Connectable::declareBuffer(const std::string& name)
-{
-  this->declareData(DataRole::BUFFER, name, false);
-}
-
-void cedar::proc::Connectable::declareOutput(const std::string& name)
-{
-  this->declareData(DataRole::OUTPUT, name, false);
-}
-
-
 void cedar::proc::Connectable::makeInputCollection(const std::string& name, bool isCollection)
 {
   this->getInputSlot(name)->setCollection(isCollection);
@@ -646,37 +708,8 @@ void cedar::proc::Connectable::makeInputCollection(const std::string& name, bool
  */
 cedar::proc::DataSlotPtr cedar::proc::Connectable::getSlot(cedar::proc::DataRole::Id role, const std::string& name)
 {
-  // Find the slot map for the given role.
-  std::map<DataRole::Id, SlotMap>::iterator slot_map_iter = this->mSlotMaps.find(role);
-
-  // If it cannot be found, throw an exception/
-  if (slot_map_iter == this->mSlotMaps.end())
-  {
-    std::string message = "Role not found in cedar::proc::Connectable::getSlot(";
-    message += cedar::proc::DataRole::type().get(role).name();
-    message += ", \"";
-    message += name;
-    message += "\").";
-    CEDAR_THROW(cedar::proc::InvalidRoleException, message);
-  }
-
-  // Find the slot (iterator) for the given name
-  SlotMap& slot_map = slot_map_iter->second;
-  SlotMap::iterator slot_iter = slot_map.find(name);
-
-  // If the name cannot be found, throw an exception.
-  if (slot_iter == slot_map.end())
-  {
-    std::string message = "Slot name not found in cedar::proc::Connectable::getSlot(";
-    message += cedar::proc::DataRole::type().get(role).name();
-    message += ", \"";
-    message += name;
-    message += "\").";
-    CEDAR_THROW(cedar::aux::InvalidNameException, message);
-  }
-
   // if everything worked, return the actual slot.
-  return slot_iter->second;
+  return this->findSlot(role, name)->second;
 }
 
 cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot
@@ -685,30 +718,8 @@ cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot
                                 const std::string& name
                               ) const
 {
-  std::map<DataRole::Id, SlotMap>::const_iterator slot_map_iter = this->mSlotMaps.find(role);
-  if (slot_map_iter == this->mSlotMaps.end())
-  {
-    std::string message = "Role not found in cedar::proc::Connectable::getSlot(";
-    message += cedar::proc::DataRole::type().get(role).name();
-    message += ", \"";
-    message += name;
-    message += "\").";
-    CEDAR_THROW(cedar::proc::InvalidRoleException, message);
-  }
-  const SlotMap& slot_map = slot_map_iter->second;
-  SlotMap::const_iterator slot_iter = slot_map.find(name);
-  if (slot_iter == slot_map.end())
-  {
-    std::string message = "Slot name not found in cedar::proc::Connectable::getSlot(";
-    message += cedar::proc::DataRole::type().get(role).name();
-    message += ", \"";
-    message += name;
-    message += "\")";
-    message += " in connectable " + this->getName();
-    message += ".";
-    CEDAR_THROW(cedar::aux::InvalidNameException, message);
-  }
-  return slot_iter->second;
+  // if everything worked, return the actual slot.
+  return this->findSlot(role, name)->second;
 }
 
 cedar::proc::ExternalDataPtr cedar::proc::Connectable::getInputSlot(const std::string& name)
@@ -771,33 +782,10 @@ void cedar::proc::Connectable::removeLock
 
 void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
 {
+  //!@todo This method should do nothing but call slot->setData(); everything else should happen via signals/slots.
   QWriteLocker locker(this->mpConnectionLock);
-  // find the slot map corresponding to the given role.
-  std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
-  if (iter == this->mSlotMaps.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException,
-                "The requested role " +
-                cedar::proc::DataRole::type().get(role).prettyString() +
-                " does not exist in Connectable \""
-                + this->getName() +
-                "\".");
-  }
 
-#ifdef DEBUG_LOCKS
-  std::cout << "Data/lock: " << this->getName() << "." << name << "/" << (&data->getLock()) << std::endl;
-#endif // DEBUG_LOCKS
-
-  // find the slot with the given name
-  SlotMap::iterator map_iterator = iter->second.find(name);
-  if (map_iterator == iter->second.end())
-  {
-    CEDAR_THROW(cedar::aux::InvalidNameException,
-                "The requested " +
-                cedar::proc::DataRole::type().get(role).prettyString() +
-                " name \"" + name + "\" does not exist.");
-  }
-  cedar::proc::DataSlotPtr slot = map_iterator->second;
+  cedar::proc::DataSlotPtr slot = this->getSlot(role, name);
 
   // inputs come from a different Connectable
   if (role == cedar::proc::DataRole::INPUT)
@@ -811,48 +799,30 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
     // remove old data from the lock set, if any
     //!@todo This will potentially cause trouble (in the shape of a deadlock) when called while locked.
     //!@todo Use signals/slots for this as well, as in the input case
-    if (slot->getData())
+    if (!cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(slot)->isShared())
     {
-      this->removeLock(slot->getData(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
+      if (slot->getData())
+      {
+        this->removeLock(slot->getData(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
+      }
+      this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
+      data->setOwner(this);
     }
-    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
-    data->setOwner(this);
+    else
+    {
+      if (slot->getData())
+      {
+        auto lockset_handle = this->getLockSetForRole(role);
+        auto lockset = this->getLocks(lockset_handle);
+        for (auto iter = lockset.begin(); iter != lockset.end(); ++iter)
+        {
+          CEDAR_ASSERT(iter->first != &slot->getData()->getLock());
+        }
+      }
+    }
   }
-
   slot->setData(data);
 
-  locker.unlock();
-
-  this->checkMandatoryConnections();
-}
-
-void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& name)
-{
-  QWriteLocker locker(this->mpConnectionLock);
-  std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
-  if (iter == this->mSlotMaps.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException,
-                "The requested role " +
-                cedar::proc::DataRole::type().get(role).prettyString() +
-                " does not exist in Connectable \""
-                + this->getName() +
-                "\".");
-  }
-
-  SlotMap::iterator map_iterator = iter->second.find(name);
-  if (map_iterator != iter->second.end())
-  {
-    cedar::proc::DataSlotPtr& slot = map_iterator->second;
-    slot->clear();
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::InvalidNameException,
-                "The requested " +
-                cedar::proc::DataRole::type().get(role).prettyString() +
-                " name \"" + name + "\" does not exist.");
-  }
   locker.unlock();
 
   this->checkMandatoryConnections();
@@ -861,7 +831,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
 /*!
  * @remarks This method is usually called by other framework parts rather than by the user. So only call it if you know
  *          what you are doing :)
- * @see     cedar::proc::Manager::connect.
  */
 void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
@@ -880,8 +849,17 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
 {
   this->setData(DataRole::OUTPUT, name, data);
 
+  //!@todo May want to move connections into data slots rather than the networks; then this case would not be necessary any more
+  auto network = this->getGroup();
+  if (!network)
+  {
+    return;
+  }
+
+  // Update the other end of connections
+  //!@todo This should also happen via signals/slots
   std::vector<cedar::proc::DataConnectionPtr> connections;
-  this->getNetwork()->getDataConnectionsFrom
+  network->getDataConnectionsFrom
   (
     boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
     name,
@@ -895,31 +873,37 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
   }
 }
 
+void cedar::proc::Connectable::freeData(DataRole::Id role, cedar::aux::ConstDataPtr data, const std::string& name)
+{
+  QWriteLocker locker(this->mpConnectionLock);
+
+  auto slot = this->getSlot(role, name);
+  if (!data)
+  {
+    data = slot->getData();
+  }
+  locker.unlock();
+
+  slot->removeData(data);
+
+  this->checkMandatoryConnections();
+}
+
 void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::ConstDataPtr data)
 {
-  cedar::proc::ExternalDataPtr slot = this->getInputSlot(name);
-  // the slot for name should always be found
-  CEDAR_ASSERT(slot);
-  if (slot->isCollection())
-  {
-    slot->removeData(data);
-  }
-  else
-  {
-    this->freeData(DataRole::INPUT, name);
-  }
+  this->freeData(DataRole::INPUT, data, name);
 
   this->inputConnectionChanged(name);
 }
 
 void cedar::proc::Connectable::freeBuffer(const std::string& name)
 {
-  this->freeData(DataRole::BUFFER, name);
+  this->freeData(DataRole::BUFFER, cedar::aux::ConstDataPtr(), name);
 }
 
 void cedar::proc::Connectable::freeOutput(const std::string& name)
 {
-  this->freeData(DataRole::OUTPUT, name);
+  this->freeData(DataRole::OUTPUT, cedar::aux::ConstDataPtr(), name);
 }
 
 cedar::aux::ConstDataPtr cedar::proc::Connectable::getInput(const std::string& name) const
@@ -937,27 +921,14 @@ cedar::aux::ConstDataPtr cedar::proc::Connectable::getOutput(const std::string& 
   return this->getData(DataRole::OUTPUT, name);
 }
 
-cedar::aux::DataPtr cedar::proc::Connectable::getData(DataRole::Id role, const std::string& name) const
+cedar::aux::ConstDataPtr cedar::proc::Connectable::getData(DataRole::Id role, const std::string& name) const
 {
   QReadLocker locker(this->mpConnectionLock);
-  std::map<DataRole::Id, SlotMap>::const_iterator iter = this->mSlotMaps.find(role);
-  if (iter == this->mSlotMaps.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidRoleException,
-                "The requested role " +
-                cedar::proc::DataRole::type().get(role).prettyString() +
-                + " does not exist.");
-    return cedar::aux::DataPtr();
-  }
-  SlotMap::const_iterator map_iterator = iter->second.find(name);
-  if (map_iterator == iter->second.end())
-  {
-    CEDAR_THROW(cedar::aux::InvalidNameException, "The requested "
-                                                  + cedar::proc::DataRole::type().get(role).prettyString()
-                                                  + " name \"" + name + "\" does not exist in Connectable \""
-                                                  + this->getName() + "\".");
-  }
-  return map_iterator->second->getData();
+  // make a copy of the pointer
+  auto data = this->getSlot(role, name)->getData();
+
+  // return the pointer (locker is unlocked already)
+  return data;
 }
 
 /*! This function parses strings of the form "connectableName.dataName" and separates the string into "connectableName" and
@@ -986,111 +957,42 @@ void cedar::proc::Connectable::parseDataNameNoRole
   dataName = instr.substr(dot_idx + 1, instr.length() - dot_idx - 1);
 }
 
-void cedar::proc::Connectable::declarePromotedData(DataSlotPtr promotedSlot)
+void cedar::proc::Connectable::renameSlot(DataRole::Id role, const std::string& oldName, const std::string& newName)
 {
-  // first, create a new slot map if necessary
-  std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(promotedSlot->getRole());
-  if (iter == this->mSlotMaps.end())
+  if (oldName == newName)
   {
-    this->mSlotMaps[promotedSlot->getRole()] = SlotMap();
-    iter = this->mSlotMaps.find(promotedSlot->getRole());
-
-    CEDAR_DEBUG_ASSERT(iter != this->mSlotMaps.end());
-  }
-  std::string dotted_name = promotedSlot->getParent() + "." + promotedSlot->getName();
-
-  // check for duplicate entries in the slot map
-  SlotMap::iterator map_iter = iter->second.find(dotted_name);
-  if (map_iter != iter->second.end())
-  {
-    CEDAR_THROW(cedar::proc::DuplicateNameException, "There is already a " +
-                 cedar::proc::DataRole::type().get(promotedSlot->getRole()).prettyString()
-                 + " data-declaration with the name " + dotted_name + ".");
     return;
   }
-
-  // finally, insert a new data slot with the given parameters
-  if (promotedSlot->getRole() == cedar::proc::DataRole::INPUT)
+  QWriteLocker locker(this->mpConnectionLock);
+  CEDAR_ASSERT(mSlotMaps.find(role) != mSlotMaps.end());
+  SlotMap::iterator elem = mSlotMaps[role].find(oldName);
+  if (elem != mSlotMaps[role].end())
   {
-    iter->second[dotted_name]
-      = cedar::proc::DataSlotPtr(new cedar::proc::PromotedExternalData(promotedSlot, this));
-    mSlotConnection
-      = boost::dynamic_pointer_cast<cedar::proc::ExternalData>
-        (
-          iter->second[dotted_name]
-        )->connectToExternalDataChanged
-           (
-             boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
-           );
+    cedar::proc::DataSlotPtr slot = elem->second;
+    mSlotMaps[role].erase(elem);
+    mSlotMaps[role][newName] = slot;
+    slot->setName(newName);
   }
-  else
-  {
-    iter->second[dotted_name]
-      = cedar::proc::DataSlotPtr(new cedar::proc::PromotedOwnedData(promotedSlot, this));
-  }
-  promotedSlot->promote();
-  // since the data has (potentially) changed, re-check the inputs
-  this->checkMandatoryConnections();
-}
-
-void cedar::proc::Connectable::removePromotedData(DataRole::Id role, const std::string& name)
-{
-  std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
-  // check that a slot map was found
-  CEDAR_DEBUG_ASSERT(iter != this->mSlotMaps.end());
-  // check for duplicate entries in the slot map
-  SlotMap::iterator map_iter = iter->second.find(name);
-  CEDAR_DEBUG_ASSERT(map_iter != iter->second.end());
-  map_iter->second->demote();
-  iter->second.erase(map_iter);
 }
 
 void cedar::proc::Connectable::renameOutput(const std::string& oldName, const std::string& newName)
 {
-  if (oldName == newName)
-  {
-    return;
-  }
-  QWriteLocker locker(this->mpConnectionLock);
-  CEDAR_ASSERT(mSlotMaps.find(DataRole::OUTPUT) != mSlotMaps.end());
-  SlotMap::iterator elem = mSlotMaps[DataRole::OUTPUT].find(oldName);
-  if (elem != mSlotMaps[DataRole::OUTPUT].end())
-  {
-    cedar::proc::DataSlotPtr slot = elem->second;
-    mSlotMaps[DataRole::OUTPUT].erase(elem);
-    mSlotMaps[DataRole::OUTPUT][newName] = slot;
-    slot->setName(newName);
-  }
+  this->renameSlot(DataRole::OUTPUT, oldName, newName);
 }
 
 void cedar::proc::Connectable::renameInput(const std::string& oldName, const std::string& newName)
 {
-  if (oldName == newName)
-  {
-    return;
-  }
-
-  QWriteLocker locker(this->mpConnectionLock);
-  CEDAR_ASSERT(mSlotMaps.find(DataRole::INPUT) != mSlotMaps.end());
-  SlotMap::iterator elem = mSlotMaps[DataRole::INPUT].find(oldName);
-  if (elem != mSlotMaps[DataRole::INPUT].end())
-  {
-    cedar::proc::DataSlotPtr slot = elem->second;
-    mSlotMaps[DataRole::INPUT].erase(elem);
-    mSlotMaps[DataRole::INPUT][newName] = slot;
-    slot->setName(newName);
-  }
+  this->renameSlot(DataRole::INPUT, oldName, newName);
 }
 
-void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::string& slot)
+void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::string& slotName)
 {
-  try
+  if (this->hasOutputSlot(slotName))
   {
-    this->getOutputSlot(slot);
+    this->signalOutputPropertiesChanged(this->getName() + "." + slotName);
   }
-  catch (cedar::aux::InvalidNameException& exc)
+  else
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "Tried to emit a signal from an output that does not exist.");
   }
-  this->signalOutputPropertiesChanged(this->getName() + "." + slot);
 }
