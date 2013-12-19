@@ -391,8 +391,8 @@ private:
   //! The height of newly created steps.
   static const qreal mDefaultHeight;
 
-  boost::signals2::connection mSlotAddedConnection;
-  boost::signals2::connection mSlotRemovedConnection;
+  boost::signals2::scoped_connection mSlotAddedConnection;
+  boost::signals2::scoped_connection mSlotRemovedConnection;
 
   //!@brief the class id of the step
   cedar::aux::ConstPluginDeclarationPtr mClassId;

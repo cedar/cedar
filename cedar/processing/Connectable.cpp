@@ -194,7 +194,7 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
 
   locker.unlock();
 
-  this->mSlotRemoved(role, name);
+  this->signalSlotRemoved(role, name);
 }
 
 bool cedar::proc::Connectable::hasSlot(DataRole::Id role, const std::string& name) const
@@ -572,7 +572,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
 
   locker.unlock();
 
-  this->mSlotAdded(role, name);
+  this->signalSlotAdded(role, name);
 
   return slot_ptr;
 }
@@ -1092,5 +1092,5 @@ void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::stri
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "Tried to emit a signal from an output that does not exist.");
   }
-  this->mOutputPropertiesChanged(this->getName() + "." + slot);
+  this->signalOutputPropertiesChanged(this->getName() + "." + slot);
 }
