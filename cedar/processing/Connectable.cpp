@@ -90,8 +90,7 @@ void cedar::proc::Connectable::revalidateInputSlot(const std::string& slot)
   this->getInputValidity(slot);
 }
 
-//!@todo This should be called removeAllDataSlots
-void cedar::proc::Connectable::clearDataSlots()
+void cedar::proc::Connectable::removeAllDataSlots()
 {
   for (auto& slot_map_iter : this->mSlotMaps)
   {
@@ -387,8 +386,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::checkInputValidity
   }
 }
 
-//!@todo Give this method a better name: it doesn't just return the validity, it also re-determines it if necessary
-cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar::proc::DataSlotPtr slot)
+//!@todo Move this method to slot? (may need to use validityChanged signal)
+cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(cedar::proc::DataSlotPtr slot)
 {
   // if the validty is indetermined (unknown), try to find it out
   if (slot->getValidity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
@@ -480,7 +479,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
  */
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(const std::string& slotName)
 {
-  return this->getInputValidity(this->getSlot(cedar::proc::DataRole::INPUT, slotName));
+  return this->updateInputValidity(this->getInputSlot(slotName));
 }
 
 /*! This is the default implementation which always returns cedar::proc::DataSlot::VALIDITY_VALID. Override this
@@ -518,7 +517,7 @@ bool cedar::proc::Connectable::allInputsValid()
 
   for (SlotMap::iterator slot = slot_map.begin(); slot != slot_map.end(); ++slot)
   {
-    switch (this->getInputValidity(slot->second))
+    switch (this->updateInputValidity(slot->second))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         // If the input is invalid, push its name into the list of invalid inputs.
