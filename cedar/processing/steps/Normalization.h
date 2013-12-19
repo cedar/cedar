@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/BoolVectorParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -84,8 +85,14 @@ private:
 
   void inputConnectionChanged(const std::string& inputName);
 
+  unsigned int getNumberOfNormalizedDimensions() const;
+
+  void normalizeAlongOneDimension(int dimension);
+
+  void normalizeAlongAllDimensions();
+
 private slots:
-  void normalizationTypeChanged();
+  void recompute();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -110,7 +117,10 @@ protected:
 
 private:
   //! The normalization type.
-  cedar::aux::EnumParameterPtr mNormalizationType;
+  cedar::aux::EnumParameterPtr _mNormalizationType;
+
+  //! Dimensions along which normalization takes place.
+  cedar::aux::BoolVectorParameterPtr _mNormalizedDimensions;
 
 }; // class cedar::proc::steps::Normalization
 
