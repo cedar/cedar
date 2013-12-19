@@ -259,6 +259,12 @@ void cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::stri
   auto duplicate_ui = this->getUiElementFor(duplicate);
   duplicate_ui->readConfiguration(conf);
   duplicate_ui->setPos(scenePos);
+
+  // restore connections if this is another group
+  if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(duplicate_ui))
+  {
+    group_item->restoreConnections();
+  }
 }
 
 void cedar::proc::gui::Group::groupNameChanged()
@@ -611,11 +617,7 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem*>& eleme
     // if this is a group, restore all connections
     if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(graphics_item))
     {
-      auto connections = group_item->getGroup()->getDataConnections();
-      for (auto connection : connections)
-      {
-        group_item->checkDataConnection(connection->getSource(), connection->getTarget(), cedar::proc::Group::CONNECTION_ADDED);
-      }
+      group_item->restoreConnections();
     }
   }
 
@@ -1553,5 +1555,14 @@ void cedar::proc::gui::Group::readStickyNotes(const cedar::aux::ConfigurationNod
       const std::string& text = iter->second.get<std::string>("text");
       this->mpScene->addStickyNote(x, y, witdh, height, text);
     }
+  }
+}
+
+void cedar::proc::gui::Group::restoreConnections()
+{
+  auto connections = this->getGroup()->getDataConnections();
+  for (auto connection : connections)
+  {
+    this->checkDataConnection(connection->getSource(), connection->getTarget(), cedar::proc::Group::CONNECTION_ADDED);
   }
 }
