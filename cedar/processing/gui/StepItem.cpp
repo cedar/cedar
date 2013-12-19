@@ -588,7 +588,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   if (this->scene()->selectedItems().size() > 1)
   {
-    p_scene->networkGroupingContextMenuEvent(menu);
     menu.exec(event->screenPos());
     return;
   }
@@ -642,7 +641,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-  p_scene->networkGroupingContextMenuEvent(menu);
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;

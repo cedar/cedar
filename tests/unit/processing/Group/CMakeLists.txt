@@ -38,7 +38,7 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(Network
+cedar_add_unit_test(Group
                     main.cpp
                     ADDITIONAL_DEPENDENCIES
                     cedardyn

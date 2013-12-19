@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Network.cpp
+    File:        Group.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
@@ -79,26 +79,26 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
-const qreal cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET = static_cast<qreal>(25);
+const qreal cedar::proc::gui::Group::M_EXPANDED_SLOT_OFFSET = static_cast<qreal>(25);
 
-const qreal cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE = static_cast<qreal>(20);
-const qreal cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::mIconSize;
+const qreal cedar::proc::gui::Group::M_EXPANDED_ICON_SIZE = static_cast<qreal>(20);
+const qreal cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::mIconSize;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Network::Network
+cedar::proc::gui::Group::Group
 (
   QMainWindow *pMainWindow,
   cedar::proc::gui::Scene* scene,
   qreal width,
   qreal height,
-  cedar::proc::GroupPtr network
+  cedar::proc::GroupPtr group
 )
 :
-cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK),
-mNetwork(network),
+cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP),
+mGroup(group),
 mpScene(scene),
 mpMainWindow(pMainWindow),
 mHoldFitToContents(false),
@@ -110,27 +110,27 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  if (!mNetwork)
+  if (!mGroup)
   {
-    mNetwork = cedar::proc::GroupPtr(new cedar::proc::Group());
+    mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
   }
 
-  this->setElement(mNetwork);
-  this->setConnectable(mNetwork);
+  this->setElement(mGroup);
+  this->setConnectable(mGroup);
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
 
   mpNameDisplay = new QGraphicsTextItem(this);
-  this->networkNameChanged();
+  this->groupNameChanged();
 
 
   this->setCollapsed(false);
   this->updateCollapsedness();
 
-  cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
-  QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
+  cedar::aux::ParameterPtr name_param = this->getGroup()->getParameter("name");
+  QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(groupNameChanged()));
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
   QObject::connect
   (
@@ -140,15 +140,15 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
 
-  mDataConnectionChangedConnection = mNetwork->connectToDataConnectionChanged
+  mDataConnectionChangedConnection = mGroup->connectToDataConnectionChanged
                                      (
-                                       boost::bind(&cedar::proc::gui::Network::checkDataConnection, this, _1, _2, _3)
+                                       boost::bind(&cedar::proc::gui::Group::checkDataConnection, this, _1, _2, _3)
                                      );
-  mTriggerConnectionChangedConnection = mNetwork->connectToTriggerConnectionChanged
+  mTriggerConnectionChangedConnection = mGroup->connectToTriggerConnectionChanged
                                         (
                                           boost::bind
                                           (
-                                            &cedar::proc::gui::Network::checkTriggerConnection,
+                                            &cedar::proc::gui::Group::checkTriggerConnection,
                                             this,
                                             _1,
                                             _2,
@@ -157,21 +157,21 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
                                         );
 
   mNewElementAddedConnection
-    = mNetwork->connectToNewElementAddedSignal
+    = mGroup->connectToNewElementAddedSignal
       (
-        boost::bind(&cedar::proc::gui::Network::processElementAddedSignal, this, _1)
+        boost::bind(&cedar::proc::gui::Group::processElementAddedSignal, this, _1)
       );
   mElementRemovedConnection
-    = mNetwork->connectToElementRemovedSignal
+    = mGroup->connectToElementRemovedSignal
       (
-        boost::bind(&cedar::proc::gui::Network::processElementRemovedSignal, this, _1)
+        boost::bind(&cedar::proc::gui::Group::processElementRemovedSignal, this, _1)
       );
 
   this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
   QObject::connect
   (
-    this->mNetwork.get(),
+    this->mGroup.get(),
     SIGNAL(stepNameChanged(const std::string&, const std::string&)),
     this,
     SLOT(handleStepNameChanged(const std::string&, const std::string&))
@@ -180,7 +180,7 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
   this->update();
 }
 
-cedar::proc::gui::Network::~Network()
+cedar::proc::gui::Group::~Group()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
@@ -210,11 +210,11 @@ cedar::proc::gui::Network::~Network()
   }
   if (this->scene())
   {
-    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeNetworkItem(this);
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeGroupItem(this);
   }
   else
   {
-//    CEDAR_DEBUG_ASSERT(this->isRootNetwork());
+//    CEDAR_DEBUG_ASSERT(this->isRootGroup());
   }
 }
 
@@ -222,16 +222,16 @@ cedar::proc::gui::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::Network::itemSceneHasChanged()
+void cedar::proc::gui::Group::itemSceneHasChanged()
 {
-  this->addGuiItemsForNetwork();
+  this->addGuiItemsForGroup();
 }
 
-void cedar::proc::gui::Network::addGuiItemsForNetwork()
+void cedar::proc::gui::Group::addGuiItemsForGroup()
 {
-  CEDAR_DEBUG_ASSERT(this->getNetwork());
+  CEDAR_DEBUG_ASSERT(this->getGroup());
 
-  auto elements = this->getNetwork()->getElements();
+  auto elements = this->getGroup()->getElements();
   for (auto iter = elements.begin(); iter != elements.end(); ++iter)
   {
     auto element = iter->second;
@@ -239,32 +239,32 @@ void cedar::proc::gui::Network::addGuiItemsForNetwork()
   }
 }
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Network::getUiElementFor(cedar::proc::ElementPtr element) const
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::getUiElementFor(cedar::proc::ElementPtr element) const
 {
   return this->getScene()->getGraphicsItemFor(element.get());
 }
 
 
-void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
+void cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
 {
-  auto to_duplicate = this->getNetwork()->getElement(elementName);
+  auto to_duplicate = this->getGroup()->getElement(elementName);
   auto to_duplicate_ui = this->getUiElementFor(to_duplicate);
 
   cedar::aux::ConfigurationNode conf;
   to_duplicate_ui->writeConfiguration(conf);
 
-  std::string new_name = this->getNetwork()->duplicate(elementName, newName);
+  std::string new_name = this->getGroup()->duplicate(elementName, newName);
 
-  auto duplicate = this->getNetwork()->getElement(new_name);
+  auto duplicate = this->getGroup()->getElement(new_name);
   auto duplicate_ui = this->getUiElementFor(duplicate);
   duplicate_ui->readConfiguration(conf);
   duplicate_ui->setPos(scenePos);
 }
 
-void cedar::proc::gui::Network::networkNameChanged()
+void cedar::proc::gui::Group::groupNameChanged()
 {
   this->mpNameDisplay->setTextWidth(this->width());
-  QString name = QString::fromStdString(this->getNetwork()->getName());
+  QString name = QString::fromStdString(this->getGroup()->getName());
   if (this->isCollapsed())
   {
     this->mpNameDisplay->setHtml(name);
@@ -277,10 +277,10 @@ void cedar::proc::gui::Network::networkNameChanged()
   this->updateTextBounds();
 }
 
-QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
+QVariant cedar::proc::gui::Group::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
 {
   cedar::proc::gui::GraphicsBase::GraphicsGroup filtered_groups = 0;
-  filtered_groups |= cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK;
+  filtered_groups |= cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP;
   filtered_groups |= cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP;
   filtered_groups |= cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER;
 
@@ -313,7 +313,7 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
   }
 }
 
-void cedar::proc::gui::Network::sizeChanged()
+void cedar::proc::gui::Group::sizeChanged()
 {
   this->cedar::proc::gui::Connectable::sizeChanged();
 
@@ -329,7 +329,7 @@ void cedar::proc::gui::Network::sizeChanged()
   }
 }
 
-void cedar::proc::gui::Network::updateTextBounds()
+void cedar::proc::gui::Group::updateTextBounds()
 {
   qreal bounds_factor = static_cast<qreal>(2);
   if (this->isCollapsed())
@@ -348,34 +348,34 @@ void cedar::proc::gui::Network::updateTextBounds()
   this->mpNameDisplay->setX(this->getIconSizeForCurrentMode());
 }
 
-qreal cedar::proc::gui::Network::getIconSizeForCurrentMode() const
+qreal cedar::proc::gui::Group::getIconSizeForCurrentMode() const
 {
   if (this->isCollapsed())
   {
-    return cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE;
+    return cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE;
   }
   else
   {
-    return cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE;
+    return cedar::proc::gui::Group::M_EXPANDED_ICON_SIZE;
   }
 }
 
-void cedar::proc::gui::Network::updateIconBounds()
+void cedar::proc::gui::Group::updateIconBounds()
 {
   qreal padding = static_cast<qreal>(2);
   if (this->isCollapsed())
   {
-    qreal y = (this->height() - cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE) / static_cast<qreal>(2);
-    this->setIconBounds(padding, y, cedar::proc::gui::Network::M_COLLAPSED_ICON_SIZE - 2 * padding);
+    qreal y = (this->height() - cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE) / static_cast<qreal>(2);
+    this->setIconBounds(padding, y, cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE - 2 * padding);
   }
   else
   {
-    this->setIconBounds(padding, padding, cedar::proc::gui::Network::M_EXPANDED_ICON_SIZE - 2 * padding);
+    this->setIconBounds(padding, padding, cedar::proc::gui::Group::M_EXPANDED_ICON_SIZE - 2 * padding);
   }
 }
 
 
-bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
+bool cedar::proc::gui::Group::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
 {
   if (!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
   {
@@ -401,7 +401,7 @@ bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEven
   return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
 }
 
-void cedar::proc::gui::Network::fitToContents(bool grow)
+void cedar::proc::gui::Group::fitToContents(bool grow)
 {
   if (this->isCollapsed() || this->scene() == NULL || mHoldFitToContents)
   {
@@ -473,31 +473,31 @@ void cedar::proc::gui::Network::fitToContents(bool grow)
     p_item->setPos(old_pos_local + p_item->pos());
   }
 
-  // finally, also resize parent item if it is a network
-  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
+  // finally, also resize parent item if it is a group
+  if (cedar::proc::gui::Group *p_parent_group = dynamic_cast<cedar::proc::gui::Group *>(this->parentItem()))
   {
-    p_parent_network->fitToContents(grow);
+    p_parent_group->fitToContents(grow);
   }
 }
 
-bool cedar::proc::gui::Network::isRootNetwork()
+bool cedar::proc::gui::Group::isRootGroup()
 {
-  return this->mpScene && this == this->mpScene->getRootNetwork().get();
+  return this->mpScene && this == this->mpScene->getRootGroup().get();
 }
 
-void cedar::proc::gui::Network::transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem)
+void cedar::proc::gui::Group::transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem)
 {
   pItem->setPos(this->mapFromItem(pItem, QPointF(0, 0)));
 }
 
-bool cedar::proc::gui::Network::canAddAny(const QList<QGraphicsItem*>& items) const
+bool cedar::proc::gui::Group::canAddAny(const QList<QGraphicsItem*>& items) const
 {
   for (int i = 0; i < items.size(); ++i)
   {
     //!@todo This should cast to a cedar::proc::gui::Element class.
     if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(items.at(i)))
     {
-      if (connectable->getConnectable()->getGroup() != this->getNetwork())
+      if (connectable->getConnectable()->getGroup() != this->getGroup())
       {
         return true;
       }
@@ -507,7 +507,7 @@ bool cedar::proc::gui::Network::canAddAny(const QList<QGraphicsItem*>& items) co
   return false;
 }
 
-void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
+void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem*>& elements)
 {
   std::list<cedar::proc::ElementPtr> elements_to_move;
   std::list<cedar::proc::ElementPtr> all_elements;
@@ -553,7 +553,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
       CEDAR_THROW
       (
         cedar::aux::UnhandledTypeException,
-        "cedar::proc::gui::Network::addElements cannot handle this type of QGraphicsItem."
+        "cedar::proc::gui::Group::addElements cannot handle this type of QGraphicsItem."
       )
     }
     CEDAR_DEBUG_ASSERT(element);
@@ -580,7 +580,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     item_configs[element] = config;
   }
 
-  this->getNetwork()->add(elements_to_move);
+  this->getGroup()->add(elements_to_move);
 
   for (auto element : all_elements)
   {
@@ -608,13 +608,13 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   for (auto element : all_elements)
   {
     auto graphics_item = this->mpScene->getGraphicsItemFor(element.get());
-    // if this is a network, restore all connections
-    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(graphics_item))
+    // if this is a group, restore all connections
+    if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(graphics_item))
     {
-      auto connections = network_item->getNetwork()->getDataConnections();
+      auto connections = group_item->getGroup()->getDataConnections();
       for (auto connection : connections)
       {
-        network_item->checkDataConnection(connection->getSource(), connection->getTarget(), cedar::proc::Group::CONNECTION_ADDED);
+        group_item->checkDataConnection(connection->getSource(), connection->getTarget(), cedar::proc::Group::CONNECTION_ADDED);
       }
     }
   }
@@ -623,28 +623,28 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   this->fitToContents(true);
 }
 
-void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
+void cedar::proc::gui::Group::addElement(cedar::proc::gui::GraphicsBase *pElement)
 {
   //!@todo Does this method do what its name suggests? If so, it should call addElements with a list containing only the given element.
   // reset parent item
   pElement->setParentItem(0);
 }
 
-const std::string& cedar::proc::gui::Network::getFileName() const
+const std::string& cedar::proc::gui::Group::getFileName() const
 {
   return this->mFileName;
 }
 
-void cedar::proc::gui::Network::addElementsToScene()
+void cedar::proc::gui::Group::addElementsToScene()
 {
   //!@todo Can this method be removed?
-//  if (!this->isRootNetwork())
+//  if (!this->isRootGroup())
 //  {
 //    this->fitToContents();
 //  }
 }
 
-void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
+void cedar::proc::gui::Group::setScene(cedar::proc::gui::Scene* pScene)
 {
   //!@todo Why doesn't this use QGraphicsItem->scene() instead?
   // currently, switching the scene is not supported.
@@ -653,35 +653,35 @@ void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
   this->mpScene = pScene;
 }
 
-cedar::proc::GroupPtr cedar::proc::gui::Network::getNetwork()
+cedar::proc::GroupPtr cedar::proc::gui::Group::getGroup()
 {
-  return this->mNetwork;
+  return this->mGroup;
 }
 
-cedar::proc::ConstGroupPtr cedar::proc::gui::Network::getNetwork() const
+cedar::proc::ConstGroupPtr cedar::proc::gui::Group::getGroup() const
 {
-  return this->mNetwork;
+  return this->mGroup;
 }
 
-void cedar::proc::gui::Network::write()
+void cedar::proc::gui::Group::write()
 {
   this->write(this->mFileName);
 }
 
-void cedar::proc::gui::Network::write(const std::string& destination)
+void cedar::proc::gui::Group::write(const std::string& destination)
 {
   this->mFileName = destination;
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
 
-  this->mNetwork->writeConfiguration(root);
+  this->mGroup->writeConfiguration(root);
   this->writeConfiguration(root);
 
   write_json(destination, root);
 }
 
-void cedar::proc::gui::Network::read(const std::string& source)
+void cedar::proc::gui::Group::read(const std::string& source)
 {
   this->mFileName = source;
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
@@ -689,11 +689,11 @@ void cedar::proc::gui::Network::read(const std::string& source)
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
 
-  this->mNetwork->readConfiguration(root);
+  this->mGroup->readConfiguration(root);
   this->readConfiguration(root);
 }
 
-void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& root)
+void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationNode& root)
 {
   if (root.find("ui generic") != root.not_found())
   {
@@ -726,25 +726,25 @@ void cedar::proc::gui::Network::readConfiguration(const cedar::aux::Configuratio
   this->stepRecordStateChanged();
 }
 
-void cedar::proc::gui::Network::readPlotList(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::gui::Group::readPlotList(const cedar::aux::ConfigurationNode& node)
 {
   for (auto it : node)
   {
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
-    auto step = this->getNetwork()->getElement<cedar::proc::Step>(step_name);
+    auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
     auto step_item = this->mpScene->getStepItemFor(step.get());
     cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
   }
 }
 
-void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode& root) const
+void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   this->writeScene(root);
 
   cedar::aux::ConfigurationNode generic;
 
-  //!@todo Does the name/network thing actually do anything, or can it be removed?
-  generic.put("network", this->mNetwork->getName());
+  //!@todo Does the name/group thing actually do anything, or can it be removed?
+  generic.put("group", this->mGroup->getName());
   // add open plots to architecture
   cedar::aux::ConfigurationNode node;
   this->writeOpenPlotsTo(node);
@@ -757,7 +757,7 @@ void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode
   root.add_child("ui generic", generic);
 }
 
-void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
+void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const
 {
   for (auto step_map_item : this->mpScene->getStepMap())
   {
@@ -765,7 +765,7 @@ void cedar::proc::gui::Network::writeOpenPlotsTo(cedar::aux::ConfigurationNode& 
   }
 }
 
-void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) const
+void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode& root) const
 {
   cedar::aux::ConfigurationNode scene;
   
@@ -784,7 +784,7 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) 
     scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
   }
 
-  auto elements = this->getNetwork()->getElements();
+  auto elements = this->getGroup()->getElements();
 
   for
   (
@@ -818,10 +818,10 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) 
         node.put("type", "trigger");
         break;
 
-      case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK:
+      case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
       {
         // move along, nothing to do here
-        node.put("type", "network");
+        node.put("type", "group");
         break;
       }
 
@@ -829,36 +829,40 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) 
         continue;
     }
 
-    if (p_item->getGroup() != cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK)
+    if (p_item->getGroup() != cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP)
     {
       p_item->writeConfiguration(node);
       scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
     }
 
 
-    // write UI information of the network item
-    cedar::proc::GroupPtr network = boost::dynamic_pointer_cast<cedar::proc::Group>(element);
-    cedar::proc::gui::Network *p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_item);
-    if (network && p_network_item)
+    // write UI information of the group item
+    cedar::proc::GroupPtr group = boost::dynamic_pointer_cast<cedar::proc::Group>(element);
+    cedar::proc::gui::Group *p_group_item = dynamic_cast<cedar::proc::gui::Group*>(p_item);
+    if (group && p_group_item)
     {
-      cedar::aux::ConfigurationNode::assoc_iterator networks_node = root.find("networks");
-      if (networks_node == root.not_found())
+      cedar::aux::ConfigurationNode::assoc_iterator groups_node = root.find("groups");
+      if (groups_node == root.not_found())
       {
-        cedar::aux::ConfigurationNode networks;
-        root.put_child("networks", networks);
-        networks_node = root.find("networks");
-        CEDAR_DEBUG_ASSERT(networks_node != root.not_found());
+        groups_node = root.find("networks");
+        if (groups_node == root.not_found())
+        {
+          cedar::aux::ConfigurationNode groups;
+          root.put_child("groups", groups);
+          groups_node = root.find("groups");
+          CEDAR_DEBUG_ASSERT(groups_node != root.not_found());
+        }
       }
 
-      // check if there is already a node for the network; if not, add it
-      cedar::aux::ConfigurationNode::assoc_iterator network_node = networks_node->second.find(network->getName());
-      if (network_node == networks_node->second.not_found())
+      // check if there is already a node for the group; if not, add it
+      cedar::aux::ConfigurationNode::assoc_iterator group_node = groups_node->second.find(group->getName());
+      if (group_node == groups_node->second.not_found())
       {
-        networks_node->second.add_child(network->getName(), cedar::aux::ConfigurationNode());
-        network_node = networks_node->second.find(network->getName());
+        groups_node->second.add_child(group->getName(), cedar::aux::ConfigurationNode());
+        group_node = groups_node->second.find(group->getName());
       }
 
-      p_network_item->writeConfiguration(network_node->second);
+      p_group_item->writeConfiguration(group_node->second);
     }
   }
 
@@ -866,11 +870,11 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root) 
     root.add_child("ui", scene);
 }
 
-void cedar::proc::gui::Network::disconnect()
+void cedar::proc::gui::Group::disconnect()
 {
 }
 
-void cedar::proc::gui::Network::checkDataConnection
+void cedar::proc::gui::Group::checkDataConnection
      (
        cedar::proc::ConstDataSlotPtr source,
        cedar::proc::ConstDataSlotPtr target,
@@ -887,7 +891,7 @@ void cedar::proc::gui::Network::checkDataConnection
        );
 }
 
-void cedar::proc::gui::Network::dataConnectionChanged
+void cedar::proc::gui::Group::dataConnectionChanged
      (
        QString sourceName,
        QString sourceSlot,
@@ -897,10 +901,10 @@ void cedar::proc::gui::Network::dataConnectionChanged
      )
 {
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
-  //!@todo Write a getGraphicsItemFor(QString/std::string0 method in scene; also, maybe these items should be managed in gui::Network
-  auto element = this->getNetwork()->getElement(sourceName.toStdString());
+  //!@todo Write a getGraphicsItemFor(QString/std::string0 method in scene; also, maybe these items should be managed in gui::Group
+  auto element = this->getGroup()->getElement(sourceName.toStdString());
 
-  // if the source is a group source, get its slot from the network
+  // if the source is a group source, get its slot from the group
   if (auto group_source = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element))
   {
     for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
@@ -927,9 +931,9 @@ void cedar::proc::gui::Network::dataConnectionChanged
   CEDAR_ASSERT(source_slot);
 
   cedar::proc::gui::DataSlotItem* target_slot = NULL;
-  auto target = this->getNetwork()->getElement(targetName.toStdString());
+  auto target = this->getGroup()->getElement(targetName.toStdString());
 
-  // if the target is a group sink, get its slot from the network
+  // if the target is a group sink, get its slot from the group
   if (auto group_source = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(target))
   {
     for (size_t i = 0; i < this->mConnectorSinks.size(); ++i)
@@ -947,7 +951,7 @@ void cedar::proc::gui::Network::dataConnectionChanged
   else
   {
     cedar::proc::gui::GraphicsBase* p_base
-      = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(targetName.toStdString()).get());
+      = this->mpScene->getGraphicsItemFor(this->getGroup()->getElement(targetName.toStdString()).get());
     if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_base))
     {
       target_slot = connectable->getSlotItem(cedar::proc::DataRole::INPUT, targetSlot.toStdString());
@@ -987,7 +991,7 @@ void cedar::proc::gui::Network::dataConnectionChanged
   }
 }
 
-void cedar::proc::gui::Network::checkTriggerConnection
+void cedar::proc::gui::Group::checkTriggerConnection
      (
        cedar::proc::TriggerPtr source,
        cedar::proc::TriggerablePtr target,
@@ -995,7 +999,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
      )
 {
   /* A signal is emitted regardless of the missing representation. This fails in finding "processingDone" in the current
-   * network and results in an InvalidNameException. This exception is caught here. A debug assert assures that no other
+   * group and results in an InvalidNameException. This exception is caught here. A debug assert assures that no other
    * element caused this exception.
    */
   cedar::proc::gui::TriggerItem* source_element;
@@ -1006,7 +1010,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
         (
           this->mpScene->getGraphicsItemFor
           (
-            this->getNetwork()->getElement(source->getName()).get()
+            this->getGroup()->getElement(source->getName()).get()
           )
         );
   }
@@ -1018,7 +1022,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
   cedar::proc::gui::GraphicsBase* target_element
     = this->mpScene->getGraphicsItemFor
       (
-        this->getNetwork()->getElement(boost::dynamic_pointer_cast<cedar::proc::Element>(target)->getName()).get()
+        this->getGroup()->getElement(boost::dynamic_pointer_cast<cedar::proc::Element>(target)->getName()).get()
       );
   if (added)
   {
@@ -1044,7 +1048,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
   }
 }
 
-void cedar::proc::gui::Network::updateConnectorPositions()
+void cedar::proc::gui::Group::updateConnectorPositions()
 {
 //  qreal distance = 20;
   qreal pad_side = 5;
@@ -1074,9 +1078,9 @@ void cedar::proc::gui::Network::updateConnectorPositions()
     {
       cedar::aux::LogSingleton::getInstance()->debugMessage
       (
-        "Warning: could not find network output slot for connector \""
+        "Warning: could not find group output slot for connector \""
           + slot_name + "\". Slot item may not be positioned incorrectly in the scene.",
-        "void cedar::proc::gui::Network::updateConnectorPositions()"
+        "void cedar::proc::gui::Group::updateConnectorPositions()"
       );
     }
   }
@@ -1098,7 +1102,7 @@ void cedar::proc::gui::Network::updateConnectorPositions()
   }
 }
 
-void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPtr element)
+void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr element)
 {
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
@@ -1129,12 +1133,12 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
 
     p_scene_element = this->mpScene->getStepItemFor(step.get());
   }
-  // if network, add a new network item
-  else if (cedar::proc::GroupPtr network = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+  // if group, add a new group item
+  else if (cedar::proc::GroupPtr group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
   {
-    this->mpScene->addNetwork(QPointF(0, 0), network);
-    current_type = "network";
-    p_scene_element = this->mpScene->getNetworkFor(network.get());
+    this->mpScene->addGroup(QPointF(0, 0), group);
+    current_type = "group";
+    p_scene_element = this->mpScene->getGroupFor(group.get());
   }
   // if the new element is a trigger, add a trigger item
   else if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
@@ -1145,8 +1149,8 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
   CEDAR_ASSERT(p_scene_element != NULL);
 
-  // if not a root network, properly add the item as a child
-  if (this->mpScene && !this->isRootNetwork())
+  // if not a root group, properly add the item as a child
+  if (this->mpScene && !this->isRootGroup())
   {
     CEDAR_ASSERT(p_scene_element != NULL);
     if (p_scene_element->parentItem() != this)
@@ -1165,25 +1169,29 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
     this->mNextElementUiConfigurations.erase(iter);
   }
 
-  // see if there is a configuration for the UI item stored in the network's ui node
-  if (current_type == "network")
+  // see if there is a configuration for the UI item stored in the group's ui node
+  if (current_type == "group")
   {
-    auto config = this->getNetwork()->getLastReadConfiguration();
-    auto networks_iter = config.find("networks");
-    if (networks_iter != config.not_found())
+    auto config = this->getGroup()->getLastReadConfiguration();
+    auto groups_iter = config.find("groups");
+    if (groups_iter != config.not_found())
     {
-      auto network = cedar::aux::asserted_cast<cedar::proc::gui::Network*>(p_scene_element);
-      auto networks = networks_iter->second;
-      auto network_iter = networks.find(network->getNetwork()->getName());
-      if (network_iter != networks.not_found())
+      groups_iter = config.find("networks"); // compatibility
+      if (groups_iter != config.not_found())
       {
-        network->readConfiguration(network_iter->second);
+        auto group = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(p_scene_element);
+        auto groups = groups_iter->second;
+        auto group_iter = groups.find(group->getGroup()->getName());
+        if (group_iter != groups.not_found())
+        {
+          group->readConfiguration(group_iter->second);
+        }
       }
     }
   }
   else
   {
-    auto config = this->getNetwork()->getLastReadConfiguration();
+    auto config = this->getGroup()->getLastReadConfiguration();
     auto ui_iter = config.find("ui");
     if (ui_iter != config.not_found())
     {
@@ -1219,14 +1227,14 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
   }
 }
 
-void cedar::proc::gui::Network::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
+void cedar::proc::gui::Group::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
 {
   this->cedar::proc::gui::Connectable::slotRemoved(role, name);
 
   this->updateConnectorPositions();
 }
 
-void cedar::proc::gui::Network::removeConnectorItem(bool isSource, const std::string& name)
+void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::string& name)
 {
   auto p_list = &mConnectorSources;
   if (!isSource)
@@ -1248,7 +1256,7 @@ void cedar::proc::gui::Network::removeConnectorItem(bool isSource, const std::st
   CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find connector for data slot \"" + name + "\".");
 }
 
-void cedar::proc::gui::Network::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
+void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
 
   if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
@@ -1267,7 +1275,7 @@ void cedar::proc::gui::Network::processElementRemovedSignal(cedar::proc::ConstEl
   }
 }
 
-void cedar::proc::gui::Network::toggleSmartConnectionMode()
+void cedar::proc::gui::Group::toggleSmartConnectionMode()
 {
   bool smart = this->_mSmartMode->getValue();
   QList<QGraphicsItem*> items = this->mpScene->items();
@@ -1280,7 +1288,7 @@ void cedar::proc::gui::Network::toggleSmartConnectionMode()
   }
 }
 
-void cedar::proc::gui::Network::stepRecordStateChanged()
+void cedar::proc::gui::Group::stepRecordStateChanged()
 {
 	std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> steps = this->mpScene->getStepMap();
 
@@ -1290,19 +1298,19 @@ void cedar::proc::gui::Network::stepRecordStateChanged()
 	}
 }
 
-void cedar::proc::gui::Network::handleStepNameChanged(const std::string& from, const std::string& to)
+void cedar::proc::gui::Group::handleStepNameChanged(const std::string& from, const std::string& to)
 {
   this->changeStepName(from, to);
 }
 
-void cedar::proc::gui::Network::addPlotGroup(std::string plotGroupName)
+void cedar::proc::gui::Group::addPlotGroup(std::string plotGroupName)
 {
   cedar::aux::ConfigurationNode node;
   this->writeOpenPlotsTo(node);
   this->mPlotGroupsNode.put_child(plotGroupName, node);
 }
 
-void cedar::proc::gui::Network::removePlotGroup(std::string plotGroupName)
+void cedar::proc::gui::Group::removePlotGroup(std::string plotGroupName)
 {
   auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
   if(plot_group == this->mPlotGroupsNode.not_found())
@@ -1310,14 +1318,14 @@ void cedar::proc::gui::Network::removePlotGroup(std::string plotGroupName)
     CEDAR_THROW
     (
       cedar::aux::NotFoundException,
-      "cedar::proc::gui::Network::removePlotGroup could not remove plot group. Does not exist."
+      "cedar::proc::gui::Group::removePlotGroup could not remove plot group. Does not exist."
     );
   }
 
   this->mPlotGroupsNode.erase(mPlotGroupsNode.to_iterator(plot_group));
 }
 
-void cedar::proc::gui::Network::renamePlotGroup(std::string from, std::string to)
+void cedar::proc::gui::Group::renamePlotGroup(std::string from, std::string to)
 {
   auto plot_group = this->mPlotGroupsNode.find(from);
   if(plot_group == this->mPlotGroupsNode.not_found())
@@ -1325,7 +1333,7 @@ void cedar::proc::gui::Network::renamePlotGroup(std::string from, std::string to
     CEDAR_THROW
     (
       cedar::aux::NotFoundException,
-      "cedar::proc::gui::Network::renamePlotGroup could not rename plot group. Does not exist."
+      "cedar::proc::gui::Group::renamePlotGroup could not rename plot group. Does not exist."
     );
   }
   // rename
@@ -1335,7 +1343,7 @@ void cedar::proc::gui::Network::renamePlotGroup(std::string from, std::string to
   //maybe just do: plot_group->first = to;
 }
 
-std::list<std::string> cedar::proc::gui::Network::getPlotGroupNames()
+std::list<std::string> cedar::proc::gui::Group::getPlotGroupNames()
 {
   std::list<std::string> plot_group_names;
   for (auto node : mPlotGroupsNode)
@@ -1346,7 +1354,7 @@ std::list<std::string> cedar::proc::gui::Network::getPlotGroupNames()
   return plot_group_names;
 }
 
-void cedar::proc::gui::Network::displayPlotGroup(std::string plotGroupName)
+void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)
 {
   auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
   if(plot_group == this->mPlotGroupsNode.not_found())
@@ -1354,14 +1362,14 @@ void cedar::proc::gui::Network::displayPlotGroup(std::string plotGroupName)
     CEDAR_THROW
     (
       cedar::aux::NotFoundException,
-      "cedar::proc::gui::Network::displayPlotGroup could not display plot group. Does not exist."
+      "cedar::proc::gui::Group::displayPlotGroup could not display plot group. Does not exist."
     );
   }
 
   this->readPlotList(plot_group->second);
 }
 
-void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
@@ -1370,7 +1378,6 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
 
   if (this->scene()->selectedItems().size() > 1)
   {
-    p_scene->networkGroupingContextMenuEvent(menu);
     menu.exec(event->screenPos());
     return;
   }
@@ -1389,7 +1396,7 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
 
   QMenu* p_remove_input_menu = menu.addMenu("remove input");
   QMenu* p_remove_output_menu = menu.addMenu("remove output");
-  const cedar::proc::Group::ConnectorMap& connectors = this->getNetwork()->getConnectorMap();
+  const cedar::proc::Group::ConnectorMap& connectors = this->getGroup()->getConnectorMap();
   for (auto it = connectors.begin(); it != connectors.end(); ++it)
   {
     if (it->second)
@@ -1413,7 +1420,6 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
   }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-  p_scene->networkGroupingContextMenuEvent(menu);
 
   QAction* a = menu.exec(event->screenPos());
 
@@ -1423,17 +1429,17 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
   // execute an action
   if (a == p_add_input || a == p_add_output)
   {
-    QString default_name = QString::fromStdString(this->getNetwork()->getNewConnectorName(a == p_add_input));
+    QString default_name = QString::fromStdString(this->getGroup()->getNewConnectorName(a == p_add_input));
     QString name = QInputDialog::getText(0, "Enter a name", "Name", QLineEdit::Normal, default_name);
     if (!name.isEmpty())
     {
-      if (this->getNetwork()->hasConnector(name.toStdString()))
+      if (this->getGroup()->hasConnector(name.toStdString()))
       {
         QMessageBox::critical(NULL, "Name exists", "A connector of this name already exists.");
       }
       else
       {
-        this->getNetwork()->addConnector(name.toStdString(), (a == p_add_input));
+        this->getGroup()->addConnector(name.toStdString(), (a == p_add_input));
       }
     }
   }
@@ -1441,22 +1447,22 @@ void cedar::proc::gui::Network::contextMenuEvent(QGraphicsSceneContextMenuEvent 
   else if (a->parentWidget() == p_remove_input_menu)
   {
     std::string name = a->text().toStdString();
-    this->getNetwork()->removeConnector(name, true);
+    this->getGroup()->removeConnector(name, true);
   }
 
   else if (a->parentWidget() == p_remove_output_menu)
   {
     std::string name = a->text().toStdString();
-    this->getNetwork()->removeConnector(name, false);
+    this->getGroup()->removeConnector(name, false);
   }
 }
 
-void cedar::proc::gui::Network::setCollapsed(bool collapsed)
+void cedar::proc::gui::Group::setCollapsed(bool collapsed)
 {
   this->_mIsCollapsed->setValue(collapsed);
 }
 
-void cedar::proc::gui::Network::updateCollapsedness()
+void cedar::proc::gui::Group::updateCollapsedness()
 {
   bool collapse = this->isCollapsed();
   auto children = this->childItems();
@@ -1479,8 +1485,8 @@ void cedar::proc::gui::Network::updateCollapsedness()
     this->mConnectorSources.at(i)->setVisible(!collapse);
   }
 
-  // update the text of the network
-  this->networkNameChanged();
+  // update the text of the group
+  this->groupNameChanged();
 
   if (collapse)
   {
@@ -1491,14 +1497,14 @@ void cedar::proc::gui::Network::updateCollapsedness()
   }
   else
   {
-    this->setInputOutputSlotOffset(cedar::proc::gui::Network::M_EXPANDED_SLOT_OFFSET);
+    this->setInputOutputSlotOffset(cedar::proc::gui::Group::M_EXPANDED_SLOT_OFFSET);
     this->setSize(this->_mUncollapsedWidth->getValue(), this->_mUncollapsedHeight->getValue());
   }
 
   this->setResizeable(!collapse);
 }
 
-void cedar::proc::gui::Network::changeStepName(const std::string& from, const std::string& to)
+void cedar::proc::gui::Group::changeStepName(const std::string& from, const std::string& to)
 {
   /* plot groups are structured like this:
     {
@@ -1532,7 +1538,7 @@ void cedar::proc::gui::Network::changeStepName(const std::string& from, const st
   }
 }
 
-void cedar::proc::gui::Network::readStickyNotes(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::gui::Group::readStickyNotes(const cedar::aux::ConfigurationNode& node)
 {
 
   for (auto iter = node.begin(); iter != node.end(); ++iter)
