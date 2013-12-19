@@ -140,11 +140,11 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
 
-  mDataConnectionChangedConnection = mGroup->connectToDataConnectionChanged
+  mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
                                      (
                                        boost::bind(&cedar::proc::gui::Group::checkDataConnection, this, _1, _2, _3)
                                      );
-  mTriggerConnectionChangedConnection = mGroup->connectToTriggerConnectionChanged
+  mTriggerConnectionChangedConnection = mGroup->connectToTriggerConnectionChangedSignal
                                         (
                                           boost::bind
                                           (
