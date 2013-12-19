@@ -496,9 +496,28 @@ struct TriggerConnectionInfo
 
 void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
 {
-  typedef std::list<cedar::proc::ElementPtr>::iterator iterator;
-  typedef std::list<cedar::proc::ElementPtr>::const_iterator const_iterator;
-  for (iterator it = elements.begin(); it != elements.end(); )
+  // prune elements that are children of moved elements
+  std::list<cedar::proc::ElementPtr> elements_pruned;
+  for (auto element : elements)
+  {
+    bool is_child = false;
+    for (auto compare_element : elements)
+    {
+      auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(compare_element);
+      if (group && group->contains(element))
+      {
+        is_child = true;
+        break;
+      }
+    }
+    if (!is_child)
+    {
+      elements_pruned.push_back(element);
+    }
+  }
+  elements = elements_pruned;
+
+  for (auto it = elements.begin(); it != elements.end(); )
   {
     // check if the name already exists
     if (this->nameExists((*it)->getName()))
@@ -520,6 +539,7 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
       ++it;
     }
   }
+
   // are any elements left?
   if (elements.size() == 0)
   {
@@ -532,13 +552,9 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
 
   // sanity check if all elements have the same parent group
   cedar::proc::GroupPtr old_group = (*(elements.begin()))->getGroup();
-  for
-  (
-    iterator it = elements.begin(); it != elements.end(); ++it
-  )
+  for (auto element : elements)
   {
-    // need two parentheses here because otherwise clang throws a warning
-    if (old_group != (*it)->getGroup())
+    if (old_group != element->getGroup())
     {
       cedar::aux::LogSingleton::getInstance()->warning
       (
@@ -569,8 +585,8 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
         // find connections that we have to restore after moving elements
         cedar::proc::ElementPtr source = old_group->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
         cedar::proc::ElementPtr target = old_group->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
-        iterator source_it = std::find(elements.begin(), elements.end(), source);
-        iterator target_it = std::find(elements.begin(), elements.end(), target);
+        auto source_it = std::find(elements.begin(), elements.end(), source);
+        auto target_it = std::find(elements.begin(), elements.end(), target);
 
         // these connections connect elements that are moved
         if (source_it != elements.end() && target_it != elements.end())
@@ -609,20 +625,15 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
     else if (old_group->contains(this->shared_from_this())) // old group contains new group - moving down the hierarchy
     {
       std::vector<DataConnectionPtr> slots_deleted_later;
-      for
-      (
-        cedar::proc::Group::DataConnectionVector::iterator it = old_group->mDataConnections.begin();
-        it != old_group->getDataConnections().end();
-        ++it
-      )
+      for (auto connection : old_group->mDataConnections)
       {
         // find connections that we have to restore after moving elements
-        cedar::proc::ElementPtr source = old_group->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
-        cedar::proc::ElementPtr target = old_group->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
+        cedar::proc::ElementPtr source = old_group->getElement<cedar::proc::Element>(connection->getSource()->getParent());
+        cedar::proc::ElementPtr target = old_group->getElement<cedar::proc::Element>(connection->getTarget()->getParent());
         auto source_it = std::find(elements.begin(), elements.end(), source);
         auto target_it = std::find(elements.begin(), elements.end(), target);
 
-        cedar::proc::DataSlotPtr source_slot = (*it)->getSource();
+        cedar::proc::DataSlotPtr source_slot = connection->getSource();
         std::vector<cedar::proc::DataSlotPtr> target_slots;
 
         // these connections connect elements that are moved
@@ -631,17 +642,25 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
           // this connection must be stored (note that connections are automatically deleted if elements are removed)
           if (source_it == elements.end())
           {
-            source_slot = old_group->getRealSource((*it)->getTarget(), boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
-            target_slots.push_back((*it)->getTarget());
+            source_slot = old_group->getRealSource
+                                     (
+                                       connection->getTarget(),
+                                       boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this())
+                                     );
+            target_slots.push_back(connection->getTarget());
           }
           else if (target_it == elements.end())
           {
-            auto more_slots = old_group->getRealTargets((*it)->getSource(), boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
+            auto more_slots = old_group->getRealTargets
+                                         (
+                                           connection->getSource(),
+                                           boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this())
+                                         );
             target_slots.insert(target_slots.end(), more_slots.begin(), more_slots.end());
           }
           else
           {
-            target_slots.push_back((*it)->getTarget());
+            target_slots.push_back(connection->getTarget());
           }
           for (unsigned i = 0; i < target_slots.size(); ++i)
           {
@@ -664,19 +683,13 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
     }
   }
   // remember all trigger connections between moved elements
-  for
-  (
-    iterator it = elements.begin(); it != elements.end(); ++it
-  )
+  for (auto element : elements)
   {
-    if (cedar::proc::TriggerPtr source_trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(*it))
+    if (cedar::proc::TriggerPtr source_trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
     {
-      for
-      (
-        iterator target = elements.begin(); target != elements.end(); ++target
-      )
+      for (auto target : elements)
       {
-        cedar::proc::TriggerablePtr target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(*target);
+        cedar::proc::TriggerablePtr target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target);
         if (target_triggerable && source_trigger->isListener(target_triggerable))
         {
           trigger_connections.push_back(TriggerConnectionInfo(source_trigger, target_triggerable));
@@ -686,27 +699,27 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
   }
 
   // remove connectors
-  for (unsigned int i = 0; i < data_connections.size(); ++i)
+  for (auto connection : data_connections)
   {
-    cedar::proc::Group::deleteConnectorsAlongConnection(data_connections.at(i).from, data_connections.at(i).to);
+    cedar::proc::Group::deleteConnectorsAlongConnection(connection.from, connection.to);
   }
 
   // now add each element to the new group
-  for (iterator it = elements.begin(); it != elements.end(); ++it)
+  for (auto element : elements)
   {
-    this->add(*it);
+    this->add(element);
   }
 
   // restore data connections
-  for (unsigned int i = 0; i < data_connections.size(); ++i)
+  for (auto connection : data_connections)
   {
-    cedar::proc::Group::connectAcrossGroups(data_connections.at(i).from, data_connections.at(i).to);
+    cedar::proc::Group::connectAcrossGroups(connection.from, connection.to);
   }
 
   // restore trigger connections
-  for (unsigned int i = 0; i < trigger_connections.size(); ++i)
+  for (auto connection : trigger_connections)
   {
-    this->connectTrigger(trigger_connections.at(i).from, trigger_connections.at(i).to);
+    this->connectTrigger(connection.from, connection.to);
   }
 }
 
