@@ -164,7 +164,7 @@ public:
    *
    *  @param slot the slot that needs checking, specified via its smart pointer.
    */
-  cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
+  cedar::proc::DataSlot::VALIDITY updateInputValidity(cedar::proc::DataSlotPtr slot);
 
   //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slotName);
@@ -362,7 +362,7 @@ protected:
 
   /*!@brief Removes all declared data slots.
    */
-  void clearDataSlots();
+  void removeAllDataSlots();
 
   /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
    *        changed.
