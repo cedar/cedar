@@ -48,16 +48,8 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
-namespace cedar
-{
-  namespace proc
-  {
-    CEDAR_DECLARE_PROC_CLASS(Network);
-  }
-}
-
-//!@endcond
+#warning cedar::proc::Network was renamed to cedar::proc::Group. Please include Group.fwd.h instead of this header.
+#include "cedar/processing/Group.fwd.h"
 
 #endif // CEDAR_PROC_NETWORK_FWD_H
 

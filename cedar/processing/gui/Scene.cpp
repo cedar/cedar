@@ -46,7 +46,7 @@
 #include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/exceptions.h"
@@ -202,11 +202,11 @@ void cedar::proc::gui::Scene::reset()
   this->clear();
   CEDAR_DEBUG_ASSERT(mStepMap.empty());
   CEDAR_DEBUG_ASSERT(mTriggerMap.empty());
-  CEDAR_DEBUG_ASSERT(mNetworkMap.empty());
+  CEDAR_DEBUG_ASSERT(mGroupMap.empty());
   CEDAR_DEBUG_ASSERT(mElementMap.empty());
   this->mStepMap.clear();
   this->mTriggerMap.clear();
-  this->mNetworkMap.clear();
+  this->mGroupMap.clear();
   this->mElementMap.clear();
   this->mStickyNotes.clear();
 }
@@ -231,10 +231,10 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
   return this->mTriggerMap;
 }
 
-void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkPtr network)
+void cedar::proc::gui::Scene::setGroup(cedar::proc::gui::GroupPtr group)
 {
-  this->mNetwork = network;
-  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
+  this->mGroup = group;
+  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mGroup.get(),SLOT(stepRecordStateChanged()));
 }
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
@@ -266,14 +266,14 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
   QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
   if (p_item != this->mpDropTarget)
   {
-    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(this->mpDropTarget))
+    if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
     {
-      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
     }
 
-    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(p_item))
+    if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
     {
-      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+      group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
     }
     this->mpDropTarget = p_item;
   }
@@ -303,14 +303,14 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     {
       QPointF mapped = pEvent->scenePos();
       QString class_id = item->data(Qt::UserRole).toString();
-      auto target_network = this->getRootNetwork()->getNetwork();
-      if (auto network = dynamic_cast<cedar::proc::gui::Network*>(drop_target))
+      auto target_group = this->getRootGroup()->getGroup();
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(drop_target))
       {
-        network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-        target_network = network->getNetwork();
-        mapped -= network->scenePos();
+        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+        target_group = group->getGroup();
+        mapped -= group->scenePos();
       }
-      this->createElement(target_network, class_id.toStdString(), mapped);
+      this->createElement(target_group, class_id.toStdString(), mapped);
     }
   }
 }
@@ -404,34 +404,34 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   // ... reset the current one ...
   mpDropTarget = NULL;
   mTargetGroup.reset();
-  bool potential_target_network_found = true;
-  bool target_is_root_network = true;
+  bool potential_target_group_found = true;
+  bool target_is_root_group = true;
 
   // ... and look for a new one
   for (int i = 0; i < items_under_mouse.size(); ++i)
   {
     if (items_under_mouse.at(i)->isSelected())
     {
-      // if selected, the item is one of the networks being moved; thus, ignore it
+      // if selected, the item is one of the groups being moved; thus, ignore it
       continue;
     }
-    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(items_under_mouse.at(i)))
+    if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(items_under_mouse.at(i)))
     {
-      target_is_root_network = false;
+      target_is_root_group = false;
 
-      // check if there is an item that is not in the target network yet, highlight the target network
-      if (network_item->canAddAny(selected))
+      // check if there is an item that is not in the target group yet, highlight the target group
+      if (group_item->canAddAny(selected))
       {
-        mpDropTarget = network_item;
-        mTargetGroup = network_item->getNetwork();
-        network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+        mpDropTarget = group_item;
+        mTargetGroup = group_item->getGroup();
+        group_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
       }
       else
       {
-        potential_target_network_found = false;
+        potential_target_group_found = false;
       }
 
-      // We only look at the first network item; the ones below it (cf descending sort order above) we do not care
+      // We only look at the first group item; the ones below it (cf descending sort order above) we do not care
       // about.
       break;
     }
@@ -440,19 +440,19 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   this->resetBackgroundColor();
 
   // highlight the source groups
-  if (potential_target_network_found)
+  if (potential_target_group_found)
   {
     for (int i = 0; i < selected.size(); ++i)
     {
       auto item = selected.at(i);
       if (item->parentItem())
       {
-        if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+        if (auto group = dynamic_cast<cedar::proc::gui::Group*>(item->parentItem()))
         {
-          network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_GROUP_MEMBER_LEAVING);
+          group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_GROUP_MEMBER_LEAVING);
         }
       }
-      else if (!target_is_root_network) // items without a parent are in the root network
+      else if (!target_is_root_group) // items without a parent are in the root group
       {
         this->setBackgroundBrush(cedar::proc::gui::GraphicsBase::getLeavingGroupBrush());
       }
@@ -463,9 +463,9 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
     for (int i = 0; i < selected.size(); ++i)
     {
       auto item = selected.at(i);
-      if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(item->parentItem()))
       {
-        network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
       }
     }
   }
@@ -473,19 +473,19 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   // disable highlighting of the old drop target if the target has changed or there is no target any more
   if ((mpDropTarget == NULL && old_drop_target != NULL) || old_drop_target != mpDropTarget)
   {
-    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(old_drop_target))
+    if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(old_drop_target))
     {
-      network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      group_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
     }
   }
 
-  // if no target network was found, the step(s) should be added to the root network; thus, highlight it
-  if (target_is_root_network)
+  // if no target group was found, the step(s) should be added to the root group; thus, highlight it
+  if (target_is_root_group)
   {
-    if (this->mNetwork->canAddAny(selected))
+    if (this->mGroup->canAddAny(selected))
     {
       this->setBackgroundBrush(cedar::proc::gui::GraphicsBase::getTargetGroupBrush());
-      this->mTargetGroup = this->mNetwork->getNetwork();
+      this->mTargetGroup = this->mGroup->getGroup();
     }
   }
 }
@@ -507,27 +507,27 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 
   this->mDraggingItems = false;
 
-  // reset highlighting of the networks from which the items are being removed
+  // reset highlighting of the groups from which the items are being removed
   auto selected = this->selectedItems();
   for (int i = 0; i < selected.size(); ++i)
   {
     auto item = selected.at(i);
-    if (auto network = dynamic_cast<cedar::proc::gui::Network*>(item->parentItem()))
+    if (auto group = dynamic_cast<cedar::proc::gui::Group*>(item->parentItem()))
     {
-      network->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
     }
   }
 
   if (mTargetGroup)
   {
-    if (auto network_item = dynamic_cast<cedar::proc::gui::Network*>(mpDropTarget))
+    if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(mpDropTarget))
     {
-      network_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      network_item->addElements(this->selectedItems().toStdList());
+      group_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      group_item->addElements(this->selectedItems().toStdList());
     }
     else
     {
-      this->mNetwork->addElements(this->selectedItems().toStdList());
+      this->mGroup->addElements(this->selectedItems().toStdList());
     }
   }
 
@@ -537,40 +537,29 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   mpDropTarget = NULL;
 }
 
-void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& /*menu*/)
-{
-  /*
-  QAction *p_add_to_new_network = menu.addAction("group into new network");
-  QObject::connect(p_add_to_new_network, SIGNAL(triggered()), this, SLOT(promoteElementToNewGroup()));
-
-  QMenu *p_add_to_existing_network = menu.addMenu("move to existing network");
-  this->addNetworkNames(p_add_to_existing_network, this->mNetwork->getNetwork(), "");
-  */
-}
-
-void cedar::proc::gui::Scene::addNetworkNames
+void cedar::proc::gui::Scene::addGroupNames
      (
        QMenu* pMenu,
-       cedar::proc::ConstNetworkPtr network,
+       cedar::proc::ConstGroupPtr group,
        std::string path
      ) const
 {
-  typedef std::set<cedar::proc::ConstNetworkPtr> Subnetworks;
+  typedef std::set<cedar::proc::ConstGroupPtr> Subgroups;
   QMenu* submenu;
-  if (network == this->mNetwork->getNetwork())
+  if (group == this->mGroup->getGroup())
   {
-    submenu = pMenu->addMenu("root network");
+    submenu = pMenu->addMenu("root group");
   }
   else
   {
-    submenu = pMenu->addMenu(QString::fromStdString(network->getName()));
+    submenu = pMenu->addMenu(QString::fromStdString(group->getName()));
 
     // extend the path string
     if (!path.empty())
       path += ".";
-    path += network->getName();
+    path += group->getName();
   }
-  QAction *p_add_action = submenu->addAction("add to this network");
+  QAction *p_add_action = submenu->addAction("add to this group");
 
   p_add_action->setData(QString::fromStdString(path));
 
@@ -578,39 +567,39 @@ void cedar::proc::gui::Scene::addNetworkNames
 
   submenu->addSeparator();
 
-  Subnetworks subnetworks;
-  network->listSubnetworks(subnetworks);
-  for (Subnetworks::iterator iter = subnetworks.begin(); iter != subnetworks.end(); ++iter)
+  Subgroups subgroups;
+  group->listSubgroups(subgroups);
+  for (Subgroups::iterator iter = subgroups.begin(); iter != subgroups.end(); ++iter)
   {
-    this->addNetworkNames(submenu, *iter, path);
+    this->addGroupNames(submenu, *iter, path);
   }
 }
 
 void cedar::proc::gui::Scene::promoteElementToExistingGroup()
 {
   QAction *p_action = dynamic_cast<QAction*>(QObject::sender());
-  std::string target_network_name = p_action->data().toString().toStdString();
-  cedar::proc::NetworkPtr target_network;
-  if (target_network_name == "")
+  std::string target_group_name = p_action->data().toString().toStdString();
+  cedar::proc::GroupPtr target_group;
+  if (target_group_name == "")
   {
-    target_network = this->mNetwork->getNetwork();
+    target_group = this->mGroup->getGroup();
   }
   else
   {
-   target_network
-     = boost::dynamic_pointer_cast<cedar::proc::Network>(this->mNetwork->getNetwork()->getElement(target_network_name));
+   target_group
+     = boost::dynamic_pointer_cast<cedar::proc::Group>(this->mGroup->getGroup()->getElement(target_group_name));
   }
-  CEDAR_ASSERT(target_network);
-  cedar::proc::gui::Network *p_network
-    = cedar::aux::asserted_cast<cedar::proc::gui::Network*>(this->getGraphicsItemFor(target_network.get()));
+  CEDAR_ASSERT(target_group);
+  cedar::proc::gui::Group *p_group
+    = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(this->getGraphicsItemFor(target_group.get()));
 
   QList<QGraphicsItem *> selected = this->selectedItems();
-  p_network->addElements(selected.toStdList());
+  p_group->addElements(selected.toStdList());
 }
 
 void cedar::proc::gui::Scene::promoteElementToNewGroup()
 {
-  // do not create a new network if there are no elements selected
+  // do not create a new group if there are no elements selected
   QList<QGraphicsItem*> selected = this->selectedItems();
   // take out connections
   for (QList<QGraphicsItem*>::iterator it = selected.begin(); it != selected.end(); )
@@ -630,19 +619,19 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
     return;
   }
 
-  // create a new network and at this to the parent network
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  // create a new group and at this to the parent group
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
 
-  /* try to get a grasp on the parent network of the first step - this is the network at which the new network
+  /* try to get a grasp on the parent group of the first step - this is the group at which the new group
    * should be inserted
    */
-  cedar::proc::NetworkPtr new_parent_network;
+  cedar::proc::GroupPtr new_parent_group;
 
   auto p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected.at(0));
 
   if (p_base)
   {
-    new_parent_network = p_base->getElement()->getNetwork();
+    new_parent_group = p_base->getElement()->getGroup();
   }
   else
   {
@@ -650,32 +639,32 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   }
 
   std::list<cedar::proc::ElementPtr> elements;
-  // sanity check - are all elements stored in the same network?
+  // sanity check - are all elements stored in the same group?
   for (int i = 0; i < selected.size(); ++i)
   {
-    if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(i)))
+    if (cedar::proc::gui::Group *p_element = dynamic_cast<cedar::proc::gui::Group*>(selected.at(i)))
     {
-      if (new_parent_network != p_element->getNetwork()->getNetwork())
+      if (new_parent_group != p_element->getGroup()->getGroup())
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
-          "Not all selected items are in the same network - aborting operation.",
+          "Not all selected items are in the same group - aborting operation.",
           "cedar::proc::gui::Scene::promoteElementToNewGroup()"
         );
         return;
       }
       else
       {
-        elements.push_back(p_element->getNetwork());
+        elements.push_back(p_element->getGroup());
       }
     }
     else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(i)))
     {
-      if (new_parent_network != p_element->getStep()->getNetwork())
+      if (new_parent_group != p_element->getStep()->getGroup())
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
-          "Not all selected items are in the same network - aborting operation.",
+          "Not all selected items are in the same group - aborting operation.",
           "cedar::proc::gui::Scene::promoteElementToNewGroup()"
         );
         return;
@@ -687,11 +676,11 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
     }
     else if (cedar::proc::gui::TriggerItem *p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(i)))
     {
-      if (new_parent_network != p_element->getTrigger()->getNetwork())
+      if (new_parent_group != p_element->getTrigger()->getGroup())
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
-          "Not all selected items are in the same network - aborting operation.",
+          "Not all selected items are in the same group - aborting operation.",
           "cedar::proc::gui::Scene::promoteElementToNewGroup()"
         );
         return;
@@ -702,39 +691,39 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       }
     }
   }
-  // add the new network to the parent network
-  CEDAR_DEBUG_ASSERT(new_parent_network);
-  std::string name = new_parent_network->getUniqueIdentifier("new Network");
-  network->setName(name);
-  if (new_parent_network == this->mNetwork->getNetwork())
+  // add the new group to the parent group
+  CEDAR_DEBUG_ASSERT(new_parent_group);
+  std::string name = new_parent_group->getUniqueIdentifier("new Group");
+  group->setName(name);
+  if (new_parent_group == this->mGroup->getGroup())
   {
-    // first add the network
-    mNetwork->getNetwork()->add(network);
+    // first add the group
+    mGroup->getGroup()->add(group);
     // signals created a new graphical representation, set its parent now
-    mNetwork->addElement(this->getGraphicsItemFor(network.get()));
+    mGroup->addElement(this->getGraphicsItemFor(group.get()));
   }
   else
   {
-    new_parent_network->add(network);
-    dynamic_cast<cedar::proc::gui::Network*>
+    new_parent_group->add(group);
+    dynamic_cast<cedar::proc::gui::Group*>
     (
-      this->getGraphicsItemFor(new_parent_network.get())
-    )->addElement(this->getGraphicsItemFor(network.get()));
+      this->getGraphicsItemFor(new_parent_group.get())
+    )->addElement(this->getGraphicsItemFor(group.get()));
   }
 
   // remember all the old configurations of the ui representations
-  cedar::proc::gui::Network* p_new_network = this->getNetworkFor(network.get());
+  cedar::proc::gui::Group* p_new_group = this->getGroupFor(group.get());
   for (std::list<cedar::proc::ElementPtr>::iterator i = elements.begin(); i != elements.end(); ++i)
   {
     cedar::aux::ConfigurationNode ui_description;
     cedar::proc::ElementPtr element = *i;
     cedar::proc::gui::GraphicsBase* p_ui_element = this->getGraphicsItemFor(element.get());
     p_ui_element->writeConfiguration(ui_description);
-    p_new_network->setNextElementUiConfiguration(element, ui_description);
+    p_new_group->setNextElementUiConfiguration(element, ui_description);
   }
 
-  // move all elements to the network
-  network->add(elements);
+  // move all elements to the group
+  group->add(elements);
 }
 
 void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
@@ -747,7 +736,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   QMenu menu;
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
-  QAction *p_reset = menu.addAction("reset network");
+  QAction *p_reset = menu.addAction("reset group");
 
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
 
@@ -755,7 +744,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   {
     if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
     {
-      p_ide->resetRootNetwork();
+      p_ide->resetRootGroup();
     }
   }
   if (a == p_addSickyNode)
@@ -908,7 +897,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 static_cast<cedar::proc::Element*>
                 (
                   p_source->getSlot()->getParentPtr()
-                )->getNetwork()->connectSlots(source_name, target_name);
+                )->getGroup()->connectSlots(source_name, target_name);
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
             }
@@ -927,14 +916,14 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
               {
                 cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
-                source->getTrigger()->getNetwork()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
+                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
                 break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
               }
 
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
               {
                 cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
-                source->getTrigger()->getNetwork()->connectTrigger(source->getTrigger(), p_step_item->getStep());
+                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_step_item->getStep());
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 
@@ -1035,7 +1024,7 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem* p
 
 cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
                                                  (
-                                                   cedar::proc::NetworkPtr network,
+                                                   cedar::proc::GroupPtr group,
                                                    const std::string& classId,
                                                    QPointF position
                                                  )
@@ -1045,13 +1034,13 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
   CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
   std::string name = "new " + split_class_name.back();
 
-  std::string adjusted_name = network->getUniqueIdentifier(name);
+  std::string adjusted_name = group->getUniqueIdentifier(name);
 
   try
   {
-    network->create(classId, adjusted_name);
-    CEDAR_DEBUG_ASSERT(network->getElement<cedar::proc::Element>(adjusted_name).get());
-    this->getGraphicsItemFor(network->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
+    group->create(classId, adjusted_name);
+    CEDAR_DEBUG_ASSERT(group->getElement<cedar::proc::Element>(adjusted_name).get());
+    this->getGraphicsItemFor(group->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
@@ -1060,7 +1049,7 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
     p_dialog->exec();
   }
 
-  return network->getElement(adjusted_name);
+  return group->getElement(adjusted_name);
 }
 
 cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar::proc::Trigger* trigger)
@@ -1085,9 +1074,9 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
 
   if (iter == this->mElementMap.end())
   {
-    if (mNetwork->getNetwork().get() == element)
+    if (mGroup->getGroup().get() == element)
     {
-      return mNetwork.get();
+      return mGroup.get();
     }
 #ifdef DEBUG
     if (element)
@@ -1115,13 +1104,13 @@ cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc:
   return iter->second;
 }
 
-cedar::proc::gui::Network* cedar::proc::gui::Scene::getNetworkFor(cedar::proc::Network* network)
+cedar::proc::gui::Group* cedar::proc::gui::Scene::getGroupFor(cedar::proc::Group* group)
 {
-  NetworkMap::iterator iter = this->mNetworkMap.find(network);
-  if (iter == this->mNetworkMap.end())
+  GroupMap::iterator iter = this->mGroupMap.find(group);
+  if (iter == this->mGroupMap.end())
   {
 #ifdef DEBUG
-    std::cout << "Could not find gui::network for network \"" << network->getName() << "\"" << std::endl;
+    std::cout << "Could not find gui::group for group \"" << group->getName() << "\"" << std::endl;
 #endif // DEBUG
     return NULL;
   }
@@ -1131,42 +1120,42 @@ cedar::proc::gui::Network* cedar::proc::gui::Scene::getNetworkFor(cedar::proc::N
   }
 }
 
-cedar::proc::gui::Network* cedar::proc::gui::Scene::addNetwork(const QPointF& position, cedar::proc::NetworkPtr network)
+cedar::proc::gui::Group* cedar::proc::gui::Scene::addGroup(const QPointF& position, cedar::proc::GroupPtr group)
 {
-  cedar::proc::gui::Network *network_item = new cedar::proc::gui::Network
+  cedar::proc::gui::Group *group_item = new cedar::proc::gui::Group
                                                 (
                                                   this->mpMainWindow,
                                                   this,
                                                   400,
                                                   150,
-                                                  network
+                                                  group
                                                 );
 
-  this->addNetworkItem(network_item);
-  network_item->setPos(position);
-  return network_item;
+  this->addGroupItem(group_item);
+  group_item->setPos(position);
+  return group_item;
 }
 
-void cedar::proc::gui::Scene::addNetworkItem(cedar::proc::gui::Network *pNetwork)
+void cedar::proc::gui::Scene::addGroupItem(cedar::proc::gui::Group *pGroup)
 {
-  this->addItem(pNetwork);
-  pNetwork->setScene(this);
+  this->addItem(pGroup);
+  pGroup->setScene(this);
 
-  // we assume that network are only inserted once.
-  CEDAR_DEBUG_ASSERT(this->mNetworkMap.find(pNetwork->getNetwork().get()) == this->mNetworkMap.end());
-  this->mNetworkMap[pNetwork->getNetwork().get()] = pNetwork;
+  // we assume that group are only inserted once.
+  CEDAR_DEBUG_ASSERT(this->mGroupMap.find(pGroup->getGroup().get()) == this->mGroupMap.end());
+  this->mGroupMap[pGroup->getGroup().get()] = pGroup;
 
-  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->getNetwork().get()) == this->mElementMap.end());
-  this->mElementMap[pNetwork->getNetwork().get()] = pNetwork;
+  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pGroup->getGroup().get()) == this->mElementMap.end());
+  this->mElementMap[pGroup->getGroup().get()] = pGroup;
 }
 
-void cedar::proc::gui::Scene::removeNetworkItem(cedar::proc::gui::Network* pNetwork)
+void cedar::proc::gui::Scene::removeGroupItem(cedar::proc::gui::Group* pGroup)
 {
   // we assume that steps are only inserted once.
-  CEDAR_DEBUG_ASSERT(this->mNetworkMap.find(pNetwork->getNetwork().get()) != this->mNetworkMap.end());
-  this->mNetworkMap.erase(mNetworkMap.find(pNetwork->getNetwork().get()));
-  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->getNetwork().get()) != this->mElementMap.end());
-  this->mElementMap.erase(mElementMap.find(pNetwork->getNetwork().get()));
+  CEDAR_DEBUG_ASSERT(this->mGroupMap.find(pGroup->getGroup().get()) != this->mGroupMap.end());
+  this->mGroupMap.erase(mGroupMap.find(pGroup->getGroup().get()));
+  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pGroup->getGroup().get()) != this->mElementMap.end());
+  this->mElementMap.erase(mElementMap.find(pGroup->getGroup().get()));
 }
 
 void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPointF position)
@@ -1198,9 +1187,9 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
 }
 
-cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()
+cedar::proc::gui::GroupPtr cedar::proc::gui::Scene::getRootGroup()
 {
-  return mNetwork;
+  return mGroup;
 }
 
 void cedar::proc::gui::Scene::handleTriggerModeChange()

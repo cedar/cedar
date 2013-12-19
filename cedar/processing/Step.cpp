@@ -42,7 +42,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -247,7 +247,7 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (cedar::proc::NetworkPtr parent_network = this->getNetwork())
+  if (cedar::proc::GroupPtr parent_network = this->getGroup())
   {
     // update the name
     parent_network->updateObjectName(this);

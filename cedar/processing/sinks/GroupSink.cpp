@@ -41,7 +41,7 @@
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
@@ -106,7 +106,7 @@ void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& in
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // since the step may no longer be in a network upon deletion, we may not need to do anything.
-  cedar::proc::NetworkPtr network = this->getNetwork();
+  cedar::proc::GroupPtr network = this->getGroup();
   if (!network)
   {
     return;

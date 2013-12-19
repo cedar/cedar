@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/Data.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/PromotedExternalData.fwd.h"
 #include "cedar/processing/PromotedOwnedData.fwd.h"
@@ -73,7 +73,7 @@ public boost::enable_shared_from_this<cedar::proc::DataSlot>
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types

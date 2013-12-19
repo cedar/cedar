@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
@@ -73,7 +73,7 @@ void run_test()
   global_errors = 0;
 
   std::cout << "Reading network.json ... " << std::endl;
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   network->readJson("network.json");
   std::cout << "done." << std::endl;
 

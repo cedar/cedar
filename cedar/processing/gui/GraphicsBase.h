@@ -87,7 +87,7 @@ public:
   //!@brief group DATA ITEM
   const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 2;
   //!@brief group for NETWORK
-  const static GraphicsGroup GRAPHICS_GROUP_NETWORK = 1 << 3;
+  const static GraphicsGroup GRAPHICS_GROUP_GROUP = 1 << 3;
   //!@brief group UNKNOWN
   const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
 
