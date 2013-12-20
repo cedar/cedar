@@ -88,7 +88,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::sources::NetReader::NetReader()
 :
-cedar::proc::Step(false, true),
+cedar::proc::Step(true),
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // outputs
 mReader(),

@@ -240,15 +240,6 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
   }
 }
 
-void cedar::proc::Trigger::waitForProcessing()
-{
-  QReadLocker lock(&mpListenersLock);
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
-  {
-    this->mListeners.at(i)->waitForProcessing();
-  }
-}
-
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());

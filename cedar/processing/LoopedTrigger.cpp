@@ -97,7 +97,7 @@ cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std:
 :
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
-mWait(new cedar::aux::BoolParameter(this, "wait", true)),
+//mWait(new cedar::aux::BoolParameter(this, "wait", true)),
 mStarted(false)
 {
   // When the name changes, we need to tell the manager about this.
@@ -204,10 +204,4 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
     this->mListeners.at(i)->onTrigger(arguments, this_ptr);
   }
 //  this->trigger(arguments);
-
-  if (this->mWait->getValue())
-  {
-    // wait for all listeners
-    this->waitForProcessing();
-  }
 }
