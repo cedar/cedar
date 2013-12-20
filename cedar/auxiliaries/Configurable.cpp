@@ -157,9 +157,9 @@ void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType) co
   cedar::aux::lock(this->mParameterLocks, lockType);
 }
 
-void cedar::aux::Configurable::unlockParameters() const
+void cedar::aux::Configurable::unlockParameters(cedar::aux::LOCK_TYPE lockType) const
 {
-  cedar::aux::unlock(this->mParameterLocks);
+  cedar::aux::unlock(this->mParameterLocks, lockType);
 }
 
 void cedar::aux::Configurable::updateLockSet()

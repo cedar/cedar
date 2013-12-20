@@ -72,6 +72,28 @@ cedar::proc::DataSlot::~DataSlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::DataSlot::clear()
+{
+  this->clearInternal();
+}
+
+
+void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
+{
+  this->setDataInternal(data);
+
+  this->signalDataSet(data);
+  this->signalDataChanged();
+}
+
+void cedar::proc::DataSlot::removeData(cedar::aux::DataPtr data)
+{
+  this->removeDataInternal(data);
+
+  this->signalDataRemoved(data);
+  this->signalDataChanged();
+}
+
 void cedar::proc::DataSlot::setCheck(const TypeCheckFunction& check)
 {
   this->mTypeCheck = check;
@@ -123,7 +145,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
 void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
 {
   this->mValidity = validity;
-  this->mValidityChanged();
+  this->signalValidityChanged();
 }
 
 bool cedar::proc::DataSlot::isMandatory() const

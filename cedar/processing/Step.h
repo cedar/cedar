@@ -291,7 +291,7 @@ protected:
    *
    * @remarks Usually, this should only be called automatically.
    */
-  void unlock() const;
+  void unlock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
 
   void revalidateInputSlot(const std::string& slot);
 

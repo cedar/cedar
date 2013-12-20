@@ -138,10 +138,10 @@ void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
   this->lockParameters(parameterAccessType);
 }
 
-void cedar::proc::Step::unlock() const
+void cedar::proc::Step::unlock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
   this->mpConnectionLock->unlock();
-  this->unlockParameters();
+  this->unlockParameters(parameterAccessType);
   this->unlockData();
 }
 
@@ -378,7 +378,6 @@ void cedar::proc::Step::run()
       this->mBusy.unlock();
       return;
     } // this->mMandatoryConnectionsAreSet
-
 
     if (this->mLastComputeCall != 0)
     {

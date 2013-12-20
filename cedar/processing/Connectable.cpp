@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <boost/scoped_ptr.hpp>
 #include <string>
 #include <iostream>
 
@@ -90,8 +91,7 @@ void cedar::proc::Connectable::revalidateInputSlot(const std::string& slot)
   this->getInputValidity(slot);
 }
 
-//!@todo This should be called removeAllDataSlots
-void cedar::proc::Connectable::clearDataSlots()
+void cedar::proc::Connectable::removeAllDataSlots()
 {
   for (auto& slot_map_iter : this->mSlotMaps)
   {
@@ -260,9 +260,14 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   this->signalSlotRemoved(role, name);
 }
 
-bool cedar::proc::Connectable::hasSlot(DataRole::Id role, const std::string& name) const
+bool cedar::proc::Connectable::hasSlot(DataRole::Id role, const std::string& name, bool lock) const
 {
-  QReadLocker locker(this->mpConnectionLock);
+  boost::scoped_ptr<QReadLocker> locker;
+
+  if (lock)
+  {
+    locker.reset(new QReadLocker(this->mpConnectionLock));
+  }
 
   std::map<DataRole::Id, SlotMap>::const_iterator map_iter = this->mSlotMaps.find(role);
 
@@ -357,6 +362,22 @@ const cedar::proc::Connectable::SlotList& cedar::proc::Connectable::getOrderedDa
   return iter->second;
 }
 
+void cedar::proc::Connectable::callInputConnectionChangedFor(cedar::proc::DataSlotWeakPtr slot)
+{
+  if (auto slot_shared = slot.lock())
+  {
+    this->inputConnectionChanged(slot_shared->getName());
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Tried to call inputConnectionChanged on a slot that could no longer be locked.",
+      "cedar::proc::Connectable::callInputConnectionChangedFor(cedar::proc::DataSlotWeakPtr)"
+    );
+  }
+}
+
 /*! This is the default implementation of this function. The function, it does nothing!
  *  In your subclasses of cedar::proc::Connectable you may override this function to react to changes in the connected inputs
  *  of the Connectable. One common use for this method is to store a pointer to the new/changed data in the correct format,
@@ -387,9 +408,19 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::checkInputValidity
   }
 }
 
-//!@todo Give this method a better name: it doesn't just return the validity, it also re-determines it if necessary
-cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar::proc::DataSlotPtr slot)
+//!@todo Move this method to slot? (may need to use validityChanged signal)
+cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(cedar::proc::DataSlotWeakPtr slotWeak)
 {
+  cedar::proc::DataSlotPtr slot = slotWeak.lock();
+  if (!slot)
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Tried to update the validity of a slot that no longer exists.",
+      "cedar::proc::Connectable::updateInputValidity(cedar::proc::DataSlotWeakPtr)"
+    );
+  }
+
   // if the validty is indetermined (unknown), try to find it out
   if (slot->getValidity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
   {
@@ -480,7 +511,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
  */
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(const std::string& slotName)
 {
-  return this->getInputValidity(this->getSlot(cedar::proc::DataRole::INPUT, slotName));
+  return this->updateInputValidity(this->getInputSlot(slotName));
 }
 
 /*! This is the default implementation which always returns cedar::proc::DataSlot::VALIDITY_VALID. Override this
@@ -518,7 +549,7 @@ bool cedar::proc::Connectable::allInputsValid()
 
   for (SlotMap::iterator slot = slot_map.begin(); slot != slot_map.end(); ++slot)
   {
-    switch (this->getInputValidity(slot->second))
+    switch (this->updateInputValidity(slot->second))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         // If the input is invalid, push its name into the list of invalid inputs.
@@ -539,22 +570,21 @@ void cedar::proc::Connectable::checkMandatoryConnections()
   this->mMandatoryConnectionsAreSet = true;
   mMissingMandatoryConnections.clear();
   // then test every input. If one is false, return that.
-  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mSlotMaps.begin();
-       slot != this->mSlotMaps.end();
-       ++slot)
+  for (auto slot_id_pair : this->mSlotMaps)
   {
-    for (SlotMap::iterator iter = slot->second.begin();
-        iter != slot->second.end();
-         ++iter)
+    const auto& slot_map = slot_id_pair.second;
+    auto role = slot_id_pair.first;
+    for (auto name_slot_pair : slot_map)
     {
-      if (iter->second->isMandatory() && !iter->second->getData())
+      auto slot = name_slot_pair.second;
+      if (slot->isMandatory() && !slot->getData())
       {
         this->mMandatoryConnectionsAreSet = false;
         mMissingMandatoryConnections.push_back(
                                                 "slot type: "
-                                                + cedar::proc::DataRole::type().get(slot->first).name()
+                                                + cedar::proc::DataRole::type().get(role).name()
                                                 + " name: "
-                                                + iter->second->getName()
+                                                + slot->getName()
                                               );
       }
     }
@@ -595,7 +625,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
   {
     CEDAR_THROW(cedar::proc::DuplicateNameException, "There is already a " +
                  cedar::proc::DataRole::type().get(role).prettyString()
-                 + " data-declaration with the name " + name + ".");
+                 + " data-declaration with the name \"" + name + "\".");
   }
 
   // check the name
@@ -607,25 +637,98 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
   }
 
   cedar::proc::DataSlotPtr slot_ptr;
-  // finally, insert a new data slot with the given parameters
-  //!@todo Don't just connect for inputs; rather, use a unified interface
+  // create a new data slot with the given parameters
   if (role == cedar::proc::DataRole::INPUT)
   {
-    cedar::proc::ExternalDataPtr ext_slot_ptr(new cedar::proc::ExternalData(role, name, this, mandatory));
-    mSlotConnection
-      = ext_slot_ptr->connectToExternalDataChanged
-                      (
-                        boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
-                      );
-    slot_ptr = ext_slot_ptr;
+    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this, mandatory));
   }
   else
   {
     slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, isShared));
   }
+
   iter->second[name] = slot_ptr;
 
+  // insert the slot into the order list
   ordered_iter->second.push_back(slot_ptr);
+
+  // connect the appropriate signals
+  slot_ptr->connectToDataSetSignal
+  (
+    boost::bind
+    (
+      &cedar::proc::Connectable::dataAddedToSlot,
+      this,
+      role,
+      slot_ptr,
+      _1
+    )
+  );
+
+  //!@todo This seems sketchy .. what if there is more than one slot? Also, if this weren't solved like this, mSlotConnection should be a scoped_connection
+  mSlotConnection = slot_ptr->connectToDataChangedSignal
+                              (
+                                boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
+                              );
+
+  slot_ptr->connectToDataRemovedSignal
+  (
+    boost::bind
+    (
+      &cedar::proc::Connectable::removeLock,
+      this,
+      _1,
+      slot_ptr->getLockType(),
+      this->getLockSetForRole(role)
+    )
+  );
+
+  if (role == cedar::proc::DataRole::INPUT)
+  {
+
+    slot_ptr->connectToDataChangedSignal
+    (
+      boost::bind
+      (
+        &cedar::proc::Connectable::callInputConnectionChangedFor,
+        this,
+        slot_ptr
+      )
+    );
+
+    slot_ptr->connectToDataChangedSignal
+    (
+      boost::bind
+      (
+        &cedar::proc::Connectable::updateInputValidity,
+        this,
+        slot_ptr
+      )
+    );
+  }
+  else if (role == cedar::proc::DataRole::OUTPUT)
+  {
+    slot_ptr->connectToDataSetSignal
+    (
+      boost::bind
+      (
+        &cedar::proc::Connectable::updateTargetSlots,
+        this,
+        slot_ptr,
+        _1
+      )
+    );
+    slot_ptr->connectToDataRemovedSignal
+    (
+      boost::bind
+      (
+        &cedar::proc::Connectable::updateTargetSlots,
+        this,
+        slot_ptr,
+        _1
+      )
+    );
+  }
 
   // since the data has (potentially) changed, re-check the inputs
   this->checkMandatoryConnections();
@@ -648,7 +751,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareBuffer(const std::stri
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareOutput(const std::string& name, cedar::aux::DataPtr data)
 {
   // if you don't actually want to set data here, call a different function.
-  CEDAR_ASSERT(data.get() != NULL);
+  CEDAR_ASSERT(data);
 
   cedar::proc::DataSlotPtr slot = this->declareData(cedar::proc::DataRole::OUTPUT, name);
   this->setData(cedar::proc::DataRole::OUTPUT, name, data);
@@ -662,7 +765,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareSharedOutput
 )
 {
   // if you don't actually want to set data here, call a different function.
-  CEDAR_ASSERT(data.get() != NULL);
+  CEDAR_ASSERT(data);
 
   cedar::proc::DataSlotPtr slot = this->declareData(cedar::proc::DataRole::OUTPUT, name, true, true);
   this->setData(cedar::proc::DataRole::OUTPUT, name, data);
@@ -672,21 +775,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareSharedOutput
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
-  cedar::proc::DataSlotPtr slot = this->declareData(DataRole::INPUT, name, mandatory);
-
-  this->getInputSlot(name)->connectToExternalDataRemoved
-  (
-    boost::bind
-    (
-      &cedar::proc::Connectable::removeLock,
-      this,
-      _1,
-      cedar::aux::LOCK_TYPE_READ,
-      this->getLockSetForRole(DataRole::INPUT)
-    )
-  );
-
-  return slot;
+  return this->declareData(DataRole::INPUT, name, mandatory);
 }
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInputCollection(const std::string& name)
@@ -780,52 +869,38 @@ void cedar::proc::Connectable::removeLock
   this->cedar::aux::Lockable::removeLock(&data->getLock(), lockType, lockSet);
 }
 
+void cedar::proc::Connectable::dataAddedToSlot(DataRole::Id role, cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::ConstDataPtr data)
+{
+  // note: old data need not be removed from the lock sets here, that is done automatically via signals
+  auto slot = slotWeak.lock();
+  CEDAR_ASSERT(slot);
+
+  this->addLock(&data->getLock(), slot->getLockType(), this->getLockSetForRole(role));
+//  else
+//  {
+    //!@todo This will potentially cause trouble (in the shape of a deadlock) when called while locked.
+//    if (!cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(slot)->isShared())
+//    {
+//      this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
+//    }
+//    else
+//    {
+//      if (slot->getData())
+//      {
+//        auto lockset_handle = this->getLockSetForRole(role);
+//        auto lockset = this->getLocks(lockset_handle);
+//        for (auto iter = lockset.begin(); iter != lockset.end(); ++iter)
+//        {
+//          CEDAR_ASSERT(iter->first != &slot->getData()->getLock());
+//        }
+//      }
+//    }
+//  }
+}
+
 void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
 {
-  //!@todo This method should do nothing but call slot->setData(); everything else should happen via signals/slots.
-  QWriteLocker locker(this->mpConnectionLock);
-
-  cedar::proc::DataSlotPtr slot = this->getSlot(role, name);
-
-  // inputs come from a different Connectable
-  if (role == cedar::proc::DataRole::INPUT)
-  {
-    // no need to remove the old data from the lock set -- this is done via signals/slots
-    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_READ, this->getLockSetForRole(role));
-    slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
-  }
-  else
-  {
-    // remove old data from the lock set, if any
-    //!@todo This will potentially cause trouble (in the shape of a deadlock) when called while locked.
-    //!@todo Use signals/slots for this as well, as in the input case
-    if (!cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(slot)->isShared())
-    {
-      if (slot->getData())
-      {
-        this->removeLock(slot->getData(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
-      }
-      this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
-      data->setOwner(this);
-    }
-    else
-    {
-      if (slot->getData())
-      {
-        auto lockset_handle = this->getLockSetForRole(role);
-        auto lockset = this->getLocks(lockset_handle);
-        for (auto iter = lockset.begin(); iter != lockset.end(); ++iter)
-        {
-          CEDAR_ASSERT(iter->first != &slot->getData()->getLock());
-        }
-      }
-    }
-  }
-  slot->setData(data);
-
-  locker.unlock();
-
-  this->checkMandatoryConnections();
+  this->getSlot(role, name)->setData(data);
 }
 
 /*!
@@ -835,9 +910,6 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
 void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::INPUT, name, data);
-  this->inputConnectionChanged(name);
-  // update the validity of the input
-  this->getInputValidity(name);
 }
 
 void cedar::proc::Connectable::setBuffer(const std::string& name, cedar::aux::DataPtr data)
@@ -848,32 +920,39 @@ void cedar::proc::Connectable::setBuffer(const std::string& name, cedar::aux::Da
 void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::OUTPUT, name, data);
+}
 
+void cedar::proc::Connectable::updateTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data)
+{
   //!@todo May want to move connections into data slots rather than the networks; then this case would not be necessary any more
-  auto network = this->getGroup();
-  if (!network)
+  auto group = this->getGroup();
+  if (!group)
   {
     return;
   }
 
+  auto slot = slotWeak.lock();
+  CEDAR_ASSERT(slot);
+
   // Update the other end of connections
   //!@todo This should also happen via signals/slots
   std::vector<cedar::proc::DataConnectionPtr> connections;
-  network->getDataConnectionsFrom
+  group->getDataConnectionsFrom
   (
     boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
-    name,
+    slot->getName(),
     connections
   );
 
   for (size_t i = 0; i < connections.size(); ++i)
   {
     cedar::proc::DataConnectionPtr connection = connections.at(i);
+    //!@todo With signals & slots, now it should be possible to just call setData on the target slot
     connection->getTarget()->getParentPtr()->setInput(connection->getTarget()->getName(), data);
   }
 }
 
-void cedar::proc::Connectable::freeData(DataRole::Id role, cedar::aux::ConstDataPtr data, const std::string& name)
+void cedar::proc::Connectable::freeData(DataRole::Id role, cedar::aux::DataPtr data, const std::string& name)
 {
   QWriteLocker locker(this->mpConnectionLock);
 
@@ -885,25 +964,21 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, cedar::aux::ConstData
   locker.unlock();
 
   slot->removeData(data);
-
-  this->checkMandatoryConnections();
 }
 
-void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::ConstDataPtr data)
+void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->freeData(DataRole::INPUT, data, name);
-
-  this->inputConnectionChanged(name);
 }
 
 void cedar::proc::Connectable::freeBuffer(const std::string& name)
 {
-  this->freeData(DataRole::BUFFER, cedar::aux::ConstDataPtr(), name);
+  this->freeData(DataRole::BUFFER, cedar::aux::DataPtr(), name);
 }
 
 void cedar::proc::Connectable::freeOutput(const std::string& name)
 {
-  this->freeData(DataRole::OUTPUT, cedar::aux::ConstDataPtr(), name);
+  this->freeData(DataRole::OUTPUT, cedar::aux::DataPtr(), name);
 }
 
 cedar::aux::ConstDataPtr cedar::proc::Connectable::getInput(const std::string& name) const
@@ -923,12 +998,7 @@ cedar::aux::ConstDataPtr cedar::proc::Connectable::getOutput(const std::string& 
 
 cedar::aux::ConstDataPtr cedar::proc::Connectable::getData(DataRole::Id role, const std::string& name) const
 {
-  QReadLocker locker(this->mpConnectionLock);
-  // make a copy of the pointer
-  auto data = this->getSlot(role, name)->getData();
-
-  // return the pointer (locker is unlocked already)
-  return data;
+  return this->getSlot(role, name)->getData();
 }
 
 /*! This function parses strings of the form "connectableName.dataName" and separates the string into "connectableName" and
@@ -987,7 +1057,8 @@ void cedar::proc::Connectable::renameInput(const std::string& oldName, const std
 
 void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::string& slotName)
 {
-  if (this->hasOutputSlot(slotName))
+  // outputPropertiesChanged is emitted in contexts where the step is already lock; thus, don't lock in hasOutputSlot
+  if (this->hasOutputSlot(slotName, false))
   {
     this->signalOutputPropertiesChanged(this->getName() + "." + slotName);
   }

@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/OwnedData.h"
+#include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
@@ -70,19 +71,32 @@ cedar::proc::OwnedData::~OwnedData()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::OwnedData::removeData(cedar::aux::ConstDataPtr data)
+cedar::aux::LOCK_TYPE cedar::proc::OwnedData::getLockType() const
+{
+  if (this->isShared())
+  {
+    return cedar::aux::LOCK_TYPE_DONT_LOCK;
+  }
+  else
+  {
+    return cedar::aux::LOCK_TYPE_WRITE;
+  }
+}
+
+void cedar::proc::OwnedData::removeDataInternal(cedar::aux::DataPtr data)
 {
   // should always remove the data actually in this slot.
   CEDAR_NON_CRITICAL_ASSERT(this->mData == data);
-  this->clear();
-}
-
-void cedar::proc::OwnedData::clear()
-{
   this->mData.reset();
+  data->setOwner(NULL);
 }
 
-void cedar::proc::OwnedData::setData(cedar::aux::DataPtr data)
+void cedar::proc::OwnedData::clearInternal()
+{
+  this->removeData(this->mData);
+}
+
+void cedar::proc::OwnedData::setDataInternal(cedar::aux::DataPtr data)
 {
   CEDAR_DEBUG_ASSERT(data);
   // reset validity when the data changes.
@@ -91,7 +105,15 @@ void cedar::proc::OwnedData::setData(cedar::aux::DataPtr data)
     this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   }
 
+  if (this->mData)
+  {
+    this->removeData(this->mData);
+  }
+
   this->mData = data;
+
+  CEDAR_DEBUG_ASSERT(this->mpParent != NULL);
+  this->mData->setOwner(this->mpParent);
 }
 
 cedar::aux::DataPtr cedar::proc::OwnedData::getData()
