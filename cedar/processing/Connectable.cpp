@@ -175,58 +175,21 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   // first, disconnect all connections from the slot
   if (this->getGroup())
   {
-    //!@todo Can the two methods below be unified into a single disconnectSlot(role, ...) method in Group?
-    switch (role)
-    {
-      case cedar::proc::DataRole::INPUT:
-        this->getGroup()->disconnectInputSlot
-                            (
-                              boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
-                            );
-        break;
-
-      case cedar::proc::DataRole::OUTPUT:
-        this->getGroup()->disconnectOutputSlot
-                            (
-                              boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
-                            );
-        break;
-
-      default:
-        // nothing to do for other types
-        break;
-    }
+    this->getGroup()->disconnectSlot
+                      (
+                        role,
+                        boost::static_pointer_cast<Connectable>(this->shared_from_this()),
+                        slot->getName()
+                      );
   }
 
   // then, actually remove the slot
   QWriteLocker locker(this->mpConnectionLock);
   slot_map.erase(slot_map_iter);
 
-  // remove the slot's data from the lock set (if any)
-  // (don't do this for data that is just shared)
-  bool not_shared = true;
-  if
-  (
-    boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot)
-      && boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot)->isShared()
-  )
+  if (slot->getData())
   {
-    not_shared = false;
-  }
-  //!@todo Can this be solved via signals/slots in dataSlot?
-  if (slot->getData() && not_shared)
-  {
-    cedar::aux::LOCK_TYPE lock_type;
-    switch (role)
-    {
-      case cedar::proc::DataRole::INPUT:
-        lock_type = cedar::aux::LOCK_TYPE_READ;
-        break;
-
-      default:
-        lock_type = cedar::aux::LOCK_TYPE_WRITE;
-    }
-    this->removeLock(slot->getData(), lock_type, this->getLockSetForRole(role));
+    this->removeLock(slot->getData(), slot->getLockType(), this->getLockSetForRole(role));
   }
 
   // also delete the slot from the ordered list of slots
@@ -876,26 +839,6 @@ void cedar::proc::Connectable::dataAddedToSlot(DataRole::Id role, cedar::proc::D
   CEDAR_ASSERT(slot);
 
   this->addLock(&data->getLock(), slot->getLockType(), this->getLockSetForRole(role));
-//  else
-//  {
-    //!@todo This will potentially cause trouble (in the shape of a deadlock) when called while locked.
-//    if (!cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>(slot)->isShared())
-//    {
-//      this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
-//    }
-//    else
-//    {
-//      if (slot->getData())
-//      {
-//        auto lockset_handle = this->getLockSetForRole(role);
-//        auto lockset = this->getLocks(lockset_handle);
-//        for (auto iter = lockset.begin(); iter != lockset.end(); ++iter)
-//        {
-//          CEDAR_ASSERT(iter->first != &slot->getData()->getLock());
-//        }
-//      }
-//    }
-//  }
 }
 
 void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
@@ -935,7 +878,6 @@ void cedar::proc::Connectable::updateTargetSlots(cedar::proc::DataSlotWeakPtr sl
   CEDAR_ASSERT(slot);
 
   // Update the other end of connections
-  //!@todo This should also happen via signals/slots
   std::vector<cedar::proc::DataConnectionPtr> connections;
   group->getDataConnectionsFrom
   (
@@ -947,7 +889,6 @@ void cedar::proc::Connectable::updateTargetSlots(cedar::proc::DataSlotWeakPtr sl
   for (size_t i = 0; i < connections.size(); ++i)
   {
     cedar::proc::DataConnectionPtr connection = connections.at(i);
-    //!@todo With signals & slots, now it should be possible to just call setData on the target slot
     connection->getTarget()->getParentPtr()->setInput(connection->getTarget()->getName(), data);
   }
 }

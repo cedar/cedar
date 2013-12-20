@@ -311,6 +311,14 @@ public:
    */
   void disconnectSlots(const std::vector<cedar::proc::DataConnectionPtr>& connections);
 
+  /*!@brief Deletes all connections to the given data slot.
+   *
+   * @param role Role of the slot  (input, output etc.)
+   * @param connectable The slot's parent.
+   * @param slot Identifier of the data slot.
+   */
+  void disconnectSlot(cedar::proc::DataRole::Id role, cedar::proc::ConnectablePtr connectable, const std::string& slot);
+
   /*!@brief Deletes all connections from a given data slot.
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
@@ -325,10 +333,10 @@ public:
    */
   //void disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
-    /*!@brief Deletes all connections to the given data slot.
-     * @param connectable The slot's parent.
-     * @param slot Identifier of the data slot.
-     */
+  /*!@brief Deletes all connections to the given data slot.
+   * @param connectable The slot's parent.
+   * @param slot Identifier of the data slot.
+   */
   void disconnectInputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes the connection between source and target.
