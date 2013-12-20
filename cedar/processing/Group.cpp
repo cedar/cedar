@@ -1053,18 +1053,39 @@ void cedar::proc::Group::disconnectSlots(const std::vector<cedar::proc::DataConn
   }
 }
 
-void cedar::proc::Group::disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
+void cedar::proc::Group::disconnectSlot
+(
+  cedar::proc::DataRole::Id role,
+  cedar::proc::ConnectablePtr connectable,
+  const std::string& slot
+)
 {
   std::vector<cedar::proc::DataConnectionPtr> connections;
-  this->getDataConnectionsFrom(connectable, slot, connections);
+  switch (role)
+  {
+    case cedar::proc::DataRole::INPUT:
+      this->getDataConnectionsTo(connectable, slot, connections);
+      break;
+
+    case cedar::proc::DataRole::OUTPUT:
+      this->getDataConnectionsFrom(connectable, slot, connections);
+      break;
+
+    case cedar::proc::DataRole::BUFFER:
+      // nothing to do: buffers have no connections
+      return;
+  }
   this->disconnectSlots(connections);
+}
+
+void cedar::proc::Group::disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
+{
+  this->disconnectSlot(cedar::proc::DataRole::OUTPUT, connectable, slot);
 }
 
 void cedar::proc::Group::disconnectInputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
 {
-  std::vector<cedar::proc::DataConnectionPtr> connections;
-  this->getDataConnectionsTo(connectable, slot, connections);
-  this->disconnectSlots(connections);
+  this->disconnectSlot(cedar::proc::DataRole::INPUT, connectable, slot);
 }
 
 void cedar::proc::Group::disconnectSlots(const std::string& source, const std::string& target)
