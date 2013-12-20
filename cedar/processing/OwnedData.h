@@ -72,8 +72,9 @@ public:
 
   cedar::aux::ConstDataPtr getData() const;
 
-
   bool isShared() const;
+
+  cedar::aux::LOCK_TYPE getLockType() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,7 +90,7 @@ private:
 
   void setDataInternal(cedar::aux::DataPtr data);
 
-  void removeDataInternal(cedar::aux::ConstDataPtr data);
+  void removeDataInternal(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
