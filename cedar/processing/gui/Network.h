@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_GROUP_H
-#define CEDAR_PROC_GUI_GROUP_H
+#ifndef CEDAR_PROC_GUI_NETWORK_H
+#define CEDAR_PROC_GUI_NETWORK_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,4 +55,4 @@
 #warning cedar::proc::gui::Network was renamed to cedar::proc::gui::Group. Please include Group.h instead of this header.
 #include "cedar/processing/gui/Group.h"
 
-#endif // CEDAR_PROC_GUI_GROUP_H
+#endif // CEDAR_PROC_GUI_NETWORK_H
