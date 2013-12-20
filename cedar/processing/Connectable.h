@@ -151,7 +151,7 @@ public:
   void setInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Removes a connection to another Connectable's output.
-  void freeInput(const std::string& name, cedar::aux::ConstDataPtr data);
+  void freeInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Returns a specific data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getData(DataRole::Id role, const std::string& name) const;
@@ -164,7 +164,7 @@ public:
    *
    *  @param slot the slot that needs checking, specified via its smart pointer.
    */
-  cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
+  cedar::proc::DataSlot::VALIDITY updateInputValidity(cedar::proc::DataSlotWeakPtr slot);
 
   //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slotName);
@@ -269,21 +269,21 @@ protected:
   void renameInput(const std::string& oldName, const std::string& newName);
 
   //! does this input slot exist?
-  inline bool hasInputSlot(const std::string& name)
+  inline bool hasInputSlot(const std::string& name, bool lock = true)
   {
-    return this->hasSlot(DataRole::INPUT, name);
+    return this->hasSlot(DataRole::INPUT, name, lock);
   }
 
   //! does this buffer exist?
-  inline bool hasBufferSlot(const std::string& name)
+  inline bool hasBufferSlot(const std::string& name, bool lock = true)
   {
-    return this->hasSlot(DataRole::BUFFER, name);
+    return this->hasSlot(DataRole::BUFFER, name, lock);
   }
 
   //! does this output slot exist?
-  inline bool hasOutputSlot(const std::string& name)
+  inline bool hasOutputSlot(const std::string& name, bool lock = true)
   {
-    return this->hasSlot(DataRole::OUTPUT, name);
+    return this->hasSlot(DataRole::OUTPUT, name, lock);
   }
 
   /*!@brief   Sets the isCollection member of the corresponding data slot to the given value.
@@ -362,7 +362,7 @@ protected:
 
   /*!@brief Removes all declared data slots.
    */
-  void clearDataSlots();
+  void removeAllDataSlots();
 
   /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
    *        changed.
@@ -376,11 +376,15 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void updateTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data);
+
+  void dataAddedToSlot(DataRole::Id role, cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::ConstDataPtr data);
+
   //!@brief Removes a slot from the connectable.
   void removeSlot(DataRole::Id role, const std::string& name);
 
   //!@brief Checks if the connectable has a slot with the given role and name.
-  bool hasSlot(DataRole::Id role, const std::string& name) const;
+  bool hasSlot(DataRole::Id role, const std::string& name, bool lock = true) const;
 
   //! Renames a slot.
   void renameSlot(DataRole::Id role, const std::string& oldName, const std::string& newName);
@@ -400,7 +404,7 @@ private:
 
   /*!@brief Sets the data pointer of the slot with the given name and role to zero.
    */
-  void freeData(DataRole::Id role, cedar::aux::ConstDataPtr data, const std::string& name);
+  void freeData(DataRole::Id role, cedar::aux::DataPtr data, const std::string& name);
 
   /*!@brief (Re-)Checks that all mandatory connections are actually set to non-zero data.
    *
@@ -455,6 +459,8 @@ private:
   //! Returns an iterator to the slot. Throws if the slot is not found.
   SlotMap::const_iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name) const;
 
+  void callInputConnectionChangedFor(cedar::proc::DataSlotWeakPtr slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
   //--------------------------------------------------------------------------------------------------------------------
@@ -467,7 +473,7 @@ public:
 
 private:
   //!@brief a connection to a signal emitted by an external data slot
-  boost::signals2::scoped_connection mSlotConnection;
+  boost::signals2::connection mSlotConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

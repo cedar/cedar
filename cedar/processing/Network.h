@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        threadingUtilities.h
+    File:        Network.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 08
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 19
 
     Description:
 
@@ -34,30 +38,21 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_LOCK_TYPE_H
-#define CEDAR_AUX_LOCK_TYPE_H
+#ifndef CEDAR_PROC_NETWORK_H
+#define CEDAR_PROC_NETWORK_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
-#include <set>
-#include <QReadWriteLock>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-namespace cedar
-{
-  namespace aux
-  {
-    //!@brief the role of a lock (either READ lock or WRITE lock)
-    enum LOCK_TYPE
-    {
-      //! The lock should be locked for reading
-      LOCK_TYPE_READ,
-      //! The lock should be locked for writing
-      LOCK_TYPE_WRITE,
-      //! The lock is ignored.
-      LOCK_TYPE_DONT_LOCK
-    };
-  }
-}
+#warning cedar::proc::Network was renamed to cedar::proc::Group. Please include Group.h instead of this header.
+#include "cedar/processing/Group.h"
 
-#endif // CEDAR_AUX_LOCK_TYPE_H
+#endif // CEDAR_PROC_GROUP_H
