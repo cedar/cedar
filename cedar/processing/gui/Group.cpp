@@ -184,10 +184,6 @@ cedar::proc::gui::Group::~Group()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-//  if (mSlotConnection.connected())
-//  {
-//    mSlotConnection.disconnect();
-//  }
   if (mNewElementAddedConnection.connected())
   {
     mNewElementAddedConnection.disconnect();

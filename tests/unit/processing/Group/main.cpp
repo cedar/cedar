@@ -293,6 +293,28 @@ int main(int /* argc */, char** /* argv */)
   network_connector->add(list);
   network_root->add(list);
 
+  // test the 'connect across groups' functionality
+  cedar::proc::GroupPtr network_base(new cedar::proc::Group());
+  network_base->setName("root");
+  cedar::proc::GroupPtr network_left(new cedar::proc::Group());
+  network_left->setName("left");
+  network_base->add(network_left);
+  cedar::proc::GroupPtr network_right(new cedar::proc::Group());
+  network_right->setName("right");
+  network_base->add(network_right);
+  cedar::proc::steps::StaticGainPtr gain_left(new cedar::proc::steps::StaticGain());
+  network_left->add(gain_left, "left");
+  cedar::proc::steps::StaticGainPtr gain_right(new cedar::proc::steps::StaticGain());
+  network_left->add(gain_right, "right");
+  cedar::proc::DataSlotPtr output_slot = gain_left->getOutputSlot("output");
+  cedar::proc::DataSlotPtr input_slot = gain_right->getInputSlot("input");
+  network_left->connectSlots(output_slot, input_slot);
+  to_move.clear();
+  to_move.push_back(gain_right);
+  network_right->add(to_move);
+  network_left->add(to_move);
+  network_left->disconnectSlots(output_slot, input_slot);
+
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
