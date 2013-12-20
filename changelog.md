@@ -79,6 +79,8 @@ Unreleased
   - There is now a command line parser available. This is intended to make software that performs experiments easy to
     customize; it features auto-generated help texts, reading and writing of options to file and some sanity checking of
     user inputs. It is still being developed.
+- cedar::proc
+  - Step can no longer be executed in a separate thread (nobody uses this functionality).
 
 Released versions
 =================

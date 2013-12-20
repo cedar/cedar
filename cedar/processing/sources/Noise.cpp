@@ -79,7 +79,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::sources::Noise::Noise()
 :
-cedar::proc::Step(false, true),
+cedar::proc::Step(true),
 mRandomMatrix(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 4)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
