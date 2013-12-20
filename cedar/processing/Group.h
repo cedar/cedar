@@ -56,6 +56,7 @@
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/TriggerConnection.fwd.h"
+#include "cedar/processing/GroupFileFormatV1.fwd.h"
 #include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 #include "cedar/processing/sinks/GroupSink.fwd.h"
 
@@ -83,6 +84,8 @@
 class cedar::proc::Group : public QThread, public cedar::proc::Connectable, public cedar::proc::Triggerable
 {
   Q_OBJECT
+
+  friend class cedar::proc::GroupFileFormatV1;
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -507,58 +510,6 @@ private:
     const cedar::aux::ConfigurationNode& root,
     std::vector<std::string>& exceptions
   );
-
-  /*!@brief Reads the group from a configuration node using the first version of the format.
-   */
-  void readFromV1(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
-
-  /*!@brief Writes the meta data to the configuration.
-   */
-  void writeMetaData(cedar::aux::ConfigurationNode& root) const;
-
-  /*!@brief Reads steps from the configuration node and adds them to the group.
-   */
-  void readSteps(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
-
-  /*!@brief Writes the steps in the group to the configuration node.
-   */
-  void writeSteps(cedar::aux::ConfigurationNode& root) const;
-
-  /*!@brief Reads triggers from a configuration node and adds them to the group.
-   */
-  void readTriggers(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
-
-  /*!@brief Writes the triggers in the group to the configuration node.
-   */
-  void writeTriggers(cedar::aux::ConfigurationNode& root) const;
-
-  /*!@brief Writes the steps that are registered in the recorder in the group to the configuration node.
-   */
-  void writeRecords(cedar::aux::ConfigurationNode& root) const;
-
-  /*!@brief Reads the slots that should be registered in the recorder.
-  */
-  void readRecords(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
-
-  /*!@brief Reads groups from a configuration node and adds them to the parent group.
-   */
-  void readGroups(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
-
-  /*!@brief Writes the child groups in the group to the configuration node.
-   */
-  void writeGroups(cedar::aux::ConfigurationNode& root) const;
-
-  /*!@brief Writes a data connection to the configuration node.
-   */
-  void writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection) const;
-
-  /*!@brief Reads data connections from a configuration node and adds them to the group.
-   */
-  void readDataConnections(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
-
-  /*!@brief Writes the data connections in the group to the configuration node.
-   */
-  void writeDataConnections(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
    * @returns return the next iterator
