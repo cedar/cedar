@@ -658,6 +658,7 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
         }
       }
     }
+    //!@todo this code is copy&paste, try to unify
     else // old and new group have a common parent, try to find it
     {
       // this should never be root, but just in case!
@@ -668,6 +669,50 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
         // this should never be root, but just in case!
         CEDAR_ASSERT(!common_parent->isRoot());
         common_parent = common_parent->getGroup();
+      }
+      std::vector<DataConnectionPtr> slots_deleted_later;
+      for (auto connection : old_group->mDataConnections)
+      {
+        // find connections that we have to restore after moving elements
+        cedar::proc::ElementPtr source = old_group->getElement<cedar::proc::Element>(connection->getSource()->getParent());
+        cedar::proc::ElementPtr target = old_group->getElement<cedar::proc::Element>(connection->getTarget()->getParent());
+        auto source_it = std::find(elements.begin(), elements.end(), source);
+        auto target_it = std::find(elements.begin(), elements.end(), target);
+
+        cedar::proc::DataSlotPtr source_slot = connection->getSource();
+        std::vector<cedar::proc::DataSlotPtr> target_slots;
+
+        // these connections connect elements that are moved
+        if (source_it != elements.end() || target_it != elements.end())
+        {
+          // this connection must be stored (note that connections are automatically deleted if elements are removed)
+          if (source_it == elements.end())
+          {
+            source_slot = old_group->getRealSource
+                                     (
+                                       connection->getTarget(),
+                                       boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this())
+                                     );
+            target_slots.push_back(connection->getTarget());
+          }
+          else if (target_it == elements.end())
+          {
+            auto more_slots = old_group->getRealTargets
+                                         (
+                                           connection->getSource(),
+                                           boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this())
+                                         );
+            target_slots.insert(target_slots.end(), more_slots.begin(), more_slots.end());
+          }
+          else
+          {
+            target_slots.push_back(connection->getTarget());
+          }
+          for (unsigned i = 0; i < target_slots.size(); ++i)
+          {
+            data_connections.push_back(DataConnectionInfo(source_slot, target_slots.at(i)));
+          }
+        }
       }
     }
   }
@@ -2268,7 +2313,14 @@ void cedar::proc::Group::connectAcrossGroups(cedar::proc::DataSlotPtr source, ce
   }
   else // connection going through shared parent
   {
-    ;
+    std::string connector_name = target_group->getUniqueIdentifier("external input");
+    target_group->addConnector(connector_name, true);
+    target_group->connectSlots
+                  (
+                    target_group->getElement<cedar::proc::Connectable>(connector_name)->getOutputSlot("output"),
+                    target
+                  );
+    cedar::proc::Group::connectAcrossGroups(source, target_group->getInputSlot(connector_name));
   }
 }
 
