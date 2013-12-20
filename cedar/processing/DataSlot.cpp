@@ -86,7 +86,7 @@ void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
   this->signalDataChanged();
 }
 
-void cedar::proc::DataSlot::removeData(cedar::aux::ConstDataPtr data)
+void cedar::proc::DataSlot::removeData(cedar::aux::DataPtr data)
 {
   this->removeDataInternal(data);
 

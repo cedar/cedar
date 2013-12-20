@@ -199,7 +199,7 @@ void test_step(cedar::proc::GroupPtr network, TriggerTestPtr step)
   step->mDataOut->setData(1);
 
   // trigger step; this should propagate all of its data to the subsequent steps
-  std::cout << "Triggering step." << std::endl;
+  std::cout << "Triggering step " << step->getName() << std::endl;
   step->onTrigger();
 
   // check all triggered steps for being up-to-date (they should be after being triggered.

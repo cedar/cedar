@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/DataRole.h"
+#include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
@@ -182,6 +183,9 @@ public:
    */
   cedar::proc::DataSlot::VALIDITY checkValidityOf(cedar::aux::ConstDataPtr data) const;
 
+  //! Returns the lock type for this data slot.
+  virtual cedar::aux::LOCK_TYPE getLockType() const = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------
@@ -190,9 +194,9 @@ public:
 public:
   CEDAR_DECLARE_SIGNAL(DataChanged, void());
 public:
-  CEDAR_DECLARE_SIGNAL(DataSet, void(cedar::aux::ConstDataPtr data));
+  CEDAR_DECLARE_SIGNAL(DataSet, void(cedar::aux::DataPtr data));
 public:
-  CEDAR_DECLARE_SIGNAL(DataRemoved, void(cedar::aux::ConstDataPtr data));
+  CEDAR_DECLARE_SIGNAL(DataRemoved, void(cedar::aux::DataPtr data));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -202,7 +206,7 @@ protected:
   void setData(cedar::aux::DataPtr data);
 
   //! Remove the DataPtr from this slot. Child classes decide how to handle this.
-  void removeData(cedar::aux::ConstDataPtr data);
+  void removeData(cedar::aux::DataPtr data);
 
   //! Clears all data in the slot.
   void clear();
@@ -214,13 +218,13 @@ protected:
   }
 
   //! Emits the DataAdded signal.
-  void emitDataSet(cedar::aux::ConstDataPtr data)
+  void emitDataSet(cedar::aux::DataPtr data)
   {
     this->signalDataSet(data);
   }
 
   //! Emits the DataRemoved signal.
-  void emitDataRemoved(cedar::aux::ConstDataPtr data)
+  void emitDataRemoved(cedar::aux::DataPtr data)
   {
     this->signalDataRemoved(data);
   }
@@ -245,7 +249,7 @@ private:
   virtual void setDataInternal(cedar::aux::DataPtr data) = 0;
 
   //! To be overridden by child classes.
-  virtual void removeDataInternal(cedar::aux::ConstDataPtr data) = 0;
+  virtual void removeDataInternal(cedar::aux::DataPtr data) = 0;
 
   //!@brief Removes all data from the slot.
   virtual void clearInternal() = 0;

@@ -65,6 +65,11 @@ cedar::proc::ExternalData::~ExternalData()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::LOCK_TYPE cedar::proc::ExternalData::getLockType() const
+{
+  return cedar::aux::LOCK_TYPE_READ;
+}
+
 void cedar::proc::ExternalData::setCollection(bool isCollection)
 {
   CEDAR_ASSERT(this->getRole() == cedar::proc::DataRole::INPUT);
@@ -106,7 +111,7 @@ void cedar::proc::ExternalData::clearInternal()
   }
 }
 
-void cedar::proc::ExternalData::removeDataInternal(cedar::aux::ConstDataPtr data)
+void cedar::proc::ExternalData::removeDataInternal(cedar::aux::DataPtr data)
 {
   CEDAR_DEBUG_ASSERT(data);
   // Find the data entry.
@@ -161,6 +166,7 @@ void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data)
   {
     this->setDataInternal(data, 0);
   }
+  this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
 }
 
 void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data, unsigned int index)

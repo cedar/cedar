@@ -129,6 +129,8 @@ public:
    */
   void clearInternal();
 
+  cedar::aux::LOCK_TYPE getLockType() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -157,7 +159,7 @@ private:
 
   /*!@brief   Removes the data pointer from the slot's collection.
    */
-  void removeDataInternal(cedar::aux::ConstDataPtr data);
+  void removeDataInternal(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
