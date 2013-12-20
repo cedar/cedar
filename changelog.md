@@ -79,6 +79,9 @@ Unreleased
   - There is now a command line parser available. This is intended to make software that performs experiments easy to
     customize; it features auto-generated help texts, reading and writing of options to file and some sanity checking of
     user inputs. It is still being developed.
+- cedar::proc
+  - Groups now work as intended: one can freely move elements between groups, existing connections are preserved, using 
+    group connectors if necessary. In the gui, grouping is drag-and-drop-based.
 
 Released versions
 =================

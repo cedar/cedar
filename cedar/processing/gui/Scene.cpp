@@ -736,7 +736,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   QMenu menu;
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
-  QAction *p_reset = menu.addAction("reset group");
+  QAction *p_reset = menu.addAction("reset architecture");
 
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
 
