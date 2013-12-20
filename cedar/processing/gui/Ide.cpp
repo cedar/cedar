@@ -483,7 +483,6 @@ void cedar::proc::gui::Ide::architectureToolFinished()
 void cedar::proc::gui::Ide::resetStepList()
 {
   //!@todo This should become its own widget
-  using cedar::proc::Manager;
 
   std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
   for (auto iter = categories.begin(); iter != categories.end(); ++iter)

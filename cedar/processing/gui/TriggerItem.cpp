@@ -45,7 +45,6 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"

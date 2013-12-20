@@ -48,7 +48,6 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
-#include "cedar/processing/Manager.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -69,7 +68,6 @@ class cedar::proc::Trigger : public cedar::proc::Element,
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Manager;
   friend class cedar::proc::Group;
   friend class cedar::proc::TriggerConnection;
   friend class cedar::proc::Triggerable;

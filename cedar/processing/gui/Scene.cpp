@@ -131,7 +131,6 @@ void cedar::proc::gui::Scene::setRecorderWidget(cedar::proc::gui::RecorderWidget
 void cedar::proc::gui::Scene::itemSelected()
 {
   using cedar::proc::Step;
-  using cedar::proc::Manager;
 
   // either show the resize handles if only one item is selected, or hide them if more than one is selected
   auto selected_items = this->selectedItems();

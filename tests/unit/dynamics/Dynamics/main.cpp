@@ -68,7 +68,6 @@ unsigned int global_errors;
 void run_test()
 {
   using cedar::proc::LoopedTrigger;
-  using cedar::proc::Manager;
 
   global_errors = 0;
 
