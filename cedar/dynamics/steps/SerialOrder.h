@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/dynamics/steps/SerialOrder.fwd.h"
