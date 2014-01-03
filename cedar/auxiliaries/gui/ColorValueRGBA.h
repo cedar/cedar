@@ -49,7 +49,7 @@
 
 
 //!@brief A color value in RGBA (red, green, blue, alpha).
-struct cedar::aux::gui::ColorValueRGBA
+class cedar::aux::gui::ColorValueRGBA
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructor
