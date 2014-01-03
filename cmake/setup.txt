@@ -115,7 +115,10 @@ if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
   add_definitions(-std=gnu++0x)
 elseif (MSVC)
-  add_definitions(-W2 -D_SCL_SECURE_NO_WARNINGS)
+  add_definitions(-W2
+                  -D_SCL_SECURE_NO_WARNINGS
+                  -wd4250 # disable warning about inheritance working as expected
+                  )
   # Allow sorting projects into subfodlers (to make solutions more usable)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif (CMAKE_COMPILER_IS_GNUCC)
