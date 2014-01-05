@@ -61,6 +61,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 
@@ -97,7 +98,27 @@ namespace
     (
       "A grouping element for steps."
     );
-    network_decl->declare();
+	network_decl->declare();
+
+#ifdef CEDAR_COMPILER_MSVC
+	// on windows/MSVC, the dynamics dll is not linked because it is unused. This code loads the library manually.
+	{
+    HMODULE module_handle = LoadLibrary("cedardyn"
+#ifdef _DEBUG // in debug builds, the library is called cedardynd.dll; ".dll" is automatically appended
+      "d"
+#endif // _DEBUG
+      );
+    if (module_handle == NULL)
+    {
+      std::string error_message = cedar::aux::PluginProxy::getLastError();
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Failed to load dynamics library. You may be missing some processing steps. Windows says: \"" + error_message + "\".",
+        "cedar/processing/Network.cpp : declare()"
+      );
+    }
+	}
+#endif // CEDAR_COMPILER_MSVC
 
     return true;
   }
