@@ -852,6 +852,9 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
     auto p_dialog = new cedar::aux::gui::ExceptionDialog();
     p_dialog->displayCedarException(e);
     p_dialog->exec();
+
+    // when an exception was thrown, return NULL
+    return cedar::proc::ElementPtr();
   }
 
   return this->mNetwork->getNetwork()->getElement(adjusted_name);
