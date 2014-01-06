@@ -1,0 +1,20 @@
+/*!
+
+@page BoostSignalsWrapper cedar's boost::signals helpers
+
+cedar ships with a header that makes the use of boost signals and slots in classes a little easier. The header
+cedar/auxiliaries/boostSignalsHelper defines a macro that automatically generates code for boost signals.
+
+To declare a signal that takes three arguments and returns a bool, write
+@code
+public: // note, that this is important! Due to the way the macro is defined, everything after it is private.
+  CEDAR_DECLARE_SIGNAL(YourSignalName, bool (int, double, string));
+@endcode
+
+To emit this signal, write
+@code
+  this->signalYourSignalName(1, 2.0, "3");
+@endcode
+anywhere within the class.
+
+*/
