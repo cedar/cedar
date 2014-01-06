@@ -213,6 +213,7 @@ void cedar::proc::Step::callAction(const std::string& name)
   if (autolock)
   {
     // lock the step
+    //!@todo Should this be a read lock?
     this->lock(cedar::aux::LOCK_TYPE_WRITE);
   }
 
@@ -534,46 +535,6 @@ void cedar::proc::Step::setThreaded(bool /*isThreaded*/)
 {
   // does nothing
 }
-
-/*!
- * @returns True, if the arguments were set successfully, false otherwise.
- *
- * @remarks The function returns false only if arguments have previously been set that were not yet processed by the
- *          run function.
- */
-//bool cedar::proc::Step::setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent)
-//{
-//  // first, check if new arguments have already been set.
-//  {
-//    QReadLocker arg_lock(mpArgumentsLock);
-//    if (this->isRunning())
-//    {
-//      return false;
-//    }
-//    else
-//    {
-//      if (this->mBusy.tryLock())
-//      {
-//        if (this->mNextArguments)
-//        {
-//          this->mBusy.unlock();
-//          return false;
-//        }
-//      }
-//      else
-//      {
-//        return false;
-//      }
-//    }
-//  }
-//
-//  QWriteLocker arg_lock(mpArgumentsLock);
-//  this->mNextArguments = arguments;
-//  this->mTriggerSubsequent = triggerSubsequent;
-//  arg_lock.unlock();
-//  this->mBusy.unlock();
-//  return true;
-//}
 
 bool cedar::proc::Step::isThreaded() const
 {

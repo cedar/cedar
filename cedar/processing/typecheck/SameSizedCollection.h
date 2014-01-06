@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,54 +22,52 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ComponentMultiply.h
+    File:        SameSizedCollection.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 12 22
+    Date:        2014 01 06
 
-    Description:
+    Description: Header file for the class cedar::proc::typecheck::SameSizedCollection.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_COMPONENT_MULTIPLY_H
-#define CEDAR_PROC_STEPS_COMPONENT_MULTIPLY_H
+#ifndef CEDAR_PROC_TYPECHECK_SAME_SIZED_COLLECTION_H
+#define CEDAR_PROC_TYPECHECK_SAME_SIZED_COLLECTION_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/DataTemplate.h"
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/typecheck/TypeCheck.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/processing/steps/ComponentMultiply.fwd.h"
+#include "cedar/processing/typecheck/SameSizedCollection.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief A class that multiplies two matrices component-wise.
+/*!@breif Type check for a slot that is a collection of matrices of the same size.
  */
-class cedar::proc::steps::ComponentMultiply : public cedar::proc::Step
+class cedar::proc::typecheck::SameSizedCollection : public cedar::proc::typecheck::TypeCheck
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  ComponentMultiply();
+  SameSizedCollection(bool allow0D = false);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void inputConnectionChanged(const std::string& inputName);
+  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -81,27 +79,17 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  cedar::aux::MatDataPtr mOutput;
-  cedar::proc::ExternalDataPtr mInputs;
+  bool mAllow0D;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // class cedar::proc::typecheck::SameSizedCollection
 
-private:
-  cedar::aux::EnumParameterPtr _mOutputMatrixType;
+#endif // CEDAR_PROC_TYPECHECK_SAME_SIZED_COLLECTION_H
 
-}; // class cedar::proc::steps::ComponentMultiply
-
-#endif // CEDAR_PROC_STEPS_COMPONENT_MULTIPLY_H
