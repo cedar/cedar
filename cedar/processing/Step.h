@@ -357,12 +357,6 @@ private:
   //!@brief flag that states if step is still computing its latest output
   mutable QMutex mBusy;
 
-  //!@brief The arguments for the next cedar::proc::Step::compute call.
-  ConstArgumentsPtr mNextArguments;
-
-  //! Whether or not subseqent steps should be triggered after the next arguments have been processed.
-  bool mTriggerSubsequent;
-
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 

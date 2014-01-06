@@ -77,7 +77,6 @@ cedar::proc::Step::Step(bool /*runInThread*/, bool isLooped)
 :
 Triggerable(isLooped),
 // initialize members
-mTriggerSubsequent(true),
 // average the last 100 iteration times
 mMovingAverageIterationTime(100),
 // average the last 100 iteration times
@@ -100,7 +99,6 @@ cedar::proc::Step::Step(bool isLooped)
 :
 Triggerable(isLooped),
 // initialize members
-mTriggerSubsequent(true),
 // average the last 100 iteration times
 mMovingAverageIterationTime(100),
 // average the last 100 iteration times
@@ -263,7 +261,7 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
   this->mTriggers.push_back(trigger);
 }
 
-void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::proc::TriggerPtr /*trigger*/)
+void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::proc::TriggerPtr trigger)
 {
 #ifdef DEBUG_RUNNING
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
@@ -381,7 +379,12 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
 
     //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
-    if (this->mTriggerSubsequent || this->isLooped() || !this->isTriggered())
+    // subsequent steps are triggered if one of the following conditions is met:
+    // a) This step has not been triggered as part of a trigger chain. This is the case if trigger is NULL.
+    // b) The step is looped. In this case it is the start of a trigger chain
+    // c) The step is not triggered by anyone. This can happen, e.g., if it has no inputs. This also makes it the start
+    //    of a trigger chain.
+    if (!trigger || this->isLooped() || !this->isTriggered())
     {
       this->getFinishedTrigger()->trigger();
     }
