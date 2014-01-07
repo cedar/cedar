@@ -393,15 +393,6 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     //!@todo Should busy be unlocked before triggering subsequent steps?
     this->mBusy.unlock();
   }
-  else
-  {
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      "Step \"" + this->getName() + "\" was busy during its run() call, computation skipped.",
-      "cedar::proc::Step::run()"
-    );
-  }
-
 }
 
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
