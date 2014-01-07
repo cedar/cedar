@@ -641,6 +641,11 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits,
     for (int j = 0; j < cols; ++j)
     {
       size_t v = static_cast<size_t>(p_in[j]);
+
+      CEDAR_DEBUG_ASSERT(v < mLookupTableB.size());
+      CEDAR_DEBUG_ASSERT(v < mLookupTableG.size());
+      CEDAR_DEBUG_ASSERT(v < mLookupTableR.size());
+
       // channel 0
       p_converted[3 * j + 0] = mLookupTableB.at(v);
       // channel 1
@@ -734,7 +739,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
     case DATA_TYPE_MAT:
     {
-      double min, max;
+      double min = 0, max = 0;
       if (this->mAutoScaling)
       {
         cv::minMaxLoc(in, &min, &max);
