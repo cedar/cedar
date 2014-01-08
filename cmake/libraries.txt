@@ -54,6 +54,7 @@ message("-- Searching for Qt...")
 # TODO: We need compiler flags to tell what libraries to include.. for now WITH_QT5 will always be false
 if(NOT WITH_QT5)
   # Try to find Qt4
+  message("-- looking for Qt4...")
 
   find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml QtSvg)
   if(QT4_FOUND)
@@ -72,6 +73,7 @@ endif(NOT WITH_QT5)
 
 if(WITH_QT5 OR NOT QT4_FOUND)
   # Try to find Qt5 Libraries
+  message("-- looking for Qt5...")
 
   find_package(Qt5Widgets REQUIRED)
   if(Qt5Widgets_FOUND)
