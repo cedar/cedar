@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // FORWARD DECLARATIONS
@@ -93,12 +93,6 @@ private slots:
 private:
   void compute(const cedar::proc::Arguments&);
 
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-  (
-    cedar::proc::ConstDataSlotPtr,
-    cedar::aux::ConstDataPtr data
-  ) const;
-
   void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,10 +133,10 @@ private:
   cedar::aux::BoolParameterPtr mApplyUpperThreshold;
 
   //! Lower threshold.
-  cedar::aux::UIntParameterPtr _mLowerThresholdValue;
+  cedar::aux::DoubleParameterPtr _mLowerThresholdValue;
 
   //! Upper threshold.
-  cedar::aux::UIntParameterPtr _mUpperThresholdValue;
+  cedar::aux::DoubleParameterPtr _mUpperThresholdValue;
 
 }; // class cedar::proc::steps::Threshold
 
