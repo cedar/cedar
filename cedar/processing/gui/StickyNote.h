@@ -93,8 +93,17 @@ public:
   //!@brief Events when mouse is moved in the note.
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
+  //!@brief Overrride the context menu. Used for setting colors.
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  //!@brief Returns the text of the StickyNote.
   std::string getText() const;
+
+  //!@brief Returns the color of the note.
+  QColor getColor() const;
+
+  //!@brief sets the color of the note;
+  void setColor(QColor color);
 
 
   //--------------------------------------------------------------------------------------------------------------------
