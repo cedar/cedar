@@ -146,14 +146,14 @@ install before you can compile cedar. The version numbers are the oldest
 versions supported.
 
 * CMake
-* Boost 1.47 (except version 1.49, which apparently does not work with c++11)
-* OpenCV 2.2
-* Qt 4.6.2
-* qwt 5.2.1
-* libqglviewer 2.3.6
+* Boost >= 1.47 (except version 1.49, which apparently does not work with c++11)
+* OpenCV >= 2.2
+* Qt >= 4.6.2 (Qt5 may work, but is not yet supported officially)
 
 optional dependencies:
 
+* qwt 5.2.1
+* libqglviewer 2.3.6
 * YARP 2.3.6 (for YARP features like network connectivity)
 * libDC1394 (for firewire cameras)
 * fftw-3.2.2 (for FFT-based convolutions)
@@ -272,3 +272,13 @@ processing framework:
    them up.
 
    Have fun!
+   
+## Reporting issues
+
+Our repositories and issue trackers
+are hosted on [bitbucket](https://bitbucket.org/cedar).
+
+We always welcome any features, bug-reports and other things.
+
+Note: we try to be warning-free. If you encounter warnings when compiling
+cedar on your system, let us know!
