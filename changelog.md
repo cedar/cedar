@@ -70,6 +70,9 @@ known issues
 Unreleased
 ==========
 
+- build system
+  - libQGLViewer is now optional. If it is not present, many of the GL components of cedar, including the kinematic chain
+    simulator will likely not function properly.
 - general
   - The plugin system has been changed. It is no longer specific to the processing framework, although it is not (yet)
     used elsewhere. Plugins can now be added in an improved manager. They are found in a different way, now: a list of
