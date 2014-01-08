@@ -187,10 +187,6 @@ public:
    */
   void timerEvent(QTimerEvent *pEvent);
 
-  /*!@brief Set the scaling mode of the plot.
-   */
-  void setSmoothScaling(bool smooth);
-
   /*! Sets fixed limits for the plot values.
    */
   void setLimits(double min, double max);
@@ -214,6 +210,10 @@ public slots:
 
   //! Enables automatic scaling.
   void setAutomaticScaling();
+
+  /*!@brief Set the scaling mode of the plot.
+   */
+  void setSmoothScaling(bool smooth);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
