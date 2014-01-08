@@ -74,6 +74,8 @@ cedar::proc::gui::GraphicsBase(width,height)
   setFlag(ItemIsMovable);
   setFlag(ItemIsSelectable);
   setFlag(ItemIsFocusable);
+
+  this->setZValue(0);
 }
 
 cedar::proc::gui::StickyNote::~StickyNote()
