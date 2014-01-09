@@ -232,6 +232,13 @@ void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 {
   QMenu menu(this);
 
+  int mat_type = -1;
+
+  if (this->mData)
+  {
+    mat_type = this->mData->getCvType();
+  }
+
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
@@ -244,7 +251,7 @@ void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   p_smooth->setChecked(this->mSmoothScaling);
 
   QMenu* p_scaling = menu.addMenu("value scaling");
-  p_scaling->setEnabled(mDataType == DATA_TYPE_MAT);
+  p_scaling->setEnabled(mDataType == DATA_TYPE_MAT || mat_type == CV_32F);
 
   auto p_auto_scale = p_scaling->addAction("automatic");
   p_auto_scale->setCheckable(true);
@@ -702,31 +709,57 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         std::vector<cv::Mat> merge_vec;
         cv::Mat zeros = 0.0 * in;
 
+        cv::Mat in_scaled;
+        switch (in.type())
+        {
+          case CV_32F:
+          {
+            double min_val = this->mValueLimits.getLower();
+            double max_val = this->mValueLimits.getUpper();
+            if (this->mAutoScaling)
+            {
+              cv::minMaxLoc(in, &min_val, &max_val);
+            }
+            if (min_val != max_val)
+            {
+              in_scaled = 255.0 * (in - min_val) / (max_val - min_val);
+            }
+            else
+            {
+              in_scaled = in;
+            }
+            break;
+          }
+          default:
+            in_scaled = in;
+            break;
+        }
+
         switch (type)
         {
           case cedar::aux::annotation::ColorSpace::Red:
             merge_vec.push_back(zeros);
             merge_vec.push_back(zeros);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             break;
 
           case cedar::aux::annotation::ColorSpace::Green:
             merge_vec.push_back(zeros);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             merge_vec.push_back(zeros);
             break;
 
           case cedar::aux::annotation::ColorSpace::Blue:
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             merge_vec.push_back(zeros);
             merge_vec.push_back(zeros);
             break;
 
           default:
           case cedar::aux::annotation::ColorSpace::Gray:
-            merge_vec.push_back(in);
-            merge_vec.push_back(in);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
+            merge_vec.push_back(in_scaled);
+            merge_vec.push_back(in_scaled);
             break;
         }
 
