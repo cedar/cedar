@@ -105,6 +105,10 @@ public:
   //!@brief sets the color of the note;
   void setColor(QColor color);
 
+  void setFontSize(int s);
+
+  int getFontSize();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

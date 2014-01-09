@@ -196,6 +196,20 @@ void cedar::proc::gui::StickyNote::setColor(QColor color)
   this->mColor = color;
 }
 
+void cedar::proc::gui::StickyNote::setFontSize(int s)
+{
+  QString temp = mText.toPlainText();
+  mText.clear();
+  QFont font = mText.font();
+  font.setPointSize(s);
+  mText.setFont(font);
+  mText.setPlainText(temp);
+}
+
+int cedar::proc::gui::StickyNote::getFontSize()
+{
+  return mText.font().pointSize();
+}
 
 void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
@@ -203,44 +217,83 @@ void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEve
 
 
   QMenu menu;
-  QAction *blue = menu.addAction("blue");
+  QMenu* colors = menu.addMenu("color");
+  QAction *blue = colors->addAction("blue");
   blue->setIcon(QIcon(":/colors/blue.svg"));
-  QAction *red = menu.addAction("red");
+  QAction *red = colors->addAction("red");
   red->setIcon(QIcon(":/colors/red.svg"));
-  QAction *green = menu.addAction("green");
+  QAction *green = colors->addAction("green");
   green->setIcon(QIcon(":/colors/green.svg"));
-  QAction *magenta = menu.addAction("magenta");
+  QAction *magenta = colors->addAction("magenta");
   magenta->setIcon(QIcon(":/colors/purple.svg"));
-  QAction *cyan = menu.addAction("cyan");
+  QAction *cyan = colors->addAction("cyan");
   cyan->setIcon(QIcon(":/colors/cyan.svg"));
-  QAction *yellow = menu.addAction("yellow");
+  QAction *yellow = colors->addAction("yellow");
   yellow->setIcon(QIcon(":/colors/yellow.svg"));
 
+  QMenu* fontsize = menu.addMenu("font size");
+  QAction *xs = fontsize->addAction("xs");
+  QAction *small = fontsize->addAction("small");
+  QAction *normal = fontsize->addAction("normal");
+  QAction *large = fontsize->addAction("large");
+  QAction *xl = fontsize->addAction("xl");
+  QAction *xxl = fontsize->addAction("xxl");
+
   QAction *a = menu.exec(event->screenPos());
+
+  //change colors
   if (a == blue)
   {
     this->mColor = Qt::blue;
   }
-  if (a == red)
+  else if (a == red)
   {
     this->mColor = Qt::red;
   }
-  if (a == green)
+  else if (a == green)
   {
     this->mColor = Qt::green;
   }
-  if (a == cyan)
+  else if (a == cyan)
   {
     this->mColor = Qt::cyan;
   }
-  if (a == magenta)
+  else if (a == magenta)
   {
     this->mColor = Qt::magenta;
   }
-  if (a == yellow)
+  else if (a == yellow)
   {
     this->mColor = Qt::yellow;
   }
+
+  //set font size
+  else if (a == xs)
+  {
+    this->setFontSize(6);
+  }
+  else if (a == small)
+  {
+    this->setFontSize(8);
+  }
+  else if (a == normal)
+  {
+    this->setFontSize(10);
+  }
+  else if (a == large)
+  {
+    this->setFontSize(14);
+  }
+  else if (a == xl)
+  {
+    this->setFontSize(20);
+  }
+  else if (a == xxl)
+  {
+    this->setFontSize(40);
+  }
+
+
 
   update();
 
