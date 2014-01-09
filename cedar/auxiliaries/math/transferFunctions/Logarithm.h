@@ -22,57 +22,55 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Threshold.h
+    File:        Logarithm.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 08 13
+    Date:        2014 01 08
 
-    Description:
+    Description: Header file for the class cedar::aux::math::transferFunctions::Logarithm.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_THRESHOLD_H
-#define CEDAR_PROC_STEPS_THRESHOLD_H
+#ifndef CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_LOGARITHM_H
+#define CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_LOGARITHM_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/steps/Threshold.fwd.h"
+#include "cedar/auxiliaries/math/transferFunctions/Logarithm.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Applies a threshold to its input.
+/*!@brief A transfer function that calculates the natural logarithm of its input.
  */
-class cedar::proc::steps::Threshold : public cedar::proc::Step
+class cedar::aux::math::Logarithm : public cedar::aux::math::TransferFunction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Threshold();
+  Logarithm();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*!@brief this function calculates the logarithm of the input.
+   */
+  virtual double compute(double value) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -83,17 +81,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private slots:
-  void applyLowerThesholdChanged();
-
-  void applyUpperThesholdChanged();
-
-  void recalculate();
-
 private:
-  void compute(const cedar::proc::Arguments&);
-
-  void inputConnectionChanged(const std::string& inputName);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,23 +90,7 @@ private:
 protected:
   // none yet
 private:
-  // inputs
-  //! Input image (cached for performance).
-  cedar::aux::ConstMatDataPtr mInputImage;
-
-  // buffers
-  //! Input image after lower threshold has been applied.
-  cedar::aux::MatDataPtr mLowerThreshold;
-
-  //! Input image after upper threshold has been applied.
-  cedar::aux::MatDataPtr mUpperThreshold;
-
-  // outputs
-  //! Input image after all selected thresholds have been applied.
-  cedar::aux::MatDataPtr mThresholdedImage;
-
-  //! Value to write where the image exceeds the threshold.
-  double mMaxValue;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -126,19 +99,9 @@ protected:
   // none yet
 
 private:
-  //! Whether or not to apply the lower threshold.
-  cedar::aux::BoolParameterPtr mApplyLowerThreshold;
+  // none yet
 
-  //! Whether or not to apply the upper threshold.
-  cedar::aux::BoolParameterPtr mApplyUpperThreshold;
+}; // class cedar::aux::math::transferFunctions::Logarithm
 
-  //! Lower threshold.
-  cedar::aux::DoubleParameterPtr _mLowerThresholdValue;
-
-  //! Upper threshold.
-  cedar::aux::DoubleParameterPtr _mUpperThresholdValue;
-
-}; // class cedar::proc::steps::Threshold
-
-#endif // CEDAR_PROC_STEPS_THRESHOLD_H
+#endif // CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_LOGARITHM_H
 

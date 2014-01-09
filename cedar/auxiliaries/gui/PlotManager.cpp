@@ -58,7 +58,6 @@ void cedar::aux::gui::PlotManager::getPlotClassesFor
        std::set<cedar::aux::gui::ConstPlotDeclarationPtr>& declarations
      )
 {
-  typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
   typedef cedar::aux::gui::PlotDeclarationManager::ConstNodePtr ConstPlotNodePtr;
 
   // find all base classes of the data type

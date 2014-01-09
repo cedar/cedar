@@ -230,20 +230,21 @@ void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double m
 
 void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 {
-  if (mDataType != DATA_TYPE_MAT)
-  {
-    // currently, there are no context menu options for any plots other than matrices.
-    return;
-  }
-
   QMenu menu(this);
 
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpLegend != NULL && this->mpLegend->isVisible());
+  p_legend->setEnabled(mDataType == DATA_TYPE_MAT);
+
+  auto p_smooth = menu.addAction("smooth");
+  p_smooth->setCheckable(true);
+  QObject::connect(p_smooth, SIGNAL(toggled(bool)), this, SLOT(setSmoothScaling(bool)));
+  p_smooth->setChecked(this->mSmoothScaling);
 
   QMenu* p_scaling = menu.addMenu("value scaling");
+  p_scaling->setEnabled(mDataType == DATA_TYPE_MAT);
 
   auto p_auto_scale = p_scaling->addAction("automatic");
   p_auto_scale->setCheckable(true);
