@@ -39,7 +39,9 @@
 #include "StickyNote.h"
 
 // SYSTEM INCLUDES
-#include<QBrush>
+#include <QBrush>
+#include <QMenu>
+#include <QAction>
 #include <iostream>
 
 
@@ -72,6 +74,8 @@ cedar::proc::gui::GraphicsBase(width,height)
   setFlag(ItemIsMovable);
   setFlag(ItemIsSelectable);
   setFlag(ItemIsFocusable);
+
+  this->setZValue(0);
 }
 
 cedar::proc::gui::StickyNote::~StickyNote()
@@ -180,5 +184,67 @@ void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* even
 std::string cedar::proc::gui::StickyNote::getText() const
 {
   return this->mText.toPlainText().toStdString();
+}
+
+QColor cedar::proc::gui::StickyNote::getColor() const
+{
+  return this->mColor;
+}
+
+void cedar::proc::gui::StickyNote::setColor(QColor color)
+{
+  this->mColor = color;
+}
+
+
+void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+  this->QGraphicsItem::contextMenuEvent(event);
+
+
+  QMenu menu;
+  QAction *blue = menu.addAction("blue");
+  blue->setIcon(QIcon(":/colors/blue.svg"));
+  QAction *red = menu.addAction("red");
+  red->setIcon(QIcon(":/colors/red.svg"));
+  QAction *green = menu.addAction("green");
+  green->setIcon(QIcon(":/colors/green.svg"));
+  QAction *magenta = menu.addAction("magenta");
+  magenta->setIcon(QIcon(":/colors/purple.svg"));
+  QAction *cyan = menu.addAction("cyan");
+  cyan->setIcon(QIcon(":/colors/cyan.svg"));
+  QAction *yellow = menu.addAction("yellow");
+  yellow->setIcon(QIcon(":/colors/yellow.svg"));
+
+  QAction *a = menu.exec(event->screenPos());
+  if (a == blue)
+  {
+    this->mColor = Qt::blue;
+  }
+  if (a == red)
+  {
+    this->mColor = Qt::red;
+  }
+  if (a == green)
+  {
+    this->mColor = Qt::green;
+  }
+  if (a == cyan)
+  {
+    this->mColor = Qt::cyan;
+  }
+  if (a == magenta)
+  {
+    this->mColor = Qt::magenta;
+  }
+  if (a == yellow)
+  {
+    this->mColor = Qt::yellow;
+  }
+
+  update();
+
+
+  event->accept();
 }
 

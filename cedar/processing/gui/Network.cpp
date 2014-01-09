@@ -565,6 +565,12 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
     node.put("x",note->scenePos().x());
     node.put("y",note->scenePos().y());
     node.put("text",note->getText());
+    QColor color = note->getColor();
+    node.put("r",color.red());
+    node.put("g",color.green());
+    node.put("b",color.blue());
+    node.put("a",color.alpha());
+
     scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
   }
   auto elements = this->mNetwork->getElements();
@@ -1103,7 +1109,12 @@ void cedar::proc::gui::Network::readStickyNotes(cedar::aux::ConfigurationNode& n
       int witdh = iter->second.get<int>("width");
       int height = iter->second.get<int>("height");
       const std::string& text = iter->second.get<std::string>("text");
-      this->mpScene->addStickyNote(x, y, witdh, height, text);
+      cedar::proc::gui::StickyNote* note = this->mpScene->addStickyNote(x, y, witdh, height, text);
+      int r = iter->second.get<int>("r");
+      int g = iter->second.get<int>("g");
+      int b = iter->second.get<int>("b");
+      int a = iter->second.get<int>("a");
+      note->setColor(QColor(r,g,b,a));
     }
   }
 }
