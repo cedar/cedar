@@ -272,7 +272,7 @@ void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   data->lockForRead();
   const cv::Mat& mat = plot_series->mMatData->getData();
 
-  CEDAR_DEBUG_ASSERT(cedar::aux::math::getDimensionalityOf(mat) == 1);
+  CEDAR_DEBUG_ASSERT(cedar::aux::math::getDimensionalityOf(mat) <= 1);
 
   size_t num = cedar::aux::math::get1DMatrixSize(mat);
   data->unlock();
