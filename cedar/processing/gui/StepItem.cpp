@@ -190,9 +190,9 @@ cedar::proc::gui::StepItem::Decoration::Decoration
 
 cedar::proc::gui::StepItem::~StepItem()
 {
-  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  for(auto child_widget : mChildWidgets)
   {
-    (*it)->close();
+    child_widget->close();
   }
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
@@ -711,28 +711,21 @@ void cedar::proc::gui::StepItem::addTriggerItems()
 
 void cedar::proc::gui::StepItem::addDataItems()
 {
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
+  for (auto role : cedar::proc::DataRole::type().list())
   {
-    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
+    if (role == cedar::aux::Enum::UNDEFINED)
       continue;
 
     // populate step item list
-    mSlotMap[*enum_it] = DataSlotNameMap();
+    this->mSlotMap[role] = DataSlotNameMap();
 
-    try
+    if (this->mStep->hasRole(role))
     {
-      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(*enum_it);
-      for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      for (auto slot : this->mStep->getOrderedDataSlots(role))
       {
         // use a non-const version of this slot
-        this->addDataItemFor(this->mStep->getSlot(*enum_it, (*iter)->getName()));
+        this->addDataItemFor(this->mStep->getSlot(role, slot->getName()));
       }
-    }
-    catch(const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 
@@ -781,10 +774,10 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
   add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + M_DATA_SLOT_PADDING, 0);
   add_directions[cedar::proc::DataRole::OUTPUT] = QPointF(0, 1);
 
-  for (DataSlotMap::iterator role_it = mSlotMap.begin(); role_it != mSlotMap.end(); ++role_it)
+  for (auto role_map_pair : this->mSlotMap)
   {
-    cedar::proc::DataRole::Id role = role_it->first;
-    DataSlotNameMap& slot_item_map = role_it->second;
+    cedar::proc::DataRole::Id role = role_map_pair.first;
+    DataSlotNameMap& slot_item_map = role_map_pair.second;
 
     if (role == cedar::aux::Enum::UNDEFINED)
       continue;
@@ -797,7 +790,7 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
     const QPointF& origin = add_origins[role];
     const QPointF& direction = add_directions[role];
 
-    try
+    if (this->mStep->hasRole(role))
     {
       QPointF current_origin = QPointF(0, 0);
       const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(role);
@@ -818,10 +811,6 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
         p_item->setPos(QPointF(x - size_diff, y) + current_origin);
         current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
       }
-    }
-    catch(const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 }
