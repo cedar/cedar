@@ -554,7 +554,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
    * the next line multiplies by time anyway)
    */
   cv::randn(input_noise, cv::Scalar(0), cv::Scalar(1));
-  d_u += 1.0 / sqrt(time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second))
+  d_u += sqrt(time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second))
          *_mInputNoiseGain->getValue() * input_noise;
 
   boost::shared_ptr<QWriteLocker> activation_write_locker;
