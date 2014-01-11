@@ -41,14 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/detail/CallFunctionInThreadWorker.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
-#include "cedar/auxiliaries/CallFunctionInThreadWorker.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -56,7 +58,9 @@
 #include <QThread>
 #include <QMutex>
 #include <QReadWriteLock>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
+#endif
 #include <functional>
 
 /*!@brief This class wraps a function call into a thread.

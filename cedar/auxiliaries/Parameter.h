@@ -42,13 +42,17 @@
 #define CEDAR_AUX_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/IntrusivePtrBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
 #include <QReadWriteLock>
 #include <set>
+#include <string>
 
 
 /*!@brief Base class for all parameters.

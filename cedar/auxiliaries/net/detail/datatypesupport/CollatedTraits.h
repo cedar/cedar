@@ -39,19 +39,16 @@
 #define CEDAR_COLLATED_TRAITS_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.fwd.h"
 
 // PROJECT INCLUDES
-#include <boost/static_assert.hpp>
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/static_assert.hpp>
+#endif
+#include <string>
 
-
-
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
 //!@cond SKIPPED_DOCUMENTATION
 
 
@@ -61,7 +58,7 @@ namespace cedar {
  * and HAS TO BE SPECIALIZED
  */
 template<class T>
-struct CollatedTraits
+struct cedar::aux::net::detail::CollatedTraits
 {
   // default traits struct is empty
   // this should not compile
@@ -72,7 +69,6 @@ struct CollatedTraits
 };
 
 //!@endcond
-} } } } // end namespaces 
 
 // specializations (these will compile):
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/CollatedTraits.h"

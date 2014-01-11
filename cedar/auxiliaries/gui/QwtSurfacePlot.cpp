@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/gui/QwtSurfacePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
+#include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #include "cedar/auxiliaries/annotation/Dimensions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -193,19 +194,27 @@ void cedar::aux::gui::QwtSurfacePlot::plot(cedar::aux::ConstDataPtr data, const 
 
 void cedar::aux::gui::QwtSurfacePlot::init()
 {
-  this->mPerspectives.push_back(Perspective("default",
+  this->mPerspectives.push_back(Perspective("top-down",
                                             90, 0, -90,
                                             1, 1, 5,
                                             0.15, 0, 0,
                                             1.0
                                             ));
 
-  this->mPerspectives.push_back(Perspective("view 2",
-                                            45, 0, 45,
+  this->mPerspectives.push_back(Perspective("bird's eye view",
+                                            45, 0, 225,
                                             1, 1, 5,
                                             0.15, 0, 0,
                                             1.0
                                             ));
+
+  this->mPerspectives.push_back(Perspective("bird's eye view (rotated)",
+                                            45, 0, -45,
+                                            1, 1, 5,
+                                            0.15, 0, 0,
+                                            1.0
+                                            ));
+
   // create a new layout for the widget
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
@@ -221,7 +230,17 @@ void cedar::aux::gui::QwtSurfacePlot::init()
 
   // apply the standard color vector
   Qwt3D::StandardColor col;
-  col.setColorVector(cedar::aux::gui::MatrixPlot::getStandardColorVector());
+  std::vector<Qwt3D::RGBA> qwt_colors;
+  auto colors = cedar::aux::gui::MatrixPlot::getStandardColorVector();
+  qwt_colors.resize(colors.size());
+  for (size_t i = 0; i < colors.size(); ++i)
+  {
+    qwt_colors.at(i).r = colors.at(i).red;
+    qwt_colors.at(i).g = colors.at(i).green;
+    qwt_colors.at(i).b = colors.at(i).blue;
+    qwt_colors.at(i).a = colors.at(i).alpha;
+  }
+  col.setColorVector(qwt_colors);
   this->mpPlot->setDataColor(col);
   this->mpPlot->updateGL();
 

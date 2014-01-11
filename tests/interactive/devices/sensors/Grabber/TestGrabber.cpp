@@ -36,13 +36,16 @@
 
 // LOCAL INCLUDES
 #include "cedar/testingUtilities/devices/TestGrabber.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <boost/math/special_functions/round.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/math/special_functions/round.hpp>
+#endif
 #include <ios>
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -75,7 +78,7 @@ namespace
         ).total_milliseconds() < (FPS_TEST_DURATION_IN_SEC*1000)
       )
       {
-        cedar::aux::sleep(cedar::unit::Milliseconds(200));
+        cedar::aux::sleep(cedar::unit::Time(200.0 * cedar::unit::milli * cedar::unit::second));
         std::cout << "measured fps: "<< grabber.getMeasuredFramerate()<<std::endl;
        }
 
@@ -211,7 +214,7 @@ int main(int , char **)
   delete grabber_1;
   grabber_1 = NULL;
 
-  cedar::aux::sleep(cedar::unit::Milliseconds(1));
+  cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second));
   cedar::test::dev::TestGrabber *grabber_2 = new cedar::test::dev::TestGrabber(CHANNEL_0_NAME, CHANNEL_1_NAME);
 
   grabber_2->readJson(CONFIG_FILE_NAME_1);
@@ -273,7 +276,7 @@ int main(int , char **)
 
 
   std::cout << "\n\nPress now CTRL-C\n";
-  cedar::aux::sleep(cedar::unit::Seconds(static_cast<double>(3*FPS_TEST_DURATION_IN_SEC)));
+  cedar::aux::sleep(cedar::unit::Time(static_cast<double>(3*FPS_TEST_DURATION_IN_SEC) * cedar::unit::seconds));
 
   //no ctrl-c pressed
   std::cout << "\n\nWARNING: No CTRL-C catched - do normal cleanup\n";

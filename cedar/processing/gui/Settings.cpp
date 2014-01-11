@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/processing/PluginProxy.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
@@ -45,8 +45,14 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
-#include <boost/property_tree/json_parser.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/json_parser.hpp>
+#endif
 #include <QMainWindow>
+#include <vector>
+#include <iostream>
+#include <string>
+
 
 cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode>
   cedar::proc::gui::Settings::StepDisplayMode::mType("cedar::proc::gui::Settings::StepDisplayMode::");
@@ -72,21 +78,6 @@ mProperties(new cedar::proc::gui::Settings::DockSettings()),
 mMainWindowGeometry(new cedar::aux::StringParameter(this, "mainWindowGeometry", "")),
 mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 {
-
-  cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
-  this->addConfigurableChild("plugins", plugins);
-
-  std::set<std::string> default_plugins;
-  mPluginsToLoad = cedar::aux::StringSetParameterPtr
-                   (
-                     new cedar::aux::StringSetParameter
-                     (
-                       plugins.get(),
-                       "loadOnStartup",
-                       default_plugins
-                     )
-                   );
-
   cedar::aux::ConfigurablePtr ui_settings(new cedar::aux::Configurable());
   this->addConfigurableChild("ui", ui_settings);
   
@@ -118,6 +109,20 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                         )
                       );
 
+  this->_mElementListShowsDeprecated = new cedar::aux::BoolParameter
+      (
+        ui_settings.get(),
+        "show deprecated steps in elemen list",
+        true
+      );
+
+  this->_mHighlightConnections = new cedar::aux::BoolParameter
+                                 (
+                                   ui_settings.get(),
+                                   "highlight connections of selected steps",
+                                   true
+                                 );
+
   cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
   this->addConfigurableChild("displaySettings", display_settings);
   mUseGraphicsItemShadowEffects = cedar::aux::BoolParameterPtr
@@ -145,15 +150,6 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->addConfigurableChild("fileHistory", recent_files);
   this->_mMaxFileHistorySize = new cedar::aux::UIntParameter(recent_files.get(), "maximum history size", 10);
 
-  this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr
-      (
-        new cedar::aux::DirectoryParameter
-        (
-          recent_files.get(),
-          "lastPluginLoadDialogLocation",
-          ""
-        )
-      );
   this->mArchitectureLoadDialogDirectory = cedar::aux::DirectoryParameterPtr
       (
         new cedar::aux::DirectoryParameter
@@ -201,50 +197,14 @@ cedar::proc::gui::Settings::~Settings()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::Settings::loadDefaultPlugins()
+bool cedar::proc::gui::Settings::getElementListShowsDeprecated() const
 {
-  const std::set<std::string>& plugins = this->pluginsToLoad();
-  for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
-  {
-    std::string action = "reading";
-    try
-    {
-      action = "opening";
-      cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
-      action = "loading";
-      plugin->declare();
-      cedar::aux::LogSingleton::getInstance()->message
-      (
-        "Loaded default plugin \"" + (*iter) + "\"",
-        "void cedar::proc::Manager::loadDefaultPlugins()"
-      );
-    }
-    catch (const cedar::aux::ExceptionBase& e)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Error while " + action + " default plugin \"" + (*iter) + "\": " + e.exceptionInfo(),
-        "void cedar::proc::Manager::loadDefaultPlugins()"
-      );
-    }
-    catch (std::exception& e)
-    {
-      std::string what = e.what();
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Error while " + action + " default plugin \"" + (*iter) + "\": " + what,
-        "void cedar::proc::Manager::loadDefaultPlugins()"
-      );
-    }
-    catch (...)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Unknown error while " + action + " default plugin.",
-        "void cedar::proc::Manager::loadDefaultPlugins()"
-      );
-    }
-  }
+  return this->_mElementListShowsDeprecated->getValue();
+}
+
+void cedar::proc::gui::Settings::setElementListShowsDeprecated(bool show)
+{
+  this->_mElementListShowsDeprecated->setValue(show);
 }
 
 bool cedar::proc::gui::Settings::snapToGrid() const
@@ -309,11 +269,6 @@ cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureLo
 cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureExportDialogDirectory()
 {
   return this->mArchitectureExportDialogDirectory;
-}
-
-cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastPluginLoadDialogLocation()
-{
-  return this->mPluginLoadDialogLocation;
 }
 
 void cedar::proc::gui::Settings::storeMainWindow(QMainWindow *pWindow)
@@ -390,6 +345,7 @@ void cedar::proc::gui::Settings::load()
       std::string("Error reading framework gui settings: ") + e.what(),
       "void cedar::proc::gui::Settings::load()"
     );
+    //!@todo Restore defaults
   }
 }
 
@@ -412,23 +368,3 @@ void cedar::proc::gui::Settings::save()
     }
   }
 }
-
-const std::set<std::string>& cedar::proc::gui::Settings::pluginsToLoad()
-{
-  return this->mPluginsToLoad->get();
-}
-
-void cedar::proc::gui::Settings::addPluginToLoad(const std::string& path)
-{
-  this->mPluginsToLoad->insert(path);
-}
-
-void cedar::proc::gui::Settings::removePluginToLoad(const std::string& path)
-{
-  std::set<std::string>::iterator pos = this->mPluginsToLoad->get().find(path);
-  if (pos != this->mPluginsToLoad->get().end())
-  {
-    this->mPluginsToLoad->get().erase(pos);
-  }
-}
-

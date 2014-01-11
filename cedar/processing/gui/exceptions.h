@@ -42,8 +42,10 @@
 #define CEDAR_PROC_GUI_EXCEPTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/exceptions.fwd.h"
 
 // SYSTEM INCLUDES
 

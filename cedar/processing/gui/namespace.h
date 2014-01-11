@@ -42,59 +42,35 @@
 #include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+  #include <boost/property_tree/ptree.hpp>
+#endif
 
+#warning Do not include this header any more. Use the new forward declaration headers instead.
 
-namespace cedar
-{
-  /*!@brief Namespace for all processing classes. */
-  namespace proc
-  {
-    namespace gui
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      class CEDAR_PROC_LIB_EXPORT ArchitectureConsistencyCheck;
-      class CEDAR_PROC_LIB_EXPORT ArchitectureToolBox;
-      class CEDAR_PROC_LIB_EXPORT BoostControl;
-      class CEDAR_PROC_LIB_EXPORT Connection;
-      class CEDAR_PROC_LIB_EXPORT DataSlotItem;
-      class CEDAR_PROC_LIB_EXPORT ElementClassList;
-      class CEDAR_PROC_LIB_EXPORT GraphicsBase;
-      class CEDAR_PROC_LIB_EXPORT FrameworkSettings;
-      class CEDAR_PROC_LIB_EXPORT Ide;
-      class CEDAR_PROC_LIB_EXPORT IdeApplication;
-      class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
-      CEDAR_DECLARE_PROC_CLASS(Network);
-      CEDAR_DECLARE_PROC_CLASS(PlotWidget);
-      class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
-      class CEDAR_PROC_LIB_EXPORT PropertyPane;
-      class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
-      class CEDAR_PROC_LIB_EXPORT Scene;
-      class CEDAR_PROC_LIB_EXPORT Settings;
-      class CEDAR_PROC_LIB_EXPORT SettingsDialog;
-      class CEDAR_PROC_LIB_EXPORT StepItem;
-      class CEDAR_PROC_LIB_EXPORT ToolBox;
-      class CEDAR_PROC_LIB_EXPORT TriggerItem;
-      class CEDAR_PROC_LIB_EXPORT UiSettings;
-      class CEDAR_PROC_LIB_EXPORT View;
-      class CEDAR_PROC_LIB_EXPORT ProjectionMappingParameter;
-
-      /* Exceptions */
-      class CEDAR_PROC_LIB_EXPORT InvalidModeException;
-      //!@endcond
-
-      /* enums */
-      enum ConnectValidity
-      {
-        CONNECT_YES,
-        CONNECT_ERROR,
-        CONNECT_WARNING,
-        CONNECT_NO,
-        CONNECT_UNKNOWN
-      };
-    }
-  }
-}
+#include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
+#include "cedar/processing/gui/ArchitectureToolBox.fwd.h"
+#include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/gui/Connection.fwd.h"
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/ElementClassList.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/Ide.fwd.h"
+#include "cedar/processing/gui/IdeApplication.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/PlotWidget.fwd.h"
+#include "cedar/processing/gui/ProjectionMappingParameter.fwd.h"
+#include "cedar/processing/gui/PropertyPane.fwd.h"
+#include "cedar/processing/gui/RecorderProperty.fwd.h"
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
+#include "cedar/processing/gui/Settings.fwd.h"
+#include "cedar/processing/gui/SettingsDialog.fwd.h"
+#include "cedar/processing/gui/StepItem.fwd.h"
+#include "cedar/processing/gui/ToolBox.fwd.h"
+#include "cedar/processing/gui/TriggerItem.fwd.h"
+#include "cedar/processing/gui/UiSettings.fwd.h"
+#include "cedar/processing/gui/View.fwd.h"
 
 #endif // CEDAR_PROC_GUI_NAMESPACE_H

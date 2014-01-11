@@ -41,7 +41,9 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
 
 namespace cedar
 {

@@ -42,12 +42,15 @@
 #define CEDAR_AUX_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/exceptions.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/VectorParameter.fwd.h"
+
 // SYSTEM INCLUDES
 #include <vector>
+#include <algorithm>
 
 namespace cedar
 {
@@ -217,6 +220,14 @@ public:
     return ret;
   }
 
+  //! Erases the entry at the given index.
+  void eraseIndex(size_t index)
+  {
+    CEDAR_ASSERT(index < this->mValues.size());
+
+    this->mValues.erase(this->mValues.begin() + index);
+  }
+
   //!@brief Erase first occurrence of T entry
   void eraseFirst(const T& entry)
   {
@@ -286,6 +297,17 @@ public:
     return this->mValues.size();
   }
 
+  //! Swaps the given elements.
+  void swap(size_t first, size_t second)
+  {
+    CEDAR_ASSERT(first < this->mValues.size());
+    CEDAR_ASSERT(second < this->mValues.size());
+
+    std::swap(this->mValues[first], this->mValues[second]);
+
+    this->emitChangedSignal();
+  }
+
   /*!@brief resize the vector to a new size and initialize new entries to the given value
    * @param size the new size of the vector
    * @param value the default value used to initialize new entries
@@ -299,7 +321,20 @@ public:
       return;
     }
 
+    // make sure the defaults vector is at least as big as the current vector
+    this->mDefaults.resize(std::max(this->mDefaults.size(), this->mValues.size()));
+    for (size_t i = 0; i < this->mValues.size(); ++i)
+    {
+      this->mDefaults.at(i) = this->mValues.at(i);
+    }
+
     this->mValues.resize(size, value);
+
+    // restore previous value
+    for (size_t i = 0; i < this->mValues.size() && i < this->mDefaults.size(); ++i)
+    {
+      this->mValues.at(i) = this->mDefaults.at(i);
+    }
 
     if (!blockSignal)
     {

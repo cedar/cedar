@@ -38,7 +38,9 @@
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
-#include <boost/date_time/posix_time/posix_time.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
+#include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/assert.h"
@@ -64,6 +65,7 @@
 #include <QLinearGradient>
 #include <QPalette>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
@@ -124,6 +126,9 @@ cedar::aux::gui::detail::ImagePlotLegend::ImagePlotLegend()
   this->mpMin = new QLabel("min");
   this->mpMax = new QLabel("max");
 
+  this->mpMin->setMinimumWidth(35);
+  this->mpMax->setMinimumWidth(35);
+
   auto p_gradient = new QFrame();
   p_gradient->setSizePolicy(QSizePolicy::Fixed, p_gradient->sizePolicy().verticalPolicy());
   p_gradient->setFixedWidth(20);
@@ -139,9 +144,11 @@ cedar::aux::gui::detail::ImagePlotLegend::ImagePlotLegend()
   p_gradient->setPalette(palette);
 
   auto p_layout = new QGridLayout();
+  p_layout->setContentsMargins(1, 1, 1, 1);
   p_layout->addWidget(p_gradient, 0, 0, 3, 1);
   p_layout->addWidget(this->mpMax, 0, 1);
   p_layout->addWidget(this->mpMin, 2, 1);
+  p_layout->setColumnStretch(1, 1);
   p_layout->setRowStretch(1, 1);
   this->setLayout(p_layout);
 }
@@ -210,26 +217,41 @@ void cedar::aux::gui::ImagePlot::setAutomaticScaling()
 
 void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double max)
 {
-  this->mpMin->setText(QString("%1").arg(min));
-  this->mpMax->setText(QString("%1").arg(max));
+  int precision = 2;
+  double diff = std::abs(max - min);
+  double log = std::log10(diff);
+  if (log < 0)
+  {
+    precision = std::max(precision, static_cast<int>(cedar::aux::math::round(std::abs(log))));
+  }
+  this->mpMin->setText(QString("%1").arg(min, 0, 'g', precision));
+  this->mpMax->setText(QString("%1").arg(max, 0, 'g', precision));
 }
 
 void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 {
-  if (mDataType != DATA_TYPE_MAT)
-  {
-    // currently, there are no context menu options for any plots other than matrices.
-    return;
-  }
-
   QMenu menu(this);
+
+  int mat_type = -1;
+
+  if (this->mData)
+  {
+    mat_type = this->mData->getCvType();
+  }
 
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpLegend != NULL && this->mpLegend->isVisible());
+  p_legend->setEnabled(mDataType == DATA_TYPE_MAT);
+
+  auto p_smooth = menu.addAction("smooth");
+  p_smooth->setCheckable(true);
+  QObject::connect(p_smooth, SIGNAL(toggled(bool)), this, SLOT(setSmoothScaling(bool)));
+  p_smooth->setChecked(this->mSmoothScaling);
 
   QMenu* p_scaling = menu.addMenu("value scaling");
+  p_scaling->setEnabled(mDataType == DATA_TYPE_MAT || mat_type == CV_32F);
 
   auto p_auto_scale = p_scaling->addAction("automatic");
   p_auto_scale->setCheckable(true);
@@ -311,7 +333,7 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEve
     return;
 
   QReadLocker locker(&this->mData->getLock());
-  
+
   const cv::Mat& matrix = this->mData->getData();
 
   if (matrix.empty())
@@ -447,29 +469,22 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
     case CV_32FC1:
     {
-      // find min and max for scaling
+      // convert grayscale to three-channel matrix
+      cv::Mat copy = mat.clone();
       double min, max;
-
       if (this->mpPlot->mAutoScaling)
       {
         cv::minMaxLoc(mat, &min, &max);
       }
-      else
-      {
-        min = this->mpPlot->mValueLimits.getLower();
-        max = this->mpPlot->mValueLimits.getUpper();
-      }
-      cv::Mat scaled = (mat - min) / (max - min) * 255.0;
       read_lock.unlock();
-      cv::Mat mat_8u;
-      scaled.convertTo(mat_8u, CV_8U);
-
-      // convert grayscale to three-channel matrix
-      cv::Mat converted = this->mpPlot->threeChannelGrayscale(mat_8u);
+      cv::Mat converted = this->mpPlot->threeChannelGrayscale(copy);
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->mpPlot->imageFromMat(converted);
 
-      emit minMaxChanged(min, max);
+      if (this->mpPlot->mAutoScaling)
+      {
+        emit minMaxChanged(min, max);
+      }
       break;
     }
 
@@ -529,7 +544,7 @@ void cedar::aux::gui::ImagePlot::fillColorizationGradient(QGradient& gradient)
   gradient.setColorAt(static_cast<qreal>(0.0), QColor(127, 0, 0));
 }
 
-cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
+cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits, double min, double max)
 {
   QReadLocker lookup_readlock(&mLookupTableLock);
   if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
@@ -540,7 +555,8 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
     if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
     {
       const size_t steps = 256;
-      const Qwt3D::ColorVector& standard = cedar::aux::gui::MatrixPlot::getStandardColorVector();
+      const std::vector<cedar::aux::gui::ColorValueRGBA>& standard
+        = cedar::aux::gui::MatrixPlot::getStandardColorVector();
       mLookupTableR.resize(steps, 0);
       mLookupTableG.resize(steps, 0);
       mLookupTableB.resize(steps, 0);
@@ -557,14 +573,14 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
 
         CEDAR_DEBUG_ASSERT(closest_standard < standard.size());
 
-        double r_lower = static_cast<double>(standard.at(closest_standard).r) * 255.0;
-        double g_lower = static_cast<double>(standard.at(closest_standard).g) * 255.0;
-        double b_lower = static_cast<double>(standard.at(closest_standard).b) * 255.0;
+        double r_lower = static_cast<double>(standard.at(closest_standard).red) * 255.0;
+        double g_lower = static_cast<double>(standard.at(closest_standard).green) * 255.0;
+        double b_lower = static_cast<double>(standard.at(closest_standard).blue) * 255.0;
         if (closest_standard + 1 < standard.size())
         {
-          double r_upper = static_cast<double>(standard.at(closest_standard + 1).r);
-          double g_upper = static_cast<double>(standard.at(closest_standard + 1).g);
-          double b_upper = static_cast<double>(standard.at(closest_standard + 1).b);
+          double r_upper = static_cast<double>(standard.at(closest_standard + 1).red);
+          double g_upper = static_cast<double>(standard.at(closest_standard + 1).green);
+          double b_upper = static_cast<double>(standard.at(closest_standard + 1).blue);
 
           double factor = static_cast<double>(v - lower_closest) / static_cast<double>(upper_closest - lower_closest);
 
@@ -588,7 +604,6 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
   }
 
   // accept only char type matrices
-  CEDAR_ASSERT(matrix.depth() != sizeof(char));
 
   int channels = matrix.channels();
 
@@ -601,17 +616,44 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
     rows = 1;
   }
 
+  cv::Mat in_converted;
+
+  if (matrix.type() != CV_8UC1)
+  {
+    switch (matrix.type())
+    {
+      case CV_32F:
+      {
+        cv::Mat scaled = (matrix - min) / (max - min) * 255.0;
+        scaled.convertTo(in_converted, CV_8UC1);
+        break;
+      }
+      default:
+        matrix.convertTo(in_converted, CV_8UC1);
+        break;
+    }
+  }
+  else
+  {
+    in_converted = matrix;
+  }
+
   cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
 
   const unsigned char* p_in;
   unsigned char* p_converted;
   for (int i = 0; i < rows; ++i)
   {
-    p_in = matrix.ptr<unsigned char>(i);
+    p_in = in_converted.ptr<unsigned char>(i);
     p_converted = converted.ptr<unsigned char>(i);
     for (int j = 0; j < cols; ++j)
     {
       size_t v = static_cast<size_t>(p_in[j]);
+
+      CEDAR_DEBUG_ASSERT(v < mLookupTableB.size());
+      CEDAR_DEBUG_ASSERT(v < mLookupTableG.size());
+      CEDAR_DEBUG_ASSERT(v < mLookupTableR.size());
+
       // channel 0
       p_converted[3 * j + 0] = mLookupTableB.at(v);
       // channel 1
@@ -621,6 +663,13 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
     }
   }
 
+  if (limits)
+  {
+    cv::Mat min_vals = (matrix < min);
+    cv::Mat max_vals = (matrix > max);
+    converted.setTo(0xFFFFFF, min_vals | max_vals);
+  }
+
   return converted;
 }
 
@@ -628,6 +677,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 {
   CEDAR_DEBUG_ASSERT(in.channels() == 1);
 
+  // find min and max for scaling
   switch (this->mDataType)
   {
     default:
@@ -650,50 +700,90 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         cv::Mat merged, converted;
         cv::merge(merge_vec, merged);
         cv::cvtColor(merged, converted, CV_HSV2BGR);
-        return converted;
+        cv::Mat converted_8uc3;
+        converted.convertTo(converted_8uc3, CV_8UC3);
+        return converted_8uc3;
       }
       else
       {
         std::vector<cv::Mat> merge_vec;
         cv::Mat zeros = 0.0 * in;
 
+        cv::Mat in_scaled;
+        switch (in.type())
+        {
+          case CV_32F:
+          {
+            double min_val = this->mValueLimits.getLower();
+            double max_val = this->mValueLimits.getUpper();
+            if (this->mAutoScaling)
+            {
+              cv::minMaxLoc(in, &min_val, &max_val);
+            }
+            if (min_val != max_val)
+            {
+              in_scaled = 255.0 * (in - min_val) / (max_val - min_val);
+            }
+            else
+            {
+              in_scaled = in;
+            }
+            break;
+          }
+          default:
+            in_scaled = in;
+            break;
+        }
+
         switch (type)
         {
           case cedar::aux::annotation::ColorSpace::Red:
             merge_vec.push_back(zeros);
             merge_vec.push_back(zeros);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             break;
 
           case cedar::aux::annotation::ColorSpace::Green:
             merge_vec.push_back(zeros);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             merge_vec.push_back(zeros);
             break;
 
           case cedar::aux::annotation::ColorSpace::Blue:
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             merge_vec.push_back(zeros);
             merge_vec.push_back(zeros);
             break;
 
           default:
           case cedar::aux::annotation::ColorSpace::Gray:
-            merge_vec.push_back(in);
-            merge_vec.push_back(in);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
+            merge_vec.push_back(in_scaled);
+            merge_vec.push_back(in_scaled);
             break;
         }
 
         cv::Mat converted;
         cv::merge(merge_vec, converted);
-        return converted;
+        cv::Mat converted_8uc3;
+        converted.convertTo(converted_8uc3, CV_8UC3);
+        return converted_8uc3;
       }
     }
 
     case DATA_TYPE_MAT:
     {
-      return cedar::aux::gui::ImagePlot::colorizedMatrix(in);
+      double min = 0, max = 0;
+      if (this->mAutoScaling)
+      {
+        cv::minMaxLoc(in, &min, &max);
+      }
+      else
+      {
+        min = this->mValueLimits.getLower();
+        max = this->mValueLimits.getUpper();
+      }
+      return cedar::aux::gui::ImagePlot::colorizedMatrix(in, !this->mAutoScaling, min, max);
     }
   }
 }

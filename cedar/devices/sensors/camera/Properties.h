@@ -56,6 +56,7 @@
 #include <QObject>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
+#include <map>
 
 
 /*!@brief This class manages all properties and their capabilities of one camerachannel

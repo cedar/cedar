@@ -42,241 +42,93 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+  #include <boost/property_tree/ptree.hpp>
+#endif
 #include <opencv2/opencv.hpp>
 
+#warning Do not include this header any more. Use the new forward declaration headers instead!
 
-namespace cedar
-{
-  /*!@brief Namespace for all aux classes. */
-  namespace aux
-  {
-    /*!@brief Namespace for implementation details you should not use. */
-    namespace detail
-    {
-      class ThreadWorker;
-      class LoopedThreadWorker;
-      class CallFunctionInThreadWorker;
-    }
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Configurable);
-    CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
-    CEDAR_DECLARE_AUX_CLASS(Lockable);
-    CEDAR_DECLARE_AUX_CLASS(Settings);
-
-    CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
-    CEDAR_DECLARE_AUX_CLASS(LoopedThread);
-    CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
-    CEDAR_DECLARE_AUX_CLASS(LoopFunctionInThread);
-    CEDAR_DECLARE_AUX_CLASS(LoopMode);
-    CEDAR_DECLARE_AUX_CLASS(UserData);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
-    //!@endcond
-
-    template <class T> class Singleton;
-
-    template <typename T> class MovingAverage;
-
-    template <class ReturnedT> class CloneableBase;
-
-    template <class ClonedT, class ReturnedT> class Cloneable;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(LogFile);
-    CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
-    CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrame);
-    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame Object);
-    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame RigidBody);
-    CEDAR_DECLARE_AUX_CLASS(System);
-    //!@endcond
-
-    //!@brief A type for identifying enum entries. Corresponds to the C++ enum int values for each enum entry.
-    typedef unsigned int EnumId;
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Enum);
-    CEDAR_DECLARE_AUX_CLASS(EnumBase);
-    //!@endcond
-    template <class T> class EnumType;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Arguments);
-    //!@endcond
-
-    template <class BaseTypePtr> class Factory;
-    template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
-    template <class BaseTypePtr> class FactoryManager;
-    template <class BaseTypePtr> class DeclarationManagerTemplate;
-
-    template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectParameter);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
-    //!@endcond
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(PluginDeclaration);
-    CEDAR_DECLARE_AUX_CLASS(PluginDeclarationList);
-    template <class BaseClassPtr> class PluginDeclarationBaseTemplate;
-    template <class BaseClassPtr, class PluginClassPtr, class BaseClass> class PluginDeclarationTemplate;
-    //!@endcond
-
-    //!@brief a template class for parameters
-    template <typename T> class ParameterTemplate;
-    //!@brief a template class for numeric parameters, having a minimum and maximum value
-    template <typename T> class NumericParameter;
-    //!@brief a template class for vector parameters (of same type)
-    template <typename T> class VectorParameter;
-    //!@brief a template class for vector parameters (of numeric type)
-    template <typename T> class NumericVectorParameter;
-    //!@brief a template class for storing objects that are allocated dynamically.
-    template <typename T> class ObjectParameterTemplate;
-    //!@brief a template class for lists of objects of arbitrary type
-    template <typename T> class ObjectListParameterTemplate;
-    //!@brief a template class for maps of objects of arbitrary type
-    template <typename T> class ObjectMapParameterTemplate;
-    //!@brief A concretization of NumericParameter for double values.
-    typedef NumericParameter<double> DoubleParameter;
-    //!@brief A concretization of NumericParameter for unsigned int values.
-    typedef NumericParameter<unsigned int> UIntParameter;
-    //!@brief A concretization of NumericParameter for int values.
-    typedef NumericParameter<int> IntParameter;
-    //!@brief A concretization of ParameterTemplate for strings.
-    typedef ParameterTemplate<std::string> StringParameter;
-    //!@brief A concretization of ParameterTemplate for booleans.
-    typedef ParameterTemplate<bool> BoolParameter;
-    //!@brief A concretization of VectorParameter for booleans.
-    typedef VectorParameter<bool> BoolVectorParameter;
-    //!@brief A concretization of VectorParameter for strings.
-    typedef VectorParameter<std::string> StringVectorParameter;
-    //!@brief A concretization of NumericVectorParameter for double values.
-    typedef NumericVectorParameter<double> DoubleVectorParameter;
-    //!@brief A concretization of NumericVectorParameter for unsigned int values.
-    typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
-    //!@brief A concretization of NumericVectorParameter for unsigned int values.
-    typedef NumericVectorParameter<int> IntVectorParameter;
-
-    //!@brief A class for associating data with types and mapping the type hierarchy as well.
-    template <typename DataType, typename RootType> class TypeHierarchyMap;
-
-    // all intrusive smart pointers
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntVectorParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
-    //!@endcond
-
-    //!@brief a parameter storing a valid directory
-    class DirectoryParameter;
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DirectoryParameter);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(FileParameter);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(EnumParameter);
-    //!@endcond
-
-    //!@brief a parameter containing a set of type T
-    template <typename T> class SetParameter;
-    //!@brief a parameter containing a set of type string
-    typedef SetParameter<std::string> StringSetParameter;
-    //!@brief an intrusive pointer to a parameter containing a set of type string
-    typedef boost::intrusive_ptr<StringSetParameter> StringSetParameterPtr;
-
-    //!@brief a better name for boost's property tree
-    typedef boost::property_tree::ptree ConfigurationNode;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Data);
-    //!@endcond
-
-    //!@brief a templated version of cedar::aux::Data
-    template <typename T> class DataTemplate;
-
-    //!@brief A concretization of DataTemplate for simple points (cv::Point).
-    typedef DataTemplate<cv::Point> CvPointData;
-
-    //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
-    typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(MatData);
-    CEDAR_DECLARE_AUX_CLASS(DoubleData);
-    CEDAR_GENERATE_POINTER_TYPES(CvPointData);
-    CEDAR_GENERATE_POINTER_TYPES(ImageSetData);
-    CEDAR_DECLARE_AUX_CLASS(ImageData);
-    CEDAR_DECLARE_AUX_CLASS(StereoImageData);
-    /* exceptions */
-    CEDAR_DECLARE_AUX_CLASS(AnnotationNotFoundException);
-    CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
-    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
-    CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
-    CEDAR_DECLARE_AUX_CLASS(DimensionalityMismatchException);
-    CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
-    CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
-    CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
-    CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
-    CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
-    CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
-    CEDAR_DECLARE_AUX_CLASS(InitializationException);
-    CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
-    CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
-    CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
-    CEDAR_DECLARE_AUX_CLASS(NotFoundException);
-    CEDAR_DECLARE_AUX_CLASS(NullPointerException);
-    CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
-    CEDAR_DECLARE_AUX_CLASS(ParseException);
-    CEDAR_DECLARE_AUX_CLASS(RangeException);
-    CEDAR_DECLARE_AUX_CLASS(ResourceNotFoundException);
-    CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
-    CEDAR_DECLARE_AUX_CLASS(UnhandledTypeException);
-    CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
-    CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
-    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
-    CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
-    CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
-    CEDAR_DECLARE_AUX_CLASS(ThreadingErrorException);
-    //!@endcond
-    
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Grabbable);
-    //!@endcond
-
-    // Log related classes --------------------------------------------------------------------------------------------
-    
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Log);
-    CEDAR_DECLARE_AUX_CLASS(LogInterface);
-    CEDAR_DECLARE_AUX_CLASS(LogFilter);
-    CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
-    CEDAR_DECLARE_AUX_CLASS(NullLogger);
-    //!@endcond
-    
-    //!@brief Enumeration that defines different log levels.
-    enum LOG_LEVEL
-    {
-      //! System information. For example, this could be to inform the user of automatically determined constants/values.
-      LOG_LEVEL_SYSTEM_INFO,
-      //! A normal message.
-      LOG_LEVEL_MESSAGE,
-      //! A warning.
-      LOG_LEVEL_WARNING,
-      //! An error.
-      LOG_LEVEL_ERROR,
-      //! A debug message. Will only be sent in debug builds!
-      LOG_LEVEL_DEBUG,
-      //! A debug message concerned with memory allocation. Will only be sent in debug builds!
-      LOG_LEVEL_MEM_DEBUG
-    };
-  }
-}
+#include "cedar/auxiliaries/BoolParameter.fwd.h"
+#include "cedar/auxiliaries/BoolVectorParameter.fwd.h"
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+#include "cedar/auxiliaries/Cloneable.fwd.h"
+#include "cedar/auxiliaries/CommandLineParser.fwd.h"
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/ConsoleLog.fwd.h"
+#include "cedar/auxiliaries/Data.fwd.h"
+#include "cedar/auxiliaries/DataTemplate.fwd.h"
+#include "cedar/auxiliaries/DataSpectator.fwd.h"
+#include "cedar/auxiliaries/DeclarationManagerTemplate.fwd.h"
+#include "cedar/auxiliaries/DirectoryParameter.fwd.h"
+#include "cedar/auxiliaries/DoubleData.fwd.h"
+#include "cedar/auxiliaries/DoubleParameter.fwd.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.fwd.h"
+#include "cedar/auxiliaries/Enum.fwd.h"
+#include "cedar/auxiliaries/EnumBase.fwd.h"
+#include "cedar/auxiliaries/EnumParameter.fwd.h"
+#include "cedar/auxiliaries/EnumType.fwd.h"
+#include "cedar/auxiliaries/exceptions.fwd.h"
+#include "cedar/auxiliaries/GlobalClock.fwd.h"
+#include "cedar/auxiliaries/Grabbable.fwd.h"
+#include "cedar/auxiliaries/GraphTemplate.fwd.h"
+#include "cedar/auxiliaries/Factory.fwd.h"
+#include "cedar/auxiliaries/FactoryDerived.fwd.h"
+#include "cedar/auxiliaries/FactoryManager.fwd.h"
+#include "cedar/auxiliaries/FileParameter.fwd.h"
+#include "cedar/auxiliaries/ImageData.fwd.h"
+#include "cedar/auxiliaries/IntParameter.fwd.h"
+#include "cedar/auxiliaries/IntrusivePtrBase.fwd.h"
+#include "cedar/auxiliaries/IntVectorParameter.fwd.h"
+#include "cedar/auxiliaries/ImageSetData.fwd.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.fwd.h"
+#include "cedar/auxiliaries/Lockable.fwd.h"
+#include "cedar/auxiliaries/Log.fwd.h"
+#include "cedar/auxiliaries/LogFile.fwd.h"
+#include "cedar/auxiliaries/LogFilter.fwd.h"
+#include "cedar/auxiliaries/LogInterface.fwd.h"
+#include "cedar/auxiliaries/LoopedThread.fwd.h"
+#include "cedar/auxiliaries/LoopFunctionInThread.fwd.h"
+#include "cedar/auxiliaries/LoopMode.fwd.h"
+#include "cedar/auxiliaries/MapParameter.fwd.h"
+#include "cedar/auxiliaries/MatrixIterator.fwd.h"
+#include "cedar/auxiliaries/NamedConfigurable.fwd.h"
+#include "cedar/auxiliaries/NullLogger.fwd.h"
+#include "cedar/auxiliaries/NumericParameter.fwd.h"
+#include "cedar/auxiliaries/NumericVectorParameter.fwd.h"
+#include "cedar/auxiliaries/ObjectListParameter.fwd.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/ObjectMapParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/ObjectParameter.fwd.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/Parameter.fwd.h"
+#include "cedar/auxiliaries/ParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/Path.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
+#include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
+#include "cedar/auxiliaries/PluginDeclarationTemplate.fwd.h"
+#include "cedar/auxiliaries/PluginProxy.fwd.h"
+#include "cedar/auxiliaries/Recorder.fwd.h"
+#include "cedar/auxiliaries/SetParameter.fwd.h"
+#include "cedar/auxiliaries/Settings.fwd.h"
+#include "cedar/auxiliaries/Singleton.fwd.h"
+#include "cedar/auxiliaries/StereoImageData.fwd.h"
+#include "cedar/auxiliaries/StringMapParameter.fwd.h"
+#include "cedar/auxiliaries/StringParameter.fwd.h"
+#include "cedar/auxiliaries/StringSetParameter.fwd.h"
+#include "cedar/auxiliaries/StringVectorParameter.fwd.h"
+#include "cedar/auxiliaries/ThreadCollection.fwd.h"
+#include "cedar/auxiliaries/ThreadWrapper.fwd.h"
+#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+#include "cedar/auxiliaries/TypeHierarchyMap.fwd.h"
+#include "cedar/auxiliaries/UIntParameter.fwd.h"
+#include "cedar/auxiliaries/UIntVectorParameter.fwd.h"
+#include "cedar/auxiliaries/UnitData.fwd.h"
+#include "cedar/auxiliaries/UnitDataTemplate.fwd.h"
+#include "cedar/auxiliaries/UnitParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/detail/CallFunctionInThreadWorker.fwd.h"
+#include "cedar/auxiliaries/detail/LoopedThreadWorker.fwd.h"
+#include "cedar/auxiliaries/detail/ThreadWorker.fwd.h"
 
 #endif // CEDAR_AUX_NAMESPACE_H

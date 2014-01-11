@@ -59,7 +59,7 @@
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(170, 218, 24);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
-const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(206, 109, 11);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(0, 76, 249);
 
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
@@ -78,6 +78,7 @@ mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
+mFillStyle(Qt::SolidPattern),
 mSnapToGrid(true),
 mWidth
 (
@@ -174,6 +175,16 @@ void cedar::proc::gui::GraphicsBase::setFillColor(const QColor& color)
 {
   this->mFillColor = color;
   this->update();
+}
+
+void cedar::proc::gui::GraphicsBase::setFillStyle(Qt::BrushStyle style, bool update)
+{
+  this->mFillStyle = style;
+
+  if (update)
+  {
+    this->update();
+  }
 }
 
 void cedar::proc::gui::GraphicsBase::highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource)
@@ -371,7 +382,10 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   {
     painter->save();
     painter->setPen(QPen(Qt::NoPen));
-    painter->setBrush(this->mFillColor);
+    QBrush brush;
+    brush.setColor(this->mFillColor);
+    brush.setStyle(this->mFillStyle);
+    painter->setBrush(brush);
     switch (this->mShape)
     {
       case BASE_SHAPE_RECT:
@@ -482,6 +496,10 @@ const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity v
   }
 }
 
+void cedar::proc::gui::GraphicsBase::itemSelected(bool)
+{
+  // empty default implementation
+}
 
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
@@ -509,6 +527,12 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     case QGraphicsItem::ItemPositionHasChanged:
     {
       this->updateConnections();
+      break;
+    }
+
+    case QGraphicsItem::ItemSelectedHasChanged:
+    {
+      this->itemSelected(value.toBool());
       break;
     }
 

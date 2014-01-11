@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/logFilter/namespace.h"
 #include "cedar/auxiliaries/LogFilter.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 

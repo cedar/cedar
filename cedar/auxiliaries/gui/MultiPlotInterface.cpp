@@ -54,5 +54,21 @@ cedar::aux::gui::PlotInterface(pParent)
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::MultiPlotInterface::append(cedar::aux::ConstDataPtr data, const std::string& title)
 {
+  this->mDataMap[data] = title;
   this->doAppend(data, title);
+}
+
+void cedar::aux::gui::MultiPlotInterface::detach(cedar::aux::ConstDataPtr data)
+{
+  this->doDetach(data);
+  auto map_item = this->mDataMap.find(data);
+  if(map_item != this->mDataMap.end())
+  {
+    this->mDataMap.erase(map_item);
+  }
+}
+
+const cedar::aux::gui::MultiPlotInterface::DataMap& cedar::aux::gui::MultiPlotInterface::getDataMap() const
+{
+  return this->mDataMap;
 }

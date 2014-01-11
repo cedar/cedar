@@ -38,31 +38,21 @@
 #define CEDAR_AUX_KERNEL_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/defines.h"
 
+// FORWARD DECLARATIONS
+
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
 
-namespace cedar
-{
-  /*!@brief Namespace for all aux classes. */
-  namespace aux
-  {
-  /*!@brief Namespace for all kernel classes. */
-    namespace kernel
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Box);
-      CEDAR_DECLARE_AUX_CLASS(Kernel);
-      CEDAR_DECLARE_AUX_CLASS(Separable);
-      CEDAR_DECLARE_AUX_CLASS(Gauss);
-      //!@endcond
+#warning Do not include this header any more. Use the new forward declaration headers instead.
 
-      //!@brief The factory manager for kernel classes.
-      typedef cedar::aux::FactoryManager<cedar::aux::kernel::KernelPtr> FactoryManager;
-    }
-  }
-}
+#include "cedar/auxiliaries/kernel/Box.fwd.h"
+#include "cedar/auxiliaries/kernel/FactoryManager.fwd.h"
+#include "cedar/auxiliaries/kernel/Gauss.fwd.h"
+#include "cedar/auxiliaries/kernel/Kernel.fwd.h"
+#include "cedar/auxiliaries/kernel/Separable.fwd.h"
 
 #endif // CEDAR_AUX_KERNEL_NAMESPACE_H

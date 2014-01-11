@@ -40,16 +40,15 @@
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_YARP
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/processing/sources/namespace.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/net/Reader.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/NetReader.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -102,6 +101,10 @@ protected:
 private:
   //!@brief Resets the step and recreates the yarp connection.
   void reset();
+
+  //!@brief calls emitOutputPropertiesChangedSignal on all outputs
+  //! needed because emitOutputPropertiesChanged() is protected
+  void emitOutputPropertiesChangedSignalOnAction();
 
   void connect();
 

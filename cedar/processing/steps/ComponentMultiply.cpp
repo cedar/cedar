@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/ComponentMultiply.h"
+#include "cedar/processing/typecheck/SameSizedCollection.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -45,6 +46,7 @@
 #include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
+#include <boost/make_shared.hpp>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,38 +89,22 @@ cedar::proc::steps::ComponentMultiply::ComponentMultiply()
 :
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 {
-  this->declareInputCollection("operands");
+  auto input = this->declareInputCollection("operands");
+  input->setCheck(cedar::proc::typecheck::SameSizedCollection(true));
   this->declareOutput("product", mOutput);
 
-  this->mInputs = boost::shared_dynamic_cast<cedar::proc::ExternalData>(this->getInputSlot("operands"));
+  this->mInputs = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(this->getInputSlot("operands"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ComponentMultiply::determineInputValidity
-                                                              (
-                                                                cedar::proc::ConstDataSlotPtr,
-                                                                cedar::aux::ConstDataPtr data
-                                                              ) const
-{
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
-  {
-    if (this->mInputs->getDataCount() == 0
-        || this->mInputs->getData(0)->getData<cv::Mat>().size == mat_data->getData().size)
-    {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
-    }
-  }
-  return cedar::proc::DataSlot::VALIDITY_ERROR;
-}
-
 void cedar::proc::steps::ComponentMultiply::inputConnectionChanged(const std::string& inputName)
 {
   cedar::proc::ConstExternalDataPtr slot = this->getInputSlot(inputName);
   cv::Mat in_mat;
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(slot->getData()))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(slot->getData()))
   {
     in_mat = mat_data->getData().clone();
   }
@@ -137,7 +123,7 @@ void cedar::proc::steps::ComponentMultiply::compute(const cedar::proc::Arguments
 
   for (unsigned int i = 0; i < this->mInputs->getDataCount(); ++i)
   {
-    cedar::aux::MatDataPtr mat_data = boost::shared_static_cast<cedar::aux::MatData>(this->mInputs->getData(i));
+    cedar::aux::MatDataPtr mat_data = boost::static_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(i));
     cv::Mat input = mat_data->getData();
 
     prod = prod.mul(input);

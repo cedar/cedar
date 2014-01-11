@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>988</width>
+    <width>819</width>
     <height>762</height>
    </rect>
   </property>
@@ -37,119 +37,13 @@
        <attribute name="title">
         <string>architecture</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,0,0">
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="1">
         <property name="margin">
          <number>0</number>
         </property>
         <property name="spacing">
          <number>0</number>
         </property>
-        <item row="2" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0,0,0,0">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="mpZoomMinus">
-            <property name="maximumSize">
-             <size>
-              <width>15</width>
-              <height>15</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>-</string>
-            </property>
-            <property name="autoRepeat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSlider" name="mpZoomSlider">
-            <property name="minimum">
-             <number>25</number>
-            </property>
-            <property name="maximum">
-             <number>175</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="invertedAppearance">
-             <bool>false</bool>
-            </property>
-            <property name="invertedControls">
-             <bool>false</bool>
-            </property>
-            <property name="tickPosition">
-             <enum>QSlider::NoTicks</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="mpZoomPlus">
-            <property name="maximumSize">
-             <size>
-              <width>15</width>
-              <height>15</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>+</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="mpZoomDisplay">
-            <property name="maximumSize">
-             <size>
-              <width>60</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="mpResetZoom">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>100%</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="0" column="0">
          <widget class="cedar::proc::gui::View" name="mpProcessingDrawer"/>
         </item>
@@ -164,8 +58,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>988</width>
-     <height>20</height>
+     <width>819</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -183,13 +77,6 @@
     <addaction name="separator"/>
     <addaction name="mpActionExit"/>
    </widget>
-   <widget class="QMenu" name="menuPlugins">
-    <property name="title">
-     <string>Plugins</string>
-    </property>
-    <addaction name="mpActionManagePlugins"/>
-    <addaction name="mpActionLoadPlugin"/>
-   </widget>
    <widget class="QMenu" name="menuSimulation">
     <property name="title">
      <string>Simulation</string>
@@ -204,6 +91,9 @@
      <string>Windows</string>
     </property>
     <addaction name="separator"/>
+    <addaction name="mpActionShowRobotManager"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionArchitectureConsistencyCheck"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -215,6 +105,8 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="mpActionManagePlugins"/>
+    <addaction name="separator"/>
     <addaction name="mpActionDuplicate"/>
     <addaction name="mpActionSelectAll"/>
    </widget>
@@ -245,7 +137,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
-   <addaction name="menuPlugins"/>
    <addaction name="menuSimulation"/>
    <addaction name="menuTools"/>
    <addaction name="mpMenuWindows"/>
@@ -319,8 +210,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>115</width>
-          <height>458</height>
+          <width>129</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -332,8 +223,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>96</width>
-          <height>26</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -350,7 +241,7 @@
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
-    <string>Properties</string>
+    <string>Settings</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -361,7 +252,139 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
+      <widget class="QTabWidget" name="tabWidget_2">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Properties</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Recorder</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QScrollArea" name="scrollArea">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="cedar::proc::gui::RecorderWidget" name="mpRecorderWidget">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>98</width>
+              <height>28</height>
+             </rect>
+            </property>
+            <property name="palette">
+             <palette>
+              <active>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </active>
+              <inactive>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </inactive>
+              <disabled>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Shadow">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>249</red>
+                  <green>249</green>
+                  <blue>249</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </disabled>
+             </palette>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -376,20 +399,27 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionSave"/>
-   <addaction name="mpActionResetRootNetwork"/>
-   <addaction name="separator"/>
-   <addaction name="mpActionToggleTriggerVisibility"/>
    <addaction name="separator"/>
    <addaction name="mpThreadsStartAll"/>
    <addaction name="mpThreadsStopAll"/>
-   <addaction name="separator"/>
    <addaction name="mpThreadsSingleStep"/>
+   <addaction name="mpActionRecord"/>
+   <addaction name="mpActionSnapshot"/>
+   <addaction name="separator"/>
    <addaction name="mpActionBoostControl"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleSmartConnections"/>
-   <addaction name="mpActionCloseAllPlots"/>
+   <addaction name="mpActionShowHideGrid"/>
+   <addaction name="mpActionToggleTriggerVisibility"/>
+   <addaction name="mpActionClosePlots"/>
+   <addaction name="mpActionToggleVisibilityOfPlots"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionDisplayPlotGroup"/>
+   <addaction name="mpActionNewPlotGroup"/>
+   <addaction name="mpActionEditPlotGroup"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionDeletePlotGroup"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -434,10 +464,13 @@
   </action>
   <action name="mpActionManagePlugins">
    <property name="text">
-    <string>Manage ...</string>
+    <string>Manage plugins ...</string>
    </property>
   </action>
   <action name="mpThreadsStartAll">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
      <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
@@ -450,6 +483,15 @@
    </property>
   </action>
   <action name="mpThreadsStopAll">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
      <normaloff>:/cedar/auxiliaries/gui/stop.svg</normaloff>:/cedar/auxiliaries/gui/stop.svg</iconset>
@@ -509,7 +551,7 @@
     <string>Reset root network</string>
    </property>
    <property name="toolTip">
-    <string>Resets the root network of the current architecture.</string>
+    <string>Resets all steps</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
@@ -518,6 +560,14 @@
   <action name="mpActionExportSVG">
    <property name="text">
     <string>Export SVG ...</string>
+   </property>
+  </action>
+  <action name="mpActionShowRobotManager">
+   <property name="text">
+    <string>Robot Manager ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="mpActionDuplicate">
@@ -584,7 +634,7 @@
     <string>Single-step each trigger</string>
    </property>
    <property name="toolTip">
-    <string>do a singles step with each trigger</string>
+    <string>execute a single step with each trigger</string>
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
@@ -621,7 +671,7 @@
     <string>toggle smart connections</string>
    </property>
   </action>
-  <action name="mpActionCloseAllPlots">
+  <action name="mpActionClosePlots">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/close_all_plots.svg</normaloff>:/toolbaricons/close_all_plots.svg</iconset>
@@ -631,6 +681,97 @@
    </property>
    <property name="toolTip">
     <string>closes all plots</string>
+   </property>
+  </action>
+  <action name="mpActionRecord">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/record.svg</normaloff>
+     <normalon>:/cedar/auxiliaries/gui/recordStop.svg</normalon>
+     <activeoff>:/cedar/auxiliaries/gui/record.svg</activeoff>
+     <activeon>:/cedar/auxiliaries/gui/recordStop.svg</activeon>
+     <selectedon>:/cedar/auxiliaries/gui/recordStop.svg</selectedon>:/cedar/auxiliaries/gui/record.svg</iconset>
+   </property>
+   <property name="text">
+    <string>record</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Record all registered slots.</string>
+   </property>
+  </action>
+  <action name="mpActionSnapshot">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/snapshot.svg</normaloff>:/toolbaricons/snapshot.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Snapshot</string>
+   </property>
+   <property name="toolTip">
+    <string>Takes a snapshot from the registered steps</string>
+   </property>
+  </action>
+  <action name="mpActionToggleVisibilityOfPlots">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</normaloff>:/toolbaricons/toggle_visibility_of_plots.svg</iconset>
+   </property>
+   <property name="text">
+    <string>toggle visibility of plots</string>
+   </property>
+   <property name="toolTip">
+    <string>hides/shows all open plots</string>
+   </property>
+  </action>
+  <action name="mpActionNewPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/new.svg</normaloff>:/toolbaricons/new.svg</iconset>
+   </property>
+   <property name="text">
+    <string>New Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>add a plot group</string>
+   </property>
+  </action>
+  <action name="mpActionEditPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/edit.svg</normaloff>:/toolbaricons/edit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>edit selected plot group</string>
+   </property>
+  </action>
+  <action name="mpActionDisplayPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/display.svg</normaloff>:/toolbaricons/display.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Display Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>display selected plot group</string>
+   </property>
+  </action>
+  <action name="mpActionDeletePlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/trash.svg</normaloff>:/toolbaricons/trash.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>delete selected plot group</string>
    </property>
   </action>
  </widget>
@@ -655,6 +796,12 @@
    <class>cedar::aux::gui::Log</class>
    <extends>QWidget</extends>
    <header>cedar/auxiliaries/gui/Log.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::RecorderWidget</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/gui/RecorderWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

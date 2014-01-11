@@ -37,7 +37,6 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#include "cedar/auxiliaries/namespace.h"
 
 #ifndef CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
 #define CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
@@ -45,6 +44,8 @@
 #include "cedar/testingUtilities/namespace.h"
 
 // CEDAR INCLUDES
+#include <functional>
+#include <string>
 
 // SYSTEM INCLUDES
 namespace cedar
@@ -68,7 +69,8 @@ namespace cedar
     CEDAR_TESTING_UTILITIES_LIB_EXPORT void test_time
                                        (
                                          std::string id,
-                                         std::function<void()> fun
+                                         std::function<void()> fun,
+                                         unsigned int repetitions = 1
                                        );
   }
 }

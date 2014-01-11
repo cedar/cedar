@@ -41,11 +41,14 @@
 #include "cedar/processing/sources/Picture.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/math/tools.h"
 
-
 // SYSTEM INCLUDES
+#include <sstream>
+#include <string>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -151,15 +154,17 @@ void cedar::proc::sources::Picture::reset()
 void cedar::proc::sources::Picture::updatePicture()
 {
   cv::Mat old_image = this->mImage->getData();
-  onTrigger();
-
+  // fill output with new image
+  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->compute(cedar::proc::Arguments());
+  this->unlock();
   cv::Mat new_image = this->mImage->getData();
   if (!cedar::aux::math::matrixSizesEqual(old_image, new_image) || old_image.type() != new_image.type())
   {
     this->annotateImage();
     this->emitOutputPropertiesChangedSignal("Picture");
-    onTrigger();
   }
+  onTrigger();
 }
 
 void cedar::proc::sources::Picture::compute(const cedar::proc::Arguments&)

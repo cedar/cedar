@@ -61,7 +61,6 @@ typedef boost::shared_ptr<StepTest> StepTestPtr;
 
 int main(int /* argc */, char** /* argv */)
 {
-  using cedar::aux::LogFile;
   using cedar::proc::Trigger;
   using cedar::proc::TriggerPtr;
 

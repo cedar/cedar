@@ -44,6 +44,7 @@
 // SYSTEM INCLUDES
 #include <QGridLayout>
 #include <QDialog>
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter

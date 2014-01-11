@@ -1,4 +1,4 @@
-List of changes                                                                                             {#changelog}
+List of changes
 ===============
 
  <!--
@@ -26,7 +26,7 @@ List of changes                                                                 
    Institute:   Ruhr-Universitaet Bochum
                 Institut fuer Neuroinformatik
 
-   File:        changelog.txt
+   File:        changelog.md
 
    Maintainer:  all cedar developers
    Email:       cedar@ini.rub.de
@@ -39,13 +39,7 @@ List of changes                                                                 
 =======================================================================================================================
 -->
 
-Below, you can find a list of current changes for the different branches of cedar.
-
-stable release
---------------
-
-Please keep in mind that "stable" refers to the state of our interfaces, i.e., doesn't mean the software is crash- or
-bug-free, but rather, that we'll try to not change any signatures of functions without deprecating them first.
+Below, you can find a list of current changes of cedar. Please keep in mind that we try to keep our interfaces as stable as possible. This doesn't mean the software is crash- or bug-free.
 
 Currently, there are still a few classes and frameworks that are under development. Here's a list of interfaces that are
 likely to undergo major changes:
@@ -63,32 +57,45 @@ known issues
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it (it's deactivated in the gui anyway).
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
-  - the constness of parameters in the PropertyPane is sometimes not updated correctly - de- and reselecting helps
-  - Some of the interactive Caren tests may not run if you do not have the corresponding meshes.
+  - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
     standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
-      
-Unreleased changes
-==================
-
-The following is a list of all the changes that have not been released in an official version, yet. You can get them by
-accessing the corresponding repositories.
-
-
-current stable
---------------
-- cedar::proc::gui
-  - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
-    (see also issue #10 in stable)
-- cedar::dyn
-  - Fixed a potential deadlock in the neural field that occurred when the activation was set as output and an exception occurred during the Euler step.
+  - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
+  - Singleton-related classes may sometimes cause crashes when programs exit. If you experience random crashes when your
+    own programs exit and the stack contains cedar::aux::Log::getMemoryDebugFlag(), this may be the cause. As a
+    workaround, make sure to reset all smart pointers at the end of your main method (the usual cause are global-scope
+    smart pointers that send a log message after the log singleton was freed.)
 
 
-current testing
----------------
+Unreleased
+==========
+
+- build system
+  - libQGLViewer is now optional. If it is not present, many of the GL components of cedar, including the kinematic chain
+    simulator will likely not function properly.
+- general
+  - The plugin system has been changed. It is no longer specific to the processing framework, although it is not (yet)
+    used elsewhere. Plugins can now be added in an improved manager. They are found in a different way, now: a list of
+    user-defined paths is searched for a plugin of a given name by appending certain directories (such as the plugin
+    name itself and a "build" folder.) Using this new functionality, architectures now store which plugins they require.
+- cedar::aux
+  - There is now a command line parser available. This is intended to make software that performs experiments easy to
+    customize; it features auto-generated help texts, reading and writing of options to file and some sanity checking of
+    user inputs. It is still being developed.
+- cedar::proc
+  - Step can no longer be executed in a separate thread (nobody uses this functionality).
+
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+
+Version 2.0.0
+-------------
 - general
   - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
-    for example anchor, shift, and limit of kernels and threshold of sigmoids. 
+    for example anchor, shift, and limit of kernels and threshold of sigmoids.
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.
@@ -137,15 +144,21 @@ current testing
     architectures - this mode is fully automatic, so there's now way to move any lines around by hand.
   - DataSlots now scale when you drag a connection close to them. You can configure (and disable) this behavior in the
     tools -> settings -> user interface menu of the processingIde.
-
+  - Please note that step icons can now only have the svg format. If you have an icon in a different format, please
+    embed it in a svg file using, e.g., inkscape.
+  - Connections of selected steps in the processingIde are now hightlighted. This behavior is active by default and can
+    be disabled in the settings menu.
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
 
-Released versions
-=================
 
-The following are the changes made in the release versions. You can find these on the cedar home page as well as the
-repositories.
+Version 1.0.10
+-------------
+- cedar::proc::gui
+  - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
+    (see also issue #10 in stable)
+- cedar::dyn
+  - Fixed a potential deadlock in the neural field that occurred when the activation was set as output and an exception occurred during the Euler step.
 
 
 Version 1.0.9

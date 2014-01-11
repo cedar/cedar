@@ -49,10 +49,12 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 
 // SYSTEM INCLUDES
-#include <boost/numeric/conversion/bounds.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/numeric/conversion/bounds.hpp>
+#endif
 #include <qwt_legend.h>
 #include <qwt_scale_div.h>
 #include <qwt_symbol.h>
@@ -100,17 +102,19 @@ mpLock(new QReadWriteLock())
 
 cedar::aux::gui::QwtLinePlot::~QwtLinePlot()
 {
-  if (mpLock)
-  {
-    delete mpLock;
-  }
-
   if (this->mpWorkerThread)
   {
     this->mpWorkerThread->quit();
     this->mpWorkerThread->wait();
     delete this->mpWorkerThread;
     this->mpWorkerThread = NULL;
+  }
+
+  this->mPlotSeriesVector.clear();
+
+  if (mpLock)
+  {
+    delete mpLock;
   }
 }
 
@@ -122,7 +126,11 @@ cedar::aux::math::Limits<double> cedar::aux::gui::QwtLinePlot::getXLimits() cons
 {
   cedar::aux::math::Limits<double> limits;
 
+#if QWT_VERSION >= 0x060100
+  const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#else
   QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#endif
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -132,7 +140,11 @@ cedar::aux::math::Limits<double> cedar::aux::gui::QwtLinePlot::getYLimits() cons
 {
   cedar::aux::math::Limits<double> limits;
 
+#if QWT_VERSION >= 0x060100
+  const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+#else
   QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+#endif
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -194,15 +206,15 @@ void cedar::aux::gui::QwtLinePlot::applyStyle(cedar::aux::ConstDataPtr data, siz
   pCurve->setPen(pen);
 
   // Use symbols instead of curves for discrete data
-  if (data->hasAnnotation<cedar::aux::annotation::DiscreteCoordinates>())
+  if (data->hasAnnotation<cedar::aux::annotation::DiscreteMetric>())
   {
     pCurve->setStyle(QwtPlotCurve::NoCurve);
     QwtSymbol
-#if (QWT_VERSION >> 16) == 6
+#if (QWT_VERSION >= 0x060000)
     * // qwt 6.x expects a pointer
 #endif
       symbol
-#if (QWT_VERSION >> 16) == 6
+#if (QWT_VERSION >= 0x060000)
       = new QwtSymbol
 #endif
       (mLineSymbols.at(style_id), QBrush(mLineColors.at(color_id)), pen, QSize(10, 10));
@@ -260,7 +272,7 @@ void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   data->lockForRead();
   const cv::Mat& mat = plot_series->mMatData->getData();
 
-  CEDAR_DEBUG_ASSERT(cedar::aux::math::getDimensionalityOf(mat) == 1);
+  CEDAR_DEBUG_ASSERT(cedar::aux::math::getDimensionalityOf(mat) <= 1);
 
   size_t num = cedar::aux::math::get1DMatrixSize(mat);
   data->unlock();
@@ -273,10 +285,10 @@ void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
 
   plot_series->buildArrays(num);
 
-#if (QWT_VERSION >> 16) == 5
-  plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
-#elif (QWT_VERSION >> 16) == 6
+#if (QWT_VERSION >= 0x060000)
   plot_series->mpCurve->setRawSamples(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
+#elif (QWT_VERSION >= 0x050000)
+  plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
 #else
 #error unsupported qwt version
 #endif
@@ -285,6 +297,32 @@ void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   mpLock->unlock();
 
   this->startTimer(30);
+}
+
+bool cedar::aux::gui::QwtLinePlot::canDetach(cedar::aux::ConstDataPtr data) const
+{
+  if(this->mpPlot != nullptr && this->mPlotSeriesVector.size() > 1)
+  {
+    for(auto plot_series : this->mPlotSeriesVector)
+    {
+      if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data)
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+void cedar::aux::gui::QwtLinePlot::doDetach(cedar::aux::ConstDataPtr data)
+{
+  mpLock->lockForWrite();
+  auto new_end = std::remove_if(mPlotSeriesVector.begin(), mPlotSeriesVector.end(), [&](PlotSeriesPtr plot_series){
+    return (boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data);
+  });
+  mPlotSeriesVector.erase(new_end, mPlotSeriesVector.end());
+  mpLock->unlock();
 }
 
 void cedar::aux::gui::QwtLinePlot::attachMarker(QwtPlotMarker *pMarker)
@@ -440,7 +478,7 @@ void cedar::aux::gui::QwtLinePlot::showLegend(bool show)
   if (show)
   {
     // show legend
-    auto *p_legend = this->mpPlot->legend();
+    auto p_legend = this->mpPlot->legend();
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();
@@ -529,15 +567,15 @@ void cedar::aux::gui::QwtLinePlot::conversionDone()
     PlotSeriesPtr series = this->mPlotSeriesVector.at(i);
 
     // choose the right function depending on the qwt version
-    #if (QWT_VERSION >> 16) == 5
-      series->mpCurve->setData
+    #if (QWT_VERSION >= 0x060000)
+      series->mpCurve->setRawSamples
       (
         &series->mXValues.at(0),
         &series->mYValues.at(0),
         static_cast<int>(series->mXValues.size())
       );
-    #elif (QWT_VERSION >> 16) == 6
-      series->mpCurve->setRawSamples
+    #elif (QWT_VERSION >= 0x050000)
+      series->mpCurve->setData
       (
         &series->mXValues.at(0),
         &series->mYValues.at(0),

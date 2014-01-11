@@ -24,13 +24,11 @@
 
     File:        namespace.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Maintainer:  Mathis Richter
+
+    Email:       mathis.richter@ini.rub.de
+
+    Date:        2013 02 18
 
     Description: Namespace file for cedar::units.
 
@@ -45,34 +43,23 @@
 #include "cedar/units/lib.h"
 
 // SYSTEM INCLUDES
-#include <string>
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
 
+/*! Defined to indicate that the new unit framework is in effect. This can be used to keep software compatible with
+ *  multiple versions of cedar.
+ */
+#define CEDAR_UNIT_FRAMEWORK_V2
 
 namespace cedar
 {
   /*!@brief Namespace for all aux classes. */
   namespace unit
   {
-    // because strings (as template arguments) must be constant at compile-time, this is used for the prefixes:
-    //!@brief string prefix for microseconds
-    extern CEDAR_UNITS_LIB_EXPORT const char prefix_us[];
-    //!@brief string prefix for milliseconds
-    extern CEDAR_UNITS_LIB_EXPORT const char prefix_ms[];
-    //!@brief string prefix for seconds
-    extern CEDAR_UNITS_LIB_EXPORT const char prefix_s[];
-
-    //!@brief the base class Time
-    class CEDAR_UNITS_LIB_EXPORT Time;
-
-    template <unsigned int factor, const char* suffix> class TimeUnit;
-
-    //!@brief the template concretization for microseconds
-    typedef TimeUnit<1, prefix_us> Microseconds;
-    //!@brief the template concretization for milliseconds
-    typedef TimeUnit<1000, prefix_ms> Milliseconds;
-    //!@brief the template concretization for seconds
-    typedef TimeUnit<1000000, prefix_s> Seconds;
+    //!@cond SKIPPED_DOCUMENTATION
+    template <typename DimensionType> struct UnitMatrix;
+    //!@endcond
   }
 }
 

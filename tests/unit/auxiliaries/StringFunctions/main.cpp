@@ -437,5 +437,19 @@ int main()
 
   std::cout << "Test finished with " << errors << " error(s)." << std::endl;
 
+
+  // fromString test ---------------------------------------------------------------------------------------------------
+  {
+    std::string test_string = "string with spaces";
+    std::cout << "Testing cedar::aux::fromString<std::string>(\"" << test_string << "\")" << std::endl;
+    std::string from_string_res = cedar::aux::fromString<std::string>(test_string);
+
+    if (from_string_res != test_string)
+    {
+      std::cout << "  ERROR: result \"" << from_string_res << "\" != test string." << std::endl;
+      ++errors;
+    }
+  }
+
   return errors;
 }

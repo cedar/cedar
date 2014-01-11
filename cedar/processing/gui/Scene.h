@@ -42,13 +42,28 @@
 #define CEDAR_PROC_SCENE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/Scene.fwd.h"
+#include "cedar/processing/gui/StepItem.fwd.h"
+#include "cedar/processing/gui/View.fwd.h"
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/gui/TriggerItem.fwd.h"
+#include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
+#include "cedar/processing/gui/StickyNote.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
 #include <QMainWindow>
+#include <map>
+#include <vector>
+#include <string>
 
 
 /*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Networks.
@@ -260,7 +275,11 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
    */
-  void setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget);
+  void setConfigurableWidget(cedar::aux::gui::PropertyPane* pConfigurableWidget);
+
+  /*!@brief Sets the widget used for displaying/editing the record parameters.
+   */
+  void setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget);
 
   /*!@brief Exports the scene to an svg file
    */
@@ -279,6 +298,17 @@ public:
 
   //! deselect all items
   void selectNone();
+
+  /*!brief Adds a sticky node to the current scene
+   */
+  void addStickyNote();
+  cedar::proc::gui::StickyNote* addStickyNote(int x, int y, int witdh, int height, std::string text);
+
+  //! Removes a sticky note
+  void removeStickyNote(StickyNote* note);
+
+  // Gets all sticky notes
+  const std::vector<cedar::proc::gui::StickyNote* > getStickyNotes() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -378,6 +408,9 @@ private:
   //! Map of all the elements.
   ElementMap mElementMap;
 
+  //! List of all sticky notes
+  std::vector<cedar::proc::gui::StickyNote*> mStickyNotes;
+
   //! The main window containing the scene.
   QMainWindow *mpMainWindow;
 
@@ -386,6 +419,15 @@ private:
 
   //! The widget used to display configurables when they are selected in the scene. May be null.
   cedar::aux::gui::PropertyPane *mpConfigurableWidget;
+
+  //! The widget used to display record settings of steps when they are selected in the scene. May be null.
+  cedar::proc::gui::RecorderWidget *mpRecorderWidget;
+
+  //! Saves the mouse x position in the scene
+  int mMousePosX;
+
+  //! Saves the mouse y position in the scene
+  int mMousePosY;
 
 }; // class ProcessingScene
 

@@ -38,13 +38,19 @@
 #define CEDAR_AUX_MATH_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/Factory.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/Velocity.h"
+#include "cedar/units/Acceleration.h"
+#include "cedar/units/PlaneAngle.h"
+#include "cedar/units/AngularVelocity.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
 
 
 namespace cedar
@@ -76,11 +82,24 @@ namespace cedar
       //!@brief a template specialization for unsigned int-based limits
       typedef LimitsParameter<unsigned int> UIntLimitsParameter;
 
+      typedef LimitsParameter<cedar::unit::Length> LengthLimitsParameter;
+      typedef LimitsParameter<cedar::unit::Time> TimeLimitsParameter;
+      typedef LimitsParameter<cedar::unit::Velocity> VelocityLimitsParameter;
+      typedef LimitsParameter<cedar::unit::Acceleration> AccelerationLimitsParameter;
+      typedef LimitsParameter<cedar::unit::PlaneAngle> PlaneAngleLimitsParameter;
+      typedef LimitsParameter<cedar::unit::AngularVelocity> AngularVelocityLimitsParameter;
+
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_GENERATE_POINTER_TYPES(TransferFunctionFactory);
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntLimitsParameter);
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(LengthLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TimeLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(VelocityLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(AccelerationLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(PlaneAngleLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(AngularVelocityLimitsParameter);
       //!@endcond
     }
   }

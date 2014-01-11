@@ -51,12 +51,15 @@
 
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/AbstractNetBase.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/interfaces/InterfaceOpenable.h"
 
 // PROJECT INCLUDES
 #include <yarp/os/Network.h>
-#include <boost/utility.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/utility.hpp>
+#endif
+#include <string>
 
 
 // SYSTEM INCLUDES

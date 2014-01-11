@@ -42,10 +42,11 @@
 #define CEDAR_PROC_LOOPED_TRIGGER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/LoopedTrigger.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -68,7 +69,10 @@ class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0, const std::string& name = "");
+  LoopedTrigger(
+                 cedar::unit::Time stepSize = cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second),
+                 const std::string& name = ""
+               );
 
   //!@brief Destructor
   virtual ~LoopedTrigger();
@@ -79,7 +83,7 @@ public:
 public:
   /*!@brief Step method implemented from the superclass.
    */
-  void step(double time);
+  void step(cedar::unit::Time time);
 
   /*!@brief Starts the trigger loop.
    *
@@ -139,10 +143,10 @@ private:
   void addListener(cedar::proc::TriggerablePtr triggerable);
 
   //! Called when the trigger is started.
-  void applyStart();
+  void prepareStart();
 
   //! Called when the trigger is started.
-  void applyStop(bool);
+  void processStop(bool);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -160,20 +164,11 @@ protected:
   // none yet
 
 private:
-  //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
-  cedar::aux::BoolParameterPtr mWait;
+  //! Used to prevent multiple start calls to the trigger.
+  bool mStarted;
 
   //! Used to prevent multiple start calls to the trigger.
-  bool mStarting;
-
-  //! Used to prevent multiple start calls to the trigger.
-  QMutex mStartingMutex;
-
-  //! Used to prevent multiple start calls to the trigger.
-  bool mStopping;
-
-  //! Used to prevent multiple start calls to the trigger.
-  QMutex mStoppingMutex;
+  QMutex mStartedMutex;
 
 }; // class cedar::proc::LoopedTrigger
 

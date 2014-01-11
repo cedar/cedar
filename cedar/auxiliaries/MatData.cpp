@@ -43,10 +43,15 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
-
+#include <vector>
+#include <string>
+#include <fstream>
+#include <QReadLocker>
+#include <QReadWriteLock>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -95,6 +100,99 @@ std::string cedar::aux::MatData::getDescription() const
   this->unlock();
 
   return description;
+}
+
+void cedar::aux::MatData::serializeData(std::ostream& stream) const
+{
+  QReadLocker locker(this->mpLock);
+  //creating index that addresses an element in the n dimensional Mat
+  std::vector<int> index(mData.dims, 0);
+
+  //iterate  as long the last dimension has exceeded
+  while (index[mData.dims-1] < mData.size[mData.dims-1])
+  {
+    // get memory address of the element.
+    uchar* element = mData.data;
+    for (int i = 0; i < mData.dims; i++)
+    {
+      //Addresses an element of the Mat. See OpenCV Documentation.
+      element += mData.step[i]*index[i];
+    }
+    //check data type
+    for (int i = 0; i < mData.channels(); i++)
+    {
+      switch (mData.depth())
+      {
+        case CV_8U:
+        {
+          stream << static_cast<int>(element[i]) << ",";
+          break;
+        }
+        case CV_8S:
+        {
+          stream  << static_cast<int>(reinterpret_cast<schar*>(element)[i]) << ",";
+          break;
+        }
+        case CV_16U:
+        {
+          stream  << reinterpret_cast<unsigned short*>(element)[i] << ",";
+          break;
+        }
+        case CV_16S:
+        {
+          stream  << reinterpret_cast<short*>(element)[i] << ",";
+          break;
+        }
+        case CV_32S:
+        {
+          stream  << reinterpret_cast<int*>(element)[i] << ",";
+          break;
+        }
+        case CV_32F:
+        {
+          stream  << reinterpret_cast<float*>(element)[i] << ",";
+          break;
+        }
+        case CV_64F:
+        {
+          stream  << reinterpret_cast<double*>(element)[i] << ",";
+          break;
+        }
+      }
+    }
+
+    //increase index
+	  //!@todo This is slow in multiple ways; a faster approach would be to iterate over the linear memory with a linear index
+    //!@todo Also, we have an iterator class for iterating over a 3d matrix
+    index[0]++;
+    for(int i =0; i < mData.dims-1; i++)
+    {
+      if(index[i] >= mData.size[i])
+      {
+        index[i]=0;
+        index[i+1]++;
+      }
+    }
+  }
+}
+
+void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
+{
+  QReadLocker locker(this->mpLock);
+  stream << "Mat" << ",";
+  stream << cedar::aux::math::matrixTypeToString(mData) << ",";
+  for(int i =0; i < mData.dims;i++)
+  {
+    stream << mData.size[i] << ",";
+  }
+}
+
+cedar::aux::DataPtr cedar::aux::MatData::clone() const
+{
+  QReadLocker locker(this->mpLock);
+  MatDataPtr cloned(new MatData(mData.clone()));
+  locker.unlock();
+  return cloned;
 }
 
 unsigned int cedar::aux::MatData::getDimensionality() const

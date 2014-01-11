@@ -43,14 +43,29 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/units/Time.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+#include "cedar/processing/TriggerConnection.fwd.h"
+#include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
 #include <vector>
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif
+#include <map>
+#include <set>
+#include <list>
+#include <string>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
@@ -77,6 +92,8 @@ public:
     CONNECTION_REMOVED,
   };
 
+ signals:
+  void stepNameChanged(const std::string& from, const std::string& to);
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -194,8 +211,9 @@ public:
    *
    * @param elementName Identifier of the existing element.
    * @param newName Name to be given to the new element.
+   * @returns The new name of the element.
    */
-  void duplicate(const std::string& elementName, const std::string& newName = "");
+  std::string duplicate(const std::string& elementName, const std::string& newName = "");
 
   /*!@brief unmodifiedName unmodified name, possibly non-unique in network
    * @return unique name created by attaching a number if name is already taken
@@ -269,11 +287,21 @@ public:
    */
   void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
 
+  /*!@brief Deletes the connections in the list.
+   */
+  void disconnectSlots(const std::vector<cedar::proc::DataConnectionPtr>& connections);
+
   /*!@brief Deletes all connections from a given data slot.
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
    */
   void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+
+    /*!@brief Deletes all connections to the given data slot.
+     * @param connectable The slot's parent.
+     * @param slot Identifier of the data slot.
+     */
+  void disconnectInputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes the connection between source and target.
    */
@@ -285,11 +313,35 @@ public:
    * @param sourceDataName The name of the slot from which to look list outgoing connections.
    * @param connections    Vector into which the connections are written.
    */
-  void getDataConnections(
+  CEDAR_DECLARE_DEPRECATED(void getDataConnections(
                            cedar::proc::ConnectablePtr source,
                            const std::string& sourceDataName,
                            std::vector<cedar::proc::DataConnectionPtr>& connections
+                         ));
+
+  /*!@brief Writes all the connections originating from a source connectable into a vector.
+   *
+   * @param source             The connectable source.
+   * @param sourceDataSlotName The name of the slot from which to look list outgoing connections.
+   * @param connections        Vector into which the connections are written.
+   */
+  void getDataConnectionsFrom(
+                           cedar::proc::ConnectablePtr source,
+                           const std::string& sourceDataSlotName,
+                           std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
+
+  /*!@brief Writes all the connections ending at a target connectable into a vector.
+   *
+   * @param source             The connectable target.
+   * @param sourceDataSlotName The name of the slot at which connections end.
+   * @param connections        Vector into which the connections are written.
+   */
+  void getDataConnectionsTo(
+                             cedar::proc::ConnectablePtr target,
+                             const std::string& targetDataSlotName,
+                             std::vector<cedar::proc::DataConnectionPtr>& connections
+                           );
 
   /*!@brief access the vector of data connections
    */
@@ -397,6 +449,9 @@ public:
   //! Returns a list of all the looped triggers in this network.
   std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
 
+  //! Reads the meta information from the given file and extracts the plugins required by the architecture.
+  static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -439,6 +494,14 @@ private:
    */
   void writeTriggers(cedar::aux::ConfigurationNode& root) const;
 
+  /*!@brief Writes the steps that are registered in the recorder in the network to the configuration node.
+   */
+  void writeRecords(cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Reads the slots that should be registered in the recorder.
+  */
+  void readRecords(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
+
   /*!@brief Reads networks from a configuration node and adds them to the parent network.
    */
   void readNetworks(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
@@ -446,10 +509,6 @@ private:
   /*!@brief Writes the child networks in the network to the configuration node.
    */
   void writeNetworks(cedar::aux::ConfigurationNode& root) const;
-
-  /*!@brief Reads a data connection from a configuration node and adds it to the network.
-   */
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes a data connection to the configuration node.
    */
@@ -476,13 +535,6 @@ private:
 
   //!@brief processes slot promotion
   void processPromotedSlots();
-
-  /*!@brief   Single-steps all triggers in this network with the given time step.
-   *
-   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
-   *          all triggers are stopped.
-   */
-  void stepTriggers(double stepTime);
 
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.

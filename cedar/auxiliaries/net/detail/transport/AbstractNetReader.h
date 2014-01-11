@@ -45,18 +45,21 @@
 #define CEDAR_ABSTRACT_NET_READER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetBase.h"
+#include "cedar/auxiliaries/net/detail/transport/AbstractNetReader.fwd.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 #include <yarp/os/Network.h>
 
 // SYSTEM INCLUDES
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string>
 
 namespace cedar {
   namespace aux {
