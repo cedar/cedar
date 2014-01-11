@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
@@ -45,8 +44,10 @@
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+  #include <boost/filesystem.hpp>
+#endif
 
 
 // a test class with two parameters

@@ -41,9 +41,14 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATION
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
+#include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 // definitions used for loading a list from a plugin.
 # ifdef __cplusplus
@@ -143,6 +148,9 @@ public:
   {
     return this->mDeclarations.at(i);
   }
+
+  //! Sets the source of the plugin list. Only set after the list has been populated!
+  void setSource(const std::string& source);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

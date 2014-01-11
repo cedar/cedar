@@ -41,13 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/DeclarationManagerTemplate.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/PluginDeclarationTemplate.fwd.h"
+
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@todo describe.
@@ -126,7 +129,7 @@ public:
    */
   bool isObjectInstanceOf(BaseClassPtr pointer) const
   {
-    return boost::dynamic_pointer_cast<PluginClass>(pointer);
+    return !!boost::dynamic_pointer_cast<PluginClass>(pointer);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -142,6 +145,11 @@ private:
   virtual void onDeclare() const
   {
     PluginFactoryManager::getInstance()->template registerType<PluginClassPtr>(this->mClassName);
+
+    if (this->isDeprecated())
+    {
+      PluginFactoryManager::getInstance()->template deprecate<PluginClassPtr>();
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------

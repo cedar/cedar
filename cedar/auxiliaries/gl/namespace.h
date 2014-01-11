@@ -39,10 +39,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif
 
 namespace cedar
 {
@@ -52,19 +53,7 @@ namespace cedar
     namespace gl
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Scene);
-      CEDAR_DECLARE_AUX_CLASS(ObjectVisualization);
-      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualization Object);
-      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualization RigidBodyVisualization);
-      CEDAR_DECLARE_AUX_CLASS(Block);
-      CEDAR_DECLARE_AUX_CLASS(Sphere);
-      CEDAR_DECLARE_AUX_CLASS(Cone);
-      CEDAR_DECLARE_AUX_CLASS(Cylinder);
-      CEDAR_DECLARE_AUX_CLASS(Prism);
-      CEDAR_DECLARE_AUX_CLASS(Pyramid);
-      CEDAR_DECLARE_AUX_CLASS(Torus);
-      CEDAR_DECLARE_AUX_CLASS(Ellipse);
-      CEDAR_DECLARE_AUX_CLASS(Chessboard);
+#warning Do not include this header any more. Use the new forward declaration headers instead!
       //!@endcond
     }
   }

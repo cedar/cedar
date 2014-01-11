@@ -52,7 +52,9 @@
 #include <QApplication>
 #include <QHeaderView>
 #include <QScrollBar>
-#include <boost/bind.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/bind.hpp>
+#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -362,7 +364,6 @@ void cedar::aux::gui::PropertyPane::parameterChangeFlagChanged()
 
 void cedar::aux::gui::PropertyPane::rowSizeChanged()
 {
-
   int row;
   try
   {
@@ -375,7 +376,9 @@ void cedar::aux::gui::PropertyPane::rowSizeChanged()
 
   // the process-events call is only necessary because qt does otherwise not detect the new size properly.
   // should this bug ever be fixed, this can be removed.
-  QApplication::processEvents();
+  // in addition, we have to exclude user input events, otherwise, they interfere with previous unprocessed events
+  // (which might lead to deadlocks)
+  QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 
   this->resizeRowToContents(row);
 }

@@ -42,15 +42,24 @@
 #define CEDAR_PROC_GUI_NETWORK_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Network.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QObject>
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif // Q_MOC_RUN
+#include <map>
+#include <vector>
+#include <string>
+#include <list>
 
 /*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
  *
@@ -123,6 +132,9 @@ public:
   //!@brief Adds a list of elements to the network efficiently.
   void addElements(const std::list<QGraphicsItem*>& elements);
 
+  //! Duplicates an element and places it at the given position.
+  void duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
+
   //!@brief Sets the scene containing this item.
   void setScene(cedar::proc::gui::Scene* pScene);
 
@@ -174,6 +186,29 @@ public:
     return this->_mSmartMode->getValue();
   }
 
+  //! creates plot group of provided name containing all currently opened plots
+  void addPlotGroup(std::string plotGroupName);
+
+  //! removes plot group of given name
+  void removePlotGroup(std::string plotGroupName);
+
+  //! renames plot group of given name (from) to given name (to)
+  void renamePlotGroup(std::string from, std::string to);
+  
+  //! returns the name of every plot group of this network
+  std::list<std::string> getPlotGroupNames();
+
+  //! opens the given plot group
+  void displayPlotGroup(std::string plotGroupName);
+
+  //! search and replace every occurance of 'from' with 'to' in the plot groups node
+  void changeStepName(const std::string& from, const std::string& to);
+
+public slots:
+  void stepRecordStateChanged();
+
+  void handleStepNameChanged(const std::string& from, const std::string& to);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -198,7 +233,13 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, cedar::proc::Network::ConnectionChange change);
+  //!@brief a function that translates a boost signal to check a data connection into a Qt signal
+  void checkDataConnection
+       (
+         cedar::proc::ConstDataSlotPtr source,
+         cedar::proc::ConstDataSlotPtr target,
+         cedar::proc::Network::ConnectionChange change
+       );
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
@@ -206,13 +247,31 @@ private:
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
-  void readOpenPlots(const cedar::aux::ConfigurationNode& node);
+  void readPlotList(const cedar::aux::ConfigurationNode& node);
+
+  void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
+
+  void readStickyNotes(cedar::aux::ConfigurationNode& node);
+
+signals:
+  //!@brief signal that is emitted when a boost signal is received
+  void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Network::ConnectionChange);
 
 private slots:
   //!@brief Updates the label of the network.
   void networkNameChanged();
 
   void toggleSmartConnectionMode();
+
+  //!@brief handle an internal signal to create or remove gui connections
+  void dataConnectionChanged
+       (
+         QString sourceName,
+         QString sourceSlot,
+         QString targetName,
+         QString targetSlot,
+         cedar::proc::Network::ConnectionChange change
+       );
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -262,6 +321,8 @@ private:
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
   cedar::aux::BoolParameterPtr _mSmartMode;
+
+  cedar::aux::ConfigurationNode mPlotGroupsNode;
 
 }; // class cedar::proc::gui::NetworkFile
 

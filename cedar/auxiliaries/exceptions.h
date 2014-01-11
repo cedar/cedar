@@ -42,11 +42,15 @@
 #define CEDAR_AUX_EXCEPTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/exceptions.fwd.h"
+
 // SYSTEM INCLUDES
-#include <opencv2/core/mat.hpp>
+#include <opencv2/opencv.hpp>
+#include <string>
+#include <vector>
 
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */
@@ -90,6 +94,49 @@ class cedar::aux::ParameterNotFoundException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ParameterNotFoundException
 
+/*!@brief Exception that occurs when a plugin is not found.
+ */
+class cedar::aux::PluginNotFoundException : public cedar::aux::ExceptionBase
+{
+public:
+  //! constructor
+  PluginNotFoundException(const std::vector<std::string>& searchedPaths)
+  :
+  mSearchedPaths(searchedPaths)
+  {
+    std::string message = "The following paths were searched:";
+    for (size_t i = 0; i < searchedPaths.size(); ++i)
+    {
+      message += "\n";
+      message += searchedPaths.at(i);
+    }
+    this->setMessage(message);
+  }
+
+  //! destructor that ensure that no exception is thrown
+  ~PluginNotFoundException() throw ()
+  {
+  }
+
+  //! get the messages of this exception
+  const std::vector<std::string>& getSearchedPaths() const
+  {
+    return this->mSearchedPaths;
+  }
+
+private:
+  std::vector<std::string> mSearchedPaths;
+}; // class cedar::aux::PluginNotFoundException
+
+/*!@brief Exception that occurs when a plugin cannot be loaded.
+ *
+ * @todo This exception is too generic.
+ */
+class cedar::aux::PluginException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::PluginException
+
+
 /*!@brief Exception that occurs when a unique id appears twice.
  */
 class cedar::aux::DuplicateIdException : public cedar::aux::ExceptionBase
@@ -101,6 +148,13 @@ class cedar::aux::DuplicateIdException : public cedar::aux::ExceptionBase
 class cedar::aux::DuplicateNameException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::DuplicateNameException
+
+/*!@brief Exception that occurs when a unique channel name appears twice.
+ */
+class cedar::aux::DuplicateChannelNameException : public cedar::aux::DuplicateNameException
+{
+}; // class cedar::aux::DuplicateChannelNameException
+
 
 /*!@brief Exception that occurs when a value leaves a certain range.
  */
@@ -178,6 +232,12 @@ class cedar::aux::DeadReferenceException : public cedar::aux::ExceptionBase
 {
 };
 
+/*!@brief Exception that is thrown when a configuration tree does not have the right format.
+ */
+class cedar::aux::MalformedConfigurationTreeException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception that is thrown when two matrices do not match in type or size.
  */
 class cedar::aux::MatrixMismatchException : public cedar::aux::ExceptionBase
@@ -211,6 +271,17 @@ class cedar::aux::ValidationFailedException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ValidationFailedException
 
+/*!@brief Exception that occurs when a parameter validation fails.
+ */
+class cedar::aux::UnknownUnitSuffixException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::UnknownUnitSuffixException
+
+//! Exception that signals an invalid path.
+class cedar::aux::InvalidPathException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception that occurs when threading code is mis-used
  */
 class cedar::aux::ThreadingErrorException : public cedar::aux::ExceptionBase
@@ -222,5 +293,20 @@ class cedar::aux::ThreadingErrorException : public cedar::aux::ExceptionBase
 class cedar::aux::ParseException: public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::ParseException
+
+/*!@brief An exception that is thrown, when a function is not implemented.
+ */
+class cedar::aux::NotImplementedException: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::NotImplementedException
+
+/*!@brief An exception that is thrown, when a thread is running and an operation
+ *        is called which is not allowed.
+ * @todo  This exception needs a better name
+ */
+class cedar::aux::ThreadRunningExeption: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ThreadRunningExeption
+
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

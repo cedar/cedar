@@ -42,15 +42,21 @@
 #define CEDAR_PROC_GUI_IDE_APPLICATION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Ide.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/Ide.fwd.h"
+#include "cedar/processing/gui/IdeApplication.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
+#include <QReadWriteLock>
 
 #ifdef CEDAR_COMPILER_MSVC
 #include <Windows.h>
 #endif // CEDAR_COMPILER_MSVC
+
+#include <string>
 
 
 /*!@brief The application for the processingIde.
@@ -109,9 +115,8 @@ public:
 protected:
 
 signals:
-  /*!@brief Signal that is sent when cedar::proc::gui::Ide::notify catches an otherwise unhandled exception.
-   */
-  void exception(const QString& message);
+  //!@brief signals that the exception dialog should be opened
+  void showExceptionDialogSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -127,6 +132,9 @@ private:
   static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
 #endif // CEDAR_COMPILER_MSVC
 
+private slots:
+  void showExceptionDialog();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -140,6 +148,15 @@ private:
 
   //! Last cedar exception caught by the application.
   cedar::aux::ExceptionBase mLastCedarException;
+
+  //! what() of the last std::exception caught by the application.
+  std::string mLastStdExceptionWhat;
+
+  //! type of the last std::exception caught by the application.
+  std::string mLastStdExceptionType;
+
+  //! Lock for the last exception information.
+  QReadWriteLock mLastExceptionInfoLock;
 
 }; // class cedar::proc::gui::IdeApplication
 

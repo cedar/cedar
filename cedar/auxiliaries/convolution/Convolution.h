@@ -50,6 +50,8 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QObject>
+#include <vector>
+#include <set>
 
 
 /*!@brief   Base class for convolution engines.
@@ -210,6 +212,12 @@ public:
   inline cedar::aux::conv::ConstEnginePtr getEngine() const
   {
     return this->_mEngine->getValue();
+  }
+
+  //!@brief Returns the convolution engine.
+  inline void setEngine(cedar::aux::conv::EnginePtr engine)
+  {
+    this->_mEngine->setValue(engine);
   }
 
   //!@brief Get the border type.

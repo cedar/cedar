@@ -50,6 +50,7 @@
 #include <dc1394/dc1394.h>
 #include <iostream>
 #include <vector>
+#include <string>
 
 /*!@brief This class is a simple interface to the firewire bus.
  *

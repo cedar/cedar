@@ -38,11 +38,15 @@
 #define CEDAR_AUX_MAT_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/math/tools.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <string>
 
 /*!@brief Data containing matrices.
  */
@@ -78,6 +82,15 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns a string that contains the matrix body in CSV format.
+  void serializeData(std::ostream& stream) const;
+  
+  //!@brief Returns a string that describes the matrix header in CSV format.
+  void serializeHeader(std::ostream& stream) const;
+  
+  //!@brief creates a deep copy of this data
+  cedar::aux::DataPtr clone() const;
+
   std::string getDescription() const;
 
   /*!@brief Returns the dimensionality of the matrix stored in this data.
@@ -92,10 +105,29 @@ public:
     return this->getData().type();
   }
 
+  void copyValueFrom(cedar::aux::ConstDataPtr data)
+  {
+    if (ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<ConstMatData>(data))
+    {
+      this->setData(mat_data_ptr->getData().clone());
+    }
+    else
+    {
+      CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot cast given data to matrix data.");
+    }
+  }
+
   //! Checks if the matrix is empty.
   bool isEmpty() const
   {
     return this->getData().empty();
+  }
+
+  //! Returns the value of the contained (two-dimensional) matrix at the given location
+  template <typename ReturnT>
+  ReturnT getValue(int row, int col) const
+  {
+    return cedar::aux::math::getMatrixEntry<ReturnT>(this->getData(), row, col);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

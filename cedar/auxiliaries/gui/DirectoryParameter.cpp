@@ -127,5 +127,9 @@ void cedar::aux::gui::DirectoryParameter::onBrowseClicked()
   cedar::aux::DirectoryParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter());
   QString value = QFileDialog::getExistingDirectory(this, "Select a directory", parameter->getValue().absolutePath());
-  parameter->setValue(value.toStdString(), true);
+
+  if (!value.isEmpty())
+  {
+    parameter->setValue(value.toStdString(), true);
+  }
 }

@@ -42,8 +42,10 @@
 #define CEDAR_AUX_GUI_DOUBLE_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/NumericVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/DoubleVectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>

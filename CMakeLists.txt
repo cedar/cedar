@@ -52,6 +52,9 @@ include(${CEDAR_CONF_FILE})
 
 set(CEDAR_CMAKE_DIR "${CEDAR_HOME}/cmake" CACHE PATH "Directory all additional CMake files will be stored in.")
 
+# make a sanity check of what we have read from the configuration file thus far
+include(${CEDAR_CMAKE_DIR}/sanity.txt)
+
 # include the macro section
 include(${CEDAR_CMAKE_DIR}/macros.txt)
 

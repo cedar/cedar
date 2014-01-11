@@ -38,13 +38,17 @@
 #define CEDAR_AUX_GL_SCENE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Scene.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
-#include "cedar/auxiliaries/gui/Viewer.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Viewer.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif
 #include <string>
 #include <QList>
 

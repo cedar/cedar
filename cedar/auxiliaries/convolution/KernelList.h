@@ -39,10 +39,15 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/kernel/Kernel.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2.hpp>
+#include <opencv2/opencv.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif
 #include <vector>
 
 /*!@brief This is a structure for storing a list of kernels.

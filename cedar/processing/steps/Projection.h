@@ -39,15 +39,18 @@
 #define CEDAR_PROC_STEPS_PROJECTION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/Projection.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Processing step, which projects neuronal activation between processing steps of different dimensionality.
@@ -135,8 +138,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief computes the projected output whenever this step is triggered
-  void compute(const cedar::proc::Arguments& arguments);
+  //! Sets the dimensionality of the output.
+  inline void setOutputDimensionality(unsigned int dimensionality)
+  {
+    this->_mOutputDimensionality->setValue(dimensionality);
+  }
+
+  //! Sets the size of the output in the given dimension.
+  inline void setOutputDimensionSize(unsigned int dimension, unsigned int size)
+  {
+    this->_mOutputDimensionSizes->set(dimension, size);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -161,6 +173,9 @@ protected slots:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief computes the projected output whenever this step is triggered
+  void compute(const cedar::proc::Arguments& arguments);
+
   //!@brief this function is triggered whenever a new connection is connected as an input to the projection step
   void inputConnectionChanged(const std::string& inputName);
   //!@brief initializes or reconfigures the output matrix
@@ -229,6 +244,9 @@ private:
   cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
   //!@brief type of compression used when reducing the dimensionality (maximum, minimum, average, sum)
   cedar::aux::EnumParameterPtr _mCompressionType;
+
+  //!@brief a lookup table for mappings
+  std::vector<unsigned int> mMappingLookup;
 }; // class cedar::proc::steps::Projection
 
 #endif // CEDAR_PROC_STEPS_PROJECTION_H

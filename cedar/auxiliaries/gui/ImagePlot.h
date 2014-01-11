@@ -38,16 +38,20 @@
 #define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
-#include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/math/Limits.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
+#include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
+#include <vector>
 
 
 namespace cedar
@@ -183,17 +187,18 @@ public:
    */
   void timerEvent(QTimerEvent *pEvent);
 
-  /*!@brief Set the scaling mode of the plot.
-   */
-  void setSmoothScaling(bool smooth);
-
   /*! Sets fixed limits for the plot values.
    */
   void setLimits(double min, double max);
 
   /*!@brief Applies a color scale to a matrix.
+   *
+   * @param matrix Matrix to colorize
+   * @param limits Whether or not there are limits to the scaling.
+   * @param min    lower limit - if limits is true, values above this will be blacked out
+   * @param max    upper limit - if limits is true, values below this will be blacked out
    */
-  static cv::Mat colorizedMatrix(cv::Mat matrix);
+  static cv::Mat colorizedMatrix(cv::Mat matrix, bool limits = false, double min = 0.0, double max = 0.0);
 
   /*! Fills the gradient used for colorization into a QGradient
    */
@@ -205,6 +210,10 @@ public slots:
 
   //! Enables automatic scaling.
   void setAutomaticScaling();
+
+  /*!@brief Set the scaling mode of the plot.
+   */
+  void setSmoothScaling(bool smooth);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.

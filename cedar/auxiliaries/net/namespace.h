@@ -34,53 +34,7 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_NAMESPACE_NET_H
-#define CEDAR_NAMESPACE_NET_H
+//@todo: remove this file
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#warning Do not include this header any more. Use the new forward declaration headers instead!
 
-// SYSTEM INCLUDES
-
-// CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
-#include "cedar/defines.h"
-
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <opencv2/opencv.hpp>
-
-
-namespace cedar
-{
-
-  namespace aux
-  {
-
-    /*!@brief Namespace for all network communication related classes. */
-    namespace net
-    {
-      template <typename T>
-      class Writer;
-
-      template <typename T>
-      class Reader;
-
-      template <typename T>
-      class BlockingReader;
-
-      //!@cond SKIPPED_DOCUMENTATION
-
-      /* exceptions */
-      CEDAR_DECLARE_AUX_CLASS(NetMissingRessourceException);
-      CEDAR_DECLARE_AUX_CLASS(NetUnexpectedDataException);
-      CEDAR_DECLARE_AUX_CLASS(NetNoNewDataException);
-      CEDAR_DECLARE_AUX_CLASS(NetUnhandledDataException);
-      CEDAR_DECLARE_AUX_CLASS(NetWaitingForWriterException);
-      //!@endcond
-
-    }
-  }
-} // end namespaces
-
-#endif // CEDAR_XXX_XXX_H

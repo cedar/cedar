@@ -38,13 +38,18 @@
 #define CEDAR_PROC_EXTERNAL_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/DataSlot.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/ExternalData.fwd.h"
+
 // SYSTEM INCLUDES
-#include <boost/signals2/signal.hpp>
-#include <boost/signals2/connection.hpp>
-#include <boost/function.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+  #include <boost/function.hpp>
+#endif
+#include <vector>
 
 /*!@brief   A slot for data that is not owned by a Connectable.
  *
@@ -135,6 +140,12 @@ public:
    */
   boost::signals2::connection connectToExternalDataRemoved(boost::function<void (cedar::aux::ConstDataPtr)> slot);
 
+  /*!@brief Register a function to react to the addition of external data in this slot.
+   *
+   *        The connected function receives the added data as first argument.
+   */
+  boost::signals2::connection connectToExternalDataAdded(boost::function<void (cedar::aux::ConstDataPtr)> slot);
+
   /*!@brief Clears all data from the slot.
    */
   void clear();
@@ -180,6 +191,9 @@ private:
 
   //!@brief A boost signal that is emitted when external data is removed from this slot's list.
   boost::signals2::signal<void (cedar::aux::ConstDataPtr)> mExternalDataRemoved;
+
+  //!@brief A boost signal that is emitted when external data is added from this slot's list.
+  boost::signals2::signal<void (cedar::aux::ConstDataPtr)> mExternalDataAdded;
 
 }; // class cedar::proc::ExternalData
 

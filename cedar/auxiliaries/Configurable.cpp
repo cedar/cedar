@@ -43,13 +43,16 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/threadingUtilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ini_parser.hpp>
-#include <boost/filesystem.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/json_parser.hpp>
+  #include <boost/property_tree/ini_parser.hpp>
+  #include <boost/filesystem.hpp>
+#endif
 #include <string>
 #include <sstream>
 #include <fstream> // only used for legacy configurable compatibility

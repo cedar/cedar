@@ -41,6 +41,9 @@
 #include "cedar/processing/gui/UiSettings.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/gui/BoolParameter.h"
+#include "cedar/auxiliaries/gui/UIntParameter.h"
+#include "cedar/auxiliaries/gui/Settings.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 
@@ -62,6 +65,8 @@ QWidget(pParent)
   this->mpSlotGrowthEnabled->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingEnabled);
   this->mpGrowthFactor->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScaling);
   this->mpSensitivity->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingSensitivity);
+  this->mpHighlightConnections->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightConnections);
+  this->mpMaximumNumberOfLogMessages->setParameter(cedar::aux::gui::SettingsSingleton::getInstance()->getMaximalNumberOfLogEntriesParameter());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

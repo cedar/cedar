@@ -161,7 +161,7 @@ int main()
     errors++;
     std::cout << "ERROR in function veeAxis<float>(cv::Mat& matrix, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero(cv::norm(vec3_float - cedar::aux::math::veeAxis(mat33_float))))
+  if (!cedar::aux::math::isZero(cv::norm(vec3_float - cedar::aux::math::veeAxis(mat33_float)), 1e-5))
   {
     errors++;
     std::cout << "ERROR in function veeAxis<float>(cv::Mat& matrix)" << std::endl;

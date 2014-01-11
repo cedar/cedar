@@ -53,7 +53,9 @@
 
 // SYSTEM INCLUDES
 #include <iostream>
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -104,7 +106,7 @@ _mTransferFunction
   )
 )
 {
-  // add deprecated name for trasnfer function
+  // add deprecated name for transfer function
   this->_mTransferFunction->addDeprecatedName("sigmoid");
 
   //declare input and output

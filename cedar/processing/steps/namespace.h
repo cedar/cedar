@@ -43,41 +43,36 @@
 #include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-
-
-namespace cedar
-{
-  namespace proc
-  {
-    /*!@brief Namespace for processing steps. */
-    namespace steps
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(AbsoluteValue);
-      CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
-      CEDAR_DECLARE_PROC_CLASS(TransformationType);
-      CEDAR_DECLARE_PROC_CLASS(ComponentMultiply);
-      CEDAR_DECLARE_PROC_CLASS(CoordinateTransformation);
-      CEDAR_DECLARE_PROC_CLASS(ChannelSplit);
-      CEDAR_DECLARE_PROC_CLASS(Convolution);
-      CEDAR_DECLARE_PROC_CLASS(ColorConversion);
-      CEDAR_DECLARE_PROC_CLASS(Flip);
-      CEDAR_DECLARE_PROC_CLASS(MatrixMultiply);
-      CEDAR_DECLARE_PROC_CLASS(MatrixTypeConverter);
-      CEDAR_DECLARE_PROC_CLASS(Projection);
-      CEDAR_DECLARE_PROC_CLASS(Resize);
-      CEDAR_DECLARE_PROC_CLASS(StaticGain);
-      CEDAR_DECLARE_PROC_CLASS(Sum);
-      CEDAR_DECLARE_PROC_CLASS(Switch);
-      CEDAR_DECLARE_PROC_CLASS(TransferFunction);
-
-#ifdef CEDAR_USE_YARP
-      CEDAR_DECLARE_PROC_CLASS(NetWriterSink);
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
 #endif
-      //!@endcond
-    }
-  }
-}
+
+
+#warning Do not include this header anymore. Use the new forward declaration headers instead.
+
+#include "cedar/processing/steps/AbsoluteValue.fwd.h"
+#include "cedar/processing/steps/ChannelSplit.fwd.h"
+#include "cedar/processing/steps/ColorConversion.fwd.h"
+#include "cedar/processing/steps/Component.fwd.h"
+#include "cedar/processing/steps/ComponentMultiply.fwd.h"
+#include "cedar/processing/steps/Convolution.fwd.h"
+#include "cedar/processing/steps/CoordinateTransformation.fwd.h"
+#include "cedar/processing/steps/Flip.fwd.h"
+#include "cedar/processing/steps/Histogram.fwd.h"
+#include "cedar/processing/steps/Mask.fwd.h"
+#include "cedar/processing/steps/MatrixMultiply.fwd.h"
+#include "cedar/processing/steps/MatrixSlice.fwd.h"
+#include "cedar/processing/steps/MatrixTypeConverter.fwd.h"
+#include "cedar/processing/steps/Normalization.fwd.h"
+#include "cedar/processing/steps/NormalizationType.fwd.h"
+#include "cedar/processing/steps/Projection.fwd.h"
+#include "cedar/processing/steps/RemoveMean.fwd.h"
+#include "cedar/processing/steps/Resize.fwd.h"
+#include "cedar/processing/steps/StaticGain.fwd.h"
+#include "cedar/processing/steps/Sum.fwd.h"
+#include "cedar/processing/steps/Switch.fwd.h"
+#include "cedar/processing/steps/Threshold.fwd.h"
+#include "cedar/processing/steps/TransferFunction.fwd.h"
+#include "cedar/processing/steps/UnitConverter.fwd.h"
 
 #endif // CEDAR_PROC_STEPS_NAMESPACE_H

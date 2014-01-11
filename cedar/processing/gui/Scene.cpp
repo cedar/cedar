@@ -42,10 +42,12 @@
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/StickyNote.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -68,6 +70,8 @@
 #include <QSvgGenerator>
 #include <QToolTip>
 #include <iostream>
+#include <set>
+#include <list>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -84,6 +88,8 @@ mpMainWindow(pMainWindow),
 mSnapToGrid(false),
 mpConfigurableWidget(NULL)
 {
+  mMousePosX = 0;
+  mMousePosY = 0;
   // connect signals/slots
   QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 }
@@ -115,12 +121,17 @@ void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPan
   this->mpConfigurableWidget = pConfigurableWidget;
 }
 
+void cedar::proc::gui::Scene::setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget)
+{
+  this->mpRecorderWidget = pRecorderWidget;
+}
+
 void cedar::proc::gui::Scene::itemSelected()
 {
   using cedar::proc::Step;
   using cedar::proc::Manager;
 
-  if (this->mpConfigurableWidget == NULL)
+  if (this->mpConfigurableWidget == NULL || this->mpRecorderWidget == NULL)
   {
     return;
   }
@@ -134,12 +145,18 @@ void cedar::proc::gui::Scene::itemSelected()
       if (p_item->getElement())
       {
         this->mpConfigurableWidget->display(p_item->getElement());
+      
+        if(cedar::proc::StepPtr castedStep = boost::dynamic_pointer_cast<cedar::proc::Step>(p_item->getElement()))
+        {
+          this->mpRecorderWidget->setStep(castedStep);
+        }
       }
     }
   }
   else
   {
     this->mpConfigurableWidget->resetContents();
+    this->mpRecorderWidget->clearLayout();
   }
 }
 
@@ -164,6 +181,7 @@ void cedar::proc::gui::Scene::reset()
   this->mTriggerMap.clear();
   this->mNetworkMap.clear();
   this->mElementMap.clear();
+  this->mStickyNotes.clear();
 }
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
@@ -189,6 +207,7 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
 void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
+  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
 }
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
@@ -290,6 +309,8 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
       QGraphicsScene::mouseMoveEvent(pMouseEvent);
       break;
   }
+  this->mMousePosX = pMouseEvent->scenePos().x();
+  this->mMousePosY = pMouseEvent->scenePos().y();
 }
 
 
@@ -516,13 +537,23 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
+  QAction *p_addSickyNode = menu.addAction("add sticky note");
+  menu.addSeparator();
   QAction *p_reset = menu.addAction("reset network");
 
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
 
+  //!@todo Instead of this structure, connect each action with an appropriate slot.
   if (a == p_reset)
   {
-    this->mNetwork->getNetwork()->reset();
+    if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
+    {
+      p_ide->resetRootNetwork();
+    }
+  }
+  else if (a == p_addSickyNode)
+  {
+    this->addStickyNote();
   }
   else if (a != NULL)
   {
@@ -821,6 +852,9 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
     auto p_dialog = new cedar::aux::gui::ExceptionDialog();
     p_dialog->displayCedarException(e);
     p_dialog->exec();
+
+    // when an exception was thrown, return NULL
+    return cedar::proc::ElementPtr();
   }
 
   return this->mNetwork->getNetwork()->getElement(adjusted_name);
@@ -1013,4 +1047,35 @@ void cedar::proc::gui::Scene::selectNone()
   {
     selected_items.at(i)->setSelected(false);
   }
+}
+void cedar::proc::gui::Scene::addStickyNote()
+{
+  this->addStickyNote(mMousePosX, mMousePosY, 120, 70, "");
+}
+
+cedar::proc::gui::StickyNote* cedar::proc::gui::Scene::addStickyNote(int x, int y, int witdh, int height, std::string text)
+{
+  cedar::proc::gui::StickyNote* note = new cedar::proc::gui::StickyNote(this, x, y, witdh, height, text);
+  mStickyNotes.push_back(note);
+  this->addItem(note);
+  return note;
+}
+
+
+void cedar::proc::gui::Scene::removeStickyNote(StickyNote* note)
+{
+  for (auto it = mStickyNotes.begin(); it != mStickyNotes.end(); it++)
+  {
+    if ((*it) == note)
+    {
+      mStickyNotes.erase(it);
+      break;
+    }
+  }
+  this->removeItem(note);
+}
+
+const std::vector<cedar::proc::gui::StickyNote* > cedar::proc::gui::Scene::getStickyNotes() const
+{
+  return this->mStickyNotes;
 }

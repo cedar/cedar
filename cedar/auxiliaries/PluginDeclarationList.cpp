@@ -44,7 +44,9 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <boost/property_tree/xml_parser.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/xml_parser.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -57,6 +59,14 @@ cedar::aux::PluginDeclarationList::PluginDeclarationList()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::PluginDeclarationList::setSource(const std::string& source)
+{
+  for (size_t i = 0; i < this->mDeclarations.size(); ++i)
+  {
+    this->mDeclarations.at(i)->setSource(source);
+  }
+}
 
 void cedar::aux::PluginDeclarationList::add(cedar::aux::PluginDeclarationPtr declaration)
 {

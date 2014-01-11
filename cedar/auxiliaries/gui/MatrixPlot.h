@@ -42,14 +42,19 @@
 #define CEDAR_AUX_GUI_MATRIX_PLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/gui/ColorValueRGBA.fwd.h"
+#include "cedar/auxiliaries/gui/MatrixPlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
+#include <vector>
+#include <string>
 
 /*!@brief Base class for plots that can display matrices.
  *
@@ -85,11 +90,13 @@ public:
 public:
   //!@brief display a MatData
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
+  //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  //!@brief Check if the given data can be detached from the plot.
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
   //!@brief return vector of standard colors
-  static const Qwt3D::ColorVector& getStandardColorVector();
+  static const std::vector<cedar::aux::gui::ColorValueRGBA>& getStandardColorVector();
 
 public slots:
   /*!@brief Reacts to a change in the plotted data.
@@ -109,6 +116,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -123,7 +131,9 @@ private:
   QWidget* mpCurrentPlotWidget;
 
   //!@brief vector filled with standard colors
-  static Qwt3D::ColorVector mStandardColorVector;
+  static std::vector<cedar::aux::gui::ColorValueRGBA> mStandardColorVector;
+
+  std::string mTitle;
 
 }; // class cedar::aux::gui::MatrixPlot
 

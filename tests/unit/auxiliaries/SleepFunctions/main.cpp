@@ -39,16 +39,22 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
+#endif
 #include <iostream>
 #include <time.h>
 #include <vector>
+#include <boost/units/io.hpp>
 
-bool checkTime(long expired_milliseconds, double expected_milliseconds)
+bool checkTime(long expiredMilliseconds, cedar::unit::Time expectedTime)
 {
-  return fabs(static_cast<double>(expired_milliseconds) - expected_milliseconds) < 0.001 * expected_milliseconds;
+  double expected_milliseconds = expectedTime / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
+  return fabs(static_cast<double>(expiredMilliseconds) - expected_milliseconds) < 0.001 * expected_milliseconds;
 }
 
 int main(int, char**)
@@ -57,21 +63,21 @@ int main(int, char**)
   int errors = 0;
 
   // Test waiting for seconds
-  std::vector<double> wait_times_seconds;
-  wait_times_seconds.push_back(1);
-  wait_times_seconds.push_back(10);
+  std::vector<cedar::unit::Time> wait_times_seconds;
+  wait_times_seconds.push_back(cedar::unit::Time(1.0 * cedar::unit::second));
+  wait_times_seconds.push_back(cedar::unit::Time(10.0 * cedar::unit::seconds));
   
   std::cout << "Testing waiting for seconds." << std::endl;
   for (size_t i = 0; i < wait_times_seconds.size(); ++i)
   {
-    cedar::unit::Seconds wait_time(wait_times_seconds.at(i));
+    cedar::unit::Time wait_time = wait_times_seconds.at(i);
     std::cout << "Waiting for " << wait_time << std::endl;
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::universal_time();
     cedar::aux::sleep(wait_time);
     boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
 
     boost::posix_time::time_duration expired_time = end - start;
-    if (!checkTime(expired_time.total_milliseconds(), 1000.0 * wait_times_seconds.at(i)))
+    if (!checkTime(expired_time.total_milliseconds(), wait_time))
     {
       std::cout << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
       errors++;
@@ -82,25 +88,25 @@ int main(int, char**)
     }
   }
 
-  std::vector<double> wait_times_milliseconds;
-  wait_times_milliseconds.push_back(10);
-  wait_times_milliseconds.push_back(100);
-  wait_times_milliseconds.push_back(1000);
+  std::vector<cedar::unit::Time> wait_times_milliseconds;
+  wait_times_milliseconds.push_back(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
+  wait_times_milliseconds.push_back(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds));
+  wait_times_milliseconds.push_back(cedar::unit::Time(1000.0 * cedar::unit::milli * cedar::unit::seconds));
 
   std::cout << "Testing waiting for milliseconds." << std::endl;
   for (size_t i = 0; i < wait_times_milliseconds.size(); ++i)
   {
-    cedar::unit::Milliseconds wait_time(wait_times_milliseconds.at(i));
+    cedar::unit::Time wait_time = wait_times_milliseconds.at(i);
     std::cout << "Waiting for " << wait_time << std::endl;
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::universal_time();
     cedar::aux::sleep(wait_time);
     boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
 
     boost::posix_time::time_duration expired_time = end - start;
-    if (!checkTime(expired_time.total_milliseconds(), wait_times_milliseconds.at(i)))
+    if (!checkTime(expired_time.total_milliseconds(), wait_time))
     {
       std::cout << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed."
-               << " (should have been " << wait_times_milliseconds.at(i) / 1000.0 << ")" << std::endl;
+               << " (should have been " << wait_time << ")" << std::endl;
       errors++;
     }
     else

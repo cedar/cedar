@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*! @class cedar::dev::sensors::visual::PictureGrabber

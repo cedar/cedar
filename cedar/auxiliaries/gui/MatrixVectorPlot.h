@@ -42,9 +42,12 @@
 #ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 #include "cedar/auxiliaries/math/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/gui/MatrixVectorPlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -53,6 +56,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 /*!@brief Matrix plot that can display 1D matrices (i.e. vectors) as vectors.
  */
@@ -77,6 +81,7 @@ private:
 
     ~PlotSeries()
     {
+      mpCurve->detach();
     }
 
     //!@brief the displayed data
@@ -127,6 +132,7 @@ public:
   void clearMarkers();
 
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
   //!@brief Returns the limits of the x axis.
   cedar::aux::math::Limits<double> getXLimits() const;
@@ -149,6 +155,7 @@ private:
   void buildArrays(PlotSeriesPtr series, unsigned int new_size);
 
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   //!@brief Applies a plot style to a given curve.
   static void applyStyle(size_t lineId, QwtPlotCurve *pCurve);

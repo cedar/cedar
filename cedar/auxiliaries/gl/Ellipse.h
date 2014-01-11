@@ -38,7 +38,7 @@
 #define CEDAR_AUX_GL_ELLIPSE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Ellipse.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES

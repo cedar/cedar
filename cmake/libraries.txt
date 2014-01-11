@@ -54,6 +54,7 @@ message("-- Searching for Qt...")
 # TODO: We need compiler flags to tell what libraries to include.. for now WITH_QT5 will always be false
 if(NOT WITH_QT5)
   # Try to find Qt4
+  message("-- looking for Qt4...")
 
   find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml QtSvg)
   if(QT4_FOUND)
@@ -63,6 +64,8 @@ if(NOT WITH_QT5)
     if (CEDAR_VERBOSE_BUILD_SYSTEM)
       message("   Qt was found in ${QT_INCLUDE_DIRS}")
     endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+  else (QT4_FOUND)
+    message("    Qt4 was not found.")
   endif(QT4_FOUND)
 
   SET(QT_FOUND ${QT4_FOUND})
@@ -70,6 +73,7 @@ endif(NOT WITH_QT5)
 
 if(WITH_QT5 OR NOT QT4_FOUND)
   # Try to find Qt5 Libraries
+  message("-- looking for Qt5...")
 
   find_package(Qt5Widgets REQUIRED)
   if(Qt5Widgets_FOUND)
@@ -181,6 +185,7 @@ elseif(OpenCV_FOUND)
 endif(OpenCV_FOUND)
 
 # libQGLViewer
+option(CEDAR_USE_QGLVIEWER "Use QGLViewer." ON)
 message("-- Searching for QGLViewer...")
 find_package(QGLViewer REQUIRED)
 if(QGLViewer_FOUND)
@@ -192,9 +197,8 @@ if(QGLViewer_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QGLViewer_LIBS})
   include_directories(${QGLViewer_INCLUDE_DIRS})
 else(QGLViewer_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "   Required library QGLViewer was not found on your system!
-  You can try to alter the default search paths in cedar.conf.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized QGLViewer2 debug QGLViewerd2)
+  message("-- QGLViewer not found.")
+  set(CEDAR_USE_QGLVIEWER OFF)
 endif(QGLViewer_FOUND)
 
 # libQwt
@@ -273,6 +277,7 @@ if(CEDAR_USE_FFTW)
   else(FFTW_FOUND)
     message("-- FFTW was not found.")
     set(CEDAR_USE_FFTW OFF)
+    set(FFTW_INCLUDE_DIRS "")
   endif(FFTW_FOUND)
 endif(CEDAR_USE_FFTW)
 

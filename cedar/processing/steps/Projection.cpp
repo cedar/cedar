@@ -36,8 +36,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/steps/Projection.h"
+#include "cedar/processing/ProjectionMapping.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Arguments.h"
@@ -104,7 +104,7 @@ cedar::proc::steps::Projection::Projection()
 :
 mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
-_mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
+_mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 4)),
 _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
 _mCompressionType(new cedar::aux::EnumParameter(
                                                  this,
@@ -387,15 +387,24 @@ void cedar::proc::steps::Projection::expandMDtoND()
     input_index.push_back(0);
   }
 
+  auto mapping = _mDimensionMappings->getValue();
+  unsigned int number_of_mappings = mapping->getNumberOfMappings();
+  unsigned int i = 0;
+  // do this lookup only once, assuming that mapping does not change at run time...
+  mMappingLookup.resize(number_of_mappings);
+  for (i = 0; i < number_of_mappings; ++i)
+  {
+    mMappingLookup.at(i) = mapping->lookUp(i);
+  }
   do
   {
     // get index pointing to the current element in the output matrix
     const std::vector<int>& output_index = output_iterator.getCurrentIndexVector();
 
     // compute the corresponding index in the input matrix
-    for (unsigned int i = 0; i < _mDimensionMappings->getValue()->getNumberOfMappings(); ++i)
+    for (i = 0; i < number_of_mappings; ++i)
     {
-      input_index[i] = output_index.at(_mDimensionMappings->getValue()->lookUp(i));
+      input_index[i] = output_index.at(mMappingLookup.at(i));
     }
 
     // copy the activation value in the input matrix to the corresponding output matrix

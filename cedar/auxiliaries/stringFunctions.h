@@ -46,10 +46,14 @@
 #include "cedar/version.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/lexical_cast.hpp>
+  #include <boost/regex.hpp>
+#endif
 #include <vector>
 #include <string>
 #include <sstream>
-#include <boost/regex.hpp>
+#include <limits.h>
 
 namespace cedar
 {
@@ -265,6 +269,13 @@ namespace cedar
       return result;
     }
 
+    /*! @brief Returns a string with all occurrences of needle removed from the given string haystack.
+     */
+    inline std::string erase(const std::string& haystack, const std::string& needle)
+    {
+      return replace(haystack, needle, "");
+    }
+
     /*!@brief Template function that converts an STL string to a simple data type.
      *
      * @param value The data value that will be converted to a string.
@@ -305,9 +316,11 @@ namespace cedar
     template <class T>
     inline T fromString(const std::string& string)
     {
-      T result;
-      std::istringstream stream(string);
-      if((stream >> result).fail())
+      try
+      {
+        return boost::lexical_cast<T>(string);
+      }
+      catch (boost::bad_lexical_cast)
       {
         CEDAR_THROW
         (
@@ -315,8 +328,6 @@ namespace cedar
           "Could not convert the string \"" + string + "\" to the requested type."
         );
       }
-
-      return result;
     }
 
     //! Template specialization for double values.
@@ -329,11 +340,12 @@ namespace cedar
       {
         if (string == "inf")
         {
-          return INFINITY;
+          //!@todo num_limits<>::has_infinity could help make this more generic/remove the need for double, float specialization
+          return std::numeric_limits<double>::infinity();
         }
         else if (string == "-inf")
         {
-          return -INFINITY;
+          return -std::numeric_limits<double>::infinity();
         }
         else
         {
@@ -358,11 +370,11 @@ namespace cedar
       {
         if (string == "inf")
         {
-          return INFINITY;
+          return std::numeric_limits<float>::infinity();
         }
         else if (string == "-inf")
         {
-          return -INFINITY;
+          return -std::numeric_limits<float>::infinity();
         }
         else
         {
