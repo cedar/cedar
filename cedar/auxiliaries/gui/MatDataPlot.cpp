@@ -81,7 +81,7 @@ namespace
 cedar::aux::gui::MatDataPlot::MatDataPlot(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(NULL)
+mpCurrentPlotWidget(nullptr)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
@@ -96,7 +96,7 @@ mpCurrentPlotWidget(NULL)
 
 bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
-  if (this->mpCurrentPlotWidget == NULL)
+  if (this->mpCurrentPlotWidget == nullptr)
   {
     return false;
   }
@@ -114,14 +114,44 @@ bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) cons
   }
 }
 
+bool cedar::aux::gui::MatDataPlot::canDetach(cedar::aux::ConstDataPtr data) const
+{
+  if (this->mpCurrentPlotWidget == nullptr)
+  {
+    return false;
+  }
+  else if
+  (
+    cedar::aux::gui::MultiPlotInterface *p_multi_plot
+      = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
+  )
+  {
+    return p_multi_plot->canDetach(data);
+  }
+  else
+  {
+    return false;
+  }
+}
+
 void cedar::aux::gui::MatDataPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != NULL);
+  CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != nullptr);
   cedar::aux::gui::MultiPlotInterface *p_multi_plot
     = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
 
-  CEDAR_DEBUG_ASSERT(p_multi_plot != NULL);
+  CEDAR_DEBUG_ASSERT(p_multi_plot != nullptr);
   p_multi_plot->append(data, title);
+}
+
+void cedar::aux::gui::MatDataPlot::doDetach(cedar::aux::ConstDataPtr data)
+{
+  CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != nullptr);
+  cedar::aux::gui::MultiPlotInterface *p_multi_plot
+    = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
+
+  CEDAR_DEBUG_ASSERT(p_multi_plot != nullptr);
+  p_multi_plot->detach(data);
 }
 
 void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
@@ -136,7 +166,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
   if (this->mpCurrentPlotWidget)
   {
     delete this->mpCurrentPlotWidget;
-    this->mpCurrentPlotWidget = NULL;
+    this->mpCurrentPlotWidget = nullptr;
   }
 
   // color space-annotated data
@@ -178,7 +208,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
   {
   }
 
-  if (this->mpCurrentPlotWidget == NULL)
+  if (this->mpCurrentPlotWidget == nullptr)
   {
     // data should be plotted as a matrix
     cedar::aux::gui::MatrixPlot* p_plot = new cedar::aux::gui::MatrixPlot();

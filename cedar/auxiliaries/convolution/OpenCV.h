@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/convolution/Engine.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A convolution engine based on OpenCV's filter engine.

@@ -38,7 +38,7 @@
 #define CEDAR_AUX_EXCEPTION_BASE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ExceptionBase.fwd.h"
 
 // SYSTEM INCLUDES
 #include <exception>

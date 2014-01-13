@@ -39,9 +39,11 @@
 #define CEDAR_AUX_DOUBLE_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/DoubleData.fwd.h"
 
 /*!@brief Data containing matrices.
  */

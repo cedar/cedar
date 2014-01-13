@@ -34,9 +34,9 @@
  -----------------------------------------------------------------------------*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gl/KukaArm.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gl/KukaArm.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -56,34 +56,40 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr kuka_arm(new cedar::dev::robot::SimulatedKinematicChain());
-  kuka_arm->readJson(configuration_file);
+  cedar::dev::KinematicChainPtr p_kuka_arm(new cedar::dev::SimulatedKinematicChain());
+  p_kuka_arm->readJson(configuration_file);
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KukaArmPtr kuka_arm_visualization
+  cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
+  //cedar::dev::gl::KinematicChainPtr p_kuka_arm_visualization
+  //(
+  //  new cedar::dev::gl::KukaArm(p_kuka_arm)
+  //);
+  cedar::dev::gl::KukaArmPtr p_kuka_arm_visualization
   (
-    new cedar::dev::robot::gl::KukaArm(kuka_arm)
+    new cedar::dev::gl::KukaArm(p_kuka_arm)
   );
+  p_arm_visualization = p_kuka_arm_visualization;
 
   // create scene and viewer to display the arm
-  cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene());
-  scene->setSceneLimit(2);
-  scene->drawFloor(true);
-  scene->addObjectVisualization(kuka_arm_visualization);
-  cedar::aux::gui::Viewer viewer(scene);
+  cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
+  p_scene->setSceneLimit(2);
+  p_scene->drawFloor(true);
+  p_scene->addObjectVisualization(p_arm_visualization);
+  cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
-  viewer.setSceneRadius(scene->getSceneLimit());
+  viewer.setSceneRadius(p_scene->getSceneLimit());
 
   // create control widgets for the scene and the arm
-  cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
-  cedar::dev::robot::gui::KinematicChainWidget widget_arm(kuka_arm);
+  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
+  cedar::dev::gui::KinematicChainWidget widget_arm(p_kuka_arm);
 
   // show and start everything
-  scene_widget->show();
+  p_scene_widget->show();
   widget_arm.show();
   viewer.startTimer(20);
-  kuka_arm->startTimer(20);
-  kuka_arm->start();
+  p_kuka_arm->startTimer(20);
+  p_kuka_arm->start();
   a.exec();
 
   return 0;

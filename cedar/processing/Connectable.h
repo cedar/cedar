@@ -38,7 +38,6 @@
 #define CEDAR_PROC_CONNECTABLE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
@@ -46,12 +45,16 @@
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/Lockable.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/signals2/connection.hpp>
-#endif
 #include <vector>
+#include <map>
 
 /*!@brief   An interface for classes that have data slots that can be connected.
  *
@@ -98,9 +101,9 @@ public:
   //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
-  //!@brief Returns if Connectable has data of a specific role.
-  //!@param role the specified role
-  bool hasRole(DataRole::Id role);
+  //!@brief Returns whether this connectable has a slot of the given role.
+  //!@todo Rename this to hasSlotForRole.
+  bool hasRole(cedar::proc::DataRole::Id role) const;
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
@@ -361,6 +364,10 @@ protected:
     return iter->second;
   }
 
+  /*!@brief Removes all declared data slots.
+   */
+  void clearDataSlots();
+
   /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
    *        changed.
    *
@@ -429,43 +436,16 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(SlotAdded, void (cedar::proc::DataRole::Id, const std::string&));
+public:
+  CEDAR_DECLARE_SIGNAL(SlotRemoved, void (cedar::proc::DataRole::Id, const std::string&));
+public:
+  CEDAR_DECLARE_SIGNAL(OutputPropertiesChanged, void (const std::string&));
+
 private:
   //!@brief a connection to a signal emitted by an external data slot
-  boost::signals2::connection mSlotConnection;
-
-  //! Signal that is emitted whenever a slot is added.
-  boost::signals2::signal<void (cedar::proc::DataRole::Id, const std::string&)> mSlotAdded;
-
-  //! Signal that is emitted whenever a slot is removed.
-  boost::signals2::signal<void (cedar::proc::DataRole::Id, const std::string&)> mSlotRemoved;
-
-public:
-  //! connect to the slot added signal, which provides the data role and slot name
-  inline boost::signals2::connection connectToSlotAdded
-                                     (
-                                       boost::function<void (cedar::proc::DataRole::Id, const std::string&)> slot
-                                     )
-  {
-    return this->mSlotAdded.connect(slot);
-  }
-
-  //! connect to the slot removed signal, which provides the data role and slot name
-  inline boost::signals2::connection connectToSlotRemoved
-                                     (
-                                       boost::function<void (cedar::proc::DataRole::Id, const std::string&)> slot
-                                     )
-  {
-    return this->mSlotRemoved.connect(slot);
-  }
-
-  //! connect to the output slot properties altered signal, which deals with revalidation
-  inline boost::signals2::connection connectToOutputPropertiesChanged
-                                     (
-                                       boost::function<void (const std::string&)> slot
-                                     )
-  {
-    return this->mOutputPropertiesChanged.connect(slot);
-  }
+  boost::signals2::scoped_connection mSlotConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -480,8 +460,6 @@ protected:
   //!@brief Lock for making accesses to the connections thread-safe.
   QReadWriteLock* mpConnectionLock;
 
-  //! signal that is emitted if the properties of an output require data revalidation along connections
-  boost::signals2::signal<void (const std::string&)> mOutputPropertiesChanged;
 private:
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mSlotMaps;

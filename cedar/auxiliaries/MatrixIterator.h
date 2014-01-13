@@ -38,9 +38,12 @@
 #define CEDAR_AUX_MATRIX_ITERATOR_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatrixIterator.fwd.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 

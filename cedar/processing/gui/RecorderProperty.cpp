@@ -37,13 +37,18 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/RecorderProperty.h"
+#include "cedar/processing/gui/RecorderWidget.h"
+#include "cedar/processing/DataSlot.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
 
-cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName, cedar::proc::DataSlotPtr slot)
+cedar::proc::gui::RecorderProperty::RecorderProperty(cedar::proc::gui::RecorderWidget* parent, const std::string& stepName, cedar::proc::DataSlotPtr slot)
 {
+  this->mRecorderWidget = parent;
   //Get slot properties.
   mStepName = stepName;
   mName = slot->getName();
@@ -66,18 +71,26 @@ cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName
   connect(mCheckBox, SIGNAL(stateChanged(int)), this, SLOT(registerRecordData(int)));
   this->addWidget(mCheckBox);
 
-  //Create spin bix.
+  //Create spin box.
   mStepSize = new QSpinBox();
   mStepSize->setMaximum(1000);
-  mStepSize->setMinimum(0);  
-  if (registered)
+  mStepSize->setMinimum(0);
+
   {
-    mStepSize->setValue(cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(mStepName + "_" + mName));
-  }
-  else
-  {
-    mStepSize->setValue(200); 
-    mStepSizeValue= 200;
+    using namespace cedar::unit;
+    if (registered)
+    {
+      Time milli_second(1.0 * milli * second);
+      mStepSize->setValue(cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(mStepName + "_" + mName) / milli_second);
+    }
+    else
+    {
+      // step size in ms
+      double value = 200.0;
+
+      mStepSize->setValue(static_cast<int>(value));
+      mStepSizeValue = Time(value * milli * seconds);
+    }
   }
   mStepSize->setEnabled(registered);
   connect(mStepSize, SIGNAL(valueChanged(int)), this, SLOT(updateStepSize(int)));
@@ -109,11 +122,15 @@ void cedar::proc::gui::RecorderProperty::registerRecordData(int status)
   {
     cedar::aux::RecorderSingleton::getInstance()->unregisterData(mStepName + "_" + mName); 
     mStepSize->setEnabled(false);
-  }   
+  }
+  mRecorderWidget->emitStepRegisteredinRecorder();
 }
 
 void cedar::proc::gui::RecorderProperty::updateStepSize(int value)
 {
-  mStepSizeValue = static_cast<int>(value);
-  cedar::aux::RecorderSingleton::getInstance()->setRecordIntervalTime(mStepName + "_" + mName, static_cast<unsigned int>(value));
+  using namespace cedar::unit;
+  Time step_size(static_cast<double>(value) * milli * seconds);
+
+  mStepSizeValue = step_size;
+  cedar::aux::RecorderSingleton::getInstance()->setRecordIntervalTime(mStepName + "_" + mName, step_size);
 }

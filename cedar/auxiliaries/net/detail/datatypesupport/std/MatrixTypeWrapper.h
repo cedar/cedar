@@ -38,16 +38,14 @@
 #define CEDAR_COLLATED_TYPE_STD_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 
 // SYSTEM INCLUDES
-
+#include <string>
 
 
 
 /////////////////// SPECIALIZATIONS of MatrixTypeWrapper
-
 
 namespace cedar {
   namespace aux {
@@ -57,7 +55,7 @@ namespace cedar {
 //!@cond SKIPPED_DOCUMENTATION
 
 
-/////// cv::Mat
+/////// std:std::string
 
 
 template <>
@@ -91,7 +89,9 @@ inline void* MatrixTypeWrapper<std::string>::contentAll() const
   return (void*) mData.c_str();
 }
 
+
 //!@endcond
-} } } } // end namespaces
+
+      } } } } // end namespaces
 
 #endif

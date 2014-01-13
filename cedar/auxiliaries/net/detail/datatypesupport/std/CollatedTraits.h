@@ -39,38 +39,32 @@
 
 // LOCAL INCLUDES
 // traits specializations:
-#include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/header/BasicNetHeader.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <string>
 
+
+//////////////// OPENCV SPECIALIZATION of our traits class
 
 namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
-        //!@cond SKIPPED_DOCUMENTATION
-        template<> struct CollatedTraits<std::string>;
-        //!@endcond
-      }
-    }
-  }
-}
-
-
-//////////////// OPENCV SPECIALIZATION of our traits class
 
 //!@cond SKIPPED_DOCUMENTATION
 
 // CollatedTraits implementation for std::string
 template<>
-struct cedar::aux::net::detail::CollatedTraits<std::string>
+struct CollatedTraits<std::string>
 {
   typedef std::string                                    DataType;
   typedef cedar::aux::net::detail::BasicNetHeader        HeaderType;
 };
+
+} } } } // end namespaces
 
 //!@endcond
 

@@ -51,6 +51,7 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <string>
 
 
 /*!@brief This class implements the capabilities of one property

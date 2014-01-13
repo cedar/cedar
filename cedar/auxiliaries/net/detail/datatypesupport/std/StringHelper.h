@@ -38,7 +38,7 @@
 #define CEDAR_STD_STRING_HELPER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/std/StringHelper.fwd.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/header/BasicNetHeader.h"
 
@@ -46,18 +46,14 @@
 
 // SYSTEM INCLUDES
 
-
-
-
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
 //!@cond SKIPPED_DOCUMENTATION
+// TODO: make constant
+#define CONST_MAGIC_NUMBER (0xabc)
+
 
 //!@brief a helper class which implements InterfacCollatedData for opencv types
 template <typename CVT>
-class StringHelper
+class cedar::aux::net::detail::StringHelper
 {
 
   //---------------------------------------------------------------------------
@@ -70,32 +66,124 @@ private:
   HeaderType mLocalHeader; // local info about matrix-header, to compare
                            // with future user inputs
 
-  //!@brief prepare (init) the external data, which will be sent
-  void initExternalHeader(const CVT &mat, HeaderType &extheader);
+  // save local copy of the header inforsion. (will be compared later on with
+  // user input)
   //!@brief prepare (init) the local copy of the header for comparisons
-  void initLocalHeader(const HeaderType &extheader);
+  void initLocalHeader( const HeaderType &header)
+  {
+    // initially fill the local header with inforsion 
+    mLocalHeader.mMagicNumber= CONST_MAGIC_NUMBER;
+                                  // note: this is set here, not copied from
+                                  //       the external header
+    mLocalHeader.mDataSize= header.mDataSize;
+  }
+
+  // init the *external* header from the srix, that will be sent over the line
+  //!@brief prepare (init) the external data, which will be sent
+  void initExternalHeader( const CVT &s, HeaderType &extheader)
+  {
+    extheader.mDataSize= s.size() + 1; // dont forget the trailig \0!
+    extheader.mMagicNumber= CONST_MAGIC_NUMBER;
+  }
 
 
   //---------------------------------------------------------------------------
   // protected methods
   //---------------------------------------------------------------------------
 protected:
+
+  // check the data before we write it over the network.
+  // mainly we have to compare the header-info - and maybe initialize it
+  // param: extheader may be changed (initialized)!
   //!@brief check the data before writing it (opencv implementation)
-  bool checkCollatedDataForWrite(const CVT &mat, HeaderType &extheader);
+  bool checkCollatedDataForWrite(
+                                                 const CVT &s,
+                                                 HeaderType &extheader)
+  {
+    // TODO: safer: have a boolean in header to mark initialization status
+
+    // first run: Initialize
+    if (!mLocalHeader.mDataSize)
+    {
+      // init the header data (from s) that will be sent over the line
+      initExternalHeader(s, extheader); // get info from mat!
+
+      // init the local copy of the header that we will save to compare
+      // with later user inputs
+      initLocalHeader(extheader);
+      return true;
+    }
+    // all later runs: Compare (with locally saved localheader to check against)
+    else
+    {
+      {
+        // init the header data (from s) that will be sent over the line
+
+        // we need this for different s-variables that are passed
+        // to the same writer
+        initExternalHeader(s, extheader);
+
+        return true;
+      }
+    }
+  }
+
   //!@brief check the data before reading it (opencv implementation)
-  bool checkCollatedDataForRead(const HeaderType &extheader);
+  bool checkCollatedDataForRead(const HeaderType &extheader)
+  {
+    if (!mLocalHeader.mDataSize)
+    {
+      // first run: initialize!
+      initLocalHeader(extheader); // get info from header!
+
+      // consistency check for the first run
+      if (mLocalHeader.mMagicNumber != extheader.mMagicNumber)
+      {                // ^--- was just set in initLocalHeader()
+                       //      (and not copied from the extheader)
+        return false;
+      }
+   
+      return true;
+    }
+    else
+    {
+      // all later runs: just check for consistency
+      if (mLocalHeader.mMagicNumber != extheader.mMagicNumber 
+        )
+      {
+        // exceptions will not be thrown here
+        return false;
+      }
+
+      return true;
+    }
+  }
 
   //---------------------------------------------------------------------------
   // constructors and destructor
   //---------------------------------------------------------------------------
 public:
+
   //!@brief The standard constructor.
-  StringHelper();
+  StringHelper() 
+    : mLocalHeader()
+  {
+#ifdef DEBUG_NETT
+  //  cout << "  StringHelper [CONSTRUCTOR]" << endl;
+#endif
+      mLocalHeader.mDataSize= 0;
+  }
+
   //!@brief Destructor
-  virtual ~StringHelper();
+  virtual ~StringHelper()
+  {
+#ifdef DEBUG_NETT
+  //  cout << "  ~StringHelper [DESTRUCTOR]" << endl;
+#endif
+  }
+
 };
 
 //!@endcond
-} } } } // end namespaces
 
 #endif

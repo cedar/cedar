@@ -39,13 +39,18 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/logFilter/All.h"
 #include "cedar/auxiliaries/utilities.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Log.fwd.h"
+#include "cedar/auxiliaries/LogInterface.fwd.h"
+
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 //!@brief A class for logging messages in a file.
 class cedar::aux::Log

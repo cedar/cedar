@@ -41,16 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 #include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/FileParameter.h"
-//#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/Video.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -127,11 +127,11 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the time in ms between two frames. Depends on the the framerate of the video
-  cedar::unit::Milliseconds mFrameDuration;
+  //!@brief the time between two frames. Depends on the frame rate of the video
+  cedar::unit::Time mFrameDuration;
 
   //!@brief the time elapsed since the last frame is displayed
-  cedar::unit::Milliseconds mTimeElapsed;
+  cedar::unit::Time mTimeElapsed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -141,10 +141,6 @@ protected:
 
 private:
   // none yet
-
-
 }; // class cedar::proc::sources::Video
-
 #endif // CEDAR_PROC_SOURCES_VIDEO_H
-
 

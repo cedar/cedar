@@ -135,9 +135,9 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   }
   else if (cedar::aux::math::getDimensionalityOf(matrix) == 0)
   {
-
     return cv::Mat(1, 1, kernel.type(), cv::sum(kernel * cedar::aux::math::getMatrixEntry<double>(matrix, 0, 0)));
   }
+  //!@todo Why the - 1?
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
   {
     if (matrix.size[dim] < kernel.size[dim])
@@ -153,6 +153,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
 
   cv::Mat matrix_64;
   cv::Mat kernel_64;
+  //!@todo Why not != CV_64F?
   if (matrix.type() == CV_32F)
   {
     matrix.convertTo(matrix_64, CV_64F);
@@ -163,6 +164,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     matrix_64 = matrix;
   }
 
+  //!@todo Why not != CV_64F?
   if (kernel.type() == CV_32F)
   {
     kernel.convertTo(kernel_64, CV_64F);
@@ -229,6 +231,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   if (matrix.type() == CV_32F)
   {
     cv::Mat output_32;
+    //!@todo Why not replace CV_32F by matrix.type() (if matrix.type() != CV_64F)?
     output.convertTo(output_32, CV_32F);
     return output_32;
   }
@@ -270,17 +273,18 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
 
     kernel_regions.at(1).push_back(cv::Range(kernel_center, kernel.size[dim])); // upper limit
   }
+
+  unsigned int dim_0_fix = 0;
+  if (cedar::aux::math::getDimensionalityOf(matrix) == 1)
+  {
+    dim_0_fix = 1;
+  }
+
+  std::vector<cv::Range> output_index(cedar::aux::math::getDimensionalityOf(matrix) + dim_0_fix);
+  std::vector<cv::Range> kernel_index(cedar::aux::math::getDimensionalityOf(matrix) + dim_0_fix);
+
   for (size_t part = 0; part < static_cast<unsigned int>((1 << cedar::aux::math::getDimensionalityOf(matrix))); ++part)
   {
-    unsigned int dim_0_fix = 0;
-    if (cedar::aux::math::getDimensionalityOf(matrix) == 1)
-    {
-      dim_0_fix = 1;
-    }
-
-    std::vector<cv::Range> output_index(cedar::aux::math::getDimensionalityOf(matrix) + dim_0_fix);
-    std::vector<cv::Range> kernel_index(cedar::aux::math::getDimensionalityOf(matrix) + dim_0_fix);
-
     for (size_t dim = 0; dim < cedar::aux::math::getDimensionalityOf(matrix); ++dim)
     {
       if (part & (1 << dim))
@@ -294,11 +298,30 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
         kernel_index[dim] = kernel_regions.at(0).at(dim);
       }
     }
+
+    //!@todo Should't this check if rows or cols is 1 and decide where to put this based on that?
     if (cedar::aux::math::getDimensionalityOf(matrix) == 1)
     {
       output_index[1] = cv::Range(0,1);
       kernel_index[1] = cv::Range(0,1);
     }
+
+    // if there are empty ranges (where start == end), skip this part
+    bool skip = false;
+    for (auto range : output_index)
+    {
+      if (range.start == range.end)
+      {
+        skip = true;
+        break;
+      }
+    }
+
+    if (skip)
+    {
+      continue;
+    }
+
   // if 1.0 is missing, the temporary cv::Mat view onto output is replaced by kernel, instead of setting the values
   // at the specified region to the values of kernel (1.0 * kernel returns a cv::MatExpr, not cv::Mat...)
     output(&(output_index.front())) = 1.0 * kernel(&(kernel_index.front()));

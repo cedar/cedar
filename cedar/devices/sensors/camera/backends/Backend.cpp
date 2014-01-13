@@ -42,9 +42,12 @@
 #include "cedar/devices/sensors/camera/exceptions.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QWriteLocker>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -90,7 +93,7 @@ void cedar::dev::sensors::camera::Backend::createCaptureBackend()
   while (! this->mpCameraChannel->mVideoCapture.read(this->mpCameraChannel->mImageMat))
   {
     ++timeout;
-    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+    cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
     if (timeout>100)
     {
       break;

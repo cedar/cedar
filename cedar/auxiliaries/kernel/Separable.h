@@ -38,10 +38,13 @@
 #define CEDAR_AUX_KERNEL_SEPARABLE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/kernel/Separable.fwd.h"
+
 // SYSTEM INCLUDES
+#include <vector>
 
 //!@brief Meta class to derive separable kernels when implementing kernels.
 class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel

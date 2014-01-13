@@ -63,11 +63,9 @@ QDialog(pParent)
 void cedar::proc::gui::SettingsDialog::changesAccepted()
 {
   this->mpUiSettingsTab->accept();
-  this->mpProcessingSettingsTab->accept();
 }
 
 void cedar::proc::gui::SettingsDialog::changesRejected()
 {
   this->mpUiSettingsTab->reject();
-  this->mpProcessingSettingsTab->reject();
 }

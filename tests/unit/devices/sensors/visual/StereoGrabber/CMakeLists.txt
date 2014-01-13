@@ -35,4 +35,4 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(StereoGrabber main.cpp )
+cedar_add_unit_test(StereoGrabber main.cpp LINK_TESTUTILS)

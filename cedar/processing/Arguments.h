@@ -42,7 +42,9 @@
 #define CEDAR_PROC_ARGUMENTS_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Arguments.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>

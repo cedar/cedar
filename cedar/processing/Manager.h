@@ -42,16 +42,19 @@
 #define CEDAR_PROC_MANAGER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/FrameworkSettings.h"
 #include "cedar/processing/Step.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LoopedThread.fwd.h"
+#include "cedar/auxiliaries/PluginProxy.fwd.h"
+#include "cedar/processing/Manager.fwd.h"
+#include "cedar/processing/PluginDeclaration.fwd.h"
+
 // SYSTEM INCLUDES
+#include <QObject>
 #include <map>
 #include <set>
 #include <vector>
-#include <QObject>
 
 
 /*!@brief A manager for processing architectures.
@@ -92,7 +95,7 @@ public:
 
   //!@brief load a plugin
   //!@deprecated Call declare() on the plugin pointer instead.
-  CEDAR_DECLARE_DEPRECATED(void load(cedar::proc::PluginProxyPtr plugin));
+  CEDAR_DECLARE_DEPRECATED(void load(cedar::aux::PluginProxyPtr plugin));
 
   //!@brief Loads the declarations from a plugin declaration.
   //!@deprecated Call declareAll() on the declaration pointer instead.
@@ -114,7 +117,7 @@ public:
    */
   CEDAR_DECLARE_DEPRECATED(void stopThreads(bool wait = false));
 
-  //!@brief get a singleton instance of Manager
+  //! Returns the singleton instance of the manager.
   CEDAR_DECLARE_DEPRECATED(static cedar::proc::Manager& getInstance());
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
