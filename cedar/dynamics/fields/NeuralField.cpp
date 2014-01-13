@@ -556,7 +556,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
   // integrate one time step
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u
-         + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(tau))
+         + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1.0)) / cedar::unit::Milliseconds(tau)
            * _mInputNoiseGain->getValue() * input_noise;
 }
 
