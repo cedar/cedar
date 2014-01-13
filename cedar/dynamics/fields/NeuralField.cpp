@@ -550,13 +550,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   // the field equation
   cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0] + input_sum;
 
-  /* add input noise, but use the squared time only for Euler integration (divide by sqrt(time) here, because
-   * the next line multiplies by time anyway)
-   */
-  cv::randn(input_noise, cv::Scalar(0), cv::Scalar(1));
-  d_u += sqrt(time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second))
-         *_mInputNoiseGain->getValue() * input_noise;
-
   boost::shared_ptr<QWriteLocker> activation_write_locker;
   if (this->activationIsOutput())
   {
@@ -564,8 +557,12 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     activation_write_locker = boost::shared_ptr<QWriteLocker>(new QWriteLocker(&this->mActivation->getLock()));
   }
 
+  cv::randn(input_noise, cv::Scalar(0), cv::Scalar(1));
+
   // integrate one time step
-  u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u;
+  u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u
+       + sqrt(time/cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds))
+           * _mInputNoiseGain->getValue() * input_noise;
 }
 
 void cedar::dyn::NeuralField::updateInputSum()
