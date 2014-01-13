@@ -38,10 +38,12 @@
 #define CEDAR_PROC_ELEMENT_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/Network.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN

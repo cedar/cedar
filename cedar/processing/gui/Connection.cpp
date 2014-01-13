@@ -391,6 +391,13 @@ QColor cedar::proc::gui::Connection::highlightColor(const QColor& source) const
       );
 }
 
+QPainterPath cedar::proc::gui::Connection::shape() const
+{
+  QPainterPathStroker stroke;
+  stroke.setWidth(10);
+  return stroke.createStroke(this->path());
+}
+
 void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   pPainter->save();

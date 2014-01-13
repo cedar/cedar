@@ -58,6 +58,8 @@
 #include "cedar/devices/sensors/camera/backends/Backend.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 /*! @class cedar::dev::sensors::camera::Grabber
  *  @brief This grabber grabs images from a camera. The functionality is implemented by

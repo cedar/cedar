@@ -36,7 +36,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ProjectionMappingParameter.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/processing/ProjectionMapping.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -50,6 +49,7 @@
 #include <QColor>
 #include <QPalette>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter

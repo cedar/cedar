@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Log.h"
+#include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/logFilter/All.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Settings.h"
@@ -49,6 +50,7 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QMenu>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -156,7 +158,7 @@ void cedar::aux::gui::Log::updatePaneCurrentness(QTableWidget* pPane)
   int delta_low = -1;
 
   // check for maximum amount of log messages
-  unsigned int max_messages = cedar::aux::SettingsSingleton::getInstance()->getMaximumNumberOfLogEntries();
+  unsigned int max_messages = cedar::aux::gui::SettingsSingleton::getInstance()->getMaximumNumberOfLogEntries();
   while (static_cast<unsigned int>(pPane->rowCount()) > max_messages)
   {
     pPane->removeRow(0);

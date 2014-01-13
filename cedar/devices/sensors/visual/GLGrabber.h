@@ -48,6 +48,7 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QGLWidget>
+#include <string>
 
 /*! @brief A grabber to grab from a QGLWidget
  *

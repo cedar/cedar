@@ -36,8 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -56,13 +56,13 @@ int main(int argc, char **argv)
 
   // create simulated arm
   std::string finger_one_configuration_file = cedar::aux::locateResource("configs/test_arm.json");
-  cedar::dev::robot::KinematicChainPtr test_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr test_arm(new cedar::dev::SimulatedKinematicChain());
   test_arm->readJson(finger_one_configuration_file);
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr test_arm_visualization
+  cedar::dev::gl::KinematicChainPtr test_arm_visualization
   (
-    new cedar::dev::robot::gl::KinematicChain(test_arm)
+    new cedar::dev::gl::KinematicChain(test_arm)
   );
 //  cedar::aux::gl::ConePtr end_effector_visualization(new cedar::aux::gl::Cone (test_arm_model->getEndEffector(), .03, .1 ));
 
@@ -90,12 +90,12 @@ int main(int argc, char **argv)
 
 
   // create everything for a second arm that's connected to the end-effector of the first one
-  cedar::dev::robot::KinematicChainPtr second_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr second_arm(new cedar::dev::SimulatedKinematicChain());
   second_arm->readJson(finger_one_configuration_file);
 
-  cedar::dev::robot::gl::KinematicChainPtr second_arm_visualization
+  cedar::dev::gl::KinematicChainPtr second_arm_visualization
   (
-    new cedar::dev::robot::gl::KinematicChain(second_arm)
+    new cedar::dev::gl::KinematicChain(second_arm)
   );
   second_arm_visualization->setDisplayBase(false);
   scene->addObjectVisualization(second_arm_visualization);
@@ -108,7 +108,6 @@ int main(int argc, char **argv)
   second_arm->setJointVelocity(1, .1);
   second_arm->setJointVelocity(2, .1);
   second_arm->setJointVelocity(3, .1);
-
 
   test_arm->start();
   test_arm->startTimer(20);

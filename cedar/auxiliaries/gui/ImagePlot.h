@@ -38,15 +38,20 @@
 #define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
-#include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/math/Limits.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
+#include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 
 namespace cedar
@@ -182,10 +187,6 @@ public:
    */
   void timerEvent(QTimerEvent *pEvent);
 
-  /*!@brief Set the scaling mode of the plot.
-   */
-  void setSmoothScaling(bool smooth);
-
   /*! Sets fixed limits for the plot values.
    */
   void setLimits(double min, double max);
@@ -209,6 +210,10 @@ public slots:
 
   //! Enables automatic scaling.
   void setAutomaticScaling();
+
+  /*!@brief Set the scaling mode of the plot.
+   */
+  void setSmoothScaling(bool smooth);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.

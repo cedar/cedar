@@ -43,13 +43,21 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_Ide.h"
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/LogInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+#include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
+#include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/gui/ElementClassList.fwd.h"
+#include "cedar/processing/gui/Ide.fwd.h"
+#include "cedar/processing/gui/Network.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
+#include <QComboBox>
 #include <map>
 
 
@@ -130,10 +138,6 @@ public slots:
    */
   void loadFile(QString path);
 
-  /*!@brief Opens the load plugin dialog.
-   */
-  void showLoadPluginDialog();
-
   /*!@brief Opens the manage plugins dialog.
    */
   void showManagePluginsDialog();
@@ -170,6 +174,10 @@ public slots:
    */
   void exportSvg();
 
+  /*!@brief Opens a dialog that contains the robot manager widget.
+   */
+  void showRobotManager();
+  
   /*!@brief Duplicates a selected step
    */
   void duplicateStep();
@@ -194,11 +202,28 @@ public slots:
   void toggleSmartConnections(bool smart);
 
   //!@brief closes all plot windows of every step
-  void closeAllPlots();
+  void closePlots();
+
+  //!@brief shows/hides all plot windows of every step
+  void toggleVisibilityOfPlots();
 
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);
 
+  //!@brief Takes a snap shot from the registered steps;
+  void takeSnapshot();
+
+  //!@brief opens dialogue to add plotgroup
+  void addPlotGroup();
+  
+  //!@brief opens dialogue to edit selected plotgroup
+  void editPlotGroup();
+
+  //!@brief displays the selected plotgroup
+  void displayPlotGroup();
+
+  //!@brief deletes the selected plotgroup
+  void deletePlotGroup();
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const
   {
@@ -257,6 +282,9 @@ private:
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
+
+  //!@brief populates the Plot Groups Combobox with available Plot Groups
+  void loadPlotGroupsIntoComboBox();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -287,6 +315,9 @@ private:
 
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
+
+  // Combobox to select plot groups
+  QComboBox* mpPlotGroupsComboBox;
 
 }; // class cedar::MainWindow
 

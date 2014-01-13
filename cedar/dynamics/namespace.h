@@ -43,33 +43,17 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/lib.h"
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif
-#include <opencv2/opencv.hpp>
 
+#warning Do not include this header any more. Use the new forward declaration headers instead!
 
-namespace cedar
-{
-  /*!@brief Namespace for all dyn classes. */
-  namespace dyn
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DYN_CLASS(Dynamics);
-    CEDAR_DECLARE_DYN_CLASS(NeuralField);
-    CEDAR_DECLARE_DYN_CLASS(Preshape);
-    CEDAR_DECLARE_DYN_CLASS(RateMatrixToSpaceCode);
-    CEDAR_DECLARE_DYN_CLASS(RateToSpaceCode);
-    CEDAR_DECLARE_DYN_CLASS(SerialOrder);
-    CEDAR_DECLARE_DYN_CLASS(SpaceToRateCode);
-    //!@endcond
-
-    //!@brief A function for loading the declarations of the dynamics namespace as plugin.
-    CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::aux::PluginDeclarationListPtr plugin));
-  }
-}
+#include "cedar/dynamics/Dynamics.fwd.h"
+#include "cedar/dynamics/fields/NeuralField.fwd.h"
+#include "cedar/dynamics/fields/Preshape.fwd.h"
+#include "cedar/dynamics/steps/RateMatrixToSpaceCode.fwd.h"
+#include "cedar/dynamics/steps/RateToSpaceCode.fwd.h"
+#include "cedar/dynamics/steps/SerialOrder.fwd.h"
+#include "cedar/dynamics/steps/SpaceToRateCode.fwd.h"
 
 #endif // CEDAR_DYN_NAMESPACE_H

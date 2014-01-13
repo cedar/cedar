@@ -37,9 +37,10 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
-#include "cedar/devices/kteam/KheperaDrive.h"
-#include "cedar/devices/communication/SerialCommunication.h"
+#include "cedar/devices/kteam/DriveSerial.h"
+#include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -49,13 +50,13 @@ int main(int argc, char **argv)
   QApplication application(argc, argv);
 
   // open the channel to the epuck
-  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
+  cedar::dev::kteam::SerialChannelPtr communication(new cedar::dev::kteam::SerialChannel());
   std::string serial_communication_config = cedar::aux::locateResource("configs/khepera_serial_communication.json");
   communication->readJson(serial_communication_config);
   communication->open();
 
   // initialize epuck-drive
-  cedar::dev::kteam::KheperaDrivePtr drive(new cedar::dev::kteam::KheperaDrive(communication));
+  cedar::dev::kteam::DriveSerialPtr drive(new cedar::dev::kteam::DriveSerial(communication));
   std::string epuck_drive_config = cedar::aux::locateResource("configs/khepera.json");
   drive->readJson(epuck_drive_config);
 
@@ -64,10 +65,11 @@ int main(int argc, char **argv)
   drive_control->show();
 
   // close and open the gripper
-  drive->closeGripper();
-  cedar::aux::sleep(cedar::unit::Seconds(5));
-  drive->openGripper();
-  cedar::aux::sleep(cedar::unit::Seconds(5));
+  //!@todo Reenable this once the robot framework is completed
+//  drive->closeGripper();
+  cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
+//  drive->openGripper();
+  cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
 
   //start the program
   application.exec();

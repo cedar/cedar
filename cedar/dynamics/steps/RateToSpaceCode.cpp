@@ -200,6 +200,8 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateToSpaceCode::determineInputValid
     (
       !mat_data->isEmpty()
       &&
+      mat_data->getData().type() == CV_32F
+      &&
       (
         dimensionality == 0 || (dimensionality == 1 && cedar::aux::math::get1DMatrixSize(mat_data->getData()) < 4)
       )

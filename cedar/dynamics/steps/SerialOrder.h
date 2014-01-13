@@ -38,14 +38,18 @@
 #define CEDAR_DYN_SERIAL_ORDER_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/dynamics/steps/SerialOrder.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A step that implements the serial order architecture. See the following publication for a detailed description

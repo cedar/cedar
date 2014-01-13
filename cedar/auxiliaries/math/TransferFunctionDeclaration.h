@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/FactoryDerived.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief A TransferFunctionDeclaration contains the relation of a unique class id (as string) and the corresponding

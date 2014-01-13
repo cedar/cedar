@@ -42,19 +42,22 @@
 #define CEDAR_DYN_NEURAL_FIELD_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/kernel/Gauss.fwd.h"
+#include "cedar/dynamics/fields/NeuralField.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -112,6 +115,12 @@ public:
   inline cedar::aux::ConstMatDataPtr getFieldActivation() const
   {
     return this->mActivation;
+  }
+
+  //! Returns the matrix data pointer that holds the sum of all inputs in this field.
+  inline cedar::aux::ConstMatDataPtr getInputSum() const
+  {
+    return this->mInputSum;
   }
 
   /*!@brief   Overrides the default configuration reading.
