@@ -294,9 +294,9 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
   CEDAR_ASSERT(mOrdinalNodes.size() == mMemoryNodes.size());
   CEDAR_ASSERT(mOrdinalNodes.size() == mOrdinalNodeOutputs.size());
 
-  // to implement the global inhibition between the ordinal and memory nodes, we need to sum up all sigmoided outputs
+  // to implement the global inhibition between the ordinal and memory nodes, we need to sum up
+  // all outputs of the ordinal layer
   cv::Mat sum_of_ordinal_outputs = cv::Mat::zeros(1, 1, CV_32F);
-  cv::Mat sum_of_memory_outputs = cv::Mat::zeros(1, 1, CV_32F);
 
   // go through all ordinal positions to compute the sigmoided output of all nodes
   for (unsigned int i = 0; i < mOrdinalNodes.size(); ++i)
@@ -312,8 +312,6 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
     cv::Mat& dm = mMemoryNodes.at(i)->getData();
     cv::Mat& dm_output = mMemoryNodeOutputs.at(i)->getData();
     dm_output = _mSigmoid->getValue()->compute<float>(dm);
-    // sum the outputs
-    sum_of_memory_outputs += dm_output;
   }
 
   // go through all ordinal positions again, this time to do the actual Euler approximation
@@ -364,7 +362,7 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
 
     // compute the change rate of the memory node
     cv::Mat dm_dot = -dm + hm + c4 * f_dm
-                    + c5 * (sum_of_memory_outputs - f_dm)
+                    + c5 * (sum_of_ordinal_outputs - f_dm)
                     + c6 * f_d;
 
     dm += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * dm_dot;
