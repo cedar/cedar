@@ -170,7 +170,7 @@ void cedar::dev::gui::MountedCameraViewer::draw()
   qglviewer::Camera* viewer_camera = this->camera();
   viewer_camera->setFromProjectionMatrix(projection_matrix_float.ptr<float>());
   viewer_camera->setZNearCoefficient(0.025f);
-#endif CEDAR_USE_QGLVIEWER
+#endif // CEDAR_USE_QGLVIEWER
   //!@todo clean up this code
 /*
   // get single parameters
