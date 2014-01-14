@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FFTW.h
+    File:        FFTWPlanningStrategy.h
 
     Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2014 01 14
 
     Description:
 
@@ -34,125 +34,111 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_FFTW_H
-#define CEDAR_AUX_CONV_FFTW_H
+#ifndef CEDAR_AUX_CONV_FFTW_PLANNING_STRATEGY_H
+#define CEDAR_AUX_CONV_FFTW_PLANNING_STRATEGY_H
 
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_FFTW
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/Engine.h"
+#include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
+#ifdef CEDAR_USE_FFTW
 #include <fftw3.h>
-#include <vector>
+#endif
 
-/*!@brief A convolution engine based on the FFTW library.
+
+/*!@brief Enum describing the convolution mode.
+ *
+ *        This parameter describes the planning strategy of the FFTW convolution:
+ *        <ul>
+ *          <li>@em Estimate: Use a heuristic.</li>
+ *          <li>@em Measure: Use time measures of different FFT methods.</li>
+ *          <li>@em Patient: Use time measures of different FFT methods, search longer.</li>
+ *          <li>@em Exhaustive: Use time measures of different FFT methods, search longest.</li>
+ *        </ul>
  */
-class cedar::aux::conv::FFTW : public cedar::aux::conv::Engine
+class cedar::aux::conv::FFTWPlanningStrategy
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! The enum id
+  typedef cedar::aux::EnumId Id;
+
+  //! Pointer type to the enum base object of this class.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  FFTW();
+  // none
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
-  ) const;
+  //! Initialization of the enum values.
+  static void construct();
 
-  cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    const cv::Mat& kernel,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
-    const std::vector<int>& anchor = std::vector<int>()
-  ) const;
+  //! Returns a reference to the base enum object.
+  static const cedar::aux::EnumBase& type();
 
-  cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    cedar::aux::kernel::ConstKernelPtr kernel,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
-  ) const;
-
-  cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    cedar::aux::conv::ConstKernelListPtr kernelList,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
-  ) const;
-
-  bool checkCapability
-  (
-    size_t matrixDim,
-    size_t kernelDim,
-    cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::Mode::Id mode
-  ) const;
-
-  bool checkBorderTypeCapability
-  (
-    cedar::aux::conv::BorderType::Id borderType
-  ) const;
-
-  bool checkModeCapability
-  (
-    cedar::aux::conv::Mode::Id mode
-  ) const;
+  //! Returns a pointer to the base enum object.
+  static const cedar::aux::conv::FFTWPlanningStrategy::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief the internal version of the convolve method, currently called by all interface methods
-  cv::Mat convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel, cedar::aux::conv::BorderType::Id borderType) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  cv::Mat padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const;
-  static fftw_plan getForwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes);
-  static fftw_plan getBackwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes);
-  static void loadWisdom(const std::string& uniqueIdentifier);
-  static void saveWisdom(const std::string& uniqueIdentifier);
-  static void initThreads();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+#ifdef CEDAR_USE_FFTW
+  //! Use heuristics.
+  static const Id Estimate = FFTW_ESTIMATE;
+
+  //! Use time measures of different FFT methods.
+  static const Id Measure = FFTW_MEASURE;
+
+  //! Use time measures of different FFT methods, search longer.
+  static const Id Patient = FFTW_PATIENT;
+
+  //! Use time measures of different FFT methods, search longest.
+  static const Id Exhaustive = FFTW_EXHAUSTIVE;
+#else
+  //! Use heuristics.
+  static const Id Estimate = 0;
+
+  //! Use time measures of different FFT methods.
+  static const Id Measure = 1;
+
+  //! Use time measures of different FFT methods, search longer.
+  static const Id Patient = 2;
+
+  //! Use time measures of different FFT methods, search longest.
+  static const Id Exhaustive = 3;
+#endif
+
 protected:
   // none yet
 private:
-  //!@brief plan creation and destruction is not thread-safe, must be locked
-  static QReadWriteLock mPlanLock;
-  static bool mMultiThreadActivated;
-  static bool mWisdomLoaded;
-  static std::map<std::string, fftw_plan> mForwardPlans;
-  static std::map<std::string, fftw_plan> mBackwardPlans;
-  mutable unsigned int mAllocatedSize;
-  mutable fftw_complex* mMatrixBuffer;
-  mutable fftw_complex* mKernelBuffer;
-  mutable fftw_complex* mResultBuffer;
+  //! The type object for this enum class.
+  static cedar::aux::EnumType<cedar::aux::conv::FFTWPlanningStrategy> mType;
 
-}; // cedar::aux::conv::FFTW
+}; // class cedar::aux::conv::FFTWPlanningStrategy
 
-#endif // CEDAR_FFTW
-#endif // CEDAR_AUX_CONV_FFTW_H
+#endif // CEDAR_AUX_CONV_FFTW_PLANNING_STRATEGY_H
