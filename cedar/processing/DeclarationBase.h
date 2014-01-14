@@ -42,7 +42,8 @@
 #define CEDAR_PROC_DECLARATION_BASE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+
+// FORWARD DECLARATIONS
 
 // SYSTEM INCLUDES
 

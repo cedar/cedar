@@ -39,7 +39,7 @@
 #define CEDAR_AUX_BOOL_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/auxiliaries/BoolVectorParameter.fwd.h"
 
 #endif // CEDAR_AUX_BOOL_VECTOR_PARAMETER_H

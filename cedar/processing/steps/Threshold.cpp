@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Threshold.h"
+#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/assert.h"
@@ -90,8 +91,8 @@ mThresholdedImage(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_8U))),
 mMaxValue (255.0),
 mApplyLowerThreshold(new cedar::aux::BoolParameter(this, "apply lower threshold", true)),
 mApplyUpperThreshold(new cedar::aux::BoolParameter(this, "apply upper threshold", true)),
-_mLowerThresholdValue(new cedar::aux::UIntParameter(this, "lower threshold", 0, 0, 255)),
-_mUpperThresholdValue(new cedar::aux::UIntParameter(this, "upper threshold", 255, 0, 255))
+_mLowerThresholdValue(new cedar::aux::DoubleParameter(this, "lower threshold", 0, 0, 255.0)),
+_mUpperThresholdValue(new cedar::aux::DoubleParameter(this, "upper threshold", 255.0, 0, 255.0))
 {
   QObject::connect(this->mApplyLowerThreshold.get(), SIGNAL(valueChanged()), this, SLOT(applyLowerThesholdChanged()));
   QObject::connect(this->mApplyUpperThreshold.get(), SIGNAL(valueChanged()), this, SLOT(applyUpperThesholdChanged()));
@@ -99,7 +100,13 @@ _mUpperThresholdValue(new cedar::aux::UIntParameter(this, "upper threshold", 255
   QObject::connect(this->_mLowerThresholdValue.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
   QObject::connect(this->_mUpperThresholdValue.get(), SIGNAL(valueChanged()), this, SLOT(recalculate()));
 
-  this->declareInput("input");
+  cedar::proc::typecheck::Matrix input_check;
+  input_check.addAcceptedDimensionalityRange(0, 2);
+  input_check.addAcceptedType(CV_8UC1);
+  input_check.addAcceptedType(CV_32FC1);
+
+  auto input_slot = this->declareInput("input");
+  input_slot->setCheck(input_check);
 
   this->declareBuffer("lower threshold", mLowerThreshold);
   this->declareBuffer("upper threshold", mUpperThreshold);
@@ -175,23 +182,24 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
   }
 }
 
-void cedar::proc::steps::Threshold::Threshold::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
 {
   const cv::Mat& input = this->mInputImage->getData();
   cv::Mat& thresholded_image = this->mThresholdedImage->getData();
   cv::Mat& lower_threshold_image = this->mLowerThreshold->getData();
   cv::Mat& upper_threshold_image = this->mUpperThreshold->getData();
-  const unsigned int lower_threshold = this->_mLowerThresholdValue->getValue();
-  const unsigned int upper_threshold = this->_mUpperThresholdValue->getValue();
+  const double lower_threshold = this->_mLowerThresholdValue->getValue();
+  const double upper_threshold = this->_mUpperThresholdValue->getValue();
+  const double max_value = this->mMaxValue;
 
   if (this->mApplyLowerThreshold->getValue())
   {
-    cv::threshold(input, lower_threshold_image, lower_threshold, mMaxValue, CV_THRESH_BINARY);
+    cv::threshold(input, lower_threshold_image, lower_threshold, max_value, CV_THRESH_BINARY);
   }
 
   if (this->mApplyUpperThreshold->getValue())
   {
-    cv::threshold(input, upper_threshold_image, upper_threshold, mMaxValue, CV_THRESH_BINARY_INV);
+    cv::threshold(input, upper_threshold_image, upper_threshold, max_value, CV_THRESH_BINARY_INV);
   }
 
   if (this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
@@ -215,20 +223,4 @@ void cedar::proc::steps::Threshold::Threshold::compute(const cedar::proc::Argume
     // if nothing was applied, simply clone the input
     thresholded_image = input.clone();
   }
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Threshold::determineInputValidity
-                                                               (
-                                                                 cedar::proc::ConstDataSlotPtr,
-                                                                 cedar::aux::ConstDataPtr data
-                                                               ) const
-{
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
-  {
-    if (cedar::aux::math::getDimensionalityOf(mat_data->getData()) <= 2 && mat_data->getData().type() == CV_8UC1)
-    {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
-    }
-  }
-  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }

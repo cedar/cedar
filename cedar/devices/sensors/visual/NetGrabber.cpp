@@ -46,8 +46,11 @@
 #include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
+#include <sstream>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,7 +206,7 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
         {
           std::string msg = this->getName() + ": Couldn't open the YARP channel \""+channel_name+"\"\nTrying again...";
           cedar::aux::LogSingleton::getInstance()->warning(msg, method_name);
-          cedar::aux::sleep(cedar::unit::Milliseconds(100));
+          cedar::aux::sleep(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::second));
         }
       }
       catch (cedar::aux::ExceptionBase& e)
@@ -252,7 +255,7 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
         else
         {
           reading_ok = false;
-          cedar::aux::sleep(cedar::unit::Milliseconds(50));
+          cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
         }
       }
       catch (std::exception& e)

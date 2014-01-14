@@ -55,6 +55,10 @@ endif()
 
 include("project.conf")
 
+if (CMAKE_BUILD_TYPE MATCHES "debug")
+  add_definitions(-DDEBUG)
+endif()
+
 if (DEBUG_CEDAR_BUILD_SYSTEM)
   message ("  >> cedar home is set to ${CEDAR_HOME}")
 endif(DEBUG_CEDAR_BUILD_SYSTEM)
@@ -144,6 +148,12 @@ macro(cedar_project_add_target)
   set(old_binary_dir ${CMAKE_CURRENT_BINARY_DIR})
   set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated_project_files)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  
+  foreach (header ${moc_headers})
+    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${header}")
+      message(WARNING "Could not find moc file ${header}. Check the path in the project's root CMakeLists.txt")
+    endif()
+  endforeach()
   
   qt_add_resources(compiled_resource_paths ${project_resources})
   qt_wrap_cpp(moc_headers ${moc_headers})

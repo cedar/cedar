@@ -41,11 +41,13 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/MatrixTypeConverter.fwd.h"
 
 // SYSTEM INCLUDES
 

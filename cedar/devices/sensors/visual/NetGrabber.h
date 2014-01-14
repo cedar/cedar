@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/net/Reader.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 /*! @class cedar::dev::sensors::visual::NetGrabber
  *  @brief This grabber grabs images from a yarp-server located somewhere in the network

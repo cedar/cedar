@@ -39,7 +39,6 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
 

@@ -146,24 +146,31 @@ install before you can compile cedar. The version numbers are the oldest
 versions supported.
 
 * CMake
-* Boost 1.47 (except version 1.49, which apparently does not work with c++11)
-* OpenCV 2.2
-* Qt 4.6.2
-* qwt 5.2.1
-* qwtplot3d 0.3
-* libqglviewer 2.3.6
+* Boost >= 1.47 (except version 1.49, which apparently does not work with c++11)
+* OpenCV >= 2.2
+* Qt >= 4.6.2 (Qt5 may work, but is not yet supported officially)
 
 optional dependencies:
 
+* qwt 5.2.1
+* libqglviewer 2.3.6
 * YARP 2.3.6 (for YARP features like network connectivity)
 * libDC1394 (for firewire cameras)
 * fftw-3.2.2 (for FFT-based convolutions)
 * Doxygen (to generate HTML or LaTeX documentation)
+* qwtplot3d 0.3 (to display surface plots)
+* VTK 5.6 (alternative library for surface and line plots)
 
 We depend on a particular version of qwtplot3d, which we had to patch to
 fit our needs. You can get the
 [source code](https://bitbucket.org/cedar/dependencies/downloads/qwtplot3d-0.3.0-patched.tar.gz)
 of this library from our dependencies repository.
+
+To use VTK you need to install the VTK Library with Qt support and the C++ Header files. The latter is usually included in a VTK-Dev package. The former can be achieved by building VTK from source with Qt-Support enabled or by installing a VTK and a VTK-Qt package, given your package manager provides one. If you were to use apt-get for instance, you'd have to install the following packages:
+* libvtk5.8
+* libvtk5.8-qt4
+* libvtk5-dev
+* libvtk5-qt4-dev
 
 ## Clone the cedar repository
 
@@ -265,3 +272,13 @@ processing framework:
    them up.
 
    Have fun!
+   
+## Reporting issues
+
+Our repositories and issue trackers
+are hosted on [bitbucket](https://bitbucket.org/cedar).
+
+We always welcome any features, bug-reports and other things.
+
+Note: we try to be warning-free. If you encounter warnings when compiling
+cedar on your system, let us know!

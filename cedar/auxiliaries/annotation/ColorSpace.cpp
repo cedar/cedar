@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <map>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

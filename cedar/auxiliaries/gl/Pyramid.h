@@ -38,8 +38,8 @@
 #define CEDAR_AUX_GL_PYRAMID_H
 
 // CEDAR INCLUDES
-#include "namespace.h"
-#include "ObjectVisualization.h"
+#include "cedar/auxiliaries/gl/Pyramid.fwd.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 

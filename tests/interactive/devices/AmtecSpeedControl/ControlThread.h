@@ -40,7 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
 
@@ -64,7 +64,7 @@ public:
    */
   ControlThread
   (
-    const cedar::dev::robot::KinematicChainPtr kinematicChain,
+    const cedar::dev::KinematicChainPtr kinematicChain,
     double stepSize = 1.0,
     double idleTime = 0.001
   );
@@ -92,7 +92,7 @@ protected:
   // none yet
 
 private:
-  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
+  cedar::dev::KinematicChainPtr mpKinematicChain;
 
 }; // class ControlThread
 

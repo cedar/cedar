@@ -42,7 +42,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/IntrusivePtrBase.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN

@@ -43,7 +43,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/View.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsView>

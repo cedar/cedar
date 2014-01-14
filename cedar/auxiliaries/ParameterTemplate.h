@@ -42,11 +42,14 @@
 #define CEDAR_PROC_PARAMETER_TEMPLATE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/Log.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/ParameterTemplate.fwd.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
 #ifndef Q_MOC_RUN
   #include <boost/function.hpp>
 #endif
@@ -138,18 +141,18 @@ public:
   //!@brief load a value of type T from a configuration tree
   void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
-#ifdef DEBUG
     try
     {
-#endif
       this->mValue = node.get_value<T>();
-#ifdef DEBUG
     }
     catch (const boost::property_tree::ptree_bad_path& e)
     {
-      std::cout << "Error while setting parameter to value: " << e.what() << std::endl;
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+      (
+        "Error while setting parameter to value: " + std::string(e.what()),
+        "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
+      );
     }
-#endif
   }
 
   //!@brief set value to default

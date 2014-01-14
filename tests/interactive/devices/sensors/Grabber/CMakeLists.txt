@@ -34,5 +34,5 @@
 #
 #=======================================================================================================================
 
-cedar_add_interactive_test( "Grabber" TestGrabber.cpp )
+cedar_add_interactive_test("Grabber" TestGrabber.cpp LINK_TESTUTILS)
 

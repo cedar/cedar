@@ -38,14 +38,17 @@
 #define CEDAR_DYN_RATE_MATRIX_TO_SPACE_CODE_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/math/tools.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/dynamics/steps/RateMatrixToSpaceCode.fwd.h"
+
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A step that converts a 2-dimensional matrix of rate code values to a 3-dimensional matrix of space code.
@@ -132,7 +135,7 @@ private:
     }
     else
     {
-      return -1;      
+      return -1;
     }
   }
 

@@ -41,9 +41,14 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@todo describe.
@@ -85,6 +90,9 @@ public:
   {
     return this->mCategory;
   }
+
+  //! Returns the type of the declaration (plot, element, ...)
+  virtual std::string getPluginType() const;
 
   /*!@brief Marks the declared type as deprecated.
    */
