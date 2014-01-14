@@ -75,6 +75,7 @@ cedar_add_library(cedarproc
   steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
   steps/MatrixMultiply.h
+  steps/MatrixPadding.h
   steps/MatrixSlice.h
   steps/MatrixTypeConverter.h
   steps/Normalization.h
