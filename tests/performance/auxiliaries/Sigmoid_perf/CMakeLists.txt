@@ -22,22 +22,15 @@
 #   Institute:   Ruhr-Universitaet Bochum
 #                Institut fuer Neuroinformatik
 #
-#   File:        version.txt
+#   File:        CMakeLists.txt
 #
-#   Maintainer:  Mathis Richter
-#   Email:       mathis.richter@ini.rub.de
-#   Date:        2012 12 12
+#   Maintainer:  Stephan Zibner
+#   Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+#   Date:        2014 01 14
 #
-#   Description: Version information of the current stable release.
+#   Description:
 #
 #   Credits:
 #
 #=======================================================================================================================
-
-# set cedar version information
-set (CEDAR_VERSION_MAJOR 2)
-set (CEDAR_VERSION_MINOR 0)
-set (CEDAR_VERSION_BUGFIX 5)
-
-# combined version
-set (CEDAR_VERSION "${CEDAR_VERSION_MAJOR}.${CEDAR_VERSION_MINOR}.${CEDAR_VERSION_BUGFIX}")
+cedar_add_performance_test(Sigmoid_perf Sigmoid_perf.cpp)

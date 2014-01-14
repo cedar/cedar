@@ -92,7 +92,8 @@ public:
     cv::Mat result = values.clone();
     cv::MatConstIterator_<T> iter_src = values.begin<T>();
     cv::MatIterator_<T> iter_dest = result.begin<T>();
-    for ( ; iter_src != values.end<T>(); ++iter_src, ++iter_dest)
+    auto end = values.end<T>();
+    for ( ; iter_src != end; ++iter_src, ++iter_dest)
     {
       *iter_dest = static_cast<T>(compute(static_cast<double>(*iter_src)));
     }
