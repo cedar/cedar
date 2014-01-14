@@ -41,6 +41,47 @@
 
 // SYSTEM INCLUDES
 
+int test_resize(double default_value, size_t default_size, size_t resize_size)
+{
+  int errors = 0;
+
+  std::cout << "Testing resize(" << default_value << ", "
+      << default_size << ", " << resize_size << ", ) ..." << std::endl;
+
+  cedar::aux::ConfigurablePtr configurable(new cedar::aux::Configurable());
+  cedar::aux::DoubleVectorParameterPtr vector
+  (
+    new cedar::aux::DoubleVectorParameter
+    (
+      configurable.get(),
+      "name",
+      default_size, // default size
+      default_value
+    )
+  );
+
+  for (size_t i = 0; i < default_size; ++i)
+  {
+    if (vector->at(i) != default_value)
+    {
+      std::cout << "value " << i << " has not been set to the default value (pre-resize)." << std::endl;
+      ++errors;
+    }
+  }
+
+  vector->resize(resize_size);
+  for (size_t i = 0; i < default_size; ++i)
+  {
+    if (vector->at(i) != default_value)
+    {
+      std::cout << "value " << i << " has not been set to the default value (post-resize)." << std::endl;
+      ++errors;
+    }
+  }
+
+  return errors;
+}
+
 int main()
 {
   // the number of errors encountered in this test
@@ -107,6 +148,9 @@ int main()
   param->writeToNode(conf);
 
   param_2->readFromNode(conf.get_child("name"));
+
+  errors += test_resize(1.234, 3, 5);
+  errors += test_resize(1.234, 0, 2);
 
   return errors;
 }
