@@ -190,6 +190,8 @@ macro(cedar_project_setup directory)
   elseif (MSVC)
     add_definitions(-W2)
     add_definitions(-DMSVC)
+  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    add_definitions(-std=c++11)
   endif (CMAKE_COMPILER_IS_GNUCC)
   
 endmacro(cedar_project_setup)
