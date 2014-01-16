@@ -76,13 +76,7 @@ namespace cedar
      *
      * @param version Integer generated with CEDAR_MAKE_VERSION.
      */
-    inline std::string versionNumberToString(unsigned int version)
-    {
-      std::string res = cedar::aux::toString(CEDAR_GET_VERSION_MAJOR(version));
-      res += "." + cedar::aux::toString(CEDAR_GET_VERSION_MINOR(version));
-      res += "." + cedar::aux::toString(CEDAR_GET_VERSION_BUGFIX(version));
-      return res;
-    }
+    CEDAR_AUX_LIB_EXPORT std::string versionNumberToString(unsigned int version);
 
     /*!@brief  Splits a string based on the given separator.
      *

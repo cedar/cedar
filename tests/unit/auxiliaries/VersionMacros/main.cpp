@@ -35,11 +35,10 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
