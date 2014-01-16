@@ -64,6 +64,7 @@
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>

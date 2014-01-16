@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,27 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        version.h
+    File:        MatrixPadding.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 07 22
+    Date:        2014 01 13
 
-    Description: This file contains macros for accessing the version constants of cedar.
+    Description: Forward declaration file for the class cedar::proc::steps::MatrixPadding.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_VERSION_H
-#define CEDAR_VERSION_H
+#ifndef CEDAR_PROC_STEPS_MATRIX_PADDING_FWD_H
+#define CEDAR_PROC_STEPS_MATRIX_PADDING_FWD_H
 
+// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#define CEDAR_MAKE_VERSION(MAJOR, MINOR, BUGFIX) ((MAJOR << 16) + (MINOR << 8) + (BUGFIX))
-#define CEDAR_GET_VERSION_MAJOR(VERSION) (VERSION >> 16)
-#define CEDAR_GET_VERSION_MINOR(VERSION) ((VERSION >> 8) & 0xFF)
-#define CEDAR_GET_VERSION_BUGFIX(VERSION) (VERSION & 0xFF)
-#define CEDAR_VERSION CEDAR_MAKE_VERSION(CEDAR_VERSION_MAJOR, CEDAR_VERSION_MINOR, CEDAR_VERSION_BUGFIX)
+// CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
-#endif // CEDAR_VERSION_H
+// SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
+
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace proc
+  {
+    namespace steps
+    {
+      CEDAR_DECLARE_PROC_CLASS(MatrixPadding);
+    }
+  }
+}
+
+//!@endcond
+
+#endif // CEDAR_PROC_STEPS_MATRIX_PADDING_FWD_H
+

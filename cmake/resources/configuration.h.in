@@ -41,11 +41,6 @@
 #ifndef CEDAR_CONFIGURATION_H
 #define CEDAR_CONFIGURATION_H
 
-// Cedar version information ===========================================================================================
-#define CEDAR_VERSION_MAJOR @CEDAR_VERSION_MAJOR@
-#define CEDAR_VERSION_MINOR @CEDAR_VERSION_MINOR@
-#define CEDAR_VERSION_BUGFIX @CEDAR_VERSION_BUGFIX@
-
 // Optional libraries ==================================================================================================
 #cmakedefine CEDAR_USE_FFTW
 #cmakedefine CEDAR_USE_FFTW_THREADED

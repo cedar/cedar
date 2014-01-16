@@ -401,3 +401,6 @@ configure_file("${CEDAR_HOME}/cmake/resources/configuration.h.in" "${CEDAR_CONFI
 if (CEDAR_VERBOSE_BUILD_SYSTEM)
   message("-- Current configuration was written to ${CEDAR_BUILD_DIR}/cedar/configuration.h")
 endif(CEDAR_VERBOSE_BUILD_SYSTEM)
+
+set(CEDAR_VERSION_HEADER_OUTPUT "${CEDAR_BUILD_DIR}/cedar/version.h")
+configure_file("${CEDAR_HOME}/cmake/resources/version.h.in" "${CEDAR_VERSION_HEADER_OUTPUT}")
