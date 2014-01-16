@@ -103,7 +103,7 @@ const cedar::proc::steps::MatrixTypeConverter::MatrixType::Id
 cedar::proc::steps::MatrixTypeConverter::MatrixTypeConverter()
 :
 // data
-mConverted(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F))),
+mConverted(new cedar::aux::MatData(cv::Mat())),
 // parameters
 _mTargetType(new cedar::aux::EnumParameter(this, "target type", MatrixType::typePtr(), MatrixType::Float))
 {

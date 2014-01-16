@@ -84,7 +84,7 @@ namespace
 
 cedar::proc::steps::RemoveMean::RemoveMean()
 :
-mMeanFreeMat(new cedar::aux::MatData(cv::Mat(1, 1, CV_8U)))
+mMeanFreeMat(new cedar::aux::MatData(cv::Mat()))
 {
   auto input_matrix = this->declareInput("matrix");
   input_matrix->setCheck(cedar::proc::typecheck::IsMatrix());
