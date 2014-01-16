@@ -224,8 +224,8 @@ void cedar::proc::steps::Normalization::normalizeAlongOneDimension(int normalize
 
     case 3:
     {
-      int index_0;
-      int index_1;
+      int index_0 = 0;
+      int index_1 = 1;
       switch (normalizedDimension)
       {
         case 0:
