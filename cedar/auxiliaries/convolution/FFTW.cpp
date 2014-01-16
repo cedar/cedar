@@ -53,6 +53,9 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
+#ifdef CEDAR_USE_FFTW_THREADED
+#include <omp.h>
+#endif // CEDAR_USE_FFTW_THREADED
 
 QReadWriteLock cedar::aux::conv::FFTW::mPlanLock;
 bool cedar::aux::conv::FFTW::mMultiThreadActivated = false;
@@ -568,6 +571,8 @@ void cedar::aux::conv::FFTW::initThreads()
   {
     // this should be done only once
     fftw_init_threads();
+    omp_set_num_threads(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads());
+    fftw_set_timelimit(30.0);
     // from now on, all plans are generated for n threads
     fftw_plan_with_nthreads(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads());
     // make sure that we do not initialize this again
