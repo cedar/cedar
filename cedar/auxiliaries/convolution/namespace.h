@@ -64,6 +64,7 @@ namespace cedar
 
       // convolution engines
       CEDAR_DECLARE_AUX_CLASS(FFTW);
+      CEDAR_DECLARE_AUX_CLASS(FFTWPlanningStrategy);
       CEDAR_DECLARE_AUX_CLASS(OpenCV);
       //!@endcond
 

@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/convolution/FFTWPlanningStrategy.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
@@ -86,6 +87,23 @@ _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", f
                                 "search paths",
                                 (std::vector<std::string>())
                               );
+
+#ifdef CEDAR_USE_FFTW
+  this->_mFFTWNumberOfThreads = new cedar::aux::UIntParameter
+                                (
+                                  this,
+                                  "number of FFTW threads",
+                                  1
+                                );
+
+  this->_mFFTWPlanningStrategy = new cedar::aux::EnumParameter
+                                 (
+                                   this,
+                                   "FFTW planning strategy",
+                                   cedar::aux::conv::FFTWPlanningStrategy::typePtr(),
+                                   cedar::aux::conv::FFTWPlanningStrategy::Estimate
+                                 );
+#endif // CEDAR_USE_FFTW
 
   try
   {
@@ -322,3 +340,20 @@ void cedar::aux::Settings::removePluginToLoad(const std::string& path)
     this->_mPluginsToLoad->get().erase(pos);
   }
 }
+
+#ifdef CEDAR_USE_FFTW
+unsigned int cedar::aux::Settings::getFFTWNumberOfThreads() const
+{
+  return this->_mFFTWNumberOfThreads->getValue();
+}
+
+cedar::aux::EnumId cedar::aux::Settings::getFFTWPlanningStrategy() const
+{
+  return this->_mFFTWPlanningStrategy->getValue().id();
+}
+
+std::string cedar::aux::Settings::getFFTWPlanningStrategyString() const
+{
+  return this->_mFFTWPlanningStrategy->getValue().name();
+}
+#endif // CEDAR_USE_FFTW
