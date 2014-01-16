@@ -498,13 +498,26 @@ fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, st
           matrix.size,
           const_cast<double*>(matrix.clone().ptr<double>()),
           matrix_fourier,
-          FFTW_FORWARD + cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
+          FFTW_FORWARD | cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
         );
-    cedar::aux::conv::FFTW::mForwardPlans[unique_identifier] = matrix_plan_forward;
-    cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
-    cedar::aux::conv::FFTW::mPlanLock.unlock();
     fftw_free(matrix_fourier);
-    return matrix_plan_forward;
+    if (matrix_plan_forward)
+    {
+      cedar::aux::conv::FFTW::mForwardPlans[unique_identifier] = matrix_plan_forward;
+      cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
+      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      return matrix_plan_forward;
+    }
+    else
+    {
+      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      CEDAR_THROW
+      (
+        cedar::aux::NotFoundException,
+        "FFTW could not find a forward transformation plan for a matrix with sizes " + unique_identifier
+        + ". You can try to alter the planning strategy."
+      );
+    }
   }
 }
 
@@ -554,13 +567,25 @@ fftw_plan cedar::aux::conv::FFTW::getBackwardPlan(unsigned int dimensionality, s
           matrix.size,
           matrix_fourier,
           const_cast<double*>(matrix.ptr<double>()),
-          FFTW_BACKWARD + cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
+          FFTW_BACKWARD | cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
         );
-    cedar::aux::conv::FFTW::mBackwardPlans[unique_identifier] = matrix_plan_backward;
-    cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
-    cedar::aux::conv::FFTW::mPlanLock.unlock();
     fftw_free(matrix_fourier);
-    return matrix_plan_backward;
+    if (matrix_plan_backward)
+    {
+      cedar::aux::conv::FFTW::mBackwardPlans[unique_identifier] = matrix_plan_backward;
+      cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
+      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      return matrix_plan_backward;
+    }
+    else
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::NotFoundException,
+        "FFTW could not find a backward transformation plan for a matrix with sizes " + unique_identifier
+        + ". You can try to alter the planning strategy."
+      );
+    }
   }
 }
 
