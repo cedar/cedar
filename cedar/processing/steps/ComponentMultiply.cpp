@@ -126,6 +126,16 @@ void cedar::proc::steps::ComponentMultiply::compute(const cedar::proc::Arguments
     cedar::aux::MatDataPtr mat_data = boost::static_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(i));
     cv::Mat input = mat_data->getData();
 
-    prod = prod.mul(input);
+    if (!mat_data->isEmpty())
+    {
+      if (mat_data->getDimensionality() == 0)
+      {
+        prod = cedar::aux::math::getMatrixEntry<double>(input, 0) * prod;
+      }
+      else
+      {
+        prod = prod.mul(input);
+      }
+    }
   }
 }
