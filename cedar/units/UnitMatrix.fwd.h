@@ -22,41 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Frequency.h
+    File:        UnitMatrix.fwd.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2013 02 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 01 17
 
-    Description: This is a header for all frequency-related units.
+    Description: Forward declaration file for the class cedar::unit::UnitMatrix.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_FREQUENCY_H
-#define CEDAR_UNITS_FREQUENCY_H
+#ifndef CEDAR_UNIT_UNIT_MATRIX_FWD_H
+#define CEDAR_UNIT_UNIT_MATRIX_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/units/UnitMatrix.h"
+#include "cedar/units/lib.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/frequency.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
+//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace unit
   {
-    typedef boost::units::quantity<boost::units::si::frequency> Frequency;
-    using boost::units::si::hertz;
-
-    //!@brief template concretion for frequency
-    typedef UnitMatrix<boost::units::si::frequency> FrequencyMatrix;
-
-    //!@brief default unit for frequency
-    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::Frequency DEFAULT_FREQUENCY_UNIT;
+    template <typename DimensionType> struct UnitMatrix;
   }
 }
 
-#endif // CEDAR_UNITS_FREQUENCY_H
+//!@endcond
+
+#endif // CEDAR_UNIT_UNIT_MATRIX_FWD_H
+
