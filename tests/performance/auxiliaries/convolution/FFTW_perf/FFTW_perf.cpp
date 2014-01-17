@@ -96,7 +96,8 @@ void test_convolution_time_1d(TestSet& test)
 
   conv->getKernelList()->append(gauss);
 
-  int sizes_3D[3] = {test.mImsize, test.mImsize, test.mImsize};
+  int size = static_cast<int>(test.mImsize);
+  int sizes_3D[3] = {size, size, size};
   cv::Mat matrix_3D(3, sizes_3D, CV_32F);
   cv::Mat image = matrix_3D;
 //  cv::Mat image = cv::Mat::ones(test.mImsize, 1, CV_32F);
@@ -112,7 +113,6 @@ void test_convolution_time_1d(TestSet& test)
   test.mDuration = static_cast<double>((end - start).total_milliseconds()) / 1000.0;
   cedar::test::write_measurement(case_id, test.mDuration);
 }
-
 
 int main(int, char**)
 {

@@ -498,7 +498,7 @@ fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, st
           matrix.size,
           const_cast<double*>(matrix.clone().ptr<double>()),
           matrix_fourier,
-          FFTW_FORWARD | cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
+          cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
         );
     fftw_free(matrix_fourier);
     if (matrix_plan_forward)
@@ -567,7 +567,7 @@ fftw_plan cedar::aux::conv::FFTW::getBackwardPlan(unsigned int dimensionality, s
           matrix.size,
           matrix_fourier,
           const_cast<double*>(matrix.ptr<double>()),
-          FFTW_BACKWARD | cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
+          cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
         );
     fftw_free(matrix_fourier);
     if (matrix_plan_backward)
