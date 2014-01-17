@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,32 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        LinearTransferFunction.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 07 23
+    Date:        2014 01 17
 
-    Description: Namespace file for transfer functions in cedar::aux::math.
+    Description: Forward declaration file for the class cedar::aux::math::transferFunctions::LinearTransferFunction.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H
-#define CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H
+#ifndef CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_LINEAR_TRANSFER_FUNCTION_FWD_H
+#define CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_LINEAR_TRANSFER_FUNCTION_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-#warning Do not include this header any more. Use the forward declaration headers insteaed.
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace math
+    {
+      CEDAR_DECLARE_AUX_CLASS(LinearTransferFunction);
+    }
+  }
+}
 
-#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.fwd.h"
-#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.fwd.h"
-#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.fwd.h"
-#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.fwd.h"
-#include "cedar/auxiliaries/math/transferFunctions/SemiLinearTransferFunction.fwd.h"
+//!@endcond
 
-#endif // CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H
+#endif // CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_LINEAR_TRANSFER_FUNCTION_FWD_H
+
