@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,31 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Type.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 02 15
+    Date:        2014 01 17
 
-    Description: Namespace file for cedar::aux::logFilter.
+    Description: Forward declaration file for the class cedar::aux::logFilter::Type.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_LOG_FILTER_NAMESPACE_H
-#define CEDAR_AUX_LOG_FILTER_NAMESPACE_H
+#ifndef CEDAR_AUX_LOG_FILTER_TYPE_FWD_H
+#define CEDAR_AUX_LOG_FILTER_TYPE_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-// FORWARD DECLARATIONS
-#include "cedar/auxiliaries/logFilter/All.fwd.h"
-#include "cedar/auxiliaries/logFilter/Type.fwd.h"
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace logFilter
+    {
+      CEDAR_DECLARE_AUX_CLASS(Type);
+    }
+  }
+}
 
-#warning Do not include this header any more. Use the new forward headers instead.
+//!@endcond
 
-#endif // CEDAR_AUX_LOG_FILTER_NAMESPACE_H
+#endif // CEDAR_AUX_LOG_FILTER_TYPE_FWD_H
+
