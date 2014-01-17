@@ -38,10 +38,10 @@
 #define CEDAR_AUX_CONV_KERNEL_LIST_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/kernel/Kernel.fwd.h"
+#include "cedar/auxiliaries/convolution/KernelList.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

@@ -50,6 +50,7 @@ namespace_aliases["aux"] = "auxiliaries"
 namespace_aliases["proc"] = "processing"
 namespace_aliases["dyn"] = "dynamics"
 namespace_aliases["dev"] = "devices"
+namespace_aliases["conv"] = "convolution"
 
 # determine user's home directory
 home = os.getenv('USERPROFILE') or os.getenv('HOME')
@@ -213,8 +214,8 @@ for extension in extensions:
     print "destination:", destination
     
     if os.path.exists(destination):
-      print "File already exists. Aborting."
-      sys.exit()
+      print "File already exists. Skipping."
+      continue
       
     with open(destination, "w") as out:
       out.write(contents)
