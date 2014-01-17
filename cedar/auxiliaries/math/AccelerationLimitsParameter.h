@@ -39,10 +39,12 @@
 #define CEDAR_AUX_MATH_ACCELERATION_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/AccelerationParameter.h"
 #include "cedar/auxiliaries/LengthParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/AccelerationLimitsParameter.fwd.h"
 
 #endif // CEDAR_AUX_MATH_ACCELERATION_LIMITS_PARAMETER_H

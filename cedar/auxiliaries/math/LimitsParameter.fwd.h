@@ -22,25 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LengthLimitsParameter.h
+    File:        LimitsParameter.fwd.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2013 02 27
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 01 17
 
-    Description: This is a dummy header for the typedef LengthLimitsParameter (which is actually a
-                 cedar::aux::math::LimitsParameter<cedar::unit::Length>).
+    Description: Forward declaration file for the class cedar::aux::math::LimitsParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_LENGTH_LIMITS_PARAMETER_H
-#define CEDAR_AUX_MATH_LENGTH_LIMITS_PARAMETER_H
+#ifndef CEDAR_AUX_MATH_LIMITS_PARAMETER_FWD_H
+#define CEDAR_AUX_MATH_LIMITS_PARAMETER_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/LengthLimitsParameter.fwd.h"
-#include "cedar/auxiliaries/math/LimitsParameter.h"
-#include "cedar/auxiliaries/LengthParameter.h"
+#include "cedar/auxiliaries/lib.h"
 
-#endif // CEDAR_AUX_MATH_LENGTH_LIMITS_PARAMETER_H
+// SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
+
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace math
+    {
+      template <class T> class LimitsParameter;
+    }
+  }
+}
+
+//!@endcond
+
+#endif // CEDAR_AUX_MATH_LIMITS_PARAMETER_FWD_H
+
