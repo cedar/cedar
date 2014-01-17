@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES

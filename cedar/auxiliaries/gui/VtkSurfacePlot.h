@@ -43,7 +43,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
-#include "cedar/auxiliaries/math/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
