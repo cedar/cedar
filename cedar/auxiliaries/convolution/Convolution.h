@@ -38,7 +38,6 @@
 #define CEDAR_AUX_CONV_CONVOLUTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
 #include "cedar/auxiliaries/convolution/Engine.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
@@ -46,6 +45,10 @@
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/MatData.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/convolution/Convolution.fwd.h"
+#include "cedar/auxiliaries/convolution/EngineParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

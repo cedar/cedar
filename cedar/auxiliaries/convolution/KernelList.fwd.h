@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,39 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        KernelList.fwd.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 01 17
 
-    Description: Namespace file for cedar::aux::conv.
+    Description: Forward declaration file for the class cedar::aux::conv::KernelList.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_NAMESPACE_H
-#define CEDAR_AUX_CONV_NAMESPACE_H
+#ifndef CEDAR_AUX_CONV_KERNEL_LIST_FWD_H
+#define CEDAR_AUX_CONV_KERNEL_LIST_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/lib.h"
 
-#warning Do not include this header any more. Include the new forward declaration headers instead.
+// SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-// FORWARD DECLARATIONS
-#include "cedar/auxiliaries/Singleton.fwd.h"
-#include "cedar/auxiliaries/FactoryManager.fwd.h"
-#include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
-#include "cedar/auxiliaries/convolution/BorderType.fwd.h"
-#include "cedar/auxiliaries/convolution/Convolution.fwd.h"
-#include "cedar/auxiliaries/convolution/Engine.fwd.h"
-#include "cedar/auxiliaries/convolution/KernelList.fwd.h"
-#include "cedar/auxiliaries/convolution/Mode.fwd.h"
-#include "cedar/auxiliaries/convolution/FFTW.fwd.h"
-#include "cedar/auxiliaries/convolution/OpenCV.fwd.h"
-#include "cedar/auxiliaries/convolution/EngineManager.fwd.h"
-#include "cedar/auxiliaries/convolution/EngineParameter.fwd.h"
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace conv
+    {
+      CEDAR_DECLARE_AUX_CLASS(KernelList);
+    }
+  }
+}
 
+//!@endcond
 
-#endif // CEDAR_AUX_CONV_NAMESPACE_H
+#endif // CEDAR_AUX_CONV_KERNEL_LIST_FWD_H
+
