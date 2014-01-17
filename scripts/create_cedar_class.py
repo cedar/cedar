@@ -51,6 +51,7 @@ namespace_aliases["proc"] = "processing"
 namespace_aliases["dyn"] = "dynamics"
 namespace_aliases["dev"] = "devices"
 namespace_aliases["conv"] = "convolution"
+namespace_aliases["test"] = "testingUtilities"
 
 # determine user's home directory
 home = os.getenv('USERPROFILE') or os.getenv('HOME')
