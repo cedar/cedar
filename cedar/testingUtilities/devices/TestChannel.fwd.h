@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,37 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        TestChannel.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 07 18
+    Date:        2014 01 17
 
-    Description: Namespace file for cedar::test.
+    Description: Forward declaration file for the class cedar::test::dev::TestChannel.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTING_UTILITIES_NAMESPACE_H
-#define CEDAR_TESTING_UTILITIES_NAMESPACE_H
+#ifndef CEDAR_TEST_DEV_TEST_CHANNEL_FWD_H
+#define CEDAR_TEST_DEV_TEST_CHANNEL_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/testingUtilities/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-#warning Do not include this header any more. Use the new forward declaration headers instead.
-
+//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
-  /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
-   *
-   *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
-   */
   namespace test
   {
+    namespace dev
+    {
+      CEDAR_DECLARE_TESTING_UTILITIES_CLASS(TestChannel);
+    }
   }
 }
 
-#endif // CEDAR_TESTING_UTILITIES_NAMESPACE_H
+//!@endcond
+
+#endif // CEDAR_TEST_DEV_TEST_CHANNEL_FWD_H
+
