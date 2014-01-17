@@ -303,22 +303,21 @@ void cedar::aux::gui::detail::MatrixSlicePlot3DWorker::convert()
 
 void cedar::aux::gui::MatrixSlicePlot3D::updateData()
 {
-  const cv::Mat& mat = this->mData->getData();
-  if (cedar::aux::math::getDimensionalityOf(mat) != 3) // plot is no longer capable of displaying the data
+  //!@todo Wouldn't it make sense to copy (clone) the matrix here to keep it locked as short as possible?
+  QReadLocker locker(&this->mData->getLock());
+  if (this->mData->getDimensionality() != 3) // plot is no longer capable of displaying the data
   {
     emit dataChanged();
     return;
   }
 
-  this->mData->lockForRead();
+  const cv::Mat& mat = this->mData->getData();
   if (mat.empty())
   {
     this->mpImageDisplay->setText("Matrix is empty.");
-    this->mData->unlock();
     return;
   }
   int type = mat.type();
-  this->mData->unlock();
 
   switch(type)
   {
@@ -326,9 +325,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::updateData()
     case CV_32FC1:
 //  case CV_64FC1:
     {
-      this->mData->lockForRead();
       this->slicesFromMat(this->mData->getData());
-      this->mData->unlock();
       break;
     }
 
