@@ -148,6 +148,25 @@ public:
     this->_mDiscreteMetric->setValue(value);
   }
 
+  //!@brief Set the dimensionality of the field.
+  inline void setDimensionality(unsigned int dim)
+  {
+    this->_mDimensionality->setValue(dim);
+  }
+
+  //!@brief Returns the dimensionality of the field.
+  inline unsigned int getDimensionality() const
+  {
+    return this->_mDimensionality->getValue();
+  }
+
+  //!@brief Set the size at given dimension of the field.
+  inline void setSize(unsigned int dim, unsigned int size)
+  {
+    CEDAR_ASSERT(dim < this->_mSizes->size());
+    this->_mSizes->set(dim, size);
+  }
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
@@ -200,12 +219,6 @@ private:
 
   //!@brief Makes the kernel list stored in the convolution equal to the one in the field.
   void transferKernelsToConvolution();
-
-  //!@brief Returns the dimensionality of the field.
-  inline unsigned int getDimensionality() const
-  {
-    return this->_mDimensionality->getValue();
-  }
 
   /*!@brief   Recalculates the sum of all inputs.
    *

@@ -55,9 +55,9 @@
 class cedar::aux::conv::FFTW : public cedar::aux::conv::Engine
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,6 +135,10 @@ private:
   static void saveWisdom(const std::string& uniqueIdentifier);
   static void initThreads();
 
+private slots:
+  void kernelChanged() const;
+  void kernelListChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -151,7 +155,9 @@ private:
   mutable fftw_complex* mMatrixBuffer;
   mutable fftw_complex* mKernelBuffer;
   mutable fftw_complex* mResultBuffer;
-
+  // dirty flag if kernel has changed since last time
+  mutable bool mRetransformKernel;
+  mutable QReadWriteLock mKernelTransformLock;
 }; // cedar::aux::conv::FFTW
 
 #endif // CEDAR_FFTW

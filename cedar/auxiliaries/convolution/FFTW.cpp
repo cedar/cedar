@@ -80,9 +80,10 @@ cedar::aux::conv::FFTW::FFTW()
 mAllocatedSize(0),
 mMatrixBuffer(NULL),
 mKernelBuffer(NULL),
-mResultBuffer(NULL)
+mResultBuffer(NULL),
+mRetransformKernel(true)
 {
-
+ this->connect(this, SIGNAL(kernelListChanged()), SLOT(kernelListChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -114,6 +115,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const std::vector<int>& /* anchor */
 ) const
 {
+  this->kernelChanged();
   return this->convolveInternal(matrix, kernel, borderType);
 }
 
@@ -125,6 +127,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   cedar::aux::conv::Mode::Id /* mode */
 ) const
 {
+  this->kernelChanged();
   return this->convolveInternal(matrix, kernel->getKernel(), borderType);
 }
 
@@ -138,6 +141,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 {
   if (kernelList->size() > 0)
   {
+    this->kernelChanged();
     return this->convolveInternal(matrix, kernelList->getCombinedKernel(), borderType);
   }
   else
@@ -234,6 +238,8 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     mResultBuffer = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
     mKernelBuffer = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
     mAllocatedSize = transformed_elements;
+    QWriteLocker write_lock(&this->mKernelTransformLock);
+    this->mRetransformKernel = true;
   }
 
 //  fftw_execute(matrix_plan_forward);
@@ -250,12 +256,18 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     mMatrixBuffer
   );
 //  fftw_execute(kernel_plan_forward);
-  fftw_execute_dft_r2c
-  (
-    cedar::aux::conv::FFTW::getForwardPlan(cedar::aux::math::getDimensionalityOf(padded_kernel), mat_sizes),
-    const_cast<double*>(padded_kernel.ptr<double>()),
-    mKernelBuffer
-  );
+  QWriteLocker write_lock(&this->mKernelTransformLock);
+  if (this->mRetransformKernel)
+  {
+    fftw_execute_dft_r2c
+    (
+      cedar::aux::conv::FFTW::getForwardPlan(cedar::aux::math::getDimensionalityOf(padded_kernel), mat_sizes),
+      const_cast<double*>(padded_kernel.ptr<double>()),
+      mKernelBuffer
+    );
+    this->mRetransformKernel = false;
+  }
+  write_lock.unlock();
 
   // go trough all data points
   for (unsigned int xyz = 0; xyz < transformed_elements; ++xyz)
@@ -604,6 +616,17 @@ void cedar::aux::conv::FFTW::initThreads()
     mMultiThreadActivated = true;
   }
 #endif
+}
+
+void cedar::aux::conv::FFTW::kernelChanged() const
+{
+  QWriteLocker write_lock(&this->mKernelTransformLock);
+  this->mRetransformKernel = true;
+}
+
+void cedar::aux::conv::FFTW::kernelListChanged()
+{
+  this->connect(this->getKernelList().get(), SIGNAL(combinedKernelUpdated()), SLOT(kernelChanged()));
 }
 
 #endif // CEDAR_FFTW
