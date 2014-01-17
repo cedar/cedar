@@ -525,7 +525,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
     //!@todo not sure, if dividing time by 1s (which is an implicit tau) makes any sense or should be a parameter
     //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
-    sigmoid_u = _mSigmoid->getValue()->compute<float>
+    sigmoid_u = _mSigmoid->getValue()->compute
                 (
                   u
                   + sqrt(time / (1.0 * cedar::unit::second))
@@ -535,7 +535,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   else
   {
     // calculate output
-    sigmoid_u = _mSigmoid->getValue()->compute<float>(u);
+    sigmoid_u = _mSigmoid->getValue()->compute(u);
   }
   sigmoid_u_lock.unlock();
 

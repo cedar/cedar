@@ -52,6 +52,12 @@ else(CEDAR_USE_QWTPLOT3D)
   set(qwtplot3d_moc_files "")
 endif(CEDAR_USE_QWTPLOT3D)
 
+if (CEDAR_USE_FFTW)  
+  set(fftw_moc_files convolution/FFTW.h)
+else (CEDAR_USE_FFTW)
+  set(fftw_moc_files "")
+endif (CEDAR_USE_FFTW)
+
 cedar_add_library(cedaraux
   MOC_HEADERS
   ThreadWrapper.h
@@ -101,7 +107,10 @@ cedar_add_library(cedaraux
   ${qwt_moc_files}
   ${vtk_moc_files}
   ${qwtplot3d_moc_files}
+  ${fftw_moc_files}
   convolution/Convolution.h
+  convolution/KernelList.h
+  convolution/Engine.h
   Parameter.h
   kernel/Separable.h
   kernel/Kernel.h
