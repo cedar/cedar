@@ -390,8 +390,22 @@ macro(cedar_add_library)
   cedar_set_common_target_properties(${libraryName})
   
   if (MSVC)
-    # In visual studio, put all unit tests into a subfolder
+    # In visual studio, put all libraries into a (virtual) subfolder
     set_target_properties(${libraryName} PROPERTIES FOLDER "cedar libraries")
+    
+    get_target_property(library_out_dir ${libraryName} LIBRARY_OUTPUT_DIRECTORY)
+    get_target_property(runtime_out_dir ${libraryName} RUNTIME_OUTPUT_DIRECTORY)
+    get_target_property(archive_out_dir ${libraryName} ARCHIVE_OUTPUT_DIRECTORY)
+    message("--------> original: ${library_out_dir}")
+    message("                    ${runtime_out_dir}")
+    message("                    ${archive_out_dir}")
+    
+    foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+      string(TOUPPER ${CONFIG} CONFIG)
+      set_target_properties(${libraryName} PROPERTIES LIBRARY_OUTPUT_DIRECTORY_${CONFIG} ${library_out_dir})
+      set_target_properties(${libraryName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_${CONFIG} ${runtime_out_dir})
+      set_target_properties(${libraryName} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_${CONFIG} ${archive_out_dir})
+    endforeach()
   endif (MSVC)
   
   if (MSVC)
