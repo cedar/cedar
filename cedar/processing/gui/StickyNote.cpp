@@ -42,6 +42,7 @@
 #include <QBrush>
 #include <QMenu>
 #include <QAction>
+#include <QColorDialog>
 #include <iostream>
 
 
@@ -58,7 +59,7 @@ cedar::proc::gui::GraphicsBase(width,height)
   //initialize
   mScaling = false;
   this->mpParent = pParent;
-  mColor = Qt::yellow;
+  mColor = QColor(255,255,110);
   mBound =  QRectF(0, 0, width, height);
   this->setPos(x,y);
 
@@ -230,6 +231,7 @@ void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEve
   cyan->setIcon(QIcon(":/colors/cyan.svg"));
   QAction *yellow = colors->addAction("yellow");
   yellow->setIcon(QIcon(":/colors/yellow.svg"));
+  QAction *other = colors->addAction("other");
 
   QMenu* fontsize = menu.addMenu("font size");
   QAction *xs = fontsize->addAction("xs");
@@ -244,27 +246,35 @@ void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEve
   //change colors
   if (a == blue)
   {
-    this->mColor = Qt::blue;
+    this->mColor = QColor(110,110,255);
   }
   else if (a == red)
   {
-    this->mColor = Qt::red;
+    this->mColor = QColor(255,110,110);
   }
   else if (a == green)
   {
-    this->mColor = Qt::green;
+    this->mColor = QColor(110,255,110);
   }
   else if (a == cyan)
   {
-    this->mColor = Qt::cyan;
+    this->mColor = QColor(110,255,255);
   }
   else if (a == magenta)
   {
-    this->mColor = Qt::magenta;
+    this->mColor = QColor(255,110,255);
   }
   else if (a == yellow)
   {
-    this->mColor = Qt::yellow;
+    this->mColor = QColor(255,255,110);
+  }
+  else if (a == other)
+  {
+    QColor color = QColorDialog::getColor(this->mColor);
+    if (color.isValid())
+    {
+      this->mColor = color;
+    }
   }
 
   //set font size
