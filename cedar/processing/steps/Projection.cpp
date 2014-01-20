@@ -260,7 +260,8 @@ void cedar::proc::steps::Projection::reconfigure()
     }
     else
     {
-      std::cout << "Not implemented yet.\n";
+      mpProjectionMethod = NULL;
+      CEDAR_THROW(cedar::aux::NotImplementedException, "The projection for this configuration is not implemented.");
     }
   }
   // if the projection expands ...
