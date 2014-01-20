@@ -123,6 +123,7 @@ void cedar::processingCL::MainApplication::startTriggers()
     return;
   }
   this->mArchitecture->startTriggers();
+  std::cout << "Triggers started." << std::endl;
 }
 
 void cedar::processingCL::MainApplication::loadArchitecture(const std::string& path)
