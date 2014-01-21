@@ -38,13 +38,17 @@
 #define CEDAR_AUX_CONV_ENGINE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
 #include "cedar/auxiliaries/convolution/Mode.h"
 #include "cedar/auxiliaries/Configurable.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/kernel/Separable.fwd.h"
+#include "cedar/auxiliaries/convolution/Engine.fwd.h"
+
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Base class for convolution engines.

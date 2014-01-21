@@ -42,9 +42,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Parameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/casts.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/NumericParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -225,7 +227,7 @@ private:
     parameter->lockForRead();
     if (parameter->getValue() != WidgetPolicy::getValue(this->mpWidget))
     {
-      this->mpWidget->setValue(parameter->getValue());
+      WidgetPolicy::setValue(this->mpWidget, parameter->getValue());
     }
     parameter->unlock();
     this->mpWidget->blockSignals(blocked);

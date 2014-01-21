@@ -42,12 +42,15 @@
 #ifdef CEDAR_USE_FFTW
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/convolution/Engine.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/convolution/FFTW.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <fftw3.h>
+#include <vector>
 
 /*!@brief A convolution engine based on the FFTW library.
  */

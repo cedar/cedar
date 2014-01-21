@@ -49,26 +49,36 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Network.h"
-#include "cedar/processing/gui/PluginLoadDialog.h"
-#include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
+#include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDialogButtonBox>
+#include <QInputDialog>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/detail/json_parser_error.hpp>
 #endif
+#include <vector>
+#include <set>
+#include <list>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -85,23 +95,29 @@ mpBoostControl(NULL)
   // manually added components
   auto p_enable_custom_time_step = new QCheckBox();
   p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
-  this->mpToolBar->insertWidget(this->mpActionBoostControl, p_enable_custom_time_step);
+  this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
+  this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
   this->mpCustomTimeStep->setValue(10.0);
   this->mpCustomTimeStep->setMinimum(1.0);
   this->mpCustomTimeStep->setSuffix(" ms");
   this->mpCustomTimeStep->setMaximum(10000.0);
   this->mpCustomTimeStep->setDecimals(1);
   this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
-  this->mpToolBar->insertWidget(this->mpActionBoostControl, this->mpCustomTimeStep);
+  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
 
   p_enable_custom_time_step->setChecked(false);
   this->mpCustomTimeStep->setEnabled(false);
 
   QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
 
-  this->mpToolBar->insertSeparator(this->mpActionBoostControl);
+  this->mpToolBar->insertSeparator(this->mpActionRecord);
+
+  // PlotGroupsComboBox, insert it before the displayplotgroup action
+  this->mpPlotGroupsComboBox = new QComboBox;
+  this->mpToolBar->insertWidget(this->mpActionDisplayPlotGroup, this->mpPlotGroupsComboBox);
+
 
   // set window title
   this->mDefaultWindowTitle = this->windowTitle();
@@ -139,13 +155,19 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
-  QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
-  QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+  QObject::connect(this->mpActionClosePlots, SIGNAL(triggered()), this, SLOT(closePlots()));
+  QObject::connect(this->mpActionToggleVisibilityOfPlots, SIGNAL(triggered()), this, SLOT(toggleVisibilityOfPlots()));
   QObject::connect(this->mpActionRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecorder(bool)));
+  QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
+
+  QObject::connect(this->mpActionNewPlotGroup, SIGNAL(triggered()), this, SLOT(addPlotGroup()));
+  QObject::connect(this->mpActionEditPlotGroup, SIGNAL(triggered()), this, SLOT(editPlotGroup()));
+  QObject::connect(this->mpActionDisplayPlotGroup, SIGNAL(triggered()), this, SLOT(displayPlotGroup()));
+  QObject::connect(this->mpActionDeletePlotGroup, SIGNAL(triggered()), this, SLOT(deletePlotGroup()));
   
 
 
@@ -177,6 +199,11 @@ mpBoostControl(NULL)
                    this,
                    SLOT(exportSvg()));
 
+  QObject::connect(mpActionShowRobotManager,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showRobotManager()));
+
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
 
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
@@ -184,6 +211,11 @@ mpBoostControl(NULL)
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
+
+  cedar::aux::PluginProxy::connectToPluginDeclaredSignal
+  (
+    boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
+  );
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -194,6 +226,16 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showRobotManager()
+{
+  auto p_dialog = new QDialog(this);
+  auto p_layout = new QVBoxLayout();
+  p_dialog->setLayout(p_layout);
+  p_layout->addWidget(new cedar::dev::gui::RobotManager());
+  p_dialog->setMinimumHeight(500);
+  p_dialog->show();
+}
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 {
@@ -293,6 +335,8 @@ void cedar::proc::gui::Ide::selectAll()
 
 void cedar::proc::gui::Ide::resetRootNetwork()
 {
+  //reset global timer @!todo should the time be reseted here?
+  //cedar::aux::GlobalClockSingleton::getInstance()->reset();
   this->getLog()->outdateAllMessages();
   this->mNetwork->getNetwork()->reset();
 }
@@ -390,26 +434,12 @@ void cedar::proc::gui::Ide::restoreSettings()
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::gui::SettingsSingleton::getInstance()->loadDefaultPlugins();
-}
-
-void cedar::proc::gui::Ide::showLoadPluginDialog()
-{
-  cedar::proc::gui::PluginLoadDialog* p_dialog = new cedar::proc::gui::PluginLoadDialog(this);
-  int res = p_dialog->exec();
-
-  if (res == QDialog::Accepted && p_dialog->plugin())
-  {
-    p_dialog->plugin()->declare();
-    this->resetStepList();
-  }
-
-  delete p_dialog;
+  cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showManagePluginsDialog()
 {
-  cedar::proc::gui::PluginManagerDialog* p_dialog = new cedar::proc::gui::PluginManagerDialog(this);
+  cedar::aux::gui::PluginManagerDialog* p_dialog = new cedar::aux::gui::PluginManagerDialog(this);
   p_dialog->exec();
   delete p_dialog;
 }
@@ -434,6 +464,8 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   {
     this->mpBoostControl->setNetwork(network->getNetwork());
   }
+
+  this->loadPlotGroupsIntoComboBox();
 }
 
 void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
@@ -462,6 +494,7 @@ void cedar::proc::gui::Ide::architectureToolFinished()
 
 void cedar::proc::gui::Ide::resetStepList()
 {
+  //!@todo This should become its own widget
   using cedar::proc::Manager;
 
   std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
@@ -479,7 +512,7 @@ void cedar::proc::gui::Ide::resetStepList()
     {
       p_tab = mElementClassListWidgets[category_name];
     }
-    p_tab->showList(ElementManagerSingleton::getInstance()->getCategoryEntries(category_name));
+    p_tab->showList(category_name);
   }
 }
 
@@ -609,6 +642,10 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 
 void cedar::proc::gui::Ide::startThreads()
 {
+  this->mpThreadsStartAll->setChecked(true);
+  this->mpThreadsStopAll->setChecked(false);
+  //start global timer
+  cedar::aux::GlobalClockSingleton::getInstance()->start();
   CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
   // calls this->mNetwork->getNetwork()->startTriggers()
   this->mStartThreadsCaller->start();
@@ -618,7 +655,8 @@ void cedar::proc::gui::Ide::stepThreads()
 {
   if (this->mpCustomTimeStep->isEnabled())
   {
-    this->mNetwork->getNetwork()->stepTriggers(cedar::unit::Milliseconds(this->mpCustomTimeStep->value()));
+    cedar::unit::Time step_size(this->mpCustomTimeStep->value() * cedar::unit::milli * cedar::unit::seconds);
+    this->mNetwork->getNetwork()->stepTriggers(step_size);
   }
   else
   {
@@ -628,6 +666,10 @@ void cedar::proc::gui::Ide::stepThreads()
 
 void cedar::proc::gui::Ide::stopThreads()
 {
+  this->mpThreadsStartAll->setChecked(false);
+  this->mpThreadsStopAll->setChecked(true);
+  //stop global timer @!todo should the time be stoped here?
+  //cedar::aux::GlobalClockSingleton::getInstance()->stop();
   CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
   // calls this->mNetwork->getNetwork()->stopTriggers()
   this->mStopThreadsCaller->start();
@@ -709,6 +751,90 @@ void cedar::proc::gui::Ide::loadFile(QString file)
                                              "void cedar::proc::gui::Ide::loadFile(QString)"
                                            );
 
+  // check if all required plugins are loaded
+  auto required_plugins = cedar::proc::Network::getRequiredPlugins(file.toStdString());
+  std::set<std::string> plugins_not_found;
+  std::set<std::string> plugins_not_loaded;
+  for (auto iter = required_plugins.begin(); iter != required_plugins.end(); ++iter)
+  {
+    const std::string& plugin_name = *iter;
+    if (!cedar::aux::PluginProxy::canFindPlugin(plugin_name))
+    {
+      plugins_not_found.insert(plugin_name);
+    }
+    else if (!cedar::aux::PluginProxy::getPlugin(plugin_name)->isDeclared())
+    {
+      plugins_not_loaded.insert(plugin_name);
+    }
+  }
+
+  if (!plugins_not_found.empty())
+  {
+    auto p_message(new QMessageBox(this));
+
+    p_message->setWindowTitle("Missing plugins");
+    p_message->setText("Some plugins required for this architecture were not found. Continue?");
+
+    QString details = "The plugins not found are:";
+    for (auto iter = plugins_not_found.begin(); iter != plugins_not_found.end(); ++iter)
+    {
+      details += "\n";
+      details += QString::fromStdString(*iter);
+    }
+
+    p_message->setDetailedText(details);
+
+    p_message->addButton(QMessageBox::Yes);
+    p_message->addButton(QMessageBox::No);
+
+    int r = p_message->exec();
+
+    delete p_message;
+
+    if (r == QMessageBox::No)
+    {
+      return;
+    }
+  }
+
+  if (!plugins_not_loaded.empty())
+  {
+    auto p_message(new QMessageBox(this));
+
+    p_message->setWindowTitle("Unloaded plugins");
+    p_message->setText("Some plugins required for this architecture were not loaded. Load them?");
+
+    QString details = "The plugins not found are:";
+    for (auto iter = plugins_not_loaded.begin(); iter != plugins_not_loaded.end(); ++iter)
+    {
+      details += "\n";
+      details += QString::fromStdString(*iter);
+    }
+
+    p_message->setDetailedText(details);
+
+    p_message->addButton(QMessageBox::Yes);
+    p_message->addButton(QMessageBox::No);
+    p_message->addButton(QMessageBox::Cancel);
+
+    int r = p_message->exec();
+
+    delete p_message;
+
+    if (r == QMessageBox::Cancel)
+    {
+      return;
+    }
+    if (r == QMessageBox::Yes)
+    {
+      for (auto iter = plugins_not_loaded.begin(); iter != plugins_not_loaded.end(); ++iter)
+      {
+        auto plugin_name = *iter;
+        cedar::aux::PluginProxy::getPlugin(plugin_name)->declare();
+      }
+    }
+  }
+
   // reset scene
   this->mpProcessingDrawer->getScene()->reset();
   // create new root network
@@ -774,6 +900,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->displayFilename(file.toStdString());
   this->updateTriggerStartStopThreadCallers();
+  this->loadPlotGroupsIntoComboBox();
 
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
@@ -871,7 +998,7 @@ void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
   this->mNetwork->toggleSmartConnectionMode(smart);
 }
 
-void cedar::proc::gui::Ide::closeAllPlots()
+void cedar::proc::gui::Ide::closePlots()
 {
   auto steps = this->mNetwork->getScene()->getStepMap();
   for(auto it = steps.begin(); it != steps.end(); ++it)
@@ -880,14 +1007,99 @@ void cedar::proc::gui::Ide::closeAllPlots()
   }
 }
 
+void cedar::proc::gui::Ide::toggleVisibilityOfPlots()
+{
+  auto steps = this->mNetwork->getScene()->getStepMap();
+  for(auto it = steps.begin(); it != steps.end(); ++it)
+  {
+    it->second->toggleVisibilityOfPlots();
+  }
+}
+
 void cedar::proc::gui::Ide::toggleRecorder(bool status)
 {
   if (!status)
   {
     cedar::aux::RecorderSingleton::getInstance()->stop();
+    this->mpRecorderWidget->setEnabled(true);
   }
   else
   {
+    this->mpRecorderWidget->setEnabled(false);
     cedar::aux::RecorderSingleton::getInstance()->start();
+  }
+}
+
+void cedar::proc::gui::Ide::takeSnapshot()
+{
+  cedar::aux::RecorderSingleton::getInstance()->takeSnapshot();
+}
+
+void cedar::proc::gui::Ide::addPlotGroup()
+{
+  bool ok;
+  QString plot_group_default_name = QString("Plotgroup#%1").arg(this->mNetwork->getPlotGroupNames().size());
+  QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Plotgroup name:"), QLineEdit::Normal, plot_group_default_name, &ok);
+  if (ok && !text.isEmpty())
+  {
+    this->mNetwork->addPlotGroup(text.toStdString()); // toStdString assumes ascii, for utf8 use toUtf8().constData()
+    int pos = this->mpPlotGroupsComboBox->count();
+    this->mpPlotGroupsComboBox->insertItem(pos, text);
+    this->mpPlotGroupsComboBox->setCurrentIndex(pos);
+  }
+}
+  
+void cedar::proc::gui::Ide::editPlotGroup()
+{
+  bool ok;
+  // get selecte plot group
+  QString plot_group_current_name = this->mpPlotGroupsComboBox->currentText();
+  int position = this->mpPlotGroupsComboBox->currentIndex();
+  if(position != -1)
+  {
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Plotgroup name:"), QLineEdit::Normal, plot_group_current_name, &ok);
+    if (ok && !text.isEmpty())
+    {
+      this->mNetwork->renamePlotGroup(plot_group_current_name.toStdString(), text.toStdString()); // toStdString assumes ascii
+      this->mpPlotGroupsComboBox->removeItem(position);
+      this->mpPlotGroupsComboBox->insertItem(position, text);
+      this->mpPlotGroupsComboBox->setCurrentIndex(position);
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::displayPlotGroup()
+{
+  QString plot_group_name = this->mpPlotGroupsComboBox->currentText();
+  if(this->mpPlotGroupsComboBox->currentIndex() != -1)
+  {
+    this->mNetwork->displayPlotGroup(plot_group_name.toStdString()); // toStdString assumes ascii
+  }
+}
+
+void cedar::proc::gui::Ide::deletePlotGroup()
+{
+  QString plot_group_name = this->mpPlotGroupsComboBox->currentText();
+  int position = this->mpPlotGroupsComboBox->currentIndex();
+  if(position != -1)
+  {
+    QMessageBox::StandardButton reply;
+    QString message = QString("This will delete %1. Proceed?").arg(plot_group_name);
+    reply = QMessageBox::question(this, "Delete Plot Group", message, QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes)
+    {
+      this->mNetwork->removePlotGroup(plot_group_name.toStdString()); // toStdString assumes ascii
+      this->mpPlotGroupsComboBox->removeItem(position);
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::loadPlotGroupsIntoComboBox()
+{
+  this->mpPlotGroupsComboBox->clear();
+  std::list<std::string> plot_group_names = this->mNetwork->getPlotGroupNames();
+  for(auto it = plot_group_names.begin(); it != plot_group_names.end(); ++it)
+  {
+    this->mpPlotGroupsComboBox->addItem(QString::fromStdString(*it));
   }
 }

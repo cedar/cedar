@@ -40,11 +40,15 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
+#include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
+#include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -85,7 +89,7 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  this->cedar::dev::robot::KinematicChain::readConfiguration(node);
+  this->cedar::dev::KinematicChain::readConfiguration(node);
 
   // create a new Instance of the friRemote
   if (_mRemoteHost->getValue() != "NULL")
@@ -101,8 +105,12 @@ void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::Confi
   copyFromFRI();
 
   //set step size and idle time for the looped thread
-  setStepSize(12.0);
-  setIdleTime(0.01);
+  cedar::unit::Time step_size(12.0 * cedar::unit::milli * cedar::unit::seconds);
+  setStepSize(step_size);
+
+  cedar::unit::Time idle_time(0.01 * cedar::unit::milli * cedar::unit::seconds);
+  setIdleTime(idle_time);
+
   //start the thread
   start();
 
@@ -171,7 +179,7 @@ void cedar::dev::kuka::KinematicChain::start()
   }
 
   //QThread::start();
-  cedar::dev::robot::KinematicChain::start();
+  cedar::dev::KinematicChain::start();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions

@@ -42,11 +42,13 @@
 #define CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/DataSlot.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -139,7 +141,7 @@ protected:
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
 signals:
-  //!@brief signals that a validity has changed
+  //! Signal that is emitted whenever the validity of attached connections changes.
   void connectionValidityChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -40,9 +40,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
+#include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -57,6 +58,7 @@
 #else
   #error Please implement signal handling for your compiler.
 #endif // CEDAR_COMPILER_GCC
+#include <iostream>
 
 #define CATCH_EXCEPTIONS_IN_GUI
 
@@ -72,31 +74,26 @@ mLastExceptionType(NONE)
 {
   QStringList args = QCoreApplication::arguments();
 
-  if (args.contains("--help"))
-  {
-    std::cout << "Possible command line arguments:" << std::endl;
-    std::cout << std::endl;
-    std::cout << "--no-plugins\tStart without loading any plugins." << std::endl;
-    std::cout << "--no-log\tDon't redirect log messages to the UI. May help debugging if too many log messages cause"
-              << " the UI to lock up." << std::endl;
-    std::cout << "--help\tDisplay this help text." << std::endl;
+  cedar::aux::CommandLineParser parser;
+  parser.defineFlag
+  (
+    "no-plugins",
+    "Start without loading any plugins.",
+    'p'
+  );
 
-    ::exit(0);
-  }
+  parser.defineFlag
+  (
+    "no-log",
+    "Don't redirect log messages to the UI. May help debugging if too many log messages cause the UI to lock up.",
+    'l'
+  );
 
-  bool no_plugins = args.contains("--no-plugins");
+  parser.parse(argc, argv);
+  parser.writeSummary();
 
-  if (no_plugins)
-  {
-    std::cout << "-- Starting without plugins." << std::endl;
-  }
-
-  bool no_log_redirect = args.contains("--no-log");
-
-  if (no_log_redirect)
-  {
-    std::cout << "-- Log messages won't be redirected to the gui." << std::endl;
-  }
+  bool no_plugins = parser.hasParsedFlag("no-plugins");
+  bool no_log_redirect = parser.hasParsedFlag("no-log");
 
   this->mpIde = new cedar::proc::gui::Ide(!no_plugins, !no_log_redirect);
 

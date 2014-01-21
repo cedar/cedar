@@ -45,6 +45,7 @@
 // SYSTEM INCLUDES
 #include <QStyle>
 #include <QApplication>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

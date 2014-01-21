@@ -84,6 +84,10 @@ std::string cedar::aux::annotation::Dimensions::getDescription() const
 
   for (size_t i = 0; i < this->mDimensions.size(); ++i)
   {
+    if (i > 0)
+    {
+      description += "<br />";
+    }
     description += "Dimension " + cedar::aux::toString(i) + ": " + this->mDimensions[i].mLabel;
   }
 

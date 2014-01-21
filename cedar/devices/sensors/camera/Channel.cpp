@@ -46,6 +46,7 @@
 #include "cedar/devices/sensors/camera/backends/BackendV4L.h"
 
 // SYSTEM INCLUDES
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
