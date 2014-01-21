@@ -857,7 +857,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
    * element caused this exception.
    */
   cedar::proc::gui::TriggerItem* source_element;
-  try
+  if (this->getNetwork()->nameExists(source->getName()))
   {
     source_element
       = dynamic_cast<cedar::proc::gui::TriggerItem*>
@@ -868,7 +868,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
           )
         );
   }
-  catch(cedar::aux::InvalidNameException& exc)
+  else
   {
     CEDAR_ASSERT(source->getName() == "processingDone");
     return;

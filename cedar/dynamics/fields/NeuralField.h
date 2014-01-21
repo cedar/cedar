@@ -43,12 +43,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/Dynamics.h"
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
@@ -56,6 +54,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/convolution/Convolution.fwd.h"
 #include "cedar/auxiliaries/kernel/Gauss.fwd.h"
 #include "cedar/dynamics/fields/NeuralField.fwd.h"
 

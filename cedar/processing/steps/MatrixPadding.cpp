@@ -100,7 +100,7 @@ _mBorderType
 {
   auto input_slot = this->declareInput("input");
   cedar::proc::typecheck::Matrix input_check;
-  input_check.addAcceptedDimensionality(2);
+  input_check.addAcceptedDimensionalityRange(2, 3);
   input_slot->setCheck(input_check);
 
   this->declareOutput("padded", this->mPadded);
@@ -170,14 +170,38 @@ void cedar::proc::steps::MatrixPadding::computeND()
       switch (this->_mBorderType->getValue())
       {
         case cedar::aux::conv::BorderType::Zero:
-          if (source_pos.at(d) >= input.size[d])
+          if (source_pos.at(d) < 0 || source_pos.at(d) >= input.size[d])
           {
             zero = true;
           }
           break;
 
         case cedar::aux::conv::BorderType::Cyclic:
-          source_pos.at(d) = (source_pos.at(d) + input.size[d]) % input.size[d]; // adding input size makes sure the result is positive
+          // weird equation below just makes sure that we always get a positive result from the mod operation
+          source_pos.at(d) = ((source_pos.at(d) % input.size[d]) + input.size[d]) % input.size[d];
+          break;
+
+        case cedar::aux::conv::BorderType::Replicate:
+          if (source_pos.at(d) < 0)
+          {
+            source_pos.at(d) = 0;
+          }
+          else if (source_pos.at(d) >= input.size[d])
+          {
+            source_pos.at(d) = input.size[d] - 1;
+          }
+          break;
+
+        case cedar::aux::conv::BorderType::Reflect:
+          if (source_pos.at(d) < 0)
+          {
+            source_pos.at(d) = std::abs(source_pos.at(d));
+          }
+          else if (source_pos.at(d) >= input.size[d])
+          {
+            source_pos.at(d) = 2 * input.size[d] - source_pos.at(d) - 1;
+          }
+          source_pos.at(d) = (source_pos.at(d) + input.size[d]) % input.size[d];
           break;
 
         default:
@@ -188,11 +212,11 @@ void cedar::proc::steps::MatrixPadding::computeND()
 
     if (!zero)
     {
-      output.at<T>(&source_pos.front()) = input.at<T>(&source_pos.front());
+      output.at<T>(&iter.getCurrentIndexVector().front()) = input.at<T>(&source_pos.front());
     }
     else
     {
-      output.at<T>(&source_pos.front()) = 0;
+      output.at<T>(&iter.getCurrentIndexVector().front()) = 0;
     }
   }
   while (iter.increment());

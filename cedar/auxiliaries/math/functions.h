@@ -38,9 +38,10 @@
 #define CEDAR_AUX_MATH_FUNCTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
 #include <math.h>
 #include <vector>
 

@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 #include "cedar/auxiliaries/math/LengthLimitsParameter.h"
 
 // SYSTEM INCLUDES

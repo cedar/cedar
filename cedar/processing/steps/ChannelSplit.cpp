@@ -161,7 +161,7 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
   {
     color_space = this->mInput->getAnnotation<cedar::aux::annotation::ColorSpace>();
 
-    CEDAR_ASSERT(color_space->getNumberOfChannels() == num_channels);
+    CEDAR_ASSERT(color_space->getNumberOfChannels() >= num_channels);
   }
   catch (cedar::aux::AnnotationNotFoundException)
   {

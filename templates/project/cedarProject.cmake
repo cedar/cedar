@@ -169,7 +169,18 @@ macro(cedar_project_add_target)
     add_library(${target_name} SHARED ${files})
   endif()
   
-  target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn ${CEDAR_EXTERNAL_LIBS})
+  if (MSVC)
+    target_link_libraries(${target_name}
+                          optimized cedarunits debug cedarunitsd
+                          optimized cedaraux debug cedarauxd
+                          optimized cedardev debug cedardevd
+                          optimized cedarproc debug cedarprocd
+                          optimized cedardyn debug cedardynd
+                          )
+  else (MSVC)
+    target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn)
+  endif(MSVC)
+    target_link_libraries(${target_name} ${CEDAR_EXTERNAL_LIBS})
   
   foreach (dependency ${add_DEPENDS_ON})
     cedar_project_depends_on(${target_name} DEPENDS_ON ${dependency})

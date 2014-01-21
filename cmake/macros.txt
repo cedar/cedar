@@ -88,6 +88,8 @@ macro(cedar_add_target_executable)
   	set_target_properties(${executableExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
   endif(CMAKE_COMPILER_IS_GNUCC)
   
+  cedar_set_common_target_properties(${executableExecutableName})
+  
   # link all cedar and third party libraries into the demo executable
   if (executable_CEDAR_DEPENDENCIES)
     target_link_libraries(${executableExecutableName} ${executable_CEDAR_DEPENDENCIES})
@@ -390,7 +392,7 @@ macro(cedar_add_library)
   cedar_set_common_target_properties(${libraryName})
   
   if (MSVC)
-    # In visual studio, put all unit tests into a subfolder
+    # In visual studio, put all libraries into a (virtual) subfolder
     set_target_properties(${libraryName} PROPERTIES FOLDER "cedar libraries")
   endif (MSVC)
   
@@ -416,6 +418,19 @@ macro(cedar_set_common_target_properties target)
                         PROPERTIES
                         VERSION ${CEDAR_VERSION}
                         )
+                        
+  if (MSVC)
+    get_target_property(library_out_dir ${target} LIBRARY_OUTPUT_DIRECTORY)
+    get_target_property(runtime_out_dir ${target} RUNTIME_OUTPUT_DIRECTORY)
+    get_target_property(archive_out_dir ${target} ARCHIVE_OUTPUT_DIRECTORY)
+    
+    foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+      string(TOUPPER ${CONFIG} CONFIG)
+      set_target_properties(${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY_${CONFIG} ${library_out_dir})
+      set_target_properties(${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_${CONFIG} ${runtime_out_dir})
+      set_target_properties(${target} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_${CONFIG} ${archive_out_dir})
+    endforeach()
+  endif (MSVC)
 endmacro(cedar_set_common_target_properties)
 
 ################################################################################################################
