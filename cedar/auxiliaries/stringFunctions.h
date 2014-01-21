@@ -43,7 +43,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
