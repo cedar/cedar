@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/FFTW.h"
 #include "cedar/auxiliaries/convolution/FFTWPlanningStrategy.h"
+#include "cedar/auxiliaries/convolution/EngineManager.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/FactoryManager.h"

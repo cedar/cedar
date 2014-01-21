@@ -52,57 +52,21 @@
   #include <boost/smart_ptr.hpp>
 #endif
 
+#warning Do not include this header any more. Use the new forward declaration headers instead.
 
-namespace cedar
-{
-  namespace aux
-  {
-    /*!@brief Namespace for all math classes. */
-    namespace math
-    {
-      //!@brief a templated class for representing limits (i.e. an interval) of some type
-      template <typename T> class Limits;
-
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Sigmoid);
-      CEDAR_DECLARE_AUX_CLASS(TransferFunction);
-      CEDAR_DECLARE_AUX_CLASS(TransferFunctionDeclaration);
-      //!@endcond
-
-      //!@brief a templated declaration for sigmoid function implementation
-      template <class DerivedClass> class TransferFunctionDeclarationT;
-      //!@brief a template specialization for sigmoid factories
-      typedef cedar::aux::Factory<TransferFunctionPtr> TransferFunctionFactory;
-
-      template <class T> class LimitsParameter;
-      //!@brief a template specialization for double-based limits
-      typedef LimitsParameter<double> DoubleLimitsParameter;
-      //!@brief a template specialization for int-based limits
-      typedef LimitsParameter<int> IntLimitsParameter;
-      //!@brief a template specialization for unsigned int-based limits
-      typedef LimitsParameter<unsigned int> UIntLimitsParameter;
-
-      typedef LimitsParameter<cedar::unit::Length> LengthLimitsParameter;
-      typedef LimitsParameter<cedar::unit::Time> TimeLimitsParameter;
-      typedef LimitsParameter<cedar::unit::Velocity> VelocityLimitsParameter;
-      typedef LimitsParameter<cedar::unit::Acceleration> AccelerationLimitsParameter;
-      typedef LimitsParameter<cedar::unit::PlaneAngle> PlaneAngleLimitsParameter;
-      typedef LimitsParameter<cedar::unit::AngularVelocity> AngularVelocityLimitsParameter;
-
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_GENERATE_POINTER_TYPES(TransferFunctionFactory);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntLimitsParameter);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntLimitsParameter);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(LengthLimitsParameter);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TimeLimitsParameter);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(VelocityLimitsParameter);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(AccelerationLimitsParameter);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(PlaneAngleLimitsParameter);
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(AngularVelocityLimitsParameter);
-      //!@endcond
-    }
-  }
-}
+#include "cedar/auxiliaries/math/Limits.fwd.h"
+#include "cedar/auxiliaries/math/LimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/IntLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/UIntLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/AccelerationLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/AngularVelocityLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/LengthLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/PlaneAngleLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/TimeLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/VelocityLimitsParameter.fwd.h"
+#include "cedar/auxiliaries/math/Sigmoid.fwd.h"
+#include "cedar/auxiliaries/math/TransferFunction.fwd.h"
+#include "cedar/auxiliaries/math/TransferFunctionDeclaration.fwd.h"
 
 #endif // CEDAR_AUX_MATH_NAMESPACE_H

@@ -42,26 +42,11 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-  #include <boost/property_tree/ptree.hpp>
-#endif
-#include <opencv2/opencv.hpp>
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/logFilter/All.fwd.h"
+#include "cedar/auxiliaries/logFilter/Type.fwd.h"
 
-namespace cedar
-{
-  namespace aux
-  {
-    /*!@brief Namespace for all aux::logFilter classes. */
-    namespace logFilter
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(All);
-      CEDAR_DECLARE_AUX_CLASS(Type);
-      //!@endcond
-    }
-  }
-}
+#warning Do not include this header any more. Use the new forward headers instead.
 
 #endif // CEDAR_AUX_LOG_FILTER_NAMESPACE_H

@@ -37,7 +37,6 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/units/namespace.h"
 #include "cedar/units/Length.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/Velocity.h"

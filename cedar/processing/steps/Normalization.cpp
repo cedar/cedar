@@ -176,7 +176,7 @@ void cedar::proc::steps::Normalization::compute(const cedar::proc::Arguments&)
     return;
   }
 
-  if (this->mImage->getDimensionality() == this->getNumberOfNormalizedDimensions())
+  if (this->mImage->getDimensionality() <= this->getNumberOfNormalizedDimensions())
   {
     this->normalizeAlongAllDimensions();
   }

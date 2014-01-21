@@ -102,32 +102,24 @@ public:
   template <typename T>
   bool hasAnnotation() const
   {
-    try
+    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
     {
-      this->findAnnotation<T>();
-      return true;
+      if (typeid(*this->mAnnotations[i]) == typeid(T))
+      {
+        return true;
+      }
     }
-    catch (cedar::aux::AnnotationNotFoundException)
-    {
-      return false;
-    }
+    return false;
   }
 
   //! Removes all instances of the given annotation type, if any. Does nothing if there are no annotations of this type.
   template <typename T>
   void removeAnnotations()
   {
-    try
+    while (this->hasAnnotation<T>())
     {
-      while (true)
-      {
-        size_t index = this->findAnnotation<T>();
-        this->mAnnotations.erase(this->mAnnotations.begin() + index);
-      }
-    }
-    catch (cedar::aux::AnnotationNotFoundException)
-    {
-      // done
+      size_t index = this->findAnnotation<T>();
+      this->mAnnotations.erase(this->mAnnotations.begin() + index);
     }
   }
 
@@ -178,6 +170,20 @@ private:
     }
 
     CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
+  }
+
+  /*! Checks whether an annotation with the same type as the given one is present.
+   */
+  bool hasAnnotation(cedar::aux::annotation::AnnotationPtr annotation) const
+  {
+    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
+    {
+      if (typeid(*this->mAnnotations[i]) == typeid(*annotation))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/defines.h"
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Limits.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
@@ -47,6 +46,9 @@
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

@@ -41,7 +41,6 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/kteam/khepera/namespace.h"
 #include "cedar/devices/Component.h"

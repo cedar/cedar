@@ -38,8 +38,10 @@
 #define CEDAR_AUX_CONV_BORDER_TYPE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/EnumBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/convolution/BorderType.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/imgproc/imgproc.hpp>
