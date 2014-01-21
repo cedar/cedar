@@ -41,15 +41,11 @@
 #ifndef CEDAR_CONFIGURATION_H
 #define CEDAR_CONFIGURATION_H
 
-// Cedar version information ===========================================================================================
-#define CEDAR_VERSION_MAJOR @CEDAR_VERSION_MAJOR@
-#define CEDAR_VERSION_MINOR @CEDAR_VERSION_MINOR@
-#define CEDAR_VERSION_BUGFIX @CEDAR_VERSION_BUGFIX@
-
 // Optional libraries ==================================================================================================
 #cmakedefine CEDAR_USE_FFTW
 #cmakedefine CEDAR_USE_LIB_DC1394
 #cmakedefine CEDAR_USE_YARP
+#cmakedefine CEDAR_USE_QGLVIEWER
 
 #cmakedefine CEDAR_USE_VTK
 #cmakedefine CEDAR_USE_QWT

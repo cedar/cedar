@@ -65,6 +65,7 @@
 #include <QLinearGradient>
 #include <QPalette>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
@@ -221,7 +222,7 @@ void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double m
   double log = std::log10(diff);
   if (log < 0)
   {
-    precision = std::max(precision, static_cast<int>(std::round(std::abs(log))));
+    precision = std::max(precision, static_cast<int>(cedar::aux::math::round(std::abs(log))));
   }
   this->mpMin->setText(QString("%1").arg(min, 0, 'g', precision));
   this->mpMax->setText(QString("%1").arg(max, 0, 'g', precision));
@@ -229,20 +230,28 @@ void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double m
 
 void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 {
-  if (mDataType != DATA_TYPE_MAT)
-  {
-    // currently, there are no context menu options for any plots other than matrices.
-    return;
-  }
-
   QMenu menu(this);
+
+  int mat_type = -1;
+
+  if (this->mData)
+  {
+    mat_type = this->mData->getCvType();
+  }
 
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpLegend != NULL && this->mpLegend->isVisible());
+  p_legend->setEnabled(mDataType == DATA_TYPE_MAT);
+
+  auto p_smooth = menu.addAction("smooth");
+  p_smooth->setCheckable(true);
+  QObject::connect(p_smooth, SIGNAL(toggled(bool)), this, SLOT(setSmoothScaling(bool)));
+  p_smooth->setChecked(this->mSmoothScaling);
 
   QMenu* p_scaling = menu.addMenu("value scaling");
+  p_scaling->setEnabled(mDataType == DATA_TYPE_MAT || mat_type == CV_32F);
 
   auto p_auto_scale = p_scaling->addAction("automatic");
   p_auto_scale->setCheckable(true);
@@ -640,6 +649,11 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits,
     for (int j = 0; j < cols; ++j)
     {
       size_t v = static_cast<size_t>(p_in[j]);
+
+      CEDAR_DEBUG_ASSERT(v < mLookupTableB.size());
+      CEDAR_DEBUG_ASSERT(v < mLookupTableG.size());
+      CEDAR_DEBUG_ASSERT(v < mLookupTableR.size());
+
       // channel 0
       p_converted[3 * j + 0] = mLookupTableB.at(v);
       // channel 1
@@ -695,31 +709,57 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         std::vector<cv::Mat> merge_vec;
         cv::Mat zeros = 0.0 * in;
 
+        cv::Mat in_scaled;
+        switch (in.type())
+        {
+          case CV_32F:
+          {
+            double min_val = this->mValueLimits.getLower();
+            double max_val = this->mValueLimits.getUpper();
+            if (this->mAutoScaling)
+            {
+              cv::minMaxLoc(in, &min_val, &max_val);
+            }
+            if (min_val != max_val)
+            {
+              in_scaled = 255.0 * (in - min_val) / (max_val - min_val);
+            }
+            else
+            {
+              in_scaled = in;
+            }
+            break;
+          }
+          default:
+            in_scaled = in;
+            break;
+        }
+
         switch (type)
         {
           case cedar::aux::annotation::ColorSpace::Red:
             merge_vec.push_back(zeros);
             merge_vec.push_back(zeros);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             break;
 
           case cedar::aux::annotation::ColorSpace::Green:
             merge_vec.push_back(zeros);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             merge_vec.push_back(zeros);
             break;
 
           case cedar::aux::annotation::ColorSpace::Blue:
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
             merge_vec.push_back(zeros);
             merge_vec.push_back(zeros);
             break;
 
           default:
           case cedar::aux::annotation::ColorSpace::Gray:
-            merge_vec.push_back(in);
-            merge_vec.push_back(in);
-            merge_vec.push_back(in);
+            merge_vec.push_back(in_scaled);
+            merge_vec.push_back(in_scaled);
+            merge_vec.push_back(in_scaled);
             break;
         }
 
@@ -733,7 +773,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
     case DATA_TYPE_MAT:
     {
-      double min, max;
+      double min = 0, max = 0;
       if (this->mAutoScaling)
       {
         cv::minMaxLoc(in, &min, &max);

@@ -42,8 +42,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/VectorParameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/NumericVectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -71,8 +73,7 @@ public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
                 )
     {
       typedef cedar::aux::NumericVectorParameter<ValueT> NumericVector;
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(NumericVector);
-      NumericVectorPtr numeric_parameter = cedar::aux::asserted_pointer_cast<NumericVector>(parameter);
+      auto numeric_parameter = cedar::aux::asserted_pointer_cast<NumericVector>(parameter);
       pWidget->setDisabled(parameter->isConstantAt(index));
       bool signals_blocked = pWidget->blockSignals(true);
       setMinimum(pWidget, numeric_parameter->getMinimum());

@@ -41,10 +41,13 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/Cloneable.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
+
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief Base class for annotations.

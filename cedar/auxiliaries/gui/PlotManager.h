@@ -38,13 +38,20 @@
 #define CEDAR_AUX_GUI_PLOT_MANAGER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/utilities.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Data.fwd.h"
+#include "cedar/auxiliaries/gui/PlotManager.fwd.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
+#include "cedar/auxiliaries/gui/PlotDeclarationTemplate.fwd.h"
+
 // SYSTEM INCLUDES
+#include <string>
 #include <set>
+#include <map>
 
 /*!@brief A manager for different types of plots
  *

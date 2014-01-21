@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 ControlThread::ControlThread(
-                              const cedar::dev::robot::KinematicChainPtr kinematicChain,
+                              const cedar::dev::KinematicChainPtr kinematicChain,
                               double stepSize,
                               double idleTime
                             )

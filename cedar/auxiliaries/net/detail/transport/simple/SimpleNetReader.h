@@ -40,7 +40,7 @@
 #define CEDAR_SIMPLE_NET_READER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetReader.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetReader.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 
@@ -52,11 +52,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
+#include <string>
 
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief implements reading (RIAA over network) simple variable types
@@ -64,7 +60,7 @@ namespace cedar {
  * use in Reader
  */
 template <typename T, bool BLOCK= false>
-class SimpleNetReader : public AbstractNetReader<T>
+class cedar::aux::net::detail::SimpleNetReader : public AbstractNetReader<T>
 {
   //---------------------------------------------------------------------------
   // members
@@ -151,7 +147,5 @@ public:
 
 };
 //!@endcond
-
-} } } } // end namespaces
 
 #endif

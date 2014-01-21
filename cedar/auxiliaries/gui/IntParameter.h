@@ -39,7 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericParameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/IntParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>

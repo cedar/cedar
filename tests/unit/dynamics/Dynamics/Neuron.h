@@ -39,6 +39,10 @@
 
 // LOCAL INCLUDES
 #include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/DoubleData.fwd.h"
 
 // PROJECT INCLUDES
 

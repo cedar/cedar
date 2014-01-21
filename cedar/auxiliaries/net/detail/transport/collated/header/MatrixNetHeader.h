@@ -40,23 +40,18 @@
 #define CEDAR_MATRIX_NET_HEADER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeader.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/header/BasicNetHeader.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
-
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief extend the header struct to matrix data (cols, rows)
  *
  */
-struct MatrixNetHeader : BasicNetHeader
+struct cedar::aux::net::detail::MatrixNetHeader : BasicNetHeader
 {
 public:
   /*unsigned*/ int mRows; // cv::Mat uses signed ints for this
@@ -64,8 +59,6 @@ public:
   unsigned int mElementSize;
 };
 //!@endcond
-
-} } } }  // end namespaces
 
 #endif
 

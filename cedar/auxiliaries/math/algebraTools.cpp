@@ -36,6 +36,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/algebraTools.h"
 #include "cedar/auxiliaries/math/constants.h"
 

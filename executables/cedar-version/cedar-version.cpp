@@ -41,6 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/version.h"
 
 
 // SYSTEM INCLUDES

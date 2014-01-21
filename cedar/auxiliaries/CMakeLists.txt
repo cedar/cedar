@@ -55,10 +55,12 @@ endif(CEDAR_USE_QWTPLOT3D)
 cedar_add_library(cedaraux
   MOC_HEADERS
   ThreadWrapper.h
-  ThreadWorker.h
+  detail/ThreadWorker.h
   LoopedThread.h
   LocalCoordinateFrame.h
   gl/ObjectVisualization.h
+  gui/AccelerationParameter.h
+  gui/AngularVelocityParameter.h
   gui/BaseWidget.h
   gui/BoolParameter.h
   gui/BoolVectorParameter.h
@@ -69,20 +71,28 @@ cedar_add_library(cedaraux
   gui/EnumParameter.h
   gui/ExceptionDialog.h
   gui/FileParameter.h
+  gui/FrequencyParameter.h
   gui/IntParameter.h
+  gui/LengthParameter.h
   gui/Log.h
   gui/ObjectParameter.h
   gui/ObjectListParameter.h
   gui/Parameter.h
   gui/LocalCoordinateFrameWidget.h
   gui/ObjectVisualizationWidget.h
+  gui/PluginInfoDialog.h
+  gui/PluginManagerDialog.h
   gui/Viewer.h
   gui/SceneWidget.h
   gui/PropertyPane.h
+  gui/PlaneAngleParameter.h
   gui/StringParameter.h
+  gui/TimeParameter.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/IntVectorParameter.h
+  gui/VelocityParameter.h
+  gui/ResourceDialog.h
   gui/PlotInterface.h
   gui/HistoryPlot.h
   gui/MatrixPlot.h

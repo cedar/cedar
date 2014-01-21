@@ -41,6 +41,7 @@
 
 // SYSTEM INCLUDES
 #include <string>
+#include <iostream>
 
 int main()
 {

@@ -38,8 +38,10 @@
 #define CEDAR_AUX_CONV_MODE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/EnumBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/convolution/Mode.fwd.h"
 
 // SYSTEM INCLUDES
 

@@ -38,8 +38,10 @@
 #define CEDAR_AUX_LOG_FILE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/LogFile.fwd.h"
 
 // SYSTEM INCLUDES
 #include <fstream>
@@ -47,7 +49,7 @@
 
 /*!@brief A class for logging messages in a file.
  *
- * @todo Port this to the new logging framework.
+ * @todo Port this to the new logging framework or remove it.
  */
 class cedar::aux::LogFile : public std::ofstream
 {
