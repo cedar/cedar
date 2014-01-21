@@ -39,10 +39,11 @@
 
 #include "cedar/configuration.h"
 
-
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/EnumBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/convolution/FFTWPlanningStrategy.fwd.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_USE_FFTW
