@@ -222,6 +222,9 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   unsigned int max_columns = static_cast<unsigned int>(mat.size[1]);
   for (unsigned int tile = 0; tile < tiles; ++tile)
   {
+    // current tile offset
+    unsigned int row_offset = (mat.size[0] + 1) * (tile / columns);
+    unsigned int column_offset = (mat.size[1] + 1) * (tile % columns);
     for (unsigned int row = 0; row < max_rows; ++row)
     {
       for (unsigned int column = 0; column < max_columns; ++column)
@@ -232,9 +235,10 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
         index.push_back(tile);
         mSliceMatrix.at<float>
         (
-          row + (mat.size[0] + 1) * (tile / columns),
-          column + (mat.size[1] + 1) * (tile % columns)
-        ) = mat.at<float>(&index[0]);
+          row + row_offset,
+          column + column_offset
+        ) = mat.at<float>(&index.front());
+        frame.at<unsigned char>(row + row_offset, column + column_offset) = 0;
       }
     }
   }
