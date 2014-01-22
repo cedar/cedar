@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
+#include <QString>
 #include <fstream>
 #include <cstdlib>
 #ifdef CEDAR_COMPILER_GCC
@@ -101,6 +102,15 @@ mLastExceptionType(NONE)
   this->mpIde = new cedar::proc::gui::Ide(!no_plugins, !no_log_redirect);
 
   QObject::connect(this, SIGNAL(showExceptionDialogSignal()), this, SLOT(showExceptionDialog()));
+
+  if (args.size() > 1)
+  {
+    QString last_argument = args.last();
+    if (!last_argument.startsWith("--") && !last_argument.startsWith("-"))
+    {
+      this->mpIde->loadFile(last_argument);
+    }
+  }
 }
 
 cedar::proc::gui::IdeApplication::~IdeApplication()
