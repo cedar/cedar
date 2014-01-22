@@ -181,5 +181,9 @@ void cedar::proc::gui::PerformanceOverview::addMeasurement(cedar::unit::Time mea
 
 void cedar::proc::gui::PerformanceOverview::clear()
 {
+  for (int row = 0; row < this->mpStepTimeOverview->rowCount(); ++row)
+  {
+    this->mpStepTimeOverview->removeRow(row);
+  }
   this->mpStepTimeOverview->setRowCount(0);
 }
