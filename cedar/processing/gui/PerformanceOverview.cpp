@@ -57,8 +57,9 @@ public:
   TimeCellItem(cedar::unit::Time time)
   {
     double run_time_number = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
-    this->setData(Qt::DisplayRole, QString("%1 ms").arg(run_time_number));
+    this->setData(Qt::DisplayRole, QString("%1 ms").arg(run_time_number, 0, 'f', 1));
     this->setData(Qt::UserRole, run_time_number);
+    this->setTextAlignment(Qt::AlignRight);
   }
 
   // constructor for an invalid measurement
