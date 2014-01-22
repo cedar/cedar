@@ -458,10 +458,15 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
   network->getNetwork()->setName("root");
-  this->mNetwork = network;
-  this->mpProcessingDrawer->getScene()->setNetwork(network);
+  this->setNetwork(network);
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork->addElementsToScene();
+}
+
+void cedar::proc::gui::Ide::setNetwork(cedar::proc::gui::NetworkPtr network)
+{
+  this->mNetwork = network;
+  this->mpProcessingDrawer->getScene()->setNetwork(network);
   this->mpPropertyTable->resetContents();
 
   this->updateTriggerStartStopThreadCallers();
@@ -906,19 +911,11 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
   this->mpActionSave->setEnabled(true);
 
-  //!@todo Why doesn't this call resetTo?
-  this->mNetwork = network;
-
-  if (this->mpBoostControl)
-  {
-    this->mpBoostControl->setNetwork(this->mNetwork->getNetwork());
-  }
+  this->setNetwork(network);
 
   this->displayFilename(file.toStdString());
-  this->updateTriggerStartStopThreadCallers();
-  this->loadPlotGroupsIntoComboBox();
 
-  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);
