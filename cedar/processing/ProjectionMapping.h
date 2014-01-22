@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <map>
+#include <vector>
 
 /*!@brief Description of a mapping between dimensions.
  *
