@@ -37,6 +37,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/defines.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_OS_WINDOWS
@@ -48,8 +50,9 @@
 
 void cedar::aux::sleep(cedar::unit::Time time)
 {
-  cedar::unit::Microseconds us(time);
-  cedar::aux::usleep(static_cast<unsigned int>(us.getRawTime()));
+  cedar::unit::Time microsecond(1.0 * cedar::unit::micro * cedar::unit::second);
+  double time_in_microseconds = time / microsecond;
+  cedar::aux::usleep(static_cast<unsigned int>(time_in_microseconds));
 }
 
 void cedar::aux::usleep(unsigned int microseconds)
@@ -69,13 +72,4 @@ void cedar::aux::usleep(unsigned int microseconds)
   ::usleep(microseconds);
 
 #endif // CEDAR_OS_WINDOWS
-}
-
-void cedar::aux::sleep(unsigned int seconds)
-{
-#ifdef CEDAR_OS_WINDOWS
-  Sleep(1000 * static_cast<DWORD>(seconds));
-#else // CEDAR_OS_WINDOWS
-  ::sleep(seconds);
-#endif // CEDAR_OS_*
 }

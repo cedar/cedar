@@ -41,13 +41,15 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/FileParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/sources/GrabberBase.fwd.h"
 
 // SYSTEM INCLUDES
 

@@ -38,9 +38,11 @@
 #define CEDAR_AUX_MATH_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/math/Limits.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/LimitsParameter.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -65,41 +67,22 @@ public:
     cedar::aux::Configurable* pOwner,
     const std::string& name,
     const T& defaultLowerLimit,
-    const T& defaultUpperLimit,
     const T& defaultLowerLimitMinimum,
     const T& defaultLowerLimitMaximum,
+    const T& defaultUpperLimit,
     const T& defaultUpperLimitMinimum,
     const T& defaultUpperLimitMaximum
   )
   :
   cedar::aux::Parameter(pOwner, name),
   mLowerLimitDefault(defaultLowerLimit),
-  mUpperLimitDefault(defaultUpperLimit),
   mLowerLimitMinimum(defaultLowerLimitMinimum),
   mLowerLimitMaximum(defaultLowerLimitMaximum),
+  mUpperLimitDefault(defaultUpperLimit),
   mUpperLimitMinimum(defaultUpperLimitMinimum),
   mUpperLimitMaximum(defaultUpperLimitMaximum)
   {
     this->makeDefault();
-  }
-
-  //!@brief the constructor
-  LimitsParameter
-  (
-    cedar::aux::Configurable* pOwner,
-    const std::string& name,
-    const T& defaultLowerLimitMinimum,
-    const T& defaultLowerLimitMaximum,
-    const T& defaultUpperLimitMinimum,
-    const T& defaultUpperLimitMaximum
-  )
-  :
-  cedar::aux::Parameter(pOwner, name),
-  mLowerLimitMinimum(defaultLowerLimitMinimum),
-  mLowerLimitMaximum(defaultLowerLimitMaximum),
-  mUpperLimitMinimum(defaultUpperLimitMinimum),
-  mUpperLimitMaximum(defaultUpperLimitMaximum)
-  {
   }
 
   //!@brief Destructor
@@ -317,12 +300,13 @@ protected:
 private:
   //!@brief The default value of the lower limit
   T mLowerLimitDefault;
-  //!@brief The default value of the upper limit
-  T mUpperLimitDefault;
   //!@brief The minimum value of the lower limit
   T mLowerLimitMinimum;
   //!@brief The maximum value of the lower limit
   T mLowerLimitMaximum;
+
+  //!@brief The default value of the upper limit
+  T mUpperLimitDefault;
   //!@brief The minimum value of the upper limit
   T mUpperLimitMinimum;
   //!@brief The maximum value of the upper limit

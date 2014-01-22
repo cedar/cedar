@@ -38,8 +38,10 @@
 #define CEDAR_AUX_GUI_EXCEPTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/exceptions.fwd.h"
 
 // SYSTEM INCLUDES
 

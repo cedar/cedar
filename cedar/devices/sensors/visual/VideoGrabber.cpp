@@ -211,20 +211,6 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
     }
   }
 
-  std::stringstream init_message;
-  init_message << ": Initialize video grabber with " << num_channels << " files ..." << std::endl;
-  for (unsigned int channel = 0; channel < num_channels; ++channel)
-  {
-    init_message << "Channel " << channel << ": capture from: "
-                 << getVideoChannel(channel)->_mSourceFileName->getPath() << std::endl;
-  }
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()"
-                                           );
-
-
   // open capture one by one
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
@@ -380,7 +366,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
   // check range
   if (newPositionRel < 0 || newPositionRel > 1)
   {
-    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"VideoGrabber::setPositionRelative");
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "VideoGrabber::setPositionRelative");
   }
 
   double max_pos = static_cast<double>(mFramesCount - 1);
@@ -401,21 +387,11 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
     new_pos_abs = 0;
   }
 
-  // create debug-message
-  std::stringstream debug_message;
-  debug_message << std::endl <<"\tNew position wanted (relative 0..1): " << newPositionRel << std::endl;
-  debug_message << "\tPosition set to frame: " << new_pos_abs << std::endl;
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                            (
-                                              this->getName() + ": " + debug_message.str(),
-                                              "cedar::dev::sensors::visual::VideoGrabber::setPositionRelative()"
-                                            );
-
   // set to new values
   unsigned int num_channels = getNumChannels();
   for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    getVideoChannel(channel)->mVideoCapture.set(CV_CAP_PROP_POS_FRAMES,new_pos_abs);
+    getVideoChannel(channel)->mVideoCapture.set(CV_CAP_PROP_POS_FRAMES, new_pos_abs);
   }
 }
 
@@ -438,24 +414,14 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
   // newPos can't be smaller than zero, because it is an unsigned int. Only check upper border
   if (newPositionAbs + 1 > mFramesCount)
   {
-    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"VideoGrabber::setPositionAbsolute");
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "VideoGrabber::setPositionAbsolute");
   }
-
-  // create debug-messages
-  std::stringstream debug_message;
-  debug_message << std::endl <<"\tCurrent position: " << getPositionAbsolute() << std::endl
-                << "\tPosition set to frame: " << newPositionAbs << std::endl;
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                            (
-                                              this->getName() + ": " + debug_message.str(),
-                                              "cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute()"
-                                            );
 
   // set new position
   unsigned int num_channels = getNumChannels();
   for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    (getVideoChannel(channel)->mVideoCapture).set(CV_CAP_PROP_POS_FRAMES,newPositionAbs);
+    (getVideoChannel(channel)->mVideoCapture).set(CV_CAP_PROP_POS_FRAMES, newPositionAbs);
   }
 }
 
@@ -485,13 +451,13 @@ double cedar::dev::sensors::visual::VideoGrabber::getSourceProperty(unsigned int
 
 double cedar::dev::sensors::visual::VideoGrabber::getSourceFramerate(unsigned int channel)
 {
-  return getSourceProperty(channel,CV_CAP_PROP_FPS);
+  return getSourceProperty(channel, CV_CAP_PROP_FPS);
 }
 
 
 double cedar::dev::sensors::visual::VideoGrabber::getSourceEncoding(unsigned int channel)
 {
-  return getSourceProperty(channel,CV_CAP_PROP_FOURCC);
+  return getSourceProperty(channel, CV_CAP_PROP_FOURCC);
 }
 
 
@@ -499,7 +465,7 @@ const std::string cedar::dev::sensors::visual::VideoGrabber::getSourceFile(unsig
 {
   if (channel >= getNumChannels())
   {
-    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"VideoGrabber::setSourceFile");
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "VideoGrabber::setSourceFile");
   }
 
   return getVideoChannel(channel)->_mSourceFileName->getPath();

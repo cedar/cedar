@@ -39,7 +39,6 @@
 
 // LOCAL INCLUDES
 // traits specializations:
-#include "cedar/auxiliaries/net/detail/namespace.h"
 
 // PROJECT INCLUDES
 

@@ -44,8 +44,8 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
-#include "cedar/dynamics/namespace.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 
@@ -75,7 +75,13 @@ void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int& numberOfEr
   try
   {
     cedar::proc::LoopedTriggerPtr trigger = network->getElement<cedar::proc::LoopedTrigger>("new LoopedTrigger");
-    cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(1.0)));
+    cedar::proc::ArgumentsPtr arguments
+                              (
+                                new cedar::proc::StepTime
+                                    (
+                                      cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second)
+                                    )
+                              );
     trigger->trigger(arguments);
   }
   catch (cedar::aux::ExceptionBase exception)

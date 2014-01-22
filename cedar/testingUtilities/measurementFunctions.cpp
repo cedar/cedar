@@ -64,7 +64,7 @@ void cedar::test::write_measurement
       << std::endl;
 }
 
-void cedar::test::test_time(std::string id, std::function< void() > fun, unsigned int repetitions)
+void cedar::test::test_time(std::string id, std::function<void()> fun, unsigned int repetitions)
 {
   using boost::posix_time::ptime;
   using boost::posix_time::microsec_clock;

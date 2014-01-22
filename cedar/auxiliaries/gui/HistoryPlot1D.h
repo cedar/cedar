@@ -41,8 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/HistoryPlot1D.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
+#ifdef CEDAR_USE_QWTPLOT3D
+  #include "cedar/auxiliaries/gui/QwtSurfacePlot.fwd.h"
+#else
+  #include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
+#endif // CEDAR_USE_QWTPLOT3D
 
 // SYSTEM INCLUDES
 

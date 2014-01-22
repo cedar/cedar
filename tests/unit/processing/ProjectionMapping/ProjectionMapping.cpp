@@ -38,6 +38,7 @@
 #include "cedar/processing/ProjectionMapping.h"
 
 // SYSTEM INCLUDES
+#include <iostream>
 
 int main()
 {

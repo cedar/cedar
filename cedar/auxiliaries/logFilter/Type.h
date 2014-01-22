@@ -38,9 +38,10 @@
 #define CEDAR_AUX_LOG_FILTER_TYPE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/logFilter/namespace.h"
 #include "cedar/auxiliaries/LogFilter.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/logFilter/Type.fwd.h"
 
 // SYSTEM INCLUDES
 

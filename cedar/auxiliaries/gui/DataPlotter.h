@@ -42,12 +42,16 @@
 #define CEDAR_PROC_GUI_DATA_PLOTTER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 #include "cedar/auxiliaries/Data.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+#include "cedar/auxiliaries/gui/DataPlotter.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QDockWidget>
+#include <string>
 
 /*!@brief Base class for a dockable plot.
  *

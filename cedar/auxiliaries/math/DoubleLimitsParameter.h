@@ -39,7 +39,7 @@
 #define CEDAR_AUX_MATH_DOUBLE_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.fwd.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 
 #endif // CEDAR_AUX_MATH_DOUBLE_LIMITS_PARAMETER_H

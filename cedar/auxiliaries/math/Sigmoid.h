@@ -42,15 +42,17 @@
 #define CEDAR_AUX_MATH_SIGMOID_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/Sigmoid.fwd.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Basic interface for all sigmoid functions.
  */
-class cedar::aux::math::Sigmoid : public TransferFunction
+class cedar::aux::math::Sigmoid : public cedar::aux::math::TransferFunction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -94,9 +96,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+  cedar::aux::DoubleParameterPtr mThreshold;
 private:
   //!@brief threshold of the sigmoid
-  cedar::aux::DoubleParameterPtr mThreshold;
 };
 
 #endif  // CEDAR_AUX_MATH_SIGMOID_H

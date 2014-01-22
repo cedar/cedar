@@ -45,21 +45,10 @@
   #include <boost/smart_ptr.hpp>
 #endif
 
-namespace cedar
-{
-  namespace proc
-  {
-    /*! @brief Namespace containing classes related to automatic type checks for slots in processing steps.
-     */
-    namespace typecheck
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(TypeCheck);
+#warning Do not include this header. Use the new forward declaration headers instead.
 
-      template <class T> class DerivedFrom;
-      //!@endcond
-    }
-  }
-}
+#include "cedar/processing/typecheck/DerivedFrom.fwd.h"
+#include "cedar/processing/typecheck/IsMatrix.fwd.h"
+#include "cedar/processing/typecheck/TypeCheck.fwd.h"
 
 #endif // CEDAR_PROC_TYPECHECK_NAMESPACE_H

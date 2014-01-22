@@ -41,8 +41,9 @@
 #include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 
-
 // SYSTEM INCLUDES
+#include <string>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -50,7 +51,7 @@
 
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
-cedar::proc::Step(false, true),
+cedar::proc::Step(true),
 mImage(new cedar::aux::MatData(cv::Mat::zeros(3, 4, CV_8UC3))),
 mRecording(new cedar::aux::BoolParameter(this, "record", false))
 {
