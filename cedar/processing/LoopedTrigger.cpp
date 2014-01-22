@@ -192,16 +192,14 @@ void cedar::proc::LoopedTrigger::processStop(bool)
   emit triggerStopped();
 }
 
-//!@todo this should take a cedar::unit::Time as argument
 void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 {
   cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time));
 
   //!@todo Is this right?
   auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  for (const auto& listener : this->mListeners)
   {
-    this->mListeners.at(i)->onTrigger(arguments, this_ptr);
+    listener->onTrigger(arguments, this_ptr);
   }
-//  this->trigger(arguments);
 }
