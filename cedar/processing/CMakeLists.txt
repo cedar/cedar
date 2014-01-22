@@ -58,6 +58,7 @@ cedar_add_library(cedarproc
   gui/Ide.h
   gui/IdeApplication.h
   gui/ProjectionMappingParameter.h
+  gui/PerformanceOverview.h
   gui/RecorderWidget.h
   gui/RecorderProperty.h
   gui/Scene.h
