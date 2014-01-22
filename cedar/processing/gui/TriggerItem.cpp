@@ -46,17 +46,18 @@
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/Manager.h"
-#include "cedar/auxiliaries/Data.h"
-#include "cedar/auxiliaries/utilities.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -66,6 +67,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsDropShadowEffect>
 #include <iostream>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

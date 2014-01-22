@@ -38,12 +38,14 @@
 #define CEDAR_PROC_PROJECTION_MAPPING_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/processing/ProjectionMapping.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/ProjectionMapping.fwd.h"
+#include "cedar/processing/ProjectionMappingParameter.fwd.h"
 
 // SYSTEM INCLUDES
-#include <climits>
+
 
 /*!@brief Parameter type for the projection mapping.
  *

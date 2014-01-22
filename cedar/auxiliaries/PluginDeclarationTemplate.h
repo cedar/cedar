@@ -41,13 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/DeclarationManagerTemplate.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/PluginDeclarationTemplate.fwd.h"
+
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@todo describe.

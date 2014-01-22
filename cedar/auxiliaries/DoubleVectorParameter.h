@@ -39,7 +39,7 @@
 #define CEDAR_AUX_DOUBLE_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.fwd.h"
 
 #endif // CEDAR_AUX_DOUBLE_VECTOR_PARAMETER_H

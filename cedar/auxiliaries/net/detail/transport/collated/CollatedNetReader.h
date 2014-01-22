@@ -44,7 +44,7 @@
 #define CEDAR_COLLATED_NET_READER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetReader.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetBase.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetReader.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
@@ -58,12 +58,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
-
+#include <string>
 
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief implements reading (RIAA) of a complex data type (header + matrix)
@@ -75,8 +70,8 @@ namespace cedar {
  * partly implemented in CollatedNetBase
  */
 template <typename T, bool BLOCK= false>
-class CollatedNetReader : public CollatedNetBase<T>,
-                          public AbstractNetReader<T>
+class cedar::aux::net::detail::CollatedNetReader : public CollatedNetBase<T>,
+                                                   public AbstractNetReader<T>
 {
   //---------------------------------------------------------------------------
   // members
@@ -205,7 +200,5 @@ public:
   }
 };
 //!@endcond
-
-} } } }  // end namespaces
 
 #endif

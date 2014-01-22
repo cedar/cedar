@@ -44,6 +44,9 @@
 
 // SYSTEM INCLUDES
 #include <signal.h>
+#include <exception>
+#include <sstream>
+#include <iostream>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,6 +89,9 @@ cedar::aux::LoopedThread()
   std::vector<cedar::dev::sensors::visual::GrabberChannelPtr> grabberchannels;
   grabberchannels.push_back(pChannel);
   this->init(grabberchannels);
+
+  this->connectToStartSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::prepareStart, this));
+  this->connectToStopSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::processStop, this, _1));
 }
 
 
@@ -149,11 +155,6 @@ cedar::dev::sensors::visual::Grabber::~Grabber()
 
   if ((*it) == this)
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                            (
-                                              this->getName() + ": Deleted this grabber from list of all instances.",
-                                              "cedar::dev::sensors::visual::Grabber::~Grabber()"
-                                            );
     mInstances.erase(it);
   }
   cedar::aux::LogSingleton::getInstance()->freeing(this);
@@ -216,13 +217,8 @@ void cedar::dev::sensors::visual::Grabber::installCrashHandler()
 
 void cedar::dev::sensors::visual::Grabber::doCleanUp()
 {
-  if (! mCleanUpAlreadyDone)
+  if (!mCleanUpAlreadyDone)
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                             (
-                                              this->getName() + ": cleanup",
-                                               "cedar::dev::sensors::visual::Grabber::doCleanUp()"
-                                             );
     mCleanUpAlreadyDone = true;
 
     // stop LoopedThread
@@ -397,7 +393,7 @@ double cedar::dev::sensors::visual::Grabber::getMeasuredFramerate() const
 
 double cedar::dev::sensors::visual::Grabber::getFramerate() const
 {
-  double fps = 1000. / LoopedThread::getStepSize();
+  double fps = cedar::unit::Time(1.0 * cedar::unit::second) / LoopedThread::getStepSize();
   return fps;
 }
 
@@ -417,9 +413,10 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                              );
   }
   // cycle time in ms: 1000ms/frames_per_second
-  double milliseconds = 1000. / fps;
+  cedar::unit::Time one_second(1.0 * cedar::unit::second);
+  cedar::unit::Time cycle_time(one_second / fps);
 
-  LoopedThread::setStepSize(milliseconds);        // change speed in thread
+  LoopedThread::setStepSize(cycle_time);        // change speed in thread
 
   if (wasRunning)
   {
@@ -442,7 +439,7 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                            );
 }
 
-void cedar::dev::sensors::visual::Grabber::applyStop(bool)
+void cedar::dev::sensors::visual::Grabber::processStop(bool)
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
@@ -467,7 +464,7 @@ void cedar::dev::sensors::visual::Grabber::setIsGrabbing(bool isGrabbing)
   mpLockIsGrabbing->unlock();
 }
 
-void cedar::dev::sensors::visual::Grabber::applyStart()
+void cedar::dev::sensors::visual::Grabber::prepareStart()
 {
   mpLockIsGrabbing->lockForWrite();
   mIsGrabbing = true;
@@ -914,7 +911,7 @@ bool cedar::dev::sensors::visual::Grabber::isRecording() const
   return mRecording;
 }
 
-void cedar::dev::sensors::visual::Grabber::step(double)
+void cedar::dev::sensors::visual::Grabber::step(cedar::unit::Time)
 {
   // if something went wrong on grabbing,
   // an exception is being thrown in the grab function

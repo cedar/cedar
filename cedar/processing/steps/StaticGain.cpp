@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/DerivedFrom.h"
 #include "cedar/processing/steps/StaticGain.h"
+#include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -93,7 +93,7 @@ _mGainFactor(new cedar::aux::DoubleParameter(this, "gain factor", 1.0, -10000.0,
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
 
-  input->setCheck(cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>());
+  input->setCheck(cedar::proc::typecheck::IsMatrix());
 
   // connect the parameter's change signal
   QObject::connect(_mGainFactor.get(), SIGNAL(valueChanged()), this, SLOT(gainChanged()));

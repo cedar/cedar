@@ -38,26 +38,13 @@
 #define CEDAR_TESTING_DEV_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/testingUtilities/namespace.h"
+#include "cedar/testingUtilities/lib.h"
 
 // SYSTEM INCLUDES
 
-namespace cedar
-{
-  namespace test
-  {
-    /*!@brief Namespace that encapsulates functionality shared across dev unit/interactive tests.
-     *
-     *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
-     */
-    namespace dev
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_TESTING_UTILITIES_CLASS(TestGrabber);
-      CEDAR_DECLARE_TESTING_UTILITIES_CLASS(TestChannel);
-      //!@endcond
-    }
-  }
-}
+#warning Do not include this header any more. Use the new forward declaration headers instead.
+
+#include "cedar/testingUtilities/devices/TestChannel.fwd.h"
+#include "cedar/testingUtilities/devices/TestGrabber.fwd.h"
 
 #endif // CEDAR_TESTING_DEV_NAMESPACE_H

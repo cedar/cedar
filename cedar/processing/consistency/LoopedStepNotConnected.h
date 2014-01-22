@@ -41,10 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/consistency/ConsistencyIssue.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/consistency/LoopedStepNotConnected.fwd.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Step.fwd.h"
+
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief A consistency issue that indicates a looped step that is not connected to a looped trigger.

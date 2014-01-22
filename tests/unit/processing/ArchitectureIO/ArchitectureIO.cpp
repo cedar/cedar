@@ -37,12 +37,13 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/DoubleData.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 /*!
  * This is a generic class for testing. When compute is called, its data is set from zero to one.
@@ -104,8 +105,6 @@ CEDAR_GENERATE_POINTER_TYPES(TestModuleDoubleConnection);
 
 int main(int, char**)
 {
-  using cedar::aux::LogFile;
-
   unsigned int errors = 0;
 
   std::cout << "Creating step declarations ... ";
@@ -144,7 +143,14 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Creating trigger ... ";
-  cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger(10.0, "trigger"));
+  cedar::proc::LoopedTriggerPtr trigger
+                                (
+                                  new cedar::proc::LoopedTrigger
+                                      (
+                                        cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds),
+                                        "trigger"
+                                      )
+                                );
   network->add(trigger);
   std::cout << "done." << std::endl;
 
@@ -185,7 +191,14 @@ int main(int, char**)
   }
 
   std::cout << "Creating a second trigger ... ";
-  cedar::proc::LoopedTriggerPtr trigger_2(new cedar::proc::LoopedTrigger(10.0, "trigger2"));
+  cedar::proc::LoopedTriggerPtr trigger_2
+                                (
+                                  new cedar::proc::LoopedTrigger
+                                      (
+                                        cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds),
+                                        "trigger2"
+                                      )
+                                );
   network->add(trigger_2);
 
   std::cout << "Connecting trigger to trigger2 ... ";

@@ -22,22 +22,22 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckDriveTest.cpp
+    File:        main.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2013 02 04
 
-    Description: Interactive test-program for the EPuckDrive class.
+    Description: Interactive test-program for the drive of the e-puck robot.
 
-    Credits:
+    Credits:     Original program written by Andre Bartel
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/systemFunctions.h"
-#include "cedar/devices/kteam/EPuckDrive.h"
-#include "cedar/devices/communication/SerialCommunication.h"
+#include "cedar/devices/kteam/Drive.h"
+#include "cedar/devices/Robot.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
 
 // SYSTEM INCLUDES
@@ -47,16 +47,15 @@ int main(int argc, char **argv)
 {
   QApplication application(argc, argv);
 
-  // open the channel to the epuck
-  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  std::string serial_communication_config = cedar::aux::locateResource("configs/epuck_serial_communication.json");
-  communication->readJson(serial_communication_config);
-  communication->open();
+  cedar::dev::RobotPtr robot(new cedar::dev::Robot());
+  std::string robot_configuration = cedar::aux::locateResource("configs/epuck/hardware_configuration.json");
+  robot->readJson(robot_configuration);
 
-  // initialize epuck-drive
-  cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
-  std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck.json");
-  drive->readJson(epuck_drive_config);
+  cedar::dev::kteam::DrivePtr drive
+    = robot->getComponent<cedar::dev::kteam::Drive>("drive");
+
+  cedar::dev::ChannelPtr channel = drive->getChannel();
+  channel->open();
 
   // open the control-GUI
   cedar::dev::kteam::gui::DriveControlWidgetPtr drive_control(new cedar::dev::kteam::gui::DriveControlWidget(drive));

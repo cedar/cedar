@@ -38,10 +38,13 @@
 #define CEDAR_PROC_STEPS_COMPONENT_MULTIPLY_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/ComponentMultiply.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -66,17 +69,20 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void compute(const cedar::proc::Arguments&);
-
   void inputConnectionChanged(const std::string& inputName);
-
-  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  void compute(const cedar::proc::Arguments&);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
