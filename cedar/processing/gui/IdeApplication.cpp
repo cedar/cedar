@@ -98,6 +98,14 @@ mLastExceptionType(NONE)
   this->mpIde = new cedar::proc::gui::Ide(!no_plugins, !no_log_redirect);
 
   QObject::connect(this, SIGNAL(showExceptionDialogSignal()), this, SLOT(showExceptionDialog()));
+
+  auto unparsed = parser.getUnparsedValues();
+  if (!unparsed.empty())
+  {
+    // the last unparsed value is the one that is loaded
+    QString last = QString::fromStdString(unparsed.back());
+    this->mpIde->loadFile(last);
+  }
 }
 
 cedar::proc::gui::IdeApplication::~IdeApplication()
