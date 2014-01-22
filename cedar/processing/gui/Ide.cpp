@@ -94,7 +94,7 @@ mpBoostControl(NULL)
   // setup the (automatically generated) ui components
   this->setupUi(this);
 
-  mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview();
+  mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
 
   // manually added components
   auto p_enable_custom_time_step = new QCheckBox();

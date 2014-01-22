@@ -92,7 +92,7 @@ public:
 
 cedar::proc::gui::PerformanceOverview::PerformanceOverview(QWidget* pParent)
 :
-QWidget(pParent)
+QDialog(pParent)
 {
   setupUi(this);
   QObject::connect(this->mpRefreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
