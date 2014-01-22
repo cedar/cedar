@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
+#include <QString>
 #include <fstream>
 #include <cstdlib>
 #ifdef CEDAR_COMPILER_GCC

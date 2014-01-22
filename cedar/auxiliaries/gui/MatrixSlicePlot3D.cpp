@@ -322,14 +322,15 @@ void cedar::aux::gui::MatrixSlicePlot3D::updateData()
     return;
   }
   int type = mat.type();
-
+  cv::Mat cloned_mat = mat.clone();
+  locker.unlock();
   switch(type)
   {
 //  case CV_8UC1:
     case CV_32FC1:
 //  case CV_64FC1:
     {
-      this->slicesFromMat(this->mData->getData());
+      this->slicesFromMat(cloned_mat);
       break;
     }
 
