@@ -84,6 +84,8 @@ Unreleased
     user inputs. It is still being developed.
 - cedar::proc
   - Step can no longer be executed in a separate thread (nobody uses this functionality).
+  - There is now a tool in the processingIde that lists all steps along with their execution times. This can be helpful
+    in finding out which steps make your architectures slow.
 
 Released versions
 =================
