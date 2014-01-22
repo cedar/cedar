@@ -50,12 +50,12 @@
 #include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
+#include <QDialog>
 
 
 /*!@brief A widget that shows the performance of an architecture.
  */
-class cedar::proc::gui::PerformanceOverview : public QWidget, public Ui_PerformanceOverview
+class cedar::proc::gui::PerformanceOverview : public QDialog, public Ui_PerformanceOverview
 {
   Q_OBJECT
 
