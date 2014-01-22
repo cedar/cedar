@@ -441,10 +441,31 @@ cedar::unit::Time cedar::proc::Step::getLockTimeMeasurement() const
   }
 }
 
+bool cedar::proc::Step::hasRunTimeMeasurement() const
+{
+  QReadLocker locker(&this->mLastIterationTimeLock);
+  bool has_measurement = this->mMovingAverageIterationTime.size() > 0;
+  return has_measurement;
+}
+
+bool cedar::proc::Step::hasLockTimeMeasurement() const
+{
+  QReadLocker locker(&this->mLockTimeLock);
+  bool has_measurement = this->mLockingTime.size() > 0;
+  return has_measurement;
+}
+
+bool cedar::proc::Step::hasRoundTimeMeasurement() const
+{
+  QReadLocker locker(&this->mRoundTimeLock);
+  bool has_measurement = this->mRoundTime.size() > 0;
+  return has_measurement;
+}
+
 cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
 {
   QReadLocker locker(&this->mLastIterationTimeLock);
-  if (this->mMovingAverageIterationTime.size() > 0)
+  if (this->hasRunTimeMeasurement())
   {
     cedar::unit::Time copy = this->mMovingAverageIterationTime.getAverage();
     return copy;
