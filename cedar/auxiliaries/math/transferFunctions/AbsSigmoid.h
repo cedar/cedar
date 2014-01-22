@@ -42,8 +42,10 @@
 #define CEDAR_AUX_MATH_ABS_SIGMOID_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -77,6 +79,8 @@ public:
   /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
+
+  virtual cv::Mat compute(const cv::Mat& values) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

@@ -44,20 +44,21 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/kuka/namespace.h"
-#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/KinematicChain.h"
 #include "cedar/auxiliaries/IntParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 #include <fri/friremote.h>
 #include <QReadWriteLock>
+#include <vector>
 
 
 /*!@brief kinematic chain interface for the KUKA LBR
  *
  * This class wraps the KUKA Fast Research Interface (FRI)
  */
-class cedar::dev::kuka::KinematicChain :  public cedar::dev::robot::KinematicChain
+class cedar::dev::kuka::KinematicChain :  public cedar::dev::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

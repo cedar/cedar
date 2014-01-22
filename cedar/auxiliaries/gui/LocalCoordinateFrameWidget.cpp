@@ -38,6 +38,8 @@
 #include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -135,21 +137,21 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::initWindow()
   // add position spin boxes
   mpTranslationXSpinBox = new QDoubleSpinBox();
   mpTranslationXSpinBox->setRange(mXMin, mXMax);
-  mpTranslationXSpinBox->setValue(mpLocalCoordinateFrame->getTranslationX());
+  mpTranslationXSpinBox->setValue(mpLocalCoordinateFrame->getTranslationX() / cedar::unit::DEFAULT_LENGTH_UNIT);
   mpTranslationXSpinBox->setSingleStep(mSingleTranslationStep);
   connect(mpTranslationXSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
   mpGridLayout->addWidget(mpTranslationXSpinBox, 1, 1, 1, 2);
 
   mpTranslationYSpinBox = new QDoubleSpinBox();
   mpTranslationYSpinBox->setRange(mYMin, mYMax);
-  mpTranslationYSpinBox->setValue(mpLocalCoordinateFrame->getTranslationY());
+  mpTranslationYSpinBox->setValue(mpLocalCoordinateFrame->getTranslationY() / cedar::unit::DEFAULT_LENGTH_UNIT);
   mpTranslationYSpinBox->setSingleStep(mSingleTranslationStep);
   connect(mpTranslationYSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
   mpGridLayout->addWidget(mpTranslationYSpinBox, 1, 3, 1, 2);
 
   mpTranslationZSpinBox = new QDoubleSpinBox();
   mpTranslationZSpinBox->setRange(mZMin, mZMax);
-  mpTranslationZSpinBox->setValue(mpLocalCoordinateFrame->getTranslationZ());
+  mpTranslationZSpinBox->setValue(mpLocalCoordinateFrame->getTranslationZ() / cedar::unit::DEFAULT_LENGTH_UNIT);
   mpTranslationZSpinBox->setSingleStep(mSingleTranslationStep);
   connect(mpTranslationZSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
   mpGridLayout->addWidget(mpTranslationZSpinBox, 1, 5, 1, 2);
@@ -268,39 +270,39 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::positionChanged(double)
 {
   mpLocalCoordinateFrame->setTranslation
   (
-    mpTranslationXSpinBox->value(),
-    mpTranslationYSpinBox->value(),
-    mpTranslationZSpinBox->value()
+    mpTranslationXSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT,
+    mpTranslationYSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT,
+    mpTranslationZSpinBox->value() * cedar::unit::DEFAULT_LENGTH_UNIT
   );
 }
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::rotateXPos()
 {
-  mpLocalCoordinateFrame->rotate(0, mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(0, mSingleRotationStep * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::rotateXNeg()
 {
-  mpLocalCoordinateFrame->rotate(0, -mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(0, -mSingleRotationStep * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::rotateYPos()
 {
-  mpLocalCoordinateFrame->rotate(1, mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(1, mSingleRotationStep * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::rotateYNeg()
 {
-  mpLocalCoordinateFrame->rotate(1, -mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(1, -mSingleRotationStep * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::rotateZPos()
 {
-  mpLocalCoordinateFrame->rotate(2, mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(2, mSingleRotationStep * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::rotateZNeg()
 {
-  mpLocalCoordinateFrame->rotate(2, -mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(2, -mSingleRotationStep * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 

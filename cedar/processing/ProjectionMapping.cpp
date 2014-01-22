@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 #include <limits>
+#include <vector>
 
 // this number is used to represent a dimension that is to be dropped
 unsigned int cedar::proc::ProjectionMapping::msDropIndex = std::numeric_limits<unsigned int>::max();

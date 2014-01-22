@@ -41,13 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/LogInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Log.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QGraphicsSceneContextMenuEvent>
+#include <map>
 
 
 /*!@brief A default log widget.
@@ -129,7 +132,7 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief reacts to timer event and slowly fades out old messages
+  //!@brief Called periodically. Responsible for fading out older messages.
   void timerEvent(QTimerEvent* pEvent);
 
 signals:

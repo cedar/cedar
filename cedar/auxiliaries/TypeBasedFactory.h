@@ -38,13 +38,16 @@
 #define CEDAR_AUX_TYPE_BASED_FACTORY_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/utilities.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+
 // SYSTEM INCLUDES
 #include <vector>
+#include <string>
 #include <typeinfo>
 
 

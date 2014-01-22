@@ -42,9 +42,11 @@
 #define CEDAR_PROC_STEP_TIME_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/units/Time.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/StepTime.fwd.h"
 
 // SYSTEM INCLUDES
 

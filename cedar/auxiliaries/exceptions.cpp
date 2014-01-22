@@ -40,9 +40,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include "cedar/auxiliaries/math/tools.h"
 
 cedar::aux::MatrixMismatchException::MatrixMismatchException(const cv::Mat& matA, const cv::Mat& matB)
 {

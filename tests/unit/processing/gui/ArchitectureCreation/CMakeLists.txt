@@ -36,4 +36,6 @@
 
 cedar_add_unit_test(ArchitectureCreation
                     main.cpp
+                    ADDITIONAL_DEPENDENCIES
+                    cedardyn
                    )

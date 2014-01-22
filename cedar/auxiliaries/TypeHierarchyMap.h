@@ -38,8 +38,10 @@
 #define CEDAR_AUX_TYPE_HIERARCHY_MAP_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/utilities.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/TypeHierarchyMap.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -48,6 +50,8 @@
 #include <set>
 #include <queue>
 #include <iostream>
+#include <map>
+#include <string>
 
 /*!@brief   A structure capable of representing parts of the inheritance sturcture between types.
  *

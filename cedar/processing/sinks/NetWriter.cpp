@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -84,7 +85,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::sinks::NetWriter::NetWriter()
 :
-cedar::proc::Step(false, true),
+cedar::proc::Step(true),
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
 mWriter(),

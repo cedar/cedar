@@ -25,9 +25,9 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="cedar::proc::gui::FrameworkSettings" name="mpProcessingSettingsTab">
+     <widget class="cedar::aux::gui::SettingsWidget" name="tab">
       <attribute name="title">
-       <string>processing</string>
+       <string>auxiliaries</string>
       </attribute>
      </widget>
      <widget class="cedar::proc::gui::UiSettings" name="mpUiSettingsTab">
@@ -51,15 +51,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>cedar::proc::gui::FrameworkSettings</class>
-   <extends>QWidget</extends>
-   <header>cedar/processing/gui/FrameworkSettings.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>cedar::proc::gui::UiSettings</class>
    <extends>QWidget</extends>
    <header>cedar/processing/gui/UiSettings.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::SettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/SettingsWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

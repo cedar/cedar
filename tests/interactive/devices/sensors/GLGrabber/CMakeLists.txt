@@ -34,4 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_interactive_test("GLGrabber" GLGrabberTest.cpp)
+if (CEDAR_USE_QGLVIEWER)
+  cedar_add_interactive_test("GLGrabber" GLGrabberTest.cpp)
+endif(CEDAR_USE_QGLVIEWER)
