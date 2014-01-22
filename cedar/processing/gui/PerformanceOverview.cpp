@@ -47,6 +47,45 @@
 #include <limits.h>
 
 //----------------------------------------------------------------------------------------------------------------------
+// private nested classes
+//----------------------------------------------------------------------------------------------------------------------
+
+class cedar::proc::gui::PerformanceOverview::TimeCellItem : public QTableWidgetItem
+{
+public:
+  // constructor for an existing measurement
+  TimeCellItem(cedar::unit::Time time)
+  {
+    double run_time_number = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
+    this->setData(Qt::DisplayRole, QString("%1 ms").arg(run_time_number));
+    this->setData(Qt::UserRole, run_time_number);
+  }
+
+  // constructor for an invalid measurement
+  TimeCellItem()
+  {
+    this->setData(Qt::DisplayRole, "n/a");
+    this->setData(Qt::UserRole, -1.0);
+  }
+
+  bool operator <(const QTableWidgetItem& other) const
+  {
+    double this_value = this->data(Qt::UserRole).toDouble();
+    bool ok;
+    double other_value = other.data(Qt::UserRole).toDouble(&ok);
+
+    if (ok)
+    {
+      return this_value < other_value;
+    }
+    else
+    {
+      return false;
+    }
+  }
+};
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -131,22 +170,12 @@ void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr
 
 void cedar::proc::gui::PerformanceOverview::addUnAvailableMeasurement(int row, int column)
 {
-  auto p_run_time_measurement = new QTableWidgetItem();
-  p_run_time_measurement->setData(Qt::DisplayRole, "n/a");
-  p_run_time_measurement->setData(Qt::UserRole, -1.0); // -1.0 should get sorted behind everything else
-  this->mpStepTimeOverview->setItem(row, column, p_run_time_measurement);
+  this->mpStepTimeOverview->setItem(row, column, new TimeCellItem());
 }
 
 void cedar::proc::gui::PerformanceOverview::addMeasurement(cedar::unit::Time measurement, int row, int column)
 {
-  QString run_time_str;
-  double run_time_number = measurement / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
-  run_time_str = QString("%1 ms").arg(run_time_number);
-
-  auto p_run_time_measurement = new QTableWidgetItem();
-  p_run_time_measurement->setData(Qt::DisplayRole, run_time_str);
-  p_run_time_measurement->setData(Qt::UserRole, run_time_number);
-  this->mpStepTimeOverview->setItem(row, column, p_run_time_measurement);
+  this->mpStepTimeOverview->setItem(row, column, new cedar::proc::gui::PerformanceOverview::TimeCellItem(measurement));
 }
 
 void cedar::proc::gui::PerformanceOverview::clear()
