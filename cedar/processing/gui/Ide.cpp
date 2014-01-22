@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
+#include "cedar/processing/gui/PerformanceOverview.h"
 #include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
@@ -86,11 +87,14 @@
 cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 :
 mpConsistencyChecker(NULL),
+mpPerformanceOverview(NULL),
 mpConsistencyDock(NULL),
 mpBoostControl(NULL)
 {
   // setup the (automatically generated) ui components
   this->setupUi(this);
+
+  mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview();
 
   // manually added components
   auto p_enable_custom_time_step = new QCheckBox();
@@ -212,6 +216,8 @@ mpBoostControl(NULL)
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
 
+  QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
+
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
@@ -221,6 +227,11 @@ mpBoostControl(NULL)
 cedar::proc::gui::Ide::~Ide()
 {
   this->mpLog->uninstallHandlers();
+
+  if (this->mpPerformanceOverview != NULL)
+  {
+    delete this->mpPerformanceOverview;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -463,6 +474,11 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   if (this->mpBoostControl != NULL)
   {
     this->mpBoostControl->setNetwork(network->getNetwork());
+  }
+
+  if (this->mpPerformanceOverview != NULL)
+  {
+    this->mpPerformanceOverview->setNetwork(network->getNetwork());
   }
 
   this->loadPlotGroupsIntoComboBox();
