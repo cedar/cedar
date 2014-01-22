@@ -100,13 +100,12 @@ mLastExceptionType(NONE)
 
   QObject::connect(this, SIGNAL(showExceptionDialogSignal()), this, SLOT(showExceptionDialog()));
 
-  if (args.size() > 1)
+  auto unparsed = parser.getUnparsedValues();
+  if (!unparsed.empty())
   {
-    QString last_argument = args.last();
-    if (!last_argument.startsWith("--") && !last_argument.startsWith("-"))
-    {
-      this->mpIde->loadFile(last_argument);
-    }
+    // the last unparsed value is the one that is loaded
+    QString last = QString::fromStdString(unparsed.back());
+    this->mpIde->loadFile(last);
   }
 }
 
