@@ -47,6 +47,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+#include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"
@@ -285,6 +286,7 @@ private:
 
   //!@brief populates the Plot Groups Combobox with available Plot Groups
   void loadPlotGroupsIntoComboBox();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -299,6 +301,9 @@ private:
 
   //! Architecture consistency check widget.
   cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;
+
+  //! Performance overview.
+  cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;
 
   //! Dock widget for the consistency checker.
   QDockWidget* mpConsistencyDock;
