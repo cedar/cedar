@@ -1,0 +1,90 @@
+/*======================================================================================================================
+
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
+
+ ----- File:        main.cpp
+
+ ----- Maintainer:  Hendrik Reimann
+ ----- Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 11 17
+
+ ----- Description: interactive test for the kinematic chain simulation
+
+ ----- Credits:
+ -----------------------------------------------------------------------------*/
+
+// CEDAR INCLUDES
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/gl/KukaArm.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gui/SceneWidget.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+
+
+// SYSTEM INCLUDES
+#include <QApplication>
+
+
+int main(int argc, char **argv)
+{
+  // find resources
+  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
+
+  QApplication a(argc, argv);
+
+  // create simulated kinematic chains
+  cedar::dev::robot::KinematicChainPtr kuka_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  kuka_arm->readJson(configuration_file);
+
+  // create gl visualization objects
+  cedar::dev::robot::gl::KukaArmPtr kuka_arm_visualization
+  (
+    new cedar::dev::robot::gl::KukaArm(kuka_arm)
+  );
+
+  // create scene and viewer to display the arm
+  cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene());
+  scene->setSceneLimit(2);
+  scene->drawFloor(true);
+  scene->addObjectVisualization(kuka_arm_visualization);
+  cedar::aux::gui::Viewer viewer(scene);
+  viewer.show();
+  viewer.setSceneRadius(scene->getSceneLimit());
+
+  // create control widgets for the scene and the arm
+  cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
+  cedar::dev::robot::gui::KinematicChainWidget widget_arm(kuka_arm);
+
+  // show and start everything
+  scene_widget->show();
+  widget_arm.show();
+  viewer.startTimer(20);
+  kuka_arm->startTimer(20);
+  kuka_arm->start();
+  a.exec();
+
+  return 0;
+}
