@@ -141,37 +141,38 @@ void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr
   auto p_name = new QTableWidgetItem(QString::fromStdString(step->getName()));
   this->mpStepTimeOverview->setItem(row, 0, p_name);
 
+  // we have to use the row of the name item below as sorting may move it around
   if (step->hasRunTimeMeasurement())
   {
-    this->addMeasurement(step->getRunTimeAverage(), row, 1);
+    this->addMeasurement(step->getRunTimeAverage(), p_name->row(), 1);
   }
   else
   {
-    this->addUnAvailableMeasurement(row, 1);
+    this->addUnAvailableMeasurement(p_name->row(), 1);
   }
 
   if (step->hasRoundTimeMeasurement())
   {
-    this->addMeasurement(step->getRoundTimeAverage(), row, 2);
+    this->addMeasurement(step->getRoundTimeAverage(), p_name->row(), 2);
   }
   else
   {
-    this->addUnAvailableMeasurement(row, 2);
+    this->addUnAvailableMeasurement(p_name->row(), 2);
   }
 
   if (step->hasLockTimeMeasurement())
   {
-    this->addMeasurement(step->getLockTimeAverage(), row, 3);
+    this->addMeasurement(step->getLockTimeAverage(), p_name->row(), 3);
   }
   else
   {
-    this->addUnAvailableMeasurement(row, 3);
+    this->addUnAvailableMeasurement(p_name->row(), 3);
   }
 }
 
 void cedar::proc::gui::PerformanceOverview::addUnAvailableMeasurement(int row, int column)
 {
-  this->mpStepTimeOverview->setItem(row, column, new TimeCellItem());
+  this->mpStepTimeOverview->setItem(row, column, new cedar::proc::gui::PerformanceOverview::TimeCellItem());
 }
 
 void cedar::proc::gui::PerformanceOverview::addMeasurement(cedar::unit::Time measurement, int row, int column)
@@ -181,9 +182,8 @@ void cedar::proc::gui::PerformanceOverview::addMeasurement(cedar::unit::Time mea
 
 void cedar::proc::gui::PerformanceOverview::clear()
 {
-  for (int row = 0; row < this->mpStepTimeOverview->rowCount(); ++row)
+  while (this->mpStepTimeOverview->rowCount() > 0)
   {
-    this->mpStepTimeOverview->removeRow(row);
+    this->mpStepTimeOverview->removeRow(0);
   }
-  this->mpStepTimeOverview->setRowCount(0);
 }
