@@ -904,6 +904,13 @@ void cedar::proc::gui::Ide::loadFile(QString file)
     p_dialog->displayCedarException(e);
     p_dialog->exec();
   }
+  catch (const boost::property_tree::json_parser::json_parser_error& e)
+  {
+    auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+    p_dialog->setAdditionalString("Could not load architecture.");
+    p_dialog->displayStdException(e);
+    p_dialog->exec();
+  }
   this->mpActionSave->setEnabled(true);
 
   //!@todo Why doesn't this call resetTo?
