@@ -183,6 +183,9 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   mSliceMatrixByteC3 = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC3);
   cv::Mat frame = cv::Mat::ones(mSliceMatrixByte.rows, mSliceMatrixByte.cols, mSliceMatrixByte.type());
 
+  double min = std::numeric_limits<double>::max();
+  double max = -std::numeric_limits<double>::max();
+
   // decide which plot code is used depending on the OpenCV version
   // versions are defined since version 2.4, which supports the following code
 #if defined CV_MINOR_VERSION and defined CV_MAJOR_VERSION and CV_MAJOR_VERSION >= 2 and CV_MINOR_VERSION >= 4
@@ -224,6 +227,11 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 
     slice.copyTo(mSliceMatrix(dest_rows, dest_cols));
     frame(dest_rows, dest_cols) = cv::Scalar(0);
+
+    double local_min, local_max;
+    cv::minMaxLoc(slice, &local_min, &local_max);
+    max = std::max(local_max, max);
+    min = std::min(local_min, min);
   }
 #else
   // for each tile, copy content to right place
@@ -251,9 +259,8 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       }
     }
   }
-#endif // OpenCV version
-  double min, max;
   cv::minMaxLoc(mSliceMatrix, &min, &max);
+#endif // OpenCV version
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
 
@@ -321,10 +328,9 @@ void cedar::aux::gui::MatrixSlicePlot3D::updateData()
     this->mpImageDisplay->setText("Matrix is empty.");
     return;
   }
-  int type = mat.type();
   cv::Mat cloned_mat = mat.clone();
   locker.unlock();
-  switch(type)
+  switch(cloned_mat.type())
   {
 //  case CV_8UC1:
     case CV_32FC1:
@@ -335,7 +341,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::updateData()
     }
 
     default:
-      QString text = QString("Unhandled matrix type %1.").arg(mat.type());
+      QString text = QString("Unhandled matrix type %1.").arg(cloned_mat.type());
       this->mpImageDisplay->setText(text);
       return;
   }
