@@ -123,6 +123,12 @@ mAutoLockInputsAndOutputs(true)
   this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
 }
 
+cedar::proc::Step::~Step()
+{
+  this->mFinishedCaller->stop();
+  this->mFinishedCaller->wait();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -400,7 +406,20 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     // trigger subsequent steps in a non-blocking manner
     if (!this->mFinishedCaller->isRunning())
     {
-      this->mFinishedCaller->start();
+      try
+      {
+        this->mFinishedCaller->start();
+      }
+      catch (const cedar::aux::ThreadingErrorException& e)
+      {
+        //!@todo Sometimes, the thread wrapper throws an exception. I'm not sure why ...
+        cedar::aux::LogSingleton::getInstance()->debugMessage
+        (
+          "A threading exception occurred while triggering the successors of step \"" + this->getName() + "\". The "
+          "exception was: " + e.exceptionInfo(),
+          "cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::Trigger)"
+        );
+      }
     }
   }
 }
