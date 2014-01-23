@@ -480,22 +480,26 @@ void cedar::proc::Connectable::checkMandatoryConnections()
   this->mMandatoryConnectionsAreSet = true;
   mMissingMandatoryConnections.clear();
   // then test every input. If one is false, return that.
-  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mSlotMaps.begin();
-       slot != this->mSlotMaps.end();
-       ++slot)
+//  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mSlotMaps.begin();
+//       slot != this->mSlotMaps.end();
+//       ++slot)
+  for (const auto& role_slot_map_pair : this->mSlotMaps)
   {
-    for (SlotMap::iterator iter = slot->second.begin();
-        iter != slot->second.end();
-         ++iter)
+//    for (SlotMap::iterator iter = slot->second.begin();
+//        iter != slot->second.end();
+//         ++iter)
+    for (const auto& name_slot_pair : role_slot_map_pair.second)
     {
-      if (iter->second->isMandatory() && !iter->second->getData())
+      const auto& slot = name_slot_pair.second;
+      const auto& role = name_slot_pair.first;
+      if (slot->isMandatory() && !slot->getData())
       {
         this->mMandatoryConnectionsAreSet = false;
         mMissingMandatoryConnections.push_back(
                                                 "slot type: "
-                                                + cedar::proc::DataRole::type().get(slot->first).name()
+                                                + cedar::proc::DataRole::type().get(role).name()
                                                 + " name: "
-                                                + iter->second->getName()
+                                                + slot->getName()
                                               );
       }
     }
@@ -853,7 +857,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 " name \"" + name + "\" does not exist.");
   }
-  locker.unlock();
+//  locker.unlock();
 
   this->checkMandatoryConnections();
 }

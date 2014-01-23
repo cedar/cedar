@@ -404,22 +404,34 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
 //    this->getFinishedTrigger()->trigger();
     // trigger subsequent steps in a non-blocking manner
-    if (!this->mFinishedCaller->isRunning())
+    if (this->isLooped())
     {
-      try
+      if (!this->mFinishedCaller->isRunning())
       {
-        this->mFinishedCaller->start();
+        try
+        {
+          this->mFinishedCaller->start();
+        }
+        catch (const cedar::aux::ThreadingErrorException& e)
+        {
+          //!@todo Sometimes, the thread wrapper throws an exception. I'm not sure why ...
+          static bool warned_about_threading_error = false;
+          if (!warned_about_threading_error)
+          {
+            warned_about_threading_error = true;
+            cedar::aux::LogSingleton::getInstance()->debugMessage
+            (
+              "A threading exception occurred while triggering the successors of step \"" + this->getName() + "\". The "
+              "exception was: " + e.exceptionInfo() + ". Will not warn about this again.",
+              "cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::Trigger)"
+            );
+          }
+        }
       }
-      catch (const cedar::aux::ThreadingErrorException& e)
-      {
-        //!@todo Sometimes, the thread wrapper throws an exception. I'm not sure why ...
-        cedar::aux::LogSingleton::getInstance()->debugMessage
-        (
-          "A threading exception occurred while triggering the successors of step \"" + this->getName() + "\". The "
-          "exception was: " + e.exceptionInfo(),
-          "cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::Trigger)"
-        );
-      }
+    }
+    else
+    {
+      this->getFinishedTrigger()->trigger();
     }
   }
 }
@@ -592,5 +604,6 @@ void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   this->inputConnectionChanged(slot);
+
   this->getInputValidity(slot);
 }

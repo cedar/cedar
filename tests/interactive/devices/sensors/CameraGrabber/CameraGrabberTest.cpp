@@ -377,7 +377,7 @@ int main(int argc, char* argv[])
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  if (p_grabber->isRunning())
+  if (p_grabber->isRunningNolocking())
   {
     p_grabber->stop();
   }

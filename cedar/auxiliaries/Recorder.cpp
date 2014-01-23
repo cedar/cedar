@@ -95,7 +95,7 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, ced
   mDataSpectatorCollection.addThread(spec);
 
   // If Recorder is already running, also start the new DataSpectator
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     spec->start();
   }
@@ -105,7 +105,7 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, ced
 void cedar::aux::Recorder::unregisterData(const std::string& name)
 {
   //throw exception if running
-  if (isRunning())
+  if (isRunningNolocking())
   {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption, "Cannot unregister data while Recorder is running");
   }
@@ -178,7 +178,7 @@ void cedar::aux::Recorder::processStop(bool /*suppressWarning*/)
 void cedar::aux::Recorder::clear()
 {
   //throw exception if running
-  if (isRunning())
+  if (isRunningNolocking())
   {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
   }
@@ -192,7 +192,7 @@ void cedar::aux::Recorder::clear()
 void cedar::aux::Recorder::setRecordedProjectName(const std::string& name)
 {
   //throw exception if running
-  if (isRunning())
+  if (isRunningNolocking())
   {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change output directory while recorder is running");
   }
@@ -208,7 +208,7 @@ const std::string& cedar::aux::Recorder::getOutputDirectory() const
 void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, cedar::unit::Time recordInterval)
 {
   //throw exception if running
-  if (isRunning())
+  if (isRunningNolocking())
   {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change record inerval while recorder is running");
   }
@@ -282,7 +282,7 @@ bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data) const
 void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName)
 {
   //throw exception if running
-  if(isRunning())
+  if(isRunningNolocking())
   {
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot rename data while recorder is running");
   }

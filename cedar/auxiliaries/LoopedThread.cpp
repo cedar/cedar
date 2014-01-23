@@ -142,7 +142,7 @@ void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
 
 void cedar::aux::LoopedThread::singleStep()
 {
-  if (!this->isRunning()) // use thread-safe variant  
+  if (!this->isRunningNolocking()) //!@todo use thread-safe variant
   {
     switch (_mLoopMode->getValue())
     {
