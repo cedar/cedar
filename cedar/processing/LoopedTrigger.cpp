@@ -133,7 +133,7 @@ void cedar::proc::LoopedTrigger::onNameChanged()
 void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr triggerable)
 {
   this->cedar::proc::Trigger::removeListener(triggerable);
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     triggerable->callOnStop();
   }
@@ -142,7 +142,7 @@ void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr trig
 void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr triggerable)
 {
   this->cedar::proc::Trigger::addListener(triggerable);
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     triggerable->callOnStart();
   }

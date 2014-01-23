@@ -145,12 +145,14 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
   if (validWorker())
   {
     delete mpWorker;
+    this->mpWorker = NULL;
   }
 
   // free thread data
   if (isValidThread())
   {
     delete mpThread;
+    this->mpThread = NULL;
   }
 }
 
@@ -160,9 +162,14 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 
 bool cedar::aux::ThreadWrapper::isRunning() const
 {
-  // no locks, because they really slow things down, here ...
-  //!@todo: can I have a lockless-version that only is called from mpThread?
+  QMutexLocker locker(&mGeneralAccessLock);
+  bool running = this->isRunningNolocking();
+  return running;
+}
 
+bool cedar::aux::ThreadWrapper::isRunningNolocking() const
+{
+  // no locks, because they really slow things down, here ...
   if (mpThread == NULL)
     return false;
 
@@ -207,7 +214,7 @@ void cedar::aux::ThreadWrapper::start()
 
   CEDAR_ASSERT(validWorker() == isValidThread());
 
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
@@ -371,7 +378,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
  
   // cant wait for mFinishedThreadMutex here, because that will dead-lock
 
-  if (isRunning())
+  if (this->isRunningNolocking())
   {
     mStopSignal(suppressWarning);
       // intentionally called while the thread may still be running. 
@@ -392,7 +399,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
     }
   }
 
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     if (QThread::currentThread() != mpThread)
     {

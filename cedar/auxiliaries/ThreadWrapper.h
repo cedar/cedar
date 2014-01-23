@@ -131,9 +131,6 @@ public:
    */
   void start();
 
-  //! is the thread still running?
-  bool isRunning() const; 
-
   /*!Tell the thread to abort as soon as possible
    *
    * This method does not block as it only registers the stop request.
@@ -193,6 +190,12 @@ public:
    */
   boost::signals2::connection connectToStartSignal(boost::function<void ()> slot);
 
+  //! is the thread still running? (This method IS thread safe.)
+  bool isRunning() const;
+
+  //! is the thread still running? (This method is NOT thread safe.)
+  bool isRunningNolocking() const;
+
 public slots:
   //! slot called when thread finishes. context: the new thread
   void quittedThreadSlot(); 
@@ -205,6 +208,11 @@ signals:
   //! signal is emitted when the worker normally finished its work.
   void finishedThread();
 
+  //----------------------------------------------------------------------------
+  // protected methods
+  //----------------------------------------------------------------------------
+protected:
+  // none yet
 
   //----------------------------------------------------------------------------
   // private methods

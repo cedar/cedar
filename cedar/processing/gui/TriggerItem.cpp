@@ -274,7 +274,7 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     menu.addSeparator();
     p_scene->networkGroupingContextMenuEvent(menu);
 
-    if (looped_trigger->isRunning())
+    if (looped_trigger->isRunningNolocking())
     {
       p_start->setEnabled(false);
       p_single->setEnabled(false);

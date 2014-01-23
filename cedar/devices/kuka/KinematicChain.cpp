@@ -173,7 +173,7 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
  */
 void cedar::dev::kuka::KinematicChain::start()
 {
-  if (isRunning())
+  if (isRunningNolocking())
   {
     return;
   }
