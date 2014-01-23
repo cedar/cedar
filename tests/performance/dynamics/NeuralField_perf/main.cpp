@@ -40,6 +40,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/testingUtilities/measurementFunctions.h"
 
 // SYSTEM INCLUDES
@@ -74,11 +75,17 @@ void measure(unsigned int dim, unsigned int repetitions)
     boost::bind(&cedar::proc::Step::onTrigger, field, cedar::proc::StepTimePtr(new cedar::proc::StepTime(0.001 * cedar::unit::seconds)), cedar::proc::TriggerPtr()),
     repetitions
   );
+
+  QApplication::exit(0); // no errors -- this is a performance test.
 }
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
+  QApplication app(argc, argv);
+
+  cedar::aux::CallFunctionInThread caller(boost::bind(&measure, 3, 100));
+  caller.start();
 //  measure(2, 20000);
-  measure(3, 100);
-  return 0; // no errors -- this is a performance test.
+//  measure(3, 100);
+  return app.exec();
 }

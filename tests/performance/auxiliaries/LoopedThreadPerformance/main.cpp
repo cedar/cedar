@@ -86,7 +86,7 @@ private:
     auto start = microsec_clock::local_time();
     cedar::unit::Time duration(0.0 * cedar::unit::seconds);
 
-    while(duration < work_time && isRunning())
+    while(duration < work_time && this->isRunningNolocking())
     {
       // do nothing
 
