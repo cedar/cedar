@@ -157,6 +157,7 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
   );
 
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
+  this->propertiesChanged();
 }
 
 void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)
@@ -168,4 +169,17 @@ void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)
     QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
     parameter->setValue(value.toStdString(), true);
   }
+}
+
+void cedar::aux::gui::EnumParameter::propertiesChanged()
+{
+  cedar::aux::ParameterPtr parameter = this->getParameter();
+
+  bool blocked = this->mpEdit->blockSignals(true);
+
+  parameter->lockForRead();
+  this->mpEdit->setDisabled(parameter->isConstant());
+  parameter->unlock();
+
+  this->mpEdit->blockSignals(blocked);
 }
