@@ -103,7 +103,7 @@ _mLoopMode
   this->modeChanged();
 
   //this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::prepareStart, this));
-  this->connectToStopSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this, _1));
+  this->connectToQuitSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this ));
 }
 
 cedar::aux::LoopedThread::~LoopedThread()
@@ -114,9 +114,10 @@ cedar::aux::LoopedThread::~LoopedThread()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
+void cedar::aux::LoopedThread::stopStatistics()
 {
   // is intentionally thread un-safe
+  bool suppressWarning = false; // @todo: write a set function for this
 
   unsigned long numberOfSteps = mpWorker->getNumberOfSteps();
 
@@ -167,9 +168,9 @@ void cedar::aux::LoopedThread::singleStep()
   }
 }
 
-void cedar::aux::LoopedThread::processStop(bool suppressWarning)
+void cedar::aux::LoopedThread::processStop()
 {
-  stopStatistics(suppressWarning);
+  stopStatistics();
 }
 
 void cedar::aux::LoopedThread::setStepSize(cedar::unit::Time stepSize)
