@@ -325,24 +325,9 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
   {
     // if my own stop() is not running, then delete the pointers:
     // (this is a fall-back, if the thread was destroyed by any other means)
-   if(1) // if (mGeneralAccessLock.tryLock())
-    {
-      //std::cout << "deleting thread: " << mpThread << " ( current thread: " << QThread::currentThread() << ") in: " << this << std::endl;
-
-     thread_worker_readlock.unlock();
-      scheduleThreadDeletion();
-      thread_worker_readlock.relock();
-
-      //mGeneralAccessLock.unlock();
-    }
-    else
-    {
-      cedar::aux::LogSingleton::getInstance()->debugMessage
-      (
-        "Thread not deleted in quittedThreadSlot().",
-        "cedar::aux::ThreadWrapper::quittedThreadSlot()"
-      );
-    }
+    thread_worker_readlock.unlock();
+    scheduleThreadDeletion();
+    thread_worker_readlock.relock();
   }
   else
   {
