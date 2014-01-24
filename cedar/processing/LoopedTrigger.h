@@ -146,7 +146,7 @@ private:
   void prepareStart();
 
   //! Called when the trigger is started.
-  void processStop(bool);
+  void processQuit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

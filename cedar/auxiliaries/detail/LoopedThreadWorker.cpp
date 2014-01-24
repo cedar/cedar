@@ -268,9 +268,11 @@ void cedar::aux::detail::LoopedThreadWorker::updateStatistics(double stepsTaken)
       "cedar::aux::LoopedThread::updateStatistics(double)"
     );
 
+    //!@todo: unlock locker1 before going in here!
     initStatistics();
     return;
   }
+
 }
 
 boost::posix_time::ptime cedar::aux::detail::LoopedThreadWorker::getLastTimeStepStart() const

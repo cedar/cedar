@@ -104,7 +104,7 @@ mStarted(false)
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
   this->connectToStartSignal(boost::bind(&cedar::proc::LoopedTrigger::prepareStart, this));
-  this->connectToStopSignal(boost::bind(&cedar::proc::LoopedTrigger::processStop, this, _1));
+  this->connectToQuitSignal(boost::bind(&cedar::proc::LoopedTrigger::processQuit, this ));
 }
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
@@ -171,7 +171,7 @@ void cedar::proc::LoopedTrigger::prepareStart()
   emit triggerStarted();
 }
 
-void cedar::proc::LoopedTrigger::processStop(bool)
+void cedar::proc::LoopedTrigger::processQuit()
 {
   QMutexLocker locker(&mStartedMutex);
   if (!this->mStarted)

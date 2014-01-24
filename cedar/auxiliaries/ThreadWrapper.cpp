@@ -321,6 +321,8 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
   if (mDestructing) // always test after locking, see start()
     return;
 
+  mQuitSignal();
+
   if (isValidThread())
   {
     // if my own stop() is not running, then delete the pointers:
@@ -374,7 +376,7 @@ bool cedar::aux::ThreadWrapper::isValidThread() const
 }
 
 
-void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
+void cedar::aux::ThreadWrapper::stop(unsigned int time, bool /*suppressWarning*/ )
 {
   if (mDestructing) // quick abort, see below
     return;
@@ -395,7 +397,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
   QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
   if (this->isRunningNolocking())
   {
-    mStopSignal(suppressWarning);
+    mStopSignal();
       // intentionally called while the thread may still be running. 
       // we need to guarantee that the worker class hasn't been destroyed, yet.
       // This is only possible here or in quittedThreadSlot(). 
@@ -469,9 +471,14 @@ bool cedar::aux::ThreadWrapper::stopRequested()
   return value;
 }
 
-boost::signals2::connection cedar::aux::ThreadWrapper::connectToStopSignal(boost::function<void (bool)> slot)
+boost::signals2::connection cedar::aux::ThreadWrapper::connectToStopSignal(boost::function<void ()> slot)
 {
   return mStopSignal.connect(slot);
+}
+
+boost::signals2::connection cedar::aux::ThreadWrapper::connectToQuitSignal(boost::function<void ()> slot)
+{
+  return mQuitSignal.connect(slot);
 }
 
 boost::signals2::connection cedar::aux::ThreadWrapper::connectToStartSignal(boost::function<void ()> slot)
