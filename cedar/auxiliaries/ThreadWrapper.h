@@ -272,6 +272,9 @@ private:
   //! lock pointer ops
   mutable QMutex mThreadPointerDeletionMutex;
 
+  //! Lock for mpThread and mpWorker
+  mutable QReadWriteLock mThreadAndWorkerLock;
+
 
   //!@brief stop is requested
   bool mStopRequested; 
