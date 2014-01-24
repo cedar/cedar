@@ -308,6 +308,8 @@ void cedar::proc::steps::Projection::reconfigure()
     this->_mOutputDimensionSizes->set(output_dim, this->mInput->getData().size[input_dim]);
     this->_mOutputDimensionSizes->setConstantAt(output_dim, true);
   }
+  // now do a final step and try to calculate an output with the new configuration
+  this->onTrigger(cedar::proc::ArgumentsPtr(new cedar::proc::Arguments()));
 }
 
 void cedar::proc::steps::Projection::initializeOutputMatrix()
