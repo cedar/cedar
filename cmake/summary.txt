@@ -172,6 +172,14 @@ cedar_summary_h2("Installation prefix")
 
 message("  ${CMAKE_INSTALL_PREFIX}")
 
+cedar_summary_h2("Issues (check these if you have problems compiling cedar)")
+
+if ("${CEDAR_ISSUES}" STREQUAL "")
+  message("  none")
+else ("${CEDAR_ISSUES}" STREQUAL "")
+  message("  ${CEDAR_ISSUES}")
+endif ("${CEDAR_ISSUES}" STREQUAL "")
+
 message("")
 fill_line("=")
 message("")
