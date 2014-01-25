@@ -61,10 +61,8 @@
 cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(QWidget* pParent)
 :
 cedar::aux::gui::QImagePlot(pParent),
-mTimerId(0),
 mDataIsSet(false),
-mDesiredColumns(0),
-mConverting(false)
+mDesiredColumns(0)
 {
   this->init();
 }
@@ -77,24 +75,11 @@ cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D
 )
 :
 cedar::aux::gui::QImagePlot(pParent),
-mTimerId(0),
 mDataIsSet(false),
-mDesiredColumns(0),
-mConverting(false)
+mDesiredColumns(0)
 {
   this->init();
   this->plot(matData, title);
-}
-
-cedar::aux::gui::MatrixSlicePlot3D::~MatrixSlicePlot3D()
-{
-  if (this->mpWorkerThread)
-  {
-    this->mpWorkerThread->quit();
-    this->mpWorkerThread->wait();
-    delete this->mpWorkerThread;
-    this->mpWorkerThread = NULL;
-  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,31 +92,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
   this->setLayout(p_layout);
   this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-  mpImageDisplay = new QLabel("no image loaded");
-  p_layout->addWidget(mpImageDisplay);
-  mpImageDisplay->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  mpImageDisplay->setWordWrap(true);
   this->setFocusPolicy(Qt::StrongFocus);
   this->setToolTip(QString("Use + and - to alter number of columns."));
-
-  this->mpWorkerThread = new QThread();
-  mWorker = cedar::aux::gui::detail::MatrixSlicePlot3DWorkerPtr
-            (
-              new cedar::aux::gui::detail::MatrixSlicePlot3DWorker(this)
-            );
-  mWorker->moveToThread(this->mpWorkerThread);
-
-  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
-  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
-
-  this->mpWorkerThread->start(QThread::LowPriority);
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
-  if (mTimerId != 0)
-    this->killTimer(mTimerId);
-
+  this->stop();
 
   this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
@@ -147,25 +114,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, con
   }
   mDataIsSet = true;
 
-  mpImageDisplay->setText("slice plot");
+  this->setInfo("slice plot");
 
   if (!this->mData->getData().empty())
   {
-    mpImageDisplay->setText("");
-    this->mTimerId = this->startTimer(70);
-    CEDAR_DEBUG_ASSERT(mTimerId != 0);
+    this->setInfo("");
+    this->start();
   }
-}
-
-void cedar::aux::gui::MatrixSlicePlot3D::timerEvent(QTimerEvent* /*pEvent*/)
-{
-  if (!this->isVisible() || !mDataIsSet || mConverting)
-  {
-    return;
-  }
-
-  mConverting = true;
-  emit convert();
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
@@ -271,31 +226,25 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   this->displayMatrix(mSliceMatrixByteC3);
 }
 
-//!@cond SKIPPED_DOCUMENTATION
-void cedar::aux::gui::detail::MatrixSlicePlot3DWorker::convert()
+bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
 {
-  // convert
-  this->mpPlot->updateData();
+  if (!mDataIsSet)
+  {
+    return false;
+  }
 
-  emit done();
-}
-//!@endcond
-
-void cedar::aux::gui::MatrixSlicePlot3D::updateData()
-{
-  //!@todo Wouldn't it make sense to copy (clone) the matrix here to keep it locked as short as possible?
   QReadLocker locker(&this->mData->getLock());
   if (this->mData->getDimensionality() != 3) // plot is no longer capable of displaying the data
   {
     emit dataChanged();
-    return;
+    return false;
   }
 
   const cv::Mat& mat = this->mData->getData();
   if (mat.empty())
   {
-    this->mpImageDisplay->setText("Matrix is empty.");
-    return;
+    this->setInfo("Matrix is empty.");
+    return false;
   }
   cv::Mat cloned_mat = mat.clone();
   locker.unlock();
@@ -311,17 +260,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::updateData()
 
     default:
       QString text = QString("Unhandled matrix type %1.").arg(cloned_mat.type());
-      this->mpImageDisplay->setText(text);
-      return;
+      this->setInfo(text.toStdString());
+      return false;
   }
+
+  return true;
 }
 
-void cedar::aux::gui::MatrixSlicePlot3D::conversionDone()
-{
-  this->updateImage();
-
-  mConverting = false;
-}
 void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
 {
   switch (pEvent->key())

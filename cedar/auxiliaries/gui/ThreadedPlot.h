@@ -22,37 +22,33 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        QImagePlot.h
+    File:        ThreadedPlot.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 01 24
+    Date:        2014 01 25
 
-    Description: Header file for the class cedar::aux::gui::QImagePlot.
+    Description: Header file for the class cedar::aux::gui::ThreadedPlot.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_QIMAGE_PLOT_H
-#define CEDAR_AUX_GUI_QIMAGE_PLOT_H
+#ifndef CEDAR_AUX_GUI_THREADED_PLOT_H
+#define CEDAR_AUX_GUI_THREADED_PLOT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
-#include "cedar/auxiliaries/gui/ThreadedPlot.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
+#include "cedar/auxiliaries/gui/ThreadedPlot.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QMenu>
-#include <QLabel>
-#include <QLinearGradient>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
+#include <QObject>
+#include <QThread>
 
 
 namespace cedar
@@ -64,136 +60,129 @@ namespace cedar
       namespace detail
       {
         //!@cond SKIPPED_DOCUMENTATION
-        /* This is an internal class of QImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
+        /* This is an internal class of ThreadedPlot that cannot be nested because Qt's moc doesn't support nested classes.
         *
-        * Don't use it outside of the QImagePlot!
+        * Don't use it outside of the ThreadedPlot!
         */
-        /*! Class for displaying a legend for the image plot worker.
-        */
-        class QImagePlotLegend : public QWidget
+        class ThreadedPlotWorker : public QObject
         {
           Q_OBJECT
 
         public:
-          QImagePlotLegend();
+          ThreadedPlotWorker(cedar::aux::gui::ThreadedPlot* pPlot)
+          :
+          mpPlot(pPlot)
+          {
+          }
 
-          public slots:
-          //! Updates the minimum and maximum value displayed by the legend.
-          void updateMinMax(double min, double max);
+          public slots :
+            void convert();
 
-        private:
-          QLabel* mpMin;
-          QLabel* mpMax;
+        signals:
+          void conversionDone();
 
-          QLinearGradient mGradient;
+          void conversionFailed();
+
+          void minMaxChanged(double min, double max);
+
+        public:
+          cedar::aux::gui::ThreadedPlot *mpPlot;
         };
+        CEDAR_GENERATE_POINTER_TYPES(ThreadedPlotWorker);
+        //!@endcond
       } // namespace detail
     }
   }
 }
 
-/*!@brief A base class for plots that use QImages as a displaying device.
+/*!@brief A base class for plots that convert data in a separate thread.
+ *
+ * @todo The inheritance order of PlotInterface/ThreadedPlot might have to be turned around, as it might otherwise be impossible to use this class with MultiPlotInterface.
  */
-class cedar::aux::gui::QImagePlot : public cedar::aux::gui::ThreadedPlot
+class cedar::aux::gui::ThreadedPlot : public cedar::aux::gui::PlotInterface
 {
   Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::gui::detail::ThreadedPlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  class ImageDisplay;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  QImagePlot(QWidget* pParent = NULL);
+  ThreadedPlot(QWidget* pParent = NULL);
+
+  //! Destructor.
+  ~ThreadedPlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-  /*! Fills the gradient used for colorization into a QGradient
-  */
-  static void fillColorizationGradient(QGradient& gradient);
+  // none yet
 
-public slots:
-  /*!@brief Set the scaling mode of the plot.
-  */
-  void setSmoothScaling(bool smooth);
+signals :
+  void convert();
 
-  //! Toggles the visibility of the legend.
-  void showLegend(bool show);
+  void conversionFailedSignal();
 
-signals:
-  void minMaxChanged(double min, double max);
+  void conversionDoneSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-  */
-  void resizeEvent(QResizeEvent *event);
+  void startConversion();
 
-  //!@brief create and handle the context menu
-  void contextMenuEvent(QContextMenuEvent *pEvent);
+  void timerEvent(QTimerEvent* /* pEvent */);
 
-  //! Prints a message instead of plotting the image.
-  void setInfo(const std::string& text);
+  void start();
 
-  void updatePlot();
-
-  /*! Set the matrix to be displayed.
-   *  @remarks This only has effect after updateImage() is called from the GUI threat.
-   */
-  void displayMatrix(const cv::Mat& matrix);
-
-  void setLegendAvailable(bool available)
-  {
-    this->mLegendAvailable = available;
-  }
-
-protected slots:
-  void updateMinMax(double min, double max);
+  void stop();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Resizes the pixmap used to display the image data.
-  */
-  void resizePixmap();
+  /*! Method in which child classes should do their conversions. Called outside the GUI thread.
+   *
+   * @return True, if the conversion was successful, false otherwise.
+   */
+  virtual bool doConversion() = 0;
 
-  virtual void fillContextMenu(QMenu& menu);
+  /*! Called in the GUI thread when the conversion is done. Child classes should update their display in this function.
+   *
+   */
+  virtual void updatePlot() = 0;
 
-  virtual void plotClicked(QMouseEvent* pEvent, int imageX, int imageY);
-  
+private slots:
+  void conversionDone();
+
+  void conversionFailed();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Label used for displaying the image.
-  ImageDisplay* mpImageDisplay;
-
+  // none yet
 private:
-  //! Converted image.
-  QImage mImage;
+  //! Thread in which conversion of mat data to qwt triple is done.
+  QThread* mpWorkerThread;
 
-  //! Lock for mImage.
-  QReadWriteLock mImageLock;
+  //! Worker object.
+  cedar::aux::gui::detail::ThreadedPlotWorkerPtr mWorker;
 
-  //! Whether the matrix should be smoothed during scaling.
-  bool mSmoothScaling;
+  //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
+  bool mConverting;
 
-  //! Whether or not a legend is available
-  bool mLegendAvailable;
-
-  //! Legend (if any).
-  cedar::aux::gui::detail::QImagePlotLegend* mpLegend;
+  //! Id of the timer used for updating the plot.
+  int mTimerId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -204,7 +193,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::gui::QImagePlot
+}; // class cedar::aux::gui::ThreadedPlot
 
-#endif // CEDAR_AUX_GUI_QIMAGE_PLOT_H
+#endif // CEDAR_AUX_GUI_THREADED_PLOT_H
 

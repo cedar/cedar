@@ -52,48 +52,6 @@
 #include <vector>
 
 
-namespace cedar
-{
-  namespace aux
-  {
-    namespace gui
-    {
-      namespace detail
-      {
-        //!@cond SKIPPED_DOCUMENTATION
-        /* This is an internal class of ImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
-         *
-         * Don't use it outside of the ImagePlot!
-         */
-        class ImagePlotWorker : public QObject
-        {
-          Q_OBJECT
-
-          public:
-            ImagePlotWorker(cedar::aux::gui::ImagePlot* pPlot)
-            :
-            mpPlot(pPlot)
-            {
-            }
-
-          public slots:
-            void convert();
-
-          signals:
-            void done();
-            void failed();
-            void minMaxChanged(double min, double max);
-
-          public:
-            cedar::aux::gui::ImagePlot *mpPlot;
-        };
-        CEDAR_GENERATE_POINTER_TYPES(ImagePlotWorker);
-        //!@endcond
-      } // namespace detail
-    }
-  }
-}
-
 /*!@brief A plot for images.
  */
 class cedar::aux::gui::ImagePlot : public cedar::aux::gui::QImagePlot
@@ -102,11 +60,6 @@ class cedar::aux::gui::ImagePlot : public cedar::aux::gui::QImagePlot
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::gui::detail::ImagePlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -130,9 +83,6 @@ public:
   //!@brief Constructor that plots some data.
   ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
-  //!@brief Destructor.
-  ~ImagePlot();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -144,10 +94,6 @@ public:
    * @param title title of the plot window
    */
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
-  /*!@brief Updates the plot periodically.
-   */
-  void timerEvent(QTimerEvent *pEvent);
 
   /*! Sets fixed limits for the plot values.
    */
@@ -165,10 +111,6 @@ public:
 public slots:
   //! Enables automatic scaling.
   void setAutomaticScaling();
-
-signals:
-  //!@brief Signals the worker thread to convert the data to the plot's internal format.
-  void convert();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -190,11 +132,9 @@ private:
   
   void construct();
 
+  bool doConversion();
+
 private slots:
-  void conversionDone();
-
-  void conversionFailed();
-
   void queryFixedValueScale();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -209,20 +149,8 @@ private:
   //! The color space annotation of the data (if present).
   cedar::aux::annotation::ConstColorSpacePtr mDataColorSpace;
 
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
-
   //! Type of the data.
   DataType mDataType;
-
-  //! Thread in which conversion of mat data to qwt triple is done.
-  QThread* mpWorkerThread;
-
-  //! Worker object.
-  cedar::aux::gui::detail::ImagePlotWorkerPtr mWorker;
-
-  //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
-  bool mConverting;
 
   //! Whether scaling of plots is determined automatically or fixed.
   bool mAutoScaling;
