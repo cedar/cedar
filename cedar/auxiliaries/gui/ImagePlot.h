@@ -38,7 +38,7 @@
 #define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/QImagePlot.h"
 #include "cedar/auxiliaries/math/Limits.h"
 
 // FORWARD DECLARATIONS
@@ -48,9 +48,7 @@
 #include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
 #include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
 #include <vector>
 
 
@@ -91,27 +89,6 @@ namespace cedar
         };
         CEDAR_GENERATE_POINTER_TYPES(ImagePlotWorker);
         //!@endcond
-
-
-        /*! Class for displaying a legend for the image plot worker.
-         */
-        class ImagePlotLegend : public QWidget
-        {
-          Q_OBJECT
-
-        public:
-          ImagePlotLegend();
-
-        public slots:
-          //! Updates the minimum and maximum value displayed by the legend.
-          void updateMinMax(double min, double max);
-
-        private:
-          QLabel* mpMin;
-          QLabel* mpMax;
-
-          QLinearGradient mGradient;
-        };
       } // namespace detail
     }
   }
@@ -119,7 +96,7 @@ namespace cedar
 
 /*!@brief A plot for images.
  */
-class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::ImagePlot : public cedar::aux::gui::QImagePlot
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -141,21 +118,6 @@ private:
     DATA_TYPE_IMAGE,
     DATA_TYPE_MAT,
     DATA_TYPE_UNKNOWN
-  };
-
-  //! Widget used for displaying the image.
-  class ImageDisplay : public QLabel
-  {
-    public:
-      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
-
-    protected:
-      void mousePressEvent(QMouseEvent * pEvent);
-
-    public:
-      cedar::aux::ConstMatDataPtr mData;
-
-      cedar::aux::gui::ImagePlot* mpPlot;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -200,20 +162,9 @@ public:
    */
   static cv::Mat colorizedMatrix(cv::Mat matrix, bool limits = false, double min = 0.0, double max = 0.0);
 
-  /*! Fills the gradient used for colorization into a QGradient
-   */
-  static void fillColorizationGradient(QGradient& gradient);
-
 public slots:
-  //! Toggles the visibility of the legend.
-  void showLegend(bool show);
-
   //! Enables automatic scaling.
   void setAutomaticScaling();
-
-  /*!@brief Set the scaling mode of the plot.
-   */
-  void setSmoothScaling(bool smooth);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -223,30 +174,20 @@ signals:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
-
   //!@brief create and handle the context menu
-  void contextMenuEvent(QContextMenuEvent *pEvent);
+  void fillContextMenu(QMenu& menu);
+
+  void plotClicked(QMouseEvent* pEvent, int imageX, int imageY);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
-
   /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
    *        channels.
    */
   cv::Mat threeChannelGrayscale(const cv::Mat& in) const;
-
-  /*!@brief Creates the image based on the matrix.
-   */
-  void imageFromMat(const cv::Mat& mat);
-
+  
   void construct();
 
 private slots:
@@ -262,20 +203,11 @@ private slots:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  cedar::aux::gui::ImagePlot::ImageDisplay *mpImageDisplay;
-
   //! Data displayed by the plot.
   cedar::aux::ConstMatDataPtr mData;
 
   //! The color space annotation of the data (if present).
   cedar::aux::annotation::ConstColorSpacePtr mDataColorSpace;
-
-  //! Converted image.
-  QImage mImage;
-
-  //! Lock for mImage.
-  QReadWriteLock mImageLock;
 
   //! Id of the timer used for updating the plot.
   int mTimerId;
@@ -292,17 +224,11 @@ private:
   //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
   bool mConverting;
 
-  //! Whether the matrix should be smoothed during scaling.
-  bool mSmoothScaling;
-
   //! Whether scaling of plots is determined automatically or fixed.
   bool mAutoScaling;
 
   //! Limits for fixed scaling.
   cedar::aux::math::Limits<double> mValueLimits;
-
-  //! Legend (if any).
-  cedar::aux::gui::detail::ImagePlotLegend* mpLegend;
 
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;

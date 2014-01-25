@@ -60,7 +60,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(QWidget* pParent)
 :
-cedar::aux::gui::PlotInterface(pParent),
+cedar::aux::gui::QImagePlot(pParent),
 mTimerId(0),
 mDataIsSet(false),
 mDesiredColumns(0),
@@ -76,7 +76,7 @@ cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D
   QWidget* pParent
 )
 :
-cedar::aux::gui::PlotInterface(pParent),
+cedar::aux::gui::QImagePlot(pParent),
 mTimerId(0),
 mDataIsSet(false),
 mDesiredColumns(0),
@@ -268,38 +268,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 
   mSliceMatrixByteC3.setTo(0xFFFFFF, frame);
 
-  QWriteLocker lock(&this->mImageLock);
-  this->mImage = QImage
-  (
-    mSliceMatrixByteC3.data,
-    mSliceMatrixByteC3.cols,
-    mSliceMatrixByteC3.rows,
-    mSliceMatrixByteC3.step,
-    QImage::Format_RGB888
-  ).rgbSwapped();
-}
-
-void cedar::aux::gui::MatrixSlicePlot3D::resizeEvent(QResizeEvent* /*pEvent*/)
-{
-  this->resizePixmap();
-}
-
-void cedar::aux::gui::MatrixSlicePlot3D::resizePixmap()
-{
-  QReadLocker lock(&this->mImageLock);
-  QSize scaled_size = this->mImage.size();
-  scaled_size.scale(this->mpImageDisplay->size(), Qt::KeepAspectRatio);
-  if ( (!this->mpImageDisplay->pixmap()
-        || scaled_size != this->mpImageDisplay->pixmap()->size()
-        )
-        && !this->mImage.isNull()
-      )
-  {
-    QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(),
-                                              Qt::KeepAspectRatio,
-                                              Qt::SmoothTransformation);
-    this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
-  }
+  this->displayMatrix(mSliceMatrixByteC3);
 }
 
 //!@cond SKIPPED_DOCUMENTATION
@@ -349,11 +318,8 @@ void cedar::aux::gui::MatrixSlicePlot3D::updateData()
 
 void cedar::aux::gui::MatrixSlicePlot3D::conversionDone()
 {
-  QReadLocker lock(&this->mImageLock);
-  this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
-  lock.unlock();
+  this->updateImage();
 
-  this->resizePixmap();
   mConverting = false;
 }
 void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)

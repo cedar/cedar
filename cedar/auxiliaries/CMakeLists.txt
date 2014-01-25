@@ -100,6 +100,7 @@ cedar_add_library(cedaraux
   gui/VelocityParameter.h
   gui/ResourceDialog.h
   gui/PlotInterface.h
+  gui/QImagePlot.h
   gui/HistoryPlot.h
   gui/MatrixPlot.h
   gui/MatrixSlicePlot3D.h
