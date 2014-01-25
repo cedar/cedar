@@ -112,45 +112,14 @@ cedar::aux::gui::QImagePlot(pParent)
   this->plot(matData, title);
 }
 
-cedar::aux::gui::ImagePlot::~ImagePlot()
-{
-  if (this->mpWorkerThread)
-  {
-    this->mpWorkerThread->quit();
-    this->mpWorkerThread->wait();
-    delete this->mpWorkerThread;
-    this->mpWorkerThread = NULL;
-  }
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 void cedar::aux::gui::ImagePlot::construct()
 {
-  this->mTimerId = 0;
   this->mDataType = DATA_TYPE_UNKNOWN;
-  this->mConverting = false;
   this->mAutoScaling = true;
-
-  this->mpWorkerThread = new QThread();
-  mWorker = cedar::aux::gui::detail::ImagePlotWorkerPtr(new cedar::aux::gui::detail::ImagePlotWorker(this));
-  mWorker->moveToThread(this->mpWorkerThread);
-
-  QObject::connect
-  (
-    this->mWorker.get(),
-    SIGNAL(minMaxChanged(double, double)),
-    this,
-    SLOT(updateMinMax(double, double))
-  );
-
-  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
-  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
-  QObject::connect(mWorker.get(), SIGNAL(failed()), this, SLOT(conversionFailed()));
-
-  this->mpWorkerThread->start(QThread::LowPriority);
 }
 
 void cedar::aux::gui::ImagePlot::setLimits(double min, double max)
@@ -309,22 +278,26 @@ void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, int imageX, in
 }
 
 //!@cond SKIPPED_DOCUMENTATION
-void cedar::aux::gui::detail::ImagePlotWorker::convert()
+bool cedar::aux::gui::ImagePlot::doConversion()
 {
-  QReadLocker read_lock(&this->mpPlot->mData->getLock());
-  if (this->mpPlot->mData->getDimensionality() > 2)
+  QReadLocker read_lock(&this->mData->getLock());
+
+  if (this->mDataType == DATA_TYPE_UNKNOWN)
   {
-    this->mpPlot->setInfo("cannot display matrices of dimensionality > 2");
-    emit failed();
-    return;
+    return false;
   }
-  const cv::Mat& mat = this->mpPlot->mData->getData();
+
+  if (this->mData->getDimensionality() > 2)
+  {
+    this->setInfo("cannot display matrices of dimensionality > 2");
+    return false;
+  }
+  const cv::Mat& mat = this->mData->getData();
 
   if (mat.empty())
   {
-    this->mpPlot->setInfo("Matrix is empty.");
-    emit failed();
-    return;
+    this->setInfo("Matrix is empty.");
+    return false;
   }
   int type = mat.type();
 
@@ -332,10 +305,10 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
   {
     case CV_8UC1:
     {
-      cv::Mat converted = this->mpPlot->threeChannelGrayscale(this->mpPlot->mData->getData());
+      cv::Mat converted = this->threeChannelGrayscale(this->mData->getData());
       read_lock.unlock();
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
-      this->mpPlot->displayMatrix(converted);
+      this->displayMatrix(converted);
       break;
     }
 
@@ -345,21 +318,21 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
       // check if this is a HSV image
       if
       (
-        this->mpPlot->mDataColorSpace
-        && this->mpPlot->mDataColorSpace->getNumberOfChannels() == 3
-        && this->mpPlot->mDataColorSpace->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
-        && this->mpPlot->mDataColorSpace->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
-        && this->mpPlot->mDataColorSpace->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
+        this->mDataColorSpace
+        && this->mDataColorSpace->getNumberOfChannels() == 3
+        && this->mDataColorSpace->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
+        && this->mDataColorSpace->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
+        && this->mDataColorSpace->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
       )
       {
         cv::Mat converted;
-        cv::cvtColor(this->mpPlot->mData->getData(), converted, CV_HSV2BGR);
+        cv::cvtColor(this->mData->getData(), converted, CV_HSV2BGR);
 				read_lock.unlock();
-        this->mpPlot->displayMatrix(converted);
+        this->displayMatrix(converted);
       }
       else
       {
-        this->mpPlot->displayMatrix(this->mpPlot->mData->getData());
+        this->displayMatrix(this->mData->getData());
 				read_lock.unlock();
       }
       break;
@@ -370,16 +343,16 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
       // convert grayscale to three-channel matrix
       cv::Mat copy = mat.clone();
       double min, max;
-      if (this->mpPlot->mAutoScaling)
+      if (this->mAutoScaling)
       {
         cv::minMaxLoc(mat, &min, &max);
       }
       read_lock.unlock();
-      cv::Mat converted = this->mpPlot->threeChannelGrayscale(copy);
+      cv::Mat converted = this->threeChannelGrayscale(copy);
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
-      this->mpPlot->displayMatrix(converted);
+      this->displayMatrix(converted);
 
-      if (this->mpPlot->mAutoScaling)
+      if (this->mAutoScaling)
       {
         emit minMaxChanged(min, max);
       }
@@ -390,42 +363,14 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
     {
       read_lock.unlock();
       std::string matrix_type_name = cedar::aux::math::matrixTypeToString(mat);
-      this->mpPlot->setInfo("Cannot display matrix of type " + matrix_type_name + ".");
-      emit failed();
-      return;
+      this->setInfo("Cannot display matrix of type " + matrix_type_name + ".");
+      return false;
     }
   }
 
-  emit done();
+  return true;
 }
 //!@endcond
-
-void cedar::aux::gui::ImagePlot::conversionDone()
-{
-  this->updateImage();
-  mConverting = false;
-}
-
-void cedar::aux::gui::ImagePlot::conversionFailed()
-{
-  mConverting = false;
-}
-
-void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
-{
-  if
-  (
-    !this->isVisible() // plot widget is not visible -- no need to plot
-    || this->mDataType == DATA_TYPE_UNKNOWN // data type cannot be plotted
-    || mConverting // already converting -- skip this timer event
-  )
-  {
-    return;
-  }
-
-  mConverting = true;
-  emit convert();
-}
 
 cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits, double min, double max)
 {
@@ -673,10 +618,9 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
 void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
-  if (mTimerId != 0)
-    this->killTimer(mTimerId);
+  this->stop();
 
-  mDataType = DATA_TYPE_MAT;
+  this->mDataType = DATA_TYPE_MAT;
   this->setLegendAvailable(true);
 
   this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
@@ -690,9 +634,7 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::
   if (this->mData->getDimensionality() > 2)
   {
     this->setInfo("cannot display matrices of dimensionality > 2");
-    // start the timer anyway
-    this->mTimerId = this->startTimer(70);
-    CEDAR_DEBUG_ASSERT(mTimerId != 0);
+    this->start();
     return;
   }
 
@@ -709,7 +651,6 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::
   if (!this->mData->getData().empty())
   {
     this->setInfo("");
-    this->mTimerId = this->startTimer(70);
-    CEDAR_DEBUG_ASSERT(mTimerId != 0);
+    this->start();
   }
 }

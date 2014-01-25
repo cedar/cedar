@@ -78,7 +78,7 @@ public:
 
 cedar::aux::gui::QImagePlot::QImagePlot(QWidget* pParent)
 :
-cedar::aux::gui::PlotInterface(pParent),
+cedar::aux::gui::ThreadedPlot(pParent),
 mSmoothScaling(true),
 mLegendAvailable(false)
 {
@@ -93,6 +93,14 @@ mLegendAvailable(false)
   p_layout->addWidget(mpImageDisplay);
   this->mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
   this->mpImageDisplay->setMinimumSize(QSize(50, 50));
+
+  QObject::connect
+  (
+    this,
+    SIGNAL(minMaxChanged(double, double)),
+    this,
+    SLOT(updateMinMax(double, double))
+  );
 }
 
 cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
@@ -212,7 +220,7 @@ void cedar::aux::gui::QImagePlot::setInfo(const std::string& text)
   this->mpImageDisplay->setText("cannot display matrices of dimensionality > 2");
 }
 
-void cedar::aux::gui::QImagePlot::updateImage()
+void cedar::aux::gui::QImagePlot::updatePlot()
 {
   QReadLocker lock(&this->mImageLock);
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));

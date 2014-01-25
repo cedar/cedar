@@ -78,33 +78,34 @@ cedar_add_library(cedaraux
   gui/ExceptionDialog.h
   gui/FileParameter.h
   gui/FrequencyParameter.h
+  gui/HistoryPlot.h
+  gui/ImagePlot.h
   gui/IntParameter.h
+  gui/IntVectorParameter.h
   gui/LengthParameter.h
+  gui/LocalCoordinateFrameWidget.h
   gui/Log.h
+  gui/MatrixPlot.h
+  gui/MatrixSlicePlot3D.h
   gui/ObjectParameter.h
   gui/ObjectListParameter.h
-  gui/Parameter.h
-  gui/LocalCoordinateFrameWidget.h
   gui/ObjectVisualizationWidget.h
+  gui/Parameter.h
+  gui/PlaneAngleParameter.h
+  gui/PlotInterface.h
   gui/PluginInfoDialog.h
   gui/PluginManagerDialog.h
-  gui/Viewer.h
-  gui/SceneWidget.h
   gui/PropertyPane.h
-  gui/PlaneAngleParameter.h
+  gui/QImagePlot.h
+  gui/ResourceDialog.h
+  gui/SceneWidget.h
   gui/StringParameter.h
+  gui/ThreadedPlot.h
   gui/TimeParameter.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
-  gui/IntVectorParameter.h
   gui/VelocityParameter.h
-  gui/ResourceDialog.h
-  gui/PlotInterface.h
-  gui/QImagePlot.h
-  gui/HistoryPlot.h
-  gui/MatrixPlot.h
-  gui/MatrixSlicePlot3D.h
-  gui/ImagePlot.h
+  gui/Viewer.h
   ${qwt_moc_files}
   ${vtk_moc_files}
   ${qwtplot3d_moc_files}
