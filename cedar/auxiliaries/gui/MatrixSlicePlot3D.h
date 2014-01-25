@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/QImagePlot.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -96,7 +96,7 @@ namespace cedar
 
 /*!@brief A slice-plot for 3D matrices.
  */
-class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::QImagePlot
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -148,10 +148,6 @@ signals:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
-
   /*!@brief Processes key events.
    *
    * This function handles ctrl+G, which saves the window settings.
@@ -165,10 +161,6 @@ private:
   /*!@brief Creates the image based on the matrix.
    */
   void slicesFromMat(const cv::Mat& mat);
-
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
 
   void updateData();
 
@@ -189,12 +181,6 @@ private:
 
   //! Data displayed by the plot.
   cedar::aux::ConstMatDataPtr mData;
-
-  //! Converted image.
-  QImage mImage;
-
-  //! Lock for mImage.
-  QReadWriteLock mImageLock;
 
   //! Id of the timer used for updating the plot.
   int mTimerId;
