@@ -50,60 +50,61 @@
 #include <QHeaderView>
 #include <QAbstractItemModel>
 #include <QStyledItemDelegate>
+#include <QTreeWidgetItemIterator>
+#include <QApplication>
 #include <QList>
 #include <QLabel>
 
+
 //----------------------------------------------------------------------------------------------------------------------
-// delegate that tells the QTreeWidget what widget to open for editing parameters
+// private class: DataDelegate
 //----------------------------------------------------------------------------------------------------------------------
 
-class DataDelegate : public QStyledItemDelegate
+class cedar::aux::gui::Configurable::DataDelegate : public QStyledItemDelegate
 {
-  public:
-    DataDelegate(cedar::aux::ConfigurablePtr pConfigurable)
-    :
-    mpConfigurable(pConfigurable)
+public:
+  DataDelegate(cedar::aux::ConfigurablePtr pConfigurable, cedar::aux::gui::Configurable* configurableWidget)
+  :
+  mpConfigurable(pConfigurable),
+  mConfigurableWidget(configurableWidget)
+  {
+  }
+
+  QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem& /*option*/, const QModelIndex &index) const
+  {
+    // Get the name of the parameter for which to return the edit widget.
+    std::string parameter_path = index.data(Qt::UserRole).toString().toStdString();
+
+    cedar::aux::ParameterPtr parameter = this->mpConfigurable->getParameter(parameter_path);
+
+    QWidget* p_ret = NULL;
+    try
     {
+      cedar::aux::gui::Parameter *p_widget
+        = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
+      p_widget->setParameter(parameter);
+      QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()), Qt::QueuedConnection);
+      p_ret = p_widget;
+    }
+    catch (cedar::aux::UnknownTypeException& e)
+    {
+      QLabel* p_no_widget_label = new QLabel("(No widget for type)");
+      p_no_widget_label->setToolTip(QString::fromStdString(e.exceptionInfo()));
+      p_no_widget_label->setAlignment(Qt::AlignCenter);
+      p_no_widget_label->setAutoFillBackground(true);
+      p_no_widget_label->setStyleSheet("background-color: rgb(255, 200, 137)");
+      p_ret = p_no_widget_label;
     }
 
-    QWidget *createEditor
-             (
-               QWidget *pParent,
-               const QStyleOptionViewItem& /*option*/,
-               const QModelIndex &index
-             )
-             const
-    {
-      // Get the name of the parameter for which to return the edit widget.
-      std::string parameter_path = index.data(Qt::UserRole).toString().toStdString();
+    p_ret->setParent(pParent);
 
-      cedar::aux::ParameterPtr parameter = this->mpConfigurable->getParameter(parameter_path);
+    return p_ret;
+  }
 
-      QWidget* p_ret = NULL;
-      try
-      {
-        cedar::aux::gui::Parameter *p_widget
-          = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
-        p_widget->setParameter(parameter);
-        p_ret = p_widget;
-      }
-      catch (cedar::aux::UnknownTypeException& e)
-      {
-        QLabel* p_no_widget_label = new QLabel("(No widget for type)");
-        p_no_widget_label->setToolTip(QString::fromStdString(e.exceptionInfo()));
-        p_no_widget_label->setAlignment(Qt::AlignCenter);
-        p_no_widget_label->setAutoFillBackground(true);
-        p_no_widget_label->setStyleSheet("background-color: rgb(255, 200, 137)");
-        p_ret = p_no_widget_label;
-      }
+private:
+  cedar::aux::ConfigurablePtr mpConfigurable;
 
-      p_ret->setParent(pParent);
-
-      return p_ret;
-    }
-
-  private:
-    cedar::aux::ConfigurablePtr mpConfigurable;
+  cedar::aux::gui::Configurable* mConfigurableWidget;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -133,16 +134,20 @@ cedar::aux::gui::Configurable::Configurable()
   this->mpPropertyTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::Configurable::fitRowsToContents()
+{
+  this->mpPropertyTree->doItemsLayout();
+}
 
 void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configurable)
 {
   this->clear();
   
-  this->mpPropertyTree->setItemDelegateForColumn(1, new DataDelegate(configurable));
+  this->mpPropertyTree->setItemDelegateForColumn(1, new cedar::aux::gui::Configurable::DataDelegate(configurable, this));
 
   std::string type_name = cedar::aux::objectTypeToString(configurable);
   QStringList text;
@@ -157,19 +162,23 @@ void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configur
 
 void cedar::aux::gui::Configurable::append(cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem, const std::string& pathSoFar)
 {
-  auto parameters = configurable->getParameters();
-  for (auto param_iter = parameters.begin(); param_iter != parameters.end(); ++param_iter)
+  //auto parameters = configurable->getParameters();
+  //for (auto param_iter = parameters.begin(); param_iter != parameters.end(); ++param_iter)
+  for (auto parameter : configurable->getParameters())
   {
-    cedar::aux::ParameterPtr parameter = *param_iter;
+    //cedar::aux::ParameterPtr parameter = *param_iter;
 
     this->append(parameter, pItem, pathSoFar);
   }
 
-  auto children = configurable->configurableChildren();
-  for (auto child_iter = children.begin(); child_iter != children.end(); ++child_iter)
+  //auto children = configurable->configurableChildren();
+  for (auto name_child_pair : configurable->configurableChildren())
+  //for (auto child_iter = children.begin(); child_iter != children.end(); ++child_iter)
   {
-    const std::string& child_name = child_iter->first;
-    cedar::aux::ConfigurablePtr child = child_iter->second;
+    //const std::string& child_name = child_iter->first;
+    //cedar::aux::ConfigurablePtr child = child_iter->second;
+    const std::string& child_name = name_child_pair.first;
+    cedar::aux::ConfigurablePtr child = name_child_pair.second;
 
     std::string path = pathSoFar;
     if (!path.empty())

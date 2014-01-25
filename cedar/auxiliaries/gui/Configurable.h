@@ -44,12 +44,14 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/Configurable.fwd.h"
+#include "cedar/auxiliaries/gui/Parameter.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QTreeWidget>
+
 
 /*!@brief A widget to display and manipulate the parameters of cedar::aux::Configurables.
  *
@@ -62,6 +64,8 @@ class cedar::aux::gui::Configurable : public QWidget
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  class DataDelegate;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -83,6 +87,9 @@ public:
   /*!@brief Clears the widget and removes any displayed parameters.
    */
   void clear();
+
+public slots:
+  void fitRowsToContents();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
