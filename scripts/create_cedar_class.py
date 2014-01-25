@@ -145,6 +145,11 @@ for namespace, alias in namespace_aliases.items():
 class_path = class_path.replace("::", os.sep)
 namespace_path = class_path[:class_path.rfind(os.sep)]
 
+standard_separator = "/"
+if os.sep != standard_separator:
+  namespace_path = namespace_path.replace(os.sep, standard_separator)
+  class_path = class_path.replace(os.sep, standard_separator)
+
 class_name = class_name_full.split("::")[-1]
 class_id_all_cap = class_name_full.replace("::", "_")
 class_id_all_cap = re.sub(r"([a-z])([A-Z])", r"\1_\2", class_id_all_cap).upper()
