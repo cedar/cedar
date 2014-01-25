@@ -94,6 +94,8 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
 
   this->setFocusPolicy(Qt::StrongFocus);
   this->setToolTip(QString("Use + and - to alter number of columns."));
+
+  this->setLegendAvailable(true);
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
@@ -218,6 +220,8 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 #endif // OpenCV version
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
+
+  emit minMaxChanged(min, max);
 
   mSliceMatrixByteC3 = cedar::aux::gui::ImagePlot::colorizedMatrix(mSliceMatrixByte);
 
