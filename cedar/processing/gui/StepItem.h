@@ -352,6 +352,8 @@ private slots:
 
   void openActionsDock();
 
+  void openPropertiesNewWidget();
+
   void plotAll();
 
   //--------------------------------------------------------------------------------------------------------------------

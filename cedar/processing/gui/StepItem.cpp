@@ -50,6 +50,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -1007,6 +1008,14 @@ void cedar::proc::gui::StepItem::openActionsDock()
   p_dock_widget->show();
 }
 
+void cedar::proc::gui::StepItem::openPropertiesNewWidget()
+{
+  cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
+  props->display(this->getStep());
+  auto p_widget = this->createDockWidget("Properties", props);
+  p_widget->show();
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
@@ -1044,6 +1053,9 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QAction* p_properties = menu.addAction("open properties widget");
   QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
   p_properties->setIcon(QIcon(":/menus/properties.svg"));
+
+  p_properties = menu.addAction("open new properties widget");
+  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openPropertiesNewWidget()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
