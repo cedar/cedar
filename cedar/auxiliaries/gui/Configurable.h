@@ -41,7 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Configurable.fwd.h"
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

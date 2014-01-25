@@ -50,6 +50,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
