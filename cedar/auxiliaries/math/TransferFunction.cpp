@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -55,3 +56,38 @@ float cedar::aux::math::TransferFunction::compute(float value) const
 {
   return static_cast<float>(compute(static_cast<double>(value)));
 }
+
+cv::Mat cedar::aux::math::TransferFunction::compute(const cv::Mat& values) const
+{
+  cv::Mat result = values.clone();
+  if (values.type() == CV_32F)
+  {
+    cv::MatConstIterator_<float> iter_src = values.begin<float>();
+    cv::MatIterator_<float> iter_dest = result.begin<float>();
+    auto end = values.end<float>();
+    for ( ; iter_src != end; ++iter_src, ++iter_dest)
+    {
+      *iter_dest = static_cast<float>(compute(static_cast<double>(*iter_src)));
+    }
+  }
+  else if (values.type() == CV_64F)
+  {
+    cv::MatConstIterator_<double> iter_src = values.begin<double>();
+    cv::MatIterator_<double> iter_dest = result.begin<double>();
+    auto end = values.end<double>();
+    for ( ; iter_src != end; ++iter_src, ++iter_dest)
+    {
+      *iter_dest = compute(*iter_src);
+    }
+  }
+  else
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotImplementedException,
+      "This transfer function is not implemented for non-floating data types."
+    );
+  }
+  return result;
+}
+

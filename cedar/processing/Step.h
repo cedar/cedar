@@ -48,6 +48,7 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 #include "cedar/auxiliaries/BoolParameter.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/Step.fwd.h"
@@ -108,6 +109,8 @@ public:
   //!@brief The standard constructor.
   Step(bool isLooped = false);
 
+  ~Step();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -159,12 +162,8 @@ public:
   //!@brief Calls the reset signal in a thread-safe manner.
   void callReset();
 
-  /*!@brief The wait method.
-   */
-//  void waitForProcessing()
-//  {
-//    return;
-//  }
+  //! True if the step currently has a run time measurement.
+  bool hasRunTimeMeasurement() const;
 
   /*!@brief Returns the last run time measured for this step.
    */
@@ -174,6 +173,9 @@ public:
    */
   cedar::unit::Time getRunTimeAverage() const;
 
+  //! True if the step currently has a lock time measurement.
+  bool hasLockTimeMeasurement() const;
+
   /*!@brief Returns the last lock time measured for this step.
    */
   cedar::unit::Time getLockTimeMeasurement() const;
@@ -181,6 +183,9 @@ public:
   /*!@brief Returns the average lock time measured for this step.
    */
   cedar::unit::Time getLockTimeAverage() const;
+
+  //! True if the step currently has a round time measurement.
+  bool hasRoundTimeMeasurement() const;
 
   /*!@brief Returns the last round time measured for this step, i.e., the time between the last two compute calls.
    */
@@ -385,6 +390,9 @@ private:
 
   //! Whether the step should lock its inputs and outputs automatically.
   bool mAutoLockInputsAndOutputs;
+
+  //! Used for calling this->getFinishedTrigger() in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mFinishedCaller;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

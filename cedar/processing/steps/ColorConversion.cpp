@@ -101,7 +101,7 @@ const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::Co
 cedar::proc::steps::ColorConversion::ColorConversion()
 :
 mInputColorSpace(cedar::proc::steps::ColorConversion::ColorSpace::AUTO),
-mOutput(new cedar::aux::MatData(cv::Mat(2, 2, CV_32FC3))),
+mOutput(new cedar::aux::MatData(cv::Mat())),
 mCvConversionConstant(-1),
 _mSourceType
 (

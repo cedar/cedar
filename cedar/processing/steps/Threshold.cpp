@@ -151,9 +151,9 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
       return;
     }
 
-    this->mThresholdedImage->getData() = cv::Mat(input.rows, input.cols, input.type());
-    this->mLowerThreshold->getData() = cv::Mat(input.rows, input.cols, input.type());
-    this->mUpperThreshold->getData() = cv::Mat(input.rows, input.cols, input.type());
+    this->mThresholdedImage->getData() = cv::Mat::zeros(input.rows, input.cols, input.type());
+    this->mLowerThreshold->getData() = cv::Mat::zeros(input.rows, input.cols, input.type());
+    this->mUpperThreshold->getData() = cv::Mat::zeros(input.rows, input.cols, input.type());
     this->mThresholdedImage->copyAnnotationsFrom(this->mInputImage);
     this->mLowerThreshold->copyAnnotationsFrom(this->mInputImage);
     this->mUpperThreshold->copyAnnotationsFrom(this->mInputImage);

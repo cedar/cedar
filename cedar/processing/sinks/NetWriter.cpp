@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

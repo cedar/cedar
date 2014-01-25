@@ -185,6 +185,13 @@ public:
    */
   void readConfigFromFile(const cedar::aux::Path& path);
 
+  /*! @brief Returns a vector of unparsed values.
+   *
+   *         Unparsed values are those that do not belong to a value parameter. Exmaple: if --foo is a flag:
+   *         ./programName --foo unparsed_value
+   */
+  const std::vector<std::string>& getUnparsedValues() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -268,6 +275,9 @@ private:
 
   //! Long names of parsed flags.
   std::vector<std::string> mParsedFlags;
+
+  //! List of unparsed values.
+  std::vector<std::string> mUnparsedValues;
 
   //! Parameters in groups.
   std::map<std::string, std::set<std::string> > mGroups;

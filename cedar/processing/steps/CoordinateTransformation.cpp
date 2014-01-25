@@ -310,14 +310,23 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
     cv::Range range[3];
     range[0] = cv::Range::all();
     range[1] = cv::Range::all();
+    cv::Mat output_slice = cv::Mat(output.size[0], output.size[1], output.type());
+    std::vector<int> dst_sizes(3);
+    dst_sizes[0] = output.size[0];
+    dst_sizes[1] = output.size[1];
+    dst_sizes[2] = 1;
+
     for (int d3 = 0; d3 < this->mInput->getData().size[2]; ++d3)
     {
       range[2] = cv::Range(d3, d3 + 1);
 
       // extract 2d slices
-      cv::Mat input_slice = input(range).clone();
-      input_slice.copySize(cv::Mat(input.size[0], input.size[1], input.type()));
-      cv::Mat output_slice = cv::Mat::zeros(output.size[0], output.size[1], output.type());
+      //!@todo Find a way to avoid this clone
+      cv::Mat slice_3d = input(range).clone();
+      // create a header for the current slice
+      cv::Mat input_slice = cv::Mat(input.size[0], input.size[1], input.type(), slice_3d.data);
+
+      output_slice.setTo(0.0);
 
       // transform coordinate system
       cv::remap
@@ -332,9 +341,7 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
       );
 
       // write to output
-      cv::Mat output_slice_clone = output(range).clone();
-      output_slice.copySize(output_slice_clone);
-      output(range) = 1.0 * output_slice;
+      output(range) = 1.0 * cv::Mat(3, &dst_sizes.front(), output.type(), output_slice.data);
     }
   }
 }

@@ -223,7 +223,7 @@ void cedar::proc::Network::startTriggers(bool wait)
   for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
   {
     auto trigger = *iter;
-    if (!trigger->isRunning())
+    if (!trigger->isRunningNolocking())
     {
       trigger->start();
     }
@@ -234,7 +234,7 @@ void cedar::proc::Network::startTriggers(bool wait)
     for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
     {
       auto trigger = *iter;
-      while (!trigger->isRunning())
+      while (!trigger->isRunningNolocking())
       {
         cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
@@ -249,7 +249,7 @@ void cedar::proc::Network::stopTriggers(bool wait)
   for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
   {
     auto trigger = *iter;
-    if (trigger->isRunning())
+    if (trigger->isRunningNolocking())
     {
       trigger->stop();
     }
@@ -260,7 +260,7 @@ void cedar::proc::Network::stopTriggers(bool wait)
     for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
     {
       auto trigger = *iter;
-      while (trigger->isRunning())
+      while (trigger->isRunningNolocking())
       {
         cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
@@ -292,7 +292,7 @@ void cedar::proc::Network::stepTriggers(cedar::unit::Time timeStep)
   for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
   {
     auto trigger = *iter;
-    if (!trigger->isRunning())
+    if (!trigger->isRunningNolocking())
     {
       trigger->step(timeStep);
     }

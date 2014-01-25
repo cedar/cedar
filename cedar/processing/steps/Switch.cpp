@@ -90,7 +90,7 @@ namespace
 cedar::proc::steps::Switch::Switch()
 :
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat(1, 1, CV_32F))),
+mOutput(new cedar::aux::MatData(cv::Mat())),
 // other members
 mFactorDataType(FACTOR_TYPE_UNDETERMINED)
 {

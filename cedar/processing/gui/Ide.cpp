@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
+#include "cedar/processing/gui/PerformanceOverview.h"
 #include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
@@ -64,6 +65,7 @@
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -85,11 +87,14 @@
 cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 :
 mpConsistencyChecker(NULL),
+mpPerformanceOverview(NULL),
 mpConsistencyDock(NULL),
 mpBoostControl(NULL)
 {
   // setup the (automatically generated) ui components
   this->setupUi(this);
+
+  mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
 
   // manually added components
   auto p_enable_custom_time_step = new QCheckBox();
@@ -211,6 +216,8 @@ mpBoostControl(NULL)
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
 
+  QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
+
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
@@ -220,6 +227,11 @@ mpBoostControl(NULL)
 cedar::proc::gui::Ide::~Ide()
 {
   this->mpLog->uninstallHandlers();
+
+  if (this->mpPerformanceOverview != NULL)
+  {
+    delete this->mpPerformanceOverview;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -446,10 +458,15 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
   network->getNetwork()->setName("root");
-  this->mNetwork = network;
-  this->mpProcessingDrawer->getScene()->setNetwork(network);
+  this->setNetwork(network);
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork->addElementsToScene();
+}
+
+void cedar::proc::gui::Ide::setNetwork(cedar::proc::gui::NetworkPtr network)
+{
+  this->mNetwork = network;
+  this->mpProcessingDrawer->getScene()->setNetwork(network);
   this->mpPropertyTable->resetContents();
 
   this->updateTriggerStartStopThreadCallers();
@@ -462,6 +479,11 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   if (this->mpBoostControl != NULL)
   {
     this->mpBoostControl->setNetwork(network->getNetwork());
+  }
+
+  if (this->mpPerformanceOverview != NULL)
+  {
+    this->mpPerformanceOverview->setNetwork(network->getNetwork());
   }
 
   this->loadPlotGroupsIntoComboBox();
@@ -887,21 +909,20 @@ void cedar::proc::gui::Ide::loadFile(QString file)
     p_dialog->displayCedarException(e);
     p_dialog->exec();
   }
+  catch (const boost::property_tree::json_parser::json_parser_error& e)
+  {
+    auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+    p_dialog->setAdditionalString("Could not load architecture.");
+    p_dialog->displayStdException(e);
+    p_dialog->exec();
+  }
   this->mpActionSave->setEnabled(true);
 
-  //!@todo Why doesn't this call resetTo?
-  this->mNetwork = network;
-
-  if (this->mpBoostControl)
-  {
-    this->mpBoostControl->setNetwork(this->mNetwork->getNetwork());
-  }
+  this->setNetwork(network);
 
   this->displayFilename(file.toStdString());
-  this->updateTriggerStartStopThreadCallers();
-  this->loadPlotGroupsIntoComboBox();
 
-  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);

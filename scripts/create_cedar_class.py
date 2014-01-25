@@ -50,6 +50,8 @@ namespace_aliases["aux"] = "auxiliaries"
 namespace_aliases["proc"] = "processing"
 namespace_aliases["dyn"] = "dynamics"
 namespace_aliases["dev"] = "devices"
+namespace_aliases["conv"] = "convolution"
+namespace_aliases["test"] = "testingUtilities"
 
 # determine user's home directory
 home = os.getenv('USERPROFILE') or os.getenv('HOME')
@@ -143,6 +145,11 @@ for namespace, alias in namespace_aliases.items():
 class_path = class_path.replace("::", os.sep)
 namespace_path = class_path[:class_path.rfind(os.sep)]
 
+standard_separator = "/"
+if os.sep != standard_separator:
+  namespace_path = namespace_path.replace(os.sep, standard_separator)
+  class_path = class_path.replace(os.sep, standard_separator)
+
 class_name = class_name_full.split("::")[-1]
 class_id_all_cap = class_name_full.replace("::", "_")
 class_id_all_cap = re.sub(r"([a-z])([A-Z])", r"\1_\2", class_id_all_cap).upper()
@@ -213,8 +220,8 @@ for extension in extensions:
     print "destination:", destination
     
     if os.path.exists(destination):
-      print "File already exists. Aborting."
-      sys.exit()
+      print "File already exists. Skipping."
+      continue
       
     with open(destination, "w") as out:
       out.write(contents)

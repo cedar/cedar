@@ -39,8 +39,10 @@
 #define CEDAR_AUX_MATH_PLANE_ANGLE_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/PlaneAngleParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/PlaneAngleLimitsParameter.fwd.h"
 
 #endif // CEDAR_AUX_MATH_PLANE_ANGLE_LIMITS_PARAMETER_H

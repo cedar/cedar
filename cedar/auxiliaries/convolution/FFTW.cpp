@@ -38,16 +38,32 @@
 
 #ifdef CEDAR_USE_FFTW
 
+#define CEDAR_INTERNAL
+#include "cedar/internals.h"
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/convolution/FFTWPlanningStrategy.h"
+#include "cedar/auxiliaries/convolution/EngineManager.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
+#ifdef CEDAR_USE_FFTW_THREADED
+#include <omp.h>
+#endif // CEDAR_USE_FFTW_THREADED
 
 QReadWriteLock cedar::aux::conv::FFTW::mPlanLock;
+bool cedar::aux::conv::FFTW::mMultiThreadActivated = false;
+bool cedar::aux::conv::FFTW::mWisdomLoaded = false;
+std::map<std::string, fftw_plan> cedar::aux::conv::FFTW::mForwardPlans;
+std::map<std::string, fftw_plan> cedar::aux::conv::FFTW::mBackwardPlans;
+
 //----------------------------------------------------------------------------------------------------------------------
 // register type with the factory
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,6 +76,16 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::aux::conv::FFTW::FFTW()
+:
+mAllocatedSize(0),
+mMatrixBuffer(NULL),
+mKernelBuffer(NULL),
+mResultBuffer(NULL),
+mRetransformKernel(true)
+{
+ this->connect(this, SIGNAL(kernelListChanged()), SLOT(kernelListChanged()));
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -90,6 +116,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const std::vector<int>& /* anchor */
 ) const
 {
+  this->kernelChanged();
   return this->convolveInternal(matrix, kernel, borderType);
 }
 
@@ -101,6 +128,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   cedar::aux::conv::Mode::Id /* mode */
 ) const
 {
+  this->kernelChanged();
   return this->convolveInternal(matrix, kernel->getKernel(), borderType);
 }
 
@@ -114,6 +142,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 {
   if (kernelList->size() > 0)
   {
+    this->kernelChanged();
     return this->convolveInternal(matrix, kernelList->getCombinedKernel(), borderType);
   }
   else
@@ -188,46 +217,79 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   }
   transformed_elements *= matrix_64.size[cedar::aux::math::getDimensionalityOf(matrix_64) -1] / 2 + 1;
   number_of_elements *= matrix_64.size[cedar::aux::math::getDimensionalityOf(matrix_64) -1];
-  fftw_complex *matrix_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
-  fftw_complex *result_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
-  fftw_complex *kernel_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
 
-  // transform matrix to frequency domain (fft)
-  cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
-  fftw_plan matrix_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, const_cast<double*>(matrix_64.clone().ptr<double>()), matrix_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
-  fftw_plan kernel_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(padded_kernel), padded_kernel.size, const_cast<double*>(padded_kernel.clone().ptr<double>()), kernel_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
-  fftw_plan matrix_plan_backward = fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.clone().ptr<double>()), FFTW_BACKWARD + FFTW_ESTIMATE);
+  if (transformed_elements != mAllocatedSize)
+  {
+    if (mMatrixBuffer)
+    {
+      fftw_free(mMatrixBuffer);
+    }
 
-  fftw_destroy_plan(matrix_plan_forward);
-  fftw_destroy_plan(kernel_plan_forward);
-  fftw_destroy_plan(matrix_plan_backward);
+    if (mResultBuffer)
+    {
+      fftw_free(mResultBuffer);
+    }
 
-  matrix_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, const_cast<double*>(matrix_64.ptr<double>()), matrix_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
-  kernel_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(padded_kernel), padded_kernel.size, const_cast<double*>(padded_kernel.ptr<double>()), kernel_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
-  matrix_plan_backward = fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.ptr<double>()), FFTW_BACKWARD + FFTW_ESTIMATE);
-  cedar::aux::conv::FFTW::mPlanLock.unlock();
-  fftw_execute(matrix_plan_forward);
-  fftw_execute(kernel_plan_forward);
+    if (mKernelBuffer)
+    {
+      fftw_free(mKernelBuffer);
+    }
 
-  // go trhough all data points
+    mMatrixBuffer = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
+    mResultBuffer = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
+    mKernelBuffer = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
+    mAllocatedSize = transformed_elements;
+    QWriteLocker write_lock(&this->mKernelTransformLock);
+    this->mRetransformKernel = true;
+  }
+
+//  fftw_execute(matrix_plan_forward);
+  std::vector<unsigned int> mat_sizes(cedar::aux::math::getDimensionalityOf(matrix_64));
+  for (unsigned int dim = 0; dim < mat_sizes.size(); ++dim)
+  {
+   mat_sizes.at(dim) = static_cast<unsigned int>(matrix.size[dim]);
+  }
+
+  fftw_execute_dft_r2c
+  (
+    cedar::aux::conv::FFTW::getForwardPlan(cedar::aux::math::getDimensionalityOf(matrix_64), mat_sizes),
+    const_cast<double*>(matrix_64.ptr<double>()),
+    mMatrixBuffer
+  );
+//  fftw_execute(kernel_plan_forward);
+  QWriteLocker write_lock(&this->mKernelTransformLock);
+  if (this->mRetransformKernel)
+  {
+    fftw_execute_dft_r2c
+    (
+      cedar::aux::conv::FFTW::getForwardPlan(cedar::aux::math::getDimensionalityOf(padded_kernel), mat_sizes),
+      const_cast<double*>(padded_kernel.ptr<double>()),
+      mKernelBuffer
+    );
+    this->mRetransformKernel = false;
+  }
+  write_lock.unlock();
+
+  // go trough all data points
   for (unsigned int xyz = 0; xyz < transformed_elements; ++xyz)
   {
     // complex multiplication (lateral)
-    result_fourier[xyz][0] = (kernel_fourier[xyz][0] * matrix_fourier[xyz][0] - kernel_fourier[xyz][1] * matrix_fourier[xyz][1]) / number_of_elements;
-    result_fourier[xyz][1] = (kernel_fourier[xyz][1] * matrix_fourier[xyz][0] + kernel_fourier[xyz][0] * matrix_fourier[xyz][1]) / number_of_elements;
+    mResultBuffer[xyz][0] = (mKernelBuffer[xyz][0] * mMatrixBuffer[xyz][0] - mKernelBuffer[xyz][1] * mMatrixBuffer[xyz][1]) / number_of_elements;
+    mResultBuffer[xyz][1] = (mKernelBuffer[xyz][1] * mMatrixBuffer[xyz][0] + mKernelBuffer[xyz][0] * mMatrixBuffer[xyz][1]) / number_of_elements;
   }
 
   // transform interaction back to time domain (ifft)
-  fftw_execute(matrix_plan_backward);
+//  fftw_execute(matrix_plan_backward);
+  fftw_execute_dft_c2r
+  (
+    cedar::aux::conv::FFTW::getBackwardPlan(cedar::aux::math::getDimensionalityOf(output), mat_sizes),
+    mResultBuffer,
+    const_cast<double*>(output.ptr<double>())
+  );
 
-  fftw_free(matrix_fourier);
-  fftw_free(result_fourier);
-  fftw_free(kernel_fourier);
-  cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
-  fftw_destroy_plan(matrix_plan_forward);
-  fftw_destroy_plan(kernel_plan_forward);
-  fftw_destroy_plan(matrix_plan_backward);
-  cedar::aux::conv::FFTW::mPlanLock.unlock();
+//  fftw_free(matrix_fourier);
+//  fftw_free(result_fourier);
+//  fftw_free(kernel_fourier);
   if (matrix.type() == CV_32F)
   {
     cv::Mat output_32;
@@ -373,6 +435,199 @@ bool cedar::aux::conv::FFTW::checkModeCapability
 {
   // currently, only the full same is supported
   return mode == cedar::aux::conv::Mode::Same;
+}
+
+void cedar::aux::conv::FFTW::loadWisdom(const std::string& uniqueIdentifier)
+{
+  if (!cedar::aux::conv::FFTW::mWisdomLoaded)
+  {
+    std::string path = cedar::aux::getUserApplicationDataDirectory()
+                         + "/.cedar/fftw/fftw."
+                         + CEDAR_BUILT_ON_MACHINE + "."
+                         + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads()) + "."
+                         + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategyString()) + "."
+                         + uniqueIdentifier + "."
+                         + "wisdom";
+    fftw_import_wisdom_from_filename(path.c_str());
+    cedar::aux::conv::FFTW::mWisdomLoaded = true;
+  }
+}
+
+void cedar::aux::conv::FFTW::saveWisdom(const std::string& uniqueIdentifier)
+{
+  std::string path = cedar::aux::getUserApplicationDataDirectory()
+                       + "/.cedar/fftw/fftw."
+                       + CEDAR_BUILT_ON_MACHINE + "."
+                       + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads()) + "."
+                       + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategyString()) + "."
+                       + uniqueIdentifier + "."
+                       + "wisdom";
+  fftw_export_wisdom_to_filename(path.c_str());
+}
+
+fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes)
+{
+  CEDAR_ASSERT(sizes.size() == dimensionality);
+  std::string unique_identifier = cedar::aux::toString(sizes.at(0));
+  for (unsigned int i = 1; i < sizes.size(); ++i)
+  {
+    unique_identifier += "." + cedar::aux::toString(sizes.at(i));
+  }
+  auto entry = cedar::aux::conv::FFTW::mForwardPlans.find(unique_identifier);
+  if (entry != cedar::aux::conv::FFTW::mForwardPlans.end())
+  {
+    return entry->second;
+  }
+  else
+  {
+#ifdef CEDAR_USE_FFTW_THREADED
+    cedar::aux::conv::FFTW::initThreads();
+#endif
+    cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
+    cedar::aux::conv::FFTW::loadWisdom(unique_identifier);
+    std::vector<int> sizes_signed(sizes.size());
+    for (unsigned int i = 0; i < sizes_signed.size(); ++i)
+    {
+      sizes_signed.at(i) = static_cast<int>(sizes.at(i));
+    }
+
+    cv::Mat matrix(dimensionality, &(sizes_signed.front()), CV_64F);
+
+    unsigned int transformed_elements = 1;
+    double number_of_elements = 1.0;
+    for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
+    {
+      transformed_elements *= matrix.size[dim];
+      number_of_elements *= matrix.size[dim];
+    }
+    transformed_elements *= matrix.size[cedar::aux::math::getDimensionalityOf(matrix) -1] / 2 + 1;
+    number_of_elements *= matrix.size[cedar::aux::math::getDimensionalityOf(matrix) -1];
+
+    fftw_complex* matrix_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
+    fftw_plan matrix_plan_forward
+      = fftw_plan_dft_r2c
+        (
+          cedar::aux::math::getDimensionalityOf(matrix),
+          matrix.size,
+          const_cast<double*>(matrix.clone().ptr<double>()),
+          matrix_fourier,
+          cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
+        );
+    fftw_free(matrix_fourier);
+    if (matrix_plan_forward)
+    {
+      cedar::aux::conv::FFTW::mForwardPlans[unique_identifier] = matrix_plan_forward;
+      cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
+      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      return matrix_plan_forward;
+    }
+    else
+    {
+      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      CEDAR_THROW
+      (
+        cedar::aux::NotFoundException,
+        "FFTW could not find a forward transformation plan for a matrix with sizes " + unique_identifier
+        + ". You can try to alter the planning strategy."
+      );
+    }
+  }
+}
+
+fftw_plan cedar::aux::conv::FFTW::getBackwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes)
+{
+  CEDAR_ASSERT(sizes.size() == dimensionality);
+  std::string unique_identifier = cedar::aux::toString(sizes.at(0));
+  for (unsigned int i = 1; i < sizes.size(); ++i)
+  {
+    unique_identifier += "." + cedar::aux::toString(sizes.at(i));
+  }
+  auto entry = cedar::aux::conv::FFTW::mBackwardPlans.find(unique_identifier);
+  if (entry != cedar::aux::conv::FFTW::mBackwardPlans.end())
+  {
+    return entry->second;
+  }
+  else
+  {
+#ifdef CEDAR_USE_FFTW_THREADED
+    cedar::aux::conv::FFTW::initThreads();
+#endif
+    cedar::aux::conv::FFTW::mPlanLock.lockForWrite();
+    cedar::aux::conv::FFTW::loadWisdom(unique_identifier);
+    std::vector<int> sizes_signed(sizes.size());
+    for (unsigned int i = 0; i < sizes_signed.size(); ++i)
+    {
+      sizes_signed.at(i) = static_cast<int>(sizes.at(i));
+    }
+
+    cv::Mat matrix(dimensionality, &(sizes_signed.front()), CV_64F);
+
+    unsigned int transformed_elements = 1;
+    double number_of_elements = 1.0;
+    for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
+    {
+      transformed_elements *= matrix.size[dim];
+      number_of_elements *= matrix.size[dim];
+    }
+    transformed_elements *= matrix.size[cedar::aux::math::getDimensionalityOf(matrix) -1] / 2 + 1;
+    number_of_elements *= matrix.size[cedar::aux::math::getDimensionalityOf(matrix) -1];
+
+    fftw_complex* matrix_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
+    fftw_plan matrix_plan_backward
+      = fftw_plan_dft_c2r
+        (
+          cedar::aux::math::getDimensionalityOf(matrix),
+          matrix.size,
+          matrix_fourier,
+          const_cast<double*>(matrix.ptr<double>()),
+          cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategy()
+        );
+    fftw_free(matrix_fourier);
+    if (matrix_plan_backward)
+    {
+      cedar::aux::conv::FFTW::mBackwardPlans[unique_identifier] = matrix_plan_backward;
+      cedar::aux::conv::FFTW::saveWisdom(unique_identifier);
+      cedar::aux::conv::FFTW::mPlanLock.unlock();
+      return matrix_plan_backward;
+    }
+    else
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::NotFoundException,
+        "FFTW could not find a backward transformation plan for a matrix with sizes " + unique_identifier
+        + ". You can try to alter the planning strategy."
+      );
+    }
+  }
+}
+
+void cedar::aux::conv::FFTW::initThreads()
+{
+#ifdef CEDAR_USE_FFTW_THREADED
+  if (!mMultiThreadActivated)
+  {
+    // this should be done only once
+    fftw_init_threads();
+    omp_set_num_threads(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads());
+    fftw_set_timelimit(30.0);
+    // from now on, all plans are generated for n threads
+    fftw_plan_with_nthreads(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads());
+    // make sure that we do not initialize this again
+    mMultiThreadActivated = true;
+  }
+#endif
+}
+
+void cedar::aux::conv::FFTW::kernelChanged() const
+{
+  QWriteLocker write_lock(&this->mKernelTransformLock);
+  this->mRetransformKernel = true;
+}
+
+void cedar::aux::conv::FFTW::kernelListChanged()
+{
+  this->connect(this->getKernelList().get(), SIGNAL(combinedKernelUpdated()), SLOT(kernelChanged()));
 }
 
 #endif // CEDAR_FFTW

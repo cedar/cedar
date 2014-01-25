@@ -668,7 +668,7 @@ private:
    *          This method invokes internally LoopedThread::stop() and does
    *          some cleanup like stopRecording or set the measured FPS to zero
    */
-  void processStop(bool);
+  void processStop();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

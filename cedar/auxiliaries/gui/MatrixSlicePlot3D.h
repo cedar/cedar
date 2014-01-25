@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/QImagePlot.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -53,61 +53,15 @@
 #include <opencv2/opencv.hpp>
 
 
-//!@cond SKIPPED_DOCUMENTATION
-namespace cedar
-{
-  namespace aux
-  {
-    namespace gui
-    {
-      namespace detail
-      {
-        /* This is an internal class of MatrixSlicePlot3D that cannot be nested because Qt's moc doesn't support nested classes.
-         *
-         * Don't use it outside of the MatrixSlicePlot3D!
-         */
-        class MatrixSlicePlot3DWorker : public QObject
-        {
-          Q_OBJECT
-
-          public:
-            MatrixSlicePlot3DWorker(cedar::aux::gui::MatrixSlicePlot3D* pPlot)
-            :
-            mpPlot(pPlot)
-            {
-            }
-
-          public slots:
-            void convert();
-
-          signals:
-            void done();
-
-          public:
-            cedar::aux::gui::MatrixSlicePlot3D *mpPlot;
-        };
-        CEDAR_GENERATE_POINTER_TYPES(MatrixSlicePlot3DWorker);
-      }
-    }
-  }
-}
-//!@endcond
-
-
 /*!@brief A slice-plot for 3D matrices.
  */
-class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::QImagePlot
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::gui::detail::MatrixSlicePlot3DWorker;
-
+  
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,8 +76,6 @@ public:
   //!@brief A constructor taking both a data pointer and a title.
   MatrixSlicePlot3D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
-  //!@brief Destructor
-  ~MatrixSlicePlot3D();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,23 +87,11 @@ public:
    * @param title title of the plot window
    */
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
-  /*!@brief Updates the plot periodically.
-   */
-  void timerEvent(QTimerEvent *pEvent);
-
-signals:
-  //!@brief Signals the worker thread to convert the data to the plot's internal format.
-  void convert();
-
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
-
   /*!@brief Processes key events.
    *
    * This function handles ctrl+G, which saves the window settings.
@@ -166,17 +106,10 @@ private:
    */
   void slicesFromMat(const cv::Mat& mat);
 
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
-
-  void updateData();
+  bool doConversion();
 
   //! initialize the widget
   void init();
-
-private slots:
-  void conversionDone();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -184,26 +117,8 @@ private slots:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  QLabel* mpImageDisplay;
-
   //! Data displayed by the plot.
   cedar::aux::ConstMatDataPtr mData;
-
-  //! Converted image.
-  QImage mImage;
-
-  //! Lock for mImage.
-  QReadWriteLock mImageLock;
-
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
-
-  //! Thread in which conversion of mat data to qwt triple is done.
-  QThread* mpWorkerThread;
-
-  //! Worker object.
-  cedar::aux::gui::detail::MatrixSlicePlot3DWorkerPtr mWorker;
 
   cv::Mat mSliceMatrix;
   cv::Mat mSliceMatrixByte;
@@ -213,9 +128,6 @@ private:
 
   //! desired columns of the slice plot
   unsigned int mDesiredColumns;
-
-  //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
-  bool mConverting;
 
 }; // class cedar::aux::gui::MatrixSlicePlot3D
 

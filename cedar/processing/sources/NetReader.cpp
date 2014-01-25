@@ -37,17 +37,16 @@ s
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_YARP
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/sources/NetReader.h"
 #include "cedar/auxiliaries/net/exceptions.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/net/exceptions.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

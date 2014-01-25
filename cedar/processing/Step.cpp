@@ -53,12 +53,14 @@
 #include "cedar/units/prefixes.h"
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 // SYSTEM INCLUDES
 #include <QMutexLocker>
 #include <QReadLocker>
 #include <QWriteLocker>
 #include <opencv2/opencv.hpp>
+#include <boost/make_shared.hpp>
 #include <iostream>
 #include <ctime>
 #include <string>
@@ -89,6 +91,8 @@ mAutoLockInputsAndOutputs(true)
   // create the finished trigger singleton.
   this->getFinishedTrigger();
 
+  this->mFinishedCaller = boost::make_shared<cedar::aux::CallFunctionInThread>(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
+
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
@@ -111,10 +115,18 @@ mAutoLockInputsAndOutputs(true)
   // create the finished trigger singleton.
   this->getFinishedTrigger();
 
+  this->mFinishedCaller = boost::make_shared<cedar::aux::CallFunctionInThread>(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
+
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
   this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
+}
+
+cedar::proc::Step::~Step()
+{
+  this->mFinishedCaller->stop();
+  this->mFinishedCaller->wait();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -291,107 +303,136 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
 
   // do the work!
-  if (this->mBusy.tryLock())
+  if (!this->mBusy.tryLock())
   {
-    // start measuring the execution time.
-    clock_t lock_start = clock();
+    return;
+  }
+  // start measuring the execution time.
+  clock_t lock_start = clock();
 
-    // lock the step
-    this->lock(cedar::aux::LOCK_TYPE_READ);
+  // lock the step
+  this->lock(cedar::aux::LOCK_TYPE_READ);
 
-    clock_t lock_end = clock();
-    clock_t lock_elapsed = lock_end - lock_start;
-    double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-    this->setLockTimeMeasurement(lock_elapsed_s * cedar::unit::seconds);
+  clock_t lock_end = clock();
+  clock_t lock_elapsed = lock_end - lock_start;
+  double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+  this->setLockTimeMeasurement(lock_elapsed_s * cedar::unit::seconds);
 
-    if (!this->mandatoryConnectionsAreSet())
+  if (!this->mandatoryConnectionsAreSet())
+  {
+    std::string errors = cedar::aux::join(mInvalidInputNames, ", ");
+
+    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
+                   "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
+    this->unlock();
+    this->mBusy.unlock();
+    return;
+  } // this->mMandatoryConnectionsAreSet
+
+
+  if (this->mLastComputeCall != 0)
+  {
+    clock_t last = this->mLastComputeCall;
+    this->mLastComputeCall = clock();
+    clock_t elapsed = this->mLastComputeCall - last;
+    double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+    this->setRoundTimeMeasurement(elapsed_s * cedar::unit::seconds);
+  }
+  else
+  {
+    this->mLastComputeCall = clock();
+  }
+
+  // start measuring the execution time.
+  clock_t run_start = clock();
+
+  try
+  {
+    // call the compute function with the given arguments
+    this->compute(*(arguments.get()));
+  }
+  // catch exceptions and translate them to the given state/message
+  catch(const cedar::aux::ExceptionBase& e)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "An exception occurred in step \"" + this->getName() + "\": " + e.exceptionInfo(),
+      "cedar::proc::Step::run()",
+      this->getName()
+    );
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
+  }
+  catch(const std::exception& e)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "An exception occurred in step \"" + this->getName() + "\": " + std::string(e.what()),
+      "cedar::proc::Step::run()",
+      this->getName()
+    );
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
+  }
+  catch(...)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "An exception of unknown type occurred in step \"" + this->getName() + "\".",
+      "cedar::proc::Step::run()",
+      this->getName()
+    );
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
+  }
+
+  clock_t run_end = clock();
+  clock_t run_elapsed = run_end - run_start;
+  double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+
+  // take time measurements
+  this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
+
+  // unlock the step
+  this->unlock();
+  this->mBusy.unlock();
+
+  //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
+  // subsequent steps are triggered if one of the following conditions is met:
+  // a) This step has not been triggered as part of a trigger chain. This is the case if trigger is NULL.
+  // b) The step is looped. In this case it is the start of a trigger chain
+  // c) The step is not triggered by anyone. This can happen, e.g., if it has no inputs. This also makes it the start
+  //    of a trigger chain.
+  if (!trigger || this->isLooped() || !this->isTriggered())
+  {
+//    this->getFinishedTrigger()->trigger();
+    // trigger subsequent steps in a non-blocking manner
+    if (this->isLooped())
     {
-      std::string errors = cedar::aux::join(mInvalidInputNames, ", ");
-
-      this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
-                     "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
-      this->unlock();
-      this->mBusy.unlock();
-      return;
-    } // this->mMandatoryConnectionsAreSet
-
-
-    if (this->mLastComputeCall != 0)
-    {
-      clock_t last = this->mLastComputeCall;
-      this->mLastComputeCall = clock();
-      clock_t elapsed = this->mLastComputeCall - last;
-      double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-      this->setRoundTimeMeasurement(elapsed_s * cedar::unit::seconds);
+      if (!this->mFinishedCaller->isRunning())
+      {
+        try
+        {
+          this->mFinishedCaller->start();
+        }
+        catch (const cedar::aux::ThreadingErrorException& e)
+        {
+          //!@todo Sometimes, the thread wrapper throws an exception. I'm not sure why ...
+          static bool warned_about_threading_error = false;
+          if (!warned_about_threading_error)
+          {
+            warned_about_threading_error = true;
+            cedar::aux::LogSingleton::getInstance()->debugMessage
+            (
+              "A threading exception occurred while triggering the successors of step \"" + this->getName() + "\". The "
+              "exception was: " + e.exceptionInfo() + ". Will not warn about this again.",
+              "cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::Trigger)"
+            );
+          }
+        }
+      }
     }
     else
     {
-      this->mLastComputeCall = clock();
-    }
-
-    // start measuring the execution time.
-    clock_t run_start = clock();
-
-    try
-    {
-      // call the compute function with the given arguments
-      this->compute(*(arguments.get()));
-    }
-    // catch exceptions and translate them to the given state/message
-    catch(const cedar::aux::ExceptionBase& e)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "An exception occurred in step \"" + this->getName() + "\": " + e.exceptionInfo(),
-        "cedar::proc::Step::run()",
-        this->getName()
-      );
-      this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
-    }
-    catch(const std::exception& e)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "An exception occurred in step \"" + this->getName() + "\": " + std::string(e.what()),
-        "cedar::proc::Step::run()",
-        this->getName()
-      );
-      this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
-    }
-    catch(...)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "An exception of unknown type occurred in step \"" + this->getName() + "\".",
-        "cedar::proc::Step::run()",
-        this->getName()
-      );
-      this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
-    }
-
-    clock_t run_end = clock();
-    clock_t run_elapsed = run_end - run_start;
-    double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-
-    // unlock the step
-    this->unlock();
-
-    // take time measurements
-    this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
-
-    //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
-    // subsequent steps are triggered if one of the following conditions is met:
-    // a) This step has not been triggered as part of a trigger chain. This is the case if trigger is NULL.
-    // b) The step is looped. In this case it is the start of a trigger chain
-    // c) The step is not triggered by anyone. This can happen, e.g., if it has no inputs. This also makes it the start
-    //    of a trigger chain.
-    if (!trigger || this->isLooped() || !this->isTriggered())
-    {
       this->getFinishedTrigger()->trigger();
     }
-
-    //!@todo Should busy be unlocked before triggering subsequent steps?
-    this->mBusy.unlock();
   }
 }
 
@@ -441,12 +482,33 @@ cedar::unit::Time cedar::proc::Step::getLockTimeMeasurement() const
   }
 }
 
+bool cedar::proc::Step::hasRunTimeMeasurement() const
+{
+  QReadLocker locker(&this->mLastIterationTimeLock);
+  bool has_measurement = this->mMovingAverageIterationTime.size() > 0;
+  return has_measurement;
+}
+
+bool cedar::proc::Step::hasLockTimeMeasurement() const
+{
+  QReadLocker locker(&this->mLockTimeLock);
+  bool has_measurement = this->mLockingTime.size() > 0;
+  return has_measurement;
+}
+
+bool cedar::proc::Step::hasRoundTimeMeasurement() const
+{
+  QReadLocker locker(&this->mRoundTimeLock);
+  bool has_measurement = this->mRoundTime.size() > 0;
+  return has_measurement;
+}
+
 cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
 {
   QReadLocker locker(&this->mLastIterationTimeLock);
-  if (this->mMovingAverageIterationTime.size() > 0)
+  if (this->hasRunTimeMeasurement())
   {
-    cedar::unit::Time copy = this->mMovingAverageIterationTime.getNewest();
+    cedar::unit::Time copy = this->mMovingAverageIterationTime.getAverage();
     return copy;
   }
   else
@@ -460,7 +522,7 @@ cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
   QReadLocker locker(&this->mLockTimeLock);
   if (this->mLockingTime.size() > 0)
   {
-    cedar::unit::Time copy = this->mLockingTime.getNewest();
+    cedar::unit::Time copy = this->mLockingTime.getAverage();
     return copy;
   }
   else
@@ -474,7 +536,7 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeMeasurement() const
   QReadLocker locker(&this->mRoundTimeLock);
   if (this->mRoundTime.size() > 0)
   {
-    cedar::unit::Time copy = this->mLockingTime.getNewest();
+    cedar::unit::Time copy = this->mRoundTime.getNewest();
     return copy;
   }
   else
@@ -488,7 +550,7 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
   QReadLocker locker(&this->mRoundTimeLock);
   if (this->mRoundTime.size() > 0)
   {
-    cedar::unit::Time copy = this->mRoundTime.getNewest();
+    cedar::unit::Time copy = this->mRoundTime.getAverage();
     return copy;
   }
   else
@@ -542,5 +604,6 @@ void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   this->inputConnectionChanged(slot);
+
   this->getInputValidity(slot);
 }

@@ -367,6 +367,11 @@ const std::string& cedar::aux::CommandLineParser::getDefaultValue(const std::str
   }
 }
 
+const std::vector<std::string>& cedar::aux::CommandLineParser::getUnparsedValues() const
+{
+  return this->mUnparsedValues;
+}
+
 void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminationAllowed)
 {
   enum STATE
@@ -467,6 +472,10 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
               }
             }
           }
+        }
+        else // string does not begin with "-" or "--", thus, it is an unparsed value
+        {
+          this->mUnparsedValues.push_back(string);
         }
         break;
       }
@@ -723,6 +732,16 @@ void cedar::aux::CommandLineParser::writeSummary(std::ostream& stream) const
     for (auto iter = this->mParsedValues.begin(); iter != this->mParsedValues.end(); ++iter)
     {
       stream << "--" << iter->first << ": " << iter->second << std::endl;
+    }
+    stream << std::endl;
+  }
+
+  if (!this->mUnparsedValues.empty())
+  {
+    stream << "The following unparsed values were found:" << std::endl;
+    for (const auto& unparsed : this->mUnparsedValues)
+    {
+      stream << unparsed << std::endl;
     }
     stream << std::endl;
   }
