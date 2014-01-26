@@ -115,7 +115,9 @@ private:
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::Configurable::Configurable()
+cedar::aux::gui::Configurable::Configurable(QWidget* pParent)
+:
+QWidget(pParent)
 {
   // create layout
   QVBoxLayout* p_layout = new QVBoxLayout();
@@ -187,6 +189,7 @@ void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configur
   this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN, new cedar::aux::gui::Configurable::DataDelegate(configurable, this));
 
   std::string type_name = cedar::aux::objectTypeToString(configurable);
+  type_name = cedar::aux::replace(type_name, "::", ".");
   auto p_item = this->appendHeading(this->mpPropertyTree->invisibleRootItem(), QString::fromStdString(type_name), 1);
   p_item->setExpanded(true);
 
@@ -272,6 +275,7 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
 
 void cedar::aux::gui::Configurable::clear()
 {
+  this->mpPropertyTree->clear();
   QAbstractItemDelegate * p_delegate = this->mpPropertyTree->itemDelegateForColumn(PARAMETER_EDITOR_COLUMN);
   if (p_delegate != NULL)
   {
