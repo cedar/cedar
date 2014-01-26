@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
@@ -210,15 +211,36 @@ cedar::aux::ConstConfigurablePtr cedar::aux::Configurable::getConfigurableChild(
   cedar::aux::ConstConfigurablePtr child;
   const auto& first_path = path_components.at(0);
   Children::const_iterator iter = this->mChildren.find(first_path);
+  size_t index_start = first_path.find('[');
+  size_t index_end = first_path.find(']');
   if (iter == this->mChildren.end())
   {
     auto param_iter = this->mParameterAssociations.find(first_path);
+    /*!@todo This should probably be solved differently: have two superclasses:
+     *       ParameterWithConfigurable and ParameterWithConfigurables
+     *       That way, this would generalize to, e.g., ObjectMapParameter.
+     */
     if (param_iter != this->mParameterAssociations.end())
     {
       auto parameter = *(param_iter->second);
       if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
       {
         child = object_parameter->getConfigurable();
+      }
+    }
+    else if (index_start != std::string::npos && index_end != std::string::npos)
+    {
+      std::string name = first_path.substr(0, index_start);
+      auto param_iter = this->mParameterAssociations.find(name);
+      if (param_iter != this->mParameterAssociations.end())
+      {
+        auto parameter = *(param_iter->second);
+        if (auto list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+        {
+          std::string index_str = first_path.substr(index_start + 1, index_end - index_start - 1);
+          unsigned int index = cedar::aux::fromString<unsigned int>(index_str);
+          child = list_parameter->configurableAt(index);
+        }
       }
     }
   }
