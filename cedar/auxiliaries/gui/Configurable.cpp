@@ -271,14 +271,12 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
   changed_font.setBold(true);
   parameter_item->setFont(PARAMETER_CHANGED_FLAG_COLUMN, changed_font);
 
-  //!@todo Properly disconnect this signal in clear
   QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
 
   // check if parameter is an object parameter
   if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
   {
     this->append(object_parameter->getConfigurable(), parameter_item, path);
-    //!@todo The tree under this has to be updated when the parameter's value changes
     QObject::connect(object_parameter.get(), SIGNAL(valueChanged()), this, SLOT(objectParameterValueChanged()));
     parameter_item->setExpanded(true);
   }
@@ -290,6 +288,17 @@ void cedar::aux::gui::Configurable::objectParameterValueChanged()
   CEDAR_DEBUG_ASSERT(p_object_parameter != nullptr);
 
   auto item = this->getItemForParameter(p_object_parameter);
+
+  if (item == nullptr)
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Could not update object parameter \"" + p_object_parameter->getName() + "\": corresponding item not found.",
+      "void cedar::aux::gui::Configurable::parameterChangeFlagChanged()"
+    );
+    return;
+  }
+
   // iterate in reverse because we erase children, thus changing the index of all following children
   for (int child_index = item->childCount(); child_index >= 0; --child_index)
   {
@@ -306,6 +315,21 @@ QString cedar::aux::gui::Configurable::getPathFromItem(QTreeWidgetItem* item)
 
 void cedar::aux::gui::Configurable::clear()
 {
+  for (QTreeWidgetItemIterator iter(this->mpPropertyTree); *iter != nullptr; ++iter)
+  {
+    auto item = *iter;
+    auto parameter = static_cast<cedar::aux::Parameter*>(item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void*>());
+    if (parameter != nullptr)
+    {
+      QObject::disconnect(parameter, SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
+
+      if (auto object_parameter = dynamic_cast<cedar::aux::ObjectParameter*>(parameter))
+      {
+        QObject::disconnect(object_parameter, SIGNAL(valueChanged()), this, SLOT(objectParameterValueChanged()));
+      }
+    }
+  }
+
   this->mpPropertyTree->clear();
   QAbstractItemDelegate * p_delegate = this->mpPropertyTree->itemDelegateForColumn(PARAMETER_EDITOR_COLUMN);
   if (p_delegate != NULL)
