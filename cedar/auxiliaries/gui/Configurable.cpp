@@ -113,6 +113,53 @@ private:
   cedar::aux::gui::Configurable* mConfigurableWidget;
 };
 
+class cedar::aux::gui::Configurable::ParameterItem : public QTreeWidgetItem
+{
+public:
+  ParameterItem(cedar::aux::ParameterPtr parameter, const std::string& path)
+  :
+  mParameter(parameter)
+  {
+    this->setText(PARAMETER_NAME_COLUMN, QString::fromStdString(parameter->getName()));
+    this->setData(PARAMETER_NAME_COLUMN, Qt::UserRole, QVariant::fromValue(static_cast<void*>(parameter.get())));
+    this->setData(PARAMETER_EDITOR_COLUMN, Qt::UserRole, QString::fromStdString(path));
+  }
+
+  QVariant data(int column, int role) const
+  {
+    switch (role)
+    {
+      case Qt::ToolTipRole:
+      {
+        switch (column)
+        {
+          case PARAMETER_NAME_COLUMN:
+            return QString::fromStdString(this->mParameter->getName());
+
+          case PARAMETER_CHANGED_FLAG_COLUMN:
+            if (this->mParameter->isChanged())
+            {
+              return "The parameter was changed since the last save.";
+            }
+            else
+            {
+              return "";
+            }
+
+          default:
+            return "";
+        }
+      }
+
+      default:
+        return this->QTreeWidgetItem::data(column, role);
+    }
+  }
+
+private:
+  cedar::aux::ParameterPtr mParameter;
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -259,10 +306,7 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
   }
   path += parameter->getName();
 
-  QTreeWidgetItem* parameter_item = new QTreeWidgetItem();
-  parameter_item->setText(PARAMETER_NAME_COLUMN, QString::fromStdString(parameter->getName()));
-  parameter_item->setData(PARAMETER_NAME_COLUMN, Qt::UserRole, QVariant::fromValue(static_cast<void*>(parameter.get())));
-  parameter_item->setData(PARAMETER_EDITOR_COLUMN, Qt::UserRole, QString::fromStdString(path));
+  ParameterItem* parameter_item = new ParameterItem(parameter, path);
   pNode->addChild(parameter_item);
   this->mpPropertyTree->openPersistentEditor(parameter_item, PARAMETER_EDITOR_COLUMN);
   this->updateChangeState(parameter_item, parameter.get());
