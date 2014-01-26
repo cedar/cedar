@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
@@ -206,13 +207,31 @@ cedar::aux::ConstConfigurablePtr cedar::aux::Configurable::getConfigurableChild(
 
   CEDAR_ASSERT(path_components.size() != 0);
 
-  Children::const_iterator iter = this->mChildren.find(path_components.at(0));
+  cedar::aux::ConstConfigurablePtr child;
+  const auto& first_path = path_components.at(0);
+  Children::const_iterator iter = this->mChildren.find(first_path);
   if (iter == this->mChildren.end())
+  {
+    auto param_iter = this->mParameterAssociations.find(first_path);
+    if (param_iter != this->mParameterAssociations.end())
+    {
+      auto parameter = *(param_iter->second);
+      if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+      {
+        child = object_parameter->getConfigurable();
+      }
+    }
+  }
+  else
+  {
+    child = iter->second;
+  }
+
+  if (!child)
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "Child \"" + path + "\" not found.");
   }
 
-  cedar::aux::ConstConfigurablePtr child = iter->second;
   if (path_components.size() == 1)
   {
     return child;
@@ -258,6 +277,7 @@ cedar::aux::ConstParameterPtr cedar::aux::Configurable::getParameter(const std::
     --last;
     subpath_components.insert(subpath_components.begin(), first, last);
     std::string subpath = cedar::aux::join(subpath_components, ".");
+
     p_configurable = this->getConfigurableChild(subpath).get();
   }
 

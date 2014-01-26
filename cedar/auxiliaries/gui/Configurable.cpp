@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -270,7 +271,37 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
   changed_font.setBold(true);
   parameter_item->setFont(PARAMETER_CHANGED_FLAG_COLUMN, changed_font);
 
+  //!@todo Properly disconnect this signal in clear
   QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
+
+  // check if parameter is an object parameter
+  if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+  {
+    this->append(object_parameter->getConfigurable(), parameter_item, path);
+    //!@todo The tree under this has to be updated when the parameter's value changes
+    QObject::connect(object_parameter.get(), SIGNAL(valueChanged()), this, SLOT(objectParameterValueChanged()));
+    parameter_item->setExpanded(true);
+  }
+}
+
+void cedar::aux::gui::Configurable::objectParameterValueChanged()
+{
+  auto p_object_parameter = dynamic_cast<cedar::aux::ObjectParameter*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_object_parameter != nullptr);
+
+  auto item = this->getItemForParameter(p_object_parameter);
+  // iterate in reverse because we erase children, thus changing the index of all following children
+  for (int child_index = item->childCount(); child_index >= 0; --child_index)
+  {
+    item->removeChild(item->child(child_index));
+  }
+  
+  this->append(p_object_parameter->getConfigurable(), item, this->getPathFromItem(item).toStdString());
+}
+
+QString cedar::aux::gui::Configurable::getPathFromItem(QTreeWidgetItem* item)
+{
+  return item->data(PARAMETER_EDITOR_COLUMN, Qt::UserRole).toString();
 }
 
 void cedar::aux::gui::Configurable::clear()
@@ -286,17 +317,38 @@ void cedar::aux::gui::Configurable::clear()
 void cedar::aux::gui::Configurable::parameterChangeFlagChanged()
 {
   cedar::aux::Parameter *p_parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
-  CEDAR_DEBUG_ASSERT(p_parameter != NULL);
+  CEDAR_DEBUG_ASSERT(p_parameter != nullptr);
+
+  auto item = this->getItemForParameter(p_parameter);
+
+  if (item != nullptr)
+  {
+    this->updateChangeState(item, p_parameter);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Could not update changed state of parameter \"" + p_parameter->getName() + "\": corresponding item not found.",
+      "void cedar::aux::gui::Configurable::parameterChangeFlagChanged()"
+    );
+  }
+}
+
+QTreeWidgetItem* cedar::aux::gui::Configurable::getItemForParameter(cedar::aux::Parameter* parameter)
+{
+  CEDAR_DEBUG_ASSERT(parameter != nullptr);
 
   for (QTreeWidgetItemIterator iter(this->mpPropertyTree); *iter != nullptr; ++iter)
   {
     auto item = *iter;
-    if (item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void*>() == static_cast<void*>(p_parameter))
+    if (item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void*>() == static_cast<void*>(parameter))
     {
-      this->updateChangeState(item, p_parameter);
-      return;
+      return item;
     }
   }
+
+  return nullptr;
 }
 
 void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter)
