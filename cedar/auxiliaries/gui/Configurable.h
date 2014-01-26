@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/gui/Parameter.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/Parameter.fwd.h"
+#include "cedar/auxiliaries/ObjectListParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -117,10 +118,21 @@ private:
 
   QString getPathFromItem(QTreeWidgetItem* item);
 
+  void disconnect(QTreeWidgetItem* item);
+
+  void appendObjectListParameter
+       (
+         cedar::aux::ObjectListParameterPtr objectListParameter,
+         QTreeWidgetItem* pParent,
+         const std::string& path
+       );
+
 private slots:
   void parameterChangeFlagChanged();
 
   void objectParameterValueChanged();
+
+  void objectListParameterValueChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

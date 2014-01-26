@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/ObjectListParameter.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -280,6 +281,61 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
     QObject::connect(object_parameter.get(), SIGNAL(valueChanged()), this, SLOT(objectParameterValueChanged()));
     parameter_item->setExpanded(true);
   }
+
+  // check if parameter is an object list parameter
+  if (auto list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+  {
+    QObject::connect(list_parameter.get(), SIGNAL(valueChanged()), this, SLOT(objectListParameterValueChanged()));
+
+    this->appendObjectListParameter(list_parameter, parameter_item, path);
+    parameter_item->setExpanded(true);
+  }
+}
+
+void cedar::aux::gui::Configurable::appendObjectListParameter
+(
+  cedar::aux::ObjectListParameterPtr objectListParameter,
+  QTreeWidgetItem* pParent,
+  const std::string& path
+)
+{
+  for (size_t i = 0; i < objectListParameter->size(); ++i)
+  {
+    cedar::aux::ConfigurablePtr configurable = objectListParameter->configurableAt(i);
+    std::string subpath = path + "[" + cedar::aux::toString(i) + "]";
+    QString label = QString(QString::fromStdString(objectListParameter->getName()) + " [%1]").arg(i);
+    auto sub_item = this->appendHeading(pParent, label, 2);
+    this->append(configurable, sub_item, subpath);
+    sub_item->setExpanded(true);
+  }
+}
+
+void cedar::aux::gui::Configurable::objectListParameterValueChanged()
+{
+  auto p_object_list_parameter = dynamic_cast<cedar::aux::ObjectListParameter*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_object_list_parameter != nullptr);
+
+  auto item = this->getItemForParameter(p_object_list_parameter);
+
+  if (item == nullptr)
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Could not update object parameter \"" + p_object_list_parameter->getName() + "\": corresponding item not found.",
+      "void cedar::aux::gui::Configurable::objectListParameterValueChanged()"
+    );
+    return;
+  }
+
+  // iterate in reverse because we erase children, thus changing the index of all following children
+  for (int child_index = item->childCount() - 1; child_index >= 0; --child_index)
+  {
+    auto child_item = item->child(child_index);
+    this->disconnect(child_item);
+    item->removeChild(child_item);
+  }
+
+  this->appendObjectListParameter(p_object_list_parameter, item, this->getPathFromItem(item).toStdString());
 }
 
 void cedar::aux::gui::Configurable::objectParameterValueChanged()
@@ -300,9 +356,11 @@ void cedar::aux::gui::Configurable::objectParameterValueChanged()
   }
 
   // iterate in reverse because we erase children, thus changing the index of all following children
-  for (int child_index = item->childCount(); child_index >= 0; --child_index)
+  for (int child_index = item->childCount() - 1; child_index >= 0; --child_index)
   {
-    item->removeChild(item->child(child_index));
+    auto child_item = item->child(child_index);
+    this->disconnect(child_item);
+    item->removeChild(child_item);
   }
   
   this->append(p_object_parameter->getConfigurable(), item, this->getPathFromItem(item).toStdString());
@@ -313,21 +371,30 @@ QString cedar::aux::gui::Configurable::getPathFromItem(QTreeWidgetItem* item)
   return item->data(PARAMETER_EDITOR_COLUMN, Qt::UserRole).toString();
 }
 
+void cedar::aux::gui::Configurable::disconnect(QTreeWidgetItem* item)
+{
+  auto parameter = static_cast<cedar::aux::Parameter*>(item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void*>());
+  if (parameter != nullptr)
+  {
+    QObject::disconnect(parameter, SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
+
+    if (auto object_parameter = dynamic_cast<cedar::aux::ObjectParameter*>(parameter))
+    {
+      QObject::disconnect(object_parameter, SIGNAL(valueChanged()), this, SLOT(objectParameterValueChanged()));
+    }
+
+    if (auto list_parameter = dynamic_cast<cedar::aux::ObjectListParameter*>(parameter))
+    {
+      QObject::disconnect(list_parameter, SIGNAL(valueChanged()), this, SLOT(objectListParameterValueChanged()));
+    }
+  }
+}
+
 void cedar::aux::gui::Configurable::clear()
 {
   for (QTreeWidgetItemIterator iter(this->mpPropertyTree); *iter != nullptr; ++iter)
   {
-    auto item = *iter;
-    auto parameter = static_cast<cedar::aux::Parameter*>(item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void*>());
-    if (parameter != nullptr)
-    {
-      QObject::disconnect(parameter, SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
-
-      if (auto object_parameter = dynamic_cast<cedar::aux::ObjectParameter*>(parameter))
-      {
-        QObject::disconnect(object_parameter, SIGNAL(valueChanged()), this, SLOT(objectParameterValueChanged()));
-      }
-    }
+    this->disconnect(*iter);
   }
 
   this->mpPropertyTree->clear();
