@@ -107,6 +107,15 @@ private:
   //! Appends the given parameter to the tree node.
   void append(cedar::aux::ParameterPtr parameter, QTreeWidgetItem* pNode, const std::string& pathSoFar);
 
+  QTreeWidgetItem* appendHeading(QTreeWidgetItem* pParent, const QString& text, int hLevel = 2);
+
+  void makeHeading(QTreeWidgetItem* item, const QString& text, int hLevel = 2);
+
+  void updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
+
+private slots:
+  void parameterChangeFlagChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

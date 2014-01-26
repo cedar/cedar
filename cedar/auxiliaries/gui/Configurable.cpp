@@ -55,6 +55,10 @@
 #include <QList>
 #include <QLabel>
 
+#define PARAMETER_NAME_COLUMN 0
+#define PARAMETER_CHANGED_FLAG_COLUMN 1
+#define PARAMETER_EDITOR_COLUMN 2
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // private class: DataDelegate
@@ -124,14 +128,17 @@ cedar::aux::gui::Configurable::Configurable()
   this->mpPropertyTree->setAlternatingRowColors(true);
 
   // setup header
-  this->mpPropertyTree->setColumnCount(2);
+  this->mpPropertyTree->setColumnCount(3);
   QStringList header_labels;
-  header_labels << "Property" << "Value";
+  header_labels << "Property" << "" << "Value";
   this->mpPropertyTree->setHeaderLabels(header_labels);
 
   // make first section stretch
-  this->mpPropertyTree->header()->setResizeMode(0, QHeaderView::Stretch);
-  this->mpPropertyTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
+  this->mpPropertyTree->header()->setResizeMode(PARAMETER_NAME_COLUMN, QHeaderView::Interactive);
+  this->mpPropertyTree->header()->setResizeMode(PARAMETER_CHANGED_FLAG_COLUMN, QHeaderView::Fixed);
+  this->mpPropertyTree->header()->setResizeMode(PARAMETER_EDITOR_COLUMN, QHeaderView::Stretch);
+  this->mpPropertyTree->header()->resizeSection(PARAMETER_NAME_COLUMN, 150);
+  this->mpPropertyTree->header()->resizeSection(PARAMETER_CHANGED_FLAG_COLUMN, 20);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -143,18 +150,44 @@ void cedar::aux::gui::Configurable::fitRowsToContents()
   this->mpPropertyTree->doItemsLayout();
 }
 
+QTreeWidgetItem* cedar::aux::gui::Configurable::appendHeading(QTreeWidgetItem* pParent, const QString& text, int hLevel)
+{
+  QTreeWidgetItem* p_item = new QTreeWidgetItem();
+  pParent->addChild(p_item);
+  this->makeHeading(p_item, text, hLevel);
+  return p_item;
+}
+
+void cedar::aux::gui::Configurable::makeHeading(QTreeWidgetItem* pItem, const QString& text, int hLevel)
+{
+  pItem->setFirstColumnSpanned(true);
+  QFont font = pItem->font(0);
+  switch (hLevel)
+  {
+    case 1:
+    case 2:
+      font.setBold(true);
+      font.setPointSize(font.pointSize() + 3 - hLevel);
+      pItem->setBackground(0, this->palette().brush(QPalette::Dark));
+      pItem->setForeground(0, this->palette().brush(QPalette::Light));
+      break;
+    default:
+      font.setItalic(true);
+  }
+  pItem->setFont(0, font);
+
+  pItem->setTextAlignment(0, Qt::AlignHCenter | Qt::AlignVCenter);
+  pItem->setText(0, text);
+}
+
 void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configurable)
 {
   this->clear();
   
-  this->mpPropertyTree->setItemDelegateForColumn(1, new cedar::aux::gui::Configurable::DataDelegate(configurable, this));
+  this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN, new cedar::aux::gui::Configurable::DataDelegate(configurable, this));
 
   std::string type_name = cedar::aux::objectTypeToString(configurable);
-  QStringList text;
-  text << QString::fromStdString(type_name);
-  QTreeWidgetItem* p_item = new QTreeWidgetItem(text);
-  this->mpPropertyTree->addTopLevelItem(p_item);
-  this->mpPropertyTree->setFirstItemColumnSpanned(p_item, true);
+  auto p_item = this->appendHeading(this->mpPropertyTree->invisibleRootItem(), QString::fromStdString(type_name), 1);
   p_item->setExpanded(true);
 
   this->append(configurable, p_item, std::string());
@@ -162,21 +195,24 @@ void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configur
 
 void cedar::aux::gui::Configurable::append(cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem, const std::string& pathSoFar)
 {
-  //auto parameters = configurable->getParameters();
-  //for (auto param_iter = parameters.begin(); param_iter != parameters.end(); ++param_iter)
+  QTreeWidgetItem* advanced_node = new QTreeWidgetItem();
+  // the advanced node needs to be added here already as some properties (e.g., setFirstColumnSpanned) will otherwise not work
+  pItem->addChild(advanced_node);
+  this->makeHeading(advanced_node, "advanced", 3);
+  advanced_node->setExpanded(false);
+
   for (auto parameter : configurable->getParameters())
   {
-    //cedar::aux::ParameterPtr parameter = *param_iter;
-
-    this->append(parameter, pItem, pathSoFar);
+    auto parent = pItem;
+    if (parameter->isAdvanced())
+    {
+      parent = advanced_node;
+    }
+    this->append(parameter, parent, pathSoFar);
   }
 
-  //auto children = configurable->configurableChildren();
   for (auto name_child_pair : configurable->configurableChildren())
-  //for (auto child_iter = children.begin(); child_iter != children.end(); ++child_iter)
   {
-    //const std::string& child_name = child_iter->first;
-    //cedar::aux::ConfigurablePtr child = child_iter->second;
     const std::string& child_name = name_child_pair.first;
     cedar::aux::ConfigurablePtr child = name_child_pair.second;
 
@@ -187,17 +223,30 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ConfigurablePtr configura
     }
     path += child_name;
 
-    QTreeWidgetItem* child_item = new QTreeWidgetItem();
-    child_item->setText(0, QString::fromStdString(child_name));
-    pItem->addChild(child_item);
-    this->mpPropertyTree->setFirstItemColumnSpanned(child_item, true);
+    QTreeWidgetItem* parent_node = pItem;
+    if (child->isAdvanced())
+    {
+      parent_node = advanced_node;
+    }
+
+    auto child_item = this->appendHeading(parent_node, QString::fromStdString(child_name), 2);
     this->append(child, child_item, path);
     child_item->setExpanded(true);
+  }
+
+  if (advanced_node->childCount() == 0)
+  {
+    pItem->removeChild(advanced_node);
   }
 }
 
 void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, QTreeWidgetItem* pNode, const std::string& pathSoFar)
 {
+  if (parameter->isHidden())
+  {
+    return;
+  }
+
   std::string path = pathSoFar;
   if (!pathSoFar.empty())
   {
@@ -206,17 +255,54 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
   path += parameter->getName();
 
   QTreeWidgetItem* parameter_item = new QTreeWidgetItem();
-  parameter_item->setText(0, QString::fromStdString(parameter->getName()));
-  parameter_item->setData(1, Qt::UserRole, QString::fromStdString(path));
+  parameter_item->setText(PARAMETER_NAME_COLUMN, QString::fromStdString(parameter->getName()));
+  parameter_item->setData(PARAMETER_NAME_COLUMN, Qt::UserRole, QVariant::fromValue(static_cast<void*>(parameter.get())));
+  parameter_item->setData(PARAMETER_EDITOR_COLUMN, Qt::UserRole, QString::fromStdString(path));
   pNode->addChild(parameter_item);
-  this->mpPropertyTree->openPersistentEditor(parameter_item, 1);
+  this->mpPropertyTree->openPersistentEditor(parameter_item, PARAMETER_EDITOR_COLUMN);
+  this->updateChangeState(parameter_item, parameter.get());
+
+  parameter_item->setTextAlignment(PARAMETER_CHANGED_FLAG_COLUMN, Qt::AlignHCenter | Qt::AlignVCenter);
+  QFont changed_font = parameter_item->font(PARAMETER_CHANGED_FLAG_COLUMN);
+  changed_font.setBold(true);
+  parameter_item->setFont(PARAMETER_CHANGED_FLAG_COLUMN, changed_font);
+
+  QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
 }
 
 void cedar::aux::gui::Configurable::clear()
 {
-  QAbstractItemDelegate * p_delegate = this->mpPropertyTree->itemDelegateForColumn(1);
+  QAbstractItemDelegate * p_delegate = this->mpPropertyTree->itemDelegateForColumn(PARAMETER_EDITOR_COLUMN);
   if (p_delegate != NULL)
   {
     delete p_delegate;
+  }
+}
+
+void cedar::aux::gui::Configurable::parameterChangeFlagChanged()
+{
+  cedar::aux::Parameter *p_parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_parameter != NULL);
+
+  for (QTreeWidgetItemIterator iter(this->mpPropertyTree); *iter != nullptr; ++iter)
+  {
+    auto item = *iter;
+    if (item->data(PARAMETER_NAME_COLUMN, Qt::UserRole).value<void*>() == static_cast<void*>(p_parameter))
+    {
+      this->updateChangeState(item, p_parameter);
+      return;
+    }
+  }
+}
+
+void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter)
+{
+  if (pParameter->isChanged())
+  {
+    item->setText(PARAMETER_CHANGED_FLAG_COLUMN, "*");
+  }
+  else
+  {
+    item->setText(PARAMETER_CHANGED_FLAG_COLUMN, "");
   }
 }
