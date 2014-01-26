@@ -982,7 +982,7 @@ void cedar::proc::gui::StepItem::showPlot
   p_dock_widget->show();
 }
 
-void cedar::proc::gui::StepItem::openProperties()
+void cedar::proc::gui::StepItem::openPropertiesOldWidget()
 {
   cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
   auto p_dock_widget = this->createDockWidget("Properties", props);
@@ -1008,7 +1008,7 @@ void cedar::proc::gui::StepItem::openActionsDock()
   p_dock_widget->show();
 }
 
-void cedar::proc::gui::StepItem::openPropertiesNewWidget()
+void cedar::proc::gui::StepItem::openProperties()
 {
   cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
   props->display(this->getStep());
@@ -1054,8 +1054,8 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
   p_properties->setIcon(QIcon(":/menus/properties.svg"));
 
-  p_properties = menu.addAction("open new properties widget");
-  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openPropertiesNewWidget()));
+  p_properties = menu.addAction("open old properties widget");
+  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openPropertiesOldWidget()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 

@@ -415,7 +415,7 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {
   this->storeSettings();
   // Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
-  this->mpPropertyTable->resetContents();
+  this->mpPropertyTable->clear();
   pEvent->accept();
 }
 
@@ -467,7 +467,7 @@ void cedar::proc::gui::Ide::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
-  this->mpPropertyTable->resetContents();
+  this->mpPropertyTable->clear();
 
   this->updateTriggerStartStopThreadCallers();
 
@@ -634,7 +634,7 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
   // delete step
   if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(pItem))
   {
-    this->mpPropertyTable->resetContents();
+    this->mpPropertyTable->clear();
     p_drawer->hide();
     p_drawer->getStep()->getNetwork()->remove(p_drawer->getStep());
   }
