@@ -560,10 +560,10 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
     cedar::aux::ConfigurationNode node;
     node.put("type","stickyNote");
     QRectF rect = note->boundingRect();
-    node.put("width",rect.width());
-    node.put("height",rect.height());
-    node.put("x",note->scenePos().x());
-    node.put("y",note->scenePos().y());
+    node.put("width",(int)rect.width());
+    node.put("height",(int)rect.height());
+    node.put("x",(int)note->scenePos().x());
+    node.put("y",(int)note->scenePos().y());
     node.put("text",note->getText());
     QColor color = note->getColor();
     node.put("r",color.red());
