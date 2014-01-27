@@ -77,6 +77,16 @@
       </spacer>
      </item>
      <item>
+      <widget class="QCheckBox" name="mpAutoRefresh">
+       <property name="toolTip">
+        <string>Automatically refreshes the overview.</string>
+       </property>
+       <property name="text">
+        <string>auto refresh</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="mpRefreshButton">
        <property name="text">
         <string>refresh</string>
