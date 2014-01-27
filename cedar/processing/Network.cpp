@@ -161,6 +161,33 @@ cedar::proc::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::vector<std::string> cedar::proc::Network::listInvalidSteps() const
+{
+  std::vector<std::string> invalid_steps;
+
+  for (auto name_element_pair : this->getElements())
+  {
+    auto element = name_element_pair.second;
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+    {
+      switch (step->getState())
+      {
+        case cedar::proc::Triggerable::STATE_EXCEPTION:
+        case cedar::proc::Triggerable::STATE_EXCEPTION_ON_START:
+        case cedar::proc::Triggerable::STATE_NOT_RUNNING:
+          invalid_steps.push_back(step->getName());
+          break;
+
+        default:
+          // nothing to do
+          break;
+      }
+    }
+  }
+
+  return invalid_steps;
+}
+
 std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Network::checkConsistency() const
 {
   std::vector<cedar::proc::ConsistencyIssuePtr> issues;
