@@ -170,7 +170,7 @@ private:
 
   virtual void fillContextMenu(QMenu& menu);
 
-  virtual void plotClicked(QMouseEvent* pEvent, int imageX, int imageY);
+  virtual void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

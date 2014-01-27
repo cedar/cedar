@@ -263,7 +263,7 @@ void cedar::aux::gui::QImagePlot::fillContextMenu(QMenu&)
   // empty default implementation
 }
 
-void cedar::aux::gui::QImagePlot::plotClicked(QMouseEvent* /* pEvent */, int /* imageX */, int /* imageY */)
+void cedar::aux::gui::QImagePlot::plotClicked(QMouseEvent* /* pEvent */, double /* imageX */, double /* imageY */)
 {
   // empty default implementation
 }

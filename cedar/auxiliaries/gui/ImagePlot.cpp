@@ -201,7 +201,7 @@ void cedar::aux::gui::ImagePlot::queryFixedValueScale()
   }
 }
 
-void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, int imageX, int imageY)
+void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY)
 {
   if (!this->mData || pEvent->button() != Qt::LeftButton)
     return;
@@ -215,8 +215,8 @@ void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, int imageX, in
     return;
   }
   
-  int x = static_cast<int>(imageX * static_cast<double>(matrix.cols));
-  int y = static_cast<int>(imageY * static_cast<double>(matrix.rows));
+  int x = static_cast<int>(relativeImageX * static_cast<double>(matrix.cols));
+  int y = static_cast<int>(relativeImageY * static_cast<double>(matrix.rows));
 
   if (x < 0 || y < 0 || x >= matrix.cols || y >= matrix.rows)
   {
