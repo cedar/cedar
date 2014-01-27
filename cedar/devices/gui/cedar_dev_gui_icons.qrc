@@ -1,0 +1,14 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/cedar/dev/gui">
+    <file>icons/epuck_icon_256.png</file>
+    <file>icons/generic_hardware_icon.svg</file>
+    <file>icons/khepera_icon_256.png</file>
+    <file>icons/select_component.svg</file>
+    <file>icons/not_connected.svg</file>
+    <file>icons/connected.svg</file>
+    <file>icons/partially_connected.svg</file>
+    <file>icons/connecting.svg</file>
+  </qresource>
+</RCC>
+
