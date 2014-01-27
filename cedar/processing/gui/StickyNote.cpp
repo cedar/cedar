@@ -48,10 +48,10 @@
 
 cedar::proc::gui::StickyNote::StickyNote(
     cedar::proc::gui::Scene* pParent,
-    int x,
-    int y,
-    int width,
-    int height,
+    float x,
+    float y,
+    float width,
+    float height,
     std::string text)
 :
 cedar::proc::gui::GraphicsBase(width,height)

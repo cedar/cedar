@@ -1053,7 +1053,7 @@ void cedar::proc::gui::Scene::addStickyNote()
   this->addStickyNote(mMousePosX, mMousePosY, 120, 70, "");
 }
 
-cedar::proc::gui::StickyNote* cedar::proc::gui::Scene::addStickyNote(int x, int y, int witdh, int height, std::string text)
+cedar::proc::gui::StickyNote* cedar::proc::gui::Scene::addStickyNote(float x, float y, float witdh, float height, std::string text)
 {
   cedar::proc::gui::StickyNote* note = new cedar::proc::gui::StickyNote(this, x, y, witdh, height, text);
   mStickyNotes.push_back(note);
