@@ -1,0 +1,88 @@
+/*!
+
+@page UnitsConcept An introduction to cedar's unit system
+
+@section Rationale
+
+cedar uses the Boost unit framework to handle variables with units (e.g., 15 meters or 1 millisecond). We try
+to use units whereever possible, in particular in interfaces. While the explicit use of units may make it a bit
+harder to program, it makes you think about the units and prevents mistakes. For instance, if an interface takes
+a time parameter but uses a regular float or double data type for it
+@code
+void setMovementTime(double time);
+@endcode
+the programmer does not know whether the method expects the time to be in seconds, milliseconds, or years. This
+problem can be tackled by adding comments to the interface, but sometimes programmers forget to add the comment or
+forget to change it when changing the method itself.
+
+In cedar, however, the interface would look something like the following
+@code
+void setMovementTime(cedar::unit::Time time);
+@endcode
+and you can create a variable like this to pass into the method
+@code
+Time time(1.0 * second);
+@endcode
+or like this
+@code
+Time time(1.0 * milli * second);
+Now, you can just pass the variable into the method and don't have to worry about the units anymore.
+
+@section Things to look out for
+
+I will use time units for demonstrating purposes but all rules hold for other units.
+
+1. When creating a unit variable, ALWAYS wrap it into an object, like so
+@code
+cedar::unit::Time one_milli_second(1.0 * cedar::unit::milli * cedar::unit::second);
+@endcode
+
+You run into problems when you try to create a unit variable on the fly like this
+@code
+setMovementTime(1.0 * cedar::unit::second);
+@endcode
+
+Remeber to wrap it:
+@code
+setMovementTime(cedar::unit::Time(1.0 * cedar::unit::second));
+@endcode
+
+2. Try to use units whenever you can. If you have to extract the double value of the variable, you have to cancel
+the unit. For instance, if you have three seconds
+@code
+cedar::unit::Time three_seconds(3.0 * cedar::unit::seconds);
+@endcode
+you get the double value in milli seconds (3000.0) by dividing it by one milli second
+@code
+double my_time = three_seconds / one_milli_second; // my_time = 3000.0;
+@endcode
+
+3. If it annoys you to write cedar::unit all the time, insert
+@code
+using namespace cedar::unit;
+@endcode
+before your code.
+
+The code from above would look like this:
+@code
+Time one_milli_second(1.0 * milli * second);
+Time three_seconds(3.0 * seconds);
+double my_time = three_seconds / one_milli_second;
+@endcode
+
+4. To use the unit framework, you have to include
+@code
+#include <cedar/units/Time.h>
+@endcode
+for using units and
+@code
+#include <cedar/units/prefixes.h>
+@endcode
+for using prefixes like cedar::unit::milli or cedar::unit::kilo.
+
+@section Documentation pointer
+
+cedar's unit framework is based completely on the unit framework in Boost. Have a look at their documentation
+(http://www.boost.org/doc/libs/release/libs/units/) if you need a deeper insight into the framework.
+
+*/
