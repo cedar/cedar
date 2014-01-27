@@ -217,7 +217,7 @@ void cedar::aux::gui::QImagePlot::resizePixmap()
 
 void cedar::aux::gui::QImagePlot::setInfo(const std::string& text)
 {
-  this->mpImageDisplay->setText("cannot display matrices of dimensionality > 2");
+  this->mpImageDisplay->setText(QString::fromStdString(text));
 }
 
 void cedar::aux::gui::QImagePlot::updatePlot()
@@ -258,12 +258,14 @@ void cedar::aux::gui::QImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEv
   this->mpPlot->plotClicked(pEvent, image_x, image_y);
 }
 
-void cedar::aux::gui::QImagePlot::fillContextMenu(QMenu& menu)
+void cedar::aux::gui::QImagePlot::fillContextMenu(QMenu&)
 {
+  // empty default implementation
 }
 
-void cedar::aux::gui::QImagePlot::plotClicked(QMouseEvent* pEvent, int imageX, int imageY)
+void cedar::aux::gui::QImagePlot::plotClicked(QMouseEvent* /* pEvent */, int /* imageX */, int /* imageY */)
 {
+  // empty default implementation
 }
 
 void cedar::aux::gui::QImagePlot::showLegend(bool show)
