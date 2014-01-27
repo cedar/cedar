@@ -171,6 +171,8 @@ public:
   /*! connect to the signal that is sent when the thread will be stopped via stop()
    * The Signal will not be called if the thread already stopped before on its own (i.e. via a requestStop() or it finished).
    *
+   * DEPRECATED because you will almost always want to call connectToQuitSignal!
+   *
    * The signal is:
    * Called in context of the holding thread. 
    * The thread (and worker) may still be executing, but the requestStop
@@ -180,7 +182,7 @@ public:
    * Preconditions: the worker exists and its pointer is still valid.
    * @see: connectToQuitSignal
    */
-  boost::signals2::connection connectToStopSignal(boost::function<void ()> slot);
+  CEDAR_DECLARE_DEPRECATED( boost::signals2::connection connectToStopSignal(boost::function<void ()> slot) );
 
   /*! connect to the signal that is sent when Thread quits (terminates normally)
    *
