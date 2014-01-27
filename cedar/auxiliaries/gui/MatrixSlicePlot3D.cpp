@@ -87,11 +87,6 @@ mDesiredColumns(0)
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::MatrixSlicePlot3D::init()
 {
-  QVBoxLayout* p_layout = new QVBoxLayout();
-  p_layout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(p_layout);
-  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-
   this->setFocusPolicy(Qt::StrongFocus);
   this->setToolTip(QString("Use + and - to alter number of columns."));
 
