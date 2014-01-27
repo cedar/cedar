@@ -376,6 +376,9 @@ protected:
    */
   void emitOutputPropertiesChangedSignal(const std::string& slot);
 
+  //! Determines the validity of an input slot anew.
+  void redetermineInputValidity(const std::string& slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
