@@ -48,7 +48,7 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+#include "cedar/auxiliaries/CallFunctionInThreadALot.fwd.h"
 #include "cedar/auxiliaries/BoolParameter.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/Step.fwd.h"
@@ -392,7 +392,7 @@ private:
   bool mAutoLockInputsAndOutputs;
 
   //! Used for calling this->getFinishedTrigger() in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mFinishedCaller;
+  cedar::aux::CallFunctionInThreadALotPtr mFinishedCaller;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

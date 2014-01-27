@@ -62,6 +62,8 @@ cedar_add_library(cedaraux
   MOC_HEADERS
   ThreadWrapper.h
   detail/ThreadWorker.h
+  CallFunctionInThreadALot.h
+  detail/CallFunctionInThreadALotWorker.h
   LoopedThread.h
   LocalCoordinateFrame.h
   gl/ObjectVisualization.h

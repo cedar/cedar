@@ -53,7 +53,7 @@
 #include "cedar/units/prefixes.h"
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/Recorder.h"
-#include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/CallFunctionInThreadALot.h"
 
 // SYSTEM INCLUDES
 #include <QMutexLocker>
@@ -91,7 +91,8 @@ mAutoLockInputsAndOutputs(true)
   // create the finished trigger singleton.
   this->getFinishedTrigger();
 
-  this->mFinishedCaller = boost::make_shared<cedar::aux::CallFunctionInThread>(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
+  this->mFinishedCaller = boost::make_shared<cedar::aux::CallFunctionInThreadALot>(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
+  this->mFinishedCaller->start();
 
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -115,7 +116,8 @@ mAutoLockInputsAndOutputs(true)
   // create the finished trigger singleton.
   this->getFinishedTrigger();
 
-  this->mFinishedCaller = boost::make_shared<cedar::aux::CallFunctionInThread>(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
+  this->mFinishedCaller = boost::make_shared<cedar::aux::CallFunctionInThreadALot>(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
+  this->mFinishedCaller->start();
 
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -413,7 +415,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
       {
         try
         {
-          this->mFinishedCaller->start();
+          this->mFinishedCaller->execute();
         }
         catch (const cedar::aux::ThreadingErrorException& e)
         {
