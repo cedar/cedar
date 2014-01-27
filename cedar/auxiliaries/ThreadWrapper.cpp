@@ -55,8 +55,8 @@
 cedar::aux::ThreadWrapper::ThreadWrapper()
 :
 mpThread(NULL),
-mDestructing(false),
 mReallocateOnStart(true),
+mDestructing(false),
 mStopRequested(false),
 mpWorker(NULL)
 {
@@ -125,7 +125,6 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
       // need to wait for the thread to finish of its own accord, to make sure
       // the worker doesnt continue with work() (or step()) after we 
       // have been detructed
-      //!@todo See comment below: is it possible that the thread is destroyed while we wait?
       auto old_thread = this->mpThread;
       thread_worker_readlock.unlock();
 
@@ -334,7 +333,6 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
 
   // note, we cannot test isRunning(), here, per premise that we
   // are operating without locks
-  //!@todo isRunning() has no locks anymore. still valid?
 
   if (mDestructing) // always test after locking, see start()
     return;
@@ -402,8 +400,12 @@ bool cedar::aux::ThreadWrapper::isValidThread() const
   return mpThread != NULL;
 }
 
-
 void cedar::aux::ThreadWrapper::stop(unsigned int time, bool /*suppressWarning*/ )
+{
+  cedar::aux::ThreadWrapper::stop(time);
+}
+
+void cedar::aux::ThreadWrapper::stop(unsigned int time)
 {
   if (mDestructing) // quick abort, see below
     return;
@@ -445,7 +447,6 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool /*suppressWarning*/
       // std::cout << "  (current thread: " << QThread::currentThread() << std::endl;
 
       // make a copy of the thread pointer, it may get deleted due to being stopped
-      //!@todo Is this maybe a problem? (another thread may delete the QThread object while we wait)
       QThread* old_thread = mpThread;
       thread_worker_readlock.unlock();
 
