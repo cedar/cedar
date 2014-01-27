@@ -289,6 +289,9 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     return;
   }
 
+  // make sure noone changes the connections while the trigger call is being processed
+  QReadLocker connections_locker(this->mpConnectionLock);
+
   // if there are invalid inputs, stop
   if (!this->allInputsValid())
   {

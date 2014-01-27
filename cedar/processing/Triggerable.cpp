@@ -59,6 +59,8 @@ mpStartCallsLock(new QMutex())
 
 cedar::proc::Triggerable::~Triggerable()
 {
+  QReadLocker reader(&mTriggersListenedToLock);
+
   while (!this->mTriggersListenedTo.empty())
   {
     cedar::proc::TriggerPtr trigger = this->mTriggersListenedTo.begin()->lock();
@@ -124,11 +126,13 @@ bool cedar::proc::Triggerable::exceptionWrappedCall
 
 void cedar::proc::Triggerable::triggeredBy(cedar::proc::TriggerPtr trigger)
 {
+  QWriteLocker locker(&mTriggersListenedToLock);
   this->mTriggersListenedTo.insert(trigger);
 }
 
 void cedar::proc::Triggerable::noLongerTriggeredBy(cedar::proc::TriggerPtr trigger)
 {
+  QWriteLocker locker(&mTriggersListenedToLock);
   auto iter = this->mTriggersListenedTo.find(trigger);
   CEDAR_ASSERT(iter != this->mTriggersListenedTo.end());
   this->mTriggersListenedTo.erase(iter);
