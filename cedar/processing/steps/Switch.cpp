@@ -233,6 +233,7 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       if (data)
       {
         this->mInput1 = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(data);
+        this->redetermineInputValidity("input 2");
       }
       else
       {
@@ -245,6 +246,7 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       if (data)
       {
         this->mInput2 = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(data);
+        this->redetermineInputValidity("input 1");
       }
       else
       {
