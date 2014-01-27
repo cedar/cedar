@@ -272,7 +272,7 @@ void cedar::aux::ThreadWrapper::start()
 
     // when the thread finishes (returns from run()), react to it:
     connect( mpWorker, SIGNAL(finishedWorking()), this, SLOT(finishedWorkSlot()), Qt::DirectConnection );
-    // this will be called on a thread termination (should not happen):
+    // this will be called on a thread termination:
     connect( mpThread, SIGNAL(finished()), this, SLOT(quittedThreadSlot()), Qt::DirectConnection );
 
     thread_worker_writelock.unlock();
@@ -308,8 +308,6 @@ void cedar::aux::ThreadWrapper::startedThreadSlot()
 void cedar::aux::ThreadWrapper::finishedWorkSlot()
 {
   // is called in the new thread's context(!)
-
-  // std::cout << "finished work" << std::endl;
 
   QThread::currentThread()->quit();
 }

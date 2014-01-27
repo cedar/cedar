@@ -118,6 +118,11 @@ public:
   //! Execute the function in its own thread.
   void execute();
 
+  //! is the step currently executing?
+  bool isExecuting();
+
+  void finishedWorkSlot() override;
+
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
@@ -144,6 +149,10 @@ private:
 private:
   //! the worker pointer
   cedar::aux::detail::CallFunctionInThreadALotWorker* mpWorker;
+
+  bool mExecuting;
+  mutable QReadWriteLock mExecutingLock;
+
 }; // class cedar::aux::CallFunctionInThreadALot
 
 #endif // CEDAR_AUX_LOOPED_THREAD_H

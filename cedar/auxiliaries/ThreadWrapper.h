@@ -223,7 +223,7 @@ public slots:
   //! slot called when thread starts, context: the calling thread
   void startedThreadSlot();
   //! slot called when the worker finishes, context: the new thread
-  void finishedWorkSlot();
+  virtual void finishedWorkSlot();
 
 signals:
   //! signal is emitted when the worker normally finished its work.

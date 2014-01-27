@@ -63,6 +63,17 @@ cedar::aux::CallFunctionInThreadALot::~CallFunctionInThreadALot()
 // methods
 //------------------------------------------------------------------------------
 
+bool cedar::aux::CallFunctionInThreadALot::isExecuting()
+{
+  if (!mExecutingLock.tryLockForWrite()) // allow us to return to ignore the lock
+  {
+    return true;
+  }
+
+  mExecutingLock.unlock();
+  return false;
+}
+
 void cedar::aux::CallFunctionInThreadALot::call()
 {
   // called via friend worker class
@@ -72,7 +83,7 @@ void cedar::aux::CallFunctionInThreadALot::call()
 cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionInThreadALot::resetWorker()
 {
   auto worker = new cedar::aux::detail::CallFunctionInThreadALotWorker(this);
-
+  
   connect( this, SIGNAL(executeSignal()), worker, SLOT(executeSlot()), Qt::QueuedConnection );
 
     // intentionally returns a raw pointer, see parent
@@ -81,6 +92,32 @@ cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionInThreadALot::resetWor
 
 void cedar::aux::CallFunctionInThreadALot::execute()
 {
+  if (!mExecutingLock.tryLockForWrite())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Calling execute() on a still calculating execute(). check isExecuting() before calling execute()!",
+      "cedar::aux::CallFunctionInThreadALot::execute()"
+    );
+  }
+
+  // check if we are running?
+
+  if (!isRunning())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "calling execute() on a not running thread! did you forget to start() it?",
+      "cedar::aux::CallFunctionInThreadALot::execute()"
+    );
+  }
+
   emit executeSignal();
+  mExecutingLock.unlock();
+}
+
+void cedar::aux::CallFunctionInThreadALot::finishedWorkSlot()
+{
+  // do nothing (the base class calls quit() instead)
 }
 

@@ -411,7 +411,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     // trigger subsequent steps in a non-blocking manner
     if (this->isLooped())
     {
-      if (!this->mFinishedCaller->isRunning())
+      if (!this->mFinishedCaller->isExecuting())
       {
         try
         {
