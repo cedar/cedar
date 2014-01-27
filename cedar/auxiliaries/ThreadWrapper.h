@@ -118,11 +118,11 @@ public:
    *
    *@param timeout: a value != 0 will abort waiting on the worker thread after
    *        the timeout-period. Use with caution.
-   *@param suppressWarning: will be passed to the signal StopSignal
    * @see requestStop()
    */
-  void stop(unsigned int timeout = UINT_MAX, bool suppressWarning = false); 
-  //!@todo: deprecate 2 parameter version
+  void stop(unsigned int timeout = UINT_MAX); 
+  CEDAR_DECLARE_DEPRECATED( void stop(unsigned int timeout, bool suppressWarning) );
+  //! @todo: delete deprecated function in future version
 
   /*! start the thread and initialize the worker
    *
@@ -253,12 +253,12 @@ private:
    */
   virtual cedar::aux::detail::ThreadWorker* resetWorker() = 0;
 
-  /*! deprecated: please use conntetToStopSignal
+  /*! deprecated: please use connectToStopSignal
    *@todo: remove in future version
    */
   CEDAR_DECLARE_DEPRECATED(virtual void applyStop(bool suppressWarning));
 
-  /*! deprecated: please use conntetToStopSignal
+  /*! deprecated: please use connectToStopSignal
    *@todo: remove in future version
    */
   CEDAR_DECLARE_DEPRECATED(virtual void applyStart());
