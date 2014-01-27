@@ -212,6 +212,11 @@ public:
   //! is the thread still running? (This method is NOT thread safe.)
   bool isRunningNolocking() const;
 
+  //! Reallocate the worker and thread when re-starting? Default: yes
+  void setReallocateOnStart(bool);
+  //! Reallocate the worker and thread when re-starting?
+  bool getReallocateOnStart();
+
 public slots:
   //! slot called when thread finishes. context: the new thread
   void quittedThreadSlot(); 
@@ -274,6 +279,8 @@ private:
   //! the new thread's QThread holding object
   QThread* mpThread;
     // inentionally a raw pointer. will be destroyed via QT's deleteLater()
+  //! whether the thread and worker will be reallocated on restart.
+  bool mReallocateOnStart;
 
   //! are we currently destructing?
   mutable bool mDestructing; 
@@ -290,6 +297,8 @@ private:
 
   //! Lock for mpThread and mpWorker
   mutable QReadWriteLock mThreadAndWorkerLock;
+
+  mutable QReadWriteLock mReallocateOnStartLock;
 
 
   //!@brief stop is requested
