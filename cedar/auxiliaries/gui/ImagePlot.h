@@ -119,7 +119,7 @@ protected:
   //!@brief create and handle the context menu
   void fillContextMenu(QMenu& menu);
 
-  void plotClicked(QMouseEvent* pEvent, int imageX, int imageY);
+  void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
