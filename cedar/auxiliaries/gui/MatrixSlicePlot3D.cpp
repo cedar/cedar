@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
+#include <QToolTip>
 #include <QVBoxLayout>
 #include <QThread>
 #include <QReadLocker>
@@ -265,6 +266,52 @@ bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
 
   return true;
 }
+
+void cedar::aux::gui::MatrixSlicePlot3D::plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY)
+{
+  QReadLocker locker(&this->mData->getLock());
+
+  int padding = 1;
+
+  int idx_row = static_cast<int>(relativeImageY * static_cast<double>(mSliceMatrix.rows));
+  int idx_col = static_cast<int>(relativeImageX * static_cast<double>(mSliceMatrix.cols));
+
+  cv::Mat mat = this->mData->getData();
+  auto size = mat.size;
+
+  int idx_2_per_row = mSliceMatrix.cols / (size[1] + padding) + 1; // +1 because there is no padding on the right side
+
+  int idx[3];
+  idx[0] = idx_row % (size[0] + padding);
+  idx[1] = idx_col % (size[1] + padding);
+  idx[2] = idx_col / (size[1] + padding) + idx_2_per_row * (idx_row / (size[0] + padding));
+
+  // if we hit the white matter, return
+  if (idx[0] >= size[0] || idx[1] >= size[1] || idx[2] >= size[2])
+  {
+    return;
+  }
+
+  QString info_text = QString("index = (%1, %2, %3)<br />value = %4").arg(idx[0]).arg(idx[1]).arg(idx[2]);
+
+  switch (mat.type())
+  {
+    case CV_32F:
+      info_text = info_text.arg(mat.at<float>(idx));
+      break;
+
+    case CV_64F:
+      info_text = info_text.arg(mat.at<double>(idx));
+      break;
+
+    default:
+      info_text = info_text.arg("-");
+  }
+
+  QToolTip::showText(pEvent->globalPos(), info_text);
+  locker.unlock();
+}
+
 
 void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
 {
