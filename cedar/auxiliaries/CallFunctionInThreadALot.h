@@ -133,6 +133,9 @@ private:
   //! overwritten method. return a new worker pointer
   cedar::aux::detail::ThreadWorker* resetWorker();
 
+  //! called when stop() is called
+  void processStop();
+
 signals:
   void executeSignal(); 
 

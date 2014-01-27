@@ -233,7 +233,8 @@ signals:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-
+  //! helper function to quit the thread
+  void forceQuitThread(); // intentionally protected!
 
   //----------------------------------------------------------------------------
   // private methods

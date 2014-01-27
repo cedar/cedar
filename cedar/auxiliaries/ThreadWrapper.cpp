@@ -540,4 +540,14 @@ bool cedar::aux::ThreadWrapper::getReallocateOnStart()
   return mReallocateOnStart;
 }
  
+void cedar::aux::ThreadWrapper::forceQuitThread()
+{
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
+
+  if (mpThread != NULL)
+  {
+    mpThread->quit();
+  }
+}
+
 

@@ -53,6 +53,7 @@ cedar::aux::CallFunctionInThreadALot::CallFunctionInThreadALot
 : mFunction(fun)
 {
   setReallocateOnStart(false); // we get a lot of quick re-starts
+  this->connectToStopSignal(boost::bind(&cedar::aux::CallFunctionInThreadALot::processStop, this));
 }
 
 cedar::aux::CallFunctionInThreadALot::~CallFunctionInThreadALot()
@@ -119,5 +120,10 @@ void cedar::aux::CallFunctionInThreadALot::execute()
 void cedar::aux::CallFunctionInThreadALot::finishedWorkSlot()
 {
   // do nothing (the base class calls quit() instead)
+}
+
+void cedar::aux::CallFunctionInThreadALot::processStop()
+{
+  forceQuitThread();
 }
 
