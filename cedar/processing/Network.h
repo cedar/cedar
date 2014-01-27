@@ -452,6 +452,9 @@ public:
   //! Reads the meta information from the given file and extracts the plugins required by the architecture.
   static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
 
+  //! Returns a list of all steps that are in an invalid state.
+  std::vector<std::string> listInvalidSteps() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
