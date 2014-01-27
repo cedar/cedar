@@ -56,6 +56,7 @@ cedar::aux::ThreadWrapper::ThreadWrapper()
 :
 mpThread(NULL),
 mDestructing(false),
+mReallocateOnStart(true),
 mStopRequested(false),
 mpWorker(NULL)
 {
@@ -280,8 +281,15 @@ void cedar::aux::ThreadWrapper::start()
   }
   else
   {
-    CEDAR_THROW(cedar::aux::ThreadingErrorException, 
-      "Re-starting a not cleanly finished thread. Continuing.");
+    if (!getReallocateOnStart())
+    {
+      CEDAR_THROW(cedar::aux::ThreadingErrorException, 
+        "Re-starting a not cleanly finished thread. Continuing.");
+    }
+    else
+    {
+      // all is good
+    }
   }
 
   thread_worker_readlock.unlock(); // unlock for signalling ...
@@ -365,17 +373,20 @@ void cedar::aux::ThreadWrapper::scheduleThreadDeletion()
   {
     CEDAR_ASSERT( mpWorker != NULL );
 
-    auto tmp_thread = mpThread;
-    auto tmp_worker = mpWorker;
+    if (!getReallocateOnStart())
+    {
+      auto tmp_thread = mpThread;
+      auto tmp_worker = mpWorker;
 
-    // allow me to restart a new thread/worker
-    mpThread = NULL;
-    mpWorker = NULL;
+      // force me to reallocate a new thread/worker on the next start()
+      mpThread = NULL;
+      mpWorker = NULL;
 
-  //!@todo this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app): not that important
-  //!@todo it will also lead to a destruction of a held mutex (in helgrind). not that important
-    tmp_thread->deleteLater();
-    tmp_worker->deleteLater();
+      //!@todo this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app): not that important
+      //!@todo it will also lead to a destruction of a held mutex (in helgrind). not that important
+      tmp_thread->deleteLater();
+      tmp_worker->deleteLater();
+    }
   }
 }
 
@@ -517,4 +528,17 @@ void cedar::aux::ThreadWrapper::applyStop(bool)
 {
   // deprecated
 }
+
+void cedar::aux::ThreadWrapper::setReallocateOnStart(bool doit)
+{
+  QWriteLocker locker(&mReallocateOnStartLock);
+  mReallocateOnStart = doit;
+}
+
+bool cedar::aux::ThreadWrapper::getReallocateOnStart()
+{
+  QReadLocker locker(&mReallocateOnStartLock);
+  return mReallocateOnStart;
+}
+ 
 
