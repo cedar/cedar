@@ -63,7 +63,7 @@ mName(name)
   this->setStepSize(recordIntervall);
 
   this->connectToStartSignal(boost::bind(&cedar::aux::DataSpectator::prepareStart, this));
-  this->connectToStopSignal(boost::bind(&cedar::aux::DataSpectator::processQuit, this));
+  this->connectToQuitSignal(boost::bind(&cedar::aux::DataSpectator::processQuit, this));
 }
 
 

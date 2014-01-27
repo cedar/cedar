@@ -91,7 +91,7 @@ cedar::aux::LoopedThread()
   this->init(grabberchannels);
 
   this->connectToStartSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::prepareStart, this));
-  this->connectToStopSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::processStop, this));
+  this->connectToQuitSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::processQuit, this));
 }
 
 
@@ -439,7 +439,7 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                            );
 }
 
-void cedar::dev::sensors::visual::Grabber::processStop()
+void cedar::dev::sensors::visual::Grabber::processQuit()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
