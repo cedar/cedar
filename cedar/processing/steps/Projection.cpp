@@ -272,6 +272,14 @@ void cedar::proc::steps::Projection::reconfigure()
     {
       this->mpProjectionMethod = &cedar::proc::steps::Projection::expand0DtoND;
     }
+    else if (input_dimensionality == 1 && output_dimensionality == 3)
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand1Dto3D;
+    }
+    else if (input_dimensionality == 2 && output_dimensionality == 3)
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand2Dto3D;
+    }
     else
     {
       this->mpProjectionMethod = &cedar::proc::steps::Projection::expandMDtoND;
@@ -370,6 +378,211 @@ void cedar::proc::steps::Projection::expand1Dto2D()
   if (transposed)
   {
     output = output.t();
+  }
+}
+
+void cedar::proc::steps::Projection::expand2Dto3D()
+{
+  const cv::Mat& input = this->mInput->getData();
+  cv::Mat& output = this->mOutput->getData();
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(input);
+  unsigned int output_dimensionality = cedar::aux::math::getDimensionalityOf(output);
+  // sanity check
+  CEDAR_DEBUG_ASSERT(input_dimensionality == 2 && output_dimensionality == 3);
+  auto mapping = _mDimensionMappings->getValue();
+  unsigned int number_of_mappings = mapping->getNumberOfMappings();
+  unsigned int i = 0;
+  // do this lookup only once, assuming that mapping does not change at run time...
+  mMappingLookup.resize(number_of_mappings);
+  for (i = 0; i < number_of_mappings; ++i)
+  {
+    mMappingLookup.at(i) = mapping->lookUp(i);
+  }
+  CEDAR_DEBUG_ASSERT(mMappingLookup.size() == 2);
+  float value;
+  int x;
+  int y;
+  int target_index;
+  if (std::find(mMappingLookup.begin(), mMappingLookup.end(), 0) == mMappingLookup.end()) // expand over dim 0
+  {
+    if (mMappingLookup.at(0) == 1) // not flipped
+    {
+      for (x = 0; x < input.size[0]; ++x)
+      {
+        for (y = 0; y < input.size[1]; ++y)
+        {
+          value = input.at<float>(x, y);
+          for (target_index = 0; target_index < output.size[0]; ++ target_index)
+          {
+            output.at<float>(target_index, x, y) = value;
+          }
+        }
+      }
+    }
+    else // flipped
+    {
+      for (x = 0; x < input.size[0]; ++x)
+      {
+        for (y = 0; y < input.size[1]; ++y)
+        {
+          value = input.at<float>(x, y);
+          for (target_index = 0; target_index < output.size[0]; ++ target_index)
+          {
+            output.at<float>(target_index, y, x) = value;
+          }
+        }
+      }
+    }
+  }
+  else if (std::find(mMappingLookup.begin(), mMappingLookup.end(), 1) == mMappingLookup.end()) // expand over dim 1
+  {
+    if (mMappingLookup.at(0) == 0) // not flipped
+    {
+      for (x = 0; x < input.size[0]; ++x)
+      {
+        for (y = 0; y < input.size[1]; ++y)
+        {
+          value = input.at<float>(x, y);
+          for (target_index = 0; target_index < output.size[1]; ++ target_index)
+          {
+            output.at<float>(x, target_index, y) = value;
+          }
+        }
+      }
+    }
+    else // flipped
+    {
+      for (x = 0; x < input.size[0]; ++x)
+      {
+        for (y = 0; y < input.size[1]; ++y)
+        {
+          value = input.at<float>(x, y);
+          for (target_index = 0; target_index < output.size[0]; ++ target_index)
+          {
+            output.at<float>(y, target_index, x) = value;
+          }
+        }
+      }
+    }
+  }
+  else if (std::find(mMappingLookup.begin(), mMappingLookup.end(), 2) == mMappingLookup.end()) // expand over dim 2
+  {
+    if (mMappingLookup.at(0) == 0) // not flipped
+    {
+      for (x = 0; x < input.size[0]; ++x)
+      {
+        for (y = 0; y < input.size[1]; ++y)
+        {
+          value = input.at<float>(x, y);
+          for (target_index = 0; target_index < output.size[2]; ++ target_index)
+          {
+            output.at<float>(x, y, target_index) = value;
+          }
+        }
+      }
+    }
+    else // flipped
+    {
+      for (x = 0; x < input.size[0]; ++x)
+      {
+        for (y = 0; y < input.size[1]; ++y)
+        {
+          value = input.at<float>(x, y);
+          for (target_index = 0; target_index < output.size[2]; ++ target_index)
+          {
+            output.at<float>(y, x, target_index) = value;
+          }
+        }
+      }
+    }
+  }
+  else
+  {
+    CEDAR_ASSERT(false);
+  }
+}
+
+void cedar::proc::steps::Projection::expand1Dto3D()
+{
+  const cv::Mat& input = this->mInput->getData();
+  cv::Mat& output = this->mOutput->getData();
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(input);
+  unsigned int output_dimensionality = cedar::aux::math::getDimensionalityOf(output);
+  // sanity check
+  CEDAR_DEBUG_ASSERT(input_dimensionality == 1 && output_dimensionality == 3);
+  auto mapping = _mDimensionMappings->getValue();
+  unsigned int number_of_mappings = mapping->getNumberOfMappings();
+  unsigned int i = 0;
+  // do this lookup only once, assuming that mapping does not change at run time...
+  mMappingLookup.resize(number_of_mappings);
+  for (i = 0; i < number_of_mappings; ++i)
+  {
+    mMappingLookup.at(i) = mapping->lookUp(i);
+  }
+  CEDAR_DEBUG_ASSERT(mMappingLookup.size() == 1);
+  switch (mMappingLookup.at(0))
+  {
+    // do not allocate these for every for loop
+    int x;
+    int y;
+    case 0:
+    {
+      float value;
+      // outer loop
+      for (int source_index = 0; source_index < input.rows; ++ source_index)
+      {
+        // get value
+        value = input.at<float>(source_index, 0);
+        for (x = 0; x < output.size[1]; ++x)
+        {
+          for (y = 0; y < output.size[2]; ++y)
+          {
+            output.at<float>(source_index, x, y) = value;
+          }
+        }
+      }
+      break;
+    }
+    case 1:
+    {
+      float value;
+      // outer loop
+      for (int source_index = 0; source_index < input.rows; ++ source_index)
+      {
+        // get value
+        value = input.at<float>(source_index, 0);
+        for (x = 0; x < output.size[0]; ++x)
+        {
+          for (y = 0; y < output.size[2]; ++y)
+          {
+            output.at<float>(x, source_index, y) = value;
+          }
+        }
+      }
+      break;
+    }
+    case 2:
+    {
+      float value;
+      // outer loop
+      for (int source_index = 0; source_index < input.rows; ++ source_index)
+      {
+        // get value
+        value = input.at<float>(source_index, 0);
+        for (x = 0; x < output.size[0]; ++x)
+        {
+          for (y = 0; y < output.size[1]; ++y)
+          {
+            output.at<float>(x, y, source_index) = value;
+          }
+        }
+      }
+      break;
+    }
+    default:
+    {
+      CEDAR_ASSERT(false);
+    }
   }
 }
 
