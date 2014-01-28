@@ -66,6 +66,9 @@ cedar::aux::gui::ThreadedPlot::~ThreadedPlot()
 {
   // stop the timer (the thread itself will stop automatically)
   this->stop();
+
+  // preemptively disconnect all slots so that no new events are posted to this class
+  QObject::disconnect(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,8 +130,9 @@ void cedar::aux::gui::ThreadedPlot::start()
 
 void cedar::aux::gui::ThreadedPlot::stop()
 {
-  if (mTimerId != 0)
+  if (this->mTimerId != 0)
   {
     this->killTimer(mTimerId);
+    this->mTimerId = 0;
   }
 }

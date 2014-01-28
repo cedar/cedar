@@ -58,6 +58,7 @@ cedar::aux::CallFunctionInThreadALot::CallFunctionInThreadALot
 
 cedar::aux::CallFunctionInThreadALot::~CallFunctionInThreadALot()
 {
+  this->forceQuitThread();
 }
 
 //------------------------------------------------------------------------------
