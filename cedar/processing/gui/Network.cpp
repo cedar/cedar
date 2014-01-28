@@ -560,10 +560,10 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
     cedar::aux::ConfigurationNode node;
     node.put("type","stickyNote");
     QRectF rect = note->boundingRect();
-    node.put("width",(int)rect.width());
-    node.put("height",(int)rect.height());
-    node.put("x",(int)note->scenePos().x());
-    node.put("y",(int)note->scenePos().y());
+    node.put("width",rect.width());
+    node.put("height",rect.height());
+    node.put("x",note->scenePos().x());
+    node.put("y",note->scenePos().y());
     node.put("text",note->getText());
     QColor color = note->getColor();
     node.put("r",color.red());
@@ -1105,10 +1105,10 @@ void cedar::proc::gui::Network::readStickyNotes(cedar::aux::ConfigurationNode& n
     const std::string& type = iter->second.get<std::string>("type");
     if (type == "stickyNote")
     {
-      int x = iter->second.get<int>("x");
-      int y = iter->second.get<int>("y");
-      int witdh = iter->second.get<int>("width");
-      int height = iter->second.get<int>("height");
+      float x = iter->second.get<float>("x");
+      float y = iter->second.get<float>("y");
+      float witdh = iter->second.get<float>("width");
+      float height = iter->second.get<float>("height");
       const std::string& text = iter->second.get<std::string>("text");
       cedar::proc::gui::StickyNote* note = this->mpScene->addStickyNote(x, y, witdh, height, text);
       int r = iter->second.get<int>("r");
