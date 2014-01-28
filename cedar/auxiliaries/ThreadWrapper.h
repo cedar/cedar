@@ -198,9 +198,9 @@ public:
   /*! connect to the signal that is sent when the thread will start
    *
    * The signal is:
-   * Called in context of the holding thread. 
-   * Called before the thread does anything else.
-   * Initially blocks the first run of the custom thread.
+   * Called in context of the thread that called start().
+   * Blocks that thread.
+   * Called before the thread does anything else, i.e. before it really starts running.
    *
    * Preconditions: the worker exists and its pointer is still valid.
    */
