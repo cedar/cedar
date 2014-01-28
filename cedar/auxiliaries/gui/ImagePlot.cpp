@@ -257,6 +257,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
     }
 
     case CV_32FC1:
+    case CV_64FC1:
     {
       // convert grayscale to three-channel matrix
       cv::Mat copy = mat.clone();
@@ -459,6 +460,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         switch (in.type())
         {
           case CV_32F:
+          case CV_64F:
           {
             double min_val = this->mValueLimits.getLower();
             double max_val = this->mValueLimits.getUpper();
