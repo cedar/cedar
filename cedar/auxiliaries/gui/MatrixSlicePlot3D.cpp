@@ -92,6 +92,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
   this->setToolTip(QString("Use + and - to alter number of columns."));
 
   this->setLegendAvailable(true);
+  this->setValueScalingEnabled(true);
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
@@ -139,6 +140,12 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   double min = std::numeric_limits<double>::max();
   double max = -std::numeric_limits<double>::max();
 
+  if (!this->mAutoScaling)
+  {
+    min = this->mValueLimits.getLower();
+    max = this->mValueLimits.getUpper();
+  }
+
   // decide which plot code is used depending on the OpenCV version
   // versions are defined since version 2.4, which supports the following code
 #if defined CV_MINOR_VERSION and defined CV_MAJOR_VERSION and CV_MAJOR_VERSION >= 2 and CV_MINOR_VERSION >= 4
@@ -181,10 +188,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     slice.copyTo(mSliceMatrix(dest_rows, dest_cols));
     frame(dest_rows, dest_cols) = cv::Scalar(0);
 
-    double local_min, local_max;
-    cv::minMaxLoc(slice, &local_min, &local_max);
-    max = std::max(local_max, max);
-    min = std::min(local_min, min);
+    if (this->mAutoScaling)
+    {
+      double local_min, local_max;
+      cv::minMaxLoc(slice, &local_min, &local_max);
+      max = std::max(local_max, max);
+      min = std::min(local_min, min);
+    }
   }
 #else
   // for each tile, copy content to right place
@@ -212,12 +222,23 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       }
     }
   }
-  cv::minMaxLoc(mSliceMatrix, &min, &max);
+  if (this->mAutoScaling)
+  {
+    cv::minMaxLoc(mSliceMatrix, &min, &max);
+  }
+  else
+  {
+    min = this->mValueLimits.getLower();
+    max = this->mValueLimits.getUpper();
+  }
 #endif // OpenCV version
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
 
-  emit minMaxChanged(min, max);
+  if (this->mAutoScaling)
+  {
+    emit minMaxChanged(min, max);
+  }
 
   mSliceMatrixByteC3 = cedar::aux::gui::ImagePlot::colorizedMatrix(mSliceMatrixByte);
 
