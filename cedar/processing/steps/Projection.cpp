@@ -398,6 +398,7 @@ void cedar::proc::steps::Projection::expand2Dto3D()
   {
     mMappingLookup.at(i) = mapping->lookUp(i);
   }
+  CEDAR_DEBUG_ASSERT(mMappingLookup.size() == 2);
   float value;
   int x;
   int y;
@@ -499,9 +500,6 @@ void cedar::proc::steps::Projection::expand2Dto3D()
   {
     CEDAR_ASSERT(false);
   }
-  CEDAR_DEBUG_ASSERT(mMappingLookup.size() == 2);
-
-
 }
 
 void cedar::proc::steps::Projection::expand1Dto3D()
