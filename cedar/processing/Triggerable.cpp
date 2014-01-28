@@ -59,12 +59,84 @@ mpStartCallsLock(new QMutex())
 
 cedar::proc::Triggerable::~Triggerable()
 {
+  QReadLocker reader(&mTriggersListenedToLock);
+
+  while (!this->mTriggersListenedTo.empty())
+  {
+    cedar::proc::TriggerPtr trigger = this->mTriggersListenedTo.begin()->lock();
+    CEDAR_ASSERT(trigger);
+    trigger->removeListener(this);
+  }
   delete this->mpStartCallsLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::Triggerable::exceptionWrappedCall
+     (
+       const boost::function<void()>& call,
+       const std::string& messagePreface,
+       cedar::proc::Triggerable::State state
+     )
+     throw()
+{
+  try
+  {
+    // execute the function
+    call();
+  }
+  // catch exceptions and translate them to the given state/message
+  catch(const cedar::aux::ExceptionBase& e)
+  {
+    std::string message = messagePreface + ": " + e.exceptionInfo();
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      message,
+      "cedar::proc::Triggerable::exceptionWrappedCall()"
+    );
+    this->setState(state, message);
+    return true;
+  }
+  catch(const std::exception& e)
+  {
+    std::string message = messagePreface + ": " + std::string(e.what());
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      message,
+      "cedar::proc::Triggerable::exceptionWrappedCall()"
+    );
+    this->setState(state, message);
+    return true;
+  }
+  catch(...)
+  {
+    std::string message = messagePreface + ": Unknown exception type.";
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      message,
+      "cedar::proc::Triggerable::exceptionWrappedCall()"
+    );
+    this->setState(state, message);
+    return true;
+  }
+  return false;
+}
+
+void cedar::proc::Triggerable::triggeredBy(cedar::proc::TriggerPtr trigger)
+{
+  QWriteLocker locker(&mTriggersListenedToLock);
+  this->mTriggersListenedTo.insert(trigger);
+}
+
+void cedar::proc::Triggerable::noLongerTriggeredBy(cedar::proc::TriggerPtr trigger)
+{
+  QWriteLocker locker(&mTriggersListenedToLock);
+  auto iter = this->mTriggersListenedTo.find(trigger);
+  CEDAR_ASSERT(iter != this->mTriggersListenedTo.end());
+  this->mTriggersListenedTo.erase(iter);
+}
 
 boost::signals2::connection cedar::proc::Triggerable::connectToStateChanged(boost::function<void ()> slot)
 {
@@ -90,19 +162,25 @@ void cedar::proc::Triggerable::callOnStart()
 {
   // make sure no other thread can start the step
   QMutexLocker locker(this->mpStartCallsLock);
-//  cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
-//  std::cout << named->getName() << "->callOnStart():" << __LINE__ << ": " << this->mStartCalls << std::endl;
 
   // only call onStart if this triggerable hasn't been started yet
+  bool exception_occurred = false;
   if (this->mStartCalls == 0)
   {
-    this->onStart();
+    exception_occurred
+      = this->exceptionWrappedCall
+        (
+          boost::bind(&cedar::proc::Triggerable::onStart, this),
+          "An exception occurred while calling onStart(). You can fix this by restarting the trigger. The exception is",
+          cedar::proc::Triggerable::STATE_EXCEPTION_ON_START
+        );
   }
 
   // count how often this triggerable was started
-  ++this->mStartCalls;
-
-//  std::cout << named->getName() << "->callOnStart():" << __LINE__ << ": " << this->mStartCalls << std::endl;
+  if (!exception_occurred)
+  {
+    ++this->mStartCalls;
+  }
 
   locker.unlock();
 
@@ -120,10 +198,9 @@ void cedar::proc::Triggerable::callOnStop()
   // only call onStop if there is only one trigger left that started this triggerable
   QMutexLocker locker(this->mpStartCallsLock);
   cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
-//  std::cout << named->getName() << "->callOnStop():" << __LINE__ << ": " << this->mStartCalls << std::endl;
 
   // count how often this was stopped
-  if (this->mStartCalls == 0)
+  if (this->mStartCalls == 0 && this->getState() != cedar::proc::Triggerable::STATE_EXCEPTION_ON_START)
   {
     std::string name = "(unnamed step)";
     if (named)
@@ -131,21 +208,29 @@ void cedar::proc::Triggerable::callOnStop()
       name = named->getName();
     }
     // should not happen, but to prevent lockups in the architecture, we just put out an error and stop doing stuff.
-    cedar::aux::LogSingleton::getInstance()->error
+    cedar::aux::LogSingleton::getInstance()->debugMessage
     (
       "Step \"" + name + "\" has an invalid start count.",
       "void cedar::proc::Triggerable::callOnStop()"
     );
     return;
   }
+  else if (this->mStartCalls == 0 && this->getState() == cedar::proc::Triggerable::STATE_EXCEPTION_ON_START)
+  {
+    // reset state to unknown
+    this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+    return;
+  }
   --this->mStartCalls;
 
   if (this->mStartCalls == 0)
   {
-    this->onStop();
+    this->exceptionWrappedCall
+    (
+      boost::bind(&cedar::proc::Triggerable::onStop, this),
+      "An exception occurred while calling onStop()"
+    );
   }
-
-//  std::cout << named->getName() << "->callOnStop():" << __LINE__ << ": " << this->mStartCalls << std::endl;
 
   locker.unlock();
 
@@ -201,7 +286,8 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getFinishedTrigger()
 {
   if (!this->mFinished)
   {
-    mFinished = cedar::proc::TriggerPtr(new cedar::proc::Trigger("processingDone"));
+    this->mFinished = cedar::proc::TriggerPtr(new cedar::proc::Trigger("processingDone"));
+    this->mFinished->setOwner(this);
   }
   return this->mFinished;
 }

@@ -55,14 +55,20 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #ifndef Q_MOC_RUN
   #include <boost/lexical_cast.hpp>
   #include <boost/make_shared.hpp>
+  #include <boost/units/cmath.hpp>
 #endif
 #include <QApplication>
+#include <vector>
+#include <set>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -97,10 +103,10 @@ namespace
     // define field plot again, but this time with image plots
     //!@todo different icon
     ElementDeclaration::PlotDefinition field_image_plot_data("field plot (image)", ":/cedar/dynamics/gui/field_image_plot.svg");
-    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot"));
-    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot"));
-    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::OUTPUT, "activation", true, "cedar::aux::gui::ImagePlot"));
-    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::OUTPUT, "sigmoided activation", false, "cedar::aux::gui::ImagePlot"));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::OUTPUT, "activation", true, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::OUTPUT, "sigmoided activation", false, "cedar::aux::gui::ImagePlot")));
     declaration->definePlot(field_image_plot_data);
 
     ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
@@ -517,19 +523,19 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
     neural_noise = this->_mNoiseCorrelationKernelConvolution->convolve(neural_noise);
 
-    //!@todo not sure, if dividing time by 1000 (which is an implicit tau) makes any sense or should be a parameter
+    //!@todo not sure, if dividing time by 1s (which is an implicit tau) makes any sense or should be a parameter
     //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
-    sigmoid_u = _mSigmoid->getValue()->compute<float>
+    sigmoid_u = _mSigmoid->getValue()->compute
                 (
                   u
-                  + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1000.0))
+                  + sqrt(time / (1.0 * cedar::unit::second))
                     * neural_noise
                 );
   }
   else
   {
     // calculate output
-    sigmoid_u = _mSigmoid->getValue()->compute<float>(u);
+    sigmoid_u = _mSigmoid->getValue()->compute(u);
   }
   sigmoid_u_lock.unlock();
 
@@ -555,8 +561,9 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cv::randn(input_noise, cv::Scalar(0), cv::Scalar(1));
 
   // integrate one time step
-  u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u
-         + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1.0)) / tau
+  u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u
+       //!@todo Something may be wrong with the units here: technically, this would be sqrt(ms) / ms, which just seems to be a silly unit,
+       + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
            * _mInputNoiseGain->getValue() * input_noise;
 }
 

@@ -38,15 +38,23 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
+#include <QReadLocker>
+#include <QWriteLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::aux::conv::KernelList::KernelList()
+:
+mCombinedKernel(new cedar::aux::MatData())
+{
 
+}
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -54,21 +62,30 @@
 void cedar::aux::conv::KernelList::append(cedar::aux::kernel::KernelPtr kernel)
 {
   this->mKernels.push_back(kernel);
-
+  this->connect(kernel.get(), SIGNAL(kernelUpdated()), SLOT(calculateCombinedKernel()));
+  calculateCombinedKernel();
   this->mKernelAddedSignal(this->mKernels.size() - 1);
 }
 
 void cedar::aux::conv::KernelList::remove(size_t index)
 {
   CEDAR_ASSERT(index < this->size());
-
+  this->mKernels.at(index)->disconnect(this, SIGNAL(kernelUpdated()));
   this->mKernels.erase(this->mKernels.begin() + index);
-
+  calculateCombinedKernel();
   this->mKernelRemovedSignal(index);
 }
 
 cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
 {
+  QReadLocker read_lock(&this->mCombinedKernel->getLock());
+  cv::Mat combined = this->mCombinedKernel->getData().clone();
+  return combined;
+}
+
+void cedar::aux::conv::KernelList::calculateCombinedKernel()
+{
+  QWriteLocker write_lock(&this->mCombinedKernel->getLock());
   // sanity check
   if (this->size() > 1)
   {
@@ -149,7 +166,9 @@ cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
       new_combined_kernel(&ranges.front()) += this->getKernel(i)->getKernel();
     }
   }
-  return new_combined_kernel;
+  mCombinedKernel->setData(new_combined_kernel);
+  write_lock.unlock();
+  emit combinedKernelUpdated();
 }
 
 bool cedar::aux::conv::KernelList::checkForSameKernelSize() const

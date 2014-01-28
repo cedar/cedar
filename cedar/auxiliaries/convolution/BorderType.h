@@ -38,11 +38,13 @@
 #define CEDAR_AUX_CONV_BORDER_TYPE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/EnumBase.h"
 
-// SYSTEM INCLUDES
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/convolution/BorderType.fwd.h"
 
+// SYSTEM INCLUDES
+#include <opencv2/imgproc/imgproc.hpp>
 
 /*!@brief An enum class for the different kinds of border handling in convolution methods.
  */

@@ -38,8 +38,10 @@
 #define CEDAR_AUX_FACTORY_DERIVED_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Factory.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/FactoryDerived.fwd.h"
 
 // SYSTEM INCLUDES
 

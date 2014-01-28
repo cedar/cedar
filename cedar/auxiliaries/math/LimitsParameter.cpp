@@ -36,9 +36,23 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/LimitsParameter.h"
+#include "cedar/auxiliaries/LengthParameter.h"
+#include "cedar/auxiliaries/TimeParameter.h"
+#include "cedar/auxiliaries/VelocityParameter.h"
+#include "cedar/auxiliaries/AccelerationParameter.h"
+#include "cedar/auxiliaries/PlaneAngleParameter.h"
+#include "cedar/auxiliaries/AngularVelocityParameter.h"
+#include "cedar/auxiliaries/FrequencyParameter.h"
 
 // SYSTEM INCLUDES
 
 template class cedar::aux::math::LimitsParameter<double>;
 template class cedar::aux::math::LimitsParameter<int>;
 template class cedar::aux::math::LimitsParameter<unsigned int>;
+template class cedar::aux::math::LimitsParameter<cedar::unit::Length>;
+template class cedar::aux::math::LimitsParameter<cedar::unit::Time>;
+template class cedar::aux::math::LimitsParameter<cedar::unit::Velocity>;
+template class cedar::aux::math::LimitsParameter<cedar::unit::Acceleration>;
+template class cedar::aux::math::LimitsParameter<cedar::unit::PlaneAngle>;
+template class cedar::aux::math::LimitsParameter<cedar::unit::AngularVelocity>;
+template class cedar::aux::math::LimitsParameter<cedar::unit::Frequency>;

@@ -93,7 +93,7 @@ cedar::proc::steps::ChannelSplit::ChannelSplit()
   this->mChannelData.resize(4);
   for (size_t i = 0; i < this->mChannelData.size(); ++i)
   {
-    this->mChannelData.at(i) = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F)));
+    this->mChannelData.at(i) = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat()));
     this->declareOutput(this->generateDataName(i), this->mChannelData.at(i));
   }
 }
@@ -161,7 +161,7 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
   {
     color_space = this->mInput->getAnnotation<cedar::aux::annotation::ColorSpace>();
 
-    CEDAR_ASSERT(color_space->getNumberOfChannels() == num_channels);
+    CEDAR_ASSERT(color_space->getNumberOfChannels() >= num_channels);
   }
   catch (cedar::aux::AnnotationNotFoundException)
   {

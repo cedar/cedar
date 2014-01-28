@@ -44,14 +44,13 @@
 #include "cedar/processing/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::Dynamics::Dynamics()
 :
-cedar::proc::Step(false, true)
+cedar::proc::Step(true)
 {
 }
 

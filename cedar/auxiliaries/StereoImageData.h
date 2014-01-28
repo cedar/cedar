@@ -40,8 +40,10 @@
 #define CEDAR_AUX_STEREO_IMAGE_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Data.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/StereoImageData.fwd.h"
 
 // SYSTEM INCLUDES
 //#include <QReadWriteLock>

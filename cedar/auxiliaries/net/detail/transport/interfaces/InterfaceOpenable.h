@@ -42,24 +42,19 @@
 #define CEDAR_INTERFACE_OPENABLE_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/interfaces/InterfaceOpenable.fwd.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
-
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief internal Interface 
  *
  * Implemented by AbstractNetWriter and Reader
  */
-class InterfaceOpenable
+class cedar::aux::net::detail::InterfaceOpenable
 {
 protected:
   /*!@brief open the port (called at RIAA object creation) */
@@ -71,6 +66,5 @@ protected:
 };
 
 //!@endcond
-} } } } // end namespace
 
 #endif

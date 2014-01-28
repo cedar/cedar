@@ -35,5 +35,7 @@
 #=======================================================================================================================
 
 cedar_add_unit_test(Projection
-  Projection.cpp
+                    Projection.cpp
+                    ADDITIONAL_DEPENDENCIES
+                    cedardyn
 )

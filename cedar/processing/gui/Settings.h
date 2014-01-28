@@ -38,15 +38,20 @@
 #define CEDAR_PROC_GUI_SETTINGS_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Enum.h"
 #include "cedar/auxiliaries/EnumType.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/Settings.fwd.h"
+#include "cedar/processing/gui/UiSettings.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QDockWidget>
@@ -157,16 +162,6 @@ public:
   //!@brief saves the UI settings
   void save();
 
-  //! Loads the plugins set to be loaded by default.
-  void loadDefaultPlugins();
-
-  //!@brief returns a list of all plugins that should be loaded on start-up
-  const std::set<std::string>& pluginsToLoad();
-  //!@brief adds a plugin to the list of plugins that are loaded on start-up
-  void addPluginToLoad(const std::string& path);
-  //!@brief removes a plugin from the list of plugins that are loaded on start-up
-  void removePluginToLoad(const std::string& path);
-
   //!@brief returns the settings concerning the docking behavior for the log widget
   DockSettingsPtr logSettings();
   //!@brief returns the settings concerning the docking behavior for the tools widget
@@ -180,9 +175,6 @@ public:
   void storeMainWindow(QMainWindow *pWindow);
   //!@brief restores a state of the main window
   void restoreMainWindow(QMainWindow *pWindow);
-
-  //!@brief returns the last directory, from which a plugin was loaded
-  cedar::aux::DirectoryParameterPtr lastPluginLoadDialogLocation();
 
   //!@brief returns the last directory, from which an architecture was loaded
   cedar::aux::DirectoryParameterPtr lastArchitectureLoadDialogDirectory();
@@ -244,6 +236,18 @@ public:
     return this->_mHighlightConnections->getValue();
   }
 
+  //! Returns whether or not deprecated steps should be displayed in the element list.
+  bool getElementListShowsDeprecated() const;
+
+  //! Sets whether or not deprecated steps should be displayed in the element list.
+  void setElementListShowsDeprecated(bool show);
+
+  //! Returns the parameter that stores whether element lists should show deprecated types.
+  cedar::aux::BoolParameterPtr getElementListShowsDeprecatedParameter() const
+  {
+    return this->_mElementListShowsDeprecated;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -272,9 +276,6 @@ protected:
   // none yet
 
 private:
-  //!@brief List of plugins that should be loaded on startup.
-  cedar::aux::StringSetParameterPtr mPluginsToLoad;
-
   //!@brief the settings concerning the docking behavior for the log widget
   DockSettingsPtr mLog;
 
@@ -292,9 +293,6 @@ private:
 
   //!@brief list of bytes coming from Qt (minimized, maximized, ...)
   cedar::aux::StringParameterPtr mMainWindowState;
-
-  //!@brief Directory, where the PluginLoadDialog is supposed to open.
-  cedar::aux::DirectoryParameterPtr mPluginLoadDialogLocation;
 
   //!@brief Directory, where the load dialog for architectures is supposed to open.
   cedar::aux::DirectoryParameterPtr mArchitectureLoadDialogDirectory;
@@ -328,6 +326,9 @@ private:
 
   //! Maximum number of entries in the recent files list.
   cedar::aux::UIntParameterPtr _mMaxFileHistorySize;
+
+  //! Whether or not the element list should display deprecated element types.
+  cedar::aux::BoolParameterPtr _mElementListShowsDeprecated;
 
 }; // class cedar::proc::gui::Settings
 

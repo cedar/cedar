@@ -39,8 +39,10 @@
 #define CEDAR_PROC_GUI_RECORDER_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/Step.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -73,20 +75,24 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public slots:
+public:
   //!@brief Sets the obtained step and recreating the widget to set the record parameters.
   void setStep(cedar::proc::StepPtr step);
- 
-  //!@brief Resets this widget
-  void resetContents();
 
-  //!@brief Unregister all slots of this step;
-  void unregister(cedar::proc::StepPtr pStep);
+  //!@brief Resets the widget and its GUI elements.
+  void clearLayout();
 
   /*!@brief If the name of a Step has changed all slots have to unregister in the recoder and 
    *registered with the new name.
    */
+
+  void emitStepRegisteredinRecorder();
+public slots:
   void updateName();
+
+
+signals:
+  void stepRegisteredinRecorder();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -94,9 +100,6 @@ public slots:
 private:
   //!@brief Updates the GUI.
   void refreshWidget();
-
-  //!@brief Resets the widget and its GUI elements.
-  void clearLayout();
 
   //!@brief Create the headers for the Widget.
   void createHeader(const std::string& name);

@@ -48,47 +48,39 @@
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
+#include <QToolTip>
 #include <QVBoxLayout>
 #include <QThread>
 #include <QReadLocker>
 #include <QWriteLocker>
 #include <QKeyEvent>
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(QWidget* pParent)
 :
-cedar::aux::gui::PlotInterface(pParent),
-mTimerId(0),
+cedar::aux::gui::QImagePlot(pParent),
 mDataIsSet(false),
-mDesiredColumns(0),
-mConverting(false)
+mDesiredColumns(0)
 {
   this->init();
 }
 
-cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent)
+cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D
+(
+  cedar::aux::ConstDataPtr matData,
+  const std::string& title,
+  QWidget* pParent
+)
 :
-cedar::aux::gui::PlotInterface(pParent),
-mTimerId(0),
+cedar::aux::gui::QImagePlot(pParent),
 mDataIsSet(false),
-mDesiredColumns(0),
-mConverting(false)
+mDesiredColumns(0)
 {
   this->init();
   this->plot(matData, title);
-}
-
-cedar::aux::gui::MatrixSlicePlot3D::~MatrixSlicePlot3D()
-{
-  if (this->mpWorkerThread)
-  {
-    this->mpWorkerThread->quit();
-    this->mpWorkerThread->wait();
-    delete this->mpWorkerThread;
-    this->mpWorkerThread = NULL;
-  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -96,33 +88,16 @@ cedar::aux::gui::MatrixSlicePlot3D::~MatrixSlicePlot3D()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::MatrixSlicePlot3D::init()
 {
-  QVBoxLayout* p_layout = new QVBoxLayout();
-  p_layout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(p_layout);
-  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-
-  mpImageDisplay = new QLabel("no image loaded");
-  p_layout->addWidget(mpImageDisplay);
-  mpImageDisplay->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  mpImageDisplay->setWordWrap(true);
   this->setFocusPolicy(Qt::StrongFocus);
   this->setToolTip(QString("Use + and - to alter number of columns."));
 
-  this->mpWorkerThread = new QThread();
-  mWorker = cedar::aux::gui::detail::MatrixSlicePlot3DWorkerPtr(new cedar::aux::gui::detail::MatrixSlicePlot3DWorker(this));
-  mWorker->moveToThread(this->mpWorkerThread);
-
-  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
-  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
-
-  this->mpWorkerThread->start(QThread::LowPriority);
+  this->setLegendAvailable(true);
+  this->setValueScalingEnabled(true);
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
-  if (mTimerId != 0)
-    this->killTimer(mTimerId);
-
+  this->stop();
 
   this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
@@ -138,25 +113,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, con
   }
   mDataIsSet = true;
 
-  mpImageDisplay->setText("slice plot");
+  this->setInfo("slice plot");
 
   if (!this->mData->getData().empty())
   {
-    mpImageDisplay->setText("");
-    this->mTimerId = this->startTimer(70);
-    CEDAR_DEBUG_ASSERT(mTimerId != 0);
+    this->setInfo("");
+    this->start();
   }
-}
-
-void cedar::aux::gui::MatrixSlicePlot3D::timerEvent(QTimerEvent* /*pEvent*/)
-{
-  if (!this->isVisible() || !mDataIsSet || mConverting)
-  {
-    return;
-  }
-
-  mConverting = true;
-  emit convert();
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
@@ -173,6 +136,15 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   mSliceMatrixByte = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC1);
   mSliceMatrixByteC3 = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC3);
   cv::Mat frame = cv::Mat::ones(mSliceMatrixByte.rows, mSliceMatrixByte.cols, mSliceMatrixByte.type());
+
+  double min = std::numeric_limits<double>::max();
+  double max = -std::numeric_limits<double>::max();
+
+  if (!this->mAutoScaling)
+  {
+    min = this->mValueLimits.getLower();
+    max = this->mValueLimits.getUpper();
+  }
 
   // decide which plot code is used depending on the OpenCV version
   // versions are defined since version 2.4, which supports the following code
@@ -215,6 +187,14 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 
     slice.copyTo(mSliceMatrix(dest_rows, dest_cols));
     frame(dest_rows, dest_cols) = cv::Scalar(0);
+
+    if (this->mAutoScaling)
+    {
+      double local_min, local_max;
+      cv::minMaxLoc(slice, &local_min, &local_max);
+      max = std::max(local_max, max);
+      min = std::min(local_min, min);
+    }
   }
 #else
   // for each tile, copy content to right place
@@ -242,107 +222,118 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       }
     }
   }
+  if (this->mAutoScaling)
+  {
+    cv::minMaxLoc(mSliceMatrix, &min, &max);
+  }
+  else
+  {
+    min = this->mValueLimits.getLower();
+    max = this->mValueLimits.getUpper();
+  }
 #endif // OpenCV version
-  double min, max;
-  cv::minMaxLoc(mSliceMatrix, &min, &max);
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
+
+  if (this->mAutoScaling)
+  {
+    emit minMaxChanged(min, max);
+  }
 
   mSliceMatrixByteC3 = cedar::aux::gui::ImagePlot::colorizedMatrix(mSliceMatrixByte);
 
   mSliceMatrixByteC3.setTo(0xFFFFFF, frame);
 
-  QWriteLocker lock(&this->mImageLock);
-  this->mImage = QImage
-  (
-    mSliceMatrixByteC3.data,
-    mSliceMatrixByteC3.cols,
-    mSliceMatrixByteC3.rows,
-    mSliceMatrixByteC3.step,
-    QImage::Format_RGB888
-  ).rgbSwapped();
+  this->displayMatrix(mSliceMatrixByteC3);
 }
 
-void cedar::aux::gui::MatrixSlicePlot3D::resizeEvent(QResizeEvent* /*pEvent*/)
+bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
 {
-  this->resizePixmap();
-}
-
-void cedar::aux::gui::MatrixSlicePlot3D::resizePixmap()
-{
-  QReadLocker lock(&this->mImageLock);
-  QSize scaled_size = this->mImage.size();
-  scaled_size.scale(this->mpImageDisplay->size(), Qt::KeepAspectRatio);
-  if ( (!this->mpImageDisplay->pixmap()
-        || scaled_size != this->mpImageDisplay->pixmap()->size()
-        )
-        && !this->mImage.isNull()
-      )
+  if (!mDataIsSet)
   {
-    QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(),
-                                              Qt::KeepAspectRatio,
-                                              Qt::SmoothTransformation);
-    this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
+    return false;
   }
-}
 
-//!@cond SKIPPED_DOCUMENTATION
-void cedar::aux::gui::detail::MatrixSlicePlot3DWorker::convert()
-{
-  // convert
-  this->mpPlot->updateData();
-
-  emit done();
-}
-//!@endcond
-
-void cedar::aux::gui::MatrixSlicePlot3D::updateData()
-{
-  const cv::Mat& mat = this->mData->getData();
-  if (cedar::aux::math::getDimensionalityOf(mat) != 3) // plot is no longer capable of displaying the data
+  QReadLocker locker(&this->mData->getLock());
+  if (this->mData->getDimensionality() != 3) // plot is no longer capable of displaying the data
   {
     emit dataChanged();
-    return;
+    return false;
   }
 
-  this->mData->lockForRead();
+  const cv::Mat& mat = this->mData->getData();
   if (mat.empty())
   {
-    this->mpImageDisplay->setText("Matrix is empty.");
-    this->mData->unlock();
-    return;
+    this->setInfo("Matrix is empty.");
+    return false;
   }
-  int type = mat.type();
-  this->mData->unlock();
-
-  switch(type)
+  cv::Mat cloned_mat = mat.clone();
+  locker.unlock();
+  switch(cloned_mat.type())
   {
 //  case CV_8UC1:
     case CV_32FC1:
 //  case CV_64FC1:
     {
-      this->mData->lockForRead();
-      this->slicesFromMat(mat);
-      this->mData->unlock();
+      this->slicesFromMat(cloned_mat);
       break;
     }
 
     default:
-      QString text = QString("Unhandled matrix type %1.").arg(mat.type());
-      this->mpImageDisplay->setText(text);
-      return;
+      QString text = QString("Unhandled matrix type %1.").arg(cloned_mat.type());
+      this->setInfo(text.toStdString());
+      return false;
   }
+
+  return true;
 }
 
-void cedar::aux::gui::MatrixSlicePlot3D::conversionDone()
+void cedar::aux::gui::MatrixSlicePlot3D::plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY)
 {
-  QReadLocker lock(&this->mImageLock);
-  this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
-  lock.unlock();
+  QReadLocker locker(&this->mData->getLock());
 
-  this->resizePixmap();
-  mConverting = false;
+  int padding = 1;
+
+  int idx_row = static_cast<int>(relativeImageY * static_cast<double>(mSliceMatrix.rows));
+  int idx_col = static_cast<int>(relativeImageX * static_cast<double>(mSliceMatrix.cols));
+
+  cv::Mat mat = this->mData->getData();
+  auto size = mat.size;
+
+  int idx_2_per_row = mSliceMatrix.cols / (size[1] + padding) + 1; // +1 because there is no padding on the right side
+
+  int idx[3];
+  idx[0] = idx_row % (size[0] + padding);
+  idx[1] = idx_col % (size[1] + padding);
+  idx[2] = idx_col / (size[1] + padding) + idx_2_per_row * (idx_row / (size[0] + padding));
+
+  // if we hit the white matter, return
+  if (idx[0] >= size[0] || idx[1] >= size[1] || idx[2] >= size[2])
+  {
+    return;
+  }
+
+  QString info_text = QString("index = (%1, %2, %3)<br />value = %4").arg(idx[0]).arg(idx[1]).arg(idx[2]);
+
+  switch (mat.type())
+  {
+    case CV_32F:
+      info_text = info_text.arg(mat.at<float>(idx));
+      break;
+
+    case CV_64F:
+      info_text = info_text.arg(mat.at<double>(idx));
+      break;
+
+    default:
+      info_text = info_text.arg("-");
+  }
+
+  QToolTip::showText(pEvent->globalPos(), info_text);
+  locker.unlock();
 }
+
+
 void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
 {
   switch (pEvent->key())

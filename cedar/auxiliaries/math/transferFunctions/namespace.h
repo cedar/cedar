@@ -41,26 +41,13 @@
 #include "cedar/auxiliaries/math/namespace.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif
 
+#warning Do not include this header any more. Use the forward declaration headers insteaed.
 
-namespace cedar
-{
-  namespace aux
-  {
-    namespace math
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(LinearTransferFunction);
-      CEDAR_DECLARE_AUX_CLASS(SemiLinearTransferFunction);
-      //!@endcond
-    }
-  }
-}
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.fwd.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.fwd.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.fwd.h"
+#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.fwd.h"
+#include "cedar/auxiliaries/math/transferFunctions/SemiLinearTransferFunction.fwd.h"
 
 #endif // CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H

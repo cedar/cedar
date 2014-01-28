@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Resize.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
 
