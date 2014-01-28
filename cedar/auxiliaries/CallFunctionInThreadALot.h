@@ -121,7 +121,7 @@ public:
   //! is the step currently executing?
   bool isExecuting();
 
-  void finishedWorkSlot() override;
+  void finishedWorkSlot();
 
   //----------------------------------------------------------------------------
   // private methods
