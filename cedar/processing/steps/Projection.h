@@ -184,6 +184,10 @@ private:
   void expand0DtoND();
   //!@brief expands a 1D input to an 2D output
   void expand1Dto2D();
+  //!@brief expands a 1D input to an 3D output
+  void expand1Dto3D();
+  //!@brief expands a 2D input to an 3D output
+  void expand2Dto3D();
   //!@brief expands and permutes MD input to ND output (M <= N)
   void expandMDtoND();
   //!@brief compresses ND input to 0D output by computing the minimum over all positions
