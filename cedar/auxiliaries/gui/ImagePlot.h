@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/QImagePlot.h"
-#include "cedar/auxiliaries/math/Limits.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -95,10 +94,6 @@ public:
    */
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
-  /*! Sets fixed limits for the plot values.
-   */
-  void setLimits(double min, double max);
-
   /*!@brief Applies a color scale to a matrix.
    *
    * @param matrix Matrix to colorize
@@ -108,17 +103,10 @@ public:
    */
   static cv::Mat colorizedMatrix(cv::Mat matrix, bool limits = false, double min = 0.0, double max = 0.0);
 
-public slots:
-  //! Enables automatic scaling.
-  void setAutomaticScaling();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief create and handle the context menu
-  void fillContextMenu(QMenu& menu);
-
   void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,9 +122,6 @@ private:
 
   bool doConversion();
 
-private slots:
-  void queryFixedValueScale();
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -151,12 +136,6 @@ private:
 
   //! Type of the data.
   DataType mDataType;
-
-  //! Whether scaling of plots is determined automatically or fixed.
-  bool mAutoScaling;
-
-  //! Limits for fixed scaling.
-  cedar::aux::math::Limits<double> mValueLimits;
 
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;
