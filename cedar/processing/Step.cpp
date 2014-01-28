@@ -127,8 +127,6 @@ mAutoLockInputsAndOutputs(true)
 
 cedar::proc::Step::~Step()
 {
-  this->mFinishedCaller->stop();
-  this->mFinishedCaller->wait();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
