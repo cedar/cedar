@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
+#include <QToolTip>
 #include <QVBoxLayout>
 #include <QThread>
 #include <QReadLocker>
@@ -91,6 +92,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
   this->setToolTip(QString("Use + and - to alter number of columns."));
 
   this->setLegendAvailable(true);
+  this->setValueScalingEnabled(true);
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
@@ -138,6 +140,12 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   double min = std::numeric_limits<double>::max();
   double max = -std::numeric_limits<double>::max();
 
+  if (!this->mAutoScaling)
+  {
+    min = this->mValueLimits.getLower();
+    max = this->mValueLimits.getUpper();
+  }
+
   // decide which plot code is used depending on the OpenCV version
   // versions are defined since version 2.4, which supports the following code
 #if defined CV_MINOR_VERSION and defined CV_MAJOR_VERSION and CV_MAJOR_VERSION >= 2 and CV_MINOR_VERSION >= 4
@@ -180,10 +188,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     slice.copyTo(mSliceMatrix(dest_rows, dest_cols));
     frame(dest_rows, dest_cols) = cv::Scalar(0);
 
-    double local_min, local_max;
-    cv::minMaxLoc(slice, &local_min, &local_max);
-    max = std::max(local_max, max);
-    min = std::min(local_min, min);
+    if (this->mAutoScaling)
+    {
+      double local_min, local_max;
+      cv::minMaxLoc(slice, &local_min, &local_max);
+      max = std::max(local_max, max);
+      min = std::min(local_min, min);
+    }
   }
 #else
   // for each tile, copy content to right place
@@ -211,12 +222,23 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       }
     }
   }
-  cv::minMaxLoc(mSliceMatrix, &min, &max);
+  if (this->mAutoScaling)
+  {
+    cv::minMaxLoc(mSliceMatrix, &min, &max);
+  }
+  else
+  {
+    min = this->mValueLimits.getLower();
+    max = this->mValueLimits.getUpper();
+  }
 #endif // OpenCV version
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
 
-  emit minMaxChanged(min, max);
+  if (this->mAutoScaling)
+  {
+    emit minMaxChanged(min, max);
+  }
 
   mSliceMatrixByteC3 = cedar::aux::gui::ImagePlot::colorizedMatrix(mSliceMatrixByte);
 
@@ -265,6 +287,52 @@ bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
 
   return true;
 }
+
+void cedar::aux::gui::MatrixSlicePlot3D::plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY)
+{
+  QReadLocker locker(&this->mData->getLock());
+
+  int padding = 1;
+
+  int idx_row = static_cast<int>(relativeImageY * static_cast<double>(mSliceMatrix.rows));
+  int idx_col = static_cast<int>(relativeImageX * static_cast<double>(mSliceMatrix.cols));
+
+  cv::Mat mat = this->mData->getData();
+  auto size = mat.size;
+
+  int idx_2_per_row = mSliceMatrix.cols / (size[1] + padding) + 1; // +1 because there is no padding on the right side
+
+  int idx[3];
+  idx[0] = idx_row % (size[0] + padding);
+  idx[1] = idx_col % (size[1] + padding);
+  idx[2] = idx_col / (size[1] + padding) + idx_2_per_row * (idx_row / (size[0] + padding));
+
+  // if we hit the white matter, return
+  if (idx[0] >= size[0] || idx[1] >= size[1] || idx[2] >= size[2])
+  {
+    return;
+  }
+
+  QString info_text = QString("index = (%1, %2, %3)<br />value = %4").arg(idx[0]).arg(idx[1]).arg(idx[2]);
+
+  switch (mat.type())
+  {
+    case CV_32F:
+      info_text = info_text.arg(mat.at<float>(idx));
+      break;
+
+    case CV_64F:
+      info_text = info_text.arg(mat.at<double>(idx));
+      break;
+
+    default:
+      info_text = info_text.arg("-");
+  }
+
+  QToolTip::showText(pEvent->globalPos(), info_text);
+  locker.unlock();
+}
+
 
 void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
 {
