@@ -79,6 +79,9 @@ void cedar::aux::CallFunctionInThreadALot::call()
 {
   // called via friend worker class
   mFunction();
+
+  // unlock, it was locked in execute()
+  mExecutingLock.unlock();
 }
 
 cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionInThreadALot::resetWorker()
@@ -93,6 +96,8 @@ cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionInThreadALot::resetWor
 
 void cedar::aux::CallFunctionInThreadALot::execute()
 {
+  // trying for the lock will NOT block the call. But you should test this via isExecuting()
+  // this lock will be unlocked in call()
   if (!mExecutingLock.tryLockForWrite())
   {
     cedar::aux::LogSingleton::getInstance()->warning
@@ -114,7 +119,6 @@ void cedar::aux::CallFunctionInThreadALot::execute()
   }
 
   emit executeSignal();
-  mExecutingLock.unlock();
 }
 
 void cedar::aux::CallFunctionInThreadALot::finishedWorkSlot()
