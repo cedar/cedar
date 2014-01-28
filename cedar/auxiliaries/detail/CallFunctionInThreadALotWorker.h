@@ -35,8 +35,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_CALL_FUN_THREADWORKER_H
-#define CEDAR_CALL_FUN_THREADWORKER_H
+#ifndef CEDAR_CALL_FUN_THREAD_ALOT_WORKER_H
+#define CEDAR_CALL_FUN_THREAD_ALOT_WORKER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -85,5 +85,5 @@ class cedar::aux::detail::CallFunctionInThreadALotWorker : public cedar::aux::de
 };
 
 
-#endif
+#endif // CEDAR_CALL_FUN_THREAD_ALOT_WORKER_H
 
