@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_WORKER_FWD_H
-#define CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_WORKER_FWD_H
+#ifndef CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_ALOT_WORKER_FWD_H
+#define CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_ALOT_WORKER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -62,5 +62,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_WORKER_FWD_H
+#endif // CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_ALOT_WORKER_FWD_H
 
