@@ -1,0 +1,150 @@
+/*======================================================================================================================
+
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        ExperimentDialog.cpp
+
+    Maintainer:  Christian Bodenstein
+    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
+    Date:        2014 01 22
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+// CEDAR INCLUDES
+#include "cedar/processing/gui/ExperimentDialog.h"
+#include "cedar/processing/gui/Network.h"
+
+// SYSTEM INCLUDES
+#include <QFileDialog>
+#include <QMessageBox>
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* parent)
+{
+  mParent = parent;
+  this->setupUi(this);
+  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(save()));
+  connect(this->loadButton, SIGNAL(clicked()), this, SLOT(load()));
+  connect(this->saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
+  connect(this->nameEdit, SIGNAL(editingFinished()), this, SLOT(nameChanged()));
+  connect(this->runButton, SIGNAL(toggled(bool)), this, SLOT(runExperiment(bool)));
+  connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(repetitionChanged()));
+  this->experiment = boost::shared_ptr<cedar::proc::experiment::Experiment>
+                 (
+                     new cedar::proc::experiment::Experiment(mParent->getNetwork()->getNetwork())
+                 );
+  this->experiment->setName("TestExperiment");
+
+}
+
+cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
+{
+
+}
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+
+void cedar::proc::gui::ExperimentDialog::save()
+{
+  std::string filename = this->experiment->getFileName();
+  if (filename.empty())
+  {
+    this->saveAs();
+  }
+  else
+  {
+    this->experiment->writeJson(filename);
+  }
+}
+
+void cedar::proc::gui::ExperimentDialog::saveAs()
+{
+  std::string old_file = this->experiment->getFileName();
+  std::string filename = QFileDialog::getSaveFileName(this,tr("Save Experiment"),tr(old_file.c_str()),tr("Experiment Files (*.json)")).toStdString();
+  if (!filename.empty())
+  {
+    this->experiment->setFileName(filename);
+    this->experiment->writeJson(filename);
+  }
+}
+
+
+void cedar::proc::gui::ExperimentDialog::load()
+{
+  std::string old_file = this->experiment->getFileName();
+  std::string filename = QFileDialog::getOpenFileName(this,tr("Open Experiment"),tr(old_file.c_str()),tr("Experiment Files (*.json)")).toStdString();
+  if (!filename.empty())
+  {
+    this->experiment->readJson(filename);
+    this->experiment->setFileName(filename);
+    this->nameEdit->setText(QString::fromStdString(this->experiment->getName()));
+    this->repetitionSpinBox->setValue(this->experiment->getRepetitions());
+  }
+}
+
+
+void cedar::proc::gui::ExperimentDialog::nameChanged()
+{
+  this->experiment->setName(nameEdit->text().toStdString());
+}
+
+
+void cedar::proc::gui::ExperimentDialog::repetitionChanged()
+{
+  this->experiment->setRepetitions(this->repetitionSpinBox->value());
+}
+
+
+void cedar::proc::gui::ExperimentDialog::runExperiment(bool status)
+{
+  if (status)
+  {
+    this->experiment->run();
+    this->runButton->setText(QString::fromStdString("Cancel"));
+  }
+  else
+  {
+    QMessageBox::StandardButton cancel = QMessageBox::warning(this,"Cancel Experiment",
+        "Do you really want to cancel this experiment", QMessageBox::Yes|QMessageBox::No);
+    if (cancel == QMessageBox::Yes)
+    {
+      this->experiment->cancel();
+      this->runButton->setText(QString::fromStdString("Run"));
+    }
+    else
+    {
+      this->runButton->setChecked(true);
+    }
+  }
+}

@@ -1,0 +1,27 @@
+/*!
+@page ParametersConcept Storing and loading configurations for parameters
+
+@section ParametersIntroduction Overview
+Working with dynamics and robots will  sooner or later put you in the situation of having a large set of parameters for
+a multitude of architecture parts, which took a lot of time figuring out and tuning to your demands. You may also want 
+to work with different sets of parameters for different scenarios, robots, or situations. For all your parameter needs,
+cedar includes an easy-to-use configuration interface based on 
+<a href=http://www.boost.org/doc/libs/1_48_0/libs/config/doc/html/index.html>Boost.Config</a>. 
+
+Parameterizing your own classes boils down to declaring members of a specific templated type, specialized for the data
+type that you need. For example, adding a resting level as parameter to a neural field class would require using a
+cedar::aux::DoubleParameter. Storing and retrieving the state of this parameter is then handled by internal structures.
+You do not have to take care of how a double value can be stored in a file or read from a file. All you need to specify
+is the file name and path.
+
+cedar not only takes care of storing and loading configurations of your classes. If you use the graphical user interface
+to set up and execute your architectures, cedar automatically creates appropriate graphical representations of your
+parameters, which allow you to check and alter the value of a parameter at runtime. Saving an architecture then also
+saves all alterations.
+
+You can also create custom parameter types by using the templated class cedar::aux::ParameterTemplate or inheriting
+from cedar::aux::Parameter. Note that you may have to provide the graphical representation for your parameter, as 
+cedar cannot automatically handle custom parameters.
+
+For details of the code-side of this (including a tutorial), see @ref ConfigurableAndParameters.
+*/
