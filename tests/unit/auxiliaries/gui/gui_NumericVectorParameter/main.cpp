@@ -132,7 +132,7 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
   std::cout << "Testing " << cedar::aux::typeToString<ParameterType>()
             << " with " << cedar::aux::typeToString<WidgetType>() << std::endl;
 
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ParameterType);
+  typedef boost::intrusive_ptr<ParameterType> ParameterTypePtr;
   cedar::aux::ConfigurablePtr test_cfg(new cedar::aux::Configurable());
 
   ParameterTypePtr parameter

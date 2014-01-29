@@ -44,7 +44,7 @@
 #define CEDAR_ABSTRACT_NET_WRITER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/AbstractNetWriter.fwd.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetBase.h"
 
 // PROJECT INCLUDES
@@ -53,6 +53,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string>
 
 namespace cedar {
   namespace aux {

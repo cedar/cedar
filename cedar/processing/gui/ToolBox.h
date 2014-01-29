@@ -42,13 +42,16 @@
 #define CEDAR_PROC_GUI_TOOLBOX_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/ToolBox.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QGridLayout>
 #include <QToolButton>
 #include <map>
+#include <string>
 
 
 /*!@brief This is a base class for widgets that contain little boxes that represent some tools.

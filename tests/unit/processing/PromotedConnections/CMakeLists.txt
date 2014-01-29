@@ -36,4 +36,6 @@
 
 cedar_add_unit_test(PromotedConnections
                     main.cpp
+                    ADDITIONAL_DEPENDENCIES
+                    cedardyn
                     )

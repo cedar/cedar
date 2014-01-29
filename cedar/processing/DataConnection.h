@@ -38,12 +38,14 @@
 #define CEDAR_PROC_DATA_CONNECTION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/DataConnection.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief   This is a class that represents a connection between two data items.
+/*!@brief   This is a class that represents a connection between two data slots.
  *
  * @remarks This class is used internally in the processing framework, do not use it directly.
  */
@@ -68,11 +70,23 @@ public:
   //!@brief test if the given source and target are parents of the slots of this DataConnection
   bool connects(cedar::proc::ConstConnectablePtr source, cedar::proc::ConstConnectablePtr target) const;
 
+  /*!@brief Removes the connection between source and target.
+   *
+   * Source and target will be null after this call.
+   */
+  void disconnect();
+
   //!@brief get the source of this connection
   cedar::proc::ConstDataSlotPtr getSource() const;
 
   //!@brief get the target of this connection
   cedar::proc::ConstDataSlotPtr getTarget() const;
+
+  //!@brief get the source of this connection
+  cedar::proc::DataSlotPtr getSource();
+
+  //!@brief get the target of this connection
+  cedar::proc::DataSlotPtr getTarget();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

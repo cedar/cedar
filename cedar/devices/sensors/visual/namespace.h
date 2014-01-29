@@ -45,6 +45,9 @@
 #include "cedar/devices/lib.h"
 #include "cedar/auxiliaries/SetParameter.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ObjectListParameterTemplate.fwd.h"
+
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>

@@ -38,10 +38,12 @@
 #define CEDAR_PROC_STEPS_GATE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Switch.fwd.h"
 
 // SYSTEM INCLUDES
 

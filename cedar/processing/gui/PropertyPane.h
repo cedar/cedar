@@ -38,12 +38,13 @@
 #define CEDAR_PROC_PROPERTY_PANE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/PropertyPane.fwd.h"
+
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief A widget for displaying the parameters of configurables.

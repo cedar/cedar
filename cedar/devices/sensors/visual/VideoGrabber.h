@@ -48,6 +48,8 @@
 #include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
+#include <string>
+
 
 /*! @brief This grabber grabs images from video-files
  *
