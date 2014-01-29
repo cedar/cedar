@@ -132,6 +132,7 @@
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionExperiments"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
@@ -224,8 +225,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -282,8 +283,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>429</height>
              </rect>
             </property>
             <property name="palette">
@@ -778,6 +779,14 @@
   <action name="mpActionPerformanceOverview">
    <property name="text">
     <string>Performance overview ...</string>
+   </property>
+  </action>
+  <action name="mpActionExperiments">
+   <property name="text">
+    <string>Experiments...</string>
+   </property>
+   <property name="toolTip">
+    <string>Framwork for starting experiments</string>
    </property>
   </action>
  </widget>

@@ -50,6 +50,7 @@
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/gui/ExperimentDialog.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"
 #include "cedar/processing/gui/Ide.fwd.h"
 #include "cedar/processing/gui/Network.fwd.h"
@@ -97,6 +98,8 @@ public:
   /*!@brief Resets the current scene and displays the new network.
    */
   void resetTo(cedar::proc::gui::NetworkPtr network);
+
+  cedar::proc::gui::NetworkPtr getNetwork();
 
 public slots:
   /*!@brief Slot that displays notifications.
@@ -198,6 +201,8 @@ public slots:
   /*!@brief Opens a boost control widget.
    */
   void showBoostControl();
+
+  void showExperimentDialog();
 
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
@@ -313,6 +318,8 @@ private:
   QString mDefaultWindowTitle;
 
   cedar::proc::gui::BoostControl* mpBoostControl;
+
+  cedar::proc::gui::ExperimentDialog* mpExperimentDialog;
 
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;
