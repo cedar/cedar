@@ -385,10 +385,12 @@ void cedar::proc::steps::Projection::expand2Dto3D()
 {
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& output = this->mOutput->getData();
-  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(input);
-  unsigned int output_dimensionality = cedar::aux::math::getDimensionalityOf(output);
   // sanity check
-  CEDAR_DEBUG_ASSERT(input_dimensionality == 2 && output_dimensionality == 3);
+  CEDAR_DEBUG_ASSERT
+  (
+    cedar::aux::math::getDimensionalityOf(input) == 2
+      && cedar::aux::math::getDimensionalityOf(output) == 3
+  );
   auto mapping = _mDimensionMappings->getValue();
   unsigned int number_of_mappings = mapping->getNumberOfMappings();
   unsigned int i = 0;
@@ -506,10 +508,12 @@ void cedar::proc::steps::Projection::expand1Dto3D()
 {
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& output = this->mOutput->getData();
-  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(input);
-  unsigned int output_dimensionality = cedar::aux::math::getDimensionalityOf(output);
   // sanity check
-  CEDAR_DEBUG_ASSERT(input_dimensionality == 1 && output_dimensionality == 3);
+  CEDAR_DEBUG_ASSERT
+  (
+    cedar::aux::math::getDimensionalityOf(input) == 1
+      && cedar::aux::math::getDimensionalityOf(output) == 3
+  );
   auto mapping = _mDimensionMappings->getValue();
   unsigned int number_of_mappings = mapping->getNumberOfMappings();
   unsigned int i = 0;
