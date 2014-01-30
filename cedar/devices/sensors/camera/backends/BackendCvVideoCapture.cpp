@@ -42,6 +42,7 @@
 #include "cedar/devices/sensors/camera/exceptions.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

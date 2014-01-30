@@ -40,4 +40,6 @@
 
 cedar_add_unit_test(Network
                     main.cpp
+                    ADDITIONAL_DEPENDENCIES
+                    cedardyn
                    )

@@ -109,6 +109,8 @@ mpLock(new QReadWriteLock())
 
 cedar::aux::gui::MatrixVectorPlot::~MatrixVectorPlot()
 {
+  this->mPlotSeriesVector.clear();
+  
   if (mpLock)
   {
     delete mpLock;
@@ -236,10 +238,10 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
 
   this->buildArrays(plot_series, num);
 
-#if (QWT_VERSION >> 16) == 5
-  plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
-#elif (QWT_VERSION >> 16) == 6
+#if (QWT_VERSION >= 0x060000)
   plot_series->mpCurve->setRawSamples(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
+#elif (QWT_VERSION >= 0x050000)
+  plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
 #else
 #error unsupported qwt version
 #endif
@@ -248,6 +250,32 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
   mpLock->unlock();
 
   this->startTimer(30);
+}
+
+bool cedar::aux::gui::MatrixVectorPlot::canDetach(cedar::aux::ConstDataPtr data) const
+{
+  if(this->mpPlot != nullptr && this->mPlotSeriesVector.size() > 1)
+  {
+    for(auto plot_series : this->mPlotSeriesVector)
+    {
+      if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data)
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+void cedar::aux::gui::MatrixVectorPlot::doDetach(cedar::aux::ConstDataPtr data)
+{
+  mpLock->lockForWrite();
+  auto new_end = std::remove_if(mPlotSeriesVector.begin(), mPlotSeriesVector.end(), [&](PlotSeriesPtr plot_series){
+    return (boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data);
+  });
+  mPlotSeriesVector.erase(new_end, mPlotSeriesVector.end());
+  mpLock->unlock();
 }
 
 void cedar::aux::gui::MatrixVectorPlot::attachMarker(QwtPlotMarker *pMarker)
@@ -449,15 +477,15 @@ void cedar::aux::gui::MatrixVectorPlot::timerEvent(QTimerEvent * /* pEvent */)
     }
 
     // choose the right function depending on the qwt version
-#if (QWT_VERSION >> 16) == 5
-    series->mpCurve->setData
+#if (QWT_VERSION >= 0x060000)
+    series->mpCurve->setRawSamples
     (
       &series->mXValues.at(0),
       &series->mYValues.at(0),
       static_cast<int>(series->mXValues.size())
     );
-#elif (QWT_VERSION >> 16) == 6
-    series->mpCurve->setRawSamples
+#elif (QWT_VERSION >= 0x050000)
+    series->mpCurve->setData
     (
       &series->mXValues.at(0),
       &series->mYValues.at(0),

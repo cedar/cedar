@@ -41,9 +41,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/testingUtilities/devices/namespace.h"
 #include "cedar/devices/sensors/visual/GrabberChannel.h"
 #include "cedar/auxiliaries/IntParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/testingUtilities/devices/TestChannel.fwd.h"
+#include "cedar/testingUtilities/devices/TestGrabber.fwd.h"
 
 // SYSTEM INCLUDES
 

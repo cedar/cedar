@@ -28,7 +28,7 @@
     Email:       <email address>
     Date:        <creation date YYYY MM DD>
 
-    Description:
+    Description: Source file for the class <full class name>.
 
     Credits:
 

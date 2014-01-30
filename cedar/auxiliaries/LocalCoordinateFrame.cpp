@@ -36,9 +36,13 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -85,9 +89,8 @@ cedar::aux::LocalCoordinateFrame::~LocalCoordinateFrame()
 void cedar::aux::LocalCoordinateFrame::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::aux::NamedConfigurable::readConfiguration(node);
-  setTranslation(_mInitialTranslation->getValue());
 
-  CEDAR_ASSERT(_mInitialRotation->size() >=9);
+  CEDAR_ASSERT(_mInitialRotation->size() >= 9);
   mTransformation.at<double>(0, 3) = _mInitialTranslation->at(0);
   mTransformation.at<double>(1, 3) = _mInitialTranslation->at(1);
   mTransformation.at<double>(2, 3) = _mInitialTranslation->at(2);
@@ -102,25 +105,30 @@ void cedar::aux::LocalCoordinateFrame::readConfiguration(const cedar::aux::Confi
   mTransformation.at<double>(2, 2) = _mInitialRotation->at(8);
 }
 
-cv::Mat cedar::aux::LocalCoordinateFrame::getTranslation() const
+cedar::unit::LengthMatrix cedar::aux::LocalCoordinateFrame::getTranslation() const
 {
   QReadLocker locker(&mLock);
-  return mTransformation(cv::Rect(3, 0, 1, 4)).clone();
+  cedar::unit::LengthMatrix translation
+                             (
+                               mTransformation(cv::Rect(3, 0, 1, 4)).clone(),
+                               cedar::unit::DEFAULT_LENGTH_UNIT
+                             );
+  return translation;
 }
 
-double cedar::aux::LocalCoordinateFrame::getTranslationX() const
+cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationX() const
 {
-  return mTransformation.at<double>(0, 3);
+  return mTransformation.at<double>(0, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
-double cedar::aux::LocalCoordinateFrame::getTranslationY() const
+cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationY() const
 {
-  return mTransformation.at<double>(1, 3);
+  return mTransformation.at<double>(1, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
-double cedar::aux::LocalCoordinateFrame::getTranslationZ() const
+cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationZ() const
 {
-  return mTransformation.at<double>(2, 3);
+  return mTransformation.at<double>(2, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 cv::Mat cedar::aux::LocalCoordinateFrame::getRotation() const
@@ -146,53 +154,80 @@ void cedar::aux::LocalCoordinateFrame::update()
 
 }
 
-void cedar::aux::LocalCoordinateFrame::setTranslation(double x, double y, double z)
+void cedar::aux::LocalCoordinateFrame::setTranslation
+     (
+       const cedar::unit::Length& x,
+       const cedar::unit::Length& y,
+       const cedar::unit::Length& z
+     )
 {
   QWriteLocker locker(&mLock);
-  mTransformation.at<double>(0, 3) = x;
-  mTransformation.at<double>(1, 3) = y;
-  mTransformation.at<double>(2, 3) = z;
+  mTransformation.at<double>(0, 3) = x / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<double>(1, 3) = y / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<double>(2, 3) = z / cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
-void cedar::aux::LocalCoordinateFrame::setTranslation(const cv::Mat& translation)
+void cedar::aux::LocalCoordinateFrame::setTranslation(const cedar::unit::LengthMatrix& translation)
 {
+  double conversion_factor = translation.unit / cedar::unit::DEFAULT_LENGTH_UNIT;
+
   QWriteLocker locker(&mLock);
-  mTransformation.at<double>(0, 3) = translation.at<double>(0, 0);
-  mTransformation.at<double>(1, 3) = translation.at<double>(1, 0);
-  mTransformation.at<double>(2, 3) = translation.at<double>(2, 0);
+  mTransformation.at<double>(0, 3) = translation.matrix.at<double>(0, 0) * conversion_factor;
+  mTransformation.at<double>(1, 3) = translation.matrix.at<double>(1, 0) * conversion_factor;
+  mTransformation.at<double>(2, 3) = translation.matrix.at<double>(2, 0) * conversion_factor;
 }
 
-void cedar::aux::LocalCoordinateFrame::setTranslation(const std::vector<double>& translation)
+void cedar::aux::LocalCoordinateFrame::setTranslation(const std::vector<cedar::unit::Length >& translation)
 {
   QWriteLocker locker(&mLock);
   CEDAR_ASSERT(translation.size() >=3);
-  mTransformation.at<double>(0, 3) = translation[0];
-  mTransformation.at<double>(1, 3) = translation[1];
-  mTransformation.at<double>(2, 3) = translation[2];
+  mTransformation.at<double>(0, 3) = translation[0] / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<double>(1, 3) = translation[1] / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<double>(2, 3) = translation[2] / cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
-void cedar::aux::LocalCoordinateFrame::translate(double x, double y, double z)
+void cedar::aux::LocalCoordinateFrame::translate
+     (
+       const cedar::unit::Length& x,
+       const cedar::unit::Length& y,
+       const cedar::unit::Length& z
+     )
 {
   QWriteLocker locker(&mLock);
-  mTransformation.at<double>(0, 3) = mTransformation.at<double>(0, 3) + x;
-  mTransformation.at<double>(1, 3) = mTransformation.at<double>(1, 3) + y;
-  mTransformation.at<double>(2, 3) = mTransformation.at<double>(2, 3) + z;
+  mTransformation.at<double>(0, 3) = mTransformation.at<double>(0, 3) + x / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<double>(1, 3) = mTransformation.at<double>(1, 3) + y / cedar::unit::DEFAULT_LENGTH_UNIT;
+  mTransformation.at<double>(2, 3) = mTransformation.at<double>(2, 3) + z / cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
-void cedar::aux::LocalCoordinateFrame::translate(const cv::Mat& translation)
+void cedar::aux::LocalCoordinateFrame::translate(const cedar::unit::LengthMatrix& translation)
 {
+  double conversion_factor = translation.unit / cedar::unit::DEFAULT_LENGTH_UNIT;
+
   QWriteLocker locker(&mLock);
   mTransformation(cv::Rect(3, 0, 1, 3))
-    = mTransformation(cv::Rect(3, 0, 1, 3)) + translation(cv::Rect(0, 0, 1, 3));
+    = mTransformation(cv::Rect(3, 0, 1, 3))
+    + translation.matrix(cv::Rect(0, 0, 1, 3)) * conversion_factor;
 }
 
-void cedar::aux::LocalCoordinateFrame::translate(const std::vector<double>& translation)
+void cedar::aux::LocalCoordinateFrame::translate
+     (
+       const std::vector<cedar::unit::Length >& translation
+     )
 {
   QWriteLocker locker(&mLock);
   CEDAR_ASSERT(translation.size() >=3);
-  mTransformation.at<double>(0, 3) = mTransformation.at<double>(0, 3) + translation[0];
-  mTransformation.at<double>(1, 3) = mTransformation.at<double>(1, 3) + translation[1];
-  mTransformation.at<double>(2, 3) = mTransformation.at<double>(2, 3) + translation[2];
+
+  mTransformation.at<double>(0, 3)
+    = mTransformation.at<double>(0, 3)
+    + translation[0] / cedar::unit::DEFAULT_LENGTH_UNIT;
+
+  mTransformation.at<double>(1, 3)
+    = mTransformation.at<double>(1, 3)
+    + translation[1] / cedar::unit::DEFAULT_LENGTH_UNIT;
+
+  mTransformation.at<double>(2, 3)
+    = mTransformation.at<double>(2, 3)
+    + translation[2] / cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
 void cedar::aux::LocalCoordinateFrame::setRotation(const cv::Mat& rotation)
@@ -223,11 +258,12 @@ void cedar::aux::LocalCoordinateFrame::setRotation(const std::vector<double>& ro
   mTransformation.at<double>(2, 1) = rotation[7];
   mTransformation.at<double>(2, 2) = rotation[8];
 }
-void cedar::aux::LocalCoordinateFrame::rotate(unsigned int axis, double angle)
+void cedar::aux::LocalCoordinateFrame::rotate(unsigned int axis, const cedar::unit::PlaneAngle& angle)
 {
   QWriteLocker locker(&mLock);
   mTransformation(cv::Rect(0, 0, 3, 3))
-    = mTransformation(cv::Rect(0, 0, 3, 3)) * cedar::aux::math::expAxis<double>(mUnitAxes[axis], angle);
+    = mTransformation(cv::Rect(0, 0, 3, 3))
+    * cedar::aux::math::expAxis<double>(mUnitAxes[axis], angle / cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
 void cedar::aux::LocalCoordinateFrame::init()

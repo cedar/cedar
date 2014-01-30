@@ -119,7 +119,6 @@ cedar_summary_h2("Mandatory Libraries")
 cedar_summary_lib_found("Qt" QT_FOUND ${QT_VERSION_MAJOR})
 cedar_summary_lib_found("Boost" Boost_FOUND)
 cedar_summary_lib_found("OpenCV" OpenCV_FOUND)
-cedar_summary_lib_found("QGLViewer" QGLViewer_FOUND)
 
 message("")
 
@@ -145,7 +144,12 @@ message("")
 
 cedar_summary_h3("Misc. Libraries")
 
+cedar_summary_lib_found("QGLViewer" QGLViewer_FOUND)
+if(CEDAR_USE_FFTW_THREADED)
+cedar_summary_lib_found("FFTW (multi-threaded)" CEDAR_USE_FFTW)
+else(CEDAR_USE_FFTW_THREADED)
 cedar_summary_lib_found("FFTW" CEDAR_USE_FFTW)
+endif(CEDAR_USE_FFTW_THREADED)
 cedar_summary_lib_found("Yarp" CEDAR_USE_YARP)
 
 message("")

@@ -43,8 +43,12 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/EnumBase.h"
-#include "cedar/processing/steps/namespace.h"
-#include "cedar/processing/Step.h" // if we are going to inherit from cedar::proc::Step, we have to include the header
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/processing/Step.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/CoordinateTransformation.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -214,19 +218,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief compute coordinate transformation
-  void compute(const cedar::proc::Arguments&);
-
 public slots:
   //!@brief Triggers a computation of a step.
   void recompute();
-
-  //!@brief Checks that number of rows is at least 1.
-  void changeNumberOfRows();
-
-  //!@brief Checks that number of columns is at least 1.
-  void changeNumberOfCols();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -266,6 +260,19 @@ private:
 
   //!@brief Annotates the current result matrix.
   void applyAnnotations();
+
+  //!@brief Computes the coordinate transformation.
+  void compute(const cedar::proc::Arguments&);
+
+  /*! Allocates an output matrix with the given number of rows and columns (and the right size in the third dimension,
+   *  if the input is three-dimensional.
+   */
+  void allocateOutput(int rows, int cols);
+
+  /*! Returns the number of input rows and cols. In case of three-dimensional matrices, returns the sizes of the first
+   *  and second dimension.
+   */
+  void getRowColSize(const cv::Mat& mat, unsigned int& rows, unsigned int& cols);
 
 private slots:
   //! Reacts to a change in the transform direction.
@@ -331,6 +338,9 @@ private:
 
     //! Defines the magnitude of the logarithmic scale for the backward log-polar-transformation
     cedar::aux::DoubleParameterPtr  _mMagnitudeBackward;
+
+    //! Fills the center by offsetting the rho values by one.
+    cedar::aux::BoolParameterPtr _mFillCenter;
 }; // class cedar::proc::steps::CoordinateTransformation
 
 #endif // CEDAR_PROC_STEPS_COORDINATE_TRANSFORMATION_H

@@ -38,8 +38,7 @@
 #define CEDAR_EXCEPTIONS_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/namespace.h"
-#include "cedar/auxiliaries/net/exceptions.h"
+#include "cedar/auxiliaries/net/exceptions.fwd.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES

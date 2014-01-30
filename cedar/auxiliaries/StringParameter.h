@@ -39,7 +39,7 @@
 #define CEDAR_AUX_STRING_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/StringParameter.fwd.h"
 
 #endif // CEDAR_AUX_STRING_PARAMETER_H

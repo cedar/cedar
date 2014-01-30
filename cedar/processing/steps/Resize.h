@@ -38,13 +38,17 @@
 #define CEDAR_PROC_STEPS_RESIZE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/processing/steps/Resize.fwd.h"
 
 // SYSTEM INCLUDES
+#include <utility>
+#include <vector>
 
 
 /*!@brief   A processing step that resizes a matrix.
@@ -143,13 +147,6 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Determines whether the data item can be connected to the slot.
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::ConstDataPtr data
-                                  ) const;
-
   /*!@brief reads a configuration from a node
    * @param node the said node
    */

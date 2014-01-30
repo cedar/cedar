@@ -39,7 +39,6 @@
 ======================================================================================================================*/
 
 #include "cedar/processing/gui/IdeApplication.h"
-#include "cedar/dynamics/namespace.h"
 
 int main(int argc, char** argv)
 {

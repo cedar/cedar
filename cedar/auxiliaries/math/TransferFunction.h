@@ -38,14 +38,16 @@
 #define CEDAR_AUX_MATH_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/TransferFunction.fwd.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Basic interface for all TransferFunction functions.
  */
-class cedar::aux::math::TransferFunction : public Configurable
+class cedar::aux::math::TransferFunction : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -99,6 +101,8 @@ public:
     }
     return result;
   }
+
+  virtual cv::Mat compute(const cv::Mat& values) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

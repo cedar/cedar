@@ -38,10 +38,13 @@
 #define CEDAR_AUX_CONSOLE_LOG_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/LogInterface.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ConsoleLog.fwd.h"
+
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief An interface for classes that redirect log outputs to the console.

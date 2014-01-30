@@ -38,16 +38,41 @@
 #define CEDAR_AUX_FACTORY_MANAGER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/Log.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/FactoryManager.fwd.h"
+
 // SYSTEM INCLUDES
 #include <map>
 #include <set>
+#include <vector>
+#include <string>
 
+
+//!@todo Does this deserve its own header? This problem might occur on multiple occasions
+namespace cedar
+{
+  namespace aux
+  {
+    // use template specialization to derive the const version of the base type pointer.
+    template<typename TPtr>
+    class ConstPtrProvider
+    {
+    };
+
+    // specialization for shared_ptr
+    template<typename T>
+    class ConstPtrProvider<boost::shared_ptr<T> >
+    {
+      public:
+        typedef boost::shared_ptr<const T> ConstBaseTypePtr;
+    };
+  }
+}
 
 /*!@brief A manager of factories.
  *
@@ -65,6 +90,7 @@ class cedar::aux::FactoryManager
 private:
   typedef typename boost::shared_ptr< cedar::aux::Factory<BaseTypePtr> > FactoryTypePtr;
   typedef typename BaseTypePtr::element_type BaseType;
+  typedef typename cedar::aux::ConstPtrProvider<BaseTypePtr>::ConstBaseTypePtr ConstBaseTypePtr;
 
   typedef std::map<std::string, std::vector<FactoryTypePtr> > CategoryMap;
 
@@ -220,11 +246,11 @@ public:
   }
 
   //!@brief look up the type id of an object
-  const std::string& getTypeId(BaseTypePtr object)
+  const std::string& getTypeId(ConstBaseTypePtr object) const
   {
     std::string generated_type_name = cedar::aux::objectTypeToString(object);
 
-    std::map<std::string, std::string>::iterator iter = mTypeNameMapping.find(generated_type_name);
+    std::map<std::string, std::string>::const_iterator iter = mTypeNameMapping.find(generated_type_name);
     if (iter == mTypeNameMapping.end())
     {
       CEDAR_THROW

@@ -42,12 +42,39 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MovingAverage.fwd.h"
 
 // SYSTEM INCLUDES
 #include <deque>
 #include <iostream>
 
+
+namespace cedar
+{
+  namespace aux
+  {
+    /*!@brief Holds a return type.
+     *  By default, the return type is the same as the template argument of the class.
+     */
+    template <typename U>
+    struct ReturnTypeHelper
+    {
+      //! the return type held by this class
+      typedef U return_type;
+    }; // class cedar::aux::ReturnTypeHelper
+
+    /*!@brief Holds a return type.
+     */
+    template <>
+    struct ReturnTypeHelper<int>
+    {
+      //! the return type held by this class
+      typedef double return_type;
+    }; // class cedar::aux::ReturnTypeHelper
+  }
+}
 
 /*!@brief Calculates a moving average of a set of values.
  *
@@ -145,10 +172,12 @@ public:
   }
 
   /*!@brief Returns the average value of the elements in the buffer.
+   * This method uses template specialization for integer types in oder to return floating point
+   * values instead of ElementType. See below the class for the implementation of the specializations.
    */
-  ElementType getAverage() const
+  typename cedar::aux::ReturnTypeHelper<ElementType>::return_type getAverage() const
   {
-    return this->getSum() / this->size();
+    return this->getSum() / static_cast<double>(this->size());
   }
 
   /*!@brief Returns the sum of the elements in the buffer.

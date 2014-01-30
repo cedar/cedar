@@ -57,9 +57,8 @@ cedar_add_library(cedarproc
   gui/ElementClassList.h
   gui/Ide.h
   gui/IdeApplication.h
-  gui/PluginLoadDialog.h
-  gui/PluginManagerDialog.h
   gui/ProjectionMappingParameter.h
+  gui/PerformanceOverview.h
   gui/RecorderWidget.h
   gui/RecorderProperty.h
   gui/Scene.h
@@ -71,14 +70,19 @@ cedar_add_library(cedarproc
   gui/View.h
   sources/BoxInput.h
   sources/GaussInput.h
-  steps/StaticGain.h
+  steps/Component.h
   steps/Convolution.h
   steps/ColorConversion.h
   steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
   steps/MatrixMultiply.h
+  steps/MatrixPadding.h
+  steps/MatrixSlice.h
   steps/MatrixTypeConverter.h
+  steps/Normalization.h
   steps/Flip.h
+  steps/StaticGain.h
+  steps/UnitConverter.h
   steps/Histogram.h
   steps/Threshold.h
   steps/TransferFunction.h
@@ -97,5 +101,5 @@ cedar_add_library(cedarproc
   ${yarp_moc_headers}
   RESOURCES
   gui/icons/cedar_proc_gui_icons.qrc
-  gui/images/images.qrc
+  gui/images/cedar_proc_gui_images.qrc
   )

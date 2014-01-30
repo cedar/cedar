@@ -43,8 +43,11 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -155,7 +158,7 @@ void cedar::proc::sources::Camera::onStop()
 
 void cedar::proc::sources::Camera::applyParameter()
 {
-  if (this->getCameraGrabber()->isCreated() && this->getCameraGrabber()->isRunning())
+  if (this->getCameraGrabber()->isCreated() && this->getCameraGrabber()->isRunningNolocking())
   {
     std::string msg = this->getCameraGrabber()->getName() + ": Already grabbing! Please stop grabbing and try again!";
     cedar::aux::LogSingleton::getInstance()->warning(msg,"void cedar::proc::sources::Camera::applyParameter()");
@@ -184,7 +187,7 @@ void cedar::proc::sources::Camera::updateFrame()
   {
     for (int i = 0; i < 5; ++i)
     {
-      cedar::aux::sleep(cedar::unit::Milliseconds(50));
+      cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
       this->onTrigger();
       this->annotateImage();
     }

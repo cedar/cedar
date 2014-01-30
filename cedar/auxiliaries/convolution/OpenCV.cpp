@@ -38,11 +38,11 @@
 #include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
 #include "cedar/auxiliaries/convolution/Mode.h"
+#include "cedar/auxiliaries/convolution/EngineManager.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
-#include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/casts.h"
+
 
 // SYSTEM INCLUDES
 

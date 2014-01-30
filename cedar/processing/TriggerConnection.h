@@ -38,7 +38,11 @@
 #define CEDAR_PROC_TRIGGER_CONNECTION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+#include "cedar/processing/TriggerConnection.fwd.h"
 
 // SYSTEM INCLUDES
 
