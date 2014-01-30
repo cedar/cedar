@@ -52,34 +52,17 @@
   #include <boost/smart_ptr.hpp>
 #endif
 
+#warning Do not include this header any more. Use cedar's new forward declaration headers instead.
 
-namespace cedar
-{
-  namespace proc
-  {
-    /*!@brief Namespace for all sources in the processing framework. */
-    namespace sources
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(Boost);
-      CEDAR_DECLARE_PROC_CLASS(BoxInput);
-      CEDAR_DECLARE_PROC_CLASS(GrabberBase);
-      CEDAR_DECLARE_PROC_CLASS(GaussInput);
-      CEDAR_DECLARE_PROC_CLASS(Noise);
-      CEDAR_DECLARE_PROC_CLASS(Picture);
-      CEDAR_DECLARE_PROC_CLASS(Video);
 
-      CEDAR_DECLARE_PROC_CLASS(Camera);
-
-#ifdef CEDAR_USE_LIB_DC1394
-#endif
-
-#ifdef CEDAR_USE_YARP
-      CEDAR_DECLARE_PROC_CLASS(NetReader);
-#endif      
-      //!@endcond
-    }
-  }
-}
+#include "cedar/processing/sources/Boost.fwd.h"
+#include "cedar/processing/sources/BoxInput.fwd.h"
+#include "cedar/processing/sources/Camera.fwd.h"
+#include "cedar/processing/sources/GaussInput.fwd.h"
+#include "cedar/processing/sources/GrabberBase.fwd.h"
+#include "cedar/processing/sources/NetReader.fwd.h"
+#include "cedar/processing/sources/Noise.fwd.h"
+#include "cedar/processing/sources/Picture.fwd.h"
+#include "cedar/processing/sources/Video.fwd.h"
 
 #endif // CEDAR_PROC_SOURCES_NAMESPACE_H

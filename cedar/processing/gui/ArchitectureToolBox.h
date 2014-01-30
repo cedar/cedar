@@ -45,6 +45,9 @@
 #include "cedar/processing/gui/ToolBox.h"
 #include "cedar/processing/gui/Scene.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/ArchitectureToolBox.fwd.h"
+
 // SYSTEM INCLUDES
 
 

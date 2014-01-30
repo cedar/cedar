@@ -42,19 +42,21 @@
 #define CEDAR_DYN_NEURAL_FIELD_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/convolution/Convolution.fwd.h"
+#include "cedar/auxiliaries/kernel/Gauss.fwd.h"
+#include "cedar/dynamics/fields/NeuralField.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -114,6 +116,12 @@ public:
     return this->mActivation;
   }
 
+  //! Returns the matrix data pointer that holds the sum of all inputs in this field.
+  inline cedar::aux::ConstMatDataPtr getInputSum() const
+  {
+    return this->mInputSum;
+  }
+
   /*!@brief   Overrides the default configuration reading.
    *
    * @remarks This method provides downwards-compatibility for reading fields that were written with a previous version.
@@ -137,6 +145,25 @@ public:
   void setDiscreteMetric(bool value)
   {
     this->_mDiscreteMetric->setValue(value);
+  }
+
+  //!@brief Set the dimensionality of the field.
+  inline void setDimensionality(unsigned int dim)
+  {
+    this->_mDimensionality->setValue(dim);
+  }
+
+  //!@brief Returns the dimensionality of the field.
+  inline unsigned int getDimensionality() const
+  {
+    return this->_mDimensionality->getValue();
+  }
+
+  //!@brief Set the size at given dimension of the field.
+  inline void setSize(unsigned int dim, unsigned int size)
+  {
+    CEDAR_ASSERT(dim < this->_mSizes->size());
+    this->_mSizes->set(dim, size);
   }
 
 public slots:
@@ -191,12 +218,6 @@ private:
 
   //!@brief Makes the kernel list stored in the convolution equal to the one in the field.
   void transferKernelsToConvolution();
-
-  //!@brief Returns the dimensionality of the field.
-  inline unsigned int getDimensionality() const
-  {
-    return this->_mDimensionality->getValue();
-  }
 
   /*!@brief   Recalculates the sum of all inputs.
    *

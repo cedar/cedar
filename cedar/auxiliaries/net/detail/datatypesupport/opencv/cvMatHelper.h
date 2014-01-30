@@ -38,7 +38,6 @@
 #define CEDAR_CVMAT_HELPER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
 

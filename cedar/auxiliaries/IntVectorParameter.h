@@ -39,7 +39,7 @@
 #define CEDAR_AUX_INT_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/IntVectorParameter.fwd.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 
 #endif // CEDAR_AUX_INT_VECTOR_PARAMETER_H

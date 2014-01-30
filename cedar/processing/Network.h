@@ -43,8 +43,17 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/namespace.h"
 #include "cedar/units/Time.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Triggerable.fwd.h"
+#include "cedar/processing/TriggerConnection.fwd.h"
+#include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -53,6 +62,10 @@
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
 #endif
+#include <map>
+#include <set>
+#include <list>
+#include <string>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
@@ -79,6 +92,8 @@ public:
     CONNECTION_REMOVED,
   };
 
+ signals:
+  void stepNameChanged(const std::string& from, const std::string& to);
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -434,6 +449,12 @@ public:
   //! Returns a list of all the looped triggers in this network.
   std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
 
+  //! Reads the meta information from the given file and extracts the plugins required by the architecture.
+  static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
+
+  //! Returns a list of all steps that are in an invalid state.
+  std::vector<std::string> listInvalidSteps() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -476,6 +497,14 @@ private:
    */
   void writeTriggers(cedar::aux::ConfigurationNode& root) const;
 
+  /*!@brief Writes the steps that are registered in the recorder in the network to the configuration node.
+   */
+  void writeRecords(cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Reads the slots that should be registered in the recorder.
+  */
+  void readRecords(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
+
   /*!@brief Reads networks from a configuration node and adds them to the parent network.
    */
   void readNetworks(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
@@ -509,13 +538,6 @@ private:
 
   //!@brief processes slot promotion
   void processPromotedSlots();
-
-  /*!@brief   Single-steps all triggers in this network with the given time step.
-   *
-   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
-   *          all triggers are stopped.
-   */
-  void stepTriggers(double stepTime);
 
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.

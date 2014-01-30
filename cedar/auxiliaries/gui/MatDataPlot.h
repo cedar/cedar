@@ -41,8 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/gui/MatDataPlot.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -64,6 +67,9 @@ public:
   //!@brief The standard constructor.
   MatDataPlot(QWidget *pParent = NULL);
 
+  //! Constructor that immediately plots data.
+  MatDataPlot(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent = NULL);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -73,6 +79,9 @@ public:
 
   //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
+
+  //!@brief Check if the given data can be detached from the plot.
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -85,6 +94,9 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
+
+  void initLayout();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -96,7 +108,7 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
 }; // class cedar::aux::gui::MatDataPlot
 

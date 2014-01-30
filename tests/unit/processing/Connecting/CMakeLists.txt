@@ -36,4 +36,6 @@
 
 cedar_add_unit_test(Connecting
                     Connecting.cpp
+                    ADDITIONAL_DEPENDENCIES
+                    cedardyn
                     )

@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Viewer.h"
-#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Scene.h"
 
 // SYSTEM INCLUDES
 
@@ -73,7 +73,9 @@ void cedar::aux::gui::Viewer::init()
 {
   if (mReadFromFile)
   {
+#ifdef CEDAR_USE_QGLVIEWER
     restoreStateFromFile();
+#endif // CEDAR_USE_QGLVIEWER
     cedar::aux::LogSingleton::getInstance()->debugMessage
     (
       "Restoring Viewer state from file.",
@@ -119,6 +121,7 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
 
 void cedar::aux::gui::Viewer::grabBuffer()
 {
+#ifdef CEDAR_USE_QGLVIEWER
   // grab framebuffer without alpha-channel. possible values
   // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT,
   // GL_AUXi, where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
@@ -135,6 +138,7 @@ void cedar::aux::gui::Viewer::grabBuffer()
   mpGrabberLock->lockForWrite();
   mGrabberBuffer = mat2;
   mpGrabberLock->unlock();
+#endif // CEDAR_USE_QGLVIEWER
 }
 
 
@@ -169,3 +173,4 @@ void cedar::aux::gui::Viewer::deregisterGrabber(QReadWriteLock* lock)
     CEDAR_THROW(cedar::aux::NotFoundException, "Lock address does not match the stored address.");
   }
 }
+

@@ -37,9 +37,9 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
-#include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
+#include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
   std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
   QApplication a(argc, argv);
   FriStatusWidget* p_fri_status_widget = 0;
-  cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;
+  cedar::dev::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;
 
   // create the hardware interface
   cedar::dev::kuka::KinematicChainPtr p_arm(new cedar::dev::kuka::KinematicChain());
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
   p_fri_status_widget = new FriStatusWidget(p_arm);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
-  p_kinematic_chain_widget = new cedar::dev::robot::gui::KinematicChainWidget(p_arm);
+  p_kinematic_chain_widget = new cedar::dev::gui::KinematicChainWidget(p_arm);
   p_kinematic_chain_widget->show();
 
   a.exec();

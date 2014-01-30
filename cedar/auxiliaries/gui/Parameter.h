@@ -42,8 +42,12 @@
 #define CEDAR_AUX_GUI_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Parameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -127,5 +131,7 @@ private:
   //!@brief parameter, which is graphically represented by this instance
   cedar::aux::ParameterPtr mParameter;
 }; // class cedar::aux::gui::Parameter
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::gui::ParameterFactory);
 
 #endif // CEDAR_AUX_GUI_PARAMETER_H

@@ -38,9 +38,8 @@
 #define CEDAR_NET_READER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/namespace.h"
+#include "cedar/auxiliaries/net/Reader.fwd.h"
 #include "cedar/auxiliaries/net/exceptions.h"
-#include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetReader.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetReader.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
@@ -51,12 +50,8 @@
 #include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
+#include <string>
 
-
-
-namespace cedar {
-  namespace aux {
-    namespace net {
 
 
   //---------------------------------------------------------------------------
@@ -102,7 +97,7 @@ namespace cedar {
  * @see: BlockingReader, Writer
  */
 template <typename T>
-class Reader
+class cedar::aux::net::Reader
 {
    //!@brief The standard constructor will not load. Do not call it.
    Reader()
@@ -137,6 +132,9 @@ class Reader
    
 };
 
+namespace cedar {
+  namespace aux {
+    namespace net {
 
   //---------------------------------------------------------------------------
   // template specialization for char 

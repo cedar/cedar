@@ -42,13 +42,17 @@
 #define CEDAR_PROC_STEP_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/units/Time.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThreadALot.fwd.h"
+#include "cedar/auxiliaries/BoolParameter.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QThread>
@@ -60,6 +64,8 @@
 #endif
 #include <map>
 #include <set>
+#include <utility>
+#include <vector>
 
 
 /*!@brief This class represents a processing step in the processing framework.
@@ -73,7 +79,7 @@
  * displayed in plots). Each data slot is assigned some data pointer, input slots get external data, buffer and output
  * slots must be assigned by the user, usually during the constructor.
  */
-class cedar::proc::Step : public QThread,
+class cedar::proc::Step : public QObject,
                           public cedar::proc::Connectable,
                           public cedar::proc::Triggerable
 {
@@ -98,11 +104,13 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Step(bool runInThread = false, bool isLooped = false);
+  // this constructor is deprecated because steps are no longer executed in their own thread
+  CEDAR_DECLARE_DEPRECATED(Step(bool runInThread, bool isLooped));
 
-  //!@brief Destructor
-  virtual ~Step();
+  //!@brief The standard constructor.
+  Step(bool isLooped = false);
+
+  ~Step();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -126,17 +134,19 @@ public:
 
   /*!@brief Sets the arguments used by the next execution of the run function.
    */
-  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments);
+//  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
+   *        This function is deprecated because steps are not executed in their own thread anymore.
    */
-  void setThreaded(bool isThreaded);
+  CEDAR_DECLARE_DEPRECATED(void setThreaded(bool isThreaded));
 
   /*!@brief States if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
+   *        This function is deprecated because steps are not executed in their own thread anymore.
    */
-  bool isThreaded() const;
+  CEDAR_DECLARE_DEPRECATED(bool isThreaded() const);
 
   //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
@@ -153,12 +163,8 @@ public:
   //!@brief Calls the reset signal in a thread-safe manner.
   void callReset();
 
-  /*!@brief The wait method.
-   */
-  void waitForProcessing()
-  {
-    this->QThread::wait();
-  }
+  //! True if the step currently has a run time measurement.
+  bool hasRunTimeMeasurement() const;
 
   /*!@brief Returns the last run time measured for this step.
    */
@@ -168,6 +174,9 @@ public:
    */
   cedar::unit::Time getRunTimeAverage() const;
 
+  //! True if the step currently has a lock time measurement.
+  bool hasLockTimeMeasurement() const;
+
   /*!@brief Returns the last lock time measured for this step.
    */
   cedar::unit::Time getLockTimeMeasurement() const;
@@ -175,6 +184,9 @@ public:
   /*!@brief Returns the average lock time measured for this step.
    */
   cedar::unit::Time getLockTimeAverage() const;
+
+  //! True if the step currently has a round time measurement.
+  bool hasRoundTimeMeasurement() const;
 
   /*!@brief Returns the last round time measured for this step, i.e., the time between the last two compute calls.
    */
@@ -189,6 +201,8 @@ public:
   {
     return this->mBusy;
   }
+
+  bool isRecorded() const;
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -304,13 +318,6 @@ private:
    */
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
-  /*!@brief Implementation of the thread's main method.
-   *
-   *        This method checks all preconditions for running the step (i.e., are all inputs valid, have proper arguments
-   *        been set, ...). If all these preconditions are met, the compute function is called.
-   */
-  void run();
-
   /*!@brief This is the reset method.
    *
    *        Implement this method if you want to react to a reset signal.
@@ -318,6 +325,7 @@ private:
   virtual void reset();
 
   /*!@brief Sets the current execution time measurement.
+   * @todo Rename to ComputeTimeMeasurement
    */
   void setRunTimeMeasurement(const cedar::unit::Time& time);
 
@@ -345,6 +353,7 @@ private:
    *
    */
   void callInputConnectionChanged(const std::string& slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -355,12 +364,6 @@ private:
   //!@brief flag that states if step is still computing its latest output
   mutable QMutex mBusy;
 
-  //!@brief The lock used for protecting the computation arguments of the step.
-  QReadWriteLock* mpArgumentsLock;
-
-  //!@brief The arguments for the next cedar::proc::Step::compute call.
-  ConstArgumentsPtr mNextArguments;
-
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 
@@ -368,30 +371,21 @@ private:
   ActionMap mActions;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mMovingAverageIterationTime;
+  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mComputeTime;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mLockingTime;
+  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mLockingTime;
 
   //!@brief Moving average of the time between compute calls.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mRoundTime;
+  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mRoundTime;
 
   clock_t mLastComputeCall;
 
-  //!@brief Lock for the last iteration time.
-  mutable QReadWriteLock mLastIterationTimeLock;
-
-  //!@brief Lock for the last iteration time.
-  mutable QReadWriteLock mLockTimeLock;
-
-  //!@brief Lock for the round time.
-  mutable QReadWriteLock mRoundTimeLock;
-
-  //! The state of open-cv's RNG.
-  uint64 mRNGState;
-
   //! Whether the step should lock its inputs and outputs automatically.
   bool mAutoLockInputsAndOutputs;
+
+  //! Used for calling this->getFinishedTrigger() in a separate thread
+  cedar::aux::CallFunctionInThreadALotPtr mFinishedCaller;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -400,8 +394,7 @@ protected:
   // none yet
 
 private:
-  //!@brief Whether to call the compute function in a separate thread when cedar::proc::Step::onTrigger is called.
-  cedar::aux::BoolParameterPtr _mRunInThread;
+  // none yet
 
 }; // class cedar::proc::Step
 

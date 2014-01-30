@@ -114,23 +114,7 @@ cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 
 void cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
 {
-  // create debug-message
-  unsigned int num_channels = getNumChannels();
-  std::stringstream init_message;
-  init_message << ": Initialize grabber with " << getNumChannels() << " channels ..." << std::endl;
-
-  for(unsigned int channel = 0; channel < num_channels; ++channel)
-  {
-    init_message << "Channel " << channel
-                 << ": QT::OGLWidget class \"" << typeid(getGLChannel(channel)->mpQGLWidget).name()
-                 << "\"" << std::endl;
-  }
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                            this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::OglGrabber::onCreateGrabber()"
-                                           );
-  // nothing else to do
+  // nothing to do
 }
 
 
@@ -221,7 +205,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
   }
 
   // stop grabbing thread if running
-  bool restart_grabber = LoopedThread::isRunning();
+  bool restart_grabber = LoopedThread::isRunningNolocking();
   if (restart_grabber)
   {
     this->stop();
@@ -229,11 +213,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
 
   // change source
   getGLChannel(channel)->mpQGLWidget = qglWidget;
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             this->getName() + ": New Widget applied",
-                                             "cedar::dev::sensors::visual::GLGrabber::setWidget"
-                                           );
+
   // get first new image
   this->grab();
 

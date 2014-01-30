@@ -38,9 +38,11 @@
 #define CEDAR_AUX_GL_SCENE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Scene.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
-#include "cedar/auxiliaries/gui/Viewer.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/Viewer.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -49,6 +51,7 @@
 #endif
 #include <string>
 #include <QList>
+#include <QReadWriteLock>
 
 /*!@brief This class visualizes several objects in the same environment
  *
@@ -158,6 +161,8 @@ private:
   QList<cedar::aux::gl::ObjectVisualizationPtr> mObjectVisualizations;
   // list of viewers currently displaying this scene
   QList<cedar::aux::gui::Viewer*> mViewers;
+  
+  mutable QReadWriteLock mObjectVisualizationLock;
 };
 
 #endif  // CEDAR_AUX_GL_SCENE_H
