@@ -338,6 +338,9 @@ private:
 
     //! Defines the magnitude of the logarithmic scale for the backward log-polar-transformation
     cedar::aux::DoubleParameterPtr  _mMagnitudeBackward;
+
+    //! Fills the center by offsetting the rho values by one.
+    cedar::aux::BoolParameterPtr _mFillCenter;
 }; // class cedar::proc::steps::CoordinateTransformation
 
 #endif // CEDAR_PROC_STEPS_COORDINATE_TRANSFORMATION_H
