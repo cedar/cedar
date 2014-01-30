@@ -193,7 +193,8 @@ _mSamplesPerDistance(new cedar::aux::DoubleParameter(this, "samples per distance
 _mNumberOfRows(new cedar::aux::UIntParameter(this, "rows size", 10, cedar::aux::UIntParameter::LimitType::positive())),
 _mNumberOfCols(new cedar::aux::UIntParameter(this, "cols size", 10, cedar::aux::UIntParameter::LimitType::positive())),
 _mMagnitudeForward(new cedar::aux::DoubleParameter(this, "magnitude forward", 10, 0, 1000)),
-_mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 10, 0, 1000))
+_mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 10, 0, 1000)),
+_mFillCenter(new cedar::aux::BoolParameter(this, "fill center", false))
 {
   // matrix in original coordinates that has to be transformed
   this->declareInput("input", true);
@@ -214,6 +215,7 @@ _mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 
   QObject::connect(this->_mNumberOfCols.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(this->_mMagnitudeForward.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(this->_mMagnitudeBackward.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(this->_mFillCenter.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
 
   this->applyAnnotations();
 }
@@ -566,6 +568,12 @@ void cedar::proc::steps::CoordinateTransformation::createCartLogPolarMapBackward
   backward_map_x = cv::Mat(map_rows, map_cols, CV_32F);
   backward_map_y = cv::Mat(map_rows, map_cols, CV_32F);
 
+  float offset = 0.0f;
+  if (this->_mFillCenter->getValue() == true)
+  {
+    offset = 1.0f;
+  }
+
   for (unsigned int r = 0; r < map_rows; ++r)
   {
     for (unsigned int c = 0; c < map_cols; ++c)
@@ -582,7 +590,7 @@ void cedar::proc::steps::CoordinateTransformation::createCartLogPolarMapBackward
                   (
                     pow(static_cast<float>(c) - static_cast<float>(map_cols) / 2.0, 2.0)
                     + pow(static_cast<float>(r) - static_cast<float>(map_rows) / 2.0, 2.0)
-                  );
+                  ) + offset;
       backward_map_x.at<float>(r, c) = magnitude_backward * log(rho) * this->_mSamplesPerDistance->getValue();
       backward_map_y.at<float>(r, c) = angle * this->_mSamplesPerDegree->getValue();
     }
