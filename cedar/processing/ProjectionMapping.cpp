@@ -147,7 +147,7 @@ void cedar::proc::ProjectionMapping::drop(unsigned int inputIndex)
 
 void cedar::proc::ProjectionMapping::initialize(unsigned int numberOfMappings)
 {
-  this->mDefaultValues.resize(std::max(this->mDefaultValues.size(), this->mMapping.size()), msDropIndex);
+  this->mDefaultValues.resize(std::max(this->mMapping.size(), std::max(this->mDefaultValues.size(), static_cast<size_t>(numberOfMappings))), msDropIndex);
   for (size_t i = 0; i < this->mMapping.size(); ++i)
   {
     this->mDefaultValues.at(i) = this->mMapping[i];
