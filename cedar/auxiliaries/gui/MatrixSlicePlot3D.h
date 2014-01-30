@@ -46,6 +46,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.fwd.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -115,6 +116,13 @@ private:
 
   void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
+  void fillContextMenu(QMenu& menu);
+
+  static void getSetup(int& dim0, int& dim1, int slicedDimension);
+
+private slots:
+  void slicedDimensionSelected();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -132,6 +140,9 @@ private:
 
   //! desired columns of the slice plot
   unsigned int mDesiredColumns;
+
+  //! Dimension along which the slices are made.
+  cedar::aux::LockableMember<unsigned int> mSlicedDimension;
 
 }; // class cedar::aux::gui::MatrixSlicePlot3D
 
