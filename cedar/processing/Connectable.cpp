@@ -912,6 +912,7 @@ void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::Co
   CEDAR_ASSERT(slot);
   if (slot->isCollection())
   {
+    QWriteLocker locker(this->mpConnectionLock);
     slot->removeData(data);
   }
   else
