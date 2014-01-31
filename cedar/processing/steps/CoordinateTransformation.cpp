@@ -318,7 +318,18 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
   }
 
   const int interpolation = cv::INTER_LINEAR;
-  const int border_handling = cv::BORDER_TRANSPARENT;
+  int border_handling;
+  switch (this->_mTransformationDirection->getValue())
+  {
+    default:
+    case cedar::proc::steps::TransformationDirection::Forward:
+      border_handling = cv::BORDER_TRANSPARENT;
+      break;
+
+    case cedar::proc::steps::TransformationDirection::Backward:
+      border_handling = cv::BORDER_WRAP;
+      break;
+  }
 
   if (this->mInput->getDimensionality() == 2)
   {
