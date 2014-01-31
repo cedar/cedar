@@ -57,6 +57,7 @@
 #include <QThread>
 #include <QMessageBox>
 #include <iostream>
+#include <sstream>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -97,17 +98,19 @@ mpLock(new QReadWriteLock())
 
 cedar::aux::gui::VtkLinePlot::~VtkLinePlot()
 {
-  if (mpLock)
-  {
-    delete mpLock;
-  }
-
   if (this->mpWorkerThread)
   {
     this->mpWorkerThread->quit();
     this->mpWorkerThread->wait();
     delete this->mpWorkerThread;
-    this->mpWorkerThread = NULL;
+    this->mpWorkerThread = nullptr;
+  }
+
+  this->mPlotSeriesVector.clear();
+
+  if (mpLock)
+  {
+    delete mpLock;
   }
 }
 
@@ -234,15 +237,14 @@ bool cedar::aux::gui::VtkLinePlot::canAppend(cedar::aux::ConstDataPtr data) cons
 
 void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const std::string&)
 {
-  PlotSeriesPtr plot_series(new PlotSeries());
-  plot_series->mpVtkTable = this->mpVtkTable;
+  PlotSeriesPtr plot_series(new PlotSeries(mpVtkTable, mpChart));
 
   size_t line_id = mPlotSeriesVector.size();
   plot_series->mXColumn = 0;
   std::stringstream ss;
   ss << "line #" << line_id;
   plot_series->mYColumnName = ss.str();
-  plot_series->mYColumn = this->mpVtkTable->GetNumberOfColumns();
+  auto yColumn = this->mpVtkTable->GetNumberOfColumns();
 
   QWriteLocker locker(mpLock);
   mPlotSeriesVector.push_back(plot_series);
@@ -283,17 +285,48 @@ void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   CEDAR_DEBUG_ASSERT(static_cast<size_t>(this->mpVtkTable->GetNumberOfRows()) == num);
 
   // assert that column was added.
-  CEDAR_DEBUG_ASSERT(this->mpVtkTable->GetColumn(plot_series->mYColumn) != NULL);
+  CEDAR_DEBUG_ASSERT(this->mpVtkTable->GetColumn(yColumn) != nullptr);
 
 #if VTK_MAJOR_VERSION <= 5
-  plot_series->mpCurve->SetInput(this->mpVtkTable, plot_series->mXColumn, plot_series->mYColumn);
+  plot_series->mpCurve->SetInput(this->mpVtkTable, plot_series->mXColumn, yColumn);
 #else
-  plot_series->mpCurve->SetInputData(this->mpVtkTable, plot_series->mXColumn, plot_series->mYColumn);
+  plot_series->mpCurve->SetInputData(this->mpVtkTable, plot_series->mXColumn, yColumn);
 #endif
 
   locker.unlock();
 
   this->startTimer(30);
+}
+
+bool cedar::aux::gui::VtkLinePlot::canDetach(cedar::aux::ConstDataPtr data) const
+{
+  if(this->mPlotSeriesVector.size() > 1)
+  {
+    for(auto plot_series : this->mPlotSeriesVector)
+    {
+      if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data)
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+void cedar::aux::gui::VtkLinePlot::doDetach(cedar::aux::ConstDataPtr data)
+{
+  QWriteLocker locker(mpLock);
+  for(auto it = mPlotSeriesVector.begin(); it != mPlotSeriesVector.end(); ++it)
+  { 
+    auto plot_series = *it;
+    if(boost::dynamic_pointer_cast<cedar::aux::ConstData>(plot_series->mMatData) == data)
+    {
+      mPlotSeriesVector.erase(it);
+      break;
+    }
+  }
+  locker.unlock();
 }
 
 void cedar::aux::gui::VtkLinePlot::PlotSeries::buildXAxis(unsigned int new_size)
@@ -331,7 +364,7 @@ void cedar::aux::gui::detail::VtkLinePlotWorker::convert()
       return;
     }
 
-    if (this->mpPlot->mpVtkTable->GetColumn(series->mYColumn) == NULL)
+    if (this->mpPlot->mpVtkTable->GetColumnByName(series->mYColumnName.c_str()) == nullptr)
     {
       vtkSmartPointer<vtkDoubleArray> y_arr = vtkSmartPointer<vtkDoubleArray>::New();
       y_arr->SetNumberOfValues(this->mpPlot->mpVtkTable->GetNumberOfRows());
@@ -344,7 +377,7 @@ void cedar::aux::gui::detail::VtkLinePlotWorker::convert()
     }
     for (size_t j = 0; j < size; ++j)
     {
-      this->mpPlot->mpVtkTable->SetValue(j, series->mYColumn,cedar::aux::math::getMatrixEntry<double>(mat, j));
+      this->mpPlot->mpVtkTable->SetValueByName(j, series->mYColumnName.c_str(),cedar::aux::math::getMatrixEntry<double>(mat, j));
     }
   }
 

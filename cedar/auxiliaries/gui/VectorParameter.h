@@ -41,11 +41,13 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/VectorParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/casts.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/VectorParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>

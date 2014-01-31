@@ -40,18 +40,11 @@
 #define CEDAR_COLLATED_NET_HEADER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/BasicNetHeader.fwd.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
-
-
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
 
 //!@cond SKIPPED_DOCUMENTATION
 /*!@brief net portable struct that will hold the header (of a matrix)
@@ -63,13 +56,11 @@ namespace cedar {
  * functions. For accessing the data, 
  * see the static class MatrixNetHeaderAccessor
  */
-struct BasicNetHeader
+struct cedar::aux::net::detail::BasicNetHeader
 {
   unsigned int mMagicNumber;
   size_t       mDataSize; // this is highly-architecture dependant!
 };
 //!@endcond
 
-} } } } // end namespaces
-      
 #endif

@@ -55,6 +55,10 @@ endif()
 
 include("project.conf")
 
+if (CMAKE_BUILD_TYPE MATCHES "debug")
+  add_definitions(-DDEBUG)
+endif()
+
 if (DEBUG_CEDAR_BUILD_SYSTEM)
   message ("  >> cedar home is set to ${CEDAR_HOME}")
 endif(DEBUG_CEDAR_BUILD_SYSTEM)
@@ -145,6 +149,12 @@ macro(cedar_project_add_target)
   set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated_project_files)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
   
+  foreach (header ${moc_headers})
+    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${header}")
+      message(WARNING "Could not find moc file ${header}. Check the path in the project's root CMakeLists.txt")
+    endif()
+  endforeach()
+  
   qt_add_resources(compiled_resource_paths ${project_resources})
   qt_wrap_cpp(moc_headers ${moc_headers})
   qt_wrap_ui(forms ${project_forms})
@@ -159,7 +169,18 @@ macro(cedar_project_add_target)
     add_library(${target_name} SHARED ${files})
   endif()
   
-  target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn ${CEDAR_EXTERNAL_LIBS})
+  if (MSVC)
+    target_link_libraries(${target_name}
+                          optimized cedarunits debug cedarunitsd
+                          optimized cedaraux debug cedarauxd
+                          optimized cedardev debug cedardevd
+                          optimized cedarproc debug cedarprocd
+                          optimized cedardyn debug cedardynd
+                          )
+  else (MSVC)
+    target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn)
+  endif(MSVC)
+    target_link_libraries(${target_name} ${CEDAR_EXTERNAL_LIBS})
   
   foreach (dependency ${add_DEPENDS_ON})
     cedar_project_depends_on(${target_name} DEPENDS_ON ${dependency})
@@ -180,6 +201,8 @@ macro(cedar_project_setup directory)
   elseif (MSVC)
     add_definitions(-W2)
     add_definitions(-DMSVC)
+  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    add_definitions(-std=c++11)
   endif (CMAKE_COMPILER_IS_GNUCC)
   
 endmacro(cedar_project_setup)

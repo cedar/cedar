@@ -38,10 +38,13 @@
 #define CEDAR_AUX_OBJECT_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ObjectParameter.fwd.h"
+
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A parameter that can store objects of dynamically determined type.

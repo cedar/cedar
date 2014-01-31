@@ -41,9 +41,14 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+
+// FORWARD DECLARATION
+#include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
+#include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 // definitions used for loading a list from a plugin.
 # ifdef __cplusplus

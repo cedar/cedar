@@ -42,8 +42,10 @@
 #define CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.fwd.h"
 
 // SYSTEM INCLUDES
 

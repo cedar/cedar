@@ -38,24 +38,17 @@
 #define CEDAR_AUX_THREADING_UTILITIES_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/LockType.h"
 
 // SYSTEM INCLUDES
-#include <set>
 #include <QReadWriteLock>
+#include <utility>
+#include <set>
 
 namespace cedar
 {
   namespace aux
   {
-    //!@brief the role of a lock (either READ lock or WRITE lock)
-    enum LOCK_TYPE
-    {
-      //! The lock should be locked for reading
-      LOCK_TYPE_READ,
-      //! The lock should be locked for writing
-      LOCK_TYPE_WRITE
-    };
-
     //!@brief A set of pairs of QReadWriteLocks and their corresponding lock role from cedar::aux::LOCK_TYPE.
     typedef std::set<std::pair<QReadWriteLock*, LOCK_TYPE> > LockSet;
 

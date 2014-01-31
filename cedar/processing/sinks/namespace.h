@@ -43,25 +43,13 @@
 #include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
 #endif
 
+#warning Do not include this header any more. Use the new forward declaration headers instead.
 
-namespace cedar
-{
-  namespace proc
-  {
-    /*!@brief Namespace for processing sinks. */
-    namespace sinks
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-#ifdef CEDAR_USE_YARP
-      CEDAR_DECLARE_PROC_CLASS(NetWriter);
-#endif
-      //!@endcond
-    }
-  }
-}
+#include "cedar/processing/sinks/NetWriter.fwd.h"
 
 #endif // CEDAR_PROC_STEPS_NAMESPACE_H

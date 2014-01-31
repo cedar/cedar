@@ -60,20 +60,37 @@ cv::Mat cedar::aux::math::boxMatrix
   {
     matrix_sizes_int.at(i) = static_cast<int>(matrixSizes.at(i));
   }
+  if (dimensionality < 2)
+  {
+    matrix_sizes_int.push_back(1);
+  }
+
+  cv::Mat output
+    = cv::Mat(static_cast<int>(dimensionality), &matrix_sizes_int.front(), CV_32F, cv::Scalar(referenceLevel));
 
   std::vector<int> box_widths_int(widths.size());
   for (unsigned int i = 0; i < widths.size(); ++i)
   {
-    box_widths_int.at(i) = static_cast<int>(widths.at(i));
+    unsigned int left = leftBounds.at(i);
+    if (left >= matrixSizes.at(i))
+    {
+      return output;
+    }
+    if (left + widths.at(i) > matrixSizes.at(i))
+    {
+      box_widths_int.at(i) = static_cast<int>(matrixSizes.at(i) - leftBounds.at(i));
+    }
+    else
+    {
+      box_widths_int.at(i) = static_cast<int>(widths.at(i));
+    }
   }
 
   if (dimensionality < 2)
   {
-    matrix_sizes_int.push_back(1);
     box_widths_int.push_back(1);
   }
 
-  cv::Mat output = cv::Mat(static_cast<int>(dimensionality), &matrix_sizes_int.front(), CV_32F, cv::Scalar(referenceLevel));
   cv::Mat box = cv::Mat(static_cast<int>(dimensionality), &box_widths_int.front(), CV_32F, cv::Scalar(boxAmplitude));
 
   std::vector<cv::Range> box_ranges(dimensionality);

@@ -43,8 +43,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericParameter.h"
-#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/Log.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/gui/UIntParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>
@@ -74,7 +76,7 @@ namespace cedar
         unsigned int new_limit = newValue;
         if (new_limit > static_cast<unsigned int>(std::numeric_limits<int>::max()))
         {
-          cedar::aux::LogSingleton::getInstance()->warning
+          cedar::aux::LogSingleton::getInstance()->debugMessage
           (
             "Minimum for unsigned int parameter exceed qt's capabilities -- limiting to max int.",
             "void cedar::aux::gui::NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(WidgetT*, const ValueT&)"
@@ -92,7 +94,7 @@ namespace cedar
         unsigned int new_limit = newValue;
         if (new_limit > static_cast<unsigned int>(std::numeric_limits<int>::max()))
         {
-          cedar::aux::LogSingleton::getInstance()->warning
+          cedar::aux::LogSingleton::getInstance()->debugMessage
           (
             "Maximum for unsigned int parameter exceed qt's capabilities -- limiting to max int.",
             "void cedar::aux::gui::NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(WidgetT*, const ValueT&)"

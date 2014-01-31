@@ -41,11 +41,15 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/annotation/Annotation.h"
 #include "cedar/auxiliaries/Cloneable.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
+
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 /*!@brief An annotation that indicates a certain color space.
  *

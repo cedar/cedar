@@ -39,6 +39,9 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/testingUtilities/measurementFunctions.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -53,14 +56,14 @@ int errors = 0;
 // variations
 
 const unsigned int MAX_THREADS = 20;
-const unsigned int STEP_SIZE = 20;
-const double WORK_SEC = 0.015;
+const cedar::unit::Time step_size(20.0 * cedar::unit::milli * cedar::unit::seconds);
+const cedar::unit::Time work_time(15.0 * cedar::unit::milli * cedar::unit::seconds);
 
 struct MyThread : public cedar::aux::LoopedThread
 {
   unsigned long mNumSteps;
-  double mTotalRealStep;
-  double mMaxRealStep;
+  cedar::unit::Time mTotalRealStep;
+  cedar::unit::Time mMaxRealStep;
 
   MyThread() 
   : mNumSteps(0), mTotalRealStep(0), mMaxRealStep(0)
@@ -68,7 +71,7 @@ struct MyThread : public cedar::aux::LoopedThread
   }
 
 private:
-  void step(double real_step)
+  void step(cedar::unit::Time real_step)
   {
     mNumSteps++;
     mTotalRealStep += real_step;
@@ -81,15 +84,17 @@ private:
     using boost::posix_time::microsec_clock;
 
     auto start = microsec_clock::local_time();
-    double duration = 0.0;
+    cedar::unit::Time duration(0.0 * cedar::unit::seconds);
 
-    while( duration < WORK_SEC 
-           && isRunning() )
+    while(duration < work_time && this->isRunningNolocking())
     {
       // do nothing
 
       auto end = microsec_clock::local_time();
-      duration = static_cast<double>((end - start).total_milliseconds()) / 1000.0;
+      duration = cedar::unit::Time
+                 (
+                   static_cast<double>((end - start).total_milliseconds()) * cedar::unit::milli * cedar::unit::seconds
+                 );
     }
     
   }
@@ -103,7 +108,7 @@ void create_test()
   for (; i <= MAX_THREADS; i++ )
   {
     threads.push_back( new MyThread() );
-    threads.back()->setStepSize( STEP_SIZE );
+    threads.back()->setStepSize(step_size);
   }
 }
 
@@ -144,30 +149,35 @@ void run_test()
   cedar::test::test_time("create threads", create_test);
   cedar::test::test_time("start threads", start_test);
 
-  usleep(1000*1000*3);
+  cedar::aux::sleep(cedar::unit::Time(3.0 * cedar::unit::seconds));
 
-  cedar::test::test_time("stop threads", stop_test );
+  cedar::test::test_time("stop threads", stop_test);
 
   // evaluation statistics for all threads:
 
-  unsigned int num_steps_all7= 0;
-  double total_real_step_all= 0;
-  double max_real_step_all= 0;
+  unsigned int num_steps_all7 = 0;
+  cedar::unit::Time total_real_step_all(0.0 * cedar::unit::seconds);
+  cedar::unit::Time max_real_step_all(0.0 * cedar::unit::seconds);
 
   auto it = threads.begin();
-  for (; it != threads.end(); it++ )
+  for (; it != threads.end(); it++)
   {
     num_steps_all7 = (*it)->mNumSteps;
     total_real_step_all = (*it)->mTotalRealStep;
 
-    if ( (*it)->mMaxRealStep > max_real_step_all )
+    if ((*it)->mMaxRealStep > max_real_step_all)
+    {
       max_real_step_all= (*it)->mMaxRealStep;
+    }
   }
- 
+
+  cedar::unit::Time one_second(1.0 * cedar::unit::second);
+
   cedar::test::write_measurement("num steps", num_steps_all7);
-  cedar::test::write_measurement("real-step size", total_real_step_all );
-  cedar::test::write_measurement("real-step max", max_real_step_all );
-  cedar::test::write_measurement("rel deviatiation", (total_real_step_all / num_steps_all7) - STEP_SIZE);
+  cedar::test::write_measurement("real-step size", total_real_step_all / one_second);
+  cedar::test::write_measurement("real-step max", max_real_step_all / one_second);
+  double deviation = ((total_real_step_all / one_second) / num_steps_all7) - (step_size / one_second);
+  cedar::test::write_measurement("rel deviatiation", deviation);
   cedar::test::test_time("delete threads", delete_test);
 }
 

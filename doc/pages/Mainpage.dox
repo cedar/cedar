@@ -38,4 +38,25 @@ the build system). Doxygen will create an HTML and a PDF output of the code docu
 this introductory page. Feel free to browse through the class documentation, or just dig into the concepts incorporated
 in the implementation. You can also start with one of our tutorials, to get accustomed to the ways cedar can be used.
 
+@section CitingCedar Citing cedar
+
+In 2013, we published a paper on cedar at ICANN. To cite this paper, use the following bibtex information:
+@verbatim
+@incollection{cedar2013,
+              year={2013},
+              isbn={978-3-642-40727-7},
+              booktitle={Artificial Neural Networks and Machine Learning --- ICANN 2013},
+              volume={8131},
+              series={Lecture Notes in Computer Science},
+              editor={Mladenov, Valeri and Koprinkova-Hristova, Petia and Palm, G\"{u}nther and Villa, Alessandro E.P. and Appollini, Bruno and Kasabov, Nikola},
+              doi={10.1007/978-3-642-40728-4\_60},
+              title={A Software Framework for Cognition, Embodiment, Dynamics, and Autonomy in Robotics: cedar},
+              url={http://dx.doi.org/10.1007/978-3-642-40728-4\_60},
+              publisher={Springer Berlin Heidelberg},
+              keywords={software framework; embodied cognition; neural dynamics; Dynamic Field Theory; cognitive robotic models},
+              author={Lomp, Oliver and Zibner, Stephan Klaus Ulrich and Richter, Mathis and Ra\~{n}\'{o}, I\~{n}aki and Sch\"{o}ner, Gregor},
+              pages={475-482}
+              }
+@endverbatim
+
 */

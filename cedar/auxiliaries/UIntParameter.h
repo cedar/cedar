@@ -39,7 +39,7 @@
 #define CEDAR_AUX_UINT_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/UIntParameter.fwd.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 
 #endif // CEDAR_AUX_UINT_PARAMETER_H

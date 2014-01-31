@@ -49,11 +49,14 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 #include <iostream>
 #include <list>
 
+unsigned int errors = 0;
 
 class TestModule : public cedar::proc::Step
 {
@@ -78,13 +81,12 @@ public:
 
 CEDAR_GENERATE_POINTER_TYPES(TestModule);
 
-int main(int /* argc */, char** /* argv */)
+void run_test()
 {
   using cedar::proc::Network;
   using cedar::proc::StepPtr;
   using cedar::proc::Step;
 
-  unsigned int errors = 0;
 
   std::cout << "Creating step declaration ... ";
   cedar::proc::ElementDeclarationPtr test_module_decl
@@ -233,5 +235,19 @@ int main(int /* argc */, char** /* argv */)
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
+
+  QApplication::exit(0);
+}
+
+int main(int argc, char** argv)
+{
+  QApplication app(argc, argv);
+
+  cedar::aux::CallFunctionInThread caller(boost::bind(&run_test));
+
+  caller.start();
+
+  app.exec();
+
   return errors;
 }

@@ -1,4 +1,23 @@
-/*========================================================================================================================
+/*======================================================================================================================
+
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
@@ -15,6 +34,7 @@
 
 ======================================================================================================================*/
 
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabbableGrabber.h"
 #include "cedar/auxiliaries/Grabbable.h"
@@ -25,6 +45,11 @@
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -34,7 +59,6 @@
   #include <boost/lexical_cast.hpp>
 #endif
 #include <ios>
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -103,17 +127,22 @@ int main(int argc, char **argv)
 
   // create a rectangular block and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_block_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
-  p_block_local_coordinate_frame->setTranslation(3, -3, 3);
+  p_block_local_coordinate_frame->setTranslation
+  (
+    3.0 * cedar::unit::meters,
+    -3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_block
   (
     new cedar::aux::gl::Block(p_block_local_coordinate_frame, 1, 2, 3, 0, 1, 0.5)
   );
   p_scene->addObjectVisualization(p_block);
-  p_block_local_coordinate_frame->rotate(0, M_PI/2);
+  p_block_local_coordinate_frame->rotate(0, cedar::aux::math::pi/2.0 * cedar::unit::radians);
 
   // wait until viewer is finished with its creation
   processQtEvents();
-  cedar::aux::sleep(cedar::unit::Milliseconds(100));
+  cedar::aux::sleep(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds));
 
   // -------------------------------------------------------------------------------------------------------------------
   // Create grabber, with viewer-class as parameter
@@ -176,7 +205,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < 100; ++i)
   {
     processQtEvents();
-    cedar::aux::sleep(cedar::unit::Milliseconds(10));
+    cedar::aux::sleep(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   }
 
 
@@ -248,7 +277,7 @@ int main(int argc, char **argv)
       // display real reached fps
       std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
-    cedar::aux::sleep(cedar::unit::Milliseconds(1));
+    cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds));
   }
 
   //----------------------------------------------------------------------------------------
@@ -262,7 +291,7 @@ int main(int argc, char **argv)
 
   // stop grabbing-thread if running
   // recording will also be stopped
-  if (p_grabber->isRunning())
+  if (p_grabber->isRunningNolocking())
   {
     p_grabber->stop();
   }

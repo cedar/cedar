@@ -51,6 +51,8 @@
 #ifndef Q_MOC_RUN
   #include <boost/lexical_cast.hpp>
 #endif
+#include <utility>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

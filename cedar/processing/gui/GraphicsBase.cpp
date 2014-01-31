@@ -78,6 +78,7 @@ mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
+mFillStyle(Qt::SolidPattern),
 mSnapToGrid(true),
 mWidth
 (
@@ -174,6 +175,16 @@ void cedar::proc::gui::GraphicsBase::setFillColor(const QColor& color)
 {
   this->mFillColor = color;
   this->update();
+}
+
+void cedar::proc::gui::GraphicsBase::setFillStyle(Qt::BrushStyle style, bool update)
+{
+  this->mFillStyle = style;
+
+  if (update)
+  {
+    this->update();
+  }
 }
 
 void cedar::proc::gui::GraphicsBase::highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource)
@@ -371,7 +382,10 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   {
     painter->save();
     painter->setPen(QPen(Qt::NoPen));
-    painter->setBrush(this->mFillColor);
+    QBrush brush;
+    brush.setColor(this->mFillColor);
+    brush.setStyle(this->mFillStyle);
+    painter->setBrush(brush);
     switch (this->mShape)
     {
       case BASE_SHAPE_RECT:

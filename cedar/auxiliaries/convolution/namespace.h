@@ -38,48 +38,24 @@
 #define CEDAR_AUX_CONV_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/defines.h"
 
-// SYSTEM INCLUDES
+#warning Do not include this header any more. Include the new forward declaration headers instead.
 
-namespace cedar
-{
-  namespace aux
-  {
-    /*!@brief Namespace for all classes related to cedar's convolution framework.
-     */
-    namespace conv
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(BorderType);
-      CEDAR_DECLARE_AUX_CLASS(Convolution);
-      CEDAR_DECLARE_AUX_CLASS(Engine);
-      CEDAR_DECLARE_AUX_CLASS(KernelList);
-      CEDAR_DECLARE_AUX_CLASS(Mode);
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Singleton.fwd.h"
+#include "cedar/auxiliaries/FactoryManager.fwd.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/convolution/BorderType.fwd.h"
+#include "cedar/auxiliaries/convolution/Convolution.fwd.h"
+#include "cedar/auxiliaries/convolution/Engine.fwd.h"
+#include "cedar/auxiliaries/convolution/KernelList.fwd.h"
+#include "cedar/auxiliaries/convolution/Mode.fwd.h"
+#include "cedar/auxiliaries/convolution/FFTW.fwd.h"
+#include "cedar/auxiliaries/convolution/FFTWPlanningStrategy.fwd.h"
+#include "cedar/auxiliaries/convolution/OpenCV.fwd.h"
+#include "cedar/auxiliaries/convolution/EngineManager.fwd.h"
+#include "cedar/auxiliaries/convolution/EngineParameter.fwd.h"
 
-      // convolution engines
-      CEDAR_DECLARE_AUX_CLASS(FFTW);
-      CEDAR_DECLARE_AUX_CLASS(OpenCV);
-      //!@endcond
-
-      /*!@brief The manager of all convolution classes.
-       */
-      typedef cedar::aux::FactoryManager<cedar::aux::conv::EnginePtr> EngineManager;
-
-      /*!@brief The manager of all convolution classes.
-       */
-      typedef cedar::aux::Singleton<EngineManager> EngineManagerSingleton;
-
-      /*!@brief A parameter for dynamically storing convolution engine objects.
-       */
-      typedef cedar::aux::ObjectParameterTemplate<cedar::aux::conv::Engine> EngineParameter;
-
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(EngineParameter);
-      //!@endcond
-    }
-  }
-}
 
 #endif // CEDAR_AUX_CONV_NAMESPACE_H

@@ -42,11 +42,14 @@
 #define CEDAR_AUX_MATH_TRANSFER_FUNCTION_DECLARATION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/Factory.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/TransferFunctionDeclaration.fwd.h"
+
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief A TransferFunctionDeclaration contains the relation of a unique class id (as string) and the corresponding

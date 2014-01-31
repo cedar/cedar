@@ -49,6 +49,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
 #endif
+#include <map>
 
 namespace cedar
 {

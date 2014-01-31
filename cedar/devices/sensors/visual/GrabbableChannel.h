@@ -44,6 +44,9 @@
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/devices/sensors/visual/GrabberChannel.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Grabbable.h"
+
 // SYSTEM INCLUDES
 
 
