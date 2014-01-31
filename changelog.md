@@ -44,9 +44,7 @@ Below, you can find a list of current changes of cedar. Please keep in mind that
 Currently, there are still a few classes and frameworks that are under development. Here's a list of interfaces that are
 likely to undergo major changes:
 - everything in devices
-- everything in units
 - the class CoordinateTransformation in processing::steps
-
 
 known issues
 ============
@@ -66,9 +64,18 @@ known issues
     workaround, make sure to reset all smart pointers at the end of your main method (the usual cause are global-scope
     smart pointers that send a log message after the log singleton was freed.)
 
-
 Unreleased
 ==========
+
+none
+
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+Version 3.0.0
+-------------
 
 - build system
   - libQGLViewer is now optional. If it is not present, many of the GL components of cedar, including the kinematic chain
@@ -78,20 +85,18 @@ Unreleased
     used elsewhere. Plugins can now be added in an improved manager. They are found in a different way, now: a list of
     user-defined paths is searched for a plugin of a given name by appending certain directories (such as the plugin
     name itself and a "build" folder.) Using this new functionality, architectures now store which plugins they require.
+- cedar:unit
+  - The unit framework was replaced by typedefs to the boost unit framework.
 - cedar::aux
   - There is now a command line parser available. This is intended to make software that performs experiments easy to
     customize; it features auto-generated help texts, reading and writing of options to file and some sanity checking of
     user inputs. It is still being developed.
+- cedar::dev
+  - A framework for robots and components was added.
 - cedar::proc
   - Step can no longer be executed in a separate thread (nobody uses this functionality).
   - There is now a tool in the processingIde that lists all steps along with their execution times. This can be helpful
     in finding out which steps make your architectures slow.
-
-Released versions
-=================
-
-The following are the changes made in the release versions.
-
 
 Version 2.0.0
 -------------
