@@ -50,7 +50,16 @@
 
 bool checkTime(long expired_milliseconds, double expected_milliseconds)
 {
-  return fabs(static_cast<double>(expired_milliseconds) - expected_milliseconds) < 0.005 * expected_milliseconds;
+  double threshold;
+  if (expected_milliseconds > 1000)
+  {
+    threshold = 0.005 * expected_milliseconds; // be more tolerant with larger wait times
+  }
+  else
+  {
+    threshold = 5; // deviations of up to 5 milliseconds are allowed
+  }
+  return fabs(static_cast<double>(expired_milliseconds) - expected_milliseconds) < threshold;
 }
 
 int main(int, char**)
