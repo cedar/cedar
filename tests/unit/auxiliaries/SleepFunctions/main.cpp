@@ -63,7 +63,7 @@ bool checkTime(long expiredMilliseconds, cedar::unit::Time expectedTime)
   {
     threshold = 5; // deviations of up to 5 milliseconds are allowed
   }
-  return fabs(static_cast<double>(expired_milliseconds) - expected_milliseconds) < threshold;
+  return fabs(static_cast<double>(expiredMilliseconds) - expected_milliseconds) < threshold;
 }
 
 int main(int, char**)
