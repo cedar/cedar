@@ -396,8 +396,13 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
 
 void cedar::proc::steps::CoordinateTransformation::recompute()
 {
+  cv::Mat old_output = this->mOutput->getData();
   this->createMap();
-  emitOutputPropertiesChangedSignal("result");
+
+  if (!cedar::aux::math::matrixSizesEqual(old_output, this->mOutput->getData()))
+  {
+    emitOutputPropertiesChangedSignal("result");
+  }
   this->onTrigger();
 }
 
