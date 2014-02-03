@@ -81,6 +81,8 @@ public:
    */
   virtual double compute(double value) const;
 
+  cv::Mat compute(const cv::Mat& values) const;
+
   /*!@brief Returns the current beta value.
    */
   inline double getBeta() const
