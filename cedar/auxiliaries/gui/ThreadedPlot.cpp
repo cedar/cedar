@@ -39,7 +39,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ThreadedPlot.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -134,5 +137,15 @@ void cedar::aux::gui::ThreadedPlot::stop()
   {
     this->killTimer(mTimerId);
     this->mTimerId = 0;
+  }
+}
+
+void cedar::aux::gui::ThreadedPlot::wait()
+{
+  CEDAR_NON_CRITICAL_ASSERT(this->mTimerId == 0);
+
+  while (this->mCaller.isExecuting())
+  {
+    cedar::aux::sleep(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   }
 }

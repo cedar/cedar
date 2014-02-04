@@ -82,6 +82,8 @@ public:
   //!@brief Constructor that plots some data.
   ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
+  ~ImagePlot();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
