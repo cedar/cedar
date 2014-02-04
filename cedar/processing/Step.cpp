@@ -311,6 +311,8 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   // start measuring the execution time.
   clock_t lock_start = clock();
 
+  connections_locker.unlock();
+
   // lock the step
   this->lock(cedar::aux::LOCK_TYPE_READ);
 

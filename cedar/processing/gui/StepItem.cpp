@@ -61,6 +61,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QPen>
@@ -363,22 +364,29 @@ void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
               "</table>");
 
   std::vector<boost::function<cedar::unit::Time ()> > measurements;
+  std::vector<boost::function<bool ()> > checks;
   measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRunTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRunTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasLockTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasLockTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRoundTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRoundTimeMeasurement, this->mStep));
 
   for (size_t i = 0; i < measurements.size(); ++i)
   {
-    try
+    if (checks.at(i)())
     {
       cedar::unit::Time ms = measurements.at(i)();
-      double dval = ms / (0.001 * cedar::unit::seconds);
+      double dval = ms / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
       tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
     }
-    catch (const cedar::proc::NoMeasurementException&)
+    else
     {
       tool_tip = tool_tip.arg("n/a");
     }
