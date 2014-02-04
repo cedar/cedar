@@ -391,7 +391,12 @@ void cedar::aux::gui::MatrixSlicePlot3D::plotClicked(QMouseEvent* pEvent, double
   idx[dim_sliced] = idx_col / (size[dim_1] + padding) + idx_2_per_row * (idx_row / (size[dim_0] + padding));
 
   // if we hit the white matter, return
-  if (idx[0] >= size[0] || idx[1] >= size[1] || idx[2] >= size[2])
+  if
+  (
+    idx[0] < 0 || idx[0] >= size[0]
+    || idx[1] < 0 || idx[1] >= size[1]
+    || idx[2] < 0 || idx[2] >= size[2]
+  )
   {
     return;
   }
