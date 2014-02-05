@@ -22,50 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Condition.cpp
+    File:        Instruction.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
     Date:        2014 01 22
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::expertiment::Instruction.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_proc_EXPERIMENT_INSTRUCTION_FWD_H
+#define CEDAR_proc_EXPERIMENT_INSTRUCTION_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
-#include <boost/bind.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// register the class
-//----------------------------------------------------------------------------------------------------------------------
-namespace
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
- auto declared = cedar::proc::experiment::InstructionManagerSingleton::getInstance()->
-     registerType<cedar::proc::experiment::ConditionPtr>();
+  namespace proc
+  {
+    namespace experiment
+    {
+      CEDAR_DECLARE_PROC_CLASS(Instruction);
+    }
+  }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Condition::Condition()
-{
+//!@endcond
 
-}
-cedar::proc::experiment::Condition::~Condition()
-{
-
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
+#endif // CEDAR_proc_ANNOTATION_INSTRUCTION_FWD_H
 

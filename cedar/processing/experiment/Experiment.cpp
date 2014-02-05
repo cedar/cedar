@@ -52,11 +52,21 @@
 cedar::proc::experiment::Experiment::Experiment(cedar::proc::NetworkPtr network)
 :
 _mFileName(new cedar::aux::StringParameter(this, "filename", "")),
-_mRepetitions(new cedar::aux::UIntParameter(this, "repetitions", 0))
+_mRepetitions(new cedar::aux::UIntParameter(this, "repetitions", 0)),
+_mActionSequences
+(
+  new ActionSequencelListParameter
+  (
+    this,
+    "ActionSequences",
+    std::vector<ActionSequencePtr>()
+  )
+)
 {
   this->mNetwork = network;
 
-  this->addActionSequence("Action1",boost::shared_ptr<ActionSequence>(new ActionSequence()));
+  this->addActionSequence(boost::shared_ptr<ActionSequence>(new ActionSequence()));
+  this->addActionSequence(boost::shared_ptr<ActionSequence>(new ActionSequence()));
 
 
   this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
@@ -120,12 +130,19 @@ void cedar::proc::experiment::Experiment::startNetwork()
   this->mStartThreadsCaller->start();
 }
 
-void cedar::proc::experiment::Experiment::addActionSequence(
-		const std::string& name,
-		cedar::proc::experiment::ActionSequencePtr actionSequence)
+void cedar::proc::experiment::Experiment::addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence)
 {
+	  this->_mActionSequences->pushBack(actionSequence);
+}
 
-	  this->addConfigurableChild(name,actionSequence);
+std::vector<cedar::proc::experiment::ActionSequencePtr> cedar::proc::experiment::Experiment::getActionSequences()
+{
+  std::vector<cedar::proc::experiment::ActionSequencePtr> ret;
+  for (unsigned int i = 0; i < _mActionSequences->size(); i++)
+  {
+    ret.push_back(this->_mActionSequences->at(i));
+  }
+  return ret;
 }
 
 void cedar::proc::experiment::Experiment::stopNetwork()

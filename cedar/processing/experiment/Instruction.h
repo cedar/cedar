@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSequence.h
+    File:        Instruction.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
@@ -34,60 +34,39 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_ACTION_SEQUENCE_H
-#define CEDAR_proc_EXPERIMENT_ACTION_SEQUENCE_H
+#ifndef CEDAR_proc_EXPERIMENT_INSTRUCTION_H
+#define CEDAR_proc_EXPERIMENT_INSTRUCTION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ActionSequence.fwd.h"
+#include "cedar/processing/experiment/Instruction.fwd.h"
 
 // SYSTEM INCLUDES
 
 
 /*!@brief
  */
-class cedar::proc::experiment::ActionSequence : public cedar::aux::NamedConfigurable
+class cedar::proc::experiment::Instruction : public cedar::aux::Configurable
 {
-
-public:
-  //!@brief a parameter for action sequence objects
-  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::Action> ActionListParameter;
-  typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::Condition> ConditionParameter;
-
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionListParameter);
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConditionParameter);
-  //!@endcond
-
 private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  ActionSequence();
+  Instruction();
   //!@brief Destructor
-  ~ActionSequence();
+  ~Instruction();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void addAction(cedar::proc::experiment::ActionPtr action);
-  void setCondition(cedar::proc::experiment::ConditionPtr condition);
-  std::vector<cedar::proc::experiment::ActionPtr> getActions();
-  std::vector<cedar::proc::experiment::ConditionPtr> getConditions();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,14 +86,12 @@ protected:
   // none yet
 
 private:
-  ActionListParameterPtr _mActionSet;
-  ConditionParameterPtr _mCondition;
 
-}; // class cedar::proc::experiment::Experiment
+}; // class cedar::proc::experiment::Instruction
 
 #include "cedar/auxiliaries/FactoryManager.h"
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ActionSequencePtr>);
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::InstructionPtr>);
 
 namespace cedar
 {
@@ -123,11 +100,11 @@ namespace cedar
     namespace experiment
     {
       //!@brief The singleton instance of the kernel factory manager.
-      typedef cedar::aux::Singleton< cedar::aux::FactoryManager<cedar::proc::experiment::ActionSequencePtr>>
-              ActionSequenceManagerSingleton;
+      typedef cedar::aux::Singleton< cedar::aux::FactoryManager<cedar::proc::experiment::InstructionPtr>>
+              InstructionManagerSingleton;
     }
   }
 }
 
-#endif // CEDAR_proc_EXPERIMENT_ACTION_SEQUENCE_H
+#endif // CEDAR_proc_EXPERIMENT_INSTRUCTION_H
 
