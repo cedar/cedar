@@ -41,12 +41,14 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/experiment/ActionSequence.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
@@ -58,6 +60,14 @@
  */
 class cedar::proc::experiment::Experiment : public cedar::aux::NamedConfigurable
 {
+
+public:
+  //!@brief a parameter for action sequence objects
+  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::ActionSequence> ActionSequencelListParameter;
+
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionSequencelListParameter);
+  //!@endcond
 private:
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -79,7 +89,8 @@ public:
   void setRepetitions(unsigned int repetitions);
   void run();
   void cancel();
-  void addActionSequence(const std::string& name, cedar::proc::experiment::ActionSequencePtr actionSequence);
+  void addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
+  std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -109,6 +120,9 @@ private:
 
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
+
+
+  ActionSequencelListParameterPtr _mActionSequences;
 
 }; // class cedar::proc::experiment::Experiment
 

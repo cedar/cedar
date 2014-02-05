@@ -39,20 +39,46 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ActionSequence.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+ auto declared = cedar::proc::experiment::ActionSequenceManagerSingleton::getInstance()->
+     registerType<cedar::proc::experiment::ActionSequencePtr>();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::experiment::ActionSequence::ActionSequence()
 :
-_conditionSet(boost::shared_ptr<Configurable>(new Configurable())),
-_actionSet((boost::shared_ptr<Configurable>(new Configurable())))
+_mActionSet
+(
+  new ActionListParameter
+  (
+    this,
+    "ActionSet",
+    std::vector<ActionPtr>()
+  )
+)
+,
+_mCondition
+(
+  new ConditionParameter
+  (
+    this,
+    "condition",
+    ConditionPtr(new Condition())
+  )
+)
 {
-	this->addConfigurableChild("ConditionSet",_conditionSet);
-	this->addConfigurableChild("ActionSet",_actionSet);
+
 }
 cedar::proc::experiment::ActionSequence::~ActionSequence()
 {
@@ -68,10 +94,22 @@ cedar::proc::experiment::ActionSequence::~ActionSequence()
 
 void cedar::proc::experiment::ActionSequence::addAction(cedar::proc::experiment::ActionPtr action)
 {
-	this->_actionSet->addConfigurableChild("Action",action);
+	this->_mActionSet->pushBack(action);
 }
 
-void cedar::proc::experiment::ActionSequence::addCondition(cedar::proc::experiment::ConditionPtr condition)
+void cedar::proc::experiment::ActionSequence::setCondition(cedar::proc::experiment::ConditionPtr condition)
 {
-	this->_conditionSet->addConfigurableChild("Condition",condition);
+	this->_mCondition->setValue(condition);
+}
+
+std::vector<cedar::proc::experiment::ActionPtr> cedar::proc::experiment::ActionSequence::getActions()
+{
+  std::vector<cedar::proc::experiment::ActionPtr> ret;
+  return ret;
+}
+
+std::vector<cedar::proc::experiment::ConditionPtr> cedar::proc::experiment::ActionSequence::getConditions()
+{
+  std::vector<cedar::proc::experiment::ConditionPtr> ret;
+  return ret;
 }

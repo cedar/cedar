@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Condition.cpp
+    File:        Instruction.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
@@ -38,28 +38,18 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
+#include "cedar/processing/experiment/Instruction.h"
 
 // SYSTEM INCLUDES
-#include <boost/bind.hpp>
-
-//----------------------------------------------------------------------------------------------------------------------
-// register the class
-//----------------------------------------------------------------------------------------------------------------------
-namespace
-{
- auto declared = cedar::proc::experiment::InstructionManagerSingleton::getInstance()->
-     registerType<cedar::proc::experiment::ConditionPtr>();
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Condition::Condition()
+cedar::proc::experiment::Instruction::Instruction()
 {
 
 }
-cedar::proc::experiment::Condition::~Condition()
+cedar::proc::experiment::Instruction::~Instruction()
 {
 
 }

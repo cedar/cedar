@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/processing/experiment/Instruction.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Condition.fwd.h"
@@ -53,7 +54,7 @@
 
 /*!@brief
  */
-class cedar::proc::experiment::Condition : public cedar::aux::Configurable
+class cedar::proc::experiment::Condition : public cedar::proc::experiment::Instruction
 {
 private:
 
