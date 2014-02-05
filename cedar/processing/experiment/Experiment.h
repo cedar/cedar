@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/Network.h"
+#include "cedar/processing/experiment/ActionSequence.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
@@ -78,6 +79,7 @@ public:
   void setRepetitions(unsigned int repetitions);
   void run();
   void cancel();
+  void addActionSequence(const std::string& name, cedar::proc::experiment::ActionSequencePtr actionSequence);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
