@@ -56,6 +56,8 @@ _mRepetitions(new cedar::aux::UIntParameter(this, "repetitions", 0))
 {
   this->mNetwork = network;
 
+  this->addActionSequence("Action1",boost::shared_ptr<ActionSequence>(new ActionSequence()));
+
 
   this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
                               (
@@ -116,6 +118,14 @@ void cedar::proc::experiment::Experiment::startNetwork()
   cedar::aux::GlobalClockSingleton::getInstance()->start();
   cedar::aux::RecorderSingleton::getInstance()->start();
   this->mStartThreadsCaller->start();
+}
+
+void cedar::proc::experiment::Experiment::addActionSequence(
+		const std::string& name,
+		cedar::proc::experiment::ActionSequencePtr actionSequence)
+{
+
+	  this->addConfigurableChild(name,actionSequence);
 }
 
 void cedar::proc::experiment::Experiment::stopNetwork()
