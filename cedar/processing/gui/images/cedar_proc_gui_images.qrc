@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/cedar/processing/gui/images">
+    <file>current_version_image.svg</file>
+  </qresource>
+</RCC>
