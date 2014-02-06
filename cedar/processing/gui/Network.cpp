@@ -88,6 +88,9 @@ mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode())
 {
+  //!@todo This assert should not be here, but for now, the code doesn't work without a scene.
+  CEDAR_ASSERT(scene != nullptr);
+
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   if (!mNetwork)
