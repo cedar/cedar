@@ -87,7 +87,7 @@ public:
   void addAction(cedar::proc::experiment::ActionPtr action);
   void setCondition(cedar::proc::experiment::ConditionPtr condition);
   std::vector<cedar::proc::experiment::ActionPtr> getActions();
-  std::vector<cedar::proc::experiment::ConditionPtr> getConditions();
+  cedar::proc::experiment::ConditionPtr getCondition();
 
 
   //--------------------------------------------------------------------------------------------------------------------

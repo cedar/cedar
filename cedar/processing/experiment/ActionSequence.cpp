@@ -42,7 +42,6 @@
 #include "cedar/auxiliaries/FactoryManager.h"
 
 // SYSTEM INCLUDES
-#include <boost/bind.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -73,8 +72,8 @@ _mCondition
   new ConditionParameter
   (
     this,
-    "condition",
-    ConditionPtr(new Condition())
+    "Condition",
+    cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::Condition())
   )
 )
 {
@@ -105,11 +104,14 @@ void cedar::proc::experiment::ActionSequence::setCondition(cedar::proc::experime
 std::vector<cedar::proc::experiment::ActionPtr> cedar::proc::experiment::ActionSequence::getActions()
 {
   std::vector<cedar::proc::experiment::ActionPtr> ret;
+  for (unsigned int i = 0; i < _mActionSet->size(); i++)
+  {
+    ret.push_back(this->_mActionSet->at(i));
+  }
   return ret;
 }
 
-std::vector<cedar::proc::experiment::ConditionPtr> cedar::proc::experiment::ActionSequence::getConditions()
+cedar::proc::experiment::ConditionPtr cedar::proc::experiment::ActionSequence::getCondition()
 {
-  std::vector<cedar::proc::experiment::ConditionPtr> ret;
-  return ret;
+	return this->_mCondition->getValue();
 }

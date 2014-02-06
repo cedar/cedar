@@ -39,17 +39,17 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/Condition.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 
 // SYSTEM INCLUDES
-#include <boost/bind.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
- auto declared = cedar::proc::experiment::InstructionManagerSingleton::getInstance()->
-     registerType<cedar::proc::experiment::ConditionPtr>();
+	bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
+		registerType<cedar::proc::experiment::ConditionPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,7 +57,6 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::experiment::Condition::Condition()
 {
-
 }
 cedar::proc::experiment::Condition::~Condition()
 {
