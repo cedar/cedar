@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_CONDITION_H
-#define CEDAR_proc_EXPERIMENT_CONDITION_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,7 +44,6 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/processing/experiment/Instruction.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Condition.fwd.h"
@@ -54,7 +53,7 @@
 
 /*!@brief
  */
-class cedar::proc::experiment::Condition : public cedar::proc::experiment::Instruction
+class cedar::proc::experiment::Condition : public cedar::aux::Configurable
 {
 private:
 
@@ -92,5 +91,22 @@ private:
 
 }; // class cedar::proc::experiment::Condition
 
-#endif // CEDAR_proc_EXPERIMENT_CONDITION_H
+#include "cedar/auxiliaries/FactoryManager.h"
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ConditionPtr>);
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace experiment
+    {
+      //!@brief The singleton instance of the instruction factory manager.
+      typedef cedar::aux::Singleton< cedar::aux::FactoryManager<cedar::proc::experiment::ConditionPtr>>
+              ConditionManagerSingleton;
+    }
+  }
+}
+
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_H
 

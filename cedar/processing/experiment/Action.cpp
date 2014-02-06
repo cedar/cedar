@@ -39,16 +39,16 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/Action.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 
 // SYSTEM INCLUDES
-#include <boost/bind.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
- auto declared = cedar::proc::experiment::InstructionManagerSingleton::getInstance()->
+ bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
      registerType<cedar::proc::experiment::ActionPtr>();
 }
 

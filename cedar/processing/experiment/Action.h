@@ -44,7 +44,6 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/processing/experiment/Instruction.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Action.fwd.h"
@@ -54,7 +53,7 @@
 
 /*!@brief
  */
-class cedar::proc::experiment::Action : public cedar::proc::experiment::Instruction
+class cedar::proc::experiment::Action : public cedar::aux::Configurable
 {
 private:
 
@@ -91,6 +90,23 @@ protected:
 private:
 
 }; // class cedar::proc::experiment::Action
+
+#include "cedar/auxiliaries/FactoryManager.h"
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ActionPtr>);
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace experiment
+    {
+      //!@brief The singleton instance of the instruction factory manager.
+      typedef cedar::aux::Singleton< cedar::aux::FactoryManager<cedar::proc::experiment::ActionPtr>>
+              ActionManagerSingleton;
+    }
+  }
+}
 
 #endif // CEDAR_proc_EXPERIMENT_ACTION_H
 
