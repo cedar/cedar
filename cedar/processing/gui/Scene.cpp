@@ -82,11 +82,12 @@ QGraphicsScene (pParent),
 mMode(MODE_SELECT),
 mTriggerMode(MODE_SHOW_ALL),
 mpeParentView(peParentView),
-mpNewConnectionIndicator(NULL),
-mpConnectionStart(NULL),
+mpNewConnectionIndicator(nullptr),
+mpConnectionStart(nullptr),
 mpMainWindow(pMainWindow),
 mSnapToGrid(false),
-mpConfigurableWidget(NULL)
+mpConfigurableWidget(nullptr),
+mpRecorderWidget(nullptr)
 {
   mMousePosX = 0;
   mMousePosY = 0;
@@ -207,7 +208,10 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
 void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
-  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
+  if (this->mpRecorderWidget != nullptr)
+  {
+    connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
+  }
 }
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
