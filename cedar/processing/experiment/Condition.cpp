@@ -40,17 +40,19 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/Condition.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
-namespace
+/*namespace
 {
 	bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
 		registerType<cedar::proc::experiment::ConditionPtr>();
-}
+}*/
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -62,6 +64,7 @@ cedar::proc::experiment::Condition::~Condition()
 {
 
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods

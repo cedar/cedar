@@ -46,8 +46,6 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/processing/experiment/Action.h"
 #include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/ObjectParameterTemplate.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ActionSequence.fwd.h"
@@ -59,16 +57,6 @@
  */
 class cedar::proc::experiment::ActionSequence : public cedar::aux::NamedConfigurable
 {
-
-public:
-  //!@brief a parameter for action sequence objects
-  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::Action> ActionListParameter;
-  typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::Condition> ConditionParameter;
-
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionListParameter);
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConditionParameter);
-  //!@endcond
 
 private:
 
@@ -107,8 +95,8 @@ protected:
   // none yet
 
 private:
-  ActionListParameterPtr _mActionSet;
-  ConditionParameterPtr _mCondition;
+  cedar::proc::experiment::Action::ActionListParameterPtr _mActionSet;
+  cedar::proc::experiment::Condition::ConditionParameterPtr _mCondition;
 
 }; // class cedar::proc::experiment::Experiment
 

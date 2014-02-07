@@ -22,80 +22,91 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Experiment.h
+    File:        ConditionCheckValue.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description:
+    Description: Header file for the class cedar::proc::experiment::ConditionCheckValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_EXPERIMENT_H
-#define CEDAR_proc_EXPERIMENT_EXPERIMENT_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/processing/Network.h"
-#include "cedar/processing/experiment/ActionSequence.h"
-#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/processing/experiment/Condition.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/Experiment.fwd.h"
-#include "cedar/processing/experiment/ExperimentController.fwd.h"
+#include "cedar/processing/experiment/ConditionCheckValue.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::experiment::Experiment : public cedar::aux::NamedConfigurable
+template <typename T>
+class cedar::proc::experiment::ConditionCheckValue : public cedar::proc::experiment::Condition
 {
 
-public:
-  //!@brief a parameter for action sequence objects
-  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::ActionSequence> ActionSequencelListParameter;
-
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionSequencelListParameter);
-  //!@endcond
+  //----------------------------------------------------------------------------------------------------------------------
+  // register the class
+  //----------------------------------------------------------------------------------------------------------------------
 private:
+    static const bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
+      registerType<boost::shared_ptr<cedar::proc::experiment::ConditionCheckValue<T> > >();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Experiment(cedar::proc::NetworkPtr network);
+  //!@brief The standard constructor.
+  ConditionCheckValue()
+  :
+  _valueToCheck
+  (
+      new cedar::aux::ParameterTemplate<T>(this,"ValueToCheck",NULL)
+  )
+  ,
+  _desiredValue
+  (
+      new cedar::aux::ParameterTemplate<T>(this,"DesiredValue",NULL)
+  )
+
+  {
+
+  }
+
   //!@brief Destructor
-  ~Experiment();
+  virtual ~ConditionCheckValue();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const std::string& getFileName() const;
-  void setFileName(const std::string& filename);
+  bool check(Experiment* experiment)
+  {
+    if (_valueToCheck!=NULL &&_desiredValue!=NULL)
+    {
+      return _valueToCheck->getValue() ==_desiredValue->getValue();
+    }
+    return false;
+  }
 
-  unsigned int getRepetitions() const;
-  void setRepetitions(unsigned int repetitions);
-  void run();
-  void cancel();
-  void addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
-  std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
-  void startNetwork();
-  void stopNetwork();
-  void executeAcionSequences();
-  bool isOnInit();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,29 +117,27 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
 private:
-  cedar::aux::StringParameterPtr _mFileName;
-  cedar::aux::UIntParameterPtr _mRepetitions;
-  cedar::proc::NetworkPtr mNetwork;
+  boost::shared_ptr<cedar::aux::ParameterTemplate<T>> _valueToCheck;
+  boost::shared_ptr<cedar::aux::ParameterTemplate<T>> _desiredValue;
 
-  //! Used for starting all triggers in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
+}; // class cedar::proc::experiment::ConditionCheckValue
 
-  //! Used for stopping all triggers in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
-
-
-  ActionSequencelListParameterPtr _mActionSequences;
-  unsigned int mRepetitionCounter;
-  ExperimentControllerPtr mController;
-
-}; // class cedar::proc::experiment::Experiment
-
-#endif // CEDAR_proc_EXPERIMENT_EXPERIMENT_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
 

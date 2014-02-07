@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Action.cpp
+    File:        ExperimentController.cpp
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description:
+    Description: Source file for the class cedar::proc::experiment::ExperimentController.
 
     Credits:
 
@@ -38,30 +38,54 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// register the class
-//----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Action::Action()
-{
 
-}
-cedar::proc::experiment::Action::~Action()
+cedar::proc::experiment::ExperimentController::ExperimentController(Experiment* parent)
+:
+init(true)
 {
+  this->mpExperiment = parent;
 
+  this->connectToStartSignal(boost::bind(&cedar::proc::experiment::ExperimentController::prepareStart, this));
+  this->connectToQuitSignal(boost::bind(&cedar::proc::experiment::ExperimentController::processQuit, this));
 }
+
+cedar::proc::experiment::ExperimentController::~ExperimentController()
+{
+}
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+
+void cedar::proc::experiment::ExperimentController::step(cedar::unit::Time)
+{
+  this->mpExperiment->executeAcionSequences();
+}
+
+void cedar::proc::experiment::ExperimentController::prepareStart()
+{
+  this->mpExperiment->executeAcionSequences();
+  this->init = false;
+}
+
+void cedar::proc::experiment::ExperimentController::processQuit()
+{
+  this->init = true;
+}
+
+bool cedar::proc::experiment::ExperimentController::isOnInit()
+{
+  return init;
+}
 

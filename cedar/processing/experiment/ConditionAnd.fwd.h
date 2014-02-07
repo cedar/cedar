@@ -22,46 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Action.cpp
+    File:        ConditionAnd.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
     Date:        2014 01 22
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::expertiment::ConditionAnd.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AND_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_AND_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// register the class
-//----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Action::Action()
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-
+  namespace proc
+  {
+    namespace experiment
+    {
+      CEDAR_DECLARE_PROC_CLASS(ConditionAnd);
+    }
+  }
 }
-cedar::proc::experiment::Action::~Action()
-{
 
-}
+//!@endcond
 
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
+#endif // CEDAR_PROC_ANNOTATION_CONDITION_AND_FWD_H
 

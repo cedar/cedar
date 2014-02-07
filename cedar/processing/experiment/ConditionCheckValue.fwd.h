@@ -22,46 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Action.cpp
+    File:        ConditionCheckValue.fwd.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::experiment::ConditionCheckValue.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// register the class
-//----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Action::Action()
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-
+  namespace proc
+  {
+    namespace experiment
+    {
+       template <typename T> class ConditionCheckValue;
+    }
+  }
 }
-cedar::proc::experiment::Action::~Action()
-{
 
-}
+//!@endcond
 
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
 

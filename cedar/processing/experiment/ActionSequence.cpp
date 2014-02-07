@@ -39,7 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ActionSequence.h"
+#include "cedar/processing/experiment/ActionStart.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/experiment/ConditionOnInit.h"
 
 // SYSTEM INCLUDES
 
@@ -48,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
- auto declared = cedar::proc::experiment::ActionSequenceManagerSingleton::getInstance()->
+ bool declared = cedar::proc::experiment::ActionSequenceManagerSingleton::getInstance()->
      registerType<cedar::proc::experiment::ActionSequencePtr>();
 }
 
@@ -59,7 +61,7 @@ cedar::proc::experiment::ActionSequence::ActionSequence()
 :
 _mActionSet
 (
-  new ActionListParameter
+  new cedar::proc::experiment::Action::ActionListParameter
   (
     this,
     "ActionSet",
@@ -69,11 +71,11 @@ _mActionSet
 ,
 _mCondition
 (
-  new ConditionParameter
+  new cedar::proc::experiment::Condition::ConditionParameter
   (
     this,
     "Condition",
-    cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::Condition())
+    cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::ConditionOnInit())
   )
 )
 {
