@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Action.cpp
+    File:        ConditionCheckValue.cpp
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description:
+    Description: Source file for the class cedar::proc::experiment::ConditionCheckValue.
 
     Credits:
 
@@ -38,30 +38,37 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/experiment/ConditionCheckValue.h"
 
 // SYSTEM INCLUDES
-
+/*
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
+    registerType<cedar::proc::experiment::ConditionCheckValuePtr>();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Action::Action()
-{
 
-}
-cedar::proc::experiment::Action::~Action()
+cedar::proc::experiment::ConditionCheckValue::ConditionCheckValue()
 {
-
 }
 
-
+cedar::proc::experiment::ConditionCheckValue::~ConditionCheckValue()
+{
+}
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 
+bool cedar::proc::experiment::ConditionCheckValue::check(Experiment* experiment)
+{
+  return true;
+}
+*/

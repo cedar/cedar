@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/Network.h"
+#include "cedar/processing/experiment/ActionStart.h"
+#include "cedar/processing/experiment/ExperimentController.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
@@ -62,11 +64,14 @@ _mActionSequences
     std::vector<ActionSequencePtr>()
   )
 )
+,
+mController(new ExperimentController(this))
 {
   this->mNetwork = network;
 
-  this->addActionSequence(boost::shared_ptr<ActionSequence>(new ActionSequence()));
-  this->addActionSequence(boost::shared_ptr<ActionSequence>(new ActionSequence()));
+  ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
+  as->addAction(ActionPtr(new ActionStart()));
+  this->addActionSequence(as);
 
 
   this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
@@ -116,10 +121,11 @@ void cedar::proc::experiment::Experiment::setRepetitions(unsigned int repetition
 
 void cedar::proc::experiment::Experiment::run()
 {
-  this->startNetwork();
+  this->mController->start();
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
+  this->mController->stop();
   this->stopNetwork();
 }
 
@@ -132,7 +138,7 @@ void cedar::proc::experiment::Experiment::startNetwork()
 
 void cedar::proc::experiment::Experiment::addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence)
 {
-	  this->_mActionSequences->pushBack(actionSequence);
+  this->_mActionSequences->pushBack(actionSequence);
 }
 
 std::vector<cedar::proc::experiment::ActionSequencePtr> cedar::proc::experiment::Experiment::getActionSequences()
@@ -153,3 +159,24 @@ void cedar::proc::experiment::Experiment::stopNetwork()
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
   this->mNetwork->reset();
 }
+
+void cedar::proc::experiment::Experiment::executeAcionSequences()
+{
+  for (ActionSequencePtr action_sequence: this->getActionSequences())
+  {
+    if(action_sequence->getCondition()->check(this))
+    {
+      for(ActionPtr action : action_sequence->getActions())
+      {
+        action->run(this);
+      }
+    }
+  }
+}
+
+bool cedar::proc::experiment::Experiment::isOnInit()
+{
+  return this->mController->isOnInit();
+}
+
+

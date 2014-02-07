@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Action.cpp
+    File:        ConditionAnd.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
@@ -38,25 +38,35 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
+#include "cedar/processing/experiment/ConditionAnd.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+	bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
+		registerType<cedar::proc::experiment::ConditionAndPtr>();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Action::Action()
+cedar::proc::experiment::ConditionAnd::ConditionAnd()
+{
+}
+cedar::proc::experiment::ConditionAnd::~ConditionAnd()
 {
 
 }
-cedar::proc::experiment::Action::~Action()
-{
 
+bool cedar::proc::experiment::ConditionAnd::check(Experiment* experiment)
+{
+  return _mCondition1->getValue()->check(experiment) && _mCondition2->getValue()->check(experiment);
 }
 
 

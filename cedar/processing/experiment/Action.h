@@ -42,11 +42,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Action.fwd.h"
+#include "cedar/processing/experiment/Experiment.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -55,6 +56,19 @@
  */
 class cedar::proc::experiment::Action : public cedar::aux::Configurable
 {
+public:
+
+	//!@brief a parameter for action sequence objects
+	typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::Action> ActionListParameter;
+	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::Action> ActionParameter;
+
+	//!@cond SKIPPED_DOCUMENTATION
+	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionListParameter);
+	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionParameter);
+	//!@endcond
+
+	#include "cedar/auxiliaries/FactoryManager.h"
+
 private:
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,7 +83,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
+  virtual void run(Experiment* experiment) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -85,13 +99,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
 private:
 
 }; // class cedar::proc::experiment::Action
-
-#include "cedar/auxiliaries/FactoryManager.h"
 
 CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ActionPtr>);
 

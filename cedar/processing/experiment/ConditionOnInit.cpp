@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Action.cpp
+    File:        ConditionOnInit.cpp
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description:
+    Description: Source file for the class cedar::proc::experiment::ConditionOnInit.
 
     Credits:
 
@@ -38,30 +38,38 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/experiment/ConditionOnInit.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+	bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
+		registerType<cedar::proc::experiment::ConditionOnInitPtr>();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Action::Action()
-{
 
+cedar::proc::experiment::ConditionOnInit::ConditionOnInit()
+{
 }
-cedar::proc::experiment::Action::~Action()
-{
 
+cedar::proc::experiment::ConditionOnInit::~ConditionOnInit()
+{
+}
+
+bool cedar::proc::experiment::ConditionOnInit::check(Experiment* experiment)
+{
+  return experiment->isOnInit();
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-

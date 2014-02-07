@@ -40,6 +40,9 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/gui/Network.h"
+#include "cedar/processing/experiment/ActionSequence.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
 #include <QFileDialog>
@@ -63,6 +66,7 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
                      new cedar::proc::experiment::Experiment(mParent->getNetwork()->getNetwork())
                  );
   this->experiment->setName("TestExperiment");
+  this->redraw();
 
 }
 
@@ -126,6 +130,21 @@ void cedar::proc::gui::ExperimentDialog::repetitionChanged()
 }
 
 
+void cedar::proc::gui::ExperimentDialog::clearActionSequences()
+{
+  QLayoutItem *child;
+  while ((child = this->mActionSequences->takeAt(0)) != 0) {
+    std::cout << "DELETED"<< std::endl;
+    delete child;
+  }
+}
+
+void cedar::proc::gui::ExperimentDialog::paintEvent(QPaintEvent* pe)
+{
+  QWidget::paintEvent(pe);
+  //this->redraw();
+}
+
 void cedar::proc::gui::ExperimentDialog::runExperiment(bool status)
 {
   if (status)
@@ -146,5 +165,30 @@ void cedar::proc::gui::ExperimentDialog::runExperiment(bool status)
     {
       this->runButton->setChecked(true);
     }
+  }
+}
+
+void cedar::proc::gui::ExperimentDialog::redraw()
+{
+  this->clearActionSequences();
+  std::vector<cedar::proc::experiment::ActionSequencePtr> action_sequences =
+      this->experiment->getActionSequences();
+  for(unsigned int i=0; i < action_sequences.size();i++)
+  {
+    cedar::proc::experiment::ActionSequencePtr action_seq =action_sequences[i];
+    cedar::aux::ParameterPtr condition = action_seq->getParameter("Condition");
+    cedar::aux::gui::Parameter *p_widget
+      = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(condition)->allocateRaw();
+    p_widget->setParent(this);
+    p_widget->setParameter(condition);
+    this->mActionSequences->addWidget(p_widget);
+
+    cedar::aux::ParameterPtr action = action_seq->getParameter("ActionSet");
+        p_widget = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(action)->allocateRaw();
+        p_widget->setParent(this);
+        p_widget->setParameter(action);
+        this->mActionSequences->addWidget(p_widget);
+
+
   }
 }

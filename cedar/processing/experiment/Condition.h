@@ -44,8 +44,10 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/experiment/Experiment.fwd.h"
 #include "cedar/processing/experiment/Condition.fwd.h"
 
 // SYSTEM INCLUDES
@@ -55,6 +57,13 @@
  */
 class cedar::proc::experiment::Condition : public cedar::aux::Configurable
 {
+public:
+	//!@brief a parameter for action sequence objects
+	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::Condition> ConditionParameter;
+
+	//!@cond SKIPPED_DOCUMENTATION
+	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConditionParameter);
+	//!@endcond
 private:
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,6 +78,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  virtual bool check(Experiment* parent) = 0;
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -85,11 +95,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
 private:
 
 }; // class cedar::proc::experiment::Condition
+
 
 #include "cedar/auxiliaries/FactoryManager.h"
 

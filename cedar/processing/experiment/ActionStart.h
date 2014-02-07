@@ -22,80 +22,61 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Experiment.h
+    File:        ActionStart.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description:
+    Description: Header file for the class cedar::proc::experiment::ActionStart.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_EXPERIMENT_H
-#define CEDAR_proc_EXPERIMENT_EXPERIMENT_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_START_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_START_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/processing/Network.h"
-#include "cedar/processing/experiment/ActionSequence.h"
-#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/experiment/ActionStart.fwd.h"
+#include "cedar/processing/experiment/Action.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/experiment/Experiment.fwd.h"
-#include "cedar/processing/experiment/ExperimentController.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::experiment::Experiment : public cedar::aux::NamedConfigurable
+class cedar::proc::experiment::ActionStart : public cedar::proc::experiment::Action
 {
-
-public:
-  //!@brief a parameter for action sequence objects
-  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::ActionSequence> ActionSequencelListParameter;
-
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionSequencelListParameter);
-  //!@endcond
-private:
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Experiment(cedar::proc::NetworkPtr network);
+  //!@brief The standard constructor.
+  ActionStart();
+
   //!@brief Destructor
-  ~Experiment();
+  virtual ~ActionStart();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const std::string& getFileName() const;
-  void setFileName(const std::string& filename);
+  void run(Experiment* experiment);
 
-  unsigned int getRepetitions() const;
-  void setRepetitions(unsigned int repetitions);
-  void run();
-  void cancel();
-  void addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
-  std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
-  void startNetwork();
-  void stopNetwork();
-  void executeAcionSequences();
-  bool isOnInit();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,29 +87,25 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
 private:
-  cedar::aux::StringParameterPtr _mFileName;
-  cedar::aux::UIntParameterPtr _mRepetitions;
-  cedar::proc::NetworkPtr mNetwork;
 
-  //! Used for starting all triggers in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
+}; // class cedar::proc::experiment::ActionStart
 
-  //! Used for stopping all triggers in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
-
-
-  ActionSequencelListParameterPtr _mActionSequences;
-  unsigned int mRepetitionCounter;
-  ExperimentControllerPtr mController;
-
-}; // class cedar::proc::experiment::Experiment
-
-#endif // CEDAR_proc_EXPERIMENT_EXPERIMENT_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_START_H
 
