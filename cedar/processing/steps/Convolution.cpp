@@ -211,6 +211,9 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     // Assign the input to the member. This saves us from casting in every computation step.
     this->mKernel = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   }
+
+  //!@todo This should not be sent when the sizes don't change
+  this->emitOutputPropertiesChangedSignal("result");
 }
 
 void cedar::proc::steps::Convolution::inputDimensionalityChanged()

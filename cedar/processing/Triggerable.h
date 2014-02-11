@@ -158,12 +158,14 @@ public:
   boost::signals2::connection connectToStateChanged(boost::function<void ()> slot);
 
   //!@brief Waits for the trigger signal to be finished.
-  virtual void waitForProcessing() = 0;
+//  virtual void waitForProcessing() = 0;
 
   //! Returns true if there is at least one trigger triggering this triggerable.
   inline bool isTriggered() const
   {
-    return this->mTriggersListenedTo.size() > 0;
+    QReadLocker locker(&mTriggersListenedToLock);
+    bool triggered = this->mTriggersListenedTo.size() > 0;
+    return triggered;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -234,6 +236,8 @@ protected:
   //! The triggers this step is triggered by.
   //!@todo Unify this with mParentTrigger
   std::set<TriggerWeakPtr> mTriggersListenedTo;
+
+  mutable QReadWriteLock mTriggersListenedToLock;
 
   //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;

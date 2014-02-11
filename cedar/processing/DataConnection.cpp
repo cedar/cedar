@@ -80,6 +80,13 @@ mAlreadyDisconnected(false)
         "An exception occured during establishing a connection: "
         + exc.getMessage()
       );
+
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "An exception occurred while connecting \"" + source->getName() + "\" to \"" + target->getName() + "\". "
+        + "The exception is: " + exc.exceptionInfo(),
+        "cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr)"
+      );
     }
   }
   catch (std::exception& exc)
@@ -92,6 +99,13 @@ mAlreadyDisconnected(false)
         cedar::proc::Triggerable::STATE_EXCEPTION,
         "An exception occured during establishing a connection: "
         + std::string(exc.what())
+      );
+
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "An exception occurred while connecting \"" + source->getName() + "\" to \"" + target->getName() + "\". "
+        + "The exception is: " + std::string(exc.what()),
+        "cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr)"
       );
     }
   }

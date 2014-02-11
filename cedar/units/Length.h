@@ -38,7 +38,6 @@
 #define CEDAR_UNITS_LENGTH_H
 
 // CEDAR INCLUDES
-#include "cedar/units/namespace.h"
 #include "cedar/units/UnitMatrix.h"
 
 // SYSTEM INCLUDES

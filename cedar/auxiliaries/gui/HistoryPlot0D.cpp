@@ -433,7 +433,12 @@ void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
       curve->mYValues.pop_front();
     }
 
-    curve->mXArray.assign(curve->mXValues.begin(), curve->mXValues.end());
+    // convert the x values to now - time
+    curve->mXArray.resize(curve->mXValues.size());
+    for (size_t i = 0; i < curve->mXValues.size(); ++i)
+    {
+      curve->mXArray.at(i) = static_cast<double>(curve->mXValues.at(i) - time)/1000.0;
+    }
     curve->mYArray.assign(curve->mYValues.begin(), curve->mYValues.end());
 
     CEDAR_DEBUG_ASSERT(curve->mXValues.size() == curve->mYValues.size());

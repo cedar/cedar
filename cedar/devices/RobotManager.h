@@ -251,7 +251,7 @@ namespace cedar
   namespace aux
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::dev::RobotManager>);
+    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::RobotManager>);
     //!@endcond
   }
 }

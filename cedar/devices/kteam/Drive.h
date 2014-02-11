@@ -42,9 +42,11 @@
 #include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/DifferentialDrive.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/units/Length.h"
 #include "cedar/units/Frequency.h"
+
+// FORWARD DELCARATIONS
+#include "cedar/auxiliaries/math/IntLimitsParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>

@@ -275,7 +275,7 @@ protected:
   //----------------------------------------------------------------------------
 private:
   //! end counting the statistics. is not thread-safe
-  void stopStatistics(bool suppressWarnings); 
+  void stopStatistics(); 
 
   //! overwritten method. return the new worker object for LoopedThread
   cedar::aux::detail::ThreadWorker* resetWorker();
@@ -287,7 +287,7 @@ private:
   virtual void step(cedar::unit::Time time) = 0;
 
   //! slot called when the thread finishes via stop().
-  void processStop(bool suppressWarning);
+  void processStop();
 
 
 private slots:

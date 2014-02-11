@@ -89,6 +89,9 @@ protected:
 private slots:
   void parameterValueChanged();
 
+  //! Reacts to a change in the properties of the parameter and applies them to the widget.
+  void propertiesChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

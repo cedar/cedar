@@ -67,6 +67,9 @@ public:
   //!@brief The standard constructor.
   MatDataPlot(QWidget *pParent = NULL);
 
+  //! Constructor that immediately plots data.
+  MatDataPlot(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent = NULL);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,6 +96,8 @@ private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
   void doDetach(cedar::aux::ConstDataPtr data);
 
+  void initLayout();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,7 +108,7 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
 }; // class cedar::aux::gui::MatDataPlot
 

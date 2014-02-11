@@ -43,6 +43,8 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Settings.fwd.h"
@@ -105,6 +107,15 @@ public:
 
   //! Returns a list of known plugins
   const std::set<std::string>& getKnownPlugins() const;
+
+  //! Returns the number of threads that should be used for FFTW
+  unsigned int getFFTWNumberOfThreads() const;
+
+  //! Returns the planning strategy that should be used for FFTW
+  cedar::aux::EnumId getFFTWPlanningStrategy() const;
+
+  //! Returns the planning strategy that should be used for FFTW
+  std::string getFFTWPlanningStrategyString() const;
 
   //! Adds a plugin search path.
   void addPluginSearchPath(const std::string& path);
@@ -228,6 +239,12 @@ protected:
 
   //! List of all the directories to search for plugins.
   cedar::aux::StringVectorParameterPtr _mPluginSearchPaths;
+
+  //! Number of threads used for FFTW convolution.
+  cedar::aux::UIntParameterPtr _mFFTWNumberOfThreads;
+
+  //! Planning strategy of FFTW.
+  cedar::aux::EnumParameterPtr _mFFTWPlanningStrategy;
 
 private:
   // none yet

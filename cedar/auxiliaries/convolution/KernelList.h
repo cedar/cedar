@@ -38,10 +38,11 @@
 #define CEDAR_AUX_CONV_KERNEL_LIST_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/kernel/Kernel.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/convolution/KernelList.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -49,18 +50,25 @@
   #include <boost/signals2.hpp>
 #endif
 #include <vector>
+#include <QObject>
 
 /*!@brief This is a structure for storing a list of kernels.
  */
-class cedar::aux::conv::KernelList
+class cedar::aux::conv::KernelList : public QObject
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-  // none yet
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  KernelList();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief append a new kernel at the back of the list
@@ -130,22 +138,21 @@ public:
   bool checkForSameKernelSize() const;
 
   //--------------------------------------------------------------------------------------------------------------------
-  // public methods
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+signals:
+  void combinedKernelUpdated();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   // none yet
+
+private slots:
+  void calculateCombinedKernel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -161,6 +168,8 @@ private:
   boost::signals2::signal<void (size_t)> mKernelChangedSignal;
 
   boost::signals2::signal<void (size_t)> mKernelRemovedSignal;
+
+  cedar::aux::MatDataPtr mCombinedKernel;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

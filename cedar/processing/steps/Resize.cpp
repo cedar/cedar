@@ -39,6 +39,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -104,7 +105,7 @@ cedar::proc::steps::Resize::Resize()
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // parameters
-_mOutputSize(new cedar::aux::UIntVectorParameter(this, "output size", 1, 10, 1, 1000000)),
+_mOutputSize(new cedar::aux::UIntVectorParameter(this, "output size", 1, 50, 1, 5000)),
 _mInterpolationType(new cedar::aux::EnumParameter(this,
                                                   "interpolation",
                                                   cedar::proc::steps::Resize::Interpolation::typePtr(),
@@ -112,7 +113,11 @@ _mInterpolationType(new cedar::aux::EnumParameter(this,
                     )
 {
   // declare all data
-  this->declareInput("input");
+  auto input_slot = this->declareInput("input");
+
+  cedar::proc::typecheck::Matrix input_check;
+  input_slot->setCheck(input_check);
+
   this->declareOutput("output", mOutput);
 
   // connect the parameter's change signal
@@ -339,27 +344,6 @@ void cedar::proc::steps::Resize::updateOutputMatrixSize()
 void cedar::proc::steps::Resize::recompute()
 {
   this->onTrigger();
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Resize::determineInputValidity
-                                (
-                                  cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::ConstDataPtr data
-                                ) const
-{
-  // First, let's make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-
-  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
-  {
-    // Mat data is accepted.
-    return cedar::proc::DataSlot::VALIDITY_VALID;
-  }
-  else
-  {
-    // Everything else is rejected.
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
 }
 
 void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& inputName)

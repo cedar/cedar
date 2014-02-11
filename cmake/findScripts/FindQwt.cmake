@@ -18,5 +18,7 @@ if(qwt_INCLUDE_DIRS AND qwt_LIBS)
   set(qwt_FOUND true)
 else(qwt_INCLUDE_DIRS AND qwt_LIBS)
   set(qwt_FOUND false)
+  set(qwt_LIBS "")
+  set(qwt_INCLUDE_DIRS "")
 endif(qwt_INCLUDE_DIRS AND qwt_LIBS)
 

@@ -146,7 +146,7 @@ private:
   void prepareStart();
 
   //! Called when the trigger is started.
-  void processStop(bool);
+  void processQuit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -164,9 +164,6 @@ protected:
   // none yet
 
 private:
-  //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
-  cedar::aux::BoolParameterPtr mWait;
-
   //! Used to prevent multiple start calls to the trigger.
   bool mStarted;
 

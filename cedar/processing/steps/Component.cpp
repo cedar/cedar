@@ -82,7 +82,7 @@ namespace
 
 cedar::proc::steps::Component::Component()
 :
-cedar::proc::Step(false, true),
+cedar::proc::Step(true),
 mConnectedOnStart(false),
 _mComponent(new cedar::dev::ComponentParameter(this, "component"))
 {

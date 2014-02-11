@@ -274,6 +274,8 @@ private:
    */
   void getRowColSize(const cv::Mat& mat, unsigned int& rows, unsigned int& cols);
 
+  static void getSetup(int& dim0, int& dim1, int sliced_dimension);
+
 private slots:
   //! Reacts to a change in the transform direction.
   void transformDirectionChanged();
@@ -338,6 +340,12 @@ private:
 
     //! Defines the magnitude of the logarithmic scale for the backward log-polar-transformation
     cedar::aux::DoubleParameterPtr  _mMagnitudeBackward;
+
+    //! Fills the center by offsetting the rho values by one.
+    cedar::aux::BoolParameterPtr _mFillCenter;
+
+    //! Dimension along which 2d slices are made when treating 3d inputs
+    cedar::aux::UIntParameterPtr _mSlicedDimension;
 }; // class cedar::proc::steps::CoordinateTransformation
 
 #endif // CEDAR_PROC_STEPS_COORDINATE_TRANSFORMATION_H

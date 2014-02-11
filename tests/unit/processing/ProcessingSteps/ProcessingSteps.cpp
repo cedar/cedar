@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/units/prefixes.h"
 
 // global includes
@@ -156,7 +157,7 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
   return i;
 }
 
-int main(int, char**)
+void run_tests()
 {
   // Filter out mem-debug messages so the output reamins readable
   cedar::aux::logFilter::TypePtr memdebug_filter(new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_MEM_DEBUG));
@@ -205,5 +206,15 @@ int main(int, char**)
     }
   }
 
-  return errors;
+  QCoreApplication::exit(errors);
+}
+
+int main(int argc, char** argv)
+{
+  QCoreApplication app(argc, argv);
+
+  cedar::aux::CallFunctionInThread caller(boost::bind(&run_tests));
+  caller.start();
+
+  return app.exec();
 }

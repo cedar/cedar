@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <map>
+#include <vector>
 
 /*!@brief Description of a mapping between dimensions.
  *
@@ -209,6 +210,7 @@ private:
   unsigned int mOutputDimensionality;
   //! validity of the mapping (whether it can be used in the given context)
   VALIDITY mValidity;
+  std::vector<unsigned int> mDefaultValues;
 
 }; // class cedar::proc::ProjectionMapping
 

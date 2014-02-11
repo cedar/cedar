@@ -83,12 +83,13 @@ mMode(MODE_SELECT),
 mTriggerMode(MODE_SHOW_ALL),
 mpDropTarget(NULL),
 mpeParentView(peParentView),
-mpNewConnectionIndicator(NULL),
-mpConnectionStart(NULL),
+mpNewConnectionIndicator(nullptr),
+mpConnectionStart(nullptr),
 mpMainWindow(pMainWindow),
 mSnapToGrid(false),
-mpConfigurableWidget(NULL),
-mDraggingItems(false)
+mpConfigurableWidget(nullptr),
+mDraggingItems(false),
+mpRecorderWidget(nullptr)
 {
   mMousePosX = 0;
   mMousePosY = 0;
@@ -233,7 +234,10 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
 void cedar::proc::gui::Scene::setGroup(cedar::proc::gui::GroupPtr group)
 {
   this->mGroup = group;
-  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mGroup.get(),SLOT(stepRecordStateChanged()));
+  if (this->mpRecorderWidget != nullptr)
+  {
+    connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mGroup.get(),SLOT(stepRecordStateChanged()));
+  }
 }
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
@@ -1047,6 +1051,9 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
     auto p_dialog = new cedar::aux::gui::ExceptionDialog();
     p_dialog->displayCedarException(e);
     p_dialog->exec();
+
+    // when an exception was thrown, return NULL
+    return cedar::proc::ElementPtr();
   }
 
   return group->getElement(adjusted_name);
@@ -1253,11 +1260,12 @@ void cedar::proc::gui::Scene::addStickyNote()
   this->addStickyNote(mMousePosX, mMousePosY, 120, 70, "");
 }
 
-void cedar::proc::gui::Scene::addStickyNote(int x, int y, int witdh, int height, std::string text)
+cedar::proc::gui::StickyNote* cedar::proc::gui::Scene::addStickyNote(float x, float y, float witdh, float height, std::string text)
 {
   cedar::proc::gui::StickyNote* note = new cedar::proc::gui::StickyNote(this, x, y, witdh, height, text);
   mStickyNotes.push_back(note);
   this->addItem(note);
+  return note;
 }
 
 

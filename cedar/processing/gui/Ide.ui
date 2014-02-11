@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>819</width>
+    <width>983</width>
     <height>762</height>
    </rect>
   </property>
@@ -58,7 +58,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>819</width>
+     <width>983</width>
      <height>25</height>
     </rect>
    </property>
@@ -131,6 +131,7 @@
     </property>
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
+    <addaction name="mpActionPerformanceOverview"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
@@ -210,8 +211,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>129</width>
-          <height>418</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -772,6 +773,11 @@
    </property>
    <property name="toolTip">
     <string>delete selected plot group</string>
+   </property>
+  </action>
+  <action name="mpActionPerformanceOverview">
+   <property name="text">
+    <string>Performance overview ...</string>
    </property>
   </action>
  </widget>

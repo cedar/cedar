@@ -38,9 +38,11 @@
 #define CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/transferFunctions/SemiLinearTransferFunction.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -78,6 +80,8 @@ public:
   /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
+
+  cv::Mat compute(const cv::Mat& values) const;
 
   /*!@brief Returns the current beta value.
    */

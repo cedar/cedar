@@ -80,9 +80,25 @@ namespace
 
 cedar::aux::gui::MatDataPlot::MatDataPlot(QWidget *pParent)
 :
-cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(nullptr)
+cedar::aux::gui::MultiPlotInterface(pParent)
 {
+  this->initLayout();
+}
+
+cedar::aux::gui::MatDataPlot::MatDataPlot(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent)
+:
+cedar::aux::gui::MultiPlotInterface(pParent)
+{
+  this->initLayout();
+
+  this->plot(data, title);
+}
+
+
+void cedar::aux::gui::MatDataPlot::initLayout()
+{
+  mpCurrentPlotWidget = nullptr;
+
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
 

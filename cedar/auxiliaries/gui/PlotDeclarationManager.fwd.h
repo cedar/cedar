@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/Data.fwd.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.fwd.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
+#include "cedar/auxiliaries/Singleton.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -65,11 +66,14 @@ namespace cedar
            >
            PlotDeclarationManager;
 
-      //!@brief singleton specialization for the plot delcaration manager
-      typedef cedar::aux::Singleton<PlotDeclarationManager> PlotDeclarationManagerSingleton;
+	  typedef
+		  cedar::aux::Singleton<cedar::aux::gui::PlotDeclarationManager>
+		  PlotDeclarationManagerSingleton;
     }
   }
 }
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::gui::PlotDeclarationManager);
 
 //!@endcond
 

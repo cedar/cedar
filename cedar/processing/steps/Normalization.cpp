@@ -83,7 +83,7 @@ namespace
 
 cedar::proc::steps::Normalization::Normalization()
 :
-mNormalizedImage(new cedar::aux::MatData(cv::Mat(1, 1, CV_8U))),
+mNormalizedImage(new cedar::aux::MatData(cv::Mat())),
 _mNormalizationType
 (
   new cedar::aux::EnumParameter
@@ -150,7 +150,7 @@ void cedar::proc::steps::Normalization::inputConnectionChanged(const std::string
 
       if (this->mImage->getDimensionality() < 3)
       {
-        this->mNormalizedImage->getData() = cv::Mat(input.rows, input.cols, CV_32F);
+        this->mNormalizedImage->getData() = cv::Mat::zeros(input.rows, input.cols, CV_32F);
       }
       else if (this->mImage->getDimensionality() == 3)
       {
@@ -176,7 +176,7 @@ void cedar::proc::steps::Normalization::compute(const cedar::proc::Arguments&)
     return;
   }
 
-  if (this->mImage->getDimensionality() == this->getNumberOfNormalizedDimensions())
+  if (this->mImage->getDimensionality() <= this->getNumberOfNormalizedDimensions())
   {
     this->normalizeAlongAllDimensions();
   }
@@ -224,8 +224,8 @@ void cedar::proc::steps::Normalization::normalizeAlongOneDimension(int normalize
 
     case 3:
     {
-      int index_0;
-      int index_1;
+      int index_0 = 0;
+      int index_1 = 1;
       switch (normalizedDimension)
       {
         case 0:

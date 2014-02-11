@@ -107,9 +107,6 @@ public:
   //!@brief saves a configuration to a ConfigurationNode
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
-  //!@brief The wait method.
-  void waitForProcessing();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -166,7 +163,8 @@ protected:
   mutable QReadWriteLock mpListenersLock;
 
 private:
-  // none yet
+  mutable QReadWriteLock mpTriggeringOrderLock;
+
 }; // class cedar::proc::Trigger
 
 #endif // CEDAR_PROC_TRIGGER_H

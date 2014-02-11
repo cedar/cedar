@@ -41,13 +41,13 @@
 #ifndef CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
 #define CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
 
-#include "cedar/testingUtilities/namespace.h"
-
 // CEDAR INCLUDES
+#include "cedar/testingUtilities/lib.h"
+
+// SYSTEM INCLUDES
 #include <functional>
 #include <string>
 
-// SYSTEM INCLUDES
 namespace cedar
 {
   namespace test
