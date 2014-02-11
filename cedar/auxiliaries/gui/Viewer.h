@@ -37,6 +37,9 @@
 #ifndef CEDAR_AUX_GUI_VIEWER_H
 #define CEDAR_AUX_GUI_VIEWER_H
 
+#include "cedar/configuration.h"
+
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Scene.fwd.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.fwd.h"
@@ -46,7 +49,11 @@
 #include "cedar/auxiliaries/gui/Viewer.fwd.h"
 
 // SYSTEM INCLUDES
+#ifdef CEDAR_USE_QGLVIEWER
 #include <qglviewer.h>
+#else
+#include <QWidget>
+#endif // CEDAR_USE_QGLVIEWER
 #include <QList>
 #include <QReadWriteLock>
 #include <string>
@@ -57,11 +64,16 @@
  * camera position and other perks, coming from QGLViewer.
  *
  * @remarks To visualize an object, add it to an instance of cedar::aux::gl::Scene, then create a Viewer for this Scene
+ * @remarks This class uses QGLViewer. Without it, it will not function properly.
  *
  */
 class cedar::aux::gui::Viewer
 :
+#ifdef CEDAR_USE_QGLVIEWER
 public QGLViewer,
+#else
+public QWidget,
+#endif // CEDAR_USE_QGLVIEWER
 public cedar::aux::Grabbable
 {
 private:
@@ -128,6 +140,15 @@ public:
    */
   void deregisterGrabber(QReadWriteLock* lock);
 
+#ifndef CEDAR_USE_QGLVIEWER
+  //@cond SKIPPED_DOCUMENTATION
+  // The following functions mimic part of the interface of QGLViewer to reduce compilation issues when the library is
+  // not present. Rest assured that they do nothing.
+  void setSceneRadius(double) {}
+  void showEntireScene() {}
+  //@endcond
+#endif // CEDAR_USE_QGLVIEWER
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -157,4 +178,5 @@ private:
 
   std::string mRegisteredGrabber;
 };
+
 #endif  // CEDAR_AUX_GUI_VIEWER_H

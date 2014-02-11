@@ -38,7 +38,6 @@
 #define CEDAR_AUX_CONV_ENGINE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
 #include "cedar/auxiliaries/convolution/Mode.h"
@@ -46,9 +45,11 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/kernel/Separable.fwd.h"
+#include "cedar/auxiliaries/convolution/Engine.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <QObject>
 
 
 /*!@brief Base class for convolution engines.
@@ -61,12 +62,12 @@
  *
  * @see   cedar::aux::conv::Convolution
  */
-class cedar::aux::conv::Engine : public cedar::aux::Configurable
+class cedar::aux::conv::Engine : public QObject, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -174,6 +175,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+signals:
+  void kernelListChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

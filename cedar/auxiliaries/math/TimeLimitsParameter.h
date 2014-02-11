@@ -39,7 +39,7 @@
 #define CEDAR_AUX_MATH_TIME_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/TimeLimitsParameter.fwd.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
 

@@ -42,8 +42,10 @@
 #ifdef CEDAR_USE_FFTW
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/convolution/Engine.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/convolution/FFTW.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -55,15 +57,14 @@
 class cedar::aux::conv::FFTW : public cedar::aux::conv::Engine
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
-
+  FFTW();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -130,6 +131,15 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   cv::Mat padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const;
+  static fftw_plan getForwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes);
+  static fftw_plan getBackwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes);
+  static void loadWisdom(const std::string& uniqueIdentifier);
+  static void saveWisdom(const std::string& uniqueIdentifier);
+  static void initThreads();
+
+private slots:
+  void kernelChanged() const;
+  void kernelListChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -139,7 +149,17 @@ protected:
 private:
   //!@brief plan creation and destruction is not thread-safe, must be locked
   static QReadWriteLock mPlanLock;
-
+  static bool mMultiThreadActivated;
+  static bool mWisdomLoaded;
+  static std::map<std::string, fftw_plan> mForwardPlans;
+  static std::map<std::string, fftw_plan> mBackwardPlans;
+  mutable unsigned int mAllocatedSize;
+  mutable fftw_complex* mMatrixBuffer;
+  mutable fftw_complex* mKernelBuffer;
+  mutable fftw_complex* mResultBuffer;
+  // dirty flag if kernel has changed since last time
+  mutable bool mRetransformKernel;
+  mutable QReadWriteLock mKernelTransformLock;
 }; // cedar::aux::conv::FFTW
 
 #endif // CEDAR_FFTW

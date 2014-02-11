@@ -64,4 +64,5 @@ cv::Mat cedar::aux::conv::Engine::convolveSeparable
 void cedar::aux::conv::Engine::setKernelList(cedar::aux::conv::KernelListPtr kernelList)
 {
   this->mKernelList = kernelList;
+  emit kernelListChanged();
 }

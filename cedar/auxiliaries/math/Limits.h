@@ -40,7 +40,6 @@
 #define NOMINMAX // to avoid Windows issues
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/units/Acceleration.h"
@@ -50,6 +49,9 @@
 #include "cedar/units/PlaneAngle.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/Velocity.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/Limits.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN

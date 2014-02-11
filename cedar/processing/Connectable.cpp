@@ -79,6 +79,12 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Connectable::redetermineInputValidity(const std::string& slot)
+{
+  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  this->getInputValidity(slot);
+}
+
 void cedar::proc::Connectable::callInputConnectionChanged(const std::string& slot)
 {
   this->revalidateInputSlot(slot);
@@ -533,13 +539,12 @@ void cedar::proc::Connectable::checkMandatoryConnections()
   this->mMandatoryConnectionsAreSet = true;
   mMissingMandatoryConnections.clear();
   // then test every input. If one is false, return that.
-  for (auto slot_id_pair : this->mSlotMaps)
+  for (const auto& role_slot_map_pair : this->mSlotMaps)
   {
-    const auto& slot_map = slot_id_pair.second;
-    auto role = slot_id_pair.first;
-    for (auto name_slot_pair : slot_map)
+    for (const auto& name_slot_pair : role_slot_map_pair.second)
     {
-      auto slot = name_slot_pair.second;
+      const auto& slot = name_slot_pair.second;
+      const auto& role = name_slot_pair.first;
       if (slot->isMandatory() && !slot->getData())
       {
         this->mMandatoryConnectionsAreSet = false;
@@ -846,6 +851,51 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   this->getSlot(role, name)->setData(data);
 }
 
+void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& name)
+{
+  QWriteLocker locker(this->mpConnectionLock);
+  std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
+  if (iter == this->mSlotMaps.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException,
+                "The requested role " +
+                cedar::proc::DataRole::type().get(role).prettyString() +
+                " does not exist in Connectable \""
+                + this->getName() +
+                "\".");
+  }
+
+  SlotMap::iterator map_iterator = iter->second.find(name);
+  if (map_iterator != iter->second.end())
+  {
+    cedar::proc::DataSlotPtr& slot = map_iterator->second;
+    slot->clear();
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::InvalidNameException,
+                "The requested " +
+                cedar::proc::DataRole::type().get(role).prettyString() +
+                " name \"" + name + "\" does not exist.");
+  }
+//  locker.unlock();
+
+  this->checkMandatoryConnections();
+}
+
+/*!
+ * @remarks This method is usually called by other framework parts rather than by the user. So only call it if you know
+ *          what you are doing :)
+ * @see     cedar::proc::Manager::connect.
+ */
+void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
+{
+  this->setData(DataRole::INPUT, name, data);
+  this->inputConnectionChanged(name);
+  // update the validity of the input
+  this->getInputValidity(name);
+}
+
 /*!
  * @remarks This method is usually called by other framework parts rather than by the user. So only call it if you know
  *          what you are doing :)
@@ -900,6 +950,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, cedar::aux::DataPtr d
   auto slot = this->getSlot(role, name);
   if (!data)
   {
+    QWriteLocker locker(this->mpConnectionLock);
     data = slot->getData();
   }
   locker.unlock();

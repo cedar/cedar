@@ -224,7 +224,7 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
   }
 
   // preallocate the appropriate output matrix
-  cv::Mat output = cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type());
+  cv::Mat output = 0.0 * cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type());
   cv::Mat old_output = this->mOutput->getData();
   this->mOutput->setData(output);
 

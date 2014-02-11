@@ -39,16 +39,19 @@
 #include "StickyNote.h"
 
 // SYSTEM INCLUDES
-#include<QBrush>
+#include <QBrush>
+#include <QMenu>
+#include <QAction>
+#include <QColorDialog>
 #include <iostream>
 
 
 cedar::proc::gui::StickyNote::StickyNote(
     cedar::proc::gui::Scene* pParent,
-    int x,
-    int y,
-    int width,
-    int height,
+    float x,
+    float y,
+    float width,
+    float height,
     std::string text)
 :
 cedar::proc::gui::GraphicsBase(width,height)
@@ -56,7 +59,7 @@ cedar::proc::gui::GraphicsBase(width,height)
   //initialize
   mScaling = false;
   this->mpParent = pParent;
-  mColor = Qt::yellow;
+  mColor = QColor(255,255,110);
   mBound =  QRectF(0, 0, width, height);
   this->setPos(x,y);
 
@@ -72,6 +75,8 @@ cedar::proc::gui::GraphicsBase(width,height)
   setFlag(ItemIsMovable);
   setFlag(ItemIsSelectable);
   setFlag(ItemIsFocusable);
+
+  this->setZValue(0);
 }
 
 cedar::proc::gui::StickyNote::~StickyNote()
@@ -180,5 +185,129 @@ void cedar::proc::gui::StickyNote::mouseMoveEvent(QGraphicsSceneMouseEvent* even
 std::string cedar::proc::gui::StickyNote::getText() const
 {
   return this->mText.toPlainText().toStdString();
+}
+
+QColor cedar::proc::gui::StickyNote::getColor() const
+{
+  return this->mColor;
+}
+
+void cedar::proc::gui::StickyNote::setColor(QColor color)
+{
+  this->mColor = color;
+}
+
+void cedar::proc::gui::StickyNote::setFontSize(int s)
+{
+  QString temp = mText.toPlainText();
+  mText.clear();
+  QFont font = mText.font();
+  font.setPointSize(s);
+  mText.setFont(font);
+  mText.setPlainText(temp);
+}
+
+int cedar::proc::gui::StickyNote::getFontSize()
+{
+  return mText.font().pointSize();
+}
+
+void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+  this->QGraphicsItem::contextMenuEvent(event);
+
+
+  QMenu menu;
+  QMenu* colors = menu.addMenu("color");
+  QAction *blue = colors->addAction("blue");
+  blue->setIcon(QIcon(":/colors/blue.svg"));
+  QAction *red = colors->addAction("red");
+  red->setIcon(QIcon(":/colors/red.svg"));
+  QAction *green = colors->addAction("green");
+  green->setIcon(QIcon(":/colors/green.svg"));
+  QAction *magenta = colors->addAction("magenta");
+  magenta->setIcon(QIcon(":/colors/purple.svg"));
+  QAction *cyan = colors->addAction("cyan");
+  cyan->setIcon(QIcon(":/colors/cyan.svg"));
+  QAction *yellow = colors->addAction("yellow");
+  yellow->setIcon(QIcon(":/colors/yellow.svg"));
+  QAction *other = colors->addAction("other");
+
+  QMenu* fontsize = menu.addMenu("font size");
+  QAction *xs = fontsize->addAction("xs");
+  QAction *small = fontsize->addAction("small");
+  QAction *normal = fontsize->addAction("normal");
+  QAction *large = fontsize->addAction("large");
+  QAction *xl = fontsize->addAction("xl");
+  QAction *xxl = fontsize->addAction("xxl");
+
+  QAction *a = menu.exec(event->screenPos());
+
+  //change colors
+  if (a == blue)
+  {
+    this->mColor = QColor(110,110,255);
+  }
+  else if (a == red)
+  {
+    this->mColor = QColor(255,110,110);
+  }
+  else if (a == green)
+  {
+    this->mColor = QColor(110,255,110);
+  }
+  else if (a == cyan)
+  {
+    this->mColor = QColor(110,255,255);
+  }
+  else if (a == magenta)
+  {
+    this->mColor = QColor(255,110,255);
+  }
+  else if (a == yellow)
+  {
+    this->mColor = QColor(255,255,110);
+  }
+  else if (a == other)
+  {
+    QColor color = QColorDialog::getColor(this->mColor);
+    if (color.isValid())
+    {
+      this->mColor = color;
+    }
+  }
+
+  //set font size
+  else if (a == xs)
+  {
+    this->setFontSize(6);
+  }
+  else if (a == small)
+  {
+    this->setFontSize(8);
+  }
+  else if (a == normal)
+  {
+    this->setFontSize(10);
+  }
+  else if (a == large)
+  {
+    this->setFontSize(14);
+  }
+  else if (a == xl)
+  {
+    this->setFontSize(20);
+  }
+  else if (a == xxl)
+  {
+    this->setFontSize(40);
+  }
+
+
+
+  update();
+
+
+  event->accept();
 }
 

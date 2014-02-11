@@ -153,7 +153,7 @@ namespace cedar
   }
 }
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::proc::gui::Settings);
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::gui::Settings);
 
 #endif // CEDAR_AUX_GUI_SETTINGS_H
 

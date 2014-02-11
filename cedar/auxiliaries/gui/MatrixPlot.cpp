@@ -53,6 +53,10 @@
 #else // CEDAR_USE_QWTPLOT3D
   #include "cedar/auxiliaries/gui/ImagePlot.h"
 #endif // CEDAR_USE_QWTPLOT3D
+#ifdef CEDAR_USE_VTK
+#include "cedar/auxiliaries/gui/VtkLinePlot.h"
+#include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
+#endif // CEDAR_USE_VTK
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
@@ -211,11 +215,20 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       this->mpCurrentPlotWidget = new cedar::aux::gui::QwtLinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
+#elif defined CEDAR_USE_VTK
+    case 1:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkLinePlot(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
 #endif // CEDAR_USE_QWT
 
     case 2:
 #ifdef CEDAR_USE_QWTPLOT3D
       this->mpCurrentPlotWidget = new cedar::aux::gui::QwtSurfacePlot(this->mData, title);
+#elif defined CEDAR_USE_VTK
+      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
 #else
       this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
 #endif // CEDAR_USE_QWTPLOT3D

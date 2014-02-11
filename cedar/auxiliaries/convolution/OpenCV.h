@@ -38,8 +38,10 @@
 #define CEDAR_AUX_CONVOLUTION_OPENCV_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/convolution/Engine.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/convolution/OpenCV.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>

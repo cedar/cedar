@@ -272,7 +272,7 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
 
     menu.addSeparator();
 
-    if (looped_trigger->isRunning())
+    if (looped_trigger->isRunningNolocking())
     {
       p_start->setEnabled(false);
       p_single->setEnabled(false);

@@ -52,15 +52,8 @@
  */
 #define CEDAR_UNIT_FRAMEWORK_V2
 
-namespace cedar
-{
-  /*!@brief Namespace for all aux classes. */
-  namespace unit
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    template <typename DimensionType> struct UnitMatrix;
-    //!@endcond
-  }
-}
+#warning Do not include this header any more. Use the new forward declaration headers instead.
+
+#include "cedar/units/UnitMatrix.fwd.h"
 
 #endif // CEDAR_UNITS_NAMESPACE_H

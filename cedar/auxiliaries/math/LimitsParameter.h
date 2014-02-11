@@ -38,9 +38,11 @@
 #define CEDAR_AUX_MATH_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/math/Limits.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/math/LimitsParameter.fwd.h"
 
 // SYSTEM INCLUDES
 

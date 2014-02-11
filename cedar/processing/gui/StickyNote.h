@@ -64,7 +64,7 @@ class cedar::proc::gui::StickyNote: public cedar::proc::gui::GraphicsBase
 
 public:
   //!@brief the constructor
-  StickyNote(cedar::proc::gui::Scene* pParent, int x, int y, int width = 120, int height = 70, std::string text = "");
+  StickyNote(cedar::proc::gui::Scene* pParent, float x, float y, float width = 120, float height = 70, std::string text = "");
 
   //!@brief the destructor
   ~StickyNote();
@@ -93,8 +93,21 @@ public:
   //!@brief Events when mouse is moved in the note.
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
+  //!@brief Overrride the context menu. Used for setting colors.
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  //!@brief Returns the text of the StickyNote.
   std::string getText() const;
+
+  //!@brief Returns the color of the note.
+  QColor getColor() const;
+
+  //!@brief sets the color of the note;
+  void setColor(QColor color);
+
+  void setFontSize(int s);
+
+  int getFontSize();
 
 
   //--------------------------------------------------------------------------------------------------------------------

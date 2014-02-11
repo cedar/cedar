@@ -1,5 +1,12 @@
 <RCC>
   <qresource prefix="/">
+    <file>colors/blue.svg</file>
+    <file>colors/cyan.svg</file>
+    <file>colors/green.svg</file>
+    <file>colors/orange.svg</file>
+    <file>colors/purple.svg</file>
+    <file>colors/red.svg</file>
+    <file>colors/yellow.svg</file>
     <file>toolbaricons/trash.svg</file>
     <file>toolbaricons/display.svg</file>
     <file>toolbaricons/new.svg</file>
@@ -42,6 +49,7 @@
     <file>steps/switch.svg</file>
     <file>steps/threshold.svg</file>
     <file>steps/matrix_multiply.svg</file>
+    <file>steps/matrix_padding.svg</file>
     <file>steps/matrix_slice.svg</file>
     <file>steps/matrix_type_conversion.svg</file>
     <file>steps/net_reader.svg</file>

@@ -41,7 +41,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/units/namespace.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/units/UnitMatrix.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

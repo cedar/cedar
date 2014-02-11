@@ -49,14 +49,14 @@ int testZeroness()
 {
   int errors = 0;
 
-  T first = 0.0;
+  T first = static_cast<T>(0.0);
   if (!cedar::aux::math::isZero(first))
   {
     std::cout << "error in isZero():" << __LINE__ << std::endl;
     errors++;
   }
 
-  T second = 1e-10;
+  T second = static_cast<T>(1e-10);
   if (!cedar::aux::math::isZero(second))
   {
     std::cout << "error in isZero():" << __LINE__ << std::endl;
@@ -68,7 +68,7 @@ int testZeroness()
     errors++;
   }
 
-  T third = 1e-8;
+  T third = static_cast<T>(1e-8);
   if (cedar::aux::math::isZero(third))
   {
     std::cout << "error in isZero():" << __LINE__ << std::endl;

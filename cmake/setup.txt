@@ -101,6 +101,26 @@ link_directories(${CEDAR_LIB_DIR})
 # add the cedar home directory to the ones that need to be included
 include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
+# for MSVC: set the debug flag (by default, MSVC sets _DEBUG rather than DEBUG
+if (MSVC)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
+endif(MSVC)
+
+########################################################################################################################
+# check compiler version
+if (CMAKE_COMPILER_IS_GNUCC)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                    OUTPUT_VARIABLE GCC_VERSION)
+    string(REGEX MATCHALL "[0-9]+" GCC_VERSION_COMPONENTS ${GCC_VERSION})
+    list(GET GCC_VERSION_COMPONENTS 0 GCC_MAJOR)
+    list(GET GCC_VERSION_COMPONENTS 1 GCC_MINOR)
+    if (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
+      set(CEDAR_ISSUES ${CEDAR_ISSUES} "Your gcc version (${GCC_MAJOR}.${GCC_MINOR}) is outdated. Please consider an\n  upgrade to version >= 4.6.\n\n")
+    else (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
+      set(CEDAR_ISSUES "${CEDAR_ISSUES}")
+    endif (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
+endif(CMAKE_COMPILER_IS_GNUCC)
 
 ########################################################################################################################
 # add preprocessor definitions 
@@ -109,7 +129,10 @@ if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
   add_definitions(-std=gnu++0x)
 elseif (MSVC)
-  add_definitions(-W2 -D_SCL_SECURE_NO_WARNINGS)
+  add_definitions(-W2
+                  -D_SCL_SECURE_NO_WARNINGS
+                  -wd4250 # disable warning about inheritance working as expected
+                  )
   # Allow sorting projects into subfodlers (to make solutions more usable)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif (CMAKE_COMPILER_IS_GNUCC)

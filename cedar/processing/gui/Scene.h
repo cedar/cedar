@@ -298,7 +298,7 @@ public:
   /*!brief Adds a sticky node to the current scene
    */
   void addStickyNote();
-  void addStickyNote(int x, int y, int witdh, int height, std::string text);
+  cedar::proc::gui::StickyNote* addStickyNote(float x, float y, float witdh, float height, std::string text);
 
   //! Removes a sticky note
   void removeStickyNote(StickyNote* note);
