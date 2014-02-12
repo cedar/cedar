@@ -287,7 +287,7 @@ private:
   //!@brief populates the Plot Groups Combobox with available Plot Groups
   void loadPlotGroupsIntoComboBox();
 
-  void setNetwork(cedar::proc::gui::NetworkPtr network);
+  void setGroup(cedar::proc::gui::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -229,9 +229,9 @@ cedar::proc::gui::Connection* cedar::proc::gui::DataSlotItem::connectTo(cedar::p
   return new cedar::proc::gui::Connection(this, pTarget);
 }
 
-void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
+void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
-  cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
   CEDAR_DEBUG_ASSERT(p_scene);
 
   QMenu menu;

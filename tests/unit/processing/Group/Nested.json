@@ -7,8 +7,7 @@
     {
         "TestModule":
         {
-            "name": "parent step",
-            "threaded": "false"
+            "name": "parent step"
         }
     },
     "groups":
@@ -23,8 +22,7 @@
             {
                 "TestModule":
                 {
-                    "name": "child step",
-                    "threaded": "false"
+                    "name": "child step"
                 }
             },
             "triggers":
@@ -36,7 +34,6 @@
                     "idle time": "1e-05 s",
                     "simulated time": "0.001 s",
                     "loop mode": "Fixed",
-                    "wait": "true",
                     "listeners":
                     [
                         "child step"

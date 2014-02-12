@@ -88,8 +88,8 @@ mpConnectionStart(nullptr),
 mpMainWindow(pMainWindow),
 mSnapToGrid(false),
 mpConfigurableWidget(nullptr),
-mDraggingItems(false),
-mpRecorderWidget(nullptr)
+mpRecorderWidget(nullptr),
+mDraggingItems(false)
 {
   mMousePosX = 0;
   mMousePosY = 0;

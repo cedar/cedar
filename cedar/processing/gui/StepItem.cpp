@@ -589,7 +589,7 @@ void cedar::proc::gui::StepItem::openActionsDock()
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
   CEDAR_DEBUG_ASSERT(p_scene);
 
   QMenu menu;

@@ -100,7 +100,7 @@ void cedar::proc::sinks::GroupSink::compute(const cedar::proc::Arguments& /*argu
   // nothing to do here!
 }
 
-void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::sinks::GroupSink::inputConnectionChanged(const std::string& CEDAR_DEBUG_ONLY(inputName))
 {
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(inputName == "input");

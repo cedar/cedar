@@ -610,14 +610,3 @@ void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
   this->revalidateInputSlot(slot);
 }
-
-void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
-{
-  //!@todo Why is this not in cedar::proc::Connectable?
-  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
-  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
-  //!@todo This method does more than its name suggests: it doesn't just revalidate, it also reconnects.
-  this->inputConnectionChanged(slot);
-
-  this->getInputValidity(slot);
-}

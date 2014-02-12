@@ -743,7 +743,22 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareSharedOutput
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
-  return this->declareData(DataRole::INPUT, name, mandatory);
+  cedar::proc::DataSlotPtr slot = this->declareData(DataRole::INPUT, name, mandatory);
+
+  this->getInputSlot(name)->connectToDataRemovedSignal
+  (
+    boost::bind
+    (
+      &cedar::proc::Connectable::removeLock,
+      this,
+      _1,
+      cedar::aux::LOCK_TYPE_READ,
+      this->getLockSetForRole(DataRole::INPUT)
+    )
+  );
+
+  return slot;
+//  return this->declareData(DataRole::INPUT, name, mandatory);
 }
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInputCollection(const std::string& name)
@@ -837,6 +852,53 @@ void cedar::proc::Connectable::removeLock
   this->cedar::aux::Lockable::removeLock(&data->getLock(), lockType, lockSet);
 }
 
+void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
+{
+//  QWriteLocker locker(this->mpConnectionLock);
+  // find the slot map corresponding to the given role.
+  std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
+  if (iter == this->mSlotMaps.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException,
+                "The requested role " +
+                cedar::proc::DataRole::type().get(role).prettyString() +
+                " does not exist in Connectable \""
+                + this->getName() +
+                "\".");
+  }
+
+#ifdef DEBUG_LOCKS
+  std::cout << "Data/lock: " << this->getName() << "." << name << "/" << (&data->getLock()) << std::endl;
+#endif // DEBUG_LOCKS
+
+  // find the slot with the given name
+  SlotMap::iterator map_iterator = iter->second.find(name);
+  if (map_iterator == iter->second.end())
+  {
+    CEDAR_THROW(cedar::aux::InvalidNameException,
+                "The requested " +
+                cedar::proc::DataRole::type().get(role).prettyString() +
+                " name \"" + name + "\" does not exist.");
+  }
+  cedar::proc::DataSlotPtr slot = map_iterator->second;
+
+  // inputs come from a different Connectable
+  if (role == cedar::proc::DataRole::INPUT)
+  {
+    slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  }
+  else
+  {
+    data->setOwner(this);
+  }
+
+  slot->setData(data);
+
+//  locker.unlock();
+
+  this->checkMandatoryConnections();
+}
+
 void cedar::proc::Connectable::dataAddedToSlot(DataRole::Id role, cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::ConstDataPtr data)
 {
   // note: old data need not be removed from the lock sets here, that is done automatically via signals
@@ -846,11 +908,7 @@ void cedar::proc::Connectable::dataAddedToSlot(DataRole::Id role, cedar::proc::D
   this->addLock(&data->getLock(), slot->getLockType(), this->getLockSetForRole(role));
 }
 
-void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
-{
-  this->getSlot(role, name)->setData(data);
-}
-
+/*
 void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& name)
 {
   QWriteLocker locker(this->mpConnectionLock);
@@ -882,6 +940,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
 
   this->checkMandatoryConnections();
 }
+*/
 
 /*!
  * @remarks This method is usually called by other framework parts rather than by the user. So only call it if you know
@@ -894,15 +953,6 @@ void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::Dat
   this->inputConnectionChanged(name);
   // update the validity of the input
   this->getInputValidity(name);
-}
-
-/*!
- * @remarks This method is usually called by other framework parts rather than by the user. So only call it if you know
- *          what you are doing :)
- */
-void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
-{
-  this->setData(DataRole::INPUT, name, data);
 }
 
 void cedar::proc::Connectable::setBuffer(const std::string& name, cedar::aux::DataPtr data)

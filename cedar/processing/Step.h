@@ -345,6 +345,11 @@ private:
    */
   void unlockData() const;
 
+  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
+   *
+   */
+  void callInputConnectionChanged(const std::string& slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

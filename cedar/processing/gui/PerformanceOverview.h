@@ -45,7 +45,7 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 
@@ -76,7 +76,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setNetwork(cedar::proc::NetworkPtr network);
+  void setGroup(cedar::proc::GroupPtr group);
 
 public slots:
   void refresh();
@@ -107,7 +107,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::NetworkPtr mNetwork;
+  cedar::proc::GroupPtr mGroup;
 
   int mTimerId;
 
