@@ -1369,7 +1369,7 @@ void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)
 
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
   CEDAR_DEBUG_ASSERT(p_scene);
 
   QMenu menu;

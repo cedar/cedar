@@ -444,11 +444,11 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
   delete p_dialog;
 }
 
-void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr network)
+void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)
 {
-  network->getGroup()->setName("root");
-  this->setGroup(network);
-  this->mpProcessingDrawer->getScene()->setGroup(network);
+  group->getGroup()->setName("root");
+  this->setGroup(group);
+  this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpProcessingDrawer->getScene()->reset();
   this->mGroup->addElementsToScene();
   this->mpPropertyTable->resetContents();
@@ -457,17 +457,17 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr network)
 
   if (this->mpConsistencyChecker != NULL)
   {
-    this->mpConsistencyChecker->setGroup(network);
+    this->mpConsistencyChecker->setGroup(group);
   }
 
   if (this->mpBoostControl != NULL)
   {
-    this->mpBoostControl->setGroup(network->getGroup());
+    this->mpBoostControl->setGroup(group->getGroup());
   }
 
   if (this->mpPerformanceOverview != NULL)
   {
-    this->mpPerformanceOverview->setNetwork(network->getNetwork());
+    this->mpPerformanceOverview->setGroup(group->getGroup());
   }
 
   this->loadPlotGroupsIntoComboBox();
@@ -1110,4 +1110,10 @@ void cedar::proc::gui::Ide::loadPlotGroupsIntoComboBox()
   {
     this->mpPlotGroupsComboBox->addItem(QString::fromStdString(*it));
   }
+}
+
+
+void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
+{
+  this->mGroup = group;
 }
