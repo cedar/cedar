@@ -854,7 +854,7 @@ void cedar::proc::Connectable::removeLock
 
 void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
 {
-//  QWriteLocker locker(this->mpConnectionLock);
+  QWriteLocker locker(this->mpConnectionLock);
   // find the slot map corresponding to the given role.
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
   if (iter == this->mSlotMaps.end())
@@ -891,10 +891,9 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   {
     data->setOwner(this);
   }
-
+  //!@todo (SZ) warning: unlocking here prevents a deadlock, but as a consequence setData is not thread-safe any more
+  locker.unlock();
   slot->setData(data);
-
-//  locker.unlock();
 
   this->checkMandatoryConnections();
 }
@@ -1000,7 +999,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, cedar::aux::DataPtr d
   auto slot = this->getSlot(role, name);
   if (!data)
   {
-    QWriteLocker locker(this->mpConnectionLock);
     data = slot->getData();
   }
   locker.unlock();
