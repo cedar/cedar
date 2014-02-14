@@ -317,6 +317,11 @@ void run_test()
   network_left->add(to_move);
   network_left->disconnectSlots(output_slot, input_slot);
 
+  // test importing networks
+  std::cout << "testing importing groups" << std::endl;
+  cedar::proc::GroupPtr network_importing(new cedar::proc::Group());
+  network_importing->importGroupFromFile("network child", "Nested.json");
+
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
 

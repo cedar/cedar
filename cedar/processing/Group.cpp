@@ -1886,3 +1886,30 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
     receiver->callInputConnectionChanged(connection->getTarget()->getName());
   }
 }
+
+void cedar::proc::Group::importGroupFromFile(const std::string& groupName, const std::string& fileName)
+{
+  cedar::aux::ConfigurationNode configuration;
+  boost::property_tree::read_json(fileName, configuration);
+
+  try
+  {
+    cedar::aux::ConfigurationNode& groups_node = configuration.get_child("groups");
+    try
+    {
+      cedar::aux::ConfigurationNode& group_node = groups_node.get_child(groupName);
+      cedar::proc::GroupPtr imported_group(new cedar::proc::Group());
+      this->add(imported_group, this->getUniqueIdentifier("imported group"));
+      group_node.put("name", this->getUniqueIdentifier(group_node.get<std::string>("name")));
+      imported_group->readConfiguration(group_node);
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+      CEDAR_THROW(cedar::aux::NotFoundException, "Could not find group with name " + groupName + " in file " + fileName);
+    }
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + fileName);
+  }
+}
