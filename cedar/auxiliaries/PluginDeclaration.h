@@ -83,7 +83,7 @@ public:
   virtual void declare() const = 0;
 
   //! Returns the class name associated with this declaration.
-  virtual std::string getClassName() const = 0;
+  virtual std::string getClassName() const;
 
   //! Returns the category of this declaration.
   inline const std::string& getCategory() const

@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Group.h"
+#include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupFileFormatV1.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -99,6 +100,38 @@ namespace
       "A grouping element for steps."
     );
     group_decl->declare();
+
+#ifdef CEDAR_COMPILER_MSVC
+    // on windows/MSVC, the dynamics dll is not linked because it is unused. This code loads the library manually.
+    {
+      HMODULE module_handle = LoadLibrary("cedardyn"
+#ifdef _DEBUG // in debug builds, the library is called cedardynd.dll; ".dll" is automatically appended
+      "d"
+#endif // _DEBUG
+        );
+      if (module_handle == NULL)
+      {
+        std::string error_message = cedar::aux::PluginProxy::getLastError();
+        cedar::aux::LogSingleton::getInstance()->error
+        (
+          "Failed to load dynamics library. You may be missing some processing steps. Windows says: \"" + error_message + "\".",
+          "cedar/processing/Network.cpp : declare()"
+        );
+      }
+    }
+#endif // CEDAR_COMPILER_MSVC
+
+    cedar::proc::GroupDeclarationPtr group_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                       "Two-layer field",
+                                       "resource://groupTemplates/fieldTemplates.json",
+                                       "two-layer",
+                                       "DFT"
+                                     )
+                                   );
+    group_declaration->declare();
 
     return true;
   }

@@ -43,6 +43,8 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/Group.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/GroupDeclarationManager.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -321,6 +323,19 @@ void run_test()
   std::cout << "testing importing groups" << std::endl;
   cedar::proc::GroupPtr network_importing(new cedar::proc::Group());
   network_importing->importGroupFromFile("network child", "Nested.json");
+
+  cedar::proc::GroupDeclarationPtr group_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                       "Two-layer field",
+                                       "resource://groupTemplates/fieldTemplates.json",
+                                       "two-layer",
+                                       "DFT"
+                                     )
+                                   );
+  group_declaration->declare();
+  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("Two-layer field", network_importing);
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

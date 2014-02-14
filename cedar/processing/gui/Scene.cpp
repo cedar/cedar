@@ -50,6 +50,9 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/GroupDeclarationManager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
@@ -315,7 +318,6 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     if (item)
     {
       QPointF mapped = pEvent->scenePos();
-      QString class_id = item->data(Qt::UserRole).toString();
       auto target_group = this->getRootGroup()->getGroup();
       if (auto group = dynamic_cast<cedar::proc::gui::Group*>(drop_target))
       {
@@ -323,7 +325,21 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
         target_group = group->getGroup();
         mapped -= group->scenePos();
       }
-      this->createElement(target_group, class_id.toStdString(), mapped);
+      auto pointer = item->data(Qt::UserRole).value<void*>();
+      auto real_pointer = static_cast<const cedar::aux::PluginDeclaration*>(pointer);
+
+      if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(real_pointer))
+      {
+        this->createElement(target_group, elem_declaration->getClassName(), mapped);
+      }
+      else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(real_pointer))
+      {
+        cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(group_declaration->getClassName(), this->getRootGroup()->getGroup());
+      }
+      else
+      {
+        CEDAR_THROW(cedar::aux::NotFoundException, "blurp");
+      }
     }
   }
 }

@@ -22,90 +22,83 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementClassList.h
+    File:        GroupDeclarationManager.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 11 23
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2014 02 14
 
-    Description:
+    Description: Header file for the class cedar::proc::GroupDeclarationManager.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
-#define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
+#ifndef CEDAR_PROC_GROUP_DECLARATION_MANAGER_H
+#define CEDAR_PROC_GROUP_DECLARATION_MANAGER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Singleton.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/ElementClassList.fwd.h"
-#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
+#include "cedar/processing/GroupDeclarationManager.fwd.h"
+#include "cedar/processing/GroupDeclaration.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QListWidget>
-#include <string>
+#include <map>
 
-/*!@brief A widget showing a list of steps that can be dragged into the architecture area.
+/*!@todo describe.
  *
- * More detailed description of the class.
+ * @todo describe more.
  */
-class cedar::proc::gui::ElementClassList : public QListWidget
+class cedar::proc::GroupDeclarationManager
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+  friend class cedar::aux::Singleton<cedar::proc::GroupDeclarationManager>;
 
+public:
+  //--------------------------------------------------------------------------------------------------------------------
+  // typedefs
+  //--------------------------------------------------------------------------------------------------------------------
+  typedef std::map<std::string, cedar::proc::ConstGroupDeclarationPtr> GroupDeclarationMap;
+private:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
   //!@brief The standard constructor.
-  ElementClassList(QWidget *pParent = NULL);
+  GroupDeclarationManager();
 
+public:
   //!@brief Destructor
-  ~ElementClassList();
+  virtual ~GroupDeclarationManager();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const std::string& categoryName);
+  void addDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
+
+  void addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base) const;
+
+  const GroupDeclarationMap& getDefinitions() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Opens up the context menu.
-  void contextMenuEvent(QContextMenuEvent* pEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void addListEntry
-       (
-         const std::string& className,
-         const std::string& fullClassName,
-         const QIcon& icon,
-         const std::vector<QString>& decorations,
-         const std::string& description,
-         const std::string& deprecation,
-         const std::string& source,
-         cedar::aux::ConstPluginDeclarationPtr declaration
-       );
-
-private slots:
-  void showDeprecatedSteps(bool show);
-
-  void rebuild();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -113,8 +106,21 @@ private slots:
 protected:
   // none yet
 private:
-  std::string mCategoryName;
+  // none yet
 
-}; // class ElementClassList
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
+private:
+  //! List of all declarations.
+  GroupDeclarationMap mDeclarations;
+
+}; // class cedar::proc::GroupDeclarationManager
+
+CEDAR_PROC_SINGLETON(GroupDeclarationManager);
+
+#endif // CEDAR_PROC_GROUP_DECLARATION_MANAGER_H
+
