@@ -426,8 +426,11 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
     {
       //!@todo Can this be made easier by using scoped_connections?
       auto conn_it = this->mRevalidateConnections.find(connectable->getName());
-      conn_it->second.disconnect();
-      this->mRevalidateConnections.erase(conn_it);
+      if (conn_it != this->mRevalidateConnections.end())
+      {
+        conn_it->second.disconnect();
+        this->mRevalidateConnections.erase(conn_it);
+      }
     }
     mElements.erase(it);
   }
