@@ -49,6 +49,7 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
@@ -57,8 +58,15 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/json_parser.hpp>
+  #include <boost/property_tree/ini_parser.hpp>
+  #include <boost/filesystem.hpp>
+#endif
+#include <QFileDialog>
 #include <QByteArray>
 #include <QDataStream>
 #include <QMap>
@@ -69,6 +77,7 @@
 #include <QAction>
 #include <QSvgGenerator>
 #include <QToolTip>
+#include <QDialogButtonBox>
 #include <iostream>
 #include <set>
 #include <list>
@@ -737,6 +746,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
+  QAction *p_importGroup = menu.addAction("import group from file");
+  menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
   QAction *p_reset = menu.addAction("reset architecture");
@@ -750,6 +761,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     {
       p_ide->resetRootGroup();
     }
+  }
+  else if (a == p_importGroup)
+  {
+    this->importGroup();
   }
   else if (a == p_addSickyNode)
   {
@@ -1285,4 +1300,71 @@ void cedar::proc::gui::Scene::removeStickyNote(StickyNote* note)
 const std::vector<cedar::proc::gui::StickyNote* > cedar::proc::gui::Scene::getStickyNotes() const
 {
   return this->mStickyNotes;
+}
+
+void cedar::proc::gui::Scene::importGroup()
+{
+  class GroupSelectDialog : public QDialog
+  {
+  public:
+    GroupSelectDialog(const std::vector<std::string>& groupNames)
+    :
+    mpGroupNamesBox(new QComboBox())
+    {
+      QHBoxLayout* p_layout = new QHBoxLayout();
+      p_layout->addWidget(mpGroupNamesBox);
+      QDialogButtonBox* p_button_box = new QDialogButtonBox();
+      p_button_box->addButton(QDialogButtonBox::StandardButton::Ok);
+      p_button_box->addButton(QDialogButtonBox::StandardButton::Cancel);
+
+      this->connect(p_button_box, SIGNAL(accepted()), this, SLOT(accept()));
+      this->connect(p_button_box, SIGNAL(rejected()), this, SLOT(reject()));
+      p_layout->addWidget(p_button_box);
+      for (auto name : groupNames)
+      {
+        mpGroupNamesBox->addItem(QString::fromStdString(name));
+      }
+      this->setLayout(p_layout);
+    }
+    std::string returnChosenGroup()
+    {
+      return mpGroupNamesBox->currentText().toStdString();
+    }
+
+    QComboBox* mpGroupNamesBox;
+  };
+
+  cedar::aux::DirectoryParameterPtr last_dir
+    = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+  QString file = QFileDialog::getOpenFileName(this->mpMainWindow, // parent
+                                              "Select from which file to load a group", // caption
+                                              last_dir->getValue().absolutePath(), // initial directory
+                                              "json (*.json)" // filter(s), separated by ';;'
+                                              );
+
+  if (!file.isEmpty())
+  {
+    cedar::aux::ConfigurationNode configuration;
+    boost::property_tree::read_json(file.toStdString(), configuration);
+
+    try
+    {
+      const cedar::aux::ConfigurationNode& groups_node = configuration.get_child("groups");
+      std::vector<std::string> group_names;
+      for (auto group : groups_node)
+      {
+        group_names.push_back(group.first);
+      }
+      GroupSelectDialog* group_dialog(new GroupSelectDialog(group_names));
+      int result = group_dialog->exec();
+      if (result == QDialog::Accepted)
+      {
+        mGroup->getGroup()->importGroupFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+      }
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+      CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + file.toStdString());
+    }
+  }
 }
