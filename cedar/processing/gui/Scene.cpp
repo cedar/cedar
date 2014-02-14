@@ -78,6 +78,7 @@
 #include <QSvgGenerator>
 #include <QToolTip>
 #include <QDialogButtonBox>
+#include <QMessageBox>
 #include <iostream>
 #include <set>
 #include <list>
@@ -1307,11 +1308,13 @@ void cedar::proc::gui::Scene::importGroup()
   class GroupSelectDialog : public QDialog
   {
   public:
-    GroupSelectDialog(const std::vector<std::string>& groupNames)
+    GroupSelectDialog(const std::vector<std::string>& groupNames, QWidget* pParent)
     :
+    QDialog(pParent),
     mpGroupNamesBox(new QComboBox())
     {
-      QHBoxLayout* p_layout = new QHBoxLayout();
+      this->setWindowTitle(QString("Select a group."));
+      QVBoxLayout* p_layout = new QVBoxLayout();
       p_layout->addWidget(mpGroupNamesBox);
       QDialogButtonBox* p_button_box = new QDialogButtonBox();
       p_button_box->addButton(QDialogButtonBox::StandardButton::Ok);
@@ -1347,7 +1350,8 @@ void cedar::proc::gui::Scene::importGroup()
     cedar::aux::ConfigurationNode configuration;
     boost::property_tree::read_json(file.toStdString(), configuration);
 
-    try
+    // is there a node groups?
+    if (configuration.find("groups") != configuration.not_found())
     {
       const cedar::aux::ConfigurationNode& groups_node = configuration.get_child("groups");
       std::vector<std::string> group_names;
@@ -1355,16 +1359,29 @@ void cedar::proc::gui::Scene::importGroup()
       {
         group_names.push_back(group.first);
       }
-      GroupSelectDialog* group_dialog(new GroupSelectDialog(group_names));
-      int result = group_dialog->exec();
-      if (result == QDialog::Accepted)
+      // found at least one group
+      if (group_names.size() > 0)
       {
-        mGroup->getGroup()->importGroupFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+        // open selection dialog
+        GroupSelectDialog* group_dialog(new GroupSelectDialog(group_names, this->mpMainWindow));
+        int result = group_dialog->exec();
+        if (result == QDialog::Accepted)
+        {
+          // import selected group
+          mGroup->getGroup()->importGroupFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+        }
+        return;
       }
     }
-    catch (const boost::property_tree::ptree_bad_path&)
-    {
-      CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + file.toStdString());
-    }
+    QMessageBox* p_message
+      = new QMessageBox
+        (
+          QMessageBox::Warning,
+          QString("No groups found"),
+          QString("Could not find any groups in file " ) + file,
+          QMessageBox::Ok,
+          this->mpMainWindow
+        );
+    p_message->exec();
   }
 }
