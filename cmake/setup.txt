@@ -122,7 +122,6 @@ if (CMAKE_COMPILER_IS_GNUCC)
     endif (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
 endif(CMAKE_COMPILER_IS_GNUCC)
 
-
 ########################################################################################################################
 # add preprocessor definitions 
 

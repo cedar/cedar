@@ -79,6 +79,12 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Connectable::redetermineInputValidity(const std::string& slot)
+{
+  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  this->getInputValidity(slot);
+}
+
 void cedar::proc::Connectable::clearDataSlots()
 {
   for (auto role_iter = this->mSlotMaps.begin(); role_iter != this->mSlotMaps.end(); ++role_iter)
@@ -906,6 +912,7 @@ void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::Co
   CEDAR_ASSERT(slot);
   if (slot->isCollection())
   {
+    QWriteLocker locker(this->mpConnectionLock);
     slot->removeData(data);
   }
   else

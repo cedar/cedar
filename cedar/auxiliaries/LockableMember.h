@@ -22,47 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixSlicePlot3D.h
+    File:        LockableMember.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2012 05 29
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 01 28
 
-    Description:
+    Description: Header file for the class cedar::aux::LockableMember.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
-#define CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
+#ifndef CEDAR_AUX_LOCKABLE_MEMBER_H
+#define CEDAR_AUX_LOCKABLE_MEMBER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/QImagePlot.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/auxiliaries/gui/MatrixSlicePlot3D.fwd.h"
-#include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LockableMember.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
 
 
-/*!@brief A slice-plot for 3D matrices.
+/*!@brief A lightweight convenience class for grouping a class member with a lock.
+ *
+ * @todo Use this in cedar::aux::Data?
  */
-class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::QImagePlot
+template <typename T, class LockType>
+class cedar::aux::LockableMember
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-  
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,57 +63,51 @@ class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::QImagePlot
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  MatrixSlicePlot3D(QWidget* pParent = NULL);
-
-  //!@brief A constructor taking both a data pointer and a title.
-  MatrixSlicePlot3D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
-
-  ~MatrixSlicePlot3D();
+  LockableMember(const T& member)
+  :
+  mMember(member)
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::MatData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-  
+  //! Returns the member.
+  const T& member() const
+  {
+    return this->mMember;
+  }
+
+  //! Returns the member.
+  T& member()
+  {
+    return this->mMember;
+  }
+
+  //! Returns the associated lock.
+  LockType& getLock() const
+  {
+    return this->mLock;
+  }
+
+  //! Returns a pointer to associated lock. Use this method for things like QReadLocker etc.
+  LockType* getLockPtr() const
+  {
+    return &this->mLock;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Processes key events.
-   *
-   * This function handles ctrl+G, which saves the window settings.
-   */
-  virtual void keyPressEvent(QKeyEvent* pEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Creates the image based on the matrix.
-   */
-  void slicesFromMat(const cv::Mat& mat);
-
-  bool doConversion();
-
-  //! initialize the widget
-  void init();
-
-  void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
-
-  void fillContextMenu(QMenu& menu);
-
-  static void getSetup(int& dim0, int& dim1, int slicedDimension);
-
-private slots:
-  void slicedDimensionSelected();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -129,21 +115,13 @@ private slots:
 protected:
   // none yet
 private:
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+  //! The actual member.
+  T mMember;
 
-  cv::Mat mSliceMatrix;
-  cv::Mat mSliceMatrixByte;
-  cv::Mat mSliceMatrixByteC3;
-  cv::Mat mSliceSize;
-  bool mDataIsSet;
+  //! Lock for the member.
+  mutable LockType mLock;
 
-  //! desired columns of the slice plot
-  unsigned int mDesiredColumns;
+}; // class cedar::aux::LockableMember
 
-  //! Dimension along which the slices are made.
-  cedar::aux::LockableMember<unsigned int> mSlicedDimension;
+#endif // CEDAR_AUX_LOCKABLE_MEMBER_H
 
-}; // class cedar::aux::gui::MatrixSlicePlot3D
-
-#endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H

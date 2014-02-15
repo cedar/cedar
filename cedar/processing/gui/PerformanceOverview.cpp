@@ -92,7 +92,8 @@ public:
 
 cedar::proc::gui::PerformanceOverview::PerformanceOverview(QWidget* pParent)
 :
-QDialog(pParent)
+QDialog(pParent),
+mTimerId(0)
 {
   setupUi(this);
   QObject::connect(this->mpRefreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
@@ -102,6 +103,8 @@ QDialog(pParent)
 
   // sort everything by the compute time (second column)
   this->mpStepTimeOverview->sortByColumn(1);
+
+  QObject::connect(this->mpAutoRefresh, SIGNAL(toggled(bool)), this, SLOT(autoRefreshToggled(bool)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -185,5 +188,32 @@ void cedar::proc::gui::PerformanceOverview::clear()
   while (this->mpStepTimeOverview->rowCount() > 0)
   {
     this->mpStepTimeOverview->removeRow(0);
+  }
+}
+
+void cedar::proc::gui::PerformanceOverview::autoRefreshToggled(bool enabled)
+{
+  if (enabled)
+  {
+    if (this->mTimerId == 0)
+    {
+      this->mTimerId = this->startTimer(500); // update once every 0.5 seconds
+    }
+  }
+  else
+  {
+    if (mTimerId != 0)
+    {
+      this->killTimer(mTimerId);
+      mTimerId = 0;
+    }
+  }
+}
+
+void cedar::proc::gui::PerformanceOverview::timerEvent(QTimerEvent*)
+{
+  if (this->mpAutoRefresh->isChecked())
+  {
+    this->refresh();
   }
 }

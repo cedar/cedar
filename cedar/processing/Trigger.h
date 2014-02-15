@@ -165,7 +165,8 @@ protected:
   mutable QReadWriteLock mpListenersLock;
 
 private:
-  // none yet
+  mutable QReadWriteLock mpTriggeringOrderLock;
+
 }; // class cedar::proc::Trigger
 
 #endif // CEDAR_PROC_TRIGGER_H

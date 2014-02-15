@@ -185,7 +185,7 @@ _mSizes
     this,
     "sizes",
     2,
-    10,
+    50,
     cedar::aux::UIntParameter::LimitType::positive(5000)
   )
 ),

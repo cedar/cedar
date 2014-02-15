@@ -54,7 +54,16 @@
 bool checkTime(long expiredMilliseconds, cedar::unit::Time expectedTime)
 {
   double expected_milliseconds = expectedTime / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
-  return fabs(static_cast<double>(expiredMilliseconds) - expected_milliseconds) < 0.001 * expected_milliseconds;
+  double threshold;
+  if (expected_milliseconds > 1000)
+  {
+    threshold = 0.005 * expected_milliseconds; // be more tolerant with larger wait times
+  }
+  else
+  {
+    threshold = 5; // deviations of up to 5 milliseconds are allowed
+  }
+  return fabs(static_cast<double>(expiredMilliseconds) - expected_milliseconds) < threshold;
 }
 
 int main(int, char**)
@@ -79,7 +88,7 @@ int main(int, char**)
     boost::posix_time::time_duration expired_time = end - start;
     if (!checkTime(expired_time.total_milliseconds(), wait_time))
     {
-      std::cout << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
+      std::cout << "Sleep time deviated by more than the expected amount; " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
       errors++;
     }
     else
@@ -105,7 +114,7 @@ int main(int, char**)
     boost::posix_time::time_duration expired_time = end - start;
     if (!checkTime(expired_time.total_milliseconds(), wait_time))
     {
-      std::cout << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed."
+      std::cout << "Sleep time deviated by more than the expected amount; only " << expired_time.total_milliseconds() << " milliseconds have passed."
                << " (should have been " << wait_time << ")" << std::endl;
       errors++;
     }

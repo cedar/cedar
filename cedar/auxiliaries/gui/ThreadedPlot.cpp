@@ -39,9 +39,13 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ThreadedPlot.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 #include <boost/make_shared.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -51,77 +55,73 @@
 cedar::aux::gui::ThreadedPlot::ThreadedPlot(QWidget* pParent)
 :
 cedar::aux::gui::PlotInterface(pParent),
-mpWorkerThread(new QThread()),
-mConverting(false),
-mTimerId(0)
+mTimerId(0),
+mCaller(boost::bind(&cedar::aux::gui::ThreadedPlot::convert, this))
 {
-  this->mWorker = boost::make_shared<cedar::aux::gui::detail::ThreadedPlotWorker>(this);
-  this->mWorker->moveToThread(this->mpWorkerThread);
-  
-  QObject::connect(this, SIGNAL(convert()), this->mWorker.get(), SLOT(convert()));
-  QObject::connect(this->mWorker.get(), SIGNAL(conversionDone()), this, SLOT(conversionDone()));
-  QObject::connect(this->mWorker.get(), SIGNAL(conversionFailed()), this, SLOT(conversionFailed()));
+  QObject::connect(this, SIGNAL(conversionDoneSignal()), this, SLOT(conversionDone()), Qt::QueuedConnection);
+  QObject::connect(this, SIGNAL(conversionFailedSignal()), this, SLOT(conversionFailed()), Qt::QueuedConnection);
 
-  this->mpWorkerThread->start(QThread::LowPriority);
+  //!@todo Give this a low priority!
+  mCaller.start();
 }
 
 cedar::aux::gui::ThreadedPlot::~ThreadedPlot()
 {
-  if (this->mpWorkerThread)
-  {
-    this->mpWorkerThread->quit();
-    this->mpWorkerThread->wait();
-    delete this->mpWorkerThread;
-    this->mpWorkerThread = nullptr;
-  }
+  // stop the timer (the thread itself will stop automatically)
+  this->stop();
+
+  // preemptively disconnect all slots so that no new events are posted to this class
+  QObject::disconnect(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::ThreadedPlot::startConversion()
+// Called in the worker thread
+void cedar::aux::gui::ThreadedPlot::convert()
 {
-  emit this->convert();
-}
+  // make sure this is NOT called in the main (gui) thread
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(QApplication::instance()->thread() != QThread::currentThread());
 
-void cedar::aux::gui::detail::ThreadedPlotWorker::convert()
-{
-  if (this->mpPlot->doConversion())
+  if (this->doConversion())
   {
-    emit this->conversionDone();
+    emit this->conversionDoneSignal();
   }
   else
   {
-    emit this->conversionFailed();
+    emit this->conversionFailedSignal();
   }
 }
 
+// called in the main gui thread
 void cedar::aux::gui::ThreadedPlot::conversionDone()
 {
-  this->updatePlot();
+  // make sure this IS called in the main (gui) thread
+  CEDAR_DEBUG_ASSERT(QApplication::instance()->thread() == QThread::currentThread());
 
-  this->mConverting = false;
+  // update the display in the underlying plots
+  this->updatePlot();
 }
 
 void cedar::aux::gui::ThreadedPlot::conversionFailed()
 {
-  this->mConverting = false;
+  // make sure this IS called in the main (gui) thread
+  CEDAR_DEBUG_ASSERT(QApplication::instance()->thread() == QThread::currentThread());
+  // nothing else to do at the moment
 }
 
 void cedar::aux::gui::ThreadedPlot::timerEvent(QTimerEvent* /*pEvent*/)
 {
-  if
-  (
-    !this->isVisible() // plot widget is not visible -- no need to plot
-    || this->mConverting // already converting -- skip this timer event
-  )
+  if (!this->isVisible()) // plot widget is not visible -- no need to plot
   {
     return;
   }
 
-  this->mConverting = true;
-  emit convert();
+  if (!this->mCaller.isExecuting())
+  {
+    this->mCaller.execute();
+  }
 }
 
 void cedar::aux::gui::ThreadedPlot::start()
@@ -133,8 +133,19 @@ void cedar::aux::gui::ThreadedPlot::start()
 
 void cedar::aux::gui::ThreadedPlot::stop()
 {
-  if (mTimerId != 0)
+  if (this->mTimerId != 0)
   {
     this->killTimer(mTimerId);
+    this->mTimerId = 0;
+  }
+}
+
+void cedar::aux::gui::ThreadedPlot::wait()
+{
+  CEDAR_NON_CRITICAL_ASSERT(this->mTimerId == 0);
+
+  while (this->mCaller.isExecuting())
+  {
+    cedar::aux::sleep(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   }
 }

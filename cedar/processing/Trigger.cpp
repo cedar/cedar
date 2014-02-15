@@ -184,7 +184,7 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
 
   // we (should) now have a map assigning a distance to all triggerables triggered by this trigger
   // now we need to transform it to a usable structures
-  QWriteLocker lock_w(&mpListenersLock);
+  QWriteLocker lock_w(&mpTriggeringOrderLock);
   this->mTriggeringOrder.clear();
 
   for (auto dist_iter = distances.begin(); dist_iter != distances.end(); ++dist_iter)
@@ -243,7 +243,7 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
-  QReadLocker lock(&mpListenersLock);
+  QReadLocker lock(&mpTriggeringOrderLock);
 
   for (auto iter = this->mTriggeringOrder.begin(); iter != this->mTriggeringOrder.end(); ++iter)
   {

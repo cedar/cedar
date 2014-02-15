@@ -48,6 +48,10 @@
 #include <QLabel>
 #include <QToolTip>
 #include <QMenu>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QDoubleSpinBox>
+#include <QPushButton>
 
 
 //! Widget used for displaying the image.
@@ -79,6 +83,7 @@ public:
 cedar::aux::gui::QImagePlot::QImagePlot(QWidget* pParent)
 :
 cedar::aux::gui::ThreadedPlot(pParent),
+mAutoScaling(true),
 mSmoothScaling(true),
 mLegendAvailable(false)
 {
@@ -139,6 +144,61 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::QImagePlot::setAutomaticScaling()
+{
+  this->mAutoScaling = true;
+}
+
+void cedar::aux::gui::QImagePlot::setLimits(double min, double max)
+{
+  this->updateMinMax(min, max);
+
+  this->mValueLimits.setLower(min);
+  this->mValueLimits.setUpper(max);
+  this->mAutoScaling = false;
+}
+
+void cedar::aux::gui::QImagePlot::queryFixedValueScale()
+{
+  QDialog* p_dialog = new QDialog();
+  p_dialog->setModal(true);
+  auto p_layout = new QGridLayout();
+  p_dialog->setLayout(p_layout);
+  QLabel* p_label;
+  p_label = new QLabel("lower limit:");
+  p_layout->addWidget(p_label, 0, 0);
+
+  auto p_lower = new QDoubleSpinBox();
+  p_layout->addWidget(p_lower, 0, 1);
+  p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_lower->setMaximum(boost::numeric::bounds<double>::highest());
+  p_lower->setValue(this->mValueLimits.getLower());
+
+  p_label = new QLabel("upper limit:");
+  p_layout->addWidget(p_label, 1, 0);
+
+  auto p_upper = new QDoubleSpinBox();
+  p_layout->addWidget(p_upper, 1, 1);
+  p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_upper->setMaximum(boost::numeric::bounds<double>::highest());
+  p_upper->setValue(this->mValueLimits.getUpper());
+
+  auto p_buttons = new QDialogButtonBox();
+  p_buttons->addButton(QDialogButtonBox::Ok);
+  p_buttons->addButton(QDialogButtonBox::Cancel);
+  p_layout->addWidget(p_buttons, 2, 0, 1, 2);
+
+  QObject::connect(p_buttons->button(QDialogButtonBox::Ok), SIGNAL(clicked()), p_dialog, SLOT(accept()));
+  QObject::connect(p_buttons->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), p_dialog, SLOT(reject()));
+
+  int res = p_dialog->exec();
+
+  if (res == QDialog::Accepted)
+  {
+    this->setLimits(p_lower->value(), p_upper->value());
+  }
+}
+
 void cedar::aux::gui::QImagePlot::updateMinMax(double min, double max)
 {
   if (this->mpLegend)
@@ -176,6 +236,19 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpLegend != NULL && this->mpLegend->isVisible());
   p_legend->setEnabled(this->mLegendAvailable);
+
+  QMenu* p_scaling = menu.addMenu("value scaling");
+  p_scaling->setEnabled(this->mValueScalingAvailable);
+
+  auto p_auto_scale = p_scaling->addAction("automatic");
+  p_auto_scale->setCheckable(true);
+  p_auto_scale->setChecked(this->mAutoScaling);
+  QObject::connect(p_auto_scale, SIGNAL(triggered()), this, SLOT(setAutomaticScaling()));
+
+  auto p_fixed_scaling = p_scaling->addAction("fixed ...");
+  p_fixed_scaling->setCheckable(true);
+  p_fixed_scaling->setChecked(!this->mAutoScaling);
+  QObject::connect(p_fixed_scaling, SIGNAL(triggered()), this, SLOT(queryFixedValueScale()));
 
   this->fillContextMenu(menu);
 
@@ -217,7 +290,7 @@ void cedar::aux::gui::QImagePlot::resizePixmap()
 
 void cedar::aux::gui::QImagePlot::setInfo(const std::string& text)
 {
-  this->mpImageDisplay->setText("cannot display matrices of dimensionality > 2");
+  this->mpImageDisplay->setText(QString::fromStdString(text));
 }
 
 void cedar::aux::gui::QImagePlot::updatePlot()
@@ -258,12 +331,14 @@ void cedar::aux::gui::QImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEv
   this->mpPlot->plotClicked(pEvent, image_x, image_y);
 }
 
-void cedar::aux::gui::QImagePlot::fillContextMenu(QMenu& menu)
+void cedar::aux::gui::QImagePlot::fillContextMenu(QMenu&)
 {
+  // empty default implementation
 }
 
-void cedar::aux::gui::QImagePlot::plotClicked(QMouseEvent* pEvent, int imageX, int imageY)
+void cedar::aux::gui::QImagePlot::plotClicked(QMouseEvent* /* pEvent */, double /* imageX */, double /* imageY */)
 {
+  // empty default implementation
 }
 
 void cedar::aux::gui::QImagePlot::showLegend(bool show)

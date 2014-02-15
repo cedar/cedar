@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/CallFunctionInThreadALot.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/ThreadedPlot.fwd.h"
@@ -51,50 +52,6 @@
 #include <QThread>
 
 
-namespace cedar
-{
-  namespace aux
-  {
-    namespace gui
-    {
-      namespace detail
-      {
-        //!@cond SKIPPED_DOCUMENTATION
-        /* This is an internal class of ThreadedPlot that cannot be nested because Qt's moc doesn't support nested classes.
-        *
-        * Don't use it outside of the ThreadedPlot!
-        */
-        class ThreadedPlotWorker : public QObject
-        {
-          Q_OBJECT
-
-        public:
-          ThreadedPlotWorker(cedar::aux::gui::ThreadedPlot* pPlot)
-          :
-          mpPlot(pPlot)
-          {
-          }
-
-          public slots :
-            void convert();
-
-        signals:
-          void conversionDone();
-
-          void conversionFailed();
-
-          void minMaxChanged(double min, double max);
-
-        public:
-          cedar::aux::gui::ThreadedPlot *mpPlot;
-        };
-        CEDAR_GENERATE_POINTER_TYPES(ThreadedPlotWorker);
-        //!@endcond
-      } // namespace detail
-    }
-  }
-}
-
 /*!@brief A base class for plots that convert data in a separate thread.
  *
  * @todo The inheritance order of PlotInterface/ThreadedPlot might have to be turned around, as it might otherwise be impossible to use this class with MultiPlotInterface.
@@ -102,10 +59,10 @@ namespace cedar
 class cedar::aux::gui::ThreadedPlot : public cedar::aux::gui::PlotInterface
 {
   Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::gui::detail::ThreadedPlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -118,7 +75,6 @@ public:
   //!@brief The standard constructor.
   ThreadedPlot(QWidget* pParent = NULL);
 
-  //! Destructor.
   ~ThreadedPlot();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,8 +84,6 @@ public:
   // none yet
 
 signals :
-  void convert();
-
   void conversionFailedSignal();
 
   void conversionDoneSignal();
@@ -138,13 +92,13 @@ signals :
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void startConversion();
-
   void timerEvent(QTimerEvent* /* pEvent */);
 
   void start();
 
   void stop();
+
+  void wait();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -161,6 +115,8 @@ private:
    */
   virtual void updatePlot() = 0;
 
+  void convert();
+
 private slots:
   void conversionDone();
 
@@ -172,17 +128,11 @@ private slots:
 protected:
   // none yet
 private:
-  //! Thread in which conversion of mat data to qwt triple is done.
-  QThread* mpWorkerThread;
-
-  //! Worker object.
-  cedar::aux::gui::detail::ThreadedPlotWorkerPtr mWorker;
-
-  //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
-  bool mConverting;
-
   //! Id of the timer used for updating the plot.
   int mTimerId;
+
+  //! Used for calling the plot function.
+  cedar::aux::CallFunctionInThreadALot mCaller;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
