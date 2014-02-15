@@ -333,7 +333,15 @@ void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& pluginNa
   int row = this->mpPluginList->rowCount();
   this->mpPluginList->insertRow(row);
 
-  cedar::aux::PluginProxyPtr plugin = cedar::aux::PluginProxy::getPlugin(pluginName);
+  cedar::aux::PluginProxyPtr plugin;
+  try
+  {
+    plugin = cedar::aux::PluginProxy::getPlugin(pluginName);
+  }
+  catch (cedar::aux::PluginNotFoundException& e)
+  {
+    // nothing to do
+  }
 
   QCheckBox* p_cb = new QCheckBox();
   p_cb->setChecked(cedar::aux::SettingsSingleton::getInstance()->isPluginLoadedOnStartup(pluginName));
@@ -341,7 +349,7 @@ void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& pluginNa
   QObject::connect(p_cb, SIGNAL(toggled(bool)), this, SLOT(loadOnStartupCheckboxToggled(bool)));
 
   QCheckBox* p_cb2 = new QCheckBox();
-  p_cb2->setChecked(plugin->isDeclared());
+  p_cb2->setChecked(plugin && plugin->isDeclared());
   p_cb2->setDisabled(true);
   this->mpPluginList->setCellWidget(row, PLUGIN_MANAGER_PLUGIN_LOADED_ROW, p_cb2);
 

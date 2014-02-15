@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 #include "cedar/auxiliaries/gui/ThreadedPlot.h"
+#include "cedar/auxiliaries/math/Limits.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
@@ -120,6 +121,10 @@ public:
   */
   static void fillColorizationGradient(QGradient& gradient);
 
+  /*! Sets fixed limits for the plot values.
+   */
+  void setLimits(double min, double max);
+
 public slots:
   /*!@brief Set the scaling mode of the plot.
   */
@@ -157,8 +162,16 @@ protected:
     this->mLegendAvailable = available;
   }
 
+  void setValueScalingEnabled(bool enabled)
+  {
+    mValueScalingAvailable = enabled;
+  }
+
 protected slots:
   void updateMinMax(double min, double max);
+
+  //! Enables automatic scaling.
+  void setAutomaticScaling();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -170,7 +183,10 @@ private:
 
   virtual void fillContextMenu(QMenu& menu);
 
-  virtual void plotClicked(QMouseEvent* pEvent, int imageX, int imageY);
+  virtual void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
+
+private slots:
+  void queryFixedValueScale();
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -178,6 +194,12 @@ private:
 protected:
   //! Label used for displaying the image.
   ImageDisplay* mpImageDisplay;
+
+  //! Whether scaling of plots is determined automatically or fixed.
+  bool mAutoScaling;
+
+  //! Limits for fixed scaling.
+  cedar::aux::math::Limits<double> mValueLimits;
 
 private:
   //! Converted image.
@@ -191,6 +213,9 @@ private:
 
   //! Whether or not a legend is available
   bool mLegendAvailable;
+
+  //! Whether the plot can scale its values according to user-defined limits.
+  bool mValueScalingAvailable;
 
   //! Legend (if any).
   cedar::aux::gui::detail::QImagePlotLegend* mpLegend;

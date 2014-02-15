@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallFunctionInThread.cpp
+    File:        CallFunctionInThreadALot.cpp
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.rub.de
     Date:        2010 12 02
 
-    Description: Implementation of the @em cedar::aux::CallFunctionInThread class.
+    Description: Implementation of the @em cedar::aux::CallFunctionInThreadALot class.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/CallFunctionInThreadALot.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
@@ -46,32 +46,89 @@
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-cedar::aux::CallFunctionInThread::CallFunctionInThread
+cedar::aux::CallFunctionInThreadALot::CallFunctionInThreadALot
 (
   FunctionType fun
 )
 : mFunction(fun)
 {
   setReallocateOnStart(false); // we get a lot of quick re-starts
+  this->connectToStopSignal(boost::bind(&cedar::aux::CallFunctionInThreadALot::processStop, this));
 }
 
-cedar::aux::CallFunctionInThread::~CallFunctionInThread()
+cedar::aux::CallFunctionInThreadALot::~CallFunctionInThreadALot()
 {
+  this->forceQuitThread();
 }
 
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::CallFunctionInThread::call()
+bool cedar::aux::CallFunctionInThreadALot::isExecuting()
+{
+  if (!mExecutingLock.tryLockForWrite()) // allow us to return to ignore the lock
+  {
+    return true;
+  }
+
+  mExecutingLock.unlock();
+  return false;
+}
+
+void cedar::aux::CallFunctionInThreadALot::call()
 {
   // called via friend worker class
   mFunction();
+
+  // unlock, it was locked in execute()
+  mExecutingLock.unlock();
 }
 
-cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionInThread::resetWorker()
+cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionInThreadALot::resetWorker()
 {
-  return new cedar::aux::detail::CallFunctionInThreadWorker(this);
+  auto worker = new cedar::aux::detail::CallFunctionInThreadALotWorker(this);
+  
+  connect( this, SIGNAL(executeSignal()), worker, SLOT(executeSlot()), Qt::QueuedConnection );
+
     // intentionally returns a raw pointer, see parent
+  return worker;
+}
+
+void cedar::aux::CallFunctionInThreadALot::execute()
+{
+  // trying for the lock will NOT block the call. But you should test this via isExecuting()
+  // this lock will be unlocked in call()
+  if (!mExecutingLock.tryLockForWrite())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Calling execute() on a still calculating execute(). check isExecuting() before calling execute()!",
+      "cedar::aux::CallFunctionInThreadALot::execute()"
+    );
+  }
+
+  // check if we are running?
+
+  if (!isRunning())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "calling execute() on a not running thread! did you forget to start() it?",
+      "cedar::aux::CallFunctionInThreadALot::execute()"
+    );
+  }
+
+  emit executeSignal();
+}
+
+void cedar::aux::CallFunctionInThreadALot::finishedWorkSlot()
+{
+  // do nothing (the base class calls quit() instead)
+}
+
+void cedar::aux::CallFunctionInThreadALot::processStop()
+{
+  forceQuitThread();
 }
 

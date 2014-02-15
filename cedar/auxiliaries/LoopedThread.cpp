@@ -104,6 +104,7 @@ _mLoopMode
 
   //this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::prepareStart, this));
   this->connectToQuitSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this ));
+
 }
 
 cedar::aux::LoopedThread::~LoopedThread()

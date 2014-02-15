@@ -57,11 +57,7 @@
 #include <QMouseEvent>
 #include <QThread>
 #include <QMenu>
-#include <QDialog>
-#include <QDialogButtonBox>
 #include <QFrame>
-#include <QDoubleSpinBox>
-#include <QPushButton>
 #include <QLinearGradient>
 #include <QPalette>
 #include <iostream>
@@ -112,6 +108,12 @@ cedar::aux::gui::QImagePlot(pParent)
   this->plot(matData, title);
 }
 
+cedar::aux::gui::ImagePlot::~ImagePlot()
+{
+  this->stop();
+  this->wait();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,89 +121,11 @@ cedar::aux::gui::QImagePlot(pParent)
 void cedar::aux::gui::ImagePlot::construct()
 {
   this->mDataType = DATA_TYPE_UNKNOWN;
-  this->mAutoScaling = true;
+
+  this->setValueScalingEnabled(false);
 }
 
-void cedar::aux::gui::ImagePlot::setLimits(double min, double max)
-{
-  this->updateMinMax(min, max);
-
-  this->mValueLimits.setLower(min);
-  this->mValueLimits.setUpper(max);
-  this->mAutoScaling = false;
-}
-
-//! Enables automatic scaling.
-void cedar::aux::gui::ImagePlot::setAutomaticScaling()
-{
-  this->mAutoScaling = true;
-}
-
-void cedar::aux::gui::ImagePlot::fillContextMenu(QMenu& menu)
-{
-  int mat_type = -1;
-
-  if (this->mData)
-  {
-    mat_type = this->mData->getCvType();
-  }
-  
-  QMenu* p_scaling = menu.addMenu("value scaling");
-  p_scaling->setEnabled(mDataType == DATA_TYPE_MAT || mat_type == CV_32F);
-
-  auto p_auto_scale = p_scaling->addAction("automatic");
-  p_auto_scale->setCheckable(true);
-  p_auto_scale->setChecked(this->mAutoScaling);
-  QObject::connect(p_auto_scale, SIGNAL(triggered()), this, SLOT(setAutomaticScaling()));
-
-  auto p_fixed_scaling = p_scaling->addAction("fixed ...");
-  p_fixed_scaling->setCheckable(true);
-  p_fixed_scaling->setChecked(!this->mAutoScaling);
-  QObject::connect(p_fixed_scaling, SIGNAL(triggered()), this, SLOT(queryFixedValueScale()));
-}
-
-void cedar::aux::gui::ImagePlot::queryFixedValueScale()
-{
-  QDialog* p_dialog = new QDialog();
-  p_dialog->setModal(true);
-  auto p_layout = new QGridLayout();
-  p_dialog->setLayout(p_layout);
-  QLabel* p_label;
-  p_label = new QLabel("lower limit:");
-  p_layout->addWidget(p_label, 0, 0);
-
-  auto p_lower = new QDoubleSpinBox();
-  p_layout->addWidget(p_lower, 0, 1);
-  p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
-  p_lower->setMaximum(boost::numeric::bounds<double>::highest());
-  p_lower->setValue(this->mValueLimits.getLower());
-
-  p_label = new QLabel("upper limit:");
-  p_layout->addWidget(p_label, 1, 0);
-
-  auto p_upper = new QDoubleSpinBox();
-  p_layout->addWidget(p_upper, 1, 1);
-  p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
-  p_upper->setMaximum(boost::numeric::bounds<double>::highest());
-  p_upper->setValue(this->mValueLimits.getUpper());
-
-  auto p_buttons = new QDialogButtonBox();
-  p_buttons->addButton(QDialogButtonBox::Ok);
-  p_buttons->addButton(QDialogButtonBox::Cancel);
-  p_layout->addWidget(p_buttons, 2, 0, 1, 2);
-
-  QObject::connect(p_buttons->button(QDialogButtonBox::Ok), SIGNAL(clicked()), p_dialog, SLOT(accept()));
-  QObject::connect(p_buttons->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), p_dialog, SLOT(reject()));
-
-  int res = p_dialog->exec();
-
-  if (res == QDialog::Accepted)
-  {
-    this->setLimits(p_lower->value(), p_upper->value());
-  }
-}
-
-void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, int imageX, int imageY)
+void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY)
 {
   if (!this->mData || pEvent->button() != Qt::LeftButton)
     return;
@@ -215,8 +139,8 @@ void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, int imageX, in
     return;
   }
   
-  int x = static_cast<int>(imageX * static_cast<double>(matrix.cols));
-  int y = static_cast<int>(imageY * static_cast<double>(matrix.rows));
+  int x = static_cast<int>(relativeImageX * static_cast<double>(matrix.cols));
+  int y = static_cast<int>(relativeImageY * static_cast<double>(matrix.rows));
 
   if (x < 0 || y < 0 || x >= matrix.cols || y >= matrix.rows)
   {
@@ -339,6 +263,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
     }
 
     case CV_32FC1:
+    case CV_64FC1:
     {
       // convert grayscale to three-channel matrix
       cv::Mat copy = mat.clone();
@@ -541,6 +466,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         switch (in.type())
         {
           case CV_32F:
+          case CV_64F:
           {
             double min_val = this->mValueLimits.getLower();
             double max_val = this->mValueLimits.getUpper();
@@ -647,6 +573,8 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::
   }
 
   this->setInfo("no image loaded");
+
+  this->setValueScalingEnabled(mDataType == DATA_TYPE_MAT || this->mData->getData().type() == CV_32F);
 
   if (!this->mData->getData().empty())
   {
