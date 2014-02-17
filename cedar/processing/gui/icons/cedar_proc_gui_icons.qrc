@@ -16,6 +16,7 @@
     <file>menus/close_all_plots.svg</file>
     <file>decorations/looped.svg</file>
     <file>decorations/record.svg</file>
+    <file>decorations/template.svg</file>
     <file>decorations/from_plugin.svg</file>
     <file>modeicons/select.svg</file>
     <file>modeicons/connect.svg</file>

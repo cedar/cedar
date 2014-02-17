@@ -173,9 +173,10 @@ void cedar::proc::gui::ElementClassList::showList(const std::string& categoryNam
   {
     auto definition = group_entry.second;
     std::vector<QString> decorations;
+    decorations.push_back(":/decorations/template.svg");
     if (definition->getCategory() == categoryName)
     {
-      this->addListEntry(definition->getClassName(), "group template", QIcon(), decorations, "", "", "", definition);
+      this->addListEntry(definition->getClassName(), "group template", definition->getIcon(), decorations, "", "", "", definition);
     }
   }
 }
