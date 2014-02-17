@@ -67,7 +67,9 @@ known issues
 Unreleased
 ==========
 
-none
+- processingIde
+    - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters pf a
+      step. The old-style widget is still accessible in the right-click menu of steps.
 
 Released versions
 =================
