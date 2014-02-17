@@ -66,13 +66,13 @@ class cedar::aux::IntrusivePtrBase
    *
    *        Required for boost::intrusive_ptr.
    */
-  friend void ::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
+  friend void CEDAR_AUX_LIB_EXPORT ::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
 
   /*!@brief Function that decreases the reference counter of the object and deletes it if the counter goes to zero.
    *
    *        Required for boost::intrusive_ptr
    */
-  friend void ::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
+  friend void CEDAR_AUX_LIB_EXPORT ::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

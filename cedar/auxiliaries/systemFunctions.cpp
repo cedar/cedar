@@ -46,16 +46,15 @@
 #endif
 #include <cstdlib>
 
-#if defined CEDAR_OS_UNIX
+#if defined CEDAR_COMPILER_GCC
 #include <stdlib.h>
-#endif // CEDAR_OS_UNIX
+#endif // CEDAR_COMPILER_GCC
 
-#ifdef CEDAR_OS_WINDOWS
-#include <Shlobj.h>
-#include <comutil.h>
-
-#pragma comment(lib, "comsuppw")
-#endif // CEDAR_OS_WINDOWS
+#ifdef CEDAR_COMPILER_MSVC
+  #include <comutil.h>
+  #include <Shlobj.h>
+  #pragma comment(lib, "comsuppw")
+#endif // CEDAR_COMPILER_MSVC
 
 // INTERNALS HEADER
 #define CEDAR_INTERNAL
@@ -77,14 +76,13 @@ void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 std::string cedar::aux::getUserHomeDirectory()
 {
 #ifdef CEDAR_OS_UNIX
-  std::string homedir;
-  char* p_home_env = getenv("HOME");
-  if (p_home_env != NULL)
-  {
-    homedir = p_home_env;
-  }
+  std::string homedir = getenv("HOME");
   return homedir;
 #elif defined CEDAR_OS_WINDOWS
+#ifdef CEDAR_COMPILER_GCC
+  std::string homedir = getenv("USERPROFILE");
+  return homedir;
+#else // CEDAR_COMPILER_GCC
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Profile, KF_FLAG_CREATE, 0, &path)))
   {
@@ -98,6 +96,7 @@ std::string cedar::aux::getUserHomeDirectory()
     //!@todo handle errors
   }
   return "";
+#endif // CEDAR_COMPILER_GCC
 #else
 #error Implement me for this OS!
 #endif // CEDAR_OS_UNIX
