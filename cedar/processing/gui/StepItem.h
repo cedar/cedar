@@ -215,7 +215,7 @@ private:
   void timerEvent(QTimerEvent *pEvent);
 
   //! Sets the current display mode.
-  void setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::Id mode);
+  void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode);
 
   QWidget* createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position);
 
