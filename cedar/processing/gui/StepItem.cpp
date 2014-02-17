@@ -1187,6 +1187,7 @@ void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu& menu, const QPoint& plo
     {
       p_default_plot->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[default_index].mIcon)));
     }
+    p_default_plot->setData(plotPosition);
     QObject::connect(p_default_plot, SIGNAL(triggered()), this, SLOT(openDefinedPlotAction()));
   }
   else
