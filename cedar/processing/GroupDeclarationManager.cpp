@@ -62,13 +62,36 @@ cedar::proc::GroupDeclarationManager::~GroupDeclarationManager()
 
 void cedar::proc::GroupDeclarationManager::addDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration)
 {
-  this->mDeclarations[declaration->getClassName()] = declaration;
+  if (this->mDeclarations.find(declaration->getClassName()) == this->mDeclarations.end())
+  {
+    this->mDeclarations[declaration->getClassName()] = declaration;
+  }
+  else
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "A group declaration with name " + declaration->getClassName() + " already exists."
+    );
+  }
 }
 
 void cedar::proc::GroupDeclarationManager::addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base) const
 {
-  cedar::proc::ConstGroupDeclarationPtr declaration = this->mDeclarations.find(templateName)->second;
-  base->importGroupFromFile(declaration->getGroupName(), declaration->getFileName());
+  auto iter = this->mDeclarations.find(templateName);
+  if (iter != this->mDeclarations.end())
+  {
+    cedar::proc::ConstGroupDeclarationPtr declaration = this->mDeclarations.find(templateName)->second;
+    base->importGroupFromFile(declaration->getGroupName(), declaration->getFileName());
+  }
+  else
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "A group declaration with name " + templateName + " could not be found."
+    );
+  }
 }
 
 const cedar::proc::GroupDeclarationManager::GroupDeclarationMap& cedar::proc::GroupDeclarationManager::getDefinitions() const
