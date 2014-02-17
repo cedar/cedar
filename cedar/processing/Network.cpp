@@ -100,12 +100,16 @@ namespace
     );
 	network_decl->declare();
 
-#ifdef CEDAR_COMPILER_MSVC
+#ifdef CEDAR_OS_WINDOWS
 	// on windows/MSVC, the dynamics dll is not linked because it is unused. This code loads the library manually.
 	{
-    HMODULE module_handle = LoadLibrary("cedardyn"
+    HMODULE module_handle = LoadLibrary(
+#ifndef CEDAR_COMPILER_MSVC
+        "lib"
+#endif // CEDAR_COMPILER_MSVC
+        "cedardyn"
 #ifdef _DEBUG // in debug builds, the library is called cedardynd.dll; ".dll" is automatically appended
-      "d"
+        "d"
 #endif // _DEBUG
       );
     if (module_handle == NULL)
