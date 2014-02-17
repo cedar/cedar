@@ -54,6 +54,7 @@ endif()
 
 if (CEDAR_BUILD_DEBUG_VERSION)
   set (CMAKE_BUILD_TYPE debug)
+  add_definitions( -D_DEBUG )
 else(CEDAR_BUILD_DEBUG_VERSION)
   set (CMAKE_BUILD_TYPE release)
 endif(CEDAR_BUILD_DEBUG_VERSION)
@@ -128,6 +129,11 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
   add_definitions(-std=gnu++0x)
+  	
+  if (WIN32)
+	add_definitions(-Wno-unused-local-typedefs)
+  endif(WIN32)
+
 elseif (MSVC)
   add_definitions(-W2
                   -D_SCL_SECURE_NO_WARNINGS

@@ -54,7 +54,6 @@
 #include <iostream>
 #include <list>
 
-
 class TestModule : public cedar::proc::Step
 {
 public:

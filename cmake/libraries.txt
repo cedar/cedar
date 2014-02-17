@@ -146,6 +146,9 @@ if(NOT QT_FOUND)
 endif(NOT QT_FOUND)
 
 # Boost
+if (WIN32)
+  add_definitions("-D_WIN32_WINNT=0x0601")
+endif(WIN32)
 if (${CMAKE_BUILD_STATIC_LIBS})
   set(Boost_USE_STATIC_LIBS ON)
 else (${CMAKE_BUILD_STATIC_LIBS})

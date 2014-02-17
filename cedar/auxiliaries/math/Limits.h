@@ -37,7 +37,9 @@
 #ifndef CEDAR_AUX_MATH_LIMITS_H
 #define CEDAR_AUX_MATH_LIMITS_H
 
+#ifndef NOMINMAX
 #define NOMINMAX // to avoid Windows issues
+#endif
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/assert.h"
