@@ -59,6 +59,29 @@
 #include <vector>
 
 
+// the following methods make sure that a plugin declaration can be passed around via drag & drop
+Q_DECLARE_METATYPE(cedar::aux::PluginDeclaration*)
+
+QDataStream &operator<<(QDataStream &out, cedar::aux::PluginDeclaration* const &rhs)
+{
+  out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
+  return out;
+}
+
+QDataStream & operator >> (QDataStream &in, cedar::aux::PluginDeclaration *&rhs)
+{
+  in.readRawData(reinterpret_cast<char*>(&rhs), sizeof(rhs));
+  return in;
+}
+
+bool registerPluginDeclaratioMetaType()
+{
+  qRegisterMetaTypeStreamOperators<cedar::aux::PluginDeclaration*>("cedar::aux::PluginDeclaration*");
+  return true;
+}
+
+bool metatype_registered = registerPluginDeclaratioMetaType();
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -247,6 +270,6 @@ void cedar::proc::gui::ElementClassList::addListEntry
   p_item->setToolTip(class_description);
 
 //  p_item->setData(Qt::UserRole, QVariant(fullClassName.c_str()));
-  p_item->setData(Qt::UserRole, qVariantFromValue(static_cast<void*>(const_cast<cedar::aux::PluginDeclaration*>(declaration.get()))));
+  p_item->setData(Qt::UserRole, QVariant::fromValue(const_cast<cedar::aux::PluginDeclaration*>(declaration.get())));
   this->addItem(p_item);
 }

@@ -86,6 +86,9 @@
 #include <set>
 #include <list>
 
+// needed for being able to cast data in drop events to a plugin declaration
+Q_DECLARE_METATYPE(cedar::aux::PluginDeclaration*)
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -325,21 +328,20 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
         target_group = group->getGroup();
         mapped -= group->scenePos();
       }
-      auto pointer = item->data(Qt::UserRole).value<void*>();
-      auto real_pointer = static_cast<const cedar::aux::PluginDeclaration*>(pointer);
+      auto pointer = item->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
 
-      if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(real_pointer))
+      if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(pointer))
       {
         this->createElement(target_group, elem_declaration->getClassName(), mapped);
       }
-      else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(real_pointer))
+      else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(pointer))
       {
         cedar::proc::ElementPtr elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(group_declaration->getClassName(), this->getRootGroup()->getGroup());
         this->getGraphicsItemFor(elem.get())->setPos(mapped);
       }
       else
       {
-        CEDAR_THROW(cedar::aux::NotFoundException, "blurp");
+        CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
       }
     }
   }
