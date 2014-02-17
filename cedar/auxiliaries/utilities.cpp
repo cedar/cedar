@@ -44,7 +44,9 @@
   // for name unmangling/undecorating
   #include <cxxabi.h>
   // for generating stack traces
-  //#include <execinfo.h>
+  #ifndef CEDAR_OS_WINROWS
+    #include <execinfo.h>
+  #endif // CEDAR_OS_WINDOWS
 #endif // CEDAR_COMPILER_GCC
 
 #ifdef CEDAR_COMPILER_MSVC
