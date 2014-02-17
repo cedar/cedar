@@ -228,6 +228,7 @@ void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configur
   type_name = cedar::aux::replace(type_name, "::", ".");
   auto p_item = this->appendHeading(this->mpPropertyTree->invisibleRootItem(), QString::fromStdString(type_name), 1);
   p_item->setExpanded(true);
+  this->mpPropertyTree->setRootIsDecorated(false);
 
   this->append(configurable, p_item, std::string());
 }
