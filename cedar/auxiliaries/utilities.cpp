@@ -284,6 +284,7 @@ void init(CONTEXT context);
 cedar::aux::StackTrace::StackTrace()
 {
 #ifdef CEDAR_COMPILER_GCC
+#ifndef CEDAR_OS_WINDOWS
   // array for the backtraces
   const size_t max_stack_size = 100;
   void *array[max_stack_size];
@@ -306,6 +307,7 @@ cedar::aux::StackTrace::StackTrace()
   }
 
   free (strings);
+#endif // CEDAR_OS_WINDOWS
 #else
   CONTEXT context_record;
   RtlCaptureContext(&context_record);

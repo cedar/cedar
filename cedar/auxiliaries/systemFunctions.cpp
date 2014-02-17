@@ -107,6 +107,11 @@ std::string cedar::aux::getUserApplicationDataDirectory()
 #ifdef CEDAR_OS_UNIX
   return cedar::aux::getUserHomeDirectory();
 #elif defined CEDAR_OS_WINDOWS
+
+#ifdef CEDAR_COMPILER_GCC
+  std::string homedir = getenv("APPDATA");
+  return homedir;
+#else // CEDAR_COMPILER_GCC
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, 0, &path)))
   {
@@ -120,6 +125,7 @@ std::string cedar::aux::getUserApplicationDataDirectory()
     //!@todo handle errors
   }
   return "";
+#endif // CEDAR_COMPILER_GCC
 #else // CEDAR_OS_WINDOWS
 #error Implement me for this OS!
 #endif // CEDAR_OS_WINDOWS
