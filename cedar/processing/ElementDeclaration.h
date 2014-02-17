@@ -75,8 +75,8 @@ namespace cedar
       ElementFactoryManager;
   }
 }
-CEDAR_PROC_EXPORT_SINGLETON(cedar::proc::ElementDeclarationManager);
-CEDAR_PROC_EXPORT_SINGLETON(cedar::proc::ElementFactoryManager);
+CEDAR_PROC_SINGLETON(ElementDeclarationManager);
+CEDAR_PROC_SINGLETON(ElementFactoryManager);
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to

@@ -49,6 +49,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -133,6 +134,19 @@ namespace
                                    );
     group_declaration->setIconPath(":/steps/field_temp.svg");
     group_declaration->declare();
+
+    cedar::proc::GroupDeclarationPtr field_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                       "one-dimensional field",
+                                       "resource://groupTemplates/fieldTemplates.json",
+                                       "one-dimensional field",
+                                       "DFT"
+                                     )
+                                   );
+    field_declaration->setIconPath(":/steps/field_temp.svg");
+    field_declaration->declare();
 
     return true;
   }
@@ -1924,7 +1938,7 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
   }
 }
 
-void cedar::proc::Group::importGroupFromFile(const std::string& groupName, const std::string& fileName)
+cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::string& groupName, const std::string& fileName)
 {
   cedar::aux::ConfigurationNode configuration;
   boost::property_tree::read_json(fileName, configuration);
@@ -1939,6 +1953,7 @@ void cedar::proc::Group::importGroupFromFile(const std::string& groupName, const
       this->add(imported_group, this->getUniqueIdentifier("imported group"));
       group_node.put("name", this->getUniqueIdentifier(group_node.get<std::string>("name")));
       imported_group->readConfiguration(group_node);
+      return imported_group;
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {
@@ -1948,5 +1963,38 @@ void cedar::proc::Group::importGroupFromFile(const std::string& groupName, const
   catch (const boost::property_tree::ptree_bad_path&)
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + fileName);
+  }
+}
+
+cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string& stepName, const std::string& fileName)
+{
+  cedar::aux::ConfigurationNode configuration;
+  boost::property_tree::read_json(fileName, configuration);
+
+  try
+  {
+    cedar::aux::ConfigurationNode& steps_node = configuration.get_child("steps");
+    try
+    {
+      for (auto step_node : steps_node)
+      {
+        if (step_node.second.get<std::string>("name") == stepName)
+        {
+          cedar::proc::ElementPtr imported_step = cedar::proc::ElementDeclarationManagerSingleton::getInstance()->allocate(step_node.first);
+          this->add(imported_step, this->getUniqueIdentifier("imported step"));
+          step_node.second.put("name", this->getUniqueIdentifier(step_node.second.get<std::string>("name")));
+          imported_step->readConfiguration(step_node.second);
+          return imported_step;
+        }
+      }
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+      CEDAR_THROW(cedar::aux::NotFoundException, "Could not find step with name " + stepName + " in file " + fileName);
+    }
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any steps in file " + fileName);
   }
 }

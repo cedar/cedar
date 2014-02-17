@@ -489,7 +489,9 @@ public:
 
   bool isRoot() const;
 
-  void importGroupFromFile(const std::string& groupName, const std::string& fileName);
+  cedar::proc::ElementPtr importGroupFromFile(const std::string& groupName, const std::string& fileName);
+
+  cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

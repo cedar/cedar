@@ -76,13 +76,31 @@ void cedar::proc::GroupDeclarationManager::addDeclaration(cedar::proc::ConstGrou
   }
 }
 
-void cedar::proc::GroupDeclarationManager::addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base) const
+cedar::proc::ElementPtr cedar::proc::GroupDeclarationManager::addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base) const
 {
   auto iter = this->mDeclarations.find(templateName);
   if (iter != this->mDeclarations.end())
   {
     cedar::proc::ConstGroupDeclarationPtr declaration = this->mDeclarations.find(templateName)->second;
-    base->importGroupFromFile(declaration->getGroupName(), declaration->getFileName());
+    try
+    {
+      return base->importGroupFromFile(declaration->getGroupName(), declaration->getFileName());
+    }
+    catch (cedar::aux::NotFoundException& exc)
+    {
+      try
+      {
+        return base->importStepFromFile(declaration->getGroupName(), declaration->getFileName());
+      }
+      catch (cedar::aux::NotFoundException& exc)
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::NotFoundException,
+          "A group declaration with name " + templateName + " could not be found."
+        );
+      }
+    }
   }
   else
   {

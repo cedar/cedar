@@ -71,7 +71,7 @@ std::string cedar::proc::GroupDeclaration::getClassName() const
 
 std::string cedar::proc::GroupDeclaration::getFileName() const
 {
-  return this->mFileName.absolute().toString();
+  return this->mFileName.absolute(false).toString();
 }
 
 std::string cedar::proc::GroupDeclaration::getGroupName() const
