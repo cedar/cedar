@@ -324,17 +324,6 @@ void run_test()
   cedar::proc::GroupPtr network_importing(new cedar::proc::Group());
   network_importing->importGroupFromFile("network child", "Nested.json");
 
-  cedar::proc::GroupDeclarationPtr group_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "Two-layer field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "two-layer",
-                                       "DFT"
-                                     )
-                                   );
-  group_declaration->declare();
   cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("Two-layer field", network_importing);
 
   // return
