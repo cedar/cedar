@@ -131,6 +131,7 @@ namespace
                                        "DFT"
                                      )
                                    );
+    group_declaration->setIconPath(":/steps/field_temp.svg");
     group_declaration->declare();
 
     return true;
