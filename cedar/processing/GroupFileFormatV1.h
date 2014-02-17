@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Responsible for reading and writing groups to boost configuration trees.
