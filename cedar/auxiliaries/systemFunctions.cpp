@@ -161,7 +161,7 @@ std::vector<std::string> cedar::aux::listResourcePaths()
   return paths;
 }
 
-std::string cedar::aux::locateResource(const std::string& resourcePath)
+std::string cedar::aux::locateResource(const std::string& resourcePath, bool showInLog)
 {
   bool is_directory = false;
   std::vector<std::string> paths = cedar::aux::listResourcePaths();
@@ -172,11 +172,14 @@ std::string cedar::aux::locateResource(const std::string& resourcePath)
     {
       if (boost::filesystem::is_regular_file(path))
       {
-        cedar::aux::LogSingleton::getInstance()->systemInfo
-        (
-          "Found resource \"" + resourcePath + "\" at \"" + path + "\".",
-          "std::string cedar::aux::locateResource(const std::string&)"
-        );
+        if (showInLog)
+        {
+          cedar::aux::LogSingleton::getInstance()->systemInfo
+          (
+            "Found resource \"" + resourcePath + "\" at \"" + path + "\".",
+            "std::string cedar::aux::locateResource(const std::string&)"
+          );
+        }
         return path;
       }
       else

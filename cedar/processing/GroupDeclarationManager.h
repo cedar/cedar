@@ -47,6 +47,7 @@
 #include "cedar/processing/GroupDeclarationManager.fwd.h"
 #include "cedar/processing/GroupDeclaration.fwd.h"
 #include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/Element.fwd.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -84,7 +85,7 @@ public:
 public:
   void addDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
 
-  void addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base) const;
+  cedar::proc::ElementPtr addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base) const;
 
   const GroupDeclarationMap& getDefinitions() const;
 

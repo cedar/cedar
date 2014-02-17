@@ -334,7 +334,8 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
       }
       else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(real_pointer))
       {
-        cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(group_declaration->getClassName(), this->getRootGroup()->getGroup());
+        cedar::proc::ElementPtr elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(group_declaration->getClassName(), this->getRootGroup()->getGroup());
+        this->getGraphicsItemFor(elem.get())->setPos(mapped);
       }
       else
       {
