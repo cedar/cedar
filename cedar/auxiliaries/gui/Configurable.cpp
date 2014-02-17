@@ -58,8 +58,7 @@
 #include <QLabel>
 
 #define PARAMETER_NAME_COLUMN 0
-#define PARAMETER_CHANGED_FLAG_COLUMN 1
-#define PARAMETER_EDITOR_COLUMN 2
+#define PARAMETER_EDITOR_COLUMN 1
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,16 +135,6 @@ public:
           case PARAMETER_NAME_COLUMN:
             return QString::fromStdString(this->mParameter->getName());
 
-          case PARAMETER_CHANGED_FLAG_COLUMN:
-            if (this->mParameter->isChanged())
-            {
-              return "The parameter was changed since the last save.";
-            }
-            else
-            {
-              return "";
-            }
-
           default:
             return "";
         }
@@ -179,17 +168,15 @@ QWidget(pParent)
   this->mpPropertyTree->setAlternatingRowColors(true);
 
   // setup header
-  this->mpPropertyTree->setColumnCount(3);
+  this->mpPropertyTree->setColumnCount(2);
   QStringList header_labels;
-  header_labels << "Property" << "" << "Value";
+  header_labels << "Property" << "Value";
   this->mpPropertyTree->setHeaderLabels(header_labels);
 
   // make first section stretch
   this->mpPropertyTree->header()->setResizeMode(PARAMETER_NAME_COLUMN, QHeaderView::Interactive);
-  this->mpPropertyTree->header()->setResizeMode(PARAMETER_CHANGED_FLAG_COLUMN, QHeaderView::Fixed);
   this->mpPropertyTree->header()->setResizeMode(PARAMETER_EDITOR_COLUMN, QHeaderView::Stretch);
   this->mpPropertyTree->header()->resizeSection(PARAMETER_NAME_COLUMN, 150);
-  this->mpPropertyTree->header()->resizeSection(PARAMETER_CHANGED_FLAG_COLUMN, 20);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -310,11 +297,6 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
   pNode->addChild(parameter_item);
   this->mpPropertyTree->openPersistentEditor(parameter_item, PARAMETER_EDITOR_COLUMN);
   this->updateChangeState(parameter_item, parameter.get());
-
-  parameter_item->setTextAlignment(PARAMETER_CHANGED_FLAG_COLUMN, Qt::AlignHCenter | Qt::AlignVCenter);
-  QFont changed_font = parameter_item->font(PARAMETER_CHANGED_FLAG_COLUMN);
-  changed_font.setBold(true);
-  parameter_item->setFont(PARAMETER_CHANGED_FLAG_COLUMN, changed_font);
 
   QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
 
@@ -488,12 +470,7 @@ QTreeWidgetItem* cedar::aux::gui::Configurable::getItemForParameter(cedar::aux::
 
 void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter)
 {
-  if (pParameter->isChanged())
-  {
-    item->setText(PARAMETER_CHANGED_FLAG_COLUMN, "*");
-  }
-  else
-  {
-    item->setText(PARAMETER_CHANGED_FLAG_COLUMN, "");
-  }
+  QFont font = item->font(PARAMETER_NAME_COLUMN);
+  font.setBold(pParameter->isChanged());
+  item->setFont(PARAMETER_NAME_COLUMN, font);
 }
