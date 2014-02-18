@@ -57,6 +57,7 @@ namespace cedar
 {
   namespace proc
   {
+    //!@todo These typedefs are redundant
     /*! Manages declarations of element classes.
      */
     typedef
@@ -67,14 +68,18 @@ namespace cedar
     typedef
       cedar::aux::Singleton<cedar::proc::ElementManager>
       ElementManagerSingleton;
-  }
 
-  namespace aux
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<cedar::proc::ElementManager>);
-    //!@endcond
+    typedef
+      cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
+      ElementDeclarationManager;
+
+    typedef
+      cedar::aux::FactoryManager<cedar::proc::ElementPtr>
+      ElementFactoryManager;
   }
 }
+
+CEDAR_PROC_SINGLETON(ElementDeclarationManager);
+CEDAR_PROC_SINGLETON(ElementFactoryManager);
 
 #endif // CEDAR_PROC_DECLARATION_REGISTRY_H

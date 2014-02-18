@@ -323,13 +323,20 @@ void cedar::proc::gui::Ide::duplicateStep()
   QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
 
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
+  QPointF center(0.0, 0.0);
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+	center += selected_items.at(i)->pos();
+  }
+  center /= static_cast<qreal>(selected_items.size());
+
   for (int i = 0; i < selected_items.size(); ++i)
   {
     if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
     {
       try
       {
-        this->mGroup->duplicate(new_pos, p_base->getElement()->getName());
+        this->mGroup->duplicate(new_pos - (center - p_base->pos()), p_base->getElement()->getName());
       }
       catch (cedar::aux::ExceptionBase& exc)
       {

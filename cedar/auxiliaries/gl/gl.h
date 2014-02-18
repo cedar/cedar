@@ -37,7 +37,9 @@
 #include "cedar/configuration.h"
 
 #if defined CEDAR_OS_WINDOWS
-  #define NOMINMAX
+  #ifndef NOMINMAX
+    #define NOMINMAX
+  #endif
   #include <Windows.h>
   #include <gl/GL.h>
 #elif defined CEDAR_OS_APPLE
