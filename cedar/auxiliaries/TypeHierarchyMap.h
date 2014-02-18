@@ -144,6 +144,10 @@ public:
       {
       }
 
+      virtual ~Node()
+      {
+      }
+
       //!@brief Returns the string version of the type held by this node.
       virtual std::string getTypeString() const = 0;
 
