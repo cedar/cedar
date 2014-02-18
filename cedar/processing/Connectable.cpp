@@ -745,20 +745,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::strin
 {
   cedar::proc::DataSlotPtr slot = this->declareData(DataRole::INPUT, name, mandatory);
 
-  this->getInputSlot(name)->connectToDataRemovedSignal
-  (
-    boost::bind
-    (
-      &cedar::proc::Connectable::removeLock,
-      this,
-      _1,
-      cedar::aux::LOCK_TYPE_READ,
-      this->getLockSetForRole(DataRole::INPUT)
-    )
-  );
-
   return slot;
-//  return this->declareData(DataRole::INPUT, name, mandatory);
 }
 
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInputCollection(const std::string& name)
