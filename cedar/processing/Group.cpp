@@ -1941,15 +1941,19 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
 
 cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::string& groupName, const std::string& fileName)
 {
+  // first, read in the configuration tree
   cedar::aux::ConfigurationNode configuration;
   boost::property_tree::read_json(fileName, configuration);
 
   try
   {
+    // try to access the "groups" node
     cedar::aux::ConfigurationNode& groups_node = configuration.get_child("groups");
     try
     {
+      // try to access the group node with name "groupName"
       cedar::aux::ConfigurationNode& group_node = groups_node.get_child(groupName);
+      // create, add, and configure
       cedar::proc::GroupPtr imported_group(new cedar::proc::Group());
       this->add(imported_group, this->getUniqueIdentifier("imported group"));
       group_node.put("name", this->getUniqueIdentifier(group_node.get<std::string>("name")));
@@ -1958,6 +1962,7 @@ cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::strin
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {
+      // could not find given group, abort
       CEDAR_THROW
       (
         cedar::aux::NotFoundException,
@@ -1967,22 +1972,27 @@ cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::strin
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
+    // could not find a "groups" node, abort
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + fileName);
   }
 }
 
 cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string& stepName, const std::string& fileName)
 {
+  // first, read in the configuration tree
   cedar::aux::ConfigurationNode configuration;
   boost::property_tree::read_json(fileName, configuration);
 
   try
   {
+    // try to access the "steps" node
     cedar::aux::ConfigurationNode& steps_node = configuration.get_child("steps");
+    // for every node in "steps", check if this node matches the name
     for (auto step_node : steps_node)
     {
       if (step_node.second.get<std::string>("name") == stepName)
       {
+        // we found our step, add to group and configure it!
         cedar::proc::ElementPtr imported_step
           = cedar::proc::ElementDeclarationManagerSingleton::getInstance()->allocate(step_node.first);
         this->add(imported_step, this->getUniqueIdentifier("imported step"));
@@ -1991,10 +2001,12 @@ cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string
         return imported_step;
       }
     }
+    // could not find a matching step, abort
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not find step with name " + stepName + " in file " + fileName);
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
+    // could not find a "steps" node, abort
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any steps in file " + fileName);
   }
 }
