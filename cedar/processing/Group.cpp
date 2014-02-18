@@ -1958,7 +1958,11 @@ cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::strin
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {
-      CEDAR_THROW(cedar::aux::NotFoundException, "Could not find group with name " + groupName + " in file " + fileName);
+      CEDAR_THROW
+      (
+        cedar::aux::NotFoundException,
+        "Could not find group with name " + groupName + " in file " + fileName
+      );
     }
   }
   catch (const boost::property_tree::ptree_bad_path&)
@@ -1975,24 +1979,19 @@ cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string
   try
   {
     cedar::aux::ConfigurationNode& steps_node = configuration.get_child("steps");
-    try
+    for (auto step_node : steps_node)
     {
-      for (auto step_node : steps_node)
+      if (step_node.second.get<std::string>("name") == stepName)
       {
-        if (step_node.second.get<std::string>("name") == stepName)
-        {
-          cedar::proc::ElementPtr imported_step = cedar::proc::ElementDeclarationManagerSingleton::getInstance()->allocate(step_node.first);
-          this->add(imported_step, this->getUniqueIdentifier("imported step"));
-          step_node.second.put("name", this->getUniqueIdentifier(step_node.second.get<std::string>("name")));
-          imported_step->readConfiguration(step_node.second);
-          return imported_step;
-        }
+        cedar::proc::ElementPtr imported_step
+          = cedar::proc::ElementDeclarationManagerSingleton::getInstance()->allocate(step_node.first);
+        this->add(imported_step, this->getUniqueIdentifier("imported step"));
+        step_node.second.put("name", this->getUniqueIdentifier(step_node.second.get<std::string>("name")));
+        imported_step->readConfiguration(step_node.second);
+        return imported_step;
       }
     }
-    catch (const boost::property_tree::ptree_bad_path&)
-    {
-      CEDAR_THROW(cedar::aux::NotFoundException, "Could not find step with name " + stepName + " in file " + fileName);
-    }
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find step with name " + stepName + " in file " + fileName);
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
