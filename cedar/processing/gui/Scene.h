@@ -370,7 +370,9 @@ private slots:
    */
   void itemSelected();
 
+  //!@todo importGroup and importStep share a lot of code
   void importGroup();
+  void importStep();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

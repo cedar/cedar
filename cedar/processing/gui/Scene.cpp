@@ -766,7 +766,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
-  QAction *p_importGroup = menu.addAction("import group from file");
+  QAction* p_importGroup = menu.addAction("import group from file");
+  QAction* p_importStep = menu.addAction("import step from file");
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
@@ -785,6 +786,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   else if (a == p_importGroup)
   {
     this->importGroup();
+  }
+  else if (a == p_importStep)
+  {
+    this->importStep();
   }
   else if (a == p_addSickyNode)
   {
@@ -1322,39 +1327,40 @@ const std::vector<cedar::proc::gui::StickyNote* > cedar::proc::gui::Scene::getSt
   return this->mStickyNotes;
 }
 
+class GroupSelectDialog : public QDialog
+{
+public:
+  GroupSelectDialog(const std::vector<std::string>& groupNames, QWidget* pParent)
+  :
+  QDialog(pParent),
+  mpGroupNamesBox(new QComboBox())
+  {
+    this->setWindowTitle(QString("Select a group."));
+    QVBoxLayout* p_layout = new QVBoxLayout();
+    p_layout->addWidget(mpGroupNamesBox);
+    QDialogButtonBox* p_button_box = new QDialogButtonBox();
+    p_button_box->addButton(QDialogButtonBox::StandardButton::Ok);
+    p_button_box->addButton(QDialogButtonBox::StandardButton::Cancel);
+
+    this->connect(p_button_box, SIGNAL(accepted()), this, SLOT(accept()));
+    this->connect(p_button_box, SIGNAL(rejected()), this, SLOT(reject()));
+    p_layout->addWidget(p_button_box);
+    for (auto name : groupNames)
+    {
+      mpGroupNamesBox->addItem(QString::fromStdString(name));
+    }
+    this->setLayout(p_layout);
+  }
+  std::string returnChosenGroup()
+  {
+    return mpGroupNamesBox->currentText().toStdString();
+  }
+
+  QComboBox* mpGroupNamesBox;
+};
+
 void cedar::proc::gui::Scene::importGroup()
 {
-  class GroupSelectDialog : public QDialog
-  {
-  public:
-    GroupSelectDialog(const std::vector<std::string>& groupNames, QWidget* pParent)
-    :
-    QDialog(pParent),
-    mpGroupNamesBox(new QComboBox())
-    {
-      this->setWindowTitle(QString("Select a group."));
-      QVBoxLayout* p_layout = new QVBoxLayout();
-      p_layout->addWidget(mpGroupNamesBox);
-      QDialogButtonBox* p_button_box = new QDialogButtonBox();
-      p_button_box->addButton(QDialogButtonBox::StandardButton::Ok);
-      p_button_box->addButton(QDialogButtonBox::StandardButton::Cancel);
-
-      this->connect(p_button_box, SIGNAL(accepted()), this, SLOT(accept()));
-      this->connect(p_button_box, SIGNAL(rejected()), this, SLOT(reject()));
-      p_layout->addWidget(p_button_box);
-      for (auto name : groupNames)
-      {
-        mpGroupNamesBox->addItem(QString::fromStdString(name));
-      }
-      this->setLayout(p_layout);
-    }
-    std::string returnChosenGroup()
-    {
-      return mpGroupNamesBox->currentText().toStdString();
-    }
-
-    QComboBox* mpGroupNamesBox;
-  };
 
   cedar::aux::DirectoryParameterPtr last_dir
     = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
@@ -1398,6 +1404,58 @@ void cedar::proc::gui::Scene::importGroup()
           QMessageBox::Warning,
           QString("No groups found"),
           QString("Could not find any groups in file " ) + file,
+          QMessageBox::Ok,
+          this->mpMainWindow
+        );
+    p_message->exec();
+  }
+}
+
+void cedar::proc::gui::Scene::importStep()
+{
+
+  cedar::aux::DirectoryParameterPtr last_dir
+    = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+  QString file = QFileDialog::getOpenFileName(this->mpMainWindow, // parent
+                                              "Select from which file to load a group", // caption
+                                              last_dir->getValue().absolutePath(), // initial directory
+                                              "json (*.json)" // filter(s), separated by ';;'
+                                              );
+
+  if (!file.isEmpty())
+  {
+    cedar::aux::ConfigurationNode configuration;
+    boost::property_tree::read_json(file.toStdString(), configuration);
+
+    // is there a node groups?
+    if (configuration.find("steps") != configuration.not_found())
+    {
+      const cedar::aux::ConfigurationNode& steps_node = configuration.get_child("steps");
+      std::vector<std::string> step_names;
+      for (auto step : steps_node)
+      {
+        step_names.push_back(step.second.get<std::string>("name"));
+      }
+      // found at least one group
+      if (step_names.size() > 0)
+      {
+        // open selection dialog
+        GroupSelectDialog* group_dialog(new GroupSelectDialog(step_names, this->mpMainWindow));
+        int result = group_dialog->exec();
+        if (result == QDialog::Accepted)
+        {
+          // import selected group
+          mGroup->getGroup()->importStepFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+        }
+        return;
+      }
+    }
+    QMessageBox* p_message
+      = new QMessageBox
+        (
+          QMessageBox::Warning,
+          QString("No groups found"),
+          QString("Could not find any steps in file " ) + file,
           QMessageBox::Ok,
           this->mpMainWindow
         );
