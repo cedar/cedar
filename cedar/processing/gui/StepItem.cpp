@@ -990,14 +990,6 @@ void cedar::proc::gui::StepItem::showPlot
   p_dock_widget->show();
 }
 
-void cedar::proc::gui::StepItem::openPropertiesOldWidget()
-{
-  cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
-  auto p_dock_widget = this->createDockWidget("Properties", props);
-  props->display(this->getStep());
-  p_dock_widget->show();
-}
-
 void cedar::proc::gui::StepItem::openActionsDock()
 {
   QWidget* p_actions = new QWidget();
@@ -1061,9 +1053,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QAction* p_properties = menu.addAction("open properties widget");
   QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
   p_properties->setIcon(QIcon(":/menus/properties.svg"));
-
-  p_properties = menu.addAction("open old properties widget");
-  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openPropertiesOldWidget()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
