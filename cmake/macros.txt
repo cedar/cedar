@@ -396,10 +396,10 @@ macro(cedar_add_library)
     set_target_properties(${libraryName} PROPERTIES FOLDER "cedar libraries")
   endif (MSVC)
   
-  if (MSVC)
+  if (WIN32)
     set(LIB_EXPORTS "CEDAR_LIB_EXPORTS_${CAP_LIB_NAME}")
     set_target_properties(${libraryName} PROPERTIES COMPILE_FLAGS -D${LIB_EXPORTS})
-  endif (MSVC)
+  endif (WIN32)
 
   # link library to all relevant cedar and third party libraries
   target_link_libraries(${libraryName} ${CEDAR_THIRD_PARTY_LIBS} ${library_LINK_LIBRARIES})

@@ -329,14 +329,14 @@ namespace cedar
     {
       double result;
       std::istringstream stream(string);
-      if((stream >> result).fail())
+      if((stream >> result).fail()|| string.find("#") != std::string::npos)
       {
-        if (string == "inf")
+        if (string == "inf" || string == "1.#INF")
         {
           //!@todo num_limits<>::has_infinity could help make this more generic/remove the need for double, float specialization
           return std::numeric_limits<double>::infinity();
         }
-        else if (string == "-inf")
+        else if (string == "-inf" || string == "-1.#INF")
         {
           return -std::numeric_limits<double>::infinity();
         }
@@ -359,13 +359,14 @@ namespace cedar
     {
       float result;
       std::istringstream stream(string);
-      if((stream >> result).fail())
+
+      if((stream >> result).fail() || string.find("#") != std::string::npos)
       {
-        if (string == "inf")
+        if (string == "inf" || string == "1.#INF")
         {
           return std::numeric_limits<float>::infinity();
         }
-        else if (string == "-inf")
+        else if (string == "-inf" || string == "-1.#INF" )
         {
           return -std::numeric_limits<float>::infinity();
         }

@@ -150,15 +150,17 @@ namespace cedar
   {
     //!@brief The manager of all sigmoind instances
     typedef cedar::aux::FactoryManager<cedar::dev::ChannelPtr> ChannelManager;
-
-    //!@brief The singleton object of the TransferFunctionFactory.
-    typedef cedar::aux::Singleton<cedar::dev::ChannelManager> ChannelManagerSingleton;
-
+//
+//    //!@brief The singleton object of the TransferFunctionFactory.
+//    typedef cedar::aux::Singleton<cedar::dev::ChannelManager> ChannelManagerSingleton;
+//
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::ChannelManager>);
+//    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::ChannelManager>);
     //!@endcond
   }
 }
+
+CEDAR_DEV_SINGLETON(ChannelManager);
 
 
 #endif // CEDAR_DEV_CHANNEL_H
