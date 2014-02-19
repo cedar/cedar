@@ -45,7 +45,6 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -170,8 +169,8 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
     {
       return cedar::proc::gui::CONNECT_NO;
     }
-    // ... source and target are not in the same network
-    else if (this->getTrigger()->getNetwork() != p_step_item->getStep()->getNetwork())
+    // ... source and target are not in the same group
+    else if (this->getTrigger()->getGroup() != p_step_item->getStep()->getGroup())
     {
       return cedar::proc::gui::CONNECT_NO;
     }
@@ -189,8 +188,8 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
     {
       return cedar::proc::gui::CONNECT_NO;
     }
-    // ... source and target are not in the same network
-    else if (this->getTrigger()->getNetwork() != p_trigger_item->getTrigger()->getNetwork())
+    // ... source and target are not in the same group
+    else if (this->getTrigger()->getGroup() != p_trigger_item->getTrigger()->getGroup())
     {
       return cedar::proc::gui::CONNECT_NO;
     }
@@ -261,7 +260,7 @@ void cedar::proc::gui::TriggerItem::triggerStopped()
 
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
-  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
   CEDAR_DEBUG_ASSERT(p_scene);
 
   if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->mTrigger))
@@ -272,7 +271,6 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     QAction *p_single = menu.addAction("single step");
 
     menu.addSeparator();
-    p_scene->networkGroupingContextMenuEvent(menu);
 
     if (looped_trigger->isRunningNolocking())
     {
@@ -308,7 +306,6 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
   else
   {
     QMenu menu;
-    p_scene->networkGroupingContextMenuEvent(menu);
     menu.exec(event->screenPos());
   }
 }

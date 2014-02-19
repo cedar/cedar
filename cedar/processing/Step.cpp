@@ -42,7 +42,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -131,6 +131,13 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
+{
+  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
+  this->cedar::proc::Connectable::revalidateInputSlot(slot);
+}
+
 void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
   this->mpConnectionLock->lockForRead();
@@ -138,10 +145,10 @@ void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
   this->lockParameters(parameterAccessType);
 }
 
-void cedar::proc::Step::unlock() const
+void cedar::proc::Step::unlock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
   this->mpConnectionLock->unlock();
-  this->unlockParameters();
+  this->unlockParameters(parameterAccessType);
   this->unlockData();
 }
 
@@ -243,13 +250,15 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
 }
 
 /*! This method takes care of changing the step's name in the registry as well.
+ *
+ * @todo Unify in element using boost signals/slots
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
+  if (cedar::proc::GroupPtr parent_network = this->getGroup())
   {
     // update the name
-    boost::static_pointer_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
+    parent_network->updateObjectName(this);
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();
@@ -345,7 +354,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     this->mLastComputeCall = clock();
   }
-
+  
   // start measuring the execution time.
   clock_t run_start = clock();
 
@@ -600,15 +609,4 @@ bool cedar::proc::Step::isThreaded() const
 void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
   this->revalidateInputSlot(slot);
-}
-
-void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
-{
-  //!@todo Why is this not in cedar::proc::Connectable?
-  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
-  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
-  //!@todo This method does more than its name suggests: it doesn't just revalidate, it also reconnects.
-  this->inputConnectionChanged(slot);
-
-  this->getInputValidity(slot);
 }

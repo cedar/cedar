@@ -67,7 +67,9 @@ known issues
 Unreleased
 ==========
 
-none
+- cedar::proc
+  - Groups now work as intended: one can freely move elements between groups, existing connections are preserved, using 
+    group connectors if necessary. In the gui, grouping is drag-and-drop-based.
 
 Released versions
 =================
