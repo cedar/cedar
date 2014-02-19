@@ -55,13 +55,6 @@
 using namespace cedar::aux::net;
 using namespace std;
 
-struct three_t 
-{
-  float r;
-  float g;
-  float b;
-};
-
 int main()
 {
   cedar::aux::LogFile log_file("net.log");
@@ -114,32 +107,34 @@ int main()
 
 #if 1
   // preparing ...
-  cv::Mat mat= cv::Mat::eye(SIZE, 2, CV_64F);
-  cv::Mat mat2= cv::Mat::zeros(SIZE, 2, CV_64F);
-  cv::Mat mat3= cv::Mat::zeros(16, 2, CV_64F);
-  cv::Mat mat6= cv::Mat::zeros(SIZE, 2, CV_64F);
-  cv::Mat mat7= cv::Mat::zeros(SIZE, 2, CV_64F);
-  cv::Mat mat8= cv::Mat::zeros(20, 2, CV_32FC3); // multichannel
-  cv::Mat mat9= cv::Mat::zeros(20, 2, CV_32FC3); // multichannel
+  cv::Mat mat = cv::Mat::eye(SIZE, 2, CV_64F);
+  cv::Mat mat2 = cv::Mat::zeros(SIZE, 2, CV_64F);
+  cv::Mat mat3 = cv::Mat::zeros(16, 2, CV_64F);
+  cv::Mat mat6 = cv::Mat::zeros(SIZE, 2, CV_64F);
+  cv::Mat mat7 = cv::Mat::zeros(SIZE, 2, CV_64F);
+  cv::Mat mat8 = cv::Mat::zeros(20, 2, CV_32FC3); // multichannel
+  cv::Mat mat9 = cv::Mat::zeros(20, 2, CV_32FC3); // multichannel
 
   for (int i=0; i < SIZE; i++)
   {
-    mat.at<TestType>(i,0)= 300 + i;
-    mat.at<TestType>(i,1)= SIZE + 500 + i;
+    mat.at<TestType>(i,0) = 300 + i;
+    mat.at<TestType>(i,1) = SIZE + 500 + i;
 
-    mat6.at<TestType>(i,0)= i;
-    mat6.at<TestType>(i,1)= 100 + i;
+    mat6.at<TestType>(i,0) = i;
+    mat6.at<TestType>(i,1) = 100 + i;
 
-    mat2.at<TestType>(i,0)= -1;
-    mat2.at<TestType>(i,1)= -1;
+    mat2.at<TestType>(i,0) = -1;
+    mat2.at<TestType>(i,1) = -1;
   }
   // mat8 is a bit smaller, but has multi channels
-  for (int i=0; i < 20; i++)
+  for (int i = 0; i < 20; ++i)
   {
-    struct three_t rgb = {1.0, 2.0, static_cast<float>(i)};
-
-    mat8.at<three_t>(i,0)= rgb;
-    mat8.at<three_t>(i,1)= rgb;
+    cv::Vec3f rgb;
+    rgb[0] = 1.0;
+    rgb[1] = 2.0;
+    rgb[2] = static_cast<float>(i);
+    mat8.at<cv::Vec3f>(i,0) = rgb;
+    mat8.at<cv::Vec3f>(i,1) = rgb;
   }
 
   try
@@ -154,12 +149,12 @@ int main()
     BlockingReader<cv::Mat> myMatReader8(MYPORT"8");
 
     myMatWriter.write(mat);
-    mat2= myMatReader2.read();
-    mat3= myMatReader3.read();
+    mat2 = myMatReader2.read();
+    mat3 = myMatReader3.read();
 
     // writing over same channel (mat6 is same size as mat)
     myMatWriter.write(mat6);
-    mat7= myMatReader2.read(); 
+    mat7 = myMatReader2.read();
 
     // test it
     for (int i=0; i < SIZE; i++)
@@ -180,15 +175,15 @@ int main()
     }
 
     myMatWriter8.write(mat8);
-    mat9= myMatReader8.read();
+    mat9 = myMatReader8.read();
 
     for (int i= 0; i < 20; i++)
     {
-      struct three_t rgb;
+      cv::Vec3f rgb;
 
-      rgb= mat9.at<three_t>(i,0);
+      rgb = mat9.at<cv::Vec3f>(i,0);
 
-      if (rgb.b != i)
+      if (rgb[2] != i)
       {
         mat_errors++;
       }
@@ -205,7 +200,7 @@ int main()
   {
     log_file << "ERROR with cv::Mat simple write() / read()" << std::endl;
     errors++;
-    mat_errors= 0;
+    mat_errors = 0;
   }
   else
   {
@@ -221,23 +216,23 @@ int main()
     typedef cv::Mat_<float> floatMat_;
     floatMat_ mat4, mat5;
   
-    mat_errors= 0;
+    mat_errors = 0;
     Writer< cv::Mat_<float> > myMatWriter2_1(MYPORT"_");
     BlockingReader< cv::Mat_<float> > myMatReader2_1(MYPORT"_");
 
-    mat4= floatMat_(2,2);
+    mat4 = floatMat_(2,2);
 
 
     for (int i = 0; i < mat4.rows; i++)
     {
-      for(int j = 0; j < mat4.cols; j++)
+      for (int j = 0; j < mat4.cols; j++)
       {
-              mat4(i,j)= 79;
+        mat4(i,j)= 79;
       }
    }
 
-    myMatWriter2_1.write( mat4 );
-    mat5= myMatReader2_1.read(); 
+    myMatWriter2_1.write(mat4);
+    mat5 = myMatReader2_1.read();
 
 
     if (mat5(1,1) != mat4(1,1))
@@ -267,7 +262,7 @@ int main()
   {
     log_file << "ERROR with cv::Mat_ simple" << std::endl;
     errors++;
-    mat_errors= 0;
+    mat_errors = 0;
   }
   else
   {
@@ -313,7 +308,7 @@ int main()
     return 1;
   }
 #endif
-std::cout << "done" << std::endl;
+  std::cout << "done, encountered " << static_cast<unsigned int>(errors) << " errors" << std::endl;
 
   return errors;
 }
