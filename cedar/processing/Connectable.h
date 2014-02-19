@@ -379,7 +379,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@todo updateTargetSlots and freeTargetSlots share a lot of code!
   void updateTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data);
+  void freeTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data);
 
   void dataAddedToSlot(DataRole::Id role, cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::ConstDataPtr data);
 
