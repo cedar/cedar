@@ -190,6 +190,16 @@ public:
    */
   void addDeprecatedName(const std::string& deprecatedName);
 
+  /*! @brief If possible, copies the value from another parameter into this parameter.
+   *
+   * The default implementation always throws an exception.
+   */
+  virtual void copyValueFrom(cedar::aux::ConstParameterPtr other);
+
+  /*!@brief Checks if this parameter can copy its value from the given one.
+   */
+  virtual bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

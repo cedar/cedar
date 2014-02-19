@@ -82,6 +82,16 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::Parameter::copyValueFrom(cedar::aux::ConstParameterPtr /* other */)
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException, "Copying values from this type of parameter is not supported.");
+}
+
+bool cedar::aux::Parameter::canCopyFrom(cedar::aux::ConstParameterPtr /* other */) const
+{
+  return false;
+}
+
 void cedar::aux::Parameter::addDeprecatedName(const std::string& deprecatedName)
 {
   this->mpOwner->addDeprecatedName(this, deprecatedName);

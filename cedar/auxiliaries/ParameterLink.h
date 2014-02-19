@@ -1,0 +1,126 @@
+/*======================================================================================================================
+
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        ParameterLink.h
+
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 02 18
+
+    Description: Header file for the class cedar::aux::ParameterLink.
+
+    Credits:
+
+======================================================================================================================*/
+
+#ifndef CEDAR_AUX_PARAMETER_LINK_H
+#define CEDAR_AUX_PARAMETER_LINK_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/Parameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/auxiliaries/ParameterLink.fwd.h"
+
+// SYSTEM INCLUDES
+#include <QObject>
+
+
+/*!@brief Base for classes that link different parameters together.
+ *
+ *        A parameter link is an association between two or more parameters. The values of the associated parameters
+ *        are then linked, meaning that when one value is changed, another one is changed as well.
+ */
+class cedar::aux::ParameterLink : public QObject
+{
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  ParameterLink();
+
+  //!@brief Destructor
+  virtual ~ParameterLink();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  void setLinkedParameters(cedar::aux::ParameterPtr left, cedar::aux::ParameterPtr right);
+
+  cedar::aux::ParameterPtr getLeft() const;
+
+  cedar::aux::ParameterPtr getRight() const;
+
+  bool canLink(cedar::aux::ParameterPtr left, cedar::aux::ParameterPtr right);
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  virtual void leftChanged() = 0;
+
+  virtual void rightChanged() = 0;
+
+private:
+  virtual bool checkIfLinkable(cedar::aux::ConstParameterPtr left, cedar::aux::ConstParameterPtr right) const = 0;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+private:
+  cedar::aux::ParameterPtr mLeft;
+  cedar::aux::ParameterPtr mRight;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::aux::ParameterLink
+
+#endif // CEDAR_AUX_PARAMETER_LINK_H
+
