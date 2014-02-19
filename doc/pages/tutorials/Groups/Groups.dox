@@ -1,0 +1,54 @@
+/*!
+
+@page GroupsTutorial Groups Tutorials for the Processing Framework
+
+This tutorial is a step-by-step instruction that introduces the concept of groups in @em cedar's GUI. This page contains the following sections:
+
+<ol>
+  <li>@ref GroupsTutorialBasics</li>
+  <li>@ref GroupsTutorialRefined</li>
+</ol>
+
+@section BeforeYouStart Before you start
+Before you start, keep in mind that this software is still under development and save often. You will surely encounter
+ exceptions and crashes along the way. We are continuously improving @em cedar and feedback of any kind is welcome.
+ 
+@section StartingUpCedar Starting up cedar
+Please start your processing gui right now. If you do not know how to do this, take a look at 
+@link ProcessingGuiTutorial this @endlink tutorial.  
+
+@section GroupsTutorialBasics Basics of groups
+
+Creating
+
+<ul>
+<li> go to the @em Utilities tab and drag a @em Group into the architecture canvas</li>
+<li> click inside the newly created box - this selects the group</li>
+<li> you can now alter the group's name in the properties section or resize the box by dragging its corners</li>
+<li> add steps to the group by dragging them from the elements area directly into the group or by dragging already created steps from the canvas into the group</li>
+<li> note that the group gets highlighted when you hover over it while dragging a step</li>
+<li> try to remove steps from the group by selecting them and dragging them outside the group box</li>
+</ul>
+
+Connecting
+<ul>
+<li> try to connect steps inside the group in the usual way - nothing special here!</li>
+<li> now let's take care of connecting the group to the outside - right-click the group, choose @em add @em input, and pick a name</li>
+<li> do the same for @em add @em output</li>
+<li> you can now connect steps outside the group to the newly created inputs and outputs, and do the same with the steps inside the group</li>
+<li> you can remove group inputs and outputs in the right-click menu</li>
+</ul>
+
+Nesting
+<ul>
+<li> you can of course nest groups into other groups - it works the same way!</li>
+</ul>
+
+@section GroupsTutorialRefined Mastering groups
+
+Interactive drag-and-drop
+
+<ul>
+<li> drag and drop connected steps</li>
+</ul>
+*/
