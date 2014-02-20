@@ -122,5 +122,19 @@ private:
 
 }; // class cedar::aux::ParameterLink
 
+#include "cedar/auxiliaries/FactoryManager.h"
+
+namespace cedar
+{
+  namespace aux
+  {
+    typedef
+      cedar::aux::FactoryManager<cedar::aux::ParameterLinkPtr>
+      ParameterLinkFactoryManager;
+  }
+}
+
+CEDAR_AUX_SINGLETON(ParameterLinkFactoryManager);
+
 #endif // CEDAR_AUX_PARAMETER_LINK_H
 

@@ -144,6 +144,15 @@ private:
     std::vector<std::string>& exceptions
   );
 
+  /*!@brief Reads groups from a configuration node and adds them to the parent group.
+   */
+  void readParameterLinks
+  (
+    cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& root,
+    std::vector<std::string>& exceptions
+  );
+
   /*!@brief Writes the meta data to the configuration.
    */
   void writeMetaData(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
