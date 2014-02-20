@@ -1,0 +1,65 @@
+/*!
+
+@page TemplatesTutorial Template Tutorials for the Processing Framework
+
+This tutorial is a step-by-step instruction that introduces the concept of templates in @em cedar's GUI. This page contains the following sections:
+
+<ol>
+  <li>@ref TemplateTutorialBasics</li>
+  <li>@ref TemplateTutorialRefined</li>
+</ol>
+
+@section BeforeYouStart Before you start
+Before you start, keep in mind that this software is still under development and save often. You will surely encounter
+ exceptions and crashes along the way. We are continuously improving @em cedar and feedback of any kind is welcome.
+ 
+@section StartingUpCedar Starting up cedar
+Please start your processing gui right now. If you do not know how to do this, take a look at 
+@link ProcessingGuiTutorial this @endlink tutorial.  
+
+@section TemplateTutorialBasics Basics of templates
+
+Templates are predefined configurations of steps and groups that you can add to any architecture.
+
+<ul>
+<li> go to the @em DFT tab and drag a @em one-dimensional @em field into the architecture canvas - this creates a field
+with dimensionality one (in comparison to the default dimensionality two)</li>
+<li> add a  @em two-layer @em field from the same tab - a group with two fields appears</li>
+</ul>
+
+
+@section TemplateTutorialRefined Adding own templates
+Done like this in plugin.cpp of your plugin:
+@code
+void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin)
+{
+    // add a group
+    cedar::proc::GroupDeclarationPtr group_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                         "Three-layer field", // name of group in file
+                                         "resource://groupTemplates/fieldTemplates.json", // file
+                                         "three-layer", // group name after insertion
+                                         "DFT" // category
+                                     )
+                                   );
+    group_declaration->setIconPath(":/steps/field_temp.svg"); // icon
+    plugin->add(group_declaration);
+
+    // add a step    
+    cedar::proc::GroupDeclarationPtr field_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                         "three-dimensional field", // name of step in file
+                                         "resource://groupTemplates/fieldTemplates.json", // file
+                                         "three-dimensional field", // same as name of step!
+                                         "DFT" // category
+                                     )
+                                   );
+    field_declaration->setIconPath(":/steps/field_temp.svg"); // icon
+    plugin->add(field_declaration);
+}
+@endcode
+*/
