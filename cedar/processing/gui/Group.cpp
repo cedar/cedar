@@ -1172,18 +1172,19 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   {
     auto config = this->getGroup()->getLastReadConfiguration();
     auto groups_iter = config.find("groups");
-    if (groups_iter != config.not_found())
+    if (groups_iter == config.not_found())
     {
       groups_iter = config.find("networks"); // compatibility
-      if (groups_iter != config.not_found())
+    }
+
+    if (groups_iter != config.not_found())
+    {
+      auto group = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(p_scene_element);
+      auto groups = groups_iter->second;
+      auto group_iter = groups.find(group->getGroup()->getName());
+      if (group_iter != groups.not_found())
       {
-        auto group = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(p_scene_element);
-        auto groups = groups_iter->second;
-        auto group_iter = groups.find(group->getGroup()->getName());
-        if (group_iter != groups.not_found())
-        {
-          group->readConfiguration(group_iter->second);
-        }
+        group->readConfiguration(group_iter->second);
       }
     }
   }
