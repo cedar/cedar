@@ -188,6 +188,19 @@ cedar::proc::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@todo The additional information must be stored as well
+void cedar::proc::Group::addParameterLink
+(
+  cedar::proc::ElementPtr /* sourceElement */,
+  cedar::aux::ParameterPtr /* sourceParameter */,
+  cedar::proc::ElementPtr /* targetElement */,
+  cedar::aux::ParameterPtr /* targetParameter */,
+  cedar::aux::ParameterLinkPtr link
+)
+{
+  this->mParameterLinks.push_back(link);
+}
+
 std::string cedar::proc::Group::getNewConnectorName(bool inputConnector) const
 {
   std::string base = "input";

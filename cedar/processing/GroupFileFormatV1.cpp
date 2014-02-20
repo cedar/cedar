@@ -47,6 +47,7 @@
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
+#include "cedar/auxiliaries/ParameterLink.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
@@ -311,7 +312,75 @@ void cedar::proc::GroupFileFormatV1::read
   {
     // no records declared -- this is ok.
   }
+
+  auto parameter_links_iter = root.find("parameter links");
+  if (parameter_links_iter != root.not_found())
+  {
+    this->readParameterLinks(group, parameter_links_iter->second, exceptions);
+  }
 }
+
+void cedar::proc::GroupFileFormatV1::readParameterLinks
+     (
+       cedar::proc::GroupPtr group,
+       const cedar::aux::ConfigurationNode& root,
+       std::vector<std::string>& exceptions
+     )
+{
+  for (const auto& link_iter : root)
+  {
+    const auto& node = link_iter.second;
+    auto type_iter = node.find("type");
+    if (type_iter == node.not_found())
+    {
+      continue;
+    }
+    std::string type = type_iter->second.get_value<std::string>();
+    auto link = cedar::aux::ParameterLinkFactoryManagerSingleton::getInstance()->allocate(type);
+
+    auto src_elem_iter = node.find("source element");
+    if (src_elem_iter == node.not_found())
+    {
+      continue;
+    }
+    std::string src_element_name = src_elem_iter->second.get_value<std::string>();
+
+    auto src_param_iter = node.find("source parameter");
+    if (src_param_iter == node.not_found())
+    {
+      continue;
+    }
+    std::string src_param_name = src_param_iter->second.get_value<std::string>();
+
+    auto tar_elem_iter = node.find("target element");
+    if (tar_elem_iter == node.not_found())
+    {
+      continue;
+    }
+    std::string tar_element_name = tar_elem_iter->second.get_value<std::string>();
+
+    auto tar_param_iter = node.find("target parameter");
+    if (tar_param_iter == node.not_found())
+    {
+      continue;
+    }
+    std::string tar_param_name = tar_param_iter->second.get_value<std::string>();
+
+    //!@todo Error handling
+    //!@todo Store these links to make them (re-)storable later
+
+    auto src_element = group->getElement(src_element_name);
+    auto tar_element = group->getElement(tar_element_name);
+
+    auto src_param = src_element->getParameter(src_param_name);
+    auto tar_param = tar_element->getParameter(tar_param_name);
+
+    link->setLinkedParameters(src_param, tar_param);
+
+    group->addParameterLink(src_element, src_param, tar_element, tar_param, link);
+  }
+}
+
 
 void cedar::proc::GroupFileFormatV1::readRecords
      (

@@ -52,6 +52,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.fwd.h"
+#include "cedar/auxiliaries/ParameterLink.fwd.h"
 #include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
@@ -493,6 +494,16 @@ public:
 
   cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
 
+  //! Adds a parameter link to the list of links in this group. Does NOT link the parameters.
+  void addParameterLink
+  (
+    cedar::proc::ElementPtr sourceElement,
+    cedar::aux::ParameterPtr sourceParameter,
+    cedar::proc::ElementPtr targetElement,
+    cedar::aux::ParameterPtr targetParameter,
+    cedar::aux::ParameterLinkPtr link
+  );
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -595,6 +606,9 @@ private:
 
   //!@brief connection to state changed signal of step
   std::map<std::string, boost::signals2::connection> mRevalidateConnections;
+
+  //! List of all the parameter links in this group.
+  std::vector<cedar::aux::ParameterLinkPtr> mParameterLinks;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
