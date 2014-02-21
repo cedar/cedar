@@ -364,8 +364,6 @@ private:
 private slots:
   void promoteElementToExistingGroup();
 
-  void promoteElementToNewGroup();
-
   /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
    */
   void itemSelected();

@@ -629,135 +629,6 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   p_group->addElements(selected.toStdList());
 }
 
-void cedar::proc::gui::Scene::promoteElementToNewGroup()
-{
-  // do not create a new group if there are no elements selected
-  QList<QGraphicsItem*> selected = this->selectedItems();
-  // take out connections
-  for (QList<QGraphicsItem*>::iterator it = selected.begin(); it != selected.end(); )
-  {
-    if (dynamic_cast<cedar::proc::gui::Connection*>(*it))
-    {
-      it = selected.erase(it);
-    }
-    else
-    {
-      ++it;
-    }
-  }
-  // check if there are no selected elements left
-  if (selected.size() == 0)
-  {
-    return;
-  }
-
-  // create a new group and at this to the parent group
-  cedar::proc::GroupPtr group(new cedar::proc::Group());
-
-  /* try to get a grasp on the parent group of the first step - this is the group at which the new group
-   * should be inserted
-   */
-  cedar::proc::GroupPtr new_parent_group;
-
-  auto p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected.at(0));
-
-  if (p_base)
-  {
-    new_parent_group = p_base->getElement()->getGroup();
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::UnknownTypeException, "This GUI element type is not known.")
-  }
-
-  std::list<cedar::proc::ElementPtr> elements;
-  // sanity check - are all elements stored in the same group?
-  for (int i = 0; i < selected.size(); ++i)
-  {
-    if (cedar::proc::gui::Group *p_element = dynamic_cast<cedar::proc::gui::Group*>(selected.at(i)))
-    {
-      if (new_parent_group != p_element->getGroup()->getGroup())
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Not all selected items are in the same group - aborting operation.",
-          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
-        );
-        return;
-      }
-      else
-      {
-        elements.push_back(p_element->getGroup());
-      }
-    }
-    else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(i)))
-    {
-      if (new_parent_group != p_element->getStep()->getGroup())
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Not all selected items are in the same group - aborting operation.",
-          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
-        );
-        return;
-      }
-      else
-      {
-        elements.push_back(p_element->getStep());
-      }
-    }
-    else if (cedar::proc::gui::TriggerItem *p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(i)))
-    {
-      if (new_parent_group != p_element->getTrigger()->getGroup())
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Not all selected items are in the same group - aborting operation.",
-          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
-        );
-        return;
-      }
-      else
-      {
-        elements.push_back(p_element->getTrigger());
-      }
-    }
-  }
-  // add the new group to the parent group
-  CEDAR_DEBUG_ASSERT(new_parent_group);
-  std::string name = new_parent_group->getUniqueIdentifier("new Group");
-  group->setName(name);
-  if (new_parent_group == this->mGroup->getGroup())
-  {
-    // first add the group
-    mGroup->getGroup()->add(group);
-    // signals created a new graphical representation, set its parent now
-    mGroup->addElement(this->getGraphicsItemFor(group.get()));
-  }
-  else
-  {
-    new_parent_group->add(group);
-    dynamic_cast<cedar::proc::gui::Group*>
-    (
-      this->getGraphicsItemFor(new_parent_group.get())
-    )->addElement(this->getGraphicsItemFor(group.get()));
-  }
-
-  // remember all the old configurations of the ui representations
-  cedar::proc::gui::Group* p_new_group = this->getGroupFor(group.get());
-  for (std::list<cedar::proc::ElementPtr>::iterator i = elements.begin(); i != elements.end(); ++i)
-  {
-    cedar::aux::ConfigurationNode ui_description;
-    cedar::proc::ElementPtr element = *i;
-    cedar::proc::gui::GraphicsBase* p_ui_element = this->getGraphicsItemFor(element.get());
-    p_ui_element->writeConfiguration(ui_description);
-    p_new_group->setNextElementUiConfiguration(element, ui_description);
-  }
-
-  // move all elements to the group
-  group->add(elements);
-}
-
 void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
 {
   this->QGraphicsScene::contextMenuEvent(pContextMenuEvent);
@@ -844,7 +715,7 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
   }
 }
 
-void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent)
+void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent* pMouseEvent)
 {
   if(mpNewConnectionIndicator != NULL)
   {
@@ -869,9 +740,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
       bool connected = false;
       for (int i = 0; i < items.size() && !connected; ++i)
       {
-        if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
-             && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
-            )
+        if
+        (
+          (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+            && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
+        )
         {
           connected = true;
           p2 = target->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
@@ -970,6 +843,13 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_step_item->getStep());
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
+
+              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
+              {
+                cedar::proc::gui::Group* p_group = dynamic_cast<cedar::proc::gui::Group*>(target);
+                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_group->getGroup());
+                break;
+              } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP
 
               default:
                 CEDAR_DEBUG_ASSERT(false); // this should not happen
