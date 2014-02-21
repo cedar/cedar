@@ -131,7 +131,7 @@ namespace
                                    (
                                      new cedar::proc::GroupDeclaration
                                      (
-                                       "Two-layer field",
+                                       "two-layer field",
                                        "resource://groupTemplates/fieldTemplates.json",
                                        "two-layer",
                                        "DFT"

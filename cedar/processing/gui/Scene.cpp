@@ -1335,7 +1335,7 @@ public:
   QDialog(pParent),
   mpGroupNamesBox(new QComboBox())
   {
-    this->setWindowTitle(QString("Select a group."));
+    this->setWindowTitle(QString("Select an element to add to your architecture."));
     QVBoxLayout* p_layout = new QVBoxLayout();
     p_layout->addWidget(mpGroupNamesBox);
     QDialogButtonBox* p_button_box = new QDialogButtonBox();
@@ -1454,7 +1454,7 @@ void cedar::proc::gui::Scene::importStep()
       = new QMessageBox
         (
           QMessageBox::Warning,
-          QString("No groups found"),
+          QString("No steps found"),
           QString("Could not find any steps in file " ) + file,
           QMessageBox::Ok,
           this->mpMainWindow
