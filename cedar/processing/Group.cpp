@@ -488,6 +488,15 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
     }
     mElements.erase(it);
   }
+
+  // remove element from triggerables list if it is looped
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element);
+  auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
+  if (item != this->mLoopedTriggerables.end())
+  {
+    this->mLoopedTriggerables.erase(item);
+  }
+
   this->signalElementRemoved(element);
 }
 
@@ -848,6 +857,15 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
   {
     this->mRevalidateConnections[connectable->getName()]
       = connectable->connectToOutputPropertiesChangedSignal(boost::bind(&cedar::proc::Group::revalidateConnections, this, _1));
+  }
+
+  // add this element to the list of looped elements
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element))
+  {
+    if (triggerable->isLooped())
+    {
+      this->mLoopedTriggerables.push_back(triggerable);
+    }
   }
 }
 
@@ -2045,6 +2063,13 @@ void cedar::proc::Group::onStart()
   }
   // if we get to this point, set the state to running
   this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
+  for (auto element : this->mElements)
+  {
+    if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element.second))
+    {
+      group->onStart();
+    }
+  }
 }
 
 void cedar::proc::Group::onStop()
@@ -2052,6 +2077,13 @@ void cedar::proc::Group::onStop()
   this->_mIsLooped->setConstant(false);
   // if we get to this point, set the state to running
   this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "");
+  for (auto element : this->mElements)
+  {
+    if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element.second))
+    {
+      group->onStop();
+    }
+  }
 }
 
 bool cedar::proc::Group::isLooped() const
