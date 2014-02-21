@@ -173,9 +173,6 @@ private slots:
 private:
   void emitStepStateChanged();
 
-  //!@brief Adds the decorations to the step.
-  void addDecorations();
-
   //!@brief sets the represented step
   void setStep(cedar::proc::StepPtr step);
 

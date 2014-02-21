@@ -46,6 +46,7 @@
 #include "cedar/processing/NetworkPath.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/units/Time.h"
 
@@ -107,6 +108,8 @@ public:
 private:
   //! Type of the trigger connection list.
   typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
+
+  typedef std::vector<cedar::proc::TriggerablePtr> TriggerableVector;
 
 public:
   //! Type of the data connection list.
@@ -493,6 +496,18 @@ public:
 
   cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
 
+  //!@brief
+  void setIsLooped(bool looped);
+
+  // make sure to create a list of all looped triggerables on start
+  void onStart();
+
+  // onStop enables the isLooped parameter
+  void onStop();
+
+  //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
+  bool isLooped() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -596,11 +611,15 @@ private:
   //!@brief connection to state changed signal of step
   std::map<std::string, boost::signals2::connection> mRevalidateConnections;
 
+  //! Map containing every looped thread
+  TriggerableVector mLoopedTriggerables;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
    ConnectorMapParameterPtr _mConnectors;
+   cedar::aux::BoolParameterPtr _mIsLooped;
 
 }; // class cedar::proc::Group
 

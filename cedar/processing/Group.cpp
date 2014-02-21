@@ -166,7 +166,8 @@ namespace
 cedar::proc::Group::Group()
 :
 Triggerable(false),
-_mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap()))
+_mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap())),
+_mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mConnectors->setHidden(true);
@@ -1605,16 +1606,24 @@ void cedar::proc::Group::removeAllConnectors()
   }
 }
 
-void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr /* trigger */)
+void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr trigger)
 {
-  for (auto iter = this->_mConnectors->begin(); iter != this->_mConnectors->end(); ++iter)
+  for (auto connector : this->_mConnectors->getValue())
   {
-    auto name = iter->first;
+    auto name = connector.first;
 
-    if (iter->second)
+    if (connector.second)
     {
       auto source = boost::static_pointer_cast<cedar::proc::sources::GroupSource>(this->getElement(name));
-      source->onTrigger(args);
+      source->onTrigger(args, trigger);
+    }
+  }
+  if (this->isLooped())
+  {
+    // trigger every looped element in this group
+    for (auto triggerable : this->mLoopedTriggerables)
+    {
+      triggerable->onTrigger(args, trigger);
     }
   }
 }
@@ -2013,4 +2022,39 @@ cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string
     // could not find a "steps" node, abort
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any steps in file " + fileName);
   }
+}
+
+void cedar::proc::Group::setIsLooped(bool looped)
+{
+  this->_mIsLooped->setValue(looped);
+}
+
+void cedar::proc::Group::onStart()
+{
+  this->_mIsLooped->setConstant(true);
+  this->mLoopedTriggerables.clear();
+  for (auto element : this->mElements)
+  {
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element.second))
+    {
+      if (triggerable->isLooped())
+      {
+        this->mLoopedTriggerables.push_back(triggerable);
+      }
+    }
+  }
+  // if we get to this point, set the state to running
+  this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
+}
+
+void cedar::proc::Group::onStop()
+{
+  this->_mIsLooped->setConstant(false);
+  // if we get to this point, set the state to running
+  this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "");
+}
+
+bool cedar::proc::Group::isLooped() const
+{
+  return this->_mIsLooped->getValue();
 }

@@ -139,6 +139,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     this,
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
+  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
+  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(updateDecorations()));
 
   mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
                                      (
@@ -176,7 +178,7 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     this,
     SLOT(handleStepNameChanged(const std::string&, const std::string&))
   );
-
+  this->addDecorations();
   this->update();
 }
 
@@ -329,6 +331,7 @@ void cedar::proc::gui::Group::sizeChanged()
     this->_mUncollapsedWidth->setValue(this->width());
     this->_mUncollapsedHeight->setValue(this->height());
   }
+  this->updateDecorationPositions();
 }
 
 void cedar::proc::gui::Group::updateTextBounds()
@@ -1387,14 +1390,23 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   this->connect(p_collapse, SIGNAL(toggled(bool)), SLOT(setCollapsed(bool)));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-
   QAction* p_add_input = menu.addAction("add input");
   QAction* p_add_output = menu.addAction("add output");
+  if (this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING)
+  {
+    p_add_input->setEnabled(false);
+    p_add_output->setEnabled(false);
+  }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   QMenu* p_remove_input_menu = menu.addMenu("remove input");
   QMenu* p_remove_output_menu = menu.addMenu("remove output");
+  if (this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING)
+  {
+    p_remove_input_menu->setEnabled(false);
+    p_remove_output_menu->setEnabled(false);
+  }
   const cedar::proc::Group::ConnectorMap& connectors = this->getGroup()->getConnectorMap();
   for (auto it = connectors.begin(); it != connectors.end(); ++it)
   {
@@ -1562,4 +1574,9 @@ void cedar::proc::gui::Group::restoreConnections()
   {
     this->checkDataConnection(connection->getSource(), connection->getTarget(), cedar::proc::Group::CONNECTION_ADDED);
   }
+}
+
+void cedar::proc::gui::Group::updateDecorations()
+{
+  this->addDecorations();
 }

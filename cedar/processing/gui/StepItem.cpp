@@ -402,53 +402,6 @@ void cedar::proc::gui::StepItem::setRecorded(bool status)
 
 }
 
-void cedar::proc::gui::StepItem::addDecorations()
-{
-  this->mDecorations.clear();
-
-  if (this->getStep() && this->getStep()->isLooped())
-  {
-    DecorationPtr decoration
-    (
-      new Decoration
-      (
-        this,
-        ":/decorations/looped.svg",
-        "This step is looped, i.e., it expects to be connected to a looped trigger."
-      )
-    );
-
-    this->mDecorations.push_back(decoration);
-  }
-
-  auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getElement());
-
-  if (declaration->isDeprecated())
-  {
-    std::string dep_msg = "This step is deprecated.";
-
-    if (!declaration->getDeprecationDescription().empty())
-    {
-      dep_msg += " " + declaration->getDeprecationDescription();
-    }
-
-    DecorationPtr decoration
-    (
-      new Decoration
-      (
-        this,
-        ":/cedar/auxiliaries/gui/warning.svg",
-        QString::fromStdString(dep_msg),
-        QColor(255, 240, 110)
-      )
-    );
-
-    this->mDecorations.push_back(decoration);
-  }
-
-  this->updateDecorationPositions();
-}
-
 void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu)
 {
   std::string label = e.prettyString() + "s";

@@ -54,6 +54,7 @@
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -324,7 +325,19 @@ void run_test()
   cedar::proc::GroupPtr network_importing(new cedar::proc::Group());
   network_importing->importGroupFromFile("network child", "Nested.json");
 
-  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("Two-layer field", network_importing);
+  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("two-layer field", network_importing);
+
+  // test connecting triggers to groups
+  std::cout << "testing connecting triggers to groups" << std::endl;
+  cedar::proc::GroupPtr group_trigger(new cedar::proc::Group());
+  cedar::proc::GroupPtr group_triggered(new cedar::proc::Group());
+  cedar::proc::LoopedTriggerPtr new_trigger(new cedar::proc::LoopedTrigger());
+  group_trigger->add(group_triggered, "group");
+  group_trigger->add(new_trigger, "trigger");
+  group_trigger->connectTrigger(new_trigger, group_triggered);
+  new_trigger->start();
+  cedar::aux::sleep(0.5 * cedar::unit::seconds);
+  new_trigger->stop();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

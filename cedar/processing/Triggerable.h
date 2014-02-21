@@ -122,7 +122,7 @@ public:
   void setParentTrigger(cedar::proc::TriggerPtr parent);
 
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
-  inline bool isLooped() const
+  virtual bool isLooped() const
   {
     return this->mIsLooped;
   }
@@ -228,7 +228,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief Whether the connect function should automatically connect the triggers as well.
-  const bool mIsLooped;
+  bool mIsLooped;
 
   //!@brief If set, this is the trigger that triggers the step.
   cedar::proc::TriggerWeakPtr mParentTrigger;
