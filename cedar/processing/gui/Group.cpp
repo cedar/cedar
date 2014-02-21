@@ -1513,6 +1513,7 @@ void cedar::proc::gui::Group::updateCollapsedness()
   }
 
   this->setResizeable(!collapse);
+  this->updateConnections();
 }
 
 void cedar::proc::gui::Group::changeStepName(const std::string& from, const std::string& to)
