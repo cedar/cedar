@@ -252,64 +252,40 @@ void cedar::proc::GroupFileFormatV1::read
 
   group->processConnectors();
 
-  try
+  auto steps = root.find("steps");
+  if (steps != root.not_found())
   {
-    const cedar::aux::ConfigurationNode& steps = root.get_child("steps");
-    this->readSteps(group, steps, exceptions);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no steps declared -- this is ok.
+    this->readSteps(group, steps->second, exceptions);
   }
 
-  try
+  auto networks = root.find("networks");
+  if (networks != root.not_found())
   {
-    const cedar::aux::ConfigurationNode& groups = root.get_child("networks");
-    this->readGroups(group, groups, exceptions);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no networks declared -- this is ok.
+    this->readGroups(group, networks->second, exceptions);
   }
 
-  try
+  auto groups = root.find("groups");
+  if (groups != root.not_found())
   {
-    const cedar::aux::ConfigurationNode& groups = root.get_child("groups");
-    this->readGroups(group, groups, exceptions);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no groups declared -- this is ok.
+    this->readGroups(group, groups->second, exceptions);
   }
 
-  try
+  auto connections = root.find("connections");
+  if (connections != root.not_found())
   {
-    const cedar::aux::ConfigurationNode& connections = root.get_child("connections");
-    this->readDataConnections(group, connections, exceptions);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no connections declared -- this is ok.
+    this->readDataConnections(group, connections->second, exceptions);
   }
 
-  try
+  auto triggers = root.find("triggers");
+  if (triggers != root.not_found())
   {
-    const cedar::aux::ConfigurationNode& triggers = root.get_child("triggers");
-    this->readTriggers(group, triggers, exceptions);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no triggers declared -- this is ok.
+    this->readTriggers(group, triggers->second, exceptions);
   }
 
-  try
+  auto records = root.find("records");
+  if (records != root.not_found())
   {
-    const cedar::aux::ConfigurationNode& records = root.get_child("records");
-    this->readRecords(group, records, exceptions);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no records declared -- this is ok.
+    this->readRecords(group, records->second, exceptions);
   }
 }
 
