@@ -55,7 +55,7 @@
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
-#include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
+#include "cedar/auxiliaries/gui/Configurable.fwd.h"
 #include "cedar/processing/gui/StickyNote.fwd.h"
 
 // SYSTEM INCLUDES
@@ -271,7 +271,7 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
    */
-  void setConfigurableWidget(cedar::aux::gui::PropertyPane* pConfigurableWidget);
+  void setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget);
 
   /*!@brief Sets the widget used for displaying/editing the record parameters.
    */
@@ -427,7 +427,7 @@ private:
   bool mSnapToGrid;
 
   //! The widget used to display configurables when they are selected in the scene. May be null.
-  cedar::aux::gui::PropertyPane* mpConfigurableWidget;
+  cedar::aux::gui::Configurable* mpConfigurableWidget;
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
   cedar::proc::gui::RecorderWidget* mpRecorderWidget;
