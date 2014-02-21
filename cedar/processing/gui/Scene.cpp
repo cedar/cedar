@@ -135,7 +135,7 @@ void cedar::proc::gui::Scene::exportSvg(const QString& file)
   painter.end();
 }
 
-void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget)
+void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
 {
   this->mpConfigurableWidget = pConfigurableWidget;
 }
@@ -182,7 +182,7 @@ void cedar::proc::gui::Scene::itemSelected()
   }
   else
   {
-    this->mpConfigurableWidget->resetContents();
+    this->mpConfigurableWidget->clear();
     this->mpRecorderWidget->clearLayout();
   }
 }

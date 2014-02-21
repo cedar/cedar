@@ -67,6 +67,9 @@ known issues
 Unreleased
 ==========
 
+- processingIde
+    - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters pf a
+      step, but is otherwise quite similar to the old one.
 - cedar::proc
   - Groups now work as intended: one can freely move elements between groups, existing connections are preserved, using 
     group connectors if necessary. In the gui, grouping is drag-and-drop-based.
