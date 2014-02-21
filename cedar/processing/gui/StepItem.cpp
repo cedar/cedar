@@ -50,6 +50,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -989,14 +990,6 @@ void cedar::proc::gui::StepItem::showPlot
   p_dock_widget->show();
 }
 
-void cedar::proc::gui::StepItem::openProperties()
-{
-  cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
-  auto p_dock_widget = this->createDockWidget("Properties", props);
-  props->display(this->getStep());
-  p_dock_widget->show();
-}
-
 void cedar::proc::gui::StepItem::openActionsDock()
 {
   QWidget* p_actions = new QWidget();
@@ -1013,6 +1006,14 @@ void cedar::proc::gui::StepItem::openActionsDock()
   std::string title = "Actions of step \"" + this->mStep->getName() + "\"";
   auto p_dock_widget = this->createDockWidget(title, p_actions);
   p_dock_widget->show();
+}
+
+void cedar::proc::gui::StepItem::openProperties()
+{
+  cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
+  props->display(this->getStep());
+  auto p_widget = this->createDockWidget("Properties", props);
+  p_widget->show();
 }
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
