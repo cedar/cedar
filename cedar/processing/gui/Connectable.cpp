@@ -296,7 +296,7 @@ void cedar::proc::gui::Connectable::addDataItems()
       continue;
 
     // populate step item list
-    try
+    if (this->getConnectable()->hasRole(*enum_it))
     {
       const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(*enum_it);
       for (cedar::proc::Connectable::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
@@ -304,10 +304,6 @@ void cedar::proc::gui::Connectable::addDataItems()
         // use a non-const version of this slot
         this->addDataItemFor(this->getConnectable()->getSlot(*enum_it, (*iter)->getName()));
       }
-    }
-    catch (const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 
