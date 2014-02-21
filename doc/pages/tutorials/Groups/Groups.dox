@@ -43,9 +43,14 @@ group or send output to subsequent steps outside of the group.
 <li> you can remove group inputs and outputs in the right-click menu</li>
 </ul>
 
-You can of course nest groups into other groups - it works the same way! Groups behave in the same way as steps - therefore you cannot have a group with the same name as another step or group 
-in a parent group. You might run into this while moving around groups. The GUI will prompt a warning in the log and the
-group or step will not be moved. 
+You can of course nest groups into other groups - it works the same way! Groups behave in the same way as steps - 
+therefore you cannot have a group with the same name as another step or group in a parent group. You might run into this
+ while moving around groups. The GUI will prompt a warning in the log and the group or step will not be moved.
+ 
+If your group contains looped elements (e.g., a field or another group with looped elements) that usually require a
+ connection to a looped trigger, you can switch the whole group to being looped in the properties and connect the group
+ to a looped trigger. The group will now take care of triggering all contained looped elements - no need to put a looped
+ trigger into the group! 
 
 @section GroupsTutorialRefined Mastering groups
 
