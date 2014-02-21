@@ -49,13 +49,16 @@
                         "format": "1"
                     },
                     "name": "network grand child",
-                    "connectors": ""
+                    "connectors": "",
+                    "is looped": "false"
                 }
             },
             "name": "network child",
-            "connectors": ""
+            "connectors": "",
+            "is looped": "false"
         }
     },
     "name": "",
-    "connectors": ""
+    "connectors": "",
+    "is looped": "false"
 }
