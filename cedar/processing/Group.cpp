@@ -222,9 +222,9 @@ std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Group::checkConsisten
   std::vector<cedar::proc::LoopedTriggerPtr> looped_triggers = listLoopedTriggers();
 
   // Check for looped steps that are not connected to looped triggers
-  for (auto iter = this->getElements().begin(); iter != this->getElements().end(); ++iter)
+  for (auto iter : this->getElements())
   {
-    cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second);
+    cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter.second);
 
     if (!step)
     {
@@ -259,9 +259,9 @@ std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTrigger
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers;
 
-  for (auto iter = this->getElements().begin(); iter != this->getElements().end(); ++iter)
+  for (auto iter : this->getElements())
   {
-    cedar::proc::ElementPtr element = iter->second;
+    cedar::proc::ElementPtr element = iter.second;
     if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
     {
       triggers.push_back(trigger);
@@ -275,9 +275,8 @@ void cedar::proc::Group::startTriggers(bool wait)
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
-  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  for (auto trigger : triggers)
   {
-    auto trigger = *iter;
     if (!trigger->isRunning())
     {
       trigger->start();
@@ -286,9 +285,8 @@ void cedar::proc::Group::startTriggers(bool wait)
 
   if (wait)
   {
-    for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+    for (auto trigger : triggers)
     {
-      auto trigger = *iter;
       while (!trigger->isRunning())
       {
         cedar::aux::sleep(0.005 * cedar::unit::seconds);
@@ -301,9 +299,8 @@ void cedar::proc::Group::stopTriggers(bool wait)
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
-  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  for (auto trigger : triggers)
   {
-    auto trigger = *iter;
     if (trigger->isRunning())
     {
       trigger->stop();
@@ -312,9 +309,8 @@ void cedar::proc::Group::stopTriggers(bool wait)
 
   if (wait)
   {
-    for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+    for (auto trigger : triggers)
     {
-      auto trigger = *iter;
       while (trigger->isRunning())
       {
         cedar::aux::sleep(0.005 * cedar::unit::seconds);
@@ -387,9 +383,9 @@ bool cedar::proc::Group::nameExists(const std::string& name) const
 void cedar::proc::Group::listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const
 {
   subgroups.clear();
-  for (ElementMap::const_iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  for (auto iter : this->mElements)
   {
-    if (cedar::proc::ConstGroupPtr group = boost::dynamic_pointer_cast<const cedar::proc::Group>(iter->second))
+    if (cedar::proc::ConstGroupPtr group = boost::dynamic_pointer_cast<const cedar::proc::Group>(iter.second))
     {
       subgroups.insert(group);
     }
@@ -1945,9 +1941,9 @@ void cedar::proc::Group::removeAll()
 {
   // read out all elements and call this->remove for each element
   std::vector<cedar::proc::ElementPtr> elements;
-  for (ElementMapIterator it = mElements.begin(); it != mElements.end(); ++it)
+  for (auto it : mElements)
   {
-    elements.push_back(it->second);
+    elements.push_back(it.second);
   }
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
