@@ -141,6 +141,7 @@ elseif (MSVC)
                   )
   # Allow sorting projects into subfodlers (to make solutions more usable)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  set(CEDAR_ISSUES ${CEDAR_ISSUES} "You're on Windows. Unit tests may not work properly.\n\n")
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 # add definitions for clang
