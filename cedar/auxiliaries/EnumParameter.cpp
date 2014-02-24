@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 
@@ -67,6 +68,28 @@ mEnumDeclaration(enumBase)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::EnumParameter::canCopyFrom(cedar::aux::ConstParameterPtr other) const
+{
+  return static_cast<bool>(boost::dynamic_pointer_cast<ConstEnumParameter>(other));
+}
+
+void cedar::aux::EnumParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
+{
+  if (auto other_self = boost::dynamic_pointer_cast<ConstEnumParameter>(other))
+  {
+    this->setValue(other_self->getValue());
+  }
+  else
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::UnhandledTypeException,
+      "Cannot copy parameter value: types don't match. Type of this: " + cedar::aux::objectTypeToString(this)
+      + ", type of other: " + cedar::aux::objectTypeToString(other)
+    );
+  }
+}
 
 void cedar::aux::EnumParameter::disable(cedar::aux::EnumId value)
 {
@@ -143,14 +166,21 @@ void cedar::aux::EnumParameter::setValue(cedar::aux::EnumId enumId, bool lock)
 {
   if (lock)
   {
-    this->lockForRead();
+    this->lockForWrite();
   }
+  bool changed = (this->mValue != enumId);
+
   this->mValue = enumId;
+
   if (lock)
   {
     this->unlock();
   }
-  this->emitChangedSignal();
+
+  if (changed)
+  {
+    this->emitChangedSignal();
+  }
 }
 
 void cedar::aux::EnumParameter::setValue(const std::string& enumId, bool lock)

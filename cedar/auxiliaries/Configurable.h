@@ -220,6 +220,13 @@ public:
     return this->mIsAdvanced;
   }
 
+  /*!@brief Returns the path of the parameter, relative to this configurable.
+   *
+   *        If the parameter is directly attached to this object, this method returns just the name. Otherwise, it looks
+   *        through all configurable children and other parameters.
+   */
+  std::string findParameterPath(cedar::aux::ParameterPtr parameter) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
