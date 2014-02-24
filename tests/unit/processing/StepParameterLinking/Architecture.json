@@ -170,6 +170,27 @@
         "source parameter": "resting level",
         "target element": "new NeuralField 2",
         "target parameter": "resting level"
+      },
+      {
+        "type": "cedar.aux.DirectParameterLink",
+        "source element": "new NeuralField 1",
+        "source parameter": "lateral kernel convolution.borderType",
+        "target element": "new NeuralField 2",
+        "target parameter": "lateral kernel convolution.borderType"
+      },
+      {
+        "type": "cedar.aux.DirectParameterLink",
+        "source element": "new NeuralField 1",
+        "source parameter": "sigmoid.beta",
+        "target element": "new NeuralField 2",
+        "target parameter": "sigmoid.beta"
+      },
+      {
+        "type": "cedar.aux.DirectParameterLink",
+        "source element": "new NeuralField 1",
+        "source parameter": "lateral kernels[0].amplitude",
+        "target element": "new NeuralField 2",
+        "target parameter": "lateral kernels[0].amplitude"
       }
     ],
     "name": "root",
