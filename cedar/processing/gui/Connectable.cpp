@@ -45,6 +45,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 
 // SYSTEM INCLUDES
@@ -296,7 +297,7 @@ void cedar::proc::gui::Connectable::addDataItems()
       continue;
 
     // populate step item list
-    try
+    if (this->getConnectable()->hasRole(*enum_it))
     {
       const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(*enum_it);
       for (cedar::proc::Connectable::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
@@ -304,10 +305,6 @@ void cedar::proc::gui::Connectable::addDataItems()
         // use a non-const version of this slot
         this->addDataItemFor(this->getConnectable()->getSlot(*enum_it, (*iter)->getName()));
       }
-    }
-    catch (const cedar::proc::InvalidRoleException&)
-    {
-      // ok -- a step may not have any data for this role.
     }
   }
 
@@ -572,4 +569,52 @@ void cedar::proc::gui::Connectable::Decoration::setSize(double sizeFactor)
   this->mpRectangle->setRect(new_dims);
   qreal h = this->mpIcon->boundingRect().height();
   this->mpIcon->setScale(size / h);
+}
+
+void cedar::proc::gui::Connectable::addDecorations()
+{
+  this->mDecorations.clear();
+
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
+  if (triggerable && triggerable->isLooped())
+  {
+    DecorationPtr decoration
+    (
+      new Decoration
+      (
+        this,
+        ":/decorations/looped.svg",
+        "This step is looped, i.e., it expects to be connected to a looped trigger."
+      )
+    );
+
+    this->mDecorations.push_back(decoration);
+  }
+
+  auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getElement());
+
+  if (declaration->isDeprecated())
+  {
+    std::string dep_msg = "This step is deprecated.";
+
+    if (!declaration->getDeprecationDescription().empty())
+    {
+      dep_msg += " " + declaration->getDeprecationDescription();
+    }
+
+    DecorationPtr decoration
+    (
+      new Decoration
+      (
+        this,
+        ":/cedar/auxiliaries/gui/warning.svg",
+        QString::fromStdString(dep_msg),
+        QColor(255, 240, 110)
+      )
+    );
+
+    this->mDecorations.push_back(decoration);
+  }
+
+  this->updateDecorationPositions();
 }

@@ -103,12 +103,16 @@ namespace
     );
     group_decl->declare();
 
-#ifdef CEDAR_COMPILER_MSVC
-    // on windows/MSVC, the dynamics dll is not linked because it is unused. This code loads the library manually.
-    {
-      HMODULE module_handle = LoadLibrary("cedardyn"
+#ifdef CEDAR_OS_WINDOWS
+	// on windows/MSVC, the dynamics dll is not linked because it is unused. This code loads the library manually.
+	{
+    HMODULE module_handle = LoadLibrary(
+#ifndef CEDAR_COMPILER_MSVC
+        "lib"
+#endif // CEDAR_COMPILER_MSVC
+        "cedardyn"
 #ifdef _DEBUG // in debug builds, the library is called cedardynd.dll; ".dll" is automatically appended
-      "d"
+        "d"
 #endif // _DEBUG
         );
       if (module_handle == NULL)
@@ -127,7 +131,7 @@ namespace
                                    (
                                      new cedar::proc::GroupDeclaration
                                      (
-                                       "Two-layer field",
+                                       "two-layer field",
                                        "resource://groupTemplates/fieldTemplates.json",
                                        "two-layer",
                                        "DFT"
@@ -162,7 +166,8 @@ namespace
 cedar::proc::Group::Group()
 :
 Triggerable(false),
-_mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap()))
+_mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap())),
+_mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mConnectors->setHidden(true);
@@ -230,9 +235,9 @@ std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Group::checkConsisten
   std::vector<cedar::proc::LoopedTriggerPtr> looped_triggers = listLoopedTriggers();
 
   // Check for looped steps that are not connected to looped triggers
-  for (auto iter = this->getElements().begin(); iter != this->getElements().end(); ++iter)
+  for (auto iter : this->getElements())
   {
-    cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second);
+    cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter.second);
 
     if (!step)
     {
@@ -267,9 +272,9 @@ std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTrigger
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers;
 
-  for (auto iter = this->getElements().begin(); iter != this->getElements().end(); ++iter)
+  for (auto iter : this->getElements())
   {
-    cedar::proc::ElementPtr element = iter->second;
+    cedar::proc::ElementPtr element = iter.second;
     if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
     {
       triggers.push_back(trigger);
@@ -283,9 +288,8 @@ void cedar::proc::Group::startTriggers(bool wait)
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
-  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  for (auto trigger : triggers)
   {
-    auto trigger = *iter;
     if (!trigger->isRunning())
     {
       trigger->start();
@@ -294,9 +298,8 @@ void cedar::proc::Group::startTriggers(bool wait)
 
   if (wait)
   {
-    for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+    for (auto trigger : triggers)
     {
-      auto trigger = *iter;
       while (!trigger->isRunning())
       {
         cedar::aux::sleep(0.005 * cedar::unit::seconds);
@@ -309,9 +312,8 @@ void cedar::proc::Group::stopTriggers(bool wait)
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
-  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  for (auto trigger : triggers)
   {
-    auto trigger = *iter;
     if (trigger->isRunning())
     {
       trigger->stop();
@@ -320,9 +322,8 @@ void cedar::proc::Group::stopTriggers(bool wait)
 
   if (wait)
   {
-    for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+    for (auto trigger : triggers)
     {
-      auto trigger = *iter;
       while (trigger->isRunning())
       {
         cedar::aux::sleep(0.005 * cedar::unit::seconds);
@@ -395,9 +396,9 @@ bool cedar::proc::Group::nameExists(const std::string& name) const
 void cedar::proc::Group::listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const
 {
   subgroups.clear();
-  for (ElementMap::const_iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  for (auto iter : this->mElements)
   {
-    if (cedar::proc::ConstGroupPtr group = boost::dynamic_pointer_cast<const cedar::proc::Group>(iter->second))
+    if (cedar::proc::ConstGroupPtr group = boost::dynamic_pointer_cast<const cedar::proc::Group>(iter.second))
     {
       subgroups.insert(group);
     }
@@ -496,6 +497,15 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
     }
     mElements.erase(it);
   }
+
+  // remove element from triggerables list if it is looped
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element);
+  auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
+  if (item != this->mLoopedTriggerables.end())
+  {
+    this->mLoopedTriggerables.erase(item);
+  }
+
   this->signalElementRemoved(element);
 }
 
@@ -856,6 +866,15 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
   {
     this->mRevalidateConnections[connectable->getName()]
       = connectable->connectToOutputPropertiesChangedSignal(boost::bind(&cedar::proc::Group::revalidateConnections, this, _1));
+  }
+
+  // add this element to the list of looped elements
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element))
+  {
+    if (triggerable->isLooped())
+    {
+      this->mLoopedTriggerables.push_back(triggerable);
+    }
   }
 }
 
@@ -1614,16 +1633,24 @@ void cedar::proc::Group::removeAllConnectors()
   }
 }
 
-void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr /* trigger */)
+void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr trigger)
 {
-  for (auto iter = this->_mConnectors->begin(); iter != this->_mConnectors->end(); ++iter)
+  for (auto connector : this->_mConnectors->getValue())
   {
-    auto name = iter->first;
+    auto name = connector.first;
 
-    if (iter->second)
+    if (connector.second)
     {
       auto source = boost::static_pointer_cast<cedar::proc::sources::GroupSource>(this->getElement(name));
-      source->onTrigger(args);
+      source->onTrigger(args, trigger);
+    }
+  }
+  if (this->isLooped())
+  {
+    // trigger every looped element in this group
+    for (auto triggerable : this->mLoopedTriggerables)
+    {
+      triggerable->onTrigger(args, trigger);
     }
   }
 }
@@ -1927,9 +1954,9 @@ void cedar::proc::Group::removeAll()
 {
   // read out all elements and call this->remove for each element
   std::vector<cedar::proc::ElementPtr> elements;
-  for (ElementMapIterator it = mElements.begin(); it != mElements.end(); ++it)
+  for (auto it : mElements)
   {
-    elements.push_back(it->second);
+    elements.push_back(it.second);
   }
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
@@ -2022,4 +2049,53 @@ cedar::proc::ElementPtr cedar::proc::Group::importStepFromFile(const std::string
     // could not find a "steps" node, abort
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any steps in file " + fileName);
   }
+}
+
+void cedar::proc::Group::setIsLooped(bool looped)
+{
+  this->_mIsLooped->setValue(looped);
+}
+
+void cedar::proc::Group::onStart()
+{
+  this->_mIsLooped->setConstant(true);
+  this->mLoopedTriggerables.clear();
+  for (auto element : this->mElements)
+  {
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element.second))
+    {
+      if (triggerable->isLooped())
+      {
+        this->mLoopedTriggerables.push_back(triggerable);
+      }
+    }
+  }
+  // if we get to this point, set the state to running
+  this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
+  for (auto element : this->mElements)
+  {
+    if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element.second))
+    {
+      group->onStart();
+    }
+  }
+}
+
+void cedar::proc::Group::onStop()
+{
+  this->_mIsLooped->setConstant(false);
+  // if we get to this point, set the state to running
+  this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "");
+  for (auto element : this->mElements)
+  {
+    if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element.second))
+    {
+      group->onStop();
+    }
+  }
+}
+
+bool cedar::proc::Group::isLooped() const
+{
+  return this->_mIsLooped->getValue();
 }

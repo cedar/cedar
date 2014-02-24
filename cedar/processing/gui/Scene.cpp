@@ -135,7 +135,7 @@ void cedar::proc::gui::Scene::exportSvg(const QString& file)
   painter.end();
 }
 
-void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget)
+void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
 {
   this->mpConfigurableWidget = pConfigurableWidget;
 }
@@ -182,7 +182,7 @@ void cedar::proc::gui::Scene::itemSelected()
   }
   else
   {
-    this->mpConfigurableWidget->resetContents();
+    this->mpConfigurableWidget->clear();
     this->mpRecorderWidget->clearLayout();
   }
 }
@@ -629,135 +629,6 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   p_group->addElements(selected.toStdList());
 }
 
-void cedar::proc::gui::Scene::promoteElementToNewGroup()
-{
-  // do not create a new group if there are no elements selected
-  QList<QGraphicsItem*> selected = this->selectedItems();
-  // take out connections
-  for (QList<QGraphicsItem*>::iterator it = selected.begin(); it != selected.end(); )
-  {
-    if (dynamic_cast<cedar::proc::gui::Connection*>(*it))
-    {
-      it = selected.erase(it);
-    }
-    else
-    {
-      ++it;
-    }
-  }
-  // check if there are no selected elements left
-  if (selected.size() == 0)
-  {
-    return;
-  }
-
-  // create a new group and at this to the parent group
-  cedar::proc::GroupPtr group(new cedar::proc::Group());
-
-  /* try to get a grasp on the parent group of the first step - this is the group at which the new group
-   * should be inserted
-   */
-  cedar::proc::GroupPtr new_parent_group;
-
-  auto p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected.at(0));
-
-  if (p_base)
-  {
-    new_parent_group = p_base->getElement()->getGroup();
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::UnknownTypeException, "This GUI element type is not known.")
-  }
-
-  std::list<cedar::proc::ElementPtr> elements;
-  // sanity check - are all elements stored in the same group?
-  for (int i = 0; i < selected.size(); ++i)
-  {
-    if (cedar::proc::gui::Group *p_element = dynamic_cast<cedar::proc::gui::Group*>(selected.at(i)))
-    {
-      if (new_parent_group != p_element->getGroup()->getGroup())
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Not all selected items are in the same group - aborting operation.",
-          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
-        );
-        return;
-      }
-      else
-      {
-        elements.push_back(p_element->getGroup());
-      }
-    }
-    else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(i)))
-    {
-      if (new_parent_group != p_element->getStep()->getGroup())
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Not all selected items are in the same group - aborting operation.",
-          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
-        );
-        return;
-      }
-      else
-      {
-        elements.push_back(p_element->getStep());
-      }
-    }
-    else if (cedar::proc::gui::TriggerItem *p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(i)))
-    {
-      if (new_parent_group != p_element->getTrigger()->getGroup())
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Not all selected items are in the same group - aborting operation.",
-          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
-        );
-        return;
-      }
-      else
-      {
-        elements.push_back(p_element->getTrigger());
-      }
-    }
-  }
-  // add the new group to the parent group
-  CEDAR_DEBUG_ASSERT(new_parent_group);
-  std::string name = new_parent_group->getUniqueIdentifier("new Group");
-  group->setName(name);
-  if (new_parent_group == this->mGroup->getGroup())
-  {
-    // first add the group
-    mGroup->getGroup()->add(group);
-    // signals created a new graphical representation, set its parent now
-    mGroup->addElement(this->getGraphicsItemFor(group.get()));
-  }
-  else
-  {
-    new_parent_group->add(group);
-    dynamic_cast<cedar::proc::gui::Group*>
-    (
-      this->getGraphicsItemFor(new_parent_group.get())
-    )->addElement(this->getGraphicsItemFor(group.get()));
-  }
-
-  // remember all the old configurations of the ui representations
-  cedar::proc::gui::Group* p_new_group = this->getGroupFor(group.get());
-  for (std::list<cedar::proc::ElementPtr>::iterator i = elements.begin(); i != elements.end(); ++i)
-  {
-    cedar::aux::ConfigurationNode ui_description;
-    cedar::proc::ElementPtr element = *i;
-    cedar::proc::gui::GraphicsBase* p_ui_element = this->getGraphicsItemFor(element.get());
-    p_ui_element->writeConfiguration(ui_description);
-    p_new_group->setNextElementUiConfiguration(element, ui_description);
-  }
-
-  // move all elements to the group
-  group->add(elements);
-}
-
 void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
 {
   this->QGraphicsScene::contextMenuEvent(pContextMenuEvent);
@@ -766,7 +637,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
-  QAction *p_importGroup = menu.addAction("import group from file");
+  QAction* p_importGroup = menu.addAction("import group from file");
+  QAction* p_importStep = menu.addAction("import step from file");
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
@@ -785,6 +657,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   else if (a == p_importGroup)
   {
     this->importGroup();
+  }
+  else if (a == p_importStep)
+  {
+    this->importStep();
   }
   else if (a == p_addSickyNode)
   {
@@ -839,7 +715,7 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
   }
 }
 
-void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent)
+void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent* pMouseEvent)
 {
   if(mpNewConnectionIndicator != NULL)
   {
@@ -864,9 +740,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
       bool connected = false;
       for (int i = 0; i < items.size() && !connected; ++i)
       {
-        if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
-             && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
-            )
+        if
+        (
+          (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+            && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
+        )
         {
           connected = true;
           p2 = target->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
@@ -965,6 +843,13 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_step_item->getStep());
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
+
+              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
+              {
+                cedar::proc::gui::Group* p_group = dynamic_cast<cedar::proc::gui::Group*>(target);
+                source->getTrigger()->getGroup()->connectTrigger(source->getTrigger(), p_group->getGroup());
+                break;
+              } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP
 
               default:
                 CEDAR_DEBUG_ASSERT(false); // this should not happen
@@ -1322,39 +1207,40 @@ const std::vector<cedar::proc::gui::StickyNote* > cedar::proc::gui::Scene::getSt
   return this->mStickyNotes;
 }
 
+class GroupSelectDialog : public QDialog
+{
+public:
+  GroupSelectDialog(const std::vector<std::string>& groupNames, QWidget* pParent)
+  :
+  QDialog(pParent),
+  mpGroupNamesBox(new QComboBox())
+  {
+    this->setWindowTitle(QString("Select an element to add to your architecture."));
+    QVBoxLayout* p_layout = new QVBoxLayout();
+    p_layout->addWidget(mpGroupNamesBox);
+    QDialogButtonBox* p_button_box = new QDialogButtonBox();
+    p_button_box->addButton(QDialogButtonBox::StandardButton::Ok);
+    p_button_box->addButton(QDialogButtonBox::StandardButton::Cancel);
+
+    this->connect(p_button_box, SIGNAL(accepted()), this, SLOT(accept()));
+    this->connect(p_button_box, SIGNAL(rejected()), this, SLOT(reject()));
+    p_layout->addWidget(p_button_box);
+    for (auto name : groupNames)
+    {
+      mpGroupNamesBox->addItem(QString::fromStdString(name));
+    }
+    this->setLayout(p_layout);
+  }
+  std::string returnChosenGroup()
+  {
+    return mpGroupNamesBox->currentText().toStdString();
+  }
+
+  QComboBox* mpGroupNamesBox;
+};
+
 void cedar::proc::gui::Scene::importGroup()
 {
-  class GroupSelectDialog : public QDialog
-  {
-  public:
-    GroupSelectDialog(const std::vector<std::string>& groupNames, QWidget* pParent)
-    :
-    QDialog(pParent),
-    mpGroupNamesBox(new QComboBox())
-    {
-      this->setWindowTitle(QString("Select a group."));
-      QVBoxLayout* p_layout = new QVBoxLayout();
-      p_layout->addWidget(mpGroupNamesBox);
-      QDialogButtonBox* p_button_box = new QDialogButtonBox();
-      p_button_box->addButton(QDialogButtonBox::StandardButton::Ok);
-      p_button_box->addButton(QDialogButtonBox::StandardButton::Cancel);
-
-      this->connect(p_button_box, SIGNAL(accepted()), this, SLOT(accept()));
-      this->connect(p_button_box, SIGNAL(rejected()), this, SLOT(reject()));
-      p_layout->addWidget(p_button_box);
-      for (auto name : groupNames)
-      {
-        mpGroupNamesBox->addItem(QString::fromStdString(name));
-      }
-      this->setLayout(p_layout);
-    }
-    std::string returnChosenGroup()
-    {
-      return mpGroupNamesBox->currentText().toStdString();
-    }
-
-    QComboBox* mpGroupNamesBox;
-  };
 
   cedar::aux::DirectoryParameterPtr last_dir
     = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
@@ -1398,6 +1284,58 @@ void cedar::proc::gui::Scene::importGroup()
           QMessageBox::Warning,
           QString("No groups found"),
           QString("Could not find any groups in file " ) + file,
+          QMessageBox::Ok,
+          this->mpMainWindow
+        );
+    p_message->exec();
+  }
+}
+
+void cedar::proc::gui::Scene::importStep()
+{
+
+  cedar::aux::DirectoryParameterPtr last_dir
+    = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+  QString file = QFileDialog::getOpenFileName(this->mpMainWindow, // parent
+                                              "Select from which file to load a group", // caption
+                                              last_dir->getValue().absolutePath(), // initial directory
+                                              "json (*.json)" // filter(s), separated by ';;'
+                                              );
+
+  if (!file.isEmpty())
+  {
+    cedar::aux::ConfigurationNode configuration;
+    boost::property_tree::read_json(file.toStdString(), configuration);
+
+    // is there a node groups?
+    if (configuration.find("steps") != configuration.not_found())
+    {
+      const cedar::aux::ConfigurationNode& steps_node = configuration.get_child("steps");
+      std::vector<std::string> step_names;
+      for (auto step : steps_node)
+      {
+        step_names.push_back(step.second.get<std::string>("name"));
+      }
+      // found at least one group
+      if (step_names.size() > 0)
+      {
+        // open selection dialog
+        GroupSelectDialog* group_dialog(new GroupSelectDialog(step_names, this->mpMainWindow));
+        int result = group_dialog->exec();
+        if (result == QDialog::Accepted)
+        {
+          // import selected group
+          mGroup->getGroup()->importStepFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+        }
+        return;
+      }
+    }
+    QMessageBox* p_message
+      = new QMessageBox
+        (
+          QMessageBox::Warning,
+          QString("No steps found"),
+          QString("Could not find any steps in file " ) + file,
           QMessageBox::Ok,
           this->mpMainWindow
         );
