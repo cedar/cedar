@@ -181,6 +181,8 @@ private:
    */
   void writeDataConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
+  void writeParameterLinks(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

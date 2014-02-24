@@ -91,6 +91,15 @@ class cedar::proc::Group : public QThread, public cedar::proc::Connectable, publ
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  struct ParameterLinkInfo
+  {
+    cedar::aux::ParameterLinkPtr mParameterLink;
+
+    cedar::proc::ElementPtr mSourceElement;
+    cedar::proc::ElementPtr mTargetElement;
+  };
+
 public:
   //! Enum that represents the change of a given connection.
   enum ConnectionChange
@@ -501,9 +510,7 @@ public:
   void addParameterLink
   (
     cedar::proc::ElementPtr sourceElement,
-    cedar::aux::ParameterPtr sourceParameter,
     cedar::proc::ElementPtr targetElement,
-    cedar::aux::ParameterPtr targetParameter,
     cedar::aux::ParameterLinkPtr link
   );
   
@@ -623,7 +630,7 @@ private:
   std::map<std::string, boost::signals2::connection> mRevalidateConnections;
 
   //! List of all the parameter links in this group.
-  std::vector<cedar::aux::ParameterLinkPtr> mParameterLinks;
+  std::vector<ParameterLinkInfo> mParameterLinks;
 
   //! Map containing every looped thread
   TriggerableVector mLoopedTriggerables;

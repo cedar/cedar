@@ -97,6 +97,11 @@ void cedar::proc::GroupFileFormatV1::write
   if (!records.empty())
     root.add_child("records", records);
 
+  cedar::aux::ConfigurationNode links;
+  this->writeParameterLinks(group, links);
+  if (!links.empty())
+    root.add_child("parameter links", links);
+
   group->cedar::aux::Configurable::writeConfiguration(root);
 }
 
@@ -296,11 +301,41 @@ void cedar::proc::GroupFileFormatV1::read
   }
 }
 
+void cedar::proc::GroupFileFormatV1::writeParameterLinks
+     (
+       cedar::proc::ConstGroupPtr group,
+       cedar::aux::ConfigurationNode& root
+     )
+     const
+{
+  for (const auto& link_info : group->mParameterLinks)
+  {
+    cedar::aux::ConfigurationNode link_node;
+
+    std::string source_path = group->findPath(link_info.mSourceElement);
+    std::string target_path = group->findPath(link_info.mTargetElement);
+    auto source = link_info.mParameterLink->getLeft();
+    auto target = link_info.mParameterLink->getRight();
+    std::string source_parameter_path = link_info.mSourceElement->findParameterPath(source);
+    std::string target_parameter_path = link_info.mTargetElement->findParameterPath(target);
+    std::string link_type = cedar::aux::objectTypeToString(link_info.mParameterLink);
+    link_type = cedar::aux::replace(link_type, "::", ".");
+
+    link_node.put("type", link_type);
+    link_node.put("source element", source_path);
+    link_node.put("target element", target_path);
+    link_node.put("source parameter", source_parameter_path);
+    link_node.put("target parameter", target_parameter_path);
+
+    root.push_back(cedar::aux::ConfigurationNode::value_type("", link_node));
+  }
+}
+
 void cedar::proc::GroupFileFormatV1::readParameterLinks
      (
        cedar::proc::GroupPtr group,
        const cedar::aux::ConfigurationNode& root,
-       std::vector<std::string>& exceptions
+       std::vector<std::string>& /* exceptions */
      )
 {
   for (const auto& link_iter : root)
@@ -343,7 +378,6 @@ void cedar::proc::GroupFileFormatV1::readParameterLinks
     std::string tar_param_name = tar_param_iter->second.get_value<std::string>();
 
     //!@todo Error handling
-    //!@todo Store these links to make them (re-)storable later
 
     auto src_element = group->getElement(src_element_name);
     auto tar_element = group->getElement(tar_element_name);
@@ -353,7 +387,7 @@ void cedar::proc::GroupFileFormatV1::readParameterLinks
 
     link->setLinkedParameters(src_param, tar_param);
 
-    group->addParameterLink(src_element, src_param, tar_element, tar_param, link);
+    group->addParameterLink(src_element, tar_element, link);
   }
 }
 

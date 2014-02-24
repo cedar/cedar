@@ -196,14 +196,16 @@ cedar::proc::Group::~Group()
 //!@todo The additional information must be stored as well
 void cedar::proc::Group::addParameterLink
 (
-  cedar::proc::ElementPtr /* sourceElement */,
-  cedar::aux::ParameterPtr /* sourceParameter */,
-  cedar::proc::ElementPtr /* targetElement */,
-  cedar::aux::ParameterPtr /* targetParameter */,
+  cedar::proc::ElementPtr sourceElement,
+  cedar::proc::ElementPtr targetElement,
   cedar::aux::ParameterLinkPtr link
 )
 {
-  this->mParameterLinks.push_back(link);
+  ParameterLinkInfo info;
+  info.mParameterLink = link;
+  info.mSourceElement = sourceElement;
+  info.mTargetElement = targetElement;
+  this->mParameterLinks.push_back(info);
 }
 
 std::string cedar::proc::Group::getNewConnectorName(bool inputConnector) const
