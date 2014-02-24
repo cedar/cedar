@@ -690,7 +690,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
     (
       boost::bind
       (
-        &cedar::proc::Connectable::updateTargetSlots,
+        &cedar::proc::Connectable::freeTargetSlots,
         this,
         slot_ptr,
         _1
@@ -976,6 +976,34 @@ void cedar::proc::Connectable::updateTargetSlots(cedar::proc::DataSlotWeakPtr sl
   {
     cedar::proc::DataConnectionPtr connection = connections.at(i);
     connection->getTarget()->getParentPtr()->setInput(connection->getTarget()->getName(), data);
+  }
+}
+
+void cedar::proc::Connectable::freeTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data)
+{
+  //!@todo May want to move connections into data slots rather than the networks; then this case would not be necessary any more
+  auto group = this->getGroup();
+  if (!group)
+  {
+    return;
+  }
+
+  auto slot = slotWeak.lock();
+  CEDAR_ASSERT(slot);
+
+  // Update the other end of connections
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  group->getDataConnectionsFrom
+  (
+    boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
+    slot->getName(),
+    connections
+  );
+
+  for (size_t i = 0; i < connections.size(); ++i)
+  {
+    cedar::proc::DataConnectionPtr connection = connections.at(i);
+    connection->getTarget()->getParentPtr()->freeInput(connection->getTarget()->getName(), data);
   }
 }
 

@@ -275,6 +275,7 @@ int checkHierarchy(const AHierarchy& hierarchy)
 class Helper
 {
   public:
+    virtual ~Helper(){};
     virtual void insertInto(AHierarchy& hierarchy) = 0;
 
     virtual std::string toString() const = 0;
@@ -286,6 +287,7 @@ template <class T>
 class HelperTemplate : public Helper
 {
   public:
+    virtual ~HelperTemplate(){};
     void insertInto(AHierarchy& hierarchy)
     {
       std::string data_name = "data_" + cedar::aux::typeToString<T>();

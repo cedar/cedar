@@ -95,7 +95,7 @@ void run_test()
   cedar::aux::RecorderSingleton::getInstance()->start();
   cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
   cedar::aux::RecorderSingleton::getInstance()->stop();
-
+  cedar::aux::RecorderSingleton::getInstance()->clear();
 
   std::string filename = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory()+"/Mat1.csv";
   if(!fileExists(filename))

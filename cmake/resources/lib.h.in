@@ -41,9 +41,11 @@
 // CEDAR INCLUDES
 #include "cedar/defines.h"
 
-#ifdef CEDAR_COMPILER_MSVC
+#ifdef CEDAR_OS_WINDOWS
 
+#ifdef CEDAR_COMPILER_MSVC
   #pragma warning(disable: 4251)
+#endif // CEDAR_COMPILER_MSVC
 
   #ifdef CEDAR_LIB_EXPORTS_@CAP_LIB_NAME@
     #define CEDAR_DECLARE_@CAP_LIB_NAME@_CLASS(CLASS_NAME) CEDAR_DECLARE_CLASS_PREFIXED(__declspec(dllexport), CLASS_NAME)
@@ -79,7 +81,7 @@
         { \
           namespace aux \
           { \
-            template class __declspec(dllimport) cedar::aux::Singleton<FULL_CLASS_NAME>; \
+            extern template class __declspec(dllimport) cedar::aux::Singleton<FULL_CLASS_NAME>; \
           } \
         }
   #endif // CEDAR_LIB_EXPORTS_@CAP_LIB_NAME@
@@ -103,7 +105,7 @@
         { \
           namespace aux \
           { \
-            template class __declspec(dllimport) cedar::aux::Singleton<cedar::@LIB_NAMESPACE_NAME@::CLASS_NAME>; \
+            extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::@LIB_NAMESPACE_NAME@::CLASS_NAME>; \
           } \
           namespace @LIB_NAMESPACE_NAME@ \
           { \

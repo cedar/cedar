@@ -78,6 +78,10 @@ private:
   //! Struct for the entries in the factory.
   struct Entry
   {
+    virtual ~Entry()
+    {
+    }
+
     //! Type info for identifying exact matches of types.
     const std::type_info* mTypeInfo;
 

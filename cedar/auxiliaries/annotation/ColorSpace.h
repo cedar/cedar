@@ -78,7 +78,10 @@ public:
     Alpha,
     Luminance,
     ChromaticRed,
-    ChromaticBlue
+    ChromaticBlue,
+    Lab_L,
+    Lab_a,
+    Lab_b
   };
 
 

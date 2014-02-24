@@ -323,13 +323,20 @@ void cedar::proc::gui::Ide::duplicateStep()
   QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
 
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
+  QPointF center(0.0, 0.0);
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+	center += selected_items.at(i)->pos();
+  }
+  center /= static_cast<qreal>(selected_items.size());
+
   for (int i = 0; i < selected_items.size(); ++i)
   {
     if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
     {
       try
       {
-        this->mGroup->duplicate(new_pos, p_base->getElement()->getName());
+        this->mGroup->duplicate(new_pos - (center - p_base->pos()), p_base->getElement()->getName());
       }
       catch (cedar::aux::ExceptionBase& exc)
       {
@@ -404,7 +411,7 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {
   this->storeSettings();
   // Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
-  this->mpPropertyTable->resetContents();
+  this->mpPropertyTable->clear();
   pEvent->accept();
 }
 
@@ -451,7 +458,7 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpProcessingDrawer->getScene()->reset();
   this->mGroup->addElementsToScene();
-  this->mpPropertyTable->resetContents();
+  this->mpPropertyTable->clear();
 
   this->updateTriggerStartStopThreadCallers();
 
@@ -612,7 +619,7 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
   // delete step
   if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(pItem))
   {
-    this->mpPropertyTable->resetContents();
+    this->mpPropertyTable->clear();
     p_drawer->hide();
     p_drawer->getStep()->getGroup()->remove(p_drawer->getStep());
   }

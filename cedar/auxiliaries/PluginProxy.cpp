@@ -48,7 +48,9 @@
 #include <dlfcn.h>
 #elif defined CEDAR_OS_WINDOWS
 #include <Windows.h>
+#ifdef CEDAR_COMPILER_MSVC
 #include <strsafe.h>
+#endif // CEDAR_COMPILER_MSVC
 #endif // CEDAR_OS_UNIX
 
 #ifndef Q_MOC_RUN
@@ -293,6 +295,9 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, c
   plugin_filename += pluginName;
   plugin_filename += ".dylib";
 #elif defined CEDAR_OS_WINDOWS
+#ifndef CEDAR_COMPILER_MSVC
+  plugin_filename = "lib";
+#endif // CEDAR_COMPILER_MSVC
   plugin_filename += pluginName;
   plugin_filename += ".dll";
 #endif

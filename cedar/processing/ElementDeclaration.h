@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/PlotData.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
@@ -59,24 +60,6 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
-
-
-// instantiation of the relevant singletons to make sure they are available across DLLs
-namespace cedar
-{
-  namespace proc
-  {
-    typedef
-      cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
-      ElementDeclarationManager;
-
-    typedef
-      cedar::aux::FactoryManager<cedar::proc::ElementPtr>
-      ElementFactoryManager;
-  }
-}
-CEDAR_PROC_SINGLETON(ElementDeclarationManager);
-CEDAR_PROC_SINGLETON(ElementFactoryManager);
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to

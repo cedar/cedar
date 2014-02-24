@@ -58,6 +58,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -96,8 +97,7 @@ void run_test()
 
   // start the processing
   network->getElement<LoopedTrigger>("Main Trigger")->start();
-
-  sleep(1);
+  cedar::aux::sleep(1.0 * cedar::unit::second);
 
   // stop the processing
   network->getElement<LoopedTrigger>("Main Trigger")->stop();

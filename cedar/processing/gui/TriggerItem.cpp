@@ -77,7 +77,8 @@ cedar::proc::gui::TriggerItem::TriggerItem()
 cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
@@ -91,7 +92,8 @@ cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
@@ -163,16 +165,19 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
     return cedar::proc::gui::CONNECT_NO;
   }
 
-  if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
+  if (cedar::proc::gui::Connectable* p_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(pTarget))
   {
-    if(p_step_item->getStep()->getParentTrigger() || this->mTrigger->isListener(p_step_item->getStep()))
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(p_connectable->getConnectable()))
     {
-      return cedar::proc::gui::CONNECT_NO;
-    }
-    // ... source and target are not in the same group
-    else if (this->getTrigger()->getGroup() != p_step_item->getStep()->getGroup())
-    {
-      return cedar::proc::gui::CONNECT_NO;
+      if (triggerable->getParentTrigger() || this->mTrigger->isListener(triggerable))
+      {
+        return cedar::proc::gui::CONNECT_NO;
+      }
+      // ... source and target are not in the same group
+      else if (this->getTrigger()->getGroup() != p_connectable->getConnectable()->getGroup())
+      {
+        return cedar::proc::gui::CONNECT_NO;
+      }
     }
   }
 

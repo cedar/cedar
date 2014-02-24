@@ -219,6 +219,8 @@ protected:
   //! Sets the size and position of the icon display. The icon will, at most, be size x size.
   void setIconBounds(const qreal& x, const qreal& y, const qreal& size);
 
+  //!@brief Adds the decorations to the step.
+  void addDecorations();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

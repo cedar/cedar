@@ -49,6 +49,7 @@
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -402,53 +403,6 @@ void cedar::proc::gui::StepItem::setRecorded(bool status)
 
 }
 
-void cedar::proc::gui::StepItem::addDecorations()
-{
-  this->mDecorations.clear();
-
-  if (this->getStep() && this->getStep()->isLooped())
-  {
-    DecorationPtr decoration
-    (
-      new Decoration
-      (
-        this,
-        ":/decorations/looped.svg",
-        "This step is looped, i.e., it expects to be connected to a looped trigger."
-      )
-    );
-
-    this->mDecorations.push_back(decoration);
-  }
-
-  auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getElement());
-
-  if (declaration->isDeprecated())
-  {
-    std::string dep_msg = "This step is deprecated.";
-
-    if (!declaration->getDeprecationDescription().empty())
-    {
-      dep_msg += " " + declaration->getDeprecationDescription();
-    }
-
-    DecorationPtr decoration
-    (
-      new Decoration
-      (
-        this,
-        ":/cedar/auxiliaries/gui/warning.svg",
-        QString::fromStdString(dep_msg),
-        QColor(255, 240, 110)
-      )
-    );
-
-    this->mDecorations.push_back(decoration);
-  }
-
-  this->updateDecorationPositions();
-}
-
 void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu)
 {
   std::string label = e.prettyString() + "s";
@@ -561,14 +515,6 @@ void cedar::proc::gui::StepItem::showPlot
   p_dock_widget->show();
 }
 
-void cedar::proc::gui::StepItem::openProperties()
-{
-  cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
-  auto p_dock_widget = this->createDockWidget("Properties", props);
-  props->display(this->getStep());
-  p_dock_widget->show();
-}
-
 void cedar::proc::gui::StepItem::openActionsDock()
 {
   QWidget* p_actions = new QWidget();
@@ -585,6 +531,14 @@ void cedar::proc::gui::StepItem::openActionsDock()
   std::string title = "Actions of step \"" + this->getStep()->getName() + "\"";
   auto p_dock_widget = this->createDockWidget(title, p_actions);
   p_dock_widget->show();
+}
+
+void cedar::proc::gui::StepItem::openProperties()
+{
+  cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
+  props->display(this->getStep());
+  auto p_widget = this->createDockWidget("Properties", props);
+  p_widget->show();
 }
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -765,6 +719,7 @@ void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu& menu, const QPoint& plo
     {
       p_default_plot->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[default_index].mIcon)));
     }
+    p_default_plot->setData(plotPosition);
     QObject::connect(p_default_plot, SIGNAL(triggered()), this, SLOT(openDefinedPlotAction()));
   }
   else

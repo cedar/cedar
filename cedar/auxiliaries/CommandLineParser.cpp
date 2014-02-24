@@ -51,11 +51,11 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::aux::CommandLineParser::M_STANDARD_OPTIONS_GROUP = "common options";
-std::string cedar::aux::CommandLineParser::M_WRITE_CONFIG_COMMAND = "write-config-to-file";
-std::string cedar::aux::CommandLineParser::M_READ_CONFIG_COMMAND = "read-config-from-file";
-std::string cedar::aux::CommandLineParser::M_UNGROUPED_OPTIONS_NAME = "ungrouped";
-std::string cedar::aux::CommandLineParser::M_CFG_FILE_INCLUDE_TAG = "include";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_STANDARD_OPTIONS_GROUP = "common options";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_WRITE_CONFIG_COMMAND = "write-config-to-file";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_READ_CONFIG_COMMAND = "read-config-from-file";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_UNGROUPED_OPTIONS_NAME = "ungrouped";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_CFG_FILE_INCLUDE_TAG = "include";
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
