@@ -7,7 +7,7 @@
     {
         "cedar.dynamics.NeuralField":
         {
-            "name": "new NeuralField 1",
+            "name": "field 1",
             "resting level": "-5",
             "time scale": "100",
             "global inhibition": "-0.01",
@@ -85,7 +85,7 @@
         },
         "cedar.dynamics.NeuralField":
         {
-            "name": "new NeuralField 2",
+            "name": "field 2",
             "resting level": "-5",
             "time scale": "100",
             "global inhibition": "-0.01",
@@ -166,29 +166,29 @@
     [
         {
             "type": "cedar.aux.DirectParameterLink",
-            "source element": "new NeuralField 1",
-            "target element": "new NeuralField 2",
+            "source element": "field 1",
+            "target element": "field 2",
             "source parameter": "resting level",
             "target parameter": "resting level"
         },
         {
             "type": "cedar.aux.DirectParameterLink",
-            "source element": "new NeuralField 1",
-            "target element": "new NeuralField 2",
+            "source element": "field 1",
+            "target element": "field 2",
             "source parameter": "lateral kernel convolution.borderType",
             "target parameter": "lateral kernel convolution.borderType"
         },
         {
             "type": "cedar.aux.DirectParameterLink",
-            "source element": "new NeuralField 1",
-            "target element": "new NeuralField 2",
+            "source element": "field 1",
+            "target element": "field 2",
             "source parameter": "sigmoid.beta",
             "target parameter": "sigmoid.beta"
         },
         {
             "type": "cedar.aux.DirectParameterLink",
-            "source element": "new NeuralField 1",
-            "target element": "new NeuralField 2",
+            "source element": "field 1",
+            "target element": "field 2",
             "source parameter": "lateral kernels[0].amplitude",
             "target parameter": "lateral kernels[0].amplitude"
         }
@@ -200,7 +200,7 @@
     [
         {
             "type": "step",
-            "step": "new NeuralField 1",
+            "step": "field 1",
             "display style": "ICON_AND_TEXT",
             "width": "160",
             "height": "50",
@@ -209,7 +209,7 @@
         },
         {
             "type": "step",
-            "step": "new NeuralField 2",
+            "step": "field 2",
             "display style": "ICON_AND_TEXT",
             "width": "160",
             "height": "50",
