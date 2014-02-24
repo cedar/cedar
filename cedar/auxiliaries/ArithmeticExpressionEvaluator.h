@@ -57,6 +57,7 @@ class cedar::aux::ArithmeticExpressionEvaluator
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  template <typename Iterator> class ParserGrammar;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
