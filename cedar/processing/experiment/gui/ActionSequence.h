@@ -22,42 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentDialog.h
+    File:        ActionSequence.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description:
+    Description: Header file for the class cedar::proc::experiment::gui::ActionSequence.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_EXPERIMENT_DIALOG_H
-#define CEDAR_PROC_GUI_EXPERIMENT_DIALOG_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
+#define CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_ExperimentDialog.h"
-#include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/gui/Ide.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/ExperimentDialog.fwd.h"
+#include "cedar/processing/experiment/gui/ActionSequence.fwd.h"
+#include "cedar/processing/experiment/ActionSequence.fwd.h"
+#include "cedar/processing/experiment/Experiment.fwd.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/signals2.hpp>
-#endif
+#include <QWidget>
+#include <QBoxLayout>
 
 
-/*!@brief A widget for
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::gui::ExperimentDialog : public QWidget, public Ui_ExperimentDialog
+class cedar::proc::experiment::gui::ActionSequence : public QWidget
 {
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,40 +73,29 @@ class cedar::proc::gui::ExperimentDialog : public QWidget, public Ui_ExperimentD
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExperimentDialog(cedar::proc::gui::Ide* parent);
+  ActionSequence(cedar::proc::experiment::ActionSequencePtr sequence, cedar::proc::experiment::ExperimentPtr parent);
 
-  //!@brief The destructor.
-  ~ExperimentDialog();
-
-  void redraw();
+  //!@brief Destructor
+  virtual ~ActionSequence();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Sets the network whose boosts are controlled by this widget.
-   */
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void paintEvent(QPaintEvent *pe);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  void clearActionSequences();
 private slots:
-    void save();
-    void saveAs();
-    void load();
-    void nameChanged();
-    void addActionSequence();
-    void repetitionChanged();
-    void runExperiment(bool status);
-
+void remove();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -110,10 +103,20 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::proc::gui::Ide* mParent;
-  cedar::proc::experiment::ExperimentPtr experiment;
+  // none yet
 
-}; // class cedar::proc::gui::ExperimentDialog
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_EXPERIMENT_DIALOG_H
+private:
+  QVBoxLayout* mLayout;
+  cedar::proc::experiment::ActionSequencePtr mSequence;
+  cedar::proc::experiment::ExperimentPtr mParent;
+
+}; // class cedar::proc::experiment::gui::ActionSequence
+
+#endif // CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
 

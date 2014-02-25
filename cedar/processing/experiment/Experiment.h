@@ -91,6 +91,7 @@ public:
   void run();
   void cancel();
   void addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
+  void removeActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
   std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
   void startNetwork();
   void stopNetwork();

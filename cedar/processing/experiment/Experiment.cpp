@@ -71,6 +71,7 @@ mController(new ExperimentController(this))
 
   ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
   as->addAction(ActionPtr(new ActionStart()));
+  as->setName("ActionSequence1");
   this->addActionSequence(as);
 
 
@@ -170,6 +171,19 @@ void cedar::proc::experiment::Experiment::executeAcionSequences()
       {
         action->run(this);
       }
+    }
+  }
+}
+
+void cedar::proc::experiment::Experiment::removeActionSequence(
+    cedar::proc::experiment::ActionSequencePtr actionSequence)
+{
+  for (unsigned int i = 0; i < _mActionSequences->size(); i++)
+  {
+    if (this->_mActionSequences->at(i) == actionSequence)
+    {
+      this->_mActionSequences->removeObject(i);
+      return;
     }
   }
 }
