@@ -45,7 +45,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/ActionSequence.fwd.h"
 #include "cedar/processing/experiment/ActionSequence.fwd.h"
-#include "cedar/processing/experiment/Experiment.fwd.h"
+#include "cedar/processing/gui/ExperimentDialog.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -73,7 +73,7 @@ class cedar::proc::experiment::gui::ActionSequence : public QWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ActionSequence(cedar::proc::experiment::ActionSequencePtr sequence, cedar::proc::experiment::ExperimentPtr parent);
+  ActionSequence(cedar::proc::experiment::ActionSequencePtr sequence, cedar::proc::gui::ExperimentDialog* pParent);
 
   //!@brief Destructor
   virtual ~ActionSequence();
@@ -113,8 +113,10 @@ protected:
 
 private:
   QVBoxLayout* mLayout;
+  QVBoxLayout* mActions;
+  QHBoxLayout* mCondition;
   cedar::proc::experiment::ActionSequencePtr mSequence;
-  cedar::proc::experiment::ExperimentPtr mParent;
+  cedar::proc::gui::ExperimentDialog* mpParent;
 
 }; // class cedar::proc::experiment::gui::ActionSequence
 

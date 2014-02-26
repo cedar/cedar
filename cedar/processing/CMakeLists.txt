@@ -52,6 +52,7 @@ cedar_add_library(cedarproc
   MOC_HEADERS
   experiment/gui/ActionSequence.h
   experiment/gui/Condition.h
+  experiment/gui/ConditionOnInit.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h

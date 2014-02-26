@@ -78,6 +78,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //@todo Weakpointer
   virtual bool check(Experiment* parent) = 0;
 
 

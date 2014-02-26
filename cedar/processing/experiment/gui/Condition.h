@@ -41,6 +41,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/Condition.fwd.h"
@@ -110,6 +113,9 @@ private:
   // none yet
 
 }; // class cedar::proc::experiment::gui::Condition
+
+
+CEDAR_PROC_EXPORT_SINGLETON(cedar::proc::experiment::gui::ConditionFactory);
 
 #endif // CEDAR_PROC_EXPERIMENT_GUI_CONDITION_H
 

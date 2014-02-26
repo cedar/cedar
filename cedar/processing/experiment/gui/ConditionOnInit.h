@@ -22,44 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentDialog.h
+    File:        ConditionOnInit.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 26
 
-    Description:
+    Description: Header file for the class cedar::proc::experiment::gui::ConditionOnInit.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_EXPERIMENT_DIALOG_H
-#define CEDAR_PROC_GUI_EXPERIMENT_DIALOG_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_CONDITION_ON_INIT_H
+#define CEDAR_PROC_EXPERIMENT_GUI_CONDITION_ON_INIT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_ExperimentDialog.h"
-#include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/experiment/gui/Condition.h"
+#include "cedar/processing/experiment/ConditionOnInit.h"
+
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/ExperimentDialog.fwd.h"
+#include "cedar/processing/experiment/gui/ConditionOnInit.fwd.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/signals2.hpp>
-#endif
 
 
-/*!@brief A widget for
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::gui::ExperimentDialog : public QWidget, public Ui_ExperimentDialog
+class cedar::proc::experiment::gui::ConditionOnInit : public cedar::proc::experiment::gui::Condition
 {
-  Q_OBJECT
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,39 +71,28 @@ class cedar::proc::gui::ExperimentDialog : public QWidget, public Ui_ExperimentD
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExperimentDialog(cedar::proc::gui::Ide* parent);
+  ConditionOnInit();
 
-  //!@brief The destructor.
-  ~ExperimentDialog();
-
-  void redraw();
+  //!@brief Destructor
+  virtual ~ConditionOnInit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::experiment::ExperimentPtr getExperiment();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void paintEvent(QPaintEvent *pe);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void clearActionSequences();
-private slots:
-    void save();
-    void saveAs();
-    void load();
-    void nameChanged();
-    void addActionSequence();
-    void repetitionChanged();
-    void runExperiment(bool status);
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -109,10 +100,18 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::proc::gui::Ide* mParent;
-  cedar::proc::experiment::ExperimentPtr experiment;
+  // none yet
 
-}; // class cedar::proc::gui::ExperimentDialog
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_EXPERIMENT_DIALOG_H
+private:
+  // none yet
+
+}; // class cedar::proc::experiment::gui::ConditionOnInit
+
+#endif // CEDAR_PROC_EXPERIMENT_GUI_CONDITION_ON_INIT_H
 

@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Condition.cpp
+    File:        ConditionOnInit.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 02 26
 
-    Description: Source file for the class cedar::proc::experiment::gui::Condition.
+    Description: Source file for the class cedar::proc::experiment::gui::ConditionOnInit.
 
     Credits:
 
@@ -38,20 +38,31 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/gui/Condition.h"
+#include "cedar/processing/experiment/gui/ConditionOnInit.h"
 
 // SYSTEM INCLUDES
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// associate experiment::gui::Condition with the experiment::Condition
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::proc::experiment::gui::ConditionFactorySingleton::getInstance()->add
+      <
+        cedar::proc::experiment::ConditionOnInit,
+        cedar::proc::experiment::gui::ConditionOnInit
+      >();
+}
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::gui::Condition::Condition()
+cedar::proc::experiment::gui::ConditionOnInit::ConditionOnInit()
 {
 }
 
-cedar::proc::experiment::gui::Condition::~Condition()
+cedar::proc::experiment::gui::ConditionOnInit::~ConditionOnInit()
 {
 }
 
