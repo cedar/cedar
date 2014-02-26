@@ -155,6 +155,11 @@ void cedar::proc::gui::ExperimentDialog::addActionSequence()
   this->redraw();
 }
 
+cedar::proc::experiment::ExperimentPtr cedar::proc::gui::ExperimentDialog::getExperiment()
+{
+  return this->experiment;
+}
+
 void cedar::proc::gui::ExperimentDialog::runExperiment(bool status)
 {
   if (status)
@@ -187,10 +192,10 @@ void cedar::proc::gui::ExperimentDialog::redraw()
   {
     cedar::proc::experiment::ActionSequencePtr action_seq =action_sequences[i];
     cedar::proc::experiment::gui::ActionSequence* as_gui
-      = new cedar::proc::experiment::gui::ActionSequence(action_seq,this->experiment);
+      = new cedar::proc::experiment::gui::ActionSequence(action_seq,this);
     this->mActionSequences->addWidget(as_gui);
 
-    /*
+/*
     cedar::aux::ParameterPtr condition = action_seq->getParameter("Condition");
     cedar::aux::gui::Parameter *p_widget
       = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(condition)->allocateRaw();
@@ -202,7 +207,7 @@ void cedar::proc::gui::ExperimentDialog::redraw()
         p_widget = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(action)->allocateRaw();
         p_widget->setParent(this);
         p_widget->setParameter(action);
-        this->mActionSequences->addWidget(p_widget);*/
-
+        this->mActionSequences->addWidget(p_widget);
+*/
   }
 }

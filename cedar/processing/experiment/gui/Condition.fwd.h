@@ -43,6 +43,11 @@
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/experiment/Condition.fwd.h"
+#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+#include "cedar/auxiliaries/Singleton.fwd.h"
+
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
@@ -58,6 +63,9 @@ namespace cedar
       namespace gui
       {
         CEDAR_DECLARE_PROC_CLASS(Condition);
+        typedef cedar::aux::TypeBasedFactory<cedar::proc::experiment::ConditionPtr,
+            cedar::proc::experiment::gui::ConditionPtr> ConditionFactory;
+        typedef cedar::aux::Singleton<ConditionFactory> ConditionFactorySingleton;
       }
     }
   }

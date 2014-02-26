@@ -54,6 +54,7 @@
  *
  * @todo describe more.
  */
+//@todo Superviser
 class cedar::proc::experiment::ExperimentController : public cedar::aux::LoopedThread
 {
   //--------------------------------------------------------------------------------------------------------------------

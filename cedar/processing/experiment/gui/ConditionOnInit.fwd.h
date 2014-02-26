@@ -22,39 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Condition.cpp
+    File:        ConditionOnInit.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 02 26
 
-    Description: Source file for the class cedar::proc::experiment::gui::Condition.
+    Description: Forward declaration file for the class cedar::proc::experiment::gui::ConditionOnInit.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_CONDITION_ON_INIT_FWD_H
+#define CEDAR_PROC_EXPERIMENT_GUI_CONDITION_ON_INIT_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/gui/Condition.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::experiment::gui::Condition::Condition()
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
+  namespace proc
+  {
+    namespace experiment
+    {
+      namespace gui
+      {
+        CEDAR_DECLARE_PROC_CLASS(ConditionOnInit);
+      }
+    }
+  }
 }
 
-cedar::proc::experiment::gui::Condition::~Condition()
-{
-}
+//!@endcond
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_PROC_EXPERIMENT_GUI_CONDITION_ON_INIT_FWD_H
+
