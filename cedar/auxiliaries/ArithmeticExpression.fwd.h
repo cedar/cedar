@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,53 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ArithmeticExpressionEvaluator.cpp
+    File:        ArithmeticExpressionEvaluator.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2014 02 24
 
-    Description: 
+    Description: Forward declaration file for the class cedar::aux::ArithmeticExpressionEvaluator.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_AUX_ARITHMETIC_EXPRESSION_FWD_H
+#define CEDAR_AUX_ARITHMETIC_EXPRESSION_FWD_H
 
-// LOCAL INCLUDES
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/ArithmeticExpressionEvaluator.h"
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-#define TEST_ASSERTION(cond) if (!(cond)) { ++errors; std::cout << "ERROR in line " << __LINE__ << ": " << # cond << std::endl; } \
-  else { std::cout << "passed: " << # cond << std::endl; }
-
-
-int test_basic_expression()
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-  int errors = 0;
-  cedar::aux::ArithmeticExpressionEvaluator evaluator;
-
-  TEST_ASSERTION(evaluator.evaluate("1 + 2") == 3);
-
-  TEST_ASSERTION(evaluator.evaluate("1 + 2 + 3") == 6);
-
-  std::map<std::string, double> variables;
-  variables["x"] = 3;
-  TEST_ASSERTION(evaluator.evaluate("1 + 2 + x", variables) == 6);
-
-  return errors;
+  namespace aux
+  {
+    CEDAR_DECLARE_AUX_CLASS(ArithmeticExpression);
+  }
 }
 
-int main()
-{
-  // the number of errors encountered in this test
-  int errors = 0;
+//!@endcond
 
-  errors += test_basic_expression();
+#endif // CEDAR_AUX_ARITHMETIC_EXPRESSION_FWD_H
 
-  return errors;
-}

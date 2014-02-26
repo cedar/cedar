@@ -34,6 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(ArithmeticExpressionEvaluator
-                    ArithmeticExpressionEvaluator.cpp
+cedar_add_unit_test(ArithmeticExpression
+                    ArithmeticExpression.cpp
                     )
