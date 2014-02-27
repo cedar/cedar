@@ -123,13 +123,23 @@ int test_equation(const std::string& equation)
   std::cout << "Testing equation: \"" << equation << "\"" << std::endl;
 
   cedar::aux::ArithmeticExpression expression(equation);
-
-  std::cout << "Original equation:" << std::endl;
-  std::cout << expression.toString() << std::endl;
-
-  std::cout << "Solved for x:" << std::endl;
   auto solved_for_x = expression.solveFor("x");
-  std::cout << solved_for_x->toString() << std::endl;
+
+  if (solved_for_x->isSolvedFor("x"))
+  {
+    std::cout << "SOLVED as " << solved_for_x->toString() << std::endl;
+  }
+  else
+  {
+    ++errors;
+    std::cout << "FAILED to solve the equation properly." << std::endl;
+
+    std::cout << "Original equation:" << std::endl;
+    std::cout << expression.toString() << std::endl;
+
+    std::cout << "Solved for x:" << std::endl;
+    std::cout << solved_for_x->toString() << std::endl;
+  }
 
   return errors;
 }
@@ -142,6 +152,8 @@ int test_basic_equations()
   errors += test_equation("y = 2 * x");
   errors += test_equation("y = 2 * x + 3");
   errors += test_equation("y = 2 * (x + 3)");
+  errors += test_equation("y = 3 * (x + 3) + 2 * x + 3");
+  errors += test_equation("y = 2 * (x + 3) + 2 * x + 3");
 
   return errors;
 }
