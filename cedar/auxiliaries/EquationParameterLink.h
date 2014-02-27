@@ -22,41 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterLink.h
+    File:        EquationParameterLink.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 02 18
+    Date:        2014 02 27
 
-    Description: Header file for the class cedar::aux::ParameterLink.
+    Description: Header file for the class cedar::aux::EquationParameterLink.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_PARAMETER_LINK_H
-#define CEDAR_AUX_PARAMETER_LINK_H
+#ifndef CEDAR_AUX_EQUATION_PARAMETER_LINK_H
+#define CEDAR_AUX_EQUATION_PARAMETER_LINK_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/ParameterLink.h"
+#include "cedar/auxiliaries/ArithmeticExpression.fwd.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/ParameterLink.fwd.h"
+#include "cedar/auxiliaries/EquationParameterLink.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QObject>
 
 
-/*!@brief Base for classes that link different parameters together.
- *
- *        A parameter link is an association between two or more parameters. The values of the associated parameters
- *        are then linked, meaning that when one value is changed, another one is changed as well.
+/*!@brief A parameter link that uses a (linear) equation to determine how to link parameters.
  */
-class cedar::aux::ParameterLink : public QObject, public cedar::aux::Configurable
+class cedar::aux::EquationParameterLink : public cedar::aux::ParameterLink
 {
   Q_OBJECT
 
@@ -69,22 +66,13 @@ class cedar::aux::ParameterLink : public QObject, public cedar::aux::Configurabl
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ParameterLink();
-
-  //!@brief Destructor
-  virtual ~ParameterLink();
+  EquationParameterLink();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setLinkedParameters(cedar::aux::ParameterPtr left, cedar::aux::ParameterPtr right);
-
-  cedar::aux::ParameterPtr getLeft() const;
-
-  cedar::aux::ParameterPtr getRight() const;
-
-  bool canLink(cedar::aux::ParameterPtr left, cedar::aux::ParameterPtr right);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -95,13 +83,17 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private slots:
-  virtual void leftChanged() = 0;
-
-  virtual void rightChanged() = 0;
-
 private:
-  virtual bool checkIfLinkable(cedar::aux::ConstParameterPtr left, cedar::aux::ConstParameterPtr right) const = 0;
+  // none yet
+
+  void leftChanged();
+
+  void rightChanged();
+
+  bool checkIfLinkable(cedar::aux::ConstParameterPtr left, cedar::aux::ConstParameterPtr right) const;
+
+private slots:
+  void equationChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -109,8 +101,11 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ParameterPtr mLeft;
-  cedar::aux::ParameterPtr mRight;
+  //! Expression of the form right = f(left)
+  cedar::aux::ArithmeticExpressionPtr mForwardExpression;
+
+  //! Expression of the form left = f(right)
+  cedar::aux::ArithmeticExpressionPtr mBackwardExpression;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -119,23 +114,10 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! Equation linking the two parameters. Must have the form right = f(left), where f is some linear function.
+  cedar::aux::StringParameterPtr _mEquation;
 
-}; // class cedar::aux::ParameterLink
+}; // class cedar::aux::EquationParameterLink
 
-#include "cedar/auxiliaries/FactoryManager.h"
-
-namespace cedar
-{
-  namespace aux
-  {
-    typedef
-      cedar::aux::FactoryManager<cedar::aux::ParameterLinkPtr>
-      ParameterLinkFactoryManager;
-  }
-}
-
-CEDAR_AUX_SINGLETON(ParameterLinkFactoryManager);
-
-#endif // CEDAR_AUX_PARAMETER_LINK_H
+#endif // CEDAR_AUX_EQUATION_PARAMETER_LINK_H
 

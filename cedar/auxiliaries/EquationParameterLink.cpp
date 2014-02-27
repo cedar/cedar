@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DirectParameterLink.cpp
+    File:        EquationParameterLink.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 02 18
+    Date:        2014 02 27
 
-    Description: Source file for the class cedar::aux::DirectParameterLink.
+    Description: Source file for the class cedar::aux::EquationParameterLink.
 
     Credits:
 
@@ -38,11 +38,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/DirectParameterLink.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/EquationParameterLink.h"
 #include "cedar/auxiliaries/NumericParameterHelper.h"
+#include "cedar/auxiliaries/ArithmeticExpression.h"
 
 // SYSTEM INCLUDES
+#include <map>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
@@ -52,80 +53,58 @@ namespace
 {
   bool registerType()
   {
-    cedar::aux::ParameterLinkFactoryManagerSingleton::getInstance()->registerType<cedar::aux::DirectParameterLinkPtr>();
+    cedar::aux::ParameterLinkFactoryManagerSingleton::getInstance()->registerType<cedar::aux::EquationParameterLinkPtr>();
     return true;
   }
 
   bool registered = registerType();
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::DirectParameterLink::DirectParameterLink()
+cedar::aux::EquationParameterLink::EquationParameterLink()
+:
+_mEquation(new cedar::aux::StringParameter(this, "equation", "target = source"))
 {
-}
-
-cedar::aux::DirectParameterLink::~DirectParameterLink()
-{
+  this->equationChanged();
+  QObject::connect(this->_mEquation.get(), SIGNAL(valueChanged()), this, SLOT(equationChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::DirectParameterLink::leftChanged()
+void cedar::aux::EquationParameterLink::equationChanged()
 {
-  this->assign(this->getLeft(), this->getRight());
+  cedar::aux::ArithmeticExpression expr(this->_mEquation->getValue());
+  this->mForwardExpression = expr.solveFor("target");
+  this->mBackwardExpression = expr.solveFor("source");
 }
 
-void cedar::aux::DirectParameterLink::rightChanged()
+void cedar::aux::EquationParameterLink::leftChanged()
 {
-  this->assign(this->getRight(), this->getLeft());
+  std::map<std::string, double> variables;
+  variables["source"] = cedar::aux::NumericParameterHelper::getValue(this->getLeft());
+  double new_value = this->mForwardExpression->getRight()->evaluate(variables);
+  cedar::aux::NumericParameterHelper::setValue(this->getRight(), new_value);
 }
 
-bool cedar::aux::DirectParameterLink::checkIfLinkable
+void cedar::aux::EquationParameterLink::rightChanged()
+{
+  std::map<std::string, double> variables;
+  variables["target"] = cedar::aux::NumericParameterHelper::getValue(this->getRight());
+  double new_value = this->mBackwardExpression->getRight()->evaluate(variables);
+  cedar::aux::NumericParameterHelper::setValue(this->getLeft(), new_value);
+}
+
+bool cedar::aux::EquationParameterLink::checkIfLinkable
      (
-       cedar::aux::ConstParameterPtr /* left */,
-       cedar::aux::ConstParameterPtr /* right */
+       cedar::aux::ConstParameterPtr left,
+       cedar::aux::ConstParameterPtr right
      )
      const
 {
-  // TODO
-  return true;
-}
-
-
-void cedar::aux::DirectParameterLink::assign
-     (
-       cedar::aux::ConstParameterPtr source,
-       cedar::aux::ParameterPtr target
-     ) const
-{
-  // if the target parameter can copy from the source, use this built-in functionality
-  if (target->canCopyFrom(source))
-  {
-    target->copyValueFrom(source);
-    return;
-  }
-
-  // otherwise, we have to check if we know how to convert these values appropriately
-
-  if (cedar::aux::NumericParameterHelper::isNumeric(source) && cedar::aux::NumericParameterHelper::isNumeric(target))
-  {
-    double value = cedar::aux::NumericParameterHelper::getValue(source);
-    cedar::aux::NumericParameterHelper::setValue(target, value);
-  }
-  else
-  {
-    // finally, if we couldn't handle the parameters until this point, throw an exception
-    CEDAR_THROW
-    (
-      cedar::aux::UnhandledTypeException,
-      "Cannot assing values from " + cedar::aux::objectTypeToString(source) + " to "
-      + cedar::aux::objectTypeToString(target)
-    );
-  }
+  return cedar::aux::NumericParameterHelper::isNumeric(left) && cedar::aux::NumericParameterHelper::isNumeric(right);
 }
