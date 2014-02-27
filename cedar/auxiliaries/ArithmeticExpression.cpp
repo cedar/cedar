@@ -64,18 +64,61 @@ cedar::aux::ArithmeticExpression::ArithmeticExpression(const std::string& expres
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::aux::ArithmeticExpression::Expression::equalsVariable(const std::string& variable) const
+{
+  if (this->mTerms.size() != 1)
+  {
+    return false;
+  }
+
+  return this->mTerms.at(0)->equalsVariable(variable);
+}
+
+bool cedar::aux::ArithmeticExpression::isSolvedFor(const std::string& variable) const
+{
+  // To solve equations, we need a left and right side
+  if (!this->mLeft || !this->mRight)
+  {
+    return false;
+  }
+
+  bool variable_on_left = this->mLeft->contains(variable);
+  bool variable_on_right = this->mRight->contains(variable);
+
+  // If the variable is on both sides, the equation is not solved for it
+  if (variable_on_left && variable_on_right)
+  {
+    return false;
+  }
+
+  if (variable_on_right)
+  {
+    return this->mRight->equalsVariable(variable);
+  }
+  else
+  {
+    return this->mLeft->equalsVariable(variable);
+  }
+}
+
 cedar::aux::ArithmeticExpressionPtr cedar::aux::ArithmeticExpression::solveFor(const std::string& variable) const
 {
   //!@todo Proper exception
   // To solve equations, we need a left and right side
   CEDAR_ASSERT(this->mLeft && this->mRight);
 
+  auto left = boost::dynamic_pointer_cast<Expression>(this->mLeft->clone());
+  auto right = boost::dynamic_pointer_cast<Expression>(this->mRight->clone());
+
+  left->flatten();
+  right->flatten();
+
   ArithmeticExpressionPtr result(new ArithmeticExpression());
 
   result->mLeft = ExpressionPtr(new Expression());
   result->mRight = ExpressionPtr(new Expression());
 
-  ExpressionPtr expressions [] = {this->mLeft, this->mRight};
+  ExpressionPtr expressions [] = {left, right};
 
   // sort terms: put terms containing the variable to be solved for on the left, others on the right
   for (size_t i = 0; i < 2; ++i)
@@ -88,7 +131,7 @@ cedar::aux::ArithmeticExpressionPtr cedar::aux::ArithmeticExpression::solveFor(c
       {
         result->mLeft->mTerms.push_back(clone);
 
-        if (expression == this->mRight)
+        if (expression == right)
         {
           clone->mSign = -1.0;
         }
@@ -97,12 +140,20 @@ cedar::aux::ArithmeticExpressionPtr cedar::aux::ArithmeticExpression::solveFor(c
       {
         result->mRight->mTerms.push_back(clone);
 
-        if (expression == this->mLeft)
+        if (expression == left)
         {
           clone->mSign = -1.0;
         }
       }
     }
+  }
+
+  // if the left side has more than one term, see if we can factorise it
+  if (result->mLeft->mTerms.size() > 1)
+  {
+    ExpressionPtr factorized = result->mLeft->factorize(variable);
+
+    result->mLeft = factorized;
   }
 
   // if the only term on the left is one containing the variable ...
@@ -281,6 +332,130 @@ void cedar::aux::ArithmeticExpression::Variable::writeTo(std::ostream& stream, s
   stream << " ]" << std::endl;
 }
 
+cedar::aux::ArithmeticExpression::ExpressionPtr
+  cedar::aux::ArithmeticExpression::Expression::factorize(const std::string& variable) const
+{
+  ExpressionPtr factorized(new Expression());
+
+  TermPtr factorized_term(new Term());
+  factorized->mTerms.push_back(factorized_term);
+
+  FactorPtr variable_factor(new Factor());
+  variable_factor->mValue = VariablePtr(new Variable(variable));
+  factorized_term->mFactors.push_back(variable_factor);
+
+  ExpressionPtr sub_terms(new Expression());
+  FactorPtr sub_terms_factor(new Factor());
+  sub_terms_factor->mValue = sub_terms;
+  factorized_term->mFactors.push_back(sub_terms_factor);
+  for (auto term : this->mTerms)
+  {
+    auto sub_term = term->clone();
+    sub_term->cancelDivisive(variable);
+    sub_terms->mTerms.push_back(sub_term);
+  }
+
+  return factorized;
+}
+
+void cedar::aux::ArithmeticExpression::Term::cancelDivisive(const std::string& variable)
+{
+  // try to find a factor that is the variable
+  for (auto factor_it = this->mFactors.begin(); factor_it != this->mFactors.end(); ++factor_it)
+  {
+    auto factor = *factor_it;
+    if (factor->equalsVariable(variable))
+    {
+      // if the factor contains the variable, take it out
+      this->mFactors.erase(factor_it);
+      return;
+    }
+  }
+
+  // if none of the factors contains the variable, we cannot cancel it; add it as a divisive factor
+  FactorPtr div_factor(new Factor());
+  div_factor->mIsDivision = true;
+  div_factor->mValue = VariablePtr(new Variable(variable));
+  this->mFactors.push_back(div_factor);
+}
+
+void cedar::aux::ArithmeticExpression::Expression::flatten()
+{
+  std::vector<ExpressionPtr> new_expressions;
+  std::vector<double> new_signs;
+  for (auto term_it = this->mTerms.begin(); term_it != this->mTerms.end(); )
+  {
+    auto term = *term_it;
+    if (!term->isFlat())
+    {
+      // flatten the term, take it out and queue it to be re-added later
+      ExpressionPtr flattened = term->flattenFactors();
+      new_expressions.push_back(flattened);
+      new_signs.push_back(term->mSign);
+      term_it = this->mTerms.erase(term_it);
+    }
+    else
+    {
+      ++term_it;
+    }
+  }
+
+  // re-add terms that were taken out
+  CEDAR_DEBUG_ASSERT(new_expressions.size() == new_signs.size());
+  for (size_t i = 0; i < new_expressions.size(); ++i)
+  {
+    ExpressionPtr expr = new_expressions.at(i);
+    double sign = new_signs.at(i);
+    for (auto term : expr->mTerms)
+    {
+      term->mSign *= sign;
+      this->mTerms.push_back(term);
+    }
+  }
+}
+
+cedar::aux::ArithmeticExpression::ExpressionPtr cedar::aux::ArithmeticExpression::Term::flattenFactors()
+{
+  size_t first_expression_index;
+  for (first_expression_index = 0; first_expression_index < this->mFactors.size(); ++first_expression_index)
+  {
+    if (this->mFactors.at(first_expression_index)->containsExpression())
+    {
+      break;
+    }
+  }
+
+  auto first_expression = boost::dynamic_pointer_cast<Expression>(this->mFactors.at(first_expression_index)->mValue->clone());
+
+  for (size_t i = 0; i < this->mFactors.size(); ++i)
+  {
+    if (i != first_expression_index)
+    {
+      first_expression->multiplyBy(this->mFactors.at(i));
+    }
+  }
+  return first_expression;
+}
+
+
+bool cedar::aux::ArithmeticExpression::Term::isFlat() const
+{
+  for (auto factor : this->mFactors)
+  {
+    if (factor->containsExpression())
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool cedar::aux::ArithmeticExpression::Factor::containsExpression() const
+{
+  return static_cast<bool>(boost::dynamic_pointer_cast<Expression>(this->mValue));
+}
+
+
 cedar::aux::ArithmeticExpression::ValuePtr cedar::aux::ArithmeticExpression::Expression::clone() const
 {
   ExpressionPtr clone(new Expression());
@@ -301,6 +476,14 @@ void cedar::aux::ArithmeticExpression::Expression::divideBy(FactorPtr factor)
   }
 }
 
+void cedar::aux::ArithmeticExpression::Expression::multiplyBy(FactorPtr factor)
+{
+  for (auto term : this->mTerms)
+  {
+    term->multiplyBy(factor);
+  }
+}
+
 void cedar::aux::ArithmeticExpression::Term::divideBy(FactorPtr factor)
 {
   FactorPtr clone = factor->clone();
@@ -308,6 +491,12 @@ void cedar::aux::ArithmeticExpression::Term::divideBy(FactorPtr factor)
   // Flip the division state of the term (because we are dividing by it)
   clone->mIsDivision = !clone->mIsDivision;
 
+  this->mFactors.push_back(clone);
+}
+
+void cedar::aux::ArithmeticExpression::Term::multiplyBy(FactorPtr factor)
+{
+  FactorPtr clone = factor->clone();
   this->mFactors.push_back(clone);
 }
 
@@ -502,6 +691,16 @@ bool cedar::aux::ArithmeticExpression::Term::contains(const std::string& variabl
   return false;
 }
 
+bool cedar::aux::ArithmeticExpression::Term::equalsVariable(const std::string& variable) const
+{
+  if (this->mFactors.size() != 1)
+  {
+    return false;
+  }
+
+  return this->mFactors.at(0)->equalsVariable(variable);
+}
+
 std::string cedar::aux::ArithmeticExpression::Term::toString() const
 {
   std::string result;
@@ -589,6 +788,11 @@ double cedar::aux::ArithmeticExpression::Factor::evaluate(const Variables& varia
 bool cedar::aux::ArithmeticExpression::Factor::contains(const std::string& variable) const
 {
   return this->mValue->contains(variable);
+}
+
+bool cedar::aux::ArithmeticExpression::Factor::equalsVariable(const std::string& variable) const
+{
+  return this->mValue->equalsVariable(variable);
 }
 
 std::string cedar::aux::ArithmeticExpression::Factor::toString() const

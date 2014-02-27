@@ -87,6 +87,8 @@ public:
   CEDAR_GENERATE_POINTER_TYPES(Factor);
   class ConstantValue;
   CEDAR_GENERATE_POINTER_TYPES(ConstantValue);
+  class Expression;
+  CEDAR_GENERATE_POINTER_TYPES(Expression);
 
   typedef std::map<std::string, double> Variables;
 
@@ -103,6 +105,7 @@ public:
       virtual ValuePtr clone() const = 0;
       virtual std::string toString() const = 0;
       virtual bool contains(const std::string& variable) const = 0;
+      virtual bool equalsVariable(const std::string& variable) const = 0;
   };
 
   class ConstantValue : public Value
@@ -122,6 +125,11 @@ public:
       }
 
       bool contains(const std::string& /* variable */) const
+      {
+        return false;
+      }
+
+      bool equalsVariable(const std::string& /* variable */) const
       {
         return false;
       }
@@ -155,6 +163,11 @@ public:
         return variable == this->mVariable;
       }
 
+      bool equalsVariable(const std::string& variable) const
+      {
+        return variable == this->mVariable;
+      }
+
       std::string mVariable;
   };
 
@@ -174,8 +187,12 @@ public:
 
       std::string toString() const;
 
+      bool equalsVariable(const std::string& variable) const;
+
+      bool containsExpression() const;
+
       bool mIsDivision;
-    private:
+
       ValuePtr mValue;
   };
 
@@ -192,9 +209,21 @@ public:
 
       void divideBy(FactorPtr factor);
 
+      void multiplyBy(FactorPtr factor);
+
       TermPtr clone() const;
 
       std::string toString() const;
+
+      bool equalsVariable(const std::string& variable) const;
+
+      void cancelDivisive(const std::string& variable);
+
+      //! True, if the term contains no subexpressions
+      bool isFlat() const;
+
+      //! Contracts all factors in the term into a single expression
+      ExpressionPtr flattenFactors();
 
       double mSign;
 
@@ -214,13 +243,22 @@ public:
 
       void divideBy(FactorPtr factor);
 
+      void multiplyBy(FactorPtr factor);
+
+      bool equalsVariable(const std::string& variable) const;
+
+      //! Flattens the expression so that it does not contain any sub-expressions
+      void flatten();
+
       ValuePtr clone() const;
+
+      //! Attempt to factorize the given variable.
+      ExpressionPtr factorize(const std::string& variable) const;
 
       std::string toString() const;
 
       std::vector<TermPtr> mTerms;
   };
-  CEDAR_GENERATE_POINTER_TYPES(Expression);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -253,6 +291,8 @@ public:
 
   //! Converts the equation to a string that can be parsed again.
   std::string toString() const;
+
+  bool isSolvedFor(const std::string& variable) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
