@@ -323,7 +323,10 @@ std::string cedar::aux::ArithmeticExpression::Variable::toString() const
 double cedar::aux::ArithmeticExpression::Variable::evaluate(const Variables& variables) const
 {
   auto iter = variables.find(this->mVariable);
-  CEDAR_ASSERT(iter != variables.end());
+  if (iter == variables.end())
+  {
+    CEDAR_THROW(cedar::aux::InvalidNameException, "Cannot evaluate variable \"" + this->mVariable + "\". No value specified for it.");
+  }
   return iter->second;
 }
 
@@ -1103,8 +1106,12 @@ std::vector<cedar::aux::ArithmeticExpression::Token>
             {
               CEDAR_ASSERT(state == InVariable);
 
-              //!@todo Proper exception
-              CEDAR_ASSERT(isValidVariableCharacter(c));
+              if (!isValidVariableCharacter(c))
+              {
+                std::string c_str;
+                c_str += c;
+                CEDAR_THROW(cedar::aux::InvalidValueException, "Error parsing equation: '" + c_str + "' is not a valid character for variables.");
+              }
 
               current_token.token += c;
             }
@@ -1126,12 +1133,12 @@ std::vector<cedar::aux::ArithmeticExpression::Token>
 bool cedar::aux::ArithmeticExpression::isValidVariableCharacter(char c)
 {
   // test for lower-case letter
-  if (c > 'a' && c < 'z')
+  if (c >= 'a' && c <= 'z')
   {
     return true;
   }
   // test for upper-case letter
-  if (c > 'A' && c < 'Z')
+  if (c >= 'A' && c <= 'Z')
   {
     return true;
   }

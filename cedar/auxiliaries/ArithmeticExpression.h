@@ -319,6 +319,18 @@ public:
   //!@todo Return mat, use mat in variables?
   double evaluate(const Variables& variableValues = (Variables())) const;
 
+  //! Returns the left-hand side of the expression.
+  ExpressionPtr getLeft() const
+  {
+    return this->mLeft;
+  }
+
+  //! Returns the right-hand side of the expression.
+  ExpressionPtr getRight() const
+  {
+    return this->mRight;
+  }
+
   //! Solves the equation for the given variable
   ArithmeticExpressionPtr solveFor(const std::string& variable) const;
 

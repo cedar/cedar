@@ -327,6 +327,13 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
     link_node.put("source parameter", source_parameter_path);
     link_node.put("target parameter", target_parameter_path);
 
+    cedar::aux::ConfigurationNode cfg_node;
+    link_info.mParameterLink->writeConfiguration(cfg_node);
+    if (!cfg_node.empty())
+    {
+      link_node.push_back(cedar::aux::ConfigurationNode::value_type("configuration", cfg_node));
+    }
+
     root.push_back(cedar::aux::ConfigurationNode::value_type("", link_node));
   }
 }
@@ -386,6 +393,12 @@ void cedar::proc::GroupFileFormatV1::readParameterLinks
     auto tar_param = tar_element->getParameter(tar_param_name);
 
     link->setLinkedParameters(src_param, tar_param);
+
+    auto cfg_iter = node.find("configuration");
+    if (cfg_iter != node.not_found())
+    {
+      link->readConfiguration(cfg_iter->second);
+    }
 
     group->addParameterLink(src_element, tar_element, link);
   }

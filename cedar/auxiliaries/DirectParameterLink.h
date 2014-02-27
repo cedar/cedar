@@ -91,19 +91,6 @@ private:
 
   void assign(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target) const;
 
-  bool isNumeric(cedar::aux::ConstParameterPtr parameter) const;
-
-  std::string getNumericType(cedar::aux::ConstParameterPtr parameter) const;
-
-  double getValue(cedar::aux::ConstParameterPtr source) const;
-
-  void setValue(cedar::aux::ParameterPtr target, double value) const;
-
-  template <typename T> double getNumericValue(cedar::aux::ConstParameterPtr source) const;
-
-  template <typename T> void setNumericValue(cedar::aux::ParameterPtr source, double value) const;
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
