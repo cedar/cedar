@@ -50,9 +50,29 @@
 int test_expression(const std::string& expression, double expected_result, const std::map<std::string, double>& variables = (std::map<std::string, double>()))
 {
   int errors = 0;
-  std::cout << "Testing expression \"" << expression << "\"" << std::endl;
-  cedar::aux::ArithmeticExpression evaluator;
-  evaluator.parse(expression);
+  std::cout << "Testing expression \"" << expression << "\" == " << expected_result;
+
+  if (!variables.empty())
+  {
+    std::cout << " (with ";
+    bool first = true;
+    for (const auto& variable_value_pair : variables)
+    {
+      if (first)
+      {
+        first = false;
+      }
+      else
+      {
+        std::cout << ",";
+      }
+      std::cout << variable_value_pair.first << " = " << variable_value_pair.second;
+    }
+    std::cout << ")";
+  }
+
+  std::cout << std::endl;
+  cedar::aux::ArithmeticExpression evaluator(expression);
   auto result = evaluator.evaluate(variables);
   if (result != expected_result)
   {
@@ -96,12 +116,43 @@ int test_basic_expression()
   return errors;
 }
 
+int test_equation(const std::string& equation)
+{
+  int errors = 0;
+
+  std::cout << "Testing equation: \"" << equation << "\"" << std::endl;
+
+  cedar::aux::ArithmeticExpression expression(equation);
+
+  std::cout << "Original equation:" << std::endl;
+  std::cout << expression.toString() << std::endl;
+
+  std::cout << "Solved for x:" << std::endl;
+  auto solved_for_x = expression.solveFor("x");
+  std::cout << solved_for_x->toString() << std::endl;
+
+  return errors;
+}
+
+int test_basic_equations()
+{
+  int errors = 0;
+
+  errors += test_equation("y = 2 + x");
+  errors += test_equation("y = 2 * x");
+  errors += test_equation("y = 2 * x + 3");
+  errors += test_equation("y = 2 * (x + 3)");
+
+  return errors;
+}
+
 int main()
 {
   // the number of errors encountered in this test
   int errors = 0;
 
   errors += test_basic_expression();
+  errors += test_basic_equations();
 
   return errors;
 }

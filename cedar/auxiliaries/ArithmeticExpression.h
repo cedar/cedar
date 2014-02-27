@@ -50,6 +50,17 @@
 
 
 /*!@brief A simple class for parsing and evaluating arithmetic expressions from strings.
+ *
+ *        The Grammar parsed by this class is:
+ *
+ *        arithmetic expression = expression ('=' expression)?
+ *        expression = term ('+' term | '-' term)*
+ *        term = factor ('*' factor | '/' factor)*
+ *        factor = double | variable | '(' expression ')'
+ *
+ *        where 'c' means a literal c, * means zero or more repetitions and (A|B) means A or B.
+ *
+ * @todo This would be solved much nicer with boost spirit, but I could not get that to work.
  */
 class cedar::aux::ArithmeticExpression
 {
@@ -66,6 +77,17 @@ private:
   };
 
 public:
+  class Term;
+  CEDAR_GENERATE_POINTER_TYPES(Term);
+  class Value;
+  CEDAR_GENERATE_POINTER_TYPES(Value);
+  class Variable;
+  CEDAR_GENERATE_POINTER_TYPES(Variable);
+  class Factor;
+  CEDAR_GENERATE_POINTER_TYPES(Factor);
+  class ConstantValue;
+  CEDAR_GENERATE_POINTER_TYPES(ConstantValue);
+
   typedef std::map<std::string, double> Variables;
 
   class Value
@@ -78,9 +100,10 @@ public:
     public:
       virtual void writeTo(std::ostream& stream, size_t indentation = 0) const = 0;
       virtual double evaluate(const Variables& variables) const = 0;
+      virtual ValuePtr clone() const = 0;
+      virtual std::string toString() const = 0;
+      virtual bool contains(const std::string& variable) const = 0;
   };
-
-  CEDAR_GENERATE_POINTER_TYPES(Value);
 
   class ConstantValue : public Value
   {
@@ -98,9 +121,17 @@ public:
         return mValue;
       }
 
+      bool contains(const std::string& /* variable */) const
+      {
+        return false;
+      }
+
+      ValuePtr clone() const;
+
+      std::string toString() const;
+
       double mValue;
   };
-  CEDAR_GENERATE_POINTER_TYPES(ConstantValue);
 
   class Variable : public Value
   {
@@ -115,23 +146,18 @@ public:
 
       double evaluate(const Variables& variables) const;
 
+      ValuePtr clone() const;
+
+      std::string toString() const;
+
+      bool contains(const std::string& variable) const
+      {
+        return variable == this->mVariable;
+      }
+
       std::string mVariable;
   };
-  CEDAR_GENERATE_POINTER_TYPES(Variable);
 
-
-  class SubExpression : public Value
-  {
-    public:
-      SubExpression();
-
-      void writeTo(std::ostream& stream, size_t indentation = 0) const;
-
-      double evaluate(const Variables& variables) const;
-
-      ArithmeticExpressionPtr mExpression;
-  };
-  CEDAR_GENERATE_POINTER_TYPES(SubExpression);
 
   class Factor
   {
@@ -142,11 +168,16 @@ public:
 
       double evaluate(const Variables& variables = (Variables())) const;
 
+      bool contains(const std::string& variable) const;
+
+      FactorPtr clone() const;
+
+      std::string toString() const;
+
       bool mIsDivision;
     private:
       ValuePtr mValue;
   };
-  CEDAR_GENERATE_POINTER_TYPES(Factor);
 
   class Term
   {
@@ -157,12 +188,39 @@ public:
 
       double evaluate(const Variables& variables = (Variables())) const;
 
+      bool contains(const std::string& variable) const;
+
+      void divideBy(FactorPtr factor);
+
+      TermPtr clone() const;
+
+      std::string toString() const;
+
       double mSign;
 
-    private:
       std::vector<FactorPtr> mFactors;
   };
-  CEDAR_GENERATE_POINTER_TYPES(Term);
+
+  class Expression : public Value
+  {
+    public:
+      void writeTo(std::ostream& stream, size_t indentation = 0) const;
+
+      double evaluate(const Variables& variables) const;
+
+      void parse(const std::vector<Token>& tokens, size_t& current);
+
+      bool contains(const std::string& variable) const;
+
+      void divideBy(FactorPtr factor);
+
+      ValuePtr clone() const;
+
+      std::string toString() const;
+
+      std::vector<TermPtr> mTerms;
+  };
+  CEDAR_GENERATE_POINTER_TYPES(Expression);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -171,16 +229,30 @@ public:
   //!@brief The standard constructor.
   ArithmeticExpression();
 
+  //! Constructor that takes an expression and parses it immediately.
+  ArithmeticExpression(const std::string& expression);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Parses the given expression.
   void parse(const std::string& expression);
 
-  //!@todo Return mat, use mat in variables?
-  double evaluate(const Variables& variables = (Variables())) const;
+  //! Removes the contents of the equation.
+  void clear();
 
+  //!@todo Return mat, use mat in variables?
+  double evaluate(const Variables& variableValues = (Variables())) const;
+
+  //! Solves the equation for the given variable
+  ArithmeticExpressionPtr solveFor(const std::string& variable) const;
+
+  //! Writes a detailed version of the equation to the given stream.
   void writeTo(std::ostream& stream, size_t indentation = 0) const;
+
+  //! Converts the equation to a string that can be parsed again.
+  std::string toString() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -204,7 +276,11 @@ private:
 protected:
   // none yet
 private:
-  std::vector<TermPtr> mTerms;
+  //! Left-hand side of the equation
+  ExpressionPtr mLeft;
+
+  //! Right-hand side of the equation. May be empty.
+  ExpressionPtr mRight;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
