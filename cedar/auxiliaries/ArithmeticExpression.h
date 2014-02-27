@@ -106,6 +106,8 @@ public:
       virtual std::string toString() const = 0;
       virtual bool contains(const std::string& variable) const = 0;
       virtual bool equalsVariable(const std::string& variable) const = 0;
+      virtual void simplify() = 0;
+      virtual bool canEvaluate() const = 0;
   };
 
   class ConstantValue : public Value
@@ -132,6 +134,17 @@ public:
       bool equalsVariable(const std::string& /* variable */) const
       {
         return false;
+      }
+
+      void simplify()
+      {
+        // nothing to do -- it doesn't get simpler than a constant value
+      }
+
+      bool canEvaluate() const
+      {
+        // constant values can always be evaluated
+        return true;
       }
 
       ValuePtr clone() const;
@@ -168,6 +181,17 @@ public:
         return variable == this->mVariable;
       }
 
+      void simplify()
+      {
+        // nothing to do -- it doesn't get simpler than a single variable
+      }
+
+      bool canEvaluate() const
+      {
+        // variables can never be evaluated
+        return false;
+      }
+
       std::string mVariable;
   };
 
@@ -188,6 +212,10 @@ public:
       std::string toString() const;
 
       bool equalsVariable(const std::string& variable) const;
+
+      void simplify();
+
+      bool canEvaluate() const;
 
       bool containsExpression() const;
 
@@ -214,6 +242,10 @@ public:
       TermPtr clone() const;
 
       std::string toString() const;
+
+      void simplify();
+
+      bool canEvaluate() const;
 
       bool equalsVariable(const std::string& variable) const;
 
@@ -249,6 +281,10 @@ public:
 
       //! Flattens the expression so that it does not contain any sub-expressions
       void flatten();
+
+      void simplify();
+
+      bool canEvaluate() const;
 
       ValuePtr clone() const;
 
