@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -211,8 +211,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>93</width>
+          <height>443</height>
          </rect>
         </property>
         <attribute name="label">
@@ -263,7 +263,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
+          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
          </item>
         </layout>
        </widget>
@@ -788,9 +788,9 @@
    <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
-   <class>cedar::proc::gui::PropertyPane</class>
+   <class>cedar::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
-   <header>cedar/processing/gui/PropertyPane.h</header>
+   <header>cedar/auxiliaries/gui/Configurable.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::proc::gui::ArchitectureToolBox</class>

@@ -104,7 +104,7 @@ public:
 
   //!@brief Stops the DataSpactator. Before stopping all RecordDatas in the queue will be written to disk.
   //!todo: should be private, docu is wrong
-  void processStop(bool suppressWarning);
+  void processQuit();
 
   //!@brief Gets the unique Name.
   const std::string& getName() const;

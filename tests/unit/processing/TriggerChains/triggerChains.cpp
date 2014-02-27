@@ -43,7 +43,9 @@
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QCoreApplication>
@@ -202,6 +204,9 @@ void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
   std::cout << "Triggering step." << std::endl;
   step->onTrigger();
 
+  // wait for the subsequent steps to finish their computation
+  cedar::aux::sleep(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds));
+
   // check all triggered steps for being up-to-date (they should be after being triggered.
 
   for (auto iter = network->getElements().begin(); iter != network->getElements().end(); ++iter)
@@ -312,18 +317,14 @@ void run_test()
 
 int main(int argc, char** argv)
 {
-  QCoreApplication* app;
-  app = new QCoreApplication(argc,argv);
+  QCoreApplication app(argc,argv);
 
-  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+  cedar::aux::CallFunctionInThread testThread(run_test);
 
-  QObject::connect(testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection);  // alternatively: call app->quit() in runTests()
+  QObject::connect(&testThread, SIGNAL(finishedThread()), &app, SLOT(quit()), Qt::QueuedConnection);  // alternatively: call app->quit() in runTests()
 
-  testThread->start();
-  app->exec();
-
-  delete testThread;
-  delete app;
+  testThread.start();
+  app.exec();
 
   std::cout << "Superfluous trigger calls: " << num_superfluous_triggers << std::endl;
   std::cout << "Test finished with " << global_errors << " error(s)." << std::endl;
