@@ -190,6 +190,10 @@ cedar::aux::ArithmeticExpressionPtr cedar::aux::ArithmeticExpression::solveFor(c
     }
   }
 
+  // Finally, make the equations a bit more simple
+  result->mLeft->simplify();
+  result->mRight->simplify();
+
   return result;
 }
 
@@ -466,6 +470,116 @@ cedar::aux::ArithmeticExpression::ValuePtr cedar::aux::ArithmeticExpression::Exp
   }
 
   return clone;
+}
+
+void cedar::aux::ArithmeticExpression::Expression::simplify()
+{
+  for (auto term : this->mTerms)
+  {
+    term->simplify();
+  }
+
+  ConstantValuePtr constants(new ConstantValue(0.0));
+
+  for (auto iter = this->mTerms.begin(); iter != this->mTerms.end(); )
+  {
+    auto term = *iter;
+    if (term->canEvaluate())
+    {
+      double value = term->mSign * term->evaluate();
+      constants->mValue += value;
+      iter = this->mTerms.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+  if (constants->mValue != 0.0)
+  {
+    FactorPtr new_factor(new Factor());
+    new_factor->mValue = constants;
+    TermPtr new_term(new Term());
+    new_term->mSign = +1.0;
+    new_term->mFactors.push_back(new_factor);
+    this->mTerms.push_back(new_term);
+  }
+}
+
+void cedar::aux::ArithmeticExpression::Factor::simplify()
+{
+  this->mValue->simplify();
+}
+
+void cedar::aux::ArithmeticExpression::Term::simplify()
+{
+  // first, simplify all factors
+  for (auto factor : this->mFactors)
+  {
+    factor->simplify();
+  }
+
+  // then, merge together all constant factors
+  ConstantValuePtr constants(new ConstantValue(1.0));
+  for (auto iter = this->mFactors.begin(); iter != this->mFactors.end(); )
+  {
+    auto factor = *iter;
+    if (factor->canEvaluate())
+    {
+      if (factor->mIsDivision)
+      {
+        constants->mValue /= factor->evaluate();
+      }
+      else
+      {
+        constants->mValue *= factor->evaluate();
+      }
+      iter = this->mFactors.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+
+  if (constants->mValue != 1.0 || this->mFactors.empty())
+  {
+    FactorPtr new_factor(new Factor());
+    new_factor->mValue = constants;
+    this->mFactors.push_back(new_factor);
+  }
+}
+
+bool cedar::aux::ArithmeticExpression::Factor::canEvaluate() const
+{
+  return this->mValue->canEvaluate();
+}
+
+bool cedar::aux::ArithmeticExpression::Expression::canEvaluate() const
+{
+  for (auto term : this->mTerms)
+  {
+    if (!term->canEvaluate())
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool cedar::aux::ArithmeticExpression::Term::canEvaluate() const
+{
+  for (auto factor : this->mFactors)
+  {
+    if (!factor->canEvaluate())
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 void cedar::aux::ArithmeticExpression::Expression::divideBy(FactorPtr factor)
