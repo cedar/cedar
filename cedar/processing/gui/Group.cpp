@@ -60,6 +60,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/gui/StickyNote.h"
+#include "cedar/processing/gui/GroupParameterDesigner.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -70,6 +71,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QSet>
 #include <QList>
+#include <QDialog>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
 #endif
@@ -1432,6 +1434,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
+  {
+    QAction* edit_parameters_action = menu.addAction("edit parameters ...");
+    QObject::connect(edit_parameters_action, SIGNAL(triggered()), this, SLOT(openParameterEditor()));
+  }
+
   QAction* a = menu.exec(event->screenPos());
 
   if (a == NULL)
@@ -1466,6 +1473,18 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     std::string name = a->text().toStdString();
     this->getGroup()->removeConnector(name, false);
   }
+}
+
+void cedar::proc::gui::Group::openParameterEditor()
+{
+  auto p_dialog = new QDialog(this->mpMainWindow);
+  auto p_layout = new QHBoxLayout();
+  p_dialog->setLayout(p_layout);
+  auto designer = new cedar::proc::gui::GroupParameterDesigner();
+  p_layout->addWidget(designer);
+  p_dialog->exec();
+
+  delete p_dialog;
 }
 
 void cedar::proc::gui::Group::setCollapsed(bool collapsed)
