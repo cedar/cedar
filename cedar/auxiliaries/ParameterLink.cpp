@@ -68,6 +68,9 @@ void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr lef
   this->mLeft = left;
   this->mRight = right;
 
+  this->mLeft->setLinked(true);
+  this->mRight->setLinked(true);
+
   QObject::connect(this->mLeft.get(), SIGNAL(valueChanged()), this, SLOT(leftChanged()));
   QObject::connect(this->mRight.get(), SIGNAL(valueChanged()), this, SLOT(rightChanged()));
 }
