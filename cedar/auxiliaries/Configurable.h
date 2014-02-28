@@ -230,7 +230,7 @@ public:
 
   /*! Returns the name, or a number added to it if there is already a parameter with that name.
    */
-  std::string getUniqueName(const std::string& baseName) const;
+  std::string getUniqueParameterName(const std::string& baseName) const;
 
 public:
   CEDAR_DECLARE_SIGNAL(ParameterAdded, void(cedar::aux::ParameterPtr));

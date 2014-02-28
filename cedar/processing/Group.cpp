@@ -57,6 +57,7 @@
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/PluginProxy.h"
+#include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
@@ -193,7 +194,35 @@ cedar::proc::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo The additional information must be stored as well
+cedar::aux::ParameterPtr cedar::proc::Group::addCustomParameter(const std::string& type, const std::string& name)
+{
+  auto parameter = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
+
+  parameter->setName(this->getUniqueParameterName(name));
+  parameter->setOwner(this);
+
+  this->mCustomParameters.push_back(parameter);
+
+  this->signalCustomParameterAdded(parameter);
+
+  return parameter;
+}
+
+void cedar::proc::Group::removeCustomParameter(const std::string& name)
+{
+  auto parameter = this->getParameter(name);
+
+  parameter->unsetOwner();
+
+  auto iter = std::find(this->mCustomParameters.begin(), this->mCustomParameters.end(), parameter);
+  if (iter != this->mCustomParameters.end())
+  {
+    this->mCustomParameters.erase(iter);
+  }
+
+  this->signalCustomParameterRemoved(parameter);
+}
+
 void cedar::proc::Group::addParameterLink
 (
   cedar::proc::ElementPtr sourceElement,

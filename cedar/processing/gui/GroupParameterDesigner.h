@@ -46,6 +46,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/GroupParameterDesigner.fwd.h"
 #include "cedar/processing/Group.fwd.h"
+#include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -89,8 +90,29 @@ private:
 
   void addParameter(const std::string& type);
 
+  void addParameterToList(cedar::aux::ParameterPtr parameter);
+
+  void translateCustomParameterAdded(cedar::aux::ParameterPtr);
+
+  void translateCustomParameterRemoved(cedar::aux::ParameterPtr);
+
+  cedar::aux::ParameterPtr parameterFromItem(QTreeWidgetItem* pItem) const;
+
+signals:
+  void customParameterAdded(QVariant pointer);
+
+  void customParameterRemoved(QVariant pointer);
+
 private slots:
+  void customParameterAddedSlot(QVariant pointer);
+
+  void customParameterRemovedSlot(QVariant pointer);
+
   void addClicked();
+
+  void deleteClicked();
+
+  void itemChanged(QTreeWidgetItem* item, int column);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
