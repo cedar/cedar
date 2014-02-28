@@ -1116,7 +1116,6 @@ void cedar::proc::gui::Network::readStickyNotes(cedar::aux::ConfigurationNode& n
       int b = iter->second.get<int>("b");
       int a = iter->second.get<int>("a");
       note->setColor(QColor(r,g,b,a));
-      std::cout << iter->second.get<int>("fontsize") << std::endl;
       note->setFontSize(iter->second.get<int>("fontsize"));
     }
   }
