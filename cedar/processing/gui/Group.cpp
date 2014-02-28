@@ -1479,8 +1479,9 @@ void cedar::proc::gui::Group::openParameterEditor()
 {
   auto p_dialog = new QDialog(this->mpMainWindow);
   auto p_layout = new QHBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
   p_dialog->setLayout(p_layout);
-  auto designer = new cedar::proc::gui::GroupParameterDesigner();
+  auto designer = new cedar::proc::gui::GroupParameterDesigner(this->getGroup());
   p_layout->addWidget(designer);
   p_dialog->exec();
 

@@ -41,9 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/ui_GroupParameterDesigner.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/GroupParameterDesigner.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -52,7 +54,7 @@
 
 /*!@brief A widget for editing parameters of groups.
  */
-class cedar::proc::gui::GroupParameterDesigner : public QWidget
+class cedar::proc::gui::GroupParameterDesigner : public QWidget, public Ui_GroupParameterDesigner
 {
   Q_OBJECT
 
@@ -64,8 +66,8 @@ class cedar::proc::gui::GroupParameterDesigner : public QWidget
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  GroupParameterDesigner();
+  //!@brief The constructor.
+  GroupParameterDesigner(cedar::proc::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -83,7 +85,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void fillParameterTypeBox();
+
+  void addParameter(const std::string& type);
+
+private slots:
+  void addClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -91,7 +98,7 @@ private:
 protected:
   // none yet
 private:
-  QComboBox* mpTypeSelector;
+  cedar::proc::GroupPtr mGroup;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
