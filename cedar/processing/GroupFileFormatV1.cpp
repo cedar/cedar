@@ -325,7 +325,6 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
   {
     cedar::aux::ConfigurationNode link_node;
 
-    std::string source_path = group->findPath(link_info.mSourceElement);
     std::string target_path = group->findPath(link_info.mTargetElement);
     auto source = link_info.mParameterLink->getLeft();
     auto target = link_info.mParameterLink->getRight();
@@ -335,7 +334,13 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
     link_type = cedar::aux::replace(link_type, "::", ".");
 
     link_node.put("type", link_type);
-    link_node.put("source element", source_path);
+
+    if (link_info.mSourceElement != group)
+    {
+      std::string source_path = group->findPath(link_info.mSourceElement);
+      link_node.put("source element", source_path);
+    }
+
     link_node.put("target element", target_path);
     link_node.put("source parameter", source_parameter_path);
     link_node.put("target parameter", target_parameter_path);
@@ -413,12 +418,17 @@ void cedar::proc::GroupFileFormatV1::readParameterLinks
     std::string type = type_iter->second.get_value<std::string>();
     auto link = cedar::aux::ParameterLinkFactoryManagerSingleton::getInstance()->allocate(type);
 
+    cedar::proc::ElementPtr src_element;
     auto src_elem_iter = node.find("source element");
-    if (src_elem_iter == node.not_found())
+    if (src_elem_iter != node.not_found())
     {
-      continue;
+      std::string src_element_name = src_elem_iter->second.get_value<std::string>();
+      src_element = group->getElement(src_element_name);
     }
-    std::string src_element_name = src_elem_iter->second.get_value<std::string>();
+    else
+    {
+      src_element = group;
+    }
 
     auto src_param_iter = node.find("source parameter");
     if (src_param_iter == node.not_found())
@@ -443,7 +453,6 @@ void cedar::proc::GroupFileFormatV1::readParameterLinks
 
     //!@todo Error handling
 
-    auto src_element = group->getElement(src_element_name);
     auto tar_element = group->getElement(tar_element_name);
 
     auto src_param = src_element->getParameter(src_param_name);
