@@ -50,6 +50,9 @@
 #include "cedar/auxiliaries/ObjectListParameter.fwd.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/connection.hpp>
+#endif // Q_MOC_RUN
 #include <QWidget>
 #include <QTreeWidget>
 
@@ -76,6 +79,8 @@ private:
 public:
   //!@brief The standard constructor.
   Configurable(QWidget* pParent = NULL);
+
+  ~Configurable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -129,12 +134,31 @@ private:
          const std::string& path
        );
 
+  void translateParameterAddedSignal(cedar::aux::ParameterPtr parameter);
+
+  void translateParameterRemovedSignal(cedar::aux::ParameterPtr parameter);
+
+  void translateParameterNameChangedSignal(const std::string& oldName, const std::string& newName);
+
+signals:
+  void parameterAdded(QString path);
+
+  void parameterRemoved(QVariant parameter);
+
+  void parameterRenamed(QString oldName, QString newName);
+
 private slots:
   void parameterChangeFlagChanged();
 
   void objectParameterValueChanged();
 
   void objectListParameterValueChanged();
+
+  void parameterAddedSlot(QString path);
+
+  void parameterRemovedSlot(QVariant parameter);
+
+  void parameterRenamedSlot(QString oldName, QString newName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -143,6 +167,14 @@ protected:
   // none yet
 private:
   QTreeWidget* mpPropertyTree;
+
+  cedar::aux::ConfigurablePtr mDisplayedConfigurable;
+
+  boost::signals2::scoped_connection mParameterAddedConnection;
+
+  boost::signals2::scoped_connection mParameterRemovedConnection;
+
+  std::map<cedar::aux::Parameter*, boost::signals2::connection> mParameterRenamedConnections;
 
 }; // class cedar::aux::gui::Configurable
 
