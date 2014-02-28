@@ -581,6 +581,11 @@ void cedar::aux::gui::Configurable::updateLinkState(QTreeWidgetItem* item, cedar
   QFont font = item->font(PARAMETER_NAME_COLUMN);
   font.setItalic(pParameter->isLinked());
   item->setFont(PARAMETER_NAME_COLUMN, font);
+
+  if (pParameter->isLinked())
+  {
+    item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
+  }
 }
 
 void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter)
