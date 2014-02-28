@@ -177,11 +177,73 @@ QWidget(pParent)
   this->mpPropertyTree->header()->setResizeMode(PARAMETER_NAME_COLUMN, QHeaderView::Interactive);
   this->mpPropertyTree->header()->setResizeMode(PARAMETER_EDITOR_COLUMN, QHeaderView::Stretch);
   this->mpPropertyTree->header()->resizeSection(PARAMETER_NAME_COLUMN, 150);
+
+  QObject::connect(this, SIGNAL(parameterAdded(QString)), this, SLOT(parameterAddedSlot(QString)));
+  QObject::connect(this, SIGNAL(parameterRemoved(QVariant)), this, SLOT(parameterRemovedSlot(QVariant)));
+  QObject::connect(this, SIGNAL(parameterRenamed(QString, QString)), this, SLOT(parameterRenamedSlot(QString, QString)));
+}
+
+cedar::aux::gui::Configurable::~Configurable()
+{
+  this->clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::Configurable::translateParameterAddedSignal(cedar::aux::ParameterPtr parameter)
+{
+  QString path = QString::fromStdString(parameter->getName());
+  emit parameterAdded(path);
+}
+
+void cedar::aux::gui::Configurable::translateParameterRemovedSignal(cedar::aux::ParameterPtr parameter)
+{
+  QVariant parameter_variant = QVariant::fromValue((void*)(parameter.get()));
+  emit parameterRemoved(parameter_variant);
+}
+
+void cedar::aux::gui::Configurable::translateParameterNameChangedSignal(const std::string& oldName, const std::string& newName)
+{
+  QString old_name = QString::fromStdString(oldName);
+  QString new_name = QString::fromStdString(newName);
+  emit parameterRenamed(old_name, new_name);
+}
+
+void cedar::aux::gui::Configurable::parameterAddedSlot(QString path)
+{
+  CEDAR_ASSERT(this->mDisplayedConfigurable);
+  auto parameter = this->mDisplayedConfigurable->getParameter(path.toStdString());
+  auto item = this->mpPropertyTree->invisibleRootItem()->child(0);
+  CEDAR_ASSERT(item != nullptr);
+  this->append(parameter, item, std::string());
+
+  this->fitRowsToContents();
+}
+
+void cedar::aux::gui::Configurable::parameterRemovedSlot(QVariant parameterP)
+{
+  auto parameter = (cedar::aux::Parameter*) parameterP.value<void*>();
+  auto item = this->getItemForParameter(parameter);
+  CEDAR_ASSERT(item != nullptr);
+  delete item;
+
+  auto iter = this->mParameterRenamedConnections.find(parameter);
+  if (iter != this->mParameterRenamedConnections.end())
+  {
+    this->mParameterRenamedConnections.erase(iter);
+  }
+
+  this->fitRowsToContents();
+}
+
+void cedar::aux::gui::Configurable::parameterRenamedSlot(QString /* oldName */, QString newName)
+{
+  auto parameter = this->mDisplayedConfigurable->getParameter(newName.toStdString());
+  auto item = this->getItemForParameter(parameter.get());
+  item->setText(0, newName);
+}
 
 void cedar::aux::gui::Configurable::fitRowsToContents()
 {
@@ -222,6 +284,8 @@ void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configur
 {
   this->clear();
   
+  this->mDisplayedConfigurable = configurable;
+
   this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN, new cedar::aux::gui::Configurable::DataDelegate(configurable, this));
 
   std::string type_name = cedar::aux::objectTypeToString(configurable);
@@ -231,6 +295,26 @@ void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configur
   this->mpPropertyTree->setRootIsDecorated(false);
 
   this->append(configurable, p_item, std::string());
+
+  this->mParameterAddedConnection = configurable->connectToParameterAddedSignal
+                                    (
+                                      boost::bind
+                                      (
+                                        &cedar::aux::gui::Configurable::translateParameterAddedSignal,
+                                        this,
+                                        _1
+                                      )
+                                    );
+
+  this->mParameterRemovedConnection = configurable->connectToParameterRemovedSignal
+                                      (
+                                        boost::bind
+                                        (
+                                          &cedar::aux::gui::Configurable::translateParameterRemovedSignal,
+                                          this,
+                                          _1
+                                        )
+                                      );
 }
 
 void cedar::aux::gui::Configurable::append(cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem, const std::string& pathSoFar)
@@ -286,6 +370,18 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
   {
     return;
   }
+
+  this->mParameterRenamedConnections[parameter.get()] =
+                  parameter->connectToNameChangedSignal
+                  (
+                    boost::bind
+                    (
+                      &cedar::aux::gui::Configurable::translateParameterNameChangedSignal,
+                      this,
+                      _1,
+                      _2
+                    )
+                  );
 
   std::string path = pathSoFar;
   if (!pathSoFar.empty())
@@ -430,6 +526,16 @@ void cedar::aux::gui::Configurable::clear()
   {
     delete p_delegate;
   }
+
+  for (auto parameter_connetion_pair : this->mParameterRenamedConnections)
+  {
+    parameter_connetion_pair.second.disconnect();
+  }
+  this->mParameterRenamedConnections.clear();
+
+  this->mDisplayedConfigurable.reset();
+  this->mParameterAddedConnection.disconnect();
+  this->mParameterRemovedConnection.disconnect();
 }
 
 void cedar::aux::gui::Configurable::parameterChangeFlagChanged()

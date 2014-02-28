@@ -93,6 +93,9 @@ public:
   //! Set the owner of the parameter. Can only be called if the parameter doesn't have an owner yet.
   void setOwner(cedar::aux::Configurable *pOwner);
 
+  //! Resets the owner of the parameter.
+  void unsetOwner();
+
   //!@brief get the flag "read automatically"
   bool getReadAutomatically() const;
   //!@brief set the flag "read automatically"

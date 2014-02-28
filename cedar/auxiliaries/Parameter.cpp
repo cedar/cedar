@@ -86,13 +86,18 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Parameter::setOwner(cedar::aux::Configurable *pOwner)
+void cedar::aux::Parameter::unsetOwner()
 {
   if(this->mpOwner != nullptr)
   {
     this->mpOwner->unregisterParameter(this);
+    this->mpOwner = nullptr;
   }
+}
 
+void cedar::aux::Parameter::setOwner(cedar::aux::Configurable *pOwner)
+{
+  this->unsetOwner();
   this->mpOwner = pOwner;
 
   this->mpOwner->registerParameter(this);
