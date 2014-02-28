@@ -39,6 +39,7 @@
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/steps/Projection.h"
+#include "cedar/processing/ProjectionMapping.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/LogFile.h"
@@ -272,6 +273,16 @@ int main()
   checkValidProjection("configs/config_3Dto3D_0_1_2_valid.json", number_of_errors);
   checkValidProjection("configs/config_3Dto3D_1_2_0_valid.json", number_of_errors);
 #endif // CEDAR_USE_FFTW
+
+  // check strange bugs!
+  cedar::proc::NetworkPtr group(new cedar::proc::Network());
+  group->create("cedar.processing.sources.GaussInput", "gauss");
+  group->create("cedar.processing.Projection", "projection");
+  group->connectSlots("gauss.Gauss input","projection.input");
+  auto projection = group->getElement<cedar::proc::steps::Projection>("projection");
+  auto map = projection->getParameter<cedar::proc::ProjectionMappingParameter>("dimension mapping");
+  map->getValue()->changeMapping(0, 0);
+  projection->setOutputDimensionality(0);
 
   std::cout << "Done. There were " << number_of_errors << " errors.\n";
 

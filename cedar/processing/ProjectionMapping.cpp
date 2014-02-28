@@ -54,11 +54,13 @@ unsigned int cedar::proc::ProjectionMapping::msDropIndex = std::numeric_limits<u
 
 cedar::proc::ProjectionMapping::ProjectionMapping()
 :
-  mOutputDimensionality(0)
-{}
+mOutputDimensionality(0)
+{
+}
 
 cedar::proc::ProjectionMapping::~ProjectionMapping()
-{}
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -148,20 +150,26 @@ void cedar::proc::ProjectionMapping::drop(unsigned int inputIndex)
 
 void cedar::proc::ProjectionMapping::initialize(unsigned int numberOfMappings)
 {
-  this->mDefaultValues.resize(std::max(this->mMapping.size(), std::max(this->mDefaultValues.size(), static_cast<size_t>(numberOfMappings))), msDropIndex);
-  for (size_t i = 0; i < this->mMapping.size(); ++i)
+  // store the old mapping
+  mMappingsMap[mMapping.size()] = mMapping;
+  // try to find a mapping matching the number of mappings
+  auto map = mMappingsMap.find(numberOfMappings);
+  if (map != mMappingsMap.end())
   {
-    this->mDefaultValues.at(i) = this->mMapping[i];
+    // we previously used this number of mappings, restore
+    mMapping = map->second;
   }
-
-  mMapping.clear();
-
-  for (unsigned int i = 0; i < numberOfMappings; ++i)
+  else
   {
-//    mMapping[i] = msDropIndex;
-    mMapping[i] = this->mDefaultValues.at(i);
+    // could not find a mapping, initialize
+    mMapping.clear();
+    for (unsigned int i = 0; i < numberOfMappings; ++i)
+    {
+      mMapping[i] = msDropIndex;
+    }
+    // also store the new configuration!
+    mMappingsMap[numberOfMappings] = mMapping;
   }
-
   updateValidity();
 }
 
@@ -215,6 +223,14 @@ bool cedar::proc::ProjectionMapping::isDropped(unsigned int inputIndex) const
 void cedar::proc::ProjectionMapping::setOutputDimensionality(unsigned int dimensionality)
 {
   mOutputDimensionality = dimensionality;
+  // prune invalid entries
+  for (unsigned int i = 0; i < mMapping.size(); ++i)
+  {
+    if (mMapping[i] >= dimensionality)
+    {
+      mMapping[i] = msDropIndex;
+    }
+  }
   updateValidity();
 }
 

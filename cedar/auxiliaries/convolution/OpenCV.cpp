@@ -1115,12 +1115,6 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
       int col_offset_left = (adapted_kernel_cols - flipped_kernel.cols) / 2;
       int col_offset_right = (adapted_kernel_cols - flipped_kernel.cols + 1) / 2;
 
-//      std::cout << std::endl << "LARGE KERNEL!!!" << std::endl << std::endl;
-//
-//      std::cout << "matrix size: " << matrix.rows << "x" << matrix.cols << std::endl;
-//      std::cout << "kernel size: " << flipped_kernel.rows << "x" << flipped_kernel.cols << std::endl;
-//      std::cout << std::endl;
-
       // then sum over image-sized sections of the kernel
       for (int start_row = 0; start_row < num_complete_sums_row; start_row += 1)
       {
@@ -1135,9 +1129,6 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
                     std::max(0, start_row * matrix.rows - row_offset_top),
                     std::min((start_row + 1) * matrix.rows - row_offset_top, flipped_kernel.rows)
                   );
-
-//        std::cout << "row: " << start_row << ", kernel range: " << kernel_row_range.start << ", " << kernel_row_range.end << std::endl;
-//        std::cout << "row: " << start_row << ", dest range: " << summed_row_range.start << ", " << summed_row_range.end << std::endl;
 
         for (int start_col = 0; start_col < num_complete_sums_col; start_col += 1)
         {
