@@ -512,6 +512,29 @@ void cedar::aux::Configurable::parameterNameChanged(const std::string& oldName, 
   this->mParameterAssociations[newName] = assoc;
 }
 
+std::string cedar::aux::Configurable::getUniqueName(const std::string& baseName) const
+{
+  auto assoc_iter = this->mParameterAssociations.find(baseName);
+
+  if (assoc_iter == this->mParameterAssociations.end())
+  {
+    return baseName;
+  }
+
+  unsigned int ctr = 2;
+  while (true)
+  {
+    std::string new_name = baseName + cedar::aux::toString(ctr);
+    if (this->mParameterAssociations.find(new_name) == this->mParameterAssociations.end())
+    {
+      return new_name;
+    }
+    ++ctr;
+  }
+
+  return baseName;
+}
+
 void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)
 {
   QWriteLocker locker (&mConfigurableLock);
@@ -559,6 +582,12 @@ void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parame
       "void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)"
     );
   }
+
+  this->updateLockSet();
+
+  locker.unlock();
+
+  this->signalParameterRemoved(parameter);
 }
 
 void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* parameter)
@@ -591,6 +620,10 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* paramete
     = parameter->connectToNameChangedSignal(boost::bind(&cedar::aux::Configurable::parameterNameChanged, this, _1, _2));
 
   this->updateLockSet();
+
+  locker.unlock();
+
+  this->signalParameterAdded(parameter);
 }
 
 const cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters() const
