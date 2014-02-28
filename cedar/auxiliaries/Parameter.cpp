@@ -46,6 +46,8 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QReadLocker>
+#include <QWriteLocker>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -54,7 +56,7 @@
 
 cedar::aux::Parameter::Parameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
 :
-mpOwner(pOwner),
+mpOwner(nullptr),
 mHasDefault(hasDefault),
 mConstant(false),
 mIsHidden(false),
@@ -64,10 +66,12 @@ mLastLockType(cedar::aux::LOCK_TYPE_DONT_LOCK),
 mpLock(new QReadWriteLock())
 
 {
-  CEDAR_ASSERT(this->mpOwner != NULL);
   this->setName(name);
 
-  this->mpOwner->registerParameter(this);
+  if (pOwner != nullptr)
+  {
+    this->setOwner(pOwner);
+  }
 }
 
 cedar::aux::Parameter::~Parameter()
@@ -81,6 +85,28 @@ cedar::aux::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::Parameter::setOwner(cedar::aux::Configurable *pOwner)
+{
+  if(this->mpOwner != nullptr)
+  {
+    this->mpOwner->unregisterParameter(this);
+  }
+
+  this->mpOwner = pOwner;
+
+  this->mpOwner->registerParameter(this);
+}
+
+void cedar::aux::Parameter::setName(const std::string& name)
+{
+  QWriteLocker locker(this->mName.getLockPtr());
+  std::string old_name = this->mName.member();
+  this->mName.member() = name;
+  locker.unlock();
+
+  this->signalNameChanged(old_name, name);
+}
 
 void cedar::aux::Parameter::copyValueFrom(cedar::aux::ConstParameterPtr /* other */)
 {
@@ -197,12 +223,10 @@ void cedar::aux::Parameter::setConstant(bool value)
   emit propertyChanged();
 }
 
-const std::string& cedar::aux::Parameter::getName() const
+std::string cedar::aux::Parameter::getName() const
 {
-  return this->mName;
-}
+  QReadLocker locker(this->mName.getLockPtr());
+  std::string name = this->mName.member();
 
-void cedar::aux::Parameter::setName(const std::string& name)
-{
-  this->mName = name;
+  return name;
 }
