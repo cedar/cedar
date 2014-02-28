@@ -242,6 +242,10 @@ private:
    */
   void registerParameter(cedar::aux::Parameter* parameter);
 
+  /*!@brief remove a parameter at this Configurable.
+   */
+  void unregisterParameter(cedar::aux::Parameter* parameter);
+
   //!@brief Transforms the old config format to one readable in the new interface.
   void oldFormatToNew(cedar::aux::ConfigurationNode& node);
 
@@ -355,6 +359,8 @@ private:
     }
   }
 
+  void parameterNameChanged(const std::string& oldName, const std::string& newName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -377,6 +383,9 @@ private:
   //!@brief map of registered parameters, using the parameter name as key
   ParameterMap mParameterAssociations;
 
+  //! Connections of the parameters' name changed signals
+  std::map<cedar::aux::Parameter*, boost::signals2::connection> mNameChangedConnections;
+
   //!@brief map of children of this Configurable instance
   Children mChildren;
 
@@ -388,6 +397,9 @@ private:
    * @remarks In order to avoid multiple inheritance down the line, configurable has, rather than is, a lockable.
    */
   mutable std::set<QReadWriteLock*> mParameterLocks;
+
+  //! Lock that is used to protect access to the various data members of the configurable itself.
+  mutable QReadWriteLock mConfigurableLock;
 
   //! Association parameter name -> deprecated names
   std::map<std::string, std::vector<std::string> > mDeprecatedParameterNames;

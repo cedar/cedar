@@ -22,56 +22,72 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LockableMember.h
+    File:        Parameter.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 01 28
+    Date:        2014 02 28
 
-    Description: Header file for the class cedar::aux::LockableMember.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_LOCKABLE_MEMBER_H
-#define CEDAR_AUX_LOCKABLE_MEMBER_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_AUX_PARAMETER_DECLARATION_H
+#define CEDAR_AUX_PARAMETER_DECLARATION_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/PluginDeclarationTemplate.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/LockableMember.fwd.h"
+#include "cedar/auxiliaries/ParameterDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief A lightweight convenience class for grouping a class member with a lock.
- *
- * @todo Use this in cedar::aux::Data?
- */
-template <typename T, class LockType>
-class cedar::aux::LockableMember
+// declarations of managers
+namespace cedar
+{
+  namespace aux
+  {
+    //! Factory manager used for parameters.
+    typedef
+        cedar::aux::FactoryManager<cedar::aux::ParameterPtr>
+        ParameterFactoryManager;
+
+    //! Declaration manager for parameters.
+    typedef
+        cedar::aux::DeclarationManagerTemplate<cedar::aux::ParameterPtr>
+        ParameterDeclarationManager;
+  }
+}
+
+CEDAR_AUX_SINGLETON(ParameterFactoryManager);
+CEDAR_AUX_SINGLETON(ParameterDeclarationManager);
+
+
+template <typename ParameterTypePtr>
+class cedar::aux::ParameterDeclaration
+:
+public cedar::aux::PluginDeclarationTemplate<cedar::aux::ParameterPtr, ParameterTypePtr>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::PluginDeclarationTemplate<cedar::aux::ParameterPtr, ParameterTypePtr> Super;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  LockableMember()
+  //!@brief The standard constructor.
+  ParameterDeclaration(const std::string& category = std::string(), const std::string& classId = std::string())
   :
-  mMember()
-  {
-  }
-
-  LockableMember(const T& member)
-  :
-  mMember(member)
+  Super(category, classId)
   {
   }
 
@@ -79,29 +95,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Returns the member.
-  const T& member() const
-  {
-    return this->mMember;
-  }
-
-  //! Returns the member.
-  T& member()
-  {
-    return this->mMember;
-  }
-
-  //! Returns the associated lock.
-  LockType& getLock() const
-  {
-    return this->mLock;
-  }
-
-  //! Returns a pointer to associated lock. Use this method for things like QReadLocker etc.
-  LockType* getLockPtr() const
-  {
-    return &this->mLock;
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -121,13 +115,17 @@ private:
 protected:
   // none yet
 private:
-  //! The actual member.
-  T mMember;
+  // none yet
 
-  //! Lock for the member.
-  mutable LockType mLock;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-}; // class cedar::aux::LockableMember
+private:
+  // none yet
+};
 
-#endif // CEDAR_AUX_LOCKABLE_MEMBER_H
 
+#endif // CEDAR_AUX_PARAMETER_DECLARATION_H
