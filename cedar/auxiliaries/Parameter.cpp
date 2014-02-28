@@ -62,9 +62,9 @@ mConstant(false),
 mIsHidden(false),
 mChanged(false),
 mAdvanced(false),
+mIsLinked(false),
 mLastLockType(cedar::aux::LOCK_TYPE_DONT_LOCK),
 mpLock(new QReadWriteLock())
-
 {
   this->setName(name);
 
@@ -85,6 +85,16 @@ cedar::aux::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::Parameter::isLinked() const
+{
+  return this->mIsLinked;
+}
+
+void cedar::aux::Parameter::setLinked(bool linked)
+{
+  this->mIsLinked = linked;
+}
 
 void cedar::aux::Parameter::unsetOwner()
 {

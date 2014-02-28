@@ -123,6 +123,12 @@ public:
   //!@brief set flag if this parameter is hidden (for GUI)
   void setHidden(bool hide);
 
+  //! Whether the parameter is linked to other parameters.
+  bool isLinked() const;
+
+  //! Sets whether the parameter is linked to other parameters. This shouldn't be called by users.
+  void setLinked(bool linked);
+
   /*!@brief   Marks this parameter as advanced.
    *
    *          Advanced parameters are those that usually don't need to be changed. This is mainly used by user interfaces
@@ -263,6 +269,8 @@ private:
 
   //! Flag that indicates whether this parameter is advanced.
   bool mAdvanced;
+
+  bool mIsLinked;
 
   //! Type of the last lock.
   mutable cedar::aux::LOCK_TYPE mLastLockType;
