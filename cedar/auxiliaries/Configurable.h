@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
@@ -219,6 +220,15 @@ public:
   {
     return this->mIsAdvanced;
   }
+
+  /*! Returns the name, or a number added to it if there is already a parameter with that name.
+   */
+  std::string getUniqueName(const std::string& baseName) const;
+
+public:
+  CEDAR_DECLARE_SIGNAL(ParameterAdded, void(cedar::aux::ParameterPtr));
+public:
+  CEDAR_DECLARE_SIGNAL(ParameterRemoved, void(cedar::aux::ParameterPtr));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
