@@ -167,7 +167,7 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
     }
     this->lock(cedar::aux::LOCK_TYPE_READ);
     this->compute(cedar::proc::Arguments());
-    this->unlock();
+    this->unlock(cedar::aux::LOCK_TYPE_READ);
     this->emitOutputPropertiesChangedSignal("sum");
     this->onTrigger();
   }

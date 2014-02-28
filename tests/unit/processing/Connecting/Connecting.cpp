@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -142,7 +142,7 @@ int testPtrChange()
 {
   int errors = 0;
 
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  cedar::proc::GroupPtr network (new cedar::proc::Group());
   TestSource2Ptr src(new TestSource2());
   TestModulePtr tar(new TestModule());
   network->add(src, "source");
@@ -227,7 +227,7 @@ int testOnlineDisconnecting()
 
   for (size_t i = 0; i < trials; ++i)
   {
-    cedar::proc::NetworkPtr network(new cedar::proc::Network());
+    cedar::proc::GroupPtr network(new cedar::proc::Group());
     network->readJson("projection.json");
 
     auto trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
@@ -246,7 +246,7 @@ int testOnlineDisconnecting()
   for (size_t i = 0; i < trials; ++i)
   {
     std::cout << "Testing double-triggered case ..." << std::endl;
-    cedar::proc::NetworkPtr network(new cedar::proc::Network());
+    cedar::proc::GroupPtr network(new cedar::proc::Group());
     network->readJson("taste_the_double_trigger.json");
 
     auto trigger1 = network->getElement<cedar::proc::LoopedTrigger>("trigger1");
@@ -276,7 +276,7 @@ void run_test()
 {
   global_errors = 0;
 
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  cedar::proc::GroupPtr network (new cedar::proc::Group());
   network->add(TestSourcePtr(new TestSource(1)), "source1");
   network->add(TestSourcePtr(new TestSource(2)), "source2");
   network->add(TestModulePtr(new TestModule()), "target");

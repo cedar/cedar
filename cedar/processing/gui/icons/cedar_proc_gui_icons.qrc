@@ -16,6 +16,7 @@
     <file>menus/close_all_plots.svg</file>
     <file>decorations/looped.svg</file>
     <file>decorations/record.svg</file>
+    <file>decorations/template.svg</file>
     <file>decorations/from_plugin.svg</file>
     <file>modeicons/select.svg</file>
     <file>modeicons/connect.svg</file>
@@ -72,7 +73,7 @@
     <file>menus/display_style.svg</file>
     <file>menus/consistency_check.svg</file>
     <file>menus/settings.svg</file>
-    <file>network.svg</file>
+    <file>group.svg</file>
     <file>toolbaricons/save.svg</file>
     <file>toolbaricons/grid.svg</file>
     <file>toolbaricons/reset.svg</file>
