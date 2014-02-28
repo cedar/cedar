@@ -62,6 +62,7 @@ class cedar::proc::ProjectionMapping
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
   typedef std::map<unsigned int, unsigned int> MappingType;
+  typedef std::map<unsigned int, MappingType> MappingMap;
   typedef MappingType::iterator iterator;
   typedef MappingType::const_iterator const_iterator;
 
@@ -206,6 +207,7 @@ private:
   static unsigned int msDropIndex;
   //! data structure containing the actual overall mapping
   MappingType mMapping;
+  MappingMap mMappingsMap;
   //! output dimensionality of the mapping
   unsigned int mOutputDimensionality;
   //! validity of the mapping (whether it can be used in the given context)
