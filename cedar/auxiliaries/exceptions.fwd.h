@@ -57,6 +57,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
     CEDAR_DECLARE_AUX_CLASS(InvalidPathException);
+    CEDAR_DECLARE_AUX_CLASS(InvalidValueException);
     CEDAR_DECLARE_AUX_CLASS(MalformedConfigurationTreeException);
     CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);

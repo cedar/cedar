@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/IntrusivePtrBase.h"
+#include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
@@ -196,6 +197,16 @@ public:
    */
   void addDeprecatedName(const std::string& deprecatedName);
 
+  /*! @brief If possible, copies the value from another parameter into this parameter.
+   *
+   * The default implementation always throws an exception.
+   */
+  virtual void copyValueFrom(cedar::aux::ConstParameterPtr other);
+
+  /*!@brief Checks if this parameter can copy its value from the given one.
+   */
+  virtual bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
+
 public:
   //! Signal that is emitted whenever the name of the parameter changes. The first string is the old name, the second the new one.
   CEDAR_DECLARE_SIGNAL(NameChanged, void(const std::string&, const std::string&));
@@ -252,6 +263,9 @@ private:
 
   //! Flag that indicates whether this parameter is advanced.
   bool mAdvanced;
+
+  //! Type of the last lock.
+  mutable cedar::aux::LOCK_TYPE mLastLockType;
 
   //! Lock for the parameter.
   mutable QReadWriteLock* mpLock;

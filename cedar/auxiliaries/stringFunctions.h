@@ -218,6 +218,28 @@ namespace cedar
       return result;
     }
 
+    /*!@brief Function that checks whether a string starts with a given one.
+     *
+     * @returns True, if string starts with startsWith, false otherwise.
+     */
+    inline bool startsWith(const std::string& string, const std::string& startsWith)
+    {
+      if (string.length() < startsWith.length())
+      {
+        return false;
+      }
+
+      for (size_t i = 0; i < startsWith.size(); ++i)
+      {
+        if (string.at(i) != startsWith.at(i))
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     /*!@brief Function that checks whether a string ends with a given one.
      *
      * @returns True, if string ends with endsWith, false otherwise.

@@ -45,6 +45,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/ElementClassList.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QListWidget>
@@ -88,6 +89,19 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  void addListEntry
+       (
+         const std::string& className,
+         const std::string& fullClassName,
+         const QIcon& icon,
+         const std::vector<QString>& decorations,
+         const std::string& description,
+         const std::string& deprecation,
+         const std::string& source,
+         cedar::aux::ConstPluginDeclarationPtr declaration
+       );
+
 private slots:
   void showDeprecatedSteps(bool show);
 

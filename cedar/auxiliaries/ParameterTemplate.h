@@ -48,6 +48,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/ParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -65,8 +66,11 @@ template <typename T>
 class cedar::aux::ParameterTemplate : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::ParameterTemplate<T> SelfType;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SelfType);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -149,9 +153,19 @@ public:
     {
       cedar::aux::LogSingleton::getInstance()->debugMessage
       (
-        "Error while setting parameter to value: " + std::string(e.what()),
+        "Error while reading parameter '" + this->getName() + "': " + std::string(e.what()) + ". Inserting default value instead.",
         "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
       );
+      this->makeDefault();
+    }
+    catch (const boost::property_tree::ptree_bad_data& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+      (
+        "Error while reading parameter '" + this->getName() + "': " + std::string(e.what()) + ". Inserting default value instead.",
+        "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
+      );
+      this->makeDefault();
     }
   }
 
@@ -176,6 +190,28 @@ public:
   void setValidator(boost::function<void(const T&)> validator)
   {
     mValidator = validator;
+  }
+
+  bool canCopyFrom(cedar::aux::ConstParameterPtr other) const
+  {
+    return static_cast<bool>(boost::dynamic_pointer_cast<ConstSelfType>(other));
+  }
+
+  void copyValueFrom(cedar::aux::ConstParameterPtr other)
+  {
+    if (auto other_self = boost::dynamic_pointer_cast<ConstSelfType>(other))
+    {
+      this->setValue(other_self->getValue());
+    }
+    else
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::UnhandledTypeException,
+        "Cannot copy parameter value: types don't match. Type of this: " + cedar::aux::objectTypeToString(this)
+        + ", type of other: " + cedar::aux::objectTypeToString(other)
+      );
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -62,7 +62,9 @@ mConstant(false),
 mIsHidden(false),
 mChanged(false),
 mAdvanced(false),
+mLastLockType(cedar::aux::LOCK_TYPE_DONT_LOCK),
 mpLock(new QReadWriteLock())
+
 {
   this->setName(name);
 
@@ -111,6 +113,16 @@ void cedar::aux::Parameter::setName(const std::string& name)
   this->signalNameChanged(old_name, name);
 }
 
+void cedar::aux::Parameter::copyValueFrom(cedar::aux::ConstParameterPtr /* other */)
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException, "Copying values from this type of parameter is not supported.");
+}
+
+bool cedar::aux::Parameter::canCopyFrom(cedar::aux::ConstParameterPtr /* other */) const
+{
+  return false;
+}
+
 void cedar::aux::Parameter::addDeprecatedName(const std::string& deprecatedName)
 {
   this->mpOwner->addDeprecatedName(this, deprecatedName);
@@ -120,21 +132,23 @@ void cedar::aux::Parameter::lockForWrite() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_WRITE);
+  this->mLastLockType = cedar::aux::LOCK_TYPE_WRITE;
+  cedar::aux::lock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::lockForRead() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_READ);
+  this->mLastLockType = cedar::aux::LOCK_TYPE_READ;
+  cedar::aux::lock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::unlock() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::unlock(locks);
+  cedar::aux::unlock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::appendLocks(std::set<QReadWriteLock*>& locks) const
