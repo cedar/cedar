@@ -48,6 +48,7 @@
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/ParameterLink.h"
+#include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
@@ -101,6 +102,11 @@ void cedar::proc::GroupFileFormatV1::write
   this->writeParameterLinks(group, links);
   if (!links.empty())
     root.add_child("parameter links", links);
+
+  cedar::aux::ConfigurationNode custom_parameters;
+  this->writeCustomParameters(group, custom_parameters);
+  if (!custom_parameters.empty())
+    root.add_child("custom parameters", custom_parameters);
 
   group->cedar::aux::Configurable::writeConfiguration(root);
 }
@@ -254,6 +260,13 @@ void cedar::proc::GroupFileFormatV1::read
        std::vector<std::string>& exceptions
      )
 {
+  // these have to be read before Configurable::readConfiguration is called.
+  auto custom_parameters = root.find("custom parameters");
+  if (custom_parameters != root.not_found())
+  {
+    this->readCustomParameters(group, custom_parameters->second, exceptions);
+  }
+
   group->cedar::aux::Configurable::readConfiguration(root);
 
   group->processConnectors();
@@ -335,6 +348,50 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
     }
 
     root.push_back(cedar::aux::ConfigurationNode::value_type("", link_node));
+  }
+}
+
+void cedar::proc::GroupFileFormatV1::writeCustomParameters(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& customParameters) const
+{
+  for (auto parameter : group->getCustomParameters())
+  {
+    cedar::aux::ConfigurationNode custom_parameter;
+
+    std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
+
+    custom_parameter.put("name", parameter->getName());
+    custom_parameter.put("type", type);
+
+    customParameters.push_back(cedar::aux::ConfigurationNode::value_type("", custom_parameter));
+  }
+}
+
+void cedar::proc::GroupFileFormatV1::readCustomParameters
+     (
+       cedar::proc::GroupPtr group,
+       const cedar::aux::ConfigurationNode& customParameters,
+       std::vector<std::string>& /* exceptions */
+     )
+{
+  for (const auto& param_iter : customParameters)
+  {
+    const auto& node = param_iter.second;
+
+    auto type_iter = node.find("type");
+    if (type_iter == node.not_found())
+    {
+      continue;
+    }
+
+    auto name_iter = node.find("name");
+    if (name_iter == node.not_found())
+    {
+      continue;
+    }
+
+    std::string type = type_iter->second.get_value<std::string>();
+    std::string name = name_iter->second.get_value<std::string>();
+    group->addCustomParameter(type, name);
   }
 }
 

@@ -153,6 +153,13 @@ private:
     std::vector<std::string>& exceptions
   );
 
+  void readCustomParameters
+  (
+    cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& customParameters,
+    std::vector<std::string>& exceptions
+  );
+
   /*!@brief Writes the meta data to the configuration.
    */
   void writeMetaData(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
@@ -182,6 +189,8 @@ private:
   void writeDataConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
   void writeParameterLinks(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  void writeCustomParameters(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

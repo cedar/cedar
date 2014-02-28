@@ -533,7 +533,7 @@ public:
   /*! Returns the list of custom parameters added to this group. Custom parameters are those that have been added by the
    *  user.
    */
-  inline std::vector<cedar::aux::ParameterPtr> getCustomParameters()
+  inline std::vector<cedar::aux::ParameterPtr> getCustomParameters() const
   {
     return this->mCustomParameters;
   }
