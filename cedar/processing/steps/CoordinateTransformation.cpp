@@ -48,7 +48,8 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <string.h>
+#include <string>
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

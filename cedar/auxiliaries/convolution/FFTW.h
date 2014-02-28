@@ -51,6 +51,8 @@
 #include <opencv2/opencv.hpp>
 #include <fftw3.h>
 #include <vector>
+#include <map>
+#include <string>
 
 /*!@brief A convolution engine based on the FFTW library.
  */
