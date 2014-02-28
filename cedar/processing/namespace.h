@@ -61,7 +61,7 @@
 #include "cedar/processing/LoopArguments.fwd.h"
 #include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Manager.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/OwnedData.fwd.h"
 #include "cedar/processing/PlotData.fwd.h"
 #include "cedar/processing/PluginDeclaration.fwd.h"

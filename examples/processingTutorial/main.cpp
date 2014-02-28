@@ -38,14 +38,14 @@
 
 ======================================================================================================================*/
 
-#include <cedar/processing/Network.h>
+#include <cedar/processing/Group.h>
 #include <cedar/processing/sources/GaussInput.h>
 #include "SimpleSummation.h" // header for the class we have written above
 
 int main(int, char**) // we don't use the arguments here
 {
   // create a network
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
 
   boost::shared_ptr<SimpleSummation> sum(new SimpleSummation());
   // This adds the sum step to the network under the name "sum".

@@ -204,7 +204,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
         // handle disconnection of slot-input
         this->mSignalConnections.push_back
         (
-          p_input_slot->connectToExternalDataRemoved
+          p_input_slot->connectToDataRemovedSignal
           (
             boost::bind
             (
@@ -218,7 +218,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
         // react to addition of input to a slot
         this->mSignalConnections.push_back
         (
-          p_input_slot->connectToExternalDataAdded
+          p_input_slot->connectToDataSetSignal
           (
             boost::bind
             (

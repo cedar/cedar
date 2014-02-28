@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,73 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        Group.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 07 17
+    Date:        2013 11 07
 
-    Description: This unit test tests cedar::proc::gui::Networks in a non-gui context.
+    Description: Forward declaration file for the class cedar::proc::gui::Network.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_GUI_GROUP_FWD_H
+#define CEDAR_PROC_GUI_GROUP_FWD_H
 
-// LOCAL INCLUDES
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
-// PROJECT INCLUDES
-#include "cedar/processing/gui/Network.h"
-#include "cedar/processing/gui/Ide.h"
-#include "cedar/processing/exceptions.h"
+// CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
-#include <QMainWindow>
 #ifndef Q_MOC_RUN
-  #include <boost/filesystem.hpp>
-#endif
-#include <iostream>
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-int main(int argc, char** argv)
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-  QApplication app(argc, argv);
-
-  unsigned int errors = 0;
-
-  cedar::proc::gui::Ide* p_window = new cedar::proc::gui::Ide(false);
-
-  cedar::proc::gui::Network* p_network
-    = new cedar::proc::gui::Network(p_window, p_window->getArchitectureView()->getScene());
-
-  try
+  namespace proc
   {
-    p_network->read("test_arch.json");
-  }
-  catch (cedar::proc::ArchitectureLoadingException& exception)
-  {
-    ++errors;
-    std::cout << "Architecture failed to load. Exceptions:" << std::endl;
-
-    for (size_t i = 0; i < exception.getMessages().size(); ++i)
+    namespace gui
     {
-      std::cout << i << ": " << exception.getMessages()[i] << std::endl;
+      CEDAR_DECLARE_PROC_CLASS(Group);
     }
   }
-
-  p_network->write("save_test.json");
-
-  if (boost::filesystem::exists("save_test.json"))
-  {
-    boost::filesystem::remove("save_test.json");
-  }
-  else
-  {
-    std::cout << "ERROR: Could not find written file." << std::endl;
-    ++errors;
-  }
-
-  // return
-  std::cout << "Done, " << errors << " error(s) occurred." << std::endl;
-  return errors;
 }
+
+//!@endcond
+
+#endif // CEDAR_PROC_GUI_GROUP_FWD_H
+

@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/Settings.h"
 
 // LOCAL INCLUDES
@@ -133,6 +133,6 @@ void cedar::processingCL::MainApplication::loadArchitecture(const std::string& p
   std::cout << "This may take a while, please be patient." << std::endl;
   std::cout << std::endl;
 
-  this->mArchitecture = boost::make_shared<cedar::proc::Network>();
+  this->mArchitecture = boost::make_shared<cedar::proc::Group>();
   this->mArchitecture->readJson(path);
 }
