@@ -52,7 +52,7 @@
 #include "cedar/processing/gui/BoostControl.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"
 #include "cedar/processing/gui/Ide.fwd.h"
-#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -96,7 +96,7 @@ public:
 
   /*!@brief Resets the current scene and displays the new network.
    */
-  void resetTo(cedar::proc::gui::NetworkPtr network);
+  void resetTo(cedar::proc::gui::GroupPtr network);
 
 public slots:
   /*!@brief Slot that displays notifications.
@@ -169,7 +169,7 @@ public slots:
 
   /*!@brief Resets the root network
    */
-  void resetRootNetwork();
+  void resetRootGroup();
 
   /*!@brief Opens a dialog that lets the user export the current scene as an SVG
    */
@@ -287,7 +287,7 @@ private:
   //!@brief populates the Plot Groups Combobox with available Plot Groups
   void loadPlotGroupsIntoComboBox();
 
-  void setNetwork(cedar::proc::gui::NetworkPtr network);
+  void setGroup(cedar::proc::gui::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -299,7 +299,7 @@ private:
   std::map<std::string, cedar::proc::gui::ElementClassList*> mElementClassListWidgets;
 
   //! The network currently displayed.
-  cedar::proc::gui::NetworkPtr mNetwork;
+  cedar::proc::gui::GroupPtr mGroup;
 
   //! Architecture consistency check widget.
   cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;

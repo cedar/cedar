@@ -122,7 +122,7 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-  if(!this->mInput)
+  if (!this->mInput)
   {
     return;
   }

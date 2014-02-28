@@ -151,7 +151,7 @@ void cedar::aux::Lockable::unlockAll(LockSetHandle lockSet) const
   {
     QReadWriteLock* p_lock = iter->first;
 
-    if (p_lock != p_last)
+    if (p_lock != p_last && iter->second != cedar::aux::LOCK_TYPE_DONT_LOCK)
     {
       p_last = p_lock;
       p_lock->unlock();
