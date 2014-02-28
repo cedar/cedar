@@ -525,6 +525,18 @@ public:
 
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
   bool isLooped() const;
+
+  cedar::aux::ParameterPtr addCustomParameter(const std::string& type, const std::string& name);
+
+  void removeCustomParameter(const std::string& name);
+
+  /*! Returns the list of custom parameters added to this group. Custom parameters are those that have been added by the
+   *  user.
+   */
+  inline std::vector<cedar::aux::ParameterPtr> getCustomParameters()
+  {
+    return this->mCustomParameters;
+  }
   
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -608,6 +620,14 @@ public:
   //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
   CEDAR_DECLARE_SIGNAL(ElementRemoved, void (cedar::proc::ConstElementPtr));
 
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is added.
+  CEDAR_DECLARE_SIGNAL(CustomParameterAdded, void (cedar::aux::ParameterPtr));
+
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(CustomParameterRemoved, void (cedar::aux::ParameterPtr));
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -634,6 +654,9 @@ private:
 
   //! Map containing every looped thread
   TriggerableVector mLoopedTriggerables;
+
+  //! List of all the custom parameters that were added to this group.
+  std::vector<cedar::aux::ParameterPtr> mCustomParameters;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
