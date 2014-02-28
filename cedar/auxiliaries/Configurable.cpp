@@ -75,6 +75,10 @@ mIsAdvanced(false)
 
 cedar::aux::Configurable::~Configurable()
 {
+  for (auto parameter_connection_pair : this->mNameChangedConnections)
+  {
+    parameter_connection_pair.second.disconnect();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -431,10 +435,72 @@ void cedar::aux::Configurable::writeCsv(const std::string& filename, const char 
   writeCsvConfiguration(new_filename, configuration, separator);
 }
 
+void cedar::aux::Configurable::parameterNameChanged(const std::string& oldName, const std::string& newName)
+{
+  auto assoc_iter = this->mParameterAssociations.find(oldName);
+  auto assoc = assoc_iter->second;
+
+  CEDAR_ASSERT(assoc_iter != this->mParameterAssociations.end());
+  this->mParameterAssociations.erase(assoc_iter);
+
+  this->mParameterAssociations[newName] = assoc;
+}
+
+void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)
+{
+  QWriteLocker locker (&mConfigurableLock);
+  auto name = parameter->getName();
+
+  auto assoc_iter = this->mParameterAssociations.find(name);
+  if (assoc_iter != this->mParameterAssociations.end())
+  {
+    this->mParameterAssociations.erase(assoc_iter);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Failed to find parameter \"" + name + "\" in association list. Ignoring.",
+      "void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)"
+    );
+  }
+
+  auto iter = std::find(this->mParameterList.begin(), this->mParameterList.end(), parameter);
+  if (iter != this->mParameterList.end())
+  {
+    this->mParameterList.erase(iter);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Failed to find parameter \"" + name + "\" in parameter list. Ignoring.",
+      "void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)"
+    );
+  }
+
+  auto signal_iter = this->mNameChangedConnections.find(parameter);
+  if (signal_iter != this->mNameChangedConnections.end())
+  {
+    signal_iter->second.disconnect();
+    this->mNameChangedConnections.erase(signal_iter);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Failed to find parameter \"" + name + "\" in parameter connection list. Ignoring.",
+      "void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)"
+    );
+  }
+}
+
 void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* parameter)
 {
+  QWriteLocker locker (&mConfigurableLock);
+
   //!@todo Make a global function for checking names. This function might then also be used for step/data/... names.
-  const std::string& name = parameter->getName();
+  auto name = parameter->getName();
   if (name.find(".") != std::string::npos)
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "\"" + name + "\" is an invalid name because it contains a '.'.");
@@ -454,6 +520,9 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* paramete
   ParameterList::iterator last_iter = this->mParameterList.end();
   --last_iter;
   this->mParameterAssociations[name] = last_iter;
+
+  this->mNameChangedConnections[parameter]
+    = parameter->connectToNameChangedSignal(boost::bind(&cedar::aux::Configurable::parameterNameChanged, this, _1, _2));
 
   this->updateLockSet();
 }
