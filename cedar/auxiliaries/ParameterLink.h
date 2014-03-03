@@ -100,8 +100,14 @@ private slots:
 
   virtual void rightChanged() = 0;
 
+  virtual void leftPropertiesChanged();
+
+  virtual void rightPropertiesChanged();
+
 private:
   virtual bool checkIfLinkable(cedar::aux::ConstParameterPtr left, cedar::aux::ConstParameterPtr right) const = 0;
+
+  void applyProperties(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

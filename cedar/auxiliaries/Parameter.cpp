@@ -233,9 +233,13 @@ bool cedar::aux::Parameter::isConstant() const
 
 void cedar::aux::Parameter::setConstant(bool value)
 {
-  this->mConstant = value;
+  bool was_constant = this->isConstant();
+  if (was_constant != value)
+  {
+    this->mConstant = value;
 
-  emit propertyChanged();
+    emit propertyChanged();
+  }
 }
 
 std::string cedar::aux::Parameter::getName() const
