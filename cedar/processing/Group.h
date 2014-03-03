@@ -53,6 +53,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.fwd.h"
+#include "cedar/auxiliaries/ParameterLink.fwd.h"
 #include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
@@ -90,6 +91,15 @@ class cedar::proc::Group : public QThread, public cedar::proc::Connectable, publ
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  struct ParameterLinkInfo
+  {
+    cedar::aux::ParameterLinkPtr mParameterLink;
+
+    cedar::proc::ElementPtr mSourceElement;
+    cedar::proc::ElementPtr mTargetElement;
+  };
+
 public:
   //! Enum that represents the change of a given connection.
   enum ConnectionChange
@@ -496,6 +506,14 @@ public:
 
   cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
 
+  //! Adds a parameter link to the list of links in this group. Does NOT link the parameters.
+  void addParameterLink
+  (
+    cedar::proc::ElementPtr sourceElement,
+    cedar::proc::ElementPtr targetElement,
+    cedar::aux::ParameterLinkPtr link
+  );
+  
   //!@brief
   void setIsLooped(bool looped);
 
@@ -508,6 +526,18 @@ public:
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
   bool isLooped() const;
 
+  cedar::aux::ParameterPtr addCustomParameter(const std::string& type, const std::string& name);
+
+  void removeCustomParameter(const std::string& name);
+
+  /*! Returns the list of custom parameters added to this group. Custom parameters are those that have been added by the
+   *  user.
+   */
+  inline std::vector<cedar::aux::ParameterPtr> getCustomParameters() const
+  {
+    return this->mCustomParameters;
+  }
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -590,6 +620,14 @@ public:
   //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
   CEDAR_DECLARE_SIGNAL(ElementRemoved, void (cedar::proc::ConstElementPtr));
 
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is added.
+  CEDAR_DECLARE_SIGNAL(CustomParameterAdded, void (cedar::aux::ParameterPtr));
+
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(CustomParameterRemoved, void (cedar::aux::ParameterPtr));
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -611,8 +649,14 @@ private:
   //!@brief connection to state changed signal of step
   std::map<std::string, boost::signals2::connection> mRevalidateConnections;
 
+  //! List of all the parameter links in this group.
+  std::vector<ParameterLinkInfo> mParameterLinks;
+
   //! Map containing every looped thread
   TriggerableVector mLoopedTriggerables;
+
+  //! List of all the custom parameters that were added to this group.
+  std::vector<cedar::aux::ParameterPtr> mCustomParameters;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

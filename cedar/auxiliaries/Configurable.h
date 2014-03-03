@@ -221,9 +221,16 @@ public:
     return this->mIsAdvanced;
   }
 
+  /*!@brief Returns the path of the parameter, relative to this configurable.
+   *
+   *        If the parameter is directly attached to this object, this method returns just the name. Otherwise, it looks
+   *        through all configurable children and other parameters.
+   */
+  std::string findParameterPath(cedar::aux::ParameterPtr parameter) const;
+
   /*! Returns the name, or a number added to it if there is already a parameter with that name.
    */
-  std::string getUniqueName(const std::string& baseName) const;
+  std::string getUniqueParameterName(const std::string& baseName) const;
 
 public:
   CEDAR_DECLARE_SIGNAL(ParameterAdded, void(cedar::aux::ParameterPtr));

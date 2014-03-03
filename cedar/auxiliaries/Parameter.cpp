@@ -62,9 +62,9 @@ mConstant(false),
 mIsHidden(false),
 mChanged(false),
 mAdvanced(false),
+mIsLinked(false),
 mLastLockType(cedar::aux::LOCK_TYPE_DONT_LOCK),
 mpLock(new QReadWriteLock())
-
 {
   this->setName(name);
 
@@ -85,6 +85,16 @@ cedar::aux::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::Parameter::isLinked() const
+{
+  return this->mIsLinked;
+}
+
+void cedar::aux::Parameter::setLinked(bool linked)
+{
+  this->mIsLinked = linked;
+}
 
 void cedar::aux::Parameter::unsetOwner()
 {
@@ -111,6 +121,16 @@ void cedar::aux::Parameter::setName(const std::string& name)
   locker.unlock();
 
   this->signalNameChanged(old_name, name);
+}
+
+void cedar::aux::Parameter::copyValueFrom(cedar::aux::ConstParameterPtr /* other */)
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException, "Copying values from this type of parameter is not supported.");
+}
+
+bool cedar::aux::Parameter::canCopyFrom(cedar::aux::ConstParameterPtr /* other */) const
+{
+  return false;
 }
 
 void cedar::aux::Parameter::addDeprecatedName(const std::string& deprecatedName)
@@ -213,9 +233,13 @@ bool cedar::aux::Parameter::isConstant() const
 
 void cedar::aux::Parameter::setConstant(bool value)
 {
-  this->mConstant = value;
+  bool was_constant = this->isConstant();
+  if (was_constant != value)
+  {
+    this->mConstant = value;
 
-  emit propertyChanged();
+    emit propertyChanged();
+  }
 }
 
 std::string cedar::aux::Parameter::getName() const
