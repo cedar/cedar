@@ -904,7 +904,7 @@ void cedar::proc::gui::Group::dataConnectionChanged
      )
 {
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
-  //!@todo Write a getGraphicsItemFor(QString/std::string0 method in scene; also, maybe these items should be managed in gui::Group
+  //!@todo Write a getGraphicsItemFor(QString/std::string) method in scene; also, maybe these items should be managed in gui::Group
   auto element = this->getGroup()->getElement(sourceName.toStdString());
 
   // if the source is a group source, get its slot from the group
@@ -1500,7 +1500,12 @@ void cedar::proc::gui::Group::updateCollapsedness()
   for (int i = 0; i < children.size(); ++i)
   {
     auto child = children.at(i);
+    //!@todo This should cast to cedar::proc::gui::Element, but that class doesn't exist (yet)
     if (auto element = dynamic_cast<cedar::proc::gui::Connectable*>(child))
+    {
+      element->setVisible(!collapse);
+    }
+    else if (auto element = dynamic_cast<cedar::proc::gui::TriggerItem*>(child))
     {
       element->setVisible(!collapse);
     }

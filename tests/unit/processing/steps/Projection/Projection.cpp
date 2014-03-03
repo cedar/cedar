@@ -275,7 +275,7 @@ int main()
 #endif // CEDAR_USE_FFTW
 
   // check strange bugs!
-  cedar::proc::NetworkPtr group(new cedar::proc::Network());
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
   group->create("cedar.processing.sources.GaussInput", "gauss");
   group->create("cedar.processing.Projection", "projection");
   group->connectSlots("gauss.Gauss input","projection.input");

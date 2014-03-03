@@ -2105,9 +2105,9 @@ void cedar::proc::Group::onStart()
   this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
   for (auto element : this->mElements)
   {
-    if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element.second))
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element.second))
     {
-      group->onStart();
+      triggerable->callOnStart();
     }
   }
 }
@@ -2119,9 +2119,9 @@ void cedar::proc::Group::onStop()
   this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "");
   for (auto element : this->mElements)
   {
-    if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element.second))
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element.second))
     {
-      group->onStop();
+      triggerable->callOnStop();
     }
   }
 }
