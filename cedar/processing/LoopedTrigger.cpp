@@ -49,6 +49,7 @@
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/auxiliaries/MovingAverage.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -97,8 +98,8 @@ cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std:
 :
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
-//mWait(new cedar::aux::BoolParameter(this, "wait", true)),
-mStarted(false)
+mStarted(false),
+mStatistics(new TimeAverage(50))
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -202,4 +203,10 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
   {
     listener->onTrigger(arguments, this_ptr);
   }
+  this->mStatistics->append(time);
+}
+
+cedar::proc::LoopedTrigger::ConstTimeAveragePtr cedar::proc::LoopedTrigger::getStatistics() const
+{
+  return this->mStatistics;
 }
