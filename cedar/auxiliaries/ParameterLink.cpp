@@ -73,6 +73,23 @@ void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr lef
 
   QObject::connect(this->mLeft.get(), SIGNAL(valueChanged()), this, SLOT(leftChanged()));
   QObject::connect(this->mRight.get(), SIGNAL(valueChanged()), this, SLOT(rightChanged()));
+  QObject::connect(this->mLeft.get(), SIGNAL(propertyChanged()), this, SLOT(leftPropertiesChanged()));
+  QObject::connect(this->mRight.get(), SIGNAL(propertyChanged()), this, SLOT(rightPropertiesChanged()));
+}
+
+void cedar::aux::ParameterLink::leftPropertiesChanged()
+{
+  this->applyProperties(this->getLeft(), this->getRight());
+}
+
+void cedar::aux::ParameterLink::rightPropertiesChanged()
+{
+  this->applyProperties(this->getRight(), this->getLeft());
+}
+
+void cedar::aux::ParameterLink::applyProperties(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target)
+{
+  target->setConstant(source->isConstant());
 }
 
 cedar::aux::ParameterPtr cedar::aux::ParameterLink::getLeft() const
