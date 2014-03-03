@@ -164,9 +164,12 @@ void cedar::proc::LoopedTrigger::prepareStart()
 
   emit triggerStarting();
 
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->callOnStart();
+    QReadLocker locker(this->mListeners.getLockPtr());
+    for (auto listener : this->mListeners.member())
+    {
+      listener->callOnStart();
+    }
   }
 
   emit triggerStarted();
@@ -185,9 +188,12 @@ void cedar::proc::LoopedTrigger::processQuit()
 
   emit triggerStopping();
 
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->callOnStop();
+    QReadLocker locker(this->mListeners.getLockPtr());
+    for (auto listener : this->mListeners.member())
+    {
+      listener->callOnStop();
+    }
   }
 
   emit triggerStopped();
@@ -197,9 +203,9 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 {
   cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time));
 
-  //!@todo Is this right?
+  QReadLocker locker(this->mListeners.getLockPtr());
   auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
-  for (const auto& listener : this->mListeners)
+  for (const auto& listener : this->mListeners.member())
   {
     listener->onTrigger(arguments, this_ptr);
   }
