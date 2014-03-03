@@ -465,7 +465,7 @@ bool cedar::proc::Step::hasRoundTimeMeasurement() const
 cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
 {
   QReadLocker locker(&this->mLastIterationTimeLock);
-  if (this->hasRunTimeMeasurement())
+  if (this->mMovingAverageIterationTime.size() > 0)
   {
     cedar::unit::Time copy = this->mMovingAverageIterationTime.getAverage();
     return copy;
