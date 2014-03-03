@@ -38,6 +38,7 @@
 #define CEDAR_PROC_TRIGGERABLE_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Arguments.fwd.h"
@@ -163,8 +164,8 @@ public:
   //! Returns true if there is at least one trigger triggering this triggerable.
   inline bool isTriggered() const
   {
-    QReadLocker locker(&mTriggersListenedToLock);
-    bool triggered = this->mTriggersListenedTo.size() > 0;
+    QReadLocker locker(this->mTriggersListenedTo.getLockPtr());
+    bool triggered = this->mTriggersListenedTo.member().size() > 0;
     return triggered;
   }
 
@@ -235,9 +236,7 @@ protected:
 
   //! The triggers this step is triggered by.
   //!@todo Unify this with mParentTrigger
-  std::set<TriggerWeakPtr> mTriggersListenedTo;
-
-  mutable QReadWriteLock mTriggersListenedToLock;
+  cedar::aux::LockableMember< std::set<TriggerWeakPtr> > mTriggersListenedTo;
 
   //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;
@@ -253,7 +252,7 @@ protected:
 
 private:
   //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
-  cedar::proc::TriggerPtr mFinished;
+  cedar::aux::LockableMember<cedar::proc::TriggerPtr> mFinished;
 
   //! Counts how often callOnStart was called. This is required to prevent multiple onStart calls.
   unsigned int mStartCalls;
