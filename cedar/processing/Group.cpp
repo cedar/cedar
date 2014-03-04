@@ -1932,7 +1932,7 @@ bool cedar::proc::Group::disconnectAcrossGroups(cedar::proc::DataSlotPtr source,
     for (auto connection : outgoing_connections)
     {
       // is a group
-      if (auto tar = source_group->getElement<cedar::proc::Group>(connection->getTarget()->getName()))
+      if (auto tar = source_group->getElement<cedar::proc::Group>(connection->getTarget()->getParent()))
       {
         if (auto group_source = tar->getElement<cedar::proc::sources::GroupSource>(connection->getTarget()->getName()))
         {
@@ -1943,7 +1943,7 @@ bool cedar::proc::Group::disconnectAcrossGroups(cedar::proc::DataSlotPtr source,
         }
       }
       // is a group sink
-      else if (auto tar = source_group->getElement<cedar::proc::sinks::GroupSink>(connection->getTarget()->getName()))
+      else if (auto tar = source_group->getElement<cedar::proc::sinks::GroupSink>(connection->getTarget()->getParent()))
       {
         if (cedar::proc::Group::disconnectAcrossGroups(source_group->getOutputSlot(connection->getTarget()->getParent()), target))
         {
