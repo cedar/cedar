@@ -564,6 +564,7 @@ private:
                            );
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  static bool disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
