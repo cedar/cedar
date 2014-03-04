@@ -44,6 +44,7 @@
 #include "cedar/processing/OwnedData.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/Lockable.h"
+#include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
@@ -180,6 +181,9 @@ public:
 
   //!@brief Returns true, if this connectable already owns data in the target.
   bool ownsDataOf(cedar::proc::ConstOwnedDataPtr slot) const;
+
+  //! Returns a copy of the vector of the names of invalid input slots. This method is thread-safe.
+  std::vector<std::string> getInvalidInputNames() const;
 
   //!@brief Parses a data and Connectable name without specifying a role.
   static void parseDataNameNoRole
@@ -457,13 +461,13 @@ protected:
   //!@brief Vector with a string name of all missing mandatory connections.
   std::vector<std::string> mMissingMandatoryConnections;
 
-  //!@brief Vector with the names of all invalid input data.
-  std::vector<std::string> mInvalidInputNames;
-
   //!@brief Lock for making accesses to the connections thread-safe.
   QReadWriteLock* mpConnectionLock;
 
 private:
+  //!@brief Vector with the names of all invalid input data.
+  cedar::aux::LockableMember< std::vector<std::string> > mInvalidInputNames;
+
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mSlotMaps;
 

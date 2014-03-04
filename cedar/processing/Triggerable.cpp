@@ -45,6 +45,7 @@
 #include <QWriteLocker>
 #include <QMutexLocker>
 
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -251,27 +252,27 @@ void cedar::proc::Triggerable::callOnStop()
 void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState, const std::string& annotation)
 {
   // Only act if the state actually changes.
-  QWriteLocker locker(&mStateLock);
-  if (newState != this->mState || annotation != this->mStateAnnotation)
+  QWriteLocker locker(this->mState.getLockPtr());
+  if (newState != this->mState.member().mState || annotation != this->mState.member().mStateReason)
   {
-    this->mState = newState;
-    this->mStateAnnotation = annotation;
+    this->mState.member().mState = newState;
+    this->mState.member().mStateReason = annotation;
     locker.unlock();
     mStateChanged();
-//    emit stateChanged();
   }
 }
 
 cedar::proc::Triggerable::State cedar::proc::Triggerable::getState() const
 {
-  QReadLocker locker(&mStateLock);
-  return this->mState;
+  QReadLocker locker(this->mState.getLockPtr());
+  auto copy = this->mState.member().mState;
+  return copy;
 }
 
 std::string cedar::proc::Triggerable::getStateAnnotation() const
 {
-  QReadLocker locker(&mStateLock);
-  return this->mStateAnnotation;
+  QReadLocker locker(this->mState.getLockPtr());
+  return this->mState.member().mStateReason;
 }
 
 void cedar::proc::Triggerable::onStart()

@@ -86,6 +86,20 @@ public:
     //! Triggerable was not started correctly. This is different from a normal exception state.
     STATE_EXCEPTION_ON_START
   };
+private:
+  //! Class that holds information on the current state.
+  struct StateInfo
+  {
+    StateInfo(State state, const std::string& reason = std::string())
+    :
+    mState(state),
+    mStateReason(reason)
+    {
+    }
+    State mState;
+    std::string mStateReason;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -142,8 +156,11 @@ public:
    */
   void callOnStop();
 
-  //!@brief Returns the current cedar::proc::Triggerable::STATE of the Triggerable.
-  State getState() const;
+  /*!@brief Returns the current cedar::proc::Triggerable::STATE of the Triggerable.
+   *
+   * @remarks This method is thread-safe, it returns a copy of the current state.
+   */
+  cedar::proc::Triggerable::State getState() const;
 
   //!@brief Returns the annotation of the current state, e.g., the reasons for failing or the message of the last
   //        exception.
@@ -238,19 +255,13 @@ protected:
   //!@todo Unify this with mParentTrigger
   cedar::aux::LockableMember< std::set<TriggerWeakPtr> > mTriggersListenedTo;
 
-  //!@brief current state of this step, taken from cedar::processing::Step::State
-  State mState;
-
-  //! Lock for the step state.
-  mutable QReadWriteLock mStateLock;
-
-  //!@brief The annotation string for the current state.
-  std::string mStateAnnotation;
-
   //!@brief Signal that is emitted whenever the Triggerable's state is changed.
   boost::signals2::signal<void ()> mStateChanged;
 
 private:
+  //!@brief current state of this step, taken from cedar::processing::Step::State
+  cedar::aux::LockableMember<StateInfo> mState;
+
   //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
   cedar::aux::LockableMember<cedar::proc::TriggerPtr> mFinished;
 
