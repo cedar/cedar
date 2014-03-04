@@ -799,6 +799,12 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
     }
   }
 
+  // delete data connections
+  for (auto connection : data_connections)
+  {
+    cedar::proc::Group::disconnectAcrossGroups(connection.from, connection.to);
+  }
+
   // now add each element to the new group
   for (auto element : elements)
   {
@@ -1890,6 +1896,69 @@ void cedar::proc::Group::connectAcrossGroups(cedar::proc::DataSlotPtr source, ce
                   );
     cedar::proc::Group::connectAcrossGroups(source, target_group->getInputSlot(connector_name));
   }
+}
+
+bool cedar::proc::Group::disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
+{
+  // prepare
+  cedar::proc::Connectable* source_step = source->getParentPtr();
+  cedar::proc::Connectable* target_step = target->getParentPtr();
+  cedar::proc::GroupPtr source_group = source_step->getGroup();
+  cedar::proc::GroupPtr target_group = target_step->getGroup();
+
+  // find the chain of connections that connects source to target
+
+  // simple case: source and target live in the same group
+  if
+  (
+    source_group == target_group
+    && source_group->isConnected
+                     (
+                       source->getParent() + "." + source->getName(),
+                       target->getParent() + "." + target->getName()
+                     )
+  )
+  {
+    source_group->disconnectSlots(source, target);
+    return true;
+  }
+  else
+  {
+    std::vector<cedar::proc::DataConnectionPtr> outgoing_connections;
+    auto source_elem = source_group->getElement<cedar::proc::Connectable>(source_step->getName());
+    source_group->getDataConnectionsFrom(source_elem, source->getName(), outgoing_connections);
+    std::vector<cedar::proc::DataConnectionPtr> delete_connections;
+    // for every found connection, call disconnectAcrossGroups again, depending on the target's type
+    for (auto connection : outgoing_connections)
+    {
+      // is a group
+      if (auto tar = source_group->getElement<cedar::proc::Group>(connection->getTarget()->getName()))
+      {
+        if (auto group_source = tar->getElement<cedar::proc::sources::GroupSource>(connection->getTarget()->getName()))
+        {
+          if (cedar::proc::Group::disconnectAcrossGroups(group_source->getOutputSlot("output"), target))
+          {
+            delete_connections.push_back(connection);
+          }
+        }
+      }
+      // is a group sink
+      else if (auto tar = source_group->getElement<cedar::proc::sinks::GroupSink>(connection->getTarget()->getName()))
+      {
+        if (cedar::proc::Group::disconnectAcrossGroups(source_group->getOutputSlot(connection->getTarget()->getParent()), target))
+        {
+          delete_connections.push_back(connection);
+        }
+      }
+      else
+      {
+        // is something else, ignore
+      }
+    }
+    // delete all connections that connect to the target
+    source_group->disconnectSlots(delete_connections);
+  }
+  return false;
 }
 
 void cedar::proc::Group::removeAll()
