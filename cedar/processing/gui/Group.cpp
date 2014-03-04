@@ -1432,6 +1432,10 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
+  QAction* p_prune = menu.addAction("prune unsued connectors");
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
   QAction* a = menu.exec(event->screenPos());
 
   if (a == NULL)
@@ -1465,6 +1469,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   {
     std::string name = a->text().toStdString();
     this->getGroup()->removeConnector(name, false);
+  }
+
+  else if (a == p_prune)
+  {
+    this->getGroup()->pruneUnusedConnectors();
   }
 }
 
