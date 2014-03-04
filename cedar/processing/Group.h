@@ -508,6 +508,9 @@ public:
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
   bool isLooped() const;
 
+  //!@brief this function removes all unused connectors, i.e., connectors that have zero incoming or outgoing connections
+  void pruneUnusedConnectors();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -559,8 +562,6 @@ private:
                              cedar::proc::DataSlotPtr slot,
                              cedar::proc::ConstGroupPtr targetGroup
                            );
-
-  static void deleteConnectorsAlongConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 

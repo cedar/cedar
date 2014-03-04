@@ -799,12 +799,6 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
     }
   }
 
-  // remove connectors
-  for (auto connection : data_connections)
-  {
-    cedar::proc::Group::deleteConnectorsAlongConnection(connection.from, connection.to);
-  }
-
   // now add each element to the new group
   for (auto element : elements)
   {
@@ -1853,53 +1847,6 @@ std::vector<cedar::proc::DataSlotPtr> cedar::proc::Group::getRealTargets
   return real_targets;
 }
 
-void cedar::proc::Group::deleteConnectorsAlongConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
-{
-  // it is easier to go from target to source, since targets are only connected to a single source
-
-  // first, get the group in which the parent of the target slot is situated
-  cedar::proc::GroupPtr group = target->getParentPtr()->getGroup();
-
-  // sanity check
-  CEDAR_ASSERT(group);
-  // get the one connection to a data slot from this group
-  std::vector<cedar::proc::DataConnectionPtr> connections;
-  group->getDataConnectionsTo(group->getElement<cedar::proc::Connectable>(target->getParent()), target->getName(), connections);
-
-  // sanity check!
-  CEDAR_ASSERT(connections.size() == 1);
-  cedar::proc::DataConnectionPtr connection = connections.at(0);
-
-  // check if we have reached our destination
-  cedar::proc::DataSlotPtr current_source = connection->getSource();
-  if (source != current_source)
-  {
-    // no, so this is apparently a connector that we want to delete
-
-    // first, get a new target slot and call this function recursively
-    cedar::proc::DataSlotPtr new_target;
-    if (auto group_source = group->getElement<cedar::proc::sources::GroupSource>(current_source->getParent()))
-    {
-      new_target = group->getInputSlot(current_source->getParent());
-      cedar::proc::Group::deleteConnectorsAlongConnection(source, new_target);
-
-      // then, clean up connection and connector
-      connection->disconnect();
-      group->removeConnector(current_source->getParent(), true);
-    }
-    else
-    {
-      auto nested_group = group->getElement<cedar::proc::Group>(current_source->getParent());
-      new_target = nested_group->getElement<cedar::proc::sinks::GroupSink>(current_source->getName())->getInputSlot("input");
-      cedar::proc::Group::deleteConnectorsAlongConnection(source, new_target);
-
-      // then, clean up connection and connector
-      connection->disconnect();
-      nested_group->removeConnector(current_source->getName(), false);
-    }
-  }
-}
-
 void cedar::proc::Group::connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
 {
   cedar::proc::Connectable* source_step = source->getParentPtr();
@@ -2093,4 +2040,48 @@ void cedar::proc::Group::onStop()
 bool cedar::proc::Group::isLooped() const
 {
   return this->_mIsLooped->getValue();
+}
+
+void cedar::proc::Group::pruneUnusedConnectors()
+{
+  cedar::proc::Group::ConnectorMap to_delete;
+  auto this_as_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this());
+  for (auto connector : _mConnectors->getValue())
+  {
+    if (connector.second) // input connector
+    {
+      auto group_source = this->getElement<cedar::proc::sources::GroupSource>(connector.first);
+      auto input_slot = this->getInputSlot(connector.first);
+      // get incoming and outgoing connections
+      std::vector<cedar::proc::DataConnectionPtr> outgoing_connections;
+      this->getDataConnectionsFrom(group_source, "output", outgoing_connections);
+      std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
+      this->getGroup()->getDataConnectionsTo(this_as_connectable, input_slot->getName(), incoming_connections);
+      // check if any slots are unsused
+      if (outgoing_connections.size() == 0 || incoming_connections.size() == 0)
+      {
+        to_delete[connector.first] = connector.second;
+      }
+    }
+    else // output connector
+    {
+      auto group_sink = this->getElement<cedar::proc::sinks::GroupSink>(connector.first);
+      auto output_slot = this->getOutputSlot(connector.first);
+      // get incoming and outgoing connections
+      std::vector<cedar::proc::DataConnectionPtr> outgoing_connections;
+      this->getGroup()->getDataConnectionsFrom(this_as_connectable, output_slot->getName(), outgoing_connections);
+      std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
+      this->getDataConnectionsTo(group_sink, "input", incoming_connections);
+      // check if any slots are unsused
+      if (outgoing_connections.size() == 0 || incoming_connections.size() == 0)
+      {
+        to_delete[connector.first] = connector.second;
+      }
+    }
+  }
+  // finally, remove all obsolete connectors
+  for (auto item : to_delete)
+  {
+    this->removeConnector(item.first, item.second);
+  }
 }
