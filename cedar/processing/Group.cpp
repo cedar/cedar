@@ -482,15 +482,19 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
         this->mRevalidateConnections.erase(conn_it);
       }
     }
-    mElements.erase(it);
-  }
+    // remove element from triggerables list if it is looped
+    auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());
+    auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
+    if (item != this->mLoopedTriggerables.end())
+    {
+      if (this->numberOfStartCalls())
+      {
+        triggerable->callOnStop();
+      }
+      this->mLoopedTriggerables.erase(item);
+    }
 
-  // remove element from triggerables list if it is looped
-  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element);
-  auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
-  if (item != this->mLoopedTriggerables.end())
-  {
-    this->mLoopedTriggerables.erase(item);
+    mElements.erase(it);
   }
 
   this->signalElementRemoved(element);
@@ -861,6 +865,10 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     if (triggerable->isLooped())
     {
       this->mLoopedTriggerables.push_back(triggerable);
+    }
+    if (this->numberOfStartCalls())
+    {
+      triggerable->callOnStart();
     }
   }
 }
