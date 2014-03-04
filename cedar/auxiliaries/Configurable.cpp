@@ -446,7 +446,7 @@ void cedar::aux::Configurable::parameterNameChanged(const std::string& oldName, 
   this->mParameterAssociations[newName] = assoc;
 }
 
-std::string cedar::aux::Configurable::getUniqueName(const std::string& baseName) const
+std::string cedar::aux::Configurable::getUniqueParameterName(const std::string& baseName) const
 {
   auto assoc_iter = this->mParameterAssociations.find(baseName);
 
@@ -458,7 +458,7 @@ std::string cedar::aux::Configurable::getUniqueName(const std::string& baseName)
   unsigned int ctr = 2;
   while (true)
   {
-    std::string new_name = baseName + cedar::aux::toString(ctr);
+    std::string new_name = baseName + " " + cedar::aux::toString(ctr);
     if (this->mParameterAssociations.find(new_name) == this->mParameterAssociations.end())
     {
       return new_name;

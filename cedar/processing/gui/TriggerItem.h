@@ -137,6 +137,9 @@ private:
   //!@brief sets the trigger associated with this graphical representation
   void setTrigger(cedar::proc::TriggerPtr trigger);
 
+  //! Updates the display of the step's run time measurements.
+  void timerEvent(QTimerEvent *pEvent);
+
 private slots:
   void triggerStateChanging();
 
@@ -158,6 +161,9 @@ private:
 
   //! Used to stop the trigger in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopCaller;
+
+  //!@brief Identifier of the timer used for updating the run time measurements.
+  int mRunTimeMeasurementTimerId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
