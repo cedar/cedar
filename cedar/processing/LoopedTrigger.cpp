@@ -49,6 +49,7 @@
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/auxiliaries/MovingAverage.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -97,8 +98,8 @@ cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std:
 :
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
-//mWait(new cedar::aux::BoolParameter(this, "wait", true)),
-mStarted(false)
+mStarted(false),
+mStatistics(new TimeAverage(50))
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -165,9 +166,12 @@ void cedar::proc::LoopedTrigger::prepareStart()
 
   emit triggerStarting();
 
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->callOnStart();
+    QReadLocker locker(this->mListeners.getLockPtr());
+    for (auto listener : this->mListeners.member())
+    {
+      listener->callOnStart();
+    }
   }
 
   emit triggerStarted();
@@ -186,9 +190,12 @@ void cedar::proc::LoopedTrigger::processQuit()
 
   emit triggerStopping();
 
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->callOnStop();
+    QReadLocker locker(this->mListeners.getLockPtr());
+    for (auto listener : this->mListeners.member())
+    {
+      listener->callOnStop();
+    }
   }
 
   emit triggerStopped();
@@ -198,10 +205,16 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 {
   cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time));
 
-  //!@todo Is this right?
+  QReadLocker locker(this->mListeners.getLockPtr());
   auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
-  for (const auto& listener : this->mListeners)
+  for (const auto& listener : this->mListeners.member())
   {
     listener->onTrigger(arguments, this_ptr);
   }
+  this->mStatistics->append(time);
+}
+
+cedar::proc::LoopedTrigger::ConstTimeAveragePtr cedar::proc::LoopedTrigger::getStatistics() const
+{
+  return this->mStatistics;
 }
