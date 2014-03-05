@@ -135,13 +135,19 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
     {
       for (size_t i = 0; i < this->mInputs->getDataCount(); ++i)
       {
-        const cv::Mat& mat
-          = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(i))->getData();
-        if
-        (
-          mat.type() != mat_data->getData().type()
-          || !cedar::aux::math::matrixSizesEqual(mat, mat_data->getData())
-        )
+        if (auto other_mat_data = boost::dynamic_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(i)))
+        {
+          const cv::Mat& mat = other_mat_data->getData();
+          if
+          (
+            mat.type() != mat_data->getData().type()
+            || !cedar::aux::math::matrixSizesEqual(mat, mat_data->getData())
+          )
+          {
+            return cedar::proc::DataSlot::VALIDITY_ERROR;
+          }
+        }
+        else
         {
           return cedar::proc::DataSlot::VALIDITY_ERROR;
         }
