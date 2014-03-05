@@ -63,7 +63,21 @@ void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr lef
   //!@todo Exception
   CEDAR_ASSERT(this->canLink(left, right));
 
-  //!@todo Disconnect if parameters are already set
+  // disconnect if parameters are already set
+  if (this->mLeft)
+  {
+    this->mLeft->setLinked(false);
+
+    QObject::disconnect(this->mLeft.get(), SIGNAL(valueChanged()), this, SLOT(leftChanged()));
+    QObject::disconnect(this->mLeft.get(), SIGNAL(propertyChanged()), this, SLOT(leftPropertiesChanged()));
+  }
+  if (this->mRight)
+  {
+    this->mRight->setLinked(false);
+
+    QObject::disconnect(this->mRight.get(), SIGNAL(valueChanged()), this, SLOT(rightChanged()));
+    QObject::disconnect(this->mRight.get(), SIGNAL(propertyChanged()), this, SLOT(rightPropertiesChanged()));
+  }
 
   this->mLeft = left;
   this->mRight = right;
@@ -72,8 +86,8 @@ void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr lef
   this->mRight->setLinked(true);
 
   QObject::connect(this->mLeft.get(), SIGNAL(valueChanged()), this, SLOT(leftChanged()));
-  QObject::connect(this->mRight.get(), SIGNAL(valueChanged()), this, SLOT(rightChanged()));
   QObject::connect(this->mLeft.get(), SIGNAL(propertyChanged()), this, SLOT(leftPropertiesChanged()));
+  QObject::connect(this->mRight.get(), SIGNAL(valueChanged()), this, SLOT(rightChanged()));
   QObject::connect(this->mRight.get(), SIGNAL(propertyChanged()), this, SLOT(rightPropertiesChanged()));
 }
 
