@@ -67,6 +67,8 @@ public:
   //!@brief The standard constructor.
   AdvancedParameterLinker();
 
+  ~AdvancedParameterLinker();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,10 +103,18 @@ private:
     const cedar::proc::Group::ParameterLinkInfo& linkInfo
   );
 
+  void parameterLinkAdded(const cedar::proc::Group::ParameterLinkInfo& linkInfo);
+
+  void disconnect();
+
+  QTreeWidgetItem* getItemForGroup(cedar::proc::GroupPtr group);
+
 private slots:
   void itemSelectionChanged();
 
   void linkInfoChanged();
+
+  void addLinkClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -113,6 +123,8 @@ protected:
   // none yet
 private:
   cedar::proc::GroupPtr mGroup;
+
+  std::vector<boost::signals2::connection> mSignalConnections;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

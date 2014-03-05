@@ -61,11 +61,7 @@ class cedar::aux::DirectParameterLink : public cedar::aux::ParameterLink
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  DirectParameterLink();
-
-  //!@brief Destructor
-  virtual ~DirectParameterLink();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -83,11 +79,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void leftChanged();
+  void sourceChanged();
 
-  void rightChanged();
+  void targetChanged();
 
-  bool checkIfLinkable(cedar::aux::ConstParameterPtr left, cedar::aux::ConstParameterPtr right) const;
+  bool checkIfLinkable(cedar::aux::ConstParameterPtr source, cedar::aux::ConstParameterPtr target) const;
 
   void assign(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target) const;
 

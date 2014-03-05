@@ -83,28 +83,28 @@ void cedar::aux::EquationParameterLink::equationChanged()
   this->mBackwardExpression = expr.solveFor("source");
 }
 
-void cedar::aux::EquationParameterLink::leftChanged()
+void cedar::aux::EquationParameterLink::sourceChanged()
 {
   std::map<std::string, double> variables;
-  variables["source"] = cedar::aux::NumericParameterHelper::getValue(this->getLeft());
+  variables["source"] = cedar::aux::NumericParameterHelper::getValue(this->getSource());
   double new_value = this->mForwardExpression->getRight()->evaluate(variables);
-  cedar::aux::NumericParameterHelper::setValue(this->getRight(), new_value);
+  cedar::aux::NumericParameterHelper::setValue(this->getTarget(), new_value);
 }
 
-void cedar::aux::EquationParameterLink::rightChanged()
+void cedar::aux::EquationParameterLink::targetChanged()
 {
   std::map<std::string, double> variables;
-  variables["target"] = cedar::aux::NumericParameterHelper::getValue(this->getRight());
+  variables["target"] = cedar::aux::NumericParameterHelper::getValue(this->getTarget());
   double new_value = this->mBackwardExpression->getRight()->evaluate(variables);
-  cedar::aux::NumericParameterHelper::setValue(this->getLeft(), new_value);
+  cedar::aux::NumericParameterHelper::setValue(this->getSource(), new_value);
 }
 
 bool cedar::aux::EquationParameterLink::checkIfLinkable
      (
-       cedar::aux::ConstParameterPtr left,
-       cedar::aux::ConstParameterPtr right
+       cedar::aux::ConstParameterPtr source,
+       cedar::aux::ConstParameterPtr target
      )
      const
 {
-  return cedar::aux::NumericParameterHelper::isNumeric(left) && cedar::aux::NumericParameterHelper::isNumeric(right);
+  return cedar::aux::NumericParameterHelper::isNumeric(source) && cedar::aux::NumericParameterHelper::isNumeric(target);
 }

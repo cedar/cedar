@@ -43,10 +43,12 @@
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/GroupFileFormatV1.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -191,6 +193,20 @@ private:
   void writeParameterLinks(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
   void writeCustomParameters(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  cedar::proc::ElementPtr getLinkElement
+  (
+    cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& node,
+    const std::string& name
+  ) const;
+
+  cedar::aux::ParameterPtr getLinkParameter
+  (
+    cedar::proc::ElementPtr element,
+    const cedar::aux::ConfigurationNode& node,
+    const std::string& name
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
