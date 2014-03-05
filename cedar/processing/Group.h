@@ -521,6 +521,9 @@ public:
     cedar::aux::ParameterLinkPtr link
   );
   
+  //! Removes the parameter link and from this group.
+  void removeParameterLink(cedar::aux::ParameterLinkPtr link);
+
   //!@brief
   void setIsLooped(bool looped);
 
@@ -652,6 +655,10 @@ public:
 public:
   //!@brief Signal that is emitted whenever a custom parameter is removed.
   CEDAR_DECLARE_SIGNAL(ParameterLinkAdded, void (const ParameterLinkInfo&));
+
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(ParameterLinkRemoved, void (cedar::aux::ParameterLinkPtr));
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
