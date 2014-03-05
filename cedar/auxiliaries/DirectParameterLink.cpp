@@ -64,26 +64,18 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::DirectParameterLink::DirectParameterLink()
-{
-}
-
-cedar::aux::DirectParameterLink::~DirectParameterLink()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::DirectParameterLink::leftChanged()
+void cedar::aux::DirectParameterLink::sourceChanged()
 {
-  this->assign(this->getLeft(), this->getRight());
+  this->assign(this->getSource(), this->getTarget());
 }
 
-void cedar::aux::DirectParameterLink::rightChanged()
+void cedar::aux::DirectParameterLink::targetChanged()
 {
-  this->assign(this->getRight(), this->getLeft());
+  this->assign(this->getTarget(), this->getSource());
 }
 
 bool cedar::aux::DirectParameterLink::checkIfLinkable

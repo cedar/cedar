@@ -197,24 +197,52 @@ cedar::proc::Group::~Group()
 
 std::string cedar::proc::Group::ParameterLinkInfo::getSourceElementPath() const
 {
-  auto group = this->mGroup.lock();
-  return group->findPath(this->mSourceElement);
+  if (this->mSourceElement)
+  {
+    auto group = this->mGroup.lock();
+    return group->findPath(this->mSourceElement);
+  }
+  else
+  {
+    return "(not set)";
+  }
 }
 
 std::string cedar::proc::Group::ParameterLinkInfo::getTargetElementPath() const
 {
-  auto group = this->mGroup.lock();
-  return group->findPath(this->mTargetElement);
+  if (this->mTargetElement)
+  {
+    auto group = this->mGroup.lock();
+    return group->findPath(this->mTargetElement);
+  }
+  else
+  {
+    return "(not set)";
+  }
 }
 
 std::string cedar::proc::Group::ParameterLinkInfo::getSourceParameterPath() const
 {
-  return this->mSourceElement->findParameterPath(this->mParameterLink->getLeft());
+  if (this->mSourceElement && this->mParameterLink->getSource())
+  {
+    return this->mSourceElement->findParameterPath(this->mParameterLink->getSource());
+  }
+  else
+  {
+    return "(not set)";
+  }
 }
 
 std::string cedar::proc::Group::ParameterLinkInfo::getTargetParameterPath() const
 {
-  return this->mTargetElement->findParameterPath(this->mParameterLink->getRight());
+  if (this->mTargetElement && this->mParameterLink->getTarget())
+  {
+    return this->mTargetElement->findParameterPath(this->mParameterLink->getTarget());
+  }
+  else
+  {
+    return "(not set)";
+  }
 }
 
 cedar::aux::ParameterPtr cedar::proc::Group::addCustomParameter(const std::string& type, const std::string& name)
@@ -259,6 +287,8 @@ void cedar::proc::Group::addParameterLink
   info.mTargetElement = targetElement;
   info.mGroup = boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this());
   this->mParameterLinks.push_back(info);
+
+  this->signalParameterLinkAdded(this->mParameterLinks.back());
 }
 
 std::string cedar::proc::Group::getNewConnectorName(bool inputConnector) const

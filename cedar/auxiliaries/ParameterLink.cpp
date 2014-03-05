@@ -58,47 +58,57 @@ cedar::aux::ParameterLink::~ParameterLink()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr left, cedar::aux::ParameterPtr right)
+void cedar::aux::ParameterLink::setSource(cedar::aux::ParameterPtr parameter)
 {
-  //!@todo Exception
-  CEDAR_ASSERT(this->canLink(left, right));
+  if (this->mSource)
+  {
+    this->mSource->setLinked(false);
 
+    QObject::disconnect(this->mSource.get(), SIGNAL(valueChanged()), this, SLOT(sourceChanged()));
+    QObject::disconnect(this->mSource.get(), SIGNAL(propertyChanged()), this, SLOT(sourcePropertiesChanged()));
+  }
+
+  this->mSource = parameter;
+  this->mSource->setLinked(true);
+  QObject::connect(this->mSource.get(), SIGNAL(valueChanged()), this, SLOT(sourceChanged()));
+  QObject::connect(this->mSource.get(), SIGNAL(propertyChanged()), this, SLOT(sourcePropertiesChanged()));
+}
+
+void cedar::aux::ParameterLink::setTarget(cedar::aux::ParameterPtr parameter)
+{
   // disconnect if parameters are already set
-  if (this->mLeft)
+  if (this->mTarget)
   {
-    this->mLeft->setLinked(false);
+    this->mTarget->setLinked(false);
 
-    QObject::disconnect(this->mLeft.get(), SIGNAL(valueChanged()), this, SLOT(leftChanged()));
-    QObject::disconnect(this->mLeft.get(), SIGNAL(propertyChanged()), this, SLOT(leftPropertiesChanged()));
-  }
-  if (this->mRight)
-  {
-    this->mRight->setLinked(false);
-
-    QObject::disconnect(this->mRight.get(), SIGNAL(valueChanged()), this, SLOT(rightChanged()));
-    QObject::disconnect(this->mRight.get(), SIGNAL(propertyChanged()), this, SLOT(rightPropertiesChanged()));
+    QObject::disconnect(this->mTarget.get(), SIGNAL(valueChanged()), this, SLOT(targetChanged()));
+    QObject::disconnect(this->mTarget.get(), SIGNAL(propertyChanged()), this, SLOT(targetPropertiesChanged()));
   }
 
-  this->mLeft = left;
-  this->mRight = right;
+  this->mTarget = parameter;
+  this->mTarget->setLinked(true);
 
-  this->mLeft->setLinked(true);
-  this->mRight->setLinked(true);
-
-  QObject::connect(this->mLeft.get(), SIGNAL(valueChanged()), this, SLOT(leftChanged()));
-  QObject::connect(this->mLeft.get(), SIGNAL(propertyChanged()), this, SLOT(leftPropertiesChanged()));
-  QObject::connect(this->mRight.get(), SIGNAL(valueChanged()), this, SLOT(rightChanged()));
-  QObject::connect(this->mRight.get(), SIGNAL(propertyChanged()), this, SLOT(rightPropertiesChanged()));
+  QObject::connect(this->mTarget.get(), SIGNAL(valueChanged()), this, SLOT(targetChanged()));
+  QObject::connect(this->mTarget.get(), SIGNAL(propertyChanged()), this, SLOT(targetPropertiesChanged()));
 }
 
-void cedar::aux::ParameterLink::leftPropertiesChanged()
+void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target)
 {
-  this->applyProperties(this->getLeft(), this->getRight());
+  //!@todo Exception; also, this should be checked in setSource, setTarget as well
+  CEDAR_ASSERT(this->canLink(source, target));
+
+  this->setSource(source);
+  this->setTarget(target);
 }
 
-void cedar::aux::ParameterLink::rightPropertiesChanged()
+void cedar::aux::ParameterLink::sourcePropertiesChanged()
 {
-  this->applyProperties(this->getRight(), this->getLeft());
+  this->applyProperties(this->getSource(), this->getTarget());
+}
+
+void cedar::aux::ParameterLink::targetPropertiesChanged()
+{
+  this->applyProperties(this->getTarget(), this->getSource());
 }
 
 void cedar::aux::ParameterLink::applyProperties(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target)
@@ -106,17 +116,17 @@ void cedar::aux::ParameterLink::applyProperties(cedar::aux::ConstParameterPtr so
   target->setConstant(source->isConstant());
 }
 
-cedar::aux::ParameterPtr cedar::aux::ParameterLink::getLeft() const
+cedar::aux::ParameterPtr cedar::aux::ParameterLink::getSource() const
 {
-  return this->mLeft;
+  return this->mSource;
 }
 
-cedar::aux::ParameterPtr cedar::aux::ParameterLink::getRight() const
+cedar::aux::ParameterPtr cedar::aux::ParameterLink::getTarget() const
 {
-  return this->mRight;
+  return this->mTarget;
 }
 
-bool cedar::aux::ParameterLink::canLink(cedar::aux::ParameterPtr left, cedar::aux::ParameterPtr right)
+bool cedar::aux::ParameterLink::canLink(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target)
 {
-  return this->checkIfLinkable(left, right);
+  return this->checkIfLinkable(source, target);
 }

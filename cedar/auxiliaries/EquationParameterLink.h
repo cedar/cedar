@@ -86,11 +86,11 @@ protected:
 private:
   // none yet
 
-  void leftChanged();
+  void sourceChanged();
 
-  void rightChanged();
+  void targetChanged();
 
-  bool checkIfLinkable(cedar::aux::ConstParameterPtr left, cedar::aux::ConstParameterPtr right) const;
+  bool checkIfLinkable(cedar::aux::ConstParameterPtr source, cedar::aux::ConstParameterPtr target) const;
 
 private slots:
   void equationChanged();

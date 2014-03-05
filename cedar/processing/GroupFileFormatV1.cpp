@@ -416,47 +416,21 @@ void cedar::proc::GroupFileFormatV1::readParameterLinks
     std::string type = type_iter->second.get_value<std::string>();
     auto link = cedar::aux::ParameterLinkFactoryManagerSingleton::getInstance()->allocate(type);
 
-    cedar::proc::ElementPtr src_element;
-    auto src_elem_iter = node.find("source element");
-    if (src_elem_iter != node.not_found())
+    auto src_element = getLinkElement(group, node, "source element");
+    auto tar_element = getLinkElement(group, node, "target element");
+
+    auto src_param = this->getLinkParameter(src_element, node, "source parameter");
+    auto tar_param = this->getLinkParameter(src_element, node, "target parameter");
+
+    if (src_param)
     {
-      std::string src_element_name = src_elem_iter->second.get_value<std::string>();
-      src_element = group->getElement(src_element_name);
+      link->setSource(src_param);
     }
-    else
+
+    if (tar_param)
     {
-      src_element = group;
+      link->setTarget(tar_param);
     }
-
-    auto src_param_iter = node.find("source parameter");
-    if (src_param_iter == node.not_found())
-    {
-      continue;
-    }
-    std::string src_param_name = src_param_iter->second.get_value<std::string>();
-
-    auto tar_elem_iter = node.find("target element");
-    if (tar_elem_iter == node.not_found())
-    {
-      continue;
-    }
-    std::string tar_element_name = tar_elem_iter->second.get_value<std::string>();
-
-    auto tar_param_iter = node.find("target parameter");
-    if (tar_param_iter == node.not_found())
-    {
-      continue;
-    }
-    std::string tar_param_name = tar_param_iter->second.get_value<std::string>();
-
-    //!@todo Error handling
-
-    auto tar_element = group->getElement(tar_element_name);
-
-    auto src_param = src_element->getParameter(src_param_name);
-    auto tar_param = tar_element->getParameter(tar_param_name);
-
-    link->setLinkedParameters(src_param, tar_param);
 
     auto cfg_iter = node.find("configuration");
     if (cfg_iter != node.not_found())
@@ -465,6 +439,62 @@ void cedar::proc::GroupFileFormatV1::readParameterLinks
     }
 
     group->addParameterLink(src_element, tar_element, link);
+  }
+}
+
+cedar::aux::ParameterPtr cedar::proc::GroupFileFormatV1::getLinkParameter
+(
+  cedar::proc::ElementPtr element,
+  const cedar::aux::ConfigurationNode& node,
+  const std::string& name
+) const
+{
+  if (element)
+  {
+    auto param_iter = node.find(name);
+    if (param_iter != node.not_found())
+    {
+      std::string name = param_iter->second.get_value<std::string>();
+      try
+      {
+        return element->getParameter(name);
+      }
+      catch (cedar::aux::UnknownNameException)
+      {
+        // ok, return a nullptr below
+      }
+    }
+  }
+
+  // if the parameter could not be found, return a nullptr
+  return cedar::aux::ParameterPtr();
+}
+
+cedar::proc::ElementPtr cedar::proc::GroupFileFormatV1::getLinkElement
+                        (
+                          cedar::proc::GroupPtr group,
+                          const cedar::aux::ConfigurationNode& node,
+                          const std::string& name
+                        )
+                        const
+{
+  auto elem_iter = node.find(name);
+  if (elem_iter == node.not_found())
+  {
+    // per convention, if no element is set, we return the group
+    return group;
+  }
+
+  std::string element_name = elem_iter->second.get_value<std::string>();
+  if (group->nameExists(element_name))
+  {
+    // if an element is set and found, return it
+    return group->getElement(element_name);
+  }
+  else
+  {
+    // if an element is set, but not found, return a nullptr
+    return cedar::proc::ElementPtr();
   }
 }
 

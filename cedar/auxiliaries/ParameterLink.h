@@ -78,13 +78,19 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setLinkedParameters(cedar::aux::ParameterPtr left, cedar::aux::ParameterPtr right);
+  void setLinkedParameters(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target);
 
-  cedar::aux::ParameterPtr getLeft() const;
+  cedar::aux::ParameterPtr getSource() const;
 
-  cedar::aux::ParameterPtr getRight() const;
+  cedar::aux::ParameterPtr getTarget() const;
 
-  bool canLink(cedar::aux::ParameterPtr left, cedar::aux::ParameterPtr right);
+  //! Sets the source of the link. Will link the parameters if a target is already set.
+  void setSource(cedar::aux::ParameterPtr parameter);
+
+  //! Sets the target of the link. Will link the parameters if a source is already set.
+  void setTarget(cedar::aux::ParameterPtr parameter);
+
+  bool canLink(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,16 +102,16 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
-  virtual void leftChanged() = 0;
+  virtual void sourceChanged() = 0;
 
-  virtual void rightChanged() = 0;
+  virtual void targetChanged() = 0;
 
-  virtual void leftPropertiesChanged();
+  virtual void sourcePropertiesChanged();
 
-  virtual void rightPropertiesChanged();
+  virtual void targetPropertiesChanged();
 
 private:
-  virtual bool checkIfLinkable(cedar::aux::ConstParameterPtr left, cedar::aux::ConstParameterPtr right) const = 0;
+  virtual bool checkIfLinkable(cedar::aux::ConstParameterPtr source, cedar::aux::ConstParameterPtr target) const = 0;
 
   void applyProperties(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target);
 
@@ -115,8 +121,8 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ParameterPtr mLeft;
-  cedar::aux::ParameterPtr mRight;
+  cedar::aux::ParameterPtr mSource;
+  cedar::aux::ParameterPtr mTarget;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
