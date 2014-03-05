@@ -557,11 +557,11 @@ private:
                                           cedar::proc::ConstGroupPtr targetGroup
                                         );
 
-  cedar::proc::DataSlotPtr getRealSource
-                           (
-                             cedar::proc::DataSlotPtr slot,
-                             cedar::proc::ConstGroupPtr targetGroup
-                           );
+  std::vector<cedar::proc::DataSlotPtr> getRealSources
+                                        (
+                                          cedar::proc::DataSlotPtr slot,
+                                          cedar::proc::ConstGroupPtr targetGroup
+                                        );
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
   static bool disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
