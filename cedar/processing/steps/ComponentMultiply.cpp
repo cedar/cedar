@@ -41,6 +41,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -114,6 +115,8 @@ void cedar::proc::steps::ComponentMultiply::inputConnectionChanged(const std::st
     mOutput->getData() = in_mat.clone();
     mOutput->getData() = cv::Scalar(1);
   }
+  this->emitOutputPropertiesChangedSignal("product");
+  this->onTrigger();
 }
 
 void cedar::proc::steps::ComponentMultiply::compute(const cedar::proc::Arguments&)
