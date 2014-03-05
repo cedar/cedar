@@ -1432,7 +1432,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  QAction* p_prune = menu.addAction("prune unsued connectors");
+  QAction* p_prune = menu.addAction("prune unused connectors");
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
