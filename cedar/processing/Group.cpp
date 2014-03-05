@@ -57,8 +57,9 @@
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/PluginProxy.h"
-#include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ParameterDeclaration.h"
+#include "cedar/auxiliaries/ParameterLink.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
@@ -194,6 +195,28 @@ cedar::proc::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::proc::Group::ParameterLinkInfo::getSourceElementPath() const
+{
+  auto group = this->mGroup.lock();
+  return group->findPath(this->mSourceElement);
+}
+
+std::string cedar::proc::Group::ParameterLinkInfo::getTargetElementPath() const
+{
+  auto group = this->mGroup.lock();
+  return group->findPath(this->mTargetElement);
+}
+
+std::string cedar::proc::Group::ParameterLinkInfo::getSourceParameterPath() const
+{
+  return this->mSourceElement->findParameterPath(this->mParameterLink->getLeft());
+}
+
+std::string cedar::proc::Group::ParameterLinkInfo::getTargetParameterPath() const
+{
+  return this->mTargetElement->findParameterPath(this->mParameterLink->getRight());
+}
+
 cedar::aux::ParameterPtr cedar::proc::Group::addCustomParameter(const std::string& type, const std::string& name)
 {
   auto parameter = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
@@ -234,6 +257,7 @@ void cedar::proc::Group::addParameterLink
   info.mParameterLink = link;
   info.mSourceElement = sourceElement;
   info.mTargetElement = targetElement;
+  info.mGroup = boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this());
   this->mParameterLinks.push_back(info);
 }
 

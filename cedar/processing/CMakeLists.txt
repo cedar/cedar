@@ -50,6 +50,7 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
+  gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h

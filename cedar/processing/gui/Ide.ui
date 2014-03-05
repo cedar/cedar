@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -132,6 +132,7 @@
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
@@ -211,8 +212,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>93</width>
-          <height>443</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -778,6 +779,11 @@
   <action name="mpActionPerformanceOverview">
    <property name="text">
     <string>Performance overview ...</string>
+   </property>
+  </action>
+  <action name="mpActionParameterLinker">
+   <property name="text">
+    <string>Parameter linking ...</string>
    </property>
   </action>
  </widget>

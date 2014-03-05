@@ -91,16 +91,23 @@ class cedar::proc::Group : public QThread, public cedar::proc::Connectable, publ
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
+public:
   struct ParameterLinkInfo
   {
+    std::string getSourceElementPath() const;
+    std::string getTargetElementPath() const;
+
+    std::string getSourceParameterPath() const;
+    std::string getTargetParameterPath() const;
+
     cedar::aux::ParameterLinkPtr mParameterLink;
 
     cedar::proc::ElementPtr mSourceElement;
     cedar::proc::ElementPtr mTargetElement;
+
+    cedar::proc::GroupWeakPtr mGroup;
   };
 
-public:
   //! Enum that represents the change of a given connection.
   enum ConnectionChange
   {
@@ -538,6 +545,20 @@ public:
     return this->mCustomParameters;
   }
   
+  /*! Returns a list of all the parameter links stored in this group.
+   */
+  inline const std::vector<ParameterLinkInfo>& getParameterLinks() const
+  {
+    return this->mParameterLinks;
+  }
+
+  /*! Returns a list of all the parameter links stored in this group.
+   */
+  inline std::vector<ParameterLinkInfo>& getParameterLinks()
+  {
+    return this->mParameterLinks;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
