@@ -87,8 +87,14 @@ public:
   //! Sets the source of the link. Will link the parameters if a target is already set.
   void setSource(cedar::aux::ParameterPtr parameter);
 
+  //! Sets the source of the link to a nullptr.
+  void unsetSource();
+
   //! Sets the target of the link. Will link the parameters if a source is already set.
   void setTarget(cedar::aux::ParameterPtr parameter);
+
+  //! Sets the target of the link to a nullptr.
+  void unsetTarget();
 
   bool canLink(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target);
 

@@ -291,6 +291,23 @@ void cedar::proc::Group::addParameterLink
   this->signalParameterLinkAdded(this->mParameterLinks.back());
 }
 
+void cedar::proc::Group::removeParameterLink(cedar::aux::ParameterLinkPtr link)
+{
+  for (auto iter = this->mParameterLinks.begin(); iter != this->mParameterLinks.end(); ++iter)
+  {
+    if (iter->mParameterLink == link)
+    {
+      this->mParameterLinks.erase(iter);
+
+      this->signalParameterLinkRemoved(link);
+
+      return;
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::NotFoundException, "Could not remove parameter link: link not found in group.");
+}
+
 std::string cedar::proc::Group::getNewConnectorName(bool inputConnector) const
 {
   std::string base = "input";

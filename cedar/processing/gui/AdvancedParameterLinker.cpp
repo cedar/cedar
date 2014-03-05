@@ -66,6 +66,7 @@ cedar::proc::gui::AdvancedParameterLinker::AdvancedParameterLinker()
   QObject::connect(this->mpTargetParameterName, SIGNAL(textEdited(const QString&)), this, SLOT(linkInfoChanged()));
 
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(addLinkClicked()));
+  QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeLinkClicked()));
 }
 
 cedar::proc::gui::AdvancedParameterLinker::~AdvancedParameterLinker()
@@ -189,7 +190,6 @@ void cedar::proc::gui::AdvancedParameterLinker::itemSelectionChanged()
   {
   }
 
-  this->mpAddButton->setEnabled(valid_selection);
   this->mpRemoveButton->setEnabled(valid_selection);
 }
 
@@ -270,6 +270,13 @@ void cedar::proc::gui::AdvancedParameterLinker::addGroup(QTreeWidgetItem* pRoot,
       boost::bind(&cedar::proc::gui::AdvancedParameterLinker::parameterLinkAdded, this, _1)
     )
   );
+  this->mSignalConnections.push_back
+  (
+    group->connectToParameterLinkRemovedSignal
+    (
+      boost::bind(&cedar::proc::gui::AdvancedParameterLinker::parameterLinkRemoved, this, _1)
+    )
+  );
 
   for (const auto& link : group->getParameterLinks())
   {
@@ -348,6 +355,19 @@ void cedar::proc::gui::AdvancedParameterLinker::addLinkClicked()
   this->getCurrentGroup()->addParameterLink(ElementPtr(), ElementPtr(), link);
 }
 
+void cedar::proc::gui::AdvancedParameterLinker::removeLinkClicked()
+{
+  try
+  {
+    cedar::proc::Group::ParameterLinkInfo& current_link_info = this->getCurrentLinkInfo();
+    current_link_info.mGroup.lock()->removeParameterLink(current_link_info.mParameterLink);
+  }
+  catch (cedar::aux::NotFoundException)
+  {
+    // nothing appropriate selected -- do nothing
+  }
+}
+
 QTreeWidgetItem* cedar::proc::gui::AdvancedParameterLinker::getItemForGroup(cedar::proc::GroupPtr group)
 {
   if (group == this->mGroup)
@@ -361,6 +381,22 @@ QTreeWidgetItem* cedar::proc::gui::AdvancedParameterLinker::getItemForGroup(ceda
     // warning: don't do anything with this object, the pointer doesn't necessarily point to a group
     auto stored_group = (cedar::proc::Group*)p_item->data(0, Qt::UserRole).value<void*>();
     if (stored_group == group.get())
+    {
+      return p_item;
+    }
+  }
+
+  return nullptr;
+}
+
+QTreeWidgetItem* cedar::proc::gui::AdvancedParameterLinker::getItemForLink(cedar::aux::ParameterLinkPtr link)
+{
+  for (QTreeWidgetItemIterator iterator(this->mpLinkTree); *iterator; ++iterator)
+  {
+    QTreeWidgetItem* p_item = *iterator;
+    // warning: don't do anything with this object, the pointer doesn't necessarily point to a group
+    auto stored_link = (cedar::aux::ParameterLink*)p_item->data(0, Qt::UserRole).value<void*>();
+    if (stored_link == link.get())
     {
       return p_item;
     }
@@ -383,3 +419,14 @@ void cedar::proc::gui::AdvancedParameterLinker::parameterLinkAdded(const cedar::
   this->updateLinkItem(p_item, linkInfo);
   group_item->addChild(p_item);
 }
+
+void cedar::proc::gui::AdvancedParameterLinker::parameterLinkRemoved(cedar::aux::ParameterLinkPtr link)
+{
+  // This method should only be called from the main thread. If this weren't the case, the signal would have to be
+  // translated into the main thread because GUI stuff is going to happen below.
+  CEDAR_NON_CRITICAL_ASSERT(QThread::currentThread() == QCoreApplication::instance()->thread());
+
+  auto p_item = this->getItemForLink(link);
+  delete p_item;
+}
+

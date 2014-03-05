@@ -105,9 +105,13 @@ private:
 
   void parameterLinkAdded(const cedar::proc::Group::ParameterLinkInfo& linkInfo);
 
+  void parameterLinkRemoved(cedar::aux::ParameterLinkPtr link);
+
   void disconnect();
 
   QTreeWidgetItem* getItemForGroup(cedar::proc::GroupPtr group);
+
+  QTreeWidgetItem* getItemForLink(cedar::aux::ParameterLinkPtr link);
 
 private slots:
   void itemSelectionChanged();
@@ -115,6 +119,8 @@ private slots:
   void linkInfoChanged();
 
   void addLinkClicked();
+
+  void removeLinkClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
