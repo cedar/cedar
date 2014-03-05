@@ -113,6 +113,8 @@ private:
 
   QTreeWidgetItem* getItemForLink(cedar::aux::ParameterLinkPtr link);
 
+  void fillParameterNameCompletions(cedar::aux::ConfigurablePtr configurable, QStringList& completions);
+
 private slots:
   void itemSelectionChanged();
 

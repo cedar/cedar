@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <QCoreApplication>
+#include <QCompleter>
 #include <QThread>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,10 +61,10 @@ cedar::proc::gui::AdvancedParameterLinker::AdvancedParameterLinker()
 
   QObject::connect(this->mpLinkTree, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
 
-  QObject::connect(this->mpSourceElementName, SIGNAL(textEdited(const QString&)), this, SLOT(linkInfoChanged()));
-  QObject::connect(this->mpSourceParameterName, SIGNAL(textEdited(const QString&)), this, SLOT(linkInfoChanged()));
-  QObject::connect(this->mpTargetElementName, SIGNAL(textEdited(const QString&)), this, SLOT(linkInfoChanged()));
-  QObject::connect(this->mpTargetParameterName, SIGNAL(textEdited(const QString&)), this, SLOT(linkInfoChanged()));
+  QObject::connect(this->mpSourceElementName, SIGNAL(textChanged(const QString&)), this, SLOT(linkInfoChanged()));
+  QObject::connect(this->mpSourceParameterName, SIGNAL(textChanged(const QString&)), this, SLOT(linkInfoChanged()));
+  QObject::connect(this->mpTargetElementName, SIGNAL(textChanged(const QString&)), this, SLOT(linkInfoChanged()));
+  QObject::connect(this->mpTargetParameterName, SIGNAL(textChanged(const QString&)), this, SLOT(linkInfoChanged()));
 
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(addLinkClicked()));
   QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeLinkClicked()));
@@ -114,9 +115,16 @@ void cedar::proc::gui::AdvancedParameterLinker::linkInfoChanged()
     CEDAR_ASSERT(new_source_element);
     current.mSourceElement = new_source_element;
     changed = true;
+    this->mpSourceParameterName->setEnabled(true);
+
+    QStringList completions;
+    this->fillParameterNameCompletions(new_source_element, completions);
+    auto completer = new QCompleter(completions, this);
+    this->mpSourceParameterName->setCompleter(completer);
   }
   catch (cedar::aux::InvalidNameException)
   {
+    this->mpSourceParameterName->setEnabled(false);
   }
 
   try
@@ -134,9 +142,16 @@ void cedar::proc::gui::AdvancedParameterLinker::linkInfoChanged()
     CEDAR_ASSERT(new_target_element);
     current.mTargetElement = new_target_element;
     changed = true;
+    this->mpTargetParameterName->setEnabled(true);
+
+    QStringList completions;
+    this->fillParameterNameCompletions(new_target_element, completions);
+    auto completer = new QCompleter(completions, this);
+    this->mpTargetParameterName->setCompleter(completer);
   }
   catch (cedar::aux::InvalidNameException)
   {
+    this->mpTargetParameterName->setEnabled(false);
   }
 
   cedar::aux::ParameterPtr new_source_parameter;
@@ -174,6 +189,14 @@ void cedar::proc::gui::AdvancedParameterLinker::linkInfoChanged()
     auto selected = this->mpLinkTree->selectedItems();
     CEDAR_DEBUG_ASSERT(selected.size() == 1);
     this->updateLinkItem(selected[0], current);
+  }
+}
+
+void cedar::proc::gui::AdvancedParameterLinker::fillParameterNameCompletions(cedar::aux::ConfigurablePtr configurable, QStringList& completions)
+{
+  for (auto parameter : configurable->getParameters())
+  {
+    completions << QString::fromStdString(parameter->getName());
   }
 }
 
@@ -249,12 +272,33 @@ cedar::proc::Group::ParameterLinkInfo& cedar::proc::gui::AdvancedParameterLinker
 
 void cedar::proc::gui::AdvancedParameterLinker::show(const cedar::proc::Group::ParameterLinkInfo& linkInfo)
 {
+  this->mpSourceElementName->blockSignals(true);
+  this->mpSourceParameterName->blockSignals(true);
+  this->mpTargetElementName->blockSignals(true);
+  this->mpTargetParameterName->blockSignals(true);
+
   this->mpSourceElementName->setText(QString::fromStdString(linkInfo.getSourceElementPath()));
   this->mpSourceParameterName->setText(QString::fromStdString(linkInfo.getSourceParameterPath()));
   this->mpTargetElementName->setText(QString::fromStdString(linkInfo.getTargetElementPath()));
   this->mpTargetParameterName->setText(QString::fromStdString(linkInfo.getTargetParameterPath()));
 
+  this->mpSourceElementName->blockSignals(false);
+  this->mpSourceParameterName->blockSignals(false);
+  this->mpTargetElementName->blockSignals(false);
+  this->mpTargetParameterName->blockSignals(false);
+
+  QStringList element_names;
+  for (auto name_element_pair : linkInfo.mGroup.lock()->getElements())
+  {
+    element_names << QString::fromStdString(name_element_pair.first);
+  }
+  auto p_completer = new QCompleter(element_names, this);
+  this->mpSourceElementName->setCompleter(p_completer);
+  this->mpTargetElementName->setCompleter(p_completer);
+
   this->mpLinkParameters->display(linkInfo.mParameterLink);
+
+  this->linkInfoChanged();
 }
 
 void cedar::proc::gui::AdvancedParameterLinker::setGroup(cedar::proc::GroupPtr group)
@@ -311,6 +355,7 @@ void cedar::proc::gui::AdvancedParameterLinker::updateLinkItem
      )
 {
   pItem->setData(0, Qt::UserRole, QVariant::fromValue((void*)linkInfo.mParameterLink.get()));
+  pItem->setIcon(0, QIcon(":/cedar/auxiliaries/gui/link.svg"));
 
   QString source_id;
   if (linkInfo.mSourceElement != linkInfo.mGroup.lock())
@@ -332,6 +377,7 @@ void cedar::proc::gui::AdvancedParameterLinker::updateLinkItem
 void cedar::proc::gui::AdvancedParameterLinker::makeGroupItem(QTreeWidgetItem* pItem, cedar::proc::GroupPtr group)
 {
   pItem->setText(0, QString::fromStdString(group->getName()));
+  pItem->setIcon(0, QIcon(":/group.svg"));
   pItem->setFirstColumnSpanned(true);
   pItem->setExpanded(true);
   pItem->setData(0, Qt::UserRole, QVariant::fromValue((void*)(group.get())));
