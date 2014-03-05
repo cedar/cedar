@@ -420,7 +420,7 @@ void cedar::proc::GroupFileFormatV1::readParameterLinks
     auto tar_element = getLinkElement(group, node, "target element");
 
     auto src_param = this->getLinkParameter(src_element, node, "source parameter");
-    auto tar_param = this->getLinkParameter(src_element, node, "target parameter");
+    auto tar_param = this->getLinkParameter(tar_element, node, "target parameter");
 
     if (src_param)
     {
