@@ -261,5 +261,5 @@ void cedar::proc::steps::MatrixSlice::compute(const cedar::proc::Arguments&)
   CEDAR_DEBUG_ASSERT(this->_mRangeLower->size() == cedar::aux::math::getDimensionalityOf(input));
   CEDAR_DEBUG_ASSERT(this->_mRangeUpper->size() == cedar::aux::math::getDimensionalityOf(input));
 
-  output = input(&mRanges.front());
+  output = input(&mRanges.front()).clone();
 }
