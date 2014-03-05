@@ -209,7 +209,11 @@ cedar::proc::Group* cedar::proc::gui::AdvancedParameterLinker::getCurrentGroup()
 
   auto item = items[0];
 
-  if (item->parent())
+  if (item->isFirstColumnSpanned())
+  {
+    return (cedar::proc::Group*)(item->data(0, Qt::UserRole).value<void*>());
+  }
+  else if (item->parent())
   {
     return (cedar::proc::Group*)(item->parent()->data(0, Qt::UserRole).value<void*>());
   }
@@ -257,8 +261,10 @@ void cedar::proc::gui::AdvancedParameterLinker::setGroup(cedar::proc::GroupPtr g
 {
   this->mGroup = group;
 
-  this->makeGroupItem(this->mpLinkTree->invisibleRootItem(), group);
-  this->addGroup(this->mpLinkTree->invisibleRootItem(), this->mGroup);
+  auto p_item = new QTreeWidgetItem();
+  this->mpLinkTree->invisibleRootItem()->addChild(p_item);
+  this->makeGroupItem(p_item, group);
+  this->addGroup(p_item, this->mGroup);
 }
 
 void cedar::proc::gui::AdvancedParameterLinker::addGroup(QTreeWidgetItem* pRoot, cedar::proc::GroupPtr group)
@@ -327,6 +333,7 @@ void cedar::proc::gui::AdvancedParameterLinker::makeGroupItem(QTreeWidgetItem* p
 {
   pItem->setText(0, QString::fromStdString(group->getName()));
   pItem->setFirstColumnSpanned(true);
+  pItem->setExpanded(true);
   pItem->setData(0, Qt::UserRole, QVariant::fromValue((void*)(group.get())));
 }
 

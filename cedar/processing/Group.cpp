@@ -223,9 +223,14 @@ std::string cedar::proc::Group::ParameterLinkInfo::getTargetElementPath() const
 
 std::string cedar::proc::Group::ParameterLinkInfo::getSourceParameterPath() const
 {
-  if (this->mSourceElement && this->mParameterLink->getSource())
+  if (this->mParameterLink->getSource())
   {
-    return this->mSourceElement->findParameterPath(this->mParameterLink->getSource());
+    auto source = this->mSourceElement;
+    if (!source)
+    {
+      source = this->mGroup.lock();
+    }
+    return source->findParameterPath(this->mParameterLink->getSource());
   }
   else
   {
@@ -235,9 +240,14 @@ std::string cedar::proc::Group::ParameterLinkInfo::getSourceParameterPath() cons
 
 std::string cedar::proc::Group::ParameterLinkInfo::getTargetParameterPath() const
 {
-  if (this->mTargetElement && this->mParameterLink->getTarget())
+  if (this->mParameterLink->getTarget())
   {
-    return this->mTargetElement->findParameterPath(this->mParameterLink->getTarget());
+    auto target = this->mTargetElement;
+    if (!target)
+    {
+      target = this->mGroup.lock();
+    }
+    return target->findParameterPath(this->mParameterLink->getTarget());
   }
   else
   {
