@@ -326,6 +326,10 @@ protected:
    */
   void contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
 
+  /*! Overrides the default help event to display tooltips for elements in the scene.
+   */
+  void helpEvent(QGraphicsSceneHelpEvent* pHelpEvent);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
