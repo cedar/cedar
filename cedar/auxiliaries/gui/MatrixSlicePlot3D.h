@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/QImagePlot.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -118,6 +119,8 @@ private:
 
   void fillContextMenu(QMenu& menu);
 
+  unsigned int getSlicedDimension() const;
+
   static void getSetup(int& dim0, int& dim1, int slicedDimension);
 
 private slots:
@@ -141,8 +144,12 @@ private:
   //! desired columns of the slice plot
   unsigned int mDesiredColumns;
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+private:
   //! Dimension along which the slices are made.
-  cedar::aux::LockableMember<unsigned int> mSlicedDimension;
+  cedar::aux::UIntParameterPtr _mSlicedDimension;
 
 }; // class cedar::aux::gui::MatrixSlicePlot3D
 
