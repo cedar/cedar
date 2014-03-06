@@ -221,6 +221,10 @@ public:
     return this->mElement;
   }
 
+  /*! Can be overridden in inheriting classes in order to upadte the item's tooltip before it is displayed.
+   */
+  virtual void updateToolTip();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

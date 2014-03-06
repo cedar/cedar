@@ -116,6 +116,11 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GraphicsBase::updateToolTip()
+{
+  // empty default implementation
+}
+
 void cedar::proc::gui::GraphicsBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   this->paintFrame(painter, style, widget);
