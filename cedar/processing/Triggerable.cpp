@@ -265,7 +265,7 @@ void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState
 cedar::proc::Triggerable::State cedar::proc::Triggerable::getState() const
 {
   QReadLocker locker(this->mState.getLockPtr());
-  auto copy = this->mState.member().mState;
+  cedar::proc::Triggerable::State copy = this->mState.member().mState;
   return copy;
 }
 

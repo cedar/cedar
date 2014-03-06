@@ -218,6 +218,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("lateral kernel", this->_mLateralKernelConvolution->getCombinedKernel());
   this->declareBuffer("neural noise kernel", this->_mNoiseCorrelationKernelConvolution->getCombinedKernel());
   this->declareBuffer("input sum", mInputSum);
+  this->declareBuffer("noise", this->mInputNoise);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
 
