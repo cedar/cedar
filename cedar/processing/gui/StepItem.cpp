@@ -50,6 +50,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -61,6 +62,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QPen>
@@ -361,22 +363,29 @@ void cedar::proc::gui::StepItem::updateToolTip()
               "</table>");
 
   std::vector<boost::function<cedar::unit::Time ()> > measurements;
+  std::vector<boost::function<bool ()> > checks;
   measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRunTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRunTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasLockTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasLockTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRoundTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRoundTimeMeasurement, this->mStep));
 
   for (size_t i = 0; i < measurements.size(); ++i)
   {
-    try
+    if (checks.at(i)())
     {
       cedar::unit::Time ms = measurements.at(i)();
-      double dval = ms / (0.001 * cedar::unit::seconds);
+      double dval = ms / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
       tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
     }
-    catch (const cedar::proc::NoMeasurementException&)
+    else
     {
       tool_tip = tool_tip.arg("n/a");
     }
@@ -971,14 +980,6 @@ void cedar::proc::gui::StepItem::showPlot
   p_dock_widget->show();
 }
 
-void cedar::proc::gui::StepItem::openProperties()
-{
-  cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
-  auto p_dock_widget = this->createDockWidget("Properties", props);
-  props->display(this->getStep());
-  p_dock_widget->show();
-}
-
 void cedar::proc::gui::StepItem::openActionsDock()
 {
   QWidget* p_actions = new QWidget();
@@ -995,6 +996,14 @@ void cedar::proc::gui::StepItem::openActionsDock()
   std::string title = "Actions of step \"" + this->mStep->getName() + "\"";
   auto p_dock_widget = this->createDockWidget(title, p_actions);
   p_dock_widget->show();
+}
+
+void cedar::proc::gui::StepItem::openProperties()
+{
+  cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
+  props->display(this->getStep());
+  auto p_widget = this->createDockWidget("Properties", props);
+  p_widget->show();
 }
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -1469,12 +1478,12 @@ void cedar::proc::gui::StepItem::handleExternalActionButtons()
 
 void cedar::proc::gui::StepItem::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
 {
-  for(auto childWidget : mChildWidgets)
+  for (auto childWidget : mChildWidgets)
   {
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
     QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
     // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
-    if(cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
     {
       cedar::aux::ConfigurationNode value_node;
       static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);

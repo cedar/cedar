@@ -55,7 +55,7 @@
 #include "cedar/processing/gui/Network.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
-#include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
+#include "cedar/auxiliaries/gui/Configurable.fwd.h"
 #include "cedar/processing/gui/StickyNote.fwd.h"
 
 // SYSTEM INCLUDES
@@ -275,7 +275,7 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
    */
-  void setConfigurableWidget(cedar::aux::gui::PropertyPane* pConfigurableWidget);
+  void setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget);
 
   /*!@brief Sets the widget used for displaying/editing the record parameters.
    */
@@ -302,7 +302,7 @@ public:
   /*!brief Adds a sticky node to the current scene
    */
   void addStickyNote();
-  cedar::proc::gui::StickyNote* addStickyNote(int x, int y, int witdh, int height, std::string text);
+  cedar::proc::gui::StickyNote* addStickyNote(float x, float y, float witdh, float height, std::string text);
 
   //! Removes a sticky note
   void removeStickyNote(StickyNote* note);
@@ -416,16 +416,16 @@ private:
   std::vector<cedar::proc::gui::StickyNote*> mStickyNotes;
 
   //! The main window containing the scene.
-  QMainWindow *mpMainWindow;
+  QMainWindow* mpMainWindow;
 
   //! Bool representing whether the snap-to-grid function is active.
   bool mSnapToGrid;
 
   //! The widget used to display configurables when they are selected in the scene. May be null.
-  cedar::aux::gui::PropertyPane *mpConfigurableWidget;
+  cedar::aux::gui::Configurable* mpConfigurableWidget;
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
-  cedar::proc::gui::RecorderWidget *mpRecorderWidget;
+  cedar::proc::gui::RecorderWidget* mpRecorderWidget;
 
   //! Saves the mouse x position in the scene
   int mMousePosX;

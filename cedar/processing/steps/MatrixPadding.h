@@ -89,6 +89,8 @@ private:
 
   void compute2D();
 
+  template <typename T> void compute3D();
+
   template <typename T> void computeND();
 
   void inputConnectionChanged(const std::string& inputName);
