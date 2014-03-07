@@ -289,6 +289,11 @@ private:
 
   void setGroup(cedar::proc::gui::GroupPtr group);
 
+private slots:
+  void globalTimeFactorSliderChanged(int newValue);
+
+  void globalTimeFactorSpinboxChanged(double value);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -323,8 +328,14 @@ private:
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
-  // Combobox to select plot groups
+  //! Combobox to select plot groups
   QComboBox* mpPlotGroupsComboBox;
+
+  //! Spinbox for controlling the global time step.
+  QDoubleSpinBox* mpGlobalTimeFactor;
+
+  //! Spinbox for controlling the global time step.
+  QSlider* mpGlobalTimeFactorSlider;
 
 }; // class cedar::MainWindow
 
