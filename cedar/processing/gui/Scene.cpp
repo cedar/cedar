@@ -104,6 +104,11 @@ cedar::proc::gui::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Scene::emitSceneChanged()
+{
+  emit sceneChanged();
+}
+
 void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
 {
   auto item = this->itemAt(pHelpEvent->scenePos());
@@ -852,6 +857,8 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem* p
   this->mTriggerMap.erase(mTriggerMap.find(pTrigger->getTrigger().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pTrigger->getTrigger().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pTrigger->getTrigger().get()));
+
+  this->emitSceneChanged();
 }
 
 cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
@@ -978,6 +985,8 @@ void cedar::proc::gui::Scene::removeNetworkItem(cedar::proc::gui::Network* pNetw
   this->mNetworkMap.erase(mNetworkMap.find(pNetwork->getNetwork().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->getNetwork().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pNetwork->getNetwork().get()));
+
+  this->emitSceneChanged();
 }
 
 void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPointF position)
@@ -1007,6 +1016,8 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
+
+  this->emitSceneChanged();
 }
 
 cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()

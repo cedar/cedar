@@ -974,6 +974,11 @@ void cedar::proc::gui::StepItem::showPlot
   cedar::proc::ElementDeclaration::DataList data_list;
   data_list.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(role.id(), dataName, false, declaration->getClassName())));
 
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+  }
+
   auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->mStep, data_list);
   auto p_dock_widget = this->createDockWidgetForPlots(this->mStep->getName(), p_plot_widget, position);
 
