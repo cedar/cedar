@@ -214,7 +214,7 @@ void cedar::proc::gui::StepItem::updateToolTip()
     }
   }
 
-  const auto& annotation = this->mStep->getStateAnnotation();
+  const auto& annotation = this->getStep()->getStateAnnotation();
   if (!annotation.empty())
   {
     // Replace any non-html characters in the annotation string by their html equivalents.
