@@ -53,7 +53,7 @@ namespace cedar
 {
   namespace aux
   {
-    template <typename T> class ParameterTemplate;
+    template <typename T, typename ValuePolicy> class ParameterTemplate;
   }
 }
 
