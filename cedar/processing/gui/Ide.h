@@ -98,6 +98,11 @@ public:
    */
   void resetTo(cedar::proc::gui::NetworkPtr network);
 
+  void suppressCloseDialog(bool suppress)
+  {
+    this->mSuppressCloseDialog = suppress;
+  }
+
 public slots:
   /*!@brief Slot that displays notifications.
    */
@@ -343,6 +348,9 @@ private:
 
   //! Spinbox for controlling the global time step.
   QSlider* mpGlobalTimeFactorSlider;
+
+  //! Whether the save on close dialog should be suppressed.
+  bool mSuppressCloseDialog;
 
 }; // class cedar::MainWindow
 
