@@ -227,11 +227,11 @@ bool cedar::aux::gui::HistoryPlot0D::canAppend(cedar::aux::ConstDataPtr data) co
 
 bool cedar::aux::gui::HistoryPlot0D::canDetach(cedar::aux::ConstDataPtr data) const
 {
-  if(this->mpPlot != nullptr && this->mCurves.size() > 1)
+  if (this->mpPlot != nullptr && this->mCurves.size() >= 1)
   {
-    for(auto curve : this->mCurves)
+    for (auto curve : this->mCurves)
     {
-      if(curve->mData == data)
+      if (curve->mData == data)
       {
         return true;
       }

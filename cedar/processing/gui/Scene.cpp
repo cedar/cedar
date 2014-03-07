@@ -104,6 +104,24 @@ cedar::proc::gui::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
+{
+  auto item = this->itemAt(pHelpEvent->scenePos());
+  if (auto base_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+  {
+    base_item->updateToolTip();
+  }
+  else if (item && item->parentItem() != NULL)
+  {
+    if (auto base_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item->parentItem()))
+    {
+      base_item->updateToolTip();
+    }
+  }
+
+  QGraphicsScene::helpEvent(pHelpEvent);
+}
+
 void cedar::proc::gui::Scene::exportSvg(const QString& file)
 {
   QSvgGenerator generator;
