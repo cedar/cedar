@@ -43,7 +43,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 #include "cedar/auxiliaries/gui/ThreadedPlot.h"
-#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
@@ -125,6 +126,27 @@ public:
    */
   void setLimits(double min, double max);
 
+  /*! Whether the scale of the plot is determined automatically.
+   */
+  bool isAutoScaling() const
+  {
+    return this->_mAutoScaling->getValue();
+  }
+
+  /*! Whether the plot is pixelated or smoothed.
+   */
+  bool isSmoothScaling() const
+  {
+    return this->_mSmoothScaling->getValue();
+  }
+
+  /*! Returns the currently set value limits.
+   */
+  const cedar::aux::math::Limits<double>& getValueLimits() const
+  {
+    return this->_mValueLimits->getValue();
+  }
+
 public slots:
   /*!@brief Set the scaling mode of the plot.
   */
@@ -187,7 +209,12 @@ private:
 
 private slots:
   void queryFixedValueScale();
+
+  //! Updates the visibility of the legend.
+  void showLegendChanged();
   
+  void valueLimitsChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -195,21 +222,12 @@ protected:
   //! Label used for displaying the image.
   ImageDisplay* mpImageDisplay;
 
-  //! Whether scaling of plots is determined automatically or fixed.
-  bool mAutoScaling;
-
-  //! Limits for fixed scaling.
-  cedar::aux::math::Limits<double> mValueLimits;
-
 private:
   //! Converted image.
   QImage mImage;
 
   //! Lock for mImage.
   QReadWriteLock mImageLock;
-
-  //! Whether the matrix should be smoothed during scaling.
-  bool mSmoothScaling;
 
   //! Whether or not a legend is available
   bool mLegendAvailable;
@@ -227,7 +245,17 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! Whether the matrix should be smoothed during scaling.
+  cedar::aux::BoolParameterPtr _mSmoothScaling;
+
+  //! Whether scaling of plots is determined automatically or fixed.
+  cedar::aux::BoolParameterPtr _mAutoScaling;
+
+  //! Whether scaling of plots is determined automatically or fixed.
+  cedar::aux::BoolParameterPtr _mShowLegend;
+
+  //! Limits for fixed scaling.
+  cedar::aux::math::DoubleLimitsParameterPtr _mValueLimits;
 
 }; // class cedar::aux::gui::QImagePlot
 
