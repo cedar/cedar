@@ -80,8 +80,7 @@ cedar::proc::gui::GraphicsBase(30, 30,
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
-                               ),
-mRunTimeMeasurementTimerId(0)
+                               )
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->construct();
@@ -96,8 +95,7 @@ cedar::proc::gui::GraphicsBase(30, 30,
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
-                               ),
-mRunTimeMeasurementTimerId(0)
+                               )
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setTrigger(trigger);
@@ -118,7 +116,6 @@ void cedar::proc::gui::TriggerItem::construct()
     p_effect->setOffset(3.0, 3.0);
     this->setGraphicsEffect(p_effect);
   }
-  this->mRunTimeMeasurementTimerId = this->startTimer(1000);
 }
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
@@ -339,7 +336,7 @@ cedar::proc::gui::Connection* cedar::proc::gui::TriggerItem::connectTo(cedar::pr
   return new Connection(this, pTarget);
 }
 
-void cedar::proc::gui::TriggerItem::timerEvent(QTimerEvent* /* pEvent */)
+void cedar::proc::gui::TriggerItem::updateToolTip()
 {
   QString tool_tip
     = QString("<table>"

@@ -268,7 +268,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
       // convert grayscale to three-channel matrix
       cv::Mat copy = mat.clone();
       double min, max;
-      if (this->mAutoScaling)
+      if (this->isAutoScaling())
       {
         cv::minMaxLoc(mat, &min, &max);
       }
@@ -277,7 +277,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->displayMatrix(converted);
 
-      if (this->mAutoScaling)
+      if (this->isAutoScaling())
       {
         emit minMaxChanged(min, max);
       }
@@ -468,9 +468,9 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
           case CV_32F:
           case CV_64F:
           {
-            double min_val = this->mValueLimits.getLower();
-            double max_val = this->mValueLimits.getUpper();
-            if (this->mAutoScaling)
+            double min_val = this->getValueLimits().getLower();
+            double max_val = this->getValueLimits().getUpper();
+            if (this->isAutoScaling())
             {
               cv::minMaxLoc(in, &min_val, &max_val);
             }
@@ -528,16 +528,16 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
     case DATA_TYPE_MAT:
     {
       double min = 0, max = 0;
-      if (this->mAutoScaling)
+      if (this->isAutoScaling())
       {
         cv::minMaxLoc(in, &min, &max);
       }
       else
       {
-        min = this->mValueLimits.getLower();
-        max = this->mValueLimits.getUpper();
+        min = this->getValueLimits().getLower();
+        max = this->getValueLimits().getUpper();
       }
-      return cedar::aux::gui::ImagePlot::colorizedMatrix(in, !this->mAutoScaling, min, max);
+      return cedar::aux::gui::ImagePlot::colorizedMatrix(in, !this->isAutoScaling(), min, max);
     }
   }
 }

@@ -85,6 +85,28 @@ public:
     this->makeDefault();
   }
 
+  //!@brief A constructor that takes limits.
+  LimitsParameter
+  (
+    cedar::aux::Configurable* pOwner,
+    const std::string& name,
+    const T& defaultLowerLimit,
+    const T& defaultUpperLimit,
+    const cedar::aux::math::Limits<T>& lowerLimitRange = cedar::aux::math::Limits<T>::full(),
+    const cedar::aux::math::Limits<T>& upperLimitRange = cedar::aux::math::Limits<T>::full()
+  )
+  :
+  cedar::aux::Parameter(pOwner, name),
+  mLowerLimitDefault(defaultLowerLimit),
+  mLowerLimitMinimum(lowerLimitRange.getLower()),
+  mLowerLimitMaximum(lowerLimitRange.getUpper()),
+  mUpperLimitDefault(defaultUpperLimit),
+  mUpperLimitMinimum(upperLimitRange.getLower()),
+  mUpperLimitMaximum(upperLimitRange.getUpper())
+  {
+    this->makeDefault();
+  }
+
   //!@brief Destructor
   ~LimitsParameter()
   {
@@ -298,6 +320,7 @@ private:
 protected:
   // none yet
 private:
+  //!@todo Why aren't mLowerLimitMinimum etc. stored as cedar::aux::math::Limits?
   //!@brief The default value of the lower limit
   T mLowerLimitDefault;
   //!@brief The minimum value of the lower limit

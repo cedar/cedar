@@ -98,7 +98,6 @@ cedar::proc::gui::Connectable
   cedar::proc::gui::StepItem::mDefaultHeight,
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 ),
-mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -116,7 +115,6 @@ cedar::proc::gui::Connectable
   cedar::proc::gui::StepItem::mDefaultHeight,
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 ),
-mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -161,7 +159,7 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::proc::gui::StepItem::updateToolTip()
 {
   QString tool_tip
     = QString("<table>"
@@ -216,6 +214,21 @@ void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
     }
   }
 
+  const auto& annotation = this->mStep->getStateAnnotation();
+  if (!annotation.empty())
+  {
+    // Replace any non-html characters in the annotation string by their html equivalents.
+    QString escaped_annotation = QString::fromStdString(annotation)
+                                     .replace("&","&amp;")
+                                     .replace(">","&gt;")
+                                     .replace("<","&lt;");
+
+    if (!escaped_annotation.isEmpty())
+    {
+      tool_tip += escaped_annotation;
+    }
+  }
+
   this->setToolTip(tool_tip);
 }
 
@@ -249,36 +262,13 @@ void cedar::proc::gui::StepItem::updateStepState()
     case cedar::proc::Step::STATE_NOT_RUNNING:
       this->setOutlineColor(Qt::red);
       this->setFillColor(QColor(255, 175, 175));
-
-      if (this->mRunTimeMeasurementTimerId != 0)
-      {
-        this->killTimer(this->mRunTimeMeasurementTimerId);
-        this->mRunTimeMeasurementTimerId = 0;
-      }
       break;
 
     case cedar::proc::Step::STATE_RUNNING:
-      if (this->mRunTimeMeasurementTimerId == 0)
-      {
-        this->mRunTimeMeasurementTimerId = this->startTimer(1000);
-      }
     default:
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
       this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
   }
-  // append <font>s to make this a rich text, thus automatically word-wrapping the tool tip.
-  const std::string& annotation = this->getStep()->getStateAnnotation();
-  QString tool_tip = "";
-  if (!annotation.empty())
-  {
-    // Replace any non-html characters in the annotation string by their html equivalents.
-    QString escaped_annotation = QString::fromStdString(annotation)
-                                     .replace("&","&amp;")
-                                     .replace(">","&gt;")
-                                     .replace("<","&lt;");
-    tool_tip = QString("<font color=\"black\">") + escaped_annotation + QString("</font>");
-  }
-  this->setToolTip(tool_tip);
   this->update();
 }
 
@@ -1031,7 +1021,7 @@ void cedar::proc::gui::StepItem::writeOpenChildWidgets(cedar::aux::Configuration
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
     QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
     // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
-    if(cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
     {
       cedar::aux::ConfigurationNode value_node;
       static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);
