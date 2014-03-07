@@ -188,10 +188,10 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   double min = std::numeric_limits<double>::max();
   double max = -std::numeric_limits<double>::max();
 
-  if (!this->mAutoScaling)
+  if (!this->isAutoScaling())
   {
-    min = this->mValueLimits.getLower();
-    max = this->mValueLimits.getUpper();
+    min = this->getValueLimits().getLower();
+    max = this->getValueLimits().getUpper();
   }
 
   // decide which plot code is used depending on the OpenCV version
@@ -239,7 +239,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     slice.copyTo(mSliceMatrix(dest_rows, dest_cols));
     frame(dest_rows, dest_cols) = cv::Scalar(0);
 
-    if (this->mAutoScaling)
+    if (this->isAutoScaling())
     {
       double local_min, local_max;
       cv::minMaxLoc(slice, &local_min, &local_max);
@@ -273,20 +273,20 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       }
     }
   }
-  if (this->mAutoScaling)
+  if (this->isAutoScaling())
   {
     cv::minMaxLoc(mSliceMatrix, &min, &max);
   }
   else
   {
-    min = this->mValueLimits.getLower();
-    max = this->mValueLimits.getUpper();
+    min = this->getValueLimits().getLower();
+    max = this->getValueLimits().getUpper();
   }
 #endif // OpenCV version
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
 
-  if (this->mAutoScaling)
+  if (this->isAutoScaling())
   {
     emit minMaxChanged(min, max);
   }
