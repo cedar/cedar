@@ -89,7 +89,8 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 mpConsistencyChecker(NULL),
 mpPerformanceOverview(NULL),
 mpConsistencyDock(NULL),
-mpBoostControl(NULL)
+mpBoostControl(NULL),
+mSuppressCloseDialog(false)
 {
   // setup the (automatically generated) ui components
   this->setupUi(this);
@@ -497,7 +498,7 @@ void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 
 bool cedar::proc::gui::Ide::checkSave()
 {
-  if (this->isWindowModified())
+  if (this->isWindowModified() && !mSuppressCloseDialog)
   {
     auto r = QMessageBox::question
         (
