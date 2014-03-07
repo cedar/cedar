@@ -62,6 +62,7 @@
 #include <QEvent>
 #include <QSet>
 #include <QList>
+#include <QMessageBox>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
 #endif
@@ -260,12 +261,6 @@ bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEven
 
   switch(pEvent->type())
   {
-//    case QEvent::GraphicsSceneMouseMove:
-//    {
-//      this->fitToContents();
-//      break;
-//    }
-
     case QEvent::GraphicsSceneMouseRelease:
       this->fitToContents();
       break;
@@ -403,14 +398,6 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   this->mHoldFitToContents = true;
   this->getNetwork()->add(elems);
   // move elements
-//  for (const_iterator i = elements.begin(); i != elements.end(); ++i)
-//  {
-//    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(*i))
-//    {
-//      // add to network
-//      this->addElement(p_element);
-//    }
-//  }
   for (std::list<cedar::proc::ElementPtr>::iterator it = elems.begin(); it != elems.end(); ++it)
   {
     this->addElement(this->mpScene->getGraphicsItemFor((*it).get()));
@@ -487,17 +474,20 @@ void cedar::proc::gui::Network::read(const std::string& source)
   read_json(source, root);
 
   this->mNetwork->readConfiguration(root);
-  try
+  if (root.find("ui generic") != root.not_found())
   {
     this->readConfiguration(root.get_child("ui generic"));
   }
-  catch (boost::property_tree::ptree_bad_path& exc) // doesn't exist yet
+  else
   {
-    //!TODO: this weaves control-flow logic into exceptions, that's not proper!
     this->toggleSmartConnectionMode(false);
   }
-  //read sticky notes
-  this->readStickyNotes(root.get_child("ui"));
+  // read sticky notes
+  if (root.find("ui") != root.not_found())
+  {
+    this->readStickyNotes(root.get_child("ui"));
+  }
+
   //update recorder icons
   this->stepRecordStateChanged();
 }
@@ -509,7 +499,7 @@ void cedar::proc::gui::Network::readConfiguration(const cedar::aux::Configuratio
   auto plot_list = node.find("open plots");
   if(plot_list != node.not_found())
   {
-    this->readPlotList(plot_list->second);
+    this->readPlotList("open plots", plot_list->second);
   }
   // read defined plot groups
   auto plot_groups = node.find("plot groups");
@@ -519,14 +509,48 @@ void cedar::proc::gui::Network::readConfiguration(const cedar::aux::Configuratio
   }
 }
 
-void cedar::proc::gui::Network::readPlotList(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::gui::Network::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
 {
+  std::set<std::string> removed_elements;
   for(auto it : node)
   {
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
-    auto step = this->getNetwork()->getElement<cedar::proc::Step>(step_name);
-    auto step_item = this->mpScene->getStepItemFor(step.get());
-    cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+    if (this->getNetwork()->nameExists(step_name))
+    {
+      auto step = this->getNetwork()->getElement<cedar::proc::Step>(step_name);
+      auto step_item = this->mpScene->getStepItemFor(step.get());
+      cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+    }
+    else
+    {
+      removed_elements.insert(step_name);
+    }
+  }
+  if (removed_elements.size() > 0)
+  {
+    std::string message;
+    message += "Some elements of the plot group " + plotGroupName + " do not exist anymore. These are:\n\n";
+    for (auto element : removed_elements)
+    {
+      message += "  " + element + "\n";
+    }
+    message += "\nDo you want to remove them?";
+
+    QMessageBox msgBox(this->mpMainWindow);
+    msgBox.addButton(QMessageBox::Yes);
+    msgBox.addButton(QMessageBox::No);
+    msgBox.setWindowTitle("Missing elements");
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(QString::fromStdString(message));
+
+    int selection = msgBox.exec();
+    if (selection == QMessageBox::Yes)
+    {
+      for (auto remove : removed_elements)
+      {
+        this->removeElementFromPlotGroup(plotGroupName, remove);
+      }
+    }
   }
 }
 
@@ -1059,7 +1083,7 @@ void cedar::proc::gui::Network::displayPlotGroup(std::string plotGroupName)
     );
   }
 
-  this->readPlotList(plot_group->second);
+  this->readPlotList(plotGroupName, plot_group->second);
 }
 
 void cedar::proc::gui::Network::changeStepName(const std::string& from, const std::string& to)
@@ -1117,6 +1141,32 @@ void cedar::proc::gui::Network::readStickyNotes(cedar::aux::ConfigurationNode& n
       int a = iter->second.get<int>("a");
       note->setColor(QColor(r,g,b,a));
       note->setFontSize(iter->second.get<int>("fontsize"));
+    }
+  }
+}
+
+void cedar::proc::gui::Network::removeElementFromPlotGroup(const std::string& plotGroupName, const std::string& elementName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "Plot group " + plotGroupName + " does not exist."
+    );
+  }
+
+  for (auto plot_iter = plot_group->second.begin(); plot_iter != plot_group->second.end(); )
+  {
+    auto name = plot_iter->second.get<std::string>("step");
+    if (name == elementName)
+    {
+      plot_iter = plot_group->second.erase(plot_iter);
+    }
+    else
+    {
+      ++plot_iter;
     }
   }
 }
