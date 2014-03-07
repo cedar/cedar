@@ -40,6 +40,7 @@
 #include "PlotWidget.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/Group.h"
 
 
 // SYSTEM INCLUDES
@@ -454,7 +455,14 @@ void cedar::proc::gui::PlotWidget::remove_qgridlayout_widget(QWidget* widget)
 // save this plot_widget in configuration node
 void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  root.put("step", this->mStep->getName());
+  std::string step_name = this->mStep->getName();
+  auto group = this->mStep->getGroup();
+  while (group->getName() != "root")
+  {
+    step_name = group->getName() + "." + step_name;
+    group = group->getGroup();
+  }
+  root.put("step", step_name);
   root.put("position_x", this->parentWidget()->x());
   root.put("position_y", this->parentWidget()->y());
   root.put("width", this->parentWidget()->width());
