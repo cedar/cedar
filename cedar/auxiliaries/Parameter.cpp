@@ -62,7 +62,9 @@ mConstant(false),
 mIsHidden(false),
 mChanged(false),
 mAdvanced(false),
+mLastLockType(cedar::aux::LOCK_TYPE_DONT_LOCK),
 mpLock(new QReadWriteLock())
+
 {
   this->setName(name);
 
@@ -120,21 +122,23 @@ void cedar::aux::Parameter::lockForWrite() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_WRITE);
+  this->mLastLockType = cedar::aux::LOCK_TYPE_WRITE;
+  cedar::aux::lock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::lockForRead() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_READ);
+  this->mLastLockType = cedar::aux::LOCK_TYPE_READ;
+  cedar::aux::lock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::unlock() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::unlock(locks);
+  cedar::aux::unlock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::appendLocks(std::set<QReadWriteLock*>& locks) const

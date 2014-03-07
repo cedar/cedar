@@ -149,9 +149,19 @@ public:
     {
       cedar::aux::LogSingleton::getInstance()->debugMessage
       (
-        "Error while setting parameter to value: " + std::string(e.what()),
+        "Error while reading parameter '" + this->getName() + "': " + std::string(e.what()) + ". Inserting default value instead.",
         "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
       );
+      this->makeDefault();
+    }
+    catch (const boost::property_tree::ptree_bad_data& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+      (
+        "Error while reading parameter '" + this->getName() + "': " + std::string(e.what()) + ". Inserting default value instead.",
+        "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
+      );
+      this->makeDefault();
     }
   }
 
