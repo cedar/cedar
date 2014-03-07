@@ -733,13 +733,13 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
   for(auto it : node)
   {
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
-    if (this->getGroup()->nameExists(step_name))
+    try
     {
       auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
       auto step_item = this->mpScene->getStepItemFor(step.get());
       cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
     }
-    else
+    catch (cedar::aux::InvalidNameException& exc)
     {
       removed_elements.insert(step_name);
     }
