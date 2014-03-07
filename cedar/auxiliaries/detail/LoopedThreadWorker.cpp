@@ -80,10 +80,6 @@ void cedar::aux::detail::LoopedThreadWorker::work()
     = boost::posix_time::microseconds(static_cast<unsigned int>(1000.0 * (mpWrapper->getStepSize()/cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second)) + 0.5));//mStepSize;
   initStatistics();
 
-  QReadLocker locker(this->mTimeFactor.getLockPtr());
-  double time_factor = this->mTimeFactor.member();
-  locker.unlock();
-
   // which mode?
   switch (mpWrapper->getLoopModeParameter())
   {
@@ -96,6 +92,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
       while (!safeStopRequested())
       {
+        QReadLocker locker(this->mTimeFactor.getLockPtr());
+        double time_factor = this->mTimeFactor.member();
+        locker.unlock();
+
         setLastTimeStepStart( getLastTimeStepEnd() );
         setLastTimeStepEnd( boost::posix_time::microsec_clock::universal_time() );
         time_difference_unitless = getLastTimeStepEnd() - getLastTimeStepStart();
@@ -112,6 +112,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
     {
       while (!safeStopRequested())
       {
+        QReadLocker locker(this->mTimeFactor.getLockPtr());
+        double time_factor = this->mTimeFactor.member();
+        locker.unlock();
+
         mpWrapper->step(mpWrapper->getSimulatedTimeParameter() * time_factor);
         cedar::unit::Time idle_time = mpWrapper->getIdleTimeParameter();
         cedar::aux::sleep(idle_time);
@@ -146,6 +150,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
       while (!safeStopRequested())
       {
+        QReadLocker locker(this->mTimeFactor.getLockPtr());
+        double time_factor = this->mTimeFactor.member();
+        locker.unlock();
+
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         double time = std::max<double>(0.0, static_cast<double>(sleep_duration.total_microseconds()));
@@ -202,6 +210,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
       while (!safeStopRequested())
       {
+        QReadLocker locker(this->mTimeFactor.getLockPtr());
+        double time_factor = this->mTimeFactor.member();
+        locker.unlock();
+
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
