@@ -97,9 +97,13 @@ mpBoostControl(NULL)
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
 
   // manually added components
+
+  // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();
   p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
+  p_enable_custom_time_step->setChecked(false);
   this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
+
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
   this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
@@ -111,10 +115,42 @@ mpBoostControl(NULL)
   this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
   this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
 
-  p_enable_custom_time_step->setChecked(false);
   this->mpCustomTimeStep->setEnabled(false);
-
   QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
+
+
+  this->mpToolBar->insertSeparator(this->mpActionRecord);
+
+  // toolbar: global time factor widgets
+  double global_time_factor_min = 0.00;
+  double global_time_factor_max = 2.00;
+  double global_time_factor_step = 0.05;
+  double global_time_factor_value = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
+
+  double slider_factor = 100.0;
+  this->mpGlobalTimeFactorSlider = new QSlider(Qt::Horizontal);
+  this->mpGlobalTimeFactorSlider->setMinimum(slider_factor * global_time_factor_min);
+  this->mpGlobalTimeFactorSlider->setMaximum(slider_factor * global_time_factor_max);
+  this->mpGlobalTimeFactorSlider->setSingleStep(slider_factor * global_time_factor_step);
+  this->mpGlobalTimeFactorSlider->setValue(slider_factor * global_time_factor_value);
+  this->mpGlobalTimeFactorSlider->setFixedWidth(80);
+  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactorSlider);
+
+  QObject::connect(this->mpGlobalTimeFactorSlider, SIGNAL(valueChanged(int)), this, SLOT(globalTimeFactorSliderChanged(int)));
+
+  this->mpGlobalTimeFactor = new QDoubleSpinBox();
+  this->mpGlobalTimeFactor->setToolTip("All timesteps are multiplied with this global factor. This allows you to slow "
+                                       "down the architecture overall and thus to better see what is going on. Also, "
+                                       "on slower machines, decreasing this factor can increase the stability of an "
+                                       "architecture.");
+  this->mpGlobalTimeFactor->setMinimum(global_time_factor_min);
+  this->mpGlobalTimeFactor->setMaximum(global_time_factor_max);
+  this->mpGlobalTimeFactor->setDecimals(2);
+  this->mpGlobalTimeFactor->setSingleStep(global_time_factor_step);
+  this->mpGlobalTimeFactor->setValue(global_time_factor_value);
+  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
+
+  QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
 
   this->mpToolBar->insertSeparator(this->mpActionRecord);
 
@@ -237,6 +273,20 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::globalTimeFactorSliderChanged(int newValue)
+{
+  this->mpGlobalTimeFactor->setValue(static_cast<double>(newValue) / 100.0);
+}
+
+void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
+{
+  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
+  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
+  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
+
+  cedar::aux::SettingsSingleton::getInstance()->setGlobalTimeFactor(newValue);
+}
 
 void cedar::proc::gui::Ide::showRobotManager()
 {
