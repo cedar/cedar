@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.fwd.h
+    File:        ActionStop.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 09
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Forward declaration file for the class cedar::proc::experiment::ActionStop.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_STOP_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_STOP_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,12 @@ namespace cedar
   {
     namespace experiment
     {
-    CEDAR_DECLARE_PROC_CLASS(ConditionCheckValue);
+      CEDAR_DECLARE_PROC_CLASS(ActionStop);
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_STOP_FWD_H
 

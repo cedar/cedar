@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.cpp
+    File:        ActionStop.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 09
 
-    Description: Source file for the class cedar::proc::experiment::ExperimentController.
+    Description: Source file for the class cedar::proc::experiment::gui::ActionStop.
 
     Credits:
 
@@ -38,64 +38,41 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ExperimentController.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/gui/ActionStop.h"
+#include "cedar/processing/experiment/ActionStop.h"
 
 // SYSTEM INCLUDES
+#include <QLabel>
+
+//----------------------------------------------------------------------------------------------------------------------
+// associate experiment::gui::Action with the experiment::Action
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::proc::experiment::gui::ActionFactorySingleton::getInstance()->add
+      <
+        cedar::proc::experiment::ActionStop,
+        cedar::proc::experiment::gui::ActionStop
+      >();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ExperimentController::ExperimentController()
-:
-mpExperiment(NULL)
-,
-init(true)
-{
-
-  this->connectToStartSignal(boost::bind(&cedar::proc::experiment::ExperimentController::prepareStart, this));
-  this->connectToQuitSignal(boost::bind(&cedar::proc::experiment::ExperimentController::processQuit, this));
-}
-
-cedar::proc::experiment::ExperimentController::~ExperimentController()
+cedar::proc::experiment::gui::ActionStop::ActionStop()
 {
 }
 
-
+cedar::proc::experiment::gui::ActionStop::~ActionStop()
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-
-void cedar::proc::experiment::ExperimentController::step(cedar::unit::Time)
+void cedar::proc::experiment::gui::ActionStop::redraw()
 {
-  this->mpExperiment->executeAcionSequences();
-}
-
-void cedar::proc::experiment::ExperimentController::prepareStart()
-{
-  this->mpExperiment->executeAcionSequences();
-  this->init = false;
-}
-
-void cedar::proc::experiment::ExperimentController::processQuit()
-{
-  this->init = true;
-}
-
-bool cedar::proc::experiment::ExperimentController::isOnInit()
-{
-  return init;
-}
-
-void cedar::proc::experiment::ExperimentController::setExperiment(Experiment* experiment)
-{
-  this->mpExperiment = experiment;
-}
-cedar::proc::experiment::Experiment* cedar::proc::experiment::ExperimentController::getExperiment()
-{
-  return this->mpExperiment;
+  mLayout->addWidget(new QLabel(QString::fromStdString("Stop")));
 }
 

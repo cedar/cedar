@@ -49,6 +49,7 @@
 #include "cedar/processing/Network.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/Data.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
@@ -97,6 +98,15 @@ public:
   void stopNetwork();
   void executeAcionSequences();
   bool isOnInit();
+
+  std::vector<std::string> getAllSteps();
+  std::vector<std::string> getStepParameters(std::string step);
+  std::vector<std::string> getStepValues(std::string step);
+  cedar::aux::ParameterPtr getStepParameter(std::string step, std::string parameter);
+  cedar::aux::DataPtr getStepValue(std::string step, std::string value);
+
+  //override
+  void writeConfiguration(cedar::aux::ConfigurationNode& root);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -127,7 +137,6 @@ private:
 
   ActionSequencelListParameterPtr _mActionSequences;
   unsigned int mRepetitionCounter;
-  ExperimentControllerPtr mController;
 
 }; // class cedar::proc::experiment::Experiment
 

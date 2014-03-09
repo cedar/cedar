@@ -41,6 +41,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/experiment/gui/Condition.h"
+#include "cedar/processing/experiment/gui/Action.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/ActionSequence.fwd.h"
@@ -82,6 +84,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  void clear(QLayout* layout);
+public slots:
+  void update();
+  void updateCondition();
+  void updateActions();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,10 +120,11 @@ protected:
 
 private:
   QVBoxLayout* mLayout;
-  QVBoxLayout* mActions;
-  QHBoxLayout* mCondition;
+  cedar::proc::experiment::gui::Condition* mCondition;
   cedar::proc::experiment::ActionSequencePtr mSequence;
   cedar::proc::gui::ExperimentDialog* mpParent;
+  QHBoxLayout* conditionRow;
+  QVBoxLayout* mActions;
 
 }; // class cedar::proc::experiment::gui::ActionSequence
 

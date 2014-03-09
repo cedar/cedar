@@ -44,12 +44,14 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/processing/experiment/Condition.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/Condition.fwd.h"
 
 // SYSTEM INCLUDES
-#include "QWidget"
+#include <QWidget>
+#include <QBoxLayout>
 
 
 /*!@todo describe.
@@ -81,7 +83,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void setCondition(cedar::proc::experiment::ConditionPtr condition);
+public slots:
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,7 +97,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void clear();
+  virtual void redraw() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -107,10 +112,11 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  QBoxLayout* mLayout;
+  cedar::proc::experiment::ConditionPtr  mCondition;
 
 private:
-  // none yet
+
 
 }; // class cedar::proc::experiment::gui::Condition
 

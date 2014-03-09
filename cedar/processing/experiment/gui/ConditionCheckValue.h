@@ -26,37 +26,41 @@
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 02 26
 
-    Description: Header file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Header file for the class cedar::proc::experiment::gui::ConditionCheckValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_CONDITION_CHECK_VALUE_H
+#define CEDAR_PROC_EXPERIMENT_GUI_CONDITION_CHECK_VALUE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/experiment/gui/Condition.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionCheckValue.fwd.h"
+#include "cedar/processing/experiment/gui/ConditionCheckValue.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QComboBox>
+#include <QDoubleSpinBox>
 
 
 /*!@todo describe.
  *
  * @todo describe more.
  */
-class cedar::proc::experiment::ConditionCheckValue : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::gui::ConditionCheckValue : public cedar::proc::experiment::gui::Condition
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -75,10 +79,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  bool check();
-
-
+public slots:
+  void updateParameters();
+  void updateSteps();
+  void parameterSelected();
+  void stepSelected();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,7 +94,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void redraw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -106,11 +111,11 @@ protected:
   // none yet
 
 private:
-  cedar::aux::StringParameterPtr _stepToCheck;
-  cedar::aux::StringParameterPtr _parameterToCheck;
-  cedar::aux::DoubleParameterPtr _desiredValue;
+  QComboBox* mStepSelector;
+  QComboBox* mParameterSelector;
+  QDoubleSpinBox* mDesiredValue;
 
-}; // class cedar::proc::experiment::ConditionCheckValue
+}; // class cedar::proc::experiment::gui::ConditionCheckValue
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#endif // CEDAR_PROC_EXPERIMENT_GUI_CONDITION_CHECK_VALUE_H
 

@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.fwd.h
+    File:        ActionSetParameter.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 07
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Forward declaration file for the class cedar::proc::experiment::gui::ActionSetParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_ACTION_SET_PARAMETER_FWD_H
+#define CEDAR_PROC_EXPERIMENT_GUI_ACTION_SET_PARAMETER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,15 @@ namespace cedar
   {
     namespace experiment
     {
-    CEDAR_DECLARE_PROC_CLASS(ConditionCheckValue);
+      namespace gui
+      {
+        CEDAR_DECLARE_PROC_CLASS(ActionSetParameter);
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_GUI_ACTION_SET_PARAMETER_FWD_H
 

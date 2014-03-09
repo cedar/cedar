@@ -41,6 +41,7 @@
 #include "cedar/processing/experiment/gui/ConditionOnInit.h"
 
 // SYSTEM INCLUDES
+#include <QLabel>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,6 +61,7 @@ namespace
 
 cedar::proc::experiment::gui::ConditionOnInit::ConditionOnInit()
 {
+  update();
 }
 
 cedar::proc::experiment::gui::ConditionOnInit::~ConditionOnInit()
@@ -69,3 +71,8 @@ cedar::proc::experiment::gui::ConditionOnInit::~ConditionOnInit()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::experiment::gui::ConditionOnInit::redraw()
+{
+  QLabel* init = new QLabel(QString::fromStdString("on init"));
+  mLayout->addWidget(init);
+}

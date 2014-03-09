@@ -39,8 +39,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ConditionAnd.h"
+#include "cedar/processing/experiment/ConditionOnInit.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/ExperimentController.h"
 
 // SYSTEM INCLUDES
 
@@ -57,6 +59,26 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::experiment::ConditionAnd::ConditionAnd()
+:
+_mCondition1
+ (
+   new cedar::proc::experiment::Condition::ConditionParameter
+   (
+     this,
+     "Condition1",
+     cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::ConditionOnInit())
+   )
+ )
+,
+_mCondition2
+ (
+   new cedar::proc::experiment::Condition::ConditionParameter
+   (
+     this,
+     "Condition2",
+     cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::ConditionOnInit())
+   )
+ )
 {
 }
 cedar::proc::experiment::ConditionAnd::~ConditionAnd()
@@ -64,9 +86,10 @@ cedar::proc::experiment::ConditionAnd::~ConditionAnd()
 
 }
 
-bool cedar::proc::experiment::ConditionAnd::check(Experiment* experiment)
+bool cedar::proc::experiment::ConditionAnd::check()
 {
-  return _mCondition1->getValue()->check(experiment) && _mCondition2->getValue()->check(experiment);
+  Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
+  return _mCondition1->getValue()->check() && _mCondition2->getValue()->check();
 }
 
 

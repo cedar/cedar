@@ -22,26 +22,32 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.fwd.h
+    File:        Action.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 07
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Forward declaration file for the class cedar::proc::experiment::gui::Action.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_ACTION_FWD_H
+#define CEDAR_PROC_EXPERIMENT_GUI_ACTION_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/experiment/Action.fwd.h"
+#include "cedar/auxiliaries/TypeBasedFactory.fwd.h"
+#include "cedar/auxiliaries/Singleton.fwd.h"
+
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -55,12 +61,18 @@ namespace cedar
   {
     namespace experiment
     {
-    CEDAR_DECLARE_PROC_CLASS(ConditionCheckValue);
+      namespace gui
+      {
+        CEDAR_DECLARE_PROC_CLASS(Action);
+        typedef cedar::aux::TypeBasedFactory<cedar::proc::experiment::ActionPtr,
+            cedar::proc::experiment::gui::ActionPtr> ActionFactory;
+        typedef cedar::aux::Singleton<ActionFactory> ActionFactorySingleton;
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_GUI_ACTION_FWD_H
 

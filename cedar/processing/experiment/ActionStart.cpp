@@ -40,9 +40,13 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ActionStart.h"
 #include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/ExperimentController.h"
 
 // SYSTEM INCLUDES
 
+//----------------------------------------------------------------------------------------------------------------------
+// register class
+//----------------------------------------------------------------------------------------------------------------------
 
 namespace
 {
@@ -69,12 +73,9 @@ cedar::proc::experiment::ActionStart::~ActionStart()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::experiment::ActionStart::run(Experiment* experiment)
+void cedar::proc::experiment::ActionStart::run()
 {
-  if (experiment!=NULL)
-  {
-    experiment->startNetwork();
-  }
+  ExperimentControllerSingleton::getInstance()->getExperiment()->startNetwork();
 }
 
 
