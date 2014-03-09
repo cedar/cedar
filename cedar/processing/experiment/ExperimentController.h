@@ -83,7 +83,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool isOnInit();
   void setExperiment(Experiment* experiment);
   Experiment* getExperiment();
 
@@ -120,7 +119,6 @@ protected:
 
 private:
   Experiment* mpExperiment;
-  bool init;
 
 }; // class cedar::proc::experiment::ExperimentController
 

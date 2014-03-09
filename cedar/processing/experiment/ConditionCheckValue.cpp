@@ -90,7 +90,7 @@ cedar::proc::experiment::ConditionCheckValue::~ConditionCheckValue()
 bool cedar::proc::experiment::ConditionCheckValue::check()
 {
   Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
-  if (cedar::aux::DataPtr data = ExperimentControllerSingleton::getInstance()->getExperiment()->
+  if (cedar::aux::DataPtr data = experiment->
       getStepValue(_stepToCheck->getValue(),_parameterToCheck->getValue()))
   {
     if (cedar::aux::MatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
