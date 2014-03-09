@@ -39,9 +39,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ConditionCheckValue.h"
+#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/ExperimentController.h"
 
 // SYSTEM INCLUDES
-/*
+
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,6 +61,21 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::experiment::ConditionCheckValue::ConditionCheckValue()
+:
+_stepToCheck
+(
+    new cedar::aux::StringParameter(this,"StepToCheck","")
+)
+,
+_parameterToCheck
+(
+    new cedar::aux::StringParameter(this,"ParameterToCheck","")
+)
+,
+_desiredValue
+(
+    new cedar::aux::DoubleParameter(this,"DesiredValue",0.0)
+)
 {
 }
 
@@ -67,8 +87,21 @@ cedar::proc::experiment::ConditionCheckValue::~ConditionCheckValue()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-bool cedar::proc::experiment::ConditionCheckValue::check(Experiment* experiment)
+bool cedar::proc::experiment::ConditionCheckValue::check()
 {
-  return true;
+  Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
+  if (cedar::aux::DataPtr data = ExperimentControllerSingleton::getInstance()->getExperiment()->
+      getStepValue(_stepToCheck->getValue(),_parameterToCheck->getValue()))
+  {
+    if (cedar::aux::MatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
+    {
+      const double cVal = value->getValue<double>(0,0);
+      if(cVal > _desiredValue->getValue())
+      {
+        return true;
+      }
+    }
+  }
+  return false;
 }
-*/
+

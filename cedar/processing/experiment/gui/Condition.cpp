@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/Condition.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
 
@@ -49,6 +50,8 @@
 
 cedar::proc::experiment::gui::Condition::Condition()
 {
+  mLayout = new QHBoxLayout;
+  this->setLayout(mLayout);
 }
 
 cedar::proc::experiment::gui::Condition::~Condition()
@@ -58,3 +61,23 @@ cedar::proc::experiment::gui::Condition::~Condition()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::experiment::gui::Condition::setCondition(cedar::proc::experiment::ConditionPtr condition)
+{
+  this->mCondition = condition;
+  this->update();
+}
+
+void cedar::proc::experiment::gui::Condition::clear()
+{
+  QLayoutItem *child;
+  while ((child = this->mLayout->takeAt(0)) != 0) {
+    delete child->widget();
+    delete child;
+  }
+}
+void cedar::proc::experiment::gui::Condition::update()
+{
+  clear();
+  redraw();
+}

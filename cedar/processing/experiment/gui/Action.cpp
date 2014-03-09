@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.cpp
+    File:        Action.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 07
 
-    Description: Source file for the class cedar::proc::experiment::ExperimentController.
+    Description: Source file for the class cedar::proc::experiment::gui::Action.
 
     Credits:
 
@@ -38,8 +38,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ExperimentController.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/gui/Action.h"
+#include "cedar/processing/experiment/Action.h"
 
 // SYSTEM INCLUDES
 
@@ -47,55 +47,36 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ExperimentController::ExperimentController()
-:
-mpExperiment(NULL)
-,
-init(true)
+cedar::proc::experiment::gui::Action::Action()
 {
-
-  this->connectToStartSignal(boost::bind(&cedar::proc::experiment::ExperimentController::prepareStart, this));
-  this->connectToQuitSignal(boost::bind(&cedar::proc::experiment::ExperimentController::processQuit, this));
+  mLayout = new QHBoxLayout;
+  this->setLayout(mLayout);
 }
 
-cedar::proc::experiment::ExperimentController::~ExperimentController()
+cedar::proc::experiment::gui::Action::~Action()
 {
 }
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-void cedar::proc::experiment::ExperimentController::step(cedar::unit::Time)
+void cedar::proc::experiment::gui::Action::setAction(cedar::proc::experiment::ActionPtr action)
 {
-  this->mpExperiment->executeAcionSequences();
+  this->mAction = action;
+  this->update();
 }
 
-void cedar::proc::experiment::ExperimentController::prepareStart()
+void cedar::proc::experiment::gui::Action::clear()
 {
-  this->mpExperiment->executeAcionSequences();
-  this->init = false;
+  QLayoutItem *child;
+  while ((child = this->mLayout->takeAt(0)) != 0) {
+    delete child->widget();
+    delete child;
+  }
 }
-
-void cedar::proc::experiment::ExperimentController::processQuit()
+void cedar::proc::experiment::gui::Action::update()
 {
-  this->init = true;
+  clear();
+  redraw();
 }
-
-bool cedar::proc::experiment::ExperimentController::isOnInit()
-{
-  return init;
-}
-
-void cedar::proc::experiment::ExperimentController::setExperiment(Experiment* experiment)
-{
-  this->mpExperiment = experiment;
-}
-cedar::proc::experiment::Experiment* cedar::proc::experiment::ExperimentController::getExperiment()
-{
-  return this->mpExperiment;
-}
-

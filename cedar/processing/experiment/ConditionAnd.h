@@ -46,7 +46,6 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ConditionAnd.fwd.h"
-#include "cedar/processing/experiment/Experiment.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -69,7 +68,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool check(Experiment* experiment);
+  bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

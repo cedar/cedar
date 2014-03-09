@@ -44,6 +44,7 @@
 #include "cedar/processing/Network.h"
 #include "cedar/processing/experiment/ActionStart.h"
 #include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
@@ -64,9 +65,8 @@ _mActionSequences
     std::vector<ActionSequencePtr>()
   )
 )
-,
-mController(new ExperimentController(this))
 {
+  ExperimentControllerSingleton::getInstance()->setExperiment(this);
   this->mNetwork = network;
 
   ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
@@ -122,11 +122,11 @@ void cedar::proc::experiment::Experiment::setRepetitions(unsigned int repetition
 
 void cedar::proc::experiment::Experiment::run()
 {
-  this->mController->start();
+  ExperimentControllerSingleton::getInstance()->start();
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
-  this->mController->stop();
+  ExperimentControllerSingleton::getInstance()->stop();
   this->stopNetwork();
 }
 
@@ -165,11 +165,11 @@ void cedar::proc::experiment::Experiment::executeAcionSequences()
 {
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
-    if(action_sequence->getCondition()->check(this))
+    if(action_sequence->getCondition()->check())
     {
       for(ActionPtr action : action_sequence->getActions())
       {
-        action->run(this);
+        action->run();
       }
     }
   }
@@ -190,7 +190,55 @@ void cedar::proc::experiment::Experiment::removeActionSequence(
 
 bool cedar::proc::experiment::Experiment::isOnInit()
 {
-  return this->mController->isOnInit();
+  return ExperimentControllerSingleton::getInstance()->isOnInit();
 }
 
+std::vector<std::string> cedar::proc::experiment::Experiment::getAllSteps()
+{
+  std::vector<std::string> ret;
+  for (auto name_element_pair : this->mNetwork->getElements())
+  {
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
+    {
+      ret.push_back(name_element_pair.first);
+    }
+  }
+  return ret;
+}
 
+std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string step)
+{
+  cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
+
+  std::vector<std::string> ret;
+  for (cedar::aux::ParameterPtr parameter :  stepItem->getParameters())
+  {
+    ret.push_back(parameter->getName());
+  }
+  return ret;
+}
+
+cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(std::string step, std::string parameter)
+{
+  cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
+
+  return stepItem->getParameter(parameter);
+}
+
+std::vector<std::string> cedar::proc::experiment::Experiment::getStepValues(std::string step)
+{
+  cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
+
+  std::vector<std::string> ret;
+  for (auto data :  stepItem->getDataSlots(cedar::proc::DataRole::OUTPUT))
+  {
+    ret.push_back(data.first);
+  }
+  return ret;
+}
+
+cedar::aux::DataPtr cedar::proc::experiment::Experiment::getStepValue(std::string step, std::string value)
+{
+  cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
+  return stepItem->getData(cedar::proc::DataRole::OUTPUT,value);
+}

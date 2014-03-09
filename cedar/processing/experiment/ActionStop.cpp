@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.cpp
+    File:        ActionStop.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 09
 
-    Description: Source file for the class cedar::proc::experiment::ExperimentController.
+    Description: Source file for the class cedar::proc::experiment::ActionStop.
 
     Credits:
 
@@ -38,64 +38,39 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ActionStop.h"
 #include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/ExperimentController.h"
+
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// register class
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::ActionStopPtr>();
+}
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ExperimentController::ExperimentController()
-:
-mpExperiment(NULL)
-,
-init(true)
-{
-
-  this->connectToStartSignal(boost::bind(&cedar::proc::experiment::ExperimentController::prepareStart, this));
-  this->connectToQuitSignal(boost::bind(&cedar::proc::experiment::ExperimentController::processQuit, this));
-}
-
-cedar::proc::experiment::ExperimentController::~ExperimentController()
+cedar::proc::experiment::ActionStop::ActionStop()
 {
 }
 
-
+cedar::proc::experiment::ActionStop::~ActionStop()
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-void cedar::proc::experiment::ExperimentController::step(cedar::unit::Time)
+void cedar::proc::experiment::ActionStop::run()
 {
-  this->mpExperiment->executeAcionSequences();
+    ExperimentControllerSingleton::getInstance()->getExperiment()->stopNetwork();
 }
-
-void cedar::proc::experiment::ExperimentController::prepareStart()
-{
-  this->mpExperiment->executeAcionSequences();
-  this->init = false;
-}
-
-void cedar::proc::experiment::ExperimentController::processQuit()
-{
-  this->init = true;
-}
-
-bool cedar::proc::experiment::ExperimentController::isOnInit()
-{
-  return init;
-}
-
-void cedar::proc::experiment::ExperimentController::setExperiment(Experiment* experiment)
-{
-  this->mpExperiment = experiment;
-}
-cedar::proc::experiment::Experiment* cedar::proc::experiment::ExperimentController::getExperiment()
-{
-  return this->mpExperiment;
-}
-

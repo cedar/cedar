@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.cpp
+    File:        ActionSetParameter.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 07
 
-    Description: Source file for the class cedar::proc::experiment::ExperimentController.
+    Description: Source file for the class cedar::proc::experiment::ActionSetParameter.
 
     Credits:
 
@@ -38,64 +38,59 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/experiment/ActionSetParameter.h"
 #include "cedar/processing/experiment/ExperimentController.h"
-#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// register class
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::ActionSetParameterPtr>();
+}
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ExperimentController::ExperimentController()
+cedar::proc::experiment::ActionSetParameter::ActionSetParameter()
 :
-mpExperiment(NULL)
+_stepToSet
+(
+    new cedar::aux::StringParameter(this,"StepToSet","")
+)
 ,
-init(true)
+_parameterToSet
+(
+    new cedar::aux::StringParameter(this,"ParameterToSet","")
+)
+,
+_desiredValue
+(
+    new cedar::aux::DoubleParameter(this,"DesiredValue",0.0)
+)
 {
-
-  this->connectToStartSignal(boost::bind(&cedar::proc::experiment::ExperimentController::prepareStart, this));
-  this->connectToQuitSignal(boost::bind(&cedar::proc::experiment::ExperimentController::processQuit, this));
 }
 
-cedar::proc::experiment::ExperimentController::~ExperimentController()
+
+cedar::proc::experiment::ActionSetParameter::~ActionSetParameter()
 {
 }
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::experiment::ExperimentController::step(cedar::unit::Time)
+void cedar::proc::experiment::ActionSetParameter::run()
 {
-  this->mpExperiment->executeAcionSequences();
+  cedar::aux::ParameterPtr parameter = ExperimentControllerSingleton::getInstance()->
+       getExperiment()->getStepParameter(_stepToSet->getValue(),_parameterToSet->getValue());
+  if (cedar::aux::DoubleParameterPtr casted_parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(parameter))
+  {
+    casted_parameter->setValue(_desiredValue->getValue());
+  }
 }
-
-void cedar::proc::experiment::ExperimentController::prepareStart()
-{
-  this->mpExperiment->executeAcionSequences();
-  this->init = false;
-}
-
-void cedar::proc::experiment::ExperimentController::processQuit()
-{
-  this->init = true;
-}
-
-bool cedar::proc::experiment::ExperimentController::isOnInit()
-{
-  return init;
-}
-
-void cedar::proc::experiment::ExperimentController::setExperiment(Experiment* experiment)
-{
-  this->mpExperiment = experiment;
-}
-cedar::proc::experiment::Experiment* cedar::proc::experiment::ExperimentController::getExperiment()
-{
-  return this->mpExperiment;
-}
-

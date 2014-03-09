@@ -45,7 +45,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ExperimentController.fwd.h"
-#include "cedar/processing/experiment/Experiment.fwd.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
@@ -58,24 +58,34 @@
 class cedar::proc::experiment::ExperimentController : public cedar::aux::LoopedThread
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+
+  // uses singleton template.
+  friend class cedar::aux::Singleton<ExperimentController>;
+  //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+private:
   //!@brief The standard constructor.
-  ExperimentController(Experiment* parent);
-
+  ExperimentController();
+public:
   //!@brief Destructor
   virtual ~ExperimentController();
 
+//@todo
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   bool isOnInit();
+  void setExperiment(Experiment* experiment);
+  Experiment* getExperiment();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -113,6 +123,22 @@ private:
   bool init;
 
 }; // class cedar::proc::experiment::ExperimentController
+
+
+
+#include "cedar/auxiliaries/Singleton.h"
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace experiment
+    {
+      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::ExperimentController>);
+      typedef cedar::aux::Singleton<cedar::proc::experiment::ExperimentController> ExperimentControllerSingleton;
+    }
+  }
+}
 
 #endif // CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
 

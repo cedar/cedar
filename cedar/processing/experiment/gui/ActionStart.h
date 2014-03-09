@@ -22,31 +22,29 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.h
+    File:        ActionStart.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 07
 
-    Description: Header file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Header file for the class cedar::proc::experiment::gui::ActionStart.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_ACTION_START_H
+#define CEDAR_PROC_EXPERIMENT_GUI_ACTION_START_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/experiment/gui/Action.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionCheckValue.fwd.h"
+#include "cedar/processing/experiment/gui/ActionStart.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -55,8 +53,13 @@
  *
  * @todo describe more.
  */
-class cedar::proc::experiment::ConditionCheckValue : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::gui::ActionStart : public cedar::proc::experiment::gui::Action
 {
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -67,17 +70,16 @@ class cedar::proc::experiment::ConditionCheckValue : public cedar::proc::experim
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ConditionCheckValue();
+  ActionStart();
 
   //!@brief Destructor
-  virtual ~ConditionCheckValue();
+  virtual ~ActionStart();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool check();
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,7 +91,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void redraw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -106,11 +108,9 @@ protected:
   // none yet
 
 private:
-  cedar::aux::StringParameterPtr _stepToCheck;
-  cedar::aux::StringParameterPtr _parameterToCheck;
-  cedar::aux::DoubleParameterPtr _desiredValue;
+  // none yet
 
-}; // class cedar::proc::experiment::ConditionCheckValue
+}; // class cedar::proc::experiment::gui::ActionStart
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#endif // CEDAR_PROC_EXPERIMENT_GUI_ACTION_START_H
 

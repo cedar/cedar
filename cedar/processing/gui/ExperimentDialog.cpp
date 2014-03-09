@@ -117,6 +117,7 @@ void cedar::proc::gui::ExperimentDialog::load()
     this->nameEdit->setText(QString::fromStdString(this->experiment->getName()));
     this->repetitionSpinBox->setValue(this->experiment->getRepetitions());
   }
+  this->redraw();
 }
 
 
@@ -137,6 +138,7 @@ void cedar::proc::gui::ExperimentDialog::clearActionSequences()
   QLayoutItem *child;
   while ((child = this->mActionSequences->takeAt(0)) != 0) {
     delete child->widget();
+    delete child;
   }
 }
 
