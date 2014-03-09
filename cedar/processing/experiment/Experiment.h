@@ -98,6 +98,7 @@ public:
   void stopNetwork();
   void executeAcionSequences();
   bool isOnInit();
+  void onInit(bool status);
 
   std::vector<std::string> getAllSteps();
   std::vector<std::string> getStepParameters(std::string step);
@@ -137,6 +138,7 @@ private:
 
   ActionSequencelListParameterPtr _mActionSequences;
   unsigned int mRepetitionCounter;
+  bool mInit;
 
 }; // class cedar::proc::experiment::Experiment
 

@@ -88,7 +88,6 @@ cedar::proc::experiment::ConditionAnd::~ConditionAnd()
 
 bool cedar::proc::experiment::ConditionAnd::check()
 {
-  Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
   return _mCondition1->getValue()->check() && _mCondition2->getValue()->check();
 }
 

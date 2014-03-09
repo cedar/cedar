@@ -50,8 +50,6 @@
 cedar::proc::experiment::ExperimentController::ExperimentController()
 :
 mpExperiment(NULL)
-,
-init(true)
 {
 
   this->connectToStartSignal(boost::bind(&cedar::proc::experiment::ExperimentController::prepareStart, this));
@@ -76,18 +74,11 @@ void cedar::proc::experiment::ExperimentController::step(cedar::unit::Time)
 
 void cedar::proc::experiment::ExperimentController::prepareStart()
 {
-  this->mpExperiment->executeAcionSequences();
-  this->init = false;
+  //this->mpExperiment->executeAcionSequences();
 }
 
 void cedar::proc::experiment::ExperimentController::processQuit()
 {
-  this->init = true;
-}
-
-bool cedar::proc::experiment::ExperimentController::isOnInit()
-{
-  return init;
 }
 
 void cedar::proc::experiment::ExperimentController::setExperiment(Experiment* experiment)

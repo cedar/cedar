@@ -65,6 +65,8 @@ _mActionSequences
     std::vector<ActionSequencePtr>()
   )
 )
+,
+mInit(true)
 {
   ExperimentControllerSingleton::getInstance()->setExperiment(this);
   this->mNetwork = network;
@@ -134,6 +136,7 @@ void cedar::proc::experiment::Experiment::startNetwork()
 {
   cedar::aux::GlobalClockSingleton::getInstance()->start();
   cedar::aux::RecorderSingleton::getInstance()->start();
+  mInit=false;
   this->mStartThreadsCaller->start();
 }
 
@@ -159,6 +162,7 @@ void cedar::proc::experiment::Experiment::stopNetwork()
   cedar::aux::GlobalClockSingleton::getInstance()->stop();
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
   this->mNetwork->reset();
+  mInit=true;
 }
 
 void cedar::proc::experiment::Experiment::executeAcionSequences()
@@ -190,7 +194,7 @@ void cedar::proc::experiment::Experiment::removeActionSequence(
 
 bool cedar::proc::experiment::Experiment::isOnInit()
 {
-  return ExperimentControllerSingleton::getInstance()->isOnInit();
+  return mInit;
 }
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getAllSteps()
@@ -241,4 +245,9 @@ cedar::aux::DataPtr cedar::proc::experiment::Experiment::getStepValue(std::strin
 {
   cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
   return stepItem->getData(cedar::proc::DataRole::OUTPUT,value);
+}
+
+void cedar::proc::experiment::Experiment::onInit(bool status)
+{
+  mInit=status;
 }
