@@ -306,6 +306,8 @@ public:
   // Gets all sticky notes
   const std::vector<cedar::proc::gui::StickyNote* > getStickyNotes() const;
 
+  void emitSceneChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -313,6 +315,9 @@ signals:
   /*!@brief Signal that is emitted when the current mode finishes, e.g., when a connection has been made.
    */
   void modeFinished();
+
+  //! Emitted whenever something in the scene changes (e.g., when an item is moved)
+  void sceneChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
