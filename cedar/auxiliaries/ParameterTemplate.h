@@ -110,8 +110,11 @@ template
 class cedar::aux::ParameterTemplate : public cedar::aux::Parameter, public ValuePolicy
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friends
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::ParameterTemplate<T> SelfType;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SelfType);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -218,6 +221,28 @@ public:
       (
         "Error while setting parameter to value: " + std::string(e.what()),
         "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
+      );
+    }
+  }
+
+  bool canCopyFrom(cedar::aux::ConstParameterPtr other) const
+  {
+    return static_cast<bool>(boost::dynamic_pointer_cast<ConstSelfType>(other));
+  }
+
+  void copyValueFrom(cedar::aux::ConstParameterPtr other)
+  {
+    if (auto other_self = boost::dynamic_pointer_cast<ConstSelfType>(other))
+    {
+      this->setValue(other_self->getValue());
+    }
+    else
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::UnhandledTypeException,
+        "Cannot copy parameter value: types don't match. Type of this: " + cedar::aux::objectTypeToString(this)
+        + ", type of other: " + cedar::aux::objectTypeToString(other)
       );
     }
   }
