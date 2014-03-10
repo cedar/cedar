@@ -53,6 +53,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
+  gui/Connectable.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
   gui/Ide.h
@@ -65,7 +66,7 @@ cedar_add_library(cedarproc
   gui/SettingsDialog.h
   gui/StepItem.h
   gui/TriggerItem.h
-  gui/Network.h
+  gui/Group.h
   gui/ToolBox.h
   gui/View.h
   sources/BoxInput.h
@@ -94,7 +95,7 @@ cedar_add_library(cedarproc
   sources/Camera.h
   steps/Projection.h
   steps/Resize.h
-  Network.h
+  Group.h
   Step.h
   LoopedTrigger.h
   ${libdc_moc_headers}

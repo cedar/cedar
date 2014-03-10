@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/IntrusivePtrBase.h"
+#include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
@@ -252,6 +253,9 @@ private:
 
   //! Flag that indicates whether this parameter is advanced.
   bool mAdvanced;
+
+  //! Type of the last lock.
+  mutable cedar::aux::LOCK_TYPE mLastLockType;
 
   //! Lock for the parameter.
   mutable QReadWriteLock* mpLock;

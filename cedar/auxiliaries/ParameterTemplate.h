@@ -177,6 +177,39 @@ public:
     }
   }
 
+  //!@brief store the current value of type T in a configuration tree
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
+  {
+    node.put(this->getName(), this->getValuePrivate());
+  }
+
+  //!@brief load a value of type T from a configuration tree
+  void readFromNode(const cedar::aux::ConfigurationNode& node)
+  {
+    try
+    {
+      this->setValuePrivate(node.get_value<typename ValuePolicy::ReadType>());
+    }
+    catch (const boost::property_tree::ptree_bad_path& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+      (
+        "Error while reading parameter '" + this->getName() + "': " + std::string(e.what()) + ". Inserting default value instead.",
+        "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
+      );
+      this->makeDefault();
+    }
+    catch (const boost::property_tree::ptree_bad_data& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+      (
+        "Error while reading parameter '" + this->getName() + "': " + std::string(e.what()) + ". Inserting default value instead.",
+        "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
+      );
+      this->makeDefault();
+    }
+  }
+
   //!@brief set value to default
   void makeDefault()
   {
@@ -198,28 +231,6 @@ public:
   void setValidator(boost::function<void(const T&)> validator)
   {
     mValidator = validator;
-  }
-
-  void writeToNode(cedar::aux::ConfigurationNode& node) const
-  {
-    node.put(this->getName(), this->getValuePrivate());
-  }
-
-  //!@brief load a value of type T from a configuration tree
-  void readFromNode(const cedar::aux::ConfigurationNode& node)
-  {
-    try
-    {
-      this->setValuePrivate(node.get_value<typename ValuePolicy::ReadType>());
-    }
-    catch (const boost::property_tree::ptree_bad_path& e)
-    {
-      cedar::aux::LogSingleton::getInstance()->debugMessage
-      (
-        "Error while setting parameter to value: " + std::string(e.what()),
-        "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
-      );
-    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------

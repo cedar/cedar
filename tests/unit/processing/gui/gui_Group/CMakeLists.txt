@@ -34,7 +34,7 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(gui_Network
+cedar_add_unit_test(gui_Group
                     main.cpp
                     ADDITIONAL_DEPENDENCIES
                     cedardyn
