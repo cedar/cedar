@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/Action.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/ActionSetParameter.fwd.h"
@@ -84,7 +85,7 @@ public slots:
   void updateSteps();
   void parameterSelected();
   void stepSelected();
-
+  void updateDesiredValue();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -114,7 +115,7 @@ protected:
 private:
   QComboBox* mStepSelector;
   QComboBox* mParameterSelector;
-  QDoubleSpinBox* mDesiredValue;
+  cedar::aux::gui::Parameter* mDesiredValue;
 
 }; // class cedar::proc::experiment::gui::ActionSetParameter
 
