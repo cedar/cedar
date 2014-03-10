@@ -48,15 +48,22 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ActionSetParameter.fwd.h"
 
-// SYSTEM INCLUDES
+// SYSTEM INCLUDE
+#include <QObject>
 
 
 /*!@todo describe.
  *
  * @todo describe more.
  */
-class cedar::proc::experiment::ActionSetParameter : public cedar::proc::experiment::Action
+class cedar::proc::experiment::ActionSetParameter : public QObject, public cedar::proc::experiment::Action
 {
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -76,6 +83,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void run();
+
+public slots:
+  void updateParamter();
+
+public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

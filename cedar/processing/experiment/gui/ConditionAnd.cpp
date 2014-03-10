@@ -120,7 +120,8 @@ void cedar::proc::experiment::gui::ConditionAnd::updateConditions()
 
   cedar::proc::experiment::Condition::ConditionParameterPtr conditionPara1 =
       boost::dynamic_pointer_cast<cedar::proc::experiment::Condition::ConditionParameter>(condition1);
-  mCondition1 = cedar::proc::experiment::gui::ConditionFactorySingleton::getInstance()->get(conditionPara1->getValue())->allocateRaw();
+  mCondition1 = cedar::proc::experiment::gui::ConditionFactorySingleton::getInstance()->
+      get(conditionPara1->getValue())->allocateRaw();
   mCondition1->setCondition(conditionPara1->getValue());
   mConditionRow1->addWidget(mCondition1);
 
@@ -129,7 +130,8 @@ void cedar::proc::experiment::gui::ConditionAnd::updateConditions()
   cedar::aux::ParameterPtr condition2 = mCondition->getParameter("Condition2");
   cedar::proc::experiment::Condition::ConditionParameterPtr conditionPara2 =
       boost::dynamic_pointer_cast<cedar::proc::experiment::Condition::ConditionParameter>(condition2);
-  mCondition2 = cedar::proc::experiment::gui::ConditionFactorySingleton::getInstance()->get(conditionPara2->getValue())->allocateRaw();
+  mCondition2 = cedar::proc::experiment::gui::ConditionFactorySingleton::getInstance()->
+      get(conditionPara2->getValue())->allocateRaw();
   mCondition2->setCondition(conditionPara2->getValue());
   mConditionRow2->addWidget(mCondition2);
 }
