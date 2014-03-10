@@ -41,11 +41,28 @@
 #include "cedar/processing/experiment/ActionSetParameter.h"
 #include "cedar/processing/experiment/ExperimentController.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
+#include "cedar/auxiliaries/ParameterDeclaration.h"
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // register class
 //----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registerParameter()
+  {
+    typedef cedar::aux::ParameterDeclaration<cedar::aux::StringParameterPtr > Declaration;
+    CEDAR_GENERATE_POINTER_TYPES(Declaration);
+
+    DeclarationPtr declaration(new Declaration("template", "cedar.aux.StringParamter"));
+    declaration->declare();
+
+    return true;
+  }
+
+  bool registered = registerParameter();
+}
 
 namespace
 {
@@ -67,13 +84,18 @@ _parameterToSet
 (
     new cedar::aux::StringParameter(this,"ParameterToSet","")
 )
+,
+_desiredValue
+(
+    new cedar::aux::StringParameter(this,"DesiredValue","")
+)
 {
+  connect(_parameterToSet.get(),SIGNAL(valueChanged()),this,SLOT(updateParamter()));
 }
 
 
 cedar::proc::experiment::ActionSetParameter::~ActionSetParameter()
 {
-  connect(_parameterToSet.get(),SIGNAL(valueChanged()),this,SLOT(updateParamter()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,10 +113,15 @@ void cedar::proc::experiment::ActionSetParameter::run()
 
 void cedar::proc::experiment::ActionSetParameter::updateParamter()
 {
+  if(_desiredValue)
+  {
+    _desiredValue->unsetOwner();
+  }
   cedar::aux::ParameterPtr parameter = ExperimentControllerSingleton::getInstance()->
          getExperiment()->getStepParameter(_stepToSet->getValue(),_parameterToSet->getValue());
   std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
   _desiredValue = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
-  _desiredValue->setParent(this);
+  _desiredValue->setOwner(this);
   _desiredValue->setName("DesiredValue");
+  _desiredValue->copyValueFrom(parameter);
 }
