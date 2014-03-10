@@ -178,7 +178,7 @@ public:
   }
 
   //!@brief store the current value of type T in a configuration tree
-  void writeToNode(cedar::aux::ConfigurationNode& root) const
+  void writeToNode(cedar::aux::ConfigurationNode& node) const
   {
     node.put(this->getName(), this->getValuePrivate());
   }
