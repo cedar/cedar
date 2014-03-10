@@ -70,7 +70,7 @@ namespace cedar
       public:
         typedef T ReadType;
 
-        ValuePolicy(const T& value)
+        ValuePolicy(const T& value = T())
         :
         mValue(value)
         {
@@ -130,7 +130,7 @@ public:
   }
 
   //!@brief The constructor.
-  ParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name)
+  ParameterTemplate(cedar::aux::Configurable *pOwner = NULL, const std::string& name = "")
   :
   cedar::aux::Parameter(pOwner, name, false)
   {

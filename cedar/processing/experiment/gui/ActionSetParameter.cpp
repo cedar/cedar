@@ -166,10 +166,10 @@ void cedar::proc::experiment::gui::ActionSetParameter::parameterSelected()
 
 void cedar::proc::experiment::gui::ActionSetParameter::updateDesiredValue()
 {
-  delete mDesiredValue;
   cedar::aux::ParameterPtr desiredValue = mAction->getParameter("DesiredValue");
   if(desiredValue)
   {
+    delete mDesiredValue;
     mDesiredValue =
         cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(desiredValue)->allocateRaw();
     mDesiredValue->setParameter(desiredValue);
