@@ -118,7 +118,7 @@ protected:
 private:
   cedar::aux::StringParameterPtr _stepToSet;
   cedar::aux::StringParameterPtr _parameterToSet;
-  cedar::aux::DoubleParameterPtr _desiredValue;
+  cedar::aux::ParameterPtr _desiredValue;
 
 }; // class cedar::proc::experiment::ActionSetParameter
 

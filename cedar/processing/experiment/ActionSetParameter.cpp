@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ActionSetParameter.h"
 #include "cedar/processing/experiment/ExperimentController.h"
-
+#include "cedar/auxiliaries/ParameterDeclaration.h"
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,11 +67,6 @@ _parameterToSet
 (
     new cedar::aux::StringParameter(this,"ParameterToSet","")
 )
-,
-_desiredValue
-(
-    new cedar::aux::DoubleParameter(this,"DesiredValue",0.0)
-)
 {
 }
 
@@ -90,10 +85,7 @@ void cedar::proc::experiment::ActionSetParameter::run()
 {
   cedar::aux::ParameterPtr parameter = ExperimentControllerSingleton::getInstance()->
        getExperiment()->getStepParameter(_stepToSet->getValue(),_parameterToSet->getValue());
-  if (cedar::aux::DoubleParameterPtr casted_parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(parameter))
-  {
-    casted_parameter->setValue(_desiredValue->getValue());
-  }
+  parameter->copyValueFrom(_desiredValue);
 }
 
 
@@ -101,5 +93,8 @@ void cedar::proc::experiment::ActionSetParameter::updateParamter()
 {
   cedar::aux::ParameterPtr parameter = ExperimentControllerSingleton::getInstance()->
          getExperiment()->getStepParameter(_stepToSet->getValue(),_parameterToSet->getValue());
-  ///copy value
+  std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
+  _desiredValue = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
+  _desiredValue->setParent(this);
+  _desiredValue->setName("DesiredValue");
 }
