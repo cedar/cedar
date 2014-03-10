@@ -54,6 +54,7 @@ cedar_add_library(cedarproc
   experiment/gui/ActionStart.h
   experiment/gui/ActionStop.h
   experiment/gui/ActionSetParameter.h
+  experiment/ActionSetParameter.h
   experiment/gui/ActionSequence.h
   experiment/gui/Condition.h
   experiment/gui/ConditionOnInit.h

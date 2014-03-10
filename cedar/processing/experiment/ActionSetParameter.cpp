@@ -78,6 +78,7 @@ _desiredValue
 
 cedar::proc::experiment::ActionSetParameter::~ActionSetParameter()
 {
+  connect(_parameterToSet.get(),SIGNAL(valueChanged()),this,SLOT(updateParamter()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,4 +94,12 @@ void cedar::proc::experiment::ActionSetParameter::run()
   {
     casted_parameter->setValue(_desiredValue->getValue());
   }
+}
+
+
+void cedar::proc::experiment::ActionSetParameter::updateParamter()
+{
+  cedar::aux::ParameterPtr parameter = ExperimentControllerSingleton::getInstance()->
+         getExperiment()->getStepParameter(_stepToSet->getValue(),_parameterToSet->getValue());
+  ///copy value
 }

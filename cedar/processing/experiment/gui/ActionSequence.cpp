@@ -150,33 +150,45 @@ void cedar::proc::experiment::gui::ActionSequence::update()
 }
 void cedar::proc::experiment::gui::ActionSequence::updateCondition()
 {
-  delete mCondition;
-  cedar::aux::ParameterPtr condition = this->mSequence->getParameter("Condition");
-  mCondition = cedar::proc::experiment::gui::ConditionFactorySingleton::getInstance()->get(mSequence->getCondition())->allocateRaw();
-  if (cedar::proc::experiment::Condition::ConditionParameterPtr conditionParameter =
-      boost::dynamic_pointer_cast<cedar::proc::experiment::Condition::ConditionParameter>(condition))
+  try
   {
-    mCondition->setCondition(conditionParameter->getValue());
+    delete mCondition;
+    mCondition = cedar::proc::experiment::gui::ConditionFactorySingleton::getInstance()->get(mSequence->getCondition())->allocateRaw();
+    mCondition->setCondition(mSequence->getCondition());
+    conditionRow->addWidget(mCondition);
   }
-  conditionRow->addWidget(mCondition);
+  catch (cedar::aux::UnknownTypeException& e)
+  {
+    if (conditionRow->count()==3)
+    {
+      delete conditionRow->takeAt(2)->widget();
+    }
+    cedar::aux::gui::Configurable* configurbleWidget = new cedar::aux::gui::Configurable(this);
+    configurbleWidget->display(mSequence->getCondition());
+    conditionRow->addWidget(configurbleWidget);
+  }
 }
 
 void cedar::proc::experiment::gui::ActionSequence::updateActions()
 {
   clear(mActions);
 
-  cedar::aux::Configurable* dummy = new cedar::aux::Configurable();
-  int i=0;
-  for(cedar::proc::experiment::ActionPtr action : mSequence->getActions())
+  for (cedar::proc::experiment::ActionPtr action : mSequence->getActions())
   {
-    cedar::aux::ParameterPtr actions = this->mSequence->getParameter("ActionSet");
-    cedar::proc::experiment::gui::Action* actionWidget = cedar::proc::experiment::gui::ActionFactorySingleton::getInstance()->get(action)->allocateRaw();
-    cedar::proc::experiment::Action::ActionParameterPtr parameter(new  cedar::proc::experiment::Action::ActionParameter(dummy,"action"+i,action));
-    actionWidget->setAction(parameter->getValue());
-    mActions->addWidget(actionWidget);
-    i++;
+    try
+    {
+      cedar::proc::experiment::gui::Action* actionWidget =
+          cedar::proc::experiment::gui::ActionFactorySingleton::getInstance()->get(action)->allocateRaw();
+      actionWidget->setAction(action);
+      mActions->addWidget(actionWidget);
+    }
+     catch (cedar::aux::UnknownTypeException& e)
+     {
+       cedar::aux::gui::Configurable* configurbleWidget = new cedar::aux::gui::Configurable(this);
+       configurbleWidget->display(action);
+       conditionRow->addWidget(configurbleWidget);
+     }
   }
-  delete dummy;
 }
 
 void cedar::proc::experiment::gui::ActionSequence::clear(QLayout* layout)

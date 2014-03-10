@@ -46,6 +46,7 @@
 #include "cedar/processing/experiment/ExperimentController.h"
 
 // SYSTEM INCLUDES
+#include <QReadWriteLock>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -95,6 +96,7 @@ bool cedar::proc::experiment::ConditionCheckValue::check()
   {
     if (cedar::aux::MatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
     {
+      QReadLocker locker(&(value->getLock()));
       const double cVal = value->getValue<double>(0,0);
       if(cVal > _desiredValue->getValue())
       {
