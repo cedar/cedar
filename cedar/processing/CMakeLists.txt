@@ -50,11 +50,21 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
+  experiment/gui/Action.h
+  experiment/gui/ActionStart.h
+  experiment/gui/ActionStop.h
+  experiment/gui/ActionSetParameter.h
+  experiment/gui/ActionSequence.h
+  experiment/gui/Condition.h
+  experiment/gui/ConditionOnInit.h
+  experiment/gui/ConditionAnd.h
+  experiment/gui/ConditionCheckValue.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
+  gui/ExperimentDialog.h
   gui/Ide.h
   gui/IdeApplication.h
   gui/ProjectionMappingParameter.h

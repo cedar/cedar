@@ -50,6 +50,7 @@
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/gui/ExperimentDialog.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"
 #include "cedar/processing/gui/Ide.fwd.h"
 #include "cedar/processing/gui/Network.fwd.h"
@@ -98,6 +99,7 @@ public:
    */
   void resetTo(cedar::proc::gui::NetworkPtr network);
 
+  cedar::proc::gui::NetworkPtr getNetwork();
   void suppressCloseDialog(bool suppress)
   {
     this->mSuppressCloseDialog = suppress;
@@ -212,6 +214,9 @@ public slots:
 
   //!@brief shows/hides all plot windows of every step
   void toggleVisibilityOfPlots();
+
+  //!@brief shows the experiment dialog widget
+  void showExperimentDialog();
 
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);
@@ -351,6 +356,9 @@ private:
 
   //! Whether the save on close dialog should be suppressed.
   bool mSuppressCloseDialog;
+
+  //! Widget for creating and running experiments
+  cedar::proc::gui::ExperimentDialog* mpExperimentDialog;
 
 }; // class cedar::MainWindow
 

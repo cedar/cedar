@@ -132,6 +132,7 @@
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionExperiments"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
@@ -779,6 +780,14 @@
   <action name="mpActionPerformanceOverview">
    <property name="text">
     <string>Performance overview ...</string>
+   </property>
+  </action>
+  <action name="mpActionExperiments">
+   <property name="text">
+    <string>Experiments...</string>
+   </property>
+   <property name="toolTip">
+    <string>Framwork for starting experiments</string>
    </property>
   </action>
  </widget>
