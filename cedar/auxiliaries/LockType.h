@@ -53,7 +53,9 @@ namespace cedar
       //! The lock should be locked for reading
       LOCK_TYPE_READ,
       //! The lock should be locked for writing
-      LOCK_TYPE_WRITE
+      LOCK_TYPE_WRITE,
+      //! The lock is ignored.
+      LOCK_TYPE_DONT_LOCK
     };
   }
 }

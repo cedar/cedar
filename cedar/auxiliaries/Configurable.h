@@ -196,7 +196,7 @@ public:
 
   /*!@brief Unlocks all parameters of the configurable.
    */
-  void unlockParameters() const;
+  void unlockParameters(cedar::aux::LOCK_TYPE lockType) const;
 
   //! Returns the number of advanced parameters & configurable children in this configurable.
   size_t countAdvanced() const;

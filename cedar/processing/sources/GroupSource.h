@@ -22,114 +22,71 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Manager.h
+    File:        GroupSource.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 11 08
 
-    Description:
+    Description: Header file for the class cedar::proc::sources::GroupSource.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_MANAGER_H
-#define CEDAR_PROC_MANAGER_H
+#ifndef CEDAR_PROC_SOURCES_GROUP_SOURCE_H
+#define CEDAR_PROC_SOURCES_GROUP_SOURCE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/LoopedThread.fwd.h"
-#include "cedar/auxiliaries/PluginProxy.fwd.h"
-#include "cedar/processing/Manager.fwd.h"
-#include "cedar/processing/PluginDeclaration.fwd.h"
+#include "cedar/processing/sources/GroupSource.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QObject>
-#include <map>
-#include <set>
-#include <vector>
 
 
-/*!@brief A manager for processing architectures.
+/*!@todo describe.
  *
- * @deprecated This class will be removed in future releases.
+ * @todo describe more.
  */
-class cedar::proc::Manager
+class cedar::proc::sources::GroupSource : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friend
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::Singleton<cedar::proc::Manager>;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // types
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief a registry for LoopedThreads
-  typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The standard constructor.
+  GroupSource();
+
   //!@brief Destructor
-  ~Manager();
+  virtual ~GroupSource();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief access to thread registry
-  //!@deprecated This function is replaced by functionality to access LoopedTriggers in cedar::proc::Networks.
-  CEDAR_DECLARE_DEPRECATED(ThreadRegistry& threads());
+  void setData(cedar::aux::DataPtr data);
+  void resetData();
 
-  //!@brief register a thread (Manager holds a collection of threads, which can be started at once)
-  void registerThread(cedar::aux::LoopedThreadPtr thread);
-
-  //!@brief load a plugin
-  //!@deprecated Call declare() on the plugin pointer instead.
-  CEDAR_DECLARE_DEPRECATED(void load(cedar::aux::PluginProxyPtr plugin));
-
-  //!@brief Loads the declarations from a plugin declaration.
-  //!@deprecated Call declareAll() on the declaration pointer instead.
-  CEDAR_DECLARE_DEPRECATED(void load(cedar::proc::PluginDeclarationPtr declaration));
-
-  //!@brief Loads the default plugins specified in cedar's configuration file.
-  //!@deprecated Use the function in cedar::proc::gui::Settings instead.
-  CEDAR_DECLARE_DEPRECATED(void loadDefaultPlugins());
-
-  /*!@brief start all registered threads
-   *
-   * @deprecated Use the startTriggers function in cedar::proc::Network instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void startThreads());
-
-  /*!@brief stop all threads
-   *
-   * @deprecated Use the stopTriggers function in cedar::proc::Network instead.
-   */
-  CEDAR_DECLARE_DEPRECATED(void stopThreads(bool wait = false));
-
-  //! Returns the singleton instance of the manager.
-  CEDAR_DECLARE_DEPRECATED(static cedar::proc::Manager& getInstance());
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief The standard constructor.
-  Manager();
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -137,12 +94,18 @@ private:
 protected:
   // none yet
 private:
-  //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
-  ThreadRegistry mThreadRegistry;
+  cedar::aux::DataPtr mEmptyData;
 
-}; // class cedar::Manager
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-CEDAR_PROC_SINGLETON(Manager);
+private:
+  // none yet
 
-#endif // CEDAR_PROC_MANAGER_H
+}; // class cedar::proc::sources::GroupSource
+
+#endif // CEDAR_PROC_SOURCES_GROUP_SOURCE_H
 

@@ -84,7 +84,7 @@
     <addaction name="mpThreadsStartAll"/>
     <addaction name="mpThreadsSingleStep"/>
     <addaction name="mpThreadsStopAll"/>
-    <addaction name="mpActionResetRootNetwork"/>
+    <addaction name="mpActionResetRootGroup"/>
    </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
@@ -544,7 +544,7 @@
     <string>About...</string>
    </property>
   </action>
-  <action name="mpActionResetRootNetwork">
+  <action name="mpActionResetRootGroup">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
