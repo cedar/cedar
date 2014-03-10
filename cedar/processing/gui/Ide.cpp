@@ -831,7 +831,7 @@ bool cedar::proc::gui::Ide::save()
   else
   {
     this->mGroup->write();
-    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(this->mNetwork->getFileName());
+    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(this->mGroup->getFileName());
     this->setArchitectureChanged(false);
     return true;
   }
