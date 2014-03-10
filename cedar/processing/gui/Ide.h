@@ -100,6 +100,10 @@ public:
   void resetTo(cedar::proc::gui::NetworkPtr network);
 
   cedar::proc::gui::NetworkPtr getNetwork();
+  void suppressCloseDialog(bool suppress)
+  {
+    this->mSuppressCloseDialog = suppress;
+  }
 
 public slots:
   /*!@brief Slot that displays notifications.
@@ -128,11 +132,11 @@ public slots:
 
   /*!@brief Slot that is connected to the "save" item in the file menu.
    */
-  void save();
+  bool save();
 
   /*!@brief Slot that is connected to the "save as" item in the file menu.
    */
-  void saveAs();
+  bool saveAs();
 
   /*!@brief Slot that is connected to the "load" item in the file menu.
    */
@@ -202,8 +206,6 @@ public slots:
    */
   void showBoostControl();
 
-  void showExperimentDialog();
-
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
 
@@ -212,6 +214,9 @@ public slots:
 
   //!@brief shows/hides all plot windows of every step
   void toggleVisibilityOfPlots();
+
+  //!@brief shows the experiment dialog widget
+  void showExperimentDialog();
 
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);
@@ -294,6 +299,18 @@ private:
 
   void setNetwork(cedar::proc::gui::NetworkPtr network);
 
+  void setArchitectureChanged(bool changed);
+
+  //! Check if the user wants to save. Returns false if the action currently being taken should be cancelled.
+  bool checkSave();
+
+private slots:
+  void globalTimeFactorSliderChanged(int newValue);
+
+  void globalTimeFactorSpinboxChanged(double value);
+
+  void architectureChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -319,8 +336,6 @@ private:
 
   cedar::proc::gui::BoostControl* mpBoostControl;
 
-  cedar::proc::gui::ExperimentDialog* mpExperimentDialog;
-
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;
 
@@ -330,8 +345,20 @@ private:
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
-  // Combobox to select plot groups
+  //! Combobox to select plot groups
   QComboBox* mpPlotGroupsComboBox;
+
+  //! Spinbox for controlling the global time step.
+  QDoubleSpinBox* mpGlobalTimeFactor;
+
+  //! Spinbox for controlling the global time step.
+  QSlider* mpGlobalTimeFactorSlider;
+
+  //! Whether the save on close dialog should be suppressed.
+  bool mSuppressCloseDialog;
+
+  //! Widget for creating and running experiments
+  cedar::proc::gui::ExperimentDialog* mpExperimentDialog;
 
 }; // class cedar::MainWindow
 

@@ -63,6 +63,12 @@ class cedar::aux::LockableMember
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  LockableMember()
+  :
+  mMember()
+  {
+  }
+
   LockableMember(const T& member)
   :
   mMember(member)

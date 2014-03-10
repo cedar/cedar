@@ -44,7 +44,9 @@
   // for name unmangling/undecorating
   #include <cxxabi.h>
   // for generating stack traces
-  #include <execinfo.h>
+  #ifndef CEDAR_OS_WINROWS
+    #include <execinfo.h>
+  #endif // CEDAR_OS_WINDOWS
 #endif // CEDAR_COMPILER_GCC
 
 #ifdef CEDAR_COMPILER_MSVC
@@ -284,6 +286,7 @@ void init(CONTEXT context);
 cedar::aux::StackTrace::StackTrace()
 {
 #ifdef CEDAR_COMPILER_GCC
+#ifndef CEDAR_OS_WINDOWS
   // array for the backtraces
   const size_t max_stack_size = 100;
   void *array[max_stack_size];
@@ -306,6 +309,7 @@ cedar::aux::StackTrace::StackTrace()
   }
 
   free (strings);
+#endif // CEDAR_OS_WINDOWS
 #else
   CONTEXT context_record;
   RtlCaptureContext(&context_record);

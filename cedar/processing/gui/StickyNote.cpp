@@ -77,11 +77,19 @@ cedar::proc::gui::GraphicsBase(width,height)
   setFlag(ItemIsFocusable);
 
   this->setZValue(0);
+
+  if (pParent)
+  {
+    pParent->emitSceneChanged();
+  }
 }
 
 cedar::proc::gui::StickyNote::~StickyNote()
 {
-
+  if (this->mpParent)
+  {
+    this->mpParent->emitSceneChanged();
+  }
 }
 QRectF cedar::proc::gui::StickyNote::boundingRect() const
 {

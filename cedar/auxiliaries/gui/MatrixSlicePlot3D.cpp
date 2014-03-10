@@ -63,8 +63,7 @@ cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(QWidget* pParent)
 :
 cedar::aux::gui::QImagePlot(pParent),
 mDataIsSet(false),
-mDesiredColumns(0),
-mSlicedDimension(2)
+mDesiredColumns(0)
 {
   this->init();
 }
@@ -78,8 +77,7 @@ cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D
 :
 cedar::aux::gui::QImagePlot(pParent),
 mDataIsSet(false),
-mDesiredColumns(0),
-mSlicedDimension(2)
+mDesiredColumns(0)
 {
   this->init();
   this->plot(matData, title);
@@ -100,6 +98,8 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
 {
   this->setFocusPolicy(Qt::StrongFocus);
   this->setToolTip(QString("Use + and - to alter number of columns."));
+
+  this->_mSlicedDimension = new cedar::aux::UIntParameter(this, "sliced dimension", 2);
 
   this->setLegendAvailable(true);
   this->setValueScalingEnabled(true);
@@ -153,13 +153,19 @@ void cedar::aux::gui::MatrixSlicePlot3D::getSetup(int& dim0, int& dim1, int slic
   }
 }
 
+unsigned int cedar::aux::gui::MatrixSlicePlot3D::getSlicedDimension() const
+{
+  QReadLocker sliced_dim_locker(this->_mSlicedDimension->getLock());
+  unsigned int copy = this->_mSlicedDimension->getValue();
+  return copy;
+}
+
+
 void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 {
   //!@todo This is actually kind of close to a 3d slice plot for a matrix with dims >= 3 (instead of just == 3)
   //!      Could this be generalized to a ND-slice-plot where three dimension are selected for plotting?
-  QReadLocker sliced_dim_locker(this->mSlicedDimension.getLockPtr());
-  int dim_sliced = this->mSlicedDimension.member();
-  sliced_dim_locker.unlock();
+  int dim_sliced = static_cast<int>(this->getSlicedDimension());
 
   int dim_0, dim_1;
 
@@ -182,15 +188,15 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   double min = std::numeric_limits<double>::max();
   double max = -std::numeric_limits<double>::max();
 
-  if (!this->mAutoScaling)
+  if (!this->isAutoScaling())
   {
-    min = this->mValueLimits.getLower();
-    max = this->mValueLimits.getUpper();
+    min = this->getValueLimits().getLower();
+    max = this->getValueLimits().getUpper();
   }
 
   // decide which plot code is used depending on the OpenCV version
   // versions are defined since version 2.4, which supports the following code
-#if defined CV_MINOR_VERSION and defined CV_MAJOR_VERSION and CV_MAJOR_VERSION >= 2 and CV_MINOR_VERSION >= 4
+#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
   // for each tile, copy content to right place
   // ranges is used to select the slice in the 3d-data
   cv::Range ranges[3];
@@ -233,7 +239,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     slice.copyTo(mSliceMatrix(dest_rows, dest_cols));
     frame(dest_rows, dest_cols) = cv::Scalar(0);
 
-    if (this->mAutoScaling)
+    if (this->isAutoScaling())
     {
       double local_min, local_max;
       cv::minMaxLoc(slice, &local_min, &local_max);
@@ -267,20 +273,20 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       }
     }
   }
-  if (this->mAutoScaling)
+  if (this->isAutoScaling())
   {
     cv::minMaxLoc(mSliceMatrix, &min, &max);
   }
   else
   {
-    min = this->mValueLimits.getLower();
-    max = this->mValueLimits.getUpper();
+    min = this->getValueLimits().getLower();
+    max = this->getValueLimits().getUpper();
   }
 #endif // OpenCV version
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
 
-  if (this->mAutoScaling)
+  if (this->isAutoScaling())
   {
     emit minMaxChanged(min, max);
   }
@@ -337,7 +343,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::fillContextMenu(QMenu& menu)
 {
   QMenu* p_slice_menu = menu.addMenu("sliced dimension");
 
-#if defined CV_MINOR_VERSION and defined CV_MAJOR_VERSION and CV_MAJOR_VERSION >= 2 and CV_MINOR_VERSION >= 4
+#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
   for (int d = 0; d < 3; ++d)
   {
     QString action_str = QString("along %1").arg(d);
@@ -345,7 +351,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::fillContextMenu(QMenu& menu)
     p_action->setData(d);
 
     p_action->setCheckable(true);
-    p_action->setChecked(this->mSlicedDimension.member() == static_cast<unsigned int>(d));
+    p_action->setChecked(this->getSlicedDimension() == static_cast<unsigned int>(d));
     QObject::connect(p_action, SIGNAL(triggered()), SLOT(slicedDimensionSelected()));
   }
 #else
@@ -359,15 +365,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicedDimensionSelected()
   CEDAR_DEBUG_ASSERT(action);
   int dimension = action->data().toInt();
 
-  QWriteLocker sliced_dim_locker(this->mSlicedDimension.getLockPtr());
-  this->mSlicedDimension.member() = dimension;
+  QWriteLocker sliced_dim_locker(this->_mSlicedDimension->getLock());
+  this->_mSlicedDimension->setValue(dimension);
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY)
 {
-  QReadLocker sliced_dim_locker(this->mSlicedDimension.getLockPtr());
-  int dim_sliced = this->mSlicedDimension.member();
-  sliced_dim_locker.unlock();
+  int dim_sliced = static_cast<int>(this->getSlicedDimension());
 
   int dim_0, dim_1;
 

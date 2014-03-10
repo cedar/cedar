@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

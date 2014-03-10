@@ -554,12 +554,12 @@ cv::Mat cedar::aux::math::twistCoordinates(const cv::Mat& rSupportPoint, const c
   cv::Mat omega = rAxis(cv::Rect(0, 0, 1, 3)) * (1 / cv::norm(rAxis(cv::Rect(0, 0, 1, 3))));
   cv::Mat cross = rSupportPoint(cv::Rect(0, 0, 1, 3)).cross(omega);
   cv::Mat twist = cv::Mat::zeros(6, 1, rSupportPoint.type());
-  twist.at<double>(0, 0) = cross.at<double>(0, 0);
-  twist.at<double>(1, 0) = cross.at<double>(1, 0);
-  twist.at<double>(2, 0) = cross.at<double>(2, 0);
-  twist.at<double>(3, 0) = omega.at<double>(0, 0);
-  twist.at<double>(4, 0) = omega.at<double>(1, 0);
-  twist.at<double>(5, 0) = omega.at<double>(2, 0);
+  twist.at<T>(0, 0) = cross.at<T>(0, 0);
+  twist.at<T>(1, 0) = cross.at<T>(1, 0);
+  twist.at<T>(2, 0) = cross.at<T>(2, 0);
+  twist.at<T>(3, 0) = omega.at<T>(0, 0);
+  twist.at<T>(4, 0) = omega.at<T>(1, 0);
+  twist.at<T>(5, 0) = omega.at<T>(2, 0);
   return twist;
 }
 

@@ -54,6 +54,7 @@ endif()
 
 if (CEDAR_BUILD_DEBUG_VERSION)
   set (CMAKE_BUILD_TYPE debug)
+  add_definitions( -D_DEBUG )
 else(CEDAR_BUILD_DEBUG_VERSION)
   set (CMAKE_BUILD_TYPE release)
 endif(CEDAR_BUILD_DEBUG_VERSION)
@@ -116,7 +117,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
     list(GET GCC_VERSION_COMPONENTS 0 GCC_MAJOR)
     list(GET GCC_VERSION_COMPONENTS 1 GCC_MINOR)
     if (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
-      set(CEDAR_ISSUES ${CEDAR_ISSUES} "Your gcc version (${GCC_MAJOR}.${GCC_MINOR}) is outdated. Please consider an\n  upgrade to version >= 4.6.\n\n")
+      list(APPEND CEDAR_ISSUES "Your gcc version (${GCC_MAJOR}.${GCC_MINOR}) is outdated. Please consider an\n  upgrade to version >= 4.6.")
     else (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
       set(CEDAR_ISSUES "${CEDAR_ISSUES}")
     endif (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
@@ -128,6 +129,11 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
   add_definitions(-std=gnu++0x)
+  	
+  if (WIN32)
+	add_definitions(-Wno-unused-local-typedefs)
+  endif(WIN32)
+
 elseif (MSVC)
   add_definitions(-W2
                   -D_SCL_SECURE_NO_WARNINGS
@@ -135,6 +141,7 @@ elseif (MSVC)
                   )
   # Allow sorting projects into subfodlers (to make solutions more usable)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  list(APPEND CEDAR_ISSUES "You're on Windows. Unit tests may not work properly.")
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 # add definitions for clang

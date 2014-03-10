@@ -460,6 +460,35 @@ void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationN
   root.put("width", this->parentWidget()->width());
   root.put("height", this->parentWidget()->height());
   root.put_child("data_list", serialize(this->mDataList));
+
+  cedar::aux::ConfigurationNode plot_settings;
+  for (int row = 0; row < this->mpLayout->rowCount(); ++row)
+  {
+    for (int col = 0; col < this->mpLayout->columnCount(); ++col)
+    {
+      auto layout_item = this->mpLayout->itemAtPosition(row, col);
+      if (auto widget_item = dynamic_cast<QWidgetItem*>(layout_item))
+      {
+        if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(widget_item->widget()))
+        {
+          cedar::aux::ConfigurationNode cfg, plot_cfg;
+          cfg.put("row", row);
+          cfg.put("col", col);
+          plot->writeConfiguration(plot_cfg);
+          if (!plot_cfg.empty())
+          {
+            cfg.push_back(cedar::aux::ConfigurationNode::value_type("plot configuration", plot_cfg));
+          }
+          plot_settings.push_back(cedar::aux::ConfigurationNode::value_type("", cfg));
+        }
+      }
+    }
+  }
+
+  if (!plot_settings.empty())
+  {
+    root.put_child("plot configurations", plot_settings);
+  }
 }
 
 // serialize the datalist for storing it in a configuration node
@@ -480,6 +509,7 @@ cedar::aux::ConfigurationNode cedar::proc::gui::PlotWidget::serialize(const ceda
 // restore plotwidget from a configuration node and add it to the respective step
 void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::StepItem* pStepItem)
 {
+  //!@todo These should really check if these nodes exist; if one doesn't, this will lead to trouble...
   int width = node.get<int>("width");
   int height = node.get<int>("height");
   int x = node.get<int>("position_x");
@@ -497,4 +527,37 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   
   auto p_plot_widget = new cedar::proc::gui::PlotWidget(pStepItem->getStep(), data_list);
   pStepItem->addPlotWidget(p_plot_widget, x, y, width, height);
+
+
+  auto settings_iter = node.find("plot configurations");
+  if (settings_iter != node.not_found())
+  {
+    for (auto cfg_iter : settings_iter->second)
+    {
+      auto cfg = cfg_iter.second;
+      auto row_iter = cfg.find("row");
+      auto col_iter = cfg.find("col");
+      if (row_iter == cfg.not_found() || col_iter == cfg.not_found())
+      {
+        continue;
+      }
+      int row = row_iter->second.get_value<int>();
+      int col = col_iter->second.get_value<int>();
+
+      auto widget_item = dynamic_cast<QWidgetItem*>(p_plot_widget->mpLayout->itemAtPosition(row, col));
+      if (!widget_item)
+      {
+        continue;
+      }
+
+      if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(widget_item->widget()))
+      {
+        auto plot_cfg_iter = cfg.find("plot configuration");
+        if (plot_cfg_iter != cfg.not_found())
+        {
+          plot->readConfiguration(plot_cfg_iter->second);
+        }
+      }
+    }
+  }
 }

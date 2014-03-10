@@ -72,6 +72,7 @@ cedar_add_library(cedaraux
   gui/BaseWidget.h
   gui/BoolParameter.h
   gui/BoolVectorParameter.h
+  gui/Configurable.h
   gui/DataPlotter.h
   gui/DirectoryParameter.h
   gui/DoubleParameter.h
@@ -116,6 +117,7 @@ cedar_add_library(cedaraux
   convolution/KernelList.h
   convolution/Engine.h
   Parameter.h
+  Settings.h
   kernel/Separable.h
   kernel/Kernel.h
   kernel/Gauss.h

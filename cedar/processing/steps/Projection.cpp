@@ -105,7 +105,7 @@ cedar::proc::steps::Projection::Projection()
 mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 4)),
-_mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
+_mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 50, 1, 1000)),
 _mCompressionType(new cedar::aux::EnumParameter(
                                                  this,
                                                  "compression type",
@@ -825,10 +825,7 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
 
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   
-  if (input_dimensionality != this->_mDimensionMappings->getValue()->getNumberOfMappings())
-  {
-    this->_mDimensionMappings->initialize(input_dimensionality);
-  }
+  this->_mDimensionMappings->initialize(input_dimensionality);
 
   this->reconfigure();
 }

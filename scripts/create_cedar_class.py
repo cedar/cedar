@@ -177,6 +177,10 @@ replacements["<email address>"] = users_mail
 replacements["<class name>"] = class_name
 replacements["<full class name>"] = class_name_full
 replacements["<namespace path>"] = namespace_path
+replacements["<copyright years>"] = "2011"
+for year in range(2012, today.year + 1):
+  replacements["<copyright years>"] += ", " + str(year)
+
 if is_cedar_class:
   replacements["<base namespace path>"] = "cedar/" + namespace_aliases[top_level_namespace]
 else:

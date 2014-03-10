@@ -184,12 +184,9 @@ namespace cedar
     typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentManager;
 
     //!@brief The singleton object of the TransferFunctionFactory.
-    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::ComponentManager>);
-    //!@endcond
+//    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
   }
 }
+CEDAR_DEV_SINGLETON(ComponentManager);
 
 #endif // CEDAR_DEV_COMPONENT_H

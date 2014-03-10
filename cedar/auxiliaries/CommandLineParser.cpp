@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -50,11 +51,11 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::aux::CommandLineParser::M_STANDARD_OPTIONS_GROUP = "common options";
-std::string cedar::aux::CommandLineParser::M_WRITE_CONFIG_COMMAND = "write-config-to-file";
-std::string cedar::aux::CommandLineParser::M_READ_CONFIG_COMMAND = "read-config-from-file";
-std::string cedar::aux::CommandLineParser::M_UNGROUPED_OPTIONS_NAME = "ungrouped";
-std::string cedar::aux::CommandLineParser::M_CFG_FILE_INCLUDE_TAG = "include";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_STANDARD_OPTIONS_GROUP = "common options";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_WRITE_CONFIG_COMMAND = "write-config-to-file";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_READ_CONFIG_COMMAND = "read-config-from-file";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_UNGROUPED_OPTIONS_NAME = "ungrouped";
+std::string CEDAR_AUX_LIB_EXPORT cedar::aux::CommandLineParser::M_CFG_FILE_INCLUDE_TAG = "include";
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -161,7 +162,22 @@ void cedar::aux::CommandLineParser::readConfiguration(cedar::aux::ConfigurationN
       for (auto iter = flags_node.begin(); iter != flags_node.end(); ++iter)
       {
         auto long_name = iter->first;
-        auto value = iter->second.get_value<bool>();
+        bool value;
+        try
+        {
+          value = iter->second.get_value<bool>();
+        }
+        catch(boost::property_tree::ptree_bad_data)
+        {
+          cedar::aux::LogSingleton::getInstance()->error
+          (
+            "Could not parse command-line value for flag \"" + long_name
+            + "\" from file. Did you use the right file format?",
+            "void cedar::aux::CommandLineParser::readConfiguration(cedar::aux::ConfigurationNode&)"
+          );
+          continue;
+        }
+
         this->setParsedFlag(long_name, value);
       }
     }

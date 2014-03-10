@@ -138,6 +138,16 @@ protected:
   //!@brief Handles mouse move events.
   void mouseMoveEvent(QMouseEvent *pEvent);
 
+  /*!@brief We have to trick Qt to allow middle button drag mode,
+   * see https://bugreports.qt-project.org/browse/QTBUG-7328 for a bug report
+   */
+  void mousePressEvent(QMouseEvent* pEvent);
+
+  /*!@brief We have to trick Qt to allow middle button drag mode,
+   * see https://bugreports.qt-project.org/browse/QTBUG-7328 for a bug report
+   */
+  void mouseReleaseEvent(QMouseEvent* pEvent);
+
 signals:
   //!@brief reacts to a change in zoom level
   void zoomLevelChanged(double newZoomLevel);
@@ -191,6 +201,8 @@ private:
 
   //!@brief Timer used for scrolling.
   QTimer *mpScrollTimer;
+
+  QPointF mLastPoint;
 }; // class ProcessingView
 
 #endif // CEDAR_PROC_VIEW_H
