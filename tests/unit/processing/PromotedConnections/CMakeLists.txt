@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -26,7 +26,7 @@
 #
 #   Maintainer:  Oliver Lomp
 #   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2012 08 02
+#   Date:        2012 07 19
 #
 #   Description:
 #
@@ -34,8 +34,8 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(gui_ProcessingIde
-                    gui_ProcessingIde.cpp
+cedar_add_unit_test(PromotedConnections
+                    main.cpp
                     ADDITIONAL_DEPENDENCIES
                     cedardyn
                     )

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -449,7 +449,7 @@ void cedar::proc::gui::Ide::showAboutDialog()
   QImage version_image(":/cedar/processing/gui/images/current_version_image.svg");
   p_version_image->setPixmap(QPixmap::fromImage(version_image));
 
-  QString about_text = "<center>This is cedar's processingIde<br />built with<br />cedar version <b>";
+  QString about_text = "<center>This is cedar<br />built with library<br />version <b>";
   about_text += QString::fromStdString(cedar::aux::versionNumberToString(CEDAR_VERSION));
   about_text += "</b>"
 #ifdef DEBUG
@@ -532,7 +532,7 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
   }
 
   this->storeSettings();
-  // Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
+  // Without this, the GUI crashes when exiting in certain circumstances (see unit test gui_cedar)
   this->mpPropertyTable->clear();
   pEvent->accept();
 }

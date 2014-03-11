@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,39 +22,27 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        cedar.cpp
 
-    Maintainer:  Oliver Lomp
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 05
 
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-
-    Date:        2014 01 20
-
-    Description: A command-line version of the processingIde.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR INCLUDES
-
-// LOCAL INCLUDES
-#include "MainApplication.h"
-
-// SYSTEM INCLUDES
-#include <QApplication>
-#include <QTimer>
-
+#include "cedar/processing/gui/IdeApplication.h"
 
 int main(int argc, char** argv)
 {
-  QApplication app(argc, argv);
-
-  cedar::processingCL::MainApplicationPtr application(new cedar::processingCL::MainApplication(argc, argv));
-
-  QObject::connect(application.get(), SIGNAL(quit()), &app, SLOT(quit()));
-
-  QTimer::singleShot(0, application.get(), SLOT(exec()));
+  cedar::proc::gui::IdeApplication app (argc, argv);
 
   return app.exec();
 }

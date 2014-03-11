@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -53,7 +53,7 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief The base class for all grabber sources for the processingIde
+/*!@brief The base class for all grabber sources for the processing framework.
  *
  *    This class implements the common structure of all grabber sources
  */
