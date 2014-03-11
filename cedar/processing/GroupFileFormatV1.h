@@ -43,10 +43,12 @@
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/GroupFileFormatV1.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
+#include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -144,6 +146,22 @@ private:
     std::vector<std::string>& exceptions
   );
 
+  /*!@brief Reads groups from a configuration node and adds them to the parent group.
+   */
+  void readParameterLinks
+  (
+    cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& root,
+    std::vector<std::string>& exceptions
+  );
+
+  void readCustomParameters
+  (
+    cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& customParameters,
+    std::vector<std::string>& exceptions
+  );
+
   /*!@brief Writes the meta data to the configuration.
    */
   void writeMetaData(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
@@ -171,6 +189,24 @@ private:
   /*!@brief Writes the data connections in the group to the configuration node.
    */
   void writeDataConnections(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  void writeParameterLinks(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  void writeCustomParameters(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  cedar::proc::ElementPtr getLinkElement
+  (
+    cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& node,
+    const std::string& name
+  ) const;
+
+  cedar::aux::ParameterPtr getLinkParameter
+  (
+    cedar::proc::ElementPtr element,
+    const cedar::aux::ConfigurationNode& node,
+    const std::string& name
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/AdvancedParameterLinker.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
 #include "cedar/processing/gui/PerformanceOverview.h"
 #include "cedar/processing/gui/BoostControl.h"
@@ -254,6 +255,7 @@ mSuppressCloseDialog(false)
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
 
   QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
+  QObject::connect(mpActionParameterLinker, SIGNAL(triggered()), this, SLOT(openParameterLinker()));
 
 
   QObject::connect(this->mpRecorderWidget,
@@ -314,6 +316,18 @@ void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
   this->mpGlobalTimeFactorSlider->blockSignals(blocked);
 
   cedar::aux::SettingsSingleton::getInstance()->setGlobalTimeFactor(newValue);
+}
+
+void cedar::proc::gui::Ide::openParameterLinker()
+{
+  auto p_dialog = new QDialog(this);
+  auto p_layout = new QVBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
+  p_dialog->setLayout(p_layout);
+  auto linker = new cedar::proc::gui::AdvancedParameterLinker();
+  linker->setGroup(this->mGroup->getGroup());
+  p_layout->addWidget(linker);
+  p_dialog->exec();
 }
 
 void cedar::proc::gui::Ide::showRobotManager()

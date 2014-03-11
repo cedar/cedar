@@ -118,6 +118,8 @@ cedar_add_library(cedaraux
   convolution/Engine.h
   Parameter.h
   Settings.h
+  ParameterLink.h
+  EquationParameterLink.h
   kernel/Separable.h
   kernel/Kernel.h
   kernel/Gauss.h
