@@ -26,7 +26,7 @@
 #
 #   Maintainer:  Oliver Lomp
 #   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2012 08 02
+#   Date:        2014 01 20
 #
 #   Description:
 #
@@ -34,8 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(gui_ProcessingIde
-                    gui_ProcessingIde.cpp
-                    ADDITIONAL_DEPENDENCIES
-                    cedardyn
-                    )
+cedar_add_executable(cedar-shell MOC_HEADERS MainApplication.h)

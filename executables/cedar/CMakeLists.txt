@@ -24,9 +24,13 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2014 01 20
+#   Maintainer:  Oliver Lomp,
+#                Mathis Richter,
+#                Stephan Zibner
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+#                mathis.richter@ini.ruhr-uni-bochum.de,
+#                stephan.zibner@ini.ruhr-uni-bochum.de
+#   Date:        2011 05 23
 #
 #   Description:
 #
@@ -34,4 +38,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_executable(processingCL MOC_HEADERS MainApplication.h)
+cedar_add_executable(cedar)

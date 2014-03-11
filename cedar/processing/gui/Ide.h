@@ -62,7 +62,7 @@
 #include <map>
 
 
-/*!@brief This is the main window of the processingIde application.
+/*!@brief This is the main window of the cedar application.
  */
 class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
 {

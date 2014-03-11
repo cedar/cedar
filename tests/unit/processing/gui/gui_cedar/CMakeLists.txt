@@ -24,13 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp,
-#                Mathis Richter,
-#                Stephan Zibner
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-#                mathis.richter@ini.ruhr-uni-bochum.de,
-#                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 05 23
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2012 08 02
 #
 #   Description:
 #
@@ -38,4 +34,8 @@
 #
 #=======================================================================================================================
 
-cedar_add_executable(processingIde)
+cedar_add_unit_test(gui_cedar
+                    gui_cedar.cpp
+                    ADDITIONAL_DEPENDENCIES
+                    cedardyn
+                    )

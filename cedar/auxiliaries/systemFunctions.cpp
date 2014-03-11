@@ -67,7 +67,7 @@ void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
   crash_file = cedar::aux::getUserHomeDirectory() + "/.cedar/crashes/";
   boost::filesystem::create_directories(crash_file);
   const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-  crash_file += "processingIde.";
+  crash_file += "cedar.";
   crash_file += boost::posix_time::to_iso_string(now);
   crash_file += ".stacktrace";
   stream.open(crash_file.c_str());
