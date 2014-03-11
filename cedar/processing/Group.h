@@ -536,6 +536,9 @@ public:
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
   bool isLooped() const;
 
+  //!@brief this function removes all unused connectors, i.e., connectors that have zero incoming or outgoing connections
+  void pruneUnusedConnectors();
+
   cedar::aux::ParameterPtr addCustomParameter(const std::string& type, const std::string& name);
 
   void removeCustomParameter(const std::string& name);
@@ -608,15 +611,14 @@ private:
                                           cedar::proc::ConstGroupPtr targetGroup
                                         );
 
-  cedar::proc::DataSlotPtr getRealSource
-                           (
-                             cedar::proc::DataSlotPtr slot,
-                             cedar::proc::ConstGroupPtr targetGroup
-                           );
-
-  static void deleteConnectorsAlongConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  std::vector<cedar::proc::DataSlotPtr> getRealSources
+                                        (
+                                          cedar::proc::DataSlotPtr slot,
+                                          cedar::proc::ConstGroupPtr targetGroup
+                                        );
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  static bool disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.

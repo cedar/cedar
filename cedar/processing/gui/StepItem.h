@@ -209,7 +209,7 @@ private:
   );
 
   //! Updates the display of the step's run time measurements.
-  void timerEvent(QTimerEvent *pEvent);
+  void updateToolTip();
 
   //! Sets the current display mode.
   void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode);
@@ -250,9 +250,6 @@ private:
 
   //!@brief a vector of all child widgets fo the current step
   std::vector<QWidget*> mChildWidgets;
-
-  //!@brief Identifier of the timer used for updating the run time measurements.
-  int mRunTimeMeasurementTimerId;
 
   //! Size used for displaying the step icons.
   static const int mIconSize;

@@ -287,13 +287,14 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
 #endif // DEBUG_RUNNING
   // if an exception has previously happened, do nothing.
-  if
-  (
-    this->mState == cedar::proc::Triggerable::STATE_EXCEPTION
-      || this->mState == cedar::proc::Triggerable::STATE_EXCEPTION_ON_START
-  )
+  switch (this->getState())
   {
-    return;
+    case cedar::proc::Triggerable::STATE_EXCEPTION:
+    case cedar::proc::Triggerable::STATE_EXCEPTION_ON_START:
+      return;
+
+    default:
+      break; // nothing to do, continue triggering
   }
 
   // make sure noone changes the connections while the trigger call is being processed
@@ -302,7 +303,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   // if there are invalid inputs, stop
   if (!this->allInputsValid())
   {
-    std::string invalid_inputs = cedar::aux::join(mInvalidInputNames, "\", \"");
+    std::string invalid_inputs = cedar::aux::join(this->getInvalidInputNames(), "\", \"");
 
     this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
                    "Invalid inputs prevent the step from running. These are: \"" + invalid_inputs + "\"");
@@ -332,7 +333,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
   if (!this->mandatoryConnectionsAreSet())
   {
-    std::string errors = cedar::aux::join(mInvalidInputNames, ", ");
+    std::string errors = cedar::aux::join(this->getInvalidInputNames(), ", ");
 
     this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
                    "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);

@@ -89,6 +89,7 @@ public:
         = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
       p_widget->setParameter(parameter);
       QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()), Qt::QueuedConnection);
+      QObject::connect(parameter.get(), SIGNAL(valueChanged()), this->mConfigurableWidget, SIGNAL(settingsChanged()));
       p_ret = p_widget;
     }
     catch (cedar::aux::UnknownTypeException& e)

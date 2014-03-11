@@ -71,6 +71,7 @@ int main(int argc, char** argv)
   int errors = 0;
 
   cedar::proc::gui::Ide* p_ide = new cedar::proc::gui::Ide(false);
+  p_ide->suppressCloseDialog(true);
   {
     simulateEventLoop();
 

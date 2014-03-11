@@ -258,7 +258,7 @@ private:
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
-  void readPlotList(const cedar::aux::ConfigurationNode& node);
+  void readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node);
 
   void writeOpenPlotsTo(cedar::aux::ConfigurationNode& node) const;
 
@@ -309,6 +309,8 @@ private slots:
   void updateIconBounds();
 
   void updateDecorations();
+  
+  void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
 
   void openParameterEditor();
 

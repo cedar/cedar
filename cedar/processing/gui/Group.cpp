@@ -706,7 +706,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
     auto plot_list = node.find("open plots");
     if (plot_list != node.not_found())
     {
-      this->readPlotList(plot_list->second);
+      this->readPlotList("open plots", plot_list->second);
     }
     // read defined plot groups
     auto plot_groups = node.find("plot groups");
@@ -729,14 +729,48 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
   this->stepRecordStateChanged();
 }
 
-void cedar::proc::gui::Group::readPlotList(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
 {
-  for (auto it : node)
+  std::set<std::string> removed_elements;
+  for(auto it : node)
   {
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
-    auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
-    auto step_item = this->mpScene->getStepItemFor(step.get());
-    cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+    try
+    {
+      auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
+      auto step_item = this->mpScene->getStepItemFor(step.get());
+      cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+    }
+    catch (cedar::aux::InvalidNameException& exc)
+    {
+      removed_elements.insert(step_name);
+    }
+  }
+  if (removed_elements.size() > 0)
+  {
+    std::string message;
+    message += "Some elements of the plot group " + plotGroupName + " do not exist anymore. These are:\n\n";
+    for (auto element : removed_elements)
+    {
+      message += "  " + element + "\n";
+    }
+    message += "\nDo you want to remove them?";
+
+    QMessageBox msgBox(this->mpMainWindow);
+    msgBox.addButton(QMessageBox::Yes);
+    msgBox.addButton(QMessageBox::No);
+    msgBox.setWindowTitle("Missing elements");
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(QString::fromStdString(message));
+
+    int selection = msgBox.exec();
+    if (selection == QMessageBox::Yes)
+    {
+      for (auto remove : removed_elements)
+      {
+        this->removeElementFromPlotGroup(plotGroupName, remove);
+      }
+    }
   }
 }
 
@@ -1370,7 +1404,7 @@ void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)
     );
   }
 
-  this->readPlotList(plot_group->second);
+  this->readPlotList(plotGroupName, plot_group->second);
 }
 
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -1434,6 +1468,10 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
+  QAction* p_prune = menu.addAction("prune unused connectors");
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
   {
     QAction* edit_parameters_action = menu.addAction("edit parameters ...");
     QObject::connect(edit_parameters_action, SIGNAL(triggered()), this, SLOT(openParameterEditor()));
@@ -1472,6 +1510,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   {
     std::string name = a->text().toStdString();
     this->getGroup()->removeConnector(name, false);
+  }
+
+  else if (a == p_prune)
+  {
+    this->getGroup()->pruneUnusedConnectors();
   }
 }
 
@@ -1605,4 +1648,30 @@ void cedar::proc::gui::Group::restoreConnections()
 void cedar::proc::gui::Group::updateDecorations()
 {
   this->addDecorations();
+}
+
+void cedar::proc::gui::Group::removeElementFromPlotGroup(const std::string& plotGroupName, const std::string& elementName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "Plot group " + plotGroupName + " does not exist."
+    );
+  }
+
+  for (auto plot_iter = plot_group->second.begin(); plot_iter != plot_group->second.end(); )
+  {
+    auto name = plot_iter->second.get<std::string>("step");
+    if (name == elementName)
+    {
+      plot_iter = plot_group->second.erase(plot_iter);
+    }
+    else
+    {
+      ++plot_iter;
+    }
+  }
 }

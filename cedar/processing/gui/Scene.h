@@ -306,6 +306,8 @@ public:
   // Gets all sticky notes
   const std::vector<cedar::proc::gui::StickyNote* > getStickyNotes() const;
 
+  void emitSceneChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -314,6 +316,9 @@ signals:
    */
   void modeFinished();
 
+  //! Emitted whenever something in the scene changes (e.g., when an item is moved)
+  void sceneChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -321,6 +326,10 @@ protected:
   /*!@brief Displays the context menu for the scene (if no item accepts the event).
    */
   void contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
+
+  /*! Overrides the default help event to display tooltips for elements in the scene.
+   */
+  void helpEvent(QGraphicsSceneHelpEvent* pHelpEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

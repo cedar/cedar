@@ -83,12 +83,13 @@ public:
 cedar::aux::gui::QImagePlot::QImagePlot(QWidget* pParent)
 :
 cedar::aux::gui::ThreadedPlot(pParent),
-mAutoScaling(true),
-mSmoothScaling(true),
-mLegendAvailable(false)
+mLegendAvailable(false),
+mpLegend(nullptr),
+_mSmoothScaling(new cedar::aux::BoolParameter(this, "smooth scaling", true)),
+_mAutoScaling(new cedar::aux::BoolParameter(this, "automatic value scaling", true)),
+_mShowLegend(new cedar::aux::BoolParameter(this, "show legend", false)),
+_mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 0.0, 1.0))
 {
-  this->mpLegend = NULL;
-
   auto p_layout = new QHBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
@@ -105,6 +106,22 @@ mLegendAvailable(false)
     SIGNAL(minMaxChanged(double, double)),
     this,
     SLOT(updateMinMax(double, double))
+  );
+
+  QObject::connect
+  (
+    this->_mShowLegend.get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(showLegendChanged())
+  );
+
+  QObject::connect
+  (
+    this->_mValueLimits.get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(valueLimitsChanged())
   );
 }
 
@@ -146,16 +163,16 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 
 void cedar::aux::gui::QImagePlot::setAutomaticScaling()
 {
-  this->mAutoScaling = true;
+  this->_mAutoScaling->setValue(true);
 }
 
 void cedar::aux::gui::QImagePlot::setLimits(double min, double max)
 {
   this->updateMinMax(min, max);
 
-  this->mValueLimits.setLower(min);
-  this->mValueLimits.setUpper(max);
-  this->mAutoScaling = false;
+  this->_mValueLimits->setLowerLimit(min);
+  this->_mValueLimits->setUpperLimit(max);
+  this->_mAutoScaling->setValue(false);
 }
 
 void cedar::aux::gui::QImagePlot::queryFixedValueScale()
@@ -172,7 +189,7 @@ void cedar::aux::gui::QImagePlot::queryFixedValueScale()
   p_layout->addWidget(p_lower, 0, 1);
   p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
   p_lower->setMaximum(boost::numeric::bounds<double>::highest());
-  p_lower->setValue(this->mValueLimits.getLower());
+  p_lower->setValue(this->getValueLimits().getLower());
 
   p_label = new QLabel("upper limit:");
   p_layout->addWidget(p_label, 1, 0);
@@ -181,7 +198,7 @@ void cedar::aux::gui::QImagePlot::queryFixedValueScale()
   p_layout->addWidget(p_upper, 1, 1);
   p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
   p_upper->setMaximum(boost::numeric::bounds<double>::highest());
-  p_upper->setValue(this->mValueLimits.getUpper());
+  p_upper->setValue(this->getValueLimits().getUpper());
 
   auto p_buttons = new QDialogButtonBox();
   p_buttons->addButton(QDialogButtonBox::Ok);
@@ -207,6 +224,14 @@ void cedar::aux::gui::QImagePlot::updateMinMax(double min, double max)
   }
 }
 
+void cedar::aux::gui::QImagePlot::valueLimitsChanged()
+{
+  if (!this->isAutoScaling())
+  {
+    this->mpLegend->updateMinMax(this->getValueLimits().getLower(), this->getValueLimits().getUpper());
+  }
+}
+
 void cedar::aux::gui::QImagePlot::fillColorizationGradient(QGradient& gradient)
 {
   gradient.setColorAt(static_cast<qreal>(1.0), QColor(0, 0, 127));
@@ -219,7 +244,7 @@ void cedar::aux::gui::QImagePlot::fillColorizationGradient(QGradient& gradient)
 
 void cedar::aux::gui::QImagePlot::setSmoothScaling(bool smooth)
 {
-  this->mSmoothScaling = smooth;
+  this->_mSmoothScaling->setValue(smooth);
 }
 
 void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
@@ -229,7 +254,7 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   auto p_smooth = menu.addAction("smooth");
   p_smooth->setCheckable(true);
   QObject::connect(p_smooth, SIGNAL(toggled(bool)), this, SLOT(setSmoothScaling(bool)));
-  p_smooth->setChecked(this->mSmoothScaling);
+  p_smooth->setChecked(this->isSmoothScaling());
 
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
@@ -242,12 +267,12 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 
   auto p_auto_scale = p_scaling->addAction("automatic");
   p_auto_scale->setCheckable(true);
-  p_auto_scale->setChecked(this->mAutoScaling);
+  p_auto_scale->setChecked(this->isAutoScaling());
   QObject::connect(p_auto_scale, SIGNAL(triggered()), this, SLOT(setAutomaticScaling()));
 
   auto p_fixed_scaling = p_scaling->addAction("fixed ...");
   p_fixed_scaling->setCheckable(true);
-  p_fixed_scaling->setChecked(!this->mAutoScaling);
+  p_fixed_scaling->setChecked(!this->isAutoScaling());
   QObject::connect(p_fixed_scaling, SIGNAL(triggered()), this, SLOT(queryFixedValueScale()));
 
   this->fillContextMenu(menu);
@@ -272,7 +297,7 @@ void cedar::aux::gui::QImagePlot::resizePixmap()
     )
   {
     Qt::TransformationMode transformation_mode;
-    if (this->mSmoothScaling)
+    if (this->isSmoothScaling())
     {
       transformation_mode = Qt::SmoothTransformation;
     }
@@ -343,7 +368,13 @@ void cedar::aux::gui::QImagePlot::plotClicked(QMouseEvent* /* pEvent */, double 
 
 void cedar::aux::gui::QImagePlot::showLegend(bool show)
 {
-  if (this->mpLegend == NULL)
+  this->_mShowLegend->setValue(show);
+}
+
+void cedar::aux::gui::QImagePlot::showLegendChanged()
+{
+  bool show = this->_mShowLegend;
+  if (show && this->mpLegend == nullptr)
   {
     auto p_layout = cedar::aux::asserted_cast<QHBoxLayout*>(this->layout());
     this->mpLegend = new cedar::aux::gui::detail::QImagePlotLegend();
@@ -352,7 +383,10 @@ void cedar::aux::gui::QImagePlot::showLegend(bool show)
     p_layout->setStretch(1, 0);
   }
 
-  this->mpLegend->setVisible(show);
+  if (this->mpLegend)
+  {
+    this->mpLegend->setVisible(show);
+  }
 }
 
 void cedar::aux::gui::detail::QImagePlotLegend::updateMinMax(double min, double max)

@@ -98,6 +98,11 @@ public:
    */
   void resetTo(cedar::proc::gui::GroupPtr network);
 
+  void suppressCloseDialog(bool suppress)
+  {
+    this->mSuppressCloseDialog = suppress;
+  }
+
 public slots:
   /*!@brief Slot that displays notifications.
    */
@@ -125,11 +130,11 @@ public slots:
 
   /*!@brief Slot that is connected to the "save" item in the file menu.
    */
-  void save();
+  bool save();
 
   /*!@brief Slot that is connected to the "save as" item in the file menu.
    */
-  void saveAs();
+  bool saveAs();
 
   /*!@brief Slot that is connected to the "load" item in the file menu.
    */
@@ -293,6 +298,18 @@ private:
 
   void setGroup(cedar::proc::gui::GroupPtr group);
 
+  void setArchitectureChanged(bool changed);
+
+  //! Check if the user wants to save. Returns false if the action currently being taken should be cancelled.
+  bool checkSave();
+
+private slots:
+  void globalTimeFactorSliderChanged(int newValue);
+
+  void globalTimeFactorSpinboxChanged(double value);
+
+  void architectureChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -327,8 +344,17 @@ private:
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
-  // Combobox to select plot groups
+  //! Combobox to select plot groups
   QComboBox* mpPlotGroupsComboBox;
+
+  //! Spinbox for controlling the global time step.
+  QDoubleSpinBox* mpGlobalTimeFactor;
+
+  //! Spinbox for controlling the global time step.
+  QSlider* mpGlobalTimeFactorSlider;
+
+  //! Whether the save on close dialog should be suppressed.
+  bool mSuppressCloseDialog;
 
 }; // class cedar::MainWindow
 

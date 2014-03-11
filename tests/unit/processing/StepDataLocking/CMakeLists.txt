@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -22,22 +22,18 @@
 #   Institute:   Ruhr-Universitaet Bochum
 #                Institut fuer Neuroinformatik
 #
-#   File:        version.txt
+#   File:        CMakeLists.txt
 #
-#   Maintainer:  Mathis Richter
-#   Email:       mathis.richter@ini.rub.de
-#   Date:        2012 12 12
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2014 03 05
 #
-#   Description: Version information of the current stable release.
+#   Description:
 #
 #   Credits:
 #
 #=======================================================================================================================
 
-# set cedar version information
-set (CEDAR_VERSION_MAJOR 3)
-set (CEDAR_VERSION_MINOR 0)
-set (CEDAR_VERSION_BUGFIX 6)
-
-# combined version
-set (CEDAR_VERSION "${CEDAR_VERSION_MAJOR}.${CEDAR_VERSION_MINOR}.${CEDAR_VERSION_BUGFIX}")
+cedar_add_unit_test(StepDataLocking
+                    StepDataLocking.cpp
+                    )

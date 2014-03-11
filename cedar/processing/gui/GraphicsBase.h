@@ -247,6 +247,10 @@ public:
   //! Returns the brush used for highlighting when one of the child items is potentially leaving. :(
   static QBrush getLeavingGroupBrush();
 
+  /*! Can be overridden in inheriting classes in order to upadte the item's tooltip before it is displayed.
+   */
+  virtual void updateToolTip();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

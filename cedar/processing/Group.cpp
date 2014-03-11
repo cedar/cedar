@@ -607,15 +607,19 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
         this->mRevalidateConnections.erase(conn_it);
       }
     }
-    mElements.erase(it);
-  }
+    // remove element from triggerables list if it is looped
+    auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());
+    auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
+    if (item != this->mLoopedTriggerables.end())
+    {
+      if (this->numberOfStartCalls())
+      {
+        triggerable->callOnStop();
+      }
+      this->mLoopedTriggerables.erase(item);
+    }
 
-  // remove element from triggerables list if it is looped
-  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element);
-  auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
-  if (item != this->mLoopedTriggerables.end())
-  {
-    this->mLoopedTriggerables.erase(item);
+    mElements.erase(it);
   }
 
   this->signalElementRemoved(element);
@@ -751,156 +755,69 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
   // remember all data connections between moved elements
   if (old_group)
   {
-    cedar::proc::GroupPtr common_parent;
-
-    // detect if we move elements up or down the group hierarchy
-    if (this->contains(old_group)) // new group contains old group - moving up the hierarchy
+    std::vector<cedar::proc::ConstDataSlotPtr> processed_sources;
+    std::vector<cedar::proc::ConstDataSlotPtr> processed_targets;
+    for (auto connection : old_group->getDataConnections())
     {
-      std::vector<DataConnectionPtr> slots_deleted_later;
-      for (auto connection : old_group->getDataConnections())
-      {
-        // find connections that we have to restore after moving elements
-        auto source = old_group->getElement<cedar::proc::Element>(connection->getSource()->getParent());
-        auto target = old_group->getElement<cedar::proc::Element>(connection->getTarget()->getParent());
-        auto source_it = std::find(elements.begin(), elements.end(), source);
-        auto target_it = std::find(elements.begin(), elements.end(), target);
+      // find connections that we have to restore after moving elements
+      auto source_slot = connection->getSource();
+      auto target_slot = connection->getTarget();
+      auto source = old_group->getElement<cedar::proc::Element>(source_slot->getParent());
+      auto target = old_group->getElement<cedar::proc::Element>(target_slot->getParent());
+      auto source_it = std::find(elements.begin(), elements.end(), source);
+      auto target_it = std::find(elements.begin(), elements.end(), target);
 
-        // these connections connect elements that are moved
-        if (source_it != elements.end() && target_it != elements.end())
-        {
-          // this connection must be stored (note that connections are automatically deleted if elements are removed)
-          data_connections.push_back(DataConnectionInfo(connection->getSource(), connection->getTarget()));
-        }
-        // the target is not in this group
-        else if (source_it != elements.end() && target_it == elements.end())
-        {
-          std::vector<cedar::proc::DataSlotPtr> targets
-            = old_group->getRealTargets
-                           (
-                             connection->getSource(),
-                             boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this())
-                           );
-          slots_deleted_later.push_back(connection);
-          for (unsigned int i = 0; i < targets.size(); ++i)
-          {
-            data_connections.push_back(DataConnectionInfo(connection->getSource(), targets.at(i)));
-          }
-        }
-        // the source is not in this group
-        else if (source_it == elements.end() && target_it != elements.end())
-        {
-          cedar::proc::DataSlotPtr source_slot
-            = old_group->getRealSource
-                           (
-                             connection->getTarget(),
-                             boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this())
-                           );
-          data_connections.push_back(DataConnectionInfo(source_slot, connection->getTarget()));
-        }
+      // these connections connect elements that are moved
+      if (source_it != elements.end() && target_it != elements.end())
+      {
+        // this connection must be stored (note that connections are automatically deleted if elements are removed)
+        data_connections.push_back(DataConnectionInfo(connection->getSource(), connection->getTarget()));
       }
-    }
-    else if (old_group->contains(this->shared_from_this())) // old group contains new group - moving down the hierarchy
-    {
-      std::vector<DataConnectionPtr> slots_deleted_later;
-      for (auto connection : old_group->mDataConnections)
+      // the target is not in this group
+      else if
+      (
+        source_it != elements.end()
+        && target_it == elements.end()
+        && std::find(processed_sources.begin(), processed_sources.end(), source_slot) == processed_sources.end()
+      )
       {
-        // find connections that we have to restore after moving elements
-        cedar::proc::ElementPtr source = old_group->getElement<cedar::proc::Element>(connection->getSource()->getParent());
-        cedar::proc::ElementPtr target = old_group->getElement<cedar::proc::Element>(connection->getTarget()->getParent());
-        auto source_it = std::find(elements.begin(), elements.end(), source);
-        auto target_it = std::find(elements.begin(), elements.end(), target);
-
-        cedar::proc::DataSlotPtr source_slot = connection->getSource();
-        std::vector<cedar::proc::DataSlotPtr> target_slots;
-
-        // these connections connect elements that are moved
-        if (source_it != elements.end() || target_it != elements.end())
+        auto targets
+          = old_group->getRealTargets
+                         (
+                           source_slot,
+                           boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this())
+                         );
+        for (auto real_target : targets)
         {
-          // this connection must be stored (note that connections are automatically deleted if elements are removed)
-          if (source_it == elements.end())
-          {
-            source_slot = old_group->getRealSource
-                                     (
-                                       connection->getTarget(),
-                                       boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this())
-                                     );
-            target_slots.push_back(connection->getTarget());
-          }
-          else if (target_it == elements.end())
-          {
-            auto more_slots = old_group->getRealTargets
-                                         (
-                                           connection->getSource(),
-                                           boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this())
-                                         );
-            target_slots.insert(target_slots.end(), more_slots.begin(), more_slots.end());
-          }
-          else
-          {
-            target_slots.push_back(connection->getTarget());
-          }
-          for (unsigned i = 0; i < target_slots.size(); ++i)
-          {
-            data_connections.push_back(DataConnectionInfo(source_slot, target_slots.at(i)));
-          }
+          data_connections.push_back(DataConnectionInfo(source_slot, real_target));
         }
+        // the above for loop adds ALL targets of the given source slot - remember to not add any more connections from this slot
+        processed_sources.push_back(source_slot);
       }
-    }
-    //!@todo this code is copy&paste, try to unify
-    else // old and new group have a common parent, try to find it
-    {
-      // this should never be root, but just in case!
-      CEDAR_ASSERT(!this->isRoot());
-      common_parent = this->getGroup();
-      while (!common_parent->contains(old_group))
+      // the source is not in this group
+      else if
+      (
+        source_it == elements.end()
+        && target_it != elements.end()
+        && std::find(processed_targets.begin(), processed_targets.end(), target_slot) == processed_targets.end()
+      )
       {
-        // this should never be root, but just in case!
-        CEDAR_ASSERT(!common_parent->isRoot());
-        common_parent = common_parent->getGroup();
-      }
-      std::vector<DataConnectionPtr> slots_deleted_later;
-      for (auto connection : old_group->mDataConnections)
-      {
-        // find connections that we have to restore after moving elements
-        cedar::proc::ElementPtr source = old_group->getElement<cedar::proc::Element>(connection->getSource()->getParent());
-        cedar::proc::ElementPtr target = old_group->getElement<cedar::proc::Element>(connection->getTarget()->getParent());
-        auto source_it = std::find(elements.begin(), elements.end(), source);
-        auto target_it = std::find(elements.begin(), elements.end(), target);
-
-        cedar::proc::DataSlotPtr source_slot = connection->getSource();
-        std::vector<cedar::proc::DataSlotPtr> target_slots;
-
-        // these connections connect elements that are moved
-        if (source_it != elements.end() || target_it != elements.end())
+        auto sources
+          = old_group->getRealSources
+                         (
+                           target_slot,
+                           boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this())
+                         );
+        for (auto real_source : sources)
         {
-          // this connection must be stored (note that connections are automatically deleted if elements are removed)
-          if (source_it == elements.end())
-          {
-            source_slot = old_group->getRealSource
-                                     (
-                                       connection->getTarget(),
-                                       boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this())
-                                     );
-            target_slots.push_back(connection->getTarget());
-          }
-          else if (target_it == elements.end())
-          {
-            auto more_slots = old_group->getRealTargets
-                                         (
-                                           connection->getSource(),
-                                           boost::dynamic_pointer_cast<cedar::proc::Group>(this->shared_from_this())
-                                         );
-            target_slots.insert(target_slots.end(), more_slots.begin(), more_slots.end());
-          }
-          else
-          {
-            target_slots.push_back(connection->getTarget());
-          }
-          for (unsigned i = 0; i < target_slots.size(); ++i)
-          {
-            data_connections.push_back(DataConnectionInfo(source_slot, target_slots.at(i)));
-          }
+          data_connections.push_back(DataConnectionInfo(real_source, target_slot));
         }
+        // the above for loop adds ALL sources of the given target slot - remember to not add any more connections to this slot
+        processed_targets.push_back(target_slot);
+      }
+      else
+      {
+        // this connection does not connect any moved elements
       }
     }
   }
@@ -920,10 +837,10 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
     }
   }
 
-  // remove connectors
+  // delete data connections
   for (auto connection : data_connections)
   {
-    cedar::proc::Group::deleteConnectorsAlongConnection(connection.from, connection.to);
+    cedar::proc::Group::disconnectAcrossGroups(connection.from, connection.to);
   }
 
   // now add each element to the new group
@@ -937,7 +854,6 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
   {
     cedar::proc::Group::connectAcrossGroups(connection.from, connection.to);
   }
-
   // restore trigger connections
   for (auto connection : trigger_connections)
   {
@@ -986,6 +902,10 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     if (triggerable->isLooped())
     {
       this->mLoopedTriggerables.push_back(triggerable);
+    }
+    if (this->numberOfStartCalls())
+    {
+      triggerable->callOnStart();
     }
   }
 }
@@ -1830,68 +1750,75 @@ bool cedar::proc::Group::isRoot() const
   return !static_cast<bool>(this->getGroup());
 }
 
-cedar::proc::DataSlotPtr cedar::proc::Group::getRealSource
-                                               (
-                                                 cedar::proc::DataSlotPtr slot,
-                                                 cedar::proc::ConstGroupPtr targetGroup
-                                               )
+std::vector<cedar::proc::DataSlotPtr> cedar::proc::Group::getRealSources
+                                                          (
+                                                            cedar::proc::DataSlotPtr slot,
+                                                            cedar::proc::ConstGroupPtr targetGroup
+                                                          )
 {
+  std::vector<cedar::proc::DataSlotPtr> real_sources;
   // first, get all outgoing connections
   std::vector<cedar::proc::DataConnectionPtr> connections;
   this->getDataConnectionsTo(this->getElement<cedar::proc::Connectable>(slot->getParent()), slot->getName(), connections);
-  // sanity check!
-  CEDAR_ASSERT(connections.size() == 1);
-  cedar::proc::DataConnectionPtr connection = connections.at(0);
 
-  // now try to decide what to do with the target of the current connection
+  for (auto connection : connections)
+  {
+    // now try to decide what to do with the target of the current connection
 
-  // first case: this is a step, but not a connector
-  if
-  (
-    this->getElement<cedar::proc::Step>(connection->getSource()->getParent())
-    && !this->getElement<cedar::proc::sources::GroupSource>(connection->getSource()->getParent())
-  )
-  {
-    return  this->getElement<cedar::proc::Step>
-            (
-              connection->getSource()->getParent())->getOutputSlot(connection->getSource()->getName()
-            );
-  }
-  // second case: this is a connector, we have to follow this connection
-  else if (auto source = this->getElement<cedar::proc::sources::GroupSource>(connection->getSource()->getParent()))
-  {
-    // is this group the target group? we can return the group source input as target
-    if (this == targetGroup.get())
+    // first case: this is a step, but not a connector
+    if
+    (
+      this->getElement<cedar::proc::Step>(connection->getSource()->getParent())
+      && !this->getElement<cedar::proc::sources::GroupSource>(connection->getSource()->getParent())
+    )
     {
-      return source->getOutputSlot(connection->getSource()->getName());
+      real_sources.push_back
+                   (
+                     this->getElement<cedar::proc::Step>
+                           (
+                             connection->getSource()->getParent())->getOutputSlot(connection->getSource()->getName()
+                           )
+                   );
     }
-    // now determine the connector input slot of this group and call this function on the parent group
+    // second case: this is a connector, we have to follow this connection
+    else if (auto source = this->getElement<cedar::proc::sources::GroupSource>(connection->getSource()->getParent()))
+    {
+      // is this group the target group? we can return the group source input as target
+      if (this == targetGroup.get())
+      {
+        real_sources.push_back(source->getOutputSlot(connection->getSource()->getName()));
+      }
+      // now determine the connector input slot of this group and call this function on the parent group
+      else
+      {
+        DataSlotPtr target_slot = this->getInputSlot(source->getName());
+        std::vector<cedar::proc::DataSlotPtr> more_sources = this->getGroup()->getRealSources(target_slot, targetGroup);
+        real_sources.insert(real_sources.end(), more_sources.begin(), more_sources.end());
+      }
+    }
+    // third case: the target itself is a group, we have to follow the connection
+    else if (auto group = this->getElement<cedar::proc::Group>(connection->getSource()->getParent()))
+    {
+      // the target group is part of the group, step into it
+      if (group->contains(targetGroup) || group == targetGroup)
+      {
+        cedar::proc::sinks::GroupSinkPtr group_sink = group->getElement<cedar::proc::sinks::GroupSink>(connection->getSource()->getName());
+        DataSlotPtr target_slot = group_sink->getInputSlot("input");
+        std::vector<cedar::proc::DataSlotPtr> more_sources =  group->getRealSources(target_slot, targetGroup);
+        real_sources.insert(real_sources.end(), more_sources.begin(), more_sources.end());
+      }
+      // the group does not contain the target group, just return its data slot
+      else
+      {
+        real_sources.push_back(group->getOutputSlot(connection->getSource()->getName()));
+      }
+    }
     else
     {
-      DataSlotPtr target_slot = this->getInputSlot(source->getName());
-      return this->getGroup()->getRealSource(target_slot, targetGroup);
+      CEDAR_ASSERT(false); // there are other cases??
     }
   }
-  // third case: the target itself is a group, we have to follow the connection
-  else if (auto group = this->getElement<cedar::proc::Group>(connection->getSource()->getParent()))
-  {
-    // the target group is part of the group, step into it
-    if (group->contains(targetGroup) || group == targetGroup)
-    {
-      cedar::proc::sinks::GroupSinkPtr group_sink = group->getElement<cedar::proc::sinks::GroupSink>(connection->getSource()->getName());
-      DataSlotPtr target_slot = group_sink->getInputSlot("input");
-      return group->getRealSource(target_slot, targetGroup);
-    }
-    // the group does not contain the target group, just return its data slot
-    else
-    {
-      return group->getOutputSlot(connection->getSource()->getName());
-    }
-  }
-  else
-  {
-    CEDAR_ASSERT(false); // there are other cases??
-  }
+  return real_sources;
 }
 
 std::vector<cedar::proc::DataSlotPtr> cedar::proc::Group::getRealTargets
@@ -1970,53 +1897,6 @@ std::vector<cedar::proc::DataSlotPtr> cedar::proc::Group::getRealTargets
   return real_targets;
 }
 
-void cedar::proc::Group::deleteConnectorsAlongConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
-{
-  // it is easier to go from target to source, since targets are only connected to a single source
-
-  // first, get the group in which the parent of the target slot is situated
-  cedar::proc::GroupPtr group = target->getParentPtr()->getGroup();
-
-  // sanity check
-  CEDAR_ASSERT(group);
-  // get the one connection to a data slot from this group
-  std::vector<cedar::proc::DataConnectionPtr> connections;
-  group->getDataConnectionsTo(group->getElement<cedar::proc::Connectable>(target->getParent()), target->getName(), connections);
-
-  // sanity check!
-  CEDAR_ASSERT(connections.size() == 1);
-  cedar::proc::DataConnectionPtr connection = connections.at(0);
-
-  // check if we have reached our destination
-  cedar::proc::DataSlotPtr current_source = connection->getSource();
-  if (source != current_source)
-  {
-    // no, so this is apparently a connector that we want to delete
-
-    // first, get a new target slot and call this function recursively
-    cedar::proc::DataSlotPtr new_target;
-    if (auto group_source = group->getElement<cedar::proc::sources::GroupSource>(current_source->getParent()))
-    {
-      new_target = group->getInputSlot(current_source->getParent());
-      cedar::proc::Group::deleteConnectorsAlongConnection(source, new_target);
-
-      // then, clean up connection and connector
-      connection->disconnect();
-      group->removeConnector(current_source->getParent(), true);
-    }
-    else
-    {
-      auto nested_group = group->getElement<cedar::proc::Group>(current_source->getParent());
-      new_target = nested_group->getElement<cedar::proc::sinks::GroupSink>(current_source->getName())->getInputSlot("input");
-      cedar::proc::Group::deleteConnectorsAlongConnection(source, new_target);
-
-      // then, clean up connection and connector
-      connection->disconnect();
-      nested_group->removeConnector(current_source->getName(), false);
-    }
-  }
-}
-
 void cedar::proc::Group::connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
 {
   cedar::proc::Connectable* source_step = source->getParentPtr();
@@ -2060,6 +1940,69 @@ void cedar::proc::Group::connectAcrossGroups(cedar::proc::DataSlotPtr source, ce
                   );
     cedar::proc::Group::connectAcrossGroups(source, target_group->getInputSlot(connector_name));
   }
+}
+
+bool cedar::proc::Group::disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
+{
+  // prepare
+  cedar::proc::Connectable* source_step = source->getParentPtr();
+  cedar::proc::Connectable* target_step = target->getParentPtr();
+  cedar::proc::GroupPtr source_group = source_step->getGroup();
+  cedar::proc::GroupPtr target_group = target_step->getGroup();
+
+  // find the chain of connections that connects source to target
+
+  // simple case: source and target live in the same group
+  if
+  (
+    source_group == target_group
+    && source_group->isConnected
+                     (
+                       source->getParent() + "." + source->getName(),
+                       target->getParent() + "." + target->getName()
+                     )
+  )
+  {
+    source_group->disconnectSlots(source, target);
+    return true;
+  }
+  else
+  {
+    std::vector<cedar::proc::DataConnectionPtr> outgoing_connections;
+    auto source_elem = source_group->getElement<cedar::proc::Connectable>(source_step->getName());
+    source_group->getDataConnectionsFrom(source_elem, source->getName(), outgoing_connections);
+    std::vector<cedar::proc::DataConnectionPtr> delete_connections;
+    // for every found connection, call disconnectAcrossGroups again, depending on the target's type
+    for (auto connection : outgoing_connections)
+    {
+      // is a group
+      if (auto tar = source_group->getElement<cedar::proc::Group>(connection->getTarget()->getParent()))
+      {
+        if (auto group_source = tar->getElement<cedar::proc::sources::GroupSource>(connection->getTarget()->getName()))
+        {
+          if (cedar::proc::Group::disconnectAcrossGroups(group_source->getOutputSlot("output"), target))
+          {
+            delete_connections.push_back(connection);
+          }
+        }
+      }
+      // is a group sink
+      else if (auto tar = source_group->getElement<cedar::proc::sinks::GroupSink>(connection->getTarget()->getParent()))
+      {
+        if (cedar::proc::Group::disconnectAcrossGroups(source_group->getOutputSlot(connection->getTarget()->getParent()), target))
+        {
+          delete_connections.push_back(connection);
+        }
+      }
+      else
+      {
+        // is something else, ignore
+      }
+    }
+    // delete all connections that connect to the target
+    source_group->disconnectSlots(delete_connections);
+  }
+  return false;
 }
 
 void cedar::proc::Group::removeAll()
@@ -2210,4 +2153,48 @@ void cedar::proc::Group::onStop()
 bool cedar::proc::Group::isLooped() const
 {
   return this->_mIsLooped->getValue();
+}
+
+void cedar::proc::Group::pruneUnusedConnectors()
+{
+  cedar::proc::Group::ConnectorMap to_delete;
+  auto this_as_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(this->shared_from_this());
+  for (auto connector : _mConnectors->getValue())
+  {
+    if (connector.second) // input connector
+    {
+      auto group_source = this->getElement<cedar::proc::sources::GroupSource>(connector.first);
+      auto input_slot = this->getInputSlot(connector.first);
+      // get incoming and outgoing connections
+      std::vector<cedar::proc::DataConnectionPtr> outgoing_connections;
+      this->getDataConnectionsFrom(group_source, "output", outgoing_connections);
+      std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
+      this->getGroup()->getDataConnectionsTo(this_as_connectable, input_slot->getName(), incoming_connections);
+      // check if any slots are unsused
+      if (outgoing_connections.size() == 0 || incoming_connections.size() == 0)
+      {
+        to_delete[connector.first] = connector.second;
+      }
+    }
+    else // output connector
+    {
+      auto group_sink = this->getElement<cedar::proc::sinks::GroupSink>(connector.first);
+      auto output_slot = this->getOutputSlot(connector.first);
+      // get incoming and outgoing connections
+      std::vector<cedar::proc::DataConnectionPtr> outgoing_connections;
+      this->getGroup()->getDataConnectionsFrom(this_as_connectable, output_slot->getName(), outgoing_connections);
+      std::vector<cedar::proc::DataConnectionPtr> incoming_connections;
+      this->getDataConnectionsTo(group_sink, "input", incoming_connections);
+      // check if any slots are unsused
+      if (outgoing_connections.size() == 0 || incoming_connections.size() == 0)
+      {
+        to_delete[connector.first] = connector.second;
+      }
+    }
+  }
+  // finally, remove all obsolete connectors
+  for (auto item : to_delete)
+  {
+    this->removeConnector(item.first, item.second);
+  }
 }
