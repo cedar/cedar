@@ -65,6 +65,11 @@ Installing cedar
 
 > This is a known bug in your Doxygen version. Use the html-doc instead or upgrade your Doxygen.
 
+
+* **Some of the unit tests fail. Help!**
+
+> There may be several causes for this. Unfortuantely, unit tests don't work well on Windows. Also, if you see a lot of unit tests with the gui prefix failing, this may be because you are not in an environment where GUIs can be opened. If you are using ssh, try adding -X.
+
 Using cedar
 -----------
 
