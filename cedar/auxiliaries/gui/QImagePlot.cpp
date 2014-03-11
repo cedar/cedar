@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -373,7 +373,7 @@ void cedar::aux::gui::QImagePlot::showLegend(bool show)
 
 void cedar::aux::gui::QImagePlot::showLegendChanged()
 {
-  bool show = this->_mShowLegend;
+  bool show = this->_mShowLegend->getValue();
   if (show && this->mpLegend == nullptr)
   {
     auto p_layout = cedar::aux::asserted_cast<QHBoxLayout*>(this->layout());
