@@ -373,7 +373,7 @@ void cedar::aux::gui::QImagePlot::showLegend(bool show)
 
 void cedar::aux::gui::QImagePlot::showLegendChanged()
 {
-  bool show = this->_mShowLegend;
+  bool show = this->_mShowLegend->getValue();
   if (show && this->mpLegend == nullptr)
   {
     auto p_layout = cedar::aux::asserted_cast<QHBoxLayout*>(this->layout());
