@@ -75,7 +75,7 @@ Using cedar
 
 * **I'm using cedar together with plugins. Why does the processing ide crash on start-up or during use (e.g., loading an architecture)?**
 
-> The plugins are most likely compiled or linked to a different version of cedar. You can disable loading the plugins by using a command line option --no-plugins (see --help). If your ide now starts up without crashing, you should recompile all plugins using your current cedar version. In some cases, outdated plugins are loaded without crashing and may lead to crashes later on while using or shutting down the processingIde. In this case, please also recompile your plugins everytime you update your core cedar.
+> The plugins are most likely compiled or linked to a different version of cedar. You can disable loading the plugins by using a command line option --no-plugins (see --help). If your ide now starts up without crashing, you should recompile all plugins using your current cedar version. In some cases, outdated plugins are loaded without crashing and may lead to crashes later on while using or shutting down cedar. In this case, please also recompile your plugins everytime you update your core cedar.
 
 * **How can I move triggers once I placed them on the architecture canvas?**
 

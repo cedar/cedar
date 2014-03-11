@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        cedar-shell.cpp
 
     Maintainer:  Oliver Lomp
 
@@ -30,7 +30,7 @@
 
     Date:        2014 01 20
 
-    Description: A command-line version of the processingIde.
+    Description: A command-line version of cedar.
 
     Credits:
 

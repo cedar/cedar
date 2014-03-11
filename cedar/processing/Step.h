@@ -219,7 +219,7 @@ protected:
   /*!@brief Adds a trigger to the step.
    *
    *        After calling this method, this step will be aware that this trigger belongs to it. Among other things, this
-   *        means that the processingIde will be able to show this trigger and allow to connect it.
+   *        means that the cedar GUI will be able to show this trigger and allow to connect it.
    */
   void addTrigger(cedar::proc::TriggerPtr trigger);
 

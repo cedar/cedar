@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        cedar.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
