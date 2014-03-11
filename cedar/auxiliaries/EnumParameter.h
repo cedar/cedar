@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <set>
+#include <string>
 
 
 namespace cedar
