@@ -55,6 +55,8 @@
 #endif // Q_MOC_RUN
 #include <QWidget>
 #include <QTreeWidget>
+#include <map>
+#include <string>
 
 
 /*!@brief A widget to display and manipulate the parameters of cedar::aux::Configurables.
