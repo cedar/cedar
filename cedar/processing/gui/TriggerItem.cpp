@@ -205,9 +205,6 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
   this->mTrigger = trigger;
   this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(mTrigger);
   
-  std::string tool_tip = this->mTrigger->getName() + " (" + this->mClassId->getClassName() + ")";
-  this->setToolTip(tool_tip.c_str());
-
   if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->mTrigger))
   {
     QObject::connect(looped_trigger.get(), SIGNAL(triggerStarting()), this, SLOT(triggerStateChanging()));
@@ -274,7 +271,7 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     menu.addSeparator();
     p_scene->networkGroupingContextMenuEvent(menu);
 
-    if (looped_trigger->isRunning())
+    if (looped_trigger->isRunningNolocking())
     {
       p_start->setEnabled(false);
       p_single->setEnabled(false);
@@ -335,4 +332,46 @@ cedar::proc::ConstTriggerPtr cedar::proc::gui::TriggerItem::getTrigger() const
 cedar::proc::gui::Connection* cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::GraphicsBase *pTarget)
 {
   return new Connection(this, pTarget);
+}
+
+void cedar::proc::gui::TriggerItem::updateToolTip()
+{
+  QString tool_tip
+    = QString("<table>"
+                "<tr>"
+                  "<th>Measurement:</th>"
+                  "<th>Last</th>"
+                  "<th>Average</th>"
+                "</tr>"
+                "<tr>"
+                  "<td>loop time</td>"
+                  "<td align=\"right\">%1</td>"
+                  "<td align=\"right\">%2</td>"
+                "</tr>"
+              "</table>");
+
+  if (auto looped = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->getTrigger()))
+  {
+    if (looped->getStatistics()->size() > 0)
+    {
+      cedar::unit::Time mean = looped->getStatistics()->getAverage();
+      double dval = mean / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
+      tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
+      cedar::unit::Time newest = looped->getStatistics()->getNewest();
+      dval = newest / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
+      tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
+    }
+    else
+    {
+      tool_tip = tool_tip.arg("n/a");
+      tool_tip = tool_tip.arg("n/a");
+    }
+  }
+  else
+  {
+    tool_tip = tool_tip.arg("n/a");
+    tool_tip = tool_tip.arg("n/a");
+  }
+
+  this->setToolTip(tool_tip);
 }

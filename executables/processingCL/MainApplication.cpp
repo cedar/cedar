@@ -45,6 +45,7 @@
 #include "MainApplication.h"
 
 // SYSTEM INCLUDES
+#include <boost/make_shared.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -63,7 +63,7 @@ mName(name)
   this->setStepSize(recordIntervall);
 
   this->connectToStartSignal(boost::bind(&cedar::aux::DataSpectator::prepareStart, this));
-  this->connectToStopSignal(boost::bind(&cedar::aux::DataSpectator::processStop, this, _1));
+  this->connectToQuitSignal(boost::bind(&cedar::aux::DataSpectator::processQuit, this));
 }
 
 
@@ -90,7 +90,7 @@ void cedar::aux::DataSpectator::prepareStart()
   writeHeader();
 }
 
-void cedar::aux::DataSpectator::processStop(bool /* suppressWarning */)
+void cedar::aux::DataSpectator::processQuit()
 {
   writeAllRecordData();
   

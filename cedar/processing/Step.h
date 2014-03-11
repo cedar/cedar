@@ -45,9 +45,11 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
+#include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThreadALot.fwd.h"
 #include "cedar/auxiliaries/BoolParameter.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/Step.fwd.h"
@@ -107,6 +109,8 @@ public:
 
   //!@brief The standard constructor.
   Step(bool isLooped = false);
+
+  ~Step();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -321,6 +325,7 @@ private:
   virtual void reset();
 
   /*!@brief Sets the current execution time measurement.
+   * @todo Rename to ComputeTimeMeasurement
    */
   void setRunTimeMeasurement(const cedar::unit::Time& time);
 
@@ -366,27 +371,21 @@ private:
   ActionMap mActions;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Time> mMovingAverageIterationTime;
+  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mComputeTime;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Time> mLockingTime;
+  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mLockingTime;
 
   //!@brief Moving average of the time between compute calls.
-  cedar::aux::MovingAverage<cedar::unit::Time> mRoundTime;
+  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mRoundTime;
 
   clock_t mLastComputeCall;
 
-  //!@brief Lock for the last iteration time.
-  mutable QReadWriteLock mLastIterationTimeLock;
-
-  //!@brief Lock for the last iteration time.
-  mutable QReadWriteLock mLockTimeLock;
-
-  //!@brief Lock for the round time.
-  mutable QReadWriteLock mRoundTimeLock;
-
   //! Whether the step should lock its inputs and outputs automatically.
   bool mAutoLockInputsAndOutputs;
+
+  //! Used for calling this->getFinishedTrigger() in a separate thread
+  cedar::aux::CallFunctionInThreadALotPtr mFinishedCaller;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

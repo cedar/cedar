@@ -89,7 +89,8 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 mpConsistencyChecker(NULL),
 mpPerformanceOverview(NULL),
 mpConsistencyDock(NULL),
-mpBoostControl(NULL)
+mpBoostControl(NULL),
+mSuppressCloseDialog(false)
 {
   // setup the (automatically generated) ui components
   this->setupUi(this);
@@ -97,9 +98,13 @@ mpBoostControl(NULL)
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
 
   // manually added components
+
+  // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();
   p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
+  p_enable_custom_time_step->setChecked(false);
   this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
+
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
   this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
@@ -111,10 +116,42 @@ mpBoostControl(NULL)
   this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
   this->mpToolBar->insertWidget(this->mpActionRecord, this->mpCustomTimeStep);
 
-  p_enable_custom_time_step->setChecked(false);
   this->mpCustomTimeStep->setEnabled(false);
-
   QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
+
+
+  this->mpToolBar->insertSeparator(this->mpActionRecord);
+
+  // toolbar: global time factor widgets
+  double global_time_factor_min = 0.00;
+  double global_time_factor_max = 2.00;
+  double global_time_factor_step = 0.05;
+  double global_time_factor_value = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
+
+  double slider_factor = 100.0;
+  this->mpGlobalTimeFactorSlider = new QSlider(Qt::Horizontal);
+  this->mpGlobalTimeFactorSlider->setMinimum(slider_factor * global_time_factor_min);
+  this->mpGlobalTimeFactorSlider->setMaximum(slider_factor * global_time_factor_max);
+  this->mpGlobalTimeFactorSlider->setSingleStep(slider_factor * global_time_factor_step);
+  this->mpGlobalTimeFactorSlider->setValue(slider_factor * global_time_factor_value);
+  this->mpGlobalTimeFactorSlider->setFixedWidth(80);
+  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactorSlider);
+
+  QObject::connect(this->mpGlobalTimeFactorSlider, SIGNAL(valueChanged(int)), this, SLOT(globalTimeFactorSliderChanged(int)));
+
+  this->mpGlobalTimeFactor = new QDoubleSpinBox();
+  this->mpGlobalTimeFactor->setToolTip("All timesteps are multiplied with this global factor. This allows you to slow "
+                                       "down the architecture overall and thus to better see what is going on. Also, "
+                                       "on slower machines, decreasing this factor can increase the stability of an "
+                                       "architecture.");
+  this->mpGlobalTimeFactor->setMinimum(global_time_factor_min);
+  this->mpGlobalTimeFactor->setMaximum(global_time_factor_max);
+  this->mpGlobalTimeFactor->setDecimals(2);
+  this->mpGlobalTimeFactor->setSingleStep(global_time_factor_step);
+  this->mpGlobalTimeFactor->setValue(global_time_factor_value);
+  this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
+
+  QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
 
   this->mpToolBar->insertSeparator(this->mpActionRecord);
 
@@ -218,6 +255,22 @@ mpBoostControl(NULL)
 
   QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
 
+
+  QObject::connect(this->mpRecorderWidget,
+                   SIGNAL(settingsChanged()),
+                   this,
+                   SLOT(architectureChanged()));
+
+  QObject::connect(this->mpPropertyTable,
+                   SIGNAL(settingsChanged()),
+                   this,
+                   SLOT(architectureChanged()));
+
+  QObject::connect(this->mpProcessingDrawer->getScene(),
+                   SIGNAL(sceneChanged()),
+                   this,
+                   SLOT(architectureChanged()));
+
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
@@ -238,6 +291,31 @@ cedar::proc::gui::Ide::~Ide()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Ide::setArchitectureChanged(bool changed)
+{
+  this->mpActionSave->setEnabled(changed);
+  this->setWindowModified(changed);
+}
+
+void cedar::proc::gui::Ide::architectureChanged()
+{
+  this->setArchitectureChanged(true);
+}
+
+void cedar::proc::gui::Ide::globalTimeFactorSliderChanged(int newValue)
+{
+  this->mpGlobalTimeFactor->setValue(static_cast<double>(newValue) / 100.0);
+}
+
+void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
+{
+  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
+  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
+  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
+
+  cedar::aux::SettingsSingleton::getInstance()->setGlobalTimeFactor(newValue);
+}
+
 void cedar::proc::gui::Ide::showRobotManager()
 {
   auto p_dialog = new QDialog(this);
@@ -250,7 +328,7 @@ void cedar::proc::gui::Ide::showRobotManager()
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 {
-  this->setWindowTitle(this->mDefaultWindowTitle + " - " + QString::fromStdString(filename));
+  this->setWindowTitle(this->mDefaultWindowTitle + " - " + QString::fromStdString(filename) + "[*]");
 }
 
 void cedar::proc::gui::Ide::showBoostControl()
@@ -418,11 +496,55 @@ void cedar::proc::gui::Ide::toggleGrid(bool triggered)
   }
 }
 
+bool cedar::proc::gui::Ide::checkSave()
+{
+  if (this->isWindowModified() && !mSuppressCloseDialog)
+  {
+    auto r = QMessageBox::question
+        (
+          this,
+          "Save changes?",
+          "There are unsaved changes. Do you want to close them?",
+          QMessageBox::Save | QMessageBox::Cancel | QMessageBox::Discard
+        );
+
+    switch (r)
+    {
+      case QMessageBox::Save:
+        // let's not accept the event yet, in case anything goes wrong (like an exception)
+        return this->save();
+
+      case QMessageBox::Cancel:
+        return false;
+
+      case QMessageBox::Discard:
+        // nothing to do: discard changes
+        break;
+
+      default:
+        CEDAR_ASSERT(false);
+    }
+  }
+  return true;
+}
+
+
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {
+  // let's not accept the event yet, in case anything goes wrong (like an exception)
+  pEvent->setAccepted(false);
+  if (this->checkSave())
+  {
+    pEvent->setAccepted(true);
+  }
+  else
+  {
+    return;
+  }
+
   this->storeSettings();
   // Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
-  this->mpPropertyTable->resetContents();
+  this->mpPropertyTable->clear();
   pEvent->accept();
 }
 
@@ -474,7 +596,7 @@ void cedar::proc::gui::Ide::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
-  this->mpPropertyTable->resetContents();
+  this->mpPropertyTable->clear();
 
   this->updateTriggerStartStopThreadCallers();
 
@@ -641,7 +763,7 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
   // delete step
   if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(pItem))
   {
-    this->mpPropertyTable->resetContents();
+    this->mpPropertyTable->clear();
     p_drawer->hide();
     p_drawer->getStep()->getNetwork()->remove(p_drawer->getStep());
   }
@@ -705,7 +827,11 @@ void cedar::proc::gui::Ide::stopThreads()
 
 void cedar::proc::gui::Ide::newFile()
 {
-  this->mpActionSave->setEnabled(false);
+  if (!this->checkSave())
+  {
+    return;
+  }
+
   this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
 
   this->displayFilename("unnamed file");
@@ -714,15 +840,26 @@ void cedar::proc::gui::Ide::newFile()
   this->mpActionToggleSmartConnections->blockSignals(true);
   this->mpActionToggleSmartConnections->setChecked(this->mNetwork->getSmartConnection());
   this->mpActionToggleSmartConnections->blockSignals(false);
+
+  this->setArchitectureChanged(false);
 }
 
-void cedar::proc::gui::Ide::save()
+bool cedar::proc::gui::Ide::save()
 {
-  this->mNetwork->write();
-  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(this->mNetwork->getFileName());
+  if (this->mNetwork->getFileName().empty())
+  {
+    return this->saveAs();
+  }
+  else
+  {
+    this->mNetwork->write();
+    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(this->mNetwork->getFileName());
+    this->setArchitectureChanged(false);
+    return true;
+  }
 }
 
-void cedar::proc::gui::Ide::saveAs()
+bool cedar::proc::gui::Ide::saveAs()
 {
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
@@ -732,30 +869,37 @@ void cedar::proc::gui::Ide::saveAs()
                                               "json (*.json)" // filter(s), separated by ';;'
                                               );
 
-  if (!file.isEmpty())
+  if (file.isEmpty())
   {
-    if (!file.endsWith(".json"))
-    {
-      file += ".json";
-    }
-
-    this->mNetwork->write(file.toStdString());
-    this->displayFilename(file.toStdString());
-
-    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
-
-    this->mpActionSave->setEnabled(true);
-
-    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
-    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
-    cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
-    last_dir->setValue(path);
-
+    return false;
   }
+
+  if (!file.endsWith(".json"))
+  {
+    file += ".json";
+  }
+
+  this->mNetwork->write(file.toStdString());
+  this->displayFilename(file.toStdString());
+  this->setArchitectureChanged(false);
+
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
+
+  this->mpActionSave->setEnabled(true);
+
+  QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  last_dir->setValue(path);
+
+  return true;
 }
 
 void cedar::proc::gui::Ide::load()
 {
+  if (!this->checkSave())
+  {
+    return;
+  }
+
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
   QString file = QFileDialog::getOpenFileName(this, // parent
@@ -772,6 +916,11 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
+  if (!this->checkSave())
+  {
+    return;
+  }
+
   // print message
   cedar::aux::LogSingleton::getInstance()->message
                                            (
@@ -923,7 +1072,6 @@ void cedar::proc::gui::Ide::loadFile(QString file)
     p_dialog->displayStdException(e);
     p_dialog->exec();
   }
-  this->mpActionSave->setEnabled(true);
 
   this->setNetwork(network);
 
@@ -938,6 +1086,8 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   this->mpActionToggleSmartConnections->blockSignals(true);
   this->mpActionToggleSmartConnections->setChecked(this->mNetwork->getSmartConnection());
   this->mpActionToggleSmartConnections->blockSignals(false);
+
+  this->setArchitectureChanged(false);
 }
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
@@ -1023,6 +1173,8 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
 void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
 {
   this->mNetwork->toggleSmartConnectionMode(smart);
+
+  this->setArchitectureChanged(true);
 }
 
 void cedar::proc::gui::Ide::closePlots()
@@ -1073,6 +1225,8 @@ void cedar::proc::gui::Ide::addPlotGroup()
     int pos = this->mpPlotGroupsComboBox->count();
     this->mpPlotGroupsComboBox->insertItem(pos, text);
     this->mpPlotGroupsComboBox->setCurrentIndex(pos);
+
+    this->setArchitectureChanged(true);
   }
 }
   
@@ -1091,6 +1245,8 @@ void cedar::proc::gui::Ide::editPlotGroup()
       this->mpPlotGroupsComboBox->removeItem(position);
       this->mpPlotGroupsComboBox->insertItem(position, text);
       this->mpPlotGroupsComboBox->setCurrentIndex(position);
+
+      this->setArchitectureChanged(true);
     }
   }
 }
@@ -1101,6 +1257,8 @@ void cedar::proc::gui::Ide::displayPlotGroup()
   if(this->mpPlotGroupsComboBox->currentIndex() != -1)
   {
     this->mNetwork->displayPlotGroup(plot_group_name.toStdString()); // toStdString assumes ascii
+
+    this->setArchitectureChanged(true);
   }
 }
 
@@ -1112,11 +1270,13 @@ void cedar::proc::gui::Ide::deletePlotGroup()
   {
     QMessageBox::StandardButton reply;
     QString message = QString("This will delete %1. Proceed?").arg(plot_group_name);
-    reply = QMessageBox::question(this, "Delete Plot Group", message, QMessageBox::Yes|QMessageBox::No);
+    reply = QMessageBox::question(this, "Delete Plot Group", message, QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes)
     {
       this->mNetwork->removePlotGroup(plot_group_name.toStdString()); // toStdString assumes ascii
       this->mpPlotGroupsComboBox->removeItem(position);
+
+      this->setArchitectureChanged(true);
     }
   }
 }

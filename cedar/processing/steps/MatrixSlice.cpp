@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/MatrixSlice.h"
-#include "cedar/processing/typecheck/IsMatrix.h"
+#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataSlot.h"
@@ -111,7 +111,9 @@ _mRangeUpper
 )
 {
   auto input = this->declareInput("matrix");
-  input->setCheck(cedar::proc::typecheck::IsMatrix());
+  cedar::proc::typecheck::Matrix input_check;
+  input_check.addAcceptedDimensionalityRange(1, 16);
+  input->setCheck(input_check);
 
   this->declareOutput("slice", mOutput);
 
@@ -190,7 +192,7 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
   mRanges.clear();
   mRanges.resize(dimensionality);
   std::vector<int> sizes;
-  sizes.resize(dimensionality);
+  sizes.resize(dimensionality, 1);
 
   for (unsigned int d = 0; d < dimensionality; ++d)
   {
@@ -224,7 +226,7 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
   }
 
   // preallocate the appropriate output matrix
-  cv::Mat output = 0.0 * cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type());
+  cv::Mat output = cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type(), cv::Scalar(0));
   cv::Mat old_output = this->mOutput->getData();
   this->mOutput->setData(output);
 
@@ -261,5 +263,5 @@ void cedar::proc::steps::MatrixSlice::compute(const cedar::proc::Arguments&)
   CEDAR_DEBUG_ASSERT(this->_mRangeLower->size() == cedar::aux::math::getDimensionalityOf(input));
   CEDAR_DEBUG_ASSERT(this->_mRangeUpper->size() == cedar::aux::math::getDimensionalityOf(input));
 
-  output = input(&mRanges.front());
+  output = input(&mRanges.front()).clone();
 }

@@ -43,6 +43,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/IntrusivePtrBase.h"
+#include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
@@ -87,6 +89,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Set the owner of the parameter. Can only be called if the parameter doesn't have an owner yet.
+  void setOwner(cedar::aux::Configurable *pOwner);
+
+  //! Resets the owner of the parameter.
+  void unsetOwner();
+
   //!@brief get the flag "read automatically"
   bool getReadAutomatically() const;
   //!@brief set the flag "read automatically"
@@ -146,8 +154,7 @@ public:
   }
 
   //!@brief Returns the name of the object.
-  //!@return Name of the object.
-  const std::string& getName() const;
+  std::string getName() const;
 
   //!@brief Sets the name of the object to the given name.
   //!@param name New name of the object.
@@ -189,6 +196,20 @@ public:
    */
   void addDeprecatedName(const std::string& deprecatedName);
 
+  /*! @brief If possible, copies the value from another parameter into this parameter.
+   *
+   * The default implementation always throws an exception.
+   */
+  virtual void copyValueFrom(cedar::aux::ConstParameterPtr other);
+
+  /*!@brief Checks if this parameter can copy its value from the given one.
+   */
+  virtual bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
+
+public:
+  //! Signal that is emitted whenever the name of the parameter changes. The first string is the old name, the second the new one.
+  CEDAR_DECLARE_SIGNAL(NameChanged, void(const std::string&, const std::string&));
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -222,7 +243,7 @@ private:
   cedar::aux::Configurable *mpOwner;
 
   //! The name of the parameter.
-  std::string mName;
+  cedar::aux::LockableMember<std::string> mName;
 
   //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
   bool mAutoRead;

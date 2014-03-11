@@ -80,9 +80,25 @@ namespace
 
 cedar::aux::gui::MatDataPlot::MatDataPlot(QWidget *pParent)
 :
-cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(nullptr)
+cedar::aux::gui::MultiPlotInterface(pParent)
 {
+  this->initLayout();
+}
+
+cedar::aux::gui::MatDataPlot::MatDataPlot(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent)
+:
+cedar::aux::gui::MultiPlotInterface(pParent)
+{
+  this->initLayout();
+
+  this->plot(data, title);
+}
+
+
+void cedar::aux::gui::MatDataPlot::initLayout()
+{
+  mpCurrentPlotWidget = nullptr;
+
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
 
@@ -93,6 +109,22 @@ mpCurrentPlotWidget(nullptr)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::MatDataPlot::readConfiguration(const cedar::aux::ConfigurationNode& configuration)
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->readConfiguration(configuration);
+  }
+}
+
+void cedar::aux::gui::MatDataPlot::writeConfiguration(cedar::aux::ConfigurationNode& configuration) const
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->writeConfiguration(configuration);
+  }
+}
 
 bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
