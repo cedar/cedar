@@ -151,10 +151,6 @@ public:
   //! Tests if the given value is enabled.
   bool isEnabled(cedar::aux::EnumId value) const;
 
-  bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
-
-  void copyValueFrom(cedar::aux::ConstParameterPtr other);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
