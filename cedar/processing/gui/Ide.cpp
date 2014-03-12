@@ -149,6 +149,7 @@ mSuppressCloseDialog(false)
   this->mpGlobalTimeFactor->setDecimals(2);
   this->mpGlobalTimeFactor->setSingleStep(global_time_factor_step);
   this->mpGlobalTimeFactor->setValue(global_time_factor_value);
+  this->mpGlobalTimeFactor->setSuffix("x");
   this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
 
   QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
