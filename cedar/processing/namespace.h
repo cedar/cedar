@@ -67,8 +67,6 @@
 #include "cedar/processing/PluginDeclaration.fwd.h"
 #include "cedar/processing/ProjectionMapping.fwd.h"
 #include "cedar/processing/ProjectionMappingParameter.fwd.h"
-#include "cedar/processing/PromotedExternalData.fwd.h"
-#include "cedar/processing/PromotedOwnedData.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 #include "cedar/processing/StepTime.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"

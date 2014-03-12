@@ -528,19 +528,6 @@ struct DataConnectionInfo
   cedar::proc::DataSlotPtr to;
 };
 
-struct PromotedConnectionInfo
-{
-  PromotedConnectionInfo(const std::string& dataFrom, const std::string& dataTo)
-  :
-  from(dataFrom),
-  to(dataTo)
-  {
-  }
-
-  std::string from;
-  std::string to;
-};
-
 struct TriggerConnectionInfo
 {
   TriggerConnectionInfo(cedar::proc::TriggerPtr dataFrom, cedar::proc::TriggerablePtr dataTo)
@@ -1315,7 +1302,6 @@ void cedar::proc::Group::updateObjectName(cedar::proc::Element* object)
   // now we can reinsert the element (this invalidates the iterator)
   mElements[object->getName()] = element;
 
-  // check all promoted items
   bool slots_changed = false;
   if (slots_changed)
   {
