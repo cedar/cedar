@@ -186,6 +186,9 @@ public:
     return triggered;
   }
 
+  //! Returns true if the step is started, i.e., if the last onStart call was not followed by an onStop call.
+  bool isStarted() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

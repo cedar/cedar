@@ -75,6 +75,13 @@ cedar::proc::Triggerable::~Triggerable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::Triggerable::isStarted() const
+{
+  QMutexLocker locker(this->mpStartCallsLock);
+  bool started = (this->mStartCalls > 0);
+  return started;
+}
+
 bool cedar::proc::Triggerable::exceptionWrappedCall
      (
        const boost::function<void()>& call,
