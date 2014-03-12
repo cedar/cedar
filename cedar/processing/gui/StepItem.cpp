@@ -1079,6 +1079,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QMenu *p_serialization_menu = menu.addMenu("save/load data");
+  p_serialization_menu->setIcon(QIcon(":/menus/save.svg"));
   this->fillDataSerialization(p_serialization_menu);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
