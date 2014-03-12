@@ -312,6 +312,8 @@ private slots:
   
   void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
 
+  void openParameterEditor();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

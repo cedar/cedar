@@ -48,6 +48,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/ParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,47 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbsSigmoid.h
+    File:        ParameterLink.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 02 18
 
-    Description: Sigmoid functions
+    Description: Header file for the class cedar::aux::ParameterLink.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
-#define CEDAR_AUX_MATH_ABS_SIGMOID_H
+#ifndef CEDAR_AUX_PARAMETER_LINK_H
+#define CEDAR_AUX_PARAMETER_LINK_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.fwd.h"
+#include "cedar/auxiliaries/ParameterLink.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
-/*!@brief Sigmoid function that is based on absolute values.
+
+/*!@brief Base for classes that link different parameters together.
  *
- *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
- *
- *        The equation for this sigmoid is:
- *        @f[
- *           \sigma(x) = \frac{1}{2} \cdot \frac{1 + \beta \cdot (x - \theta)}{1 + \beta \cdot |x - \theta|}
- *        @f]
- *        where \f$\theta\f$ is the threshold set for this function and \f$\beta\f$ is the steepness of the sigmoid.
+ *        A parameter link is an association between two or more parameters. The values of the associated parameters
+ *        are then linked, meaning that when one value is changed, another one is changed as well.
  */
-class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::ParameterLink : public QObject, public cedar::aux::Configurable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -70,27 +69,34 @@ class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  AbsSigmoid(double threshold = 0.0, double beta = 100.0);
+  ParameterLink();
+
+  //!@brief Destructor
+  virtual ~ParameterLink();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
-   */
-  virtual double compute(double value) const;
+  void setLinkedParameters(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target);
 
-  virtual cv::Mat compute(const cv::Mat& values) const;
+  cedar::aux::ParameterPtr getSource() const;
 
-  inline double getBeta() const
-  {
-    return this->_mBeta->getValue();
-  }
+  cedar::aux::ParameterPtr getTarget() const;
 
-  inline void setBeta(double beta)
-  {
-    this->_mBeta->setValue(beta);
-  }
+  //! Sets the source of the link. Will link the parameters if a target is already set.
+  void setSource(cedar::aux::ParameterPtr parameter);
+
+  //! Sets the source of the link to a nullptr.
+  void unsetSource();
+
+  //! Sets the target of the link. Will link the parameters if a source is already set.
+  void setTarget(cedar::aux::ParameterPtr parameter);
+
+  //! Sets the target of the link to a nullptr.
+  void unsetTarget();
+
+  bool canLink(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,17 +107,53 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  virtual void sourceChanged() = 0;
+
+  virtual void targetChanged() = 0;
+
+  virtual void sourcePropertiesChanged();
+
+  virtual void targetPropertiesChanged();
+
 private:
-  // none yet
+  virtual bool checkIfLinkable(cedar::aux::ConstParameterPtr source, cedar::aux::ConstParameterPtr target) const = 0;
+
+  void applyProperties(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief steepness of the abs-sigmoid
-  cedar::aux::DoubleParameterPtr _mBeta;
+  // none yet
+private:
+  cedar::aux::ParameterPtr mSource;
+  cedar::aux::ParameterPtr mTarget;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
 private:
   // none yet
-};
 
-#endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H
+}; // class cedar::aux::ParameterLink
+
+#include "cedar/auxiliaries/FactoryManager.h"
+
+namespace cedar
+{
+  namespace aux
+  {
+    typedef
+      cedar::aux::FactoryManager<cedar::aux::ParameterLinkPtr>
+      ParameterLinkFactoryManager;
+  }
+}
+
+CEDAR_AUX_SINGLETON(ParameterLinkFactoryManager);
+
+#endif // CEDAR_AUX_PARAMETER_LINK_H
+

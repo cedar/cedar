@@ -58,6 +58,8 @@
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ParameterDeclaration.h"
+#include "cedar/auxiliaries/ParameterLink.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
@@ -192,6 +194,129 @@ cedar::proc::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::proc::Group::ParameterLinkInfo::getSourceElementPath() const
+{
+  if (this->mSourceElement)
+  {
+    auto group = this->mGroup.lock();
+    return group->findPath(this->mSourceElement);
+  }
+  else
+  {
+    return "(not set)";
+  }
+}
+
+std::string cedar::proc::Group::ParameterLinkInfo::getTargetElementPath() const
+{
+  if (this->mTargetElement)
+  {
+    auto group = this->mGroup.lock();
+    return group->findPath(this->mTargetElement);
+  }
+  else
+  {
+    return "(not set)";
+  }
+}
+
+std::string cedar::proc::Group::ParameterLinkInfo::getSourceParameterPath() const
+{
+  if (this->mParameterLink->getSource())
+  {
+    auto source = this->mSourceElement;
+    if (!source)
+    {
+      source = this->mGroup.lock();
+    }
+    return source->findParameterPath(this->mParameterLink->getSource());
+  }
+  else
+  {
+    return "(not set)";
+  }
+}
+
+std::string cedar::proc::Group::ParameterLinkInfo::getTargetParameterPath() const
+{
+  if (this->mParameterLink->getTarget())
+  {
+    auto target = this->mTargetElement;
+    if (!target)
+    {
+      target = this->mGroup.lock();
+    }
+    return target->findParameterPath(this->mParameterLink->getTarget());
+  }
+  else
+  {
+    return "(not set)";
+  }
+}
+
+cedar::aux::ParameterPtr cedar::proc::Group::addCustomParameter(const std::string& type, const std::string& name)
+{
+  auto parameter = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
+
+  parameter->setName(this->getUniqueParameterName(name));
+  parameter->setOwner(this);
+
+  this->mCustomParameters.push_back(parameter);
+
+  this->signalCustomParameterAdded(parameter);
+
+  return parameter;
+}
+
+void cedar::proc::Group::removeCustomParameter(const std::string& name)
+{
+  auto parameter = this->getParameter(name);
+
+  parameter->unsetOwner();
+
+  auto iter = std::find(this->mCustomParameters.begin(), this->mCustomParameters.end(), parameter);
+  if (iter != this->mCustomParameters.end())
+  {
+    this->mCustomParameters.erase(iter);
+  }
+
+  this->signalCustomParameterRemoved(parameter);
+}
+
+void cedar::proc::Group::addParameterLink
+(
+  cedar::proc::ElementPtr sourceElement,
+  cedar::proc::ElementPtr targetElement,
+  cedar::aux::ParameterLinkPtr link
+)
+{
+  ParameterLinkInfo info;
+  info.mParameterLink = link;
+  info.mSourceElement = sourceElement;
+  info.mTargetElement = targetElement;
+  info.mGroup = boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this());
+  this->mParameterLinks.push_back(info);
+
+  this->signalParameterLinkAdded(this->mParameterLinks.back());
+}
+
+void cedar::proc::Group::removeParameterLink(cedar::aux::ParameterLinkPtr link)
+{
+  for (auto iter = this->mParameterLinks.begin(); iter != this->mParameterLinks.end(); ++iter)
+  {
+    if (iter->mParameterLink == link)
+    {
+      this->mParameterLinks.erase(iter);
+
+      this->signalParameterLinkRemoved(link);
+
+      return;
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::NotFoundException, "Could not remove parameter link: link not found in group.");
+}
 
 std::string cedar::proc::Group::getNewConnectorName(bool inputConnector) const
 {
