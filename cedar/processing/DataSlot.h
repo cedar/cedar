@@ -47,8 +47,6 @@
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
-#include "cedar/processing/PromotedExternalData.fwd.h"
-#include "cedar/processing/PromotedOwnedData.fwd.h"
 #include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
@@ -276,9 +274,6 @@ private:
 
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
-
-  //! Promoted flag
-  bool mIsPromoted;
 
   //! The function object holding a reference to the type check functions for this slot.
   TypeCheckFunction mTypeCheck;

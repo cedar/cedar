@@ -59,8 +59,7 @@ mpParent(pParent),
 mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
-mRole(role),
-mIsPromoted(false)
+mRole(role)
 {
 }
 
