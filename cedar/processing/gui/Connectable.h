@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -54,6 +54,8 @@
 // SYSTEM INCLUDES
 #include <QObject>
 #include <QGraphicsSvgItem>
+#include <map>
+#include <vector>
 
 /*!@brie A gui base class for all items that represent cedar::proc::Connectables.
  */
