@@ -231,6 +231,12 @@ public slots:
     return this->mpLog;
   }
 
+  //!@brief copy one step to buffer
+  void copyStep();
+
+  //!@brief copy configuration to target step(s)
+  void pasteStepConfiguration();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -305,6 +311,8 @@ private:
 
   //! The network currently displayed.
   cedar::proc::gui::NetworkPtr mNetwork;
+
+  cedar::proc::StepPtr mLastCopiedStep;
 
   //! Architecture consistency check widget.
   cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;

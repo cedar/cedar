@@ -84,6 +84,12 @@ public:
   //!@brief get the network at which this element is registered as const
   cedar::proc::ConstNetworkPtr getNetwork() const;
 
+  //!@brief copy a configuration from another instance of the same class (type check included)
+  void copyFrom(cedar::aux::ConstConfigurablePtr src);
+
+  //!@brief copy a configuration to another instance of the same class (type check included)
+  void copyTo(cedar::aux::ConfigurablePtr target) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

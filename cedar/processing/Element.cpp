@@ -95,3 +95,32 @@ void cedar::proc::Element::validateName(const std::string& newName) const
     }
   }
 }
+
+void cedar::proc::Element::copyFrom(cedar::aux::ConstConfigurablePtr src)
+{
+  // check type
+  if (typeid(*this) != typeid(*src))
+  {
+    CEDAR_THROW(cedar::aux::TypeMismatchException, "cannot copy if types do not match");
+  }
+  cedar::aux::ConfigurationNode root;
+  src->writeConfiguration(root);
+  root.put("name", this->getName());
+  this->readConfiguration(root);
+}
+
+void cedar::proc::Element::copyTo(cedar::aux::ConfigurablePtr target) const
+{
+  // check type
+  if (typeid(*this) != typeid(*target))
+  {
+    CEDAR_THROW(cedar::aux::TypeMismatchException, "cannot copy if types do not match");
+  }
+  cedar::aux::ConfigurationNode root;
+  this->writeConfiguration(root);
+  if (auto elem = boost::dynamic_pointer_cast<cedar::proc::Element>(target))
+  {
+    root.put("name", elem->getName());
+    target->readConfiguration(root);
+  }
+}
