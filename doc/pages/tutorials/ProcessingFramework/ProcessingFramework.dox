@@ -185,7 +185,7 @@ slot @endlink of this step. And that's it, if you compile and run this program y
 
 By the way, if you dislike writing this main method, you can use plugins and architecture files instead (see the next
 two sections, @ref ProcessingTutorialDeclarations and @ref ProcessingTutorialFirstStepArchitectureFile) or just use the
-processingIde to do it all in a user interface (see @ref ProcessingTutorialUsingTheProcessingIde).
+cedar to do it all in a user interface (see @ref ProcessingTutorialUsingTheProcessingIde).
 
 
 @section ProcessingTutorialDeclarations Beginner's Tutorial: ElementDeclarations
@@ -343,8 +343,8 @@ And that's it!
 
 @section ProcessingTutorialPlugin Beginner's Tutorial: Plug In and Play
 
-As a prepraration for using the SimpleSummation step in the processingIde, we first have to group our declarations into
-a plugin. These plugins can then be loaded from the processingIde and used for creating architecture files in a
+As a prepraration for using the SimpleSummation step in cedar, we first have to group our declarations into
+a plugin. These plugins can then be loaded from cedar and used for creating architecture files in a
 comfortable way.
 
 The first step towards this is to move the SimpleSummation step into a separate project that is compiled as a library
@@ -389,9 +389,9 @@ void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin)
 The declaration code should look familiar from @ref ProcessingTutorialFirstStepArchitectureFile. After recompiling, now,
 the plugin is ready for use!
 
-@section ProcessingTutorialUsingTheProcessingIde Beginner's Tutorial: Using the processingIde
+@section ProcessingTutorialUsingTheProcessingIde Beginner's Tutorial: Using cedar's GUI
 
-In the folder @em cedar/bin, you can find an application called @em processingIde. If you run it, you can generate the
+In the folder @em cedar/bin, you can find an application called @em cedar. If you run it, you can generate the
 configuration files described in @ref ProcessingTutorialFirstStepArchitectureFile using a visual representation. After
 starting the program, yous should see something like this:
 
@@ -399,7 +399,7 @@ starting the program, yous should see something like this:
 
 @subsection ProcessingTutorialUsingTheProcessingIdePartsOfTheUi Different Parts of the User Interface 
 
-The main user interface of the processingIde consists of a few important elements, highlighted red in the following
+The main user interface of cedar consists of a few important elements, highlighted red in the following
 picture. Note, that the elements can be reordered freely, so your interface might look slightly different.
 
 @image html doc/pages/tutorials/ProcessingFramework/images/processingIde_areas.png

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -62,7 +62,7 @@
 #include <map>
 
 
-/*!@brief This is the main window of the processingIde application.
+/*!@brief This is the main window of the cedar application.
  */
 class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
 {

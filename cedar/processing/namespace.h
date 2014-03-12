@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -67,8 +67,6 @@
 #include "cedar/processing/PluginDeclaration.fwd.h"
 #include "cedar/processing/ProjectionMapping.fwd.h"
 #include "cedar/processing/ProjectionMappingParameter.fwd.h"
-#include "cedar/processing/PromotedExternalData.fwd.h"
-#include "cedar/processing/PromotedOwnedData.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 #include "cedar/processing/StepTime.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,26 +22,26 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PromotedExternalData.fwd.h
+    File:        MainApplication.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 06
+    Date:        2014 01 20
 
-    Description: Forward declaration file for the class cedar::proc::PromotedExternalData.
+    Description: Forward declaration file for the class cedar::processingCL::MainApplication.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PROMOTED_EXTERNAL_DATA_FWD_H
-#define CEDAR_PROC_PROMOTED_EXTERNAL_DATA_FWD_H
+#ifndef CEDAR_PROC_CL_MAIN_APPLICATION_FWD_H
+#define CEDAR_PROC_CL_MAIN_APPLICATION_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+#include "cedar/defines.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,13 +51,13 @@
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
-  namespace proc
+  namespace processingCL
   {
-    CEDAR_DECLARE_PROC_CLASS(PromotedExternalData);
+    class MainApplication;
+    CEDAR_GENERATE_POINTER_TYPES(MainApplication);
   }
 }
-
 //!@endcond
 
-#endif // CEDAR_PROC_PROMOTED_EXTERNAL_DATA_FWD_H
+#endif // CEDAR_PROC_CL_MAIN_APPLICATION_FWD_H
 

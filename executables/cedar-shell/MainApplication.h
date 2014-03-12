@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,76 +22,80 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PromotedOwnedData.h
+    File:        MainApplication.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2012 01 31
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 01 20
 
-    Description:
+    Description: Header file for the class cedar::processingCL::MainApplication.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PROMOTED_OWNED_DATA_H
-#define CEDAR_PROC_PROMOTED_OWNED_DATA_H
+#ifndef CEDAR_PROC_CL_MAIN_APPLICATION_H
+#define CEDAR_PROC_CL_MAIN_APPLICATION_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/OwnedData.h"
+#include "cedar/auxiliaries/CommandLineParser.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/PromotedOwnedData.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+
+// FORWARD DECLARATIONS
+#include "MainApplication.fwd.h"
 
 // SYSTEM INCLUDES
-#include <string>
+#include <QObject>
 
-/*!@brief A slot for data that is promoted to an outer network.
+
+/*!@brief Main application of the processingCL.
  */
-class cedar::proc::PromotedOwnedData : public cedar::proc::OwnedData
+class cedar::processingCL::MainApplication : public QObject
 {
+  Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PromotedOwnedData
-  (
-    cedar::proc::DataSlotPtr promotedSlot,
-    cedar::proc::Connectable* pParent
-  );
-
-  //!@brief Destructor
-  ~PromotedOwnedData();
+  MainApplication(int argc, char** argv);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::aux::DataPtr getData();
+  // none yet
 
-  cedar::aux::ConstDataPtr getData() const;
+public slots:
+  void exec();
 
-  //!@brief get the current validity of the promoted slot
-  VALIDITY getValidity() const;
-
-  //!@brief set the current validity at the promoted slot
-  void setValidity(VALIDITY validity);
-
-  //! get the full path of slot promotion as dot-concatenated string
-  std::string getPromotionPath() const;
+signals:
+  void quit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setData(cedar::aux::DataPtr data);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  bool waitForUserInput();
+
+  void loadArchitecture(const std::string& path);
+
+  void startTriggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -99,8 +103,20 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::DataSlotPtr mDataSlot;
-}; // class cedar::proc::PromotedOwnedData
+  cedar::aux::CommandLineParser mParser;
 
-#endif // CEDAR_PROC_PROMOTED_OWNED_DATA_H
+  cedar::proc::GroupPtr mArchitecture;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::processingCL::MainApplication
+
+#endif // CEDAR_PROC_CL_MAIN_APPLICATION_H
 
