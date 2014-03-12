@@ -161,10 +161,10 @@ public:
   void resetChangedStates(bool newChangedFlagValue) const;
 
   //!@brief copy a configuration from another instance of the same class (type check included)
-  void copyFrom(ConstConfigurablePtr src);
+  virtual void copyFrom(ConstConfigurablePtr src);
 
   //!@brief copy a configuration to another instance of the same class (type check included)
-  void copyTo(ConfigurablePtr target) const;
+  virtual void copyTo(ConfigurablePtr target) const;
 
   /*!@brief Returns the parameter associated with the path.
    */
