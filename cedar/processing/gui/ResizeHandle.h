@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -48,11 +48,10 @@
 
 // SYSTEM INCLUDES
 #include <QGraphicsRectItem>
+#include <vector>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A handle that allows users to resize a grapghics item.
  */
 class cedar::proc::gui::ResizeHandle : public QGraphicsRectItem
 {
