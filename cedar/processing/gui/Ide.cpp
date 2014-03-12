@@ -276,6 +276,8 @@ mSuppressCloseDialog(false)
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
   );
+
+  this->mpActionSave->setEnabled(true);
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -884,8 +886,6 @@ bool cedar::proc::gui::Ide::saveAs()
   this->setArchitectureChanged(false);
 
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
-
-  this->mpActionSave->setEnabled(true);
 
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   last_dir->setValue(path);
