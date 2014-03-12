@@ -294,7 +294,6 @@ cedar::proc::gui::Ide::~Ide()
 
 void cedar::proc::gui::Ide::setArchitectureChanged(bool changed)
 {
-  this->mpActionSave->setEnabled(changed);
   this->setWindowModified(changed);
 }
 
