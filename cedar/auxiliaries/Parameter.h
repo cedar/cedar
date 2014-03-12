@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -195,6 +195,16 @@ public:
    * @param  deprecatedName
    */
   void addDeprecatedName(const std::string& deprecatedName);
+
+  /*! @brief If possible, copies the value from another parameter into this parameter.
+   *
+   * The default implementation always throws an exception.
+   */
+  virtual void copyValueFrom(cedar::aux::ConstParameterPtr other);
+
+  /*!@brief Checks if this parameter can copy its value from the given one.
+   */
+  virtual bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
 
 public:
   //! Signal that is emitted whenever the name of the parameter changes. The first string is the old name, the second the new one.

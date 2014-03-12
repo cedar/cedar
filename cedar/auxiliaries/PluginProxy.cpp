@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -350,7 +350,7 @@ void cedar::aux::PluginProxy::abortHandler(int)
       << "==================================================================" << std::endl;
   std::cout << std::endl << "The offending plugin is located at " << mPluginBeingLoaded  << std::endl << std::endl;
   std::cout << "This often happens when you update your cedar version but don't recompile your plugins. You can try to "
-      << "disable your plugins while starting the processingIde. Run processingIde --help for details. If this helps, "
+      << "disable your plugins while starting cedar. Run cedar --help for details. If this helps, "
       << "try to recompile the affected plugins." << std::endl;
   exit(-2);
 }

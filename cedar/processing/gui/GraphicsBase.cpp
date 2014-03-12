@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -161,12 +161,20 @@ void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
 void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
 {
   this->mHeight->setValue(static_cast<double>(height));
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+  }
   this->update();
 }
 
 void cedar::proc::gui::GraphicsBase::setWidth(qreal width)
 {
   this->mWidth->setValue(static_cast<double>(width));
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+  }
   this->update();
 }
 
@@ -262,6 +270,10 @@ bool cedar::proc::gui::GraphicsBase::hasGuiConnectionTo(GraphicsBase const* pTar
 
 void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection* pConnection)
 {
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+  }
   this->mConnections.push_back(pConnection);
 }
 
@@ -279,6 +291,11 @@ void cedar::proc::gui::GraphicsBase::removeConnection(cedar::proc::gui::Connecti
   if (it != mConnections.end())
   {
     mConnections.erase(it);
+  }
+
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
   }
 }
 
@@ -532,6 +549,10 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     case QGraphicsItem::ItemPositionHasChanged:
     {
       this->updateConnections();
+      if (this->scene() && this->mGroup != GRAPHICS_GROUP_DATA_ITEM && this->mGroup != GRAPHICS_GROUP_NONE)
+      {
+        cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+      }
       break;
     }
 

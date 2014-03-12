@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -77,11 +77,19 @@ cedar::proc::gui::GraphicsBase(width,height)
   setFlag(ItemIsFocusable);
 
   this->setZValue(0);
+
+  if (pParent)
+  {
+    pParent->emitSceneChanged();
+  }
 }
 
 cedar::proc::gui::StickyNote::~StickyNote()
 {
-
+  if (this->mpParent)
+  {
+    this->mpParent->emitSceneChanged();
+  }
 }
 QRectF cedar::proc::gui::StickyNote::boundingRect() const
 {

@@ -2,8 +2,8 @@
 
 @page PluginsInCode Tutorial: Loading Plugins in C++ code
 
-cedar now comes with a more advanced plugin system. One side of this is the new plugin manager which is included in the
-processingIde and as a stanalone application. In this manager, you can specify a set of plugins to be loaded by default.
+cedar now comes with a more advanced plugin system. One side of this is the new plugin manager which is included in
+cedar's GUI and as a stanalone application. In this manager, you can specify a set of plugins to be loaded by default.
 
 Here, we shoud how to load plugins in your own applications, either the ones selected in the manager or just individual
 ones.

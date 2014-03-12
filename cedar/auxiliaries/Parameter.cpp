@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -109,6 +109,16 @@ void cedar::aux::Parameter::setName(const std::string& name)
   locker.unlock();
 
   this->signalNameChanged(old_name, name);
+}
+
+void cedar::aux::Parameter::copyValueFrom(cedar::aux::ConstParameterPtr /* other */)
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException, "Copying values from this type of parameter is not supported.");
+}
+
+bool cedar::aux::Parameter::canCopyFrom(cedar::aux::ConstParameterPtr /* other */) const
+{
+  return false;
 }
 
 void cedar::aux::Parameter::addDeprecatedName(const std::string& deprecatedName)

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,39 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        MainApplication.fwd.h
 
     Maintainer:  Oliver Lomp
-
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-
     Date:        2014 01 20
 
-    Description: A command-line version of the processingIde.
+    Description: Forward declaration file for the class cedar::processingCL::MainApplication.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_CL_MAIN_APPLICATION_FWD_H
+#define CEDAR_PROC_CL_MAIN_APPLICATION_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+#include "cedar/defines.h"
+
 // CEDAR INCLUDES
 
-// LOCAL INCLUDES
-#include "MainApplication.h"
-
 // SYSTEM INCLUDES
-#include <QApplication>
-#include <QTimer>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-
-int main(int argc, char** argv)
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-  QApplication app(argc, argv);
-
-  cedar::processingCL::MainApplicationPtr application(new cedar::processingCL::MainApplication(argc, argv));
-
-  QObject::connect(application.get(), SIGNAL(quit()), &app, SLOT(quit()));
-
-  QTimer::singleShot(0, application.get(), SLOT(exec()));
-
-  return app.exec();
+  namespace processingCL
+  {
+    class MainApplication;
+    CEDAR_GENERATE_POINTER_TYPES(MainApplication);
+  }
 }
+//!@endcond
+
+#endif // CEDAR_PROC_CL_MAIN_APPLICATION_FWD_H
+

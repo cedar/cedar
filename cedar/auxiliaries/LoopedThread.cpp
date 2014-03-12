@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -105,6 +105,8 @@ _mLoopMode
   //this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::prepareStart, this));
   this->connectToQuitSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this ));
 
+  mStartConnection = this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::makeParametersConst, this, true));
+  mStopConnection = this->connectToStopSignal(boost::bind(&cedar::aux::LoopedThread::makeParametersConst, this, false));
 }
 
 cedar::aux::LoopedThread::~LoopedThread()
@@ -114,6 +116,23 @@ cedar::aux::LoopedThread::~LoopedThread()
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
+
+void cedar::aux::LoopedThread::makeParametersConst(bool makeConst)
+{
+  // first, apply restrictions that come from the selected mode
+  this->modeChanged();
+
+  // the loop mode itself is not affected by this, so this must be made const/unconst every time
+  this->_mLoopMode->setConstant(makeConst);
+
+  // then, make everything else const if set to do so (if not, the restrictions from above are kept)
+  if (makeConst)
+  {
+    this->_mIdleTime->setConstant(makeConst);
+    this->_mStepSize->setConstant(makeConst);
+    this->_mSimulatedTime->setConstant(makeConst);
+  }
+}
 
 void cedar::aux::LoopedThread::stopStatistics()
 {

@@ -4,7 +4,7 @@ List of changes
  <!--
 =======================================================================================================================
 
-   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
    This file is part of cedar.
 
@@ -48,7 +48,7 @@ likely to undergo major changes:
 
 known issues
 ============
-  - cedardyn is not properly loaded on some OSs (mainly Windows) when using processingIde. If you want to use its
+  - cedardyn is not properly loaded on some OSs (mainly Windows) when using cedar. If you want to use its
     content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
     this plugin to be loaded on every start.
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
@@ -68,6 +68,9 @@ Unreleased
 ==========
 
 - processingIde
+  - The processingIde is now simply called cedar. Conversely, the processingCL is now called cedar-shell.
+
+- cedar
     - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters pf a
       step, but is otherwise quite similar to the old one.
 

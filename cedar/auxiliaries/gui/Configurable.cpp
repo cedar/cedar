@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -89,6 +89,7 @@ public:
         = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
       p_widget->setParameter(parameter);
       QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()), Qt::QueuedConnection);
+      QObject::connect(parameter.get(), SIGNAL(valueChanged()), this->mConfigurableWidget, SIGNAL(settingsChanged()));
       p_ret = p_widget;
     }
     catch (cedar::aux::UnknownTypeException& e)
