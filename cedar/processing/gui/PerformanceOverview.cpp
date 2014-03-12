@@ -54,23 +54,48 @@ class cedar::proc::gui::PerformanceOverview::TimeCellItem : public QTableWidgetI
 {
 public:
   // constructor for an existing measurement
-  TimeCellItem(cedar::unit::Time time)
+  TimeCellItem(cedar::unit::Time time, bool isRunning)
+  :
+  mIsRunning(isRunning)
   {
     double run_time_number = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
     this->setData(Qt::DisplayRole, QString("%1 ms").arg(run_time_number, 0, 'f', 1));
     this->setData(Qt::UserRole, run_time_number);
     this->setTextAlignment(Qt::AlignRight);
+
+    this->applyStyle();
   }
 
   // constructor for an invalid measurement
   TimeCellItem()
+  :
+  mIsRunning(false)
   {
     this->setData(Qt::DisplayRole, "n/a");
     this->setData(Qt::UserRole, -1.0);
+
+    this->applyStyle();
   }
 
   bool operator <(const QTableWidgetItem& other) const
   {
+    try
+    {
+      const auto& other_tc = dynamic_cast<const TimeCellItem&>(other);
+      if (this->mIsRunning && !other_tc.mIsRunning)
+      {
+        return false;
+      }
+      if (!this->mIsRunning && other_tc.mIsRunning)
+      {
+        return true;
+      }
+    }
+    catch (std::bad_cast)
+    {
+      // could not cast -- ok
+    }
+
     double this_value = this->data(Qt::UserRole).toDouble();
     bool ok;
     double other_value = other.data(Qt::UserRole).toDouble(&ok);
@@ -84,6 +109,18 @@ public:
       return false;
     }
   }
+
+private:
+  void applyStyle()
+  {
+    if (!this->mIsRunning)
+    {
+      this->setBackgroundColor(Qt::lightGray);
+    }
+  }
+
+private:
+  bool mIsRunning;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,10 +181,15 @@ void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr
   auto p_name = new QTableWidgetItem(QString::fromStdString(step->getName()));
   this->mpStepTimeOverview->setItem(row, 0, p_name);
 
+  if (!step->isStarted())
+  {
+    p_name->setBackgroundColor(Qt::lightGray);
+  }
+
   // we have to use the row of the name item below as sorting may move it around
   if (step->hasRunTimeMeasurement())
   {
-    this->addMeasurement(step->getRunTimeAverage(), p_name->row(), 1);
+    this->addMeasurement(step->getRunTimeAverage(), p_name->row(), 1, step->isStarted());
   }
   else
   {
@@ -156,7 +198,7 @@ void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr
 
   if (step->hasRoundTimeMeasurement())
   {
-    this->addMeasurement(step->getRoundTimeAverage(), p_name->row(), 2);
+    this->addMeasurement(step->getRoundTimeAverage(), p_name->row(), 2, step->isStarted());
   }
   else
   {
@@ -165,7 +207,7 @@ void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr
 
   if (step->hasLockTimeMeasurement())
   {
-    this->addMeasurement(step->getLockTimeAverage(), p_name->row(), 3);
+    this->addMeasurement(step->getLockTimeAverage(), p_name->row(), 3, step->isStarted());
   }
   else
   {
@@ -178,9 +220,14 @@ void cedar::proc::gui::PerformanceOverview::addUnAvailableMeasurement(int row, i
   this->mpStepTimeOverview->setItem(row, column, new cedar::proc::gui::PerformanceOverview::TimeCellItem());
 }
 
-void cedar::proc::gui::PerformanceOverview::addMeasurement(cedar::unit::Time measurement, int row, int column)
+void cedar::proc::gui::PerformanceOverview::addMeasurement(cedar::unit::Time measurement, int row, int column, bool isRunning)
 {
-  this->mpStepTimeOverview->setItem(row, column, new cedar::proc::gui::PerformanceOverview::TimeCellItem(measurement));
+  this->mpStepTimeOverview->setItem
+  (
+    row,
+    column,
+    new cedar::proc::gui::PerformanceOverview::TimeCellItem(measurement, isRunning)
+  );
 }
 
 void cedar::proc::gui::PerformanceOverview::clear()
