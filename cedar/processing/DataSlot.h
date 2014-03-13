@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Path.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Group.fwd.h"
@@ -274,6 +275,9 @@ private:
 
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
+
+  //! Holds whether the slot is marked as serializable.
+  bool mIsSerializable;
 
   //! The function object holding a reference to the type check functions for this slot.
   TypeCheckFunction mTypeCheck;

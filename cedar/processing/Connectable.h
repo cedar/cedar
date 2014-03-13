@@ -187,6 +187,10 @@ public:
   //! Returns a copy of the vector of the names of invalid input slots. This method is thread-safe.
   std::vector<std::string> getInvalidInputNames() const;
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
   //!@brief Parses a data and Connectable name without specifying a role.
   static void parseDataNameNoRole
               (
