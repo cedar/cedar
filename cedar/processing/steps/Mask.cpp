@@ -110,10 +110,10 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Mask::determineInputValidity
     if (slot->getName() == "mask")
     {
       // check if the mask has the right depth
-      if (mat_data->getData().depth() != CV_8U)
-      {
-        return cedar::proc::DataSlot::VALIDITY_ERROR;
-      }
+//      if (mat_data->getData().depth() != CV_8U)
+//      {
+//        return cedar::proc::DataSlot::VALIDITY_ERROR;
+//      }
 
       other = this->mInput;
     }
@@ -195,5 +195,34 @@ void cedar::proc::steps::Mask::inputConnectionChanged(const std::string& inputNa
 void cedar::proc::steps::Mask::compute(const cedar::proc::Arguments&)
 {
   this->mOutput->getData() = cv::Scalar(0);
-  this->mInput->getData().copyTo(this->mOutput->getData(), this->mMask->getData());
+  const cv::Mat& input = this->mInput->getData();
+  const cv::Mat& mask = this->mMask->getData();
+  cv::Mat& output = this->mOutput->getData();
+
+  if (input.type() == mask.type() || mask.type() == CV_8U)
+  {
+    input.copyTo(output, mask);
+  }
+  else
+  {
+    cv::Mat in_converted;
+    input.convertTo(in_converted, CV_MAKETYPE(mask.depth(), input.channels()));
+
+    if (input.channels() == mask.channels())
+    {
+      output = input.mul(mask);
+    }
+    else
+    {
+      std::vector<cv::Mat> channels(static_cast<size_t>(in_converted.channels()));
+      cv::split(in_converted, channels);
+      for (auto& channel : channels)
+      {
+        channel = channel.mul(mask);
+      }
+      cv::merge(channels, output);
+
+      output.convertTo(output, input.type());
+    }
+  }
 }
