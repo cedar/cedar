@@ -56,6 +56,7 @@
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
@@ -705,7 +706,7 @@ void cedar::proc::gui::StepItem::fillDataSerialization(QMenu* pMenu)
       continue;
     }
 
-    if (!this->mStep->hasRole(role_enum))
+    if (!this->getStep()->hasRole(role_enum))
     {
       continue;
     }
@@ -713,9 +714,8 @@ void cedar::proc::gui::StepItem::fillDataSerialization(QMenu* pMenu)
     bool serializable_slots_found = false;
     this->addRoleSeparator(role_enum, pMenu);
 
-    for (auto slot : this->mStep->getOrderedDataSlots(role_enum.id()))
+    for (auto slot : this->getStep()->getOrderedDataSlots(role_enum.id()))
     {
-
       if (slot->isSerializable())
       {
         serializable_slots_found = true;

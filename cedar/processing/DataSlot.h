@@ -185,6 +185,23 @@ public:
   //! Returns the lock type for this data slot.
   virtual cedar::aux::LOCK_TYPE getLockType() const = 0;
 
+  /*! @brief Marks the data slot as serializable.
+   *
+   *         Serializable data slots are automatically written to architectures, and can be read and written from
+   *         user-given files.
+   */
+  void setSerializable(bool serializable);
+
+  //! Returns whether the slot is marked serializable.
+  bool isSerializable() const;
+
+  //! Writes the data in this slot to the given file.
+  void writeDataToFile(const cedar::aux::Path& path) const;
+
+  //! Writes the data in this slot to the given file.
+  void readDataFromFile(const cedar::aux::Path& path);
+  
+  
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------
