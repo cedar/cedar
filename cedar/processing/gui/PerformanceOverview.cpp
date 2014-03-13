@@ -113,6 +113,8 @@ public:
 private:
   void applyStyle()
   {
+    this->setTextAlignment(this->textAlignment() | Qt::AlignVCenter);
+
     if (!this->mIsRunning)
     {
       this->setBackgroundColor(Qt::lightGray);
@@ -196,7 +198,7 @@ void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr
     this->addUnAvailableMeasurement(p_name->row(), 1);
   }
 
-  if (step->hasRoundTimeMeasurement())
+  if (step->hasRoundTimeMeasurement() && step->isStarted()) // steps that aren't started don't have proper round times
   {
     this->addMeasurement(step->getRoundTimeAverage(), p_name->row(), 2, step->isStarted());
   }
