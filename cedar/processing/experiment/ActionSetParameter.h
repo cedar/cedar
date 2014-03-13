@@ -44,6 +44,7 @@
 #include "cedar/processing/experiment/Action.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ActionSetParameter.fwd.h"
@@ -116,9 +117,9 @@ protected:
   // none yet
 
 private:
-  cedar::aux::StringParameterPtr _stepToSet;
-  cedar::aux::StringParameterPtr _parameterToSet;
+  cedar::proc::experiment::StepPropertyParameterPtr _mStepProperty;
   cedar::aux::ParameterPtr _desiredValue;
+
 
 }; // class cedar::proc::experiment::ActionSetParameter
 

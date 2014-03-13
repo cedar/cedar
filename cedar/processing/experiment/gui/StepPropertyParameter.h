@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,47 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.h
+    File:        StepPropertyParameter.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 07
+    Date:        2014 03 13
 
-    Description: Header file for the class cedar::proc::experiment::gui::ActionSetParameter.
+    Description: Header file for the class cedar::proc::experiment::gui::StepPropertyParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_GUI_ACTION_SET_PARAMETER_H
-#define CEDAR_PROC_EXPERIMENT_GUI_ACTION_SET_PARAMETER_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_STEP_PROPERTY_PARAMETER_H
+#define CEDAR_PROC_EXPERIMENT_GUI_STEP_PROPERTY_PARAMETER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/gui/Action.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/gui/ActionSetParameter.fwd.h"
+#include "cedar/processing/experiment/gui/StepPropertyParameter.fwd.h"
 
 // SYSTEM INCLUDES
-
 #include <QComboBox>
-#include <QDoubleSpinBox>
-
+#include <QBoxLayout>
 
 /*!@todo describe.
  *
  * @todo describe more.
  */
-class cedar::proc::experiment::gui::ActionSetParameter  : public cedar::proc::experiment::gui::Action
+class cedar::proc::experiment::gui::StepPropertyParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -72,16 +70,27 @@ class cedar::proc::experiment::gui::ActionSetParameter  : public cedar::proc::ex
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ActionSetParameter();
+  StepPropertyParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~ActionSetParameter();
+  virtual ~StepPropertyParameter();
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  void updateSteps();
+  void updateProperties();
+
 public slots:
-  void updateDesiredValue();
+  //!@brief handles a change of the associated parameter
+  void parameterPointerChanged();
+  //!@brief handles a change in the step combo box
+  void stepChanged();
+  //!@brief handles a change in the property combo box
+  void propertyChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -92,7 +101,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void redraw();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -109,10 +118,10 @@ protected:
   // none yet
 
 private:
-  cedar::aux::gui::Parameter* mStepSelector;
-  cedar::aux::gui::Parameter* mDesiredValue;
+  QComboBox* mpStep;
+  QComboBox* mpProperty;
 
-}; // class cedar::proc::experiment::gui::ActionSetParameter
+}; // class cedar::proc::experiment::gui::StepPropertyParameter
 
-#endif // CEDAR_PROC_EXPERIMENT_GUI_ACTION_SET_PARAMETER_H
+#endif // CEDAR_PROC_EXPERIMENT_GUI_STEP_PROPERTY_PARAMETER_H
 

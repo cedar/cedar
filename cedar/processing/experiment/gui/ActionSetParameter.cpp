@@ -63,6 +63,8 @@ namespace
 
 cedar::proc::experiment::gui::ActionSetParameter::ActionSetParameter()
 :
+mStepSelector(NULL)
+,
 mDesiredValue(NULL)
 {
 }
@@ -77,103 +79,24 @@ cedar::proc::experiment::gui::ActionSetParameter::~ActionSetParameter()
 
 void cedar::proc::experiment::gui::ActionSetParameter::redraw()
 {
-  mStepSelector = new QComboBox;
-  mLayout->addWidget(new QLabel(QString::fromStdString("Set Step:")));
-  mLayout->addWidget(mStepSelector);
-  mParameterSelector = new QComboBox;
-  mLayout->addWidget(new QLabel(QString::fromStdString("Parameter")));
-  mLayout->addWidget(mParameterSelector);
-  mLayout->addWidget(new QLabel(QString::fromStdString("to")));
   if(mAction)
   {
-    //update selctor values
-   updateSteps();
-   cedar::aux::ParameterPtr stepString = mAction->getParameter("StepToSet");
-   if (cedar::aux::StringParameterPtr  stepParameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(stepString))
-   {
-     mStepSelector->setCurrentIndex(mStepSelector->findText(QString::fromStdString(stepParameter->getValue())));
-   }
-   updateParameters();
-   cedar::aux::ParameterPtr parameterString = mAction->getParameter("ParameterToSet");
-   if (cedar::aux::StringParameterPtr  parameterParameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(parameterString))
-   {
-     mParameterSelector->setCurrentIndex(mParameterSelector->findText(QString::fromStdString(parameterParameter->getValue())));
-   }
-  }
-  //get desired Value
-  updateDesiredValue();
-  connect(mStepSelector,SIGNAL(currentIndexChanged(int)),this,SLOT(stepSelected()));
-  connect(mParameterSelector,SIGNAL(currentIndexChanged(int)),this,SLOT(parameterSelected()));
-}
-
-void cedar::proc::experiment::gui::ActionSetParameter::updateSteps()
-{
-  if (mStepSelector->count() > 0)
-  {
-    mStepSelector->clear();
-  }
-  std::vector<std::string> steps = ExperimentControllerSingleton::getInstance()->getExperiment()->getAllSteps();
-  for (std::string step : steps)
-  {
-    mStepSelector->addItem(QString::fromStdString(step));
-  }
-}
-void cedar::proc::experiment::gui::ActionSetParameter::updateParameters()
-{
-  std::string index = mStepSelector->currentText().toStdString();
-  if (index == "")
-    return;
-  std::vector<std::string> parameters = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepParameters(index);
-   if (mParameterSelector->count() > 0)
-   {
-     mParameterSelector->clear();
-   }
-   for (std::string parameter : parameters)
-   {
-     mParameterSelector->addItem(QString::fromStdString(parameter));
-   }
-}
-
-void cedar::proc::experiment::gui::ActionSetParameter::stepSelected()
-{
-  std::string index = mStepSelector->currentText().toStdString();
-  if (index == "" || !mAction)
-    return;
-
-  cedar::aux::ParameterPtr parameter = mAction->getParameter("StepToSet");
-  if (cedar::aux::StringParameterPtr  stepParameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(parameter))
-  {
-      stepParameter->setValue(index);
-  }
-  updateParameters();
-
-
-}
-
-void cedar::proc::experiment::gui::ActionSetParameter::parameterSelected()
-{
-  std::string index = mParameterSelector->currentText().toStdString();
-  if (index == "" ||  !mAction)
-    return;
-
-  cedar::aux::ParameterPtr parameter = mAction->getParameter("ParameterToSet");
-  if (cedar::aux::StringParameterPtr  stepParameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(parameter))
-  {
-    stepParameter->setValue(index);
+   cedar::aux::ParameterPtr step_para = this->mAction->getParameter("StepProperty");
+   mStepSelector = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(step_para)->allocateRaw();
+   mStepSelector->setParent(this);
+   mStepSelector->setParameter(step_para);
+   this->layout()->addWidget(mStepSelector);
+   connect(step_para.get(),SIGNAL(valueChanged()),this,SLOT(updateDesiredValue()));
   }
   updateDesiredValue();
 }
 
 void cedar::proc::experiment::gui::ActionSetParameter::updateDesiredValue()
 {
-  cedar::aux::ParameterPtr desiredValue = mAction->getParameter("DesiredValue");
-  if(desiredValue)
-  {
-    delete mDesiredValue;
-    mDesiredValue =
-        cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(desiredValue)->allocateRaw();
-    mDesiredValue->setParameter(desiredValue);
-    mDesiredValue->setParent(this);
-    mLayout->addWidget(mDesiredValue);
-  }
+  delete mDesiredValue;
+  cedar::aux::ParameterPtr value_para = this->mAction->getParameter("DesiredValue");
+  mDesiredValue = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(value_para)->allocateRaw();
+  mDesiredValue->setParent(this);
+  mDesiredValue->setParameter(value_para);
+  this->layout()->addWidget(mDesiredValue);
 }
