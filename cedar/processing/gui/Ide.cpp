@@ -149,6 +149,7 @@ mSuppressCloseDialog(false)
   this->mpGlobalTimeFactor->setDecimals(2);
   this->mpGlobalTimeFactor->setSingleStep(global_time_factor_step);
   this->mpGlobalTimeFactor->setValue(global_time_factor_value);
+  this->mpGlobalTimeFactor->setSuffix("x");
   this->mpToolBar->insertWidget(this->mpActionRecord, this->mpGlobalTimeFactor);
 
   QObject::connect(this->mpGlobalTimeFactor, SIGNAL(valueChanged(double)), this, SLOT(globalTimeFactorSpinboxChanged(double)));
@@ -275,6 +276,8 @@ mSuppressCloseDialog(false)
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
   );
+
+  this->mpActionSave->setEnabled(true);
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -293,7 +296,6 @@ cedar::proc::gui::Ide::~Ide()
 
 void cedar::proc::gui::Ide::setArchitectureChanged(bool changed)
 {
-  this->mpActionSave->setEnabled(changed);
   this->setWindowModified(changed);
 }
 
@@ -859,10 +861,9 @@ bool cedar::proc::gui::Ide::saveAs()
 
   this->mGroup->write(file.toStdString());
   this->displayFilename(file.toStdString());
-
-  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
-
   this->setArchitectureChanged(false);
+  
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
 
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   last_dir->setValue(path);
