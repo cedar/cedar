@@ -45,6 +45,7 @@
 #include "cedar/processing/experiment/ActionStart.h"
 #include "cedar/processing/experiment/ExperimentController.h"
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/ParameterDeclaration.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
@@ -217,7 +218,15 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(
   std::vector<std::string> ret;
   for (cedar::aux::ParameterPtr parameter :  stepItem->getParameters())
   {
-    ret.push_back(parameter->getName());
+    try
+    {
+      cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
+      ret.push_back(parameter->getName());
+    }
+    catch(cedar::aux::UnknownTypeException e)
+    {
+       //@todo
+    }
   }
   return ret;
 }
