@@ -362,6 +362,17 @@ namespace cedar
         {
           return -std::numeric_limits<double>::infinity();
         }
+        else if (string == "nan" || string == "-nan")
+        {
+          if (std::numeric_limits<double>::has_quiet_NaN)
+          {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+          else
+          {
+            return std::numeric_limits<double>::signaling_NaN();
+          }
+        }
         else
         {
           CEDAR_THROW
@@ -391,6 +402,17 @@ namespace cedar
         else if (string == "-inf" || string == "-1.#INF" )
         {
           return -std::numeric_limits<float>::infinity();
+        }
+        else if (string == "nan" || string == "-nan")
+        {
+          if (std::numeric_limits<float>::has_quiet_NaN)
+          {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+          else
+          {
+            return std::numeric_limits<float>::signaling_NaN();
+          }
         }
         else
         {

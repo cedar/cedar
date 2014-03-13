@@ -56,6 +56,7 @@
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
@@ -71,12 +72,15 @@
 #include <QGraphicsDropShadowEffect>
 #include <QLayout>
 #include <QResource>
+#include <QFileDialog>
 #include <iostream>
 #include <QMessageBox>
 #include <QPushButton>
 #include <string>
 #include <set>
 
+//! declares a metatype for slot pointers; used by the serialization menu
+Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -605,6 +609,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QMenu *p_serialization_menu = menu.addMenu("save/load data");
+  p_serialization_menu->setIcon(QIcon(":/menus/save.svg"));
+  this->fillDataSerialization(p_serialization_menu);
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;
@@ -684,6 +693,90 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     std::string data_name = a->data().toString().toStdString();
 
     this->showPlot(event->screenPos(), data_name, role, declaration);
+  }
+}
+
+void cedar::proc::gui::StepItem::fillDataSerialization(QMenu* pMenu)
+{
+  for (auto role_enum : cedar::proc::DataRole::type().list())
+  {
+    if (role_enum.id() == cedar::proc::DataRole::INPUT)
+    {
+      // inputs cannot be serialized
+      continue;
+    }
+
+    if (!this->getStep()->hasRole(role_enum))
+    {
+      continue;
+    }
+
+    bool serializable_slots_found = false;
+    this->addRoleSeparator(role_enum, pMenu);
+
+    for (auto slot : this->getStep()->getOrderedDataSlots(role_enum.id()))
+    {
+      if (slot->isSerializable())
+      {
+        serializable_slots_found = true;
+
+        auto sub_menu = pMenu->addMenu(QString::fromStdString(slot->getText()));
+
+        QAction* save_action = sub_menu->addAction("save ...");
+        save_action->setData(QVariant::fromValue(slot));
+        QObject::connect(save_action, SIGNAL(triggered()), this, SLOT(saveDataClicked()));
+
+        QAction* load_action = sub_menu->addAction("load ...");
+        load_action->setData(QVariant::fromValue(slot));
+        QObject::connect(load_action, SIGNAL(triggered()), this, SLOT(loadDataClicked()));
+      }
+    }
+
+    if (!serializable_slots_found)
+    {
+      auto action = pMenu->addAction("No serializable slots.");
+      action->setEnabled(false);
+    }
+  }
+}
+
+void cedar::proc::gui::StepItem::saveDataClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+
+  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
+  CEDAR_DEBUG_ASSERT(slot);
+
+  QString filename = QFileDialog::getSaveFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file for saving"
+                     );
+
+  if (!filename.isEmpty())
+  {
+    slot->writeDataToFile(cedar::aux::Path(filename.toStdString()));
+  }
+}
+
+void cedar::proc::gui::StepItem::loadDataClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+
+  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
+  CEDAR_DEBUG_ASSERT(slot);
+
+  QString filename = QFileDialog::getOpenFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file to load"
+                     );
+
+  if (!filename.isEmpty())
+  {
+    slot->readDataFromFile(cedar::aux::Path(filename.toStdString()));
   }
 }
 

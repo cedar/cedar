@@ -97,7 +97,7 @@ private:
 
   void clear();
 
-  void addMeasurement(cedar::unit::Time measurement, int row, int column);
+  void addMeasurement(cedar::unit::Time measurement, int row, int column, bool isRunning);
 
   void addUnAvailableMeasurement(int row, int column);
 

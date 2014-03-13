@@ -100,7 +100,8 @@ _mTimeScaleDecay
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
-  this->declareOutput("activation", mActivation);
+  auto activation_slot = this->declareOutput("activation", mActivation);
+  activation_slot->setSerializable(true);
 
   this->declareInput("input", true);
   this->declareInput("peak detector", false);
