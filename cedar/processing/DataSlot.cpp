@@ -40,9 +40,12 @@
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <fstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,7 +62,8 @@ mpParent(pParent),
 mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
-mRole(role)
+mRole(role),
+mIsSerializable(false)
 {
 }
 
@@ -70,6 +74,34 @@ cedar::proc::DataSlot::~DataSlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::DataSlot::setSerializable(bool serializable)
+{
+  this->mIsSerializable = serializable;
+}
+
+bool cedar::proc::DataSlot::isSerializable() const
+{
+  return this->mIsSerializable;
+}
+
+void cedar::proc::DataSlot::writeDataToFile(const cedar::aux::Path& path) const
+{
+  CEDAR_ASSERT(this->isSerializable());
+  CEDAR_ASSERT(this->getData());
+
+  std::ofstream stream(path.absolute().toString());
+  this->getData()->serialize(stream);
+}
+
+void cedar::proc::DataSlot::readDataFromFile(const cedar::aux::Path& path)
+{
+  CEDAR_ASSERT(this->isSerializable());
+  CEDAR_ASSERT(this->getData());
+
+  std::ifstream stream(path.absolute().toString());
+  this->getData()->deserialize(stream);
+}
 
 void cedar::proc::DataSlot::clear()
 {

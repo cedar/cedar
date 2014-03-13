@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/Path.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/Group.fwd.h"
@@ -184,6 +185,23 @@ public:
   //! Returns the lock type for this data slot.
   virtual cedar::aux::LOCK_TYPE getLockType() const = 0;
 
+  /*! @brief Marks the data slot as serializable.
+   *
+   *         Serializable data slots are automatically written to architectures, and can be read and written from
+   *         user-given files.
+   */
+  void setSerializable(bool serializable);
+
+  //! Returns whether the slot is marked serializable.
+  bool isSerializable() const;
+
+  //! Writes the data in this slot to the given file.
+  void writeDataToFile(const cedar::aux::Path& path) const;
+
+  //! Writes the data in this slot to the given file.
+  void readDataFromFile(const cedar::aux::Path& path);
+  
+  
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------
@@ -274,6 +292,9 @@ private:
 
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
+
+  //! Holds whether the slot is marked as serializable.
+  bool mIsSerializable;
 
   //! The function object holding a reference to the type check functions for this slot.
   TypeCheckFunction mTypeCheck;

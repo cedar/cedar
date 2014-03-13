@@ -79,6 +79,83 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Connectable::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::proc::Element::readConfiguration(node);
+
+  auto stored_data_iter = node.find("stored data");
+  if (stored_data_iter == node.not_found())
+  {
+    return;
+  }
+
+  const auto& stored_data = stored_data_iter->second;
+
+  for (auto role_enum : cedar::proc::DataRole::type().list())
+  {
+    auto role_data_iter = stored_data.find(role_enum.name());
+
+    if (role_data_iter == stored_data.not_found())
+    {
+      continue;
+    }
+
+    const auto& role_node = role_data_iter->second;
+
+    for (const auto& subnode_iter : role_node)
+    {
+      const auto& slot_name = subnode_iter.first;
+      const auto& slot_data = subnode_iter.second.get_value<std::string>();
+
+      if (this->hasSlot(role_enum.id(), slot_name))
+      {
+        auto slot = this->getSlot(role_enum.id(), slot_name);
+        CEDAR_ASSERT(slot->getData());
+        std::stringstream stream(slot_data);
+        slot->getData()->deserialize(stream);
+      }
+    }
+  }
+}
+
+void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::proc::Element::writeConfiguration(root);
+
+  cedar::aux::ConfigurationNode stored_data;
+  for (auto role_enum : cedar::proc::DataRole::type().list())
+  {
+    if (!this->hasRole(role_enum.id()))
+    {
+      continue;
+    }
+
+    cedar::aux::ConfigurationNode role_stored_data;
+
+    for (auto slot : this->getOrderedDataSlots(role_enum.id()))
+    {
+      std::stringstream stream;
+      if (slot->isSerializable())
+      {
+        slot->getData()->serialize(stream);
+        cedar::aux::ConfigurationNode data_node;
+        data_node.put_value(stream.str());
+        role_stored_data.push_back(cedar::aux::ConfigurationNode::value_type(slot->getName(), data_node));
+      }
+    }
+
+    if (!role_stored_data.empty())
+    {
+      stored_data.push_back(cedar::aux::ConfigurationNode::value_type(role_enum.name(), role_stored_data));
+    }
+  }
+
+  if (!stored_data.empty())
+  {
+    root.push_back(cedar::aux::ConfigurationNode::value_type("stored data", stored_data));
+  }
+}
+
 void cedar::proc::Connectable::redetermineInputValidity(const std::string& slot)
 {
   this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);

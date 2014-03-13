@@ -185,6 +185,9 @@ private:
     std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
   );
 
+  //! Fills the menu with the appropriate entries for serializing data.
+  void fillDataSerialization(QMenu* pMenu);
+
   //!@brief Fills the defined plots into the given menu.
   void fillDefinedPlots(QMenu& menu, const QPoint& plotPosition);
 
@@ -238,6 +241,10 @@ private slots:
   void openActionsDock();
 
   void plotAll();
+
+  void saveDataClicked();
+
+  void loadDataClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
