@@ -132,6 +132,7 @@
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
@@ -779,6 +780,11 @@
   <action name="mpActionPerformanceOverview">
    <property name="text">
     <string>Performance overview ...</string>
+   </property>
+  </action>
+  <action name="mpActionParameterLinker">
+   <property name="text">
+    <string>Parameter linking ...</string>
    </property>
   </action>
  </widget>

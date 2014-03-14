@@ -204,6 +204,10 @@ public slots:
    */
   void showBoostControl();
 
+  /*! Opens the parameter linker
+   */
+  void openParameterLinker();
+
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
 

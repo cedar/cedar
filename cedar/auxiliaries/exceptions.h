@@ -174,6 +174,12 @@ class cedar::aux::InvalidNameException : public cedar::aux::ExceptionBase
 {
 };
 
+/*!@brief Exception that occurs when a value is not valid.
+ */
+class cedar::aux::InvalidValueException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception that occurs when an given type does not match an expected type.
  */
 class cedar::aux::TypeMismatchException : public cedar::aux::ExceptionBase

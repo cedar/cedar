@@ -428,6 +428,7 @@
             ],
             "name": "three-layer",
             "connectors": "",
+            "is looped": "false",
             "ui":
             [
                 {
@@ -436,8 +437,8 @@
                     "display style": "ICON_AND_TEXT",
                     "width": "160",
                     "height": "50",
-                    "positionX": "51",
-                    "positionY": "45"
+                    "positionX": "48",
+                    "positionY": "48"
                 },
                 {
                     "type": "step",
@@ -445,8 +446,8 @@
                     "display style": "ICON_AND_TEXT",
                     "width": "160",
                     "height": "50",
-                    "positionX": "270",
-                    "positionY": "113"
+                    "positionX": "272",
+                    "positionY": "112"
                 },
                 {
                     "type": "step",
@@ -454,7 +455,7 @@
                     "display style": "ICON_AND_TEXT",
                     "width": "160",
                     "height": "50",
-                    "positionX": "76",
+                    "positionX": "80",
                     "positionY": "144"
                 }
             ],
@@ -470,7 +471,7 @@
                 "uncollapsed width": "465",
                 "uncollapsed height": "229",
                 "positionX": "120",
-                "positionY": "-286"
+                "positionY": "-288"
             }
         },
         "two-layer":
@@ -649,8 +650,32 @@
                     "target": "u.input"
                 }
             ],
+            "custom parameters":
+            [
+                {
+                    "name": "dimensionality",
+                    "type": "cedar.aux.UIntParameterPtr"
+                }
+            ],
+            "parameter links":
+            [
+                {
+                    "source parameter": "dimensionality",
+                    "target element": "u",
+                    "target parameter": "dimensionality",
+                    "type": "cedar.aux.DirectParameterLink"
+                },
+                {
+                    "source parameter": "dimensionality",
+                    "target element": "v",
+                    "target parameter": "dimensionality",
+                    "type": "cedar.aux.DirectParameterLink"
+                }
+            ],
             "name": "two-layer",
             "connectors": "",
+            "is looped": "false",
+            "dimensionality": "2",
             "ui":
             [
                 {
@@ -659,8 +684,8 @@
                     "display style": "ICON_AND_TEXT",
                     "width": "160",
                     "height": "50",
-                    "positionX": "38",
-                    "positionY": "47"
+                    "positionX": "40",
+                    "positionY": "48"
                 },
                 {
                     "type": "step",
@@ -668,8 +693,8 @@
                     "display style": "ICON_AND_TEXT",
                     "width": "160",
                     "height": "50",
-                    "positionX": "229",
-                    "positionY": "85"
+                    "positionX": "232",
+                    "positionY": "88"
                 }
             ],
             "ui generic":
@@ -690,6 +715,7 @@
     },
     "name": "root",
     "connectors": "",
+    "is looped": "false",
     "ui":
     [
         {
@@ -698,8 +724,8 @@
             "display style": "ICON_AND_TEXT",
             "width": "160",
             "height": "50",
-            "positionX": "-238",
-            "positionY": "59"
+            "positionX": "-240",
+            "positionY": "56"
         },
         {
             "type": "step",
@@ -707,8 +733,8 @@
             "display style": "ICON_AND_TEXT",
             "width": "160",
             "height": "50",
-            "positionX": "-163",
-            "positionY": "-73"
+            "positionX": "-160",
+            "positionY": "-72"
         }
     ],
     "ui generic":
