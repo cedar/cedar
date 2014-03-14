@@ -75,6 +75,14 @@ public:
   {
   }
 
+  ~DataDelegate()
+  {
+    for (auto widget : mOpenedEditors)
+    {
+      delete widget;
+    }
+  }
+
   QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem& /*option*/, const QModelIndex &index) const
   {
     // Get the name of the parameter for which to return the edit widget.
@@ -103,7 +111,7 @@ public:
     }
 
     p_ret->setParent(pParent);
-
+    mOpenedEditors.push_back(p_ret);
     return p_ret;
   }
 
@@ -111,6 +119,7 @@ private:
   cedar::aux::ConfigurablePtr mpConfigurable;
 
   cedar::aux::gui::Configurable* mConfigurableWidget;
+  mutable std::vector<QWidget*> mOpenedEditors;
 };
 
 class cedar::aux::gui::Configurable::ParameterItem : public QTreeWidgetItem
@@ -518,6 +527,7 @@ void cedar::aux::gui::Configurable::clear()
 {
   for (QTreeWidgetItemIterator iter(this->mpPropertyTree); *iter != nullptr; ++iter)
   {
+    this->mpPropertyTree->closePersistentEditor(*iter, PARAMETER_EDITOR_COLUMN);
     this->disconnect(*iter);
   }
 
@@ -534,9 +544,28 @@ void cedar::aux::gui::Configurable::clear()
   }
   this->mParameterRenamedConnections.clear();
 
-  this->mDisplayedConfigurable.reset();
   this->mParameterAddedConnection.disconnect();
   this->mParameterRemovedConnection.disconnect();
+  this->mDisplayedConfigurable.reset();
+
+//  delete this->mpPropertyTree;
+//
+//  this->mpPropertyTree = new QTreeWidget();
+//  dynamic_cast<QVBoxLayout*>(this->layout())->addWidget(mpPropertyTree, 1);
+//  dynamic_cast<QVBoxLayout*>(this->layout())->setContentsMargins(0, 0, 0, 0);
+//  this->mpPropertyTree->setAlternatingRowColors(true);
+//
+//  // setup header
+//  this->mpPropertyTree->setColumnCount(2);
+//  QStringList header_labels;
+//  header_labels << "Property" << "Value";
+//  this->mpPropertyTree->setHeaderLabels(header_labels);
+//
+//  // make first section stretch
+//  this->mpPropertyTree->header()->setResizeMode(PARAMETER_NAME_COLUMN, QHeaderView::Interactive);
+//  this->mpPropertyTree->header()->setResizeMode(PARAMETER_EDITOR_COLUMN, QHeaderView::Stretch);
+//  this->mpPropertyTree->header()->resizeSection(PARAMETER_NAME_COLUMN, 150);
+
 }
 
 void cedar::aux::gui::Configurable::parameterChangeFlagChanged()
