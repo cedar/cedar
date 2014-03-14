@@ -220,7 +220,7 @@ private:
   {
     ParameterPtr parameter = this->parameter();
 
-    CEDAR_DEBUG_ASSERT(parameter->size() == this->mWidgets.size());
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(parameter->size() == this->mWidgets.size());
 
     std::vector<ValueType> values;
 
