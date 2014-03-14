@@ -954,7 +954,12 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
   // check connection
   if (this->isConnected(source, target))
   {
-    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
+    CEDAR_THROW
+    (
+      cedar::proc::DuplicateConnectionException,
+      "There is already a connection from \"" + source + "\" to \"" + target + "\" in Group \""
+      + this->getName() + "\"!"
+    );
   }
   std::string real_source_name;
   std::string real_source_slot;
