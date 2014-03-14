@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,47 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbsSigmoid.h
+    File:        EquationParameterLink.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 02 27
 
-    Description: Sigmoid functions
+    Description: Header file for the class cedar::aux::EquationParameterLink.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
-#define CEDAR_AUX_MATH_ABS_SIGMOID_H
+#ifndef CEDAR_AUX_EQUATION_PARAMETER_LINK_H
+#define CEDAR_AUX_EQUATION_PARAMETER_LINK_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/ParameterLink.h"
+#include "cedar/auxiliaries/ArithmeticExpression.fwd.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.fwd.h"
+#include "cedar/auxiliaries/EquationParameterLink.fwd.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Sigmoid function that is based on absolute values.
- *
- *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
- *
- *        The equation for this sigmoid is:
- *        @f[
- *           \sigma(x) = \frac{1}{2} \cdot \frac{1 + \beta \cdot (x - \theta)}{1 + \beta \cdot |x - \theta|}
- *        @f]
- *        where \f$\theta\f$ is the threshold set for this function and \f$\beta\f$ is the steepness of the sigmoid.
+
+/*!@brief A parameter link that uses a (linear) equation to determine how to link parameters.
  */
-class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::EquationParameterLink : public cedar::aux::ParameterLink
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -70,27 +66,13 @@ class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  AbsSigmoid(double threshold = 0.0, double beta = 100.0);
+  EquationParameterLink();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
-   */
-  virtual double compute(double value) const;
-
-  virtual cv::Mat compute(const cv::Mat& values) const;
-
-  inline double getBeta() const
-  {
-    return this->_mBeta->getValue();
-  }
-
-  inline void setBeta(double beta)
-  {
-    this->_mBeta->setValue(beta);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -104,14 +86,38 @@ protected:
 private:
   // none yet
 
+  void sourceChanged();
+
+  void targetChanged();
+
+  bool checkIfLinkable(cedar::aux::ConstParameterPtr source, cedar::aux::ConstParameterPtr target) const;
+
+private slots:
+  void equationChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief steepness of the abs-sigmoid
-  cedar::aux::DoubleParameterPtr _mBeta;
-private:
   // none yet
-};
+private:
+  //! Expression of the form right = f(left)
+  cedar::aux::ArithmeticExpressionPtr mForwardExpression;
 
-#endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H
+  //! Expression of the form left = f(right)
+  cedar::aux::ArithmeticExpressionPtr mBackwardExpression;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  //! Equation linking the two parameters. Must have the form right = f(left), where f is some linear function.
+  cedar::aux::StringParameterPtr _mEquation;
+
+}; // class cedar::aux::EquationParameterLink
+
+#endif // CEDAR_AUX_EQUATION_PARAMETER_LINK_H
+

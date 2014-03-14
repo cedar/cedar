@@ -126,6 +126,8 @@ private:
 
   void updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
 
+  void updateLinkState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
+
   QTreeWidgetItem* getItemForParameter(cedar::aux::Parameter* parameter);
 
   QString getPathFromItem(QTreeWidgetItem* item);

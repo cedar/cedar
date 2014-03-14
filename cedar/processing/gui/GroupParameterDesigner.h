@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,75 +22,61 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbsSigmoid.h
+    File:        GroupParameterDesigner.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 02 27
 
-    Description: Sigmoid functions
+    Description: Header file for the class cedar::proc::gui::GroupParameterDesigner.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
-#define CEDAR_AUX_MATH_ABS_SIGMOID_H
+#ifndef CEDAR_PROC_GUI_GROUP_PARAMETER_DESIGNER_H
+#define CEDAR_PROC_GUI_GROUP_PARAMETER_DESIGNER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/processing/gui/ui_GroupParameterDesigner.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.fwd.h"
+#include "cedar/processing/gui/GroupParameterDesigner.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+#include "cedar/auxiliaries/Parameter.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
+#include <QComboBox>
+#include <vector>
+#include <string>
 
-/*!@brief Sigmoid function that is based on absolute values.
- *
- *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
- *
- *        The equation for this sigmoid is:
- *        @f[
- *           \sigma(x) = \frac{1}{2} \cdot \frac{1 + \beta \cdot (x - \theta)}{1 + \beta \cdot |x - \theta|}
- *        @f]
- *        where \f$\theta\f$ is the threshold set for this function and \f$\beta\f$ is the steepness of the sigmoid.
+
+/*!@brief A widget for editing parameters of groups.
  */
-class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
+class cedar::proc::gui::GroupParameterDesigner : public QWidget, public Ui_GroupParameterDesigner
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  AbsSigmoid(double threshold = 0.0, double beta = 100.0);
+  //!@brief The constructor.
+  GroupParameterDesigner(cedar::proc::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
-   */
-  virtual double compute(double value) const;
-
-  virtual cv::Mat compute(const cv::Mat& values) const;
-
-  inline double getBeta() const
-  {
-    return this->_mBeta->getValue();
-  }
-
-  inline void setBeta(double beta)
-  {
-    this->_mBeta->setValue(beta);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -102,16 +88,52 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void fillParameterTypeBox();
+
+  void addParameter(const std::string& type);
+
+  void addParameterToList(cedar::aux::ParameterPtr parameter);
+
+  void translateCustomParameterAdded(cedar::aux::ParameterPtr);
+
+  void translateCustomParameterRemoved(cedar::aux::ParameterPtr);
+
+  cedar::aux::ParameterPtr parameterFromItem(QTreeWidgetItem* pItem) const;
+
+signals:
+  void customParameterAdded(QVariant pointer);
+
+  void customParameterRemoved(QVariant pointer);
+
+private slots:
+  void customParameterAddedSlot(QVariant pointer);
+
+  void customParameterRemovedSlot(QVariant pointer);
+
+  void addClicked();
+
+  void deleteClicked();
+
+  void itemChanged(QTreeWidgetItem* item, int column);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief steepness of the abs-sigmoid
-  cedar::aux::DoubleParameterPtr _mBeta;
+  // none yet
+private:
+  cedar::proc::GroupPtr mGroup;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
 private:
   // none yet
-};
 
-#endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H
+}; // class cedar::proc::gui::GroupParameterDesigner
+
+#endif // CEDAR_PROC_GUI_GROUP_PARAMETER_DESIGNER_H
+
