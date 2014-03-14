@@ -769,7 +769,10 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
                          );
         for (auto real_target : targets)
         {
-          data_connections.push_back(DataConnectionInfo(source_slot, real_target));
+          if (std::find(processed_targets.begin(), processed_targets.end(), real_target) == processed_targets.end())
+          {
+            data_connections.push_back(DataConnectionInfo(source_slot, real_target));
+          }
         }
         // the above for loop adds ALL targets of the given source slot - remember to not add any more connections from this slot
         processed_sources.push_back(source_slot);
@@ -790,7 +793,10 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
                          );
         for (auto real_source : sources)
         {
-          data_connections.push_back(DataConnectionInfo(real_source, target_slot));
+          if (std::find(processed_sources.begin(), processed_sources.end(), real_source) == processed_sources.end())
+          {
+            data_connections.push_back(DataConnectionInfo(real_source, target_slot));
+          }
         }
         // the above for loop adds ALL sources of the given target slot - remember to not add any more connections to this slot
         processed_targets.push_back(target_slot);
