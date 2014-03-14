@@ -339,6 +339,24 @@ void run_test()
   cedar::aux::sleep(0.5 * cedar::unit::seconds);
   new_trigger->stop();
 
+  std::cout << "testing moving of some steps" << std::endl;
+  cedar::proc::GroupPtr group_1(new cedar::proc::Group());
+  cedar::proc::GroupPtr group_2(new cedar::proc::Group());
+  cedar::proc::steps::StaticGainPtr gain_1(new cedar::proc::steps::StaticGain());
+  cedar::proc::steps::StaticGainPtr gain_2(new cedar::proc::steps::StaticGain());
+  cedar::proc::steps::StaticGainPtr gain_3(new cedar::proc::steps::StaticGain());
+  group_1->add(group_2, "group");
+  group_1->add(gain_1, "gain 1");
+  group_1->add(gain_2, "gain 2");
+  group_1->add(gain_3, "gain 3");
+  group_1->connectSlots("gain 1.output", "gain 2.input");
+  group_1->connectSlots("gain 1.output", "gain 3.input");
+  std::list<cedar::proc::ElementPtr> moved_gains;
+  moved_gains.push_back(gain_1);
+  moved_gains.push_back(gain_3);
+  group_2->add(moved_gains);
+  group_1->add(moved_gains);
+
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
 

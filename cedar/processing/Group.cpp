@@ -629,17 +629,10 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
       auto source_it = std::find(elements.begin(), elements.end(), source);
       auto target_it = std::find(elements.begin(), elements.end(), target);
 
-      // these connections connect elements that are moved
-      if (source_it != elements.end() && target_it != elements.end())
-      {
-        // this connection must be stored (note that connections are automatically deleted if elements are removed)
-        data_connections.push_back(DataConnectionInfo(connection->getSource(), connection->getTarget()));
-      }
-      // the target is not in this group
-      else if
+      // the source is in this group
+      if
       (
         source_it != elements.end()
-        && target_it == elements.end()
         && std::find(processed_sources.begin(), processed_sources.end(), source_slot) == processed_sources.end()
       )
       {
@@ -656,7 +649,7 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
         // the above for loop adds ALL targets of the given source slot - remember to not add any more connections from this slot
         processed_sources.push_back(source_slot);
       }
-      // the source is not in this group
+      // the source is not in this group, but the target is
       else if
       (
         source_it == elements.end()
