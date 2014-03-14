@@ -238,6 +238,7 @@ void cedar::proc::gui::Scene::resetBackgroundColor()
 
 void cedar::proc::gui::Scene::reset()
 {
+  this->mpDropTarget = nullptr;
   this->clear();
   CEDAR_DEBUG_ASSERT(mStepMap.empty());
   CEDAR_DEBUG_ASSERT(mTriggerMap.empty());
