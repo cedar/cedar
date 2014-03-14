@@ -451,7 +451,11 @@ void cedar::proc::gui::Ide::pasteStepConfiguration()
   if (this->mLastCopiedStep) // is there a step in the buffer?
   {
     QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
-    for (auto item :selected_items)
+    if (selected_items.size() == 1)
+    {
+      this->mpPropertyTable->clear();
+    }
+    for (auto item : selected_items)
     {
       if (cedar::proc::gui::StepItem* p_base = dynamic_cast<cedar::proc::gui::StepItem*>(item))
       {
@@ -463,6 +467,13 @@ void cedar::proc::gui::Ide::pasteStepConfiguration()
         {
           // this might happen, ignore
         }
+      }
+    }
+    if (selected_items.size() == 1)
+    {
+      if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(0)))
+      {
+        this->mpPropertyTable->display(p_base->getElement());
       }
     }
   }
