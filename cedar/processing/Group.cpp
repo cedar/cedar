@@ -186,6 +186,7 @@ cedar::proc::Group::~Group()
   // read out all elements and call this->remove for each element
   this->removeAll();
 
+  this->mParameterLinks.clear();
   mDataConnections.clear();
   mTriggerConnections.clear();
   mElements.clear();

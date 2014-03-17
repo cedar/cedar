@@ -114,7 +114,7 @@ class cedar::aux::ParameterTemplate : public cedar::aux::Parameter, public Value
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef cedar::aux::ParameterTemplate<T> SelfType;
+  typedef cedar::aux::ParameterTemplate<T, ValuePolicy> SelfType;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SelfType);
 
   //--------------------------------------------------------------------------------------------------------------------

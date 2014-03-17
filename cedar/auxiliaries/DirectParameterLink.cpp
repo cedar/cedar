@@ -116,7 +116,7 @@ void cedar::aux::DirectParameterLink::assign
     CEDAR_THROW
     (
       cedar::aux::UnhandledTypeException,
-      "Cannot assing values from " + cedar::aux::objectTypeToString(source) + " to "
+      "Cannot assign values from " + cedar::aux::objectTypeToString(source) + " to "
       + cedar::aux::objectTypeToString(target)
     );
   }

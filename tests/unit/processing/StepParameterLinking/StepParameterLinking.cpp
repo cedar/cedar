@@ -167,8 +167,8 @@ int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
 
-  cedar::aux::CallFunctionInThread caller(boost::bind(&run_test));
-  caller.start();
+  cedar::aux::CallFunctionInThreadPtr caller(new cedar::aux::CallFunctionInThread(boost::bind(&run_test)));
+  caller->start();
 
   return app.exec();
 }
