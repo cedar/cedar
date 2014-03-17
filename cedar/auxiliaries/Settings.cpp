@@ -293,10 +293,25 @@ const std::vector<std::string>& cedar::aux::Settings::getPluginSearchPaths() con
 
 void cedar::aux::Settings::load()
 {
-  std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/auxilariesSettings";
+  std::string basepath = cedar::aux::getUserApplicationDataDirectory();
+//  std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/auxilariesSettings";
   try
   {
-    this->readJson(path);
+    this->readJson(basepath + "/.cedar/auxiliariesSettings");
+    return;
+  }
+  catch (const boost::property_tree::json_parser::json_parser_error& e)
+  {
+    std::cout << "Error reading settings: " << e.what() << std::endl;
+  }
+
+  std::cout << "Trying a different name." << std::endl;
+
+  // backwards compatibility: there used to be a typo in the name of the settings file
+  try
+  {
+    this->readJson(basepath + "/.cedar/auxilariesSettings");
+    return;
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
@@ -306,7 +321,7 @@ void cedar::aux::Settings::load()
 
 void cedar::aux::Settings::save()
 {
-  std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/auxilariesSettings";
+  std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/auxiliariesSettings";
   try
   {
     this->writeJson(path);
