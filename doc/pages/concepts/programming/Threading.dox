@@ -1,0 +1,49 @@
+/*!
+
+@page ThreadingConcept An introduction to threading in cedar
+
+@section ThreadsIntroductionConcept Introduction
+On this page, we introduce the concept of threading in cedar. Modern workstations almost always provide the capacity
+of computing more than one operation at the same time (dual- and quad-core CPUs, threads). To access the additional
+power of multiple CPU cores, one has to choose one out of several parallel computation or threading 
+solutions. Examples are: <a href="http://openmp.org/">OpenMP</a>,
+<a href="http://www.boost.org/doc/libs/1_48_0/doc/html/thread.html">Boost threads</a>, and Qt's
+<a href="http://doc.qt.nokia.com/latest/qthread.html">QThread</a>. Note that there are many faces of parallel computation
+on different levels of abstraction. For example, parallelizing the execution of a \b for-loop is very different from 
+executing two distinct parts of your code on separate threads, while the results of both computations are visualized in 
+a third thread. We now take a closer look at the problems one may encounter when working with threads.
+
+@subsection ThreadsAndDataConcept Threads and data
+Let us consider a simple scenario. We write a little program, which consists of two threads. The first one is taking a
+live camera input and executes some processing steps on the image. A second thread runs in parallel and displays the
+output image of the first thread. If you execute this program, both threads are accessing the same data structures (the
+output image) at some point in time. In addition, the first thread uses write access, whereas the second thread's access
+is read-only. Using this simple example, we can analyze the importance of data handling if multiple sources have access
+to shared resources. Here, during execution, the second thread may use its read access to the data during some
+computation of the first thread. The result is a displayed image that contains some newly calculated pixels (the ones
+that are already processed by the first thread) and some out-dated pixels (the remaining pixels, which must be processed
+by the first thread). Since there is no synchronization between both threads, the appearance of a correct image is very
+unlikely, if the first thread is continuously updating the data. You may argue that the calculation of output is not
+affected by this asynchronous execution and it only leads to a slight glitch in what the user is seeing. Now consider
+that the first thread has to allocate some memory anew each time it executes its computation. During displaying the data
+in the second thread, the data may become invalid due to the memory operations done in the first thread. This will most
+certainly lead to a crash at some point or at least wreak havoc in memory. To resolve these serious problems concerning
+asynchronous computations, we use \b locks. This is a form of synchronization between threads, which checks whether write
+or read access can be safely executed without affecting another thread. In general, a lock object provides functions to
+lock it either for read or for write access. All threads that try to lock the object in preparation for some
+computation are affected by a previous successful lock in the following way:
+\li if any other thread has locked for write access, any attempt of locking for read or write access is blocked until the
+lock is freed by the other thread
+\li if any other thread has locked for read access, any attempt of locking for write access is blocked. Additional read
+attempts, however, are not blocked. All threads must release their read locks before another thread may acquire write 
+access.
+
+If you add a lock that works in the fashion described above, both of the described problematic scenarios can be
+resolved. In the latter example, allocating new memory would require a previously acquired write access, whereas
+displaying the data translates to locking the data for read access only. In the actual implementation, we use 
+<a href="http://doc.qt.nokia.com/latest/qreadwritelock.html">QReadWriteLock</a> of Qt. It provides all needed
+functionality with its member functions \b lockForRead, \b lockForWrite, and \b unlock.
+
+@subsection ThreadsTimeDynamicsConcept Threads, time, and dynamics
+Coming soon...
+*/
