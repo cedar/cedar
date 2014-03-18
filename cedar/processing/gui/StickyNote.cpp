@@ -48,10 +48,10 @@
 
 cedar::proc::gui::StickyNote::StickyNote(
     cedar::proc::gui::Scene* pParent,
-    int x,
-    int y,
-    int width,
-    int height,
+    float x,
+    float y,
+    float width,
+    float height,
     std::string text)
 :
 cedar::proc::gui::GraphicsBase(width,height)
@@ -77,11 +77,19 @@ cedar::proc::gui::GraphicsBase(width,height)
   setFlag(ItemIsFocusable);
 
   this->setZValue(0);
+
+  if (pParent)
+  {
+    pParent->emitSceneChanged();
+  }
 }
 
 cedar::proc::gui::StickyNote::~StickyNote()
 {
-
+  if (this->mpParent)
+  {
+    this->mpParent->emitSceneChanged();
+  }
 }
 QRectF cedar::proc::gui::StickyNote::boundingRect() const
 {

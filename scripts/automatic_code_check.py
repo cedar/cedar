@@ -40,12 +40,14 @@
 import os
 import re
 import argparse
+import datetime
 
 
 cedar_home = os.path.realpath(__file__ + "/../..")
 base_directory = cedar_home
 
 issue_type_compatibility = 'C'
+issue_type_miscellaneous = 'M'
 
 class Issue:
   def __init__(self, issue_type, issue_no, description, line = None, column = None):
@@ -69,6 +71,14 @@ class IssueC0002 (Issue):
     Issue.__init__(self, 
                    issue_type_compatibility, 2,
                    "In line " + str(line) + ", col. " + str(column) + ": Replace the function boost::" + boost_call + " by " + replacements[boost_call] + "."
+                   )
+
+class IssueM0001 (Issue):
+  def __init__(self, line, column):
+    replacements = {"shared_dynamic_cast": "dynamic_pointer_cast"}
+    Issue.__init__(self, 
+                   issue_type_miscellaneous, 1,
+                   "In line " + str(line) + ", col. " + str(column) + ": copyright year is outdated."
                    )
                    
 
@@ -142,6 +152,23 @@ class CheckC0001 (REBasedCheck):
 
   def _found(self, issues, filename, line, column, match):
     issues.add_issue(filename, IssueC0002(line, column, match.group(1)))
+    
+    
+class CheckM0001 (REBasedCheck):
+  def __init__(self):
+    self.years = "2011"
+    today = datetime.date.today()
+    for year in range(2012, today.year + 1):
+      self.years += ", " + str(year)
+      
+    REBasedCheck.__init__(self,
+                          re = re.compile(r'Copyright (\d{4},? )+'),
+                          use_preprocessed = False
+                          )
+
+  def _found(self, issues, filename, line, column, match):
+    if match.group(0) != "Copyright " + self.years + " ":
+      issues.add_issue(filename, IssueM0001(line, column))
     
 
   
@@ -249,6 +276,10 @@ def check_deprecated_boost_casts(filename, file_contents, preprocessed_contents)
   check = CheckC0001()
   check.check(issues, filename, file_contents, preprocessed_contents)
   
+def check_copyright_year(filename, file_contents, preprocessed_contents):
+  check = CheckM0001()
+  check.check(issues, filename, file_contents, preprocessed_contents)
+  
 
 #
 #
@@ -266,6 +297,7 @@ def check_file(filename):
     preprocessed_contents = preprocess(file_contents)
     check_std_headers(filename, file_contents, preprocessed_contents)
     check_deprecated_boost_casts(filename, file_contents, preprocessed_contents)
+    check_copyright_year(filename, file_contents, preprocessed_contents)
     
     
 def check_directory(directory):
@@ -288,16 +320,19 @@ def check_all(directory):
 #
 #
 if __name__ == "__main__":
-  parser = argparse.ArgumentParser(description='Checks code for style and other issues.')
-  parser.add_argument('--input-directory', dest='input_directory', action='store',
-                     default=cedar_home + os.sep + "cedar",
-                     help='Specify the directory in which files should be checked.')
-                     
-  parser.add_argument('--output', dest='output', action='store',
-                     default="issues.txt",
-                     help='Specify the file to which the issues are to be written.')
+  try:
+    parser = argparse.ArgumentParser(description='Checks code for style and other issues.')
+    parser.add_argument('--input-directory', dest='input_directory', action='store',
+                       default=cedar_home + os.sep + "cedar",
+                       help='Specify the directory in which files should be checked.')
+                       
+    parser.add_argument('--output', dest='output', action='store',
+                       default="issues.txt",
+                       help='Specify the file to which the issues are to be written.')
 
-  args = parser.parse_args()
-  check_all(args.input_directory)
-  issues.write_issues(args.output)
-  print "Done."
+    args = parser.parse_args()
+    check_all(args.input_directory)
+    issues.write_issues(args.output)
+    print "Done."
+  except KeyboardInterrupt:
+    print "Cancelled by user. Bye."

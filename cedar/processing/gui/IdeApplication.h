@@ -59,7 +59,7 @@
 #include <string>
 
 
-/*!@brief The application for the processingIde.
+/*!@brief The QApplication for the cedar application.
  */
 class cedar::proc::gui::IdeApplication : public QApplication
 {

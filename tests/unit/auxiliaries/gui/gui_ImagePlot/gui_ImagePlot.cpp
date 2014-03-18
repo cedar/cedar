@@ -37,9 +37,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -47,15 +47,12 @@
 #include <string>
 #include <iostream>
 
-//! Derives from image plot in order to be able to emit the convert signal.
-class ImagePlot_Helper : public cedar::aux::gui::ImagePlot
-{
-  public:
-    void triggerConversion()
-    {
-      emit convert();
-    }
-};
+#ifndef CEDAR_COMPILER_MSVC
+
+// The class we want to test
+#define private public
+#include "cedar/auxiliaries/gui/ImagePlot.h"
+
 
 int test_annotation_with_float(cedar::aux::annotation::ColorSpace::ChannelType type, int matrixType)
 {
@@ -74,9 +71,9 @@ int test_annotation_with_float(cedar::aux::annotation::ColorSpace::ChannelType t
   cedar::aux::MatDataPtr data(new cedar::aux::MatData(cv::Mat::ones(40, 40, matrixType)));
   data->setAnnotation(cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(type)));
 
-  auto plot = new ImagePlot_Helper();
+  auto plot = new cedar::aux::gui::ImagePlot();
   plot->plot(data, "unit test plot");
-  plot->triggerConversion();
+  plot->doConversion();
 
   while (QApplication::hasPendingEvents())
   {
@@ -114,16 +111,24 @@ int test_annotations_with_float(int matrixType)
   return errors;
 }
 
+#endif // CEDAR_COMPILER_MSVC
+
 int main(int argc, char** argv)
 {
+#ifdef CEDAR_COMPILER_MSVC
+  return 0;
+#else // CEDAR_COMPILER_MSVC
   // needs to be created because we deal with widgets here
   QApplication app(argc, argv);
 
-  // the number of errors encountered in this test
   int errors = 0;
 
   errors += test_annotations_with_float(CV_32F);
 
   std::cout << "Done with " << errors << " error(s)." << std::endl;
+
+  // the number of errors encountered in this test
   return errors;
+#endif // CEDAR_COMPILER_MSVC
 }
+

@@ -91,7 +91,7 @@ cedar::aux::LoopedThread()
   this->init(grabberchannels);
 
   this->connectToStartSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::prepareStart, this));
-  this->connectToStopSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::processStop, this, _1));
+  this->connectToQuitSignal(boost::bind(&cedar::dev::sensors::visual::Grabber::processQuit, this));
 }
 
 
@@ -222,7 +222,7 @@ void cedar::dev::sensors::visual::Grabber::doCleanUp()
     mCleanUpAlreadyDone = true;
 
     // stop LoopedThread
-    if (this->isRunning())
+    if (this->isRunningNolocking())
     {
       cedar::aux::LoopedThread::stop();
       this->wait();
@@ -358,7 +358,7 @@ void cedar::dev::sensors::visual::Grabber::closeGrabber()
 {
   setIsCreated(false);
 
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     this->stop();
   }
@@ -399,7 +399,7 @@ double cedar::dev::sensors::visual::Grabber::getFramerate() const
 
 void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
 {
-  bool wasRunning = this->isRunning();
+  bool wasRunning = this->isRunningNolocking();
 
   if (wasRunning)
   {
@@ -424,7 +424,7 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
   }
 
   std::string info;
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     info =  ": Thread running";
   }
@@ -439,7 +439,7 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                            );
 }
 
-void cedar::dev::sensors::visual::Grabber::processStop(bool)
+void cedar::dev::sensors::visual::Grabber::processQuit()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
@@ -868,7 +868,7 @@ void cedar::dev::sensors::visual::Grabber::startRecording
   // start the grabberthread if needed
   if (!mIsGrabbing)
   {
-    if (!this->isRunning() && startThread)
+    if (!this->isRunningNolocking() && startThread)
     {
       cedar::aux::LogSingleton::getInstance()->message
                                                (

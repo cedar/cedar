@@ -55,6 +55,7 @@
 cedar::aux::ThreadWrapper::ThreadWrapper()
 :
 mpThread(NULL),
+mReallocateOnStart(true),
 mDestructing(false),
 mStopRequested(false),
 mpWorker(NULL)
@@ -105,6 +106,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
   //
   // /////////////////////////////////////////////////////////////////////////
 
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
   if (validWorker())
   {
     requestStop(); // set stopped state first, 
@@ -123,7 +125,11 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
       // need to wait for the thread to finish of its own accord, to make sure
       // the worker doesnt continue with work() (or step()) after we 
       // have been detructed
-      mpThread->wait(); // blocks until finished
+      auto old_thread = this->mpThread;
+      thread_worker_readlock.unlock();
+
+      old_thread->wait(); // blocks until finished
+      thread_worker_readlock.relock();
     }
     else
     {
@@ -141,16 +147,21 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
     }
   }
 
+  thread_worker_readlock.unlock();
+
+  QWriteLocker thread_worker_writelock(&mThreadAndWorkerLock);
   // free worker data
   if (validWorker())
   {
     delete mpWorker;
+    this->mpWorker = NULL;
   }
 
   // free thread data
   if (isValidThread())
   {
     delete mpThread;
+    this->mpThread = NULL;
   }
 }
 
@@ -160,9 +171,19 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 
 bool cedar::aux::ThreadWrapper::isRunning() const
 {
-  // no locks, because they really slow things down, here ...
-  //!@todo: can I have a lockless-version that only is called from mpThread?
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
+  QMutexLocker general_access_lock(&mGeneralAccessLock);
 
+  if (mDestructing)
+    return false;
+
+  bool running = this->isRunningNolocking();
+  return running;
+}
+
+bool cedar::aux::ThreadWrapper::isRunningNolocking() const
+{
+  // no locks, because they really slow things down, here ...
   if (mpThread == NULL)
     return false;
 
@@ -205,9 +226,14 @@ void cedar::aux::ThreadWrapper::start()
   //              Communication is done via the QT event loops (also of the
   //              QThread object).
 
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
+
+  if (mDestructing)
+    return;
+
   CEDAR_ASSERT(validWorker() == isValidThread());
 
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
@@ -218,6 +244,9 @@ void cedar::aux::ThreadWrapper::start()
   }
   else if (!this->isValidThread())
   {
+    thread_worker_readlock.unlock();
+
+    QWriteLocker thread_worker_writelock(&mThreadAndWorkerLock);
     CEDAR_ASSERT(!this->validWorker());
 
     // we need a new worker object:
@@ -243,15 +272,26 @@ void cedar::aux::ThreadWrapper::start()
 
     // when the thread finishes (returns from run()), react to it:
     connect( mpWorker, SIGNAL(finishedWorking()), this, SLOT(finishedWorkSlot()), Qt::DirectConnection );
-    // this will be called on a thread termination (should not happen):
+    // this will be called on a thread termination:
     connect( mpThread, SIGNAL(finished()), this, SLOT(quittedThreadSlot()), Qt::DirectConnection );
+
+    thread_worker_writelock.unlock();
+    thread_worker_readlock.relock();
   }
   else
   {
-    CEDAR_THROW(cedar::aux::ThreadingErrorException, 
-      "Re-starting a not cleanly finished thread. Continuing.");
+    if (!getReallocateOnStart())
+    {
+      CEDAR_THROW(cedar::aux::ThreadingErrorException, 
+        "Re-starting a not cleanly finished thread. Continuing.");
+    }
+    else
+    {
+      // all is good
+    }
   }
 
+  thread_worker_readlock.unlock(); // unlock for signalling ...
   mStartSignal();
 
   // start the thread 
@@ -269,19 +309,19 @@ void cedar::aux::ThreadWrapper::finishedWorkSlot()
 {
   // is called in the new thread's context(!)
 
-  // std::cout << "finished work" << std::endl;
-
   QThread::currentThread()->quit();
 }
 
 void cedar::aux::ThreadWrapper::quittedThreadSlot()
 {
-  CEDAR_ASSERT( QThread::currentThread() == mpThread );
-  // is called in the new thread's context(!)
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
 
   // we land here after the thread ended
   if (mDestructing) // quick abort, see below
     return;
+
+  CEDAR_ASSERT(QThread::currentThread() == mpThread);
+  // is called in the new thread's context(!)
 
   //std::cout << "called quittedThreadSlot() for " << this << std::endl;  
 
@@ -291,29 +331,28 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
 
   // note, we cannot test isRunning(), here, per premise that we
   // are operating without locks
-  //!@todo isRunning() has no locks anymore. still valid?
 
   if (mDestructing) // always test after locking, see start()
     return;
+
+  thread_worker_readlock.unlock();
+  mQuitSignal();
+  thread_worker_readlock.relock();
 
   if (isValidThread())
   {
     // if my own stop() is not running, then delete the pointers:
     // (this is a fall-back, if the thread was destroyed by any other means)
-    if (mGeneralAccessLock.tryLock())
-    {
-      //std::cout << "deleting thread: " << mpThread << " ( current thread: " << QThread::currentThread() << ") in: " << this << std::endl;
-
-      scheduleThreadDeletion();
-
-      mGeneralAccessLock.unlock();
-    }
+    thread_worker_readlock.unlock();
+    scheduleThreadDeletion();
+    thread_worker_readlock.relock();
   }
   else
   {
     CEDAR_ASSERT( !validWorker() );
   }
 
+  thread_worker_readlock.unlock();
   emit finishedThread();
 }
 
@@ -321,22 +360,29 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
 void cedar::aux::ThreadWrapper::scheduleThreadDeletion()
 {
   QMutexLocker locker(&mThreadPointerDeletionMutex);
+  QWriteLocker thread_worker_lock(&mThreadAndWorkerLock);
+
+  if (mDestructing)
+    return;
 
   if (mpThread != NULL)
   {
     CEDAR_ASSERT( mpWorker != NULL );
 
-    auto tmp_thread = mpThread;
-    auto tmp_worker = mpWorker;
+    if (!getReallocateOnStart())
+    {
+      auto tmp_thread = mpThread;
+      auto tmp_worker = mpWorker;
 
-    // allow me to restart a new thread/worker
-    mpThread = NULL;
-    mpWorker = NULL;
+      // force me to reallocate a new thread/worker on the next start()
+      mpThread = NULL;
+      mpWorker = NULL;
 
-  //!@todo this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app): not that important
-  //!@todo it will also lead to a destruction of a held mutex (in helgrind). not that important
-    tmp_thread->deleteLater();
-    tmp_worker->deleteLater();
+      //!@todo this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app): not that important
+      //!@todo it will also lead to a destruction of a held mutex (in helgrind). not that important
+      tmp_thread->deleteLater();
+      tmp_worker->deleteLater();
+    }
   }
 }
 
@@ -352,8 +398,12 @@ bool cedar::aux::ThreadWrapper::isValidThread() const
   return mpThread != NULL;
 }
 
+void cedar::aux::ThreadWrapper::stop(unsigned int time, bool /*suppressWarning*/ )
+{
+  cedar::aux::ThreadWrapper::stop(time);
+}
 
-void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
+void cedar::aux::ThreadWrapper::stop(unsigned int time)
 {
   if (mDestructing) // quick abort, see below
     return;
@@ -371,28 +421,41 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
  
   // cant wait for mFinishedThreadMutex here, because that will dead-lock
 
-  if (isRunning())
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
+
+  if (mDestructing)
+    return;
+
+  if (this->isRunningNolocking())
   {
-    mStopSignal(suppressWarning);
+    thread_worker_readlock.unlock();
+    mStopSignal();
       // intentionally called while the thread may still be running. 
       // we need to guarantee that the worker class hasn't been destroyed, yet.
       // This is only possible here or in quittedThreadSlot(). 
       // But historically, stop() also carries the suppressWarning parameter,
       // which we only have access too, so we call applyStop() here.
+    thread_worker_readlock.relock();
 
     // avoid dead-locking if called from the same thread:
     if (QThread::currentThread() != mpThread)
     {
       CEDAR_ASSERT(this->mpThread != NULL);
-      // std::cout << "  waiting for thread: " << mpThread << std::endl;      
+      // std::cout << "  waiting for thread: " << mpThread << std::endl;
       // std::cout << "  (current thread: " << QThread::currentThread() << std::endl;
 
-      mpThread->wait(time);
-      //std::cout << "  resuming from wait." << std::endl;      
+      // make a copy of the thread pointer, it may get deleted due to being stopped
+      QThread* old_thread = mpThread;
+      thread_worker_readlock.unlock();
+
+      old_thread->wait(time);
+      //std::cout << "  resuming from wait." << std::endl;
+
+      thread_worker_readlock.relock();
     }
   }
 
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     if (QThread::currentThread() != mpThread)
     {
@@ -422,6 +485,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
     }
   }
 
+  thread_worker_readlock.unlock();
   scheduleThreadDeletion();
 }
 
@@ -439,9 +503,14 @@ bool cedar::aux::ThreadWrapper::stopRequested()
   return value;
 }
 
-boost::signals2::connection cedar::aux::ThreadWrapper::connectToStopSignal(boost::function<void (bool)> slot)
+boost::signals2::connection cedar::aux::ThreadWrapper::connectToStopSignal(boost::function<void ()> slot)
 {
   return mStopSignal.connect(slot);
+}
+
+boost::signals2::connection cedar::aux::ThreadWrapper::connectToQuitSignal(boost::function<void ()> slot)
+{
+  return mQuitSignal.connect(slot);
 }
 
 boost::signals2::connection cedar::aux::ThreadWrapper::connectToStartSignal(boost::function<void ()> slot)
@@ -458,4 +527,27 @@ void cedar::aux::ThreadWrapper::applyStop(bool)
 {
   // deprecated
 }
+
+void cedar::aux::ThreadWrapper::setReallocateOnStart(bool doit)
+{
+  QWriteLocker locker(&mReallocateOnStartLock);
+  mReallocateOnStart = doit;
+}
+
+bool cedar::aux::ThreadWrapper::getReallocateOnStart()
+{
+  QReadLocker locker(&mReallocateOnStartLock);
+  return mReallocateOnStart;
+}
+ 
+void cedar::aux::ThreadWrapper::forceQuitThread()
+{
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
+
+  if (mpThread != NULL)
+  {
+    mpThread->quit();
+  }
+}
+
 

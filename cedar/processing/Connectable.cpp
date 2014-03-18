@@ -79,6 +79,89 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Connectable::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::proc::Element::readConfiguration(node);
+
+  auto stored_data_iter = node.find("stored data");
+  if (stored_data_iter == node.not_found())
+  {
+    return;
+  }
+
+  const auto& stored_data = stored_data_iter->second;
+
+  for (auto role_enum : cedar::proc::DataRole::type().list())
+  {
+    auto role_data_iter = stored_data.find(role_enum.name());
+
+    if (role_data_iter == stored_data.not_found())
+    {
+      continue;
+    }
+
+    const auto& role_node = role_data_iter->second;
+
+    for (const auto& subnode_iter : role_node)
+    {
+      const auto& slot_name = subnode_iter.first;
+      const auto& slot_data = subnode_iter.second.get_value<std::string>();
+
+      if (this->hasSlot(role_enum.id(), slot_name))
+      {
+        auto slot = this->getSlot(role_enum.id(), slot_name);
+        CEDAR_ASSERT(slot->getData());
+        std::stringstream stream(slot_data);
+        slot->getData()->deserialize(stream);
+      }
+    }
+  }
+}
+
+void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode& root) const
+{
+  cedar::proc::Element::writeConfiguration(root);
+
+  cedar::aux::ConfigurationNode stored_data;
+  for (auto role_enum : cedar::proc::DataRole::type().list())
+  {
+    if (!this->hasRole(role_enum.id()))
+    {
+      continue;
+    }
+
+    cedar::aux::ConfigurationNode role_stored_data;
+
+    for (auto slot : this->getOrderedDataSlots(role_enum.id()))
+    {
+      std::stringstream stream;
+      if (slot->isSerializable())
+      {
+        slot->getData()->serialize(stream);
+        cedar::aux::ConfigurationNode data_node;
+        data_node.put_value(stream.str());
+        role_stored_data.push_back(cedar::aux::ConfigurationNode::value_type(slot->getName(), data_node));
+      }
+    }
+
+    if (!role_stored_data.empty())
+    {
+      stored_data.push_back(cedar::aux::ConfigurationNode::value_type(role_enum.name(), role_stored_data));
+    }
+  }
+
+  if (!stored_data.empty())
+  {
+    root.push_back(cedar::aux::ConfigurationNode::value_type("stored data", stored_data));
+  }
+}
+
+void cedar::proc::Connectable::redetermineInputValidity(const std::string& slot)
+{
+  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  this->getInputValidity(slot);
+}
+
 void cedar::proc::Connectable::clearDataSlots()
 {
   for (auto role_iter = this->mSlotMaps.begin(); role_iter != this->mSlotMaps.end(); ++role_iter)
@@ -445,24 +528,24 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::determineInputValidity
 bool cedar::proc::Connectable::allInputsValid()
 {
   // clear the list of invalid input names
-  mInvalidInputNames.clear();
+  QReadLocker con_locker(this->mpConnectionLock);
+  QWriteLocker locker(this->mInvalidInputNames.getLockPtr());
+  mInvalidInputNames.member().clear();
 
-  std::map<DataRole::Id, SlotMap>::iterator slot_map_iter = this->mSlotMaps.find(cedar::proc::DataRole::INPUT);
+  auto slot_map_iter = this->mSlotMaps.find(cedar::proc::DataRole::INPUT);
   if (slot_map_iter == mSlotMaps.end())
   {
-    // there are no inputs, so the inputs are valid
+    // there are no inputs, therefore, none of them are invalid
     return true;
   }
 
-  SlotMap& slot_map = slot_map_iter->second;
-
-  for (SlotMap::iterator slot = slot_map.begin(); slot != slot_map.end(); ++slot)
+  for (auto name_slot_pair : slot_map_iter->second)
   {
-    switch(this->getInputValidity(slot->second))
+    switch(this->getInputValidity(name_slot_pair.second))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         // If the input is invalid, push its name into the list of invalid inputs.
-        mInvalidInputNames.push_back(slot->first);
+        this->mInvalidInputNames.member().push_back(name_slot_pair.first);
         break;
 
       default:
@@ -471,7 +554,15 @@ bool cedar::proc::Connectable::allInputsValid()
   }
 
   // If no inputs are in the invalid list, all must be valid.
-  return mInvalidInputNames.empty();
+  bool empty = this->mInvalidInputNames.member().empty();
+  return empty;
+}
+
+std::vector<std::string> cedar::proc::Connectable::getInvalidInputNames() const
+{
+  QReadLocker locker(this->mInvalidInputNames.getLockPtr());
+  auto copy = this->mInvalidInputNames.member();
+  return copy;
 }
 
 void cedar::proc::Connectable::checkMandatoryConnections()
@@ -479,22 +570,26 @@ void cedar::proc::Connectable::checkMandatoryConnections()
   this->mMandatoryConnectionsAreSet = true;
   mMissingMandatoryConnections.clear();
   // then test every input. If one is false, return that.
-  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mSlotMaps.begin();
-       slot != this->mSlotMaps.end();
-       ++slot)
+//  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mSlotMaps.begin();
+//       slot != this->mSlotMaps.end();
+//       ++slot)
+  for (const auto& role_slot_map_pair : this->mSlotMaps)
   {
-    for (SlotMap::iterator iter = slot->second.begin();
-        iter != slot->second.end();
-         ++iter)
+//    for (SlotMap::iterator iter = slot->second.begin();
+//        iter != slot->second.end();
+//         ++iter)
+    for (const auto& name_slot_pair : role_slot_map_pair.second)
     {
-      if (iter->second->isMandatory() && !iter->second->getData())
+      const auto& slot = name_slot_pair.second;
+      const auto& role = name_slot_pair.first;
+      if (slot->isMandatory() && !slot->getData())
       {
         this->mMandatoryConnectionsAreSet = false;
         mMissingMandatoryConnections.push_back(
                                                 "slot type: "
-                                                + cedar::proc::DataRole::type().get(slot->first).name()
+                                                + cedar::proc::DataRole::type().get(role).name()
                                                 + " name: "
-                                                + iter->second->getName()
+                                                + slot->getName()
                                               );
       }
     }
@@ -852,7 +947,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 " name \"" + name + "\" does not exist.");
   }
-  locker.unlock();
+//  locker.unlock();
 
   this->checkMandatoryConnections();
 }
@@ -901,6 +996,7 @@ void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::Co
   CEDAR_ASSERT(slot);
   if (slot->isCollection())
   {
+    QWriteLocker locker(this->mpConnectionLock);
     slot->removeData(data);
   }
   else
