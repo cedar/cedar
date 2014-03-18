@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -107,6 +107,8 @@
     </property>
     <addaction name="mpActionManagePlugins"/>
     <addaction name="separator"/>
+    <addaction name="mpActionCopy"/>
+    <addaction name="mpActionPasteConfiguration"/>
     <addaction name="mpActionDuplicate"/>
     <addaction name="mpActionSelectAll"/>
    </widget>
@@ -211,8 +213,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -779,6 +781,22 @@
   <action name="mpActionPerformanceOverview">
    <property name="text">
     <string>Performance overview ...</string>
+   </property>
+  </action>
+  <action name="mpActionCopy">
+   <property name="text">
+    <string>Copy step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="mpActionPasteConfiguration">
+   <property name="text">
+    <string>Paste step configuration</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+V</string>
    </property>
   </action>
  </widget>
