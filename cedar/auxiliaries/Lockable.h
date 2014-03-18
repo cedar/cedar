@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/CallOnScopeExit.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Lockable.fwd.h"
@@ -73,6 +74,42 @@ public:
 
   //! Storage for locks in this class.
   typedef std::multiset<std::pair<QReadWriteLock*, cedar::aux::LOCK_TYPE> > Locks;
+
+  /*! @brief A RAII-based locker for lockables. Will automatically unlock when the locker is destroyed.
+   */
+  class Locker : private cedar::aux::CallOnScopeExit
+  {
+    public:
+      Locker(LockablePtr lockable, LockSetHandle lockSet = 0)
+      :
+      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      {
+        lockable->lockAll(lockSet);
+      }
+
+      Locker(Lockable* lockable, LockSetHandle lockSet = 0)
+      :
+      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      {
+        lockable->lockAll(lockSet);
+      }
+
+      Locker(Lockable* lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
+      :
+      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      {
+        lockable->lockAll(lockType, lockSet);
+      }
+
+      Locker(LockablePtr lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
+      :
+      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      {
+        lockable->lockAll(lockType, lockSet);
+      }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(Locker);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
