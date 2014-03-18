@@ -369,7 +369,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     }
     else
     {
-      this->lockAll(cedar::aux::LOCK_TYPE_READ);
+      cedar::aux::Lockable::Locker locker(this, cedar::aux::LOCK_TYPE_READ);
       auto external_data_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(slot);
       validity = cedar::proc::DataSlot::VALIDITY_VALID;
       for (unsigned int i = 0; i < external_data_slot->getDataCount(); ++i)
@@ -403,7 +403,6 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
             break;
         }
       }
-      this->unlockAll();
     }
 
     // assign the validity to the slot
