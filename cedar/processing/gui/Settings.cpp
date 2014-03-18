@@ -75,6 +75,7 @@ mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
+mBoostCtrlSettgings(new cedar::proc::gui::Settings::DockSettings()),
 mMainWindowGeometry(new cedar::aux::StringParameter(this, "mainWindowGeometry", "")),
 mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 {
@@ -85,7 +86,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("steps", mSteps);
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
-
+  ui_settings->addConfigurableChild("boost control", mBoostCtrlSettgings);
 
   cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
   this->addConfigurableChild("slot growth", slot_growth);
@@ -184,7 +185,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 cedar::proc::gui::Settings::DockSettings::DockSettings()
 :
 mVisible(new cedar::aux::BoolParameter(this, "visible", true)),
-mFloating(new cedar::aux::BoolParameter(this, "floating", false))
+mFloating(new cedar::aux::BoolParameter(this, "floating", false)),
+mGeometry(new cedar::aux::StringParameter(this, "geometry", ""))
 {
 }
 
@@ -303,12 +305,31 @@ void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
 {
   this->mVisible->setValue(pDock->isVisible());
   this->mFloating->setValue(pDock->isFloating());
+
+  QByteArray window_geometry = pDock->saveGeometry();
+  QByteArray window_geometry_hex = window_geometry.toHex();
+  this->mGeometry->setValue(window_geometry_hex.constData());
 }
 
 void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
 {
   pDock->setVisible(this->mVisible->getValue());
   pDock->setFloating(this->mFloating->getValue());
+
+  if (!this->mGeometry->getValue().empty())
+  {
+    QByteArray window_geometry_hex(this->mGeometry->getValue().c_str());
+    QByteArray window_geometry = QByteArray::fromHex(window_geometry_hex);
+    if (!pDock->restoreGeometry(window_geometry))
+    {
+      std::cout << "Could not restore geometry of dock widget." << std::endl;
+    }
+  }
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::boostCtrlSettings()
+{
+  return this->mBoostCtrlSettgings;
 }
 
 cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::logSettings()

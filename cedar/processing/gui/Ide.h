@@ -327,6 +327,9 @@ private:
   //! Dock widget for the consistency checker.
   QDockWidget* mpConsistencyDock;
 
+  //! Dock widget for the boost control
+  QDockWidget* mpBoostControlDock;
+
   QString mDefaultWindowTitle;
 
   cedar::proc::gui::BoostControl* mpBoostControl;
