@@ -220,12 +220,12 @@ void cedar::proc::Step::callAction(const std::string& name)
   boost::function<void()>& function = iter->second.first;
 
   bool autolock = iter->second.second;
-  cedar::aux::Lockable::LockerPtr locker;
+  cedar::aux::Lockable::WriteLockerPtr locker;
   if (autolock)
   {
     // lock the step
     //!@todo Should this be a read lock?
-    locker = cedar::aux::Lockable::LockerPtr(new cedar::aux::Lockable::Locker(this, cedar::aux::LOCK_TYPE_WRITE));
+    locker = cedar::aux::Lockable::WriteLockerPtr(new cedar::aux::Lockable::WriteLocker(this));
   }
 
   // call it
