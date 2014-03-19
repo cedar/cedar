@@ -22,42 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallOnScopeExit.h
+    File:        LockerBase.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 03 18
+    Date:        2014 03 19
 
-    Description: Header file for the class cedar::aux::CallOnScopeExit.
+    Description: Header file for the class cedar::aux::LockerBase.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CALL_ON_SCOPE_EXIT_H
-#define CEDAR_AUX_CALL_ON_SCOPE_EXIT_H
+#ifndef CEDAR_AUX_LOCKER_BASE_H
+#define CEDAR_AUX_LOCKER_BASE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/CallOnScopeExit.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/CallOnScopeExit.fwd.h"
+#include "cedar/auxiliaries/LockerBase.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 
 
-/*!@brief Objects of this class call a user-determined function when they go out of scope.
- *
- *        To use this object, create an instance, either as a pointer or just a normal object. Pass a function via
- *        boost::bind. When the object gets destroyed, the function you provided will be called.
- *
- * @todo Add an example of how to use it here.
+/*!@brief A base class for RAII-based lockers that behave similar to, e.g., QReadLocker
  */
-class cedar::aux::CallOnScopeExit
+class cedar::aux::LockerBase : private cedar::aux::CallOnScopeExit
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -67,37 +61,18 @@ class cedar::aux::CallOnScopeExit
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  CallOnScopeExit(const boost::function<void ()>& function)
-  :
-  mFunctionToCall(function),
-  mCall(true)
-  {
-  }
-
-  //!@brief Destructor
-  virtual ~CallOnScopeExit()
-  {
-    if (this->mCall)
-    {
-      this->mFunctionToCall();
-    }
-  }
+  //!@brief The constructor.
+  LockerBase(const boost::function<void()>& lockFunction, const boost::function<void()>& unlockFunction);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void callNow()
-  {
-    this->mCall = false;
-    this->mFunctionToCall();
-  }
+  //! Reacquires the lock.
+  void relock();
 
-  void resetCall()
-  {
-    this->mCall = true;
-  }
+  //! Releasese the lock.
+  void unlock();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -117,11 +92,9 @@ private:
 protected:
   // none yet
 private:
-  boost::function<void ()> mFunctionToCall;
+  boost::function<void()>& mLockFunction;
 
-  bool mCall;
+}; // class cedar::aux::LockerBase
 
-}; // class cedar::aux::CallOnScopeExit
-
-#endif // CEDAR_AUX_CALL_ON_SCOPE_EXIT_H
+#endif // CEDAR_AUX_LOCKER_BASE_H
 
