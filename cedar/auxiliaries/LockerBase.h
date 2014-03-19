@@ -92,7 +92,7 @@ private:
 protected:
   // none yet
 private:
-  boost::function<void()>& mLockFunction;
+  boost::function<void()> mLockFunction;
 
 }; // class cedar::aux::LockerBase
 

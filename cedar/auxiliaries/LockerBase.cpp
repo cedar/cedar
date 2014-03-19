@@ -52,6 +52,7 @@ cedar::aux::LockerBase::LockerBase
   const boost::function<void()>& unlockFunction
 )
 :
+cedar::aux::CallOnScopeExit(unlockFunction),
 mLockFunction(lockFunction)
 {
 }
