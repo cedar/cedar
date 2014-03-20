@@ -64,13 +64,8 @@ _mStepProperty
 (
     new cedar::proc::experiment::StepPropertyParameter(this,"StepProperty")
 )
-,
-_desiredValue
-(
-    new cedar::aux::StringParameter(this,"DesiredValue","")
-)
 {
-  connect(_mStepProperty.get(),SIGNAL(valueChanged()),this,SLOT(updateParamter()));
+  _mStepProperty->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
 }
 
 
@@ -85,31 +80,13 @@ cedar::proc::experiment::ActionSetParameter::~ActionSetParameter()
 
 void cedar::proc::experiment::ActionSetParameter::run()
 {
+
   if (_mStepProperty->getStep() == "" || _mStepProperty->getProperty() == "")
   {
     return;
   }
-  cedar::aux::ParameterPtr parameter = ExperimentControllerSingleton::getInstance()->
-       getExperiment()->getStepParameter(_mStepProperty->getStep(),_mStepProperty->getProperty());
-  parameter->copyValueFrom(_desiredValue);
+  cedar::aux::ParameterPtr parameter = _mStepProperty->getParameter();
+  parameter->copyValueFrom(_mStepProperty->getParameterCopy());
+
 }
 
-
-void cedar::proc::experiment::ActionSetParameter::updateParamter()
-{
-  if (_mStepProperty->getStep() == "" || _mStepProperty->getProperty() == "")
-  {
-    return;
-  }
-  if(_desiredValue)
-  {
-    _desiredValue->unsetOwner();
-  }
-  cedar::aux::ParameterPtr parameter = ExperimentControllerSingleton::getInstance()->
-         getExperiment()->getStepParameter(_mStepProperty->getStep(),_mStepProperty->getProperty());
-  std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
-  _desiredValue = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
-  _desiredValue->setOwner(this);
-  _desiredValue->setName("DesiredValue");
-  _desiredValue->copyValueFrom(parameter);
-}

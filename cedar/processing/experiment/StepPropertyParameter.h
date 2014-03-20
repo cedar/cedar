@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/Data.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/StepPropertyParameter.fwd.h"
@@ -64,13 +65,20 @@ class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parame
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  enum PropertyType
+  {
+    PARAMETER,
+    OUTPUT,
+    BUFFER
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepPropertyParameter(cedar::aux::Configurable *pOwner = NULL, const std::string& name = "");
+  StepPropertyParameter(cedar::aux::Configurable *pOwner, const std::string&);
 
   //!@brief Destructor
   virtual ~StepPropertyParameter();
@@ -79,6 +87,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   //!@brief set this parameter to a value, read from a configuration node
    void readFromNode(const cedar::aux::ConfigurationNode& node);
 
@@ -88,14 +97,10 @@ public:
    //!@brief set parameter to default
    void makeDefault();
 
-   /*! @brief If possible, copies the value from another parameter into this parameter.
-     *
-     * The default implementation always throws an exception.
-     */
-
+   //! @brief If possible, copies the value from another parameter into this parameter.
    void copyValueFrom(cedar::aux::ConstParameterPtr other);
-   /*!@brief Checks if this parameter can copy its value from the given one.
-    */
+
+   //!@brief Checks if this parameter can copy its value from the given one.
    bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
 
    void setProperty(const std::string& poperty);
@@ -106,6 +111,23 @@ public:
 
    const std::string& getStep() const;
 
+   void setType(cedar::proc::experiment::StepPropertyParameter::PropertyType type);
+
+   cedar::proc::experiment::StepPropertyParameter::PropertyType getType() const;
+
+   cedar::aux::DataPtr getData() const;
+
+   cedar::aux::ParameterPtr getParameter() const;
+
+   cedar::aux::ParameterPtr getParameterCopy() const;
+
+   void allowType(const std::string& type);
+
+   bool isAllowType(const std::string& type);
+
+   void disallowType(const std::string& type);
+
+   const std::vector<std::string>& getAllowedTypes();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -116,8 +138,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void updatePropertyCopy();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -136,6 +158,10 @@ protected:
 private:
   std::string mStep;
   std::string mProperty;
+  cedar::proc::experiment::StepPropertyParameter::PropertyType mType;
+  cedar::aux::ParameterPtr mParameterCopy;
+  std::vector<std::string> allowedTypes;
+  //cedar::aux::DataPtr mDataCopy;
 
 }; // class cedar::proc::experiment::StepPropertyParameter
 

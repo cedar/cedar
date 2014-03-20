@@ -83,6 +83,7 @@ public:
 public:
   void updateSteps();
   void updateProperties();
+  void updateValue();
 
 public slots:
   //!@brief handles a change of the associated parameter
@@ -91,6 +92,7 @@ public slots:
   void stepChanged();
   //!@brief handles a change in the property combo box
   void propertyChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -120,6 +122,7 @@ protected:
 private:
   QComboBox* mpStep;
   QComboBox* mpProperty;
+  QWidget* mpPropertyCopy;
 
 }; // class cedar::proc::experiment::gui::StepPropertyParameter
 

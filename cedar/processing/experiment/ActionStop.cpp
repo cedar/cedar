@@ -59,6 +59,19 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::experiment::ActionStop::ActionStop()
+:
+_mResetType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "reset type",
+    cedar::proc::experiment::Experiment::ResetType::typePtr(),
+    cedar::proc::experiment::Experiment::ResetType::Reset
+  )
+),
+_mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
+_mSuccessMessage(new cedar::aux::StringParameter(this,"Success Message",""))
 {
 }
 
@@ -72,5 +85,5 @@ cedar::proc::experiment::ActionStop::~ActionStop()
 
 void cedar::proc::experiment::ActionStop::run()
 {
-    ExperimentControllerSingleton::getInstance()->getExperiment()->stopNetwork();
+    ExperimentControllerSingleton::getInstance()->getExperiment()->stopNetwork(_mResetType->getValue());
 }

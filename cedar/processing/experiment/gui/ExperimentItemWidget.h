@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,47 +22,47 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.h
+    File:        ExperimentItemWidget.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 19
 
-    Description: Header file for the class cedar::proc::experiment::ExperimentController.
+    Description: Header file for the class cedar::proc::experiment::gui::ExperimentItemWidget.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
-#define CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_EXPERIMENT_ITEM_WIDGET_H
+#define CEDAR_PROC_EXPERIMENT_GUI_EXPERIMENT_ITEM_WIDGET_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/LoopedThread.h"
+
+#include "cedar/auxiliaries/Configurable.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ExperimentController.fwd.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/gui/ExperimentItemWidget.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
+#include <QLayout>
 
 
 /*!@todo describe.
  *
  * @todo describe more.
  */
-//@todo Superviser
-class cedar::proc::experiment::ExperimentController : public cedar::aux::LoopedThread
+class cedar::proc::experiment::gui::ExperimentItemWidget : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friends
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
-  // uses singleton template.
-  friend class cedar::aux::Singleton<ExperimentController>;
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -70,21 +70,18 @@ class cedar::proc::experiment::ExperimentController : public cedar::aux::LoopedT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-private:
+public:
   //!@brief The standard constructor.
-  ExperimentController();
-public:
-  //!@brief Destructor
-  virtual ~ExperimentController();
+  ExperimentItemWidget(QWidget* parent = NULL);
 
-//@todo
-public:
+  //!@brief Destructor
+  virtual ~ExperimentItemWidget();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setExperiment(Experiment* experiment);
-  Experiment* getExperiment();
+  void display(cedar::aux::ConfigurablePtr experimentItem);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,8 +93,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Calls write in the specified interval.
-  void step(cedar::unit::Time);
+  void clear(QLayout* layout = NULL);
+  void addWidget(QWidget* widget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -106,6 +103,8 @@ protected:
   // none yet
 private:
   // none yet
+private slots:
+  void objectParameterChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -114,25 +113,9 @@ protected:
   // none yet
 
 private:
-  Experiment* mpExperiment;
+  // none yet
 
-}; // class cedar::proc::experiment::ExperimentController
+}; // class cedar::proc::experiment::gui::ExperimentItemWidget
 
-
-
-#include "cedar/auxiliaries/Singleton.h"
-
-namespace cedar
-{
-  namespace proc
-  {
-    namespace experiment
-    {
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::ExperimentController>);
-      typedef cedar::aux::Singleton<cedar::proc::experiment::ExperimentController> ExperimentControllerSingleton;
-    }
-  }
-}
-
-#endif // CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
+#endif // CEDAR_PROC_EXPERIMENT_GUI_EXPERIMENT_ITEM_WIDGET_H
 

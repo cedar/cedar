@@ -50,7 +50,6 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
-  experiment/ActionSetParameter.h
   experiment/StepPropertyParameter.h
   experiment/gui/Action.h
   experiment/gui/ActionStart.h
@@ -62,6 +61,7 @@ cedar_add_library(cedarproc
   experiment/gui/ConditionAnd.h
   experiment/gui/ConditionCheckValue.h
   experiment/gui/StepPropertyParameter.h
+  experiment/gui/ExperimentItemWidget.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
