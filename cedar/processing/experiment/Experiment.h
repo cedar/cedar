@@ -58,18 +58,23 @@
 #include "cedar/processing/experiment/ExperimentController.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 
 /*!@brief
  */
-class cedar::proc::experiment::Experiment : public cedar::aux::NamedConfigurable
+class cedar::proc::experiment::Experiment : public QObject, public cedar::aux::NamedConfigurable
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! Enumeration class for the different types of normalizations.
+  /*! Enumeration class for the different types of reset.
    */
   class ResetType
   {
@@ -112,6 +117,44 @@ public:
 
     private:
       static cedar::aux::EnumType<ResetType> mType;
+  };
+
+  /*! Enumeration class for the different compare methods.
+   */
+public:
+  class CompareMethod
+  {
+    public:
+      //! Type id of the enumeration.
+      typedef cedar::aux::EnumId Id;
+      //! Pointer type of the base class.
+      typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    public:
+      //! Registers the enum values.
+      static void construct()
+      {
+        mType.type()->def(cedar::aux::Enum(Greater, ">"));
+        mType.type()->def(cedar::aux::Enum(Lower, "<"));
+        mType.type()->def(cedar::aux::Enum(Equal, "="));
+      }
+      //! Returns the enumeration type.
+      static const cedar::aux::EnumBase& type()
+      {
+        return *mType.type();
+      }
+      //! Returns a pointer to an enumeration type.
+      static const TypePtr& typePtr()
+      {
+        return mType.type();
+      }
+    public:
+     static const Id Greater = 0;
+     static const Id Lower = 1;
+     static const Id Equal = 2;
+
+    private:
+      static cedar::aux::EnumType<CompareMethod> mType;
   };
 
   //!@brief a parameter for action sequence objects
@@ -158,6 +201,11 @@ public:
 
   //override
   void writeConfiguration(cedar::aux::ConfigurationNode& root);
+
+
+signals:
+  void experimentStopped(bool stopped);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

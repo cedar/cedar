@@ -103,6 +103,7 @@ private slots:
     void addActionSequence();
     void repetitionChanged();
     void runExperiment(bool status);
+    void experimentStopped(bool status);
 
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -41,6 +41,7 @@
 #include "cedar/processing/experiment/gui/ActionSequence.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
@@ -143,10 +144,6 @@ void cedar::proc::experiment::gui::ActionSequence::update()
 
   }
   updateActions();
-
-
-  //QPushButton* add_action = new QPushButton(QString::fromStdString("add action"));
-  //mLayout->addWidget(add_action);
 }
 void cedar::proc::experiment::gui::ActionSequence::updateCondition()
 {

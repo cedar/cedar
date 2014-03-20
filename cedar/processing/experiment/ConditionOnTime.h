@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,33 +22,29 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.h
+    File:        ConditionOnTime.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 19
 
-    Description: Header file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Header file for the class cedar::proc::experiment::ConditionOnTime.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-
+#include "cedar/auxiliaries/TimeParameter.h"
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionCheckValue.fwd.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/processing/experiment/ConditionOnTime.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -57,9 +53,8 @@
  *
  * @todo describe more.
  */
-class cedar::proc::experiment::ConditionCheckValue : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment::Condition
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,17 +64,16 @@ class cedar::proc::experiment::ConditionCheckValue : public cedar::proc::experim
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ConditionCheckValue();
+  ConditionOnTime();
 
   //!@brief Destructor
-  virtual ~ConditionCheckValue();
+  virtual ~ConditionOnTime();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   bool check();
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,11 +102,10 @@ protected:
   // none yet
 
 private:
-  cedar::proc::experiment::StepPropertyParameterPtr _stepValue;
-  cedar::aux::EnumParameterPtr _mCompareMethode;
-  cedar::aux::DoubleParameterPtr _desiredValue;
+  cedar::aux::TimeParameterPtr _mTime;
+  bool mActivated;
 
-}; // class cedar::proc::experiment::ConditionCheckValue
+}; // class cedar::proc::experiment::ConditionOnTime
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
 
