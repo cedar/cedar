@@ -57,14 +57,8 @@
  *
  * @todo describe more.
  */
-class cedar::proc::experiment::ActionSetParameter : public QObject, public cedar::proc::experiment::Action
+class cedar::proc::experiment::ActionSetParameter : public cedar::proc::experiment::Action
 {
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -84,9 +78,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void run();
-
-public slots:
-  void updateParamter();
 
 public:
 
@@ -118,7 +109,6 @@ protected:
 
 private:
   cedar::proc::experiment::StepPropertyParameterPtr _mStepProperty;
-  cedar::aux::ParameterPtr _desiredValue;
 
 
 }; // class cedar::proc::experiment::ActionSetParameter

@@ -42,6 +42,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/Action.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ActionStop.fwd.h"
@@ -102,7 +105,9 @@ protected:
   // none yet
 
 private:
-  // none yet
+  cedar::aux::EnumParameterPtr _mResetType;
+  cedar::aux::BoolParameterPtr _mSuccess;
+  cedar::aux::StringParameterPtr _mSuccessMessage;
 
 }; // class cedar::proc::experiment::ActionStop
 

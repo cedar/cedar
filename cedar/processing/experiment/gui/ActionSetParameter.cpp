@@ -64,8 +64,6 @@ namespace
 cedar::proc::experiment::gui::ActionSetParameter::ActionSetParameter()
 :
 mStepSelector(NULL)
-,
-mDesiredValue(NULL)
 {
 }
 
@@ -86,17 +84,5 @@ void cedar::proc::experiment::gui::ActionSetParameter::redraw()
    mStepSelector->setParent(this);
    mStepSelector->setParameter(step_para);
    this->layout()->addWidget(mStepSelector);
-   connect(step_para.get(),SIGNAL(valueChanged()),this,SLOT(updateDesiredValue()));
   }
-  updateDesiredValue();
-}
-
-void cedar::proc::experiment::gui::ActionSetParameter::updateDesiredValue()
-{
-  delete mDesiredValue;
-  cedar::aux::ParameterPtr value_para = this->mAction->getParameter("DesiredValue");
-  mDesiredValue = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(value_para)->allocateRaw();
-  mDesiredValue->setParent(this);
-  mDesiredValue->setParameter(value_para);
-  this->layout()->addWidget(mDesiredValue);
 }

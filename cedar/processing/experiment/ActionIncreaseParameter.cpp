@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.cpp
+    File:        ActionIncreaseParameter.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 19
 
-    Description: Source file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Source file for the class cedar::proc::experiment::ActionIncreaseParameter.
 
     Credits:
 
@@ -38,64 +38,65 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ConditionCheckValue.h"
-#include "cedar/auxiliaries/Data.h"
-#include "cedar/auxiliaries/MatData.h"
+#include "cedar/processing/experiment/ActionIncreaseParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/IntParameter.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
 
 //----------------------------------------------------------------------------------------------------------------------
-// register the class
+// register class
 //----------------------------------------------------------------------------------------------------------------------
+
 namespace
 {
-  bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
-    registerType<cedar::proc::experiment::ConditionCheckValuePtr>();
+  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::ActionIncreaseParameterPtr>();
 }
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ConditionCheckValue::ConditionCheckValue()
+cedar::proc::experiment::ActionIncreaseParameter::ActionIncreaseParameter()
 :
-
-_stepValue
+_mStepParamter
 (
-    new cedar::proc::experiment::StepPropertyParameter(this,"StepProperty")
-)
-,
-_desiredValue
-(
-    new cedar::aux::DoubleParameter(this,"DesiredValue",0.0)
+    new cedar::proc::experiment::StepPropertyParameter(this,"StepParameter")
 )
 {
-  _stepValue->setType(cedar::proc::experiment::StepPropertyParameter::OUTPUT);
+  _mStepParamter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
+  _mStepParamter->allowType("cedar.aux.DoubleParameter");
+  _mStepParamter->allowType("cedar.aux.UIntParameterPtr");
 }
 
-cedar::proc::experiment::ConditionCheckValue::~ConditionCheckValue()
+cedar::proc::experiment::ActionIncreaseParameter::~ActionIncreaseParameter()
 {
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-bool cedar::proc::experiment::ConditionCheckValue::check()
+void cedar::proc::experiment::ActionIncreaseParameter::run()
 {
-  if (cedar::aux::DataPtr data = _stepValue->getData())
+  if (_mStepParamter->getStep() == "" || _mStepParamter->getProperty() == "")
   {
-    if (cedar::aux::MatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
-    {
-      QReadLocker locker(&(value->getLock()));
-      const double cVal = value->getValue<double>(0,0);
-      if(cVal > _desiredValue->getValue())
-      {
-        return true;
-      }
-    }
+    return;
   }
-  return false;
-}
+  if(cedar::aux::DoubleParameterPtr parameter =
+      boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(_mStepParamter->getParameter()))
+  {
+    cedar::aux::DoubleParameterPtr parameter_copy =
+        boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(_mStepParamter->getParameterCopy());
+    parameter->setValue(parameter->getValue() + parameter_copy->getValue());
+  }
 
+  if(cedar::aux::UIntParameterPtr parameter =
+      boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(_mStepParamter->getParameter()))
+  {
+    cedar::aux::UIntParameterPtr parameter_copy =
+        boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(_mStepParamter->getParameterCopy());
+    parameter->setValue(parameter->getValue() + parameter_copy->getValue());
+  }
+}

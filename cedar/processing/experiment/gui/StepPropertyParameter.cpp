@@ -43,6 +43,7 @@
 #include "cedar/processing/experiment/ExperimentController.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -67,74 +68,89 @@ namespace
 cedar::proc::experiment::gui::StepPropertyParameter::StepPropertyParameter(QWidget *pParent )
 :
 cedar::aux::gui::Parameter(pParent)
-{
-  mpStep = new QComboBox;
-  mpProperty = new QComboBox;
-  QVBoxLayout* layout = new QVBoxLayout;
-  this->setLayout(layout);
-  QHBoxLayout* step_row = new QHBoxLayout;
-  step_row->addWidget(new QLabel(QString::fromStdString("Step: ")));
-  step_row->addWidget(mpStep);
-  QHBoxLayout* property_row = new QHBoxLayout;
-  property_row->addWidget(new QLabel(QString::fromStdString("Property: ")));
-  property_row->addWidget(mpProperty);
 
-  layout->addLayout(step_row);
-  layout->addLayout(property_row);
+
+,
+mpStep(new QComboBox)
+,
+mpProperty(new QComboBox)
+,
+mpPropertyCopy(NULL)
+{
+
+  QHBoxLayout* layout = new QHBoxLayout;
+  this->setLayout(layout);
+  layout->addWidget(new QLabel(QString::fromStdString("Step: ")));
+  layout->addWidget(mpStep);
+  layout->addWidget(new QLabel(QString::fromStdString("Property: ")));
+  layout->addWidget(mpProperty);
+  //layout->addWidget(new QLabel(QString::fromStdString("=")));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
+
+
+
 }
 
 cedar::proc::experiment::gui::StepPropertyParameter::~StepPropertyParameter()
 {
+  //@todo Work around for double deletion
+  //this->setParameter(cedar::aux::StringParameterPtr(new cedar::aux::StringParameter(NULL,"Name","")));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+
 void cedar::proc::experiment::gui::StepPropertyParameter::parameterPointerChanged()
 {
   updateSteps();
-  boost::intrusive_ptr<cedar::proc::experiment::StepPropertyParameter> parameter;
+  cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
   this->mpStep->setCurrentIndex(this->mpStep->findText((parameter->getStep().c_str())));
   updateProperties();
-  this->mpProperty->setCurrentIndex(this->mpStep->findText((parameter->getProperty().c_str())));
+  this->mpProperty->setCurrentIndex(this->mpProperty->findText((parameter->getProperty().c_str())));
+  updateValue();
   connect(this->mpStep, SIGNAL(currentIndexChanged(int)), this, SLOT(stepChanged()));
   connect(this->mpProperty, SIGNAL(currentIndexChanged(int)), this, SLOT(propertyChanged()));
+
 
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::stepChanged()
 {
+
   QString text = mpStep->currentText();
-  boost::intrusive_ptr<cedar::proc::experiment::StepPropertyParameter> parameter;
+  cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
   parameter->setStep(text.toStdString());
 
   updateProperties();
+
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()
 {
 
-  cedar::aux::ParameterPtr hhhhh = this->getParameter();
-
   QString text = mpProperty->currentText();
-  boost::intrusive_ptr<cedar::proc::experiment::StepPropertyParameter> parameter;
+  cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
   parameter->setProperty(text.toStdString());
+
+  updateValue();
 
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateSteps()
 {
- mpStep->clear();
- std::vector<std::string> steps = ExperimentControllerSingleton::getInstance()->getExperiment()->getAllSteps();
- for (std::string step : steps)
+
+  mpStep->clear();
+  std::vector<std::string> steps = ExperimentControllerSingleton::getInstance()->getExperiment()->getAllSteps();
+  for (std::string step : steps)
   {
    mpStep->addItem(QString::fromStdString(step));
   }
+
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
@@ -142,10 +158,74 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
   std::string index = mpStep->currentText().toStdString();
   if (index == "")
      return;
-  std::vector<std::string> properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepParameters(index);
+
+  cedar::proc::experiment::StepPropertyParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
+
+  std::vector<std::string> properties;
+  switch(parameter->getType())
+  {
+    case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
+    {
+      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepParameters(index, parameter->getAllowedTypes());
+      break;
+    }
+    case cedar::proc::experiment::StepPropertyParameter::OUTPUT:
+    {
+      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepValues(index, cedar::proc::DataRole::OUTPUT);
+      break;
+    }
+    case cedar::proc::experiment::StepPropertyParameter::BUFFER:
+    {
+      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepValues(index, cedar::proc::DataRole::BUFFER);
+      break;
+    }
+  }
+
   mpProperty->clear();
   for (std::string property : properties)
   {
     mpProperty->addItem(QString::fromStdString(property));
   }
+
 }
+
+void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
+{
+  cedar::proc::experiment::StepPropertyParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
+
+  switch(parameter->getType())
+  {
+    case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
+    {
+      cedar::aux::ParameterPtr parameter_copy = parameter->getParameterCopy();
+
+      if (!parameter_copy)
+      {
+        return;
+      }
+      if (mpPropertyCopy)
+      {
+        delete mpPropertyCopy;
+        mpPropertyCopy=NULL;
+      }
+      cedar::aux::gui::Parameter* parameter_widget =
+          cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter_copy)->allocateRaw();
+      parameter_widget->setParent(this);
+      parameter_widget->setParameter(parameter_copy);
+      mpPropertyCopy = parameter_widget;
+      this->layout()->addWidget(mpPropertyCopy);
+      break;
+    }
+    case cedar::proc::experiment::StepPropertyParameter::OUTPUT:
+    {
+      break;
+    }
+    case cedar::proc::experiment::StepPropertyParameter::BUFFER:
+    {
+      break;
+    }
+  }
+}
+

@@ -47,6 +47,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ConditionCheckValue.fwd.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -106,8 +107,7 @@ protected:
   // none yet
 
 private:
-  cedar::aux::StringParameterPtr _stepToCheck;
-  cedar::aux::StringParameterPtr _parameterToCheck;
+  cedar::proc::experiment::StepPropertyParameterPtr _stepValue;
   cedar::aux::DoubleParameterPtr _desiredValue;
 
 }; // class cedar::proc::experiment::ConditionCheckValue

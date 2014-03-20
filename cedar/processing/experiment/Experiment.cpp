@@ -51,6 +51,12 @@
 #include <boost/bind.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+cedar::aux::EnumType<cedar::proc::experiment::Experiment::ResetType>
+    cedar::proc::experiment::Experiment::ResetType::mType("Expermient.ResetType.");
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::experiment::Experiment::Experiment(cedar::proc::NetworkPtr network)
@@ -67,6 +73,7 @@ _mActionSequences
   )
 )
 ,
+mRepetitionCounter(0),
 mInit(true)
 {
   ExperimentControllerSingleton::getInstance()->setExperiment(this);
@@ -156,14 +163,44 @@ std::vector<cedar::proc::experiment::ActionSequencePtr> cedar::proc::experiment:
   return ret;
 }
 
-void cedar::proc::experiment::Experiment::stopNetwork()
+void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
 {
   this->mStopThreadsCaller->start();
   cedar::aux::RecorderSingleton::getInstance()->stop();
   cedar::aux::GlobalClockSingleton::getInstance()->stop();
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
-  this->mNetwork->reset();
+  switch(reset)
+  {
+    case ResetType::None:
+    {
+      break;
+    }
+    case ResetType::Wait:
+    {
+      break;
+    }
+    case ResetType::Reset:
+    {
+      this->mNetwork->reset();
+      break;
+    }
+    case ResetType::Reload:
+    {
+      break;
+    }
+    default:
+    {
+      this->mNetwork->reset();
+      break;
+    }
+  }
   mInit=true;
+  this->mRepetitionCounter++;
+  if ( mRepetitionCounter >_mRepetitions->getValue() )
+  {
+    ExperimentControllerSingleton::getInstance()->stop();
+    mRepetitionCounter  = 0;
+  }
 }
 
 void cedar::proc::experiment::Experiment::executeAcionSequences()
@@ -211,7 +248,7 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getAllSteps()
   return ret;
 }
 
-std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string step)
+std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string step, const std::vector<std::string>& allowedTypes)
 {
   cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
 
@@ -220,8 +257,22 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(
   {
     try
     {
-      cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
-      ret.push_back(parameter->getName());
+      std::string parameter_type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
+      if(allowedTypes.size() > 0)
+      {
+        for(std::string type : allowedTypes)
+        {
+          if (type == parameter_type)
+          {
+            ret.push_back(parameter->getName());
+            break;
+          }
+        }
+      }
+      else
+      {
+        ret.push_back(parameter->getName());
+      }
     }
     catch(cedar::aux::UnknownTypeException e)
     {
@@ -238,22 +289,22 @@ cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(s
   return stepItem->getParameter(parameter);
 }
 
-std::vector<std::string> cedar::proc::experiment::Experiment::getStepValues(std::string step)
+std::vector<std::string> cedar::proc::experiment::Experiment::getStepValues(std::string step, cedar::proc::DataRole::Id role )
 {
   cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
 
   std::vector<std::string> ret;
-  for (auto data :  stepItem->getDataSlots(cedar::proc::DataRole::OUTPUT))
+  for (auto data :  stepItem->getDataSlots(role))
   {
     ret.push_back(data.first);
   }
   return ret;
 }
 
-cedar::aux::DataPtr cedar::proc::experiment::Experiment::getStepValue(std::string step, std::string value)
+cedar::aux::DataPtr cedar::proc::experiment::Experiment::getStepValue(std::string step, std::string value,cedar::proc::DataRole::Id role)
 {
   cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
-  return stepItem->getData(cedar::proc::DataRole::OUTPUT,value);
+  return stepItem->getData(role,value);
 }
 
 void cedar::proc::experiment::Experiment::onInit(bool status)

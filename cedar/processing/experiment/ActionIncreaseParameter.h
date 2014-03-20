@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,30 +22,30 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.h
+    File:        ActionIncreaseParameter.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 19
 
-    Description: Header file for the class cedar::proc::experiment::ExperimentController.
+    Description: Header file for the class cedar::proc::experiment::ActionIncreaseParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
-#define CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_INCREASE_PARAMETER_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_INCREASE_PARAMETER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/processing/experiment/Action.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ExperimentController.fwd.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/ActionIncreaseParameter.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -54,15 +54,8 @@
  *
  * @todo describe more.
  */
-//@todo Superviser
-class cedar::proc::experiment::ExperimentController : public cedar::aux::LoopedThread
+class cedar::proc::experiment::ActionIncreaseParameter : public cedar::proc::experiment::Action
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-
-  // uses singleton template.
-  friend class cedar::aux::Singleton<ExperimentController>;
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -70,21 +63,18 @@ class cedar::proc::experiment::ExperimentController : public cedar::aux::LoopedT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-private:
+public:
   //!@brief The standard constructor.
-  ExperimentController();
-public:
-  //!@brief Destructor
-  virtual ~ExperimentController();
+  ActionIncreaseParameter();
 
-//@todo
-public:
+  //!@brief Destructor
+  virtual ~ActionIncreaseParameter();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setExperiment(Experiment* experiment);
-  Experiment* getExperiment();
+  void run();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,8 +86,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Calls write in the specified interval.
-  void step(cedar::unit::Time);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -114,25 +103,9 @@ protected:
   // none yet
 
 private:
-  Experiment* mpExperiment;
+  cedar::proc::experiment::StepPropertyParameterPtr _mStepParamter;
 
-}; // class cedar::proc::experiment::ExperimentController
+}; // class cedar::proc::experiment::ActionIncreaseParameter
 
-
-
-#include "cedar/auxiliaries/Singleton.h"
-
-namespace cedar
-{
-  namespace proc
-  {
-    namespace experiment
-    {
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::ExperimentController>);
-      typedef cedar::aux::Singleton<cedar::proc::experiment::ExperimentController> ExperimentControllerSingleton;
-    }
-  }
-}
-
-#endif // CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_INCREASE_PARAMETER_H
 

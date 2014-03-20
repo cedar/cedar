@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/Condition.h"
+#include "cedar/processing/experiment/gui/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/ConditionCheckValue.fwd.h"
@@ -80,10 +81,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
-  void updateParameters();
-  void updateSteps();
-  void parameterSelected();
-  void stepSelected();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,9 +108,7 @@ protected:
   // none yet
 
 private:
-  QComboBox* mStepSelector;
-  QComboBox* mParameterSelector;
-  QDoubleSpinBox* mDesiredValue;
+  cedar::aux::gui::Parameter* mStepSelector;
 
 }; // class cedar::proc::experiment::gui::ConditionCheckValue
 

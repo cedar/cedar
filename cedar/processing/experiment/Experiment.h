@@ -50,6 +50,8 @@
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/DataRole.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
@@ -63,7 +65,55 @@
 class cedar::proc::experiment::Experiment : public cedar::aux::NamedConfigurable
 {
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*! Enumeration class for the different types of normalizations.
+   */
+  class ResetType
+  {
+    public:
+      //! Type id of the enumeration.
+      typedef cedar::aux::EnumId Id;
+      //! Pointer type of the base class.
+      typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    public:
+      //! Registers the enum values.
+      static void construct()
+      {
+        mType.type()->def(cedar::aux::Enum(None, "None"));
+        mType.type()->def(cedar::aux::Enum(Wait, "Wait"));
+        mType.type()->def(cedar::aux::Enum(Reset, "Reset"));
+        mType.type()->def(cedar::aux::Enum(Reload, "Reload"));
+      }
+
+      //! Returns the enumeration type.
+      static const cedar::aux::EnumBase& type()
+      {
+        return *mType.type();
+      }
+
+      //! Returns a pointer to an enumeration type.
+      static const TypePtr& typePtr()
+      {
+        return mType.type();
+      }
+
+    public:
+      static const Id None = 0;
+
+      static const Id Wait = 1;
+
+      static const Id Reset = 2;
+
+      static const Id Reload = 3;
+
+    private:
+      static cedar::aux::EnumType<ResetType> mType;
+  };
+
   //!@brief a parameter for action sequence objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::ActionSequence> ActionSequencelListParameter;
 
@@ -95,16 +145,16 @@ public:
   void removeActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
   std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
   void startNetwork();
-  void stopNetwork();
+  void stopNetwork(ResetType::Id reset = ResetType::Reset);
   void executeAcionSequences();
   bool isOnInit();
   void onInit(bool status);
 
   std::vector<std::string> getAllSteps();
-  std::vector<std::string> getStepParameters(std::string step);
-  std::vector<std::string> getStepValues(std::string step);
+  std::vector<std::string> getStepParameters(std::string step, const std::vector<std::string>& allowedTypes = std::vector<std::string>());
+  std::vector<std::string> getStepValues(std::string step, cedar::proc::DataRole::Id role = cedar::proc::DataRole::OUTPUT);
   cedar::aux::ParameterPtr getStepParameter(std::string step, std::string parameter);
-  cedar::aux::DataPtr getStepValue(std::string step, std::string value);
+  cedar::aux::DataPtr getStepValue(std::string step, std::string value, cedar::proc::DataRole::Id role = cedar::proc::DataRole::OUTPUT);
 
   //override
   void writeConfiguration(cedar::aux::ConfigurationNode& root);

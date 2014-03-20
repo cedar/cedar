@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/processing/experiment/ExperimentController.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/ParameterDeclaration.h"
 
 // SYSTEM INCLUDES
 
@@ -53,6 +55,8 @@ cedar::proc::experiment::StepPropertyParameter::StepPropertyParameter(
     cedar::aux::Configurable *pOwner, const std::string& name)
 :
 cedar::aux::Parameter(pOwner, name, false)
+,
+mType(PARAMETER)
 {
 }
 
@@ -68,8 +72,26 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
 {
   try
   {
+    PropertyType type =static_cast<PropertyType>(node.get_child("Type").get_value<int>());
+    this->setType(type);
     this->setStep(node.get_child("Step").get_value<std::string>());
-    this->setProperty(node.get_child("Step").get_value<std::string>());
+    this->setProperty(node.get_child("Property").get_value<std::string>());
+    switch(mType)
+    {
+      case PARAMETER:
+      {
+        mParameterCopy->readFromNode(node.get_child("PropertyParameter"));
+        break;
+      }
+      case OUTPUT:
+      {
+        break;
+      }
+      case BUFFER:
+      {
+        break;
+      }
+    }
   }
   catch (const boost::property_tree::ptree_bad_path& e)
   {
@@ -86,6 +108,26 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
   cedar::aux::ConfigurationNode step_node;
   step_node.put("Step", mStep);
   step_node.put("Property", mProperty);
+  step_node.put("Type", mType);
+
+  switch(mType)
+  {
+    case PARAMETER:
+    {
+      cedar::aux::ConfigurationNode copy_node;
+      mParameterCopy->writeToNode(copy_node);
+      step_node.add_child("PropertyParameter",copy_node);
+      break;
+    }
+    case OUTPUT:
+    {
+      break;
+    }
+    case BUFFER:
+    {
+      break;
+    }
+  }
   root.add_child(this->getName(), step_node);
 }
 
@@ -93,12 +135,14 @@ void cedar::proc::experiment::StepPropertyParameter::makeDefault()
 {
   this->mStep ="";
   this->mProperty ="";
+  this->mType=PARAMETER;
 }
 
 void cedar::proc::experiment::StepPropertyParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
 {
   if (auto other_self = boost::dynamic_pointer_cast<ConstStepPropertyParameter>(other))
   {
+    this->setType(other_self->getType());
     this->setStep(other_self->getStep());
     this->setProperty(other_self->getProperty());
   }
@@ -124,6 +168,7 @@ void cedar::proc::experiment::StepPropertyParameter::setProperty(const std::stri
   this->mProperty=property;
   if (old_value != this->mProperty)
   {
+    updatePropertyCopy();
     this->emitChangedSignal();
   }
 }
@@ -149,3 +194,121 @@ const std::string& cedar::proc::experiment::StepPropertyParameter::getStep() con
 
 }
 
+void cedar::proc::experiment::StepPropertyParameter::setType(PropertyType type)
+{
+  PropertyType old_value = this->mType;
+  this->mType=type;
+  if (old_value != this->mType)
+  {
+    this->emitChangedSignal();
+  }
+}
+
+cedar::proc::experiment::StepPropertyParameter::PropertyType cedar::proc::experiment::StepPropertyParameter::getType() const
+{
+  return this->mType;
+}
+
+cedar::aux::DataPtr cedar::proc::experiment::StepPropertyParameter::getData() const
+{
+  Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
+  if(mType==OUTPUT)
+  {
+      if (cedar::aux::DataPtr data = experiment->
+          getStepValue(mStep,mProperty,cedar::proc::DataRole::OUTPUT))
+      {
+          return data;
+      }
+  }
+
+  if(mType==BUFFER)
+  {
+    if (cedar::aux::DataPtr data = experiment->
+        getStepValue(mStep,mProperty,cedar::proc::DataRole::BUFFER))
+    {
+        return data;
+    }
+
+  }
+  return cedar::aux::DataPtr();
+}
+
+cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameter() const
+{
+  if (mStep == "" || mProperty == "" || mType!=PARAMETER)
+  {
+    return cedar::aux::ParameterPtr();
+  }
+  return ExperimentControllerSingleton::getInstance()->
+         getExperiment()->getStepParameter(mStep,mProperty);
+}
+
+cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameterCopy() const
+{
+  return this->mParameterCopy;
+}
+
+void cedar::proc::experiment::StepPropertyParameter::allowType(const std::string& type)
+{
+  this->allowedTypes.push_back(type);
+}
+
+bool cedar::proc::experiment::StepPropertyParameter::isAllowType(const std::string& type)
+{
+  for (std::string allowedtype : allowedTypes)
+  {
+    if(allowedtype==type)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void cedar::proc::experiment::StepPropertyParameter::disallowType(const std::string& type)
+{
+  int i=0;
+  for (std::string allowedtype : allowedTypes)
+  {
+    if(allowedtype==type)
+    {
+      this->allowedTypes.erase(this->allowedTypes.begin()+i);
+      break;
+    }
+    i++;
+  }
+}
+
+const std::vector<std::string>& cedar::proc::experiment::StepPropertyParameter::getAllowedTypes()
+{
+  return this->allowedTypes;
+}
+
+void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
+{
+
+  if (mStep == "" || mProperty == "")
+  {
+    return;
+  }
+  Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
+  switch(mType)
+  {
+    case PARAMETER:
+    {
+      cedar::aux::ParameterPtr parameter = experiment->getStepParameter(mStep,mProperty);
+      std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
+      mParameterCopy= cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
+      mParameterCopy->copyValueFrom(parameter);
+      break;
+    }
+    case OUTPUT:
+    {
+      break;
+    }
+    case BUFFER:
+    {
+      break;
+    }
+  }
+}

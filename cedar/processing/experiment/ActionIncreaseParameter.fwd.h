@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepPropertyParameter.fwd.h
+    File:        ActionIncreaseParameter.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 13
+    Date:        2014 03 19
 
-    Description: Forward declaration file for the class cedar::proc::experiment::StepPropertyParameter.
+    Description: Forward declaration file for the class cedar::proc::experiment::ActionIncreaseParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_STEP_PROPERTY_PARAMETER_FWD_H
-#define CEDAR_PROC_EXPERIMENT_STEP_PROPERTY_PARAMETER_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_INCREASE_PARAMETER_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_INCREASE_PARAMETER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,12 @@ namespace cedar
   {
     namespace experiment
     {
-    CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(StepPropertyParameter);
+      CEDAR_DECLARE_PROC_CLASS(ActionIncreaseParameter);
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_STEP_PROPERTY_PARAMETER_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_INCREASE_PARAMETER_FWD_H
 

@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/Condition.h"
 #include "cedar/processing/experiment/gui/Action.h"
+#include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/ActionSequence.fwd.h"
@@ -120,7 +121,7 @@ protected:
 
 private:
   QVBoxLayout* mLayout;
-  cedar::proc::experiment::gui::Condition* mCondition;
+  cedar::proc::experiment::gui::ExperimentItemWidget* mCondition;
   cedar::proc::experiment::ActionSequencePtr mSequence;
   cedar::proc::gui::ExperimentDialog* mpParent;
   QHBoxLayout* conditionRow;
