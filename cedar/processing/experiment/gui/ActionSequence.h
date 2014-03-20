@@ -41,8 +41,6 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/gui/Condition.h"
-#include "cedar/processing/experiment/gui/Action.h"
 #include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
 
 // FORWARD DECLARATIONS
