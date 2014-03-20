@@ -46,6 +46,7 @@
 #include "cedar/processing/experiment/ExperimentController.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
@@ -55,6 +56,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::EnumType<cedar::proc::experiment::Experiment::ResetType>
     cedar::proc::experiment::Experiment::ResetType::mType("Expermient.ResetType.");
+
+cedar::aux::EnumType<cedar::proc::experiment::Experiment::CompareMethod>
+    cedar::proc::experiment::Experiment::CompareMethod::mType("Expermient.CompareMethod.");
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -136,7 +140,7 @@ void cedar::proc::experiment::Experiment::run()
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
-  ExperimentControllerSingleton::getInstance()->stop();
+  ExperimentControllerSingleton::getInstance()->requestStop();
   this->stopNetwork();
 }
 
@@ -177,6 +181,7 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
     }
     case ResetType::Wait:
     {
+      cedar::aux::usleep(1000);
       break;
     }
     case ResetType::Reset:
@@ -186,6 +191,7 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
     }
     case ResetType::Reload:
     {
+      //@todo Reload function
       break;
     }
     default:
@@ -198,9 +204,10 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
   this->mRepetitionCounter++;
   if ( mRepetitionCounter >_mRepetitions->getValue() )
   {
-    ExperimentControllerSingleton::getInstance()->stop();
+    ExperimentControllerSingleton::getInstance()->requestStop();
     mRepetitionCounter  = 0;
   }
+  emit experimentStopped(true);
 }
 
 void cedar::proc::experiment::Experiment::executeAcionSequences()

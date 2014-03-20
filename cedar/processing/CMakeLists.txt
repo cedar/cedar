@@ -50,6 +50,7 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
+  experiment/Experiment.h
   experiment/StepPropertyParameter.h
   experiment/gui/ActionSequence.h
   experiment/gui/StepPropertyParameter.h

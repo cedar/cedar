@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnInit.cpp
+    File:        ConditionOnTime.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 19
 
-    Description: Source file for the class cedar::proc::experiment::ConditionOnInit.
+    Description: Source file for the class cedar::proc::experiment::ConditionOnTime.
 
     Credits:
 
@@ -38,9 +38,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ConditionOnInit.h"
-#include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ConditionOnTime.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 
@@ -49,29 +48,43 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-	bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
-		registerType<cedar::proc::experiment::ConditionOnInitPtr>();
+  bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
+    registerType<cedar::proc::experiment::ConditionOnTimePtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ConditionOnInit::ConditionOnInit()
+cedar::proc::experiment::ConditionOnTime::ConditionOnTime()
+:
+_mTime( new cedar::aux::TimeParameter(this,"Time",cedar::unit::Time()))
+,
+mActivated(false)
 {
+
 }
 
-cedar::proc::experiment::ConditionOnInit::~ConditionOnInit()
+cedar::proc::experiment::ConditionOnTime::~ConditionOnTime()
 {
-}
 
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-bool cedar::proc::experiment::ConditionOnInit::check()
+bool cedar::proc::experiment::ConditionOnTime::check()
 {
-  return ExperimentControllerSingleton::getInstance()->getExperiment()->isOnInit();
+  cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  if(time < _mTime->getValue())
+  {
+    mActivated = false;
+  }
+  else if(!mActivated)
+  {
+    mActivated = true;
+    return true;
+  }
+  return false;
 }

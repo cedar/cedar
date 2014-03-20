@@ -41,12 +41,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/gui/ActionSequence.fwd.h"
 #include "cedar/processing/experiment/ActionSequence.fwd.h"
 #include "cedar/processing/gui/ExperimentDialog.fwd.h"
+#include "cedar/processing/experiment/gui/ExperimentItemWidget.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>

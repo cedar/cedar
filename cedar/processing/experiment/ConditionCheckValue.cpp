@@ -41,6 +41,7 @@
 #include "cedar/processing/experiment/ConditionCheckValue.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -66,10 +67,22 @@ _stepValue
     new cedar::proc::experiment::StepPropertyParameter(this,"StepProperty")
 )
 ,
+_mCompareMethode
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "reset type",
+    cedar::proc::experiment::Experiment::CompareMethod::typePtr(),
+    cedar::proc::experiment::Experiment::CompareMethod::Lower
+  )
+)
+,
 _desiredValue
 (
     new cedar::aux::DoubleParameter(this,"DesiredValue",0.0)
 )
+
 {
   _stepValue->setType(cedar::proc::experiment::StepPropertyParameter::OUTPUT);
 }
@@ -89,10 +102,35 @@ bool cedar::proc::experiment::ConditionCheckValue::check()
     if (cedar::aux::MatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
     {
       QReadLocker locker(&(value->getLock()));
-      const double cVal = value->getValue<double>(0,0);
-      if(cVal > _desiredValue->getValue())
+      switch(_mCompareMethode->getValue())
       {
-        return true;
+       case cedar::proc::experiment::Experiment::CompareMethod::Lower:
+       {
+         bool inRange = cv::checkRange(value->getData(),true,NULL,-DBL_MAX,_desiredValue->getValue());
+         if(inRange)
+         {
+           return true;
+         }
+         break;
+       }
+       case cedar::proc::experiment::Experiment::CompareMethod::Greater:
+       {
+         bool inRange = cv::checkRange(value->getData(),true,NULL,_desiredValue->getValue(),DBL_MAX);
+         if(inRange)
+         {
+           return true;
+         }
+         break;
+       }
+       case cedar::proc::experiment::Experiment::CompareMethod::Equal:
+       {
+         bool inRange = cv::checkRange(value->getData(),true,NULL,_desiredValue->getValue(),_desiredValue->getValue());
+         if(inRange)
+         {
+           return true;
+         }
+         break;
+       }
       }
     }
   }
