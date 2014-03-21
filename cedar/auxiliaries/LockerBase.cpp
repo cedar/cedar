@@ -55,6 +55,7 @@ cedar::aux::LockerBase::LockerBase
 cedar::aux::CallOnScopeExit(unlockFunction),
 mLockFunction(lockFunction)
 {
+  this->relock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
