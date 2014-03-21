@@ -154,6 +154,11 @@ void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& 
 
 void cedar::proc::steps::MatrixSlice::updateDimensionality()
 {
+  if (!this->mInput)
+  {
+    return;
+  }
+
   unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   unsigned int old_dim = this->_mRangeLower->size();
   this->_mRangeLower->resize(matrix_dim);
