@@ -220,6 +220,10 @@ private:
       case cedar::aux::LOCK_TYPE_WRITE:
         pLock->lockForWrite();
         break;
+
+      case cedar::aux::LOCK_TYPE_DONT_LOCK:
+        // do nothing
+        break;
     }
   }
 

@@ -306,3 +306,10 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getFinishedTrigger()
   }
   return this->mFinished.member();
 }
+
+unsigned int cedar::proc::Triggerable::numberOfStartCalls() const
+{
+  QMutexLocker locker(this->mpStartCallsLock);
+  unsigned int calls = this->mStartCalls;
+  return calls;
+}
