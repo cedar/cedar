@@ -176,13 +176,13 @@ void cedar::proc::Step::callReset()
   this->resetState();
 
   // lock everything
-  this->lock(cedar::aux::LOCK_TYPE_READ);
+  cedar::proc::Step::ReadLocker locker(this);
 
   // reset the step
   this->reset();
 
   // unlock everything
-  this->unlock();
+  locker.unlock();
 
   this->getFinishedTrigger()->trigger();
 }
@@ -310,7 +310,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   connections_locker.unlock();
 
   // lock the step
-  this->lock(cedar::aux::LOCK_TYPE_READ);
+  cedar::proc::Step::ReadLocker step_locker(this);
 
   clock_t lock_end = clock();
   clock_t lock_elapsed = lock_end - lock_start;
@@ -323,7 +323,6 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
     this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
                    "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
-    this->unlock();
     this->mBusy.unlock();
     return;
   } // this->mMandatoryConnectionsAreSet
@@ -390,7 +389,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
 
   // unlock the step
-  this->unlock();
+  step_locker.unlock();
   this->mBusy.unlock();
 
   //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
