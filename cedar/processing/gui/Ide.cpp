@@ -255,6 +255,8 @@ mSuppressCloseDialog(false)
                    SLOT(showRobotManager()));
 
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
+  QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copyStep()));
+  QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
 
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
 
@@ -412,6 +414,57 @@ void cedar::proc::gui::Ide::duplicateStep()
       catch (cedar::aux::ExceptionBase& exc)
       {
         //!@todo Properly display an error message to the user.
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::copyStep()
+{
+  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
+  // make sure there is only one item
+  if (selected_items.size() > 1)
+  {
+    return;
+  }
+  else if (selected_items.size() == 1)
+  {
+    // copy to buffer if item == step
+    if (cedar::proc::gui::StepItem* p_base = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items.at(0)))
+    {
+      this->mLastCopiedStep = p_base->getStep();
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::pasteStepConfiguration()
+{
+  if (this->mLastCopiedStep) // is there a step in the buffer?
+  {
+    QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
+    if (selected_items.size() == 1)
+    {
+      this->mpPropertyTable->clear();
+    }
+    for (auto item : selected_items)
+    {
+      if (cedar::proc::gui::StepItem* p_base = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+      {
+        try
+        {
+          p_base->getStep()->copyFrom(this->mLastCopiedStep);
+        }
+        catch (cedar::aux::TypeMismatchException& exc)
+        {
+          // this might happen, ignore
+        }
+      }
+    }
+    if (selected_items.size() == 1)
+    {
+      if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(0)))
+      {
+        this->mpPropertyTable->display(p_base->getElement());
       }
     }
   }
