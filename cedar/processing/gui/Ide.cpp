@@ -106,6 +106,14 @@ mSuppressCloseDialog(false)
   p_enable_custom_time_step->setChecked(false);
   this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
 
+  this->mpBoostControlDock = new QDockWidget(this);
+  this->mpBoostControl = new cedar::proc::gui::BoostControl();
+  this->mpBoostControlDock->setFloating(true);
+//  this->mpBoostControlDock->setVisible(false);
+  this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
+  this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
+  this->mpBoostControlDock->setWidget(this->mpBoostControl);
+
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
   this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
@@ -349,24 +357,7 @@ void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 
 void cedar::proc::gui::Ide::showBoostControl()
 {
-  if (mpBoostControl == NULL)
-  {
-    auto p_dock = new QDockWidget(this);
-    this->mpBoostControl = new cedar::proc::gui::BoostControl();
-    p_dock->setFloating(true);
-    p_dock->setWindowTitle(this->mpBoostControl->windowTitle());
-    p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
-    p_dock->setWidget(this->mpBoostControl);
-    this->mpBoostControl->setGroup(this->mGroup->getGroup());
-    p_dock->show();
-  }
-  else
-  {
-    if (auto p_widget = dynamic_cast<QWidget*>(this->mpBoostControl->parent()))
-    {
-      p_widget->show();
-    }
-  }
+  this->mpBoostControlDock->show();
 }
 
 void cedar::proc::gui::Ide::showConsistencyChecker()
@@ -559,6 +550,7 @@ void cedar::proc::gui::Ide::storeSettings()
   cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->getFrom(this->mpToolsWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->getFrom(this->mpBoostControlDock);
 
   cedar::proc::gui::SettingsSingleton::getInstance()->storeMainWindow(this);
 
@@ -571,6 +563,7 @@ void cedar::proc::gui::Ide::restoreSettings()
   cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->setTo(this->mpToolsWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->setTo(this->mpBoostControlDock);
 
   cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);
 

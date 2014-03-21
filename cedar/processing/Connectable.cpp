@@ -491,18 +491,15 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(ce
     }
     else
     {
-      bool skip_locking = false;
+      cedar::aux::Lockable::ReadLockerPtr locker;
       if (cedar::proc::OwnedDataPtr owned = boost::dynamic_pointer_cast<cedar::proc::OwnedData>(slot))
       {
         if (owned->isShared())
         {
-          skip_locking = true;
+          locker = cedar::aux::Lockable::ReadLockerPtr(new cedar::aux::Lockable::ReadLocker(this));
         }
       }
-      if (!skip_locking)
-      {
-        this->lockAll(cedar::aux::LOCK_TYPE_READ);
-      }
+      
       auto external_data_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(slot);
       validity = cedar::proc::DataSlot::VALIDITY_VALID;
       for (unsigned int i = 0; i < external_data_slot->getDataCount(); ++i)
@@ -535,10 +532,6 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(ce
             validity = cedar::proc::DataSlot::VALIDITY_ERROR;
             break;
         }
-      }
-      if (!skip_locking)
-      {
-        this->unlockAll();
       }
     }
 

@@ -190,6 +190,52 @@ int testStartingStopping()
   return errors;
 }
 
+class ThrowsInAction : public cedar::proc::Step
+{
+public:
+  ThrowsInAction()
+  :
+  mData(new cedar::aux::MatData())
+  {
+    this->declareOutput("output", this->mData);
+
+    this->registerFunction("throwSomething", boost::bind(&ThrowsInAction::throwSomething, this));
+  }
+
+private:
+  void compute(const cedar::proc::Arguments&)
+  {
+  }
+
+  void throwSomething()
+  {
+    CEDAR_ASSERT(false);
+  }
+
+private:
+  cedar::aux::MatDataPtr mData;
+};
+CEDAR_GENERATE_POINTER_TYPES(ThrowsInAction);
+
+int testThrowInAction()
+{
+  ThrowsInActionPtr step(new ThrowsInAction());
+
+  std::cout << "Testing throwing something from a step action." << std::endl;
+  try
+  {
+    step->callAction("throwSomething");
+  }
+  catch (...)
+  {
+    // ok, there's supposed to be an exception here ...
+  }
+
+  // ... but was the data unlocked properly?
+  step->onTrigger();
+  return 0;
+}
+
 // global variable:
 int global_errors;
 
@@ -217,6 +263,7 @@ void run_test()
   }
 
   global_errors += testStartingStopping();
+  global_errors += testThrowInAction();
 
   std::cout << "test finished with " << global_errors << " error(s)." << std::endl;
 }

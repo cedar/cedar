@@ -46,6 +46,7 @@
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LockerBase.h"
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
@@ -99,6 +100,68 @@ class cedar::proc::Step : public QObject,
 public:
   //! Map from action names to their corresponding functions.
   typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
+
+private:
+  class Locker : public cedar::aux::LockerBase
+  {
+    public:
+      Locker(cedar::proc::StepPtr step, cedar::aux::LOCK_TYPE type)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::proc::Step::lock, step, type),
+        boost::bind(&cedar::proc::Step::unlock, step, type)
+      )
+      {
+      }
+
+      Locker(cedar::proc::Step* step, cedar::aux::LOCK_TYPE type)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::proc::Step::lock, step, type),
+        boost::bind(&cedar::proc::Step::unlock, step, type)
+      )
+      {
+      }
+  };
+
+public:
+  class ReadLocker : public Locker
+  {
+  public:
+    ReadLocker(cedar::proc::StepPtr step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_READ)
+    {
+    }
+
+    ReadLocker(cedar::proc::Step* step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_READ)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+
+  class WriteLocker : public Locker
+  {
+  public:
+    WriteLocker(cedar::proc::StepPtr step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_WRITE)
+    {
+    }
+
+    WriteLocker(cedar::proc::Step* step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_WRITE)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

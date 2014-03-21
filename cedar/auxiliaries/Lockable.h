@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/LockerBase.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Lockable.fwd.h"
@@ -73,6 +74,92 @@ public:
 
   //! Storage for locks in this class.
   typedef std::multiset<std::pair<QReadWriteLock*, cedar::aux::LOCK_TYPE> > Locks;
+
+private:
+  /*! @brief A RAII-based locker for lockables. Will automatically unlock when the locker is destroyed.
+   */
+  class Locker : public cedar::aux::LockerBase
+  {
+    public:
+      Locker(LockablePtr lockable, LockSetHandle lockSet = 0)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
+      {
+      }
+
+      Locker(Lockable* lockable, LockSetHandle lockSet = 0)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
+      {
+      }
+
+      Locker(Lockable* lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockType, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
+      {
+      }
+
+      Locker(LockablePtr lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockType, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
+      {
+      }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(Locker);
+
+public:
+  class ReadLocker : public Locker
+  {
+  public:
+    ReadLocker(LockablePtr lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_READ, lockSet)
+    {
+    }
+
+    ReadLocker(Lockable* lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_READ, lockSet)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+
+  class WriteLocker : public Locker
+  {
+  public:
+    WriteLocker(LockablePtr lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_WRITE, lockSet)
+    {
+    }
+
+    WriteLocker(Lockable* lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_WRITE, lockSet)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

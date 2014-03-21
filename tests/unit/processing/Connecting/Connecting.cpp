@@ -138,6 +138,59 @@ class TestSource2 : public cedar::proc::Step
 CEDAR_GENERATE_POINTER_TYPES(TestSource2);
 
 
+class ThrowsDuringDeterminInputValidity : public cedar::proc::Step
+{
+  public:
+    ThrowsDuringDeterminInputValidity()
+    {
+      this->declareInput("input");
+    }
+
+    void compute(const cedar::proc::Arguments&)
+    {
+      // nothing to do here
+    }
+
+    cedar::proc::DataSlot::VALIDITY determineInputValidity
+    (
+      cedar::proc::ConstDataSlotPtr /* slot */,
+      cedar::aux::ConstDataPtr /* data */
+    )
+    const
+    {
+      // we want to throw a failed assertion exception
+      CEDAR_ASSERT(false);
+
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+};
+CEDAR_GENERATE_POINTER_TYPES(ThrowsDuringDeterminInputValidity);
+
+int testDetermineInputValidityThrow()
+{
+  int errors = 0;
+
+  std::cout << "Testing throwing from determineInputValidity while connecting." << std::endl;
+
+  cedar::proc::GroupPtr group (new cedar::proc::Group());
+
+  TestSourcePtr src(new TestSource(0.0));
+  ThrowsDuringDeterminInputValidityPtr tar(new ThrowsDuringDeterminInputValidity());
+
+  group->add(src, "source");
+  group->add(tar, "target");
+
+  // connect the slots; this should properly deal with the exception
+  group->connectSlots("source.output", "target.input");
+
+  // trigger the source; should not trigger the target
+  src->onTrigger();
+
+  return errors;
+}
+
+
+
 int testPtrChange()
 {
   int errors = 0;
@@ -286,6 +339,7 @@ void run_test()
 
   global_errors += testPtrChange();
   global_errors += testOnlineDisconnecting();
+  global_errors += testDetermineInputValidityThrow();
 
   std::cout << "Done. There were " << global_errors << " error(s)." << std::endl;
 }
