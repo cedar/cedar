@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/sources/Boost.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Element.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
@@ -68,7 +68,7 @@ cedar::proc::gui::BoostControl::BoostControl()
 
 cedar::proc::gui::BoostControl::~BoostControl()
 {
-  if (this->mNetwork)
+  if (this->mGroup)
   {
     this->mElementAddedConnection.disconnect();
     this->mElementRemovedConnection.disconnect();
@@ -79,9 +79,9 @@ cedar::proc::gui::BoostControl::~BoostControl()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::BoostControl::setNetwork(cedar::proc::NetworkPtr network)
+void cedar::proc::gui::BoostControl::setGroup(cedar::proc::GroupPtr group)
 {
-  if (this->mNetwork)
+  if (this->mGroup)
   {
     this->mElementAddedConnection.disconnect();
     this->mElementRemovedConnection.disconnect();
@@ -90,17 +90,17 @@ void cedar::proc::gui::BoostControl::setNetwork(cedar::proc::NetworkPtr network)
   this->mpBoostTree->clear();
   this->mBoostNames.clear();
 
-  this->mNetwork = network;
+  this->mGroup = group;
 
-  for (auto iter = this->mNetwork->getElements().begin(); iter != this->mNetwork->getElements().end(); ++iter)
+  for (auto iter = this->mGroup->getElements().begin(); iter != this->mGroup->getElements().end(); ++iter)
   {
     this->translateElementAddedSignal(iter->second);
   }
 
   this->mElementAddedConnection
-    = this->mNetwork->connectToNewElementAddedSignal(boost::bind(&cedar::proc::gui::BoostControl::translateElementAddedSignal, this, _1));
+    = this->mGroup->connectToNewElementAddedSignal(boost::bind(&cedar::proc::gui::BoostControl::translateElementAddedSignal, this, _1));
   this->mElementRemovedConnection
-    = this->mNetwork->connectToElementRemovedSignal(boost::bind(&cedar::proc::gui::BoostControl::translateElementRemovedSignal, this, _1));
+    = this->mGroup->connectToElementRemovedSignal(boost::bind(&cedar::proc::gui::BoostControl::translateElementRemovedSignal, this, _1));
 }
 
 void cedar::proc::gui::BoostControl::translateElementRemovedSignal(cedar::proc::ConstElementPtr element)
@@ -134,7 +134,7 @@ void cedar::proc::gui::BoostControl::translateElementAddedSignal(cedar::proc::El
 
 void cedar::proc::gui::BoostControl::elementAdded(QString elementName)
 {
-  cedar::proc::ElementPtr element = this->mNetwork->getElement(elementName.toStdString());
+  cedar::proc::ElementPtr element = this->mGroup->getElement(elementName.toStdString());
 
   if (cedar::proc::sources::BoostPtr boost = boost::dynamic_pointer_cast<cedar::proc::sources::Boost>(element))
   {

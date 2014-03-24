@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PerformanceOverview.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/units/prefixes.h"
 
@@ -150,21 +150,21 @@ mTimerId(0)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::PerformanceOverview::setNetwork(cedar::proc::NetworkPtr network)
+void cedar::proc::gui::PerformanceOverview::setGroup(cedar::proc::GroupPtr group)
 {
-  this->mNetwork = network;
+  this->mGroup = group;
 }
 
 void cedar::proc::gui::PerformanceOverview::refresh()
 {
   this->clear();
 
-  if (!this->mNetwork)
+  if (!this->mGroup)
   {
     return;
   }
 
-  for (const auto& name_element_pair : this->mNetwork->getElements())
+  for (const auto& name_element_pair : this->mGroup->getElements())
   {
     auto element = name_element_pair.second;
 

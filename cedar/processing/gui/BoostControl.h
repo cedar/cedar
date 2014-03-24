@@ -45,7 +45,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
 #include "cedar/processing/sources/Boost.fwd.h"
 
@@ -82,7 +82,7 @@ public:
 public:
   /*!@brief Sets the network whose boosts are controlled by this widget.
    */
-  void setNetwork(cedar::proc::NetworkPtr network);
+  void setGroup(cedar::proc::GroupPtr network);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -126,7 +126,7 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::proc::NetworkPtr mNetwork;
+  cedar::proc::GroupPtr mGroup;
 
   boost::signals2::connection mElementAddedConnection;
 

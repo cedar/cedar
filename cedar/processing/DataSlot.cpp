@@ -38,7 +38,7 @@
 #include "cedar/processing/typecheck/TypeCheck.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/Data.h"
@@ -63,7 +63,6 @@ mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
 mRole(role),
-mIsPromoted(false),
 mIsSerializable(false)
 {
 }
@@ -102,6 +101,28 @@ void cedar::proc::DataSlot::readDataFromFile(const cedar::aux::Path& path)
 
   std::ifstream stream(path.absolute().toString());
   this->getData()->deserialize(stream);
+}
+
+void cedar::proc::DataSlot::clear()
+{
+  this->clearInternal();
+}
+
+
+void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
+{
+  this->setDataInternal(data);
+
+  this->signalDataSet(data);
+  this->signalDataChanged();
+}
+
+void cedar::proc::DataSlot::removeData(cedar::aux::DataPtr data)
+{
+  this->removeDataInternal(data);
+
+  this->signalDataRemoved(data);
+  this->signalDataChanged();
 }
 
 void cedar::proc::DataSlot::setCheck(const TypeCheckFunction& check)
@@ -155,7 +176,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
 void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
 {
   this->mValidity = validity;
-  this->mValidityChanged();
+  this->signalValidityChanged();
 }
 
 bool cedar::proc::DataSlot::isMandatory() const
@@ -196,22 +217,17 @@ bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) co
   return (parent.get() == mpParent);
 }
 
-void cedar::proc::DataSlot::promote()
-{
-  this->mIsPromoted = true;
-}
-
-void cedar::proc::DataSlot::demote()
-{
-  this->mIsPromoted = false;
-}
-
-bool cedar::proc::DataSlot::isPromoted() const
-{
-  return this->mIsPromoted;
-}
-
 void cedar::proc::DataSlot::setName(const std::string& name)
 {
   this->mName = name;
+}
+
+void cedar::proc::DataSlot::deleteParentPointer()
+{
+  this->resetParentPointer();
+}
+
+void cedar::proc::DataSlot::resetParentPointer()
+{
+  this->mpParent = NULL;
 }

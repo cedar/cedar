@@ -78,6 +78,8 @@ Unreleased
   - DataSlots can now be marked as serializable. What this means is that the data stored in them will be stored in the
     architecture when it is saved, and restored later on when it is loaded. In addition, users can manually save and
     load data for these slots from the right-click menu of step items.
+  - Groups now work as intended: one can freely move elements between groups, existing connections are preserved, using 
+    group connectors if necessary. In the gui, grouping is drag-and-drop-based.
 
 Released versions
 =================

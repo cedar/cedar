@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/CommandLineParser.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 
 // FORWARD DECLARATIONS
 #include "MainApplication.fwd.h"
@@ -105,7 +105,7 @@ protected:
 private:
   cedar::aux::CommandLineParser mParser;
 
-  cedar::proc::NetworkPtr mArchitecture;
+  cedar::proc::GroupPtr mArchitecture;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

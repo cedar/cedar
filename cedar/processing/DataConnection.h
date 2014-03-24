@@ -108,7 +108,7 @@ protected:
   //!@brief the target DataSlot of this connection
   cedar::proc::DataSlotWeakPtr mTarget;
 private:
-  // none yet
+  bool mAlreadyDisconnected;
 }; // class cedar::proc::DataConnection
 
 #endif // CEDAR_PROC_DATA_CONNECTION_H
