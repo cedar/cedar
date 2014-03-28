@@ -199,12 +199,14 @@ public:
   cedar::aux::ParameterPtr getStepParameter(std::string step, std::string parameter);
   cedar::aux::DataPtr getStepValue(std::string step, std::string value, cedar::proc::DataRole::Id role = cedar::proc::DataRole::OUTPUT);
 
+  unsigned int getTrialNumber();
   //override
   void writeConfiguration(cedar::aux::ConfigurationNode& root);
 
 
 signals:
   void experimentStopped(bool stopped);
+  void trialNumberChanged(int trialNumber);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
