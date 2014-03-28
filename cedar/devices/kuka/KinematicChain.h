@@ -138,7 +138,7 @@ public:
    * if in velocity- or acceleration mode, every step will also change joint angles/velocity
    * @param time Unused.
    */
-  void step(double time);
+  void step(cedar::unit::Time time);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
