@@ -14,10 +14,7 @@
    <string>Experiment</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2" colspan="3">
-    <widget class="QLineEdit" name="nameEdit"/>
-   </item>
-   <item row="0" column="5">
+   <item row="0" column="7">
     <widget class="QPushButton" name="loadButton">
      <property name="text">
       <string>load</string>
@@ -31,31 +28,28 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="5">
+   <item row="2" column="7">
     <widget class="QPushButton" name="saveAsButton">
      <property name="text">
       <string>save as...</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="4">
+   <item row="2" column="1" colspan="6">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Repetitions</string>
+   <item row="1" column="4" colspan="2">
+    <widget class="QSpinBox" name="repetitionSpinBox">
+     <property name="value">
+      <number>1</number>
      </property>
     </widget>
    </item>
-   <item row="1" column="2" colspan="2">
-    <widget class="QSpinBox" name="repetitionSpinBox"/>
-   </item>
-   <item row="1" column="4">
+   <item row="1" column="6">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -68,7 +62,7 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="1" colspan="4">
+   <item row="4" column="1" colspan="6">
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
       <bool>true</bool>
@@ -83,19 +77,6 @@
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="0">
-        <widget class="QPushButton" name="mAddActionSequence">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>+</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0" colspan="2">
         <layout class="QVBoxLayout" name="mActionSequences"/>
        </item>
@@ -111,6 +92,19 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="mAddActionSequence">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>+</string>
+         </property>
+        </widget>
        </item>
        <item row="1" column="1">
         <spacer name="horizontalSpacer_2">
@@ -129,7 +123,7 @@
      </widget>
     </widget>
    </item>
-   <item row="9" column="5">
+   <item row="9" column="7">
     <widget class="QPushButton" name="runButton">
      <property name="text">
       <string>run</string>
@@ -142,7 +136,14 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Repetition</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="7">
     <widget class="QPushButton" name="saveButton">
      <property name="text">
       <string>save</string>
@@ -155,6 +156,23 @@
       <string>Action Sequences</string>
      </property>
     </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>/</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="mActualRepetition">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="5">
+    <widget class="QLineEdit" name="nameEdit"/>
    </item>
   </layout>
  </widget>

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,49 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSequence.h
+    File:        ConditionOnTrial.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 28
 
-    Description: Header file for the class cedar::proc::experiment::gui::ActionSequence.
+    Description: Header file for the class cedar::proc::experiment::ConditionOnTrial.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
-#define CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/experiment/Condition.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/gui/ActionSequence.fwd.h"
-#include "cedar/processing/experiment/ActionSequence.fwd.h"
-#include "cedar/processing/gui/ExperimentDialog.fwd.h"
-#include "cedar/processing/experiment/gui/ExperimentItemWidget.fwd.h"
+#include "cedar/processing/experiment/ConditionOnTrial.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
-#include <QBoxLayout>
 
 
 /*!@todo describe.
  *
  * @todo describe more.
  */
-class cedar::proc::experiment::gui::ActionSequence : public QWidget
+class cedar::proc::experiment::ConditionOnTrial : public cedar::proc::experiment::Condition
 {
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,21 +65,16 @@ class cedar::proc::experiment::gui::ActionSequence : public QWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ActionSequence(cedar::proc::experiment::ActionSequencePtr sequence, cedar::proc::gui::ExperimentDialog* pParent);
+  ConditionOnTrial();
 
   //!@brief Destructor
-  virtual ~ActionSequence();
+  virtual ~ConditionOnTrial();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void clear(QLayout* layout);
-public slots:
-  void update();
-  void updateCondition();
-  void updateActions();
-
+  bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,8 +85,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private slots:
-void remove();
+private:
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,14 +103,10 @@ protected:
   // none yet
 
 private:
-  QVBoxLayout* mLayout;
-  cedar::proc::experiment::gui::ExperimentItemWidget* mCondition;
-  cedar::proc::experiment::ActionSequencePtr mSequence;
-  cedar::proc::gui::ExperimentDialog* mpParent;
-  QVBoxLayout* conditionRow;
-  QVBoxLayout* mActions;
+ cedar::aux::UIntParameterPtr _mTrial;
+ bool mActivatedFlag;
 
-}; // class cedar::proc::experiment::gui::ActionSequence
+}; // class cedar::proc::experiment::ConditionOnTrial
 
-#endif // CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_H
 

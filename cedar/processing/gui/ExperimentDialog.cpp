@@ -66,6 +66,7 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
   connect(this->nameEdit, SIGNAL(editingFinished()), this, SLOT(nameChanged()));
   connect(this->runButton, SIGNAL(toggled(bool)), this, SLOT(runExperiment(bool)));
   connect(this->experiment.get(), SIGNAL(experimentStopped(bool)), this, SLOT(experimentStopped(bool)));
+  connect(this->experiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(repetitionNumberChanged(int)));
   connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(repetitionChanged()));
   connect(this->mAddActionSequence,SIGNAL(clicked()),this,SLOT(addActionSequence()));
 
@@ -195,6 +196,12 @@ void cedar::proc::gui::ExperimentDialog::experimentStopped(bool status)
     connect(this->runButton, SIGNAL(toggled(bool)), this, SLOT(runExperiment(bool)));
   }
 }
+
+void cedar::proc::gui::ExperimentDialog::repetitionNumberChanged(int number)
+{
+  this->mActualRepetition->setText(QString::number(number));
+}
+
 void cedar::proc::gui::ExperimentDialog::redraw()
 {
   this->clearActionSequences();

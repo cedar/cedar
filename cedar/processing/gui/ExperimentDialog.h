@@ -104,6 +104,7 @@ private slots:
     void repetitionChanged();
     void runExperiment(bool status);
     void experimentStopped(bool status);
+    void repetitionNumberChanged(int number);
 
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -64,12 +64,14 @@ cedar::proc::experiment::gui::ActionSequence::ActionSequence(
 :
 QWidget(pParent)
 ,
-mCondition(NULL), conditionRow(new QHBoxLayout),mActions (new QVBoxLayout)
+mCondition(NULL), conditionRow(new QVBoxLayout),mActions (new QVBoxLayout)
 {
   this->mSequence=sequence;
   this->mpParent=pParent;
-  this->mLayout = new QVBoxLayout;
+  this->mLayout = new QVBoxLayout();
   this->setLayout(mLayout);
+  this->mActions->setMargin(20);
+  this->conditionRow->setAlignment(Qt::AlignTop);
 
   update();
 
@@ -95,14 +97,19 @@ void cedar::proc::experiment::gui::ActionSequence::update()
   clear(mLayout);
   //Add Name Label and Remove Button
   QHBoxLayout* nameRow = new QHBoxLayout;
-  QLineEdit* name = new QLineEdit();
-  name->setText(QString::fromStdString(mSequence->getName()));
+  cedar::aux::ParameterPtr nameParameter = this->mSequence->getParameter("name");
+  cedar::aux::gui::Parameter* name
+        = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(nameParameter)->allocateRaw();
+  name->setParent(this);
+  name->setParameter(nameParameter);
   QPushButton* rm = new QPushButton(QString::fromStdString("-"));
   connect(rm,SIGNAL(clicked()),this,SLOT(remove()));
   nameRow->addWidget(name);
   nameRow->addWidget(rm);
   mLayout->addLayout(nameRow);
 
+
+  QVBoxLayout* body = new QVBoxLayout;
   //Add Condition
   QLabel* condition_text = new QLabel(QString::fromStdString("Condition:"));
   conditionRow->addWidget(condition_text);
@@ -123,12 +130,12 @@ void cedar::proc::experiment::gui::ActionSequence::update()
 
   }
 
-  mLayout->addLayout(conditionRow);
-  //Add Actions
+  body->addLayout(conditionRow);
 
+  //Add Actions
   QLabel* actions_text = new QLabel(QString::fromStdString("Actions:"));
-  mLayout->addWidget(actions_text);
-  mLayout->addLayout(mActions);
+  body->addWidget(actions_text);
+  body->addLayout(mActions);
   try
   {
     cedar::aux::ParameterPtr action = this->mSequence->getParameter("ActionSet");
@@ -136,13 +143,16 @@ void cedar::proc::experiment::gui::ActionSequence::update()
             = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(action)->allocateRaw();
     actionSelector->setParent(this);
     actionSelector->setParameter(action);
-    mLayout->addWidget(actionSelector);
+    body->addWidget(actionSelector);
     connect(action.get(),SIGNAL(valueChanged()),this,SLOT(updateActions()));
   }
   catch (cedar::aux::UnknownTypeException& e)
   {
 
   }
+  body->setMargin(20);
+  mLayout->addLayout(body);
+
   updateActions();
 }
 void cedar::proc::experiment::gui::ActionSequence::updateCondition()

@@ -66,7 +66,7 @@ cedar::aux::EnumType<cedar::proc::experiment::Experiment::CompareMethod>
 cedar::proc::experiment::Experiment::Experiment(cedar::proc::NetworkPtr network)
 :
 _mFileName(new cedar::aux::StringParameter(this, "filename", "")),
-_mRepetitions(new cedar::aux::UIntParameter(this, "repetitions", 0)),
+_mRepetitions(new cedar::aux::UIntParameter(this, "repetitions", 1)),
 _mActionSequences
 (
   new ActionSequencelListParameter
@@ -136,7 +136,12 @@ void cedar::proc::experiment::Experiment::setRepetitions(unsigned int repetition
 
 void cedar::proc::experiment::Experiment::run()
 {
-  ExperimentControllerSingleton::getInstance()->start();
+
+  if (this->_mRepetitions->getValue() > 0)
+  {
+    this->mRepetitionCounter = 1;
+    ExperimentControllerSingleton::getInstance()->start();
+  }
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
@@ -146,6 +151,7 @@ void cedar::proc::experiment::Experiment::cancel()
 
 void cedar::proc::experiment::Experiment::startNetwork()
 {
+  emit trialNumberChanged(mRepetitionCounter);
   cedar::aux::GlobalClockSingleton::getInstance()->start();
   cedar::aux::RecorderSingleton::getInstance()->start();
   mInit=false;
@@ -181,7 +187,7 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
     }
     case ResetType::Wait:
     {
-      cedar::aux::usleep(1000);
+      cedar::aux::usleep(1000000);
       break;
     }
     case ResetType::Reset:
@@ -201,13 +207,14 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
     }
   }
   mInit=true;
-  this->mRepetitionCounter++;
+  mRepetitionCounter++;
   if ( mRepetitionCounter >_mRepetitions->getValue() )
   {
     ExperimentControllerSingleton::getInstance()->requestStop();
     mRepetitionCounter  = 0;
+    emit experimentStopped(true);
   }
-  emit experimentStopped(true);
+  emit trialNumberChanged(mRepetitionCounter);
 }
 
 void cedar::proc::experiment::Experiment::executeAcionSequences()
@@ -317,4 +324,9 @@ cedar::aux::DataPtr cedar::proc::experiment::Experiment::getStepValue(std::strin
 void cedar::proc::experiment::Experiment::onInit(bool status)
 {
   mInit=status;
+}
+
+unsigned int cedar::proc::experiment::Experiment::getTrialNumber()
+{
+  return this->mRepetitionCounter;
 }
