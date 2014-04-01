@@ -78,7 +78,8 @@ _mActionSequences
 )
 ,
 mRepetitionCounter(0),
-mInit(true)
+mInit(false),
+mStopped(true)
 {
   ExperimentControllerSingleton::getInstance()->setExperiment(this);
   this->mNetwork = network;
@@ -151,11 +152,12 @@ void cedar::proc::experiment::Experiment::cancel()
 
 void cedar::proc::experiment::Experiment::startNetwork()
 {
+  mStopped=false;
   emit trialNumberChanged(mRepetitionCounter);
   cedar::aux::GlobalClockSingleton::getInstance()->start();
   cedar::aux::RecorderSingleton::getInstance()->start();
-  mInit=false;
   this->mStartThreadsCaller->start();
+  cedar::aux::usleep(100000);
 }
 
 void cedar::proc::experiment::Experiment::addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence)
@@ -206,7 +208,6 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
       break;
     }
   }
-  mInit=true;
   mRepetitionCounter++;
   if ( mRepetitionCounter >_mRepetitions->getValue() )
   {
@@ -214,11 +215,13 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
     mRepetitionCounter  = 0;
     emit experimentStopped(true);
   }
+  mStopped=true;
   emit trialNumberChanged(mRepetitionCounter);
 }
 
-void cedar::proc::experiment::Experiment::executeAcionSequences()
+void cedar::proc::experiment::Experiment::executeAcionSequences(bool initial)
 {
+  this->mInit= initial;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
     if(action_sequence->getCondition()->check())
@@ -229,6 +232,7 @@ void cedar::proc::experiment::Experiment::executeAcionSequences()
       }
     }
   }
+  this->mInit = false;
 }
 
 void cedar::proc::experiment::Experiment::removeActionSequence(
@@ -329,4 +333,8 @@ void cedar::proc::experiment::Experiment::onInit(bool status)
 unsigned int cedar::proc::experiment::Experiment::getTrialNumber()
 {
   return this->mRepetitionCounter;
+}
+bool cedar::proc::experiment::Experiment::hasStopped()
+{
+  return mStopped;
 }

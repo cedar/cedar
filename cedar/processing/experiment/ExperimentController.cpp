@@ -67,7 +67,8 @@ cedar::proc::experiment::ExperimentController::~ExperimentController()
 
 void cedar::proc::experiment::ExperimentController::step(cedar::unit::Time)
 {
-  this->mpExperiment->executeAcionSequences();
+  bool init = this->mpExperiment->hasStopped();
+  this->mpExperiment->executeAcionSequences(init);
 }
 
 void cedar::proc::experiment::ExperimentController::setExperiment(Experiment* experiment)
