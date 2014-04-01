@@ -50,7 +50,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@todo Increases a parameter of a step.
  *
  * @todo describe more.
  */
@@ -74,6 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Increases a parameter of a step.
   void run();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,6 +104,7 @@ protected:
   // none yet
 
 private:
+  //!@brief The value by the parameter should be increased
   cedar::proc::experiment::StepPropertyParameterPtr _mStepParamter;
 
 }; // class cedar::proc::experiment::ActionIncreaseParameter

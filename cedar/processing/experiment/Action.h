@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_ACTION_H
-#define CEDAR_proc_EXPERIMENT_ACTION_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -52,7 +52,8 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief
+/*!@brief An abstract class for all the derived Action classes.
+ *    The derived class has to implement the run() function.
  */
 class cedar::proc::experiment::Action : public cedar::aux::Configurable
 {
@@ -75,6 +76,7 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The standard constructor.
   Action();
   //!@brief Destructor
   ~Action();
@@ -83,6 +85,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief This function should implement the things that this Action should do
   virtual void run() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -119,5 +122,5 @@ namespace cedar
   }
 }
 
-#endif // CEDAR_proc_EXPERIMENT_ACTION_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_H
 
