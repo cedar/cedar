@@ -76,13 +76,8 @@ cedar::proc::experiment::ConditionOnTrial::~ConditionOnTrial()
 bool cedar::proc::experiment::ConditionOnTrial::check()
 {
   Experiment* p_experiment = cedar::proc::experiment::ExperimentControllerSingleton::getInstance()->getExperiment();
-  if (p_experiment->getRepetitions() < _mTrial->getValue())
+  if (p_experiment->getTrialNumber() == _mTrial->getValue() && p_experiment->isOnInit())
   {
-    mActivatedFlag = false;
-  }
-  else if(!mActivatedFlag)
-  {
-    mActivatedFlag =true;
     return true;
   }
   return false;

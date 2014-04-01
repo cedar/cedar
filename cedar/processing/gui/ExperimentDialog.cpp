@@ -181,7 +181,9 @@ void cedar::proc::gui::ExperimentDialog::runExperiment(bool status)
     }
     else
     {
+      disconnect(this->runButton, SIGNAL(toggled(bool)), this, SLOT(runExperiment(bool)));
       this->runButton->setChecked(true);
+      connect(this->runButton, SIGNAL(toggled(bool)), this, SLOT(runExperiment(bool)));
     }
   }
 }
