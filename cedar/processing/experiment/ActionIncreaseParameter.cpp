@@ -66,6 +66,8 @@ _mStepParamter
 )
 {
   _mStepParamter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
+
+  // allow only UIntParameter and DoubleParameter to increase
   _mStepParamter->allowType("cedar.aux.DoubleParameter");
   _mStepParamter->allowType("cedar.aux.UIntParameterPtr");
 }
@@ -84,6 +86,7 @@ void cedar::proc::experiment::ActionIncreaseParameter::run()
   {
     return;
   }
+  //check the type of the parameter
   if(cedar::aux::DoubleParameterPtr parameter =
       boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(_mStepParamter->getParameter()))
   {
