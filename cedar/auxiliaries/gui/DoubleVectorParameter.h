@@ -91,6 +91,17 @@ namespace cedar
         pWidget->setValue(value);
       }
       //!@endcond
+
+      //!@cond SKIPPED_DOCUMENTATION
+      template<>
+      inline QDoubleSpinBox* cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::create(unsigned int index)
+      {
+        auto p_widget = new QDoubleSpinBox();
+        p_widget->setToolTip(QString("Set value for entry number %1.").arg(index));
+        p_widget->setDecimals(4);
+        return p_widget;
+      }
+      //!@endcond
     }
   }
 }
