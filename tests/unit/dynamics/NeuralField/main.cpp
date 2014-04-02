@@ -79,6 +79,7 @@ void run_test()
   std::cout << "done." << std::endl;
 
 #ifdef CEDAR_USE_FFTW
+  std::cout << "Testing change of convolution engine." << std::endl;
   cedar::aux::ConfigurablePtr convolution
     = network->getElement<NeuralField>("Field")->getConfigurableChild("lateral kernel convolution");
   cedar::aux::ObjectParameterPtr engine
@@ -86,14 +87,15 @@ void run_test()
       (
         convolution->getParameter("engine")
       );
-  engine->setType("cedar.aux.conv.FFTW");
+  //engine->setType("cedar.aux.conv.FFTW");
 
   cedar::aux::ObjectListParameterPtr kernel
     = cedar::aux::asserted_pointer_cast<cedar::aux::ObjectListParameter>
       (
-        network->getElement<NeuralField>("Field")->getParameter("lateral kernels")
+        network->getElement<NeuralField>("Field 1")->getParameter("lateral kernels")
       );
   kernel->pushBack("cedar.aux.kernel.Box");
+  kernel->pushBack("cedar.aux.kernel.Gauss");
 
   // start the processing
   network->getElement<LoopedTrigger>("Main Trigger")->start();
@@ -102,6 +104,12 @@ void run_test()
   // stop the processing
   network->getElement<LoopedTrigger>("Main Trigger")->stop();
 #endif
+
+  std::cout << "Copying..." << std::endl;
+  // check if copying configuration works
+  network->getElement<NeuralField>("Field")->copyTo(network->getElement<NeuralField>("Field 1"));
+
+  network->getElement<NeuralField>("Field 1")->copyFrom(network->getElement<NeuralField>("Field"));
 
   // return
   std::cout << "Done. There were " << global_errors << " errors." << std::endl;

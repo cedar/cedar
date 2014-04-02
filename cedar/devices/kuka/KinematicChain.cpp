@@ -184,7 +184,7 @@ void cedar::dev::kuka::KinematicChain::start()
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kuka::KinematicChain::step(double)
+void cedar::dev::kuka::KinematicChain::step(cedar::unit::Time)
 {
   // if the thread has not been initialized, do nothing
   if (mIsInit)
