@@ -87,14 +87,15 @@ void run_test()
       (
         convolution->getParameter("engine")
       );
-  engine->setType("cedar.aux.conv.FFTW");
+  //engine->setType("cedar.aux.conv.FFTW");
 
   cedar::aux::ObjectListParameterPtr kernel
     = cedar::aux::asserted_pointer_cast<cedar::aux::ObjectListParameter>
       (
-        network->getElement<NeuralField>("Field")->getParameter("lateral kernels")
+        network->getElement<NeuralField>("Field 1")->getParameter("lateral kernels")
       );
   kernel->pushBack("cedar.aux.kernel.Box");
+  kernel->pushBack("cedar.aux.kernel.Gauss");
 
   // start the processing
   network->getElement<LoopedTrigger>("Main Trigger")->start();
