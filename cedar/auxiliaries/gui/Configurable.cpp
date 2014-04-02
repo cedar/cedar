@@ -65,62 +65,69 @@
 // private class: DataDelegate
 //----------------------------------------------------------------------------------------------------------------------
 
-class cedar::aux::gui::Configurable::DataDelegate : public QStyledItemDelegate
+cedar::aux::gui::Configurable::DataDelegate::DataDelegate
+(
+  cedar::aux::ConfigurablePtr pConfigurable,
+  cedar::aux::gui::Configurable* configurableWidget
+)
+:
+mpConfigurable(pConfigurable),
+mConfigurableWidget(configurableWidget)
 {
-public:
-  DataDelegate(cedar::aux::ConfigurablePtr pConfigurable, cedar::aux::gui::Configurable* configurableWidget)
-  :
-  mpConfigurable(pConfigurable),
-  mConfigurableWidget(configurableWidget)
+}
+
+cedar::aux::gui::Configurable::DataDelegate::~DataDelegate()
+{
+  for (auto widget : mOpenedEditors)
   {
+    delete widget;
+  }
+}
+
+QWidget* cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem& /*option*/, const QModelIndex &index) const
+{
+  // Get the name of the parameter for which to return the edit widget.
+  std::string parameter_path = index.data(Qt::UserRole).toString().toStdString();
+
+  cedar::aux::ParameterPtr parameter = this->mpConfigurable->getParameter(parameter_path);
+
+  QWidget* p_ret = NULL;
+  try
+  {
+    cedar::aux::gui::Parameter *p_widget
+      = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
+    p_widget->setParameter(parameter);
+    QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()), Qt::QueuedConnection);
+    QObject::connect(parameter.get(), SIGNAL(valueChanged()), this->mConfigurableWidget, SIGNAL(settingsChanged()));
+    p_ret = p_widget;
+  }
+  catch (cedar::aux::UnknownTypeException& e)
+  {
+    QLabel* p_no_widget_label = new QLabel("(No widget for type)");
+    p_no_widget_label->setToolTip(QString::fromStdString(e.exceptionInfo()));
+    p_no_widget_label->setAlignment(Qt::AlignCenter);
+    p_no_widget_label->setAutoFillBackground(true);
+    p_no_widget_label->setStyleSheet("background-color: rgb(255, 200, 137)");
+    p_ret = p_no_widget_label;
   }
 
-  ~DataDelegate()
+  p_ret->setParent(pParent);
+  connect(p_ret, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed(QObject*)));
+  mOpenedEditors.insert(p_ret);
+  return p_ret;
+}
+
+void cedar::aux::gui::Configurable::DataDelegate::widgetDestroyed(QObject* removed)
+{
+  if (auto widget = dynamic_cast<QObject*>(removed))
   {
-    for (auto widget : mOpenedEditors)
+    auto entry = mOpenedEditors.find(widget);
+    if (entry != mOpenedEditors.end())
     {
-      delete widget;
+      mOpenedEditors.erase(entry);
     }
   }
-
-  QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem& /*option*/, const QModelIndex &index) const
-  {
-    // Get the name of the parameter for which to return the edit widget.
-    std::string parameter_path = index.data(Qt::UserRole).toString().toStdString();
-
-    cedar::aux::ParameterPtr parameter = this->mpConfigurable->getParameter(parameter_path);
-
-    QWidget* p_ret = NULL;
-    try
-    {
-      cedar::aux::gui::Parameter *p_widget
-        = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
-      p_widget->setParameter(parameter);
-      QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()), Qt::QueuedConnection);
-      QObject::connect(parameter.get(), SIGNAL(valueChanged()), this->mConfigurableWidget, SIGNAL(settingsChanged()));
-      p_ret = p_widget;
-    }
-    catch (cedar::aux::UnknownTypeException& e)
-    {
-      QLabel* p_no_widget_label = new QLabel("(No widget for type)");
-      p_no_widget_label->setToolTip(QString::fromStdString(e.exceptionInfo()));
-      p_no_widget_label->setAlignment(Qt::AlignCenter);
-      p_no_widget_label->setAutoFillBackground(true);
-      p_no_widget_label->setStyleSheet("background-color: rgb(255, 200, 137)");
-      p_ret = p_no_widget_label;
-    }
-
-    p_ret->setParent(pParent);
-    mOpenedEditors.push_back(p_ret);
-    return p_ret;
-  }
-
-private:
-  cedar::aux::ConfigurablePtr mpConfigurable;
-
-  cedar::aux::gui::Configurable* mConfigurableWidget;
-  mutable std::vector<QWidget*> mOpenedEditors;
-};
+}
 
 class cedar::aux::gui::Configurable::ParameterItem : public QTreeWidgetItem
 {
