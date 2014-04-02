@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/IntrusivePtrBase.h"
+#include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
@@ -121,6 +122,12 @@ public:
   bool isHidden() const;
   //!@brief set flag if this parameter is hidden (for GUI)
   void setHidden(bool hide);
+
+  //! Whether the parameter is linked to other parameters.
+  bool isLinked() const;
+
+  //! Sets whether the parameter is linked to other parameters. This shouldn't be called by users.
+  void setLinked(bool linked);
 
   /*!@brief   Marks this parameter as advanced.
    *
@@ -262,6 +269,11 @@ private:
 
   //! Flag that indicates whether this parameter is advanced.
   bool mAdvanced;
+
+  bool mIsLinked;
+
+  //! Type of the last lock.
+  mutable cedar::aux::LOCK_TYPE mLastLockType;
 
   //! Lock for the parameter.
   mutable QReadWriteLock* mpLock;

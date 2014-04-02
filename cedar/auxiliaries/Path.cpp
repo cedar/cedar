@@ -117,11 +117,11 @@ cedar::aux::Path cedar::aux::Path::getDirectory() const
   }
 }
 
-cedar::aux::Path cedar::aux::Path::absolute() const
+cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
 {
   if (this->isResource())
   {
-    std::string path = cedar::aux::locateResource(this->toString());
+    std::string path = cedar::aux::locateResource(this->toString(), showInLog);
     return cedar::aux::Path(path);
   }
 

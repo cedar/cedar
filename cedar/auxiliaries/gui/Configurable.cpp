@@ -411,6 +411,7 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, Q
   pNode->addChild(parameter_item);
   this->mpPropertyTree->openPersistentEditor(parameter_item, PARAMETER_EDITOR_COLUMN);
   this->updateChangeState(parameter_item, parameter.get());
+  this->updateLinkState(parameter_item, parameter.get());
 
   QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
 
@@ -610,6 +611,18 @@ QTreeWidgetItem* cedar::aux::gui::Configurable::getItemForParameter(cedar::aux::
   }
 
   return nullptr;
+}
+
+void cedar::aux::gui::Configurable::updateLinkState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter)
+{
+  QFont font = item->font(PARAMETER_NAME_COLUMN);
+  font.setItalic(pParameter->isLinked());
+  item->setFont(PARAMETER_NAME_COLUMN, font);
+
+  if (pParameter->isLinked())
+  {
+    item->setTextColor(PARAMETER_NAME_COLUMN, QColor::fromRgb(0, 0, 128));
+  }
 }
 
 void cedar::aux::gui::Configurable::updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter)

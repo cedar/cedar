@@ -92,7 +92,7 @@ class cedar::proc::Step : public QObject,
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -110,7 +110,7 @@ private:
       cedar::aux::LockerBase
       (
         boost::bind(&cedar::proc::Step::lock, step, type),
-        boost::bind(&cedar::proc::Step::unlock, step)
+        boost::bind(&cedar::proc::Step::unlock, step, type)
       )
       {
       }
@@ -120,7 +120,7 @@ private:
       cedar::aux::LockerBase
       (
         boost::bind(&cedar::proc::Step::lock, step, type),
-        boost::bind(&cedar::proc::Step::unlock, step)
+        boost::bind(&cedar::proc::Step::unlock, step, type)
       )
       {
       }
@@ -362,12 +362,8 @@ protected:
    *
    * @remarks Usually, this should only be called automatically.
    */
-  void unlock() const;
+  void unlock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
 
-  /*!@brief Redetermines the validity for an input slot.
-   *
-   * @param slot The slot to revalidate.
-   */
   void revalidateInputSlot(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
