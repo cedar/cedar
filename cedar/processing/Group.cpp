@@ -1609,29 +1609,37 @@ cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDat
 
 std::string cedar::proc::Group::findPath(cedar::proc::ConstElementPtr findMe) const
 {
+  return this->findPath(findMe.get());
+}
+
+std::string cedar::proc::Group::findPath(cedar::proc::ConstElement* pFindMe) const
+{
   // first, try to find element in this group
   try
   {
-    if (findMe == this->getElement<const cedar::proc::Element>(findMe->getName()))
+    if (pFindMe == this->getElement<const cedar::proc::Element>(pFindMe->getName()).get())
     {
-      return findMe->getName();
+      return pFindMe->getName();
     }
   }
-  catch (cedar::aux::InvalidNameException& e) // this can happen if element is not found, no problem, see below
+  catch (cedar::aux::InvalidNameException&) // this can happen if element is not found, no problem, see below
   {
   }
+
   // if element is not found, search in child groups
   for (auto iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
   {
     if (cedar::proc::ConstGroupPtr group = boost::dynamic_pointer_cast<cedar::proc::Group>(iter->second))
     {
-      std::string found = group->findPath(findMe);
-      if (found != "" && findMe == group->getElement<const cedar::proc::Element>(found))
+      std::string found = group->findPath(pFindMe);
+      if (found != "" && pFindMe == group->getElement<const cedar::proc::Element>(found).get())
       {
         return group->getName() + std::string(".") + found;
       }
     }
   }
+
+  //!@todo Why doesn't this throw?
   return std::string("");
 }
 
