@@ -103,22 +103,30 @@ private:
   //! Translates the boost signal by emitting a Qt signal.
   void translateElementRemovedSignal(cedar::proc::ConstElementPtr);
 
+  void addGroup(cedar::proc::GroupPtr group);
+
+  void disconnectSignals();
+
+  QTreeWidgetItem* getGroupItem(const std::string& elementPath);
+
+  void connectRenameSignal(cedar::proc::ElementPtr element);
+
 signals:
-//! Used to translate a boost signal to a Qt signal.
+  //! Used to translate a boost signal to a Qt signal.
   void elementAddedSignal(QString);
 
   //! Used to translate a boost signal to a Qt signal.
-  void boostRemovedSignal(QString);
+  void elementRemovedSignal(QString);
 
 private slots:
   //! Reacts to an element that has been added in the underlying network.
   void elementAdded(QString elementName);
 
   //! Reacts to the removal of a boost in the underlying network.
-  void boostRemoved(QString elementName);
+  void elementRemoved(QString elementName);
 
   //! Reacts to the change of the name of a boost in the underlying network.
-  void boostNameChanged();
+  void elementNameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -128,11 +136,11 @@ protected:
 private:
   cedar::proc::GroupPtr mGroup;
 
-  boost::signals2::connection mElementAddedConnection;
+  std::vector<boost::signals2::connection> mElementAddedConnections;
 
-  boost::signals2::connection mElementRemovedConnection;
+  std::vector<boost::signals2::connection> mElementRemovedConnections;
 
-  std::map<const cedar::proc::sources::Boost*, QString> mBoostNames;
+  std::map<const cedar::proc::Element*, QString> mElementNames;
 
 }; // class cedar::proc::gui::BoostControl
 
