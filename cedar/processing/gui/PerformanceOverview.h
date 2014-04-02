@@ -81,11 +81,13 @@ public:
 public slots:
   void refresh();
 
+  void autoRefreshToggled(bool enabled);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void timerEvent(QTimerEvent*);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -95,7 +97,7 @@ private:
 
   void clear();
 
-  void addMeasurement(cedar::unit::Time measurement, int row, int column);
+  void addMeasurement(cedar::unit::Time measurement, int row, int column, bool isRunning);
 
   void addUnAvailableMeasurement(int row, int column);
 
@@ -106,6 +108,8 @@ protected:
   // none yet
 private:
   cedar::proc::NetworkPtr mNetwork;
+
+  int mTimerId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

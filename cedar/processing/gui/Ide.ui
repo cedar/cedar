@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Processing IDE</string>
+   <string>cedar</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icons/cedar_proc_gui_icons.qrc">
@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -107,6 +107,8 @@
     </property>
     <addaction name="mpActionManagePlugins"/>
     <addaction name="separator"/>
+    <addaction name="mpActionCopy"/>
+    <addaction name="mpActionPasteConfiguration"/>
     <addaction name="mpActionDuplicate"/>
     <addaction name="mpActionSelectAll"/>
    </widget>
@@ -211,8 +213,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -263,7 +265,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
+          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
          </item>
         </layout>
        </widget>
@@ -405,6 +407,7 @@
    <addaction name="mpThreadsStartAll"/>
    <addaction name="mpThreadsStopAll"/>
    <addaction name="mpThreadsSingleStep"/>
+   <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
@@ -780,6 +783,22 @@
     <string>Performance overview ...</string>
    </property>
   </action>
+  <action name="mpActionCopy">
+   <property name="text">
+    <string>Copy step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="mpActionPasteConfiguration">
+   <property name="text">
+    <string>Paste step configuration</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+V</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -788,9 +807,9 @@
    <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
-   <class>cedar::proc::gui::PropertyPane</class>
+   <class>cedar::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
-   <header>cedar/processing/gui/PropertyPane.h</header>
+   <header>cedar/auxiliaries/gui/Configurable.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::proc::gui::ArchitectureToolBox</class>

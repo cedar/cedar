@@ -82,11 +82,12 @@ QGraphicsScene (pParent),
 mMode(MODE_SELECT),
 mTriggerMode(MODE_SHOW_ALL),
 mpeParentView(peParentView),
-mpNewConnectionIndicator(NULL),
-mpConnectionStart(NULL),
+mpNewConnectionIndicator(nullptr),
+mpConnectionStart(nullptr),
 mpMainWindow(pMainWindow),
 mSnapToGrid(false),
-mpConfigurableWidget(NULL)
+mpConfigurableWidget(nullptr),
+mpRecorderWidget(nullptr)
 {
   mMousePosX = 0;
   mMousePosY = 0;
@@ -102,6 +103,11 @@ cedar::proc::gui::Scene::~Scene()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Scene::emitSceneChanged()
+{
+  emit sceneChanged();
+}
 
 void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
 {
@@ -134,7 +140,7 @@ void cedar::proc::gui::Scene::exportSvg(const QString& file)
   painter.end();
 }
 
-void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget)
+void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
 {
   this->mpConfigurableWidget = pConfigurableWidget;
 }
@@ -173,7 +179,7 @@ void cedar::proc::gui::Scene::itemSelected()
   }
   else
   {
-    this->mpConfigurableWidget->resetContents();
+    this->mpConfigurableWidget->clear();
     this->mpRecorderWidget->clearLayout();
   }
 }
@@ -225,7 +231,10 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMa
 void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
-  connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
+  if (this->mpRecorderWidget != nullptr)
+  {
+    connect(mpRecorderWidget,SIGNAL(stepRegisteredinRecorder()),this->mNetwork.get(),SLOT(stepRecordStateChanged()));
+  }
 }
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
@@ -848,6 +857,8 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem* p
   this->mTriggerMap.erase(mTriggerMap.find(pTrigger->getTrigger().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pTrigger->getTrigger().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pTrigger->getTrigger().get()));
+
+  this->emitSceneChanged();
 }
 
 cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
@@ -974,6 +985,8 @@ void cedar::proc::gui::Scene::removeNetworkItem(cedar::proc::gui::Network* pNetw
   this->mNetworkMap.erase(mNetworkMap.find(pNetwork->getNetwork().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->getNetwork().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pNetwork->getNetwork().get()));
+
+  this->emitSceneChanged();
 }
 
 void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPointF position)
@@ -1003,6 +1016,8 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
+
+  this->emitSceneChanged();
 }
 
 cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()
@@ -1071,7 +1086,7 @@ void cedar::proc::gui::Scene::addStickyNote()
   this->addStickyNote(mMousePosX, mMousePosY, 120, 70, "");
 }
 
-cedar::proc::gui::StickyNote* cedar::proc::gui::Scene::addStickyNote(int x, int y, int witdh, int height, std::string text)
+cedar::proc::gui::StickyNote* cedar::proc::gui::Scene::addStickyNote(float x, float y, float witdh, float height, std::string text)
 {
   cedar::proc::gui::StickyNote* note = new cedar::proc::gui::StickyNote(this, x, y, witdh, height, text);
   mStickyNotes.push_back(note);

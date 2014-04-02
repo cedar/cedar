@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
@@ -156,13 +157,10 @@ protected:
   cedar::proc::Triggerable* mpOwner;
 
   //! List of listeners.
-  std::vector<cedar::proc::TriggerablePtr> mListeners;
+  cedar::aux::LockableMember<std::vector<cedar::proc::TriggerablePtr> > mListeners;
 
   //! List of the triggerables following this one
-  std::map<unsigned int, std::set<cedar::proc::TriggerablePtr> > mTriggeringOrder;
-
-  //! Lock for the listeners list.
-  mutable QReadWriteLock mpListenersLock;
+  cedar::aux::LockableMember< std::map<unsigned int, std::set<cedar::proc::TriggerablePtr> > > mTriggeringOrder;
 
 private:
   // none yet

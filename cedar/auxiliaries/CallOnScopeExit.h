@@ -70,21 +70,34 @@ public:
   //!@brief The standard constructor.
   CallOnScopeExit(const boost::function<void ()>& function)
   :
-  mFunctionToCall(function)
+  mFunctionToCall(function),
+  mCall(true)
   {
   }
 
   //!@brief Destructor
-  ~CallOnScopeExit()
+  virtual ~CallOnScopeExit()
   {
-    mFunctionToCall();
+    if (this->mCall)
+    {
+      this->mFunctionToCall();
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void callNow()
+  {
+    this->mCall = false;
+    this->mFunctionToCall();
+  }
+
+  void resetCall()
+  {
+    this->mCall = true;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -105,6 +118,8 @@ protected:
   // none yet
 private:
   boost::function<void ()> mFunctionToCall;
+
+  bool mCall;
 
 }; // class cedar::aux::CallOnScopeExit
 

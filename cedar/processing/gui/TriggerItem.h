@@ -137,6 +137,9 @@ private:
   //!@brief sets the trigger associated with this graphical representation
   void setTrigger(cedar::proc::TriggerPtr trigger);
 
+  //! Updates the display of the step's run time measurements.
+  void updateToolTip();
+
 private slots:
   void triggerStateChanging();
 
