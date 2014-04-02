@@ -1901,6 +1901,8 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
 
     // then, erase the connection
     it = mDataConnections.erase(it);
+    // we have to reset the local smart pointer as well, which prevents the connection from being deleted
+    connection.reset();
 
     // recheck if the inputs of the target are still valid
     triggerable_target->onTrigger();
