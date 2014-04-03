@@ -71,7 +71,7 @@ Unreleased
   - The processingIde is now simply called cedar. Conversely, the processingCL is now called cedar-shell.
 
 - cedar
-  - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters pf a
+  - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters of a
     step, but is otherwise quite similar to the old one.
       
 - cedar::proc
@@ -80,6 +80,11 @@ Unreleased
     load data for these slots from the right-click menu of step items.
   - Groups now work as intended: one can freely move elements between groups, existing connections are preserved, using 
     group connectors if necessary. In the gui, grouping is drag-and-drop-based.
+  - Step configurations can now be copied and pasted in the GUI using Ctrl+C and Ctrl+Shift+V.
+  - cedar now allows to slow down or speed up the global timers, effectively allowing for (0.0,2.0] x real-time.
+  - cedar now notices if there were any changes made to an architecture and notifies the user about this when closing a file.
+  - Looped triggers now have a tool tip showing statistics.
+  - Improved performance of triggering chains.
 
 Released versions
 =================
