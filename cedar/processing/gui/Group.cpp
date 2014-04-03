@@ -383,28 +383,12 @@ void cedar::proc::gui::Group::updateIconBounds()
 }
 
 
+//!@todo Can this method be removed?
 bool cedar::proc::gui::Group::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
 {
   if (!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
   {
     return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
-  }
-
-  switch(pEvent->type())
-  {
-//    case QEvent::GraphicsSceneMouseMove:
-//    {
-//      this->fitToContents();
-//      break;
-//    }
-
-    case QEvent::GraphicsSceneMouseRelease:
-//      this->fitToContents();
-      break;
-
-    default:
-      // nothing to do here
-      break;
   }
   return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
 }
@@ -624,7 +608,6 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem*>& eleme
   }
 
   this->mHoldFitToContents = false;
-  this->fitToContents(true);
 }
 
 void cedar::proc::gui::Group::addElement(cedar::proc::gui::GraphicsBase *pElement)
@@ -639,13 +622,9 @@ const std::string& cedar::proc::gui::Group::getFileName() const
   return this->mFileName;
 }
 
+//!@todo Can this method be removed?
 void cedar::proc::gui::Group::addElementsToScene()
 {
-  //!@todo Can this method be removed?
-//  if (!this->isRootGroup())
-//  {
-//    this->fitToContents();
-//  }
 }
 
 void cedar::proc::gui::Group::setScene(cedar::proc::gui::Scene* pScene)
@@ -1259,10 +1238,6 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   if (this->isCollapsed())
   {
     p_scene_element->hide();
-  }
-  else
-  {
-    this->fitToContents(true);
   }
 }
 
