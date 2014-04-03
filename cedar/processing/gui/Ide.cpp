@@ -108,7 +108,6 @@ mSuppressCloseDialog(false)
   this->mpBoostControlDock = new QDockWidget(this);
   this->mpBoostControl = new cedar::proc::gui::BoostControl();
   this->mpBoostControlDock->setFloating(true);
-//  this->mpBoostControlDock->setVisible(false);
   this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
   this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
   this->mpBoostControlDock->setWidget(this->mpBoostControl);
