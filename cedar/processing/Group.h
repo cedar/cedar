@@ -241,6 +241,8 @@ public:
 
   void addConnector(const std::string& name, bool input);
 
+  void renameConnector(const std::string& oldName, const std::string& newName, bool input);
+
   void removeConnector(const std::string& name, bool input);
 
   /*!@brief Duplicates an existing element.
