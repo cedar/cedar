@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,39 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        CallFunctionInThreadWorker.fwd.h
 
     Maintainer:  Oliver Lomp
-
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 11 08
 
-    Date:        2014 01 20
-
-    Description: A command-line version of the processingIde.
+    Description: Forward declaration file for the class cedar::aux::detail::CallFunctionInThreadWorker.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR INCLUDES
+#ifndef CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_ALOT_WORKER_FWD_H
+#define CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_ALOT_WORKER_FWD_H
 
-// LOCAL INCLUDES
-#include "MainApplication.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
-#include <QTimer>
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-
-int main(int argc, char** argv)
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-  QApplication app(argc, argv);
-
-  cedar::processingCL::MainApplicationPtr application(new cedar::processingCL::MainApplication(argc, argv));
-
-  QObject::connect(application.get(), SIGNAL(quit()), &app, SLOT(quit()));
-
-  QTimer::singleShot(0, application.get(), SLOT(exec()));
-
-  return app.exec();
+  namespace aux
+  {
+    namespace detail
+    {
+      CEDAR_DECLARE_AUX_CLASS(CallFunctionInThreadALotWorker);
+    }
+  }
 }
+
+//!@endcond
+
+#endif // CEDAR_AUX_DETAIL_CALL_FUNCTION_IN_THREAD_ALOT_WORKER_FWD_H
+

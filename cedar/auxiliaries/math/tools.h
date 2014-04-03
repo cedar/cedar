@@ -176,6 +176,9 @@ namespace cedar
       //!@brief Returns a string corresponding to the given matrix's type
       std::string matrixTypeToString(const cv::Mat& matrix);
 
+      //! Converts a string representation, e.g., "CV_32F" to the corresponding type value, e.g., CV_32F
+      int matrixTypeFromString(const std::string& typeStr);
+
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(const cv::Mat& matrix)
       {
@@ -284,7 +287,14 @@ namespace cedar
       template <typename T>
       inline T getMatrixEntry(const cv::Mat& matrix, int index)
       {
-        CEDAR_ASSERT(matrix.type() == CV_8UC1 || matrix.type() == CV_16UC1 || matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT
+        (
+          matrix.type() == CV_8UC1
+          || matrix.type() == CV_16UC1
+          || matrix.type() == CV_32F
+          || matrix.type() == CV_64F
+          || matrix.type() == CV_32S
+        );
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
 
         switch (matrix.type())
@@ -295,6 +305,10 @@ namespace cedar
 
           case CV_16UC1:
             return static_cast<T>(matrix.at<uint16_t>(index));
+            break;
+
+          case CV_32S:
+            return static_cast<T>(matrix.at<int>(index));
             break;
 
           case CV_32F:

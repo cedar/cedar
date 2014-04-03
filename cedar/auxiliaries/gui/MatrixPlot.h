@@ -98,6 +98,10 @@ public:
   //!@brief return vector of standard colors
   static const std::vector<cedar::aux::gui::ColorValueRGBA>& getStandardColorVector();
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
+
+  void writeConfiguration(cedar::aux::ConfigurationNode& configuration) const;
+
 public slots:
   /*!@brief Reacts to a change in the plotted data.
    *

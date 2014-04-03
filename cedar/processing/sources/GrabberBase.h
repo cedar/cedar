@@ -53,7 +53,7 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief The base class for all grabber sources for the processingIde
+/*!@brief The base class for all grabber sources for the processing framework.
  *
  *    This class implements the common structure of all grabber sources
  */

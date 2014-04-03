@@ -50,6 +50,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -58,9 +59,11 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QPen>
@@ -71,12 +74,15 @@
 #include <QGraphicsDropShadowEffect>
 #include <QLayout>
 #include <QResource>
+#include <QFileDialog>
 #include <iostream>
 #include <QMessageBox>
 #include <QPushButton>
 #include <string>
 #include <set>
 
+//! declares a metatype for slot pointers; used by the serialization menu
+Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -361,22 +367,29 @@ void cedar::proc::gui::StepItem::updateToolTip()
               "</table>");
 
   std::vector<boost::function<cedar::unit::Time ()> > measurements;
+  std::vector<boost::function<bool ()> > checks;
   measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRunTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRunTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasLockTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasLockTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRoundTimeMeasurement, this->mStep));
   measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->mStep));
+  checks.push_back(boost::bind(&cedar::proc::Step::hasRoundTimeMeasurement, this->mStep));
 
   for (size_t i = 0; i < measurements.size(); ++i)
   {
-    try
+    if (checks.at(i)())
     {
       cedar::unit::Time ms = measurements.at(i)();
-      double dval = ms / (0.001 * cedar::unit::seconds);
+      double dval = ms / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
       tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
     }
-    catch (const cedar::proc::NoMeasurementException&)
+    else
     {
       tool_tip = tool_tip.arg("n/a");
     }
@@ -965,17 +978,14 @@ void cedar::proc::gui::StepItem::showPlot
   cedar::proc::ElementDeclaration::DataList data_list;
   data_list.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(role.id(), dataName, false, declaration->getClassName())));
 
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+  }
+
   auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->mStep, data_list);
   auto p_dock_widget = this->createDockWidgetForPlots(this->mStep->getName(), p_plot_widget, position);
 
-  p_dock_widget->show();
-}
-
-void cedar::proc::gui::StepItem::openProperties()
-{
-  cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
-  auto p_dock_widget = this->createDockWidget("Properties", props);
-  props->display(this->getStep());
   p_dock_widget->show();
 }
 
@@ -995,6 +1005,14 @@ void cedar::proc::gui::StepItem::openActionsDock()
   std::string title = "Actions of step \"" + this->mStep->getName() + "\"";
   auto p_dock_widget = this->createDockWidget(title, p_actions);
   p_dock_widget->show();
+}
+
+void cedar::proc::gui::StepItem::openProperties()
+{
+  cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
+  props->display(this->getStep());
+  auto p_widget = this->createDockWidget("Properties", props);
+  p_widget->show();
 }
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -1058,6 +1076,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     p_actions_menu->addSeparator();
     p_actions_menu->addAction("open actions dock");
   }
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QMenu *p_serialization_menu = menu.addMenu("save/load data");
+  p_serialization_menu->setIcon(QIcon(":/menus/save.svg"));
+  this->fillDataSerialization(p_serialization_menu);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   p_scene->networkGroupingContextMenuEvent(menu);
@@ -1140,6 +1163,91 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     std::string data_name = a->data().toString().toStdString();
 
     this->showPlot(event->screenPos(), data_name, role, declaration);
+  }
+}
+
+void cedar::proc::gui::StepItem::fillDataSerialization(QMenu* pMenu)
+{
+  for (auto role_enum : cedar::proc::DataRole::type().list())
+  {
+    if (role_enum.id() == cedar::proc::DataRole::INPUT)
+    {
+      // inputs cannot be serialized
+      continue;
+    }
+
+    if (!this->mStep->hasRole(role_enum))
+    {
+      continue;
+    }
+
+    bool serializable_slots_found = false;
+    this->addRoleSeparator(role_enum, pMenu);
+
+    for (auto slot : this->mStep->getOrderedDataSlots(role_enum.id()))
+    {
+
+      if (slot->isSerializable())
+      {
+        serializable_slots_found = true;
+
+        auto sub_menu = pMenu->addMenu(QString::fromStdString(slot->getText()));
+
+        QAction* save_action = sub_menu->addAction("save ...");
+        save_action->setData(QVariant::fromValue(slot));
+        QObject::connect(save_action, SIGNAL(triggered()), this, SLOT(saveDataClicked()));
+
+        QAction* load_action = sub_menu->addAction("load ...");
+        load_action->setData(QVariant::fromValue(slot));
+        QObject::connect(load_action, SIGNAL(triggered()), this, SLOT(loadDataClicked()));
+      }
+    }
+
+    if (!serializable_slots_found)
+    {
+      auto action = pMenu->addAction("No serializable slots.");
+      action->setEnabled(false);
+    }
+  }
+}
+
+void cedar::proc::gui::StepItem::saveDataClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+
+  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
+  CEDAR_DEBUG_ASSERT(slot);
+
+  QString filename = QFileDialog::getSaveFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file for saving"
+                     );
+
+  if (!filename.isEmpty())
+  {
+    slot->writeDataToFile(cedar::aux::Path(filename.toStdString()));
+  }
+}
+
+void cedar::proc::gui::StepItem::loadDataClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+
+  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
+  CEDAR_DEBUG_ASSERT(slot);
+
+  QString filename = QFileDialog::getOpenFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file to load"
+                     );
+
+  if (!filename.isEmpty())
+  {
+    slot->readDataFromFile(cedar::aux::Path(filename.toStdString()));
   }
 }
 
@@ -1469,12 +1577,12 @@ void cedar::proc::gui::StepItem::handleExternalActionButtons()
 
 void cedar::proc::gui::StepItem::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
 {
-  for(auto childWidget : mChildWidgets)
+  for (auto childWidget : mChildWidgets)
   {
     // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
     QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
     // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
-    if(cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
     {
       cedar::aux::ConfigurationNode value_node;
       static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);

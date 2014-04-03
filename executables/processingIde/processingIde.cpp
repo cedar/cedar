@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        processingIde.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 03 13
 
     Description:
 
@@ -38,11 +34,10 @@
 
 ======================================================================================================================*/
 
-#include "cedar/processing/gui/IdeApplication.h"
+#include <iostream>
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
-  cedar::proc::gui::IdeApplication app (argc, argv);
-
-  return app.exec();
+  std::cout << "The processingIde is now called \"cedar\". Please update your calls." << std::endl;
+  return 0;
 }

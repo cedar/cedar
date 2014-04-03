@@ -65,6 +65,16 @@ cedar::aux::Data::~Data()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::Data::serialize(std::ostream& /* stream */) const
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException, "serialize function is not implemented for this type of data");
+}
+
+void cedar::aux::Data::deserialize(std::istream& /* stream */)
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException, "deserialize function is not implemented for this type of data");
+}
+
 void cedar::aux::Data::serializeData(std::ostream& /*stream*/) const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException,"serializeData function not implemented for this type of data");

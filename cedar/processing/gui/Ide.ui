@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Processing IDE</string>
+   <string>cedar</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icons/cedar_proc_gui_icons.qrc">
@@ -263,7 +263,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
+          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
          </item>
         </layout>
        </widget>
@@ -405,6 +405,7 @@
    <addaction name="mpThreadsStartAll"/>
    <addaction name="mpThreadsStopAll"/>
    <addaction name="mpThreadsSingleStep"/>
+   <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
@@ -788,9 +789,9 @@
    <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
-   <class>cedar::proc::gui::PropertyPane</class>
+   <class>cedar::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
-   <header>cedar/processing/gui/PropertyPane.h</header>
+   <header>cedar/auxiliaries/gui/Configurable.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::proc::gui::ArchitectureToolBox</class>

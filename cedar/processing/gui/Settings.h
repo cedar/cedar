@@ -92,6 +92,9 @@ public:
       cedar::aux::BoolParameterPtr mVisible;
       //!@brief flag if widget is free-floating or docked
       cedar::aux::BoolParameterPtr mFloating;
+
+      //! Geometry of the widget
+      cedar::aux::StringParameterPtr mGeometry;
   };
 
   //!@cond SKIPPED_DOCUMENTATION
@@ -170,6 +173,9 @@ public:
   DockSettingsPtr propertiesSettings();
   //!@brief returns the settings concerning the docking behavior for the steps widget
   DockSettingsPtr stepsSettings();
+
+  //! Settings for cedar's boost control widget.
+  DockSettingsPtr boostCtrlSettings();
 
   //!@brief stores the state of the main window
   void storeMainWindow(QMainWindow *pWindow);
@@ -288,6 +294,9 @@ private:
   //!@brief the settings concerning the docking behavior for the property pane
   DockSettingsPtr mProperties;
   
+  //! Settings for the boost control widget.
+  DockSettingsPtr mBoostCtrlSettgings;
+
   //!@brief list of bytes coming from Qt (sizes, ...)
   cedar::aux::StringParameterPtr mMainWindowGeometry;
 

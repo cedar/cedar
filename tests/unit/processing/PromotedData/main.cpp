@@ -43,8 +43,10 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 // SYSTEM INCLUDES
+#include <QCoreApplication>
 #include <iostream>
 
 class TestSource : public cedar::proc::Step
@@ -99,7 +101,7 @@ private:
 CEDAR_GENERATE_POINTER_TYPES(TestSource);
 CEDAR_GENERATE_POINTER_TYPES(TestClass);
 
-int main(int, char**)
+void run_tests()
 {
   // the number of errors encountered in this test
   int errors = 0;
@@ -136,5 +138,16 @@ int main(int, char**)
   {
     errors = 255;
   }
-  return errors;
+
+  QCoreApplication::exit(errors);
+}
+
+int main(int argc, char** argv)
+{
+  QCoreApplication app(argc, argv);
+
+  cedar::aux::CallFunctionInThread caller(boost::bind(&run_tests));
+  caller.start();
+
+  return app.exec();
 }

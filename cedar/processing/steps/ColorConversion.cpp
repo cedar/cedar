@@ -216,6 +216,18 @@ void cedar::proc::steps::ColorConversion::updateTargetImageColorSpace()
                      );
       break;
 
+    case ColorSpace::Lab:
+      target_space = cedar::aux::annotation::ColorSpacePtr
+                     (
+                       new cedar::aux::annotation::ColorSpace
+                       (
+                         cedar::aux::annotation::ColorSpace::Lab_L,
+                         cedar::aux::annotation::ColorSpace::Lab_a,
+                         cedar::aux::annotation::ColorSpace::Lab_b
+                       )
+                     );
+      break;
+
     default:
       // unhandled color space, do nothing.
       return;
@@ -318,6 +330,10 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
         case ColorSpace::YUV:
           CEDAR_THROW(cedar::aux::UnhandledValueException, "HSV to YUV is not handled.");
           break;
+
+        default:
+          CEDAR_THROW(cedar::aux::UnhandledValueException, "Conversion not handled.");
+          break;
       }
       break;
 
@@ -332,6 +348,14 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
         case ColorSpace::YUV:
           this->mCvConversionConstant = CV_BGR2YCrCb;
           break;
+
+        case ColorSpace::Lab:
+          this->mCvConversionConstant = CV_BGR2Lab;
+          break;
+
+        default:
+          CEDAR_THROW(cedar::aux::UnhandledValueException, "Conversion not handled.");
+          break;
       }
       break;
 
@@ -344,6 +368,10 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
           break;
         case ColorSpace::HSV:
           CEDAR_THROW(cedar::aux::UnhandledValueException, "YUV to HSV is not handled.");
+          break;
+
+        default:
+          CEDAR_THROW(cedar::aux::UnhandledValueException, "Conversion not handled.");
           break;
       }
       break;

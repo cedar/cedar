@@ -89,6 +89,9 @@ mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode())
 {
+  //!@todo This assert should not be here, but for now, the code doesn't work without a scene.
+  CEDAR_ASSERT(scene != nullptr);
+
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   if (!mNetwork)
@@ -1129,10 +1132,10 @@ void cedar::proc::gui::Network::readStickyNotes(cedar::aux::ConfigurationNode& n
     const std::string& type = iter->second.get<std::string>("type");
     if (type == "stickyNote")
     {
-      int x = iter->second.get<int>("x");
-      int y = iter->second.get<int>("y");
-      int witdh = iter->second.get<int>("width");
-      int height = iter->second.get<int>("height");
+      float x = iter->second.get<float>("x");
+      float y = iter->second.get<float>("y");
+      float witdh = iter->second.get<float>("width");
+      float height = iter->second.get<float>("height");
       const std::string& text = iter->second.get<std::string>("text");
       cedar::proc::gui::StickyNote* note = this->mpScene->addStickyNote(x, y, witdh, height, text);
       int r = iter->second.get<int>("r");
