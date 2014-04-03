@@ -62,6 +62,7 @@ cedar_add_library(cedarproc
   gui/RecorderWidget.h
   gui/RecorderProperty.h
   gui/Scene.h
+  gui/Settings.h
   gui/SettingsDialog.h
   gui/StepItem.h
   gui/TriggerItem.h
