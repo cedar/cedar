@@ -957,6 +957,36 @@ void cedar::proc::Group::addConnector(const std::string& name, bool input)
   }
 }
 
+void cedar::proc::Group::renameConnector(const std::string& oldName, const std::string& newName, bool input)
+{
+  // check if connector is in map of connectors
+  auto it = _mConnectors->find(oldName);
+  if (it == _mConnectors->end() || it->second != input)
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "There is no connector of name " + oldName + " in group " + this->getName()
+    );
+  }
+
+  // change name
+  _mConnectors->erase(oldName);
+  _mConnectors->set(newName, input);
+  if (input)
+  {
+    this->renameInput(oldName, newName);
+    auto source = this->getElement<cedar::proc::sources::GroupSource>(oldName);
+    source->setName(newName);
+  }
+  else
+  {
+    this->renameOutput(oldName, newName);
+    auto sink = this->getElement<cedar::proc::sinks::GroupSink>(oldName);
+    sink->setName(newName);
+  }
+}
+
 void cedar::proc::Group::removeConnector(const std::string& name, bool input)
 {
   // check if connector is in map of connectors

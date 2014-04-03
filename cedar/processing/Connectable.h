@@ -480,6 +480,8 @@ private:
 public:
   CEDAR_DECLARE_SIGNAL(SlotAdded, void (cedar::proc::DataRole::Id, const std::string&));
 public:
+  CEDAR_DECLARE_SIGNAL(SlotRenamed, void (cedar::proc::DataRole::Id, const std::string&, const std::string&));
+public:
   CEDAR_DECLARE_SIGNAL(SlotRemoved, void (cedar::proc::DataRole::Id, const std::string&));
 public:
   CEDAR_DECLARE_SIGNAL(OutputPropertiesChanged, void (const std::string&));
