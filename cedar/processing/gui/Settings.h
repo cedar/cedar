@@ -80,7 +80,7 @@ public:
   {
     public:
       //!@brief standard constructor
-      DockSettings();
+      DockSettings(bool defaultVisible = true);
 
       //!@brief gets visibility and floating state from a QDockWidget
       void getFrom(QDockWidget *pDock);

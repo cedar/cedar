@@ -75,7 +75,7 @@ mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
-mBoostCtrlSettgings(new cedar::proc::gui::Settings::DockSettings()),
+mBoostCtrlSettgings(new cedar::proc::gui::Settings::DockSettings(false)),
 mMainWindowGeometry(new cedar::aux::StringParameter(this, "mainWindowGeometry", "")),
 mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 {
@@ -182,9 +182,9 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->load();
 }
 
-cedar::proc::gui::Settings::DockSettings::DockSettings()
+cedar::proc::gui::Settings::DockSettings::DockSettings(bool defaultVisible)
 :
-mVisible(new cedar::aux::BoolParameter(this, "visible", true)),
+mVisible(new cedar::aux::BoolParameter(this, "visible", defaultVisible)),
 mFloating(new cedar::aux::BoolParameter(this, "floating", false)),
 mGeometry(new cedar::aux::StringParameter(this, "geometry", ""))
 {
