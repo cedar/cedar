@@ -185,6 +185,7 @@ QTreeWidgetItem* cedar::proc::gui::BoostControl::getGroupItem(const std::string&
       p_item = new QTreeWidgetItem();
       p_item->setText(0, QString::fromStdString(subpath));
       p_last->addChild(p_item);
+      p_item->setExpanded(true);
     }
     p_last = p_item;
   }
