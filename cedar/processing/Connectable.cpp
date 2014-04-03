@@ -1175,6 +1175,7 @@ void cedar::proc::Connectable::renameSlot(DataRole::Id role, const std::string& 
     mSlotMaps[role].erase(elem);
     mSlotMaps[role][newName] = slot;
     slot->setName(newName);
+    this->signalSlotRenamed(role, oldName, newName);
   }
 }
 

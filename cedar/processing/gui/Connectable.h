@@ -187,6 +187,7 @@ public:
 public slots:
   void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
   void reactToSlotAdded(cedar::proc::DataRole::Id role, QString name);
+  void reactToSlotRenamed(cedar::proc::DataRole::Id role, QString oldName, QString newName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -195,6 +196,8 @@ protected:
   void slotAdded(cedar::proc::DataRole::Id role, const std::string& name);
 
   virtual void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
+
+  void slotRenamed(cedar::proc::DataRole::Id role, const std::string& oldName, const std::string& newName);
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
@@ -231,6 +234,7 @@ private:
 
 signals:
   void reactToSlotRemovedSignal(cedar::proc::DataRole::Id role, QString name);
+  void reactToSlotRenamedSignal(cedar::proc::DataRole::Id role, QString oldName, QString newName);
   void reactToSlotAddedSignal(cedar::proc::DataRole::Id role, QString name);
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -268,6 +272,7 @@ private:
   cedar::proc::ConnectablePtr mConnectable;
 
   boost::signals2::connection mSlotAddedConnection;
+  boost::signals2::connection mSlotRenamedConnection;
   boost::signals2::connection mSlotRemovedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------

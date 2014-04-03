@@ -101,6 +101,13 @@ mInputOutputSlotOffset(static_cast<qreal>(0.0))
           SIGNAL(reactToSlotAddedSignal(cedar::proc::DataRole::Id, QString)),
           SLOT(reactToSlotAdded(cedar::proc::DataRole::Id, QString))
         );
+
+  this->connect
+        (
+          this,
+          SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
+          SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString))
+        );
 }
 
 cedar::proc::gui::Connectable::~Connectable()
@@ -261,9 +268,31 @@ void cedar::proc::gui::Connectable::slotAdded(cedar::proc::DataRole::Id role, co
   emit reactToSlotAddedSignal(role, QString::fromStdString(name));
 }
 
+void cedar::proc::gui::Connectable::slotRenamed(cedar::proc::DataRole::Id role, const std::string& oldName, const std::string& newName)
+{
+  emit reactToSlotRenamedSignal(role, QString::fromStdString(oldName), QString::fromStdString(newName));
+}
+
 void cedar::proc::gui::Connectable::reactToSlotAdded(cedar::proc::DataRole::Id role, QString name)
 {
   this->addDataItemFor(this->getConnectable()->getSlot(role, name.toStdString()));
+  this->updateAttachedItems();
+}
+
+void cedar::proc::gui::Connectable::reactToSlotRenamed(cedar::proc::DataRole::Id role, QString oldName, QString newName)
+{
+  cedar::proc::gui::DataSlotItem* p_item = NULL;
+
+  DataSlotMap::iterator iter = this->mSlotMap.find(role);
+  CEDAR_ASSERT(iter != this->mSlotMap.end());
+
+  DataSlotNameMap& name_map = iter->second;
+  DataSlotNameMap::iterator name_iter = name_map.find(oldName.toStdString());
+
+  CEDAR_ASSERT(name_iter != name_map.end());
+  p_item = name_iter->second;
+  name_map.erase(name_iter);
+  name_map[newName.toStdString()] = p_item;
   this->updateAttachedItems();
 }
 
@@ -347,6 +376,7 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
 {
   this->mConnectable = connectable;
   mSlotAddedConnection.disconnect();
+  mSlotRenamedConnection.disconnect();
   mSlotRemovedConnection.disconnect();
 
 
@@ -369,6 +399,8 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   this->addDataItems();
   mSlotAddedConnection
     = connectable->connectToSlotAddedSignal(boost::bind(&cedar::proc::gui::Connectable::slotAdded, this, _1, _2));
+  mSlotRenamedConnection
+    = connectable->connectToSlotRenamedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRenamed, this, _1, _2, _3));
   mSlotRemovedConnection
     = connectable->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRemoved, this, _1, _2));
 }

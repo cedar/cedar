@@ -1412,6 +1412,38 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
+  QMenu* p_rename_input_menu = menu.addMenu("rename input");
+  QMenu* p_rename_output_menu = menu.addMenu("rename output");
+  if (this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING)
+  {
+    p_rename_input_menu->setEnabled(false);
+    p_rename_output_menu->setEnabled(false);
+  }
+  const cedar::proc::Group::ConnectorMap& connectors = this->getGroup()->getConnectorMap();
+  for (auto it = connectors.begin(); it != connectors.end(); ++it)
+  {
+    if (it->second)
+    {
+      p_rename_input_menu->addAction(QString::fromStdString(it->first));
+    }
+    else
+    {
+      p_rename_output_menu->addAction(QString::fromStdString(it->first));
+    }
+  }
+  if (p_rename_input_menu->isEmpty())
+  {
+    QAction* none = p_rename_input_menu->addAction("none");
+    none->setEnabled(false);
+  }
+  if (p_rename_output_menu->isEmpty())
+  {
+    QAction* none = p_rename_output_menu->addAction("none");
+    none->setEnabled(false);
+  }
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
   QMenu* p_remove_input_menu = menu.addMenu("remove input");
   QMenu* p_remove_output_menu = menu.addMenu("remove output");
   if (this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING)
@@ -1419,7 +1451,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     p_remove_input_menu->setEnabled(false);
     p_remove_output_menu->setEnabled(false);
   }
-  const cedar::proc::Group::ConnectorMap& connectors = this->getGroup()->getConnectorMap();
+
   for (auto it = connectors.begin(); it != connectors.end(); ++it)
   {
     if (it->second)
@@ -1486,6 +1518,40 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   {
     std::string name = a->text().toStdString();
     this->getGroup()->removeConnector(name, false);
+  }
+
+  else if (a->parentWidget() == p_rename_input_menu)
+  {
+    std::string oldName = a->text().toStdString();
+    QString newName = QInputDialog::getText(0, "Enter a new name", "Name", QLineEdit::Normal);
+    if (!newName.isEmpty())
+    {
+      if (this->getGroup()->hasConnector(newName.toStdString()))
+      {
+        QMessageBox::critical(NULL, "New name exists", "A connector of this name already exists.");
+      }
+      else
+      {
+        this->getGroup()->renameConnector(oldName, newName.toStdString(), true);
+      }
+    }
+  }
+
+  else if (a->parentWidget() == p_rename_output_menu)
+  {
+    std::string oldName = a->text().toStdString();
+    QString newName = QInputDialog::getText(0, "Enter a new name", "Name", QLineEdit::Normal);
+    if (!newName.isEmpty())
+    {
+      if (this->getGroup()->hasConnector(newName.toStdString()))
+      {
+        QMessageBox::critical(NULL, "New name exists", "A connector of this name already exists.");
+      }
+      else
+      {
+        this->getGroup()->renameConnector(oldName, newName.toStdString(), false);
+      }
+    }
   }
 
   else if (a == p_prune)
