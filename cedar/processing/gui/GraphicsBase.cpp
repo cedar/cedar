@@ -235,7 +235,11 @@ void cedar::proc::gui::GraphicsBase::readConfiguration(const cedar::aux::Configu
   {
     // ok, y not set
   }
+
+  bool snap_to_grid = this->mSnapToGrid;
+  this->mSnapToGrid = false;
   this->setPos(x, y);
+  this->mSnapToGrid = snap_to_grid;
 }
 
 void cedar::proc::gui::GraphicsBase::writeConfiguration(cedar::aux::ConfigurationNode& root) const
