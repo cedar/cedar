@@ -280,6 +280,8 @@ private:
    */
   void restoreConnections();
 
+  void setBackgroundColor(const QColor& color);
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
@@ -313,6 +315,8 @@ private slots:
   void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
 
   void openParameterEditor();
+
+  void backgroundColorActionTriggered();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -363,6 +367,8 @@ private:
 
   //! Configuration of the next element that is added to the scene.
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
+
+  QColor mBackgroundColor;
 
   //! The vertical offset for data slots in the group used when the group is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;

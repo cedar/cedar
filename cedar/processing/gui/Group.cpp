@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/ConnectorItem.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
@@ -694,6 +695,22 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
     {
       this->mPlotGroupsNode = plot_groups->second;
     }
+
+    auto color_node = node.find("background color");
+    if (color_node != node.not_found())
+    {
+      std::string color_str = color_node->second.get_value<std::string>();
+      std::vector<std::string> color_strs;
+      cedar::aux::split(color_str, ",", color_strs);
+      if (color_strs.size() == 3)
+      {
+        int r = cedar::aux::fromString<int>(color_strs.at(0));
+        int g = cedar::aux::fromString<int>(color_strs.at(1));
+        int b = cedar::aux::fromString<int>(color_strs.at(2));
+
+        this->setBackgroundColor(QColor(r, g, b));
+      }
+    }
   }
   else
   {
@@ -768,6 +785,15 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
   generic.put_child("open plots", node);
   // add plot groups to architecture
   generic.put_child("plot groups", this->mPlotGroupsNode);
+
+  if (this->mBackgroundColor.isValid())
+  {
+    std::stringstream color_str;
+    color_str << this->mBackgroundColor.red() << ","
+        << this->mBackgroundColor.green() << ","
+        << this->mBackgroundColor.blue();
+    generic.put("background color", color_str.str());
+  }
 
   this->cedar::proc::gui::Connectable::writeConfiguration(generic);
 
@@ -1383,6 +1409,21 @@ void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)
   this->readPlotList(plotGroupName, plot_group->second);
 }
 
+void cedar::proc::gui::Group::backgroundColorActionTriggered()
+{
+  auto p_action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_ASSERT(p_action != nullptr);
+
+  QColor new_color = p_action->data().value<QColor>();
+  this->setBackgroundColor(new_color);
+}
+
+void cedar::proc::gui::Group::setBackgroundColor(const QColor& color)
+{
+  this->setFillColor(color);
+  this->mBackgroundColor = color;
+}
+
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
@@ -1400,6 +1441,31 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   p_collapse->setCheckable(true);
   p_collapse->setChecked(this->isCollapsed());
   this->connect(p_collapse, SIGNAL(toggled(bool)), SLOT(setCollapsed(bool)));
+
+  auto color_menu = menu.addMenu("color");
+  auto colors = cedar::proc::gui::SettingsSingleton::getInstance()->getUserDefinedColors();
+  colors.push_back
+  (
+    cedar::proc::gui::Settings::UserDefinedColorPtr
+    (
+      new cedar::proc::gui::Settings::UserDefinedColor("white=rgb(255,255,255)")
+    )
+  );
+
+  for (auto color : colors)
+  {
+    if (color->hasName())
+    {
+      auto action = color_menu->addAction(QString::fromStdString(color->getName()));
+      QPixmap pm(16, 16);
+      QColor qcolor = color->toQColor();
+      pm.fill(qcolor);
+      action->setIcon(QIcon(pm));
+      action->setData(QVariant::fromValue(qcolor));
+
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(backgroundColorActionTriggered()));
+    }
+  }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QAction* p_add_input = menu.addAction("add input");
