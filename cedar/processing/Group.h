@@ -570,6 +570,10 @@ public:
     return this->mParameterLinks;
   }
 
+  /*! @brief Returns a list of all steps that are in an invalid state.
+   */
+  std::vector<std::string> listInvalidSteps() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
