@@ -71,13 +71,18 @@ Unreleased
   - The processingIde is now simply called cedar. Conversely, the processingCL is now called cedar-shell.
 
 - cedar
-  - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters pf a
+  - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters of a
     step, but is otherwise quite similar to the old one.
       
 - cedar::proc
   - DataSlots can now be marked as serializable. What this means is that the data stored in them will be stored in the
     architecture when it is saved, and restored later on when it is loaded. In addition, users can manually save and
     load data for these slots from the right-click menu of step items.
+  - Step configurations can now be copied and pasted in the GUI using Ctrl+C and Ctrl+Shift+V.
+  - cedar now allows to slow down or speed up the global timers, effectively allowing for (0.0,2.0] x real-time.
+  - cedar now notices if there were any changes made to an architecture and notifies the user about this when closing a file.
+  - Looped triggers now have a tool tip showing statistics.
+  - Improved performance of triggering chains.
 
 Released versions
 =================
