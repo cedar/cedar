@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -138,11 +138,64 @@ class TestSource2 : public cedar::proc::Step
 CEDAR_GENERATE_POINTER_TYPES(TestSource2);
 
 
+class ThrowsDuringDeterminInputValidity : public cedar::proc::Step
+{
+  public:
+    ThrowsDuringDeterminInputValidity()
+    {
+      this->declareInput("input");
+    }
+
+    void compute(const cedar::proc::Arguments&)
+    {
+      // nothing to do here
+    }
+
+    cedar::proc::DataSlot::VALIDITY determineInputValidity
+    (
+      cedar::proc::ConstDataSlotPtr /* slot */,
+      cedar::aux::ConstDataPtr /* data */
+    )
+    const
+    {
+      // we want to throw a failed assertion exception
+      CEDAR_ASSERT(false);
+
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+};
+CEDAR_GENERATE_POINTER_TYPES(ThrowsDuringDeterminInputValidity);
+
+int testDetermineInputValidityThrow()
+{
+  int errors = 0;
+
+  std::cout << "Testing throwing from determineInputValidity while connecting." << std::endl;
+
+  cedar::proc::GroupPtr group (new cedar::proc::Group());
+
+  TestSourcePtr src(new TestSource(0.0));
+  ThrowsDuringDeterminInputValidityPtr tar(new ThrowsDuringDeterminInputValidity());
+
+  group->add(src, "source");
+  group->add(tar, "target");
+
+  // connect the slots; this should properly deal with the exception
+  group->connectSlots("source.output", "target.input");
+
+  // trigger the source; should not trigger the target
+  src->onTrigger();
+
+  return errors;
+}
+
+
+
 int testPtrChange()
 {
   int errors = 0;
 
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  cedar::proc::GroupPtr network (new cedar::proc::Group());
   TestSource2Ptr src(new TestSource2());
   TestModulePtr tar(new TestModule());
   network->add(src, "source");
@@ -227,7 +280,7 @@ int testOnlineDisconnecting()
 
   for (size_t i = 0; i < trials; ++i)
   {
-    cedar::proc::NetworkPtr network(new cedar::proc::Network());
+    cedar::proc::GroupPtr network(new cedar::proc::Group());
     network->readJson("projection.json");
 
     auto trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
@@ -246,7 +299,7 @@ int testOnlineDisconnecting()
   for (size_t i = 0; i < trials; ++i)
   {
     std::cout << "Testing double-triggered case ..." << std::endl;
-    cedar::proc::NetworkPtr network(new cedar::proc::Network());
+    cedar::proc::GroupPtr network(new cedar::proc::Group());
     network->readJson("taste_the_double_trigger.json");
 
     auto trigger1 = network->getElement<cedar::proc::LoopedTrigger>("trigger1");
@@ -276,7 +329,7 @@ void run_test()
 {
   global_errors = 0;
 
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  cedar::proc::GroupPtr network (new cedar::proc::Group());
   network->add(TestSourcePtr(new TestSource(1)), "source1");
   network->add(TestSourcePtr(new TestSource(2)), "source2");
   network->add(TestModulePtr(new TestModule()), "target");
@@ -286,6 +339,7 @@ void run_test()
 
   global_errors += testPtrChange();
   global_errors += testOnlineDisconnecting();
+  global_errors += testDetermineInputValidityThrow();
 
   std::cout << "Done. There were " << global_errors << " error(s)." << std::endl;
 }

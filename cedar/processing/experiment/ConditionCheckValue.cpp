@@ -97,9 +97,9 @@ cedar::proc::experiment::ConditionCheckValue::~ConditionCheckValue()
 
 bool cedar::proc::experiment::ConditionCheckValue::check()
 {
-  if (cedar::aux::DataPtr data = _stepValue->getData())
+  if (cedar::aux::ConstDataPtr data = _stepValue->getData())
   {
-    if (cedar::aux::MatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
     {
       QReadLocker locker(&(value->getLock()));
       switch(_mCompareMethode->getValue())

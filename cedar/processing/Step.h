@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -46,6 +46,7 @@
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LockerBase.h"
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
@@ -91,7 +92,7 @@ class cedar::proc::Step : public QObject,
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -99,6 +100,68 @@ class cedar::proc::Step : public QObject,
 public:
   //! Map from action names to their corresponding functions.
   typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
+
+private:
+  class Locker : public cedar::aux::LockerBase
+  {
+    public:
+      Locker(cedar::proc::StepPtr step, cedar::aux::LOCK_TYPE type)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::proc::Step::lock, step, type),
+        boost::bind(&cedar::proc::Step::unlock, step, type)
+      )
+      {
+      }
+
+      Locker(cedar::proc::Step* step, cedar::aux::LOCK_TYPE type)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::proc::Step::lock, step, type),
+        boost::bind(&cedar::proc::Step::unlock, step, type)
+      )
+      {
+      }
+  };
+
+public:
+  class ReadLocker : public Locker
+  {
+  public:
+    ReadLocker(cedar::proc::StepPtr step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_READ)
+    {
+    }
+
+    ReadLocker(cedar::proc::Step* step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_READ)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+
+  class WriteLocker : public Locker
+  {
+  public:
+    WriteLocker(cedar::proc::StepPtr step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_WRITE)
+    {
+    }
+
+    WriteLocker(cedar::proc::Step* step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_WRITE)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -219,7 +282,7 @@ protected:
   /*!@brief Adds a trigger to the step.
    *
    *        After calling this method, this step will be aware that this trigger belongs to it. Among other things, this
-   *        means that the processingIde will be able to show this trigger and allow to connect it.
+   *        means that the cedar GUI will be able to show this trigger and allow to connect it.
    */
   void addTrigger(cedar::proc::TriggerPtr trigger);
 
@@ -299,12 +362,8 @@ protected:
    *
    * @remarks Usually, this should only be called automatically.
    */
-  void unlock() const;
+  void unlock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
 
-  /*!@brief Redetermines the validity for an input slot.
-   *
-   * @param slot The slot to revalidate.
-   */
   void revalidateInputSlot(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------

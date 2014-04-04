@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -154,6 +154,11 @@ void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& 
 
 void cedar::proc::steps::MatrixSlice::updateDimensionality()
 {
+  if (!this->mInput)
+  {
+    return;
+  }
+
   unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   unsigned int old_dim = this->_mRangeLower->size();
   this->_mRangeLower->resize(matrix_dim);

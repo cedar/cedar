@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -164,6 +164,16 @@ public:
   {
     CEDAR_ASSERT(dim < this->_mSizes->size());
     this->_mSizes->set(dim, size);
+  }
+
+  inline double getRestingLevel() const
+  {
+    return this->mRestingLevel->getValue();
+  }
+
+  inline void setRestingLevel(double restingLevel) const
+  {
+    return this->mRestingLevel->setValue(restingLevel, true);
   }
 
 public slots:

@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -118,6 +118,8 @@ cedar_add_library(cedaraux
   convolution/Engine.h
   Parameter.h
   Settings.h
+  ParameterLink.h
+  EquationParameterLink.h
   kernel/Separable.h
   kernel/Kernel.h
   kernel/Gauss.h

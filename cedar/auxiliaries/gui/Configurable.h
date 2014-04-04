@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -55,6 +55,10 @@
 #endif // Q_MOC_RUN
 #include <QWidget>
 #include <QTreeWidget>
+#include <QStyledItemDelegate>
+#include <map>
+#include <string>
+#include <set>
 
 
 /*!@brief A widget to display and manipulate the parameters of cedar::aux::Configurables.
@@ -124,6 +128,8 @@ private:
 
   void updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
 
+  void updateLinkState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
+
   QTreeWidgetItem* getItemForParameter(cedar::aux::Parameter* parameter);
 
   QString getPathFromItem(QTreeWidgetItem* item);
@@ -180,6 +186,28 @@ private:
   std::map<cedar::aux::Parameter*, boost::signals2::connection> mParameterRenamedConnections;
 
 }; // class cedar::aux::gui::Configurable
+
+class cedar::aux::gui::Configurable::DataDelegate : public QStyledItemDelegate
+{
+  Q_OBJECT
+public:
+  DataDelegate(cedar::aux::ConfigurablePtr pConfigurable, cedar::aux::gui::Configurable* configurableWidget);
+
+  ~DataDelegate();
+
+  QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem& option, const QModelIndex &index) const;
+
+public slots:
+  void widgetDestroyed(QObject* removed);
+
+private:
+  cedar::aux::ConfigurablePtr mpConfigurable;
+
+  cedar::aux::gui::Configurable* mConfigurableWidget;
+
+  // set storing all opened editors - during the destructor call, all remaining editors are deleted
+  mutable std::set<QObject*> mOpenedEditors;
+};
 
 #endif // CEDAR_AUX_GUI_CONFIGURABLE_H
 

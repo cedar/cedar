@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -87,7 +87,7 @@ public:
    *
    *        If the stored path is a resource, the location of the resource is looked up.
    */
-  cedar::aux::Path absolute() const;
+  cedar::aux::Path absolute(bool showInLog = true) const;
 
   //! Returns true if the stored path is a path to a resource, false otherwise.
   bool isResource() const;

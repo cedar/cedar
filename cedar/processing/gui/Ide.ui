@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Processing IDE</string>
+   <string>cedar</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icons/cedar_proc_gui_icons.qrc">
@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -84,7 +84,7 @@
     <addaction name="mpThreadsStartAll"/>
     <addaction name="mpThreadsSingleStep"/>
     <addaction name="mpThreadsStopAll"/>
-    <addaction name="mpActionResetRootNetwork"/>
+    <addaction name="mpActionResetRootGroup"/>
    </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
@@ -107,6 +107,8 @@
     </property>
     <addaction name="mpActionManagePlugins"/>
     <addaction name="separator"/>
+    <addaction name="mpActionCopy"/>
+    <addaction name="mpActionPasteConfiguration"/>
     <addaction name="mpActionDuplicate"/>
     <addaction name="mpActionSelectAll"/>
    </widget>
@@ -133,6 +135,7 @@
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
     <addaction name="mpActionExperiments"/>
+    <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
@@ -212,8 +215,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -225,8 +228,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -283,8 +286,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>429</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -545,7 +548,7 @@
     <string>About...</string>
    </property>
   </action>
-  <action name="mpActionResetRootNetwork">
+  <action name="mpActionResetRootGroup">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
@@ -788,6 +791,41 @@
    </property>
    <property name="toolTip">
     <string>Framwork for starting experiments</string>
+   </property>
+  </action>
+    <action name="mpActionCopy">
+   <property name="text">
+    <string>Copy step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="mpActionPasteConfiguration">
+   <property name="text">
+    <string>Paste step configuration</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+V</string>
+   </property>
+  </action>
+  <action name="mpActionParameterLinker">
+   <property name="text">
+    <string>Parameter linking ...</string>
+   </property>
+  </action>
+
+  <action name="mpActionPasteConfiguration">
+   <property name="text">
+    <string>Paste step configuration</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+V</string>
+   </property>
+  </action>
+  <action name="mpActionParameterLinker">
+   <property name="text">
+    <string>Parameter linking ...</string>
    </property>
   </action>
  </widget>

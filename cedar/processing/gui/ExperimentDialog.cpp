@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ExperimentDialog.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/processing/experiment/gui/ActionSequence.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
@@ -56,7 +56,7 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
 {
   mParent = parent;this->experiment = boost::shared_ptr<cedar::proc::experiment::Experiment>
   (
-      new cedar::proc::experiment::Experiment(mParent->getNetwork()->getNetwork())
+      new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup())
   );
   this->experiment->setName("TestExperiment");
   this->setupUi(this);

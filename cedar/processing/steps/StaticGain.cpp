@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -122,7 +122,7 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-  if(!this->mInput)
+  if (!this->mInput)
   {
     return;
   }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -175,6 +175,9 @@ namespace cedar
 
       //!@brief Returns a string corresponding to the given matrix's type
       std::string matrixTypeToString(const cv::Mat& matrix);
+
+      //! Converts a string representation, e.g., "CV_32F" to the corresponding type value, e.g., CV_32F
+      int matrixTypeFromString(const std::string& typeStr);
 
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(const cv::Mat& matrix)

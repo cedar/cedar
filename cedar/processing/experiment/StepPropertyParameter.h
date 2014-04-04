@@ -115,7 +115,7 @@ public:
 
    cedar::proc::experiment::StepPropertyParameter::PropertyType getType() const;
 
-   cedar::aux::DataPtr getData() const;
+   cedar::aux::ConstDataPtr getData() const;
 
    cedar::aux::ParameterPtr getParameter() const;
 

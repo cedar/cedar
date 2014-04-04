@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -108,7 +108,7 @@ protected:
   //!@brief the target DataSlot of this connection
   cedar::proc::DataSlotWeakPtr mTarget;
 private:
-  // none yet
+  bool mAlreadyDisconnected;
 }; // class cedar::proc::DataConnection
 
 #endif // CEDAR_PROC_DATA_CONNECTION_H

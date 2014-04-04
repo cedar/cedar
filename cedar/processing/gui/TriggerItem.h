@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -50,7 +50,7 @@
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
-#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -64,7 +64,7 @@ class cedar::proc::gui::TriggerItem : public QObject, public cedar::proc::gui::G
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::gui::Network;
+  friend class cedar::proc::gui::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -134,4 +134,9 @@ void cedar::aux::PluginDeclaration::customRead(const cedar::aux::ConfigurationNo
 void cedar::aux::PluginDeclaration::setSource(const std::string& source)
 {
   this->mSource = source;
+}
+
+std::string cedar::aux::PluginDeclaration::getClassName() const
+{
+  return mClassName;
 }

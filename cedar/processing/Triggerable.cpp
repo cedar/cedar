@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -74,6 +74,13 @@ cedar::proc::Triggerable::~Triggerable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::Triggerable::isStarted() const
+{
+  QMutexLocker locker(this->mpStartCallsLock);
+  bool started = (this->mStartCalls > 0);
+  return started;
+}
 
 bool cedar::proc::Triggerable::exceptionWrappedCall
      (
@@ -298,4 +305,11 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getFinishedTrigger()
     lock_r.relock();
   }
   return this->mFinished.member();
+}
+
+unsigned int cedar::proc::Triggerable::numberOfStartCalls() const
+{
+  QMutexLocker locker(this->mpStartCallsLock);
+  unsigned int calls = this->mStartCalls;
+  return calls;
 }

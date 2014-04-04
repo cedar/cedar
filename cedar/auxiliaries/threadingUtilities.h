@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -104,6 +104,10 @@ namespace cedar
           case cedar::aux::LOCK_TYPE_WRITE:
             iter->first->lockForWrite();
             break;
+
+          case cedar::aux::LOCK_TYPE_DONT_LOCK:
+            // ignored
+            break;
         }
       }
     }
@@ -117,7 +121,10 @@ namespace cedar
       // The implicit ordering of the set is used to impose the canonical lock order here.
       for (LockSet::iterator iter = locks.begin(); iter != locks.end(); ++iter)
       {
-        iter->first->unlock();
+        if (iter->second != cedar::aux::LOCK_TYPE_DONT_LOCK)
+        {
+          iter->first->unlock();
+        }
       }
     }
 
@@ -125,6 +132,11 @@ namespace cedar
      */
     inline void lock(const std::set<QReadWriteLock*>& locks, cedar::aux::LOCK_TYPE type)
     {
+      if (type == cedar::aux::LOCK_TYPE_DONT_LOCK)
+      {
+        return;
+      }
+
       for (std::set<QReadWriteLock*>::const_iterator iter = locks.begin(); iter != locks.end(); ++iter)
       {
         // switch based on the lock type
@@ -137,14 +149,23 @@ namespace cedar
           case cedar::aux::LOCK_TYPE_WRITE:
             (*iter)->lockForWrite();
             break;
+
+          case cedar::aux::LOCK_TYPE_DONT_LOCK:
+            // ignored
+            break;
         }
       }
     }
 
     /*!@brief Alternative to the cedar::aux::unlock(cedar::aux::LockSet&) method.
      */
-    inline void unlock(const std::set<QReadWriteLock*>& locks)
+    inline void unlock(const std::set<QReadWriteLock*>& locks, cedar::aux::LOCK_TYPE type)
     {
+      if (type == cedar::aux::LOCK_TYPE_DONT_LOCK)
+      {
+        return;
+      }
+
       for (std::set<QReadWriteLock*>::const_iterator iter = locks.begin(); iter != locks.end(); ++iter)
       {
         (*iter)->unlock();

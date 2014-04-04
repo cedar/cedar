@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -45,7 +45,7 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 
@@ -76,7 +76,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setNetwork(cedar::proc::NetworkPtr network);
+  void setGroup(cedar::proc::GroupPtr group);
 
 public slots:
   void refresh();
@@ -97,7 +97,7 @@ private:
 
   void clear();
 
-  void addMeasurement(cedar::unit::Time measurement, int row, int column);
+  void addMeasurement(cedar::unit::Time measurement, int row, int column, bool isRunning);
 
   void addUnAvailableMeasurement(int row, int column);
 
@@ -107,7 +107,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::NetworkPtr mNetwork;
+  cedar::proc::GroupPtr mGroup;
 
   int mTimerId;
 

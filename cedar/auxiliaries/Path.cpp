@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -117,11 +117,11 @@ cedar::aux::Path cedar::aux::Path::getDirectory() const
   }
 }
 
-cedar::aux::Path cedar::aux::Path::absolute() const
+cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
 {
   if (this->isResource())
   {
-    std::string path = cedar::aux::locateResource(this->toString());
+    std::string path = cedar::aux::locateResource(this->toString(), showInLog);
     return cedar::aux::Path(path);
   }
 

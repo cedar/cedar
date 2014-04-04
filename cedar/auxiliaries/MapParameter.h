@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -145,6 +145,16 @@ public:
   const_iterator find(const std::string& key) const
   {
     return this->mValues.find(key);
+  }
+
+  void erase(const std::string& key)
+  {
+    this->mValues.erase(key);
+  }
+
+  bool empty()
+  {
+    return this->mValues.empty();
   }
 
   //!@brief checks if a value is already contained in this vector

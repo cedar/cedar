@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -62,6 +62,8 @@ mConstant(false),
 mIsHidden(false),
 mChanged(false),
 mAdvanced(false),
+mIsLinked(false),
+mLastLockType(cedar::aux::LOCK_TYPE_DONT_LOCK),
 mpLock(new QReadWriteLock())
 {
   this->setName(name);
@@ -83,6 +85,16 @@ cedar::aux::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::Parameter::isLinked() const
+{
+  return this->mIsLinked;
+}
+
+void cedar::aux::Parameter::setLinked(bool linked)
+{
+  this->mIsLinked = linked;
+}
 
 void cedar::aux::Parameter::unsetOwner()
 {
@@ -130,21 +142,23 @@ void cedar::aux::Parameter::lockForWrite() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_WRITE);
+  this->mLastLockType = cedar::aux::LOCK_TYPE_WRITE;
+  cedar::aux::lock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::lockForRead() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_READ);
+  this->mLastLockType = cedar::aux::LOCK_TYPE_READ;
+  cedar::aux::lock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::unlock() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::unlock(locks);
+  cedar::aux::unlock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::appendLocks(std::set<QReadWriteLock*>& locks) const
@@ -219,9 +233,13 @@ bool cedar::aux::Parameter::isConstant() const
 
 void cedar::aux::Parameter::setConstant(bool value)
 {
-  this->mConstant = value;
+  bool was_constant = this->isConstant();
+  if (was_constant != value)
+  {
+    this->mConstant = value;
 
-  emit propertyChanged();
+    emit propertyChanged();
+  }
 }
 
 std::string cedar::aux::Parameter::getName() const

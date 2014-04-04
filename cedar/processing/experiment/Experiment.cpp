@@ -41,7 +41,6 @@
 #include "cedar/processing/experiment/Experiment.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Recorder.h"
-#include "cedar/processing/Network.h"
 #include "cedar/processing/experiment/ActionStart.h"
 #include "cedar/processing/experiment/ExperimentController.h"
 #include "cedar/processing/Step.h"
@@ -63,7 +62,7 @@ cedar::aux::EnumType<cedar::proc::experiment::Experiment::CompareMethod>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Experiment::Experiment(cedar::proc::NetworkPtr network)
+cedar::proc::experiment::Experiment::Experiment(cedar::proc::GroupPtr group)
 :
 _mFileName(new cedar::aux::StringParameter(this, "filename", "")),
 _mRepetitions(new cedar::aux::UIntParameter(this, "repetitions", 1)),
@@ -82,7 +81,7 @@ mInit(false),
 mStopped(true)
 {
   ExperimentControllerSingleton::getInstance()->setExperiment(this);
-  this->mNetwork = network;
+  this->mGroup = group;
 
   ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
   as->addAction(ActionPtr(new ActionStart()));
@@ -94,7 +93,7 @@ mStopped(true)
                               (
                                 new cedar::aux::CallFunctionInThread
                                 (
-                                  boost::bind(&cedar::proc::Network::startTriggers, network, true)
+                                  boost::bind(&cedar::proc::Group::startTriggers, group, true)
                                 )
                               );
 
@@ -102,7 +101,7 @@ mStopped(true)
                              (
                                new cedar::aux::CallFunctionInThread
                                (
-                                 boost::bind(&cedar::proc::Network::stopTriggers, network, true)
+                                 boost::bind(&cedar::proc::Group::stopTriggers, group, true)
                                )
                              );
 }
@@ -194,7 +193,7 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
     }
     case ResetType::Reset:
     {
-      this->mNetwork->reset();
+      this->mGroup->reset();
       break;
     }
     case ResetType::Reload:
@@ -204,7 +203,7 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
     }
     default:
     {
-      this->mNetwork->reset();
+      this->mGroup->reset();
       break;
     }
   }
@@ -256,7 +255,7 @@ bool cedar::proc::experiment::Experiment::isOnInit()
 std::vector<std::string> cedar::proc::experiment::Experiment::getAllSteps()
 {
   std::vector<std::string> ret;
-  for (auto name_element_pair : this->mNetwork->getElements())
+  for (auto name_element_pair : this->mGroup->getElements())
   {
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
     {
@@ -268,7 +267,7 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getAllSteps()
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string step, const std::vector<std::string>& allowedTypes)
 {
-  cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
+  cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
 
   std::vector<std::string> ret;
   for (cedar::aux::ParameterPtr parameter :  stepItem->getParameters())
@@ -302,14 +301,14 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(
 
 cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(std::string step, std::string parameter)
 {
-  cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
+  cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
 
   return stepItem->getParameter(parameter);
 }
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getStepValues(std::string step, cedar::proc::DataRole::Id role )
 {
-  cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
+  cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
 
   std::vector<std::string> ret;
   for (auto data :  stepItem->getDataSlots(role))
@@ -319,9 +318,9 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepValues(std:
   return ret;
 }
 
-cedar::aux::DataPtr cedar::proc::experiment::Experiment::getStepValue(std::string step, std::string value,cedar::proc::DataRole::Id role)
+cedar::aux::ConstDataPtr cedar::proc::experiment::Experiment::getStepValue(std::string step, std::string value,cedar::proc::DataRole::Id role)
 {
-  cedar::proc::StepPtr stepItem =this->mNetwork->getElement<cedar::proc::Step>(step);
+  cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
   return stepItem->getData(role,value);
 }
 

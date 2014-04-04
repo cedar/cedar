@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -220,7 +220,7 @@ private:
   {
     ParameterPtr parameter = this->parameter();
 
-    CEDAR_DEBUG_ASSERT(parameter->size() == this->mWidgets.size());
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(parameter->size() == this->mWidgets.size());
 
     std::vector<ValueType> values;
 

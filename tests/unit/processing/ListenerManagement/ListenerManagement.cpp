@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -44,7 +44,7 @@
 // PROJECT INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -67,7 +67,7 @@ int main(int /* argc */, char** /* argv */)
   unsigned int errors = 0;
 
   std::cout << "Creating network." << std::endl;
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  cedar::proc::GroupPtr network (new cedar::proc::Group());
 
   std::cout << "Creating step." << std::endl;
   StepTestPtr step (new StepTest());

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,6 +40,7 @@
 #include "PlotWidget.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/Group.h"
 
 
 // SYSTEM INCLUDES
@@ -204,7 +205,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
         // handle disconnection of slot-input
         this->mSignalConnections.push_back
         (
-          p_input_slot->connectToExternalDataRemoved
+          p_input_slot->connectToDataRemovedSignal
           (
             boost::bind
             (
@@ -218,7 +219,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
         // react to addition of input to a slot
         this->mSignalConnections.push_back
         (
-          p_input_slot->connectToExternalDataAdded
+          p_input_slot->connectToDataSetSignal
           (
             boost::bind
             (
@@ -454,7 +455,14 @@ void cedar::proc::gui::PlotWidget::remove_qgridlayout_widget(QWidget* widget)
 // save this plot_widget in configuration node
 void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  root.put("step", this->mStep->getName());
+  std::string step_name = this->mStep->getName();
+  auto group = this->mStep->getGroup();
+  while (group->getName() != "root")
+  {
+    step_name = group->getName() + "." + step_name;
+    group = group->getGroup();
+  }
+  root.put("step", step_name);
   root.put("position_x", this->parentWidget()->x());
   root.put("position_y", this->parentWidget()->y());
   root.put("width", this->parentWidget()->width());

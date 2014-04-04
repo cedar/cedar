@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -53,7 +53,7 @@
 #include "cedar/processing/gui/ExperimentDialog.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"
 #include "cedar/processing/gui/Ide.fwd.h"
-#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -63,7 +63,7 @@
 #include <map>
 
 
-/*!@brief This is the main window of the processingIde application.
+/*!@brief This is the main window of the cedar application.
  */
 class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
 {
@@ -97,9 +97,9 @@ public:
 
   /*!@brief Resets the current scene and displays the new network.
    */
-  void resetTo(cedar::proc::gui::NetworkPtr network);
+  void resetTo(cedar::proc::gui::GroupPtr network);
 
-  cedar::proc::gui::NetworkPtr getNetwork();
+  cedar::proc::gui::GroupPtr getGroup();
   void suppressCloseDialog(bool suppress)
   {
     this->mSuppressCloseDialog = suppress;
@@ -176,7 +176,7 @@ public slots:
 
   /*!@brief Resets the root network
    */
-  void resetRootNetwork();
+  void resetRootGroup();
 
   /*!@brief Opens a dialog that lets the user export the current scene as an SVG
    */
@@ -205,6 +205,10 @@ public slots:
   /*!@brief Opens a boost control widget.
    */
   void showBoostControl();
+
+  /*! Opens the parameter linker
+   */
+  void openParameterLinker();
 
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
@@ -240,6 +244,12 @@ public slots:
   {
     return this->mpLog;
   }
+
+  //!@brief copy one step to buffer
+  void copyStep();
+
+  //!@brief copy configuration to target step(s)
+  void pasteStepConfiguration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -297,7 +307,7 @@ private:
   //!@brief populates the Plot Groups Combobox with available Plot Groups
   void loadPlotGroupsIntoComboBox();
 
-  void setNetwork(cedar::proc::gui::NetworkPtr network);
+  void setGroup(cedar::proc::gui::GroupPtr group);
 
   void setArchitectureChanged(bool changed);
 
@@ -321,7 +331,9 @@ private:
   std::map<std::string, cedar::proc::gui::ElementClassList*> mElementClassListWidgets;
 
   //! The network currently displayed.
-  cedar::proc::gui::NetworkPtr mNetwork;
+  cedar::proc::gui::GroupPtr mGroup;
+
+  cedar::proc::StepPtr mLastCopiedStep;
 
   //! Architecture consistency check widget.
   cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;
@@ -331,6 +343,9 @@ private:
 
   //! Dock widget for the consistency checker.
   QDockWidget* mpConsistencyDock;
+
+  //! Dock widget for the boost control
+  QDockWidget* mpBoostControlDock;
 
   QString mDefaultWindowTitle;
 

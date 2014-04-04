@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -53,7 +53,9 @@ namespace cedar
       //! The lock should be locked for reading
       LOCK_TYPE_READ,
       //! The lock should be locked for writing
-      LOCK_TYPE_WRITE
+      LOCK_TYPE_WRITE,
+      //! The lock is ignored.
+      LOCK_TYPE_DONT_LOCK
     };
   }
 }

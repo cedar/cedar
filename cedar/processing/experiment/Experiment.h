@@ -46,7 +46,7 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/Data.h"
@@ -169,7 +169,7 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Experiment(cedar::proc::NetworkPtr network);
+  Experiment(cedar::proc::GroupPtr group);
   //!@brief Destructor
   ~Experiment();
 
@@ -198,7 +198,7 @@ public:
   std::vector<std::string> getStepParameters(std::string step, const std::vector<std::string>& allowedTypes = std::vector<std::string>());
   std::vector<std::string> getStepValues(std::string step, cedar::proc::DataRole::Id role = cedar::proc::DataRole::OUTPUT);
   cedar::aux::ParameterPtr getStepParameter(std::string step, std::string parameter);
-  cedar::aux::DataPtr getStepValue(std::string step, std::string value, cedar::proc::DataRole::Id role = cedar::proc::DataRole::OUTPUT);
+  cedar::aux::ConstDataPtr getStepValue(std::string step, std::string value, cedar::proc::DataRole::Id role = cedar::proc::DataRole::OUTPUT);
 
   unsigned int getTrialNumber();
   //override
@@ -228,7 +228,7 @@ protected:
 private:
   cedar::aux::StringParameterPtr _mFileName;
   cedar::aux::UIntParameterPtr _mRepetitions;
-  cedar::proc::NetworkPtr mNetwork;
+  cedar::proc::GroupPtr mGroup;
 
   //! Used for starting all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;

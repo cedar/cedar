@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,7 +42,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -131,6 +131,13 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
+{
+  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
+  this->cedar::proc::Connectable::revalidateInputSlot(slot);
+}
+
 void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
   this->mpConnectionLock->lockForRead();
@@ -138,10 +145,10 @@ void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
   this->lockParameters(parameterAccessType);
 }
 
-void cedar::proc::Step::unlock() const
+void cedar::proc::Step::unlock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
   this->mpConnectionLock->unlock();
-  this->unlockParameters();
+  this->unlockParameters(parameterAccessType);
   this->unlockData();
 }
 
@@ -176,13 +183,13 @@ void cedar::proc::Step::callReset()
   this->resetState();
 
   // lock everything
-  this->lock(cedar::aux::LOCK_TYPE_READ);
+  cedar::proc::Step::ReadLocker locker(this);
 
   // reset the step
   this->reset();
 
   // unlock everything
-  this->unlock();
+  locker.unlock();
 
   this->getFinishedTrigger()->trigger();
 }
@@ -220,21 +227,16 @@ void cedar::proc::Step::callAction(const std::string& name)
   boost::function<void()>& function = iter->second.first;
 
   bool autolock = iter->second.second;
+  cedar::aux::Lockable::WriteLockerPtr locker;
   if (autolock)
   {
     // lock the step
     //!@todo Should this be a read lock?
-    this->lock(cedar::aux::LOCK_TYPE_WRITE);
+    locker = cedar::aux::Lockable::WriteLockerPtr(new cedar::aux::Lockable::WriteLocker(this));
   }
 
   // call it
   function();
-
-  if (autolock)
-  {
-    // unlock the step
-    this->unlock();
-  }
 }
 
 const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
@@ -243,13 +245,15 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
 }
 
 /*! This method takes care of changing the step's name in the registry as well.
+ *
+ * @todo Unify in element using boost signals/slots
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
+  if (cedar::proc::GroupPtr parent_network = this->getGroup())
   {
     // update the name
-    boost::static_pointer_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
+    parent_network->updateObjectName(this);
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();
@@ -315,7 +319,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   connections_locker.unlock();
 
   // lock the step
-  this->lock(cedar::aux::LOCK_TYPE_READ);
+  cedar::proc::Step::ReadLocker step_locker(this);
 
   clock_t lock_end = clock();
   clock_t lock_elapsed = lock_end - lock_start;
@@ -328,7 +332,6 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
     this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
                    "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
-    this->unlock();
     this->mBusy.unlock();
     return;
   } // this->mMandatoryConnectionsAreSet
@@ -346,7 +349,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     this->mLastComputeCall = clock();
   }
-
+  
   // start measuring the execution time.
   clock_t run_start = clock();
 
@@ -395,7 +398,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
 
   // unlock the step
-  this->unlock();
+  step_locker.unlock();
   this->mBusy.unlock();
 
   //!@todo This is code that really belongs in Trigger(able). But it can't be moved there as it is, because Trigger(able) doesn't know about loopiness etc.
@@ -601,15 +604,4 @@ bool cedar::proc::Step::isThreaded() const
 void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
   this->revalidateInputSlot(slot);
-}
-
-void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
-{
-  //!@todo Why is this not in cedar::proc::Connectable?
-  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
-  this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
-  //!@todo This method does more than its name suggests: it doesn't just revalidate, it also reconnects.
-  this->inputConnectionChanged(slot);
-
-  this->getInputValidity(slot);
 }

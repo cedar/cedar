@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -59,7 +59,7 @@
 #include <string>
 
 
-/*!@brief The application for the processingIde.
+/*!@brief The QApplication for the cedar application.
  */
 class cedar::proc::gui::IdeApplication : public QApplication
 {
@@ -157,6 +157,9 @@ private:
 
   //! Lock for the last exception information.
   QReadWriteLock mLastExceptionInfoLock;
+
+  //! Whether the ide catches exceptions.
+  bool mCatchExceptions;
 
 }; // class cedar::proc::gui::IdeApplication
 

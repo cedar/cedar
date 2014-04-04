@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -87,6 +87,10 @@ public:
   
   //!@brief Returns a string that describes the matrix header in CSV format.
   void serializeHeader(std::ostream& stream) const;
+
+  void serialize(std::ostream& stream) const;
+
+  void deserialize(std::istream& stream);
   
   //!@brief creates a deep copy of this data
   cedar::aux::DataPtr clone() const;

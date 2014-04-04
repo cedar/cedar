@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -81,6 +81,16 @@ public:
   virtual double compute(double value) const;
 
   virtual cv::Mat compute(const cv::Mat& values) const;
+
+  inline double getBeta() const
+  {
+    return this->_mBeta->getValue();
+  }
+
+  inline void setBeta(double beta)
+  {
+    this->_mBeta->setValue(beta);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

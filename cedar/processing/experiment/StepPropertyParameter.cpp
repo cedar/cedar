@@ -209,12 +209,12 @@ cedar::proc::experiment::StepPropertyParameter::PropertyType cedar::proc::experi
   return this->mType;
 }
 
-cedar::aux::DataPtr cedar::proc::experiment::StepPropertyParameter::getData() const
+cedar::aux::ConstDataPtr cedar::proc::experiment::StepPropertyParameter::getData() const
 {
   Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
   if(mType==OUTPUT)
   {
-      if (cedar::aux::DataPtr data = experiment->
+      if (cedar::aux::ConstDataPtr data = experiment->
           getStepValue(mStep,mProperty,cedar::proc::DataRole::OUTPUT))
       {
           return data;
@@ -223,14 +223,14 @@ cedar::aux::DataPtr cedar::proc::experiment::StepPropertyParameter::getData() co
 
   if(mType==BUFFER)
   {
-    if (cedar::aux::DataPtr data = experiment->
+    if (cedar::aux::ConstDataPtr data = experiment->
         getStepValue(mStep,mProperty,cedar::proc::DataRole::BUFFER))
     {
         return data;
     }
 
   }
-  return cedar::aux::DataPtr();
+  return cedar::aux::ConstDataPtr();
 }
 
 cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameter() const

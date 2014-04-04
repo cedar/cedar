@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -151,7 +151,7 @@ void cedar::aux::Lockable::unlockAll(LockSetHandle lockSet) const
   {
     QReadWriteLock* p_lock = iter->first;
 
-    if (p_lock != p_last)
+    if (p_lock != p_last && iter->second != cedar::aux::LOCK_TYPE_DONT_LOCK)
     {
       p_last = p_lock;
       p_lock->unlock();

@@ -45,10 +45,10 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ConditionCheckValue.fwd.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // SYSTEM INCLUDES
 
