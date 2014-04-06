@@ -53,9 +53,7 @@
 #include <QObject>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief Sets the parameter of a step to a desired value
  */
 class cedar::proc::experiment::ActionSetParameter : public cedar::proc::experiment::Action
 {
@@ -77,6 +75,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Sets the parameter of a step to a desired value
   void run();
 
 public:
@@ -108,7 +107,8 @@ protected:
   // none yet
 
 private:
-  cedar::proc::experiment::StepPropertyParameterPtr _mStepProperty;
+  //!@brief The step parameter to set
+  cedar::proc::experiment::StepPropertyParameterPtr _mStepParameter;
 
 
 }; // class cedar::proc::experiment::ActionSetParameter

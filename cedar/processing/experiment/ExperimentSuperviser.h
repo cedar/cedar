@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,39 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTime.h
+    File:        ExperimentController.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 19
+    Date:        2014 02 06
 
-    Description: Header file for the class cedar::proc::experiment::ConditionOnTime.
+    Description: Header file for the class cedar::proc::experiment::ExperimentController.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+#ifndef CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
+#define CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/TimeParameter.h"
+#include "cedar/auxiliaries/LoopedThread.h"
+
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionOnTime.fwd.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.fwd.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Checks if a the current trial time is greater than the time provided by this condition
+/*!@brief This thread should continuously perform the action sequences of the experiment
  *
- *        This condition is only activated once after the trial time reaches the value
  */
-class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment::Condition
+//@todo Superviser
+class cedar::proc::experiment::ExperimentSuperviser : public cedar::aux::LoopedThread
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+
+  // uses singleton template.
+  friend class cedar::aux::Singleton<ExperimentSuperviser>;
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -62,19 +69,24 @@ class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  //!@brief The private constructor.
+  ExperimentSuperviser();
 public:
-  //!@brief The standard constructor.
-  ConditionOnTime();
-
   //!@brief Destructor
-  virtual ~ConditionOnTime();
+  virtual ~ExperimentSuperviser();
 
+//@todo
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //@brief Checks if a the current trial time is greater than the time provided by this condition
-  bool check();
+  //!@brief Sets the experiment.
+  void setExperiment(Experiment* experiment);
+
+  //!@brief Returns the experimen
+  Experiment* getExperiment();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,7 +98,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Calls write in the specified interval.
+  void step(cedar::unit::Time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -94,8 +107,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief This flag will be used to check if this condition als already been triggered during this trial
-  bool mActivated;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -104,10 +116,26 @@ protected:
   // none yet
 
 private:
-  //!@brief The time that has to been reached by the trial time
-  cedar::aux::TimeParameterPtr _mTime;
+  //!@brief The experiment
+  Experiment* mpExperiment;
 
-}; // class cedar::proc::experiment::ConditionOnTime
+}; // class cedar::proc::experiment::ExperimentController
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+
+
+#include "cedar/auxiliaries/Singleton.h"
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace experiment
+    {
+      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::ExperimentSuperviser>);
+      typedef cedar::aux::Singleton<cedar::proc::experiment::ExperimentSuperviser> ExperimentControllerSingleton;
+    }
+  }
+}
+
+#endif // CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
 

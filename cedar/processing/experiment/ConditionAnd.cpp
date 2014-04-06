@@ -42,7 +42,7 @@
 #include "cedar/processing/experiment/ConditionOnInit.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.h"
 
 // SYSTEM INCLUDES
 
@@ -65,7 +65,7 @@ _mCondition1
    new cedar::proc::experiment::Condition::ConditionParameter
    (
      this,
-     "Condition1",
+     "Condition 1",
      cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::ConditionOnInit())
    )
  )
@@ -75,7 +75,7 @@ _mCondition2
    new cedar::proc::experiment::Condition::ConditionParameter
    (
      this,
-     "Condition2",
+     "Condition 2",
      cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::ConditionOnInit())
    )
  )

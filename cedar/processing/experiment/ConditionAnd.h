@@ -50,7 +50,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief
+/*!@brief Condition to to combine two Conditions
  */
 class cedar::proc::experiment::ConditionAnd : public cedar::proc::experiment::Condition
 {
@@ -60,6 +60,7 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The Constructor
 	ConditionAnd();
   //!@brief Destructor
   ~ConditionAnd();
@@ -68,6 +69,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns true if both conditions are fulfilled
   bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -80,6 +82,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,7 +90,19 @@ protected:
   // none yet
 
 private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  //!@brief The first condition
   ConditionParameterPtr _mCondition1;
+
+  //!@brief The second condition
   ConditionParameterPtr _mCondition2;
 
 }; // class cedar::proc::experiment::ConditionAnd

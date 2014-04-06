@@ -52,9 +52,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief Stops a trial of the experiment framework
  *
- * @todo describe more.
+ *        It also provides different kinds of reset methods
  */
 class cedar::proc::experiment::ActionStop : public cedar::proc::experiment::Action
 {
@@ -76,6 +76,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Stops the trial, applies the reset method and send a message to the log file
   void run();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,9 +106,14 @@ protected:
   // none yet
 
 private:
+  //!@brief The reset method that should be applied right after the stop
   cedar::aux::EnumParameterPtr _mResetType;
+
+  //!@brief Indicates if the trial is a success or a failure
   cedar::aux::BoolParameterPtr _mSuccess;
-  cedar::aux::StringParameterPtr _mSuccessMessage;
+
+  //!@brief The message that will be send to the log file
+  cedar::aux::StringParameterPtr _mMessage;
 
 }; // class cedar::proc::experiment::ActionStop
 

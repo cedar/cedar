@@ -53,7 +53,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief
+/*!@brief  This class stores actions and a condition for the experiment framework
+ *
+ *        The action should only be executed when the condition is fulfilled
  */
 class cedar::proc::experiment::ActionSequence : public cedar::aux::NamedConfigurable
 {
@@ -72,9 +74,16 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief  Adds an action to this sequence
   void addAction(cedar::proc::experiment::ActionPtr action);
+
+  //!@brief Sets the condition for this sequence
   void setCondition(cedar::proc::experiment::ConditionPtr condition);
+
+  //!@brief Returns all actions in this sequence
   std::vector<cedar::proc::experiment::ActionPtr> getActions();
+
+  //!@brief Returns the condition of this sequence
   cedar::proc::experiment::ConditionPtr getCondition();
 
 
@@ -95,7 +104,10 @@ protected:
   // none yet
 
 private:
+  //!@brief The actions
   cedar::proc::experiment::Action::ActionListParameterPtr _mActionSet;
+
+  //!@brief The condition
   cedar::proc::experiment::Condition::ConditionParameterPtr _mCondition;
 
 }; // class cedar::proc::experiment::Experiment

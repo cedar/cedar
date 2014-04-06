@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.cpp
+    File:        ExperimentController.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 07
+    Date:        2014 02 06
 
-    Description: Source file for the class cedar::proc::experiment::ActionSetParameter.
+    Description: Source file for the class cedar::proc::experiment::ExperimentController.
 
     Credits:
 
@@ -38,55 +38,45 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ActionSetParameter.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
-#include "cedar/auxiliaries/ParameterDeclaration.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// register class
-//----------------------------------------------------------------------------------------------------------------------
-
-namespace
-{
-  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::ActionSetParameterPtr>();
-}
-//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ActionSetParameter::ActionSetParameter()
+cedar::proc::experiment::ExperimentSuperviser::ExperimentSuperviser()
 :
-_mStepParameter
-(
-    new cedar::proc::experiment::StepPropertyParameter(this,"Step Parameter")
-)
+mpExperiment(NULL)
 {
-  _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
+
+}
+
+cedar::proc::experiment::ExperimentSuperviser::~ExperimentSuperviser()
+{
 }
 
 
-cedar::proc::experiment::ActionSetParameter::~ActionSetParameter()
-{
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::experiment::ActionSetParameter::run()
+void cedar::proc::experiment::ExperimentSuperviser::step(cedar::unit::Time)
 {
+  bool init = this->mpExperiment->hasStopped();
+  this->mpExperiment->executeAcionSequences(init);
+}
 
-  if (_mStepParameter->getStep() == "" || _mStepParameter->getProperty() == "")
-  {
-    return;
-  }
-  cedar::aux::ParameterPtr parameter = _mStepParameter->getParameter();
-  parameter->copyValueFrom(_mStepParameter->getParameterCopy());
-
+void cedar::proc::experiment::ExperimentSuperviser::setExperiment(Experiment* experiment)
+{
+  this->mpExperiment = experiment;
+}
+cedar::proc::experiment::Experiment* cedar::proc::experiment::ExperimentSuperviser::getExperiment()
+{
+  return this->mpExperiment;
 }
 

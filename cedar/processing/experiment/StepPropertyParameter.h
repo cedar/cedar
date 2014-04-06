@@ -51,7 +51,10 @@
 #include <QObject>
 
 
-/*!@todo describe.
+/*!@brief A parameter to set a property of a certain step
+ *
+ *          The property could either be a parameter or an output or a buffer.
+ *          The property type should be defined when creating an instance of this parameter.
  *
  * @todo describe more.
  */
@@ -103,30 +106,55 @@ public:
    //!@brief Checks if this parameter can copy its value from the given one.
    bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
 
+   /*!@brief Sets the property name of the step.
+    *               It should always be checked if the property name is still available
+    */
    void setProperty(const std::string& poperty);
 
+   //!@brief Returns the step property name
    const std::string& getProperty() const;
 
+   //!@brief Sets the step name
    void setStep(const std::string& step);
 
+   //!@brief Returns the step name
    const std::string& getStep() const;
 
+   //!@brief Sets the type of the property. Could be either PARAMETER, OUTPUT or BUFFER
    void setType(cedar::proc::experiment::StepPropertyParameter::PropertyType type);
 
+   //!@brief Returns the type of the property
    cedar::proc::experiment::StepPropertyParameter::PropertyType getType() const;
 
+   /*!@brief Returns the desired data of the step.
+    *
+    *           Should only be called if the type is BUFFER or OUTPUT
+    */
    cedar::aux::ConstDataPtr getData() const;
 
+   /*!@brief Returns the ParameterPtr of the property
+    *
+    *           Should only be called if the type is PARAMETER
+    */
    cedar::aux::ParameterPtr getParameter() const;
 
+
+   /*!@brief Returns a deep copy of the ParameterPtr
+    *
+    *           Should only be called if the type is PARAMETER
+    */
    cedar::aux::ParameterPtr getParameterCopy() const;
 
+   //!@brief Sets the types of parameters that should be allowed for this parameter
    void allowType(const std::string& type);
 
+   //!@brief Checks if a type is allowed for this parameter
    bool isAllowType(const std::string& type);
 
+   //!@brief Unset a types of parameters that should be allowed for this parameter
    void disallowType(const std::string& type);
 
+   //!@brief Returns all types that are allowed
    const std::vector<std::string>& getAllowedTypes();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,6 +167,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
+//!@brief If the property is changed, the parameter copy will be updated
   void updatePropertyCopy();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -156,12 +185,20 @@ protected:
   // none yet
 
 private:
+  //!@brief The step
   std::string mStep;
+
+  //!@brief The property
   std::string mProperty;
+
+  //!@brief The type
   cedar::proc::experiment::StepPropertyParameter::PropertyType mType;
+
+  //!@brief The copy of the step parameter
   cedar::aux::ParameterPtr mParameterCopy;
+
+  //!@brief The allowed types
   std::vector<std::string> allowedTypes;
-  //cedar::aux::DataPtr mDataCopy;
 
 }; // class cedar::proc::experiment::StepPropertyParameter
 

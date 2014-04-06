@@ -52,9 +52,7 @@
 #include <QLayout>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief Widget to display Actions and Conditions by parsing their parameters
  */
 class cedar::proc::experiment::gui::ExperimentItemWidget : public QWidget
 {
@@ -81,6 +79,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Sets the Configurable to display
   void display(cedar::aux::ConfigurablePtr experimentItem);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,8 +92,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Clear all widgets out of a layout. If layout==NUll, the main lauout would be cleared.
   void clear(QLayout* layout = NULL);
-  void addWidget(QWidget* widget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,6 +103,8 @@ protected:
 private:
   // none yet
 private slots:
+
+  //!@brief Updates the widget when a ObjectParameter has changed
   void objectParameterChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

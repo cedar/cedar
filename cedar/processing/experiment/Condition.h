@@ -53,12 +53,12 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief
+/*!@brief An abstract class for all kinds of conditions.
  */
 class cedar::proc::experiment::Condition : public cedar::aux::Configurable
 {
 public:
-	//!@brief a parameter for action sequence objects
+	//!@brief a parameter for condition objects
 	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::Condition> ConditionParameter;
 
 	//!@cond SKIPPED_DOCUMENTATION
@@ -70,6 +70,7 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+	//!@brief The Constructor
 	Condition();
   //!@brief Destructor
   ~Condition();
@@ -78,7 +79,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //@todo Weakpointer
+  /*!@brief This method has to be override by all derived classes
+   *         It should return true if the condition is fulfilled
+   */
   virtual bool check() = 0;
 
 
@@ -112,7 +115,7 @@ namespace cedar
   {
     namespace experiment
     {
-      //!@brief The singleton instance of the instruction factory manager.
+      //!@brief The singleton instance of the condition factory manager.
       typedef cedar::aux::Singleton< cedar::aux::FactoryManager<cedar::proc::experiment::ConditionPtr>>
               ConditionManagerSingleton;
     }

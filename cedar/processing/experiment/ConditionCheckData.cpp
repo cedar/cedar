@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.cpp
+    File:        ConditionCheckValue.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 07
+    Date:        2014 02 06
 
-    Description: Source file for the class cedar::proc::experiment::ActionSetParameter.
+    Description: Source file for the class cedar::proc::experiment::ConditionCheckValue.
 
     Credits:
 
@@ -38,55 +38,95 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ActionSetParameter.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
-#include "cedar/auxiliaries/ParameterDeclaration.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/processing/experiment/ConditionCheckData.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
+#include <QReadWriteLock>
 
 //----------------------------------------------------------------------------------------------------------------------
-// register class
+// register the class
 //----------------------------------------------------------------------------------------------------------------------
-
 namespace
 {
-  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::ActionSetParameterPtr>();
+  bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
+    registerType<cedar::proc::experiment::ConditionCheckDataPtr>();
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ActionSetParameter::ActionSetParameter()
+cedar::proc::experiment::ConditionCheckData::ConditionCheckData()
 :
-_mStepParameter
+
+_stepData
 (
-    new cedar::proc::experiment::StepPropertyParameter(this,"Step Parameter")
+    new cedar::proc::experiment::StepPropertyParameter(this,"StepProperty")
 )
+,
+_mCompareMethode
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "reset type",
+    cedar::proc::experiment::Experiment::CompareMethod::typePtr(),
+    cedar::proc::experiment::Experiment::CompareMethod::Lower
+  )
+)
+,
+_desiredValue
+(
+    new cedar::aux::DoubleParameter(this,"DesiredValue",0.0)
+)
+
 {
-  _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
+  _stepData->setType(cedar::proc::experiment::StepPropertyParameter::OUTPUT);
 }
 
-
-cedar::proc::experiment::ActionSetParameter::~ActionSetParameter()
+cedar::proc::experiment::ConditionCheckData::~ConditionCheckData()
 {
 }
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::experiment::ActionSetParameter::run()
+bool cedar::proc::experiment::ConditionCheckData::check()
 {
-
-  if (_mStepParameter->getStep() == "" || _mStepParameter->getProperty() == "")
+  if (cedar::aux::ConstDataPtr data = _stepData->getData())
   {
-    return;
+    if (cedar::aux::ConstMatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+    {
+      bool inRange = false;
+      QReadLocker locker(&(value->getLock()));
+      switch(_mCompareMethode->getValue())
+      {
+       case cedar::proc::experiment::Experiment::CompareMethod::Lower:
+       {
+         inRange = cv::checkRange(value->getData(),true,NULL,-DBL_MAX,_desiredValue->getValue());
+         break;
+       }
+       case cedar::proc::experiment::Experiment::CompareMethod::Greater:
+       {
+         inRange = cv::checkRange(value->getData(),true,NULL,_desiredValue->getValue(),DBL_MAX);
+         break;
+       }
+       case cedar::proc::experiment::Experiment::CompareMethod::Equal:
+       {
+         inRange = cv::checkRange(value->getData(),true,NULL,_desiredValue->getValue(),_desiredValue->getValue());
+         break;
+       }
+      }
+      if (inRange)
+      {
+        return true;
+      }
+    }
   }
-  cedar::aux::ParameterPtr parameter = _mStepParameter->getParameter();
-  parameter->copyValueFrom(_mStepParameter->getParameterCopy());
-
+  return false;
 }
 

@@ -22,38 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTime.h
+    File:        ConditionPartialCheckMat.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 19
+    Date:        2014 04 04
 
-    Description: Header file for the class cedar::proc::experiment::ConditionOnTime.
+    Description: Header file for the class cedar::proc::experiment::ConditionPartialCheckMat.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/TimeParameter.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionOnTime.fwd.h"
+#include "cedar/processing/experiment/ConditionPartialCheckData.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Checks if a the current trial time is greater than the time provided by this condition
- *
- *        This condition is only activated once after the trial time reaches the value
+/*!@brief Checks if a part of the step data fulfills the condition
  */
-class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::ConditionPartialCheckData : public cedar::proc::experiment::Condition
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,16 +67,16 @@ class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ConditionOnTime();
+  ConditionPartialCheckData();
 
   //!@brief Destructor
-  virtual ~ConditionOnTime();
+  virtual ~ConditionPartialCheckData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //@brief Checks if a the current trial time is greater than the time provided by this condition
+  //@brief Checks if a part of the step data fulfills the condition
   bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,8 +97,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief This flag will be used to check if this condition als already been triggered during this trial
-  bool mActivated;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -104,10 +106,19 @@ protected:
   // none yet
 
 private:
-  //!@brief The time that has to been reached by the trial time
-  cedar::aux::TimeParameterPtr _mTime;
+  //@brief The step data to check
+  cedar::proc::experiment::StepPropertyParameterPtr _stepData;
 
-}; // class cedar::proc::experiment::ConditionOnTime
+  //@brief The number of elements that should at least need to fulfill the condition
+  cedar::aux::UIntParameterPtr _mNumberOfElements;
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+  //!@brief The compare method. Can be greater, lower or equal
+  cedar::aux::EnumParameterPtr _mCompareMethode;
+
+  //!@brief The value the step data is compared to
+  cedar::aux::DoubleParameterPtr _desiredValue;
+
+}; // class cedar::proc::experiment::ConditionPartialCheckMat
+
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_H
 

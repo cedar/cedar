@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ActionStart.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.h"
 
 // SYSTEM INCLUDES
 
@@ -75,7 +75,7 @@ cedar::proc::experiment::ActionStart::~ActionStart()
 
 void cedar::proc::experiment::ActionStart::run()
 {
-  ExperimentControllerSingleton::getInstance()->getExperiment()->startNetwork();
+  ExperimentControllerSingleton::getInstance()->getExperiment()->startTrial();
 }
 
 

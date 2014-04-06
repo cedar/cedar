@@ -53,9 +53,8 @@
 #include <QBoxLayout>
 
 
-/*!@todo describe.
+/*!@brief The GUI implementation of cedar::proc::experiment::ActionSequence
  *
- * @todo describe more.
  */
 class cedar::proc::experiment::gui::ActionSequence : public QWidget
 {
@@ -83,12 +82,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void clear(QLayout* layout);
+  // none yet
 public slots:
+  //!@brief updates the widgets inside the action sequence
   void update();
-  void updateCondition();
-  void updateActions();
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,8 +96,20 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  //!@brief Clears all the Widgets of a layout
+  void clear(QLayout* layout);
+
+
 private slots:
-void remove();
+  //!@brief Deletes this action sequence
+  void remove();
+
+  //!@brief Updates the condition
+  void updateCondition();
+
+  //!@brief Updates all actions
+  void updateActions();
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,11 +127,22 @@ protected:
   // none yet
 
 private:
+  //!@brief The main layout of this widget
   QVBoxLayout* mLayout;
+
+  //!@brief The condition widget
   cedar::proc::experiment::gui::ExperimentItemWidget* mCondition;
+
+  //!@brief The pointer to the displayed action sequence
   cedar::proc::experiment::ActionSequencePtr mSequence;
+
+  //!@brief The parent widget
   cedar::proc::gui::ExperimentDialog* mpParent;
+
+  //!@brief The row that displays the condition
   QVBoxLayout* conditionRow;
+
+  //!@brief The layout where the Actions will be displayed
   QVBoxLayout* mActions;
 
 }; // class cedar::proc::experiment::gui::ActionSequence

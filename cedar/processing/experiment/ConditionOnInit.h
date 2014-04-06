@@ -49,9 +49,10 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief Checks if a trial is on initial state
  *
- * @todo describe more.
+ *      A trial is on initial state if it is not has been started yet.
+ *      There should be at least one of this conditions in your experiment, containing ActionStart.
  */
 class cedar::proc::experiment::ConditionOnInit : public cedar::proc::experiment::Condition
 {
@@ -73,6 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Checks if a trial is on initial state
   bool check();
 
   //--------------------------------------------------------------------------------------------------------------------

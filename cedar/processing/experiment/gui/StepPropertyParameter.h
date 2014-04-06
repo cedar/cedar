@@ -50,9 +50,8 @@
 #include <QComboBox>
 #include <QBoxLayout>
 
-/*!@todo describe.
+/*!@brief GUI implementation of cedar::proc::experiment::StepPropertyParameter
  *
- * @todo describe more.
  */
 class cedar::proc::experiment::gui::StepPropertyParameter : public cedar::aux::gui::Parameter
 {
@@ -60,10 +59,6 @@ class cedar::proc::experiment::gui::StepPropertyParameter : public cedar::aux::g
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -81,9 +76,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void updateSteps();
-  void updateProperties();
-  void updateValue();
+  // none yet
 
 public slots:
   //!@brief handles a change of the associated parameter
@@ -103,7 +96,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Updates the steps for the combo box
+  void updateSteps();
+
+  //!@brief Updates the properties the combo box
+  void updateProperties();
+
+  //!@brief Updates the parameter widget when the property has changed
+  void updateValue();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -120,8 +120,13 @@ protected:
   // none yet
 
 private:
+  //!@brief The step selector
   QComboBox* mpStep;
+
+  //!@brief The property selector
   QComboBox* mpProperty;
+
+  //!@brief The parameter widget. Only appears if the StepPropertyParameter is of type PARMAETER
   QWidget* mpPropertyCopy;
 
 }; // class cedar::proc::experiment::gui::StepPropertyParameter

@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/StepPropertyParameter.h"
 #include "cedar/processing/experiment/StepPropertyParameter.h"
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
@@ -145,7 +145,7 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateSteps()
 {
 
   mpStep->clear();
-  std::vector<std::string> steps = ExperimentControllerSingleton::getInstance()->getExperiment()->getAllSteps();
+  std::vector<std::string> steps = ExperimentControllerSingleton::getInstance()->getExperiment()->getGroupSteps();
   for (std::string step : steps)
   {
    mpStep->addItem(QString::fromStdString(step));
@@ -172,12 +172,12 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
     }
     case cedar::proc::experiment::StepPropertyParameter::OUTPUT:
     {
-      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepValues(index, cedar::proc::DataRole::OUTPUT);
+      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::OUTPUT);
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::BUFFER:
     {
-      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepValues(index, cedar::proc::DataRole::BUFFER);
+      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::BUFFER);
       break;
     }
   }

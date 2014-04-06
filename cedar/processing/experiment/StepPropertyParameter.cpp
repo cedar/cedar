@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/StepPropertyParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
@@ -76,7 +76,7 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
     this->setType(type);
     this->setStep(node.get_child("Step").get_value<std::string>());
     this->setProperty(node.get_child("Property").get_value<std::string>());
-    switch(mType)
+    switch (mType)
     {
       case PARAMETER:
       {
@@ -110,7 +110,7 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
   step_node.put("Property", mProperty);
   step_node.put("Type", mType);
 
-  switch(mType)
+  switch (mType)
   {
     case PARAMETER:
     {
@@ -212,19 +212,19 @@ cedar::proc::experiment::StepPropertyParameter::PropertyType cedar::proc::experi
 cedar::aux::ConstDataPtr cedar::proc::experiment::StepPropertyParameter::getData() const
 {
   Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
-  if(mType==OUTPUT)
+  if (mType==OUTPUT)
   {
       if (cedar::aux::ConstDataPtr data = experiment->
-          getStepValue(mStep,mProperty,cedar::proc::DataRole::OUTPUT))
+          getStepData(mStep,mProperty,cedar::proc::DataRole::OUTPUT))
       {
           return data;
       }
   }
 
-  if(mType==BUFFER)
+  if (mType==BUFFER)
   {
     if (cedar::aux::ConstDataPtr data = experiment->
-        getStepValue(mStep,mProperty,cedar::proc::DataRole::BUFFER))
+        getStepData(mStep,mProperty,cedar::proc::DataRole::BUFFER))
     {
         return data;
     }
@@ -255,9 +255,9 @@ void cedar::proc::experiment::StepPropertyParameter::allowType(const std::string
 
 bool cedar::proc::experiment::StepPropertyParameter::isAllowType(const std::string& type)
 {
-  for (std::string allowedtype : allowedTypes)
+  for (std::string allowed_type : allowedTypes)
   {
-    if(allowedtype==type)
+    if (allowed_type==type)
     {
       return true;
     }
@@ -268,9 +268,9 @@ bool cedar::proc::experiment::StepPropertyParameter::isAllowType(const std::stri
 void cedar::proc::experiment::StepPropertyParameter::disallowType(const std::string& type)
 {
   int i=0;
-  for (std::string allowedtype : allowedTypes)
+  for (std::string allowed_type : allowedTypes)
   {
-    if(allowedtype==type)
+    if (allowed_type==type)
     {
       this->allowedTypes.erase(this->allowedTypes.begin()+i);
       break;
@@ -292,7 +292,7 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
     return;
   }
   Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
-  switch(mType)
+  switch (mType)
   {
     case PARAMETER:
     {

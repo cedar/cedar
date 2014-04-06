@@ -55,13 +55,18 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
-#include "cedar/processing/experiment/ExperimentController.fwd.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
 
 
-/*!@brief
+/*!@brief A class for creating and starting experiments with the current architecture.
+ *
+ *        It can be used to start multiple trials with different parameters.
+ *        An instance will automaticly be registered to the ExperimentSuperviser, a thread to start, stop and log the
+ *        experiment session.
+ *
  */
 class cedar::proc::experiment::Experiment : public QObject, public cedar::aux::NamedConfigurable
 {
@@ -69,6 +74,12 @@ class cedar::proc::experiment::Experiment : public QObject, public cedar::aux::N
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // freinds
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::experiment::ExperimentSuperviser;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -121,7 +132,6 @@ public:
 
   /*! Enumeration class for the different compare methods.
    */
-public:
   class CompareMethod
   {
     public:
@@ -169,6 +179,7 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The Constructor
   Experiment(cedar::proc::GroupPtr group);
   //!@brief Destructor
   ~Experiment();
@@ -177,36 +188,81 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns the file name of this experiment
   const std::string& getFileName() const;
+
+  //!@brief Sets the file name of this experiment
   void setFileName(const std::string& filename);
 
-  unsigned int getRepetitions() const;
-  void setRepetitions(unsigned int repetitions);
+  //!@brief Return the number of trials, this experiment will run through
+  unsigned int getTrialCount() const;
+
+  //!@brief Sets the number of trials, this experiment will run through
+  void setTrialCount(unsigned int repetitions);
+
+  //!@brief Starts the experiment to running through each trial
   void run();
+
+  //!@brief Cancels the experiment
   void cancel();
+
+  //!@brief Adds an action sequence to the experiment
   void addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
+
+  //!@brief Removes a action sequence from the experiment
   void removeActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
+
+  //!@brief  Returns a list of all action sequences of the experiment
   std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
-  void startNetwork();
-  void stopNetwork(ResetType::Id reset = ResetType::Reset);
-  void executeAcionSequences(bool initial = false);
+
+  //!@brief Checks if the condition is on initial state. This is the case if the last trial has stopped
   bool isOnInit();
+
+  //!@brief Checks if a trial currently running
   bool hasStopped();
-  void onInit(bool status);
 
-  std::vector<std::string> getAllSteps();
-  std::vector<std::string> getStepParameters(std::string step, const std::vector<std::string>& allowedTypes = std::vector<std::string>());
-  std::vector<std::string> getStepValues(std::string step, cedar::proc::DataRole::Id role = cedar::proc::DataRole::OUTPUT);
+  //!@brief Get all steps of the current group
+  std::vector<std::string> getGroupSteps();
+
+  /*!@brief Returns all parameter names of a given step
+   *          allowedTypes defines what kind of parameters should be returned
+   *          If there is no allowed type specified, all parameters that are registered in the DeclarationFactory
+   *          will be returned
+   */
+  std::vector<std::string> getStepParameters(std::string step, const std::vector<std::string>& allowedTypes
+      = std::vector<std::string>());
+
+  //!@brief Returns all data names of the given role of a step
+  std::vector<std::string> getStepDatas(std::string step, cedar::proc::DataRole::Id role
+      = cedar::proc::DataRole::OUTPUT);
+
+  //!@brief Returns the ParameterPtr defined by step name and parameter name
   cedar::aux::ParameterPtr getStepParameter(std::string step, std::string parameter);
-  cedar::aux::ConstDataPtr getStepValue(std::string step, std::string value, cedar::proc::DataRole::Id role = cedar::proc::DataRole::OUTPUT);
 
-  unsigned int getTrialNumber();
-  //override
+  //!@brief Returns the ConstDataPtr defined by step name and data name
+  cedar::aux::ConstDataPtr getStepData(std::string step, std::string value, cedar::proc::DataRole::Id role
+      = cedar::proc::DataRole::OUTPUT);
+
+  //!@brief Returns the actual trial that is currently running
+  unsigned int getActualTrial();
+
+  //!@brief Writes the parameters to root
   void writeConfiguration(cedar::aux::ConfigurationNode& root);
 
+  //!@brief Starts a trial. Should only be called when no trial is currently running
+  void startTrial();
+
+  /*!@brief Stops a  trial. Should only be called when a trial is currently running.
+   *              @param{reset} specifies what reset method should be used after stopping
+   */
+  void stopTrial(ResetType::Id reset = ResetType::Reset);
 
 signals:
+
+  //!@brief Should be emitted if the experiment has stopped
   void experimentStopped(bool stopped);
+
+  //!@brief Should be emitted if the actual running trial has changed
   void trialNumberChanged(int trialNumber);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -219,6 +275,13 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  /*!@brief Checks for every action sequence if its condition is fulfilled.
+   *           If this the case all actions of the sequence will be executed.
+   *           The flag initial defines that all Conditions should thread this experiment as it is on initial state.
+   */
+
+  void executeAcionSequences(bool initial = false);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -226,21 +289,41 @@ protected:
   // none yet
 
 private:
-  cedar::aux::StringParameterPtr _mFileName;
-  cedar::aux::UIntParameterPtr _mRepetitions;
+
+  //!@brief The group of this experiment belongs
   cedar::proc::GroupPtr mGroup;
 
   //! Used for starting all triggers in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
+  cedar::aux::CallFunctionInThreadPtr mStartGroup;
 
   //! Used for stopping all triggers in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
+  cedar::aux::CallFunctionInThreadPtr mStopGroup;
 
+  //!@brief The currently running trial. It is 0 if no trial is running
+  unsigned int mActualTrial;
 
-  ActionSequencelListParameterPtr _mActionSequences;
-  unsigned int mRepetitionCounter;
+  //!@brief The flag stores if the experiment is on initial state
   bool mInit;
+
+  //!@brief The flag sores if there is currently no trial running
   bool mStopped;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+
+  //!@brief The filename of the experiment
+  cedar::aux::StringParameterPtr _mFileName;
+
+  //!@brief The number of trials this experiment should run Through
+  cedar::aux::UIntParameterPtr _mTrials;
+
+  //!@brief The list of action sequences containing to the experiment
+  ActionSequencelListParameterPtr _mActionSequences;
 
 }; // class cedar::proc::experiment::Experiment
 
