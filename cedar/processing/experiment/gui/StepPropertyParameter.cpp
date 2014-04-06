@@ -145,7 +145,7 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateSteps()
 {
 
   mpStep->clear();
-  std::vector<std::string> steps = ExperimentControllerSingleton::getInstance()->getExperiment()->getGroupSteps();
+  std::vector<std::string> steps = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getGroupSteps();
   for (std::string step : steps)
   {
    mpStep->addItem(QString::fromStdString(step));
@@ -167,17 +167,17 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
   {
     case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
     {
-      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepParameters(index, parameter->getAllowedTypes());
+      properties = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getStepParameters(index, parameter->getAllowedTypes());
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::OUTPUT:
     {
-      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::OUTPUT);
+      properties = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::OUTPUT);
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::BUFFER:
     {
-      properties = ExperimentControllerSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::BUFFER);
+      properties = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::BUFFER);
       break;
     }
   }

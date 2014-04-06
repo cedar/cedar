@@ -85,5 +85,7 @@ cedar::proc::experiment::ActionStop::~ActionStop()
 
 void cedar::proc::experiment::ActionStop::run()
 {
-    ExperimentControllerSingleton::getInstance()->getExperiment()->stopTrial(_mResetType->getValue());
+    ExperimentSuperviserPtr super = ExperimentSuperviserSingleton::getInstance();
+    super->getExperiment()->stopTrial(_mResetType->getValue());
+    super->log(_mSuccess->getValue()?"Trial success":"Trial failed",_mMessage->getValue());
 }

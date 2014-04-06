@@ -40,8 +40,10 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/processing/experiment/Experiment.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
+#include <QWriteLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -50,12 +52,15 @@
 cedar::proc::experiment::ExperimentSuperviser::ExperimentSuperviser()
 :
 mpExperiment(NULL)
+,
+mLogLock(new QReadWriteLock)
 {
 
 }
 
 cedar::proc::experiment::ExperimentSuperviser::~ExperimentSuperviser()
 {
+  delete mLogLock;
 }
 
 
@@ -74,9 +79,33 @@ void cedar::proc::experiment::ExperimentSuperviser::step(cedar::unit::Time)
 void cedar::proc::experiment::ExperimentSuperviser::setExperiment(Experiment* experiment)
 {
   this->mpExperiment = experiment;
+
 }
 cedar::proc::experiment::Experiment* cedar::proc::experiment::ExperimentSuperviser::getExperiment()
 {
   return this->mpExperiment;
 }
 
+void cedar::proc::experiment::ExperimentSuperviser::log(std::string messageType, std::string message)
+{
+  QWriteLocker locker(mLogLock);
+
+  cedar::unit::Time time= cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+
+  /* @todo Save Log in memory later
+   *
+   * const LogData data = {time, messageType, message};
+   * mLogList.push_back(data);
+   */
+
+  // Get file name
+  std::string file_name = mpExperiment->getFileName();
+  int lastindex = file_name.find_last_of(".");
+  file_name = file_name.substr(0, lastindex) + ".log";
+
+  //Open stream
+  std::ofstream output;
+  output.open(file_name, std::ios::out | std::ios::app);
+  output << time << "\t" << messageType << "\t" << message << std::endl;
+  output.close();
+}

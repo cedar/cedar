@@ -80,7 +80,7 @@ _mActionSequences
   )
 )
 {
-  ExperimentControllerSingleton::getInstance()->setExperiment(this);
+  ExperimentSuperviserSingleton::getInstance()->setExperiment(this);
 
   // Create first action sequence
   ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
@@ -140,12 +140,12 @@ void cedar::proc::experiment::Experiment::run()
   if (this->_mTrials->getValue() > 0)
   {
     this->mActualTrial = 1;
-    ExperimentControllerSingleton::getInstance()->start();
+    ExperimentSuperviserSingleton::getInstance()->start();
   }
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
-  ExperimentControllerSingleton::getInstance()->requestStop();
+  ExperimentSuperviserSingleton::getInstance()->requestStop();
   this->stopTrial();
 }
 
@@ -216,7 +216,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
   // Stop the experiment if the actual trial exceeds the number of wanted trials
   if ( mActualTrial >_mTrials->getValue() )
   {
-    ExperimentControllerSingleton::getInstance()->requestStop();
+    ExperimentSuperviserSingleton::getInstance()->requestStop();
     mActualTrial  = 0;
     emit experimentStopped(true);
   }

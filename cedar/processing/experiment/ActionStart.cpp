@@ -75,7 +75,7 @@ cedar::proc::experiment::ActionStart::~ActionStart()
 
 void cedar::proc::experiment::ActionStart::run()
 {
-  ExperimentControllerSingleton::getInstance()->getExperiment()->startTrial();
+  ExperimentSuperviserSingleton::getInstance()->getExperiment()->startTrial();
 }
 
 

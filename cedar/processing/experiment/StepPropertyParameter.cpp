@@ -211,7 +211,7 @@ cedar::proc::experiment::StepPropertyParameter::PropertyType cedar::proc::experi
 
 cedar::aux::ConstDataPtr cedar::proc::experiment::StepPropertyParameter::getData() const
 {
-  Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
+  Experiment* experiment = ExperimentSuperviserSingleton::getInstance()->getExperiment();
   if (mType==OUTPUT)
   {
       if (cedar::aux::ConstDataPtr data = experiment->
@@ -239,7 +239,7 @@ cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getPara
   {
     return cedar::aux::ParameterPtr();
   }
-  return ExperimentControllerSingleton::getInstance()->
+  return ExperimentSuperviserSingleton::getInstance()->
          getExperiment()->getStepParameter(mStep,mProperty);
 }
 
@@ -291,7 +291,7 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
   {
     return;
   }
-  Experiment* experiment = ExperimentControllerSingleton::getInstance()->getExperiment();
+  Experiment* experiment = ExperimentSuperviserSingleton::getInstance()->getExperiment();
   switch (mType)
   {
     case PARAMETER:
