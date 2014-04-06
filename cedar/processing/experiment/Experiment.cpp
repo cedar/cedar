@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/experiment/ActionStart.h"
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
@@ -64,8 +64,12 @@ cedar::aux::EnumType<cedar::proc::experiment::Experiment::CompareMethod>
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::experiment::Experiment::Experiment(cedar::proc::GroupPtr group)
 :
+mGroup(group),
+mActualTrial(0),
+mInit(false),
+mStopped(true),
 _mFileName(new cedar::aux::StringParameter(this, "filename", "")),
-_mRepetitions(new cedar::aux::UIntParameter(this, "repetitions", 1)),
+_mTrials(new cedar::aux::UIntParameter(this, "repetitions", 1)),
 _mActionSequences
 (
   new ActionSequencelListParameter
@@ -75,21 +79,17 @@ _mActionSequences
     std::vector<ActionSequencePtr>()
   )
 )
-,
-mRepetitionCounter(0),
-mInit(false),
-mStopped(true)
 {
   ExperimentControllerSingleton::getInstance()->setExperiment(this);
-  this->mGroup = group;
 
+  // Create first action sequence
   ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
   as->addAction(ActionPtr(new ActionStart()));
   as->setName("ActionSequence1");
   this->addActionSequence(as);
 
-
-  this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+  // Initialize Group starter and stopper
+  this->mStartGroup = cedar::aux::CallFunctionInThreadPtr
                               (
                                 new cedar::aux::CallFunctionInThread
                                 (
@@ -97,7 +97,7 @@ mStopped(true)
                                 )
                               );
 
-  this->mStopThreadsCaller  = cedar::aux::CallFunctionInThreadPtr
+  this->mStopGroup  = cedar::aux::CallFunctionInThreadPtr
                              (
                                new cedar::aux::CallFunctionInThread
                                (
@@ -124,38 +124,40 @@ void cedar::proc::experiment::Experiment::setFileName(const std::string& filenam
   _mFileName->setValue(filename);
 }
 
-unsigned int cedar::proc::experiment::Experiment::getRepetitions() const
+unsigned int cedar::proc::experiment::Experiment::getTrialCount() const
 {
-  return _mRepetitions->getValue();
+  return _mTrials->getValue();
 }
 
-void cedar::proc::experiment::Experiment::setRepetitions(unsigned int repetitions)
+void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions)
 {
-  _mRepetitions->setValue(repetitions);
+  _mTrials->setValue(repetitions);
 }
 
 void cedar::proc::experiment::Experiment::run()
 {
 
-  if (this->_mRepetitions->getValue() > 0)
+  if (this->_mTrials->getValue() > 0)
   {
-    this->mRepetitionCounter = 1;
+    this->mActualTrial = 1;
     ExperimentControllerSingleton::getInstance()->start();
   }
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
   ExperimentControllerSingleton::getInstance()->requestStop();
-  this->stopNetwork();
+  this->stopTrial();
 }
 
-void cedar::proc::experiment::Experiment::startNetwork()
+void cedar::proc::experiment::Experiment::startTrial()
 {
   mStopped=false;
-  emit trialNumberChanged(mRepetitionCounter);
+  emit trialNumberChanged(mActualTrial);
   cedar::aux::GlobalClockSingleton::getInstance()->start();
   cedar::aux::RecorderSingleton::getInstance()->start();
-  this->mStartThreadsCaller->start();
+  this->mStartGroup->start();
+
+  //@todo Sleep to handle incorrect stops if the trigger running to short
   cedar::aux::usleep(100000);
 }
 
@@ -174,12 +176,14 @@ std::vector<cedar::proc::experiment::ActionSequencePtr> cedar::proc::experiment:
   return ret;
 }
 
-void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
+void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
 {
-  this->mStopThreadsCaller->start();
+  this->mStopGroup->start();
   cedar::aux::RecorderSingleton::getInstance()->stop();
   cedar::aux::GlobalClockSingleton::getInstance()->stop();
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
+
+  // Apply the different reset types
   switch(reset)
   {
     case ResetType::None:
@@ -207,20 +211,22 @@ void cedar::proc::experiment::Experiment::stopNetwork(ResetType::Id reset)
       break;
     }
   }
-  mRepetitionCounter++;
-  if ( mRepetitionCounter >_mRepetitions->getValue() )
+  mActualTrial++;
+
+  // Stop the experiment if the actual trial exceeds the number of wanted trials
+  if ( mActualTrial >_mTrials->getValue() )
   {
     ExperimentControllerSingleton::getInstance()->requestStop();
-    mRepetitionCounter  = 0;
+    mActualTrial  = 0;
     emit experimentStopped(true);
   }
   mStopped=true;
-  emit trialNumberChanged(mRepetitionCounter);
+  emit trialNumberChanged(mActualTrial);
 }
 
 void cedar::proc::experiment::Experiment::executeAcionSequences(bool initial)
 {
-  this->mInit= initial;
+  this->mInit = initial;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
     if(action_sequence->getCondition()->check())
@@ -252,7 +258,7 @@ bool cedar::proc::experiment::Experiment::isOnInit()
   return mInit;
 }
 
-std::vector<std::string> cedar::proc::experiment::Experiment::getAllSteps()
+std::vector<std::string> cedar::proc::experiment::Experiment::getGroupSteps()
 {
   std::vector<std::string> ret;
   for (auto name_element_pair : this->mGroup->getElements())
@@ -274,6 +280,7 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(
   {
     try
     {
+      // Check if parameter is registered in the DeclarationManager
       std::string parameter_type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
       if(allowedTypes.size() > 0)
       {
@@ -306,7 +313,7 @@ cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(s
   return stepItem->getParameter(parameter);
 }
 
-std::vector<std::string> cedar::proc::experiment::Experiment::getStepValues(std::string step, cedar::proc::DataRole::Id role )
+std::vector<std::string> cedar::proc::experiment::Experiment::getStepDatas(std::string step, cedar::proc::DataRole::Id role )
 {
   cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
 
@@ -318,20 +325,15 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepValues(std:
   return ret;
 }
 
-cedar::aux::ConstDataPtr cedar::proc::experiment::Experiment::getStepValue(std::string step, std::string value,cedar::proc::DataRole::Id role)
+cedar::aux::ConstDataPtr cedar::proc::experiment::Experiment::getStepData(std::string step, std::string value,cedar::proc::DataRole::Id role)
 {
   cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
   return stepItem->getData(role,value);
 }
 
-void cedar::proc::experiment::Experiment::onInit(bool status)
+unsigned int cedar::proc::experiment::Experiment::getActualTrial()
 {
-  mInit=status;
-}
-
-unsigned int cedar::proc::experiment::Experiment::getTrialNumber()
-{
-  return this->mRepetitionCounter;
+  return this->mActualTrial;
 }
 bool cedar::proc::experiment::Experiment::hasStopped()
 {

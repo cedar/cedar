@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ConditionOnTrial.h"
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/processing/experiment/Experiment.h"
 
 
@@ -61,8 +61,6 @@ namespace
 cedar::proc::experiment::ConditionOnTrial::ConditionOnTrial()
 :
 _mTrial(new cedar::aux::UIntParameter(this,"on trial",1))
-,
-mActivatedFlag(false)
 {
 }
 
@@ -76,7 +74,7 @@ cedar::proc::experiment::ConditionOnTrial::~ConditionOnTrial()
 bool cedar::proc::experiment::ConditionOnTrial::check()
 {
   Experiment* p_experiment = cedar::proc::experiment::ExperimentControllerSingleton::getInstance()->getExperiment();
-  if (p_experiment->getTrialNumber() == _mTrial->getValue() && p_experiment->isOnInit())
+  if (p_experiment->getActualTrial() == _mTrial->getValue() && p_experiment->isOnInit())
   {
     return true;
   }

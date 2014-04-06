@@ -41,19 +41,18 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/experiment/Action.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ActionStart.fwd.h"
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/experiment/Experiment.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief Starts a trial of the experiment framework
  *
- * @todo describe more.
+ *            This Action should only be called a single time in the initial condition
  */
 class cedar::proc::experiment::ActionStart : public cedar::proc::experiment::Action
 {
@@ -75,6 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Starts a trial of the experiment framework
   void run();
 
   //--------------------------------------------------------------------------------------------------------------------

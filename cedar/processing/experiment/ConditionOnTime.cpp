@@ -58,9 +58,9 @@ namespace
 
 cedar::proc::experiment::ConditionOnTime::ConditionOnTime()
 :
-_mTime( new cedar::aux::TimeParameter(this,"Time",cedar::unit::Time()))
-,
 mActivated(false)
+,
+_mTime( new cedar::aux::TimeParameter(this,"Time",cedar::unit::Time()))
 {
 
 }
@@ -76,12 +76,14 @@ cedar::proc::experiment::ConditionOnTime::~ConditionOnTime()
 
 bool cedar::proc::experiment::ConditionOnTime::check()
 {
+  // reset the activated flag if the time is below the time to check
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
-  if(time < _mTime->getValue())
+  if (time < _mTime->getValue())
   {
     mActivated = false;
   }
-  else if(!mActivated)
+  // only trigger the condition if it has not been activated before
+  else if (!mActivated)
   {
     mActivated = true;
     return true;

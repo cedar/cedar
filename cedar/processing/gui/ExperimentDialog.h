@@ -54,7 +54,7 @@
 #endif
 
 
-/*!@brief A widget for
+/*!@brief A widget for setting up, save and load experiments
  */
 class cedar::proc::gui::ExperimentDialog : public QWidget, public Ui_ExperimentDialog
 {
@@ -83,29 +83,49 @@ public:
 
 
 public slots:
+  //!@brief Redraws the action sequences of the widget
   void redraw();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void paintEvent(QPaintEvent *pe);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Removes all ActionSequences from the widged
   void clearActionSequences();
 private slots:
-    void save();
-    void saveAs();
-    void load();
-    void nameChanged();
-    void addActionSequence();
-    void repetitionChanged();
-    void runExperiment(bool status);
-    void experimentStopped(bool status);
-    void repetitionNumberChanged(int number);
 
+
+  //!@brief Saves the experiment
+  void save();
+
+  //!@brief Saves the experiment to a new file
+  void saveAs();
+
+  //!@brief Loads the experiment
+  void load();
+
+  //!@brief Changes the name of the experiment
+  void nameChanged();
+
+  //!@brief Adds a new action sequence to the experiments
+  void addActionSequence();
+
+  //!@brief Sets the number of trials of the experiment
+  void trialChanged();
+
+  //!@brief Starts or stops the experiment
+  void runExperiment(bool status);
+
+  //!@brief Tells the GUI when the experiment has been stopped
+  void experimentStopped(bool status);
+
+  //!@brief Tells the GUI when the actual trial number has changed
+  void trialNumberChanged(int number);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -113,7 +133,10 @@ private slots:
 protected:
   // none yet
 private:
+  //!@brief The parent IDE
   cedar::proc::gui::Ide* mParent;
+
+  //!@brief The pointer to the experiment
   cedar::proc::experiment::ExperimentPtr experiment;
 
 }; // class cedar::proc::gui::ExperimentDialog

@@ -50,9 +50,8 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief Checks if the current trial has the number provided by this condition
  *
- * @todo describe more.
  */
 class cedar::proc::experiment::ConditionOnTrial : public cedar::proc::experiment::Condition
 {
@@ -74,6 +73,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Checks if the current trial has the number provided by this condition
   bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,8 +103,8 @@ protected:
   // none yet
 
 private:
+ //!@brief The trial number that has to been reached
  cedar::aux::UIntParameterPtr _mTrial;
- bool mActivatedFlag;
 
 }; // class cedar::proc::experiment::ConditionOnTrial
 

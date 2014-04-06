@@ -62,13 +62,14 @@ cedar::proc::experiment::gui::ActionSequence::ActionSequence(
     cedar::proc::gui::ExperimentDialog* pParent
     )
 :
-QWidget(pParent)
-,
-mCondition(NULL), conditionRow(new QVBoxLayout),mActions (new QVBoxLayout)
+QWidget(pParent),
+mLayout(new QVBoxLayout()),
+mCondition(NULL),
+mSequence(sequence),
+mpParent(pParent),
+conditionRow(new QVBoxLayout),
+mActions (new QVBoxLayout)
 {
-  this->mSequence=sequence;
-  this->mpParent=pParent;
-  this->mLayout = new QVBoxLayout();
   this->setLayout(mLayout);
   this->mActions->setMargin(20);
   this->conditionRow->setAlignment(Qt::AlignTop);
@@ -95,6 +96,7 @@ void cedar::proc::experiment::gui::ActionSequence::remove()
 void cedar::proc::experiment::gui::ActionSequence::update()
 {
   clear(mLayout);
+
   //Add Name Label and Remove Button
   QHBoxLayout* nameRow = new QHBoxLayout;
   cedar::aux::ParameterPtr nameParameter = this->mSequence->getParameter("name");
@@ -110,6 +112,7 @@ void cedar::proc::experiment::gui::ActionSequence::update()
 
 
   QVBoxLayout* body = new QVBoxLayout;
+
   //Add Condition
   QLabel* condition_text = new QLabel(QString::fromStdString("Condition:"));
   conditionRow->addWidget(condition_text);
@@ -157,23 +160,10 @@ void cedar::proc::experiment::gui::ActionSequence::update()
 }
 void cedar::proc::experiment::gui::ActionSequence::updateCondition()
 {
-  try
-  {
-    delete mCondition;
-    mCondition = new cedar::proc::experiment::gui::ExperimentItemWidget();
-    mCondition->display(mSequence->getCondition());
-    conditionRow->addWidget(mCondition);
-  }
-  catch (cedar::aux::UnknownTypeException& e)
-  {
-    if (conditionRow->count()==3)
-    {
-      delete conditionRow->takeAt(2)->widget();
-    }
-    cedar::aux::gui::Configurable* configurbleWidget = new cedar::aux::gui::Configurable(this);
-    configurbleWidget->display(mSequence->getCondition());
-    conditionRow->addWidget(configurbleWidget);
-  }
+  delete mCondition;
+  mCondition = new cedar::proc::experiment::gui::ExperimentItemWidget();
+  mCondition->display(mSequence->getCondition());
+  conditionRow->addWidget(mCondition);
 }
 
 void cedar::proc::experiment::gui::ActionSequence::updateActions()
@@ -182,23 +172,14 @@ void cedar::proc::experiment::gui::ActionSequence::updateActions()
 
   for (cedar::proc::experiment::ActionPtr action : mSequence->getActions())
   {
-    try
-    {
-      cedar::proc::experiment::gui::ExperimentItemWidget* actionWidget =
-          new cedar::proc::experiment::gui::ExperimentItemWidget();
-      actionWidget->display(action);
-      QHBoxLayout* row = new QHBoxLayout();
-      std::string name = cedar::proc::experiment::ActionManagerSingleton::getInstance()->getTypeId(action);
-      row->addWidget(new QLabel(QString::fromStdString(name)));
-      row->addWidget(actionWidget);
-      mActions->addLayout(row);
-    }
-     catch (cedar::aux::UnknownTypeException& e)
-     {
-       cedar::aux::gui::Configurable* configurbleWidget = new cedar::aux::gui::Configurable(this);
-       configurbleWidget->display(action);
-       conditionRow->addWidget(configurbleWidget);
-     }
+    cedar::proc::experiment::gui::ExperimentItemWidget* actionWidget =
+        new cedar::proc::experiment::gui::ExperimentItemWidget();
+    actionWidget->display(action);
+    QHBoxLayout* row = new QHBoxLayout();
+    std::string name = cedar::proc::experiment::ActionManagerSingleton::getInstance()->getTypeId(action);
+    row->addWidget(new QLabel(QString::fromStdString(name)));
+    row->addWidget(actionWidget);
+    mActions->addLayout(row);
   }
 }
 

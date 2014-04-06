@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ActionStop.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/ExperimentController.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.h"
 
 
 // SYSTEM INCLUDES
@@ -65,13 +65,13 @@ _mResetType
   new cedar::aux::EnumParameter
   (
     this,
-    "reset type",
+    "Reset type",
     cedar::proc::experiment::Experiment::ResetType::typePtr(),
     cedar::proc::experiment::Experiment::ResetType::Reset
   )
 ),
 _mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
-_mSuccessMessage(new cedar::aux::StringParameter(this,"Success Message",""))
+_mMessage(new cedar::aux::StringParameter(this,"Message",""))
 {
 }
 
@@ -85,5 +85,5 @@ cedar::proc::experiment::ActionStop::~ActionStop()
 
 void cedar::proc::experiment::ActionStop::run()
 {
-    ExperimentControllerSingleton::getInstance()->getExperiment()->stopNetwork(_mResetType->getValue());
+    ExperimentControllerSingleton::getInstance()->getExperiment()->stopTrial(_mResetType->getValue());
 }

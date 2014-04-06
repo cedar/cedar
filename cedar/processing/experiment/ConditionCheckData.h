@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,39 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTime.h
+    File:        ConditionCheckValue.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 19
+    Date:        2014 02 06
 
-    Description: Header file for the class cedar::proc::experiment::ConditionOnTime.
+    Description: Header file for the class cedar::proc::experiment::ConditionCheckValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/TimeParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
+
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionOnTime.fwd.h"
+#include "cedar/processing/experiment/ConditionCheckData.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Checks if a the current trial time is greater than the time provided by this condition
+/*!@brief Checks if the data of a step fulfills the condition
  *
- *        This condition is only activated once after the trial time reaches the value
+ *      If the data is of type MatData, this condition will check if every
+ *      single element of the matrix fulfills the condition.
  */
-class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::ConditionCheckData : public cedar::proc::experiment::Condition
 {
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -64,17 +70,18 @@ class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ConditionOnTime();
+  ConditionCheckData();
 
   //!@brief Destructor
-  virtual ~ConditionOnTime();
+  virtual ~ConditionCheckData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //@brief Checks if a the current trial time is greater than the time provided by this condition
+  //!@brief Checks if the data of a step fulfills the condition
   bool check();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,8 +101,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief This flag will be used to check if this condition als already been triggered during this trial
-  bool mActivated;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -104,10 +110,16 @@ protected:
   // none yet
 
 private:
-  //!@brief The time that has to been reached by the trial time
-  cedar::aux::TimeParameterPtr _mTime;
+  //!@brief The step data to check
+  cedar::proc::experiment::StepPropertyParameterPtr _stepData;
 
-}; // class cedar::proc::experiment::ConditionOnTime
+  //!@brief The compare method. Can be greater, lower or equal
+  cedar::aux::EnumParameterPtr _mCompareMethode;
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+  //!@brief The value the step data is compared to
+  cedar::aux::DoubleParameterPtr _desiredValue;
+
+}; // class cedar::proc::experiment::ConditionCheckValue
+
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
 

@@ -60,14 +60,16 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
   );
   this->experiment->setName("TestExperiment");
   this->setupUi(this);
+
+  // Connect the GUI elements
   connect(this->saveButton, SIGNAL(clicked()), this, SLOT(save()));
   connect(this->loadButton, SIGNAL(clicked()), this, SLOT(load()));
   connect(this->saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
   connect(this->nameEdit, SIGNAL(editingFinished()), this, SLOT(nameChanged()));
   connect(this->runButton, SIGNAL(toggled(bool)), this, SLOT(runExperiment(bool)));
   connect(this->experiment.get(), SIGNAL(experimentStopped(bool)), this, SLOT(experimentStopped(bool)));
-  connect(this->experiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(repetitionNumberChanged(int)));
-  connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(repetitionChanged()));
+  connect(this->experiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
+  connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(trialChanged()));
   connect(this->mAddActionSequence,SIGNAL(clicked()),this,SLOT(addActionSequence()));
 
   this->redraw();
@@ -116,7 +118,7 @@ void cedar::proc::gui::ExperimentDialog::load()
     this->experiment->readJson(filename);
     this->experiment->setFileName(filename);
     this->nameEdit->setText(QString::fromStdString(this->experiment->getName()));
-    this->repetitionSpinBox->setValue(this->experiment->getRepetitions());
+    this->repetitionSpinBox->setValue(this->experiment->getTrialCount());
   }
   this->redraw();
 }
@@ -128,9 +130,9 @@ void cedar::proc::gui::ExperimentDialog::nameChanged()
 }
 
 
-void cedar::proc::gui::ExperimentDialog::repetitionChanged()
+void cedar::proc::gui::ExperimentDialog::trialChanged()
 {
-  this->experiment->setRepetitions(this->repetitionSpinBox->value());
+  this->experiment->setTrialCount(this->repetitionSpinBox->value());
 }
 
 
@@ -141,12 +143,6 @@ void cedar::proc::gui::ExperimentDialog::clearActionSequences()
     delete child->widget();
     delete child;
   }
-}
-
-void cedar::proc::gui::ExperimentDialog::paintEvent(QPaintEvent* pe)
-{
-  QWidget::paintEvent(pe);
-  //this->redraw();
 }
 
 void cedar::proc::gui::ExperimentDialog::addActionSequence()
@@ -199,7 +195,7 @@ void cedar::proc::gui::ExperimentDialog::experimentStopped(bool status)
   }
 }
 
-void cedar::proc::gui::ExperimentDialog::repetitionNumberChanged(int number)
+void cedar::proc::gui::ExperimentDialog::trialNumberChanged(int number)
 {
   this->mActualRepetition->setText(QString::number(number));
 }
@@ -209,26 +205,11 @@ void cedar::proc::gui::ExperimentDialog::redraw()
   this->clearActionSequences();
   std::vector<cedar::proc::experiment::ActionSequencePtr> action_sequences =
       this->experiment->getActionSequences();
-  for(unsigned int i=0; i < action_sequences.size();i++)
+  for (unsigned int i = 0; i < action_sequences.size(); i++)
   {
     cedar::proc::experiment::ActionSequencePtr action_seq =action_sequences[i];
     cedar::proc::experiment::gui::ActionSequence* as_gui
       = new cedar::proc::experiment::gui::ActionSequence(action_seq,this);
     this->mActionSequences->addWidget(as_gui);
-
-/*
-    cedar::aux::ParameterPtr condition = action_seq->getParameter("Condition");
-    cedar::aux::gui::Parameter *p_widget
-      = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(condition)->allocateRaw();
-    p_widget->setParent(this);
-    p_widget->setParameter(condition);
-    this->mActionSequences->addWidget(p_widget);
-
-    cedar::aux::ParameterPtr action = action_seq->getParameter("ActionSet");
-        p_widget = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(action)->allocateRaw();
-        p_widget->setParent(this);
-        p_widget->setParameter(action);
-        this->mActionSequences->addWidget(p_widget);
-*/
   }
 }
