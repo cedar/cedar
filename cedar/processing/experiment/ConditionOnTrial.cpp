@@ -73,7 +73,7 @@ cedar::proc::experiment::ConditionOnTrial::~ConditionOnTrial()
 //----------------------------------------------------------------------------------------------------------------------
 bool cedar::proc::experiment::ConditionOnTrial::check()
 {
-  Experiment* p_experiment = cedar::proc::experiment::ExperimentControllerSingleton::getInstance()->getExperiment();
+  Experiment* p_experiment = cedar::proc::experiment::ExperimentSuperviserSingleton::getInstance()->getExperiment();
   if (p_experiment->getActualTrial() == _mTrial->getValue() && p_experiment->isOnInit())
   {
     return true;

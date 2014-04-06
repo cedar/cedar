@@ -169,7 +169,7 @@ void cedar::proc::gui::ExperimentDialog::runExperiment(bool status)
   else
   {
     QMessageBox::StandardButton cancel = QMessageBox::warning(this,"Cancel Experiment",
-        "Do you really want to cancel this experiment", QMessageBox::Yes|QMessageBox::No);
+        "Do you really want to cancel this experiment?", QMessageBox::Yes|QMessageBox::No);
     if (cancel == QMessageBox::Yes)
     {
       this->experiment->cancel();

@@ -73,5 +73,5 @@ cedar::proc::experiment::ConditionOnInit::~ConditionOnInit()
 
 bool cedar::proc::experiment::ConditionOnInit::check()
 {
-  return ExperimentControllerSingleton::getInstance()->getExperiment()->isOnInit();
+  return ExperimentSuperviserSingleton::getInstance()->getExperiment()->isOnInit();
 }

@@ -48,7 +48,7 @@
 #include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
-
+#include <QReadWriteLock>
 
 /*!@brief This thread should continuously perform the action sequences of the experiment
  *
@@ -62,9 +62,19 @@ class cedar::proc::experiment::ExperimentSuperviser : public cedar::aux::LoopedT
 
   // uses singleton template.
   friend class cedar::aux::Singleton<ExperimentSuperviser>;
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+
+  //!@brief A data structure to store all the DataPtr with time stamp (in ms) in a list.
+  struct LogData
+  {
+    cedar::unit::Time mLogTime;
+    std::string  mMessageType;
+    std::string mMessage;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -76,8 +86,6 @@ public:
   //!@brief Destructor
   virtual ~ExperimentSuperviser();
 
-//@todo
-public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,6 +95,9 @@ public:
 
   //!@brief Returns the experimen
   Experiment* getExperiment();
+
+  //!@brief Logs a message and writes it to the log file;
+  void log(std::string messageType, std::string message);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -119,6 +130,11 @@ private:
   //!@brief The experiment
   Experiment* mpExperiment;
 
+  //!@brief Lock during the logging process
+  QReadWriteLock* mLogLock;
+
+  //!@brief A memory list of the log
+  std::vector<LogData> mLogList;
 }; // class cedar::proc::experiment::ExperimentController
 
 
@@ -132,7 +148,7 @@ namespace cedar
     namespace experiment
     {
       CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::ExperimentSuperviser>);
-      typedef cedar::aux::Singleton<cedar::proc::experiment::ExperimentSuperviser> ExperimentControllerSingleton;
+      typedef cedar::aux::Singleton<cedar::proc::experiment::ExperimentSuperviser> ExperimentSuperviserSingleton;
     }
   }
 }
