@@ -165,6 +165,8 @@ public:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& root);
 
+  void readData(const cedar::aux::ConfigurationNode& root);
+
   /*!@deprecated Use readConfiguration instead.
    */
   CEDAR_DECLARE_DEPRECATED(void readFrom(const cedar::aux::ConfigurationNode& root))
@@ -175,6 +177,10 @@ public:
   /*!@brief Writes the group to a configuration node.
    */
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Writes data marked as serializable to the given configuration node.
+   */
+  void writeData(cedar::aux::ConfigurationNode& root) const;
 
   /*!@deprecated Use writeConfiguration instead.
    */

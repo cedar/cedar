@@ -66,6 +66,7 @@
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/version.h"
 
 // SYSTEM INCLUDES
@@ -200,11 +201,17 @@ mSuppressCloseDialog(false)
                    this, SLOT(architectureToolFinished()));
   QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
   QObject::connect(this->mpThreadsSingleStep, SIGNAL(triggered()), this, SLOT(stepThreads()));
-  QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()));
+  QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()))
+  ;
   QObject::connect(this->mpActionNew, SIGNAL(triggered()), this, SLOT(newFile()));
+
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
+
+  QObject::connect(this->mpActionSaveSerializableData, SIGNAL(triggered()), this, SLOT(saveSerializableDataAs()));
+  QObject::connect(this->mpActionLoadSerializableData, SIGNAL(triggered()), this, SLOT(loadSerializableData()));
+
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
@@ -896,6 +903,57 @@ bool cedar::proc::gui::Ide::save()
     this->setArchitectureChanged(false);
     return true;
   }
+}
+
+bool cedar::proc::gui::Ide::saveSerializableDataAs()
+{
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+
+  QString file = QFileDialog::getSaveFileName
+                 (
+                   this, // parent
+                   "Select where to save serializable data", // caption
+                   last_dir->getValue().absolutePath(), // initial directory;
+                   "data (*.data)" // filter(s), separated by ';;'
+                 );
+
+  if (file.isEmpty())
+  {
+    return false;
+  }
+
+  if (!file.endsWith(".data"))
+  {
+    file += ".data";
+  }
+
+  this->mGroup->getGroup()->writeDataFile(file.toStdString());
+
+  //!@todo Redundant code with other save/load functions; move to proc::gui::Settings.
+  QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  last_dir->setValue(path);
+
+  return true;
+}
+
+bool cedar::proc::gui::Ide::loadSerializableData()
+{
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+
+  QString file = QFileDialog::getOpenFileName(this, // parent
+                                              "Select which data file to load", // caption
+                                              last_dir->getValue().absolutePath(), // initial directory
+                                              "data (*.data)" // filter(s), separated by ';;'
+                                              );
+
+  if (!file.isEmpty())
+  {
+    this->mGroup->getGroup()->readDataFile(file.toStdString());
+
+    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+    last_dir->setValue(path);
+  }
+  return true;
 }
 
 bool cedar::proc::gui::Ide::saveAs()
