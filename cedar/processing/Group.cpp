@@ -1321,6 +1321,42 @@ void cedar::proc::Group::writeConfiguration(cedar::aux::ConfigurationNode& root)
   format.write(boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
 }
 
+void cedar::proc::Group::writeData(cedar::aux::ConfigurationNode& root) const
+{
+  for (auto name_element_pair : this->getElements())
+  {
+    auto element = name_element_pair.second;
+    if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
+    {
+      cedar::aux::ConfigurationNode data;
+      connectable->writeData(data);
+      if (!data.empty())
+      {
+        root.push_back(cedar::aux::ConfigurationNode::value_type(connectable->getName(), data));
+      }
+    }
+  }
+}
+
+void cedar::proc::Group::readData(const cedar::aux::ConfigurationNode& root)
+{
+  for (auto assoc_pair : root)
+  {
+    const std::string& element_name = assoc_pair.first;
+    if (!this->nameExists(element_name))
+    {
+      continue;
+    }
+
+    auto element = this->getElement(element_name);
+    if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
+    {
+      connectable->readData(assoc_pair.second);
+    }
+  }
+}
+
+
 std::set<std::string> cedar::proc::Group::getRequiredPlugins(const std::string& architectureFile)
 {
   std::set<std::string> plugins;

@@ -44,12 +44,16 @@
 #include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
-#include <boost/scoped_ptr.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/property_tree/json_parser.hpp>
+  #include <boost/scoped_ptr.hpp>
+#endif
 #include <string>
 #include <iostream>
 
@@ -90,32 +94,7 @@ void cedar::proc::Connectable::readConfiguration(const cedar::aux::Configuration
   }
 
   const auto& stored_data = stored_data_iter->second;
-
-  for (auto role_enum : cedar::proc::DataRole::type().list())
-  {
-    auto role_data_iter = stored_data.find(role_enum.name());
-
-    if (role_data_iter == stored_data.not_found())
-    {
-      continue;
-    }
-
-    const auto& role_node = role_data_iter->second;
-
-    for (const auto& subnode_iter : role_node)
-    {
-      const auto& slot_name = subnode_iter.first;
-      const auto& slot_data = subnode_iter.second.get_value<std::string>();
-
-      if (this->hasSlot(role_enum.id(), slot_name))
-      {
-        auto slot = this->getSlot(role_enum.id(), slot_name);
-        CEDAR_ASSERT(slot->getData());
-        std::stringstream stream(slot_data);
-        slot->getData()->deserialize(stream);
-      }
-    }
-  }
+  this->readData(stored_data);
 }
 
 void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode& root) const
@@ -123,6 +102,16 @@ void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode&
   cedar::proc::Element::writeConfiguration(root);
 
   cedar::aux::ConfigurationNode stored_data;
+  this->writeData(stored_data);
+
+  if (!stored_data.empty())
+  {
+    root.push_back(cedar::aux::ConfigurationNode::value_type("stored data", stored_data));
+  }
+}
+
+void cedar::proc::Connectable::writeData(cedar::aux::ConfigurationNode& stored_data) const
+{
   for (auto role_enum : cedar::proc::DataRole::type().list())
   {
     if (!this->hasRole(role_enum.id()))
@@ -149,10 +138,48 @@ void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode&
       stored_data.push_back(cedar::aux::ConfigurationNode::value_type(role_enum.name(), role_stored_data));
     }
   }
+}
 
-  if (!stored_data.empty())
+void cedar::proc::Connectable::writeDataFile(const cedar::aux::Path& file) const
+{
+  cedar::aux::ConfigurationNode data;
+  this->writeData(data);
+  boost::property_tree::write_json(file.toString(false), data);
+}
+
+void cedar::proc::Connectable::readDataFile(const cedar::aux::Path& file)
+{
+  cedar::aux::ConfigurationNode configuration;
+  boost::property_tree::read_json(file.toString(false), configuration);
+  this->readData(configuration);
+}
+
+void cedar::proc::Connectable::readData(const cedar::aux::ConfigurationNode& stored_data)
+{
+  for (auto role_enum : cedar::proc::DataRole::type().list())
   {
-    root.push_back(cedar::aux::ConfigurationNode::value_type("stored data", stored_data));
+    auto role_data_iter = stored_data.find(role_enum.name());
+
+    if (role_data_iter == stored_data.not_found())
+    {
+      continue;
+    }
+
+    const auto& role_node = role_data_iter->second;
+
+    for (const auto& subnode_iter : role_node)
+    {
+      const auto& slot_name = subnode_iter.first;
+      const auto& slot_data = subnode_iter.second.get_value<std::string>();
+
+      if (this->hasSlot(role_enum.id(), slot_name))
+      {
+        auto slot = this->getSlot(role_enum.id(), slot_name);
+        CEDAR_ASSERT(slot->getData());
+        std::stringstream stream(slot_data);
+        slot->getData()->deserialize(stream);
+      }
+    }
   }
 }
 
