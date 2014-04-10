@@ -218,16 +218,19 @@ void cedar::aux::DataSpectator::makeSnapshot()
   #endif // CEDAR_OS_WINDOWS
     boost::filesystem::create_directories(output_dir);
 
+  DataPtr data =mData->clone();
+
   // Create Ouput Path
   std::string output_path = output_dir+"/" + boost::algorithm::replace_all_copy(mName," ","_") + ".csv";
   std::ofstream output_stream;
 
   // Write the data
   output_stream.open(output_path, std::ios::out | std::ios::app);
-  mData->serializeHeader(output_stream);
+  data->serializeHeader(output_stream);
   output_stream << std::endl;
   output_stream << cedar::aux::GlobalClockSingleton::getInstance()->getTime() << ",";
-  mData->serializeData(mOutputStream);
+  data->serializeData(output_stream);
   output_stream << std::endl;
+  output_stream.close();
 
 }
