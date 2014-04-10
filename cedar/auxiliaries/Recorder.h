@@ -113,6 +113,8 @@ public:
    */
   void setRecordedProjectName(const std::string& name);
 
+  const std::string& getRecorderProjectName();
+
   //!@brief Gets the OutputDirectory
   const std::string& getOutputDirectory() const;
 
