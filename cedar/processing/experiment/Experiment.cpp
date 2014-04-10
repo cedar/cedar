@@ -136,9 +136,11 @@ void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions
 
 void cedar::proc::experiment::Experiment::run()
 {
-
   if (this->_mTrials->getValue() > 0)
   {
+    // Set record directory
+    std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
+    this->mRecordFolderName = this->_mName->getValue()+ "_" + time_stamp;
     this->mActualTrial = 1;
     ExperimentSuperviserSingleton::getInstance()->start();
   }
@@ -154,6 +156,12 @@ void cedar::proc::experiment::Experiment::startTrial()
   mStopped=false;
   emit trialNumberChanged(mActualTrial);
   cedar::aux::GlobalClockSingleton::getInstance()->start();
+
+  //start records
+  std::stringstream ss;
+  ss << mActualTrial;
+  std::string trial_number = ss.str();
+  cedar::aux::RecorderSingleton::getInstance()->setSubfolder(mRecordFolderName+"/"+"Trial_"+trial_number+"_#T#");
   cedar::aux::RecorderSingleton::getInstance()->start();
   this->mStartGroup->start();
 
