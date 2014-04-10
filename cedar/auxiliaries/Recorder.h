@@ -105,6 +105,9 @@ public:
   //!@brief Unregister all DataPtr.
   void clear();
 
+  //!@brief Saves the records in a special folder just for one session
+  void setSubfolder(const std::string& subfolderName);
+
   //!brief Takes a snapshot of all registered DataPtr
   void takeSnapshot();
 
@@ -113,6 +116,7 @@ public:
    */
   void setRecordedProjectName(const std::string& name);
 
+  //!@brief Returns the directory the recorded data will be written to.
   const std::string& getRecorderProjectName();
 
   //!@brief Gets the OutputDirectory
@@ -145,6 +149,9 @@ public:
 
   //!@brief Changes the name of the DataPtr.
   void renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName);
+
+  //!@brief Returns the current time formattedin a string
+  std::string getTimeStamp();
 
   //!@brief Returns all registered DataPtr by name and their record interval
   std::map<std::string, cedar::unit::Time> getRegisteredData() const;
@@ -194,6 +201,8 @@ private:
 
   //!@brief The name of the project that will be recorded
   std::string mProjectName;
+
+  std::string mSubFolder;
 
 };
 

@@ -209,16 +209,12 @@ void cedar::aux::DataSpectator::makeSnapshot()
 {
   // Create Directory
   std::string project_name = cedar::aux::RecorderSingleton::getInstance()->getRecorderProjectName();
-  #ifdef CEDAR_OS_WINDOWS
-    std::string output_dir = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
-                           + "/"+project_name+"/Snapshots/snapshot_"+ QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mmss").toStdString();
-  #else // CEDAR_OS_WINDOWS
-    std::string output_dir = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
-                           + "/"+project_name+"/Snapshots/snapshot_"+ QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
-  #endif // CEDAR_OS_WINDOWS
-    boost::filesystem::create_directories(output_dir);
+  std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
+  std::string output_dir = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
+                           + "/"+project_name+"/Snapshots/snapshot_"+ time_stamp;
+  boost::filesystem::create_directories(output_dir);
 
-  DataPtr data =mData->clone();
+  DataPtr data = mData->clone();
 
   // Create Ouput Path
   std::string output_path = output_dir+"/" + boost::algorithm::replace_all_copy(mName," ","_") + ".csv";
