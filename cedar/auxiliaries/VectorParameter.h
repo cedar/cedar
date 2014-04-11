@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // FORWARD DECLARATIONS
@@ -111,8 +112,12 @@ class cedar::aux::VectorParameter : public cedar::aux::Parameter,
                                     public cedar::aux::StorageAbstraction<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // typedef
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::VectorParameter<T> SelfType;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SelfType);
+
 public:
   //!@brief iterator for internal container type
   typedef typename std::vector<T>::iterator iterator;
@@ -159,6 +164,28 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  bool canCopyFrom(cedar::aux::ConstParameterPtr other) const
+  {
+    return static_cast<bool>(boost::dynamic_pointer_cast<ConstSelfType>(other));
+  }
+
+  void copyValueFrom(cedar::aux::ConstParameterPtr other)
+  {
+    if (auto other_self = boost::dynamic_pointer_cast<ConstSelfType>(other))
+    {
+      this->set(other_self->getValue());
+    }
+    else
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::UnhandledTypeException,
+        "Cannot copy vector parameter value: types don't match. Type of this: " + cedar::aux::objectTypeToString(this)
+        + ", type of other: " + cedar::aux::objectTypeToString(other)
+      );
+    }
+  }
+
   //!@brief set the vector to values gathered from a configuration tree
   void readFromNode(const cedar::aux::ConfigurationNode& root)
   {
