@@ -44,6 +44,8 @@
 #include "cedar/processing/experiment/gui/ActionSequence.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QFileDialog>
@@ -72,12 +74,17 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
   connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(trialChanged()));
   connect(this->mAddActionSequence,SIGNAL(clicked()),this,SLOT(addActionSequence()));
 
+  //Time update
+  mpGroupTime = new QTimer(this);
+  connect(mpGroupTime, SIGNAL(timeout()), this, SLOT(timeUpdate()));
+  mpGroupTime->start(100);
+
   this->redraw();
 }
 
 cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
 {
-
+  delete mpGroupTime;
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -212,4 +219,13 @@ void cedar::proc::gui::ExperimentDialog::redraw()
       = new cedar::proc::experiment::gui::ActionSequence(action_seq,this);
     this->mActionSequences->addWidget(as_gui);
   }
+}
+
+
+void cedar::proc::gui::ExperimentDialog::timeUpdate()
+{
+  cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  std::stringstream timeText;
+  timeText << time;
+  this->mTimeLabel->setText(QString::fromStdString(timeText.str()));
 }

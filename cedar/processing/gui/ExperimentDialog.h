@@ -52,6 +52,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif
+#include<QTimer>
 
 
 /*!@brief A widget for setting up, save and load experiments
@@ -127,6 +128,9 @@ private slots:
   //!@brief Tells the GUI when the actual trial number has changed
   void trialNumberChanged(int number);
 
+  //@brief Updates the group time in the GUI
+  void timeUpdate();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -138,6 +142,9 @@ private:
 
   //!@brief The pointer to the experiment
   cedar::proc::experiment::ExperimentPtr experiment;
+
+  //!@brief The timer to update the group time every second
+  QTimer* mpGroupTime;
 
 }; // class cedar::proc::gui::ExperimentDialog
 
