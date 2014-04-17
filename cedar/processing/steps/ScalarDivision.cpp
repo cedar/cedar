@@ -139,7 +139,14 @@ void cedar::proc::steps::ScalarDivision::inputConnectionChanged(const std::strin
     this->mMatrix = mat_data;
 
     // allocate an output matrix of appropriate size
-    this->mResult->setData(mat_data->getData().clone());
+    if (mat_data)
+    {
+      this->mResult->setData(mat_data->getData().clone());
+    }
+    else
+    {
+      this->mResult->setData(cv::Mat());
+    }
 
     // tell successive steps that the output changed
     this->emitOutputPropertiesChangedSignal("result");
