@@ -42,6 +42,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/ScalarDivision.fwd.h"
@@ -54,6 +56,8 @@
  */
 class cedar::proc::steps::ScalarDivision : public cedar::proc::Step
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -85,6 +89,9 @@ private:
 
   void inputConnectionChanged(const std::string& slotName);
 
+private slots:
+  void zeroDivisionTreatmentChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -104,7 +111,11 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! When active, the user can choose what value to use for divisions-by-zero
+  cedar::aux::BoolParameterPtr _mTreatDivZero;
+
+  //! Value used for division instead of zero.
+  cedar::aux::DoubleParameterPtr _mDivZeroReplacement;
 
 }; // class cedar::proc::steps::ScalarDivision
 

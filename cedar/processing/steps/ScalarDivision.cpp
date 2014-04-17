@@ -84,7 +84,9 @@ namespace
 
 cedar::proc::steps::ScalarDivision::ScalarDivision()
 :
-mResult(new cedar::aux::MatData(cv::Mat()))
+mResult(new cedar::aux::MatData(cv::Mat())),
+_mTreatDivZero(new cedar::aux::BoolParameter(this, "treat division by zero", false)),
+_mDivZeroReplacement(new cedar::aux::DoubleParameter(this, "zero divisor replacement", 0.000001, cedar::aux::DoubleParameter::LimitType::positiveZero()))
 {
   auto matrix_slot = this->declareInput("matrix");
   cedar::proc::typecheck::Matrix matrix_check;
@@ -98,17 +100,35 @@ mResult(new cedar::aux::MatData(cv::Mat()))
   divisor_slot->setCheck(divisor_check);
 
   this->declareOutput("result", this->mResult);
+
+  QObject::connect(this->_mTreatDivZero.get(), SIGNAL(valueChanged()), this, SLOT(zeroDivisionTreatmentChanged()));
+  QObject::connect(this->_mDivZeroReplacement.get(), SIGNAL(valueChanged()), this, SLOT(zeroDivisionTreatmentChanged()));
+  this->_mDivZeroReplacement->setConstant(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::ScalarDivision::zeroDivisionTreatmentChanged()
+{
+  this->_mDivZeroReplacement->setConstant(this->_mTreatDivZero->getValue() != true);
+  this->onTrigger();
+}
+
 void cedar::proc::steps::ScalarDivision::compute(const cedar::proc::Arguments&)
 {
-  double divisor = static_cast<double>(this->mDivisor->getData().at<float>(0, 0));
+  float divisor = this->mDivisor->getData().at<float>(0, 0);
   const cv::Mat& matrix = this->mMatrix->getData();
-  this->mResult->setData(matrix / divisor);
+
+  if (this->_mTreatDivZero->getValue() && std::abs(divisor) <= std::numeric_limits<float>::epsilon())
+  {
+    this->mResult->setData(matrix / this->_mDivZeroReplacement->getValue());
+  }
+  else
+  {
+    this->mResult->setData(matrix / divisor);
+  }
 }
 
 void cedar::proc::steps::ScalarDivision::inputConnectionChanged(const std::string& slotName)
@@ -117,6 +137,12 @@ void cedar::proc::steps::ScalarDivision::inputConnectionChanged(const std::strin
   if (slotName == "matrix")
   {
     this->mMatrix = mat_data;
+
+    // allocate an output matrix of appropriate size
+    this->mResult->setData(mat_data->getData().clone());
+
+    // tell successive steps that the output changed
+    this->emitOutputPropertiesChangedSignal("result");
   }
   else if (slotName == "divisor")
   {
