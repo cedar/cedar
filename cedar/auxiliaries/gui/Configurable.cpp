@@ -78,8 +78,10 @@ mConfigurableWidget(configurableWidget)
 
 cedar::aux::gui::Configurable::DataDelegate::~DataDelegate()
 {
-  for (auto widget : mOpenedEditors)
+  while (!this->mOpenedEditors.empty())
   {
+    auto widget = *(this->mOpenedEditors.begin());
+    // this will also remove the widget from the set of open editors via cedar::aux::gui::Configurable::DataDelegate::widgetDestroyed.
     delete widget;
   }
 }
