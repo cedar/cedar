@@ -101,7 +101,7 @@ public:
   //! Map from action names to their corresponding functions.
   typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
 
-private:
+public:
   class Locker : public cedar::aux::LockerBase
   {
     public:
