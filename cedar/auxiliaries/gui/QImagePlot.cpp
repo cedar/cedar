@@ -226,7 +226,7 @@ void cedar::aux::gui::QImagePlot::updateMinMax(double min, double max)
 
 void cedar::aux::gui::QImagePlot::valueLimitsChanged()
 {
-  if (!this->isAutoScaling())
+  if (!this->isAutoScaling() && this->mpLegend)
   {
     this->mpLegend->updateMinMax(this->getValueLimits().getLower(), this->getValueLimits().getUpper());
   }
