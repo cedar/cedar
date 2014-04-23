@@ -779,12 +779,16 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
 
   //!@todo Does the name/group thing actually do anything, or can it be removed?
   generic.put("group", this->mGroup->getName());
-  // add open plots to architecture
-  cedar::aux::ConfigurationNode node;
-  this->writeOpenPlotsTo(node);
-  generic.put_child("open plots", node);
-  // add plot groups to architecture
-  generic.put_child("plot groups", this->mPlotGroupsNode);
+  //!@todo There is a more elegant way to do this - investigate!
+  if (this->getGroup()->isRoot())
+  {
+    // add open plots to architecture
+    cedar::aux::ConfigurationNode node;
+    this->writeOpenPlotsTo(node);
+    generic.put_child("open plots", node);
+    // add plot groups to architecture
+    generic.put_child("plot groups", this->mPlotGroupsNode);
+  }
 
   if (this->mBackgroundColor.isValid())
   {
