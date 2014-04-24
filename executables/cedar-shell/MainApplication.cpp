@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/make_shared.hpp>
+#include <QTime>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -134,5 +135,8 @@ void cedar::processingCL::MainApplication::loadArchitecture(const std::string& p
   std::cout << std::endl;
 
   this->mArchitecture = boost::make_shared<cedar::proc::Group>();
+  QTime timer;
+  timer.start();
   this->mArchitecture->readJson(path);
+  std::cout << "Loading done, it took " << timer.elapsed() << " ms." << std::endl;
 }
