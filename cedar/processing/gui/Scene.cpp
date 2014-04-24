@@ -295,7 +295,7 @@ void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent
 {
   if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
-    pEvent->acceptProposedAction();
+//    pEvent->acceptProposedAction();
   }
 }
 
@@ -303,8 +303,24 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
-    pEvent->acceptProposedAction();
+    auto declaration = this->declarationFromDrop(pEvent);
+    if (declaration == nullptr)
+    {
+      return;
+    }
+
+    if (pEvent->modifiers().testFlag(Qt::ControlModifier) && dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr)
+    {
+      pEvent->setDropAction(Qt::LinkAction);
+    }
+    else
+    {
+      pEvent->setDropAction(Qt::CopyAction);
+    }
+
+    pEvent->accept();
   }
+
 
   QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
   if (p_item != this->mpDropTarget)
@@ -324,12 +340,49 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
+  auto declaration = this->declarationFromDrop(pEvent);
+  if (declaration == nullptr)
+  {
+    return;
+  }
 
   // the drop target must be reset, even if something goes wrong; so: do it now by remembering the target in another
   // variable.
   auto drop_target = this->mpDropTarget;
   this->mpDropTarget = NULL;
+
+  QPointF mapped = pEvent->scenePos();
+  auto target_group = this->getRootGroup()->getGroup();
+  if (auto group = dynamic_cast<cedar::proc::gui::Group*>(drop_target))
+  {
+    group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    target_group = group->getGroup();
+    mapped -= group->scenePos();
+  }
+
+  if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(declaration))
+  {
+    this->createElement(target_group, elem_declaration->getClassName(), mapped);
+  }
+  else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration))
+  {
+    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
+        (
+          group_declaration->getClassName(),
+          this->getRootGroup()->getGroup(),
+          pEvent->modifiers().testFlag(Qt::ControlModifier)
+        );
+    this->getGraphicsItemFor(elem.get())->setPos(mapped);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
+  }
+}
+
+cedar::aux::PluginDeclaration* cedar::proc::gui::Scene::declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const
+{
+  ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
 
   if (tree)
   {
@@ -344,31 +397,11 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
     if (item)
     {
-      QPointF mapped = pEvent->scenePos();
-      auto target_group = this->getRootGroup()->getGroup();
-      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(drop_target))
-      {
-        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-        target_group = group->getGroup();
-        mapped -= group->scenePos();
-      }
-      auto pointer = item->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
-
-      if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(pointer))
-      {
-        this->createElement(target_group, elem_declaration->getClassName(), mapped);
-      }
-      else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(pointer))
-      {
-        cedar::proc::ElementPtr elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(group_declaration->getClassName(), this->getRootGroup()->getGroup());
-        this->getGraphicsItemFor(elem.get())->setPos(mapped);
-      }
-      else
-      {
-        CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
-      }
+      return item->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
     }
   }
+
+  return nullptr;
 }
 
 void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent)

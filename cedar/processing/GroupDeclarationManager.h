@@ -85,7 +85,21 @@ public:
 public:
   void addDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
 
-  cedar::proc::ElementPtr addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base) const;
+  /*! Adds a group template to the given group.
+   *
+   * @param templateName Name of the template to add.
+   * @param base Group to which the template is added.
+   * @param makeLink Whether the created group should be a link. Linked groups are added read-only and load the
+   *                 corresponding template from its file every time the base group is loaded.
+   * @return A pointer to the added group.
+   */
+  cedar::proc::ElementPtr addGroupTemplateToGroup
+  (
+    const std::string& templateName,
+    cedar::proc::GroupPtr base,
+    bool makeLink = false
+  )
+  const;
 
   const GroupDeclarationMap& getDefinitions() const;
 

@@ -75,42 +75,50 @@ void cedar::proc::GroupFileFormatV1::write
   if (!meta.empty())
     root.add_child("meta", meta);
 
-  cedar::aux::ConfigurationNode steps;
-  this->writeSteps(group, steps);
-  if (!steps.empty())
-    root.add_child("steps", steps);
+  if (group->isLinked())
+  {
+    root.put("linked file", group->mLinkedGroupFile);
+    root.put("linked group name", group->mLinkedGroupName);
+  }
+  else
+  {
+    cedar::aux::ConfigurationNode steps;
+    this->writeSteps(group, steps);
+    if (!steps.empty())
+      root.add_child("steps", steps);
 
-  cedar::aux::ConfigurationNode triggers;
-  this->writeTriggers(group, triggers);
-  if (!triggers.empty())
-    root.add_child("triggers", triggers);
+    cedar::aux::ConfigurationNode triggers;
+    this->writeTriggers(group, triggers);
+    if (!triggers.empty())
+      root.add_child("triggers", triggers);
 
-  cedar::aux::ConfigurationNode groups;
-  this->writeGroups(group, groups);
-  if (!groups.empty())
-    root.add_child("groups", groups);
+    cedar::aux::ConfigurationNode groups;
+    this->writeGroups(group, groups);
+    if (!groups.empty())
+      root.add_child("groups", groups);
 
-  cedar::aux::ConfigurationNode connections;
-  this->writeDataConnections(group, connections);
-  if (!connections.empty())
-    root.add_child("connections", connections);
+    cedar::aux::ConfigurationNode connections;
+    this->writeDataConnections(group, connections);
+    if (!connections.empty())
+      root.add_child("connections", connections);
 
-  cedar::aux::ConfigurationNode records;
-  this->writeRecords(group, records);
-  if (!records.empty())
-    root.add_child("records", records);
+    cedar::aux::ConfigurationNode records;
+    this->writeRecords(group, records);
+    if (!records.empty())
+      root.add_child("records", records);
 
-  cedar::aux::ConfigurationNode links;
-  this->writeParameterLinks(group, links);
-  if (!links.empty())
-    root.add_child("parameter links", links);
+    cedar::aux::ConfigurationNode links;
+    this->writeParameterLinks(group, links);
+    if (!links.empty())
+      root.add_child("parameter links", links);
 
-  cedar::aux::ConfigurationNode custom_parameters;
-  this->writeCustomParameters(group, custom_parameters);
-  if (!custom_parameters.empty())
-    root.add_child("custom parameters", custom_parameters);
+    cedar::aux::ConfigurationNode custom_parameters;
+    this->writeCustomParameters(group, custom_parameters);
+    if (!custom_parameters.empty())
+      root.add_child("custom parameters", custom_parameters);
 
-  group->cedar::aux::Configurable::writeConfiguration(root);
+    group->cedar::aux::Configurable::writeConfiguration(root);
+  }
 }
 
 void cedar::proc::GroupFileFormatV1::writeMetaData(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& meta) const
@@ -262,6 +270,14 @@ void cedar::proc::GroupFileFormatV1::read
        std::vector<std::string>& exceptions
      )
 {
+
+  auto linked_file_iter = root.find("linked file");
+  auto linked_name_iter = root.find("linked group name");
+  if (linked_file_iter != root.not_found() && linked_name_iter != root.not_found())
+  {
+    group->readLinkedGroup(linked_name_iter->second.get_value<std::string>(), linked_file_iter->second.get_value<std::string>());
+    return;
+  }
   // these have to be read before Configurable::readConfiguration is called.
   auto custom_parameters = root.find("custom parameters");
   if (custom_parameters != root.not_found())
