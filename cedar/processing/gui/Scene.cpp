@@ -194,7 +194,7 @@ void cedar::proc::gui::Scene::itemSelected()
     {
       if (p_item->getElement())
       {
-        this->mpConfigurableWidget->display(p_item->getElement());
+        this->mpConfigurableWidget->display(p_item->getElement(), p_item->isReadOnly());
       
         if(cedar::proc::StepPtr castedStep = boost::dynamic_pointer_cast<cedar::proc::Step>(p_item->getElement()))
         {

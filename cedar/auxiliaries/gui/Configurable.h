@@ -94,7 +94,7 @@ public:
    *
    * @param configurable The configurable to display.
    */
-  void display(cedar::aux::ConfigurablePtr configurable);
+  void display(cedar::aux::ConfigurablePtr configurable, bool readOnly = false);
 
   /*!@brief Clears the widget and removes any displayed parameters.
    */
@@ -191,7 +191,7 @@ class cedar::aux::gui::Configurable::DataDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 public:
-  DataDelegate(cedar::aux::ConfigurablePtr pConfigurable, cedar::aux::gui::Configurable* configurableWidget);
+  DataDelegate(cedar::aux::ConfigurablePtr pConfigurable, cedar::aux::gui::Configurable* configurableWidget, bool readOnly = false);
 
   ~DataDelegate();
 
@@ -207,6 +207,8 @@ private:
 
   // set storing all opened editors - during the destructor call, all remaining editors are deleted
   mutable std::set<QObject*> mOpenedEditors;
+
+  bool mReadOnly;
 };
 
 #endif // CEDAR_AUX_GUI_CONFIGURABLE_H
