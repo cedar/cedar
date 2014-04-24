@@ -731,6 +731,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
   QMenu menu;
   QAction* p_importGroup = menu.addAction("import group from file");
+  QAction* p_link_group = menu.addAction("link group from file");
   QAction* p_importStep = menu.addAction("import step from file");
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
@@ -747,9 +748,9 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
       p_ide->resetRootGroup();
     }
   }
-  else if (a == p_importGroup)
+  else if (a == p_importGroup || a == p_link_group)
   {
-    this->importGroup();
+    this->importGroup(a == p_link_group);
   }
   else if (a == p_importStep)
   {
@@ -1338,7 +1339,7 @@ public:
   QComboBox* mpGroupNamesBox;
 };
 
-void cedar::proc::gui::Scene::importGroup()
+void cedar::proc::gui::Scene::importGroup(bool link)
 {
 
   cedar::aux::DirectoryParameterPtr last_dir
@@ -1372,7 +1373,14 @@ void cedar::proc::gui::Scene::importGroup()
         if (result == QDialog::Accepted)
         {
           // import selected group
-          mGroup->getGroup()->importGroupFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+          if (link)
+          {
+            mGroup->getGroup()->createLinkedGroup(group_dialog->returnChosenGroup(), file.toStdString());
+          }
+          else
+          {
+            mGroup->getGroup()->importGroupFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+          }
         }
         return;
       }
