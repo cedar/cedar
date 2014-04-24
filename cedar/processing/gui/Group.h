@@ -282,6 +282,8 @@ private:
 
   void setBackgroundColor(const QColor& color);
 
+  void linkedChanged(bool readOnly);
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
@@ -358,6 +360,7 @@ private:
   boost::signals2::connection mElementRemovedConnection;
   boost::signals2::connection mTriggerConnectionChangedConnection;
   boost::signals2::connection mDataConnectionChangedConnection;
+  boost::signals2::scoped_connection mLinkedChangedConnection;
 
   //! Fit to contents-calls are temporarily disabled if this is set to true.
   bool mHoldFitToContents;

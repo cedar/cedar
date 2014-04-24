@@ -2142,10 +2142,10 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const std
       cedar::aux::ConfigurationNode& group_node = groups_node.get_child(groupName);
       // create, add, and configure
 
-      this->readConfiguration(group_node);
-
       this->mLinkedGroupFile = fileName;
       this->mLinkedGroupName = groupName;
+
+      this->readConfiguration(group_node);
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {
@@ -2162,6 +2162,8 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const std
     // could not find a "groups" node, abort
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + fileName);
   }
+
+  this->signalLinkedChanged(true);
 }
 
 cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string& groupName, const std::string& fileName)
@@ -2169,9 +2171,9 @@ cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string&
   //!@todo This code is largely redundant with importGroupFromFile
 
   cedar::proc::GroupPtr imported_group(new cedar::proc::Group());
-  this->add(imported_group, this->getUniqueIdentifier("imported group"));
   imported_group->readLinkedGroup(groupName, fileName);
   imported_group->setName(this->getUniqueIdentifier(groupName));
+  this->add(imported_group, this->getUniqueIdentifier("imported group"));
 
   return imported_group;
 }

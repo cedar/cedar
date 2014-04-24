@@ -158,6 +158,22 @@ cedar::proc::gui::Connectable::Decoration::Decoration
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Connectable::setReadOnly(bool readOnly)
+{
+  this->cedar::proc::gui::GraphicsBase::setReadOnly(readOnly);
+
+  this->setFlag(QGraphicsItem::ItemIsMovable, !readOnly);
+
+  for (const auto& role_map_pair : this->mSlotMap)
+  {
+    for (const auto& name_slot_pair : role_map_pair.second)
+    {
+      auto slot = name_slot_pair.second;
+      slot->setReadOnly(readOnly);
+    }
+  }
+}
+
 void cedar::proc::gui::Connectable::setIconBounds(const qreal& x, const qreal& y, const qreal& size)
 {
   if (this->mpIconDisplay == NULL)

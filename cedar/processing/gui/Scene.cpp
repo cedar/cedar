@@ -418,7 +418,7 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
         {
           // check if the start item is a connectable thing.
           if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
-               && mpConnectionStart->canConnect())
+               && mpConnectionStart->canConnect() && !mpConnectionStart->isReadOnly())
           {
             this->mMode = MODE_CONNECT;
             mpeParentView->setMode(cedar::proc::gui::Scene::MODE_CONNECT);
@@ -450,9 +450,13 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
       {
         for (int i = 0; i < items.size(); ++i)
         {
-          if (items.at(i)->isSelected())
+          if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items.at(i)))
           {
-            this->mDraggingItems = true;
+            if (graphics_base->isSelected() && !graphics_base->isReadOnly())
+            {
+              // we cannot move with a
+              this->mDraggingItems = true;
+            }
           }
         }
       }
@@ -609,14 +613,23 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 
   if (mTargetGroup)
   {
+    std::list<QGraphicsItem*> items_to_move;
+    for (auto p_item : this->selectedItems())
+    {
+      auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item);
+      if (graphics_item && !graphics_item->isReadOnly())
+      {
+        items_to_move.push_back(p_item);
+      }
+    }
     if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(mpDropTarget))
     {
       group_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      group_item->addElements(this->selectedItems().toStdList());
+      group_item->addElements(items_to_move);
     }
     else
     {
-      this->mGroup->addElements(this->selectedItems().toStdList());
+      this->mGroup->addElements(items_to_move);
     }
   }
 
