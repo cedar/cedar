@@ -1503,24 +1503,21 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     }
   }
 
+  bool can_edit_slots = this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING
+                       && !this->getGroup()->isLinked();
+
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   QAction* p_add_input = menu.addAction("add input");
   QAction* p_add_output = menu.addAction("add output");
-  if (this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING)
-  {
-    p_add_input->setEnabled(false);
-    p_add_output->setEnabled(false);
-  }
+  p_add_input->setEnabled(can_edit_slots);
+  p_add_output->setEnabled(can_edit_slots);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   QMenu* p_rename_input_menu = menu.addMenu("rename input");
   QMenu* p_rename_output_menu = menu.addMenu("rename output");
-  if (this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING)
-  {
-    p_rename_input_menu->setEnabled(false);
-    p_rename_output_menu->setEnabled(false);
-  }
+  p_rename_input_menu->setEnabled(can_edit_slots);
+  p_rename_output_menu->setEnabled(can_edit_slots);
   const cedar::proc::Group::ConnectorMap& connectors = this->getGroup()->getConnectorMap();
   for (auto it = connectors.begin(); it != connectors.end(); ++it)
   {
@@ -1548,11 +1545,8 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
 
   QMenu* p_remove_input_menu = menu.addMenu("remove input");
   QMenu* p_remove_output_menu = menu.addMenu("remove output");
-  if (this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING)
-  {
-    p_remove_input_menu->setEnabled(false);
-    p_remove_output_menu->setEnabled(false);
-  }
+  p_remove_input_menu->setEnabled(can_edit_slots);
+  p_remove_output_menu->setEnabled(can_edit_slots);
 
   for (auto it = connectors.begin(); it != connectors.end(); ++it)
   {
@@ -1579,11 +1573,13 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   QAction* p_prune = menu.addAction("prune unused connectors");
+  p_prune->setEnabled(can_edit_slots);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   {
     QAction* edit_parameters_action = menu.addAction("edit parameters ...");
+    edit_parameters_action->setEnabled(!this->getGroup()->isLinked());
     QObject::connect(edit_parameters_action, SIGNAL(triggered()), this, SLOT(openParameterEditor()));
   }
 

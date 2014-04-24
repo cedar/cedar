@@ -939,6 +939,8 @@ void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
   QMenu* p_sub_menu = pMenu->addMenu("display style");
   p_sub_menu->setIcon(QIcon(":/menus/display_style.svg"));
 
+  p_sub_menu->setEnabled(!this->isReadOnly());
+
   for (size_t i = 0; i < cedar::proc::gui::StepItem::DisplayMode::type().list().size(); ++i)
   {
     const cedar::aux::Enum& e = cedar::proc::gui::StepItem::DisplayMode::type().list().at(i);
