@@ -291,11 +291,13 @@ void cedar::proc::gui::Scene::setMode(MODE mode, const QString& param)
   this->mModeParam = param;
 }
 
-void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
+void cedar::proc::gui::Scene::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pEvent */)
 {
-  if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
+  // reset the status message
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
   {
-//    pEvent->acceptProposedAction();
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage("");
   }
 }
 
@@ -309,13 +311,27 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
       return;
     }
 
-    if (pEvent->modifiers().testFlag(Qt::ControlModifier) && dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr)
+    bool can_link = (dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr);
+
+    QString message;
+    if (pEvent->modifiers().testFlag(Qt::ControlModifier) && can_link)
     {
+      message = "Inserted element will be added as a link, i.e., unmodifyable, and will be loaded from a file every time.";
       pEvent->setDropAction(Qt::LinkAction);
     }
     else
     {
+      if (can_link)
+      {
+        message = "Inserted element will be copied. Hold ctrl to create a linked element.";
+      }
       pEvent->setDropAction(Qt::CopyAction);
+    }
+
+    if (this->mpMainWindow && this->mpMainWindow->statusBar())
+    {
+      auto status_bar = this->mpMainWindow->statusBar();
+      status_bar->showMessage(message);
     }
 
     pEvent->accept();
@@ -344,6 +360,13 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   if (declaration == nullptr)
   {
     return;
+  }
+
+  // reset the status message
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
+  {
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage("");
   }
 
   // the drop target must be reset, even if something goes wrong; so: do it now by remembering the target in another
