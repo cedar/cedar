@@ -816,19 +816,23 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode& root) co
 {
   cedar::aux::ConfigurationNode scene;
   
-  std::vector<cedar::proc::gui::StickyNote*> stickyNotes = this->mpScene->getStickyNotes();
-
-  for(cedar::proc::gui::StickyNote* note : stickyNotes)
+  // only write sticky notes for the root network
+  if (this->getGroup()->isRoot())
   {
-    cedar::aux::ConfigurationNode node;
-    node.put("type","stickyNote");
-    QRectF rect = note->boundingRect();
-    node.put("width",rect.width());
-    node.put("height",rect.height());
-    node.put("x",note->scenePos().x());
-    node.put("y",note->scenePos().y());
-    node.put("text",note->getText());
-    scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+    std::vector<cedar::proc::gui::StickyNote*> stickyNotes = this->mpScene->getStickyNotes();
+
+    for(cedar::proc::gui::StickyNote* note : stickyNotes)
+    {
+      cedar::aux::ConfigurationNode node;
+      node.put("type","stickyNote");
+      QRectF rect = note->boundingRect();
+      node.put("width",rect.width());
+      node.put("height",rect.height());
+      node.put("x",note->scenePos().x());
+      node.put("y",note->scenePos().y());
+      node.put("text",note->getText());
+      scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+    }
   }
 
   auto elements = this->getGroup()->getElements();
