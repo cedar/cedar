@@ -148,8 +148,18 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
   }
 }
 
-void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDown)
+void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown)
 {
+  // check if this trigger was already visited during the current wave of graph generation
+  if (visited.find(this) != visited.end())
+  {
+    return;
+  }
+  else
+  {
+    // we did not visit this trigger yet - add it to the set of visited triggers
+    visited.insert(this);
+  }
   // build the triggering graph for this trigger
   cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr> graph;
   this->buildTriggerGraph(graph);
@@ -220,7 +230,7 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
         cedar::proc::TriggerPtr done = listener->mFinished.member();
         if (done)
         {
-          done->updateTriggeringOrder(false, true);
+          done->updateTriggeringOrder(visited, false, true);
         }
       }
     }
@@ -234,7 +244,7 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
     {
       auto trigger = trigger_weak.lock();
       CEDAR_ASSERT(trigger);
-      trigger->updateTriggeringOrder(true, false);
+      trigger->updateTriggeringOrder(visited, true, false);
     }
   }
 }
@@ -277,7 +287,8 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
     }
 
     lock.unlock();
-    this->updateTriggeringOrder();
+    std::set<cedar::proc::Trigger*> visited;
+    this->updateTriggeringOrder(visited);
   }
 }
 
@@ -309,7 +320,8 @@ void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
     triggerable->noLongerTriggeredBy(this_ptr);
 
     lock.unlock();
-    this->updateTriggeringOrder();
+    std::set<cedar::proc::Trigger*> visited;
+    this->updateTriggeringOrder(visited);
   }
 }
 

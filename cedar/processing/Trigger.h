@@ -138,7 +138,7 @@ private:
    *
    * @todo Describe this properly.
    */
-  void updateTriggeringOrder(bool recurseUp = true, bool recurseDown = true);
+  void updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp = true, bool recurseDown = true);
 
   void setOwner(cedar::proc::Triggerable* owner)
   {
