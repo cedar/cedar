@@ -54,9 +54,10 @@
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/gui/StickyNote.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
 #include "cedar/auxiliaries/gui/Configurable.fwd.h"
-#include "cedar/processing/gui/StickyNote.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
@@ -369,6 +370,8 @@ private:
   void highlightTargetGroups(const QPointF& mousePosition);
 
   void resetBackgroundColor();
+
+  cedar::aux::PluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const;
 
 private slots:
   void promoteElementToExistingGroup();

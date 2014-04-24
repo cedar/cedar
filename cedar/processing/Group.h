@@ -524,6 +524,10 @@ public:
 
   cedar::proc::ElementPtr importGroupFromFile(const std::string& groupName, const std::string& fileName);
 
+  cedar::proc::ElementPtr createLinkedGroup(const std::string& groupName, const std::string& fileName);
+
+  void readLinkedGroup(const std::string& groupName, const std::string& fileName);
+
   cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
 
   //! Adds a parameter link to the list of links in this group. Does NOT link the parameters.
@@ -634,6 +638,11 @@ private:
                                           cedar::proc::ConstGroupPtr targetGroup
                                         );
 
+  inline bool isLinked() const
+  {
+    return !this->mLinkedGroupFile.empty() && !this->mLinkedGroupName.empty();
+  }
+
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
   static bool disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
@@ -708,6 +717,12 @@ private:
 
   //! List of all the custom parameters that were added to this group.
   std::vector<cedar::aux::ParameterPtr> mCustomParameters;
+
+  //! If non-empty, specifies which file the group was imported from.
+  std::string mLinkedGroupFile;
+
+  //! If non-empty, the name of the group that was imported from a file.
+  std::string mLinkedGroupName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
