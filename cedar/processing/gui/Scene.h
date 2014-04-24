@@ -142,12 +142,9 @@ public:
    */
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  /*!@brief Handles the dragEnter event of the scene.
-   *
-   *        This method determines whether the contents of the drop can be handled by
-   *        cedar::proc::gui::Scene::dropEvent.
+  /*!@brief Handles the dragLeave event of the scene.
    */
-  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   /*!@brief Handles the dragMove event of the scene.
    *
