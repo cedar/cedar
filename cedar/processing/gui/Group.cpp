@@ -119,6 +119,9 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
   }
 
+  this->linkedChanged(this->mGroup->isLinked());
+  this->mLinkedChangedConnection = this->mGroup->connectToLinkedChangedSignal(boost::bind(&cedar::proc::gui::Group::linkedChanged, this, _1));
+
   this->setElement(mGroup);
   this->setConnectable(mGroup);
 
@@ -223,6 +226,26 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Group::linkedChanged(bool linked)
+{
+  if (linked)
+  {
+    this->setOutlineColor(QColor(0, 0, 128));
+  }
+  else
+  {
+    this->setOutlineColor(Qt::black);
+  }
+
+  for (auto p_item : this->childItems())
+  {
+    if (auto p_graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item))
+    {
+      p_graphics_base->setReadOnly(linked);
+    }
+  }
+}
 
 void cedar::proc::gui::Group::itemSceneHasChanged()
 {
@@ -1157,12 +1180,12 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
 {
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
-  cedar::proc::gui::GraphicsBase* p_scene_element = NULL;
+  cedar::proc::gui::GraphicsBase* p_scene_element = nullptr;
 
   // if connector, add the corresponding item
   if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element))
   {
-    auto connector_item = new cedar::proc::gui::DataSlotItem(NULL, connector->getOutputSlot("output"));
+    auto connector_item = new cedar::proc::gui::DataSlotItem(nullptr, connector->getOutputSlot("output"));
     this->mpScene->addItem(connector_item);
     mConnectorSources.push_back(connector_item);
     p_scene_element = connector_item;
@@ -1170,7 +1193,7 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   }
   else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(element))
   {
-    auto connector_item = new cedar::proc::gui::DataSlotItem(NULL, connector->getInputSlot("input"));
+    auto connector_item = new cedar::proc::gui::DataSlotItem(nullptr, connector->getInputSlot("input"));
     this->mpScene->addItem(connector_item);
     mConnectorSinks.push_back(connector_item);
     p_scene_element = connector_item;
@@ -1198,17 +1221,22 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
     current_type = "trigger";
     p_scene_element = this->mpScene->getTriggerItemFor(trigger.get());
   }
-  CEDAR_ASSERT(p_scene_element != NULL);
+  CEDAR_ASSERT(p_scene_element != nullptr);
 
   // if not a root group, properly add the item as a child
   if (this->mpScene && !this->isRootGroup())
   {
-    CEDAR_ASSERT(p_scene_element != NULL);
+    CEDAR_ASSERT(p_scene_element != nullptr);
     if (p_scene_element->parentItem() != this)
     {
 //      this->transformChildCoordinates(p_scene_element);
       p_scene_element->setParentItem(this);
     }
+  }
+
+  if (p_scene_element != nullptr && this->mGroup->isLinked())
+  {
+    p_scene_element->setReadOnly(true);
   }
 
   // if there is a configuration stored for the UI of the element, load it

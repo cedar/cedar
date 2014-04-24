@@ -719,6 +719,7 @@ void cedar::proc::gui::Ide::resetStepList()
 
 void cedar::proc::gui::Ide::deleteSelectedElements()
 {
+  //!@todo This code (and the code called from it) should probably be in proc::gui::Scene.
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   this->deleteElements(selected_items);
 }
@@ -748,6 +749,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
   // remove connections
   for (int i = 0; i < items.size(); ++i)
   {
+    //!@todo This code can probably use some cleaning up
     // delete connections
     if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
@@ -755,39 +757,53 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       {
         if (cedar::proc::gui::DataSlotItem* target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
         {
-          std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
-          std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-          // delete connection in network of source
-          source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
+          auto source_item = dynamic_cast<cedar::proc::gui::Connectable*>(source->parentItem());
+          auto target_item = dynamic_cast<cedar::proc::gui::Connectable*>(target->parentItem());
+
+          if ( (!source_item || !source_item->isReadOnly()) && (!target_item || target_item->isReadOnly()) )
+          {
+            std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
+            std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
+            // delete connection in network of source
+            source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
+          }
         }
       }
       else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
       {
-        if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
+        if (!source->isReadOnly())
         {
-          source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getStep());
-        }
-        else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
-        {
-          source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+          if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
+          {
+            if (!target->isReadOnly())
+            {
+              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getStep());
+            }
+          }
+          else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
+          {
+            if (!target->isReadOnly())
+            {
+              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+            }
+          }
         }
       }
       else
       {
         CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
       }
-//      p_connection->disconnect();
-//      delete p_connection;
-      items[i] = NULL;
+      items[i] = nullptr;
     }
   }
   std::vector<QGraphicsItem*> delete_stack;
   // fill stack with elements
   for (int i = 0; i < items.size(); ++i)
   {
-    if (items[i] != NULL)
+    auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
+    if (graphics_base != nullptr && !graphics_base->isReadOnly())
     {
-      delete_stack.push_back(items[i]);
+      delete_stack.push_back(graphics_base);
     }
   }
   // sort stack (make it a real stack)

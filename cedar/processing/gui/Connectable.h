@@ -184,6 +184,8 @@ public:
 
   const cedar::proc::gui::Connectable::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role) const;
 
+  void setReadOnly(bool readOnly);
+
 public slots:
   void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
   void reactToSlotAdded(cedar::proc::DataRole::Id role, QString name);

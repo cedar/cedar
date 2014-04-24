@@ -586,6 +586,13 @@ public:
    */
   std::vector<std::string> listInvalidSteps() const;
 
+  /*! Returns whether or not this group is linked, i.e., read from a file.
+   */
+  inline bool isLinked() const
+  {
+    return !this->mLinkedGroupFile.empty() && !this->mLinkedGroupName.empty();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -638,11 +645,6 @@ private:
                                           cedar::proc::ConstGroupPtr targetGroup
                                         );
 
-  inline bool isLinked() const
-  {
-    return !this->mLinkedGroupFile.empty() && !this->mLinkedGroupName.empty();
-  }
-
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
   static bool disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
@@ -687,6 +689,10 @@ public:
 public:
   //!@brief Signal that is emitted whenever a custom parameter is removed.
   CEDAR_DECLARE_SIGNAL(ParameterLinkRemoved, void (cedar::aux::ParameterLinkPtr));
+
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(LinkedChanged, void (bool));
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
