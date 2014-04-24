@@ -542,7 +542,7 @@ void cedar::proc::gui::StepItem::openActionsDock()
 void cedar::proc::gui::StepItem::openProperties()
 {
   cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
-  props->display(this->getStep());
+  props->display(this->getStep(), this->isReadOnly());
   auto p_widget = this->createDockWidget("Properties", props);
   p_widget->show();
 }
