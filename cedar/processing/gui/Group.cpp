@@ -149,7 +149,7 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
   );
   cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
-  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(updateDecorations()));
+  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
 
   mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
                                      (
@@ -187,7 +187,7 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
     this,
     SLOT(handleStepNameChanged(const std::string&, const std::string&))
   );
-  this->addDecorations();
+  this->updateDecorations();
   this->update();
 }
 
@@ -255,6 +255,31 @@ void cedar::proc::gui::Group::linkedChanged(bool linked)
   {
     this->setOutlineColor(Qt::black);
   }
+
+  if (linked)
+  {
+    if (!this->mpLinkedDecoration)
+    {
+      this->mpLinkedDecoration = cedar::proc::gui::Connectable::DecorationPtr(
+        new cedar::proc::gui::Connectable::Decoration
+        (
+          this,
+          ":/decorations/linked.svg",
+          "This is a linked group, i.e., it will be loaded from its original file every time the architecture is loaded."
+        )
+      );
+    }
+    this->addDecoration(mpLinkedDecoration);
+  }
+  else
+  {
+    if (this->mpLinkedDecoration)
+    {
+      this->removeDecoration(this->mpLinkedDecoration);
+    }
+  }
+
+  this->setResizeable(!linked);
 
   for (auto p_item : this->childItems())
   {
@@ -1803,9 +1828,9 @@ void cedar::proc::gui::Group::restoreConnections()
   }
 }
 
-void cedar::proc::gui::Group::updateDecorations()
+void cedar::proc::gui::Group::loopedChanged()
 {
-  this->addDecorations();
+  this->updateDecorations();
 }
 
 void cedar::proc::gui::Group::removeElementFromPlotGroup(const std::string& plotGroupName, const std::string& elementName)

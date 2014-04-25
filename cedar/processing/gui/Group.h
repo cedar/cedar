@@ -314,7 +314,7 @@ private slots:
   //! Updates the position and size of the icon.
   void updateIconBounds();
 
-  void updateDecorations();
+  void loopedChanged();
   
   void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
 
@@ -375,6 +375,8 @@ private:
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
   QColor mBackgroundColor;
+
+  cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 
   //! The vertical offset for data slots in the group used when the group is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;

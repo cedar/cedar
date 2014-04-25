@@ -158,6 +158,30 @@ cedar::proc::gui::Connectable::Decoration::Decoration
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Connectable::addDecoration(cedar::proc::gui::Connectable::DecorationPtr decoration)
+{
+  this->mDecorations.push_back(decoration);
+  decoration->setVisible(true);
+  this->updateDecorationPositions();
+}
+
+void cedar::proc::gui::Connectable::removeDecoration(cedar::proc::gui::Connectable::DecorationPtr decoration)
+{
+  for (auto iter = this->mDecorations.begin(); iter != this->mDecorations.end();)
+  {
+    if (*iter == decoration)
+    {
+       iter = this->mDecorations.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+  decoration->setVisible(false);
+  this->updateDecorationPositions();
+}
+
 void cedar::proc::gui::Connectable::setReadOnly(bool readOnly)
 {
   this->cedar::proc::gui::GraphicsBase::setReadOnly(readOnly);
@@ -419,6 +443,32 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
     = connectable->connectToSlotRenamedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRenamed, this, _1, _2, _3));
   mSlotRemovedConnection
     = connectable->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRemoved, this, _1, _2));
+
+
+  this->mDecorations.clear();
+  if (elem_decl->isDeprecated())
+  {
+    std::string dep_msg = "This step is deprecated.";
+
+    if (!elem_decl->getDeprecationDescription().empty())
+    {
+      dep_msg += " " + elem_decl->getDeprecationDescription();
+    }
+
+    DecorationPtr decoration
+    (
+      new Decoration
+      (
+        this,
+        ":/cedar/auxiliaries/gui/warning.svg",
+        QString::fromStdString(dep_msg),
+        QColor(255, 240, 110)
+      )
+    );
+
+    this->mDecorations.push_back(decoration);
+  }
+  this->updateDecorations();
 }
 
 void cedar::proc::gui::Connectable::updateDataSlotPositions()
@@ -622,49 +672,31 @@ void cedar::proc::gui::Connectable::Decoration::setSize(double sizeFactor)
   this->mpIcon->setScale(size / h);
 }
 
-void cedar::proc::gui::Connectable::addDecorations()
+void cedar::proc::gui::Connectable::updateDecorations()
 {
-  this->mDecorations.clear();
-
   auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
-  if (triggerable && triggerable->isLooped())
+  if (triggerable)
   {
-    DecorationPtr decoration
-    (
-      new Decoration
-      (
-        this,
-        ":/decorations/looped.svg",
-        "This step is looped, i.e., it expects to be connected to a looped trigger."
-      )
-    );
-
-    this->mDecorations.push_back(decoration);
-  }
-
-  auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getElement());
-
-  if (declaration->isDeprecated())
-  {
-    std::string dep_msg = "This step is deprecated.";
-
-    if (!declaration->getDeprecationDescription().empty())
+    if (triggerable->isLooped())
     {
-      dep_msg += " " + declaration->getDeprecationDescription();
+      if (!mpLoopedDecoration)
+      {
+        mpLoopedDecoration = DecorationPtr
+        (
+          new Decoration
+          (
+            this,
+            ":/decorations/looped.svg",
+            "This step is looped, i.e., it expects to be connected to a looped trigger."
+          )
+        );
+      }
+      this->addDecoration(mpLoopedDecoration);
     }
-
-    DecorationPtr decoration
-    (
-      new Decoration
-      (
-        this,
-        ":/cedar/auxiliaries/gui/warning.svg",
-        QString::fromStdString(dep_msg),
-        QColor(255, 240, 110)
-      )
-    );
-
-    this->mDecorations.push_back(decoration);
+    else if (this->mpLoopedDecoration)
+    {
+      this->removeDecoration(this->mpLoopedDecoration);
+    }
   }
 
   this->updateDecorationPositions();

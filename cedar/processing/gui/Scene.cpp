@@ -730,9 +730,9 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
-  QAction* p_importGroup = menu.addAction("import group from file");
-  QAction* p_link_group = menu.addAction("link group from file");
-  QAction* p_importStep = menu.addAction("import step from file");
+  QAction* p_importGroup = menu.addAction("import group from file ...");
+  QAction* p_link_group = menu.addAction("link group from file ...");
+  QAction* p_importStep = menu.addAction("import step from file ...");
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
