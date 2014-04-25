@@ -94,6 +94,9 @@ public:
 
   bool isAbsolute() const;
 
+  //! Returns true if the path is relative to a plugin folder, i.e., starts with the protocol plugin://
+  bool isPluginRelative() const;
+
   //! Returns true if there are no entries in this path, i.e., the path is "".
   bool isEmpty() const;
 
@@ -159,6 +162,7 @@ private:
 
   static const std::string M_PROTOCOL_ABSOLUTE_STR;
   static const std::string M_PROTOCOL_RESOURCE_STR;
+  static const std::string M_PROTOCOL_PLUGIN_STR;
 
 }; // class cedar::aux::Path
 
