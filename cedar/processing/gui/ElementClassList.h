@@ -87,6 +87,9 @@ protected:
   //! Opens up the context menu.
   void contextMenuEvent(QContextMenuEvent* pEvent);
 
+  //! What drop actions are supported by this widget.
+  Qt::DropActions supportedDropActions() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
