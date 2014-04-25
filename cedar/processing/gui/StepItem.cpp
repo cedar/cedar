@@ -321,7 +321,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 
   this->updateIconGeometry();
 
-  this->addDecorations();
+//  this->addDecorations();
 
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::emitStepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(handleStepNameChanged()));
@@ -384,24 +384,16 @@ void cedar::proc::gui::StepItem::setRecorded(bool status)
           "This step has one or more slots registered in the recorder."
         )
       );
-      this->mDecorations.push_back(mpRecordedDecoration);
+      this->addDecoration(this->mpRecordedDecoration);
 	  }
 	}
 	else
 	{
-	    for (unsigned int i = 0; i < mDecorations.size();i++)
-	    {
-	      if (mDecorations[i]==mpRecordedDecoration)
-	      {
-	         mDecorations.erase(mDecorations.begin()+i);
-	         mpRecordedDecoration.reset();
-	         break;
-	      }
-	    }
+	  if (this->mpRecordedDecoration)
+	  {
+	    this->removeDecoration(this->mpRecordedDecoration);
+	  }
 	}
-
-	this->updateDecorationPositions();
-
 }
 
 void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu)
@@ -542,7 +534,7 @@ void cedar::proc::gui::StepItem::openActionsDock()
 void cedar::proc::gui::StepItem::openProperties()
 {
   cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
-  props->display(this->getStep());
+  props->display(this->getStep(), this->isReadOnly());
   auto p_widget = this->createDockWidget("Properties", props);
   p_widget->show();
 }
@@ -938,6 +930,8 @@ void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
 {
   QMenu* p_sub_menu = pMenu->addMenu("display style");
   p_sub_menu->setIcon(QIcon(":/menus/display_style.svg"));
+
+  p_sub_menu->setEnabled(!this->isReadOnly());
 
   for (size_t i = 0; i < cedar::proc::gui::StepItem::DisplayMode::type().list().size(); ++i)
   {

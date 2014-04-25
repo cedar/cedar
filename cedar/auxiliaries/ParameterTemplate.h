@@ -159,26 +159,41 @@ public:
    */
   virtual void setValue(const T& value, bool lock = false)
   {
+    cedar::aux::Parameter::ReadLockerPtr read_locker;
+    if (lock)
+    {
+      read_locker = cedar::aux::Parameter::ReadLockerPtr(new cedar::aux::Parameter::ReadLocker(this));
+    }
+    T old_value = this->mValue;
+    if (lock)
+    {
+      read_locker->unlock();
+    }
+
+    if (value == old_value)
+    {
+      // nothing to do, value hasn't changed
+      return;
+    }
+
     if (mValidator)
     {
       mValidator(value);
     }
+
+    cedar::aux::Parameter::WriteLockerPtr write_locker;
     if (lock)
     {
-      this->lockForWrite();
+      write_locker = cedar::aux::Parameter::WriteLockerPtr(new cedar::aux::Parameter::WriteLocker(this));
     }
-    T old_value = this->mValue;
     this->mValue = value;
 
     if (lock)
     {
-      this->unlock();
+      write_locker->unlock();
     }
 
-    if (old_value != this->mValue)
-    {
-      this->emitChangedSignal();
-    }
+    this->emitChangedSignal();
   }
 
   //!@brief store the current value of type T in a configuration tree

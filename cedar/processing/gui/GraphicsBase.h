@@ -251,6 +251,13 @@ public:
    */
   virtual void updateToolTip();
 
+  virtual void setReadOnly(bool readOnly);
+
+  bool isReadOnly() const
+  {
+    return this->mReadOnly;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -371,6 +378,9 @@ private:
 
   //! Whether or not resizing is allowed.
   bool mResizeable;
+
+  //! Whether the item is in read-only mode
+  bool mReadOnly;
 
   //! Resize handle.
   std::vector<cedar::proc::gui::ResizeHandle*> mpResizeHandles;

@@ -76,7 +76,7 @@ void cedar::proc::GroupDeclarationManager::addDeclaration(cedar::proc::ConstGrou
   }
 }
 
-cedar::proc::ElementPtr cedar::proc::GroupDeclarationManager::addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base) const
+cedar::proc::ElementPtr cedar::proc::GroupDeclarationManager::addGroupTemplateToGroup(const std::string& templateName, cedar::proc::GroupPtr base, bool makeLink) const
 {
   auto iter = this->mDeclarations.find(templateName);
   if (iter != this->mDeclarations.end())
@@ -84,7 +84,14 @@ cedar::proc::ElementPtr cedar::proc::GroupDeclarationManager::addGroupTemplateTo
     cedar::proc::ConstGroupDeclarationPtr declaration = this->mDeclarations.find(templateName)->second;
     try
     {
-      return base->importGroupFromFile(declaration->getGroupName(), declaration->getFileName());
+      if (makeLink)
+      {
+        return base->createLinkedGroup(declaration->getGroupName(), declaration->getFileName());
+      }
+      else
+      {
+        return base->importGroupFromFile(declaration->getGroupName(), declaration->getFileName());
+      }
     }
     catch (cedar::aux::NotFoundException& exc)
     {
