@@ -2150,6 +2150,7 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const std
       group_node.put("name", this->getUniqueIdentifier(this->getName()));
 
       this->readConfiguration(group_node);
+      this->_mIsLooped->setConstant(true);
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {
