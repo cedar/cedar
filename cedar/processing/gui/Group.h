@@ -284,6 +284,8 @@ private:
 
   void linkedChanged(bool readOnly);
 
+  void lastReadConfigurationChanged();
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
@@ -354,13 +356,14 @@ private:
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::Group*> mpGroupsToAdd;
 
-  //! Connection to Group's slot changed signal.
 //  boost::signals2::connection mSlotConnection;
+  //!@todo Make these scoped connections
   boost::signals2::connection mNewElementAddedConnection;
   boost::signals2::connection mElementRemovedConnection;
   boost::signals2::connection mTriggerConnectionChangedConnection;
   boost::signals2::connection mDataConnectionChangedConnection;
   boost::signals2::scoped_connection mLinkedChangedConnection;
+  boost::signals2::scoped_connection mLastReadConfigurationChangedConnection;
 
   //! Fit to contents-calls are temporarily disabled if this is set to true.
   bool mHoldFitToContents;

@@ -1424,6 +1424,7 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
   }
   // make a copy of the configuration that was read -- the ui may need to read additional information from it
   mLastReadConfiguration = root;
+  this->signalLastReadConfigurationChanged();
 
   // select the proper format for reading the group
   switch (format_version)

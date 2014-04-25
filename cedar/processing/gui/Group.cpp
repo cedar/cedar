@@ -121,6 +121,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 
   this->linkedChanged(this->mGroup->isLinked());
   this->mLinkedChangedConnection = this->mGroup->connectToLinkedChangedSignal(boost::bind(&cedar::proc::gui::Group::linkedChanged, this, _1));
+  this->mLastReadConfigurationChangedConnection
+    = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
 
   this->setElement(mGroup);
   this->setConnectable(mGroup);
@@ -226,6 +228,22 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Group::lastReadConfigurationChanged()
+{
+  auto old_x = this->pos().x();
+  auto old_y = this->pos().y();
+  bool was_collapsed = this->isCollapsed();
+  auto config = this->getGroup()->getLastReadConfiguration();
+  this->readConfiguration(config);
+
+  if (this->getGroup()->isLinked())
+  {
+    // for linked groups, some properties that should not be read from the orignial file have to be overridden
+    this->setPos(old_x, old_y);
+    this->setCollapsed(was_collapsed);
+  }
+}
 
 void cedar::proc::gui::Group::linkedChanged(bool linked)
 {
