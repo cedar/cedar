@@ -694,6 +694,10 @@ public:
   //!@brief Signal that is emitted whenever a custom parameter is removed.
   CEDAR_DECLARE_SIGNAL(LinkedChanged, void (bool));
 
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(LastReadConfigurationChanged, void ());
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
