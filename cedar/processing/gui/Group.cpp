@@ -1546,7 +1546,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     }
   }
 
-  bool can_edit_slots = this->getGroup()->getState() == cedar::proc::Triggerable::STATE_RUNNING
+  bool can_edit_slots = this->getGroup()->getState() != cedar::proc::Triggerable::STATE_RUNNING
                        && !this->getGroup()->isLinked();
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
