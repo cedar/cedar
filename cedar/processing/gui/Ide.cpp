@@ -760,7 +760,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
           auto source_item = dynamic_cast<cedar::proc::gui::Connectable*>(source->parentItem());
           auto target_item = dynamic_cast<cedar::proc::gui::Connectable*>(target->parentItem());
 
-          if ( (!source_item || !source_item->isReadOnly()) && (!target_item || target_item->isReadOnly()) )
+          if ( (!source_item || !source_item->isReadOnly()) && (!target_item || !target_item->isReadOnly()) )
           {
             std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
             std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
@@ -801,9 +801,16 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
   for (int i = 0; i < items.size(); ++i)
   {
     auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
-    if (graphics_base != nullptr && !graphics_base->isReadOnly())
+    if (graphics_base != nullptr)
     {
-      delete_stack.push_back(graphics_base);
+      if (!graphics_base->isReadOnly())
+      {
+        delete_stack.push_back(graphics_base);
+      }
+    }
+    else
+    {
+      delete_stack.push_back(items[i]);
     }
   }
   // sort stack (make it a real stack)
