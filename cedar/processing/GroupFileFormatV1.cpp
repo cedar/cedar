@@ -115,10 +115,10 @@ void cedar::proc::GroupFileFormatV1::write
     cedar::aux::ConfigurationNode custom_parameters;
     this->writeCustomParameters(group, custom_parameters);
     if (!custom_parameters.empty())
-      root.add_child("custom parameters", custom_parameters);
-
-    group->cedar::aux::Configurable::writeConfiguration(root);
+    root.add_child("custom parameters", custom_parameters);
   }
+
+  group->cedar::aux::Configurable::writeConfiguration(root);
 }
 
 void cedar::proc::GroupFileFormatV1::writeMetaData(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& meta) const
@@ -270,65 +270,72 @@ void cedar::proc::GroupFileFormatV1::read
        std::vector<std::string>& exceptions
      )
 {
-
+  bool linked = false;
   auto linked_file_iter = root.find("linked file");
   auto linked_name_iter = root.find("linked group name");
   if (linked_file_iter != root.not_found() && linked_name_iter != root.not_found())
   {
     group->readLinkedGroup(linked_name_iter->second.get_value<std::string>(), linked_file_iter->second.get_value<std::string>());
-    return;
+    linked = true;
   }
-  // these have to be read before Configurable::readConfiguration is called.
-  auto custom_parameters = root.find("custom parameters");
-  if (custom_parameters != root.not_found())
+
+  if (!linked)
   {
-    this->readCustomParameters(group, custom_parameters->second, exceptions);
+    // these have to be read before Configurable::readConfiguration is called.
+    auto custom_parameters = root.find("custom parameters");
+    if (custom_parameters != root.not_found())
+    {
+      this->readCustomParameters(group, custom_parameters->second, exceptions);
+    }
   }
 
   group->cedar::aux::Configurable::readConfiguration(root);
 
-  group->processConnectors();
-
-  auto steps = root.find("steps");
-  if (steps != root.not_found())
+  if (!linked)
   {
-    this->readSteps(group, steps->second, exceptions);
-  }
+    group->processConnectors();
 
-  auto networks = root.find("networks");
-  if (networks != root.not_found())
-  {
-    this->readGroups(group, networks->second, exceptions);
-  }
+    auto steps = root.find("steps");
+    if (steps != root.not_found())
+    {
+      this->readSteps(group, steps->second, exceptions);
+    }
 
-  auto groups = root.find("groups");
-  if (groups != root.not_found())
-  {
-    this->readGroups(group, groups->second, exceptions);
-  }
+    auto networks = root.find("networks");
+    if (networks != root.not_found())
+    {
+      this->readGroups(group, networks->second, exceptions);
+    }
 
-  auto connections = root.find("connections");
-  if (connections != root.not_found())
-  {
-    this->readDataConnections(group, connections->second, exceptions);
-  }
+    auto groups = root.find("groups");
+    if (groups != root.not_found())
+    {
+      this->readGroups(group, groups->second, exceptions);
+    }
 
-  auto triggers = root.find("triggers");
-  if (triggers != root.not_found())
-  {
-    this->readTriggers(group, triggers->second, exceptions);
-  }
+    auto connections = root.find("connections");
+    if (connections != root.not_found())
+    {
+      this->readDataConnections(group, connections->second, exceptions);
+    }
 
-  auto records = root.find("records");
-  if (records != root.not_found())
-  {
-    this->readRecords(group, records->second, exceptions);
-  }
+    auto triggers = root.find("triggers");
+    if (triggers != root.not_found())
+    {
+      this->readTriggers(group, triggers->second, exceptions);
+    }
 
-  auto parameter_links_iter = root.find("parameter links");
-  if (parameter_links_iter != root.not_found())
-  {
-    this->readParameterLinks(group, parameter_links_iter->second, exceptions);
+    auto records = root.find("records");
+    if (records != root.not_found())
+    {
+      this->readRecords(group, records->second, exceptions);
+    }
+
+    auto parameter_links_iter = root.find("parameter links");
+    if (parameter_links_iter != root.not_found())
+    {
+      this->readParameterLinks(group, parameter_links_iter->second, exceptions);
+    }
   }
 }
 
