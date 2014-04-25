@@ -285,7 +285,11 @@ void cedar::proc::gui::Group::linkedChanged(bool linked)
   {
     if (auto p_graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item))
     {
-      p_graphics_base->setReadOnly(linked);
+      // don't make data slots constant
+      if (!dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_graphics_base))
+      {
+        p_graphics_base->setReadOnly(linked);
+      }
     }
   }
 }
