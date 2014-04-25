@@ -321,7 +321,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 
   this->updateIconGeometry();
 
-  this->addDecorations();
+//  this->addDecorations();
 
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::emitStepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(handleStepNameChanged()));
@@ -384,24 +384,16 @@ void cedar::proc::gui::StepItem::setRecorded(bool status)
           "This step has one or more slots registered in the recorder."
         )
       );
-      this->mDecorations.push_back(mpRecordedDecoration);
+      this->addDecoration(this->mpRecordedDecoration);
 	  }
 	}
 	else
 	{
-	    for (unsigned int i = 0; i < mDecorations.size();i++)
-	    {
-	      if (mDecorations[i]==mpRecordedDecoration)
-	      {
-	         mDecorations.erase(mDecorations.begin()+i);
-	         mpRecordedDecoration.reset();
-	         break;
-	      }
-	    }
+	  if (this->mpRecordedDecoration)
+	  {
+	    this->removeDecoration(this->mpRecordedDecoration);
+	  }
 	}
-
-	this->updateDecorationPositions();
-
 }
 
 void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu)
