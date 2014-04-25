@@ -2168,18 +2168,17 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const std
 
 cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string& groupName, const std::string& fileName)
 {
-  //!@todo This code is largely redundant with importGroupFromFile
-
   cedar::proc::GroupPtr imported_group(new cedar::proc::Group());
+  this->add(imported_group, this->getUniqueIdentifier("imported group"));
   imported_group->readLinkedGroup(groupName, fileName);
   imported_group->setName(this->getUniqueIdentifier(groupName));
-  this->add(imported_group, this->getUniqueIdentifier("imported group"));
 
   return imported_group;
 }
 
 cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::string& groupName, const std::string& fileName)
 {
+  //!@todo This code is largely redundant with importGroupFromFile
   // first, read in the configuration tree
   cedar::aux::ConfigurationNode configuration;
   boost::property_tree::read_json(fileName, configuration);
