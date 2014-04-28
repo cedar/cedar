@@ -62,8 +62,7 @@
 cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(QWidget* pParent)
 :
 cedar::aux::gui::QImagePlot(pParent),
-mDataIsSet(false),
-mDesiredColumns(0)
+mDataIsSet(false)
 {
   this->init();
 }
@@ -76,8 +75,7 @@ cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D
 )
 :
 cedar::aux::gui::QImagePlot(pParent),
-mDataIsSet(false),
-mDesiredColumns(0)
+mDataIsSet(false)
 {
   this->init();
   this->plot(matData, title);
@@ -100,6 +98,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
   this->setToolTip(QString("Use + and - to alter number of columns."));
 
   this->_mSlicedDimension = new cedar::aux::UIntParameter(this, "sliced dimension", 2);
+  this->_mDesiredColumns = new cedar::aux::UIntParameter(this, "desired columns", 0);
 
   this->setLegendAvailable(true);
   this->setValueScalingEnabled(true);
@@ -173,11 +172,11 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 
 
   unsigned int tiles = static_cast<unsigned int>(mat.size[dim_sliced]);
-  if (mDesiredColumns <= 0 || mDesiredColumns > tiles)
+  if (_mDesiredColumns->getValue() <= 0 || _mDesiredColumns->getValue() > tiles)
   {
-    mDesiredColumns = std::ceil(std::max(1.0, std::sqrt(static_cast<double>(mat.size[dim_sliced]))));
+    _mDesiredColumns->setValue(std::ceil(std::max(1.0, std::sqrt(static_cast<double>(mat.size[dim_sliced])))));
   }
-  unsigned int columns = std::min(tiles, mDesiredColumns);
+  unsigned int columns = std::min(tiles, _mDesiredColumns->getValue());
   unsigned int rows = std::ceil(tiles / static_cast<double>(columns));
 
   mSliceMatrix = cv::Mat::ones(rows * mat.size[dim_0] + rows -1, columns * mat.size[dim_1] + columns -1, mat.type());
@@ -433,17 +432,17 @@ void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
     case Qt::Key_Plus:
     {
       const cv::Mat& mat = this->mData->getData();
-      if (mDesiredColumns < static_cast<unsigned int>(mat.size[2]))
+      if (_mDesiredColumns->getValue() < static_cast<unsigned int>(mat.size[2]))
       {
-        this->mDesiredColumns++;
+        this->_mDesiredColumns->setValue(this->_mDesiredColumns->getValue() + 1);
       }
       break;
     }
     case Qt::Key_Minus:
     {
-      if (mDesiredColumns > 1)
+      if (this->_mDesiredColumns->getValue() > 1)
       {
-        this->mDesiredColumns--;
+        this->_mDesiredColumns->setValue(this->_mDesiredColumns->getValue() - 1);
       }
       break;
     }

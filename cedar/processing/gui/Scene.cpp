@@ -194,7 +194,7 @@ void cedar::proc::gui::Scene::itemSelected()
     {
       if (p_item->getElement())
       {
-        this->mpConfigurableWidget->display(p_item->getElement());
+        this->mpConfigurableWidget->display(p_item->getElement(), p_item->isReadOnly());
       
         if(cedar::proc::StepPtr castedStep = boost::dynamic_pointer_cast<cedar::proc::Step>(p_item->getElement()))
         {
@@ -291,11 +291,13 @@ void cedar::proc::gui::Scene::setMode(MODE mode, const QString& param)
   this->mModeParam = param;
 }
 
-void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
+void cedar::proc::gui::Scene::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pEvent */)
 {
-  if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
+  // reset the status message
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
   {
-    pEvent->acceptProposedAction();
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage("");
   }
 }
 
@@ -303,8 +305,38 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
-    pEvent->acceptProposedAction();
+    auto declaration = this->declarationFromDrop(pEvent);
+    if (declaration == nullptr)
+    {
+      return;
+    }
+
+    bool can_link = (dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr);
+
+    QString message;
+    if (pEvent->modifiers().testFlag(Qt::ControlModifier) && can_link)
+    {
+      message = "Inserted element will be added as a link, i.e., unmodifyable, and will be loaded from a file every time.";
+      pEvent->setDropAction(Qt::LinkAction);
+    }
+    else
+    {
+      if (can_link)
+      {
+        message = "Inserted element will be copied. Hold ctrl to create a linked element.";
+      }
+      pEvent->setDropAction(Qt::CopyAction);
+    }
+
+    if (this->mpMainWindow && this->mpMainWindow->statusBar())
+    {
+      auto status_bar = this->mpMainWindow->statusBar();
+      status_bar->showMessage(message);
+    }
+
+    pEvent->accept();
   }
+
 
   QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
   if (p_item != this->mpDropTarget)
@@ -324,12 +356,56 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
+  auto declaration = this->declarationFromDrop(pEvent);
+  if (declaration == nullptr)
+  {
+    return;
+  }
+
+  // reset the status message
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
+  {
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage("");
+  }
 
   // the drop target must be reset, even if something goes wrong; so: do it now by remembering the target in another
   // variable.
   auto drop_target = this->mpDropTarget;
   this->mpDropTarget = NULL;
+
+  QPointF mapped = pEvent->scenePos();
+  auto target_group = this->getRootGroup()->getGroup();
+  if (auto group = dynamic_cast<cedar::proc::gui::Group*>(drop_target))
+  {
+    group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    target_group = group->getGroup();
+    mapped -= group->scenePos();
+  }
+
+  if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(declaration))
+  {
+    this->createElement(target_group, elem_declaration->getClassName(), mapped);
+  }
+  else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration))
+  {
+    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
+        (
+          group_declaration->getClassName(),
+          this->getRootGroup()->getGroup(),
+          pEvent->modifiers().testFlag(Qt::ControlModifier)
+        );
+    this->getGraphicsItemFor(elem.get())->setPos(mapped);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
+  }
+}
+
+cedar::aux::PluginDeclaration* cedar::proc::gui::Scene::declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const
+{
+  ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
 
   if (tree)
   {
@@ -344,31 +420,11 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
     if (item)
     {
-      QPointF mapped = pEvent->scenePos();
-      auto target_group = this->getRootGroup()->getGroup();
-      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(drop_target))
-      {
-        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-        target_group = group->getGroup();
-        mapped -= group->scenePos();
-      }
-      auto pointer = item->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
-
-      if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(pointer))
-      {
-        this->createElement(target_group, elem_declaration->getClassName(), mapped);
-      }
-      else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(pointer))
-      {
-        cedar::proc::ElementPtr elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup(group_declaration->getClassName(), this->getRootGroup()->getGroup());
-        this->getGraphicsItemFor(elem.get())->setPos(mapped);
-      }
-      else
-      {
-        CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
-      }
+      return item->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
     }
   }
+
+  return nullptr;
 }
 
 void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent)
@@ -385,7 +441,7 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
         {
           // check if the start item is a connectable thing.
           if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
-               && mpConnectionStart->canConnect())
+               && mpConnectionStart->canConnect() && !mpConnectionStart->isReadOnly())
           {
             this->mMode = MODE_CONNECT;
             mpeParentView->setMode(cedar::proc::gui::Scene::MODE_CONNECT);
@@ -417,9 +473,13 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
       {
         for (int i = 0; i < items.size(); ++i)
         {
-          if (items.at(i)->isSelected())
+          if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items.at(i)))
           {
-            this->mDraggingItems = true;
+            if (graphics_base->isSelected() && !graphics_base->isReadOnly())
+            {
+              // we cannot move with a
+              this->mDraggingItems = true;
+            }
           }
         }
       }
@@ -576,14 +636,23 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 
   if (mTargetGroup)
   {
+    std::list<QGraphicsItem*> items_to_move;
+    for (auto p_item : this->selectedItems())
+    {
+      auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item);
+      if (graphics_item && !graphics_item->isReadOnly())
+      {
+        items_to_move.push_back(p_item);
+      }
+    }
     if (auto group_item = dynamic_cast<cedar::proc::gui::Group*>(mpDropTarget))
     {
       group_item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      group_item->addElements(this->selectedItems().toStdList());
+      group_item->addElements(items_to_move);
     }
     else
     {
-      this->mGroup->addElements(this->selectedItems().toStdList());
+      this->mGroup->addElements(items_to_move);
     }
   }
 
@@ -661,8 +730,9 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
     return;
 
   QMenu menu;
-  QAction* p_importGroup = menu.addAction("import group from file");
-  QAction* p_importStep = menu.addAction("import step from file");
+  QAction* p_importGroup = menu.addAction("import group from file ...");
+  QAction* p_link_group = menu.addAction("link group from file ...");
+  QAction* p_importStep = menu.addAction("import step from file ...");
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
@@ -678,9 +748,9 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
       p_ide->resetRootGroup();
     }
   }
-  else if (a == p_importGroup)
+  else if (a == p_importGroup || a == p_link_group)
   {
-    this->importGroup();
+    this->importGroup(a == p_link_group);
   }
   else if (a == p_importStep)
   {
@@ -1269,7 +1339,7 @@ public:
   QComboBox* mpGroupNamesBox;
 };
 
-void cedar::proc::gui::Scene::importGroup()
+void cedar::proc::gui::Scene::importGroup(bool link)
 {
 
   cedar::aux::DirectoryParameterPtr last_dir
@@ -1303,7 +1373,14 @@ void cedar::proc::gui::Scene::importGroup()
         if (result == QDialog::Accepted)
         {
           // import selected group
-          mGroup->getGroup()->importGroupFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+          if (link)
+          {
+            mGroup->getGroup()->createLinkedGroup(group_dialog->returnChosenGroup(), file.toStdString());
+          }
+          else
+          {
+            mGroup->getGroup()->importGroupFromFile(group_dialog->returnChosenGroup(), file.toStdString());
+          }
         }
         return;
       }

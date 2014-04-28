@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/IntrusivePtrBase.h"
 #include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LockerBase.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
@@ -75,6 +76,40 @@ class cedar::aux::Parameter : public QObject, public cedar::aux::IntrusivePtrBas
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::aux::Configurable;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  //! An RAII-based locker for parameters.
+  class ReadLocker : public cedar::aux::LockerBase
+  {
+  public:
+    ReadLocker(cedar::aux::Parameter* parameter)
+    :
+    cedar::aux::LockerBase
+    (
+      boost::bind(&cedar::aux::Parameter::lockForRead, parameter),
+      boost::bind(&cedar::aux::Parameter::unlock, parameter)
+    )
+    {
+    }
+  };
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+
+  class WriteLocker : public cedar::aux::LockerBase
+  {
+  public:
+    WriteLocker(cedar::aux::Parameter* parameter)
+    :
+    cedar::aux::LockerBase
+    (
+      boost::bind(&cedar::aux::Parameter::lockForWrite, parameter),
+      boost::bind(&cedar::aux::Parameter::unlock, parameter)
+    )
+    {
+    }
+  };
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

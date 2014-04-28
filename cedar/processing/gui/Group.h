@@ -282,6 +282,10 @@ private:
 
   void setBackgroundColor(const QColor& color);
 
+  void linkedChanged(bool readOnly);
+
+  void lastReadConfigurationChanged();
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
@@ -310,7 +314,7 @@ private slots:
   //! Updates the position and size of the icon.
   void updateIconBounds();
 
-  void updateDecorations();
+  void loopedChanged();
   
   void removeElementFromPlotGroup(const std::string& plotGroupname, const std::string& elementName);
 
@@ -352,12 +356,14 @@ private:
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::Group*> mpGroupsToAdd;
 
-  //! Connection to Group's slot changed signal.
 //  boost::signals2::connection mSlotConnection;
+  //!@todo Make these scoped connections
   boost::signals2::connection mNewElementAddedConnection;
   boost::signals2::connection mElementRemovedConnection;
   boost::signals2::connection mTriggerConnectionChangedConnection;
   boost::signals2::connection mDataConnectionChangedConnection;
+  boost::signals2::scoped_connection mLinkedChangedConnection;
+  boost::signals2::scoped_connection mLastReadConfigurationChangedConnection;
 
   //! Fit to contents-calls are temporarily disabled if this is set to true.
   bool mHoldFitToContents;
@@ -369,6 +375,8 @@ private:
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
   QColor mBackgroundColor;
+
+  cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 
   //! The vertical offset for data slots in the group used when the group is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;

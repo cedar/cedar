@@ -7,6 +7,7 @@
     <file>menus/toggle_plot_visibility.svg</file>
     <file>toolbaricons/toggle_visibility_of_plots.svg</file>
     <file>menus/close_all_plots.svg</file>
+    <file>decorations/linked.svg</file>
     <file>decorations/looped.svg</file>
     <file>decorations/record.svg</file>
     <file>decorations/template.svg</file>
@@ -37,6 +38,7 @@
     <file>steps/rate_matrix_to_space_code.svg</file>
     <file>steps/rate_to_space_code.svg</file>
     <file>steps/remove_mean.svg</file>
+    <file>steps/scalar_division.svg</file>
     <file>steps/serial_order.svg</file>
     <file>steps/space_to_rate_code.svg</file>
     <file>steps/static_gain.svg</file>

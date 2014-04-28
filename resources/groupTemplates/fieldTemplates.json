@@ -462,8 +462,6 @@
             "ui generic":
             {
                 "group": "three-layer",
-                "open plots": "",
-                "plot groups": "",
                 "width": "465",
                 "height": "229",
                 "smart mode": "false",
@@ -562,7 +560,7 @@
                 },
                 "cedar.dynamics.NeuralField":
                 {
-                    "name": "v",
+                    "name": "w",
                     "resting level": "-5",
                     "time scale": "100",
                     "global inhibition": "-0.01",
@@ -643,11 +641,26 @@
             [
                 {
                     "source": "u.sigmoided activation",
-                    "target": "v.input"
+                    "target": "w.input"
                 },
                 {
-                    "source": "v.sigmoided activation",
+                    "source": "w.sigmoided activation",
                     "target": "u.input"
+                }
+            ],
+            "parameter links":
+            [
+                {
+                    "type": "cedar.aux.DirectParameterLink",
+                    "target element": "u",
+                    "source parameter": "dimensionality",
+                    "target parameter": "dimensionality"
+                },
+                {
+                    "type": "cedar.aux.DirectParameterLink",
+                    "target element": "w",
+                    "source parameter": "dimensionality",
+                    "target parameter": "dimensionality"
                 }
             ],
             "custom parameters":
@@ -655,21 +668,6 @@
                 {
                     "name": "dimensionality",
                     "type": "cedar.aux.UIntParameterPtr"
-                }
-            ],
-            "parameter links":
-            [
-                {
-                    "source parameter": "dimensionality",
-                    "target element": "u",
-                    "target parameter": "dimensionality",
-                    "type": "cedar.aux.DirectParameterLink"
-                },
-                {
-                    "source parameter": "dimensionality",
-                    "target element": "v",
-                    "target parameter": "dimensionality",
-                    "type": "cedar.aux.DirectParameterLink"
                 }
             ],
             "name": "two-layer",
@@ -689,25 +687,23 @@
                 },
                 {
                     "type": "step",
-                    "step": "v",
+                    "step": "w",
                     "display style": "ICON_AND_TEXT",
                     "width": "160",
                     "height": "50",
-                    "positionX": "232",
-                    "positionY": "88"
+                    "positionX": "40",
+                    "positionY": "136"
                 }
             ],
             "ui generic":
             {
                 "group": "two-layer",
-                "open plots": "",
-                "plot groups": "",
-                "width": "400",
-                "height": "150",
+                "width": "238",
+                "height": "226",
                 "smart mode": "false",
                 "collapsed": "false",
-                "uncollapsed width": "400",
-                "uncollapsed height": "150",
+                "uncollapsed width": "238",
+                "uncollapsed height": "226",
                 "positionX": "0",
                 "positionY": "0"
             }

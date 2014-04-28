@@ -141,8 +141,6 @@ private:
   cv::Mat mSliceSize;
   bool mDataIsSet;
 
-  //! desired columns of the slice plot
-  unsigned int mDesiredColumns;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -151,6 +149,8 @@ private:
   //! Dimension along which the slices are made.
   cedar::aux::UIntParameterPtr _mSlicedDimension;
 
+  //! Number of desired columns of the slice plot.
+  cedar::aux::UIntParameterPtr _mDesiredColumns;
 }; // class cedar::aux::gui::MatrixSlicePlot3D
 
 #endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H

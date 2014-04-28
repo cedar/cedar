@@ -75,7 +75,7 @@ public:
   //! Storage for locks in this class.
   typedef std::multiset<std::pair<QReadWriteLock*, cedar::aux::LOCK_TYPE> > Locks;
 
-private:
+public:
   /*! @brief A RAII-based locker for lockables. Will automatically unlock when the locker is destroyed.
    */
   class Locker : public cedar::aux::LockerBase

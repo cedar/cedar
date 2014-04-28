@@ -1321,6 +1321,42 @@ void cedar::proc::Group::writeConfiguration(cedar::aux::ConfigurationNode& root)
   format.write(boost::static_pointer_cast<cedar::proc::ConstGroup>(this->shared_from_this()), root);
 }
 
+void cedar::proc::Group::writeData(cedar::aux::ConfigurationNode& root) const
+{
+  for (auto name_element_pair : this->getElements())
+  {
+    auto element = name_element_pair.second;
+    if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
+    {
+      cedar::aux::ConfigurationNode data;
+      connectable->writeData(data);
+      if (!data.empty())
+      {
+        root.push_back(cedar::aux::ConfigurationNode::value_type(connectable->getName(), data));
+      }
+    }
+  }
+}
+
+void cedar::proc::Group::readData(const cedar::aux::ConfigurationNode& root)
+{
+  for (auto assoc_pair : root)
+  {
+    const std::string& element_name = assoc_pair.first;
+    if (!this->nameExists(element_name))
+    {
+      continue;
+    }
+
+    auto element = this->getElement(element_name);
+    if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
+    {
+      connectable->readData(assoc_pair.second);
+    }
+  }
+}
+
+
 std::set<std::string> cedar::proc::Group::getRequiredPlugins(const std::string& architectureFile)
 {
   std::set<std::string> plugins;
@@ -1388,6 +1424,7 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
   }
   // make a copy of the configuration that was read -- the ui may need to read additional information from it
   mLastReadConfiguration = root;
+  this->signalLastReadConfigurationChanged();
 
   // select the proper format for reading the group
   switch (format_version)
@@ -2088,6 +2125,59 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
     cedar::proc::ConnectablePtr receiver = this->getElement<Connectable>(connection->getTarget()->getParent());
     receiver->callInputConnectionChanged(connection->getTarget()->getName());
   }
+}
+
+void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const std::string& fileName)
+{
+  //!@todo This code is largely redundant with importGroupFromFile
+  // first, read in the configuration tree
+  cedar::aux::ConfigurationNode configuration;
+  boost::property_tree::read_json(fileName, configuration);
+
+  try
+  {
+    // try to access the "groups" node
+    cedar::aux::ConfigurationNode& groups_node = configuration.get_child("groups");
+    try
+    {
+      // try to access the group node with name "groupName"
+      cedar::aux::ConfigurationNode& group_node = groups_node.get_child(groupName);
+      // create, add, and configure
+
+      this->mLinkedGroupFile = fileName;
+      this->mLinkedGroupName = groupName;
+
+      group_node.put("name", this->getUniqueIdentifier(this->getName()));
+
+      this->readConfiguration(group_node);
+      this->_mIsLooped->setConstant(true);
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+      // could not find given group, abort
+      CEDAR_THROW
+      (
+        cedar::aux::NotFoundException,
+        "Could not find group with name " + groupName + " in file " + fileName
+      );
+    }
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    // could not find a "groups" node, abort
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + fileName);
+  }
+
+  this->signalLinkedChanged(true);
+}
+
+cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string& groupName, const std::string& fileName)
+{
+  cedar::proc::GroupPtr imported_group(new cedar::proc::Group());
+  this->add(imported_group, this->getUniqueIdentifier(groupName));
+  imported_group->readLinkedGroup(groupName, fileName);
+
+  return imported_group;
 }
 
 cedar::proc::ElementPtr cedar::proc::Group::importGroupFromFile(const std::string& groupName, const std::string& fileName)

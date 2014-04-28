@@ -138,6 +138,12 @@ public slots:
    */
   bool saveAs();
 
+  //! Allows the user to choose a destination for saving the data of serializable data slots in all steps.
+  bool saveSerializableDataAs();
+
+  //! Allows the user to choose a source for loading data into serializable data slots of all steps.
+  bool loadSerializableData();
+
   /*!@brief Slot that is connected to the "load" item in the file menu.
    */
   void load();

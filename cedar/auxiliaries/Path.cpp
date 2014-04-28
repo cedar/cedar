@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -52,6 +53,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 const std::string cedar::aux::Path::M_PROTOCOL_ABSOLUTE_STR = "absolute";
 const std::string cedar::aux::Path::M_PROTOCOL_RESOURCE_STR = "resource";
+const std::string cedar::aux::Path::M_PROTOCOL_PLUGIN_STR = "plugin";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,9 +127,14 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
     return cedar::aux::Path(path);
   }
 
-  if (this->isAbsolute())
+  else if (this->isAbsolute())
   {
     return *this;
+  }
+
+  else if (this->isPluginRelative())
+  {
+    return cedar::aux::PluginProxy::findPluginFile(this->toString(false));
   }
 
   // if the path is neither a resource, nor absolute, it should be relative
@@ -155,6 +162,15 @@ bool cedar::aux::Path::isAbsolute() const
     return true;
   }
   //!@todo this should probably return true in other circumstances!
+  return false;
+}
+
+bool cedar::aux::Path::isPluginRelative() const
+{
+  if (this->mProtocol == cedar::aux::Path::M_PROTOCOL_PLUGIN_STR)
+  {
+    return true;
+  }
   return false;
 }
 

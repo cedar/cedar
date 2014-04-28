@@ -67,6 +67,7 @@
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/version.h"
 
 // SYSTEM INCLUDES
@@ -202,11 +203,17 @@ mpExperimentDialog(NULL)
                    this, SLOT(architectureToolFinished()));
   QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
   QObject::connect(this->mpThreadsSingleStep, SIGNAL(triggered()), this, SLOT(stepThreads()));
-  QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()));
+  QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()))
+  ;
   QObject::connect(this->mpActionNew, SIGNAL(triggered()), this, SLOT(newFile()));
+
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
+
+  QObject::connect(this->mpActionSaveSerializableData, SIGNAL(triggered()), this, SLOT(saveSerializableDataAs()));
+  QObject::connect(this->mpActionLoadSerializableData, SIGNAL(triggered()), this, SLOT(loadSerializableData()));
+
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
@@ -727,6 +734,7 @@ void cedar::proc::gui::Ide::resetStepList()
 
 void cedar::proc::gui::Ide::deleteSelectedElements()
 {
+  //!@todo This code (and the code called from it) should probably be in proc::gui::Scene.
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   this->deleteElements(selected_items);
 }
@@ -736,14 +744,14 @@ bool cedar::proc::gui::Ide::sortElements(QGraphicsItem* pFirstItem, QGraphicsIte
   unsigned int depth_first_item = 0;
   unsigned int depth_second_item = 0;
   QGraphicsItem* p_current_item = pFirstItem;
-  while (p_current_item->parentItem() != 0)
+  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
   {
     ++depth_first_item;
     p_current_item = p_current_item->parentItem();
   }
 
   p_current_item = pSecondItem;
-  while (p_current_item->parentItem() != 0)
+  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
   {
     ++depth_second_item;
     p_current_item = p_current_item->parentItem();
@@ -756,6 +764,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
   // remove connections
   for (int i = 0; i < items.size(); ++i)
   {
+    //!@todo This code can probably use some cleaning up
     // delete connections
     if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
@@ -763,37 +772,58 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       {
         if (cedar::proc::gui::DataSlotItem* target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
         {
-          std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
-          std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-          // delete connection in network of source
-          source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
+          auto source_item = dynamic_cast<cedar::proc::gui::Connectable*>(source->parentItem());
+          auto target_item = dynamic_cast<cedar::proc::gui::Connectable*>(target->parentItem());
+
+          if ( (!source_item || !source_item->isReadOnly()) && (!target_item || !target_item->isReadOnly()) )
+          {
+            std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
+            std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
+            // delete connection in network of source
+            source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
+          }
         }
       }
       else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
       {
-        if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
+        if (!source->isReadOnly())
         {
-          source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getStep());
-        }
-        else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
-        {
-          source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+          if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
+          {
+            if (!target->isReadOnly())
+            {
+              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getStep());
+            }
+          }
+          else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
+          {
+            if (!target->isReadOnly())
+            {
+              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+            }
+          }
         }
       }
       else
       {
         CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
       }
-//      p_connection->disconnect();
-//      delete p_connection;
-      items[i] = NULL;
+      items[i] = nullptr;
     }
   }
   std::vector<QGraphicsItem*> delete_stack;
   // fill stack with elements
   for (int i = 0; i < items.size(); ++i)
   {
-    if (items[i] != NULL)
+    auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
+    if (graphics_base != nullptr)
+    {
+      if (!graphics_base->isReadOnly())
+      {
+        delete_stack.push_back(graphics_base);
+      }
+    }
+    else
     {
       delete_stack.push_back(items[i]);
     }
@@ -911,6 +941,57 @@ bool cedar::proc::gui::Ide::save()
     this->setArchitectureChanged(false);
     return true;
   }
+}
+
+bool cedar::proc::gui::Ide::saveSerializableDataAs()
+{
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+
+  QString file = QFileDialog::getSaveFileName
+                 (
+                   this, // parent
+                   "Select where to save serializable data", // caption
+                   last_dir->getValue().absolutePath(), // initial directory;
+                   "data (*.data)" // filter(s), separated by ';;'
+                 );
+
+  if (file.isEmpty())
+  {
+    return false;
+  }
+
+  if (!file.endsWith(".data"))
+  {
+    file += ".data";
+  }
+
+  this->mGroup->getGroup()->writeDataFile(file.toStdString());
+
+  //!@todo Redundant code with other save/load functions; move to proc::gui::Settings.
+  QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  last_dir->setValue(path);
+
+  return true;
+}
+
+bool cedar::proc::gui::Ide::loadSerializableData()
+{
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
+
+  QString file = QFileDialog::getOpenFileName(this, // parent
+                                              "Select which data file to load", // caption
+                                              last_dir->getValue().absolutePath(), // initial directory
+                                              "data (*.data)" // filter(s), separated by ';;'
+                                              );
+
+  if (!file.isEmpty())
+  {
+    this->mGroup->getGroup()->readDataFile(file.toStdString());
+
+    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+    last_dir->setValue(path);
+  }
+  return true;
 }
 
 bool cedar::proc::gui::Ide::saveAs()

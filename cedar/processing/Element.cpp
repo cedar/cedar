@@ -98,6 +98,12 @@ void cedar::proc::Element::validateName(const std::string& newName) const
     CEDAR_THROW(cedar::aux::ValidationFailedException, "This name contains an invalid character (\".\")");
   }
 
+  // nothing to do if the name is the same
+  if (newName == this->getName())
+  {
+    return;
+  }
+
   if (cedar::proc::ConstGroupPtr network = this->getGroup())
   {
     if (network->nameExists(newName))
@@ -105,7 +111,7 @@ void cedar::proc::Element::validateName(const std::string& newName) const
       CEDAR_THROW
       (
         cedar::aux::ValidationFailedException,
-        "There is already an element of this name in this element's group."
+        "There is already an element with the name \"" + newName + "\" in this element's group."
       );
     }
   }

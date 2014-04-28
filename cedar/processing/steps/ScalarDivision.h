@@ -22,141 +22,58 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericParameter.h
+    File:        ScalarDivision.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 04 17
 
-    Description:
+    Description: Header file for the class cedar::proc::steps::ScalarDivision.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_NUMERIC_PARAMETER_H
-#define CEDAR_AUX_NUMERIC_PARAMETER_H
+#ifndef CEDAR_PROC_STEPS_SCALAR_DIVISION_H
+#define CEDAR_PROC_STEPS_SCALAR_DIVISION_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/NumericParameter.fwd.h"
+#include "cedar/processing/steps/ScalarDivision.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/numeric/conversion/bounds.hpp>
-#endif
 
 
-/*!@brief A base class template for numeric parameters.
+/*!@brief A step that divides an input matrix by a scalar value that is also given as an input.
  */
-template <typename T>
-class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
+class cedar::proc::steps::ScalarDivision : public cedar::proc::Step
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! The super class of this class.
-  typedef cedar::aux::ParameterTemplate<T> Super;
-
-public:
-  //! Type of limits used by this parameter.
-  typedef cedar::aux::math::Limits<T> LimitType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief The constructor.
-   */
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& defaultValue,
-    const T& minimum,
-    const T& maximum
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(minimum, maximum)
-  {
-  }
-
-  /*!@brief The constructor, with default minimum and maximum.
-   */
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner = nullptr,
-    const std::string& name = "",
-    const T& defaultValue = static_cast<T>(0),
-    const LimitType& limits = LimitType::full()
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(limits)
-  {
-  }
-
-  //!@brief Destructor
-  ~NumericParameter()
-  {
-  }
+  //!@brief The standard constructor.
+  ScalarDivision();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief get the minimum value of this parameter
-  const T& getMinimum() const
-  {
-    return this->mLimits.getLower();
-  }
-
-  //!@brief set the minimum value of this parameter
-  void setMinimum(const T& value)
-  {
-    this->mLimits.setLower(value);
-
-    this->emitPropertyChangedSignal();
-
-    // updates the value if the limits restrict it
-    this->setValue(this->getValue());
-  }
-
-  //!@brief get the maximum value of this parameter
-  const T& getMaximum() const
-  {
-    return this->mLimits.getUpper();
-  }
-
-  //!@brief set the maximum value of this parameter
-  void setMaximum(const T& value)
-  {
-    this->mLimits.setUpper(value);
-
-    this->emitPropertyChangedSignal();
-
-    // updates the value if the limits restrict it
-    this->setValue(this->getValue());
-  }
-
-  /*!@brief Set the value of type T of this parameter.
-   *
-   * @param value The value to set.
-   * @param lock  Whether the method should take care of properly locking the parameter.
-   */
-  void setValue(const T& value, bool lock = false)
-  {
-    this->Super::setValue(this->mLimits.limit(value), lock);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -168,7 +85,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void compute(const cedar::proc::Arguments&);
+
+  void inputConnectionChanged(const std::string& slotName);
+
+private slots:
+  void zeroDivisionTreatmentChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -176,9 +98,26 @@ private:
 protected:
   // none yet
 private:
-  //!@brief The limits for this parameter.
-  LimitType mLimits;
+  cedar::aux::ConstMatDataPtr mMatrix;
 
-}; // class cedar::aux::NumericParameter
+  cedar::aux::ConstMatDataPtr mDivisor;
 
-#endif // CEDAR_AUX_NUMERIC_PARAMETER_H
+  cedar::aux::MatDataPtr mResult;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  //! When active, the user can choose what value to use for divisions-by-zero
+  cedar::aux::BoolParameterPtr _mTreatDivZero;
+
+  //! Value used for division instead of zero.
+  cedar::aux::DoubleParameterPtr _mDivZeroReplacement;
+
+}; // class cedar::proc::steps::ScalarDivision
+
+#endif // CEDAR_PROC_STEPS_SCALAR_DIVISION_H
+
