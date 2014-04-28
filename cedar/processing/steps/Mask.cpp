@@ -169,10 +169,13 @@ void cedar::proc::steps::Mask::inputConnectionChanged(const std::string& inputNa
       {
         this->mOutput->copyAnnotationsFrom(this->mInput);
       }
+
+      this->redetermineInputValidity("mask");
     }
     else if (inputName == "mask")
     {
       this->mMask = mat_data;
+      this->redetermineInputValidity("input");
     }
   }
 
