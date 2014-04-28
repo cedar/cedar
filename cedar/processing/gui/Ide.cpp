@@ -729,14 +729,14 @@ bool cedar::proc::gui::Ide::sortElements(QGraphicsItem* pFirstItem, QGraphicsIte
   unsigned int depth_first_item = 0;
   unsigned int depth_second_item = 0;
   QGraphicsItem* p_current_item = pFirstItem;
-  while (p_current_item->parentItem() != 0)
+  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
   {
     ++depth_first_item;
     p_current_item = p_current_item->parentItem();
   }
 
   p_current_item = pSecondItem;
-  while (p_current_item->parentItem() != 0)
+  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
   {
     ++depth_second_item;
     p_current_item = p_current_item->parentItem();
