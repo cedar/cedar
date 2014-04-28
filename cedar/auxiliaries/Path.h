@@ -94,6 +94,8 @@ public:
 
   bool isAbsolute() const;
 
+  bool isRelative() const;
+
   //! Returns true if the path is relative to a plugin folder, i.e., starts with the protocol plugin://
   bool isPluginRelative() const;
 

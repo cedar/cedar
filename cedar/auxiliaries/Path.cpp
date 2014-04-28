@@ -119,6 +119,18 @@ cedar::aux::Path cedar::aux::Path::getDirectory() const
   }
 }
 
+bool cedar::aux::Path::isRelative() const
+{
+  if (this->isResource() || this->isAbsolute() || this->isPluginRelative())
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+
 cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
 {
   if (this->isResource())
