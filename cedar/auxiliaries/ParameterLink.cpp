@@ -115,6 +115,8 @@ void cedar::aux::ParameterLink::unsetTarget()
 
 void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target)
 {
+  CEDAR_ASSERT(source);
+  CEDAR_ASSERT(target);
   //!@todo Exception; also, this should be checked in setSource, setTarget as well
   CEDAR_ASSERT(this->canLink(source, target));
 
@@ -134,7 +136,10 @@ void cedar::aux::ParameterLink::targetPropertiesChanged()
 
 void cedar::aux::ParameterLink::applyProperties(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target)
 {
-  target->setConstant(source->isConstant());
+  if (target && source)
+  {
+    target->setConstant(source->isConstant());
+  }
 }
 
 cedar::aux::ParameterPtr cedar::aux::ParameterLink::getSource() const
