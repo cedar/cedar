@@ -158,6 +158,7 @@ void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, double relativ
     break;
 
   case 3:
+  {
     switch (matrix.depth())
     {
     case CV_8U:
@@ -178,11 +179,21 @@ void cedar::aux::gui::ImagePlot::plotClicked(QMouseEvent* pEvent, double relativ
                 break;
     }
 
+    case CV_32F:
+    {
+      const cv::Vec3s& value = matrix.at<cv::Vec3f>(y, x);
+      info_text += QString("%1, %2, %3").arg(static_cast<float>(value[0]))
+        .arg(static_cast<float>(value[1]))
+        .arg(static_cast<float>(value[2]));
+      break;
+    }
+
     default:
       QToolTip::showText(pEvent->globalPos(), QString("Matrix depth (%1) not handled.").arg(matrix.depth()));
       return;
     }
     break;
+  } // case: three channels
 
   default:
     // should never happen, all cases should be handled above
@@ -267,12 +278,12 @@ bool cedar::aux::gui::ImagePlot::doConversion()
     {
       // convert grayscale to three-channel matrix
       cv::Mat copy = mat.clone();
+      read_lock.unlock();
       double min, max;
       if (this->isAutoScaling())
       {
-        cv::minMaxLoc(mat, &min, &max);
+        cv::minMaxLoc(copy, &min, &max);
       }
-      read_lock.unlock();
       cv::Mat converted = this->threeChannelGrayscale(copy);
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->displayMatrix(converted);
@@ -281,6 +292,35 @@ bool cedar::aux::gui::ImagePlot::doConversion()
       {
         emit minMaxChanged(min, max);
       }
+      break;
+    }
+
+    case CV_32FC3:
+    {
+      // convert grayscale to three-channel matrix
+      cv::Mat copy = mat.clone();
+      read_lock.unlock();
+      cv::Mat channels[3];
+      double min_all = std::numeric_limits<double>::max(), max_all = -std::numeric_limits<double>::max();
+      cv::split(copy, channels);
+      for (size_t c = 0; c < 3; ++c)
+      {
+        double min, max;
+        cv::minMaxLoc(channels[c], &min, &max);
+        if (min < min_all)
+        {
+          min_all = min;
+        }
+        if (max > max_all)
+        {
+          max_all = max;
+        }
+      }
+      cv::Mat converted;
+      copy = (copy - min_all) / (max_all - min_all);
+      copy.convertTo(converted, CV_8UC3, 255.0);
+      CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
+      this->displayMatrix(converted);
       break;
     }
 
