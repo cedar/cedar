@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ConditionOnTime.h"
+#include "cedar/processing/experiment/ConditionAtTime.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
@@ -49,14 +49,14 @@
 namespace
 {
   bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
-    registerType<cedar::proc::experiment::ConditionOnTimePtr>();
+    registerType<cedar::proc::experiment::ConditionAtTimePtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ConditionOnTime::ConditionOnTime()
+cedar::proc::experiment::ConditionAtTime::ConditionAtTime()
 :
 mActivated(false)
 ,
@@ -65,7 +65,7 @@ _mTime( new cedar::aux::TimeParameter(this,"Time",cedar::unit::Time()))
 
 }
 
-cedar::proc::experiment::ConditionOnTime::~ConditionOnTime()
+cedar::proc::experiment::ConditionAtTime::~ConditionAtTime()
 {
 
 }
@@ -74,7 +74,7 @@ cedar::proc::experiment::ConditionOnTime::~ConditionOnTime()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::experiment::ConditionOnTime::check()
+bool cedar::proc::experiment::ConditionAtTime::check()
 {
   // reset the activated flag if the time is below the time to check
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();

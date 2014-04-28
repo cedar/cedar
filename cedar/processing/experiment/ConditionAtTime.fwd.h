@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,12 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ConditionOnTime);
+      CEDAR_DECLARE_PROC_CLASS(ConditionAtTime);
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
 
