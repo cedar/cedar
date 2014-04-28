@@ -169,7 +169,7 @@ void cedar::proc::steps::MatrixSlice::updateDimensionality()
     const cedar::aux::math::Limits<unsigned int>& limits = this->mStoredLimits.at(d);
 
     bool lower_blocked = this->_mRangeLower->blockSignals(true);
-    bool upper_blocked = this->_mRangeLower->blockSignals(true);
+    bool upper_blocked = this->_mRangeUpper->blockSignals(true);
 
     this->_mRangeLower->set(d, limits.getLower());
     this->_mRangeUpper->set(d, limits.getUpper());
