@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,7 +44,7 @@
 #include "cedar/processing/experiment/Condition.h"
 #include "cedar/auxiliaries/TimeParameter.h"
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionOnTime.fwd.h"
+#include "cedar/processing/experiment/ConditionAtTime.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -53,7 +53,7 @@
  *
  *        This condition is only activated once after the trial time reaches the value
  */
-class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::ConditionAtTime : public cedar::proc::experiment::Condition
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,10 +64,10 @@ class cedar::proc::experiment::ConditionOnTime : public cedar::proc::experiment:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ConditionOnTime();
+  ConditionAtTime();
 
   //!@brief Destructor
-  virtual ~ConditionOnTime();
+  virtual ~ConditionAtTime();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -109,5 +109,5 @@ private:
 
 }; // class cedar::proc::experiment::ConditionOnTime
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TIME_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_H
 

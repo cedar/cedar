@@ -172,6 +172,7 @@ void cedar::proc::gui::ExperimentDialog::runExperiment(bool status)
   {
     this->experiment->run();
     this->runButton->setText(QString::fromStdString("Cancel"));
+    this->scrollArea->setEnabled(false);
   }
   else
   {
@@ -181,6 +182,7 @@ void cedar::proc::gui::ExperimentDialog::runExperiment(bool status)
     {
       this->experiment->cancel();
       experimentStopped(true);
+      this->scrollArea->setEnabled(true);
     }
     else
     {
@@ -198,6 +200,7 @@ void cedar::proc::gui::ExperimentDialog::experimentStopped(bool status)
     disconnect(this->runButton, SIGNAL(toggled(bool)), this, SLOT(runExperiment(bool)));
     this->runButton->setText(QString::fromStdString("Run"));
     this->runButton->setChecked(false);
+    this->scrollArea->setEnabled(true);
     connect(this->runButton, SIGNAL(toggled(bool)), this, SLOT(runExperiment(bool)));
   }
 }
