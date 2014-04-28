@@ -68,18 +68,22 @@
 cedar::aux::gui::Configurable::DataDelegate::DataDelegate
 (
   cedar::aux::ConfigurablePtr pConfigurable,
-  cedar::aux::gui::Configurable* configurableWidget
+  cedar::aux::gui::Configurable* configurableWidget,
+  bool readOnly
 )
 :
 mpConfigurable(pConfigurable),
-mConfigurableWidget(configurableWidget)
+mConfigurableWidget(configurableWidget),
+mReadOnly(readOnly)
 {
 }
 
 cedar::aux::gui::Configurable::DataDelegate::~DataDelegate()
 {
-  for (auto widget : mOpenedEditors)
+  while (!this->mOpenedEditors.empty())
   {
+    auto widget = *(this->mOpenedEditors.begin());
+    // this will also remove the widget from the set of open editors via cedar::aux::gui::Configurable::DataDelegate::widgetDestroyed.
     delete widget;
   }
 }
@@ -100,6 +104,7 @@ QWidget* cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pPar
     QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()), Qt::QueuedConnection);
     QObject::connect(parameter.get(), SIGNAL(valueChanged()), this->mConfigurableWidget, SIGNAL(settingsChanged()));
     p_ret = p_widget;
+    p_ret->setEnabled(!this->mReadOnly);
   }
   catch (cedar::aux::UnknownTypeException& e)
   {
@@ -297,13 +302,13 @@ void cedar::aux::gui::Configurable::makeHeading(QTreeWidgetItem* pItem, const QS
   pItem->setText(0, text);
 }
 
-void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configurable)
+void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configurable, bool readOnly)
 {
   this->clear();
   
   this->mDisplayedConfigurable = configurable;
 
-  this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN, new cedar::aux::gui::Configurable::DataDelegate(configurable, this));
+  this->mpPropertyTree->setItemDelegateForColumn(PARAMETER_EDITOR_COLUMN, new cedar::aux::gui::Configurable::DataDelegate(configurable, this, readOnly));
 
   std::string type_name = cedar::aux::objectTypeToString(configurable);
   type_name = cedar::aux::replace(type_name, "::", ".");

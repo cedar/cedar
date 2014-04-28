@@ -191,6 +191,18 @@ public:
 
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
+  //! Writes data marked as serializable to the configuration node.
+  virtual void writeData(cedar::aux::ConfigurationNode& root) const;
+
+  //! Writes data marked as serializable to the given file.
+  void writeDataFile(const cedar::aux::Path& file) const;
+
+  //! Writes data marked as serializable to the given file.
+  void readDataFile(const cedar::aux::Path& file);
+
+  //! Writes data marked as serializable to the configuration node.
+  virtual void readData(const cedar::aux::ConfigurationNode& root);
+
   //!@brief Parses a data and Connectable name without specifying a role.
   static void parseDataNameNoRole
               (

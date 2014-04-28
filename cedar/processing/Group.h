@@ -165,6 +165,8 @@ public:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& root);
 
+  void readData(const cedar::aux::ConfigurationNode& root);
+
   /*!@deprecated Use readConfiguration instead.
    */
   CEDAR_DECLARE_DEPRECATED(void readFrom(const cedar::aux::ConfigurationNode& root))
@@ -175,6 +177,10 @@ public:
   /*!@brief Writes the group to a configuration node.
    */
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
+  /*!@brief Writes data marked as serializable to the given configuration node.
+   */
+  void writeData(cedar::aux::ConfigurationNode& root) const;
 
   /*!@deprecated Use writeConfiguration instead.
    */
@@ -518,6 +524,10 @@ public:
 
   cedar::proc::ElementPtr importGroupFromFile(const std::string& groupName, const std::string& fileName);
 
+  cedar::proc::ElementPtr createLinkedGroup(const std::string& groupName, const std::string& fileName);
+
+  void readLinkedGroup(const std::string& groupName, const std::string& fileName);
+
   cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
 
   //! Adds a parameter link to the list of links in this group. Does NOT link the parameters.
@@ -575,6 +585,13 @@ public:
   /*! @brief Returns a list of all steps that are in an invalid state.
    */
   std::vector<std::string> listInvalidSteps() const;
+
+  /*! Returns whether or not this group is linked, i.e., read from a file.
+   */
+  inline bool isLinked() const
+  {
+    return !this->mLinkedGroupFile.empty() && !this->mLinkedGroupName.empty();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -673,6 +690,14 @@ public:
   //!@brief Signal that is emitted whenever a custom parameter is removed.
   CEDAR_DECLARE_SIGNAL(ParameterLinkRemoved, void (cedar::aux::ParameterLinkPtr));
 
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(LinkedChanged, void (bool));
+
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(LastReadConfigurationChanged, void ());
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -702,6 +727,12 @@ private:
 
   //! List of all the custom parameters that were added to this group.
   std::vector<cedar::aux::ParameterPtr> mCustomParameters;
+
+  //! If non-empty, specifies which file the group was imported from.
+  std::string mLinkedGroupFile;
+
+  //! If non-empty, the name of the group that was imported from a file.
+  std::string mLinkedGroupName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

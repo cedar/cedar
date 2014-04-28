@@ -73,6 +73,12 @@ Unreleased
 - cedar
   - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters of a
     step, but is otherwise quite similar to the old one.
+  - Group templates can now be added in two ways:
+    1. They can be copied into the current architecture. Any changes to the original template will not be reflected.
+    2. They can be linked into the architecture. Only the file- and groupname will be stored, and the group will be re-
+       loaded from the stored file every time the architecture is loaded. Note: linked groups cannot be edited to avoid
+       conflicts. Any edits must be made to the file containing the imported group.
+    To link in templates, hold ctrl while dragging them from the elements tab.
       
 - cedar::proc
   - DataSlots can now be marked as serializable. What this means is that the data stored in them will be stored in the

@@ -159,8 +159,14 @@ public:
     return this->toString();
   }
 
-  //! Returns a section of the path
-  SelfType operator()(size_t start, size_t end = (getElementCount() - 1))
+  //! Returns the path, starting from the given index.
+  SelfType operator()(size_t start)
+  {
+    return this->operator()(start, this->getElementCount());
+  }
+
+  //! Returns the section of the path between start and end.
+  SelfType operator()(size_t start, size_t end)
   {
     if (start >= this->getElementCount())
     {

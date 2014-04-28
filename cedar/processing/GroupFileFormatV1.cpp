@@ -75,40 +75,48 @@ void cedar::proc::GroupFileFormatV1::write
   if (!meta.empty())
     root.add_child("meta", meta);
 
-  cedar::aux::ConfigurationNode steps;
-  this->writeSteps(group, steps);
-  if (!steps.empty())
-    root.add_child("steps", steps);
+  if (group->isLinked())
+  {
+    root.put("linked file", group->mLinkedGroupFile);
+    root.put("linked group name", group->mLinkedGroupName);
+  }
+  else
+  {
+    cedar::aux::ConfigurationNode steps;
+    this->writeSteps(group, steps);
+    if (!steps.empty())
+      root.add_child("steps", steps);
 
-  cedar::aux::ConfigurationNode triggers;
-  this->writeTriggers(group, triggers);
-  if (!triggers.empty())
-    root.add_child("triggers", triggers);
+    cedar::aux::ConfigurationNode triggers;
+    this->writeTriggers(group, triggers);
+    if (!triggers.empty())
+      root.add_child("triggers", triggers);
 
-  cedar::aux::ConfigurationNode groups;
-  this->writeGroups(group, groups);
-  if (!groups.empty())
-    root.add_child("groups", groups);
+    cedar::aux::ConfigurationNode groups;
+    this->writeGroups(group, groups);
+    if (!groups.empty())
+      root.add_child("groups", groups);
 
-  cedar::aux::ConfigurationNode connections;
-  this->writeDataConnections(group, connections);
-  if (!connections.empty())
-    root.add_child("connections", connections);
+    cedar::aux::ConfigurationNode connections;
+    this->writeDataConnections(group, connections);
+    if (!connections.empty())
+      root.add_child("connections", connections);
 
-  cedar::aux::ConfigurationNode records;
-  this->writeRecords(group, records);
-  if (!records.empty())
-    root.add_child("records", records);
+    cedar::aux::ConfigurationNode records;
+    this->writeRecords(group, records);
+    if (!records.empty())
+      root.add_child("records", records);
 
-  cedar::aux::ConfigurationNode links;
-  this->writeParameterLinks(group, links);
-  if (!links.empty())
-    root.add_child("parameter links", links);
+    cedar::aux::ConfigurationNode links;
+    this->writeParameterLinks(group, links);
+    if (!links.empty())
+      root.add_child("parameter links", links);
 
-  cedar::aux::ConfigurationNode custom_parameters;
-  this->writeCustomParameters(group, custom_parameters);
-  if (!custom_parameters.empty())
+    cedar::aux::ConfigurationNode custom_parameters;
+    this->writeCustomParameters(group, custom_parameters);
+    if (!custom_parameters.empty())
     root.add_child("custom parameters", custom_parameters);
+  }
 
   group->cedar::aux::Configurable::writeConfiguration(root);
 }
@@ -262,57 +270,72 @@ void cedar::proc::GroupFileFormatV1::read
        std::vector<std::string>& exceptions
      )
 {
-  // these have to be read before Configurable::readConfiguration is called.
-  auto custom_parameters = root.find("custom parameters");
-  if (custom_parameters != root.not_found())
+  bool linked = false;
+  auto linked_file_iter = root.find("linked file");
+  auto linked_name_iter = root.find("linked group name");
+  if (linked_file_iter != root.not_found() && linked_name_iter != root.not_found())
   {
-    this->readCustomParameters(group, custom_parameters->second, exceptions);
+    group->readLinkedGroup(linked_name_iter->second.get_value<std::string>(), linked_file_iter->second.get_value<std::string>());
+    linked = true;
+  }
+
+  if (!linked)
+  {
+    // these have to be read before Configurable::readConfiguration is called.
+    auto custom_parameters = root.find("custom parameters");
+    if (custom_parameters != root.not_found())
+    {
+      this->readCustomParameters(group, custom_parameters->second, exceptions);
+    }
   }
 
   group->cedar::aux::Configurable::readConfiguration(root);
 
-  group->processConnectors();
-
-  auto steps = root.find("steps");
-  if (steps != root.not_found())
+  if (!linked)
   {
-    this->readSteps(group, steps->second, exceptions);
-  }
+    group->processConnectors();
 
-  auto networks = root.find("networks");
-  if (networks != root.not_found())
-  {
-    this->readGroups(group, networks->second, exceptions);
-  }
+    auto steps = root.find("steps");
+    if (steps != root.not_found())
+    {
+      this->readSteps(group, steps->second, exceptions);
+    }
 
-  auto groups = root.find("groups");
-  if (groups != root.not_found())
-  {
-    this->readGroups(group, groups->second, exceptions);
-  }
+    auto networks = root.find("networks");
+    if (networks != root.not_found())
+    {
+      this->readGroups(group, networks->second, exceptions);
+    }
 
-  auto connections = root.find("connections");
-  if (connections != root.not_found())
-  {
-    this->readDataConnections(group, connections->second, exceptions);
-  }
+    auto groups = root.find("groups");
+    if (groups != root.not_found())
+    {
+      this->readGroups(group, groups->second, exceptions);
+    }
 
-  auto triggers = root.find("triggers");
-  if (triggers != root.not_found())
-  {
-    this->readTriggers(group, triggers->second, exceptions);
-  }
+    auto connections = root.find("connections");
+    if (connections != root.not_found())
+    {
+      this->readDataConnections(group, connections->second, exceptions);
+    }
 
-  auto records = root.find("records");
-  if (records != root.not_found())
-  {
-    this->readRecords(group, records->second, exceptions);
-  }
+    auto triggers = root.find("triggers");
+    if (triggers != root.not_found())
+    {
+      this->readTriggers(group, triggers->second, exceptions);
+    }
 
-  auto parameter_links_iter = root.find("parameter links");
-  if (parameter_links_iter != root.not_found())
-  {
-    this->readParameterLinks(group, parameter_links_iter->second, exceptions);
+    auto records = root.find("records");
+    if (records != root.not_found())
+    {
+      this->readRecords(group, records->second, exceptions);
+    }
+
+    auto parameter_links_iter = root.find("parameter links");
+    if (parameter_links_iter != root.not_found())
+    {
+      this->readParameterLinks(group, parameter_links_iter->second, exceptions);
+    }
   }
 }
 

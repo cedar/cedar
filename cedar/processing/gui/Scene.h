@@ -54,9 +54,10 @@
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/gui/StickyNote.fwd.h"
 #include "cedar/processing/gui/TriggerItem.fwd.h"
 #include "cedar/auxiliaries/gui/Configurable.fwd.h"
-#include "cedar/processing/gui/StickyNote.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
@@ -141,12 +142,9 @@ public:
    */
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  /*!@brief Handles the dragEnter event of the scene.
-   *
-   *        This method determines whether the contents of the drop can be handled by
-   *        cedar::proc::gui::Scene::dropEvent.
+  /*!@brief Handles the dragLeave event of the scene.
    */
-  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   /*!@brief Handles the dragMove event of the scene.
    *
@@ -370,6 +368,8 @@ private:
 
   void resetBackgroundColor();
 
+  cedar::aux::PluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const;
+
 private slots:
   void promoteElementToExistingGroup();
 
@@ -378,7 +378,7 @@ private slots:
   void itemSelected();
 
   //!@todo importGroup and importStep share a lot of code
-  void importGroup();
+  void importGroup(bool link);
   void importStep();
 
   //--------------------------------------------------------------------------------------------------------------------

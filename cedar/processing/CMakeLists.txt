@@ -94,6 +94,7 @@ cedar_add_library(cedarproc
   steps/StaticGain.h
   steps/UnitConverter.h
   steps/Histogram.h
+  steps/ScalarDivision.h
   steps/Threshold.h
   steps/TransferFunction.h
   sources/Boost.h

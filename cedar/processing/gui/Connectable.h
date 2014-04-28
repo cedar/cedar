@@ -127,6 +127,12 @@ protected:
 
       void setSize(double sizeFactor);
 
+      void setVisible(bool visible)
+      {
+        this->mpIcon->setVisible(visible);
+        this->mpRectangle->setVisible(visible);
+      }
+
     private:
       QGraphicsSvgItem* mpIcon;
 
@@ -184,6 +190,8 @@ public:
 
   const cedar::proc::gui::Connectable::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role) const;
 
+  void setReadOnly(bool readOnly);
+
 public slots:
   void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
   void reactToSlotAdded(cedar::proc::DataRole::Id role, QString name);
@@ -225,7 +233,13 @@ protected:
   void setIconBounds(const qreal& x, const qreal& y, const qreal& size);
 
   //!@brief Adds the decorations to the step.
-  void addDecorations();
+  void updateDecorations();
+
+  //! Adds a given decoration to this step.
+  void addDecoration(cedar::proc::gui::Connectable::DecorationPtr decoration);
+
+  //! Removes a given decoration from this step. Does nothing if the decoration is not in this step.
+  void removeDecoration(cedar::proc::gui::Connectable::DecorationPtr decoration);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -261,6 +275,7 @@ protected:
   //! The decorations for this connectable.
   std::vector<DecorationPtr> mDecorations;
 
+
 private:
   //! An offset to be added to in- and output slot positions.
   qreal mInputOutputSlotOffset;
@@ -274,6 +289,8 @@ private:
   boost::signals2::connection mSlotAddedConnection;
   boost::signals2::connection mSlotRenamedConnection;
   boost::signals2::connection mSlotRemovedConnection;
+
+  DecorationPtr mpLoopedDecoration;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

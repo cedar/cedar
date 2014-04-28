@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -72,6 +72,9 @@
     <addaction name="mpActionSaveAs"/>
     <addaction name="mpActionLoad"/>
     <addaction name="mpRecentFiles"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionSaveSerializableData"/>
+    <addaction name="mpActionLoadSerializableData"/>
     <addaction name="separator"/>
     <addaction name="mpActionExportSVG"/>
     <addaction name="separator"/>
@@ -215,8 +218,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>424</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -228,8 +231,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -286,8 +289,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>429</height>
              </rect>
             </property>
             <property name="palette">
@@ -826,6 +829,22 @@
   <action name="mpActionParameterLinker">
    <property name="text">
     <string>Parameter linking ...</string>
+   </property>
+  </action>
+  <action name="mpActionSaveSerializableData">
+   <property name="text">
+    <string>Save serializable data ...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a location to save all data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="mpActionLoadSerializableData">
+   <property name="text">
+    <string>Load serializable data ...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a file from which to load data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </action>
  </widget>

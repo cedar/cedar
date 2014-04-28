@@ -204,6 +204,11 @@ void cedar::proc::gui::ElementClassList::showList(const std::string& categoryNam
   }
 }
 
+Qt::DropActions cedar::proc::gui::ElementClassList::supportedDropActions() const
+{
+  return Qt::CopyAction | Qt::LinkAction;
+}
+
 void cedar::proc::gui::ElementClassList::addListEntry
 (
   const std::string& className,

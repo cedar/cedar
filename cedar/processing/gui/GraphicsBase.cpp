@@ -82,6 +82,7 @@ mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
 mFillStyle(Qt::SolidPattern),
 mSnapToGrid(true),
 mResizeable(false),
+mReadOnly(false),
 mWidth
 (
   new cedar::aux::DoubleParameter
@@ -126,6 +127,16 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::GraphicsBase::setReadOnly(bool readOnly)
+{
+  this->mReadOnly = readOnly;
+
+  if (readOnly)
+  {
+    this->clearResizeHandles();
+  }
+}
 
 void cedar::proc::gui::GraphicsBase::itemSceneHasChanged()
 {
@@ -462,10 +473,24 @@ QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
 
     default:
     case HIGHLIGHTMODE_NONE:
+    {
       QBrush brush;
-      brush.setColor(this->mFillColor);
+      QColor color = this->mFillColor;
+      if (this->mReadOnly)
+      {
+        if (color.hsvHue() == -1)
+        {
+          color = QColor::fromHsv(color.hsvHue(), color.hsvSaturation(), color.value() - 30);
+        }
+        else
+        {
+          color = QColor::fromHsv(color.hsvHue(), color.hsvSaturation() / 2, color.value());
+        }
+      }
+      brush.setColor(color);
       brush.setStyle(this->mFillStyle);
       return brush;
+    }
   }
 }
 
@@ -696,7 +721,7 @@ void cedar::proc::gui::GraphicsBase::clearResizeHandles()
 bool cedar::proc::gui::GraphicsBase::canResize() const
 {
   // currently, only networks can be resized
-  return this->mResizeable;
+  return this->mResizeable && !this->mReadOnly;
 }
 
 void cedar::proc::gui::GraphicsBase::updateConnections()
