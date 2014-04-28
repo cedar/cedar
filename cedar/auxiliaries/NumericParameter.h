@@ -94,7 +94,7 @@ public:
    */
   NumericParameter
   (
-    cedar::aux::Configurable *pOwner = NULL,
+    cedar::aux::Configurable *pOwner = nullptr,
     const std::string& name = "",
     const T& defaultValue = static_cast<T>(0),
     const LimitType& limits = LimitType::full()
