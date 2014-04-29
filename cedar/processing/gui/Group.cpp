@@ -555,6 +555,10 @@ void cedar::proc::gui::Group::transformChildCoordinates(cedar::proc::gui::Graphi
 
 bool cedar::proc::gui::Group::canAddAny(const QList<QGraphicsItem*>& items) const
 {
+  if (this->getGroup()->isLinked())
+  {
+    return false;
+  }
   for (int i = 0; i < items.size(); ++i)
   {
     //!@todo This should cast to a cedar::proc::gui::Element class.
