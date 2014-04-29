@@ -348,7 +348,10 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
     {
-      group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+      if (!group->getGroup()->isLinked())
+      {
+        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+      }
     }
     this->mpDropTarget = p_item;
   }
@@ -372,15 +375,18 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   // the drop target must be reset, even if something goes wrong; so: do it now by remembering the target in another
   // variable.
   auto drop_target = this->mpDropTarget;
-  this->mpDropTarget = NULL;
+  this->mpDropTarget = nullptr;
 
   QPointF mapped = pEvent->scenePos();
   auto target_group = this->getRootGroup()->getGroup();
   if (auto group = dynamic_cast<cedar::proc::gui::Group*>(drop_target))
   {
-    group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-    target_group = group->getGroup();
-    mapped -= group->scenePos();
+    if (!group->getGroup()->isLinked())
+    {
+      group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      target_group = group->getGroup();
+      mapped -= group->scenePos();
+    }
   }
 
   if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(declaration))
@@ -518,7 +524,7 @@ void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition
   auto old_drop_target = mpDropTarget;
 
   // ... reset the current one ...
-  mpDropTarget = NULL;
+  mpDropTarget = nullptr;
   mTargetGroup.reset();
   bool potential_target_group_found = true;
   bool target_is_root_group = true;
