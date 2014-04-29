@@ -449,6 +449,25 @@ public:
    */
   std::string findPath(cedar::proc::ConstElement* pFindMe) const;
 
+  /*!@brief Finds all elements of the given type.
+   */
+  template <typename T>
+  std::set<boost::shared_ptr<T> > findAll() const
+  {
+    std::set<boost::shared_ptr<T> > elements;
+
+    for (auto name_element_pair : this->getElements())
+    {
+      cedar::proc::ElementPtr element = name_element_pair.second;
+      if (auto t_ptr = boost::dynamic_pointer_cast<T>(element))
+      {
+        elements.insert(t_ptr);
+      }
+    }
+
+    return elements;
+  }
+
   /*!@brief This method lists all groups that are children of this group.
    */
   void listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const;
