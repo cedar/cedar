@@ -1201,6 +1201,11 @@ void cedar::proc::gui::Ide::loadFile(QString file)
     this->mpBoostControl->setGroup(this->mGroup->getGroup());
   }
 
+  if (this->mpPerformanceOverview)
+  {
+    this->mpPerformanceOverview->setGroup(this->mGroup->getGroup());
+  }
+
   this->displayFilename(file.toStdString());
   this->updateTriggerStartStopThreadCallers();
   this->loadPlotGroupsIntoComboBox();
