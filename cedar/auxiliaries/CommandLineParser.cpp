@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/EnumBase.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -95,6 +96,15 @@ cedar::aux::CommandLineParser::CommandLineParser()
 
 void cedar::aux::CommandLineParser::setParsedValue(const std::string& longName, const std::string& value)
 {
+  auto enum_iter = this->mEnumValues.find(longName);
+  if (enum_iter != this->mEnumValues.end())
+  {
+    auto enum_base_ptr = enum_iter->second;
+    if (enum_base_ptr->get(value) == cedar::aux::Enum::UNDEFINED)
+    {
+      CEDAR_THROW(cedar::aux::InvalidValueException, "Invalid value \"" + value + "\"specified for command line parameter \"" + longName + "\". See --help for more details.");
+    }
+  }
   this->mParsedValues[longName] = value;
 }
 
@@ -291,6 +301,24 @@ void cedar::aux::CommandLineParser::defineValue
      )
 {
   this->defineOption(longName, description, shortName, group);
+}
+
+void cedar::aux::CommandLineParser::defineEnum
+     (
+       const std::string& longName,
+       const std::string& description,
+       cedar::aux::EnumBasePtr enumType,
+       char shortName,
+       const std::string& group
+     )
+{
+  this->defineOption(longName, description, shortName, group);
+  this->mEnumValues[longName] = enumType;
+}
+
+bool cedar::aux::CommandLineParser::isEnum(const std::string& longName) const
+{
+  return this->mEnumValues.find(longName) != this->mEnumValues.end();
 }
 
 void cedar::aux::CommandLineParser::defineValueInt
@@ -666,6 +694,25 @@ void cedar::aux::CommandLineParser::writeHelp(std::ostream& stream) const
       if (this->hasDefaultValue(long_name))
       {
         stream << "    " << "Default value: " << this->getDefaultValue(long_name) << std::endl;
+      }
+
+      if (this->isEnum(long_name))
+      {
+        stream << "    Possible Values are: ";
+        bool first = true;
+        for (auto value : this->mEnumValues.find(long_name)->second->list())
+        {
+          if (first)
+          {
+            first = false;
+          }
+          else
+          {
+            stream << ", ";
+          }
+          stream << "\"" << value.name() << "\"";
+        }
+        stream << std::endl;
       }
 
       stream << std::endl;
