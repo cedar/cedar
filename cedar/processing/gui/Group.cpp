@@ -900,10 +900,10 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode& root) co
       cedar::aux::ConfigurationNode node;
       node.put("type","stickyNote");
       QRectF rect = note->boundingRect();
-      node.put("width",rect.width());
-      node.put("height",rect.height());
-      node.put("x",note->scenePos().x());
-      node.put("y",note->scenePos().y());
+      node.put("width",static_cast<int>(rect.width()));
+      node.put("height",static_cast<int>(rect.height()));
+      node.put("x",static_cast<int>(note->scenePos().x()));
+      node.put("y",static_cast<int>(note->scenePos().y()));
       node.put("text",note->getText());
       scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
     }
