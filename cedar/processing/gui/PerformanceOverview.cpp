@@ -164,13 +164,22 @@ void cedar::proc::gui::PerformanceOverview::refresh()
     return;
   }
 
-  for (const auto& name_element_pair : this->mGroup->getElements())
+  this->addGroup(this->mGroup);
+}
+
+void cedar::proc::gui::PerformanceOverview::addGroup(cedar::proc::ConstGroupPtr group)
+{
+  for (const auto& name_element_pair : group->getElements())
   {
     auto element = name_element_pair.second;
 
     if (auto step = boost::dynamic_pointer_cast<cedar::proc::ConstStep>(element))
     {
       this->addStepRow(step);
+    }
+    else if (auto subgroup = boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(element))
+    {
+      this->addGroup(subgroup);
     }
   }
 }
@@ -180,7 +189,7 @@ void cedar::proc::gui::PerformanceOverview::addStepRow(cedar::proc::ConstStepPtr
   int row = this->mpStepTimeOverview->rowCount();
   this->mpStepTimeOverview->setRowCount(row + 1);
 
-  auto p_name = new QTableWidgetItem(QString::fromStdString(step->getName()));
+  auto p_name = new QTableWidgetItem(QString::fromStdString(this->mGroup->findPath(step)));
   this->mpStepTimeOverview->setItem(row, 0, p_name);
 
   if (!step->isStarted())

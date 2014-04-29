@@ -93,6 +93,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void addGroup(cedar::proc::ConstGroupPtr group);
+
   void addStepRow(cedar::proc::ConstStepPtr step);
 
   void clear();
