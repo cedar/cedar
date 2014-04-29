@@ -107,6 +107,39 @@ void cedar::aux::ImageDatabase::Image::setClassId(ClassId classId)
   this->mClassId = classId;
 }
 
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithTags(const std::string& tagsStr) const
+{
+  std::vector<std::string> tags;
+  cedar::aux::split(tagsStr, ",", tags);
+  return this->getImagesWithTags(tags);
+}
+
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithTags(const std::vector<std::string>& tags) const
+{
+  std::set<ImagePtr> samples;
+
+  for (const auto& tag : tags)
+  {
+    auto tag_samples = this->getImagesWithTag(tag);
+    samples.insert(tag_samples.begin(), tag_samples.end());
+  }
+
+  return samples;
+}
+
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithTag(const std::string& tag) const
+{
+  auto iter = this->mImagesByTag.find(tag);
+  if (iter == this->mImagesByTag.end())
+  {
+    return std::set<ImagePtr>();
+  }
+  else
+  {
+    return iter->second;
+  }
+}
+
 void cedar::aux::ImageDatabase::appendImage(ImagePtr sample)
 {
   mImages.push_back(sample);
