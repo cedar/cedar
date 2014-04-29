@@ -190,12 +190,14 @@ void cedar::proc::gui::ExperimentDialog::experimentRunning(bool status)
     this->runButton->setEnabled(false);
     this->cancelButton->setEnabled(true);
     this->scrollArea->setEnabled(false);
+    this->mStatusText->setText(QString::fromStdString("Running"));
   }
   else
   {
     this->runButton->setEnabled(true);
     this->cancelButton->setEnabled(false);
     this->scrollArea->setEnabled(true);
+    this->mStatusText->setText(QString::fromStdString("Stopped"));
   }
 }
 
