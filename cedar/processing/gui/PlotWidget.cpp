@@ -268,6 +268,8 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   }
   // if there is only one plot and it is a multiplot, we need no label
   
+  //!@todo This can fail in some circumstances (possibly connected to when a step moves a buffer to the outputs)
+  CEDAR_ASSERT(!this->mPlotGridMap.empty());
   auto p_current_labeled_plot = mPlotGridMap.begin()->second;
   if (mPlotGridMap.size() == 1 && p_current_labeled_plot->mIsMultiPlot)
   {
