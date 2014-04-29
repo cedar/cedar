@@ -213,6 +213,10 @@ public:
    */
   const std::vector<std::string>& getUnparsedValues() const;
 
+  /*! Sets the default value for a given command line option.
+   */
+  void setDefaultValue(const std::string& longName, const std::string& defaultValue);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

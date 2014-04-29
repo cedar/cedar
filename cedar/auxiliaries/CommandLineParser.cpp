@@ -332,6 +332,11 @@ void cedar::aux::CommandLineParser::defineValueInt
 {
   this->defineValue(longName, description, shortName, group);
 
+  this->setDefaultValue(longName, defaultValue);
+}
+
+void cedar::aux::CommandLineParser::setDefaultValue(const std::string& longName, const std::string& defaultValue)
+{
   CEDAR_ASSERT(this->mDefaultValues.find(longName) == this->mDefaultValues.end());
   this->mDefaultValues[longName] = defaultValue;
 }
