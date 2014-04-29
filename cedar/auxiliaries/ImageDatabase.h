@@ -145,6 +145,21 @@ public:
 
   bool hasClass(const std::string& className) const;
 
+  /*!@brief Returns all images with a given tag.
+   *
+   */
+  std::set<ImagePtr> getImagesWithTag(const std::string& tag) const;
+
+  /*!@brief Returns all images with a set of given tags.
+   *
+   * @param tags A list of tags, separated by ",".
+   */
+  std::set<ImagePtr> getImagesWithTags(const std::string& tags) const;
+
+  /*!@brief Returns all images with a list of given tags.
+   */
+  std::set<ImagePtr> getImagesWithTags(const std::vector<std::string>& tags) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
