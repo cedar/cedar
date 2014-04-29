@@ -150,7 +150,6 @@ void cedar::proc::experiment::Experiment::run()
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
-  std::cout << "CANCEL" << std::endl;
   ExperimentSuperviserSingleton::getInstance()->requestStop();
   stopTrial();
   emit experimentRunning(false);
