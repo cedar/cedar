@@ -119,11 +119,14 @@ private slots:
   //!@brief Sets the number of trials of the experiment
   void trialChanged();
 
-  //!@brief Starts or stops the experiment
-  void runExperiment(bool status);
+  //!@brief Starts the experiment
+  void runExperiment();
+
+  //!@brief Stops the experiment
+   void cancelExperiment();
 
   //!@brief Tells the GUI when the experiment has been stopped
-  void experimentStopped(bool status);
+  void experimentRunning(bool status);
 
   //!@brief Tells the GUI when the actual trial number has changed
   void trialNumberChanged(int number);

@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/experiment/ActionStart.h"
+#include "cedar/processing/experiment/ConditionOnInit.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
@@ -143,12 +144,16 @@ void cedar::proc::experiment::Experiment::run()
     this->mRecordFolderName = this->_mName->getValue()+ "_" + time_stamp;
     this->mActualTrial = 1;
     ExperimentSuperviserSingleton::getInstance()->start();
+    emit experimentRunning(true);
+    this->checkActionSequences();
   }
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
+  std::cout << "CANCEL" << std::endl;
   ExperimentSuperviserSingleton::getInstance()->requestStop();
-  this->stopTrial();
+  stopTrial();
+  emit experimentRunning(false);
 }
 
 void cedar::proc::experiment::Experiment::startTrial()
@@ -225,8 +230,8 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
   if ( mActualTrial >_mTrials->getValue() )
   {
     ExperimentSuperviserSingleton::getInstance()->requestStop();
+    emit experimentRunning(false);
     mActualTrial  = 0;
-    emit experimentStopped(true);
   }
   mStopped=true;
   emit trialNumberChanged(mActualTrial);
@@ -346,4 +351,22 @@ unsigned int cedar::proc::experiment::Experiment::getActualTrial()
 bool cedar::proc::experiment::Experiment::hasStopped()
 {
   return mStopped;
+}
+void cedar::proc::experiment::Experiment::checkActionSequences()
+{
+  int counter = 0;
+  for (ActionSequencePtr action_sequence: this->getActionSequences())
+  {
+    if(boost::dynamic_pointer_cast<ConditionOnInit>(action_sequence->getCondition()))
+    {
+      for(ActionPtr action : action_sequence->getActions())
+      {
+        counter++;
+      }
+    }
+  }
+  if(counter!=1)
+  {
+    this->cancel();
+  }
 }

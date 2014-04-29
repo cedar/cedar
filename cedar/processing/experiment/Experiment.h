@@ -260,7 +260,7 @@ public:
 signals:
 
   //!@brief Should be emitted if the experiment has stopped
-  void experimentStopped(bool stopped);
+  void experimentRunning(bool running);
 
   //!@brief Should be emitted if the actual running trial has changed
   void trialNumberChanged(int trialNumber);
@@ -276,11 +276,13 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
+  //!@brief Checks if there is exactly one ActionStart in a ConditionOnInit
+  void checkActionSequences();
+
   /*!@brief Checks for every action sequence if its condition is fulfilled.
-   *           If this the case all actions of the sequence will be executed.
+   *           If this is the case all actions of the sequence will be executed.
    *           The flag initial defines that all Conditions should thread this experiment as it is on initial state.
    */
-
   void executeAcionSequences(bool initial = false);
   //--------------------------------------------------------------------------------------------------------------------
   // members
