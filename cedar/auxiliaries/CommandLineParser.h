@@ -321,16 +321,16 @@ private:
 
 }; // class cedar::aux::CommandLineParser
 
-//! Specialization of
 namespace cedar
 {
   namespace aux
   {
+    //! Specialization of the getValue method for enums.
     template <> inline cedar::aux::Enum CommandLineParser::getValue(const std::string& longName) const
     {
       //!@todo Proper exception: the given parameter is not an enum parameter.
       CEDAR_ASSERT(this->isEnum(longName));
-      return this->mEnumValues.find(longName)->second->get(longName);
+      return this->mEnumValues.find(longName)->second->get(this->getValue(longName));
     }
   }
 }
