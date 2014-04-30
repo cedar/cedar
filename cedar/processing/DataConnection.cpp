@@ -74,17 +74,17 @@ mAlreadyDisconnected(false)
     // we ignore exceptions during this constructor, but notify the user
     if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
     {
+      std::string message = "An exception occurred while connecting \"" + this->getDataSlotIdentifier(source)
+            + "\" to \"" + this->getDataSlotIdentifier(target) + "\": ";
       p_triggerable->setState
       (
         cedar::proc::Triggerable::STATE_EXCEPTION,
-        "An exception occured during establishing a connection: "
-        + exc.getMessage()
+        message + exc.getMessage()
       );
 
       cedar::aux::LogSingleton::getInstance()->error
       (
-        "An exception occurred while connecting \"" + source->getName() + "\" to \"" + target->getName() + "\". "
-        + "The exception is: " + exc.exceptionInfo(),
+        message + exc.exceptionInfo(),
         "cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr)"
       );
     }
@@ -94,17 +94,18 @@ mAlreadyDisconnected(false)
     // we ignore exceptions during this constructor, but notify the user
     if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getRealTarget()->getParentPtr()))
     {
+      std::string message = "An exception occurred while connecting \"" + this->getDataSlotIdentifier(source)
+            + "\" to \"" + this->getDataSlotIdentifier(target) + "\": ";
+
       p_triggerable->setState
       (
         cedar::proc::Triggerable::STATE_EXCEPTION,
-        "An exception occured during establishing a connection: "
-        + std::string(exc.what())
+        message + std::string(exc.what())
       );
 
       cedar::aux::LogSingleton::getInstance()->error
       (
-        "An exception occurred while connecting \"" + source->getName() + "\" to \"" + target->getName() + "\". "
-        + "The exception is: " + std::string(exc.what()),
+        message + std::string(exc.what()),
         "cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr)"
       );
     }
@@ -120,6 +121,17 @@ cedar::proc::DataConnection::~DataConnection()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::proc::DataConnection::getDataSlotIdentifier(cedar::proc::DataSlotPtr slot)
+{
+  std::string slot_id;
+  if (!slot->getParent().empty())
+  {
+    slot_id += slot->getParent();
+  }
+  slot_id += "." + slot->getName();
+  return slot_id;
+}
 
 void cedar::proc::DataConnection::disconnect()
 {
