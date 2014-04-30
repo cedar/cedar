@@ -80,6 +80,11 @@ void cedar::aux::ParameterLink::setSource(cedar::aux::ParameterPtr parameter)
   this->mSource->setLinked(true);
   QObject::connect(this->mSource.get(), SIGNAL(valueChanged()), this, SLOT(sourceChanged()));
   QObject::connect(this->mSource.get(), SIGNAL(propertyChanged()), this, SLOT(sourcePropertiesChanged()));
+
+  if (this->mSource && this->mTarget)
+  {
+    this->sourceChanged();
+  }
 }
 
 void cedar::aux::ParameterLink::unsetSource()
@@ -103,6 +108,11 @@ void cedar::aux::ParameterLink::setTarget(cedar::aux::ParameterPtr parameter)
 
   QObject::connect(this->mTarget.get(), SIGNAL(valueChanged()), this, SLOT(targetChanged()));
   QObject::connect(this->mTarget.get(), SIGNAL(propertyChanged()), this, SLOT(targetPropertiesChanged()));
+
+  if (this->mSource && this->mTarget)
+  {
+    this->sourceChanged();
+  }
 }
 
 void cedar::aux::ParameterLink::unsetTarget()
