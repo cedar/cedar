@@ -127,11 +127,17 @@ void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr sou
 void cedar::aux::ParameterLink::sourcePropertiesChanged()
 {
   this->applyProperties(this->getSource(), this->getTarget());
+
+  // also, if the properties changed, we need to copy the values
+  this->sourceChanged();
 }
 
 void cedar::aux::ParameterLink::targetPropertiesChanged()
 {
   this->applyProperties(this->getTarget(), this->getSource());
+
+  // also, if the properties changed, we need to copy the values
+  this->targetChanged();
 }
 
 void cedar::aux::ParameterLink::applyProperties(cedar::aux::ConstParameterPtr source, cedar::aux::ParameterPtr target)
