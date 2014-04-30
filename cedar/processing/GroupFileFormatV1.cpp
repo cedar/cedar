@@ -350,7 +350,6 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
   {
     cedar::aux::ConfigurationNode link_node;
 
-    std::string target_path = link_info.getTargetElementPath();
     std::string source_parameter_path = link_info.getSourceParameterPath();
     std::string target_parameter_path = link_info.getTargetParameterPath();
     std::string link_type = cedar::aux::objectTypeToString(link_info.mParameterLink);
@@ -364,7 +363,12 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
       link_node.put("source element", source_path);
     }
 
-    link_node.put("target element", target_path);
+    if (link_info.mTargetElement != group)
+    {
+      std::string target_path = link_info.getTargetElementPath();
+      link_node.put("target element", target_path);
+    }
+
     link_node.put("source parameter", source_parameter_path);
     link_node.put("target parameter", target_parameter_path);
 
