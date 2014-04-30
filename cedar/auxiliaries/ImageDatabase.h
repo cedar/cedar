@@ -52,6 +52,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/bimap.hpp>
+#include <iostream>
 #include <set>
 
 
