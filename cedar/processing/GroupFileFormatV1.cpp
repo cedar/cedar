@@ -279,6 +279,7 @@ void cedar::proc::GroupFileFormatV1::read
     linked = true;
   }
 
+
   if (!linked)
   {
     // these have to be read before Configurable::readConfiguration is called.
@@ -287,9 +288,36 @@ void cedar::proc::GroupFileFormatV1::read
     {
       this->readCustomParameters(group, custom_parameters->second, exceptions);
     }
+    group->cedar::aux::Configurable::readConfiguration(root);
+  }
+  else
+  {
+    /*!@todo This is a hack for fixing a bug that can happen in very special circumstances.
+     *
+     * What these circumstances are: a group has a new parameter added to it and linked to a step in the group;
+     * the group is linked into another architecture.
+     *
+     * What happens without this fix is that in the architecture into which the group is linked, no value is in the
+     * configuration tree. Thus, the default value gets set for it AFTER the parameter link has properly copied the
+     * value (this happens via group->readLinkedGroup above), destroying the copied values in the process. In case of
+     * vector parameters, this is an empty vector. Effectively, this means that vector parameters could not be added to
+     * groups that are linked somewhere without causing trouble.
+     *
+     * The solution here is to copy the current values of non-existent parameters into the configuration before reading
+     * it.
+     */
+    cedar::aux::ConfigurationNode root_copy = root;
+    for (auto parameter : group->getParameters())
+    {
+      auto param_iter = root_copy.find(parameter->getName());
+      if (param_iter == root_copy.not_found())
+      {
+        parameter->writeToNode(root_copy);
+      }
+    }
+    group->cedar::aux::Configurable::readConfiguration(root_copy);
   }
 
-  group->cedar::aux::Configurable::readConfiguration(root);
 
   if (!linked)
   {
