@@ -394,9 +394,10 @@ public:
   //!@brief set the internal vector to a given vector
   void set(const std::vector<T>& values, bool lock = false)
   {
+    cedar::aux::Parameter::WriteLockerPtr locker;
     if (lock)
     {
-      this->lockForWrite();
+      locker = cedar::aux::Parameter::WriteLockerPtr(new cedar::aux::Parameter::WriteLocker(this));
     }
 
     bool changed = (this->mValues.size() != values.size());
@@ -413,14 +414,14 @@ public:
 
     if (lock)
     {
-      this->unlock();
+      locker->unlock();
     }
 
     if (changed)
     {
       this->emitChangedSignal();
+      this->emitPropertyChangedSignal();
     }
-    //!@todo emit a property changed signal here as well, as the new vector may have a different size
   }
 
   //!@brief set one entry of the vector to a new value
