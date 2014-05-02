@@ -164,7 +164,29 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
 
   if (iter == this->mAnnotations.end())
   {
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find an annotation with the id \"" + annotationId + "\".");
+    std::string known_annotations;
+
+    if (!this->mAnnotations.empty())
+    {
+      bool first = true;
+      for (auto name_annotation_pair : this->mAnnotations)
+      {
+        if (first)
+        {
+          first = false;
+        }
+        else
+        {
+          known_annotations += ", ";
+        }
+        known_annotations += "\"" + name_annotation_pair.first + "\"";
+      }
+    }
+    else
+    {
+      known_annotations = "none";
+    }
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find an annotation with the id \"" + annotationId + "\". Known annotations are: " + known_annotations);
   }
 
   return iter->second;
