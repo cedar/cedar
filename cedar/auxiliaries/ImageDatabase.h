@@ -186,6 +186,9 @@ public:
 
     unsigned int getImageColumns() const;
 
+    //! Checks whether the given tag is one of the tags set for this image.
+    bool hasTag(const std::string& tag) const;
+
   private:
     ClassId mClassId;
 
