@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/filesystem.hpp>
+#include <fstream>
 
 cedar::aux::EnumType<cedar::aux::ImageDatabase::Type> cedar::aux::ImageDatabase::Type::mType("cedar::aux::ImageDatabase::Type::");
 
@@ -63,6 +64,14 @@ cedar::aux::ImageDatabase::ImageDatabase()
 {
 }
 
+cedar::aux::ImageDatabase::ObjectPoseAnnotation::ObjectPoseAnnotation()
+:
+mX(0), mY(0), mHasPosition(false),
+mOrientation(0), mHasOrientation(false),
+mScale(1.0), mHasScale(false)
+{
+}
+
 cedar::aux::ImageDatabase::Image::Image()
 :
 mClassId(0)
@@ -72,6 +81,42 @@ mClassId(0)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::ImageDatabase::ObjectPoseAnnotation::setPosition(double dxFromCenter, double dyFromCenter)
+{
+  this->mHasPosition = true;
+  this->mX = dxFromCenter;
+  this->mY = dyFromCenter;
+}
+
+void cedar::aux::ImageDatabase::ObjectPoseAnnotation::setOrientation(double orientation)
+{
+  this->mHasOrientation = true;
+  this->mOrientation = orientation;
+}
+
+void cedar::aux::ImageDatabase::ObjectPoseAnnotation::setScale(double factor)
+{
+  this->mHasScale = true;
+  this->mScale = factor;
+}
+
+void cedar::aux::ImageDatabase::Image::setFileName(const cedar::aux::Path& fileName)
+{
+  this->mFileName = fileName;
+
+  this->mImage = cv::imread(fileName.absolute().toString());
+}
+
+unsigned int cedar::aux::ImageDatabase::Image::getImageRows() const
+{
+  return static_cast<unsigned int>(this->mImage.rows);
+}
+
+unsigned int cedar::aux::ImageDatabase::Image::getImageColumns() const
+{
+  return static_cast<unsigned int>(this->mImage.cols);
+}
 
 void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLineParser& parser)
 {
@@ -102,6 +147,29 @@ void cedar::aux::ImageDatabase::readDatabase(const cedar::aux::CommandLineParser
   this->readDatabase(path, type.name());
 }
 
+void cedar::aux::ImageDatabase::Image::setAnnotation(const std::string& annotationId, AnnotationPtr annotation)
+{
+  this->mAnnotations[annotationId] = annotation;
+}
+
+bool cedar::aux::ImageDatabase::Image::hasAnnotation(const std::string& annotationId) const
+{
+  return this->mAnnotations.find(annotationId) != this->mAnnotations.end();
+}
+
+cedar::aux::ImageDatabase::ConstAnnotationPtr
+  cedar::aux::ImageDatabase::Image::getAnnotation(const std::string& annotationId) const
+{
+  auto iter = this->mAnnotations.find(annotationId);
+
+  if (iter == this->mAnnotations.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find an annotation with the id \"" + annotationId + "\".");
+  }
+
+  return iter->second;
+}
+
 void cedar::aux::ImageDatabase::Image::setClassId(ClassId classId)
 {
   this->mClassId = classId;
@@ -125,6 +193,20 @@ std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImag
   }
 
   return samples;
+}
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithClass(cedar::aux::ImageDatabase::ClassId classId) const
+{
+  std::set<ImagePtr> images;
+
+  for (auto image : this->mImages)
+  {
+    if (image->getClassId() == classId)
+    {
+      images.insert(image);
+    }
+  }
+
+  return images;
 }
 
 std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithTag(const std::string& tag) const
@@ -156,6 +238,26 @@ void cedar::aux::ImageDatabase::appendImage(ImagePtr sample)
   }
 }
 
+cedar::aux::ImageDatabase::ImagePtr cedar::aux::ImageDatabase::findImageWithFilenameNoPath(const std::string& filenameWithoutExtension)
+{
+  for (const auto& image : this->mImages)
+  {
+    if (image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".png") //!@todo Don't hard-code file type
+    {
+      return image;
+    }
+  }
+  CEDAR_THROW(cedar::aux::NotFoundException, "Could not find sample " + filenameWithoutExtension);
+}
+
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImages() const
+{
+  std::set<cedar::aux::ImageDatabase::ImagePtr> images;
+  images.insert(this->mImages.begin(), this->mImages.end());
+  return images;
+}
+
+
 void cedar::aux::ImageDatabase::readDatabase(const cedar::aux::Path& path, const std::string& dataBaseType)
 {
   auto enum_value = Type::type().get(dataBaseType);
@@ -168,6 +270,98 @@ void cedar::aux::ImageDatabase::readDatabase(const cedar::aux::Path& path, const
 
     default:
       CEDAR_THROW(cedar::aux::UnknownTypeException, "The database type \"" + dataBaseType + "\" is not known.");
+  }
+}
+
+void cedar::aux::ImageDatabase::readAnnotations(const cedar::aux::Path& path)
+{
+  cedar::aux::Path annotation_file_path = path;
+  std::ifstream annotation_file(annotation_file_path.absolute().toString() + "/annotations");
+
+  if (!annotation_file.is_open())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Annotation file not found.",
+      "void cedar::aux::ImageDataBase::readAnnotations(const cedar::aux::Path&)"
+    );
+    return;
+  }
+
+  std::string current_image;
+  ImagePtr image;
+
+  while (!annotation_file.eof())
+  {
+    std::string line;
+    std::getline(annotation_file, line);
+
+    std::vector<std::string> parts;
+    cedar::aux::split(line, ":", parts);
+
+    for (size_t p = 0; p < parts.size(); ++p)
+    {
+      parts[p] = cedar::aux::replace(parts[p], " ", "");
+    }
+
+    switch (parts.size())
+    {
+      case 2:
+      {
+        std::string left = parts[0];
+        std::string right = parts[1];
+        if (right.empty())
+        {
+          current_image = left;
+          image = this->findImageWithFilenameNoPath(current_image);
+          image->setAnnotation("object pose", ObjectPoseAnnotationPtr(new ObjectPoseAnnotation()));
+        }
+        else
+        {
+          if (left == "position")
+          {
+            CEDAR_ASSERT(right.size() > 3);
+            right = right.substr(1, right.length() - 2);
+            std::vector<std::string> position_str;
+            cedar::aux::split(right, ",", position_str);
+            CEDAR_ASSERT(position_str.size() == 2);
+            int x = cedar::aux::fromString<int>(position_str[0]);
+            int y = cedar::aux::fromString<int>(position_str[1]);
+
+            auto annotation = image->getAnnotation<ObjectPoseAnnotation>("object pose");
+            double region_rows, region_cols;
+            region_cols = static_cast<double>(image->getImageColumns());
+            region_rows = static_cast<double>(image->getImageRows());
+
+            double rel_x, rel_y;
+
+            rel_x = static_cast<double>(x) - region_cols/2.0;
+            rel_y = static_cast<double>(y) - region_rows/2.0;
+            annotation->setPosition(rel_x, rel_y);
+          }
+          else if (left == "orientation")
+          {
+            auto annotation = image->getAnnotation<ObjectPoseAnnotation>("object pose");
+            double phi = cedar::aux::fromString<double>(right);
+            annotation->setOrientation(phi);
+          }
+          else if (left == "scale-factor")
+          {
+            auto annotation = image->getAnnotation<ObjectPoseAnnotation>("object pose");
+            double scale = cedar::aux::fromString<double>(right);
+            annotation->setScale(scale);
+          }
+          else
+          {
+            std::cout << "WARNING: UNUSED ANNOTATION LINE: \"" << left << "\"=>\"" << right << "\"" << std::endl;
+          }
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
   }
 }
 
@@ -247,8 +441,7 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
     }
   }
 
-  // TODO
-//  this->readAnnotations(path);
+  this->readAnnotations(path);
 }
 
 cedar::aux::ImageDatabase::ClassId cedar::aux::ImageDatabase::getOrCreateClass(const std::string& className)
@@ -303,6 +496,16 @@ std::set<std::string> cedar::aux::ImageDatabase::listTags() const
     tags.insert(tag_imageset_pair.first);
   }
   return tags;
+}
+
+std::set<cedar::aux::ImageDatabase::ClassId> cedar::aux::ImageDatabase::listIds() const
+{
+  std::set<ClassId> ids;
+  for (auto class_id_pair : this->mClassIdAssociations.left)
+  {
+    ids.insert(class_id_pair.second);
+  }
+  return ids;
 }
 
 std::set<std::string> cedar::aux::ImageDatabase::listClasses() const

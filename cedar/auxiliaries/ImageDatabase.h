@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/EnumBase.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ImageDatabase.fwd.h"
@@ -66,16 +67,71 @@ class cedar::aux::ImageDatabase
 public:
   typedef unsigned int ClassId;
 
+  class Annotation
+  {
+  public:
+    virtual ~Annotation()
+    {
+    }
+  };
+  CEDAR_GENERATE_POINTER_TYPES(Annotation);
+
+  class ObjectPoseAnnotation : public Annotation
+  {
+  public:
+    ObjectPoseAnnotation();
+
+    void setPosition(double dxFromCenter, double dyFromCenter);
+
+    void setOrientation(double orientation);
+
+    void setScale(double factor);
+
+    double getX() const
+    {
+      return this->mX;
+    }
+
+    double getY() const
+    {
+      return this->mY;
+    }
+
+    double getOrientation() const
+    {
+      return this->mOrientation;
+    }
+
+    double getScale() const
+    {
+      return this->mScale;
+    }
+
+    bool hasScaleAnnotation() const
+    {
+      return this->mHasScale;
+    }
+
+  private:
+    double mX;
+    double mY;
+    bool mHasPosition;
+
+    double mOrientation;
+    bool mHasOrientation;
+
+    double mScale;
+    bool mHasScale;
+  };
+  CEDAR_GENERATE_POINTER_TYPES(ObjectPoseAnnotation);
+
   //! Represents an image in the database and the corresponding annotations.
   class Image
   {
   public:
     Image();
 
-    void setFileName(const cedar::aux::Path& fileName)
-    {
-      this->mFileName = fileName;
-    }
+    void setFileName(const cedar::aux::Path& fileName);
 
     const cedar::aux::Path& getFileName() const
     {
@@ -96,12 +152,50 @@ public:
       return this->mTags;
     }
 
+    void setAnnotation(const std::string& annotationId, AnnotationPtr annotation);
+
+    bool hasAnnotation(const std::string& annotationId) const;
+
+    ConstAnnotationPtr getAnnotation(const std::string& annotationId) const;
+
+    template <typename T>
+    boost::shared_ptr<T> getAnnotation(const std::string& annotationId)
+    {
+      return boost::const_pointer_cast<T>(static_cast<const Image*>(this)->getAnnotation<const T>(annotationId));
+    }
+
+    template <typename T>
+    boost::shared_ptr<T> getAnnotation(const std::string& annotationId) const
+    {
+      auto annotation = boost::dynamic_pointer_cast<T>(this->getAnnotation(annotationId));
+      if (annotation)
+      {
+        return annotation;
+      }
+      else
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::NotFoundException,
+          "Annotation with ID \"" + annotationId + "\" could not be converted to the requested type."
+        );
+      }
+    }
+
+    unsigned int getImageRows() const;
+
+    unsigned int getImageColumns() const;
+
   private:
     ClassId mClassId;
 
     cedar::aux::Path mFileName;
 
     std::set<std::string> mTags;
+
+    std::map<std::string, AnnotationPtr> mAnnotations;
+
+    cv::Mat mImage;
   };
   CEDAR_GENERATE_POINTER_TYPES(Image);
 
@@ -196,6 +290,21 @@ public:
   //! Returns a set of all the classes in this database.
   std::set<std::string> listClasses() const;
 
+  //! Returns a set of all class ids stored in this database.
+  std::set<ClassId> listIds() const;
+
+  //! Returns the id of a class given by a string identifier.
+  ClassId getClass(const std::string& className) const;
+
+  //! Returns the identifying string for a given class id.
+  const std::string& getClass(ClassId id) const;
+
+  //! Returns a set containing all images in the database.
+  std::set<ImagePtr> getImages() const;
+
+  //! Returns a set of all images matching the given class.
+  std::set<ImagePtr> getImagesWithClass(ClassId classId) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -208,17 +317,17 @@ protected:
 private:
   void scanDirectory(const cedar::aux::Path& path);
 
+  void readAnnotations(const cedar::aux::Path& path);
+
   ClassId getOrCreateClass(const std::string& className);
 
   ClassId createClass(const std::string& className);
 
   void createClass(const std::string& className, ClassId setId);
 
-  ClassId getClass(const std::string& className) const;
-
-  const std::string& getClass(ClassId id) const;
-
   void appendImage(ImagePtr sample);
+
+  ImagePtr findImageWithFilenameNoPath(const std::string& filenameWithoutExtension);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
