@@ -101,6 +101,11 @@ void cedar::aux::ImageDatabase::ObjectPoseAnnotation::setScale(double factor)
   this->mScale = factor;
 }
 
+bool cedar::aux::ImageDatabase::Image::hasTag(const std::string& tag) const
+{
+  return this->mTags.find(tag) != this->mTags.end();
+}
+
 void cedar::aux::ImageDatabase::Image::setFileName(const cedar::aux::Path& fileName)
 {
   this->mFileName = fileName;
