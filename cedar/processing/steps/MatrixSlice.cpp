@@ -125,6 +125,30 @@ _mRangeUpper
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::MatrixSlice::setRanges(const std::vector<cv::Range>& ranges)
+{
+  cedar::proc::Step::WriteLocker locker(this);
+
+  CEDAR_ASSERT(ranges.size() == this->_mRangeLower->size());
+  CEDAR_ASSERT(ranges.size() == this->_mRangeUpper->size());
+
+  bool lower_blocked = this->_mRangeLower->blockSignals(true);
+  bool upper_blocked = this->_mRangeUpper->blockSignals(true);
+
+  for (size_t d = 0; d < ranges.size(); ++d)
+  {
+    this->_mRangeUpper->set(d, ranges.at(d).end);
+    this->_mRangeLower->set(d, ranges.at(d).start);
+  }
+
+  this->_mRangeLower->blockSignals(lower_blocked);
+  this->_mRangeUpper->blockSignals(upper_blocked);
+
+  locker.unlock();
+
+  this->rangeChanged();
+}
+
 void cedar::proc::steps::MatrixSlice::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::proc::Step::readConfiguration(node);
