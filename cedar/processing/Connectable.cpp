@@ -97,19 +97,6 @@ void cedar::proc::Connectable::readConfiguration(const cedar::aux::Configuration
   this->readData(stored_data);
 }
 
-void cedar::proc::Connectable::writeConfiguration(cedar::aux::ConfigurationNode& root) const
-{
-  cedar::proc::Element::writeConfiguration(root);
-
-  cedar::aux::ConfigurationNode stored_data;
-  this->writeData(stored_data);
-
-  if (!stored_data.empty())
-  {
-    root.push_back(cedar::aux::ConfigurationNode::value_type("stored data", stored_data));
-  }
-}
-
 void cedar::proc::Connectable::writeData(cedar::aux::ConfigurationNode& stored_data) const
 {
   for (auto role_enum : cedar::proc::DataRole::type().list())
