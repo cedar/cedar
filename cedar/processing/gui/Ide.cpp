@@ -773,11 +773,14 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       {
         if (!source->isReadOnly())
         {
-          if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
+          if (cedar::proc::gui::Connectable* target = dynamic_cast<cedar::proc::gui::Connectable*>(p_connection->getTarget()))
           {
             if (!target->isReadOnly())
             {
-              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getStep());
+              if (auto target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target->getConnectable()))
+              {
+                source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target_triggerable);
+              }
             }
           }
           else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
