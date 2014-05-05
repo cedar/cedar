@@ -105,16 +105,16 @@
 
     auto dim = found->second;
 
-    mUserSubmittedCommands[type] = cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE);
+    mUserSubmittedCommands.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
   }
 
   void cedar::dev::Component::lazyInitializeUserCommandUnlocked(ComponentDataType type)
   {
-    auto found = mUserSubmittedCommands.find(type);
+    auto found = mUserSubmittedCommands.member().find(type);
 
     // lazy initialization
-    if (found == mUserSubmittedCommands.end()
-        || found->second.empty())
+    if (found == mUserSubmittedCommands.member().end()
+        || found->second->getData().empty())
     {
       // cast away const-ness
       resetUserCommandUnlocked(type);
@@ -132,19 +132,42 @@
 
     auto dim = found->second;
 
-    mIOSubmittedCommands[type] = cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE);
+    mIOSubmittedCommands.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
+  }
+
+  void cedar::dev::Component::lazyInitializeMember
+       (
+         cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr> >& lockableMember,
+         boost::function<void (ComponentDataType)> initFun,
+         ComponentDataType type
+       )
+  {
+    auto found = lockableMember.member().find(type);
+
+    if (found == lockableMember.member().end()
+        || found->second->getData().empty())
+    {
+      // cast away const for lazy init to work
+      initFun(type);
+    }
   }
 
   void cedar::dev::Component::lazyInitializeIOCommandUnlocked(ComponentDataType type)
   {
-    auto found = mIOSubmittedCommands.find(type);
-
-    if (found == mIOSubmittedCommands.end()
-        || found->second.empty())
-    {
-      // cast away const for lazy init to work
-      resetIOCommandUnlocked(type);
-    }
+    this->lazyInitializeMember
+    (
+      mIOSubmittedCommands,
+      boost::bind(&cedar::dev::Component::resetIOCommandUnlocked, this, _1),
+      type
+    );
+//    auto found = mIOSubmittedCommands.member().find(type);
+//
+//    if (found == mIOSubmittedCommands.member().end()
+//        || found->second->getData().empty())
+//    {
+//      // cast away const for lazy init to work
+//      resetIOCommandUnlocked(type);
+//    }
   }
 
   void cedar::dev::Component::resetUserMeasurementUnlocked(ComponentDataType type)
@@ -158,23 +181,29 @@
 
     auto dim = found->second;
 
-    mUserRetrievedMeasurements[type] = cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE);
+    mUserRetrievedMeasurements.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
   }
 
   void cedar::dev::Component::lazyInitializeUserMeasurementUnlocked(ComponentDataType type)
   {
-    auto found = mUserRetrievedMeasurements.find(type);
-
-  // problem: NEED to initialize with correct value!
-    if (found == mUserRetrievedMeasurements.end()
-        || found->second.empty())
-    {
-  // TODO: throw!
-
-      // lazy initialization
-      // cast away const for lazy init to work
-      resetUserMeasurementUnlocked(type);
-    }
+    this->lazyInitializeMember
+    (
+      mUserRetrievedMeasurements,
+      boost::bind(&cedar::dev::Component::resetUserMeasurementUnlocked, this, _1),
+      type
+    );
+//    auto found = mUserRetrievedMeasurements.member().find(type);
+//
+//  // problem: NEED to initialize with correct value!
+//    if (found == mUserRetrievedMeasurements.member().end()
+//        || found->second.empty())
+//    {
+//  // TODO: throw!
+//
+//      // lazy initialization
+//      // cast away const for lazy init to work
+//      resetUserMeasurementUnlocked(type);
+//    }
   }
 
   void cedar::dev::Component::resetLastIOMeasurementUnlocked(ComponentDataType type)
@@ -188,23 +217,29 @@
 
     auto dim = found->second;
 
-    mLastIORetrievedMeasurements[type] = cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE);
+    mLastIORetrievedMeasurements.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
   }
 
   void cedar::dev::Component::lazyInitializeLastIOMeasurementUnlocked(ComponentDataType type)
   {
-    auto found = mLastIORetrievedMeasurements.find(type);
-
-  // problem: NEED to initialize with correct value!
-    if (found == mLastIORetrievedMeasurements.end()
-        || found->second.empty())
-    {
-  // TODO: throw!
-
-      // lazy initialization
-      // cast away const for lazy init to work
-      resetLastIOMeasurementUnlocked(type);
-    }
+    this->lazyInitializeMember
+    (
+      mLastIORetrievedMeasurements,
+      boost::bind(&cedar::dev::Component::resetLastIOMeasurementUnlocked, this, _1),
+      type
+    );
+//    auto found = mLastIORetrievedMeasurements.member().find(type);
+//
+//  // problem: NEED to initialize with correct value!
+//    if (found == mLastIORetrievedMeasurements.member().end()
+//        || found->second.empty())
+//    {
+//  // TODO: throw!
+//
+//      // lazy initialization
+//      // cast away const for lazy init to work
+//      resetLastIOMeasurementUnlocked(type);
+//    }
   }
 
 
@@ -219,19 +254,25 @@
 
     auto dim = found->second;
 
-    mIORetrievedMeasurements[type] = cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE);
+    mIORetrievedMeasurements.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
   }
 
   void cedar::dev::Component::lazyInitializeIOMeasurementUnlocked(ComponentDataType type)
   {
-    auto found = mIORetrievedMeasurements.find(type);
-
-    if (found == mIORetrievedMeasurements.end()
-        || found->second.empty())
-    {
-      // cast away const for lazy init to work
-      resetIOMeasurementUnlocked(type);
-    }
+    this->lazyInitializeMember
+    (
+      mIORetrievedMeasurements,
+      boost::bind(&cedar::dev::Component::resetIOMeasurementUnlocked, this, _1),
+      type
+    );
+//    auto found = mIORetrievedMeasurements.member().find(type);
+//
+//    if (found == mIORetrievedMeasurements.member().end()
+//        || found->second.empty())
+//    {
+//      // cast away const for lazy init to work
+//      resetIOMeasurementUnlocked(type);
+//    }
   }
 
   void cedar::dev::Component::installCommandType(ComponentDataType type)
@@ -255,9 +296,10 @@
   void cedar::dev::Component::resetComponent()
   {
     {
-      QWriteLocker lock2(&mUserMeasurementLock);
-      QWriteLocker lock2b(&mLastIOMeasurementLock);
-      QWriteLocker lock4(&mIOMeasurementLock);
+      //!@todo As this isn't locked in a canonical lock order, this may lead to deadlocks; use cedar::aux::Lockable?
+      QWriteLocker lock2(mUserRetrievedMeasurements.getLockPtr());
+      QWriteLocker lock2b(mLastIORetrievedMeasurements.getLockPtr());
+      QWriteLocker lock4(mIORetrievedMeasurements.getLockPtr());
 
       for( ComponentDataType &type : mInstalledMeasurementTypes )
       {
@@ -268,8 +310,8 @@
     }
 
     {
-      QWriteLocker lock1(&mUserCommandLock);
-      QWriteLocker lock3(&mIOCommandLock);
+      QWriteLocker lock1(mUserSubmittedCommands.getLockPtr());
+      QWriteLocker lock3(mIOSubmittedCommands.getLockPtr());
 
       for( ComponentDataType &type : mInstalledCommandTypes )
       {
@@ -298,7 +340,7 @@
 
     // todo: issue a console-warning something if IO is not running
 
-    QWriteLocker lock(&mUserCommandLock);
+    QWriteLocker lock(mUserSubmittedCommands.getLockPtr());
 
     setUserCommandUnlocked(type, data);
   }
@@ -323,7 +365,7 @@
 
     // todo: issue a console-warning something if IO is not running
 
-    QWriteLocker lock(&mUserCommandLock);
+    QWriteLocker lock(mUserSubmittedCommands.getLockPtr());
 
     setUserCommandIndexUnlocked(type, index, value);
   }
@@ -331,7 +373,7 @@
 
   cv::Mat cedar::dev::Component::fetchUserMeasurement(ComponentDataType type) const
   {
-    QReadLocker lock(&mUserMeasurementLock);
+    QReadLocker lock(mUserRetrievedMeasurements.getLockPtr());
 
     auto ret =  getUserMeasurementUnlocked(type);
     return ret;
@@ -339,7 +381,7 @@
 
   double cedar::dev::Component::fetchUserMeasurementIndex(ComponentDataType type, int index) const
   {
-    QReadLocker lock(&mUserMeasurementLock);
+    QReadLocker lock(mUserRetrievedMeasurements.getLockPtr());
 
     auto ret = getUserMeasurementIndexUnlocked(type, index);
 
@@ -348,7 +390,7 @@
 
   cv::Mat cedar::dev::Component::fetchLastIOMeasurement(ComponentDataType type) const
   {
-    QReadLocker lock(&mLastIOMeasurementLock);
+    QReadLocker lock(mLastIORetrievedMeasurements.getLockPtr());
 
     auto ret =  getLastIOMeasurementUnlocked(type);
     return ret;
@@ -356,7 +398,7 @@
 
   double cedar::dev::Component::fetchLastIOMeasurementIndex(ComponentDataType type, int index) const
   {
-    QReadLocker lock(&mLastIOMeasurementLock);
+    QReadLocker lock(mLastIORetrievedMeasurements.getLockPtr());
 
     auto ret = getLastIOMeasurementIndexUnlocked(type, index);
 
@@ -455,7 +497,7 @@ std::cout << "ERROR: reregistering transformation hook measurment from " << from
     // todo: check locking in this function, forgot some stuff ...
     ComponentDataType type_for_IO, type_from_user;
 
-    if (mUserSubmittedCommands.size() == 0)
+    if (mUserSubmittedCommands.member().size() == 0)
     {
       return; // this is not a problem
     }
@@ -474,19 +516,19 @@ std::cout << "ERROR: reregistering transformation hook measurment from " << from
     {
       // guess command type to use
       // safe only if there was only one command hook registered
-      if (mUserSubmittedCommands.size() > 1)
+      if (mUserSubmittedCommands.member().size() > 1)
       {
-  // todo: throw 
-std::cout << "error: submitted too many commands of different types! ... " <<  std::endl;
-for (auto &what : mUserSubmittedCommands )
-{
-  std::cout << " " << what.first << std::endl;
-}
-       return;
+          // todo: throw
+        std::cout << "error: submitted too many commands of different types! ... " <<  std::endl;
+        for (auto &what : mUserSubmittedCommands.member() )
+        {
+          std::cout << " " << what.first << std::endl;
+        }
+        return;
       }
 
       // we know the map has exactly one entry
-      type_from_user = mUserSubmittedCommands.begin()->first;
+      type_from_user = mUserSubmittedCommands.member().begin()->first;
     }
 
     // evaluate command type for IO:
@@ -510,7 +552,7 @@ for (auto &what : mUserSubmittedCommands )
 
     cv::Mat userData, ioData;
     {
-      QReadLocker lock(&mUserCommandLock);
+      QReadLocker lock(mUserSubmittedCommands.getLockPtr());
       userData = getUserCommandUnlocked( type_from_user ).clone();
     }
 
@@ -535,7 +577,7 @@ for (auto &what : mUserSubmittedCommands )
 
       }
 
-      QReadLocker lock1(&mUserMeasurementLock);
+      QReadLocker lock1(mUserRetrievedMeasurements.getLockPtr());
       ioData = (found2->second)(userData);
     }
     else
@@ -554,7 +596,7 @@ for (auto &what : mUserSubmittedCommands )
     (hook_found->second)(ioData);
 #endif
 
-    mUserSubmittedCommands.clear();
+    mUserSubmittedCommands.member().clear();
   }
 
   // update the IO Cache
@@ -564,9 +606,9 @@ void cedar::dev::Component::loopIOMeasurements(double)
   std::vector< ComponentDataType > types_we_measured;;
 
   // lock measurements 
-  QWriteLocker lock1(&mIOMeasurementLock);
+  QWriteLocker lock1(mIORetrievedMeasurements.getLockPtr());
 
-  mIORetrievedMeasurements.clear();
+  mIORetrievedMeasurements.member().clear();
 
   // thinks I can get directly from HW:
   for( auto& type : mInstalledMeasurementTypes )
@@ -577,7 +619,7 @@ void cedar::dev::Component::loopIOMeasurements(double)
     if (found != mRetrieveMeasurementHooks.end())
     {
       // execute the hook:
-      mIORetrievedMeasurements[ type ] = (found->second)();
+      mIORetrievedMeasurements.member()[ type ]->setData((found->second)());
       types_we_measured.push_back( type );
 //std::cout << "we measured a tyep for: " << type << std::endl;      
 //std::cout << "  it was: " <<  mIORetrievedMeasurements[ type ] << std::endl;
@@ -604,7 +646,7 @@ void cedar::dev::Component::loopIOMeasurements(double)
 
         if (found2 != (found1->second).end())
         {
-          mIORetrievedMeasurements[ missing_type ] = (found2->second)( mIORetrievedMeasurements[ measured_type ] );
+          mIORetrievedMeasurements.member()[ missing_type ]->setData((found2->second)( mIORetrievedMeasurements.member()[ measured_type ]->getData() ));
           nothing_found = false;
           break;
         }
@@ -621,14 +663,14 @@ void cedar::dev::Component::updateUserMeasurements()
 {
   // lock IO cache todo
   // lock caches
-  QReadLocker lock1(&mIOMeasurementLock);
-  QWriteLocker lock2(&mUserMeasurementLock);
-  QWriteLocker lock3(&mLastIOMeasurementLock);
+  QReadLocker lock1(mLastIORetrievedMeasurements.getLockPtr());
+  QWriteLocker lock2(mUserRetrievedMeasurements.getLockPtr());
+  QWriteLocker lock3(mIORetrievedMeasurements.getLockPtr());
 
-  mLastIORetrievedMeasurements = mUserRetrievedMeasurements; 
+  mLastIORetrievedMeasurements.member() = mUserRetrievedMeasurements.member();
     // todo: is this really a deep copy?
-  mUserRetrievedMeasurements = mIORetrievedMeasurements;
-  mIORetrievedMeasurements.clear();
+  mUserRetrievedMeasurements.member() = mIORetrievedMeasurements.member();
+  mIORetrievedMeasurements.member().clear();
 
   lock1.unlock();
   lock2.unlock();
@@ -694,58 +736,60 @@ void cedar::dev::Component::stopTimer()
 void cedar::dev::Component::setUserCommandUnlocked(ComponentDataType& type, cv::Mat data)
 {
   lazyInitializeUserCommandUnlocked(type);
-  mUserSubmittedCommands[ type ]= data.clone();
+  mUserSubmittedCommands.member()[ type ]->setData(data.clone());
 }
 
 void cedar::dev::Component::setInitialUserCommandUnlocked(ComponentDataType& type, cv::Mat data)
 {
-  mInitialUserSubmittedCommands[ type ]= data.clone();
+  mInitialUserSubmittedCommands.member()[ type ]->setData(data.clone());
 }
 
 void cedar::dev::Component::setUserCommandIndexUnlocked(ComponentDataType& type,int index, double value) 
 {
   lazyInitializeUserCommandUnlocked(type);
-  mUserSubmittedCommands[ type ].at<double>(index,0)= value;
+  mUserSubmittedCommands.member()[ type ]->getData().at<double>(index, 0) = value;
 }
 
 cv::Mat cedar::dev::Component::getUserCommandUnlocked(ComponentDataType& type) const
 {
   const_cast<Component*>(this)->lazyInitializeUserCommandUnlocked(type);
 
-  auto found = mUserSubmittedCommands.find(type);
+  auto found = mUserSubmittedCommands.member().find(type);
 
-  if (found == mUserSubmittedCommands.end())
+  if (found == mUserSubmittedCommands.member().end())
   {
     // todo: kann nicht passieren wg lazyInitializeUsercommandUnlocked; throw
   }
 
-  return found->second;
+  return found->second->getData();
 }
 
 
 void cedar::dev::Component::setUserMeasurementUnlocked(ComponentDataType& type, cv::Mat data)
 {
   lazyInitializeUserMeasurementUnlocked(type);
-  mUserRetrievedMeasurements[ type ]= data.clone();
+  mUserRetrievedMeasurements.member()[ type ]->setData(data.clone());
 }
 
 
 cv::Mat cedar::dev::Component::getUserMeasurementUnlocked(ComponentDataType& type) const
 {
   const_cast<Component*>(this)->lazyInitializeUserMeasurementUnlocked(type);
-  auto found = mUserRetrievedMeasurements.find(type);
+  auto found = mUserRetrievedMeasurements.member().find(type);
 
 // problem: NEED to initialize with correct value!
-  if (found == mUserRetrievedMeasurements.end())
+  if (found == mUserRetrievedMeasurements.member().end())
   {
     // todo: kann nicht passieren, throw
     // todo: DOCH, kann passieren, wenn Messung geholt wird, bevor Messung kam ...
     // todo: warning werfen, wenn letzte Messung zu lange her ...
+    //!@todo this'll print a warning in case these things go wrong; replace by throw
+    CEDAR_NON_CRITICAL_ASSERT(false && "This should not happen");
     // lazy initialization
     // cast away const for lazy init to work
   }
 
-  return found->second;
+  return found->second->getData();
 }
 
 double cedar::dev::Component::getUserMeasurementIndexUnlocked(ComponentDataType& type, int index) const
@@ -756,19 +800,21 @@ double cedar::dev::Component::getUserMeasurementIndexUnlocked(ComponentDataType&
 cv::Mat cedar::dev::Component::getLastIOMeasurementUnlocked(ComponentDataType& type) const
 {
   const_cast<Component*>(this)->lazyInitializeLastIOMeasurementUnlocked(type);
-  auto found = mLastIORetrievedMeasurements.find(type);
+  auto found = mLastIORetrievedMeasurements.member().find(type);
 
 // problem: NEED to initialize with correct value!
-  if (found == mLastIORetrievedMeasurements.end())
+  if (found == mLastIORetrievedMeasurements.member().end())
   {
     // todo: kann nicht passieren, throw
     // todo: DOCH, kann passieren, wenn Messung geholt wird, bevor Messung kam ...
     // todo: warning werfen, wenn letzte Messung zu lange her ...
+    //!@todo this'll print a warning in case these things go wrong; replace by throw
+    CEDAR_NON_CRITICAL_ASSERT(false && "This should not happen");
     // lazy initialization
     // cast away const for lazy init to work
   }
 
-  return found->second;
+  return found->second->getData();
 }
 
 double cedar::dev::Component::getLastIOMeasurementIndexUnlocked(ComponentDataType& type, int index) const
@@ -780,40 +826,42 @@ double cedar::dev::Component::getLastIOMeasurementIndexUnlocked(ComponentDataTyp
 void cedar::dev::Component::setIOCommandUnlocked(ComponentDataType& type, cv::Mat data)
 {
   lazyInitializeIOCommandUnlocked(type);
-  mIOSubmittedCommands[ type ]= data;
+  mIOSubmittedCommands.member()[ type ]->setData(data);
 }
 
 cv::Mat cedar::dev::Component::getIOCommandUnlocked(ComponentDataType& type) const
 {
   const_cast<Component*>(this)->lazyInitializeIOCommandUnlocked(type);
-  auto found = mIOSubmittedCommands.find(type);
+  auto found = mIOSubmittedCommands.member().find(type);
 
-  if (found == mIOSubmittedCommands.end() )
+  if (found == mIOSubmittedCommands.member().end())
   {
     // todo throw. cannot happen
+    CEDAR_ASSERT(false && "this should not happen.");
   }
 
-  return found->second;
+  return found->second->getData();
 }
 
 void cedar::dev::Component::setIOMeasurementUnlocked(ComponentDataType& type, cv::Mat data)
 {
   lazyInitializeIOMeasurementUnlocked(type);
-  mIORetrievedMeasurements[ type ]= data;
+  mIORetrievedMeasurements.member()[ type ]->setData(data);
 }
 
 
 cv::Mat cedar::dev::Component::getIOMeasurementUnlocked(ComponentDataType& type) const
 {
   const_cast<Component*>(this)->lazyInitializeIOMeasurementUnlocked(type);
-  auto found = mIORetrievedMeasurements.find(type);
+  auto found = mIORetrievedMeasurements.member().find(type);
 
-  if (found == mIORetrievedMeasurements.end() )
-  {
-    // todo throw
-  }
+  //!@todo Throw
+  CEDAR_ASSERT(found != mIORetrievedMeasurements.member().end());
+//  if (found == mIORetrievedMeasurements.end() )
+//  {
+//  }
 
-  return found->second;
+  return found->second->getData();
 }
 
 cv::Mat cedar::dev::Component::integrateIO(cv::Mat data, ComponentDataType type)
@@ -822,7 +870,7 @@ cv::Mat cedar::dev::Component::integrateIO(cv::Mat data, ComponentDataType type)
 
   timestep= mIOThread->getStepSize();
 
-  QReadLocker lock(&mUserMeasurementLock);
+  QReadLocker lock(mUserRetrievedMeasurements.getLockPtr());
   return ( data * ( timestep / 1000.0 ) ) + getUserMeasurementUnlocked(type);;
 }
 
@@ -832,7 +880,7 @@ cv::Mat cedar::dev::Component::integrateIOTwice(cv::Mat data, ComponentDataType 
 
   timestep= mIOThread->getStepSize();
 
-  QReadLocker lock(&mUserMeasurementLock);
+  QReadLocker lock(mUserRetrievedMeasurements.getLockPtr());
   return ( ( data * (timestep / 1000.0 ) + getUserMeasurementUnlocked(type1) )
            * ( timestep / 1000.0 ) )
          + getUserMeasurementUnlocked(type2);
@@ -872,12 +920,12 @@ void cedar::dev::Component::processStart()
 
   // todo: test that mUserCommands is empty!
 
-  if (!mInitialUserSubmittedCommands.empty())
+  if (!mInitialUserSubmittedCommands.member().empty())
   {
      // do as if the initial user command was the user command
-     QWriteLocker lock1(&mUserCommandLock);
+     QWriteLocker lock1(mUserSubmittedCommands.getLockPtr());
      
-     mUserSubmittedCommands = mInitialUserSubmittedCommands;
+     mUserSubmittedCommands.member() = mInitialUserSubmittedCommands.member();
      lock1.unlock();
      loopIOCommands(0.0);
   }
