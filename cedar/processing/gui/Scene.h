@@ -296,7 +296,7 @@ public:
   /*!brief Adds a sticky node to the current scene
    */
   void addStickyNote();
-  cedar::proc::gui::StickyNote* addStickyNote(float x, float y, float witdh, float height, std::string text);
+  cedar::proc::gui::StickyNote* addStickyNote(float x, float y, float witdh, float height, std::string text, int fontSize = 10, QColor color = QColor(255,255,110));
 
   //! Removes a sticky note
   void removeStickyNote(StickyNote* note);

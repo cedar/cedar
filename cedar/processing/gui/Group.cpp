@@ -906,6 +906,11 @@ void cedar::proc::gui::Group::writeScene(cedar::aux::ConfigurationNode& root) co
       node.put("x",static_cast<int>(note->scenePos().x()));
       node.put("y",static_cast<int>(note->scenePos().y()));
       node.put("text",note->getText());
+      node.put("font size", note->getFontSize());
+      QColor color = note->getColor();
+      node.put("color red", color.red());
+      node.put("color green", color.green());
+      node.put("color blue", color.blue());
       scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
     }
   }
@@ -1815,15 +1820,39 @@ void cedar::proc::gui::Group::readStickyNotes(const cedar::aux::ConfigurationNod
 
   for (auto iter = node.begin(); iter != node.end(); ++iter)
   {
-    const std::string& type = iter->second.get<std::string>("type");
+    const auto& sticky_node = iter->second;
+    const std::string& type = sticky_node.get<std::string>("type");
     if (type == "stickyNote")
     {
-      int x = iter->second.get<int>("x");
-      int y = iter->second.get<int>("y");
-      int witdh = iter->second.get<int>("width");
-      int height = iter->second.get<int>("height");
-      const std::string& text = iter->second.get<std::string>("text");
-      this->mpScene->addStickyNote(x, y, witdh, height, text);
+
+      int x = sticky_node.get<int>("x");
+      int y = sticky_node.get<int>("y");
+      int witdh = sticky_node.get<int>("width");
+      int height = sticky_node.get<int>("height");
+      const std::string& text = sticky_node.get<std::string>("text");
+      auto font_size = sticky_node.find("font size");
+      int font = 10;
+      if (font_size != sticky_node.not_found())
+      {
+        font = font_size->second.get_value<int>();
+      }
+      auto color_red = sticky_node.find("color red");
+      auto color_green = sticky_node.find("color green");
+      auto color_blue = sticky_node.find("color blue");
+      QColor color(255, 255, 110);
+      if
+      (
+        color_red != sticky_node.not_found()
+          && color_green != sticky_node.not_found()
+          && color_blue != sticky_node.not_found()
+      )
+      {
+        color.setRed(color_red->second.get_value<int>());
+        color.setGreen(color_green->second.get_value<int>());
+        color.setBlue(color_blue->second.get_value<int>());
+      }
+
+      this->mpScene->addStickyNote(x, y, witdh, height, text, font, color);
     }
   }
 }
