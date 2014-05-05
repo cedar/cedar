@@ -41,6 +41,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
+#include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/devices/namespace.h"
 
 // FORWARD DECLARATIONS
@@ -180,6 +182,8 @@ private:
 
   void updateUserMeasurements();
 
+  void lazyInitializeMember(cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr> >& lockableMember, boost::function<void (ComponentDataType)> initFun, ComponentDataType type);
+
   void resetUserCommandUnlocked(ComponentDataType type);
   void lazyInitializeUserCommandUnlocked(ComponentDataType type);
   void setUserCommandUnlocked(ComponentDataType &type, cv::Mat);
@@ -232,20 +236,15 @@ private:
   TransformationHookContainerType mMeasurementTransformationHooks;
 
   // Cache for the user-interface
-  std::map< ComponentDataType, cv::Mat > mUserSubmittedCommands;
-  mutable QReadWriteLock mUserCommandLock;
-  std::map< ComponentDataType, cv::Mat > mUserRetrievedMeasurements;
-  mutable QReadWriteLock mUserMeasurementLock;
-  std::map< ComponentDataType, cv::Mat > mLastIORetrievedMeasurements;
-  mutable QReadWriteLock mLastIOMeasurementLock;
+  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr> > mUserSubmittedCommands;
+  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr > > mUserRetrievedMeasurements;
+  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr > > mLastIORetrievedMeasurements;
 
   decltype(mUserSubmittedCommands) mInitialUserSubmittedCommands;
 
   // Cache for the IO-interface
-  std::map< ComponentDataType, cv::Mat > mIOSubmittedCommands;
-  mutable QReadWriteLock mIOCommandLock;
-  std::map< ComponentDataType, cv::Mat > mIORetrievedMeasurements;
-  mutable QReadWriteLock mIOMeasurementLock;
+  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr > > mIOSubmittedCommands;
+  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr > > mIORetrievedMeasurements;
 
   boost::optional<ComponentDataType> mIOCommandRestriction;
   boost::optional<ComponentDataType> mUserCommandRestriction;
