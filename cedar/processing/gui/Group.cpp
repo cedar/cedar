@@ -1411,6 +1411,7 @@ void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElem
 void cedar::proc::gui::Group::toggleSmartConnectionMode()
 {
   bool smart = this->_mSmartMode->getValue();
+  CEDAR_ASSERT(this->mpScene != nullptr);
   QList<QGraphicsItem*> items = this->mpScene->items();
   for (int i = 0; i < items.size(); ++i)
   {
