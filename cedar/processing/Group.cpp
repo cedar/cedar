@@ -60,6 +60,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/auxiliaries/ParameterLink.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
@@ -2127,12 +2128,12 @@ void cedar::proc::Group::revalidateConnections(const std::string& sender)
   }
 }
 
-void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const std::string& fileName)
+void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const cedar::aux::Path& fileName)
 {
   //!@todo This code is largely redundant with importGroupFromFile
   // first, read in the configuration tree
   cedar::aux::ConfigurationNode configuration;
-  boost::property_tree::read_json(fileName, configuration);
+  boost::property_tree::read_json(fileName.absolute().toString(), configuration);
 
   try
   {
@@ -2158,14 +2159,14 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const std
       CEDAR_THROW
       (
         cedar::aux::NotFoundException,
-        "Could not find group with name " + groupName + " in file " + fileName
+        "Could not find group with name " + groupName + " in file " + fileName.toString()
       );
     }
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
     // could not find a "groups" node, abort
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + fileName);
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find any groups in file " + fileName.toString());
   }
 
   this->signalLinkedChanged(true);

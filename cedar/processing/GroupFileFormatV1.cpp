@@ -77,7 +77,7 @@ void cedar::proc::GroupFileFormatV1::write
 
   if (group->isLinked())
   {
-    root.put("linked file", group->mLinkedGroupFile);
+    root.put("linked file", group->mLinkedGroupFile.toString(true));
     root.put("linked group name", group->mLinkedGroupName);
   }
   else

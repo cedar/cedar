@@ -234,8 +234,9 @@ void cedar::proc::gui::Group::lastReadConfigurationChanged()
   auto old_x = this->pos().x();
   auto old_y = this->pos().y();
   bool was_collapsed = this->isCollapsed();
-  auto config = this->getGroup()->getLastReadConfiguration();
-  this->readConfiguration(config);
+  //!@todo either remove or reactivate if something is broken
+//  auto config = this->getGroup()->getLastReadConfiguration();
+//  this->readConfiguration(config);
 
   if (this->getGroup()->isLinked())
   {

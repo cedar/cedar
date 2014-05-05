@@ -47,6 +47,7 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/units/Time.h"
 
@@ -545,7 +546,7 @@ public:
 
   cedar::proc::ElementPtr createLinkedGroup(const std::string& groupName, const std::string& fileName);
 
-  void readLinkedGroup(const std::string& groupName, const std::string& fileName);
+  void readLinkedGroup(const std::string& groupName, const cedar::aux::Path& fileName);
 
   cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
 
@@ -609,7 +610,7 @@ public:
    */
   inline bool isLinked() const
   {
-    return !this->mLinkedGroupFile.empty() && !this->mLinkedGroupName.empty();
+    return !this->mLinkedGroupFile.isEmpty() && !this->mLinkedGroupName.empty();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -748,7 +749,7 @@ private:
   std::vector<cedar::aux::ParameterPtr> mCustomParameters;
 
   //! If non-empty, specifies which file the group was imported from.
-  std::string mLinkedGroupFile;
+  cedar::aux::Path mLinkedGroupFile;
 
   //! If non-empty, the name of the group that was imported from a file.
   std::string mLinkedGroupName;
