@@ -1,0 +1,78 @@
+/*!
+
+@page PluginsInCode Tutorial: Loading Plugins in C++ code
+
+cedar now comes with a more advanced plugin system. One side of this is the new plugin manager which is included in
+cedar's GUI and as a stanalone application. In this manager, you can specify a set of plugins to be loaded by default.
+
+Here, we shoud how to load plugins in your own applications, either the ones selected in the manager or just individual
+ones.
+
+
+@section PluginsInCode_StartupPlugins Loading Startup Plugins
+
+The easiest way to load plugins is to specify them as startup plugins in the plugin manager. Afterwards, they can be
+loaded with the following code
+@code
+#include <cedar/auxiliaries/Settings.h>
+
+// ...
+{
+  // ...
+  
+  cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
+  
+  // ...
+}
+@endcode
+
+
+@section PluginsInCode_LoadingSpecificPlugins Loading Specific Plugins
+
+Plugins can also be loaded manually. The recommended way of doing this is by first adding the plugin path to the search
+paths in the plugin manager. Then, you can load the plugin by calling
+@code
+#include <cedar/auxiliaries/PluginProxy.h>
+
+// ...
+{
+  // ...
+  
+  // find the plugin using the stored search paths
+  cedar::aux::PluginProxyPtr plugin = cedar::aux::PluginProxy::getPlugin("PluginName");
+  
+  // declare what is in the plugin
+  plugin->declare();
+  
+  // ...
+}
+@endcode
+
+The benefit of this approach is that the plugin is found independent of its actual location on the file system, i.e.,
+this approach is more portable.
+
+As a side note: the plugin system finds plugins with the following heuristics. It iterates over all search paths you
+have specified in the plugin manager. For each path, a number of subpaths are searched, namely, "build", the name of the
+plugin and any combination thereof. The actual filename of the library is determined depending on your operating system.
+For Windows, it is just [PluginName].dll, for linux it is lib[PluginName].so, for mac it is lib[PluginName].dylib.
+
+Finally, you can also load plugins by specifying the complete filepath. This can be done with the following code.
+@code
+#include <cedar/auxiliaries/PluginProxy.h>
+
+// ...
+{
+  // ...
+  
+  // create a plugin proxy using a fixed file path
+  cedar::aux::PluginProxyPtr plugin(new cedar::aux::PluginProxy("/path/to/your/libPlugin.so"));
+  
+  // declare what is in the plugin
+  plugin->declare();
+  
+  // ...
+}
+@endcode
+As this method is not very portable, it is not recommended.
+
+*/
