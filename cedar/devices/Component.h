@@ -40,20 +40,42 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/devices/namespace.h"
-#include "cedar/devices/Channel.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
+#include <opencv/cv.h>
+#include <boost/function.hpp>
+#include <boost/optional.hpp>
+#include <QReadWriteLock>
+#include <QObject>
+
 #include <vector>
 #include <map>
 
 /*!@brief Base class for components of robots.
  */
-class cedar::dev::Component : public cedar::aux::NamedConfigurable
+class cedar::dev::Component : public QObject,
+                              public cedar::aux::NamedConfigurable
 {
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // typedefs
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef boost::function< void (cv::Mat) > CommandFunctionType;
+  typedef boost::function< cv::Mat () >     MeasurementFunctionType;
+  typedef boost::function< cv::Mat (cv::Mat) > TransformationFunctionType;
+  typedef unsigned int                      ComponentDataType;
+
+private:
+  typedef std::map< ComponentDataType, TransformationFunctionType > InnerTransformationHookContainerType;
+  typedef std::map< ComponentDataType, InnerTransformationHookContainerType > TransformationHookContainerType;
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -63,18 +85,8 @@ class cedar::dev::Component : public cedar::aux::NamedConfigurable
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  enum DataType
-  {
-    MEASURED,
-    COMMANDED
-  };
 
 private:
-  struct DataSlot
-  {
-    cedar::aux::DataPtr mData;
-    boost::function<void ()> mUpdateFunction;
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -83,9 +95,6 @@ public:
   //!@brief Constructor
   Component();
 
-  //!@brief Constructor taking an externally created channel
-  Component(cedar::dev::ChannelPtr channel);
-
   //!@brief Destructor
   ~Component();
 
@@ -93,28 +102,26 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns the channel associated with the component.
-  inline cedar::dev::ChannelPtr getChannel() const
-  {
-    return mChannel;
-  }
+  CEDAR_DECLARE_DEPRECATED(void start());
+  CEDAR_DECLARE_DEPRECATED(void stop());
+  CEDAR_DECLARE_DEPRECATED(void setStepSize(double));
+  CEDAR_DECLARE_DEPRECATED(void setIdleTime(double));
+  CEDAR_DECLARE_DEPRECATED(void setSimulatedTime(double));
+  CEDAR_DECLARE_DEPRECATED(bool isRunning());
+  CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
+  CEDAR_DECLARE_DEPRECATED(void stopTimer());
+  unsigned int getIOStepSize();
 
-  inline void setChannel(cedar::dev::ChannelPtr channel)
-  {
-    this->mChannel = channel;
-  }
+  // utility Transformations
+  cv::Mat integrateIO(cv::Mat data, ComponentDataType type);
+  cv::Mat integrateIOTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
+  cv::Mat differentiateIO(cv::Mat data, ComponentDataType type);
+  cv::Mat differentiateIOTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
 
-  std::vector<std::string> getDataNames(cedar::dev::Component::DataType type) const;
+  void processStart();
 
-  cedar::aux::DataPtr getCommandedData(const std::string& name) const;
-
-  cedar::aux::DataPtr getMeasuredData(const std::string& name) const;
-
-  void updateMeasuredValues();
-
-  void updateCommandedValues();
-
-  void updateValues(cedar::dev::Component::DataType type);
+signals:
+  void updatedUserMeasurementSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -129,23 +136,77 @@ protected:
   {
     this->mSlot = slot;
   }
- 
-  void addCommandedData(const std::string& name, cedar::aux::DataPtr data, boost::function<void()> updateFun);
 
-  void addMeasuredData(const std::string& name, cedar::aux::DataPtr data, boost::function<void()> updateFun);
+  void startIO(); // todo: public?
+  void stopIO(); // todo: public?
+
+  void installCommandType(ComponentDataType type);
+  void installMeasurementType(ComponentDataType type);
+  void installCommandAndMeasurementType(ComponentDataType type);
+
+  void setCommandDimensionality(ComponentDataType type, unsigned int dim);
+  void setMeasurementDimensionality(ComponentDataType type, unsigned int dim);
+  void setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim);
+
+  void registerIOCommandHook(ComponentDataType type, CommandFunctionType fun);
+  void registerIOMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
+
+  void registerUserCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+  void registerIOMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+
+  void submitUserCommand(ComponentDataType type, cv::Mat);
+  void submitUserCommandIndex(ComponentDataType type, int index, double value);
+  void submitInitialUserCommand(ComponentDataType type, cv::Mat);
+
+  cv::Mat fetchUserMeasurement(ComponentDataType type) const;
+  double  fetchUserMeasurementIndex(ComponentDataType type, int index) const;
+
+  cv::Mat fetchLastIOMeasurement(ComponentDataType type) const;
+  double  fetchLastIOMeasurementIndex(ComponentDataType type, int index) const;
+
+  void restrictUserCommandsTo(ComponentDataType type);
+  void applyIOCommandsAs(ComponentDataType type);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void addData
-  (
-    cedar::dev::Component::DataType type,
-    const std::string& name, cedar::aux::DataPtr data,
-    boost::function<void()> updateFun
-  );
+  void resetComponent();
 
-  cedar::aux::DataPtr getData(cedar::dev::Component::DataType type, const std::string& name) const;
+  void loopIO(double); //!todo: make private and friend to LoopFunctionInThread
+  void loopIOCommands(double);
+  void loopIOMeasurements(double);
+
+  void updateUserMeasurements();
+
+  void resetUserCommandUnlocked(ComponentDataType type);
+  void lazyInitializeUserCommandUnlocked(ComponentDataType type);
+  void setUserCommandUnlocked(ComponentDataType &type, cv::Mat);
+  void setUserCommandIndexUnlocked(ComponentDataType &type, int index, double value);
+  void setInitialUserCommandUnlocked(ComponentDataType &type, cv::Mat);
+  cv::Mat getUserCommandUnlocked(ComponentDataType &type) const;
+
+  void resetUserMeasurementUnlocked(ComponentDataType type);
+  void resetLastIOMeasurementUnlocked(ComponentDataType type);
+  void lazyInitializeUserMeasurementUnlocked(ComponentDataType type);
+  void lazyInitializeLastIOMeasurementUnlocked(ComponentDataType type);
+  void setUserMeasurementUnlocked(ComponentDataType &type, cv::Mat);
+  cv::Mat getUserMeasurementUnlocked(ComponentDataType &type) const;
+  double  getUserMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
+  cv::Mat getLastIOMeasurementUnlocked(ComponentDataType &type) const;
+  double  getLastIOMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
+
+  void resetIOCommandUnlocked(ComponentDataType type);
+  void lazyInitializeIOCommandUnlocked(ComponentDataType type);
+  void setIOCommandUnlocked(ComponentDataType &type, cv::Mat);
+  cv::Mat getIOCommandUnlocked(ComponentDataType &type) const;
+
+  void resetIOMeasurementUnlocked(ComponentDataType type);
+  void lazyInitializeIOMeasurementUnlocked(ComponentDataType type);
+  void setIOMeasurementUnlocked(ComponentDataType &type, cv::Mat);
+  cv::Mat getIOMeasurementUnlocked(ComponentDataType &type) const;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -154,12 +215,40 @@ protected:
   // none yet
 
 private:
-  //! channel of communication
-  cedar::dev::ChannelPtr mChannel;
   cedar::dev::ComponentSlotWeakPtr mSlot;
 
-  //! The data of the channel, i.e., measured and commanded values.
-  std::map<cedar::dev::Component::DataType, std::map<std::string, DataSlot> > mData;
+  //! the IO-thread's wrapper
+  std::unique_ptr< cedar::aux::LoopFunctionInThread > mIOThread;
+
+  std::vector< ComponentDataType > mInstalledCommandTypes;
+  std::vector< ComponentDataType > mInstalledMeasurementTypes;
+
+  std::map< ComponentDataType, unsigned int > mInstalledCommandDimensions;
+  std::map< ComponentDataType, unsigned int > mInstalledMeasurementDimensions;
+
+  std::map< ComponentDataType, CommandFunctionType > mSubmitCommandHooks;
+  std::map< ComponentDataType, MeasurementFunctionType > mRetrieveMeasurementHooks;
+  TransformationHookContainerType mCommandTransformationHooks;
+  TransformationHookContainerType mMeasurementTransformationHooks;
+
+  // Cache for the user-interface
+  std::map< ComponentDataType, cv::Mat > mUserSubmittedCommands;
+  mutable QReadWriteLock mUserCommandLock;
+  std::map< ComponentDataType, cv::Mat > mUserRetrievedMeasurements;
+  mutable QReadWriteLock mUserMeasurementLock;
+  std::map< ComponentDataType, cv::Mat > mLastIORetrievedMeasurements;
+  mutable QReadWriteLock mLastIOMeasurementLock;
+
+  decltype(mUserSubmittedCommands) mInitialUserSubmittedCommands;
+
+  // Cache for the IO-interface
+  std::map< ComponentDataType, cv::Mat > mIOSubmittedCommands;
+  mutable QReadWriteLock mIOCommandLock;
+  std::map< ComponentDataType, cv::Mat > mIORetrievedMeasurements;
+  mutable QReadWriteLock mIOMeasurementLock;
+
+  boost::optional<ComponentDataType> mIOCommandRestriction;
+  boost::optional<ComponentDataType> mUserCommandRestriction;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

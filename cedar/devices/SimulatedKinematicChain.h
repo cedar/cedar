@@ -69,30 +69,33 @@ public:
    */
   bool isMovable() const;
 
-  /*!@brief get current state of a single joint angle
-   *
-   * @return    joint angle value
-   */
-  double getJointAngle(unsigned int index) const;
-  
-  /*!@brief set current state of a single joint angle
-   *
-   * @param index    specifies the joint
-   * @param angle    new joint angle value
-   */
-  void setJointAngle(unsigned int index, double angle);
-  
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  void sendSimulatedAngles(cv::Mat mat);
+  void sendSimulatedVelocities(cv::Mat mat);
+  void sendSimulatedAccelerations(cv::Mat mat);
+  // todo: torques
+
+  cv::Mat retrieveSimulatedAngles();
+  cv::Mat retrieveSimulatedVelocities();
+  cv::Mat retrieveSimulatedAccelerations();
+  // todo: torques
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+
   // none yet
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  std::map< ComponentDataType, cv::Mat > mSimulation;
+  mutable QReadWriteLock mSimulationLock;
 
 }; // class cedar::dev::SimulatedKinematicChain
 #endif // CEDAR_DEV_SIMULATED_KINEMATIC_CHAIN_H
