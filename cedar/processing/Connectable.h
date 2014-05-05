@@ -189,10 +189,7 @@ public:
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
-
-  //! Writes data marked as serializable to the configuration node.
-  virtual void writeData(cedar::aux::ConfigurationNode& root) const;
+  virtual void writeData(cedar::aux::ConfigurationNode& stored_data) const;
 
   //! Writes data marked as serializable to the given file.
   void writeDataFile(const cedar::aux::Path& file) const;

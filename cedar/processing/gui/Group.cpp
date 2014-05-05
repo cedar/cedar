@@ -75,6 +75,7 @@
 #include <QDialog>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
+  #include <boost/filesystem.hpp>
 #endif
 #include <iostream>
 #include <set>
@@ -738,6 +739,8 @@ void cedar::proc::gui::Group::write(const std::string& destination)
   this->writeConfiguration(root);
 
   write_json(destination, root);
+
+  this->mGroup->writeDataFile(destination + ".data");
 }
 
 void cedar::proc::gui::Group::read(const std::string& source)
@@ -750,6 +753,11 @@ void cedar::proc::gui::Group::read(const std::string& source)
 
   this->mGroup->readConfiguration(root);
   this->readConfiguration(root);
+
+  if (boost::filesystem::exists(source + ".data"))
+  {
+    this->mGroup->readDataFile(source + ".data");
+  }
 }
 
 void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationNode& root)
