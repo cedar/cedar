@@ -244,7 +244,8 @@ int main(int argc, char **argv)
 
   // create the worker thread
   WorkerThread worker(arm, target);
-  worker.setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
+  //worker.setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
+  worker.setStepSize( arm->getIOStepSize() );
 
   // start everything
   arm->start();
@@ -255,7 +256,6 @@ int main(int argc, char **argv)
   worker.stop();
   worker.wait();
   arm->stop();
-  arm->wait();
   if (use_hardware)
   {
     delete p_fri_status_widget;
