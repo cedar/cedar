@@ -451,9 +451,11 @@ public:
   std::string findPath(cedar::proc::ConstElement* pFindMe) const;
 
   /*!@brief Finds all elements of the given type.
+   *
+   * @param findRecursive Whether child groups of this group should be searched as well.
    */
   template <typename T>
-  std::set<boost::shared_ptr<T> > findAll() const
+  std::set<boost::shared_ptr<T> > findAll(bool findRecursive = false) const
   {
     std::set<boost::shared_ptr<T> > elements;
 
@@ -463,6 +465,15 @@ public:
       if (auto t_ptr = boost::dynamic_pointer_cast<T>(element))
       {
         elements.insert(t_ptr);
+      }
+
+      if (findRecursive)
+      {
+        if (auto group_ptr = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+        {
+          auto sub_items = group_ptr->findAll<T>(findRecursive);
+          elements.insert(sub_items.begin(), sub_items.end());
+        }
       }
     }
 
