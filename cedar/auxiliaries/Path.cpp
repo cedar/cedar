@@ -82,13 +82,92 @@ cedar::aux::Path::~Path()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::aux::Path::getFileNameOnly() const
+std::string cedar::aux::Path::separator()
 {
-  //!@todo If the path exists, check if it is a directory.
+  return "/";
+}
+
+void cedar::aux::Path::appendComponent(const std::string& component)
+{
+  cedar::aux::Path other(component);
+  for (auto other_component : other.mComponents)
+  {
+    this->mComponents.push_back(other_component);
+  }
+}
+
+std::vector<cedar::aux::Path> cedar::aux::Path::listSubdirectories() const
+{
+  CEDAR_ASSERT(this->isDirectory());
+
+  boost::filesystem::directory_iterator end_iter;
+  std::vector<cedar::aux::Path> folders;
+  for (boost::filesystem::directory_iterator dir_iter(this->absolute().toString()); dir_iter != end_iter ; ++dir_iter)
+  {
+    if (boost::filesystem::is_directory(dir_iter->status()))
+    {
+      std::string folder = cedar::aux::toString(*dir_iter);
+      if (folder.size() > 0 && folder.at(0) == '"')
+      {
+        folder = folder.substr(1);
+      }
+      if (folder.size() > 0 && folder.at(folder.size() - 1) == '"')
+      {
+        folder = folder.substr(0, folder.size() - 1);
+      }
+      folders.push_back(cedar::aux::Path(folder));
+    }
+  }
+
+  return folders;
+}
+
+std::vector<cedar::aux::Path> cedar::aux::Path::listFiles() const
+{
+  CEDAR_ASSERT(this->isDirectory());
+
+  boost::filesystem::directory_iterator end_iter;
+  std::vector<cedar::aux::Path> files;
+  for (boost::filesystem::directory_iterator dir_iter(this->absolute().toString()); dir_iter != end_iter ; ++dir_iter)
+  {
+    if (boost::filesystem::is_regular_file(dir_iter->status()))
+    {
+      std::string file = cedar::aux::toString(*dir_iter);
+      if (file.size() > 0 && file.at(0) == '"')
+      {
+        file = file.substr(1);
+      }
+      if (file.size() > 0 && file.at(file.size() - 1) == '"')
+      {
+        file = file.substr(0, file.size() - 1);
+      }
+      files.push_back(cedar::aux::Path(file));
+    }
+  }
+
+  return files;
+}
+
+const std::string& cedar::aux::Path::getLast() const
+{
   //!@todo Proper exception
   CEDAR_ASSERT(!this->mComponents.empty());
 
   return this->mComponents.back();
+}
+
+std::string cedar::aux::Path::getFileNameOnly() const
+{
+  //!@todo If the path exists, check if it is a directory.
+  return this->getLast();
+}
+
+std::string cedar::aux::Path::getFileNameWithoutExtension() const
+{
+  std::string filename = this->getFileNameOnly();
+  size_t ext = filename.find_last_of('.');
+  CEDAR_ASSERT(ext != std::string::npos);
+  return filename.substr(0, ext);
 }
 
 bool cedar::aux::Path::exists() const
@@ -340,14 +419,14 @@ std::string cedar::aux::Path::toString(bool withProtocol) const
     )
   )
   {
-    path += '/';
+    path += cedar::aux::Path::separator();
   }
 
   for (auto iter = this->mComponents.begin(); iter != this->mComponents.end(); ++iter)
   {
     if (iter != this->mComponents.begin())
     {
-      path += '/';
+      path += cedar::aux::Path::separator();
     }
 
     path += *iter;
