@@ -224,6 +224,10 @@ public:
    */
   const StepMap& getStepMap() const;
 
+  /*!@brief Returns the group map.
+   */
+  const GroupMap& getGroupMap() const;
+
   /*!@brief Deprecated, see getTriggerMap(). Returns the trigger map.
    */
   CEDAR_DECLARE_DEPRECATED(const TriggerMap& triggerMap() const);
