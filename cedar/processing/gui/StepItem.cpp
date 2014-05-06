@@ -100,9 +100,9 @@ cedar::proc::gui::Connectable
 (
   cedar::proc::gui::StepItem::mDefaultWidth,
   cedar::proc::gui::StepItem::mDefaultHeight,
-  cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-),
-mpMainWindow(pMainWindow)
+  cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
+  pMainWindow
+)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -117,9 +117,9 @@ cedar::proc::gui::Connectable
 (
   cedar::proc::gui::StepItem::mDefaultWidth,
   cedar::proc::gui::StepItem::mDefaultHeight,
-  cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-),
-mpMainWindow(pMainWindow)
+  cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
+  pMainWindow
+)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -145,10 +145,6 @@ void cedar::proc::gui::StepItem::construct()
 
 cedar::proc::gui::StepItem::~StepItem()
 {
-  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
-  {
-    (*it)->close();
-  }
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
@@ -396,123 +392,6 @@ void cedar::proc::gui::StepItem::setRecorded(bool status)
 	}
 }
 
-void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu)
-{
-  std::string label = e.prettyString() + "s";
-  pMenu->addSeparator();
-  QAction *p_label_action = pMenu->addAction(QString::fromStdString(label));
-  QFont font = p_label_action->font();
-  font.setBold(true);
-  p_label_action->setFont(font);
-  pMenu->addSeparator();
-  p_label_action->setEnabled(false);
-}
-
-void cedar::proc::gui::StepItem::fillPlots
-     (
-       QMenu* pMenu,
-       std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
-     )
-{
-  /*typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
-  typedef cedar::aux::gui::PlotDeclarationManager::ConstNodePtr ConstPlotNodePtr;*/
-
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
-  {
-    try
-    {
-      const cedar::aux::Enum& e = *enum_it;
-      this->addRoleSeparator(e, pMenu);
-
-      const cedar::proc::Step::SlotList& slotmap = this->getStep()->getOrderedDataSlots(e.id());
-      for
-      (
-        cedar::proc::Step::SlotList::const_iterator slot_iter = slotmap.begin();
-        slot_iter != slotmap.end();
-        ++slot_iter
-      )
-      {
-        cedar::proc::DataSlotPtr slot = *slot_iter;
-        QMenu *p_menu = pMenu->addMenu(slot->getText().c_str());
-        cedar::aux::DataPtr data = slot->getData();
-        if (!data)
-        {
-          p_menu->setTitle("[unconnected] " + p_menu->title());
-          p_menu->setEnabled(false);
-        }
-        else
-        {
-          std::set<cedar::aux::gui::ConstPlotDeclarationPtr> plots;
-          cedar::aux::gui::PlotManagerSingleton::getInstance()->getPlotClassesFor(data, plots);
-
-          if (plots.empty())
-          {
-            QAction *p_action = p_menu->addAction("no plots available");
-            p_action->setDisabled(true);
-          }
-          else
-          {
-            for (auto iter = plots.begin(); iter != plots.end(); ++iter)
-            {
-              cedar::aux::gui::ConstPlotDeclarationPtr declaration = *iter;
-              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getClassName()));
-              p_action->setData(QString::fromStdString(slot->getName()));
-              declMap[p_action] = std::make_pair(declaration, e);
-
-              if (declaration == cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data))
-              {
-                QFont font = p_action->font();
-                font.setBold(true);
-                p_action->setFont(font);
-              }
-            }
-          }
-        }
-      }
-    }
-    catch (const cedar::proc::InvalidRoleException& e)
-    {
-      // that's ok, a step may not have any data in a certain role.
-    }
-  }
-}
-void cedar::proc::gui::StepItem::showPlot
-(
-  const QPoint& position,
-  std::string& dataName,
-  const cedar::aux::Enum& role
-)
-{
-  cedar::aux::gui::ConstPlotDeclarationPtr decl =
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(this->getStep()->getData(role, dataName));
-  showPlot(position, dataName, role, decl);
-}
-
-void cedar::proc::gui::StepItem::showPlot
-(
-  const QPoint& position,
-  std::string& dataName,
-  const cedar::aux::Enum& role,
-  cedar::aux::gui::ConstPlotDeclarationPtr declaration
-)
-{
-  // create data-List
-  cedar::proc::ElementDeclaration::DataList data_list;
-  data_list.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(role.id(), dataName, false, declaration->getClassName())));
-
-  if (this->scene())
-  {
-    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
-  }
-
-  auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->getStep(), data_list);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->getStep()->getName(), p_plot_widget, position);
-
-  p_dock_widget->show();
-}
-
 void cedar::proc::gui::StepItem::openActionsDock()
 {
   QWidget* p_actions = new QWidget();
@@ -539,7 +418,7 @@ void cedar::proc::gui::StepItem::openProperties()
   p_widget->show();
 }
 
-void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
   CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
   CEDAR_DEBUG_ASSERT(p_scene);
@@ -552,23 +431,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     return;
   }
 
-  QMenu *p_data = menu.addMenu("data");
-  p_data->setIcon(QIcon(":/menus/data.svg"));
-
-  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-
-  this->fillDefinedPlots(menu, event->screenPos());
-
-  QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
-  p_advanced_plotting->setIcon(QIcon(":/menus/plot_advanced.svg"));
-
-  QAction* p_close_all_plots = menu.addAction("close all plots");
-  p_close_all_plots->setIcon(QIcon(":/menus/close_all_plots.svg"));
-  QObject::connect(p_close_all_plots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
-
-  QAction* p_toggle_visibility_of_plots = menu.addAction("toggle visibility");
-  p_toggle_visibility_of_plots->setIcon(QIcon(":/menus/toggle_plot_visibility.svg"));
-  QObject::connect(p_toggle_visibility_of_plots, SIGNAL(triggered()), this, SLOT(toggleVisibilityOfPlots()));
+  this->fillPlotMenu(menu, event);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -577,9 +440,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   p_properties->setIcon(QIcon(":/menus/properties.svg"));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-
-  std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
-  this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
   QMenu *p_actions_menu = menu.addMenu("actions");
   p_actions_menu->setIcon(QIcon(":/menus/actions.svg"));
@@ -601,51 +461,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-  QMenu *p_serialization_menu = menu.addMenu("save/load data");
+  QMenu* p_serialization_menu = menu.addMenu("save/load data");
   p_serialization_menu->setIcon(QIcon(":/menus/save.svg"));
   this->fillDataSerialization(p_serialization_menu);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-
-  // Actions for data plotting -----------------------------------------------------------------------------------------
-  std::map<QAction*, cedar::aux::Enum> action_type_map;
-  bool has_data = false;
-
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
-  {
-    try
-    {
-      const cedar::aux::Enum& e = *enum_it;
-      this->addRoleSeparator(e, p_data);
-
-      const cedar::proc::Step::SlotList& slotmap = this->getStep()->getOrderedDataSlots(e.id());
-      for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
-      {
-        cedar::proc::DataSlotPtr slot = *iter;
-        QAction *p_action = p_data->addAction(slot->getText().c_str());
-        p_action->setData(QString::fromStdString(slot->getName()));
-        if (slot->getData().get() == NULL)
-        {
-          p_action->setText("[unconnected] " + p_action->text());
-          p_action->setEnabled(false);
-        }
-        action_type_map[p_action] = e;
-        has_data = true;
-      }
-    }
-    catch (const cedar::proc::InvalidRoleException& e)
-    {
-      // that's ok, a step may not have any data in a certain role.
-    }
-  }
-
-  if (!has_data)
-  {
-    QAction *p_action = p_data->addAction("no data");
-    p_action->setEnabled(false);
-  }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   this->fillDisplayStyleMenu(&menu);
@@ -655,16 +475,8 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   if (a == NULL)
     return;
 
-  // plot data
-  if (a->parentWidget() == p_data)
-  {
-    std::string data_name = a->data().toString().toStdString();
-    const cedar::aux::Enum& role = action_type_map[a];
-    
-    this->showPlot(event->screenPos(), data_name, role);
-  }
   // execute an action
-  else if (a->parentWidget() == p_actions_menu)
+  if (a->parentWidget() == p_actions_menu)
   {
     std::string action = a->text().toStdString();
     // decide whether this is a normal action or the docking action
@@ -677,14 +489,9 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       this->openActionsDock();
     }
   }
-  // advanced plots
-  else if (advanced_plot_map.find(a) != advanced_plot_map.end())
+  else
   {
-    cedar::aux::gui::ConstPlotDeclarationPtr declaration = advanced_plot_map.find(a)->second.first;
-    const cedar::aux::Enum& role = advanced_plot_map.find(a)->second.second;
-    std::string data_name = a->data().toString().toStdString();
-
-    this->showPlot(event->screenPos(), data_name, role, declaration);
+    this->handleContextMenuAction(a, event);
   }
 }
 
@@ -770,120 +577,6 @@ void cedar::proc::gui::StepItem::loadDataClicked()
   {
     slot->readDataFromFile(cedar::aux::Path(filename.toStdString()));
   }
-}
-
-void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu& menu, const QPoint& plotPosition)
-{
-  // get declaration of the element displayed by this item
-  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getStep());
-  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
-  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
-
-  if (!elem_decl->getDefaultPlot().empty())
-  {
-    QAction* p_default_plot = menu.addAction(QString::fromStdString(elem_decl->getDefaultPlot()));
-
-    // find declaration for the default plot
-    size_t default_index = 0;
-#ifdef DEBUG    
-    bool found = false;
-#endif    
-    for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
-    {
-      const std::string& plot_name = elem_decl->definedPlots()[i].mName;
-      if (plot_name == elem_decl->getDefaultPlot())
-      {
-        default_index = i;
-#ifdef DEBUG        
-        found = true;
-#endif        
-        break;
-      }
-    }
-    CEDAR_DEBUG_ASSERT(found);
-
-    if (!elem_decl->definedPlots()[default_index].mIcon.empty())
-    {
-      p_default_plot->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[default_index].mIcon)));
-    }
-    p_default_plot->setData(plotPosition);
-    QObject::connect(p_default_plot, SIGNAL(triggered()), this, SLOT(openDefinedPlotAction()));
-  }
-  else
-  {
-    this->addPlotAllAction(menu, plotPosition);
-  }
-
-  if (!decl || !elem_decl || elem_decl->definedPlots().empty() || elem_decl->getDefaultPlot().empty())
-  {
-    QAction *p_defined_plots = menu.addAction("defined plots");
-    p_defined_plots->setIcon(QIcon(":/menus/plot.svg"));
-    p_defined_plots->setDisabled(true);
-  }
-  else
-  {
-    QMenu *p_defined_plots = menu.addMenu("defined plots");
-    p_defined_plots->setIcon(QIcon(":/menus/plot.svg"));
-
-    this->addPlotAllAction(*p_defined_plots, plotPosition);
-    p_defined_plots->addSeparator();
-
-    // list all defined plots, if available
-    for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
-    {
-      const std::string& plot_name = elem_decl->definedPlots()[i].mName;
-      QAction* p_action = p_defined_plots->addAction(QString::fromStdString(plot_name));
-      p_action->setData(plotPosition);
-
-      if (!elem_decl->definedPlots()[i].mIcon.empty())
-      {
-        p_action->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[i].mIcon)));
-      }
-      QObject::connect(p_action, SIGNAL(triggered()), this, SLOT(openDefinedPlotAction()));
-    }
-  }
-}
-
-void cedar::proc::gui::StepItem::addPlotAllAction(QMenu& menu, const QPoint& plotPosition)
-{
-  QAction* p_plot_all = menu.addAction("plot all");
-  p_plot_all->setIcon(QIcon(":/menus/plot_all.svg"));
-  p_plot_all->setData(plotPosition);
-  QObject::connect(p_plot_all, SIGNAL(triggered()), this, SLOT(plotAll()));
-}
-
-void cedar::proc::gui::StepItem::plotAll()
-{
-  QAction* p_sender = dynamic_cast<QAction*>(QObject::sender());
-  CEDAR_DEBUG_ASSERT(p_sender != NULL);
-
-  // get datalist of step
-  cedar::proc::ElementDeclaration::DataList data = cedar::proc::ElementDeclaration::DataList();
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-         enum_it != cedar::proc::DataRole::type().list().end();
-         ++enum_it)
-  {
-    const cedar::aux::Enum& e = *enum_it;
-
-    try
-    {
-      const cedar::proc::Step::SlotMap& slotmap = this->getStep()->getDataSlots(e.id());
-      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
-      {
-        cedar::proc::DataSlotPtr slot = iter->second;
-        data.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(e.id(), slot->getName())));
-      }
-    }
-    catch (const cedar::proc::InvalidRoleException& e)
-    {
-      // that's ok, a step may not have any data in a certain role.
-      // Kai: I disagree, exceptions should be exceptional see http://pragmatictips.com/34
-    }
-  }
-  auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->getStep(), data);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->getStep()->getName(), p_plot_widget, p_sender->data().toPoint());
-  
-  p_dock_widget->show();
 }
 
 void cedar::proc::gui::StepItem::openDefinedPlotAction()
@@ -981,78 +674,6 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   this->update();
 }
 
-QWidget* cedar::proc::gui::StepItem::createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position)
-{
-  auto p_dock_widget = this->createDockWidget(title, pPlotWidget);
-
-  int base_size = 200;
-  p_dock_widget->setGeometry
-  (
-    QRect
-    (
-      position,
-      QSize(base_size * pPlotWidget->getColumnCount(), base_size * pPlotWidget->getRowCount())
-    )
-  );
-
-  return p_dock_widget;
-}
-
-QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pWidget)
-{
-  //!@todo There's duplicated code here -- unify
-  if (this->mpMainWindow)
-  {
-    QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
-    p_dock->setAttribute(Qt::WA_DeleteOnClose, true);
-    p_dock->setFloating(true);
-    p_dock->setContentsMargins(0, 0, 0, 0);
-    p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
-    p_dock->setWidget(pWidget);
-
-    mChildWidgets.push_back(p_dock);
-    QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
-
-    return p_dock;
-  }
-  else
-  {
-    QWidget* p_widget = new QWidget();
-    p_widget->setAttribute(Qt::WA_DeleteOnClose, true);
-    p_widget->setWindowTitle(QString::fromStdString(title));
-    auto p_layout = new QVBoxLayout();
-    p_layout->setContentsMargins(2, 2, 2, 2);
-    p_layout->addWidget(pWidget);
-    p_widget->setLayout(p_layout);
-
-    mChildWidgets.push_back(p_widget);
-    QObject::connect(p_widget, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
-
-    return p_widget;
-  }
-}
-
-void cedar::proc::gui::StepItem::removeChildWidget()
-{
-  auto it = mChildWidgets.begin();
-  while(*it != QObject::sender() && it != mChildWidgets.end())
-  {
-    it++;
-  }
-  if(*it == QObject::sender())
-  {
-    mChildWidgets.erase(it);
-  }
-  else
-  {
-    cedar::aux::LogSingleton::getInstance()->error
-    (
-      "Could not find a reference to the destroyed ChildWidget.",
-      "cedar::proc::gui::StepItem::removeChildWidget()"
-    );
-  }
-}
-
 qreal cedar::proc::gui::StepItem::getContentsPadding() const
 {
   switch (this->mDisplayMode)
@@ -1104,50 +725,4 @@ void cedar::proc::gui::StepItem::handleExternalActionButtons()
 {
   std::string action = cedar::aux::asserted_cast<QPushButton*>(QObject::sender())->text().toStdString();
   this->getStep()->callAction(action);
-}
-
-void cedar::proc::gui::StepItem::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
-{
-  for (auto childWidget : mChildWidgets)
-  {
-    // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
-    QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
-    // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
-    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
-    {
-      cedar::aux::ConfigurationNode value_node;
-      static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);
-      node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
-    }
-  }
-}
-
-void cedar::proc::gui::StepItem::addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height)
-{
-  QPoint position = QPoint(x, y);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->getStep()->getName(), pPlotWidget, position);
-  p_dock_widget->resize(width, height);
-  p_dock_widget->show();
-}
-
-void cedar::proc::gui::StepItem::closeAllPlots()
-{
-  this->closeAllChildWidgets();
-}
-
-void cedar::proc::gui::StepItem::toggleVisibilityOfPlots()
-{
-  for (auto childWidget : mChildWidgets)
-  {
-    childWidget->setVisible(!childWidget->isVisible());
-  }
-}
-
-void cedar::proc::gui::StepItem::closeAllChildWidgets()
-{
-  for (auto childWidget : mChildWidgets)
-  {
-    childWidget->close();
-  }
-  // mChildWidgets is emptied through close event.
 }

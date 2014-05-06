@@ -102,7 +102,7 @@ private:
 public:
   //!@brief The standard constructor.
   PlotWidget(
-    cedar::proc::StepPtr step,
+    cedar::proc::ConnectablePtr connectable,
     const cedar::proc::ElementDeclaration::DataList& data
   );
 
@@ -129,7 +129,7 @@ public:
   }
 
   //!@brief recover plot from configuration
-  static void createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::StepItem* pStepItem);
+  static void createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::Connectable* pConnectable);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -165,7 +165,7 @@ protected:
   // none yet
 private:
   cedar::proc::ElementDeclaration::DataList mDataList;
-  cedar::proc::StepPtr mStep;
+  cedar::proc::ConnectablePtr mConnectable;
   int mGridSpacing;
   int mColumns;
   QGridLayout* mpLayout;
