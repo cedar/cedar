@@ -76,6 +76,24 @@ public:
   };
   CEDAR_GENERATE_POINTER_TYPES(Annotation);
 
+  class ETH80Annotation : public Annotation
+  {
+    public:
+      void setSegmentationMask(const cedar::aux::Path& maskPath)
+      {
+        this->mSegmentationMask = maskPath;
+      }
+
+      const cedar::aux::Path& getSegmentationMask() const
+      {
+        return this->mSegmentationMask;
+      }
+
+    private:
+      cedar::aux::Path mSegmentationMask;
+  };
+  CEDAR_GENERATE_POINTER_TYPES(ETH80Annotation);
+
   class ObjectPoseAnnotation : public Annotation
   {
   public:
@@ -190,6 +208,9 @@ public:
     bool hasTag(const std::string& tag) const;
 
   private:
+    void readImage() const;
+
+  private:
     ClassId mClassId;
 
     cedar::aux::Path mFileName;
@@ -198,7 +219,7 @@ public:
 
     std::map<std::string, AnnotationPtr> mAnnotations;
 
-    cv::Mat mImage;
+    mutable cv::Mat mImage;
   };
   CEDAR_GENERATE_POINTER_TYPES(Image);
 
@@ -214,6 +235,7 @@ public:
       static void construct()
       {
         mType.type()->def(cedar::aux::Enum(ScanFolder, "ScanFolder"));
+        mType.type()->def(cedar::aux::Enum(ETH80CroppedClose, "ETH80CroppedClose"));
       }
 
       static const cedar::aux::EnumBase& type()
@@ -227,6 +249,7 @@ public:
 
     public:
       static const Id ScanFolder = 0;
+      static const Id ETH80CroppedClose = 1;
 
     protected:
       // none yet
@@ -241,6 +264,10 @@ public:
   //!@brief The standard constructor.
   ImageDatabase();
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
   bool hasClass(const std::string& className) const;
 
   /*!@brief Returns all images with a given tag.
@@ -258,10 +285,6 @@ public:
    */
   std::set<ImagePtr> getImagesWithTags(const std::vector<std::string>& tags) const;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // public methods
-  //--------------------------------------------------------------------------------------------------------------------
-public:
   void readDatabase(const cedar::aux::Path& path, const std::string& dataBaseType);
 
   /*!@brief Reads the database using the settings from the given command line parser.
@@ -319,6 +342,9 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void scanDirectory(const cedar::aux::Path& path);
+
+  //! Reads in images from the ETH80 database.
+  void readETH80CroppedClose(const cedar::aux::Path& path);
 
   void readAnnotations(const cedar::aux::Path& path);
 

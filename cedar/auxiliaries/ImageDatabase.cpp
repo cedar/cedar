@@ -106,20 +106,31 @@ bool cedar::aux::ImageDatabase::Image::hasTag(const std::string& tag) const
   return this->mTags.find(tag) != this->mTags.end();
 }
 
+void cedar::aux::ImageDatabase::Image::readImage() const
+{
+  this->mImage = cv::imread(this->mFileName.absolute().toString());
+}
+
 void cedar::aux::ImageDatabase::Image::setFileName(const cedar::aux::Path& fileName)
 {
   this->mFileName = fileName;
-
-  this->mImage = cv::imread(fileName.absolute().toString());
 }
 
 unsigned int cedar::aux::ImageDatabase::Image::getImageRows() const
 {
+  if (this->mImage.empty())
+  {
+    this->readImage();
+  }
   return static_cast<unsigned int>(this->mImage.rows);
 }
 
 unsigned int cedar::aux::ImageDatabase::Image::getImageColumns() const
 {
+  if (this->mImage.empty())
+  {
+    this->readImage();
+  }
   return static_cast<unsigned int>(this->mImage.cols);
 }
 
@@ -293,6 +304,10 @@ void cedar::aux::ImageDatabase::readDatabase(const cedar::aux::Path& path, const
   {
     case Type::ScanFolder:
       this->scanDirectory(path);
+      break;
+
+    case Type::ETH80CroppedClose:
+      this->readETH80CroppedClose(path);
       break;
 
     default:
@@ -469,6 +484,64 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
   }
 
   this->readAnnotations(path);
+}
+
+void cedar::aux::ImageDatabase::readETH80CroppedClose(const cedar::aux::Path& path)
+{
+  // check all folders for the right contents
+  for (const auto& folder : path.listSubdirectories())
+  {
+    std::string class_and_instance = folder.getLast();
+    auto sep = class_and_instance.find_last_not_of("0123456789");
+    if (sep == std::string::npos)
+    {
+      // folder name does not fit the [className][InstanceNo] pattern; skip it
+      continue;
+    }
+    std::string class_name = class_and_instance.substr(0, sep + 1);
+    std::string instance = class_and_instance.substr(sep + 1);
+
+    auto class_id = this->getOrCreateClass(class_name);
+    for (const auto& file : folder.listFiles())
+    {
+      ImagePtr image(new Image());
+      image->setClassId(class_id);
+      image->setFileName(file);
+
+      std::string tags;
+
+      std::string file_name = file.getFileNameWithoutExtension();
+      std::vector<std::string> splits;
+      cedar::aux::split(file_name, "-", splits);
+      if (splits.size() != 3)
+      {
+        // file names must have the format [class name][instance no]-[angle]-[angle]
+        continue;
+      }
+
+      std::string angle_v_str, angle_h_str;
+      angle_v_str = splits.at(1);
+      angle_h_str = splits.at(2);
+
+      image->appendTags("v" + angle_v_str);
+      image->appendTags("h" + angle_h_str);
+
+      ETH80AnnotationPtr annotation(new ETH80Annotation());
+
+      cedar::aux::Path segmentation = folder;
+      segmentation.appendComponent("maps");
+      segmentation.appendComponent(file.getFileNameWithoutExtension() + "-map.png");
+
+      if (segmentation.exists())
+      {
+        annotation->setSegmentationMask(segmentation);
+      }
+
+      image->setAnnotation("eth80 annotation", annotation);
+
+      this->appendImage(image);
+    }
+  }
 }
 
 cedar::aux::ImageDatabase::ClassId cedar::aux::ImageDatabase::getOrCreateClass(const std::string& className)
