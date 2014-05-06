@@ -346,6 +346,9 @@ public:
   //! Returns a set of all images matching the given class.
   std::set<ImagePtr> getImagesWithClass(ClassId classId) const;
 
+  //! Shuffles a set of images.
+  static std::vector<ImagePtr> shuffle(const std::set<ImagePtr>& images);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -48,6 +48,7 @@
 // SYSTEM INCLUDES
 #include <boost/filesystem.hpp>
 #include <fstream>
+#include <algorithm>
 
 cedar::aux::EnumType<cedar::aux::ImageDatabase::Type> cedar::aux::ImageDatabase::Type::mType("cedar::aux::ImageDatabase::Type::");
 
@@ -132,6 +133,14 @@ unsigned int cedar::aux::ImageDatabase::Image::getImageColumns() const
     this->readImage();
   }
   return static_cast<unsigned int>(this->mImage.cols);
+}
+
+std::vector<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::shuffle(const std::set<ImagePtr>& images)
+{
+  std::vector<cedar::aux::ImageDatabase::ImagePtr> shuffled;
+  shuffled.insert(shuffled.begin(), images.begin(), images.end());
+  std::random_shuffle(shuffled.begin(), shuffled.end());
+  return shuffled;
 }
 
 void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLineParser& parser)
