@@ -55,8 +55,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* parent)
+:
+QDialog(parent)
 {
-  mParent = parent;this->experiment = boost::shared_ptr<cedar::proc::experiment::Experiment>
+  mParent = parent;
+  this->experiment = boost::shared_ptr<cedar::proc::experiment::Experiment>
   (
       new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup())
   );

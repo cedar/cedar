@@ -379,7 +379,7 @@ private:
   bool mSuppressCloseDialog;
 
   //! Widget for creating and running experiments
-  QDockWidget* mpExperimentDialog;
+  cedar::proc::gui::ExperimentDialog* mpExperimentDialog;
 
 }; // class cedar::MainWindow
 

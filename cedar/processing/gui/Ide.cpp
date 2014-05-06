@@ -374,11 +374,7 @@ void cedar::proc::gui::Ide::showExperimentDialog()
 {
   if (this->mpExperimentDialog == NULL)
   {
-    this->mpExperimentDialog = new QDockWidget(this);
-    this->mpExperimentDialog->setFloating(true);
-    this->mpExperimentDialog->setWindowTitle("Experiment");
-    this->mpExperimentDialog->setAllowedAreas(Qt::NoDockWidgetArea);
-    this->mpExperimentDialog->setWidget(new cedar::proc::gui::ExperimentDialog(this));
+    this->mpExperimentDialog = new cedar::proc::gui::ExperimentDialog(this);
   }
   mpExperimentDialog->show();
 }
