@@ -213,14 +213,47 @@ void cedar::aux::ImageDatabase::Image::setClassId(ClassId classId)
   this->mClassId = classId;
 }
 
-std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithTags(const std::string& tagsStr) const
+std::set<cedar::aux::ImageDatabase::ImagePtr>
+  cedar::aux::ImageDatabase::getImagesWithAllTags(const std::string& tagsStr) const
 {
   std::vector<std::string> tags;
   cedar::aux::split(tagsStr, ",", tags);
-  return this->getImagesWithTags(tags);
+  return this->getImagesWithAllTags(tags);
 }
 
-std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithTags(const std::vector<std::string>& tags) const
+std::set<cedar::aux::ImageDatabase::ImagePtr>
+  cedar::aux::ImageDatabase::getImagesWithAllTags(const std::vector<std::string>& tags) const
+{
+  std::set<ImagePtr> result;
+  for (auto image : this->mImages)
+  {
+    bool has_all_tags = true;
+    for (const auto& tag : tags)
+    {
+      if (!image->hasTag(tag))
+      {
+        has_all_tags = false;
+        break;
+      }
+    }
+
+    if (has_all_tags)
+    {
+      result.insert(image);
+    }
+  }
+
+  return result;
+}
+
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithAnyTags(const std::string& tagsStr) const
+{
+  std::vector<std::string> tags;
+  cedar::aux::split(tagsStr, ",", tags);
+  return this->getImagesWithAnyTags(tags);
+}
+
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithAnyTags(const std::vector<std::string>& tags) const
 {
   std::set<ImagePtr> samples;
 
