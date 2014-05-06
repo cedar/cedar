@@ -101,10 +101,9 @@ cedar::proc::gui::Group::Group
   cedar::proc::GroupPtr group
 )
 :
-cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP),
+cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP, pMainWindow),
 mGroup(group),
 mpScene(scene),
-mpMainWindow(pMainWindow),
 mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
@@ -809,9 +808,26 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     try
     {
+      // is it a step?
       auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
-      auto step_item = this->mpScene->getStepItemFor(step.get());
-      cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+      if (step) // check if cast worked
+      {
+        auto step_item = this->mpScene->getStepItemFor(step.get());
+        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+      }
+      else // might be a group instead
+      {
+        auto group = this->getGroup()->getElement<cedar::proc::Group>(step_name);
+        if (group) // check if cast worked
+        {
+          auto group_item = this->mpScene->getGroupFor(group.get());
+          cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, group_item);
+        }
+        else // element is neither step nor group - show error
+        {
+          removed_elements.insert(step_name);
+        }
+      }
     }
     catch (cedar::aux::InvalidNameException& exc)
     {
@@ -884,6 +900,10 @@ void cedar::proc::gui::Group::writeOpenPlotsTo(cedar::aux::ConfigurationNode& no
   for (auto step_map_item : this->mpScene->getStepMap())
   {
     step_map_item.second->writeOpenChildWidgets(node);
+  }
+  for (auto group_map_item : this->mpScene->getGroupMap())
+  {
+    group_map_item.second->writeOpenChildWidgets(node);
   }
 }
 
@@ -1531,6 +1551,10 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     return;
   }
 
+  this->fillPlotMenu(menu, event);
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
   QAction* p_collapse = menu.addAction("collapse");
   p_collapse->setCheckable(true);
   p_collapse->setChecked(this->isCollapsed());
@@ -1713,6 +1737,12 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   else if (a == p_prune)
   {
     this->getGroup()->pruneUnusedConnectors();
+  }
+
+  // plot data
+  else
+  {
+    this->handleContextMenuAction(a, event);
   }
 }
 

@@ -125,8 +125,6 @@ public:
     const std::string& toSlot
   ) const;
 
-  //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
-  void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
   //!@brief Sets a Decoration that shows that the step is registered in the recorder
   void setRecorded(bool status);
 
@@ -139,16 +137,6 @@ public slots:
 
   //!@brief handles name-change of the underlying step
   void handleStepNameChanged();
-
-  //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
-  void removeChildWidget();
-
-  //!@brief Closes all plots that were opened for this step.
-  void closeAllPlots();
-
-  //!@brief toggles visibility of the plots this step has opened
-  void toggleVisibilityOfPlots();
-
 
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
@@ -176,56 +164,17 @@ private:
   //!@brief sets the represented step
   void setStep(cedar::proc::StepPtr step);
 
-  void addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu);
-
-  //!@brief Fills the menu with available plots
-  void fillPlots
-  (
-    QMenu* pMenu,
-    std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
-  );
-
   //! Fills the menu with the appropriate entries for serializing data.
   void fillDataSerialization(QMenu* pMenu);
 
-  //!@brief Fills the defined plots into the given menu.
-  void fillDefinedPlots(QMenu& menu, const QPoint& plotPosition);
-
   //! Fills in the actions for the display style.
   void fillDisplayStyleMenu(QMenu* pMenu);
-
-  //!@brief Gets the default plotter and then opens a new DockWidget to show the plot.
-  void showPlot
-  (
-    const QPoint& position,
-    std::string& dataName,
-    const cedar::aux::Enum& role
-  );
-
-  //!@brief Opens a new DockWidget to show the plot.
-  void showPlot
-  (
-    const QPoint& position,
-    std::string& dataName,
-    const cedar::aux::Enum& role,
-    cedar::aux::gui::ConstPlotDeclarationPtr declaration
-  );
 
   //! Updates the display of the step's run time measurements.
   void updateToolTip();
 
   //! Sets the current display mode.
   void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode);
-
-  QWidget* createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position);
-
-  QWidget* createDockWidget(const std::string& title, QWidget* pWidget);
-
-  void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
-
-  void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const;
-
-  void closeAllChildWidgets();
 
   void updateIconGeometry();
 
@@ -240,8 +189,6 @@ private slots:
 
   void openActionsDock();
 
-  void plotAll();
-
   void saveDataClicked();
 
   void loadDataClicked();
@@ -255,9 +202,6 @@ private:
   //!@brief a vector of all triggers of the current step
   std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
 
-  //!@brief a vector of all child widgets fo the current step
-  std::vector<QWidget*> mChildWidgets;
-
   //! Size used for displaying the step icons.
   static const int mIconSize;
 
@@ -269,9 +213,6 @@ private:
 
   boost::signals2::scoped_connection mSlotAddedConnection;
   boost::signals2::scoped_connection mSlotRemovedConnection;
-
-  //!@brief the main window in which the current graphical representation is embedded
-  QMainWindow* mpMainWindow;
 
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;
