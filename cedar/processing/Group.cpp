@@ -1778,6 +1778,7 @@ void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::
     {
       triggerable->onTrigger(args, trigger);
     }
+    this->getFinishedTrigger()->trigger();
   }
 }
 
