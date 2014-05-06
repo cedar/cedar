@@ -49,11 +49,15 @@
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/PlotWidget.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QAction>
 #include <QObject>
 #include <QGraphicsSvgItem>
+#include <QMainWindow>
 #include <map>
 #include <vector>
 
@@ -149,7 +153,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Connectable(qreal width, qreal height, cedar::proc::gui::GraphicsBase::GraphicsGroup group);
+  Connectable(qreal width, qreal height, cedar::proc::gui::GraphicsBase::GraphicsGroup group, QMainWindow* pMainWindow = 0);
 
   //!@brief Destructor
   virtual ~Connectable();
@@ -192,10 +196,24 @@ public:
 
   void setReadOnly(bool readOnly);
 
+  //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
+  void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
+
 public slots:
   void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
   void reactToSlotAdded(cedar::proc::DataRole::Id role, QString name);
   void reactToSlotRenamed(cedar::proc::DataRole::Id role, QString oldName, QString newName);
+
+  //!@brief Closes all plots that were opened for this step.
+  void closeAllPlots();
+
+  //!@brief toggles visibility of the plots this step has opened
+  void toggleVisibilityOfPlots();
+
+  void plotAll();
+
+  //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
+  void removeChildWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -240,11 +258,64 @@ protected:
 
   //! Removes a given decoration from this step. Does nothing if the decoration is not in this step.
   void removeDecoration(cedar::proc::gui::Connectable::DecorationPtr decoration);
+
+  //! Fill plot menu
+  void fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
+
+  //!@brief Fills the defined plots into the given menu.
+  void fillDefinedPlots(QMenu& menu, const QPoint& plotPosition);
+
+  void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
+
+  void addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu);
+
+  //!@brief Gets the default plotter and then opens a new DockWidget to show the plot.
+  void showPlot
+  (
+    const QPoint& position,
+    std::string& dataName,
+    const cedar::aux::Enum& role
+  );
+
+  //!@brief Opens a new DockWidget to show the plot.
+  void showPlot
+  (
+    const QPoint& position,
+    std::string& dataName,
+    const cedar::aux::Enum& role,
+    cedar::aux::gui::ConstPlotDeclarationPtr declaration
+  );
+
+  //!@brief Opens a new DockWidget to show the plot.
+  void showPlot
+  (
+    const QPoint& position,
+    std::string& dataName,
+    const cedar::aux::Enum& role,
+    const std::string& plotClass
+  );
+
+  QWidget* createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position);
+
+  QWidget* createDockWidget(const std::string& title, QWidget* pWidget);
+
+  void handleContextMenuAction(QAction* action, QGraphicsSceneContextMenuEvent* event);
+
+  void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const;
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void itemSelected(bool selected);
+
+  //!@brief Fills the menu with available plots
+  void fillPlots
+  (
+    QMenu* pMenu,
+    std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
+  );
+
+  void closeAllChildWidgets();
 
 signals:
   void reactToSlotRemovedSignal(cedar::proc::DataRole::Id role, QString name);
@@ -275,6 +346,11 @@ protected:
   //! The decorations for this connectable.
   std::vector<DecorationPtr> mDecorations;
 
+  //!@brief the main window in which the current graphical representation is embedded
+  QMainWindow* mpMainWindow;
+
+  //!@brief a vector of all child widgets fo the current step
+  std::vector<QWidget*> mChildWidgets;
 
 private:
   //! An offset to be added to in- and output slot positions.

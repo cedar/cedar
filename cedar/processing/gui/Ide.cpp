@@ -1316,18 +1316,30 @@ void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
 void cedar::proc::gui::Ide::closePlots()
 {
   auto steps = this->mGroup->getScene()->getStepMap();
-  for(auto it = steps.begin(); it != steps.end(); ++it)
+  for (auto step : steps)
   {
-    it->second->closeAllPlots();
+    step.second->closeAllPlots();
+  }
+
+  auto groups = this->mGroup->getScene()->getGroupMap();
+  for (auto group : groups)
+  {
+    group.second->closeAllPlots();
   }
 }
 
 void cedar::proc::gui::Ide::toggleVisibilityOfPlots()
 {
   auto steps = this->mGroup->getScene()->getStepMap();
-  for(auto it = steps.begin(); it != steps.end(); ++it)
+  for (auto step : steps)
   {
-    it->second->toggleVisibilityOfPlots();
+    step.second->toggleVisibilityOfPlots();
+  }
+
+  auto groups = this->mGroup->getScene()->getGroupMap();
+  for (auto group : groups)
+  {
+    group.second->toggleVisibilityOfPlots();
   }
 }
 
