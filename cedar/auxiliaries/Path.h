@@ -123,6 +123,10 @@ public:
    */
   std::string getFileNameOnly() const;
 
+  /*! Returns the filename without extension
+   */
+  std::string getFileNameWithoutExtension() const;
+
   //! Appends the given path to this one.
   cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
 
@@ -137,6 +141,19 @@ public:
 
   //! Test whether the path points to a directory.
   bool isDirectory() const;
+
+  //! Lists all the direct subdirectories of this path.
+  std::vector<cedar::aux::Path> listSubdirectories() const;
+
+  //! Lists all the files that are in the path.
+  std::vector<cedar::aux::Path> listFiles() const;
+
+  //! Returns the last element in the path
+  const std::string& getLast() const;
+
+  void appendComponent(const std::string& component);
+
+  static std::string separator();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
