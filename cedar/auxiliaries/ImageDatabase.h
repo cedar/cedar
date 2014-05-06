@@ -275,15 +275,30 @@ public:
    */
   std::set<ImagePtr> getImagesWithTag(const std::string& tag) const;
 
-  /*!@brief Returns all images with a set of given tags.
+  /*!@brief Returns all images that have one or more of the given tags.
    *
    * @param tags A list of tags, separated by ",".
    */
-  std::set<ImagePtr> getImagesWithTags(const std::string& tags) const;
+  std::set<ImagePtr> getImagesWithAnyTags(const std::string& tags) const;
 
-  /*!@brief Returns all images with a list of given tags.
+  /*!@brief Returns all images that have one or more of the given tags.
    */
-  std::set<ImagePtr> getImagesWithTags(const std::vector<std::string>& tags) const;
+  std::set<ImagePtr> getImagesWithAnyTags(const std::vector<std::string>& tags) const;
+
+  CEDAR_DECLARE_DEPRECATED(std::set<ImagePtr> getImagesWithTags(const std::string& tags) const)
+  {
+    return this->getImagesWithAnyTags(tags);
+  }
+
+  /*!@brief Returns all images that have all of the given tags.
+   *
+   * @param tags A list of tags, separated by ",".
+   */
+  std::set<ImagePtr> getImagesWithAllTags(const std::string& tags) const;
+
+  /*!@brief Returns all images that have all of the given tags.
+   */
+  std::set<ImagePtr> getImagesWithAllTags(const std::vector<std::string>& tags) const;
 
   void readDatabase(const cedar::aux::Path& path, const std::string& dataBaseType);
 
