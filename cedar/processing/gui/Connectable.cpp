@@ -1150,6 +1150,10 @@ void cedar::proc::gui::Connectable::handleContextMenuAction(QAction* action, QGr
         return;
       }
     }
+    else
+    {
+      return;
+    }
 
     if (list.size() == 2)
     {
