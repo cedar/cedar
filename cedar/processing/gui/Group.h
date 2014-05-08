@@ -337,9 +337,6 @@ private:
   //!@brief a filename from which to load a group configuration, or to which to save a configuration
   std::string mFileName;
 
-  //!@brief a main window
-  QMainWindow *mpMainWindow;
-
   //!@brief a vector of all source connectors
   std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
 

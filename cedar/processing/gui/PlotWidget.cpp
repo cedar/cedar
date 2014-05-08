@@ -56,12 +56,12 @@
 
 cedar::proc::gui::PlotWidget::PlotWidget
 (
-    cedar::proc::StepPtr step,
+    cedar::proc::ConnectablePtr connectable,
     const cedar::proc::ElementDeclaration::DataList& data
 )
 :
 mDataList(data),
-mStep(step),
+mConnectable(connectable),
 mGridSpacing(2),
 mColumns(2),
 mpLayout(new QGridLayout())
@@ -185,7 +185,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   {
     try
     {
-      cedar::proc::DataSlotPtr p_slot = mStep->getSlot
+      cedar::proc::DataSlotPtr p_slot = mConnectable->getSlot
       (
         data_item->getParameter<cedar::aux::EnumParameter>("id")->getValue(),
         data_item->getParameter<cedar::aux::StringParameter>("name")->getValue()
@@ -457,8 +457,8 @@ void cedar::proc::gui::PlotWidget::remove_qgridlayout_widget(QWidget* widget)
 // save this plot_widget in configuration node
 void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  std::string step_name = this->mStep->getName();
-  auto group = this->mStep->getGroup();
+  std::string step_name = this->mConnectable->getName();
+  auto group = this->mConnectable->getGroup();
   while (group->getName() != "root")
   {
     step_name = group->getName() + "." + step_name;
@@ -517,7 +517,7 @@ cedar::aux::ConfigurationNode cedar::proc::gui::PlotWidget::serialize(const ceda
 }
 
 // restore plotwidget from a configuration node and add it to the respective step
-void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::StepItem* pStepItem)
+void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::Connectable* pConnectable)
 {
   //!@todo These should really check if these nodes exist; if one doesn't, this will lead to trouble...
   int width = node.get<int>("width");
@@ -535,8 +535,8 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
     data_list.push_back(p_plot_data);
   }
   
-  auto p_plot_widget = new cedar::proc::gui::PlotWidget(pStepItem->getStep(), data_list);
-  pStepItem->addPlotWidget(p_plot_widget, x, y, width, height);
+  auto p_plot_widget = new cedar::proc::gui::PlotWidget(pConnectable->getConnectable(), data_list);
+  pConnectable->addPlotWidget(p_plot_widget, x, y, width, height);
 
 
   auto settings_iter = node.find("plot configurations");
