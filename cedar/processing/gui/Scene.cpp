@@ -261,6 +261,11 @@ const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::getStepMap() co
   return this->mStepMap;
 }
 
+const cedar::proc::gui::Scene::GroupMap& cedar::proc::gui::Scene::getGroupMap() const
+{
+  return this->mGroupMap;
+}
+
 const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::triggerMap() const
 {
   return this->getTriggerMap();

@@ -40,6 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/PlotWidget.h"
+#include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -47,11 +49,14 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 
 // SYSTEM INCLUDES
 #include <map>
 #include <vector>
 #include <string>
+#include <QMenu>
+#include <QGraphicsSceneContextMenuEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -74,7 +79,8 @@ cedar::proc::gui::Connectable::Connectable
 (
   qreal width,
   qreal height,
-  cedar::proc::gui::GraphicsBase::GraphicsGroup group
+  cedar::proc::gui::GraphicsBase::GraphicsGroup group,
+  QMainWindow* pMainWindow
 )
 :
 cedar::proc::gui::GraphicsBase
@@ -86,6 +92,7 @@ cedar::proc::gui::GraphicsBase
 ),
 mpIconDisplay(NULL),
 mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
+mpMainWindow(pMainWindow),
 mInputOutputSlotOffset(static_cast<qreal>(0.0))
 {
   this->connect
@@ -112,6 +119,10 @@ mInputOutputSlotOffset(static_cast<qreal>(0.0))
 
 cedar::proc::gui::Connectable::~Connectable()
 {
+  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  {
+    (*it)->close();
+  }
   mSlotAddedConnection.disconnect();
   mSlotRemovedConnection.disconnect();
 }
@@ -700,4 +711,492 @@ void cedar::proc::gui::Connectable::updateDecorations()
   }
 
   this->updateDecorationPositions();
+}
+
+void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)
+{
+  QMenu* p_data = menu.addMenu("data");
+  p_data->setIcon(QIcon(":/menus/data.svg"));
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  this->fillDefinedPlots(menu, event->screenPos());
+
+  QMenu* p_advanced_plotting = menu.addMenu("advanced plotting");
+  p_advanced_plotting->setIcon(QIcon(":/menus/plot_advanced.svg"));
+
+  QAction* p_close_all_plots = menu.addAction("close all plots");
+  p_close_all_plots->setIcon(QIcon(":/menus/close_all_plots.svg"));
+  QObject::connect(p_close_all_plots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+
+  QAction* p_toggle_visibility_of_plots = menu.addAction("toggle visibility");
+  p_toggle_visibility_of_plots->setIcon(QIcon(":/menus/toggle_plot_visibility.svg"));
+  QObject::connect(p_toggle_visibility_of_plots, SIGNAL(triggered()), this, SLOT(toggleVisibilityOfPlots()));
+
+  std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
+  this->fillPlots(p_advanced_plotting, advanced_plot_map);
+
+  // Actions for data plotting -----------------------------------------------------------------------------------------
+  std::map<QAction*, cedar::aux::Enum> action_type_map;
+  bool has_data = false;
+
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+      enum_it != cedar::proc::DataRole::type().list().end();
+      ++enum_it)
+  {
+    try
+    {
+      const cedar::aux::Enum& e = *enum_it;
+      this->addRoleSeparator(e, p_data);
+
+      const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(e.id());
+      for (cedar::proc::Connectable::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      {
+        cedar::proc::DataSlotPtr slot = *iter;
+        QAction* p_action = p_data->addAction(slot->getText().c_str());
+        QList<QVariant> parameters;
+        parameters.push_back(QString::fromStdString(slot->getName()));
+        parameters.push_back(e.id());
+        p_action->setData(parameters);
+        if (slot->getData().get() == NULL)
+        {
+          p_action->setText("[unconnected] " + p_action->text());
+          p_action->setEnabled(false);
+        }
+        action_type_map[p_action] = e;
+        has_data = true;
+      }
+    }
+    catch (const cedar::proc::InvalidRoleException& e)
+    {
+      // that's ok, a step may not have any data in a certain role.
+    }
+  }
+
+  if (!has_data)
+  {
+    QAction *p_action = p_data->addAction("no data");
+    p_action->setEnabled(false);
+  }
+}
+
+void cedar::proc::gui::Connectable::fillDefinedPlots(QMenu& menu, const QPoint& plotPosition)
+{
+  // get declaration of the element displayed by this item
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getConnectable());
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
+  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
+
+  if (!elem_decl->getDefaultPlot().empty())
+  {
+    QAction* p_default_plot = menu.addAction(QString::fromStdString(elem_decl->getDefaultPlot()));
+
+    // find declaration for the default plot
+    size_t default_index = 0;
+#ifdef DEBUG
+    bool found = false;
+#endif
+    for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
+    {
+      const std::string& plot_name = elem_decl->definedPlots()[i].mName;
+      if (plot_name == elem_decl->getDefaultPlot())
+      {
+        default_index = i;
+#ifdef DEBUG
+        found = true;
+#endif
+        break;
+      }
+    }
+    CEDAR_DEBUG_ASSERT(found);
+
+    if (!elem_decl->definedPlots()[default_index].mIcon.empty())
+    {
+      p_default_plot->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[default_index].mIcon)));
+    }
+    p_default_plot->setData(plotPosition);
+    QObject::connect(p_default_plot, SIGNAL(triggered()), this, SLOT(openDefinedPlotAction()));
+  }
+  else
+  {
+    this->addPlotAllAction(menu, plotPosition);
+  }
+
+  if (!decl || !elem_decl || elem_decl->definedPlots().empty() || elem_decl->getDefaultPlot().empty())
+  {
+    QAction *p_defined_plots = menu.addAction("defined plots");
+    p_defined_plots->setIcon(QIcon(":/menus/plot.svg"));
+    p_defined_plots->setDisabled(true);
+  }
+  else
+  {
+    QMenu *p_defined_plots = menu.addMenu("defined plots");
+    p_defined_plots->setIcon(QIcon(":/menus/plot.svg"));
+
+    this->addPlotAllAction(*p_defined_plots, plotPosition);
+    p_defined_plots->addSeparator();
+
+    // list all defined plots, if available
+    for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
+    {
+      const std::string& plot_name = elem_decl->definedPlots()[i].mName;
+      QAction* p_action = p_defined_plots->addAction(QString::fromStdString(plot_name));
+      p_action->setData(plotPosition);
+
+      if (!elem_decl->definedPlots()[i].mIcon.empty())
+      {
+        p_action->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[i].mIcon)));
+      }
+      QObject::connect(p_action, SIGNAL(triggered()), this, SLOT(openDefinedPlotAction()));
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::addPlotAllAction(QMenu& menu, const QPoint& plotPosition)
+{
+  QAction* p_plot_all = menu.addAction("plot all");
+  p_plot_all->setIcon(QIcon(":/menus/plot_all.svg"));
+  p_plot_all->setData(plotPosition);
+  QObject::connect(p_plot_all, SIGNAL(triggered()), this, SLOT(plotAll()));
+}
+
+void cedar::proc::gui::Connectable::fillPlots
+     (
+       QMenu* pMenu,
+       std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
+     )
+{
+  /*typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
+  typedef cedar::aux::gui::PlotDeclarationManager::ConstNodePtr ConstPlotNodePtr;*/
+
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+      enum_it != cedar::proc::DataRole::type().list().end();
+      ++enum_it)
+  {
+    try
+    {
+      const cedar::aux::Enum& e = *enum_it;
+      this->addRoleSeparator(e, pMenu);
+
+      const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(e.id());
+      for
+      (
+        cedar::proc::Connectable::SlotList::const_iterator slot_iter = slotmap.begin();
+        slot_iter != slotmap.end();
+        ++slot_iter
+      )
+      {
+        cedar::proc::DataSlotPtr slot = *slot_iter;
+        QMenu *p_menu = pMenu->addMenu(slot->getText().c_str());
+        cedar::aux::DataPtr data = slot->getData();
+        if (!data)
+        {
+          p_menu->setTitle("[unconnected] " + p_menu->title());
+          p_menu->setEnabled(false);
+        }
+        else
+        {
+          std::set<cedar::aux::gui::ConstPlotDeclarationPtr> plots;
+          cedar::aux::gui::PlotManagerSingleton::getInstance()->getPlotClassesFor(data, plots);
+
+          if (plots.empty())
+          {
+            QAction *p_action = p_menu->addAction("no plots available");
+            p_action->setDisabled(true);
+          }
+          else
+          {
+            for (auto iter = plots.begin(); iter != plots.end(); ++iter)
+            {
+              cedar::aux::gui::ConstPlotDeclarationPtr declaration = *iter;
+              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getClassName()));
+              QList<QVariant> parameters;
+              parameters.push_back(QString::fromStdString(slot->getName()));
+              parameters.push_back(e.id());
+              parameters.push_back(QString::fromStdString(declaration->getClassName()));
+//              p_action->setData(QString::fromStdString(slot->getName()));
+              p_action->setData(parameters);
+              declMap[p_action] = std::make_pair(declaration, e);
+
+              if (declaration == cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data))
+              {
+                QFont font = p_action->font();
+                font.setBold(true);
+                p_action->setFont(font);
+              }
+            }
+          }
+        }
+      }
+    }
+    catch (const cedar::proc::InvalidRoleException& e)
+    {
+      // that's ok, a step may not have any data in a certain role.
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu)
+{
+  std::string label = e.prettyString() + "s";
+  pMenu->addSeparator();
+  QAction *p_label_action = pMenu->addAction(QString::fromStdString(label));
+  QFont font = p_label_action->font();
+  font.setBold(true);
+  p_label_action->setFont(font);
+  pMenu->addSeparator();
+  p_label_action->setEnabled(false);
+}
+
+void cedar::proc::gui::Connectable::showPlot
+(
+  const QPoint& position,
+  std::string& dataName,
+  const cedar::aux::Enum& role
+)
+{
+  cedar::aux::gui::ConstPlotDeclarationPtr decl =
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(this->getConnectable()->getData(role, dataName));
+  showPlot(position, dataName, role, decl);
+}
+
+void cedar::proc::gui::Connectable::showPlot
+(
+  const QPoint& position,
+  std::string& dataName,
+  const cedar::aux::Enum& role,
+  cedar::aux::gui::ConstPlotDeclarationPtr declaration
+)
+{
+  showPlot(position, dataName, role, declaration->getClassName());
+}
+
+void cedar::proc::gui::Connectable::showPlot
+(
+  const QPoint& position,
+  std::string& dataName,
+  const cedar::aux::Enum& role,
+  const std::string& plotClass
+)
+{
+  // create data-List
+  cedar::proc::ElementDeclaration::DataList data_list;
+  data_list.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(role.id(), dataName, false, plotClass)));
+
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+  }
+
+  auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->getConnectable(), data_list);
+  auto p_dock_widget = this->createDockWidgetForPlots(this->getConnectable()->getName(), p_plot_widget, position);
+
+  p_dock_widget->show();
+}
+
+QWidget* cedar::proc::gui::Connectable::createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position)
+{
+  auto p_dock_widget = this->createDockWidget(title, pPlotWidget);
+
+  int base_size = 200;
+  p_dock_widget->setGeometry
+  (
+    QRect
+    (
+      position,
+      QSize(base_size * pPlotWidget->getColumnCount(), base_size * pPlotWidget->getRowCount())
+    )
+  );
+
+  return p_dock_widget;
+}
+
+QWidget* cedar::proc::gui::Connectable::createDockWidget(const std::string& title, QWidget* pWidget)
+{
+  //!@todo There's duplicated code here -- unify
+  if (this->mpMainWindow)
+  {
+    QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
+    p_dock->setAttribute(Qt::WA_DeleteOnClose, true);
+    p_dock->setFloating(true);
+    p_dock->setContentsMargins(0, 0, 0, 0);
+    p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    p_dock->setWidget(pWidget);
+
+    mChildWidgets.push_back(p_dock);
+    QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
+
+    return p_dock;
+  }
+  else
+  {
+    QWidget* p_widget = new QWidget();
+    p_widget->setAttribute(Qt::WA_DeleteOnClose, true);
+    p_widget->setWindowTitle(QString::fromStdString(title));
+    auto p_layout = new QVBoxLayout();
+    p_layout->setContentsMargins(2, 2, 2, 2);
+    p_layout->addWidget(pWidget);
+    p_widget->setLayout(p_layout);
+
+    mChildWidgets.push_back(p_widget);
+    QObject::connect(p_widget, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
+
+    return p_widget;
+  }
+}
+
+void cedar::proc::gui::Connectable::closeAllPlots()
+{
+  this->closeAllChildWidgets();
+}
+
+void cedar::proc::gui::Connectable::toggleVisibilityOfPlots()
+{
+  for (auto childWidget : mChildWidgets)
+  {
+    childWidget->setVisible(!childWidget->isVisible());
+  }
+}
+
+void cedar::proc::gui::Connectable::closeAllChildWidgets()
+{
+  for (auto childWidget : mChildWidgets)
+  {
+    childWidget->close();
+  }
+  // mChildWidgets is emptied through close event.
+}
+
+void cedar::proc::gui::Connectable::plotAll()
+{
+  QAction* p_sender = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_sender != NULL);
+
+  // get datalist of step
+  cedar::proc::ElementDeclaration::DataList data = cedar::proc::ElementDeclaration::DataList();
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+         enum_it != cedar::proc::DataRole::type().list().end();
+         ++enum_it)
+  {
+    const cedar::aux::Enum& e = *enum_it;
+
+    try
+    {
+      const cedar::proc::Step::SlotMap& slotmap = this->getConnectable()->getDataSlots(e.id());
+      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      {
+        cedar::proc::DataSlotPtr slot = iter->second;
+        data.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(e.id(), slot->getName())));
+      }
+    }
+    catch (const cedar::proc::InvalidRoleException& e)
+    {
+      // that's ok, a step may not have any data in a certain role.
+      // Kai: I disagree, exceptions should be exceptional see http://pragmatictips.com/34
+    }
+  }
+  auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->getConnectable(), data);
+  auto p_dock_widget = this->createDockWidgetForPlots(this->getConnectable()->getName(), p_plot_widget, p_sender->data().toPoint());
+
+  p_dock_widget->show();
+}
+
+void cedar::proc::gui::Connectable::removeChildWidget()
+{
+  auto it = mChildWidgets.begin();
+  while (*it != QObject::sender() && it != mChildWidgets.end())
+  {
+    it++;
+  }
+  if (*it == QObject::sender())
+  {
+    mChildWidgets.erase(it);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Could not find a reference to the destroyed ChildWidget.",
+      "cedar::proc::gui::Connectable::removeChildWidget()"
+    );
+  }
+}
+
+void cedar::proc::gui::Connectable::handleContextMenuAction(QAction* action, QGraphicsSceneContextMenuEvent* event)
+{
+  if (action->data().canConvert<QList<QVariant> >())
+  {
+    // get list
+    QList<QVariant> list = action->data().toList();
+    std::string data_name;
+    int enum_id;
+    // check size, get common components
+    if (list.size() >= 2)
+    {
+      if (list.at(0).canConvert<QString>())
+      {
+        data_name = list.at(0).toString().toStdString();
+      }
+      else
+      {
+        return;
+      }
+      if (list.at(1).canConvert<int>())
+      {
+        enum_id = list.at(1).toInt();
+      }
+      else
+      {
+        return;
+      }
+    }
+    else
+    {
+      return;
+    }
+
+    if (list.size() == 2)
+    {
+      const cedar::aux::Enum& role = cedar::proc::DataRole::type().get(enum_id);//action_type_map[a];
+      this->showPlot(event->screenPos(), data_name, role);
+    }
+    else if (list.size() == 3)
+    {
+      std::string plot_name;
+      const cedar::aux::Enum& role = cedar::proc::DataRole::type().get(enum_id);
+      if (list.at(2).canConvert<QString>())
+      {
+        plot_name = list.at(2).toString().toStdString();
+      }
+      else
+      {
+        return;
+      }
+      this->showPlot(event->screenPos(), data_name, role, plot_name);
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
+{
+  for (auto childWidget : mChildWidgets)
+  {
+    // all widgets in the mChildWidgets Vector should be QDockWidgets that contain a QWidget
+    QWidget* dock_widget_child = cedar::aux::asserted_cast<QDockWidget*>(childWidget)->widget();
+    // The contained QWidget may be of different types, we're only interested in the cedar::proc::gui::PlotWidget ones
+    if (cedar::aux::objectTypeToString(dock_widget_child) == "cedar::proc::gui::PlotWidget")
+    {
+      cedar::aux::ConfigurationNode value_node;
+      static_cast<cedar::proc::gui::PlotWidget*>(dock_widget_child)->writeConfiguration(value_node);
+      node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height)
+{
+  QPoint position = QPoint(x, y);
+  auto p_dock_widget = this->createDockWidgetForPlots(this->getConnectable()->getName(), pPlotWidget, position);
+  p_dock_widget->resize(width, height);
+  p_dock_widget->show();
 }
