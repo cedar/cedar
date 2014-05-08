@@ -428,7 +428,7 @@
             ],
             "name": "three-layer",
             "connectors": "",
-            "is looped": "false",
+            "is looped": "true",
             "ui":
             [
                 {
@@ -672,7 +672,7 @@
             ],
             "name": "two-layer",
             "connectors": "",
-            "is looped": "false",
+            "is looped": "true",
             "dimensionality": "2",
             "ui":
             [
