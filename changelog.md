@@ -48,6 +48,7 @@ likely to undergo major changes:
 
 known issues
 ============
+  - Groups can sometimes lead to bad performance (very long round times). We are investigating this issue.
   - cedardyn is not properly loaded on some OSs (mainly Windows) when using cedar. If you want to use its
     content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
     this plugin to be loaded on every start.
