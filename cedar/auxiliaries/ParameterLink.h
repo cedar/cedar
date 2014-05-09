@@ -108,13 +108,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
-  virtual void sourceChanged() = 0;
+  void callSourceChanged();
 
-  virtual void targetChanged() = 0;
+  void callTargetChanged();
 
   virtual void sourcePropertiesChanged();
 
   virtual void targetPropertiesChanged();
+
+private:
+  virtual void sourceChanged() = 0;
+
+  virtual void targetChanged() = 0;
 
 private:
   virtual bool checkIfLinkable(cedar::aux::ConstParameterPtr source, cedar::aux::ConstParameterPtr target) const = 0;
