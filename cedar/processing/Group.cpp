@@ -46,6 +46,7 @@
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
+#include "cedar/processing/Element.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -1704,15 +1705,15 @@ cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDat
 
 std::string cedar::proc::Group::findPath(cedar::proc::ConstElementPtr findMe) const
 {
-  return this->findPath(findMe.get());
+  return this->findPath(static_cast<const cedar::proc::Element*>(findMe.get()));
 }
 
-std::string cedar::proc::Group::findPath(cedar::proc::ConstElement* pFindMe) const
+std::string cedar::proc::Group::findPath(const cedar::proc::Element* pFindMe) const
 {
   // first, try to find element in this group
   try
   {
-    if (pFindMe == this->getElement<const cedar::proc::Element>(pFindMe->getName()).get())
+    if (pFindMe == this->getElement<cedar::proc::ConstElement>(pFindMe->getName()).get())
     {
       return pFindMe->getName();
     }

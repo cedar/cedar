@@ -74,7 +74,7 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
     cedar::aux::LogSingleton::getInstance()->warning
     (
       "Could not entries for architecture widget.",
-      __PRETTY_FUNCTION__
+      CEDAR_CURRENT_FUNCTION_NAME
     );
     return;
   }

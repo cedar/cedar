@@ -58,6 +58,10 @@ cedar::aux::EnumParameter::Super(pOwner, name, enumBase->get(defaultValue))
   this->makeDefault();
 }
 
+cedar::aux::EnumParameterDetails::ValuePolicy::ValuePolicy()
+{
+}
+
 cedar::aux::EnumParameterDetails::ValuePolicy::ValuePolicy(const cedar::aux::Enum& value)
 :
 mValue(value)

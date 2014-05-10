@@ -64,7 +64,10 @@ namespace cedar
       public:
         typedef std::string ReadType;
 
+        ValuePolicy();
+
         ValuePolicy(const cedar::aux::Enum& value);
+
 
       protected:
         void setEnum(cedar::aux::EnumBasePtr enumDeclaration);
