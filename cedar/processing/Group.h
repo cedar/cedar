@@ -448,7 +448,7 @@ public:
   /*!@brief Find the complete path of an element, if it exists in the tree structure
    * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
    */
-  std::string findPath(cedar::proc::ConstElement* pFindMe) const;
+  std::string findPath(const cedar::proc::Element* pFindMe) const;
 
   /*!@brief Finds all elements of the given type.
    *

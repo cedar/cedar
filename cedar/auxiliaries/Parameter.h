@@ -80,6 +80,7 @@ class cedar::aux::Parameter : public QObject, public cedar::aux::IntrusivePtrBas
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
   //! An RAII-based locker for parameters.
   class ReadLocker : public cedar::aux::LockerBase
   {

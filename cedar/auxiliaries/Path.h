@@ -48,6 +48,7 @@
 // SYSTEM INCLUDES
 #include <deque>
 #include <string>
+#include <vector>
 
 
 /*!@brief A class for representing paths to files and directories.

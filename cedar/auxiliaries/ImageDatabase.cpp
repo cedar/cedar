@@ -458,7 +458,7 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Database path \"" + path.toString() + "\" does not exist.",
-      __PRETTY_FUNCTION__
+      CEDAR_CURRENT_FUNCTION_NAME
     );
     return;
   }
@@ -468,7 +468,7 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Database path \"" + path.toString() + "\" is not a directory.",
-      __PRETTY_FUNCTION__
+      CEDAR_CURRENT_FUNCTION_NAME
     );
     return;
   }
