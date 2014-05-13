@@ -85,6 +85,9 @@ public:
   //!@brief returns the default declaration for given data
   cedar::aux::gui::ConstPlotDeclarationPtr getDefaultDeclarationFor(cedar::aux::ConstDataPtr data);
 
+  //!@brief returns a declaration found by a string that contains a plot class name.
+  cedar::aux::gui::ConstPlotDeclarationPtr getDeclaration(const std::string& plotClassName) const;
+
   //!@brief set default
   template <typename DataType, typename PlotterType>
   void setDefault()

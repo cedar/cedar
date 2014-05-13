@@ -108,7 +108,7 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
 
     auto row = readOptional<int>(entry, "row", 0);
     auto column = readOptional<int>(entry, "column", 0);
-    auto type = readOptional<std::string>(entry, "type", "default plot");
+    auto type = readOptional<std::string>(entry, "type", "plot");
 
     grid_layout->setRowStretch(row, 1);
     grid_layout->setColumnStretch(column, 1);
@@ -116,71 +116,103 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
     int column_span = readOptional<int>(entry, "column span", 1);
     int row_span = readOptional<int>(entry, "row span", 1);
 
-    if (type == "default plot")
+    auto data_i = entry.find("data");
+    //!@todo Exception
+    CEDAR_ASSERT(data_i != entry.not_found());
+    const auto& data_node = data_i->second;
+
+    std::string first_data_path;
+
+    if (data_node.size() == 0)
     {
-      auto data_i = entry.find("data");
-      //!@todo Exception
-      CEDAR_ASSERT(data_i != entry.not_found());
-      const auto& data_node = data_i->second;
+      first_data_path = data_node.get_value<std::string>();
+    }
+    else
+    {
+      CEDAR_ASSERT(data_node.size() > 0);
+      first_data_path = data_node.begin()->second.get_value<std::string>();
+    }
 
-      std::string first_data_path;
+    auto data = this->findData(first_data_path);
 
-      if (data_node.size() == 0)
+    //!@todo Exception
+    CEDAR_ASSERT(data);
+
+    cedar::aux::gui::PlotInterface* plot = nullptr;
+    if (type == "plot")
+    {
+      auto plot_type = readOptional<std::string>(entry, "plot type", "default");
+
+      cedar::aux::gui::ConstPlotDeclarationPtr declaration;
+      if (plot_type == "default")
       {
-        first_data_path = data_node.get_value<std::string>();
+        declaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
       }
       else
       {
-        CEDAR_ASSERT(data_node.size() > 0);
-        first_data_path = data_node.begin()->second.get_value<std::string>();
-      }
-
-      auto data = this->findData(first_data_path);
-
-      //!@todo Exception
-      CEDAR_ASSERT(data);
-
-      auto declaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
-      auto plot = declaration->createPlot();
-      plot->plot(data, first_data_path);
-
-      grid_layout->addWidget(plot, row, column, row_span, column_span);
-
-      if (data_node.size() > 0)
-      {
-        auto multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(plot);
-        if (!multi_plot)
+        try
+        {
+          declaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDeclaration(plot_type);
+        }
+        catch (cedar::aux::NotFoundException& e)
         {
           cedar::aux::LogSingleton::getInstance()->error
           (
-            "Cannot add more data: not a multi plot.",
+            "Cannot open plot: " + e.getMessage(),
             CEDAR_CURRENT_FUNCTION_NAME
           );
           return;
         }
-        auto iter = data_node.begin();
-        ++iter;
+      }
+      plot = declaration->createPlot();
+    }
+    else
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Don't know how to process cell tpye \"" + type + "\".",
+        CEDAR_CURRENT_FUNCTION_NAME
+      );
+      return;
+    }
+    plot->plot(data, first_data_path);
 
-        for (; iter != data_node.end(); ++iter)
+    grid_layout->addWidget(plot, row, column, row_span, column_span);
+
+    if (data_node.size() > 0)
+    {
+      auto multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(plot);
+      if (!multi_plot)
+      {
+        cedar::aux::LogSingleton::getInstance()->error
+        (
+          "Cannot add more data: not a multi plot.",
+          CEDAR_CURRENT_FUNCTION_NAME
+        );
+        return;
+      }
+      auto iter = data_node.begin();
+      ++iter;
+
+      for (; iter != data_node.end(); ++iter)
+      {
+        auto path = iter->second.get_value<std::string>();
+        auto data = this->findData(path);
+
+        //!@todo Exception
+        CEDAR_ASSERT(data);
+
+        if (multi_plot->canAppend(data))
         {
-          auto path = iter->second.get_value<std::string>();
-          auto data = this->findData(path);
-
-          //!@todo Exception
-          CEDAR_ASSERT(data);
-
-          if (multi_plot->canAppend(data))
-          {
-            multi_plot->append(data, path);
-          }
-          else
-          {
-            cedar::aux::LogSingleton::getInstance()->error
-            (
-              "Cannot add data \"" + path + "\": multiplot refuses.",
-              CEDAR_CURRENT_FUNCTION_NAME
-            );
-          }
+          multi_plot->append(data, path);
+        }
+        else
+        {
+          cedar::aux::LogSingleton::getInstance()->error
+          (
+            "Cannot add data \"" + path + "\": multiplot refuses.",
+            CEDAR_CURRENT_FUNCTION_NAME
+          );
         }
       }
     }
