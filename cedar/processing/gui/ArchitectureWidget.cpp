@@ -107,8 +107,11 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
     const auto& entry = entry_pair.second;
 
     auto row = readOptional<int>(entry, "row", 0);
-    int column = readOptional<int>(entry, "column", 0);
+    auto column = readOptional<int>(entry, "column", 0);
     auto type = readOptional<std::string>(entry, "type", "default plot");
+
+    grid_layout->setRowStretch(row, 1);
+    grid_layout->setColumnStretch(column, 1);
 
     int column_span = readOptional<int>(entry, "column span", 1);
     int row_span = readOptional<int>(entry, "row span", 1);
@@ -128,7 +131,7 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
       }
       else
       {
-        CEDAR_ASSERT(data_node.size() > 1);
+        CEDAR_ASSERT(data_node.size() > 0);
         first_data_path = data_node.begin()->second.get_value<std::string>();
       }
 
@@ -143,7 +146,7 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
 
       grid_layout->addWidget(plot, row, column, row_span, column_span);
 
-      if (data_node.size() > 1)
+      if (data_node.size() > 0)
       {
         auto multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(plot);
         if (!multi_plot)
