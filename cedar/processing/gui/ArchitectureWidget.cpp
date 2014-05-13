@@ -122,7 +122,7 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
 
       std::string first_data_path;
 
-      if (data_node.size() == 1)
+      if (data_node.size() == 0)
       {
         first_data_path = data_node.get_value<std::string>();
       }
