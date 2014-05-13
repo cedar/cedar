@@ -46,6 +46,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/ArchitectureWidget.fwd.h"
 #include "cedar/processing/Group.fwd.h"
+#include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -84,7 +85,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  template <typename T>
+  static T readOptional(const cedar::aux::ConfigurationNode& node, const std::string& key, const T& defaultValue);
+
+  cedar::aux::ConstDataPtr findData(const std::string& path) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

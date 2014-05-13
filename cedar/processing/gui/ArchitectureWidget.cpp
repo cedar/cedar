@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 #include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
@@ -66,6 +67,26 @@ mGroup(group)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+//! A small helper function for reading a value from a tree. Returns a default value if the read value cannot be found.
+template <typename T>
+T cedar::proc::gui::ArchitectureWidget::readOptional
+  (
+    const cedar::aux::ConfigurationNode& node,
+    const std::string& key,
+    const T& defaultValue
+  )
+{
+  auto iter = node.find(key);
+  if (iter != node.not_found())
+  {
+    return iter->second.get_value<T>();
+  }
+  else
+  {
+    return defaultValue;
+  }
+}
+
 void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   auto entries_iter = node.find("entries");
@@ -85,52 +106,103 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
   {
     const auto& entry = entry_pair.second;
 
-    //!@todo Check that these nodes actually exist
-    auto row = entry.get<int>("row");
-    auto column = entry.get<int>("column");
-    auto type = entry.get<std::string>("type");
+    auto row = readOptional<int>(entry, "row", 0);
+    int column = readOptional<int>(entry, "column", 0);
+    auto type = readOptional<std::string>(entry, "type", "default plot");
 
-    int column_span = 1;
-    int row_span = 1;
-
-    auto col_span_iter = entry.find("column span");
-    if (col_span_iter != entry.not_found())
-    {
-      column_span = col_span_iter->second.get_value<int>();
-    }
+    int column_span = readOptional<int>(entry, "column span", 1);
+    int row_span = readOptional<int>(entry, "row span", 1);
 
     if (type == "default plot")
     {
-      //!@todo Check that these nodes actually exist
-      auto data_path = entry.get<std::string>("data");
-      //!@todo Move this code to a group function
-      std::string data_name, step_path, step_path_rest, role;
-      cedar::aux::splitLast(data_path, ".", step_path, data_name);
-      cedar::aux::splitLast(step_path, "[", step_path_rest, role);
-      if (!role.empty() && role.at(role.size() - 1) == ']')
+      auto data_i = entry.find("data");
+      //!@todo Exception
+      CEDAR_ASSERT(data_i != entry.not_found());
+      const auto& data_node = data_i->second;
+
+      std::string first_data_path;
+
+      if (data_node.size() == 1)
       {
-        role = role.substr(0, role.size() - 1);
+        first_data_path = data_node.get_value<std::string>();
+      }
+      else
+      {
+        CEDAR_ASSERT(data_node.size() > 1);
+        first_data_path = data_node.begin()->second.get_value<std::string>();
       }
 
-      auto connectable = this->mGroup->getElement<cedar::proc::Connectable>(step_path_rest);
+      auto data = this->findData(first_data_path);
 
-      auto role_enum = cedar::proc::DataRole::type().get(role);
-      auto data = connectable->getData(role_enum, data_name);
-
-      //!@todo Error handling
+      //!@todo Exception
       CEDAR_ASSERT(data);
 
       auto declaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
       auto plot = declaration->createPlot();
-      plot->plot(data, "data");
+      plot->plot(data, first_data_path);
 
       grid_layout->addWidget(plot, row, column, row_span, column_span);
+
+      if (data_node.size() > 1)
+      {
+        auto multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(plot);
+        if (!multi_plot)
+        {
+          cedar::aux::LogSingleton::getInstance()->error
+          (
+            "Cannot add more data: not a multi plot.",
+            CEDAR_CURRENT_FUNCTION_NAME
+          );
+          return;
+        }
+        auto iter = data_node.begin();
+        ++iter;
+
+        for (; iter != data_node.end(); ++iter)
+        {
+          auto path = iter->second.get_value<std::string>();
+          auto data = this->findData(path);
+
+          //!@todo Exception
+          CEDAR_ASSERT(data);
+
+          if (multi_plot->canAppend(data))
+          {
+            multi_plot->append(data, path);
+          }
+          else
+          {
+            cedar::aux::LogSingleton::getInstance()->error
+            (
+              "Cannot add data \"" + path + "\": multiplot refuses.",
+              CEDAR_CURRENT_FUNCTION_NAME
+            );
+          }
+        }
+      }
     }
     else
     {
       //!@todo error message
     }
   }
+}
+
+cedar::aux::ConstDataPtr cedar::proc::gui::ArchitectureWidget::findData(const std::string& path) const
+{
+  //!@todo Move this code to a group function
+  std::string data_name, step_path, step_path_rest, role;
+  cedar::aux::splitLast(path, ".", step_path, data_name);
+  cedar::aux::splitLast(step_path, "[", step_path_rest, role);
+  if (!role.empty() && role.at(role.size() - 1) == ']')
+  {
+    role = role.substr(0, role.size() - 1);
+  }
+
+  auto connectable = this->mGroup->getElement<cedar::proc::Connectable>(step_path_rest);
+
+  auto role_enum = cedar::proc::DataRole::type().get(role);
+  return connectable->getData(role_enum, data_name);
 }
 
 void cedar::proc::gui::ArchitectureWidget::writeConfiguration(cedar::aux::ConfigurationNode& /* node */) const
