@@ -445,7 +445,11 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
     default:
     case MODE_SELECT:
     {
-      if ((pMouseEvent->buttons() & Qt::LeftButton) > 0)
+      if // check if this is not a "fake" left click event that emulates middle mouse button scrolling
+      (
+        (pMouseEvent->buttons() & Qt::LeftButton) > 0
+          && this->mpeParentView->dragMode() != QGraphicsView::ScrollHandDrag
+      )
       {
         QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
         if (items.size() > 0)
