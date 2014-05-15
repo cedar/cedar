@@ -79,14 +79,14 @@ cedar::proc::Step::Step(bool /*runInThread*/, bool isLooped)
 :
 Triggerable(isLooped),
 // initialize members
-// average the last 100 iteration times
-mComputeTime(cedar::aux::MovingAverage<cedar::unit::Time>(100)),
-mLockingTime(cedar::aux::MovingAverage<cedar::unit::Time>(100)),
-mRoundTime(cedar::aux::MovingAverage<cedar::unit::Time>(100)),
 mLastComputeCall(0),
 // initialize parameters
 mAutoLockInputsAndOutputs(true)
 {
+  this->mComputeTimeId = this->registerTimeMeasurement("compute call");
+  this->mLockingTimeId = this->registerTimeMeasurement("locking");
+  this->mRoundTimeId = this->registerTimeMeasurement("round time");
+
   // create the finished trigger singleton.
   this->getFinishedTrigger();
 
@@ -103,14 +103,14 @@ cedar::proc::Step::Step(bool isLooped)
 :
 Triggerable(isLooped),
 // initialize members
-// average the last 100 iteration times
-mComputeTime(cedar::aux::MovingAverage<cedar::unit::Time>(100)),
-mLockingTime(cedar::aux::MovingAverage<cedar::unit::Time>(100)),
-mRoundTime(cedar::aux::MovingAverage<cedar::unit::Time>(100)),
 mLastComputeCall(0),
 // initialize parameters
 mAutoLockInputsAndOutputs(true)
 {
+  this->mComputeTimeId = this->registerTimeMeasurement("compute call");
+  this->mLockingTimeId = this->registerTimeMeasurement("locking");
+  this->mRoundTimeId = this->registerTimeMeasurement("round time");
+
   // create the finished trigger singleton.
   this->getFinishedTrigger();
 
@@ -130,6 +130,16 @@ cedar::proc::Step::~Step()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+unsigned int cedar::proc::Step::registerTimeMeasurement(const std::string& measurement)
+{
+  unsigned int id = this->mTimeMeasurementNames.size();
+  // average the last 100 iteration times
+  this->mTimeMeasurements.push_back(cedar::aux::MovingAverage<cedar::unit::Time>(100));
+  this->mTimeMeasurementNames[id] = measurement;
+
+  return id;
+}
 
 void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
 {
@@ -443,129 +453,129 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   }
 }
 
+unsigned int cedar::proc::Step::getNumberOfTimeMeasurements() const
+{
+  return this->mTimeMeasurements.size();
+}
+
+const std::string& cedar::proc::Step::getTimeMeasurementName(unsigned int id) const
+{
+  auto iter = this->mTimeMeasurementNames.find(id);
+  CEDAR_ASSERT(iter != this->mTimeMeasurementNames.end());
+  return iter->second;
+}
+
+void cedar::proc::Step::setTimeMeasurement(unsigned int id, const cedar::unit::Time& time)
+{
+  CEDAR_DEBUG_ASSERT(id < this->mTimeMeasurements.size());
+  auto& measurement = this->mTimeMeasurements.at(id);
+  QWriteLocker locker(measurement.getLockPtr());
+  measurement.member().append(time);
+}
+
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
 {
-  QWriteLocker locker(this->mComputeTime.getLockPtr());
-  this->mComputeTime.member().append(time);
+  this->setTimeMeasurement(this->mComputeTimeId, time);
 }
 
 void cedar::proc::Step::setLockTimeMeasurement(const cedar::unit::Time& time)
 {
-  QWriteLocker locker(this->mLockingTime.getLockPtr());
-  this->mLockingTime.member().append(time);
+  this->setTimeMeasurement(this->mLockingTimeId, time);
 }
 
 void cedar::proc::Step::setRoundTimeMeasurement(const cedar::unit::Time& time)
 {
-  QWriteLocker locker(this->mRoundTime.getLockPtr());
-  this->mRoundTime.member().append(time);
+  this->setTimeMeasurement(this->mRoundTimeId, time);
+}
+
+cedar::unit::Time cedar::proc::Step::getLastTimeMeasurement(unsigned int id) const
+{
+  CEDAR_DEBUG_ASSERT(id < this->mTimeMeasurements.size());
+  auto& measurement = this->mTimeMeasurements.at(id);
+  QReadLocker locker(measurement.getLockPtr());
+  if (measurement.member().size() > 0)
+  {
+    cedar::unit::Time copy = measurement.member().getNewest();
+    return copy;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
+  }
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
 {
-  QReadLocker locker(this->mComputeTime.getLockPtr());
-  if (this->mComputeTime.member().size() > 0)
-  {
-    cedar::unit::Time copy = this->mComputeTime.member().getNewest();
-    return copy;
-  }
-  else
-  {
-    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
-  }
+  return this->getLastTimeMeasurement(this->mComputeTimeId);
 }
 
 cedar::unit::Time cedar::proc::Step::getLockTimeMeasurement() const
 {
-  QReadLocker locker(this->mLockingTime.getLockPtr());
-  if (this->mLockingTime.member().size() > 0)
-  {
-    cedar::unit::Time copy = this->mLockingTime.member().getNewest();
-    return copy;
-  }
-  else
-  {
-    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
-  }
-}
-
-bool cedar::proc::Step::hasRunTimeMeasurement() const
-{
-  QReadLocker locker(this->mComputeTime.getLockPtr());
-  bool has_measurement = this->mComputeTime.member().size() > 0;
-  return has_measurement;
-}
-
-bool cedar::proc::Step::hasLockTimeMeasurement() const
-{
-  QReadLocker locker(this->mLockingTime.getLockPtr());
-  bool has_measurement = this->mLockingTime.member().size() > 0;
-  return has_measurement;
-}
-
-bool cedar::proc::Step::hasRoundTimeMeasurement() const
-{
-  QReadLocker locker(this->mRoundTime.getLockPtr());
-  bool has_measurement = this->mRoundTime.member().size() > 0;
-  return has_measurement;
-}
-
-cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
-{
-  QReadLocker locker(this->mComputeTime.getLockPtr());
-  if (this->mComputeTime.member().size() > 0)
-  {
-    cedar::unit::Time copy = this->mComputeTime.member().getAverage();
-    return copy;
-  }
-  else
-  {
-    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
-  }
-}
-
-cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
-{
-  QReadLocker locker(this->mLockingTime.getLockPtr());
-  if (this->mLockingTime.member().size() > 0)
-  {
-    cedar::unit::Time copy = this->mLockingTime.member().getAverage();
-    return copy;
-  }
-  else
-  {
-    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
-  }
+  return this->getLastTimeMeasurement(this->mLockingTimeId);
 }
 
 cedar::unit::Time cedar::proc::Step::getRoundTimeMeasurement() const
 {
-  QReadLocker locker(this->mRoundTime.getLockPtr());
-  if (this->mRoundTime.member().size() > 0)
+  return this->getLastTimeMeasurement(this->mRoundTimeId);
+}
+
+bool cedar::proc::Step::hasTimeMeasurement(unsigned int id) const
+{
+  CEDAR_DEBUG_ASSERT(id < this->mTimeMeasurements.size());
+  auto& measurement = this->mTimeMeasurements.at(id);
+
+  QReadLocker locker(measurement.getLockPtr());
+  bool has_measurement = measurement.member().size() > 0;
+  return has_measurement;
+}
+
+
+bool cedar::proc::Step::hasRunTimeMeasurement() const
+{
+  return this->hasTimeMeasurement(this->mComputeTimeId);
+}
+
+bool cedar::proc::Step::hasLockTimeMeasurement() const
+{
+  return this->hasTimeMeasurement(this->mLockingTimeId);
+}
+
+bool cedar::proc::Step::hasRoundTimeMeasurement() const
+{
+  return this->hasTimeMeasurement(this->mRoundTimeId);
+}
+
+cedar::unit::Time cedar::proc::Step::getTimeMeasurementAverage(unsigned int id) const
+{
+  CEDAR_DEBUG_ASSERT(id < this->mTimeMeasurements.size());
+  auto& measurement = this->mTimeMeasurements.at(id);
+
+  QReadLocker locker(measurement.getLockPtr());
+  if (measurement.member().size() > 0)
   {
-    cedar::unit::Time copy = this->mRoundTime.member().getNewest();
+    cedar::unit::Time copy = measurement.member().getAverage();
     return copy;
   }
   else
   {
     CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
+}
+
+cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
+{
+  return this->getTimeMeasurementAverage(this->mComputeTimeId);
+}
+
+cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
+{
+  return this->getTimeMeasurementAverage(this->mLockingTimeId);
 }
 
 cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
 {
-  QReadLocker locker(this->mRoundTime.getLockPtr());
-  if (this->mRoundTime.member().size() > 0)
-  {
-    cedar::unit::Time copy = this->mRoundTime.member().getAverage();
-    return copy;
-  }
-  else
-  {
-    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
-  }
+  return this->getTimeMeasurementAverage(this->mRoundTimeId);
 }
-
 
 bool cedar::proc::Step::isRecorded() const
 {
