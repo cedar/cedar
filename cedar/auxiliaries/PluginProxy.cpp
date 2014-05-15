@@ -144,6 +144,8 @@ std::string cedar::aux::PluginProxy::getNormalizedSearchPath() const
   std::vector<std::string> subpaths_to_remove;
   subpaths_to_remove.push_back(this->getPluginName());
   subpaths_to_remove.push_back("build");
+  subpaths_to_remove.push_back("Debug");
+  subpaths_to_remove.push_back("Release");
   subpaths_to_remove.push_back("/");
 
   for (auto iter = subpaths_to_remove.begin(); iter != subpaths_to_remove.end(); )
@@ -329,6 +331,8 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, c
 
   std::vector<std::string> subpaths_to_search;
   subpaths_to_search.push_back("build");
+  subpaths_to_search.push_back("Debug");
+  subpaths_to_search.push_back("Release");
   subpaths_to_search.push_back(pluginName);
 
   for (size_t i = 0; i < subpaths_to_search.size(); ++i)
