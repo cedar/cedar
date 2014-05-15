@@ -65,13 +65,15 @@ class cedar::aux::LockableMember
 public:
   LockableMember()
   :
-  mMember()
+  mMember(),
+  mLock(new LockType())
   {
   }
 
   LockableMember(const T& member)
   :
-  mMember(member)
+  mMember(member),
+  mLock(new LockType())
   {
   }
 
@@ -94,13 +96,13 @@ public:
   //! Returns the associated lock.
   LockType& getLock() const
   {
-    return this->mLock;
+    return *(this->mLock.get());
   }
 
   //! Returns a pointer to associated lock. Use this method for things like QReadLocker etc.
   LockType* getLockPtr() const
   {
-    return &this->mLock;
+    return this->mLock.get();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -125,7 +127,7 @@ private:
   T mMember;
 
   //! Lock for the member.
-  mutable LockType mLock;
+  mutable boost::shared_ptr<LockType> mLock;
 
 }; // class cedar::aux::LockableMember
 
