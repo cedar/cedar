@@ -234,9 +234,14 @@ void cedar::proc::gui::Group::lastReadConfigurationChanged()
   auto old_x = this->pos().x();
   auto old_y = this->pos().y();
   bool was_collapsed = this->isCollapsed();
-  //!@todo either remove or reactivate if something is broken
-//  auto config = this->getGroup()->getLastReadConfiguration();
-//  this->readConfiguration(config);
+
+  // restore the specific information of the GUI representation of the group
+  auto config = this->getGroup()->getLastReadConfiguration();
+  auto ui_iter = config.find("ui generic");
+  if (ui_iter != config.not_found())
+  {
+    this->cedar::proc::gui::Connectable::readConfiguration(ui_iter->second);
+  }
 
   if (this->getGroup()->isLinked())
   {
