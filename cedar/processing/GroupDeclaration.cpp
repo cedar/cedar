@@ -78,3 +78,8 @@ std::string cedar::proc::GroupDeclaration::getGroupName() const
 {
   return this->mGroupName;
 }
+
+std::string cedar::proc::GroupDeclaration::getPluginType() const
+{
+  return "group template";
+}
