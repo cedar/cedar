@@ -161,58 +161,41 @@ cedar::proc::gui::StepItem::~StepItem()
 
 void cedar::proc::gui::StepItem::updateToolTip()
 {
-  QString tool_tip
-    = QString("<table>"
-                "<tr>"
-                  "<th>Measurement:</th>"
-                  "<th>Last</th>"
-                  "<th>Average</th>"
-                "</tr>"
-                "<tr>"
-                  "<td>locking</td>"
-                  "<td align=\"right\">%3</td>"
-                  "<td align=\"right\">%4</td>"
-                "</tr>"
-                "<tr>"
-                  "<td>compute call</td>"
-                  "<td align=\"right\">%1</td>"
-                  "<td align=\"right\">%2</td>"
-                "</tr>"
-                "<tr>"
-                  "<td>round time</td>"
-                  "<td align=\"right\">%5</td>"
-                  "<td align=\"right\">%6</td>"
-                "</tr>"
-              "</table>");
+  QString tool_tip;
 
-  std::vector<boost::function<cedar::unit::Time ()> > measurements;
-  std::vector<boost::function<bool ()> > checks;
-  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->getStep()));
-  checks.push_back(boost::bind(&cedar::proc::Step::hasRunTimeMeasurement, this->getStep()));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->getStep()));
-  checks.push_back(boost::bind(&cedar::proc::Step::hasRunTimeMeasurement, this->getStep()));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->getStep()));
-  checks.push_back(boost::bind(&cedar::proc::Step::hasLockTimeMeasurement, this->getStep()));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->getStep()));
-  checks.push_back(boost::bind(&cedar::proc::Step::hasLockTimeMeasurement, this->getStep()));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->getStep()));
-  checks.push_back(boost::bind(&cedar::proc::Step::hasRoundTimeMeasurement, this->getStep()));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->getStep()));
-  checks.push_back(boost::bind(&cedar::proc::Step::hasRoundTimeMeasurement, this->getStep()));
+  tool_tip += "<table>";
+  tool_tip += "<tr>"
+                "<th>Measurement:</th>"
+                "<th>Last</th>"
+                "<th>Average</th>"
+              "</tr>";
 
-  for (size_t i = 0; i < measurements.size(); ++i)
+  for (unsigned int m = 0; m < this->getStep()->getNumberOfTimeMeasurements(); ++m)
   {
-    if (checks.at(i)())
+    const std::string& measurement = this->getStep()->getTimeMeasurementName(m);
+    tool_tip += "<tr>";
+    QString measurement_str = "<td>%1</td><td align=\"right\">%2</td><td align=\"right\">%3</td>";
+    measurement_str = measurement_str.arg(QString::fromStdString(measurement));
+
+    if (this->getStep()->hasTimeMeasurement(m))
     {
-      cedar::unit::Time ms = measurements.at(i)();
-      double dval = ms / (0.001 * cedar::unit::seconds);
-      tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
+      cedar::unit::Time last_ms = this->getStep()->getLastTimeMeasurement(m);
+      cedar::unit::Time average_ms = this->getStep()->getTimeMeasurementAverage(m);
+      double last_d = last_ms / (0.001 * cedar::unit::seconds);
+      double avg_d = average_ms / (0.001 * cedar::unit::seconds);
+      measurement_str = measurement_str.arg(QString("%1 ms").arg(last_d, 0, 'f', 1));
+      measurement_str = measurement_str.arg(QString("%1 ms").arg(avg_d, 0, 'f', 1));
     }
     else
     {
-      tool_tip = tool_tip.arg("n/a");
+      measurement_str = measurement_str.arg("n/a");
+      measurement_str = measurement_str.arg("n/a");
     }
+    tool_tip += measurement_str;
+    tool_tip += "</tr>";
   }
+
+  tool_tip += "</table>";
 
   const auto& annotation = this->getStep()->getStateAnnotation();
   if (!annotation.empty())

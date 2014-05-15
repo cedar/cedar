@@ -267,6 +267,21 @@ public:
 
   bool isRecorded() const;
 
+  //! Returns the last measurement that has been made for the given id.
+  cedar::unit::Time getLastTimeMeasurement(unsigned int id) const;
+
+  //! Returns the average of all present measurements that has been made for the given id.
+  cedar::unit::Time getTimeMeasurementAverage(unsigned int id) const;
+
+  //! Checks whether a measurement for the given id is present.
+  bool hasTimeMeasurement(unsigned int id) const;
+
+  //! Returns the number of time measurements registered for the step.
+  unsigned int getNumberOfTimeMeasurements() const;
+
+  //! Returns the name of a given time measurement
+  const std::string& getTimeMeasurementName(unsigned int id) const;
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -366,6 +381,15 @@ protected:
 
   void revalidateInputSlot(const std::string& slot);
 
+  /*!@brief Registers a new type of measurement for the step.
+   * @returns A unique identifyer for accessing this measurement.
+   */
+  unsigned int registerTimeMeasurement(const std::string& measurement);
+
+  /*! @brief Sets the measuement with the given id.
+   */
+  void setTimeMeasurement(unsigned int id, const cedar::unit::Time& time);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -429,14 +453,20 @@ private:
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;
 
-  //!@brief Moving average of the iteration time.
-  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mComputeTime;
+  //! Map from ID to measurement name.
+  std::map<unsigned int, std::string> mTimeMeasurementNames;
+
+  //! List of all the measurements available for the step.
+  std::vector<cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > > mTimeMeasurements;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mLockingTime;
+  unsigned int mComputeTimeId;
+
+  //!@brief Moving average of the iteration time.
+  unsigned int mLockingTimeId;
 
   //!@brief Moving average of the time between compute calls.
-  cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > mRoundTime;
+  unsigned int mRoundTimeId;
 
   clock_t mLastComputeCall;
 
