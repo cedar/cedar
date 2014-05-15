@@ -215,10 +215,10 @@ std::string cedar::aux::PluginProxy::getPluginNameFromPath(const std::string& pa
 std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& plugin_path) const
 {
   std::string plugin_name = cedar::aux::PluginProxy::getPluginNameFromPath(plugin_path);
-  plugin_name += ".xml";
+  // plugin_name += ".xml";
 
   // extract the path only
-  boost::filesystem::path plugin_dir(plugin_path);
+  /*boost::filesystem::path plugin_dir(plugin_path);
   plugin_dir.remove_filename();
   plugin_dir /= plugin_name;
 
@@ -236,6 +236,25 @@ std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& pl
   }
 
   //!@todo This should throw an exception.
+  return "";
+  */
+  
+  try
+  {
+    std::string file = this->findPluginFile(plugin_name + "/" + plugin_name + ".xml");
+
+    if (boost::filesystem::exists(file))
+    {
+      return file;
+    }
+  }
+  catch (cedar::aux::PluginNotFoundException)
+  {
+    // nothing to do, return empty string below
+  }
+
+  // to not change the old interface, return an empty string
+  //!@todo Throw an exception instead?
   return "";
 }
 
