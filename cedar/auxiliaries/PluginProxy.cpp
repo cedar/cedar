@@ -254,6 +254,7 @@ bool cedar::aux::PluginProxy::canFindPlugin(const std::string& pluginName)
 
 std::string cedar::aux::PluginProxy::findPluginFile(const std::string& fileName)
 {
+  //!@todo This is more of an ad-hoc solution, the proper way would be to remove the same stuff at the end of the path as elsewhere in the plugin finding process, i.e., "build", "Debug" and "Release"
   // first, find the name of the plugin; it is the first element of the path
   std::string plugin_name, path, full_path, plugin_base_path, throw_away;
   cedar::aux::splitFirst(fileName, "/", plugin_name, path);
@@ -263,9 +264,13 @@ std::string cedar::aux::PluginProxy::findPluginFile(const std::string& fileName)
   {
     return plugin_base_path + "/" + path;
   }
-  else
+  else if (boost::filesystem::exists(plugin_base_path + "/../" + path))
   {
     return plugin_base_path + "/../" + path;
+  }
+  else
+  {
+    return plugin_base_path + "/../../" + path;
   }
 }
 
