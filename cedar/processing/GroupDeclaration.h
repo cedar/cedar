@@ -92,6 +92,8 @@ public:
   //! Returns the group name associated with this declaration.
   std::string getGroupName() const;
 
+  std::string getPluginType() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
