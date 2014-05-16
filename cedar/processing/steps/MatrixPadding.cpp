@@ -310,7 +310,7 @@ void cedar::proc::steps::MatrixPadding::inputConnectionChanged(const std::string
 {
   this->mInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
 
-  if (this->mInput)
+  if (this->mInput && this->mInput->getDimensionality() > 0)
   {
     this->_mPaddedSize->resize(this->mInput->getDimensionality());
 
@@ -320,7 +320,7 @@ void cedar::proc::steps::MatrixPadding::inputConnectionChanged(const std::string
 
 void cedar::proc::steps::MatrixPadding::updateOutputSize()
 {
-  if (this->mInput)
+  if (this->mInput && this->mInput->getDimensionality() > 0)
   {
     const cv::Mat& input = this->mInput->getData();
     std::vector<int> dest_size(static_cast<size_t>(input.dims));
