@@ -91,8 +91,8 @@ mThresholdedImage(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_8U))),
 mMaxValue (255.0),
 mApplyLowerThreshold(new cedar::aux::BoolParameter(this, "apply lower threshold", true)),
 mApplyUpperThreshold(new cedar::aux::BoolParameter(this, "apply upper threshold", true)),
-_mLowerThresholdValue(new cedar::aux::DoubleParameter(this, "lower threshold", 0, 0, 255.0)),
-_mUpperThresholdValue(new cedar::aux::DoubleParameter(this, "upper threshold", 255.0, 0, 255.0))
+_mLowerThresholdValue(new cedar::aux::DoubleParameter(this, "lower threshold", 0, cedar::aux::DoubleParameter::LimitType::positiveZero())),
+_mUpperThresholdValue(new cedar::aux::DoubleParameter(this, "upper threshold", 255.0, cedar::aux::DoubleParameter::LimitType::positiveZero()))
 {
   QObject::connect(this->mApplyLowerThreshold.get(), SIGNAL(valueChanged()), this, SLOT(applyLowerThesholdChanged()));
   QObject::connect(this->mApplyUpperThreshold.get(), SIGNAL(valueChanged()), this, SLOT(applyUpperThesholdChanged()));
