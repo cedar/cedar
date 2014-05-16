@@ -133,20 +133,37 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
 {
   this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(dataSlotName));
 
+  bool output_changed = false;
+
   if (this->mMatrix)
   {
+    if (this->mMatrix->getData().size != this->mConverted->getData().size)
+    {
+      output_changed = true;
+    }
+
+    auto old_type = this->mConverted->getData().type();
     this->mConverted->copyAnnotationsFrom(this->mMatrix);
 
     this->lock(cedar::aux::LOCK_TYPE_READ);
     this->compute(cedar::proc::Arguments());
     this->unlock();
+
+    if (old_type != this->mConverted->getData().type())
+    {
+      output_changed = true;
+    }
   }
   else
   {
     this->mConverted->setData(cv::Mat());
+    output_changed = true;
   }
 
-  this->emitOutputPropertiesChangedSignal("converted matrix");
+  if (output_changed)
+  {
+    this->emitOutputPropertiesChangedSignal("converted matrix");
+  }
 
   if (this->mMatrix)
   {

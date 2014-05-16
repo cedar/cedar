@@ -338,8 +338,13 @@ void cedar::proc::steps::Resize::updateOutputMatrixSize()
     sizes.push_back(static_cast<int>(this->_mOutputSize->at(i)));
   }
   cv::Mat new_output_mat = cv::Mat(size, &sizes.at(0), input.type(), cv::Scalar(0));
+  bool changed = (new_output_mat.size != this->mOutput->getData().size || new_output_mat.type() != this->mOutput->getData().type());
   this->mOutput->setData(new_output_mat);
-  this->emitOutputPropertiesChangedSignal("output");
+
+  if (changed)
+  {
+    this->emitOutputPropertiesChangedSignal("output");
+  }
 }
 
 void cedar::proc::steps::Resize::recompute()
