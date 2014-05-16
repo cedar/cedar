@@ -172,14 +172,14 @@ double cedar::dev::KinematicChain::getJointAngle(unsigned int index) const
     return 0.0;
   }
 
-  auto angles = fetchUserMeasurementIndex( JOINT_ANGLES, index );
+  auto angles = getUserMeasurementBufferIndex( JOINT_ANGLES, index );
 
   return angles;
 }
 
 cv::Mat cedar::dev::KinematicChain::getJointAngles() const
 {
-  return fetchUserMeasurement( JOINT_ANGLES );
+  return getUserMeasurementBuffer( JOINT_ANGLES );
 }
 
 cv::Mat cedar::dev::KinematicChain::getCachedJointAngles() const
@@ -200,12 +200,12 @@ double cedar::dev::KinematicChain::getJointVelocity(unsigned int index) const
     return 0.0;
   }
 
-  return fetchUserMeasurementIndex( JOINT_VELOCITIES, index );
+  return getUserMeasurementBufferIndex( JOINT_VELOCITIES, index );
 }
 
 cv::Mat cedar::dev::KinematicChain::getJointVelocities() const
 {
-  return fetchUserMeasurement( JOINT_VELOCITIES );
+  return getUserMeasurementBuffer( JOINT_VELOCITIES );
 }
 
 cv::Mat cedar::dev::KinematicChain::getCachedJointVelocities() const
@@ -227,12 +227,12 @@ double cedar::dev::KinematicChain::getJointAcceleration(unsigned int index) cons
     return 0.0;
   }
 
-  return fetchUserMeasurementIndex( JOINT_ACCELERATIONS, index );
+  return getUserMeasurementBufferIndex( JOINT_ACCELERATIONS, index );
 }
 
 cv::Mat cedar::dev::KinematicChain::getJointAccelerations() const
 {
-  return fetchUserMeasurement( JOINT_ACCELERATIONS );
+  return getUserMeasurementBuffer( JOINT_ACCELERATIONS );
 }
 
 cv::Mat cedar::dev::KinematicChain::getCachedJointAccelerations() const
@@ -262,7 +262,7 @@ void cedar::dev::KinematicChain::setJointAngle(unsigned int index, double value)
   value = std::max<double>(value, getJoint(index)->_mpAngleLimits->getLowerLimit());
   value= std::min<double>(value, getJoint(index)->_mpAngleLimits->getUpperLimit());
 
-  submitUserCommandIndex( JOINT_ANGLES, index, value );
+  setUserCommandBufferIndex( JOINT_ANGLES, index, value );
 }
 
 
@@ -320,7 +320,7 @@ void cedar::dev::KinematicChain::setJointAngles(const cv::Mat& angles)
     new_angles.at<double>(i,0)= angle;
   }
 
-  submitUserCommand(JOINT_ANGLES, new_angles);
+  setUserCommandBuffer(JOINT_ANGLES, new_angles);
 }
 
 void cedar::dev::KinematicChain::setJointVelocity(unsigned int index, double velocity)
@@ -340,7 +340,7 @@ void cedar::dev::KinematicChain::setJointVelocity(unsigned int index, double vel
   velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
   velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
 
-  submitUserCommandIndex( JOINT_VELOCITIES, index, velocity );
+  setUserCommandBufferIndex( JOINT_VELOCITIES, index, velocity );
 }
 
 void cedar::dev::KinematicChain::setJointVelocities(const std::vector<double>& velocities)
@@ -386,7 +386,7 @@ void cedar::dev::KinematicChain::setJointVelocities(const cv::Mat& velocities)
 
   // TODO: test limits
 
-  submitUserCommand( JOINT_VELOCITIES, new_vels );
+  setUserCommandBuffer( JOINT_VELOCITIES, new_vels );
 }
 
 void cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
@@ -403,7 +403,7 @@ void cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, double
     return;
   }
 
-  submitUserCommandIndex( JOINT_ACCELERATIONS, index, acceleration );
+  setUserCommandBufferIndex( JOINT_ACCELERATIONS, index, acceleration );
 }
 
 void cedar::dev::KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
@@ -447,7 +447,7 @@ void cedar::dev::KinematicChain::setJointAccelerations(const cv::Mat& accelerati
   cv::Mat new_accels = accelerations.clone();
   // todo: test limits
 
-  submitUserCommand( JOINT_ACCELERATIONS, new_accels );
+  setUserCommandBuffer( JOINT_ACCELERATIONS, new_accels );
   return;
 }
 
@@ -464,16 +464,16 @@ void cedar::dev::KinematicChain::init()
   installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
 //  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_TORQUES );
 
-  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::integrateIO, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateIOTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateIO, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES )  );
+  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
+  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateDeviceTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
+  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES )  );
 
-  registerIOMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::integrateIO, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-  registerIOMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateIOTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
+  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
+  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateDeviceTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
 
-  registerIOMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::Component::differentiateIO, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-  registerIOMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::differentiateIO, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES )  );
-  registerIOMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::Component::differentiateIOTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
+  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
+  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES )  );
+  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::Component::differentiateDeviceTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
 
 
   this->addConfigurableChild("root coordinate frame", mForwardKinematics->getRootCoordinateFrame());
@@ -793,7 +793,7 @@ std::cout  << "  HIER0 "  << std::endl;
     {
       // todo: !
 std::cout  << "  HIER1 "  << std::endl;      
-      submitInitialUserCommand( cedar::dev::KinematicChain::JOINT_ANGLES, f->second );
+      setInitialUserCommandBuffer( cedar::dev::KinematicChain::JOINT_ANGLES, f->second );
       //setJointAngles( f->second );
     }
 
