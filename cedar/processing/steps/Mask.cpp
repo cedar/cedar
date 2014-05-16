@@ -193,6 +193,12 @@ void cedar::proc::steps::Mask::inputConnectionChanged(const std::string& inputNa
       this->emitOutputPropertiesChangedSignal("masked");
     }
   }
+  else if (!this->mInput || this->mInput->isEmpty() || this->mInput->getDimensionality() != 2)
+  {
+    this->mOutput->setData(cv::Mat());
+
+    this->emitOutputPropertiesChangedSignal("masked");
+  }
 }
 
 void cedar::proc::steps::Mask::compute(const cedar::proc::Arguments&)

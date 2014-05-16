@@ -120,6 +120,8 @@ _mTargetType(new cedar::aux::EnumParameter(this, "target type", MatrixType::type
 void cedar::proc::steps::MatrixTypeConverter::targetTypeChanged()
 {
   this->onTrigger();
+
+  this->emitOutputPropertiesChangedSignal("converted matrix");
 }
 
 void cedar::proc::steps::MatrixTypeConverter::compute(const cedar::proc::Arguments&)
@@ -131,18 +133,25 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
 {
   this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(dataSlotName));
 
-  if (!this->mMatrix)
+  if (this->mMatrix)
   {
-    return;
+    this->mConverted->copyAnnotationsFrom(this->mMatrix);
+
+    this->lock(cedar::aux::LOCK_TYPE_READ);
+    this->compute(cedar::proc::Arguments());
+    this->unlock();
+  }
+  else
+  {
+    this->mConverted->setData(cv::Mat());
   }
 
-  this->mConverted->copyAnnotationsFrom(this->mMatrix);
-
-  this->lock(cedar::aux::LOCK_TYPE_READ);
-  this->compute(cedar::proc::Arguments());
-  this->unlock();
   this->emitOutputPropertiesChangedSignal("converted matrix");
-  this->onTrigger();
+
+  if (this->mMatrix)
+  {
+    this->onTrigger();
+  }
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::MatrixTypeConverter::determineInputValidity

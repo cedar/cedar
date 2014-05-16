@@ -195,6 +195,9 @@ void cedar::proc::steps::MatrixSlice::updateDimensionality()
     bool lower_blocked = this->_mRangeLower->blockSignals(true);
     bool upper_blocked = this->_mRangeUpper->blockSignals(true);
 
+    CEDAR_DEBUG_ASSERT(d < this->_mRangeLower->size());
+    CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
+
     this->_mRangeLower->set(d, limits.getLower());
     this->_mRangeUpper->set(d, limits.getUpper());
 
@@ -217,6 +220,7 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
 
   CEDAR_DEBUG_ASSERT(dimensionality == this->_mRangeLower->size());
   CEDAR_DEBUG_ASSERT(dimensionality == this->_mRangeUpper->size());
+  CEDAR_DEBUG_ASSERT(dimensionality > 0);
 
   mRanges.clear();
   mRanges.resize(dimensionality);
@@ -225,6 +229,9 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
 
   for (unsigned int d = 0; d < dimensionality; ++d)
   {
+    CEDAR_DEBUG_ASSERT(d < this->_mRangeLower->size());
+    CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
+
     const unsigned int& lower = this->_mRangeLower->at(d);
     const unsigned int& upper = this->_mRangeUpper->at(d);
 
@@ -255,6 +262,7 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
   }
 
   // preallocate the appropriate output matrix
+  CEDAR_DEBUG_ASSERT(sizes.size() > 0);
   cv::Mat output = cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type(), cv::Scalar(0));
   cv::Mat old_output = this->mOutput->getData();
   this->mOutput->setData(output);

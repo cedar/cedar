@@ -116,6 +116,7 @@ _mInterpolationType(new cedar::aux::EnumParameter(this,
   auto input_slot = this->declareInput("input");
 
   cedar::proc::typecheck::Matrix input_check;
+  input_check.addAcceptedDimensionalityRange(1, 16);
   input_slot->setCheck(input_check);
 
   this->declareOutput("output", mOutput);
