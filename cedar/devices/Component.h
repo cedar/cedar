@@ -45,7 +45,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/devices/namespace.h"
 
-// FORWARD DECLARATIONS
+// FORWARD DECLARATDeviceNS
 #include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
@@ -73,7 +73,7 @@ public:
   typedef boost::function< cv::Mat () >     MeasurementFunctionType;
   typedef boost::function< cv::Mat (cv::Mat) > TransformationFunctionType;
   typedef unsigned int                      ComponentDataType;
-
+  typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
 private:
   typedef std::map< ComponentDataType, TransformationFunctionType > InnerTransformationHookContainerType;
   typedef std::map< ComponentDataType, InnerTransformationHookContainerType > TransformationHookContainerType;
@@ -112,13 +112,13 @@ public:
   CEDAR_DECLARE_DEPRECATED(bool isRunning());
   CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
   CEDAR_DECLARE_DEPRECATED(void stopTimer());
-  unsigned int getIOStepSize();
+  unsigned int getDeviceStepSize();
 
   // utility Transformations
-  cv::Mat integrateIO(cv::Mat data, ComponentDataType type);
-  cv::Mat integrateIOTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
-  cv::Mat differentiateIO(cv::Mat data, ComponentDataType type);
-  cv::Mat differentiateIOTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
+  cv::Mat integrateDevice(cv::Mat data, ComponentDataType type);
+  cv::Mat integrateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
+  cv::Mat differentiateDevice(cv::Mat data, ComponentDataType type);
+  cv::Mat differentiateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
 
   void processStart();
 
@@ -139,8 +139,8 @@ protected:
     this->mSlot = slot;
   }
 
-  void startIO(); // todo: public?
-  void stopIO(); // todo: public?
+  void startDevice(); // todo: public?
+  void stopDevice(); // todo: public?
 
   void installCommandType(ComponentDataType type);
   void installMeasurementType(ComponentDataType type);
@@ -150,24 +150,23 @@ protected:
   void setMeasurementDimensionality(ComponentDataType type, unsigned int dim);
   void setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim);
 
-  void registerIOCommandHook(ComponentDataType type, CommandFunctionType fun);
-  void registerIOMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
+  void registerDeviceCommandHook(ComponentDataType type, CommandFunctionType fun);
+  void registerDeviceMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
 
   void registerUserCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
-  void registerIOMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+  void registerDeviceMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
 
-  void submitUserCommand(ComponentDataType type, cv::Mat);
-  void submitUserCommandIndex(ComponentDataType type, int index, double value);
-  void submitInitialUserCommand(ComponentDataType type, cv::Mat);
+  void setUserCommandBuffer(ComponentDataType type, cv::Mat);
+  void setUserCommandBufferIndex(ComponentDataType type, int index, double value);
+  void setInitialUserCommandBuffer(ComponentDataType type, cv::Mat);
 
-  cv::Mat fetchUserMeasurement(ComponentDataType type) const;
-  double  fetchUserMeasurementIndex(ComponentDataType type, int index) const;
+  cv::Mat getUserMeasurementBuffer(ComponentDataType type) const;
+  double  getUserMeasurementBufferIndex(ComponentDataType type, int index) const;
 
-  cv::Mat fetchLastIOMeasurement(ComponentDataType type) const;
-  double  fetchLastIOMeasurementIndex(ComponentDataType type, int index) const;
+  cv::Mat getPreviousDeviceMeasurementBuffer(ComponentDataType type) const;
+  double  getPreviousDeviceMeasurementBufferIndex(ComponentDataType type, int index) const;
 
-  void restrictUserCommandsTo(ComponentDataType type);
-  void applyIOCommandsAs(ComponentDataType type);
+  void applyDeviceCommandsAs(ComponentDataType type);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -176,40 +175,40 @@ protected:
 private:
   void resetComponent();
 
-  void loopIO(double); //!todo: make private and friend to LoopFunctionInThread
-  void loopIOCommands(double);
-  void loopIOMeasurements(double);
+  void stepDevice(double); //!todo: make private and friend to LoopFunctionInThread
+  void stepDeviceCommands(double);
+  void stepDeviceMeasurements(double);
 
   void updateUserMeasurements();
 
   void lazyInitializeMember(cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr> >& lockableMember, boost::function<void (ComponentDataType)> initFun, ComponentDataType type);
 
-  void resetUserCommandUnlocked(ComponentDataType type);
-  void lazyInitializeUserCommandUnlocked(ComponentDataType type);
-  void setUserCommandUnlocked(ComponentDataType &type, cv::Mat);
+  void resetUserCommandBufferUnlocked(ComponentDataType type);
+  void lazyInitializeUserCommandBufferUnlocked(ComponentDataType type);
+  void setUserCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
   void setUserCommandIndexUnlocked(ComponentDataType &type, int index, double value);
-  void setInitialUserCommandUnlocked(ComponentDataType &type, cv::Mat);
-  cv::Mat getUserCommandUnlocked(ComponentDataType &type) const;
+  void setInitialUserCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
+  cv::Mat getUserCommandBufferUnlocked(ComponentDataType &type) const;
 
-  void resetUserMeasurementUnlocked(ComponentDataType type);
-  void resetLastIOMeasurementUnlocked(ComponentDataType type);
-  void lazyInitializeUserMeasurementUnlocked(ComponentDataType type);
-  void lazyInitializeLastIOMeasurementUnlocked(ComponentDataType type);
-  void setUserMeasurementUnlocked(ComponentDataType &type, cv::Mat);
-  cv::Mat getUserMeasurementUnlocked(ComponentDataType &type) const;
+  void resetUserMeasurementBufferUnlocked(ComponentDataType type);
+  void resetPreviousDeviceMeasurementBufferUnlocked(ComponentDataType type);
+  void lazyInitializeUserMeasurementBufferUnlocked(ComponentDataType type);
+  void lazyInitializePreviousDeviceMeasurementBufferUnlocked(ComponentDataType type);
+  void setUserMeasurementBufferUnlocked(ComponentDataType &type, cv::Mat);
+  cv::Mat getUserMeasurementBufferUnlocked(ComponentDataType &type) const;
   double  getUserMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
-  cv::Mat getLastIOMeasurementUnlocked(ComponentDataType &type) const;
-  double  getLastIOMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
+  cv::Mat getPreviousDeviceMeasurementBufferUnlocked(ComponentDataType &type) const;
+  double  getPreviousDeviceMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
 
-  void resetIOCommandUnlocked(ComponentDataType type);
-  void lazyInitializeIOCommandUnlocked(ComponentDataType type);
-  void setIOCommandUnlocked(ComponentDataType &type, cv::Mat);
-  cv::Mat getIOCommandUnlocked(ComponentDataType &type) const;
+  void resetDeviceCommandBufferUnlocked(ComponentDataType type);
+  void lazyInitializeDeviceCommandBufferUnlocked(ComponentDataType type);
+  void setDeviceCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
+  cv::Mat getDeviceCommandBufferUnlocked(ComponentDataType &type) const;
 
-  void resetIOMeasurementUnlocked(ComponentDataType type);
-  void lazyInitializeIOMeasurementUnlocked(ComponentDataType type);
-  void setIOMeasurementUnlocked(ComponentDataType &type, cv::Mat);
-  cv::Mat getIOMeasurementUnlocked(ComponentDataType &type) const;
+  void resetDeviceMeasurementBufferUnlocked(ComponentDataType type);
+  void lazyInitializeDeviceMeasurementBufferUnlocked(ComponentDataType type);
+  void setDeviceMeasurementBufferUnlocked(ComponentDataType &type, cv::Mat);
+  cv::Mat getDeviceMeasurementBufferUnlocked(ComponentDataType &type) const;
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -221,8 +220,8 @@ protected:
 private:
   cedar::dev::ComponentSlotWeakPtr mSlot;
 
-  //! the IO-thread's wrapper
-  std::unique_ptr< cedar::aux::LoopFunctionInThread > mIOThread;
+  //! the Device-thread's wrapper
+  std::unique_ptr< cedar::aux::LoopFunctionInThread > mDeviceThread;
 
   std::vector< ComponentDataType > mInstalledCommandTypes;
   std::vector< ComponentDataType > mInstalledMeasurementTypes;
@@ -236,18 +235,17 @@ private:
   TransformationHookContainerType mMeasurementTransformationHooks;
 
   // Cache for the user-interface
-  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr> > mUserSubmittedCommands;
-  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr > > mUserRetrievedMeasurements;
-  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr > > mLastIORetrievedMeasurements;
+  cedar::aux::LockableMember< BufferDataType > mUserCommandBuffer;
+  cedar::aux::LockableMember< BufferDataType > mUserMeasurementsBuffer;
+  cedar::aux::LockableMember< BufferDataType > mPreviousDeviceMeasurementsBuffer;
 
-  decltype(mUserSubmittedCommands) mInitialUserSubmittedCommands;
+  decltype(mUserCommandBuffer) mInitialUserSubmittedCommands;
 
-  // Cache for the IO-interface
-  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr > > mIOSubmittedCommands;
-  cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr > > mIORetrievedMeasurements;
+  // Cache for the Device-interface
+  cedar::aux::LockableMember< BufferDataType > mDeviceSubmittedCommands;
+  cedar::aux::LockableMember< BufferDataType > mDeviceRetrievedMeasurements;
 
-  boost::optional<ComponentDataType> mIOCommandRestriction;
-  boost::optional<ComponentDataType> mUserCommandRestriction;
+  boost::optional<ComponentDataType> mDeviceCommandSelection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
