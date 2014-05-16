@@ -78,8 +78,6 @@
 cedar::proc::Step::Step(bool /*runInThread*/, bool isLooped)
 :
 Triggerable(isLooped),
-// initialize members
-mLastComputeCall(0),
 // initialize parameters
 mAutoLockInputsAndOutputs(true)
 {
@@ -102,8 +100,6 @@ mAutoLockInputsAndOutputs(true)
 cedar::proc::Step::Step(bool isLooped)
 :
 Triggerable(isLooped),
-// initialize members
-mLastComputeCall(0),
 // initialize parameters
 mAutoLockInputsAndOutputs(true)
 {
@@ -323,18 +319,18 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   {
     return;
   }
-  // start measuring the execution time.
-  clock_t lock_start = clock();
+  // start measuring the lock time.
+  boost::posix_time::ptime lock_start = boost::posix_time::microsec_clock::universal_time();
 
   connections_locker.unlock();
 
   // lock the step
   cedar::proc::Step::ReadLocker step_locker(this);
 
-  clock_t lock_end = clock();
-  clock_t lock_elapsed = lock_end - lock_start;
-  double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-  this->setLockTimeMeasurement(lock_elapsed_s * cedar::unit::seconds);
+  boost::posix_time::ptime lock_end = boost::posix_time::microsec_clock::universal_time();
+  boost::posix_time::time_duration lock_elapsed = lock_end - lock_start;
+  cedar::unit::Time lock_elapsed_s(lock_elapsed.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
+  this->setLockTimeMeasurement(lock_elapsed_s);
 
   if (!this->mandatoryConnectionsAreSet())
   {
@@ -347,21 +343,21 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   } // this->mMandatoryConnectionsAreSet
 
 
-  if (this->mLastComputeCall != 0)
+  if (this->mPreciseLastComputeCall.is_not_a_date_time()) // was not called before, initialize time
   {
-    clock_t last = this->mLastComputeCall;
-    this->mLastComputeCall = clock();
-    clock_t elapsed = this->mLastComputeCall - last;
-    double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-    this->setRoundTimeMeasurement(elapsed_s * cedar::unit::seconds);
+    this->mPreciseLastComputeCall = boost::posix_time::microsec_clock::universal_time();
   }
   else
   {
-    this->mLastComputeCall = clock();
+    boost::posix_time::ptime last_precise = this->mPreciseLastComputeCall;
+    this->mPreciseLastComputeCall = boost::posix_time::microsec_clock::universal_time();
+    boost::posix_time::time_duration elapsed_precise = this->mPreciseLastComputeCall - last_precise;
+    cedar::unit::Time precise_time(elapsed_precise.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
+    this->setRoundTimeMeasurement(precise_time);
   }
   
   // start measuring the execution time.
-  clock_t run_start = clock();
+  boost::posix_time::ptime run_start = boost::posix_time::microsec_clock::universal_time();
 
   try
   {
@@ -400,12 +396,12 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 
-  clock_t run_end = clock();
-  clock_t run_elapsed = run_end - run_start;
-  double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+  boost::posix_time::ptime run_end = boost::posix_time::microsec_clock::universal_time();
+  boost::posix_time::time_duration run_elapsed = run_end - run_start;
+  cedar::unit::Time run_elapsed_s(run_elapsed.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
 
   // take time measurements
-  this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
+  this->setRunTimeMeasurement(run_elapsed_s);
 
   // unlock the step
   step_locker.unlock();

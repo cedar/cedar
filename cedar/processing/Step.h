@@ -62,6 +62,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/function.hpp>
   #include <boost/bind.hpp>
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
 #endif
 #include <map>
 #include <set>
@@ -468,7 +469,7 @@ private:
   //!@brief Moving average of the time between compute calls.
   unsigned int mRoundTimeId;
 
-  clock_t mLastComputeCall;
+  boost::posix_time::ptime mPreciseLastComputeCall;
 
   //! Whether the step should lock its inputs and outputs automatically.
   bool mAutoLockInputsAndOutputs;
