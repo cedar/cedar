@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/devices/Channel.h"
 #include "cedar/devices/namespace.h"
 
 // FORWARD DECLARATDeviceNS
@@ -97,6 +98,9 @@ public:
   //!@brief Constructor
   Component();
 
+  //!@brief Constructor taking an externally created channel
+  Component(cedar::dev::ChannelPtr channel);
+
   //!@brief Destructor
   ~Component();
 
@@ -113,6 +117,17 @@ public:
   CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
   CEDAR_DECLARE_DEPRECATED(void stopTimer());
   unsigned int getDeviceStepSize();
+
+  //!@brief Returns the channel associated with the component.
+  inline cedar::dev::ChannelPtr getChannel() const
+  {
+    return mChannel;
+  }
+
+  inline void setChannel(cedar::dev::ChannelPtr channel)
+  {
+    this->mChannel = channel;
+  }
 
   // utility Transformations
   cv::Mat integrateDevice(cv::Mat data, ComponentDataType type);
@@ -173,6 +188,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void init();
+
   void resetComponent();
 
   void stepDevice(double); //!todo: make private and friend to LoopFunctionInThread
@@ -218,6 +235,7 @@ protected:
   // none yet
 
 private:
+  cedar::dev::ChannelPtr mChannel;
   cedar::dev::ComponentSlotWeakPtr mSlot;
 
   //! the Device-thread's wrapper
