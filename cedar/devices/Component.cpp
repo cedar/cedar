@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
+#include "cedar/devices/Channel.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
@@ -49,8 +50,7 @@
   // constructors and destructor
   //----------------------------------------------------------------------------------------------------------------------
 
-  // constructor
-  cedar::dev::Component::Component()
+void cedar::dev::Component::init()
   {
     mDeviceThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
                                   new cedar::aux::LoopFunctionInThread( 
@@ -60,8 +60,20 @@
 
 
     mDeviceThread->connectToStartSignal(boost::bind(&cedar::dev::Component::processStart, this));
-  mDeviceThread->setStepSize(10);
+    mDeviceThread->setStepSize(10);
+  }
 
+  // constructor
+  cedar::dev::Component::Component()
+  {
+    init();
+  }
+
+cedar::dev::Component::Component(cedar::dev::ChannelPtr channel)
+:
+mChannel(channel)
+  {
+    init();
   }
 
   cedar::dev::Component::~Component()
