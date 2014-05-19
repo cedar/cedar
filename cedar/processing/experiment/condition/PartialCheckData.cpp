@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ConditionPartialCheckData.h"
+#include "cedar/processing/experiment/condition/PartialCheckData.h"
 #include "cedar/processing/experiment/Experiment.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -50,15 +50,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-  bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
-    registerType<cedar::proc::experiment::ConditionPartialCheckDataPtr>();
+  bool declared = cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+    registerType<cedar::proc::experiment::condition::PartialCheckDataPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ConditionPartialCheckData::ConditionPartialCheckData()
+cedar::proc::experiment::condition::PartialCheckData::PartialCheckData()
 :
 
 _stepData
@@ -84,7 +84,7 @@ _desiredValue( new cedar::aux::DoubleParameter(this,"DesiredValue",0.0))
   _stepData->setType(cedar::proc::experiment::StepPropertyParameter::OUTPUT);
 }
 
-cedar::proc::experiment::ConditionPartialCheckData::~ConditionPartialCheckData()
+cedar::proc::experiment::condition::PartialCheckData::~PartialCheckData()
 {
 }
 
@@ -92,7 +92,7 @@ cedar::proc::experiment::ConditionPartialCheckData::~ConditionPartialCheckData()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::experiment::ConditionPartialCheckData::check()
+bool cedar::proc::experiment::condition::PartialCheckData::check()
 {
   if (cedar::aux::ConstDataPtr data = _stepData->getData())
   {

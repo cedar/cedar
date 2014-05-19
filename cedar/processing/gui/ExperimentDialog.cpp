@@ -72,7 +72,7 @@ QDialog(parent)
   connect(this->saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
   connect(this->nameEdit, SIGNAL(editingFinished()), this, SLOT(nameChanged()));
   connect(this->runButton, SIGNAL(clicked()), this, SLOT(runExperiment()));
-  connect(this->cancelButton, SIGNAL(clicked()), this, SLOT(cancelExperiment()));
+  connect(this->stopButton, SIGNAL(clicked()), this, SLOT(stopExperiment()));
   connect(this->experiment.get(), SIGNAL(experimentRunning(bool)), this, SLOT(experimentRunning(bool)));
   connect(this->experiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
   connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(trialChanged()));
@@ -175,11 +175,11 @@ void cedar::proc::gui::ExperimentDialog::runExperiment()
   this->experiment->run();
 }
 
-void cedar::proc::gui::ExperimentDialog::cancelExperiment()
+void cedar::proc::gui::ExperimentDialog::stopExperiment()
 {
-  QMessageBox::StandardButton cancel = QMessageBox::warning(this,"Cancel Experiment",
-      "Do you really want to cancel this experiment?", QMessageBox::Yes|QMessageBox::No);
-  if (cancel == QMessageBox::Yes)
+  QMessageBox::StandardButton stop = QMessageBox::warning(this,"Cancel Experiment",
+      "Do you really want to stop this experiment?", QMessageBox::Yes|QMessageBox::No);
+  if (stop == QMessageBox::Yes)
   {
     this->experiment->cancel();
   }
@@ -191,14 +191,14 @@ void cedar::proc::gui::ExperimentDialog::experimentRunning(bool status)
   if(status)
   {
     this->runButton->setEnabled(false);
-    this->cancelButton->setEnabled(true);
+    this->stopButton->setEnabled(true);
     this->scrollArea->setEnabled(false);
     this->mStatusText->setText(QString::fromStdString("Running"));
   }
   else
   {
     this->runButton->setEnabled(true);
-    this->cancelButton->setEnabled(false);
+    this->stopButton->setEnabled(false);
     this->scrollArea->setEnabled(true);
     this->mStatusText->setText(QString::fromStdString("Stopped"));
   }

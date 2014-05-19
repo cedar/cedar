@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.cpp
+    File:        ConditionOnInit.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 02 06
 
-    Description: Source file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Source file for the class cedar::proc::experiment::ConditionOnInit.
 
     Credits:
 
@@ -38,95 +38,40 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ConditionCheckData.h"
-#include "cedar/auxiliaries/Data.h"
-#include "cedar/auxiliaries/MatData.h"
+#include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/ExperimentSuperviser.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-  bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
-    registerType<cedar::proc::experiment::ConditionCheckDataPtr>();
+	bool declared = cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+		registerType<cedar::proc::experiment::condition::OnInitPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ConditionCheckData::ConditionCheckData()
-:
-
-_stepData
-(
-    new cedar::proc::experiment::StepPropertyParameter(this,"StepProperty")
-)
-,
-_mCompareMethode
-(
-  new cedar::aux::EnumParameter
-  (
-    this,
-    "reset type",
-    cedar::proc::experiment::Experiment::CompareMethod::typePtr(),
-    cedar::proc::experiment::Experiment::CompareMethod::Lower
-  )
-)
-,
-_desiredValue
-(
-    new cedar::aux::DoubleParameter(this,"DesiredValue",0.0)
-)
-
-{
-  _stepData->setType(cedar::proc::experiment::StepPropertyParameter::OUTPUT);
-}
-
-cedar::proc::experiment::ConditionCheckData::~ConditionCheckData()
+cedar::proc::experiment::condition::OnInit::OnInit()
 {
 }
+
+cedar::proc::experiment::condition::OnInit::~OnInit()
+{
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 
-bool cedar::proc::experiment::ConditionCheckData::check()
+bool cedar::proc::experiment::condition::OnInit::check()
 {
-  if (cedar::aux::ConstDataPtr data = _stepData->getData())
-  {
-    if (cedar::aux::ConstMatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
-    {
-      bool inRange = false;
-      QReadLocker locker(&(value->getLock()));
-      switch(_mCompareMethode->getValue())
-      {
-       case cedar::proc::experiment::Experiment::CompareMethod::Lower:
-       {
-         inRange = cv::checkRange(value->getData(),true,NULL,-DBL_MAX,_desiredValue->getValue());
-         break;
-       }
-       case cedar::proc::experiment::Experiment::CompareMethod::Greater:
-       {
-         inRange = cv::checkRange(value->getData(),true,NULL,_desiredValue->getValue(),DBL_MAX);
-         break;
-       }
-       case cedar::proc::experiment::Experiment::CompareMethod::Equal:
-       {
-         inRange = cv::checkRange(value->getData(),true,NULL,_desiredValue->getValue(),_desiredValue->getValue());
-         break;
-       }
-      }
-      if (inRange)
-      {
-        return true;
-      }
-    }
-  }
-  return false;
+  return ExperimentSuperviserSingleton::getInstance()->getExperiment()->isOnInit();
 }
-

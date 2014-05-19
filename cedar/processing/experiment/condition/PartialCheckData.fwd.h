@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTime.fwd.h
+    File:        ConditionPartialCheckMat.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 19
+    Date:        2014 04 04
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionOnTime.
+    Description: Forward declaration file for the class cedar::proc::experiment::ConditionPartialCheckMat.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_DATA_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_DATA_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,15 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ConditionAtTime);
+      namespace condition
+      {
+        CEDAR_DECLARE_PROC_CLASS(PartialCheckData);
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_DATA_FWD_H
 

@@ -22,66 +22,55 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.h
+    File:        ConditionAnd.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
+    Date:        2014 01 22
 
-    Description: Header file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AND_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_AND_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/processing/experiment/Action.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionCheckData.fwd.h"
+#include "cedar/processing/experiment/condition/And.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Checks if the data of a step fulfills the condition
- *
- *      If the data is of type MatData, this condition will check if every
- *      single element of the matrix fulfills the condition.
+/*!@brief Condition to to combine two Conditions
  */
-class cedar::proc::experiment::ConditionCheckData : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::condition::And : public cedar::proc::experiment::condition::Condition
 {
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
+private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  ConditionCheckData();
-
+  //!@brief The Constructor
+	And();
   //!@brief Destructor
-  virtual ~ConditionCheckData();
+  ~And();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Checks if the data of a step fulfills the condition
+  //!@brief Returns true if both conditions are fulfilled
   bool check();
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,13 +82,13 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
   // none yet
 
@@ -110,16 +99,14 @@ protected:
   // none yet
 
 private:
-  //!@brief The step data to check
-  cedar::proc::experiment::StepPropertyParameterPtr _stepData;
+  //!@brief The first condition
+  ConditionParameterPtr _mCondition1;
 
-  //!@brief The compare method. Can be greater, lower or equal
-  cedar::aux::EnumParameterPtr _mCompareMethode;
+  //!@brief The second condition
+  ConditionParameterPtr _mCondition2;
 
-  //!@brief The value the step data is compared to
-  cedar::aux::DoubleParameterPtr _desiredValue;
+}; // class cedar::proc::experiment::ConditionAnd
 
-}; // class cedar::proc::experiment::ConditionCheckValue
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_AND_H
 

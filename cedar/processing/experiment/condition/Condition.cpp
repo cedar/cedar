@@ -22,45 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnInit.fwd.h
+    File:        Condition.cpp
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
+    Date:        2014 01 22
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionOnInit.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_FWD_H
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+cedar::proc::experiment::condition::Condition::Condition()
 {
-  namespace proc
-  {
-    namespace experiment
-    {
-      CEDAR_DECLARE_PROC_CLASS(ConditionOnInit);
-    }
-  }
+}
+cedar::proc::experiment::condition::Condition::~Condition()
+{
+
 }
 
-//!@endcond
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_FWD_H
 

@@ -41,7 +41,7 @@
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/processing/experiment/ActionStart.h"
 #include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/processing/experiment/ConditionOnInit.h"
+#include "cedar/processing/experiment/condition/OnInit.h"
 
 // SYSTEM INCLUDES
 
@@ -71,11 +71,11 @@ _mActionSet
 ,
 _mCondition
 (
-  new cedar::proc::experiment::Condition::ConditionParameter
+  new cedar::proc::experiment::condition::Condition::ConditionParameter
   (
     this,
     "Condition",
-    cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::ConditionOnInit())
+    cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
   )
 )
 {
@@ -98,7 +98,7 @@ void cedar::proc::experiment::ActionSequence::addAction(cedar::proc::experiment:
 	this->_mActionSet->pushBack(action);
 }
 
-void cedar::proc::experiment::ActionSequence::setCondition(cedar::proc::experiment::ConditionPtr condition)
+void cedar::proc::experiment::ActionSequence::setCondition(cedar::proc::experiment::condition::ConditionPtr condition)
 {
 	this->_mCondition->setValue(condition);
 }
@@ -113,7 +113,7 @@ std::vector<cedar::proc::experiment::ActionPtr> cedar::proc::experiment::ActionS
   return ret;
 }
 
-cedar::proc::experiment::ConditionPtr cedar::proc::experiment::ActionSequence::getCondition()
+cedar::proc::experiment::condition::ConditionPtr cedar::proc::experiment::ActionSequence::getCondition()
 {
 	return this->_mCondition->getValue();
 }
