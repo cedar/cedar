@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.cpp
+    File:        ActionStop.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 07
+    Date:        2014 03 09
 
-    Description: Source file for the class cedar::proc::experiment::ActionSetParameter.
+    Description: Source file for the class cedar::proc::experiment::ActionStop.
 
     Credits:
 
@@ -38,10 +38,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ActionSetParameter.h"
+#include "cedar/processing/experiment/action/StopAllTriggers.h"
+#include "cedar/processing/experiment/Experiment.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
-#include "cedar/auxiliaries/ParameterDeclaration.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
+
 
 // SYSTEM INCLUDES
 
@@ -51,25 +51,31 @@
 
 namespace
 {
-  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::ActionSetParameterPtr>();
+  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::action::StopAllTriggersPtr>();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ActionSetParameter::ActionSetParameter()
+cedar::proc::experiment::action::StopAllTriggers::StopAllTriggers()
 :
-_mStepParameter
+_mResetType
 (
-    new cedar::proc::experiment::StepPropertyParameter(this,"Step Parameter")
-)
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "Reset type",
+    cedar::proc::experiment::Experiment::ResetType::typePtr(),
+    cedar::proc::experiment::Experiment::ResetType::Reset
+  )
+),
+_mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
+_mMessage(new cedar::aux::StringParameter(this,"Message",""))
 {
-  _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
 }
 
-
-cedar::proc::experiment::ActionSetParameter::~ActionSetParameter()
+cedar::proc::experiment::action::StopAllTriggers::~StopAllTriggers()
 {
 }
 
@@ -77,16 +83,9 @@ cedar::proc::experiment::ActionSetParameter::~ActionSetParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-void cedar::proc::experiment::ActionSetParameter::run()
+void cedar::proc::experiment::action::StopAllTriggers::run()
 {
-
-  if (_mStepParameter->getStep() == "" || _mStepParameter->getProperty() == "")
-  {
-    return;
-  }
-  cedar::aux::ParameterPtr parameter = _mStepParameter->getParameter();
-  parameter->copyValueFrom(_mStepParameter->getParameterCopy());
-
+    ExperimentSuperviserPtr super = ExperimentSuperviserSingleton::getInstance();
+    super->getExperiment()->stopTrial(_mResetType->getValue());
+    super->log(_mSuccess->getValue()?"Trial success":"Trial failed",_mMessage->getValue());
 }
-

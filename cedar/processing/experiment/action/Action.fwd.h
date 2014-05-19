@@ -55,7 +55,10 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(Action);
+      namespace action
+      {
+        CEDAR_DECLARE_PROC_CLASS(Action);
+      }
     }
   }
 }

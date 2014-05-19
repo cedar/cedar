@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStart.cpp
+    File:        Action.cpp
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
+    Date:        2014 01 22
 
-    Description: Source file for the class cedar::proc::experiment::ActionStart.
+    Description:
 
     Credits:
 
@@ -38,44 +38,30 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ActionStart.h"
-#include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/action/Action.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// register class
+// register the class
 //----------------------------------------------------------------------------------------------------------------------
-
-namespace
-{
-  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::ActionStartPtr>();
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::experiment::ActionStart::ActionStart()
+cedar::proc::experiment::action::Action::Action()
 {
-}
 
-cedar::proc::experiment::ActionStart::~ActionStart()
+}
+cedar::proc::experiment::action::Action::~Action()
 {
-}
 
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-
-void cedar::proc::experiment::ActionStart::run()
-{
-  ExperimentSuperviserSingleton::getInstance()->getExperiment()->startTrial();
-}
 
 

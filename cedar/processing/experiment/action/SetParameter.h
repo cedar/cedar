@@ -22,41 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStop.h
+    File:        ActionSetParameter.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 09
+    Date:        2014 03 07
 
-    Description: Header file for the class cedar::proc::experiment::ActionStop.
+    Description: Header file for the class cedar::proc::experiment::ActionSetParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_STOP_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_STOP_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/processing/experiment/action/Action.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ActionStop.fwd.h"
+#include "cedar/processing/experiment/action/SetParameter.fwd.h"
 
-// SYSTEM INCLUDES
+// SYSTEM INCLUDE
+#include <QObject>
 
 
-/*!@brief Stops a trial of the experiment framework
- *
- *        It also provides different kinds of reset methods
+/*!@brief Sets the parameter of a step to a desired value
  */
-class cedar::proc::experiment::ActionStop : public cedar::proc::experiment::Action
+class cedar::proc::experiment::action::SetParameter : public cedar::proc::experiment::action::Action
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -67,17 +66,19 @@ class cedar::proc::experiment::ActionStop : public cedar::proc::experiment::Acti
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ActionStop();
+  SetParameter();
 
   //!@brief Destructor
-  virtual ~ActionStop();
+  virtual ~SetParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Stops the trial, applies the reset method and send a message to the log file
+  //!@brief Sets the parameter of a step to a desired value
   void run();
+
+public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -106,16 +107,11 @@ protected:
   // none yet
 
 private:
-  //!@brief The reset method that should be applied right after the stop
-  cedar::aux::EnumParameterPtr _mResetType;
+  //!@brief The step parameter to set
+  cedar::proc::experiment::StepPropertyParameterPtr _mStepParameter;
 
-  //!@brief Indicates if the trial is a success or a failure
-  cedar::aux::BoolParameterPtr _mSuccess;
 
-  //!@brief The message that will be send to the log file
-  cedar::aux::StringParameterPtr _mMessage;
+}; // class cedar::proc::experiment::ActionSetParameter
 
-}; // class cedar::proc::experiment::ActionStop
-
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_STOP_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
 

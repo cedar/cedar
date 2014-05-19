@@ -42,7 +42,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/condition/Condition.h"
-#include "cedar/processing/experiment/Action.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/condition/And.fwd.h"

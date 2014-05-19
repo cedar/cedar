@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_START_FWD_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_START_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,15 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ActionStart);
+      namespace action
+      {
+        CEDAR_DECLARE_PROC_CLASS(StartAllTriggers);
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_START_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_FWD_H
 

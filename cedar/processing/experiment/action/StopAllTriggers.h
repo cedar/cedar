@@ -22,40 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.h
+    File:        ActionStop.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 07
+    Date:        2014 03 09
 
-    Description: Header file for the class cedar::proc::experiment::ActionSetParameter.
+    Description: Header file for the class cedar::proc::experiment::ActionStop.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_STOP_ALL_TRIGGERS_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_STOP_ALL_TRIGGERS_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/processing/experiment/action/Action.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ActionSetParameter.fwd.h"
+#include "cedar/processing/experiment/action/StopAllTriggers.fwd.h"
 
-// SYSTEM INCLUDE
-#include <QObject>
+// SYSTEM INCLUDES
 
 
-/*!@brief Sets the parameter of a step to a desired value
+/*!@brief Stops a trial of the experiment framework
+ *
+ *        It also provides different kinds of reset methods
  */
-class cedar::proc::experiment::ActionSetParameter : public cedar::proc::experiment::Action
+class cedar::proc::experiment::action::StopAllTriggers : public cedar::proc::experiment::action::Action
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -66,19 +67,17 @@ class cedar::proc::experiment::ActionSetParameter : public cedar::proc::experime
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ActionSetParameter();
+  StopAllTriggers();
 
   //!@brief Destructor
-  virtual ~ActionSetParameter();
+  virtual ~StopAllTriggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Sets the parameter of a step to a desired value
+  //!@brief Stops the trial, applies the reset method and send a message to the log file
   void run();
-
-public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,11 +106,16 @@ protected:
   // none yet
 
 private:
-  //!@brief The step parameter to set
-  cedar::proc::experiment::StepPropertyParameterPtr _mStepParameter;
+  //!@brief The reset method that should be applied right after the stop
+  cedar::aux::EnumParameterPtr _mResetType;
 
+  //!@brief Indicates if the trial is a success or a failure
+  cedar::aux::BoolParameterPtr _mSuccess;
 
-}; // class cedar::proc::experiment::ActionSetParameter
+  //!@brief The message that will be send to the log file
+  cedar::aux::StringParameterPtr _mMessage;
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
+}; // class cedar::proc::experiment::ActionStop
+
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_STOP_ALL_TRIGGERS_H
 

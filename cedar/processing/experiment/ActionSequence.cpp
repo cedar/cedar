@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ActionSequence.h"
-#include "cedar/processing/experiment/ActionStart.h"
+#include "cedar/processing/experiment/action/StartAllTriggers.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/condition/OnInit.h"
 
@@ -61,11 +61,11 @@ cedar::proc::experiment::ActionSequence::ActionSequence()
 :
 _mActionSet
 (
-  new cedar::proc::experiment::Action::ActionListParameter
+  new cedar::proc::experiment::action::Action::ActionListParameter
   (
     this,
     "ActionSet",
-    std::vector<ActionPtr>()
+    std::vector<cedar::proc::experiment::action::ActionPtr>()
   )
 )
 ,
@@ -93,7 +93,7 @@ cedar::proc::experiment::ActionSequence::~ActionSequence()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::experiment::ActionSequence::addAction(cedar::proc::experiment::ActionPtr action)
+void cedar::proc::experiment::ActionSequence::addAction(cedar::proc::experiment::action::ActionPtr action)
 {
 	this->_mActionSet->pushBack(action);
 }
@@ -103,9 +103,9 @@ void cedar::proc::experiment::ActionSequence::setCondition(cedar::proc::experime
 	this->_mCondition->setValue(condition);
 }
 
-std::vector<cedar::proc::experiment::ActionPtr> cedar::proc::experiment::ActionSequence::getActions()
+std::vector<cedar::proc::experiment::action::ActionPtr> cedar::proc::experiment::ActionSequence::getActions()
 {
-  std::vector<cedar::proc::experiment::ActionPtr> ret;
+  std::vector<cedar::proc::experiment::action::ActionPtr> ret;
   for (unsigned int i = 0; i < _mActionSet->size(); i++)
   {
     ret.push_back(this->_mActionSet->at(i));

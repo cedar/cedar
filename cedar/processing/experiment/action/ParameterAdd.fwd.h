@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.fwd.h
+    File:        ActionIncreaseParameter.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 07
+    Date:        2014 03 19
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ActionSetParameter.
+    Description: Forward declaration file for the class cedar::proc::experiment::ActionIncreaseParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_FWD_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,15 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ActionSetParameter);
+      namespace action
+      {
+        CEDAR_DECLARE_PROC_CLASS(ParameterAdd);
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_FWD_H
 

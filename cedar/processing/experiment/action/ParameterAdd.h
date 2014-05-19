@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,71 +22,60 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Action.h
+    File:        ActionIncreaseParameter.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 03 19
 
-    Description:
+    Description: Header file for the class cedar::proc::experiment::ActionIncreaseParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/processing/experiment/action/Action.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/Action.fwd.h"
-#include "cedar/processing/experiment/Experiment.fwd.h"
+#include "cedar/processing/experiment/action/ParameterAdd.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief An abstract class for all the derived Action classes.
- *    The derived class has to implement the run() function.
+/*!@todo Increases a parameter of a step.
+ *
+ * @todo describe more.
  */
-class cedar::proc::experiment::Action : public cedar::aux::Configurable
+class cedar::proc::experiment::action::ParameterAdd : public cedar::proc::experiment::action::Action
 {
-public:
-
-	//!@brief a parameter for action sequence objects
-	typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::Action> ActionListParameter;
-	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::Action> ActionParameter;
-
-	//!@cond SKIPPED_DOCUMENTATION
-	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionListParameter);
-	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionParameter);
-	//!@endcond
-
-	#include "cedar/auxiliaries/FactoryManager.h"
-
-private:
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Action();
+  ParameterAdd();
+
   //!@brief Destructor
-  ~Action();
+  virtual ~ParameterAdd();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief This function should implement the things that this Action should do
-  virtual void run() = 0;
+  //!@brief Increases the step parameter.
+  void run();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,29 +87,27 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
 private:
+  //!@brief The value by the parameter should be increased
+  cedar::proc::experiment::StepPropertyParameterPtr _mStepParamter;
 
-}; // class cedar::proc::experiment::Action
+}; // class cedar::proc::experiment::ActionIncreaseParameter
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ActionPtr>);
-
-namespace cedar
-{
-  namespace proc
-  {
-    namespace experiment
-    {
-      //!@brief The singleton instance of the instruction factory manager.
-      typedef cedar::aux::Singleton< cedar::aux::FactoryManager<cedar::proc::experiment::ActionPtr>>
-              ActionManagerSingleton;
-    }
-  }
-}
-
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_H
 
