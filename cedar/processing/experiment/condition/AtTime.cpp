@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTrial.cpp
+    File:        ConditionOnTime.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 28
+    Date:        2014 03 19
 
-    Description: Source file for the class cedar::proc::experiment::ConditionOnTrial.
+    Description: Source file for the class cedar::proc::experiment::ConditionOnTime.
 
     Credits:
 
@@ -38,10 +38,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ConditionOnTrial.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
-#include "cedar/processing/experiment/Experiment.h"
-
+#include "cedar/processing/experiment/condition/AtTime.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 
 // SYSTEM INCLUDES
 
@@ -50,32 +48,44 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-  bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
-    registerType<cedar::proc::experiment::ConditionOnTrialPtr>();
+  bool declared = cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+    registerType<cedar::proc::experiment::condition::AtTimePtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ConditionOnTrial::ConditionOnTrial()
+cedar::proc::experiment::condition::AtTime::AtTime()
 :
-_mTrial(new cedar::aux::UIntParameter(this,"on trial",1))
+mActivated(false)
+,
+_mTime( new cedar::aux::TimeParameter(this,"Time",cedar::unit::Time()))
 {
+
 }
 
-cedar::proc::experiment::ConditionOnTrial::~ConditionOnTrial()
+cedar::proc::experiment::condition::AtTime::~AtTime()
 {
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::proc::experiment::ConditionOnTrial::check()
+
+bool cedar::proc::experiment::condition::AtTime::check()
 {
-  Experiment* p_experiment = cedar::proc::experiment::ExperimentSuperviserSingleton::getInstance()->getExperiment();
-  if (p_experiment->getActualTrial() == _mTrial->getValue() && p_experiment->isOnInit())
+  // reset the activated flag if the time is below the time to check
+  cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  if (time < _mTime->getValue())
   {
+    mActivated = false;
+  }
+  // only trigger the condition if it has not been activated before
+  else if (!mActivated)
+  {
+    mActivated = true;
     return true;
   }
   return false;

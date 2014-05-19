@@ -51,11 +51,11 @@ cedar_add_library(cedarproc
   cedardev
   MOC_HEADERS
   experiment/Experiment.h
-  gui/AdvancedParameterLinker.h
   experiment/StepPropertyParameter.h
   experiment/gui/ActionSequence.h
   experiment/gui/StepPropertyParameter.h
   experiment/gui/ExperimentItemWidget.h
+  gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h

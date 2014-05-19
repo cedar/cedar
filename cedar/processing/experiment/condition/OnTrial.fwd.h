@@ -55,7 +55,10 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ConditionOnTrial);
+      namespace condition
+      {
+        CEDAR_DECLARE_PROC_CLASS(OnTrial);
+      }
     }
   }
 }

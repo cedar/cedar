@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/experiment/ActionStart.h"
-#include "cedar/processing/experiment/ConditionOnInit.h"
+#include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
@@ -356,7 +356,7 @@ void cedar::proc::experiment::Experiment::checkActionSequences()
   int counter = 0;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
-    if(boost::dynamic_pointer_cast<ConditionOnInit>(action_sequence->getCondition()))
+    if(boost::dynamic_pointer_cast<cedar::proc::experiment::condition::OnInit>(action_sequence->getCondition()))
     {
       for(ActionPtr action : action_sequence->getActions())
       {

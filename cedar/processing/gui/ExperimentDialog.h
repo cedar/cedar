@@ -124,7 +124,7 @@ private slots:
   void runExperiment();
 
   //!@brief Stops the experiment
-   void cancelExperiment();
+   void stopExperiment();
 
   //!@brief Tells the GUI when the experiment has been stopped
   void experimentRunning(bool status);

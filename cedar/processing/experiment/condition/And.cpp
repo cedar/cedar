@@ -38,8 +38,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ConditionAnd.h"
-#include "cedar/processing/experiment/ConditionOnInit.h"
+#include "cedar/processing/experiment/condition/And.h"
+#include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/Experiment.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
@@ -51,42 +51,42 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-	bool declared = cedar::proc::experiment::ConditionManagerSingleton::getInstance()->
-		registerType<cedar::proc::experiment::ConditionAndPtr>();
+	bool declared = cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+		registerType<cedar::proc::experiment::condition::AndPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::ConditionAnd::ConditionAnd()
+cedar::proc::experiment::condition::And::And()
 :
 _mCondition1
  (
-   new cedar::proc::experiment::Condition::ConditionParameter
+   new cedar::proc::experiment::condition::Condition::ConditionParameter
    (
      this,
      "Condition 1",
-     cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::ConditionOnInit())
+     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
    )
  )
 ,
 _mCondition2
  (
-   new cedar::proc::experiment::Condition::ConditionParameter
+   new cedar::proc::experiment::condition::Condition::ConditionParameter
    (
      this,
      "Condition 2",
-     cedar::proc::experiment::ConditionPtr(new cedar::proc::experiment::ConditionOnInit())
+     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
    )
  )
 {
 }
-cedar::proc::experiment::ConditionAnd::~ConditionAnd()
+cedar::proc::experiment::condition::And::~And()
 {
 
 }
 
-bool cedar::proc::experiment::ConditionAnd::check()
+bool cedar::proc::experiment::condition::And::check()
 {
   return _mCondition1->getValue()->check() && _mCondition2->getValue()->check();
 }

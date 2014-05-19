@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,38 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTime.h
+    File:        ConditionOnInit.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 19
+    Date:        2014 02 06
 
-    Description: Header file for the class cedar::proc::experiment::ConditionOnTime.
+    Description: Header file for the class cedar::proc::experiment::ConditionOnInit.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/TimeParameter.h"
+#include "cedar/processing/experiment/condition/Condition.h"
+
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionAtTime.fwd.h"
+#include "cedar/processing/experiment/condition/OnInit.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Checks if a the current trial time is greater than the time provided by this condition
+/*!@brief Checks if a trial is on initial state
  *
- *        This condition is only activated once after the trial time reaches the value
+ *      A trial is on initial state if it is not has been started yet.
+ *      There should be at least one of this conditions in your experiment, containing ActionStart.
  */
-class cedar::proc::experiment::ConditionAtTime : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::condition::OnInit : public cedar::proc::experiment::condition::Condition
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,16 +65,16 @@ class cedar::proc::experiment::ConditionAtTime : public cedar::proc::experiment:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ConditionAtTime();
+  OnInit();
 
   //!@brief Destructor
-  virtual ~ConditionAtTime();
+  virtual ~OnInit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //@brief Checks if a the current trial time is greater than the time provided by this condition
+  //!@brief Checks if a trial is on initial state
   bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,8 +95,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief This flag will be used to check if this condition als already been triggered during this trial
-  bool mActivated;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -104,10 +104,8 @@ protected:
   // none yet
 
 private:
-  //!@brief The time that has to been reached by the trial time
-  cedar::aux::TimeParameterPtr _mTime;
 
-}; // class cedar::proc::experiment::ConditionOnTime
+}; // class cedar::proc::experiment::ConditionOnInit
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
 

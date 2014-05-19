@@ -22,38 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTrial.h
+    File:        ConditionPartialCheckMat.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 28
+    Date:        2014 04 04
 
-    Description: Header file for the class cedar::proc::experiment::ConditionOnTrial.
+    Description: Header file for the class cedar::proc::experiment::ConditionPartialCheckMat.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
+#include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionOnTrial.fwd.h"
+#include "cedar/processing/experiment/condition/PartialCheckData.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Checks if the current trial has the number provided by this condition
- *
+/*!@brief Checks if a part of the step data fulfills the condition
  */
-class cedar::proc::experiment::ConditionOnTrial : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::condition::PartialCheckData : public cedar::proc::experiment::condition::Condition
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,16 +67,16 @@ class cedar::proc::experiment::ConditionOnTrial : public cedar::proc::experiment
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ConditionOnTrial();
+  PartialCheckData();
 
   //!@brief Destructor
-  virtual ~ConditionOnTrial();
+  virtual ~PartialCheckData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Checks if the current trial has the number provided by this condition
+  //@brief Checks if a part of the step data fulfills the condition
   bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,10 +106,19 @@ protected:
   // none yet
 
 private:
- //!@brief The trial number that has to been reached
- cedar::aux::UIntParameterPtr _mTrial;
+  //@brief The step data to check
+  cedar::proc::experiment::StepPropertyParameterPtr _stepData;
 
-}; // class cedar::proc::experiment::ConditionOnTrial
+  //@brief The number of elements that should at least need to fulfill the condition
+  cedar::aux::UIntParameterPtr _mNumberOfElements;
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_H
+  //!@brief The compare method. Can be greater, lower or equal
+  cedar::aux::EnumParameterPtr _mCompareMethode;
+
+  //!@brief The value the step data is compared to
+  cedar::aux::DoubleParameterPtr _desiredValue;
+
+}; // class cedar::proc::experiment::ConditionPartialCheckMat
+
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_H
 

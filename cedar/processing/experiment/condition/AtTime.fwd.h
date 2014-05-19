@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,42 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Condition.cpp
+    File:        ConditionOnTime.fwd.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 03 19
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::experiment::ConditionOnTime.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
-#include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::proc::experiment::Condition::Condition()
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
+  namespace proc
+  {
+    namespace experiment
+    {
+      namespace condition
+      {
+        CEDAR_DECLARE_PROC_CLASS(AtTime);
+      }
+    }
+  }
 }
-cedar::proc::experiment::Condition::~Condition()
-{
 
-}
+//!@endcond
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_AT_TIME_FWD_H
 

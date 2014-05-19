@@ -22,67 +22,65 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Condition.h
+    File:        ConditionCheckValue.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description:
+    Description: Header file for the class cedar::proc::experiment::ConditionCheckValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/Experiment.fwd.h"
-#include "cedar/processing/experiment/Condition.fwd.h"
+#include "cedar/processing/experiment/condition/CheckData.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief An abstract class for all kinds of conditions.
+/*!@brief Checks if the data of a step fulfills the condition
+ *
+ *      If the data is of type MatData, this condition will check if every
+ *      single element of the matrix fulfills the condition.
  */
-class cedar::proc::experiment::Condition : public cedar::aux::Configurable
+class cedar::proc::experiment::condition::CheckData : public cedar::proc::experiment::condition::Condition
 {
-public:
-	//!@brief a parameter for condition objects
-	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::Condition> ConditionParameter;
 
-	//!@cond SKIPPED_DOCUMENTATION
-	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConditionParameter);
-	//!@endcond
-private:
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-	//!@brief The Constructor
-	Condition();
+  //!@brief The standard constructor.
+  CheckData();
+
   //!@brief Destructor
-  ~Condition();
+  virtual ~CheckData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method has to be override by all derived classes
-   *         It should return true if the condition is fulfilled
-   */
-  virtual bool check() = 0;
+  //!@brief Checks if the data of a step fulfills the condition
+  bool check();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,32 +93,33 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
 private:
+  //!@brief The step data to check
+  cedar::proc::experiment::StepPropertyParameterPtr _stepData;
 
-}; // class cedar::proc::experiment::Condition
+  //!@brief The compare method. Can be greater, lower or equal
+  cedar::aux::EnumParameterPtr _mCompareMethode;
 
+  //!@brief The value the step data is compared to
+  cedar::aux::DoubleParameterPtr _desiredValue;
 
-#include "cedar/auxiliaries/FactoryManager.h"
+}; // class cedar::proc::experiment::ConditionCheckValue
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ConditionPtr>);
-
-namespace cedar
-{
-  namespace proc
-  {
-    namespace experiment
-    {
-      //!@brief The singleton instance of the condition factory manager.
-      typedef cedar::aux::Singleton< cedar::aux::FactoryManager<cedar::proc::experiment::ConditionPtr>>
-              ConditionManagerSingleton;
-    }
-  }
-}
-
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
 

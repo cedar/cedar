@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionAnd.h
+    File:        Condition.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
@@ -34,43 +34,56 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AND_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_AND_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Condition.h"
-#include "cedar/processing/experiment/Action.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ConditionAnd.fwd.h"
+#include "cedar/processing/experiment/Experiment.fwd.h"
+#include "cedar/processing/experiment/condition/Condition.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Condition to to combine two Conditions
+/*!@brief An abstract class for all kinds of conditions.
  */
-class cedar::proc::experiment::ConditionAnd : public cedar::proc::experiment::Condition
+class cedar::proc::experiment::condition::Condition : public cedar::aux::Configurable
 {
+public:
+	//!@brief a parameter for condition objects
+	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::condition::Condition> ConditionParameter;
+
+	//!@cond SKIPPED_DOCUMENTATION
+	CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConditionParameter);
+	//!@endcond
 private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The Constructor
-	ConditionAnd();
+	//!@brief The Constructor
+	Condition();
   //!@brief Destructor
-  ~ConditionAnd();
+  ~Condition();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns true if both conditions are fulfilled
-  bool check();
+  /*!@brief This method has to be override by all derived classes
+   *         It should return true if the condition is fulfilled
+   */
+  virtual bool check() = 0;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -82,31 +95,35 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
 private:
-  // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  //!@brief The first condition
-  ConditionParameterPtr _mCondition1;
-
-  //!@brief The second condition
-  ConditionParameterPtr _mCondition2;
-
-}; // class cedar::proc::experiment::ConditionAnd
+}; // class cedar::proc::experiment::Condition
 
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_AND_H
+#include "cedar/auxiliaries/FactoryManager.h"
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ConditionPtr>);
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace experiment
+    {
+      namespace condition
+      {
+      //!@brief The singleton instance of the condition factory manager.
+      typedef cedar::aux::Singleton< cedar::aux::FactoryManager<cedar::proc::experiment::condition::ConditionPtr>>
+              ConditionManagerSingleton;
+      }
+    }
+  }
+}
+
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_H
 

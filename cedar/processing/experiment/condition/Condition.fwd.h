@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionPartialCheckMat.fwd.h
+    File:        Condition.fwd.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 04 04
+    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
+    Date:        2014 01 22
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionPartialCheckMat.
+    Description: Forward declaration file for the class cedar::proc::expertiment::Condition.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_FWD_H
+#ifndef CEDAR_proc_EXPERIMENT_CONDITION_FWD_H
+#define CEDAR_proc_EXPERIMENT_CONDITION_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,15 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ConditionPartialCheckData);
+      namespace condition
+      {
+        CEDAR_DECLARE_PROC_CLASS(Condition);
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_MAT_FWD_H
+#endif // CEDAR_proc_ANNOTATION_CONDITION_FWD_H
 

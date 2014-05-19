@@ -45,7 +45,7 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/processing/experiment/Action.h"
-#include "cedar/processing/experiment/Condition.h"
+#include "cedar/processing/experiment/condition/Condition.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/ActionSequence.fwd.h"
@@ -78,13 +78,13 @@ public:
   void addAction(cedar::proc::experiment::ActionPtr action);
 
   //!@brief Sets the condition for this sequence
-  void setCondition(cedar::proc::experiment::ConditionPtr condition);
+  void setCondition(cedar::proc::experiment::condition::ConditionPtr condition);
 
   //!@brief Returns all actions in this sequence
   std::vector<cedar::proc::experiment::ActionPtr> getActions();
 
   //!@brief Returns the condition of this sequence
-  cedar::proc::experiment::ConditionPtr getCondition();
+  cedar::proc::experiment::condition::ConditionPtr getCondition();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ private:
   cedar::proc::experiment::Action::ActionListParameterPtr _mActionSet;
 
   //!@brief The condition
-  cedar::proc::experiment::Condition::ConditionParameterPtr _mCondition;
+  cedar::proc::experiment::condition::Condition::ConditionParameterPtr _mCondition;
 
 }; // class cedar::proc::experiment::Experiment
 

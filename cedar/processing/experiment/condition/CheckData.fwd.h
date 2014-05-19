@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionAnd.fwd.h
+    File:        ConditionCheckValue.fwd.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 02 06
 
-    Description: Forward declaration file for the class cedar::proc::expertiment::ConditionAnd.
+    Description: Forward declaration file for the class cedar::proc::experiment::ConditionCheckValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_AND_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_AND_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,15 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ConditionAnd);
+      namespace condition
+      {
+      CEDAR_DECLARE_PROC_CLASS(CheckData);
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_ANNOTATION_CONDITION_AND_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_FWD_H
 
