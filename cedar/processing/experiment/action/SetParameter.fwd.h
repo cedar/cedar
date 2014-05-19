@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStop.fwd.h
+    File:        ActionSetParameter.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 09
+    Date:        2014 03 07
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ActionStop.
+    Description: Forward declaration file for the class cedar::proc::experiment::ActionSetParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_STOP_FWD_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_STOP_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,12 +55,15 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ActionStop);
+      namespace action
+      {
+        CEDAR_DECLARE_PROC_CLASS(SetParameter);
+      }
     }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_STOP_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_FWD_H
 

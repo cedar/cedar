@@ -39,9 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
-#include "cedar/processing/experiment/Action.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
 // SYSTEM INCLUDES
 #include <QLabel>
 

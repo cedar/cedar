@@ -34,17 +34,17 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_START_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_START_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Action.h"
+#include "cedar/processing/experiment/action/Action.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ActionStart.fwd.h"
+#include "cedar/processing/experiment/action/StartAllTriggers.fwd.h"
 #include "cedar/processing/experiment/Experiment.fwd.h"
 
 // SYSTEM INCLUDES
@@ -54,7 +54,7 @@
  *
  *            This Action should only be called a single time in the initial condition
  */
-class cedar::proc::experiment::ActionStart : public cedar::proc::experiment::Action
+class cedar::proc::experiment::action::StartAllTriggers : public cedar::proc::experiment::action::Action
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -65,10 +65,10 @@ class cedar::proc::experiment::ActionStart : public cedar::proc::experiment::Act
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ActionStart();
+  StartAllTriggers();
 
   //!@brief Destructor
-  virtual ~ActionStart();
+  virtual ~StartAllTriggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -107,5 +107,5 @@ private:
 
 }; // class cedar::proc::experiment::ActionStart
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_START_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_H
 

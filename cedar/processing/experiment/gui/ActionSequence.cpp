@@ -170,13 +170,13 @@ void cedar::proc::experiment::gui::ActionSequence::updateActions()
 {
   clear(mActions);
 
-  for (cedar::proc::experiment::ActionPtr action : mSequence->getActions())
+  for (cedar::proc::experiment::action::ActionPtr action : mSequence->getActions())
   {
     cedar::proc::experiment::gui::ExperimentItemWidget* actionWidget =
         new cedar::proc::experiment::gui::ExperimentItemWidget();
     actionWidget->display(action);
     QHBoxLayout* row = new QHBoxLayout();
-    std::string name = cedar::proc::experiment::ActionManagerSingleton::getInstance()->getTypeId(action);
+    std::string name = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->getTypeId(action);
     row->addWidget(new QLabel(QString::fromStdString(name)));
     row->addWidget(actionWidget);
     mActions->addLayout(row);

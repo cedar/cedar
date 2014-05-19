@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStop.cpp
+    File:        ActionStart.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 09
+    Date:        2014 02 06
 
-    Description: Source file for the class cedar::proc::experiment::ActionStop.
+    Description: Source file for the class cedar::proc::experiment::ActionStart.
 
     Credits:
 
@@ -38,10 +38,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ActionStop.h"
+#include "cedar/processing/experiment/action/StartAllTriggers.h"
 #include "cedar/processing/experiment/Experiment.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
-
 
 // SYSTEM INCLUDES
 
@@ -51,41 +50,32 @@
 
 namespace
 {
-  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::ActionStopPtr>();
+  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::action::StartAllTriggersPtr>();
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ActionStop::ActionStop()
-:
-_mResetType
-(
-  new cedar::aux::EnumParameter
-  (
-    this,
-    "Reset type",
-    cedar::proc::experiment::Experiment::ResetType::typePtr(),
-    cedar::proc::experiment::Experiment::ResetType::Reset
-  )
-),
-_mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
-_mMessage(new cedar::aux::StringParameter(this,"Message",""))
+cedar::proc::experiment::action::StartAllTriggers::StartAllTriggers()
 {
 }
 
-cedar::proc::experiment::ActionStop::~ActionStop()
+cedar::proc::experiment::action::StartAllTriggers::~StartAllTriggers()
 {
 }
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::experiment::ActionStop::run()
+
+void cedar::proc::experiment::action::StartAllTriggers::run()
 {
-    ExperimentSuperviserPtr super = ExperimentSuperviserSingleton::getInstance();
-    super->getExperiment()->stopTrial(_mResetType->getValue());
-    super->log(_mSuccess->getValue()?"Trial success":"Trial failed",_mMessage->getValue());
+  ExperimentSuperviserSingleton::getInstance()->getExperiment()->startTrial();
 }
+
+

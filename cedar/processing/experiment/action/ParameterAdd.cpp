@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ActionIncreaseParameter.h"
+#include "cedar/processing/experiment/action/ParameterAdd.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/IntParameter.h"
@@ -51,14 +51,14 @@
 
 namespace
 {
-  bool declared = cedar::proc::experiment::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::ActionIncreaseParameterPtr>();
+  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::action::ParameterAddPtr>();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ActionIncreaseParameter::ActionIncreaseParameter()
+cedar::proc::experiment::action::ParameterAdd::ParameterAdd()
 :
 _mStepParamter
 (
@@ -72,7 +72,7 @@ _mStepParamter
   _mStepParamter->allowType("cedar.aux.UIntParameterPtr");
 }
 
-cedar::proc::experiment::ActionIncreaseParameter::~ActionIncreaseParameter()
+cedar::proc::experiment::action::ParameterAdd::~ParameterAdd()
 {
 }
 
@@ -80,7 +80,7 @@ cedar::proc::experiment::ActionIncreaseParameter::~ActionIncreaseParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::experiment::ActionIncreaseParameter::run()
+void cedar::proc::experiment::action::ParameterAdd::run()
 {
   if (_mStepParamter->getStep() == "" || _mStepParamter->getProperty() == "")
   {

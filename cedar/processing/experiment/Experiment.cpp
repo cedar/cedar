@@ -41,7 +41,7 @@
 #include "cedar/processing/experiment/Experiment.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Recorder.h"
-#include "cedar/processing/experiment/ActionStart.h"
+#include "cedar/processing/experiment/action/StartAllTriggers.h"
 #include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/processing/Step.h"
@@ -85,7 +85,7 @@ _mActionSequences
 
   // Create first action sequence
   ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
-  as->addAction(ActionPtr(new ActionStart()));
+  as->addAction(cedar::proc::experiment::action::ActionPtr(new cedar::proc::experiment::action::StartAllTriggers()));
   as->setName("ActionSequence1");
   this->addActionSequence(as);
 
@@ -243,7 +243,7 @@ void cedar::proc::experiment::Experiment::executeAcionSequences(bool initial)
   {
     if(action_sequence->getCondition()->check())
     {
-      for(ActionPtr action : action_sequence->getActions())
+      for(cedar::proc::experiment::action::ActionPtr action : action_sequence->getActions())
       {
         action->run();
       }
@@ -358,9 +358,12 @@ void cedar::proc::experiment::Experiment::checkActionSequences()
   {
     if(boost::dynamic_pointer_cast<cedar::proc::experiment::condition::OnInit>(action_sequence->getCondition()))
     {
-      for(ActionPtr action : action_sequence->getActions())
+      for(cedar::proc::experiment::action::ActionPtr action : action_sequence->getActions())
       {
-        counter++;
+        if(boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartAllTriggers>(action))
+        {
+          counter++;
+        }
       }
     }
   }
