@@ -101,7 +101,7 @@ _mBorderType
 {
   auto input_slot = this->declareInput("input");
   cedar::proc::typecheck::Matrix input_check;
-  input_check.addAcceptedDimensionalityRange(2, 3);
+  input_check.addAcceptedDimensionalityRange(1, 3);
   input_slot->setCheck(input_check);
 
   this->declareOutput("padded", this->mPadded);
@@ -153,10 +153,17 @@ void cedar::proc::steps::MatrixPadding::compute2D()
   int top, bottom;
   int left, right;
 
-  CEDAR_DEBUG_ASSERT(this->_mPaddedSize->size() == 2);
+  CEDAR_DEBUG_ASSERT(this->_mPaddedSize->size() >= 1);
 
   top = bottom = this->_mPaddedSize->at(0);
-  left = right = this->_mPaddedSize->at(1);
+  if (this->_mPaddedSize->size() >= 2)
+  {
+    left = right = this->_mPaddedSize->at(1);
+  }
+  else
+  {
+    left = right = 0;
+  }
 
   int border_type = cedar::aux::conv::BorderType::toCvConstant(this->_mBorderType->getValue());
 
