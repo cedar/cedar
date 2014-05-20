@@ -59,6 +59,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/function.hpp>
   #include <boost/bind.hpp>
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
 #endif
 #include <map>
 #include <set>
@@ -374,7 +375,7 @@ private:
   //!@brief Moving average of the time between compute calls.
   cedar::aux::MovingAverage<cedar::unit::Time> mRoundTime;
 
-  clock_t mLastComputeCall;
+  boost::posix_time::ptime mPreciseLastComputeCall;
 
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock mLastIterationTimeLock;
