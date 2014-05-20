@@ -131,7 +131,10 @@ void cedar::proc::Connectable::writeDataFile(const cedar::aux::Path& file) const
 {
   cedar::aux::ConfigurationNode data;
   this->writeData(data);
-  boost::property_tree::write_json(file.toString(false), data);
+  if (!data.empty())
+  {
+    boost::property_tree::write_json(file.toString(false), data);
+  }
 }
 
 void cedar::proc::Connectable::readDataFile(const cedar::aux::Path& file)
