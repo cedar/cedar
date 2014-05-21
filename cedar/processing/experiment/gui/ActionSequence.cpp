@@ -62,7 +62,7 @@ cedar::proc::experiment::gui::ActionSequence::ActionSequence(
     cedar::proc::gui::ExperimentDialog* pParent
     )
 :
-QWidget(pParent),
+QFrame(pParent),
 mLayout(new QVBoxLayout()),
 mCondition(NULL),
 mSequence(sequence),
@@ -71,8 +71,13 @@ conditionRow(new QVBoxLayout),
 mActions (new QVBoxLayout)
 {
   this->setLayout(mLayout);
-  this->mActions->setMargin(20);
   this->conditionRow->setAlignment(Qt::AlignTop);
+  this->setFrameShape(QFrame::Box);
+  this->setFrameShadow(QFrame::Sunken);
+  this->setAutoFillBackground(true);
+  QPalette p = this->palette();
+  p.setColor(backgroundRole(), QColor(212,208,200));
+  this->setPalette(p);
 
   update();
 
@@ -114,6 +119,14 @@ void cedar::proc::experiment::gui::ActionSequence::update()
   QVBoxLayout* body = new QVBoxLayout;
 
   //Add Condition
+  QFrame* conditionBox = new QFrame;
+  conditionBox->setLayout(conditionRow);
+  conditionBox->setAutoFillBackground(true);
+  QPalette p = conditionBox->palette();
+  p.setColor(backgroundRole(), QColor(200,210,210));
+  conditionBox->setPalette(p);
+  body->addWidget(conditionBox);
+
   QLabel* condition_text = new QLabel(QString::fromStdString("Condition:"));
   conditionRow->addWidget(condition_text);
 
@@ -133,12 +146,22 @@ void cedar::proc::experiment::gui::ActionSequence::update()
 
   }
 
-  body->addLayout(conditionRow);
-
   //Add Actions
   QLabel* actions_text = new QLabel(QString::fromStdString("Actions:"));
-  body->addWidget(actions_text);
-  body->addLayout(mActions);
+  QFrame* actionBox = new QFrame;
+  QVBoxLayout* actionBoxLayout = new QVBoxLayout;
+  actionBox->setLayout(actionBoxLayout);
+  actionBoxLayout->addWidget(actions_text);
+  QFrame* actionListBox = new QFrame();
+  actionListBox->setLayout(mActions);
+  actionListBox->setFrameShape(QFrame::Box);
+  actionListBox->setFrameShadow(QFrame::Sunken);
+  actionBoxLayout->addWidget(actionListBox);
+  actionBox->setAutoFillBackground(true);
+  p = actionBox->palette();
+  p.setColor(backgroundRole(), QColor(230,230,210));
+  actionBox->setPalette(p);
+  body->addWidget(actionBox);
   try
   {
     cedar::aux::ParameterPtr action = this->mSequence->getParameter("ActionSet");
@@ -146,14 +169,14 @@ void cedar::proc::experiment::gui::ActionSequence::update()
             = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(action)->allocateRaw();
     actionSelector->setParent(this);
     actionSelector->setParameter(action);
-    body->addWidget(actionSelector);
+    actionBoxLayout->addWidget(actionSelector);
     connect(action.get(),SIGNAL(valueChanged()),this,SLOT(updateActions()));
   }
   catch (cedar::aux::UnknownTypeException& e)
   {
 
   }
-  body->setMargin(20);
+  body->setMargin(0);
   mLayout->addLayout(body);
 
   updateActions();
