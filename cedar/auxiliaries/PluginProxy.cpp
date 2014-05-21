@@ -144,6 +144,8 @@ std::string cedar::aux::PluginProxy::getNormalizedSearchPath() const
   std::vector<std::string> subpaths_to_remove;
   subpaths_to_remove.push_back(this->getPluginName());
   subpaths_to_remove.push_back("build");
+  subpaths_to_remove.push_back("Debug");
+  subpaths_to_remove.push_back("Release");
   subpaths_to_remove.push_back("/");
 
   for (auto iter = subpaths_to_remove.begin(); iter != subpaths_to_remove.end(); )
@@ -213,10 +215,10 @@ std::string cedar::aux::PluginProxy::getPluginNameFromPath(const std::string& pa
 std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& plugin_path) const
 {
   std::string plugin_name = cedar::aux::PluginProxy::getPluginNameFromPath(plugin_path);
-  plugin_name += ".xml";
+  // plugin_name += ".xml";
 
   // extract the path only
-  boost::filesystem::path plugin_dir(plugin_path);
+  /*boost::filesystem::path plugin_dir(plugin_path);
   plugin_dir.remove_filename();
   plugin_dir /= plugin_name;
 
@@ -235,6 +237,25 @@ std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& pl
 
   //!@todo This should throw an exception.
   return "";
+  */
+  
+  try
+  {
+    std::string file = this->findPluginFile(plugin_name + "/" + plugin_name + ".xml");
+
+    if (boost::filesystem::exists(file))
+    {
+      return file;
+    }
+  }
+  catch (cedar::aux::PluginNotFoundException)
+  {
+    // nothing to do, return empty string below
+  }
+
+  // to not change the old interface, return an empty string
+  //!@todo Throw an exception instead?
+  return "";
 }
 
 bool cedar::aux::PluginProxy::canFindPlugin(const std::string& pluginName)
@@ -247,6 +268,28 @@ bool cedar::aux::PluginProxy::canFindPlugin(const std::string& pluginName)
   catch (cedar::aux::PluginNotFoundException)
   {
     return false;
+  }
+}
+
+std::string cedar::aux::PluginProxy::findPluginFile(const std::string& fileName)
+{
+  //!@todo This is more of an ad-hoc solution, the proper way would be to remove the same stuff at the end of the path as elsewhere in the plugin finding process, i.e., "build", "Debug" and "Release"
+  // first, find the name of the plugin; it is the first element of the path
+  std::string plugin_name, path, full_path, plugin_base_path, throw_away;
+  cedar::aux::splitFirst(fileName, "/", plugin_name, path);
+  std::string plugin_path = cedar::aux::PluginProxy::findPlugin(plugin_name);
+  cedar::aux::splitLast(plugin_path, "/", plugin_base_path, throw_away);
+  if (boost::filesystem::exists(plugin_base_path + "/" + path))
+  {
+    return plugin_base_path + "/" + path;
+  }
+  else if (boost::filesystem::exists(plugin_base_path + "/../" + path))
+  {
+    return plugin_base_path + "/../" + path;
+  }
+  else
+  {
+    return plugin_base_path + "/../../" + path;
   }
 }
 
@@ -312,6 +355,8 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, c
 
   std::vector<std::string> subpaths_to_search;
   subpaths_to_search.push_back("build");
+  subpaths_to_search.push_back("Debug");
+  subpaths_to_search.push_back("Release");
   subpaths_to_search.push_back(pluginName);
 
   for (size_t i = 0; i < subpaths_to_search.size(); ++i)
@@ -350,7 +395,7 @@ void cedar::aux::PluginProxy::abortHandler(int)
       << "==================================================================" << std::endl;
   std::cout << std::endl << "The offending plugin is located at " << mPluginBeingLoaded  << std::endl << std::endl;
   std::cout << "This often happens when you update your cedar version but don't recompile your plugins. You can try to "
-      << "disable your plugins while starting the processingIde. Run processingIde --help for details. If this helps, "
+      << "disable your plugins while starting cedar. Run cedar --help for details. If this helps, "
       << "try to recompile the affected plugins." << std::endl;
   exit(-2);
 }

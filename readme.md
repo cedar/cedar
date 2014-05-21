@@ -268,9 +268,9 @@ processing framework:
 
         cd [your cedar directory]/bin
 
-2. Start the processing framework:
+2. Start cedar's GUI:
 
-        ./processingIde
+        ./cedar
 
 3. Now, drag and drop elements from the top onto the working area and connect
    them up.

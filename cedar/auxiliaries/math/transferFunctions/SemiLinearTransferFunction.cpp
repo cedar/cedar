@@ -78,3 +78,12 @@ double cedar::aux::math::SemiLinearTransferFunction::compute(double value) const
 {
   return cedar::aux::math::sigmoidSemiLinear(value, this->getThreshold(), this->getBeta());
 }
+
+cv::Mat cedar::aux::math::SemiLinearTransferFunction::compute(const cv::Mat& values) const
+{
+  double beta = this->getBeta();
+  double threshold = this->getThreshold();
+  cv::Mat result = threshold + beta * values;
+  result.setTo(threshold, values < threshold);
+  return result;
+}

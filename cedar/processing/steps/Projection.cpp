@@ -105,7 +105,7 @@ cedar::proc::steps::Projection::Projection()
 mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 4)),
-_mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
+_mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 50, 1, 1000)),
 _mCompressionType(new cedar::aux::EnumParameter(
                                                  this,
                                                  "compression type",
@@ -326,9 +326,9 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
 
   if (dimensionality == 0)
   {
-    this->lockAll();
+    cedar::aux::Lockable::Locker locker(this);
     this->mOutput->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
-    this->unlockAll();
+    locker.unlock();
   }
   else
   {
@@ -340,9 +340,9 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
       sizes[dim] = _mOutputDimensionSizes->at(dim);
     }
 
-    this->lockAll();
+    cedar::aux::Lockable::Locker locker(this);
     this->mOutput->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
-    this->unlockAll();
+    locker.unlock();
   }
 }
 

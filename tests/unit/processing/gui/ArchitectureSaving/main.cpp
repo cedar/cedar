@@ -46,11 +46,11 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
 
@@ -76,11 +76,11 @@ int testSaving(cedar::proc::gui::Ide *pIde)
 
   cedar::proc::gui::View *p_view = pIde->getArchitectureView();
   cedar::proc::gui::Scene *p_scene = p_view->getScene();
-  cedar::proc::gui::NetworkPtr p_gui_network = p_scene->getRootNetwork();
-  cedar::proc::NetworkPtr network = p_gui_network->getNetwork();
+  cedar::proc::gui::GroupPtr p_gui_network = p_scene->getRootGroup();
+  cedar::proc::GroupPtr network = p_gui_network->getGroup();
 
   // first, add some items to the scene
-  cedar::proc::ElementPtr field = p_scene->addElement("cedar.dynamics.NeuralField", QPointF(180, 240));
+  cedar::proc::ElementPtr field = p_scene->createElement(network, "cedar.dynamics.NeuralField", QPointF(180, 240));
 
   cedar::proc::gui::GraphicsBase* p_field_item = p_scene->getGraphicsItemFor(field.get());
 

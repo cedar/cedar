@@ -101,7 +101,7 @@ _mBorderType
 {
   auto input_slot = this->declareInput("input");
   cedar::proc::typecheck::Matrix input_check;
-  input_check.addAcceptedDimensionalityRange(2, 3);
+  input_check.addAcceptedDimensionalityRange(1, 3);
   input_slot->setCheck(input_check);
 
   this->declareOutput("padded", this->mPadded);
@@ -122,6 +122,18 @@ void cedar::proc::steps::MatrixPadding::compute(const cedar::proc::Arguments&)
       this->compute2D();
       break;
 
+    case 3:
+      switch (this->mInput->getCvType())
+      {
+        case CV_32F:
+          this->compute3D<float>();
+          break;
+
+        default:
+          CEDAR_ASSERT(false);
+      }
+      break;
+
     default:
       switch (this->mInput->getCvType())
       {
@@ -132,6 +144,7 @@ void cedar::proc::steps::MatrixPadding::compute(const cedar::proc::Arguments&)
         default:
           CEDAR_ASSERT(false);
       }
+      break;
   }
 }
 
@@ -140,14 +153,86 @@ void cedar::proc::steps::MatrixPadding::compute2D()
   int top, bottom;
   int left, right;
 
-  CEDAR_DEBUG_ASSERT(this->_mPaddedSize->size() == 2);
+  CEDAR_DEBUG_ASSERT(this->_mPaddedSize->size() >= 1);
 
   top = bottom = this->_mPaddedSize->at(0);
-  left = right = this->_mPaddedSize->at(1);
+  if (this->_mPaddedSize->size() >= 2)
+  {
+    left = right = this->_mPaddedSize->at(1);
+  }
+  else
+  {
+    left = right = 0;
+  }
 
   int border_type = cedar::aux::conv::BorderType::toCvConstant(this->_mBorderType->getValue());
 
   cv::copyMakeBorder(this->mInput->getData(), this->mPadded->getData(), top, bottom, left, right, border_type, 0.0);
+}
+
+template <typename T>
+void cedar::proc::steps::MatrixPadding::compute3D()
+{
+  const cv::Mat& input = this->mInput->getData();
+  cv::Mat& output = this->mPadded->getData();
+
+  //!@todo Setting the whole output to zero might only be necessary when the border type changes
+
+  if (this->_mBorderType->getValue() == cedar::aux::conv::BorderType::Zero)
+  {
+    output.setTo(0.0);
+  }
+
+  int border_type = cedar::aux::conv::BorderType::toCvConstant(this->_mBorderType->getValue());
+
+  int border0 = this->_mPaddedSize->at(0);
+  int border1 = this->_mPaddedSize->at(1);
+  int border2 = this->_mPaddedSize->at(2);
+
+  // first, use the 2d copyMakeBorder method on slices of the input matrix
+  int top, bottom, left, right;
+  top = bottom = border1;
+  left = right = border2;
+  for (int d0 = 0; d0 < input.size[0]; ++d0)
+  {
+    cv::Mat input_slice (input.size[1], input.size[2], input.type(), input.data + input.step[0] * d0);
+    cv::Mat output_slice (output.size[1], output.size[2], output.type(), output.data + output.step[0] * (d0 + border0));
+
+    cv::copyMakeBorder(input_slice, output_slice, top, bottom, left, right, border_type, cv::Scalar(0.0));
+  }
+
+  // finally, interpolate the slices in the output which don't correspond to any input slices
+  switch (this->_mBorderType->getValue())
+  {
+    case cedar::aux::conv::BorderType::Replicate:
+    {
+      // replicate lower border
+      cv::Mat replicate_lower (output.size[1], output.size[2], output.type(), output.data + output.step[0] * border0);
+      for (int d0 = 0; d0 < border0; ++d0)
+      {
+        cv::Mat output_slice (output.size[1], output.size[2], output.type(), output.data + output.step[0] * d0);
+        replicate_lower.copyTo(output_slice);
+      }
+
+      // replicate upper border
+      int upper_bound = border0 + input.size[0] ;
+      cv::Mat replicate_upper (output.size[1], output.size[2], output.type(), output.data + output.step[0] * (upper_bound - 1));
+      for (int d0 = upper_bound; d0 < output.size[0]; ++d0)
+      {
+        cv::Mat output_slice (output.size[1], output.size[2], output.type(), output.data + output.step[0] * d0);
+        replicate_upper.copyTo(output_slice);
+      }
+
+      break;
+    }
+
+    case cedar::aux::conv::BorderType::Zero:
+      // nothing to do, border has been set to zero above
+      break;
+
+    default:
+      CEDAR_THROW(cedar::aux::NotImplementedException, "This border type is not implemented for 3d matrices. Sorry.");
+  }
 }
 
 template <typename T>
@@ -232,7 +317,7 @@ void cedar::proc::steps::MatrixPadding::inputConnectionChanged(const std::string
 {
   this->mInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
 
-  if (this->mInput)
+  if (this->mInput && this->mInput->getDimensionality() > 0)
   {
     this->_mPaddedSize->resize(this->mInput->getDimensionality());
 
@@ -242,7 +327,7 @@ void cedar::proc::steps::MatrixPadding::inputConnectionChanged(const std::string
 
 void cedar::proc::steps::MatrixPadding::updateOutputSize()
 {
-  if (this->mInput)
+  if (this->mInput && this->mInput->getDimensionality() > 0)
   {
     const cv::Mat& input = this->mInput->getData();
     std::vector<int> dest_size(static_cast<size_t>(input.dims));

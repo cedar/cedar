@@ -45,10 +45,12 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/ElementClassList.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QListWidget>
 #include <string>
+#include <vector>
 
 /*!@brief A widget showing a list of steps that can be dragged into the architecture area.
  *
@@ -85,9 +87,25 @@ protected:
   //! Opens up the context menu.
   void contextMenuEvent(QContextMenuEvent* pEvent);
 
+  //! What drop actions are supported by this widget.
+  Qt::DropActions supportedDropActions() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  void addListEntry
+       (
+         const std::string& className,
+         const std::string& fullClassName,
+         const QIcon& icon,
+         const std::vector<QString>& decorations,
+         const std::string& description,
+         const std::string& deprecation,
+         const std::string& source,
+         cedar::aux::ConstPluginDeclarationPtr declaration
+       );
+
 private slots:
   void showDeprecatedSteps(bool show);
 

@@ -38,6 +38,7 @@
 #define CEDAR_PROC_TRIGGERABLE_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Arguments.fwd.h"
@@ -85,6 +86,20 @@ public:
     //! Triggerable was not started correctly. This is different from a normal exception state.
     STATE_EXCEPTION_ON_START
   };
+private:
+  //! Class that holds information on the current state.
+  struct StateInfo
+  {
+    StateInfo(State state, const std::string& reason = std::string())
+    :
+    mState(state),
+    mStateReason(reason)
+    {
+    }
+    State mState;
+    std::string mStateReason;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,7 +137,7 @@ public:
   void setParentTrigger(cedar::proc::TriggerPtr parent);
 
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
-  inline bool isLooped() const
+  virtual bool isLooped() const
   {
     return this->mIsLooped;
   }
@@ -141,8 +156,11 @@ public:
    */
   void callOnStop();
 
-  //!@brief Returns the current cedar::proc::Triggerable::STATE of the Triggerable.
-  State getState() const;
+  /*!@brief Returns the current cedar::proc::Triggerable::STATE of the Triggerable.
+   *
+   * @remarks This method is thread-safe, it returns a copy of the current state.
+   */
+  cedar::proc::Triggerable::State getState() const;
 
   //!@brief Returns the annotation of the current state, e.g., the reasons for failing or the message of the last
   //        exception.
@@ -163,8 +181,13 @@ public:
   //! Returns true if there is at least one trigger triggering this triggerable.
   inline bool isTriggered() const
   {
-    return this->mTriggersListenedTo.size() > 0;
+    QReadLocker locker(this->mTriggersListenedTo.getLockPtr());
+    bool triggered = this->mTriggersListenedTo.member().size() > 0;
+    return triggered;
   }
+
+  //! Returns true if the step is started, i.e., if the last onStart call was not followed by an onStop call.
+  bool isStarted() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -205,6 +228,8 @@ protected:
          Triggerable::State state = Triggerable::STATE_EXCEPTION
        ) throw();
 
+  unsigned int numberOfStartCalls() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -226,30 +251,24 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief Whether the connect function should automatically connect the triggers as well.
-  const bool mIsLooped;
+  bool mIsLooped;
 
   //!@brief If set, this is the trigger that triggers the step.
   cedar::proc::TriggerWeakPtr mParentTrigger;
 
   //! The triggers this step is triggered by.
   //!@todo Unify this with mParentTrigger
-  std::set<TriggerWeakPtr> mTriggersListenedTo;
-
-  //!@brief current state of this step, taken from cedar::processing::Step::State
-  State mState;
-
-  //! Lock for the step state.
-  mutable QReadWriteLock mStateLock;
-
-  //!@brief The annotation string for the current state.
-  std::string mStateAnnotation;
+  cedar::aux::LockableMember< std::set<TriggerWeakPtr> > mTriggersListenedTo;
 
   //!@brief Signal that is emitted whenever the Triggerable's state is changed.
   boost::signals2::signal<void ()> mStateChanged;
 
 private:
+  //!@brief current state of this step, taken from cedar::processing::Step::State
+  cedar::aux::LockableMember<StateInfo> mState;
+
   //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
-  cedar::proc::TriggerPtr mFinished;
+  cedar::aux::LockableMember<cedar::proc::TriggerPtr> mFinished;
 
   //! Counts how often callOnStart was called. This is required to prevent multiple onStart calls.
   unsigned int mStartCalls;
