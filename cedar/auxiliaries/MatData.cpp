@@ -79,17 +79,21 @@ std::string cedar::aux::MatData::getDescription() const
       if (dim == 1)
       {
         description += cedar::aux::toString(cedar::aux::math::get1DMatrixSize(mat));
+        description += " (";
       }
-      else
+
+      for (int i = 0; i < mat.dims; ++i)
       {
-        for (unsigned int i = 0; i < dim; ++i)
+        if (i > 0)
         {
-          if (i > 0)
-          {
-            description += " x ";
-          }
-          description += cedar::aux::toString(mat.size[i]);
+          description += " x ";
         }
+        description += cedar::aux::toString(mat.size[i]);
+      }
+
+      if (dim == 1)
+      {
+        description += ")";
       }
     }
     description += "<br />";

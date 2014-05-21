@@ -69,6 +69,13 @@ public:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
 
+  /*! A helper function that calculates the sum of all matrices in the given slot.
+   *
+   * @remarks This function assumes that the output matrix, sum, is initialized to the appropriate size, and that all
+   *          matrices in the slot are the same size (0D matrices are treated as scalar additions).
+   */
+  static void sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat& sum, bool lock = false);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

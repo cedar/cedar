@@ -98,21 +98,54 @@ mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::Sum::sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat& sum, bool lock)
+{
+  sum.setTo(0.0);
+  double scalar_additions = 0.0;
+
+  for (size_t i = 0; i < slot->getDataCount(); ++i)
+  {
+    auto mat_data = boost::dynamic_pointer_cast<cedar::aux::MatData>(slot->getData(i));
+    if (mat_data)
+    {
+      boost::shared_ptr<QReadLocker> locker;
+      if (lock)
+      {
+        locker = boost::shared_ptr<QReadLocker>(new QReadLocker(&mat_data->getLock()));
+      }
+
+      cv::Mat& input_mat = mat_data->getData();
+
+      unsigned int input_dim = cedar::aux::math::getDimensionalityOf(input_mat);
+      if (input_dim == 0)
+      {
+        scalar_additions += cedar::aux::math::getMatrixEntry<double>(input_mat, 0, 0);
+      }
+      else
+      {
+        CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, sum))
+
+        cv::Mat to_add;
+        if (input_dim == 1)
+        {
+          sum += cedar::aux::math::canonicalRowVector(input_mat);
+        }
+        else
+        {
+          sum += input_mat;
+        }
+      }
+    }
+  }
+  if (scalar_additions != 0.0)
+  {
+    sum += scalar_additions;
+  }
+}
+
 void cedar::proc::steps::Sum::compute(const cedar::proc::Arguments&)
 {
-  if (this->mInputs->getDataCount() == 0)
-  {
-    // no terms, result is all zeros.
-    this->mOutput->getData() *= 0;
-    return;
-  }
-  cv::Mat sum = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(0))->getData().clone();
-  for (unsigned int data_id = 1; data_id < this->mInputs->getDataCount(); ++data_id)
-  {
-    sum += cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(data_id))->getData();
-  }
-
-  this->mOutput->setData(sum);
+  cedar::proc::steps::Sum::sumSlot(this->mInputs, this->mOutput->getData(), false);
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
@@ -167,10 +200,38 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
 {
   if (this->mInputs->getDataCount() > 0)
   {
+    // first, check if all inputs are valid
     if (!this->allInputsValid())
     {
       return;
     }
+
+    // then, initialize the output to the appropriate size
+    for (size_t i = 0; i < this->mInputs->getDataCount(); ++i)
+    {
+      auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->mInputs->getData(i));
+
+      if (mat_data)
+      {
+        if (mat_data->getDimensionality() == 1)
+        {
+          this->mOutput->setData(cedar::aux::math::canonicalRowVector(mat_data->getData() * 0.0));
+        }
+        else
+        {
+          this->mOutput->setData(mat_data->getData() * 0.0);
+        }
+
+        // we need to check all data; if one is not 0d, we need to use its size
+        if (mat_data->getDimensionality() > 0)
+        {
+          break;
+        }
+      }
+    }
+
+    // finally, compute once and then notify subsequent steps that the output size may have changed
+    //!@todo Only notify when something actually changed.
     this->lock(cedar::aux::LOCK_TYPE_READ);
     this->compute(cedar::proc::Arguments());
     this->unlock(cedar::aux::LOCK_TYPE_READ);
