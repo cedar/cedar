@@ -88,10 +88,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 :
-mpConsistencyChecker(NULL),
-mpPerformanceOverview(NULL),
-mpConsistencyDock(NULL),
-mpBoostControl(NULL),
+mpConsistencyChecker(nullptr),
+mpPerformanceOverview(nullptr),
+mpConsistencyDock(nullptr),
+mpBoostControlDock(nullptr),
+mpBoostControl(nullptr),
 mSuppressCloseDialog(false)
 {
   // setup the (automatically generated) ui components
@@ -106,14 +107,6 @@ mSuppressCloseDialog(false)
   p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
   p_enable_custom_time_step->setChecked(false);
   this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
-
-  this->mpBoostControlDock = new QDockWidget(this);
-  this->mpBoostControl = new cedar::proc::gui::BoostControl();
-  this->mpBoostControlDock->setFloating(true);
-  this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
-  this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
-  this->mpBoostControlDock->setWidget(this->mpBoostControl);
-
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
   this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
@@ -365,7 +358,26 @@ void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 
 void cedar::proc::gui::Ide::showBoostControl()
 {
-  this->mpBoostControlDock->show();
+  if (this->mpBoostControlDock == nullptr)
+  {
+    this->mpBoostControlDock = new QDockWidget(this);
+    this->mpBoostControlDock->setFloating(true);
+    this->mpBoostControl = new cedar::proc::gui::BoostControl();
+    this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
+    this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
+    this->mpBoostControlDock->setWidget(this->mpBoostControl);
+
+    cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->setTo(this->mpBoostControlDock);
+
+    // for some reason I do not get, the boost settings are only restored properly when this line is included. Qt bug?
+    this->mpBoostControlDock->setVisible(false);
+
+    this->mpBoostControlDock->show();
+  }
+  else
+  {
+    this->mpBoostControlDock->show();
+  }
 }
 
 void cedar::proc::gui::Ide::showConsistencyChecker()
@@ -609,7 +621,11 @@ void cedar::proc::gui::Ide::storeSettings()
   cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->getFrom(this->mpToolsWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
-  cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->getFrom(this->mpBoostControlDock);
+
+  if (this->mpBoostControlDock)
+  {
+    cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->getFrom(this->mpBoostControlDock);
+  }
 
   cedar::proc::gui::SettingsSingleton::getInstance()->storeMainWindow(this);
 
@@ -622,7 +638,6 @@ void cedar::proc::gui::Ide::restoreSettings()
   cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->setTo(this->mpToolsWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
-  cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->setTo(this->mpBoostControlDock);
 
   cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);
 
