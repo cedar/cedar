@@ -83,6 +83,11 @@ QDialog(parent)
   connect(mpGroupTime, SIGNAL(timeout()), this, SLOT(timeUpdate()));
   mpGroupTime->start(100);
 
+  scrollArea->setAutoFillBackground(true);
+  QPalette p = scrollArea->palette();
+  p.setColor(backgroundRole(), QColor(255,255,255));
+  scrollArea->setPalette(p);
+
   this->redraw();
 }
 

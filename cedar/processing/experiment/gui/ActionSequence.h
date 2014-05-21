@@ -49,14 +49,14 @@
 #include "cedar/processing/experiment/gui/ExperimentItemWidget.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
+#include <QFrame>
 #include <QBoxLayout>
 
 
 /*!@brief The GUI implementation of cedar::proc::experiment::ActionSequence
  *
  */
-class cedar::proc::experiment::gui::ActionSequence : public QWidget
+class cedar::proc::experiment::gui::ActionSequence : public QFrame
 {
 
   //--------------------------------------------------------------------------------------------------------------------
