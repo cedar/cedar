@@ -137,7 +137,7 @@ void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions
 
 void cedar::proc::experiment::Experiment::run()
 {
-  if (this->_mTrials->getValue() > 0)
+  if (this->_mTrials->getValue() > 0 && checkActionSequences())
   {
     // Set record directory
     std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
@@ -145,7 +145,6 @@ void cedar::proc::experiment::Experiment::run()
     this->mActualTrial = 1;
     ExperimentSuperviserSingleton::getInstance()->start();
     emit experimentRunning(true);
-    this->checkActionSequences();
   }
 }
 void cedar::proc::experiment::Experiment::cancel()
@@ -351,7 +350,7 @@ bool cedar::proc::experiment::Experiment::hasStopped()
 {
   return mStopped;
 }
-void cedar::proc::experiment::Experiment::checkActionSequences()
+bool cedar::proc::experiment::Experiment::checkActionSequences()
 {
   int counter = 0;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
@@ -369,6 +368,7 @@ void cedar::proc::experiment::Experiment::checkActionSequences()
   }
   if(counter!=1)
   {
-    this->cancel();
+    return false;
   }
+  return true;
 }

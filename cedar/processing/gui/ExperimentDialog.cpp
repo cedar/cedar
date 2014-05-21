@@ -172,7 +172,15 @@ cedar::proc::experiment::ExperimentPtr cedar::proc::gui::ExperimentDialog::getEx
 
 void cedar::proc::gui::ExperimentDialog::runExperiment()
 {
-  this->experiment->run();
+  if(this->experiment->checkActionSequences())
+  {
+    this->experiment->run();
+  }
+  else
+  {
+    QMessageBox::warning(this,"Wrong configuration!",
+        "There should be exactly one StartTrigger action in an OnInit condition.", QMessageBox::Ok);
+  }
 }
 
 void cedar::proc::gui::ExperimentDialog::stopExperiment()
