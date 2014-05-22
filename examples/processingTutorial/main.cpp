@@ -44,23 +44,23 @@
 
 int main(int, char**) // we don't use the arguments here
 {
-  // create a network
-  cedar::proc::GroupPtr network(new cedar::proc::Group());
+  // create a group
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
 
   boost::shared_ptr<SimpleSummation> sum(new SimpleSummation());
-  // This adds the sum step to the network under the name "sum".
-  network->add(sum, "sum");
+  // This adds the sum step to the group under the name "sum".
+  group->add(sum, "sum");
 
   // Gauss inputs
   cedar::proc::sources::GaussInputPtr gauss1(new cedar::proc::sources::GaussInput());
-  network->add(gauss1, "gauss1");
+  group->add(gauss1, "gauss1");
   cedar::proc::sources::GaussInputPtr gauss2(new cedar::proc::sources::GaussInput());
-  network->add(gauss2, "gauss2");
+  group->add(gauss2, "gauss2");
 
   // connect the first gauss to the sum
-  network->connectSlots("gauss1.Gauss input", "sum.operand1");
+  group->connectSlots("gauss1.Gauss input", "sum.operand1");
   // connect the second gauss to the sum
-  network->connectSlots("gauss2.Gauss input", "sum.operand2");
+  group->connectSlots("gauss2.Gauss input", "sum.operand2");
 
   return 0;
 }
