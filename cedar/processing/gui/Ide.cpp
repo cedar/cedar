@@ -367,6 +367,11 @@ void cedar::proc::gui::Ide::showBoostControl()
     this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
     this->mpBoostControlDock->setWidget(this->mpBoostControl);
 
+    if (this->mGroup)
+    {
+      this->mpBoostControl->setGroup(this->mGroup->getGroup());
+    }
+
     cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->setTo(this->mpBoostControlDock);
 
     // for some reason I do not get, the boost settings are only restored properly when this line is included. Qt bug?
