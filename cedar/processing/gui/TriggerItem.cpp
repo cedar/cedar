@@ -45,7 +45,6 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -78,7 +77,8 @@ cedar::proc::gui::TriggerItem::TriggerItem()
 cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
@@ -92,7 +92,8 @@ cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
@@ -164,16 +165,19 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
     return cedar::proc::gui::CONNECT_NO;
   }
 
-  if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
+  if (cedar::proc::gui::Connectable* p_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(pTarget))
   {
-    if(p_step_item->getStep()->getParentTrigger() || this->mTrigger->isListener(p_step_item->getStep()))
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(p_connectable->getConnectable()))
     {
-      return cedar::proc::gui::CONNECT_NO;
-    }
-    // ... source and target are not in the same network
-    else if (this->getTrigger()->getNetwork() != p_step_item->getStep()->getNetwork())
-    {
-      return cedar::proc::gui::CONNECT_NO;
+      if (triggerable->getParentTrigger() || this->mTrigger->isListener(triggerable))
+      {
+        return cedar::proc::gui::CONNECT_NO;
+      }
+      // ... source and target are not in the same group
+      else if (this->getTrigger()->getGroup() != p_connectable->getConnectable()->getGroup())
+      {
+        return cedar::proc::gui::CONNECT_NO;
+      }
     }
   }
 
@@ -189,8 +193,8 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
     {
       return cedar::proc::gui::CONNECT_NO;
     }
-    // ... source and target are not in the same network
-    else if (this->getTrigger()->getNetwork() != p_trigger_item->getTrigger()->getNetwork())
+    // ... source and target are not in the same group
+    else if (this->getTrigger()->getGroup() != p_trigger_item->getTrigger()->getGroup())
     {
       return cedar::proc::gui::CONNECT_NO;
     }
@@ -205,9 +209,6 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
   this->mTrigger = trigger;
   this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(mTrigger);
   
-  std::string tool_tip = this->mTrigger->getName() + " (" + this->mClassId->getClassName() + ")";
-  this->setToolTip(tool_tip.c_str());
-
   if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->mTrigger))
   {
     QObject::connect(looped_trigger.get(), SIGNAL(triggerStarting()), this, SLOT(triggerStateChanging()));
@@ -261,7 +262,7 @@ void cedar::proc::gui::TriggerItem::triggerStopped()
 
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
-  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
   CEDAR_DEBUG_ASSERT(p_scene);
 
   if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->mTrigger))
@@ -272,9 +273,8 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     QAction *p_single = menu.addAction("single step");
 
     menu.addSeparator();
-    p_scene->networkGroupingContextMenuEvent(menu);
 
-    if (looped_trigger->isRunning())
+    if (looped_trigger->isRunningNolocking())
     {
       p_start->setEnabled(false);
       p_single->setEnabled(false);
@@ -308,7 +308,6 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
   else
   {
     QMenu menu;
-    p_scene->networkGroupingContextMenuEvent(menu);
     menu.exec(event->screenPos());
   }
 }
@@ -335,4 +334,46 @@ cedar::proc::ConstTriggerPtr cedar::proc::gui::TriggerItem::getTrigger() const
 cedar::proc::gui::Connection* cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::GraphicsBase *pTarget)
 {
   return new Connection(this, pTarget);
+}
+
+void cedar::proc::gui::TriggerItem::updateToolTip()
+{
+  QString tool_tip
+    = QString("<table>"
+                "<tr>"
+                  "<th>Measurement:</th>"
+                  "<th>Last</th>"
+                  "<th>Average</th>"
+                "</tr>"
+                "<tr>"
+                  "<td>loop time</td>"
+                  "<td align=\"right\">%1</td>"
+                  "<td align=\"right\">%2</td>"
+                "</tr>"
+              "</table>");
+
+  if (auto looped = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->getTrigger()))
+  {
+    if (looped->getStatistics()->size() > 0)
+    {
+      cedar::unit::Time mean = looped->getStatistics()->getAverage();
+      double dval = mean / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
+      tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
+      cedar::unit::Time newest = looped->getStatistics()->getNewest();
+      dval = newest / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds);
+      tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
+    }
+    else
+    {
+      tool_tip = tool_tip.arg("n/a");
+      tool_tip = tool_tip.arg("n/a");
+    }
+  }
+  else
+  {
+    tool_tip = tool_tip.arg("n/a");
+    tool_tip = tool_tip.arg("n/a");
+  }
+
+  this->setToolTip(tool_tip);
 }

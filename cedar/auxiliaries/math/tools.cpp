@@ -151,6 +151,51 @@ cv::Mat cedar::aux::math::flip(const cv::Mat& toFlip, const std::vector<bool>& f
   return result;
 }
 
+int cedar::aux::math::matrixTypeFromString(const std::string& typeStr)
+{
+#define MAT_TYPE_STR(CV_TYPE) else if (typeStr == #CV_TYPE) { return CV_TYPE; }
+  if (false)
+  {
+    // emppty to allow else if blocks in the macro
+  }
+  MAT_TYPE_STR(CV_8U)
+  MAT_TYPE_STR(CV_8UC1)
+  MAT_TYPE_STR(CV_8UC2)
+  MAT_TYPE_STR(CV_8UC3)
+  MAT_TYPE_STR(CV_8UC4)
+  MAT_TYPE_STR(CV_8S)
+  MAT_TYPE_STR(CV_8SC1)
+  MAT_TYPE_STR(CV_8SC2)
+  MAT_TYPE_STR(CV_8SC3)
+  MAT_TYPE_STR(CV_8SC4)
+  MAT_TYPE_STR(CV_16U)
+  MAT_TYPE_STR(CV_16UC1)
+  MAT_TYPE_STR(CV_16UC2)
+  MAT_TYPE_STR(CV_16UC3)
+  MAT_TYPE_STR(CV_16UC4)
+  MAT_TYPE_STR(CV_16S)
+  MAT_TYPE_STR(CV_16SC1)
+  MAT_TYPE_STR(CV_16SC2)
+  MAT_TYPE_STR(CV_16SC3)
+  MAT_TYPE_STR(CV_16SC4)
+  MAT_TYPE_STR(CV_32S)
+  MAT_TYPE_STR(CV_32SC1)
+  MAT_TYPE_STR(CV_32SC2)
+  MAT_TYPE_STR(CV_32SC3)
+  MAT_TYPE_STR(CV_32SC4)
+  MAT_TYPE_STR(CV_32F)
+  MAT_TYPE_STR(CV_32FC3)
+  MAT_TYPE_STR(CV_64F)
+  MAT_TYPE_STR(CV_64FC3)
+
+#undef MAT_TYPE_STR
+
+  else
+  {
+    CEDAR_THROW(cedar::aux::UnknownTypeException, "Cannot convert \"" + typeStr + "\" to OpenCV matrix type.");
+  }
+}
+
 std::string cedar::aux::math::matrixTypeToString(const cv::Mat& matrix)
 {
   switch (matrix.type())

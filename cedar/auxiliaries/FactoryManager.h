@@ -71,6 +71,14 @@ namespace cedar
       public:
         typedef boost::shared_ptr<const T> ConstBaseTypePtr;
     };
+
+    // specialization for intrusive_ptr
+    template<typename T>
+    class ConstPtrProvider<boost::intrusive_ptr<T> >
+    {
+      public:
+        typedef boost::intrusive_ptr<const T> ConstBaseTypePtr;
+    };
   }
 }
 

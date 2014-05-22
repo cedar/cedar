@@ -75,6 +75,11 @@ mpScrollTimer(new QTimer(this))
   this->createZoomWidget();
 
   this->setZoomLevel(100);
+
+  setResizeAnchor(AnchorViewCenter);
+  setInteractive(true);
+  setTransformationAnchor(AnchorUnderMouse);
+  setDragMode(QGraphicsView::RubberBandDrag);
 }
 
 cedar::proc::gui::View::~View()
@@ -224,7 +229,7 @@ void cedar::proc::gui::View::scrollTimerEvent()
                             );
 }
 
-void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent *pEvent)
+void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent* pEvent)
 {
   // scroll the view if connecting to something close to the edge
   if (this->mpScene->getMode() == cedar::proc::gui::Scene::MODE_CONNECT)
@@ -296,4 +301,42 @@ void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const Q
       break;
   }
   this->mpScene->setMode(mode, param);
+}
+
+void cedar::proc::gui::View::mousePressEvent(QMouseEvent* pEvent)
+{
+  if (pEvent->button() == Qt::MiddleButton)
+  {
+    // If there's a rubber band already started it doesn't autmatically get cleared when we switch to
+    // scroll hand mode. We should probably keep track of things properly but it seems to work if you just do this.
+    // I'm not sure why buttons has to be 0 here - if you just clear the left button it doesn't work.
+    QMouseEvent releaseEvent(QEvent::MouseButtonRelease, pEvent->pos(), pEvent->globalPos(),
+                 Qt::LeftButton, 0, pEvent->modifiers());
+    QGraphicsView::mouseReleaseEvent(&releaseEvent);
+
+    setDragMode(QGraphicsView::ScrollHandDrag);
+    // We need to pretend it is actually the left button that was pressed!
+    QMouseEvent fakeEvent(pEvent->type(), pEvent->pos(), pEvent->globalPos(),
+               Qt::LeftButton, pEvent->buttons() | Qt::LeftButton, pEvent->modifiers());
+    QGraphicsView::mousePressEvent(&fakeEvent);
+  }
+  else
+  {
+    QGraphicsView::mousePressEvent(pEvent);
+  }
+}
+
+void cedar::proc::gui::View::mouseReleaseEvent(QMouseEvent* pEvent)
+{
+  if (pEvent->button() == Qt::MiddleButton)
+  {
+    QMouseEvent fakeEvent(pEvent->type(), pEvent->pos(), pEvent->globalPos(),
+               Qt::LeftButton, pEvent->buttons() & ~Qt::LeftButton, pEvent->modifiers());
+    QGraphicsView::mouseReleaseEvent(&fakeEvent);
+    setDragMode(QGraphicsView::RubberBandDrag);
+  }
+  else
+  {
+    QGraphicsView::mouseReleaseEvent(pEvent);
+  }
 }

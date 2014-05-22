@@ -38,7 +38,7 @@
 #define CEDAR_AUX_ENUM_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/EnumBase.h"
 
 // FORWARD DECLARATIONS
@@ -46,55 +46,90 @@
 
 // SYSTEM INCLUDES
 #include <set>
+#include <string>
+
+
+namespace cedar
+{
+  namespace aux
+  {
+    /*!@brief A namespace for some implementation details of cedar::aux::ParameterTemplate.
+     */
+    namespace EnumParameterDetails
+    {
+      /*!@brief Standard policy for reading and writing parameters.
+       */
+      class ValuePolicy
+      {
+      public:
+        typedef std::string ReadType;
+
+        ValuePolicy();
+
+        ValuePolicy(const cedar::aux::Enum& value);
+
+
+      protected:
+        void setEnum(cedar::aux::EnumBasePtr enumDeclaration);
+
+        std::string getValuePrivate() const;
+
+        void setValuePrivate(const ReadType& value);
+
+      protected:
+        //! A pointer to the enum used by this parameter
+        cedar::aux::EnumBasePtr mEnumDeclaration;
+
+        cedar::aux::Enum mValue;
+      };
+    }
+  }
+}
 
 /*!@brief A parameter storing an enum value.
  *
- * More detailed description of the class coming soon.
+ *        With this parameter, configurables can add an enum class as a parameter. This means that the user can select
+ *        a value from a fixed set.
  */
-class cedar::aux::EnumParameter : public cedar::aux::Parameter
+class cedar::aux::EnumParameter : public cedar::aux::ParameterTemplate
+                                         <
+                                           cedar::aux::Enum,
+                                           cedar::aux::EnumParameterDetails::ValuePolicy
+                                         >
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::ParameterTemplate
+      <
+        cedar::aux::Enum,
+        cedar::aux::EnumParameterDetails::ValuePolicy
+      >
+      Super;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  EnumParameter(cedar::aux::Configurable *pOwner,
-                const std::string& name,
-                boost::shared_ptr<cedar::aux::EnumBase> enumBase);
-
-  //!@brief The standard constructor, with an additional default value.
-  EnumParameter(cedar::aux::Configurable *pOwner,
-                const std::string& name,
-                boost::shared_ptr<cedar::aux::EnumBase> enumBase,
-                cedar::aux::EnumId defaultValue);
+  //!@brief Constructor with a default value.
+  EnumParameter
+  (
+    cedar::aux::Configurable *pOwner,
+    const std::string& name,
+    cedar::aux::EnumBasePtr enumBase,
+    cedar::aux::EnumId defaultValue
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief read from a configuration node
-  void readFromNode(const cedar::aux::ConfigurationNode& root);
-
-  //!@brief write to a configuration node
-  void writeToNode(cedar::aux::ConfigurationNode& root) const;
-
-  //!@brief set enum value to default
-  void makeDefault();
-
-  //!@brief return the enum value
-  cedar::aux::Enum getValue() const;
-
   //!@brief set enum value to a specified id
   void setValue(cedar::aux::EnumId enumId, bool lock = false);
 
   //!@brief set enum value to a specified id
   void setValue(const std::string& enumId, bool lock = false);
-
-  //!@brief set enum value to a specified id
-  CEDAR_DECLARE_DEPRECATED(void set(const std::string& enumId))
-  {
-    this->setValue(enumId);
-  }
 
   //!@brief get the enum from which this parameter represents an entry
   const cedar::aux::EnumBase& getEnumDeclaration()
@@ -138,17 +173,9 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the enum value of this parameter
-  cedar::aux::EnumId mValue;
-
-  //!@brief the default value of this parameter
-  cedar::aux::EnumId mDefault;
-
-  //!@brief a pointer to the enum used by this parameter
-  boost::shared_ptr<cedar::aux::EnumBase> mEnumDeclaration;
-
   //!@brief Set of all the disabled enum values.
   std::set<cedar::aux::EnumId> mDisabledValues;
-}; // class cedar::aux::VectorParameter
+
+}; // class cedar::aux::EnumParameter
 
 #endif // CEDAR_AUX_ENUM_PARAMETER_H

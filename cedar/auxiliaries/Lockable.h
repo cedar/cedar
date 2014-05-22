@@ -42,7 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LockType.h"
-#include "cedar/auxiliaries/CallOnScopeExit.h"
+#include "cedar/auxiliaries/LockerBase.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Lockable.fwd.h"
@@ -75,41 +75,91 @@ public:
   //! Storage for locks in this class.
   typedef std::multiset<std::pair<QReadWriteLock*, cedar::aux::LOCK_TYPE> > Locks;
 
+public:
   /*! @brief A RAII-based locker for lockables. Will automatically unlock when the locker is destroyed.
    */
-  class Locker : private cedar::aux::CallOnScopeExit
+  class Locker : public cedar::aux::LockerBase
   {
     public:
       Locker(LockablePtr lockable, LockSetHandle lockSet = 0)
       :
-      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
       {
-        lockable->lockAll(lockSet);
       }
 
       Locker(Lockable* lockable, LockSetHandle lockSet = 0)
       :
-      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
       {
-        lockable->lockAll(lockSet);
       }
 
       Locker(Lockable* lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
       :
-      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockType, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
       {
-        lockable->lockAll(lockType, lockSet);
       }
 
       Locker(LockablePtr lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
       :
-      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockType, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
       {
-        lockable->lockAll(lockType, lockSet);
       }
   };
 
   CEDAR_GENERATE_POINTER_TYPES(Locker);
+
+public:
+  class ReadLocker : public Locker
+  {
+  public:
+    ReadLocker(LockablePtr lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_READ, lockSet)
+    {
+    }
+
+    ReadLocker(Lockable* lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_READ, lockSet)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+
+  class WriteLocker : public Locker
+  {
+  public:
+    WriteLocker(LockablePtr lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_WRITE, lockSet)
+    {
+    }
+
+    WriteLocker(Lockable* lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_WRITE, lockSet)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -169,6 +219,10 @@ private:
 
       case cedar::aux::LOCK_TYPE_WRITE:
         pLock->lockForWrite();
+        break;
+
+      case cedar::aux::LOCK_TYPE_DONT_LOCK:
+        // do nothing
         break;
     }
   }

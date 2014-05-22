@@ -46,6 +46,8 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QReadLocker>
+#include <QWriteLocker>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -54,18 +56,22 @@
 
 cedar::aux::Parameter::Parameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
 :
-mpOwner(pOwner),
+mpOwner(nullptr),
 mHasDefault(hasDefault),
 mConstant(false),
 mIsHidden(false),
 mChanged(false),
 mAdvanced(false),
+mIsLinked(false),
+mLastLockType(cedar::aux::LOCK_TYPE_DONT_LOCK),
 mpLock(new QReadWriteLock())
 {
-  CEDAR_ASSERT(this->mpOwner != NULL);
   this->setName(name);
 
-  this->mpOwner->registerParameter(this);
+  if (pOwner != nullptr)
+  {
+    this->setOwner(pOwner);
+  }
 }
 
 cedar::aux::Parameter::~Parameter()
@@ -80,6 +86,53 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::aux::Parameter::isLinked() const
+{
+  return this->mIsLinked;
+}
+
+void cedar::aux::Parameter::setLinked(bool linked)
+{
+  this->mIsLinked = linked;
+}
+
+void cedar::aux::Parameter::unsetOwner()
+{
+  if(this->mpOwner != nullptr)
+  {
+    this->mpOwner->unregisterParameter(this);
+    this->mpOwner = nullptr;
+  }
+}
+
+void cedar::aux::Parameter::setOwner(cedar::aux::Configurable *pOwner)
+{
+  this->unsetOwner();
+  this->mpOwner = pOwner;
+
+  this->mpOwner->registerParameter(this);
+}
+
+void cedar::aux::Parameter::setName(const std::string& name)
+{
+  QWriteLocker locker(this->mName.getLockPtr());
+  std::string old_name = this->mName.member();
+  this->mName.member() = name;
+  locker.unlock();
+
+  this->signalNameChanged(old_name, name);
+}
+
+void cedar::aux::Parameter::copyValueFrom(cedar::aux::ConstParameterPtr /* other */)
+{
+  CEDAR_THROW(cedar::aux::NotImplementedException, "Copying values from this type of parameter is not supported.");
+}
+
+bool cedar::aux::Parameter::canCopyFrom(cedar::aux::ConstParameterPtr /* other */) const
+{
+  return false;
+}
+
 void cedar::aux::Parameter::addDeprecatedName(const std::string& deprecatedName)
 {
   this->mpOwner->addDeprecatedName(this, deprecatedName);
@@ -89,21 +142,23 @@ void cedar::aux::Parameter::lockForWrite() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_WRITE);
+  this->mLastLockType = cedar::aux::LOCK_TYPE_WRITE;
+  cedar::aux::lock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::lockForRead() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_READ);
+  this->mLastLockType = cedar::aux::LOCK_TYPE_READ;
+  cedar::aux::lock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::unlock() const
 {
   std::set<QReadWriteLock*> locks;
   this->appendLocks(locks);
-  cedar::aux::unlock(locks);
+  cedar::aux::unlock(locks, this->mLastLockType);
 }
 
 void cedar::aux::Parameter::appendLocks(std::set<QReadWriteLock*>& locks) const
@@ -178,17 +233,19 @@ bool cedar::aux::Parameter::isConstant() const
 
 void cedar::aux::Parameter::setConstant(bool value)
 {
-  this->mConstant = value;
+  bool was_constant = this->isConstant();
+  if (was_constant != value)
+  {
+    this->mConstant = value;
 
-  emit propertyChanged();
+    emit propertyChanged();
+  }
 }
 
-const std::string& cedar::aux::Parameter::getName() const
+std::string cedar::aux::Parameter::getName() const
 {
-  return this->mName;
-}
+  QReadLocker locker(this->mName.getLockPtr());
+  std::string name = this->mName.member();
 
-void cedar::aux::Parameter::setName(const std::string& name)
-{
-  this->mName = name;
+  return name;
 }

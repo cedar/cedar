@@ -21,6 +21,12 @@ In the following pages you can find out about general programming concepts we us
 - @link BoostSignalsWrapper cedar's helper functions for boost signals @endlink
 - @ref EnumConcept
 
+@subsection RTTS cedar's runtime type system
+
+Much of cedar's power comes from its ability to allocate object at run-time, based on user-defined type strings. A
+description of the involved concepts can be found @link RunTimeTypeSystem here@endlink.
+ 
+
 @section BugFixing Bug Fixing
 If you want to fix a bug in cedar, please stick to the following process.
 -# report the bug in the <a href="https://bitbucket.org/cedar/testing/issues">issue tracker</a>
