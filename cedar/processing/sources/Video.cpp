@@ -178,7 +178,7 @@ void cedar::proc::sources::Video::updateVideo()
 {
   this->mImage->setData(this->getVideoGrabber()->getImage());
   //!@todo fix getFps() to include frequency as unit
-  mFrameDuration = 1000.0 / this->getVideoGrabber()->getFramerate() * cedar::unit::seconds;
+  mFrameDuration = 1.0 / this->getVideoGrabber()->getFramerate() * cedar::unit::seconds;
   mTimeElapsed = 0.0 * cedar::unit::seconds;
   mRecording->setValue(this->getVideoGrabber()->isRecording());
   this->emitOutputPropertiesChangedSignal("Video");
@@ -187,6 +187,6 @@ void cedar::proc::sources::Video::updateVideo()
 void cedar::proc::sources::Video::updateSpeedFactor()
 {
   //!@todo fix getFps() to include frequency as unit
-  mFrameDuration = 1000/this->getVideoGrabber()->getFramerate() * cedar::unit::seconds;
+  mFrameDuration = 1.0/this->getVideoGrabber()->getFramerate() * cedar::unit::seconds;
 }
 

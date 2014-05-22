@@ -416,7 +416,10 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
   cedar::unit::Time one_second(1.0 * cedar::unit::second);
   cedar::unit::Time cycle_time(one_second / fps);
 
-  LoopedThread::setStepSize(cycle_time);        // change speed in thread
+  //!@todo this is how it should be done, but this creates a deadlock
+//  LoopedThread::setStepSize(cycle_time);        // change speed in thread
+  auto param = boost::dynamic_pointer_cast<cedar::aux::TimeParameter>(this->getParameter("step size"));
+  param->setValue(cycle_time, false);
 
   if (wasRunning)
   {
