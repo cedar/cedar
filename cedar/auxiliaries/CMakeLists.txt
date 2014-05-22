@@ -103,6 +103,7 @@ cedar_add_library(cedaraux
   gui/ResourceDialog.h
   gui/SceneWidget.h
   gui/StringParameter.h
+  gui/StringVectorParameter.h
   gui/ThreadedPlot.h
   gui/TimeParameter.h
   gui/UIntParameter.h
