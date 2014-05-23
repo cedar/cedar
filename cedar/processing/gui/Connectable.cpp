@@ -729,10 +729,6 @@ void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneCont
   p_close_all_plots->setIcon(QIcon(":/menus/close_all_plots.svg"));
   QObject::connect(p_close_all_plots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
 
-  QAction* p_toggle_visibility_of_plots = menu.addAction("toggle visibility");
-  p_toggle_visibility_of_plots->setIcon(QIcon(":/menus/toggle_plot_visibility.svg"));
-  QObject::connect(p_toggle_visibility_of_plots, SIGNAL(triggered()), this, SLOT(toggleVisibilityOfPlots()));
-
   std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
   this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
