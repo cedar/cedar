@@ -46,19 +46,18 @@
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace proc
   {
     namespace sinks
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(GroupSink);
+      //!@endcond
     }
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_PROC_SINKS_GROUP_SINK_FWD_H
 

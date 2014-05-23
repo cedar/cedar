@@ -67,6 +67,8 @@ class cedar::aux::ImageDatabase
 public:
   typedef unsigned int ClassId;
 
+  /*! A base class for all kinds of image annotations.
+   */
   class Annotation
   {
   public:
@@ -76,6 +78,8 @@ public:
   };
   CEDAR_GENERATE_POINTER_TYPES(Annotation);
 
+  /*! An annotation containing information for images in the ETH80 database.
+   */
   class ETH80Annotation : public Annotation
   {
     public:
@@ -94,6 +98,8 @@ public:
   };
   CEDAR_GENERATE_POINTER_TYPES(ETH80Annotation);
 
+  /*! An annotation containing information about object pose.
+   */
   class ObjectPoseAnnotation : public Annotation
   {
   public:

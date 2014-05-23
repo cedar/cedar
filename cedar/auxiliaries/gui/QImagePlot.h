@@ -89,6 +89,7 @@ namespace cedar
 
           QLinearGradient mGradient;
         };
+        //!@endcond
       } // namespace detail
     }
   }

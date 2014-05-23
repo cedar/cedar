@@ -48,16 +48,16 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace processingCL
   {
+    //!@cond SKIPPED_DOCUMENTATION
     class MainApplication;
     CEDAR_GENERATE_POINTER_TYPES(MainApplication);
+    //!@endcond
   }
 }
-//!@endcond
 
 #endif // CEDAR_PROC_CL_MAIN_APPLICATION_FWD_H
 

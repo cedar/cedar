@@ -73,9 +73,11 @@ class cedar::aux::gui::Configurable : public QWidget
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@cond SKIPPED_DOCUMENTATION
   class DataDelegate;
 
   class ParameterItem;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -187,6 +189,8 @@ private:
 
 }; // class cedar::aux::gui::Configurable
 
+//!@cond SKIPPED_DOCUMENTATION
+// This is an internal class of the Configurable widget. Not intended for use outside of it.
 class cedar::aux::gui::Configurable::DataDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
@@ -210,6 +214,7 @@ private:
 
   bool mReadOnly;
 };
+//!@endcond
 
 #endif // CEDAR_AUX_GUI_CONFIGURABLE_H
 
