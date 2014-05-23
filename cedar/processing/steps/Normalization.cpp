@@ -149,14 +149,8 @@ void cedar::proc::steps::Normalization::inputConnectionChanged(const std::string
 
       const cv::Mat& input = this->mImage->getData();
 
-      if (this->mImage->getDimensionality() < 3)
-      {
-        this->mNormalizedImage->getData() = cv::Mat::zeros(input.rows, input.cols, CV_32F);
-      }
-      else if (this->mImage->getDimensionality() == 3)
-      {
-        this->mNormalizedImage->setData(0.0 * input.clone());
-      }
+      this->mNormalizedImage->setData(0.0 * input.clone());
+
       this->mNormalizedImage->copyAnnotationsFrom(this->mImage);
 
       CEDAR_ASSERT(input.channels() == 1);
