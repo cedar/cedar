@@ -79,6 +79,7 @@ public:
   // methods
   //--------------------------------------------------------------------------------------------------------------------
 
+  //! Returns a deep copy of the unit matrix.
   SelfType clone() const
   {
     return SelfType(this->matrix.clone(), this->unit);

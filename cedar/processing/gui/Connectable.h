@@ -116,21 +116,27 @@ public:
 
 
 protected:
+  //! Decoration item that is attached to a step icon.
   class Decoration
   {
     public:
+      //! Constructor.
       Decoration(Connectable* pConnectable, const QString& icon, const QString& description, const QColor& bg = QColor(255, 255, 255));
 
+      //! Destructor.
       ~Decoration()
       {
         delete mpIcon;
         delete mpRectangle;
       }
 
+      //! Sets the position of the decoration.
       void setPosition(const QPointF& pos);
 
+      //! Sets the size of the decoration.
       void setSize(double sizeFactor);
 
+      //! Shows or hides the decoration.
       void setVisible(bool visible)
       {
         this->mpIcon->setVisible(visible);

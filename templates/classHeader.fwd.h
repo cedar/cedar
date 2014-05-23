@@ -48,11 +48,12 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
+
 <begin namespaces>
+<namespaces indent>//!@cond SKIPPED_DOCUMENTATION
 <namespaces indent>CEDAR_DECLARE_<CAP_SHORT_MAIN_NAMESPACE>_CLASS(<class name>);
+<namespaces indent>//!@endcond
 <end namespaces>
-//!@endcond
 
 #endif // CEDAR_XXX_XXX_FWD_H
 

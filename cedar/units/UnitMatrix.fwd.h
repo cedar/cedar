@@ -48,16 +48,15 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace unit
   {
+    //!@cond SKIPPED_DOCUMENTATION
     template <typename DimensionType> struct UnitMatrix;
+    //!@endcond
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_UNIT_UNIT_MATRIX_FWD_H
 

@@ -48,19 +48,18 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
   {
     namespace math
     {
+      //!@cond SKIPPED_DOCUMENTATION
       template <typename T> class Limits;
+      //!@endcond
     }
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_AUX_MATH_LIMITS_FWD_H
 
