@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/MatrixSlice.h"
-#include "cedar/processing/typecheck/IsMatrix.h"
+#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataSlot.h"
@@ -111,7 +111,9 @@ _mRangeUpper
 )
 {
   auto input = this->declareInput("matrix");
-  input->setCheck(cedar::proc::typecheck::IsMatrix());
+  cedar::proc::typecheck::Matrix input_check;
+  input_check.addAcceptedDimensionalityRange(1, 16);
+  input->setCheck(input_check);
 
   this->declareOutput("slice", mOutput);
 
@@ -122,6 +124,30 @@ _mRangeUpper
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::steps::MatrixSlice::setRanges(const std::vector<cv::Range>& ranges)
+{
+  cedar::proc::Step::WriteLocker locker(this);
+
+  CEDAR_ASSERT(ranges.size() == this->_mRangeLower->size());
+  CEDAR_ASSERT(ranges.size() == this->_mRangeUpper->size());
+
+  bool lower_blocked = this->_mRangeLower->blockSignals(true);
+  bool upper_blocked = this->_mRangeUpper->blockSignals(true);
+
+  for (size_t d = 0; d < ranges.size(); ++d)
+  {
+    this->_mRangeUpper->set(d, ranges.at(d).end);
+    this->_mRangeLower->set(d, ranges.at(d).start);
+  }
+
+  this->_mRangeLower->blockSignals(lower_blocked);
+  this->_mRangeUpper->blockSignals(upper_blocked);
+
+  locker.unlock();
+
+  this->rangeChanged();
+}
 
 void cedar::proc::steps::MatrixSlice::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
@@ -152,6 +178,11 @@ void cedar::proc::steps::MatrixSlice::inputConnectionChanged(const std::string& 
 
 void cedar::proc::steps::MatrixSlice::updateDimensionality()
 {
+  if (!this->mInput)
+  {
+    return;
+  }
+
   unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   unsigned int old_dim = this->_mRangeLower->size();
   this->_mRangeLower->resize(matrix_dim);
@@ -163,6 +194,9 @@ void cedar::proc::steps::MatrixSlice::updateDimensionality()
 
     bool lower_blocked = this->_mRangeLower->blockSignals(true);
     bool upper_blocked = this->_mRangeUpper->blockSignals(true);
+
+    CEDAR_DEBUG_ASSERT(d < this->_mRangeLower->size());
+    CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
 
     this->_mRangeLower->set(d, limits.getLower());
     this->_mRangeUpper->set(d, limits.getUpper());
@@ -186,14 +220,18 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
 
   CEDAR_DEBUG_ASSERT(dimensionality == this->_mRangeLower->size());
   CEDAR_DEBUG_ASSERT(dimensionality == this->_mRangeUpper->size());
+  CEDAR_DEBUG_ASSERT(dimensionality > 0);
 
   mRanges.clear();
   mRanges.resize(dimensionality);
   std::vector<int> sizes;
-  sizes.resize(dimensionality);
+  sizes.resize(dimensionality, 1);
 
   for (unsigned int d = 0; d < dimensionality; ++d)
   {
+    CEDAR_DEBUG_ASSERT(d < this->_mRangeLower->size());
+    CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
+
     const unsigned int& lower = this->_mRangeLower->at(d);
     const unsigned int& upper = this->_mRangeUpper->at(d);
 
@@ -224,7 +262,8 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
   }
 
   // preallocate the appropriate output matrix
-  cv::Mat output = 0.0 * cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type());
+  CEDAR_DEBUG_ASSERT(sizes.size() > 0);
+  cv::Mat output = cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type(), cv::Scalar(0));
   cv::Mat old_output = this->mOutput->getData();
   this->mOutput->setData(output);
 
@@ -261,5 +300,5 @@ void cedar::proc::steps::MatrixSlice::compute(const cedar::proc::Arguments&)
   CEDAR_DEBUG_ASSERT(this->_mRangeLower->size() == cedar::aux::math::getDimensionalityOf(input));
   CEDAR_DEBUG_ASSERT(this->_mRangeUpper->size() == cedar::aux::math::getDimensionalityOf(input));
 
-  output = input(&mRanges.front());
+  output = input(&mRanges.front()).clone();
 }

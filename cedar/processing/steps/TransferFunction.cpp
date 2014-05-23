@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -143,7 +143,7 @@ void cedar::proc::steps::TransferFunction::compute(const cedar::proc::Arguments&
   cv::Mat& sigmoid_u = this->mOutput->getData();
 
   // calculate output
-  sigmoid_u = _mTransferFunction->getValue()->compute<float>(input);
+  sigmoid_u = _mTransferFunction->getValue()->compute(input);
 }
 
 void cedar::proc::steps::TransferFunction::inputConnectionChanged(const std::string& inputName)

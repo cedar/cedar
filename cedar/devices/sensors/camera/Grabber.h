@@ -101,7 +101,7 @@ public:
 
   /*! @brief This signal is raised, if the grabber will be recreated
    *
-   *   This signal is used from the processingIde Camera step to annotate a new imagesize
+   *   This signal is used from the gui Camera step to annotate a new imagesize
    */
   void frameSizeChanged();
 

@@ -37,13 +37,15 @@
 // LOCAL INCLUDES
 
 // CEDAR INCLUDES
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QCoreApplication>
@@ -161,7 +163,7 @@ void insert_triggered_children(TriggerTestPtr step, std::set<TriggerTestPtr>& tr
   }
 }
 
-void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
+void test_step(cedar::proc::GroupPtr network, TriggerTestPtr step)
 {
   // build a list of all steps triggered by the one being checked
   std::set<TriggerTestPtr> triggered;
@@ -199,8 +201,11 @@ void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
   step->mDataOut->setData(1);
 
   // trigger step; this should propagate all of its data to the subsequent steps
-  std::cout << "Triggering step." << std::endl;
+  std::cout << "Triggering step " << step->getName() << std::endl;
   step->onTrigger();
+
+  // wait for the subsequent steps to finish their computation
+  cedar::aux::sleep(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds));
 
   // check all triggered steps for being up-to-date (they should be after being triggered.
 
@@ -265,10 +270,10 @@ void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
   }
 }
 
-void test_network(cedar::proc::NetworkPtr network)
+void test_network(cedar::proc::GroupPtr network)
 {
-  using cedar::proc::Network;
-  using cedar::proc::NetworkPtr;
+  using cedar::proc::Group;
+  using cedar::proc::GroupPtr;
 
   for (auto iter = network->getElements().begin(); iter != network->getElements().end(); ++iter)
   {
@@ -283,15 +288,15 @@ void test_network(cedar::proc::NetworkPtr network)
 
 void run_test()
 {
-  using cedar::proc::Network;
-  using cedar::proc::NetworkPtr;
+  using cedar::proc::Group;
+  using cedar::proc::GroupPtr;
 
   {
     std::cout << "==================================" << std::endl;
     std::cout << " Checking network configuration 1" << std::endl;
     std::cout << "==================================" << std::endl << std::endl;
 
-    NetworkPtr network(new Network());
+    GroupPtr network(new Group());
     network->add(boost::make_shared<TriggerTest>(), "step1");
     network->add(boost::make_shared<TriggerTest>(), "step2");
     network->add(boost::make_shared<TriggerTest>(), "step3");
@@ -312,18 +317,14 @@ void run_test()
 
 int main(int argc, char** argv)
 {
-  QCoreApplication* app;
-  app = new QCoreApplication(argc,argv);
+  QCoreApplication app(argc,argv);
 
-  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+  cedar::aux::CallFunctionInThread testThread(run_test);
 
-  QObject::connect(testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection);  // alternatively: call app->quit() in runTests()
+  QObject::connect(&testThread, SIGNAL(finishedThread()), &app, SLOT(quit()), Qt::QueuedConnection);  // alternatively: call app->quit() in runTests()
 
-  testThread->start();
-  app->exec();
-
-  delete testThread;
-  delete app;
+  testThread.start();
+  app.exec();
 
   std::cout << "Superfluous trigger calls: " << num_superfluous_triggers << std::endl;
   std::cout << "Test finished with " << global_errors << " error(s)." << std::endl;

@@ -48,15 +48,16 @@
 #include "cedar/processing/gui/StepItem.fwd.h"
 #include "cedar/processing/gui/View.fwd.h"
 #include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
-#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
-#include "cedar/processing/gui/TriggerItem.fwd.h"
-#include "cedar/auxiliaries/gui/PropertyPane.fwd.h"
 #include "cedar/processing/gui/StickyNote.fwd.h"
+#include "cedar/processing/gui/TriggerItem.fwd.h"
+#include "cedar/auxiliaries/gui/Configurable.fwd.h"
+#include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
@@ -66,7 +67,7 @@
 #include <string>
 
 
-/*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Networks.
+/*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Groups.
  */
 class cedar::proc::gui::Scene : public QGraphicsScene
 {
@@ -75,7 +76,7 @@ class cedar::proc::gui::Scene : public QGraphicsScene
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::StepItem;
   friend class cedar::proc::gui::TriggerItem;
-  friend class cedar::proc::gui::Network;
+  friend class cedar::proc::gui::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros & types
@@ -109,8 +110,8 @@ public:
   //! Type for associating cedar::proc::Triggers to cedar::proc::gui::TriggerItem.
   typedef std::map<const cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
 
-  //! Type for associating cedar::proc::Networks to cedar::proc::gui::Networks.
-  typedef std::map<const cedar::proc::Network*, cedar::proc::gui::Network*> NetworkMap;
+  //! Type for associating cedar::proc::Groups to cedar::proc::gui::Groups.
+  typedef std::map<const cedar::proc::Group*, cedar::proc::gui::Group*> GroupMap;
 
   //! Type for associating cedar::proc::Elements to cedar::proc::gui::GraphicsBase.
   typedef std::map<const cedar::proc::Element*, cedar::proc::gui::GraphicsBase*> ElementMap;
@@ -141,12 +142,9 @@ public:
    */
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
-  /*!@brief Handles the dragEnter event of the scene.
-   *
-   *        This method determines whether the contents of the drop can be handled by
-   *        cedar::proc::gui::Scene::dropEvent.
+  /*!@brief Handles the dragLeave event of the scene.
    */
-  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   /*!@brief Handles the dragMove event of the scene.
    *
@@ -169,7 +167,7 @@ public:
 
   /*!@brief Creates an element of the given classId at the specified position and adds it to the scene.
    */
-  cedar::proc::ElementPtr addElement(const std::string& classId, QPointF position);
+  cedar::proc::ElementPtr createElement(cedar::proc::GroupPtr group, const std::string& classId, QPointF position);
 
   /*!@brief Adds a cedar::proc::gui::StepItem for the given cedar::proc::Step to the scene at the given position.
    */
@@ -189,18 +187,18 @@ public:
   void addTriggerItem(cedar::proc::gui::TriggerItem* pTrigger);
 
 
-  /*!@brief Adds a given network item to the scene.
+  /*!@brief Adds a given group item to the scene.
    */
-  cedar::proc::gui::Network* addNetwork
+  cedar::proc::gui::Group* addGroup
   (
     const QPointF& position,
-    cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
+    cedar::proc::GroupPtr group = cedar::proc::GroupPtr()
   );
 
 
-  /*!@brief Adds a given network item to the scene.
+  /*!@brief Adds a given group item to the scene.
    */
-  void addNetworkItem(cedar::proc::gui::Network* pNetwork);
+  void addGroupItem(cedar::proc::gui::Group* pGroup);
 
   /*!@brief Sets the current mode, i.e., selection, connecion etc.
    */
@@ -210,11 +208,11 @@ public:
    */
   void setMainWindow(QMainWindow *pMainWindow);
 
-  /*!@brief Sets the network that is displayed by this scene.
+  /*!@brief Sets the group that is displayed by this scene.
    */
-  void setNetwork(cedar::proc::gui::NetworkPtr network);
+  void setGroup(cedar::proc::gui::GroupPtr group);
 
-  /*!@brief Resets the network.
+  /*!@brief Resets the group.
    */
   void reset();
 
@@ -226,6 +224,10 @@ public:
    */
   const StepMap& getStepMap() const;
 
+  /*!@brief Returns the group map.
+   */
+  const GroupMap& getGroupMap() const;
+
   /*!@brief Deprecated, see getTriggerMap(). Returns the trigger map.
    */
   CEDAR_DECLARE_DEPRECATED(const TriggerMap& triggerMap() const);
@@ -234,9 +236,9 @@ public:
    */
   const TriggerMap& getTriggerMap() const;
 
-  /*!@brief Returns the gui::network that displays the given network.
+  /*!@brief Returns the gui::group that displays the given group.
    */
-  cedar::proc::gui::Network* getNetworkFor(cedar::proc::Network* network);
+  cedar::proc::gui::Group* getGroupFor(cedar::proc::Group* group);
 
   /*!@brief Returns the step item that displays the given step.
    */
@@ -258,13 +260,9 @@ public:
    */
   void setSnapToGrid(bool snap);
 
-  /*!@brief Adds actions to the menu that relate to network groups.
+  /*!@brief Access the root group
    */
-  void networkGroupingContextMenuEvent(QMenu& menu);
-
-  /*!@brief Access the root network
-   */
-  cedar::proc::gui::NetworkPtr getRootNetwork();
+  cedar::proc::gui::GroupPtr getRootGroup();
   
   /*!@brief Returns the current mode.
    */
@@ -275,7 +273,7 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
    */
-  void setConfigurableWidget(cedar::aux::gui::PropertyPane* pConfigurableWidget);
+  void setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget);
 
   /*!@brief Sets the widget used for displaying/editing the record parameters.
    */
@@ -302,13 +300,15 @@ public:
   /*!brief Adds a sticky node to the current scene
    */
   void addStickyNote();
-  cedar::proc::gui::StickyNote* addStickyNote(int x, int y, int witdh, int height, std::string text);
+  cedar::proc::gui::StickyNote* addStickyNote(float x, float y, float witdh, float height, std::string text, int fontSize = 10, QColor color = QColor(255,255,110));
 
   //! Removes a sticky note
   void removeStickyNote(StickyNote* note);
 
   // Gets all sticky notes
   const std::vector<cedar::proc::gui::StickyNote* > getStickyNotes() const;
+
+  void emitSceneChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -317,6 +317,9 @@ signals:
   /*!@brief Signal that is emitted when the current mode finishes, e.g., when a connection has been made.
    */
   void modeFinished();
+
+  //! Emitted whenever something in the scene changes (e.g., when an item is moved)
+  void sceneChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -346,9 +349,9 @@ private:
    */
   void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
 
-  /*!@brief Adds the names of networks and their subnetworks to an action.
+  /*!@brief Adds the names of groups and their subgroups to an action.
    */
-  void addNetworkNames(QMenu* pMenu, cedar::proc::ConstNetworkPtr network, std::string path) const;
+  void addGroupNames(QMenu* pMenu, cedar::proc::ConstGroupPtr group, std::string path) const;
 
   /*!@brief Removes a cedar::proc::gui::TriggerItem from the scene.
    */
@@ -358,20 +361,29 @@ private:
    */
   void removeStepItem(cedar::proc::gui::StepItem* pStep);
 
-  /*!@brief Removes a given network item from the scene.
+  /*!@brief Removes a given group item from the scene.
    */
-  void removeNetworkItem(cedar::proc::gui::Network* pNetwork);
+  void removeGroupItem(cedar::proc::gui::Group* pGroup);
 
   void handleTriggerModeChange();
+
+  //! Responsible for highlighting group targets when the mouse is dragging items around.
+  void highlightTargetGroups(const QPointF& mousePosition);
+
+  void resetBackgroundColor();
+
+  cedar::aux::PluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const;
 
 private slots:
   void promoteElementToExistingGroup();
 
-  void promoteElementToNewGroup();
-
   /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
    */
   void itemSelected();
+
+  //!@todo importGroup and importStep share a lot of code
+  void importGroup(bool link);
+  void importStep();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -388,17 +400,23 @@ private:
   //! The parameter for the current mode.
   QString mModeParam;
 
-  //! The network displayed by the scene.
-  cedar::proc::gui::NetworkPtr mNetwork;
+  //! The group displayed by the scene.
+  cedar::proc::gui::GroupPtr mGroup;
+
+  //! Stores what graphics item receives a drop, if any.
+  QGraphicsItem* mpDropTarget;
+
+  //! Group into which the items currently being moved would be added
+  cedar::proc::GroupPtr mTargetGroup;
 
   //! The view displaying the scene.
-  cedar::proc::gui::View *mpeParentView;
+  cedar::proc::gui::View* mpeParentView;
 
   //! The line indicating a new connection.
-  QGraphicsLineItem *mpNewConnectionIndicator;
+  QGraphicsLineItem* mpNewConnectionIndicator;
 
   //! The item from which a new connection is started.
-  cedar::proc::gui::GraphicsBase *mpConnectionStart;
+  cedar::proc::gui::GraphicsBase* mpConnectionStart;
 
   //! The step map.
   StepMap mStepMap;
@@ -406,8 +424,8 @@ private:
   //! The trigger map.
   TriggerMap mTriggerMap;
 
-  //! The network map.
-  NetworkMap mNetworkMap;
+  //! The group map.
+  GroupMap mGroupMap;
 
   //! Map of all the elements.
   ElementMap mElementMap;
@@ -416,22 +434,25 @@ private:
   std::vector<cedar::proc::gui::StickyNote*> mStickyNotes;
 
   //! The main window containing the scene.
-  QMainWindow *mpMainWindow;
+  QMainWindow* mpMainWindow;
 
   //! Bool representing whether the snap-to-grid function is active.
   bool mSnapToGrid;
 
   //! The widget used to display configurables when they are selected in the scene. May be null.
-  cedar::aux::gui::PropertyPane *mpConfigurableWidget;
+  cedar::aux::gui::Configurable* mpConfigurableWidget;
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
-  cedar::proc::gui::RecorderWidget *mpRecorderWidget;
+  cedar::proc::gui::RecorderWidget* mpRecorderWidget;
 
   //! Saves the mouse x position in the scene
   int mMousePosX;
 
   //! Saves the mouse y position in the scene
   int mMousePosY;
+
+  //! Whether or not the mouse is currently dragging items in the scene
+  bool mDraggingItems;
 
 }; // class ProcessingScene
 

@@ -111,7 +111,7 @@ install(CODE "execute_process(COMMAND ln -fsT ${CEDAR_RESOURCE_INSTALL_DIR}-${CE
 #------------------------
 
 #todo install all executable files here automatically
-file(GLOB cedarExecutables "${CEDAR_EXE_DIR}/processingIde")
+file(GLOB cedarExecutables "${CEDAR_EXE_DIR}/cedar")
 install(FILES ${cedarExecutables} DESTINATION ${CEDAR_EXE_INSTALL_DIR})
-install(CODE "execute_process(COMMAND chmod 755 ${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}/processingIde)")
+install(CODE "execute_process(COMMAND chmod 755 ${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}/cedar)")
 

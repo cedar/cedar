@@ -51,7 +51,7 @@
 // SYSTEM INCLUDES
 
 
-//!@brief A picture file source for the processingIde
+//!@brief A picture file source for the processing framework.
 class cedar::proc::sources::Picture
 :
 public cedar::proc::sources::GrabberBase

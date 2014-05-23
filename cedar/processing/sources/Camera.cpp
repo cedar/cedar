@@ -158,7 +158,7 @@ void cedar::proc::sources::Camera::onStop()
 
 void cedar::proc::sources::Camera::applyParameter()
 {
-  if (this->getCameraGrabber()->isCreated() && this->getCameraGrabber()->isRunning())
+  if (this->getCameraGrabber()->isCreated() && this->getCameraGrabber()->isRunningNolocking())
   {
     std::string msg = this->getCameraGrabber()->getName() + ": Already grabbing! Please stop grabbing and try again!";
     cedar::aux::LogSingleton::getInstance()->warning(msg,"void cedar::proc::sources::Camera::applyParameter()");

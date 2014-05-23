@@ -48,11 +48,52 @@
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/ParameterTemplate.fwd.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/function.hpp>
 #endif
+
+namespace cedar
+{
+  namespace aux
+  {
+    /*!@brief A namespace for some implementation details of cedar::aux::ParameterTemplate.
+     */
+    namespace ParameterTemplateDetails
+    {
+      /*!@brief Standard policy for reading and writing parameters.
+       */
+      template <typename T>
+      class ValuePolicy
+      {
+      public:
+        typedef T ReadType;
+
+        ValuePolicy(const T& value)
+        :
+        mValue(value)
+        {
+        }
+
+      protected:
+        const T& getValuePrivate() const
+        {
+          return this->mValue;
+        }
+
+        void setValuePrivate(const ReadType& value)
+        {
+          this->mValue = value;
+        }
+
+      protected:
+        T mValue;
+      };
+    }
+  }
+}
 
 /*!@brief  A generic template for parameters stored in a cedar::aux::Configurable.
  *
@@ -60,13 +101,21 @@
  *         parameter implementations should inherit this as a base class.
  *
  * @tparam T Type of the value stored as a parameter.
+ * @tparam ValuePolicy Specifies how the value in this parameter is stored.
  */
-template <typename T>
-class cedar::aux::ParameterTemplate : public cedar::aux::Parameter
+template
+<
+  typename T,
+  typename ValuePolicy = cedar::aux::ParameterTemplateDetails::ValuePolicy<T>
+>
+class cedar::aux::ParameterTemplate : public cedar::aux::Parameter, public ValuePolicy
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::ParameterTemplate<T, ValuePolicy> SelfType;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SelfType);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -76,7 +125,7 @@ public:
   ParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name, const T& defaultValue)
   :
   cedar::aux::Parameter(pOwner, name, true),
-  mValue(defaultValue),
+  ValuePolicy(defaultValue),
   mDefault(defaultValue)
   {
   }
@@ -110,32 +159,47 @@ public:
    */
   virtual void setValue(const T& value, bool lock = false)
   {
+    cedar::aux::Parameter::ReadLockerPtr read_locker;
+    if (lock)
+    {
+      read_locker = cedar::aux::Parameter::ReadLockerPtr(new cedar::aux::Parameter::ReadLocker(this));
+    }
+    T old_value = this->mValue;
+    if (lock)
+    {
+      read_locker->unlock();
+    }
+
+    if (value == old_value)
+    {
+      // nothing to do, value hasn't changed
+      return;
+    }
+
     if (mValidator)
     {
       mValidator(value);
     }
+
+    cedar::aux::Parameter::WriteLockerPtr write_locker;
     if (lock)
     {
-      this->lockForWrite();
+      write_locker = cedar::aux::Parameter::WriteLockerPtr(new cedar::aux::Parameter::WriteLocker(this));
     }
-    T old_value = this->mValue;
     this->mValue = value;
 
     if (lock)
     {
-      this->unlock();
+      write_locker->unlock();
     }
 
-    if (old_value != this->mValue)
-    {
-      this->emitChangedSignal();
-    }
+    this->emitChangedSignal();
   }
 
   //!@brief store the current value of type T in a configuration tree
-  void writeToNode(cedar::aux::ConfigurationNode& root) const
+  void writeToNode(cedar::aux::ConfigurationNode& node) const
   {
-    root.put(this->getName(), this->mValue);
+    node.put(this->getName(), this->getValuePrivate());
   }
 
   //!@brief load a value of type T from a configuration tree
@@ -143,15 +207,25 @@ public:
   {
     try
     {
-      this->mValue = node.get_value<T>();
+      this->setValuePrivate(node.get_value<typename ValuePolicy::ReadType>());
     }
     catch (const boost::property_tree::ptree_bad_path& e)
     {
       cedar::aux::LogSingleton::getInstance()->debugMessage
       (
-        "Error while setting parameter to value: " + std::string(e.what()),
+        "Error while reading parameter '" + this->getName() + "': " + std::string(e.what()) + ". Inserting default value instead.",
         "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
       );
+      this->makeDefault();
+    }
+    catch (const boost::property_tree::ptree_bad_data& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+      (
+        "Error while reading parameter '" + this->getName() + "': " + std::string(e.what()) + ". Inserting default value instead.",
+        "void cedar::aux::ParameterTemplate<T>::readFromNode(const cedar::aux::ConfigurationNode& node)"
+      );
+      this->makeDefault();
     }
   }
 
@@ -178,6 +252,28 @@ public:
     mValidator = validator;
   }
 
+  bool canCopyFrom(cedar::aux::ConstParameterPtr other) const
+  {
+    return static_cast<bool>(boost::dynamic_pointer_cast<ConstSelfType>(other));
+  }
+
+  void copyValueFrom(cedar::aux::ConstParameterPtr other)
+  {
+    if (auto other_self = boost::dynamic_pointer_cast<ConstSelfType>(other))
+    {
+      this->setValue(other_self->getValue());
+    }
+    else
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::UnhandledTypeException,
+        "Cannot copy parameter value: types don't match. Type of this: " + cedar::aux::objectTypeToString(this)
+        + ", type of other: " + cedar::aux::objectTypeToString(other)
+      );
+    }
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -195,10 +291,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-private:
-  //! The current parameter value.
-  T mValue;
 
+private:
   //! The default value of the parameter. Ignored if mHasDefault is false.
   T mDefault;
 
