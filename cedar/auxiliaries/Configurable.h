@@ -233,8 +233,10 @@ public:
   std::string getUniqueParameterName(const std::string& baseName) const;
 
 public:
+  //! (boost) Signal that is emitted whenever a parameter is added to the configurable.
   CEDAR_DECLARE_SIGNAL(ParameterAdded, void(cedar::aux::ParameterPtr));
 public:
+  //! (boost) Signal that is emitted whenever a parameter is removed from the configurable.
   CEDAR_DECLARE_SIGNAL(ParameterRemoved, void(cedar::aux::ParameterPtr));
 
   //--------------------------------------------------------------------------------------------------------------------

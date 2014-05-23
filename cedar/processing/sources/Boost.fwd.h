@@ -48,19 +48,18 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace proc
   {
     namespace sources
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(Boost);
+      //!@endcond
     }
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_PROC_SOURCES_BOOST_FWD_H
 

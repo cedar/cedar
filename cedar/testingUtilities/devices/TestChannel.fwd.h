@@ -48,19 +48,18 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace test
   {
     namespace dev
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_TESTING_UTILITIES_CLASS(TestChannel);
+      //!@endcond
     }
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_TEST_DEV_TEST_CHANNEL_FWD_H
 

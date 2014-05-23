@@ -51,6 +51,7 @@ namespace cedar
 {
   namespace aux
   {
+    //! Policy for paths that determines the separator for path entries.
     template <char Separator, typename StorageT = std::string>
     class CharSeparator
     {

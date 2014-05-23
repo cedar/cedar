@@ -48,16 +48,15 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
   {
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
+    //!@endcond
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_AUX_THREAD_WRAPPER_FWD_H
 

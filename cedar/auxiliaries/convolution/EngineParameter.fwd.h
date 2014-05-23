@@ -61,7 +61,6 @@ namespace cedar
     {
       typedef cedar::aux::ObjectParameterTemplate<cedar::aux::conv::Engine> EngineParameter;
 
-      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(EngineParameter);
     }
   }
