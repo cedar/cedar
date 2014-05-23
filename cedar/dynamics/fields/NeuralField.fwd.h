@@ -48,16 +48,15 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace dyn
   {
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
+    //!@endcond
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_DYN_NEURAL_FIELD_FWD_H
 

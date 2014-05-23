@@ -48,16 +48,15 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace dyn
   {
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_DYN_CLASS(Preshape);
+    //!@endcond
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_DYN_PRESHAPE_FWD_H
 

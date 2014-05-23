@@ -103,9 +103,15 @@ public:
   typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
 
 public:
+  /*! An RAII-based class for locking steps.
+   *
+   * @remarks Using this class directly is not recommended. Usually, cedar::proc::Step::ReadLocker or  WriteLocker will
+   *          do the trick.
+   */
   class Locker : public cedar::aux::LockerBase
   {
     public:
+      //! Constructor.
       Locker(cedar::proc::StepPtr step, cedar::aux::LOCK_TYPE type)
       :
       cedar::aux::LockerBase
@@ -116,6 +122,7 @@ public:
       {
       }
 
+      //! Constructor.
       Locker(cedar::proc::Step* step, cedar::aux::LOCK_TYPE type)
       :
       cedar::aux::LockerBase
@@ -128,6 +135,8 @@ public:
   };
 
 public:
+  /*! An RAII-based class for locking steps for writing.
+   */
   class ReadLocker : public Locker
   {
   public:
@@ -144,8 +153,8 @@ public:
     }
   };
 
-  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
-
+  /*! An RAII-based class for locking steps for reading.
+   */
   class WriteLocker : public Locker
   {
   public:
@@ -162,7 +171,10 @@ public:
     }
   };
 
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
   CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

@@ -48,16 +48,15 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
   {
+    //!@cond SKIPPED_DOCUMENTATION
     template <typename ParameterTypePtr> class ParameterDeclaration;
+    //!@endcond
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_AUX_PARAMETER_DECLARATION_FWD_H
 
