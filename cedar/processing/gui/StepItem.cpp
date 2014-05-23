@@ -1496,11 +1496,11 @@ void cedar::proc::gui::StepItem::closeAllPlots()
   this->closeAllChildWidgets();
 }
 
-void cedar::proc::gui::StepItem::toggleVisibilityOfPlots()
+void cedar::proc::gui::StepItem::toggleVisibilityOfPlots(bool visible)
 {
   for(auto childWidget : mChildWidgets)
   {
-    childWidget->setVisible(!childWidget->isVisible());
+    childWidget->setVisible(visible);
   }
 }
 

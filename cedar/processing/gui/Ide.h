@@ -206,7 +206,7 @@ public slots:
   void closePlots();
 
   //!@brief shows/hides all plot windows of every step
-  void toggleVisibilityOfPlots();
+  void toggleVisibilityOfPlots(bool hidden = false);
 
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);

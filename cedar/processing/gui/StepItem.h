@@ -236,7 +236,7 @@ public slots:
   void closeAllPlots();
 
   //!@brief toggles visibility of the plots this step has opened
-  void toggleVisibilityOfPlots();
+  void toggleVisibilityOfPlots(bool visible = true);
 
 
 signals:
