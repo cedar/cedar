@@ -72,7 +72,7 @@ mActions (new QVBoxLayout)
 {
   this->setLayout(mLayout);
   this->conditionRow->setAlignment(Qt::AlignTop);
-  this->setFrameShape(QFrame::Box);
+  this->setFrameShape(QFrame::StyledPanel);
   this->setFrameShadow(QFrame::Sunken);
   this->setAutoFillBackground(true);
   QPalette p = this->palette();

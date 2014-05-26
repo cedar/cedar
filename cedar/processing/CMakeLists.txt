@@ -53,8 +53,9 @@ cedar_add_library(cedarproc
   experiment/Experiment.h
   experiment/StepPropertyParameter.h
   experiment/gui/ActionSequence.h
-  experiment/gui/StepPropertyParameter.h
   experiment/gui/ExperimentItemWidget.h
+  experiment/gui/StepPropertyParameter.h
+  experiment/gui/TriggerParameter.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h

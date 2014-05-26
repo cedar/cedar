@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/EnumType.h"
+#include "cedar/processing/Trigger.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
@@ -223,6 +224,12 @@ public:
 
   //!@brief Get all steps of the current group
   std::vector<std::string> getGroupSteps();
+
+  //!@brief Get all triggers of the current group
+  std::vector<std::string> getGroupTriggers();
+
+  //!@brief Returns a trigger from a name
+  cedar::proc::TriggerPtr getTrigger(const std::string& triggerName);
 
   /*!@brief Returns all parameter names of a given step
    *          allowedTypes defines what kind of parameters should be returned
