@@ -446,7 +446,17 @@ void cedar::proc::gui::Ide::duplicateStep()
     {
       try
       {
-        this->mGroup->duplicate(new_pos - (center - p_base->pos()), p_base->getElement()->getName());
+        if
+        (
+            auto group
+              = dynamic_cast<cedar::proc::gui::Group*>
+                (
+                  this->mpProcessingDrawer->getScene()->getGraphicsItemFor(p_base->getElement()->getGroup().get())
+                )
+        )
+        {
+          group->duplicate(new_pos - (center - p_base->pos()), p_base->getElement()->getName());
+        }
       }
       catch (cedar::aux::ExceptionBase& exc)
       {
