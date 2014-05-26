@@ -65,11 +65,9 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::gui::StepPropertyParameter::StepPropertyParameter(QWidget *pParent )
+cedar::proc::experiment::gui::StepPropertyParameter::StepPropertyParameter(QWidget *pParent)
 :
 cedar::aux::gui::Parameter(pParent)
-
-
 ,
 mpStep(new QComboBox)
 ,
@@ -93,8 +91,7 @@ mpPropertyCopy(NULL)
 
 cedar::proc::experiment::gui::StepPropertyParameter::~StepPropertyParameter()
 {
-  //@todo Work around for double deletion
-  //this->setParameter(cedar::aux::StringParameterPtr(new cedar::aux::StringParameter(NULL,"Name","")));
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -113,8 +110,6 @@ void cedar::proc::experiment::gui::StepPropertyParameter::parameterPointerChange
   updateValue();
   connect(this->mpStep, SIGNAL(currentIndexChanged(int)), this, SLOT(stepChanged()));
   connect(this->mpProperty, SIGNAL(currentIndexChanged(int)), this, SLOT(propertyChanged()));
-
-
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::stepChanged()
@@ -126,7 +121,6 @@ void cedar::proc::experiment::gui::StepPropertyParameter::stepChanged()
   parameter->setStep(text.toStdString());
 
   updateProperties();
-
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()

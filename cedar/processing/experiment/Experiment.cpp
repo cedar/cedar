@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/processing/experiment/action/StartAllTriggers.h"
+#include "cedar/processing/experiment/action/StartTrigger.h"
 #include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/processing/Step.h"
@@ -282,6 +283,34 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getGroupSteps()
   return ret;
 }
 
+std::vector<std::string> cedar::proc::experiment::Experiment::getGroupTriggers()
+{
+  std::vector<std::string> ret;
+  for (auto name_element_pair : this->mGroup->getElements())
+  {
+    if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(name_element_pair.second))
+    {
+      ret.push_back(name_element_pair.first);
+    }
+  }
+  return ret;
+}
+
+cedar::proc::TriggerPtr cedar::proc::experiment::Experiment::getTrigger(const std::string& triggerName)
+{
+  for (auto name_element_pair : this->mGroup->getElements())
+    {
+      if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(name_element_pair.second))
+      {
+        if(name_element_pair.first == triggerName)
+        {
+          return trigger;
+        }
+      }
+    }
+    return TriggerPtr(new cedar::proc::Trigger());
+}
+
 std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string step, const std::vector<std::string>& allowedTypes)
 {
   cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
@@ -362,6 +391,11 @@ bool cedar::proc::experiment::Experiment::checkActionSequences()
         if(boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartAllTriggers>(action))
         {
           counter++;
+        }
+
+        if(boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartTrigger>(action))
+        {
+          counter=1;
         }
       }
     }
