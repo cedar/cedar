@@ -555,6 +555,10 @@ void cedar::proc::Group::reset()
     {
       step->callReset();
     }
+    else if (cedar::proc::GroupPtr group = boost::dynamic_pointer_cast<cedar::proc::Group>(iter->second))
+    {
+      group->reset();
+    }
   }
 }
 
