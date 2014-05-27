@@ -73,7 +73,7 @@ _mCompareMethode
   new cedar::aux::EnumParameter
   (
     this,
-    "reset type",
+    "Compare type",
     cedar::proc::experiment::Experiment::CompareMethod::typePtr(),
     cedar::proc::experiment::Experiment::CompareMethod::Lower
   )

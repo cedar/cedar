@@ -75,7 +75,7 @@ cedar::proc::experiment::action::StartAllTriggers::~StartAllTriggers()
 
 void cedar::proc::experiment::action::StartAllTriggers::run()
 {
-  ExperimentSuperviserSingleton::getInstance()->getExperiment()->startTrial();
+  ExperimentSuperviserSingleton::getInstance()->getExperiment()->startAllTriggers();
 }
 
 

@@ -46,6 +46,8 @@
 #include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/processing/Step.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
@@ -167,10 +169,38 @@ void cedar::proc::experiment::Experiment::startTrial()
   std::string trial_number = ss.str();
   cedar::aux::RecorderSingleton::getInstance()->setSubfolder(mRecordFolderName+"/"+"Trial_"+trial_number+"_#T#");
   cedar::aux::RecorderSingleton::getInstance()->start();
-  this->mStartGroup->start();
+}
 
-  //@todo Sleep to handle incorrect stops if the trigger running to short
-  cedar::aux::usleep(100000);
+
+void cedar::proc::experiment::Experiment::startTrigger(const std::string& triggerName)
+{
+  if(mStopped)
+  {
+    startTrial();
+  }
+  for (auto name_element_pair : this->mGroup->getElements())
+    {
+      if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(name_element_pair.second))
+      {
+        if(name_element_pair.first == triggerName)
+        {
+          if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
+          {
+            looped_trigger->start();
+          }
+        }
+      }
+    }
+}
+
+
+void cedar::proc::experiment::Experiment::startAllTriggers()
+{
+  if(mStopped)
+  {
+    startTrial();
+  }
+  this->mStartGroup->start();
 }
 
 void cedar::proc::experiment::Experiment::addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence)
@@ -294,21 +324,6 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getGroupTriggers()
     }
   }
   return ret;
-}
-
-cedar::proc::TriggerPtr cedar::proc::experiment::Experiment::getTrigger(const std::string& triggerName)
-{
-  for (auto name_element_pair : this->mGroup->getElements())
-    {
-      if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(name_element_pair.second))
-      {
-        if(name_element_pair.first == triggerName)
-        {
-          return trigger;
-        }
-      }
-    }
-    return TriggerPtr(new cedar::proc::Trigger());
 }
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string step, const std::vector<std::string>& allowedTypes)
