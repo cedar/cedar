@@ -184,7 +184,7 @@ void cedar::proc::gui::ExperimentDialog::runExperiment()
   else
   {
     QMessageBox::warning(this,"Wrong configuration!",
-        "There should be exactly one StartTrigger action in an OnInit condition.", QMessageBox::Ok);
+        "There should be at least one StartTrigger action in an OnInit condition.", QMessageBox::Ok);
   }
 }
 

@@ -53,6 +53,10 @@
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2/signal.hpp>
+  #include <boost/signals2/connection.hpp>
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -108,6 +112,15 @@ _mActionSequences
                                  boost::bind(&cedar::proc::Group::stopTriggers, group, true)
                                )
                              );
+
+  mElementRemovedConnection = this->mGroup->connectToElementRemovedSignal
+  (
+    boost::bind(&cedar::proc::experiment::Experiment::groupChanged,this,_1)
+  );
+  mNewElementAddedConnection = this->mGroup->connectToNewElementAddedSignal
+  (
+    boost::bind(&cedar::proc::experiment::Experiment::groupChanged,this,_1)
+  );
 }
 cedar::proc::experiment::Experiment::~Experiment()
 {
@@ -117,6 +130,10 @@ cedar::proc::experiment::Experiment::~Experiment()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::experiment::Experiment::groupChanged(cedar::proc::ConstElementPtr element)
+{
+
+}
 
 const std::string& cedar::proc::experiment::Experiment::getFileName() const
 {
@@ -396,7 +413,6 @@ bool cedar::proc::experiment::Experiment::hasStopped()
 }
 bool cedar::proc::experiment::Experiment::checkActionSequences()
 {
-  int counter = 0;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
     if(boost::dynamic_pointer_cast<cedar::proc::experiment::condition::OnInit>(action_sequence->getCondition()))
@@ -405,19 +421,15 @@ bool cedar::proc::experiment::Experiment::checkActionSequences()
       {
         if(boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartAllTriggers>(action))
         {
-          counter++;
+          return true;
         }
 
         if(boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartTrigger>(action))
         {
-          counter=1;
+          return true;
         }
       }
     }
   }
-  if(counter!=1)
-  {
-    return false;
-  }
-  return true;
+  return false;
 }
