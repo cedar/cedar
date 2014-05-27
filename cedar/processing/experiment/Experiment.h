@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/EnumType.h"
+#include "cedar/processing/Element.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
@@ -294,6 +295,8 @@ private:
    *           The flag initial defines that all Conditions should thread this experiment as it is on initial state.
    */
   void executeAcionSequences(bool initial = false);
+
+  void groupChanged(cedar::proc::ConstElementPtr element);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -339,6 +342,13 @@ private:
   //!@brief The list of action sequences containing to the experiment
   ActionSequencelListParameterPtr _mActionSequences;
 
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // connections
+  //--------------------------------------------------------------------------------------------------------------------
+
+  boost::signals2::scoped_connection mElementRemovedConnection;
+  boost::signals2::scoped_connection mNewElementAddedConnection;
 }; // class cedar::proc::experiment::Experiment
 
 #endif // CEDAR_proc_EXPERIMENT_EXPERIMENT_H
