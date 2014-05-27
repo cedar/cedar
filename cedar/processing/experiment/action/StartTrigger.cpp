@@ -40,8 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/action/StartTrigger.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
-#include "cedar/processing/Trigger.h"
-#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 // SYSTEM INCLUDES
 
@@ -74,18 +72,5 @@ cedar::proc::experiment::action::StartTrigger::~StartTrigger()
 
 void cedar::proc::experiment::action::StartTrigger::run()
 {
-  cedar::proc::TriggerPtr trigger = ExperimentSuperviserSingleton::getInstance()->
-    getExperiment()->getTrigger(mTrigger->getTrigger());
-
-  std::cout << trigger->getName() << std::endl;
-  if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
-  {
-    cedar::aux::CallFunctionInThreadPtr
-    (
-      new cedar::aux::CallFunctionInThread
-      (
-        boost::bind(&cedar::proc::LoopedTrigger::start, looped_trigger)
-      )
-    );
-  }
+  ExperimentSuperviserSingleton::getInstance()->getExperiment()->startTrigger(mTrigger->getTrigger());
 }

@@ -52,7 +52,6 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/EnumType.h"
-#include "cedar/processing/Trigger.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
@@ -228,9 +227,6 @@ public:
   //!@brief Get all triggers of the current group
   std::vector<std::string> getGroupTriggers();
 
-  //!@brief Returns a trigger from a name
-  cedar::proc::TriggerPtr getTrigger(const std::string& triggerName);
-
   /*!@brief Returns all parameter names of a given step
    *          allowedTypes defines what kind of parameters should be returned
    *          If there is no allowed type specified, all parameters that are registered in the DeclarationFactory
@@ -258,6 +254,12 @@ public:
 
   //!@brief Starts a trial. Should only be called when no trial is currently running
   void startTrial();
+
+  //!@brief Returns a trigger from a name
+  void startTrigger(const std::string& triggerName);
+
+  //!@brief Returns a trigger from a name
+  void startAllTriggers();
 
   /*!@brief Stops a  trial. Should only be called when a trial is currently running.
    *              @param{reset} specifies what reset method should be used after stopping

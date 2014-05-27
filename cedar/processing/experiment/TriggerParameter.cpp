@@ -64,16 +64,16 @@ cedar::proc::experiment::TriggerParameter::~TriggerParameter()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::experiment::TriggerParameter::readFromNode(
-    const cedar::aux::ConfigurationNode& node)
+void cedar::proc::experiment::TriggerParameter::readFromNode(const cedar::aux::ConfigurationNode& node)
 {
-  this->setTrigger(node.get_child("Trigger").get_value<std::string>());
+  this->setTrigger(node.get_child("Name").get_value<std::string>());
 }
 
-void cedar::proc::experiment::TriggerParameter::writeToNode(
-    cedar::aux::ConfigurationNode& root) const
+void cedar::proc::experiment::TriggerParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
 {
-  root.put("Trigger", mTrigger);
+  cedar::aux::ConfigurationNode trigger_node;
+  trigger_node.put("Name", mTrigger);
+  root.add_child(this->getName(), trigger_node);
 }
 
 void cedar::proc::experiment::TriggerParameter::makeDefault()
