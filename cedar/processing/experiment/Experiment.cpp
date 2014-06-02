@@ -132,7 +132,7 @@ cedar::proc::experiment::Experiment::~Experiment()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::experiment::Experiment::groupChanged(cedar::proc::ConstElementPtr element)
 {
-
+  emit groupChanged();
 }
 
 const std::string& cedar::proc::experiment::Experiment::getFileName() const
