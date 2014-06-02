@@ -279,6 +279,9 @@ signals:
   //!@brief Should be emitted if the actual running trial has changed
   void trialNumberChanged(int trialNumber);
 
+  //!@brief Should be emitted if the group has changed
+  void groupChanged();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

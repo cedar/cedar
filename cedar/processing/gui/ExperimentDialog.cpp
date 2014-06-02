@@ -75,6 +75,7 @@ QDialog(parent)
   connect(this->stopButton, SIGNAL(clicked()), this, SLOT(stopExperiment()));
   connect(this->experiment.get(), SIGNAL(experimentRunning(bool)), this, SLOT(experimentRunning(bool)));
   connect(this->experiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
+  connect(this->experiment.get(), SIGNAL(groupChanged()), this, SLOT(redraw()));
   connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(trialChanged()));
   connect(this->mAddActionSequence,SIGNAL(clicked()),this,SLOT(addActionSequence()));
 
