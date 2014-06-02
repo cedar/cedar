@@ -53,12 +53,11 @@
   #include <boost/signals2.hpp>
 #endif
 #include<QTimer>
-#include<QDialog>
 
 
 /*!@brief A widget for setting up, save and load experiments
  */
-class cedar::proc::gui::ExperimentDialog : public QDialog, public Ui_ExperimentDialog
+class cedar::proc::gui::ExperimentDialog : public QWidget, public Ui_ExperimentDialog
 {
   Q_OBJECT
 
@@ -97,11 +96,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Removes all ActionSequences from the widged
+  //!@brief Removes all ActionSequences from the widget
   void clearActionSequences();
+
 private slots:
-
-
   //!@brief Saves the experiment
   void save();
 
