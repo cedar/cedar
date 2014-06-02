@@ -612,6 +612,9 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
   // Without this, the GUI crashes when exiting in certain circumstances (see unit test gui_cedar)
   this->mpPropertyTable->clear();
   pEvent->accept();
+
+  // !@todo move this somewhere else?
+  delete this->mpExperimentDialog;
 }
 
 void cedar::proc::gui::Ide::storeSettings()
