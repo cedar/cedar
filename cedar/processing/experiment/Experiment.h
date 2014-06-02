@@ -300,6 +300,9 @@ private:
   void executeAcionSequences(bool initial = false);
 
   void groupChanged(cedar::proc::ConstElementPtr element);
+
+  void saveGroupState();
+  void resetGroupState();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -344,6 +347,8 @@ private:
 
   //!@brief The list of action sequences containing to the experiment
   ActionSequencelListParameterPtr _mActionSequences;
+
+  cedar::aux::ConfigurationNode mGroupState;
 
 
   //--------------------------------------------------------------------------------------------------------------------

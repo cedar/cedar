@@ -130,7 +130,7 @@ cedar::proc::experiment::Experiment::~Experiment()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::experiment::Experiment::groupChanged(cedar::proc::ConstElementPtr element)
+void cedar::proc::experiment::Experiment::groupChanged(cedar::proc::ConstElementPtr /*element*/)
 {
   emit groupChanged();
 }
@@ -157,8 +157,10 @@ void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions
 
 void cedar::proc::experiment::Experiment::run()
 {
+
   if (this->_mTrials->getValue() > 0 && checkActionSequences())
   {
+    this->saveGroupState();
     // Set record directory
     std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
     this->mRecordFolderName = this->_mName->getValue()+ "_" + time_stamp;
@@ -261,7 +263,8 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
     }
     case ResetType::Reload:
     {
-      //@todo Reload function
+      this->mGroup->reset();
+      this->resetGroupState();
       break;
     }
     default:
@@ -277,6 +280,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
   {
     ExperimentSuperviserSingleton::getInstance()->requestStop();
     emit experimentRunning(false);
+    resetGroupState();
     mActualTrial  = 0;
   }
   mStopped=true;
@@ -432,4 +436,38 @@ bool cedar::proc::experiment::Experiment::checkActionSequences()
     }
   }
   return false;
+}
+
+
+void cedar::proc::experiment::Experiment::saveGroupState()
+{
+  for (auto name_element_pair : this->mGroup->getElements())
+  {
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
+    {
+      cedar::aux::ConfigurationNode step_node;
+      step->writeConfiguration(step_node);
+      mGroupState.add_child(name_element_pair.first, step_node);
+    }
+  }
+}
+
+void cedar::proc::experiment::Experiment::resetGroupState()
+{
+  //!@todo fix exception
+  for (auto name_element_pair : this->mGroup->getElements())
+  {
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
+    {
+      cedar::aux::ConfigurationNode step_node = this->mGroupState.get_child(name_element_pair.first);
+      step->readConfiguration(step_node);
+    }
+  }
+
+  /* @todo ##########just a workaround###########
+   * + fix assertion:
+   * Non-critical assertion failed: index == this->mpInstanceSelector->count() - 1
+   * in file /home/cbodenstein/Documents/trial-framework/cedar/auxiliaries/gui/ObjectListParameter.cpp on line 189
+   */
+  saveGroupState();
 }
