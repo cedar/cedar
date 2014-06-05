@@ -98,7 +98,8 @@ from cedar but for now it is necessary for 3D plotting of data.
 ### Mac OS X 10.8.x & 10.9.x
 We highly recommend using [homebrew](http://mxcl.github.com/homebrew/) to install the
 above dependencies. Homebrew has recipes for all of cedar's dependencies
-except for *qwtplot3d*. *qwtplot3d* does not compile on 10.9.x - or at least we did not succeed in compiling it.
+except for *qwtplot3d*. *qwtplot3d* does not compile on 10.9.x.
+
 Your Clang version should be up to date, i.e. `Apple LLVM version 5.x (based on LLVM 3.3svn)` or newer. Just install the most recent XCode and you should be good to go.
 
 #### Installing qwtplot3d on OS X 10.8.x
@@ -136,6 +137,10 @@ environment.
 
 #### Do use homebrew
 As afore-mentioned we highly recommend to use homebrew to install all of cedar's dependencies. If you do that installing cedar is a breeze. If you do run into trouble it's because your system isn't *ready to brew*. `brew doctor` will help you with that. Just enter `brew doctor` into your shell and follow the instructions until the *doctor* tells you that your system is *ready to brew*.
+
+You may not find all dependencies you need in the default homebrew formula repository, you will have to `brew tap homebrew/sciences` and maybe `brew tap homebrew/versions`. Usually homebrew can help you to find what you need, please refer to the [homebrew manual](https://github.com/Homebrew/homebrew/wiki) for that.
+
+Also be attentive to which version of a dependency you install. A common pitfall is that `brew install vtk` will install vtk 6.x while we recommend to use vtk 5.10 which has a separate formula `vtk5` which will not show up until you have tapped `homebrew/versions`. An easy way to find out the version a formula will install is to call `brew info [formula-name]` without the brackets.
 
 ### Other operating systems
 
