@@ -95,7 +95,7 @@ install a patched version of *qwtplot3d* (0.3), which sadly is no longer
 available anywhere else on the web. We are working on removing this dependency
 from cedar but for now it is necessary for 3D plotting of data.
 
-### Mac OS X 10.8.x
+### Mac OS X 10.8.x & 10.9.x
 We highly recommend using [homebrew](http://mxcl.github.com/homebrew/) to install the
 above dependencies. Homebrew has recipes for all of cedar's dependencies
 except for *qwtplot3d*. *qwtplot3d* does not compile on 10.9.x - or at least we did not succeed in compiling it.
