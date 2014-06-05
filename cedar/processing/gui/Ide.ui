@@ -230,8 +230,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -288,8 +288,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>429</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -459,10 +459,13 @@
   </action>
   <action name="mpActionLoad">
    <property name="text">
-    <string>Load ...</string>
+    <string>Open file ...</string>
+   </property>
+   <property name="toolTip">
+    <string>Load an architecture file</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+L</string>
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="mpActionExit">
