@@ -673,12 +673,15 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)
 {
+  this->mpProcessingDrawer->resetViewport();
+
   group->getGroup()->setName("root");
   this->setGroup(group);
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpProcessingDrawer->getScene()->reset();
   this->mGroup->addElementsToScene();
   this->mpPropertyTable->clear();
+
 
   this->updateTriggerStartStopThreadCallers();
 
@@ -1164,7 +1167,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
 
   // reset scene
-  this->mpProcessingDrawer->getScene()->reset();
+  this->mpProcessingDrawer->resetViewport();
   // create new root network
   cedar::proc::gui::GroupPtr network(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene()));
   network->getGroup()->setName("root");

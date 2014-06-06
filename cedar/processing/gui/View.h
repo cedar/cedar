@@ -117,6 +117,9 @@ public:
   {
   }
 
+  //! Resets the viewport, i.e., redetermines the size of the scene and adapts the scroll bars accordingly.
+  void resetViewport();
+
 public slots:
   /*!@brief Changes the current zoom level of the architecture.
    */
