@@ -133,6 +133,25 @@ public:
 
   /*!@brief Defines a command line value that is determined from an enum class.
    *
+   * @param longName     Long name of the option.
+   * @param description  Description of the option.
+   * @param enumType     Enum class to be used for translating values from and to strings.
+   * @param defaultValue Default value for the parameter.
+   * @param shortName    Optional short name of the option.
+   * @param group        Group of the option; used for displaying the help text.
+   */
+  void defineEnum
+  (
+    const std::string& longName,
+    const std::string& description,
+    cedar::aux::EnumBasePtr enumType,
+    cedar::aux::EnumId defaultValue,
+    char shortName = 0,
+    const std::string& group = std::string()
+  );
+
+  /*!@brief Defines a command line value that is determined from an enum class.
+   *
    * @param longName    Long name of the option.
    * @param description Description of the option.
    * @param enumType    Enum class to be used for translating values from and to strings.

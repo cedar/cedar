@@ -316,6 +316,20 @@ void cedar::aux::CommandLineParser::defineEnum
   this->mEnumValues[longName] = enumType;
 }
 
+void cedar::aux::CommandLineParser::defineEnum
+(
+  const std::string& longName,
+  const std::string& description,
+  cedar::aux::EnumBasePtr enumType,
+  cedar::aux::EnumId defaultValue,
+  char shortName,
+  const std::string& group
+)
+{
+  this->defineEnum(longName, description, enumType, shortName, group);
+  this->setDefaultValue(longName, enumType->get(defaultValue).name());
+}
+
 bool cedar::aux::CommandLineParser::isEnum(const std::string& longName) const
 {
   return this->mEnumValues.find(longName) != this->mEnumValues.end();
