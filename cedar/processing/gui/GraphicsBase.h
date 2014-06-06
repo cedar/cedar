@@ -320,6 +320,9 @@ private:
   //! Draws the base shape of the item on the given painter
   void drawShape(QPainter* painter);
 
+  //! For non-basic shapes (i.e., any that require mPath to be valid), updates the points on the path.
+  void updateShape();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
