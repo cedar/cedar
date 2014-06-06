@@ -99,6 +99,22 @@ public:
   //! Generates the description.
   std::string getDescription() const;
 
+  //! Returns true if sampling positions are given for the requested dimension.
+  bool hasSamplingPositions(unsigned int dimension) const;
+
+  /*! Returns the sampling positions for the requested dimension.
+   *
+   *  Sampling positions specify for each position along an axis, what part of the space this sample lies in.
+   *
+   *  For example: say a 1d matrix has this annotation. Then this value indicates for each index of the matrix, that the
+   *  value of that index, together with the sampling position for that index, specifies a pair
+   *  (sampling position(index), matrix value(index)).
+   */
+  const std::vector<double>& getSamplingPositions(unsigned int dimension) const;
+
+  //! Sets the sampling positions for the given dimension.
+  void setSamplingPositions(unsigned int dimension, const std::vector<double>& positions);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -119,6 +135,8 @@ protected:
 private:
   //! Labels corresponding to the dimensions
   std::vector<Dimension> mDimensions;
+
+  std::vector< std::vector<double> > mDimensionSamplingPositions;
 
 }; // class cedar::aux::annotation::Dimensions
 
