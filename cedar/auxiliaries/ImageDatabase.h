@@ -242,6 +242,7 @@ public:
       {
         mType.type()->def(cedar::aux::Enum(ScanFolder, "ScanFolder"));
         mType.type()->def(cedar::aux::Enum(ETH80CroppedClose, "ETH80CroppedClose"));
+        mType.type()->def(cedar::aux::Enum(COIL100, "COIL100"));
       }
 
       static const cedar::aux::EnumBase& type()
@@ -256,6 +257,7 @@ public:
     public:
       static const Id ScanFolder = 0;
       static const Id ETH80CroppedClose = 1;
+      static const Id COIL100 = 2;
 
     protected:
       // none yet
@@ -352,8 +354,21 @@ public:
   //! Returns a set of all images matching the given class.
   std::set<ImagePtr> getImagesWithClass(ClassId classId) const;
 
+  /*! Returns a set of training images selected with the options set in the given command line parser.
+   *
+   * @remarks The options that are processed can be added via cedar::aux::ImageDatabase::addCommandLineOptions.
+   */
+  std::set<ImagePtr> getTrainingImages(cedar::aux::CommandLineParser& parser) const;
+
+  /*! Returns a set of training images with the options set in the given command line parser.
+   *
+   * @remarks The options that are processed can be added via cedar::aux::ImageDatabase::addCommandLineOptions.
+   */
+  std::set<ImagePtr> getTestImages(cedar::aux::CommandLineParser& parser) const;
+
   //! Shuffles a set of images.
   static std::vector<ImagePtr> shuffle(const std::set<ImagePtr>& images);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -370,6 +385,9 @@ private:
   //! Reads in images from the ETH80 database.
   void readETH80CroppedClose(const cedar::aux::Path& path);
 
+  //! Reads in images from the COIL100 database.
+  void readCOIL100(const cedar::aux::Path& path);
+
   void readAnnotations(const cedar::aux::Path& path);
 
   ClassId getOrCreateClass(const std::string& className);
@@ -381,6 +399,11 @@ private:
   void appendImage(ImagePtr sample);
 
   ImagePtr findImageWithFilenameNoPath(const std::string& filenameWithoutExtension);
+
+  std::set<cedar::aux::ImageDatabase::ImagePtr> getImagesByTagStr(const std::string& tagStr) const;
+
+  //! Reads the database type from the command line parser.
+  static cedar::aux::Enum getDatabaseType(const cedar::aux::CommandLineParser& parser);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
