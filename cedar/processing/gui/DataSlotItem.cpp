@@ -81,6 +81,9 @@ mMagneticScale(1.0)
 {
   this->setParentItem(pParent);
   this->generateTooltip();
+
+  this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
+
   if (cedar::proc::ExternalDataPtr ext_data = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(slot))
   {
     if (ext_data->isCollection())
@@ -93,6 +96,11 @@ mMagneticScale(1.0)
       this->setOutlineColor(QColor(140, 140, 140));
     }
     mSlotConnection = ext_data->connectToValidityChangedSignal(boost::bind(&cedar::proc::gui::DataSlotItem::translateValidityChangedSignal, this));
+
+    if (ext_data->isCollection())
+    {
+      this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
+    }
   }
 
   QObject::connect(this, SIGNAL(connectionValidityChanged()), this, SLOT(updateConnectionValidity()));
@@ -263,16 +271,7 @@ void cedar::proc::gui::DataSlotItem::hoverEnterEvent(QGraphicsSceneHoverEvent* p
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   painter->save(); // save current painter settings
-  this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
-  if (cedar::proc::ExternalDataPtr ext_data = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(mSlot))
-  {
-    if (ext_data->isCollection())
-    {
-      this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
-    }
-  }
   this->paintFrame(painter, style, widget);
-
   painter->restore(); // restore saved painter settings
 }
 

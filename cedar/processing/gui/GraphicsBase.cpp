@@ -169,8 +169,13 @@ void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
 {
   this->mShape = shape;
 
+  this->updateShape();
+}
+
+void cedar::proc::gui::GraphicsBase::updateShape()
+{
   mPath = QPainterPath();
-  switch (shape)
+  switch (this->mShape)
   {
     case BASE_SHAPE_DIAMOND:
       mPath.moveTo(0, this->height() / static_cast<qreal>(2));
@@ -193,7 +198,7 @@ void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
       break;
 
     default:
-      CEDAR_THROW(cedar::aux::UnhandledValueException, "Unhandled shape in cedar::proc::gui::GraphicsBase::setBaseShape");
+      CEDAR_THROW(cedar::aux::UnhandledValueException, "Unhandled shape in cedar::proc::gui::GraphicsBase::updateShape()");
   }
 }
 
@@ -584,6 +589,8 @@ void cedar::proc::gui::GraphicsBase::drawShape(QPainter* painter)
 
       case BASE_SHAPE_DIAMOND:
       case BASE_SHAPE_CROSS:
+        //!@todo This really only needs to be called if the shape changes.
+        this->updateShape();
         painter->drawPath(mPath);
         break;
     }
