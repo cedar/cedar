@@ -90,6 +90,17 @@ cedar::proc::gui::View::~View()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::gui::View::resetViewport()
+{
+  if (this->mpScene)
+  {
+    delete this->mpScene;
+    this->mpScene = nullptr;
+  }
+
+  this->mpScene = new cedar::proc::gui::Scene(this);
+  this->setScene(this->mpScene);
+}
 
 void cedar::proc::gui::View::createZoomWidget()
 {
