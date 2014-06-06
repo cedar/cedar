@@ -146,6 +146,8 @@ void cedar::aux::gui::HistoryPlot0D::init()
   p_layout->addWidget(this->mpHistoryPlot);
 
   mMaxHistorySize = 500;
+
+  mTimerId = 0;
 }
 
 void cedar::aux::gui::HistoryPlot0D::advanceHistory()
@@ -213,14 +215,11 @@ void cedar::aux::gui::HistoryPlot0D::advanceHistory()
 
 void cedar::aux::gui::HistoryPlot0D::clear()
 {
-  for (const auto& plot_data : this->mPlotData)
+  while (!this->mPlotData.empty())
   {
-    if (this->mpHistoryPlot->canDetach(plot_data.mData))
-    {
-      this->mpHistoryPlot->detach(plot_data.mData);
-    }
+    auto& first = *this->mPlotData.begin();
+    this->detach(first.mData);
   }
-  this->mPlotData.clear();
 }
 
 void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
@@ -234,7 +233,12 @@ void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const s
 
   this->append(data, title);
 
-  this->startTimer(30);
+  if (mTimerId != 0)
+  {
+    this->killTimer(this->mTimerId);
+  }
+
+  this->mTimerId = this->startTimer(30);
 }
 
 void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)

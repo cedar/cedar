@@ -157,6 +157,8 @@ private:
   //!@brief number of steps in the past, which are still plotted
   size_t mMaxHistorySize;
 
+  int mTimerId;
+
 }; // class cedar::aux::gui::HistoryPlot0D
 
 #endif // CEDAR_USE_QWT
