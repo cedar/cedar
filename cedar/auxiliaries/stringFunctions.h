@@ -291,6 +291,10 @@ namespace cedar
       return replace(haystack, needle, "");
     }
 
+    /*! Returns a copy of the given string that has no more white spaces
+     */
+    std::string removeWhiteSpaces(const std::string& stringFromWhichToRemoveWhiteSpaces);
+
     /*!@brief Template function that converts an STL string to a simple data type.
      *
      * @param value The data value that will be converted to a string.

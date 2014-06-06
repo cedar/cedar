@@ -128,6 +128,12 @@ public:
    */
   std::string getFileNameWithoutExtension() const;
 
+  /*! Returns the extension of the file.
+   *
+   * For example, for "a/folder/foo.bar", this function will return "bar"
+   */
+  std::string getExtension() const;
+
   //! Appends the given path to this one.
   cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
 
@@ -166,7 +172,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  static void splitFileNameAndExtension(const std::string& fileNameAndExtension, std::string& fileName, std::string& extension);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

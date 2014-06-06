@@ -159,15 +159,52 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
     "database-type",
     "Type of image database to read.",
     Type::typePtr(),
+    Type::ScanFolder,
     0,
     group_name
   );
+
+  std::string sample_selection_group_name = "sample selection";
+
+  //!@todo This should be an enum.
+  parser.defineValue
+  (
+    "sample-training-selection-mode",
+    "Which mode to use for selecting training samples.",
+    "by_tag",
+    0,
+    sample_selection_group_name
+  );
+
+  parser.defineValue
+  (
+    "sample-training-tags",
+    "Tag combination to use for selecting the training samples.",
+    "train",
+    0,
+    sample_selection_group_name
+  );
+
+  //!@todo This should be an enum.
+  parser.defineValue
+  (
+    "sample-testing-selection-mode",
+    "Which mode to use for selecting testing samples.",
+    "not_in_training_set",
+    0,
+    sample_selection_group_name
+  );
+}
+
+cedar::aux::Enum cedar::aux::ImageDatabase::getDatabaseType(const cedar::aux::CommandLineParser& parser)
+{
+  return parser.getValue<cedar::aux::Enum>("database-type");
 }
 
 void cedar::aux::ImageDatabase::readDatabase(const cedar::aux::CommandLineParser& parser)
 {
   cedar::aux::Path path = parser.getValue<std::string>("database-path");
-  cedar::aux::Enum type = parser.getValue<cedar::aux::Enum>("database-type");
+  cedar::aux::Enum type = cedar::aux::ImageDatabase::getDatabaseType(parser);
 
   this->readDatabase(path, type.name());
 }
@@ -352,6 +389,10 @@ void cedar::aux::ImageDatabase::readDatabase(const cedar::aux::Path& path, const
       this->readETH80CroppedClose(path);
       break;
 
+    case Type::COIL100:
+      this->readCOIL100(path);
+      break;
+
     default:
       CEDAR_THROW(cedar::aux::UnknownTypeException, "The database type \"" + dataBaseType + "\" is not known.");
   }
@@ -526,6 +567,38 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
   }
 
   this->readAnnotations(path);
+}
+
+void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
+{
+  for (const auto& file : path.listFiles())
+  {
+    std::string extension = file.getExtension();
+    if (extension != "png")
+    {
+      continue;
+    }
+
+    std::string file_name = file.getFileNameWithoutExtension();
+    std::vector<std::string> splits;
+    cedar::aux::split(file_name, "__", splits);
+
+    if (splits.size() != 2)
+    {
+      continue;
+    }
+
+    const auto& object = splits.at(0);
+    const auto& view = splits.at(1);
+
+    auto class_id = this->getOrCreateClass(object);
+
+    ImagePtr image(new Image());
+    image->setClassId(class_id);
+    image->setFileName(file);
+    image->appendTags(view);
+    this->appendImage(image);
+  }
 }
 
 void cedar::aux::ImageDatabase::readETH80CroppedClose(const cedar::aux::Path& path)
@@ -746,5 +819,94 @@ void cedar::aux::ImageDatabase::writeSummary(std::ostream& stream)
       stream << " - " << tag_name << std::endl;
     }
     stream << std::endl;
+  }
+}
+
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTestImages(cedar::aux::CommandLineParser& parser) const
+{
+  std::string mode = parser.getValue<std::string>("sample-testing-selection-mode");
+  //!@todo This should be an enum
+  if (mode == "not_in_training_set")
+  {
+    auto training_set = this->getTrainingImages(parser);
+    std::set<ImagePtr> test_set;
+    for (auto image : this->mImages)
+    {
+      if (training_set.find(image) == training_set.end())
+      {
+        test_set.insert(image);
+      }
+    }
+    return test_set;
+  }
+  else if (mode == "by_tag")
+  {
+    std::string tag_selection = parser.getValue<std::string>("sample-testing-tags");
+    return this->getImagesByTagStr(tag_selection);
+  }
+  else
+  {
+    CEDAR_ASSERT(false && "Unknown sample selection mode.");
+  }
+//  switch (cedar::aux::ImageDatabase::getDatabaseType(parser))
+//  {
+//    case cedar::aux::ImageDatabase::Type::ScanFolder:
+//      return this->getImagesWithAnyTags("test");
+//
+//    default:
+//      CEDAR_ASSERT(false && "This is not yet implemented.");
+//  }
+}
+
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTrainingImages(cedar::aux::CommandLineParser& parser) const
+{
+  std::string mode = parser.getValue<std::string>("sample-training-selection-mode");
+  //!@todo This should be an enum
+  if (mode == "by_tag")
+  {
+    std::string tag_selection = parser.getValue<std::string>("sample-training-tags");
+    return this->getImagesByTagStr(tag_selection);
+  }
+  else
+  {
+    CEDAR_ASSERT(false && "Unknown sample selection mode.");
+  }
+//  switch (cedar::aux::ImageDatabase::getDatabaseType(parser))
+//  {
+//    case cedar::aux::ImageDatabase::Type::ScanFolder:
+//    {
+//      return this->getImagesWithAnyTags("train");
+//    }
+//
+//    default:
+//    {
+//      CEDAR_ASSERT(false && "This is not yet implemented.");
+//    }
+//  }
+}
+
+std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesByTagStr(const std::string& tagStr) const
+{
+  auto open_br = tagStr.find('(');
+  if (open_br == std::string::npos)
+  {
+    return this->getImagesWithTag(tagStr);
+  }
+
+  std::string mode = tagStr.substr(0, open_br);
+  CEDAR_ASSERT(tagStr.at(tagStr.size() - 1) == ')');
+  std::string tags_str = tagStr.substr(open_br + 1, tagStr.size() - open_br - 2);
+  tags_str = cedar::aux::removeWhiteSpaces(tags_str);
+  if (mode == "any")
+  {
+    return this->getImagesWithAnyTags(tags_str);
+  }
+  else if (mode == "all")
+  {
+    return this->getImagesWithAllTags(tags_str);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::InvalidValueException, "Tag selection mode \"" + mode + "\" is not known.");
   }
 }

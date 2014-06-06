@@ -162,12 +162,29 @@ std::string cedar::aux::Path::getFileNameOnly() const
   return this->getLast();
 }
 
+void cedar::aux::Path::splitFileNameAndExtension(const std::string& fileNameAndExtension, std::string& fileName, std::string& extension)
+{
+  size_t ext = fileNameAndExtension.find_last_of('.');
+
+  //!@todo Proper exception.
+  CEDAR_ASSERT(ext != std::string::npos);
+
+  fileName = fileNameAndExtension.substr(0, ext);
+  extension = fileNameAndExtension.substr(ext + 1);
+}
+
+std::string cedar::aux::Path::getExtension() const
+{
+  std::string file_name, extension;
+  cedar::aux::Path::splitFileNameAndExtension(this->getFileNameOnly(), file_name, extension);
+  return extension;
+}
+
 std::string cedar::aux::Path::getFileNameWithoutExtension() const
 {
-  std::string filename = this->getFileNameOnly();
-  size_t ext = filename.find_last_of('.');
-  CEDAR_ASSERT(ext != std::string::npos);
-  return filename.substr(0, ext);
+  std::string file_name, extension;
+  cedar::aux::Path::splitFileNameAndExtension(this->getFileNameOnly(), file_name, extension);
+  return file_name;
 }
 
 bool cedar::aux::Path::exists() const
