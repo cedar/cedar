@@ -78,6 +78,12 @@ public:
   //!@brief Loads the given file into the picture source.
   void setSourceFileName(const std::string& imagePath);
 
+  //! Returns the mat data pointer containing the current picture.
+  cedar::aux::MatDataPtr getImage();
+
+  //! Returns the mat data pointer containing the current picture.
+  cedar::aux::ConstMatDataPtr getImage() const;
+
 public slots:
   //!@brief a slot that takes care of updating the output picture
   void updatePicture();
