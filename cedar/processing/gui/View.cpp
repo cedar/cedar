@@ -290,7 +290,7 @@ cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
 
 void cedar::proc::gui::View::resizeEvent(QResizeEvent * pEvent)
 {
-  QWidget::resizeEvent(pEvent);
+  QGraphicsView::resizeEvent(pEvent);
 }
 
 
