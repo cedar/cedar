@@ -380,6 +380,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void selectImages(std::set<ImagePtr>& images, cedar::aux::CommandLineParser& options) const;
+
+  void selectImagesFromFirstNClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses) const;
+
   void scanDirectory(const cedar::aux::Path& path);
 
   //! Reads in images from the ETH80 database.

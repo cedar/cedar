@@ -194,6 +194,17 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
     0,
     sample_selection_group_name
   );
+
+  parser.defineValue
+  (
+    "restrict-sample-selection",
+    "An instruction on how to restrict the sample selection. Possible instructions are: \n"
+    "  \"unrestricted\": no restrictions,\n"
+    "  \"first [N]\": selects only samples belonging to one of the first N classes.",
+    "unrestricted",
+    0,
+    sample_selection_group_name
+  );
 }
 
 cedar::aux::Enum cedar::aux::ImageDatabase::getDatabaseType(const cedar::aux::CommandLineParser& parser)
@@ -822,67 +833,97 @@ void cedar::aux::ImageDatabase::writeSummary(std::ostream& stream)
   }
 }
 
+void cedar::aux::ImageDatabase::selectImages(std::set<ImagePtr>& images, cedar::aux::CommandLineParser& options) const
+{
+  std::string instruction_str = options.getValue<std::string>("restrict-sample-selection");
+  std::vector<std::string> instruction_parts;
+  cedar::aux::split(instruction_str, " ", instruction_parts);
+
+  CEDAR_ASSERT(instruction_parts.size() > 0);
+
+  const auto& instruction = instruction_parts.at(0);
+  if (instruction == "first")
+  {
+    CEDAR_ASSERT(instruction_parts.size() == 2);
+    unsigned int number = cedar::aux::fromString<unsigned int>(instruction_parts.at(1));
+
+    this->selectImagesFromFirstNClasses(images, number);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Instruction \"" + instruction + "\" is not known.");
+  }
+}
+
+void cedar::aux::ImageDatabase::selectImagesFromFirstNClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses) const
+{
+  for (auto iter = images.begin(); iter != images.end();)
+  {
+    auto image = *iter;
+    if (image->getClassId() >= numberOfClasses)
+    {
+      iter = images.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+}
+
 std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTestImages(cedar::aux::CommandLineParser& parser) const
 {
+  std::set<cedar::aux::ImageDatabase::ImagePtr> images;
+
   std::string mode = parser.getValue<std::string>("sample-testing-selection-mode");
   //!@todo This should be an enum
   if (mode == "not_in_training_set")
   {
+    // get all the training images
     auto training_set = this->getTrainingImages(parser);
-    std::set<ImagePtr> test_set;
+
+    // find all images not in the training set
+    images.clear();
     for (auto image : this->mImages)
     {
       if (training_set.find(image) == training_set.end())
       {
-        test_set.insert(image);
+        images.insert(image);
       }
     }
-    return test_set;
   }
   else if (mode == "by_tag")
   {
     std::string tag_selection = parser.getValue<std::string>("sample-testing-tags");
-    return this->getImagesByTagStr(tag_selection);
+    images = this->getImagesByTagStr(tag_selection);
   }
   else
   {
     CEDAR_ASSERT(false && "Unknown sample selection mode.");
   }
-//  switch (cedar::aux::ImageDatabase::getDatabaseType(parser))
-//  {
-//    case cedar::aux::ImageDatabase::Type::ScanFolder:
-//      return this->getImagesWithAnyTags("test");
-//
-//    default:
-//      CEDAR_ASSERT(false && "This is not yet implemented.");
-//  }
+
+  this->selectImages(images, parser);
+  return images;
 }
 
 std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTrainingImages(cedar::aux::CommandLineParser& parser) const
 {
+  std::set<cedar::aux::ImageDatabase::ImagePtr> images;
   std::string mode = parser.getValue<std::string>("sample-training-selection-mode");
+
   //!@todo This should be an enum
   if (mode == "by_tag")
   {
     std::string tag_selection = parser.getValue<std::string>("sample-training-tags");
-    return this->getImagesByTagStr(tag_selection);
+    images = this->getImagesByTagStr(tag_selection);
   }
   else
   {
     CEDAR_ASSERT(false && "Unknown sample selection mode.");
   }
-//  switch (cedar::aux::ImageDatabase::getDatabaseType(parser))
-//  {
-//    case cedar::aux::ImageDatabase::Type::ScanFolder:
-//    {
-//      return this->getImagesWithAnyTags("train");
-//    }
-//
-//    default:
-//    {
-//      CEDAR_ASSERT(false && "This is not yet implemented.");
-//    }
-//  }
+
+  this->selectImages(images, parser);
+  return images;
 }
 
 std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesByTagStr(const std::string& tagStr) const
