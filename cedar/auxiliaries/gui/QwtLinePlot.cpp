@@ -524,13 +524,11 @@ void cedar::aux::gui::QwtLinePlot::PlotSeries::buildArrays(unsigned int new_size
     dimensions = this->mMatData->getAnnotation<cedar::aux::annotation::Dimensions>();
   }
 
-  if (old_size == new_size && (!dimensions || !dimensions->hasSamplingPositions(0)))
+  if (old_size != new_size)
   {
-    return;
+    this->mXValues.resize(new_size);
+    this->mYValues.resize(new_size);
   }
-
-  this->mXValues.resize(new_size);
-  this->mYValues.resize(new_size);
 
   if (!dimensions || !dimensions->hasSamplingPositions(0))
   {
@@ -552,7 +550,6 @@ void cedar::aux::gui::QwtLinePlot::PlotSeries::buildArrays(unsigned int new_size
       if (i < sampling_positions.size())
       {
         sampling_position = sampling_positions.at(i);
-        this->mXValues.at(i) = sampling_position;
       }
       else
       {
