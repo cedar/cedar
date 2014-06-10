@@ -179,7 +179,7 @@ mSuppressCloseDialog(false)
   this->resetStepList();
 
   this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
-  this->mpProcessingDrawer->getScene()->setMainWindow(this);
+  this->mpProcessingDrawer->setWidgets(this, this->mpPropertyTable, this->mpRecorderWidget);
 
   mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpToolsWidget->toggleViewAction());
@@ -187,8 +187,6 @@ mSuppressCloseDialog(false)
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
 
   // set the property pane as the scene's property displayer
-  this->mpProcessingDrawer->getScene()->setConfigurableWidget(this->mpPropertyTable);
-  this->mpProcessingDrawer->getScene()->setRecorderWidget(this->mpRecorderWidget);
 
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
                    this, SLOT(architectureToolFinished()));
@@ -674,33 +672,10 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)
 {
   this->mpProcessingDrawer->resetViewport();
+  this->mpProcessingDrawer->getScene()->reset();
 
   group->getGroup()->setName("root");
   this->setGroup(group);
-  this->mpProcessingDrawer->getScene()->setGroup(group);
-  this->mpProcessingDrawer->getScene()->reset();
-  this->mGroup->addElementsToScene();
-  this->mpPropertyTable->clear();
-
-
-  this->updateTriggerStartStopThreadCallers();
-
-  if (this->mpConsistencyChecker != NULL)
-  {
-    this->mpConsistencyChecker->setGroup(group);
-  }
-
-  if (this->mpBoostControl != NULL)
-  {
-    this->mpBoostControl->setGroup(group->getGroup());
-  }
-
-  if (this->mpPerformanceOverview != NULL)
-  {
-    this->mpPerformanceOverview->setGroup(group->getGroup());
-  }
-
-  this->loadPlotGroupsIntoComboBox();
 }
 
 void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
@@ -937,7 +912,8 @@ void cedar::proc::gui::Ide::newFile()
     return;
   }
 
-  this->resetTo(cedar::proc::gui::GroupPtr(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene())));
+  this->mpProcessingDrawer->resetViewport();
+  this->setGroup(cedar::proc::gui::GroupPtr(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene())));
 
   this->displayFilename("unnamed file");
 
@@ -1232,17 +1208,6 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->displayFilename(file.toStdString());
 
-  if (this->mpBoostControl)
-  {
-    this->mpBoostControl->setGroup(this->mGroup->getGroup());
-  }
-
-  if (this->mpPerformanceOverview)
-  {
-    this->mpPerformanceOverview->setGroup(this->mGroup->getGroup());
-  }
-
-  this->displayFilename(file.toStdString());
   this->updateTriggerStartStopThreadCallers();
   this->loadPlotGroupsIntoComboBox();
 
@@ -1476,4 +1441,28 @@ void cedar::proc::gui::Ide::loadPlotGroupsIntoComboBox()
 void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 {
   this->mGroup = group;
+
+  this->mpProcessingDrawer->getScene()->setGroup(group);
+  this->mGroup->addElementsToScene();
+  this->mpPropertyTable->clear();
+
+
+  this->updateTriggerStartStopThreadCallers();
+
+  if (this->mpConsistencyChecker != NULL)
+  {
+    this->mpConsistencyChecker->setGroup(group);
+  }
+
+  if (this->mpBoostControl != NULL)
+  {
+    this->mpBoostControl->setGroup(group->getGroup());
+  }
+
+  if (this->mpPerformanceOverview != NULL)
+  {
+    this->mpPerformanceOverview->setGroup(group->getGroup());
+  }
+
+  this->loadPlotGroupsIntoComboBox();
 }

@@ -183,7 +183,7 @@ void cedar::proc::gui::Scene::itemSelected()
     }
   }
 
-  if (this->mpConfigurableWidget == NULL || this->mpRecorderWidget == NULL)
+  if (this->mpConfigurableWidget == nullptr || this->mpRecorderWidget == nullptr)
   {
     return;
   }
