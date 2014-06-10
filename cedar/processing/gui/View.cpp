@@ -54,13 +54,13 @@
 cedar::proc::gui::View::View(QWidget *pParent)
 :
 QGraphicsView(pParent),
+mpScene(nullptr),
 mCurrentZoomLevel(static_cast<qreal>(1.0)),
 mScrollDx(static_cast<qreal>(0.0)),
 mScrollDy(static_cast<qreal>(0.0)),
 mpScrollTimer(new QTimer(this))
 {
-  this->mpScene = new cedar::proc::gui::Scene(this);
-  this->setScene(this->mpScene);
+  this->resetViewport();
   this->setInteractive(true);
   this->setDragMode(QGraphicsView::RubberBandDrag);
   this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
@@ -90,6 +90,19 @@ cedar::proc::gui::View::~View()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::View::setWidgets
+(
+  QMainWindow* pMainWindow,
+  cedar::aux::gui::Configurable* pConigurableWidget,
+  cedar::proc::gui::RecorderWidget* pRecorderWidget
+)
+{
+  this->mpMainWindow = pMainWindow;
+  this->mpConigurableWidget = pConigurableWidget;
+  this->mpRecorderWidget = pRecorderWidget;
+}
+
 void cedar::proc::gui::View::resetViewport()
 {
   if (this->mpScene)
@@ -100,6 +113,21 @@ void cedar::proc::gui::View::resetViewport()
 
   this->mpScene = new cedar::proc::gui::Scene(this);
   this->setScene(this->mpScene);
+
+  if (mpMainWindow != nullptr)
+  {
+    this->mpScene->setMainWindow(mpMainWindow);
+  }
+
+  if (this->mpConigurableWidget)
+  {
+    this->mpScene->setConfigurableWidget(mpConigurableWidget);
+  }
+
+  if (this->mpRecorderWidget)
+  {
+    this->mpScene->setRecorderWidget(this->mpRecorderWidget);
+  }
 }
 
 void cedar::proc::gui::View::createZoomWidget()

@@ -74,7 +74,7 @@ class cedar::proc::gui::View : public QGraphicsView
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  View(QWidget *pParent = NULL);
+  View(QWidget *pParent = nullptr);
 
   //!@brief Destructor
   ~View();
@@ -83,6 +83,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Sets the main widgets for the view.
+  void setWidgets
+  (
+    QMainWindow* pMainWindow,
+    cedar::aux::gui::Configurable* pConigurableWidget,
+    cedar::proc::gui::RecorderWidget* pRecorderWidget
+  );
+
   //!@brief return the displayed scene
   cedar::proc::gui::Scene* getScene();
 
@@ -206,6 +214,13 @@ private:
   QTimer *mpScrollTimer;
 
   QPointF mLastPoint;
+
+  QMainWindow* mpMainWindow;
+
+  cedar::aux::gui::Configurable* mpConigurableWidget;
+
+  cedar::proc::gui::RecorderWidget* mpRecorderWidget;
+
 }; // class ProcessingView
 
 #endif // CEDAR_PROC_VIEW_H
