@@ -58,7 +58,10 @@ mpScene(nullptr),
 mCurrentZoomLevel(static_cast<qreal>(1.0)),
 mScrollDx(static_cast<qreal>(0.0)),
 mScrollDy(static_cast<qreal>(0.0)),
-mpScrollTimer(new QTimer(this))
+mpScrollTimer(new QTimer(this)),
+mpMainWindow(nullptr),
+mpConigurableWidget(nullptr),
+mpRecorderWidget(nullptr)
 {
   this->resetViewport();
   this->setInteractive(true);
