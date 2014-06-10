@@ -1,0 +1,326 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.processing.sources.GaussInput":
+        {
+            "name": "new GaussInput",
+            "threaded": "false",
+            "amplitude": "5",
+            "dimensionality": "1",
+            "sigma":
+            [
+                "3"
+            ],
+            "centers":
+            [
+                "2"
+            ],
+            "sizes":
+            [
+                "10"
+            ],
+            "cyclic": "false"
+        },
+        "cedar.processing.sources.GaussInput":
+        {
+            "name": "new GaussInput 1",
+            "threaded": "false",
+            "amplitude": "5",
+            "dimensionality": "1",
+            "sigma":
+            [
+                "3"
+            ],
+            "centers":
+            [
+                "5"
+            ],
+            "sizes":
+            [
+                "10"
+            ],
+            "cyclic": "false"
+        },
+        "cedar.dynamics.NeuralField":
+        {
+            "name": "new NeuralField",
+            "threaded": "false",
+            "resting level": "-5",
+            "time scale": "100",
+            "global inhibition": "-0.01",
+            "dimensionality": "1",
+            "sizes":
+            [
+                "10"
+            ],
+            "activation as output": "false",
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "1",
+                    "anchor":
+                    [
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "1",
+                "anchor":
+                [
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3"
+                ],
+                "shifts":
+                [
+                    "0"
+                ],
+                "limit": "5"
+            }
+        },
+        "cedar.dynamics.NeuralField":
+        {
+            "name": "new NeuralField 1",
+            "threaded": "false",
+            "resting level": "-5",
+            "time scale": "100",
+            "global inhibition": "-0.01",
+            "dimensionality": "1",
+            "sizes":
+            [
+                "10"
+            ],
+            "activation as output": "false",
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "1",
+                    "anchor":
+                    [
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "1",
+                "anchor":
+                [
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3"
+                ],
+                "shifts":
+                [
+                    "0"
+                ],
+                "limit": "5"
+            }
+        },
+        "cedar.processing.Projection":
+        {
+            "name": "projection",
+            "threaded": "false",
+            "dimension mapping":
+            {
+                "0": "0"
+            },
+            "output dimensionality": "3",
+            "output dimension sizes":
+            [
+                "10",
+                "10",
+                "10"
+            ],
+            "compression type": "SUM"
+        },
+        "cedar.processing.steps.Convolution":
+        {
+            "name": "step",
+            "threaded": "false",
+            "kernels": "",
+            "convolution":
+            {
+                "borderType": "Zero",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            }
+        }
+    },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "trigger",
+            "step size": "1",
+            "idle time": "0.01",
+            "simulated time": "1",
+            "loop mode": "Fixed",
+            "wait": "true",
+            "listeners":
+            [
+                "new NeuralField 1",
+                "new NeuralField"
+            ]
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "new NeuralField 1.sigmoided activation",
+            "target": "step.matrix"
+        },
+        {
+            "source": "new NeuralField.sigmoided activation",
+            "target": "step.kernel"
+        },
+        {
+            "source": "new GaussInput.Gauss input",
+            "target": "new NeuralField 1.input"
+        },
+        {
+            "source": "new GaussInput 1.Gauss input",
+            "target": "new NeuralField.input"
+        },
+        {
+            "source": "step.result",
+            "target": "projection.input"
+        }
+    ],
+    "name": "root",
+    "promotedSlots": "",
+    "ui":
+    [
+        {
+            "type": "step",
+            "step": "new GaussInput",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "61",
+            "positionY": "142"
+        },
+        {
+            "type": "step",
+            "step": "new GaussInput 1",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "49",
+            "positionY": "286"
+        },
+        {
+            "type": "trigger",
+            "trigger": "trigger",
+            "width": "30",
+            "height": "30",
+            "positionX": "371",
+            "positionY": "-5"
+        },
+        {
+            "type": "step",
+            "step": "new NeuralField",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "308",
+            "positionY": "283"
+        },
+        {
+            "type": "step",
+            "step": "new NeuralField 1",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "309",
+            "positionY": "145"
+        },
+        {
+            "type": "step",
+            "step": "projection",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "855",
+            "positionY": "213"
+        },
+        {
+            "type": "step",
+            "step": "step",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "587",
+            "positionY": "213"
+        }
+    ]
+}
