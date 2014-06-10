@@ -459,7 +459,9 @@ void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationN
 {
   std::string step_name = this->mConnectable->getName();
   auto group = this->mConnectable->getGroup();
-  while (group->getName() != "root")
+  CEDAR_ASSERT(group);
+  //!@todo shouldn't this use the root group's method for finding the item's path?
+  while (group->getGroup()) // group->getName() != "root")
   {
     step_name = group->getName() + "." + step_name;
     group = group->getGroup();
