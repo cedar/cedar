@@ -129,7 +129,11 @@ public:
    */
   bool isObjectInstanceOf(BaseClassPtr pointer) const
   {
-    return !!boost::dynamic_pointer_cast<PluginClass>(pointer);
+    if (pointer)
+    {
+      return typeid(PluginClass) == typeid(*pointer);
+    }
+    return false;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
