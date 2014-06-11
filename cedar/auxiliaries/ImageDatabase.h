@@ -417,8 +417,6 @@ protected:
 private:
   boost::bimap<std::string, ClassId> mClassIdAssociations;
 
-  std::map<std::string, std::set<ImagePtr> > mImagesByTag;
-
   std::vector<ImagePtr> mImages;
 
   //--------------------------------------------------------------------------------------------------------------------

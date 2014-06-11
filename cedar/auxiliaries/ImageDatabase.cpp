@@ -339,31 +339,22 @@ std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImag
 
 std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getImagesWithTag(const std::string& tag) const
 {
-  auto iter = this->mImagesByTag.find(tag);
-  if (iter == this->mImagesByTag.end())
+  std::set<ImagePtr> images;
+
+  for (auto image : this->mImages)
   {
-    return std::set<ImagePtr>();
+    if (image->hasTag(tag))
+    {
+      images.insert(image);
+    }
   }
-  else
-  {
-    return iter->second;
-  }
+
+  return images;
 }
 
 void cedar::aux::ImageDatabase::appendImage(ImagePtr sample)
 {
   mImages.push_back(sample);
-
-  for (const auto& tag : sample->getTags())
-  {
-    auto iter = this->mImagesByTag.find(tag);
-    if (iter == this->mImagesByTag.end())
-    {
-      this->mImagesByTag[tag] = std::set<ImagePtr>();
-      iter = this->mImagesByTag.find(tag);
-    }
-    iter->second.insert(sample);
-  }
 }
 
 cedar::aux::ImageDatabase::ImagePtr cedar::aux::ImageDatabase::findImageWithFilenameNoPath(const std::string& filenameWithoutExtension)
@@ -717,9 +708,12 @@ size_t cedar::aux::ImageDatabase::getTagCount() const
 std::set<std::string> cedar::aux::ImageDatabase::listTags() const
 {
   std::set<std::string> tags;
-  for (auto tag_imageset_pair : this->mImagesByTag)
+  for (auto image : this->mImages)
   {
-    tags.insert(tag_imageset_pair.first);
+    for (const auto& tag : image->getTags())
+    {
+      tags.insert(tag);
+    }
   }
   return tags;
 }
