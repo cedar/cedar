@@ -605,10 +605,7 @@ void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
   object_names["obj29"] = "cat food";
   object_names["obj30"] = "vase";
 
-  auto files = path.listFiles();
-  std::set<cedar::aux::Path> sorted_files;
-  sorted_files.insert(files.begin(), files.end());
-  for (const auto& file : sorted_files)
+  for (const auto& file : path.listFiles())
   {
     std::string extension = file.getExtension();
     if (extension != "png")
@@ -628,6 +625,11 @@ void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
     auto object = splits.at(0);
     const auto& view = splits.at(1);
 
+    size_t number_start = object.find_first_of("0123456789");
+    CEDAR_ASSERT(number_start != std::string::npos);
+    std::string object_number_str = object.substr(number_start);
+    unsigned int object_number = cedar::aux::fromString<unsigned int>(object_number_str);
+
     auto name_iter = object_names.find(object);
     if (name_iter != object_names.end())
     {
@@ -636,7 +638,7 @@ void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
       object += ")";
     }
 
-    auto class_id = this->getOrCreateClass(object);
+    auto class_id = this->getOrCreateClass(object, object_number);
 
     ImagePtr image(new Image());
     image->setClassId(class_id);
@@ -701,6 +703,20 @@ void cedar::aux::ImageDatabase::readETH80CroppedClose(const cedar::aux::Path& pa
 
       this->appendImage(image);
     }
+  }
+}
+
+cedar::aux::ImageDatabase::ClassId
+  cedar::aux::ImageDatabase::getOrCreateClass(const std::string& className, cedar::aux::ImageDatabase::ClassId suggestedId)
+{
+  if (this->hasClass(className))
+  {
+    return this->getClass(className);
+  }
+  else
+  {
+    this->createClass(className, suggestedId);
+    return suggestedId;
   }
 }
 
@@ -894,10 +910,26 @@ void cedar::aux::ImageDatabase::selectImages(std::set<ImagePtr>& images, cedar::
 
 void cedar::aux::ImageDatabase::selectImagesFromFirstNClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses) const
 {
+  std::set<ClassId> accepted_classes;
+
+  unsigned int count = 0;
+  for (auto name_id_pair : this->mClassIdAssociations.left)
+  {
+    if (count < numberOfClasses)
+    {
+      accepted_classes.insert(name_id_pair.second);
+    }
+    else
+    {
+      break;
+    }
+    ++count;
+  }
+
   for (auto iter = images.begin(); iter != images.end();)
   {
     auto image = *iter;
-    if (image->getClassId() >= numberOfClasses)
+    if (accepted_classes.find(image->getClassId()) == accepted_classes.end())
     {
       iter = images.erase(iter);
     }

@@ -394,7 +394,11 @@ private:
 
   void readAnnotations(const cedar::aux::Path& path);
 
+  //! Creates a new class id for the class name if it does not yet exist.
   ClassId getOrCreateClass(const std::string& className);
+
+  //! Sets the given class id for the class name if it does not yet exist.
+  ClassId getOrCreateClass(const std::string& className, ClassId suggestedId);
 
   ClassId createClass(const std::string& className);
 
