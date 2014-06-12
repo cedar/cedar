@@ -573,7 +573,42 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
 
 void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
 {
-  for (const auto& file : path.listFiles())
+  std::map<std::string, std::string> object_names;
+  object_names["obj1"] = "cold tablets";
+  object_names["obj2"] = "onion";
+  object_names["obj3"] = "boat";
+  object_names["obj4"] = "tomato";
+  object_names["obj5"] = "gum";
+  object_names["obj6"] = "yellow-orange car";
+  object_names["obj7"] = "iced tea";
+  object_names["obj8"] = "yellow-green car";
+  object_names["obj9"] = "dental floss";
+  object_names["obj10"] = "espresso cup";
+  object_names["obj11"] = "brown cup";
+  object_names["obj12"] = "wood blocks";
+  object_names["obj13"] = "moisturizer";
+  object_names["obj14"] = "lucky cat";
+  object_names["obj15"] = "yellow car";
+  object_names["obj16"] = "flower cup";
+  object_names["obj17"] = "cat figure";
+  object_names["obj18"] = "white cup";
+  object_names["obj19"] = "fire truck";
+  object_names["obj20"] = "alien head";
+  object_names["obj21"] = "wooden tool";
+  object_names["obj22"] = "deodorant";
+  object_names["obj23"] = "red car";
+  object_names["obj24"] = "vitamin tablets";
+  object_names["obj25"] = "pot";
+  object_names["obj26"] = "chicken flavor";
+  object_names["obj27"] = "green car";
+  object_names["obj28"] = "frog";
+  object_names["obj29"] = "cat food";
+  object_names["obj30"] = "vase";
+
+  auto files = path.listFiles();
+  std::set<cedar::aux::Path> sorted_files;
+  sorted_files.insert(files.begin(), files.end());
+  for (const auto& file : sorted_files)
   {
     std::string extension = file.getExtension();
     if (extension != "png")
@@ -590,8 +625,16 @@ void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
       continue;
     }
 
-    const auto& object = splits.at(0);
+    auto object = splits.at(0);
     const auto& view = splits.at(1);
+
+    auto name_iter = object_names.find(object);
+    if (name_iter != object_names.end())
+    {
+      object += " (";
+      object += name_iter->second;
+      object += ")";
+    }
 
     auto class_id = this->getOrCreateClass(object);
 
