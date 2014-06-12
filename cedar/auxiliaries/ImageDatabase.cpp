@@ -913,11 +913,11 @@ void cedar::aux::ImageDatabase::selectImagesFromFirstNClasses(std::set<ImagePtr>
   std::set<ClassId> accepted_classes;
 
   unsigned int count = 0;
-  for (auto name_id_pair : this->mClassIdAssociations.left)
+  for (auto id_name_pair : this->mClassIdAssociations.right)
   {
     if (count < numberOfClasses)
     {
-      accepted_classes.insert(name_id_pair.second);
+      accepted_classes.insert(id_name_pair.first);
     }
     else
     {
