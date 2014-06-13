@@ -93,6 +93,59 @@ cedar::proc::Trigger::~Trigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Trigger::exploreSink
+     (
+       cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
+       cedar::proc::sinks::GroupSinkPtr startSink,
+       cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+       std::vector<cedar::proc::TriggerablePtr>& to_explore
+     )
+{
+  auto listener_group = startSink->getGroup();
+  if (!listener_group)
+  {
+    // this can happen during deletion of a group; thus, just ignore the step
+    return;
+  }
+
+  auto output_slot = listener_group->getOutputSlot(startSink->getName());
+  CEDAR_ASSERT(output_slot);
+
+  auto parent_group = listener_group->getGroup();
+  if (!parent_group)
+  {
+    // this can happen during deletion of a group; thus, just ignore the step
+    return;
+  }
+
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  parent_group->getDataConnectionsFrom(listener_group, output_slot->getName(), connections);
+
+  for (auto connection : connections)
+  {
+    auto target_slot = connection->getTarget();
+    auto target = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target_slot->getParentPtr()->shared_from_this());
+    CEDAR_ASSERT(target);
+
+    if (auto sink = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(target))
+    {
+      this->exploreSink(sourceNode, sink, graph, to_explore);
+    }
+    else
+    {
+      if (!graph.hasNodeForPayload(target))
+      {
+        graph.addNodeForPayload(target);
+        to_explore.push_back(target);
+      }
+
+      auto target_node = graph.getNodeByPayload(target);
+      graph.addEdge(sourceNode, target_node);
+    }
+  }
+}
+
+
 void cedar::proc::Trigger::explore
      (
        cedar::proc::TriggerablePtr source,
@@ -172,41 +225,42 @@ void cedar::proc::Trigger::explore
     // the steps outside of the group.
     else if (auto listener_sink = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(listener))
     {
-      auto listener_group = listener_sink->getGroup();
-      if (!listener_group)
-      {
-        // this can happen during deletion of a group; thus, just ignore the step
-        continue;
-      }
-
-      auto output_slot = listener_group->getOutputSlot(listener_sink->getName());
-      CEDAR_ASSERT(output_slot);
-
-      auto parent_group = listener_group->getGroup();
-      if (!parent_group)
-      {
-        // this can happen during deletion of a group; thus, just ignore the step
-        continue;
-      }
-
-      std::vector<cedar::proc::DataConnectionPtr> connections;
-      parent_group->getDataConnectionsFrom(listener_group, output_slot->getName(), connections);
-
-      for (auto connection : connections)
-      {
-        auto target_slot = connection->getTarget();
-        auto target = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target_slot->getParentPtr()->shared_from_this());
-        CEDAR_ASSERT(target);
-
-        if (!graph.hasNodeForPayload(target))
-        {
-          graph.addNodeForPayload(target);
-          to_explore.push_back(target);
-        }
-
-        auto target_node = graph.getNodeByPayload(target);
-        graph.addEdge(source_node, target_node);
-      }
+      this->exploreSink(source_node, listener_sink, graph, to_explore);
+//      auto listener_group = listener_sink->getGroup();
+//      if (!listener_group)
+//      {
+//        // this can happen during deletion of a group; thus, just ignore the step
+//        continue;
+//      }
+//
+//      auto output_slot = listener_group->getOutputSlot(listener_sink->getName());
+//      CEDAR_ASSERT(output_slot);
+//
+//      auto parent_group = listener_group->getGroup();
+//      if (!parent_group)
+//      {
+//        // this can happen during deletion of a group; thus, just ignore the step
+//        continue;
+//      }
+//
+//      std::vector<cedar::proc::DataConnectionPtr> connections;
+//      parent_group->getDataConnectionsFrom(listener_group, output_slot->getName(), connections);
+//
+//      for (auto connection : connections)
+//      {
+//        auto target_slot = connection->getTarget();
+//        auto target = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target_slot->getParentPtr()->shared_from_this());
+//        CEDAR_ASSERT(target);
+//
+//        if (!graph.hasNodeForPayload(target))
+//        {
+//          graph.addNodeForPayload(target);
+//          to_explore.push_back(target);
+//        }
+//
+//        auto target_node = graph.getNodeByPayload(target);
+//        graph.addEdge(source_node, target_node);
+//      }
     }
     else
     {
