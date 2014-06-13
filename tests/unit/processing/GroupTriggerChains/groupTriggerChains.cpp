@@ -38,6 +38,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/Noise.h"
+#include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -90,6 +91,17 @@ public:
   {
     std::cout << "Computing " << this->getName() << std::endl;
     ++mTriggerCount;
+    unsigned int in1 = 0;
+    unsigned int in2 = 0;
+    if (this->getInput("in1"))
+    {
+      in1 = this->getInput("in1")->getData<unsigned int>();
+    }
+    if (this->getInput("in2"))
+    {
+      in2 = this->getInput("in2")->getData<unsigned int>();
+    }
+    this->mDataOut->setData(in1+in2+1);
   }
 
   void resetData()
@@ -139,7 +151,7 @@ void test_trigger(cedar::proc::LoopedTriggerPtr trigger, TriggerTestPtr sink, co
   std::cout << ">>> Done testing configuration." << std::endl;
 }
 
-void test_group(TriggerTestPtr source, TriggerTestPtr sink, const std::string& testName)
+void test_group(TriggerTestPtr source, TriggerTestPtr sink, unsigned int data, const std::string& testName)
 {
   using cedar::proc::Group;
   using cedar::proc::GroupPtr;
@@ -157,8 +169,15 @@ void test_group(TriggerTestPtr source, TriggerTestPtr sink, const std::string& t
   else if (sink->mTriggerCount > 1)
   {
     ++num_superfluous_triggers;
+    ++global_errors;
     std::cout << "Sink step was triggered multiple (" << sink->mTriggerCount << ") times in " << testName << std::endl;
     failed_configurations.push_back(testName + " triggered sink more than once.");
+  }
+  if (sink->mDataOut->getData() != data)
+  {
+    ++global_errors;
+    std::cout << "Sink step does not contain correct data in " << testName << std::endl;
+    failed_configurations.push_back(testName + " did not compute the correct data.");
   }
   std::cout << ">>> Done testing configuration." << std::endl;
 }
@@ -202,7 +221,7 @@ void run_test()
     moved.push_back(group->getElement("step3"));
     nested_group->add(moved);
 
-    test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"), "configuration 1");
+    test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"), 5, "configuration 1");
   }
 
   {
@@ -232,7 +251,7 @@ void run_test()
     moved.push_back(group->getElement("step4"));
     nested_group->add(moved);
 
-    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step4"), "configuration 2");
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step4"), 5, "configuration 2");
   }
 
   {
@@ -262,7 +281,7 @@ void run_test()
     moved.push_back(group->getElement("step1"));
     nested_group->add(moved);
 
-    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"),  "configuration 3");
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"), 5, "configuration 3");
   }
 
   {
@@ -288,7 +307,7 @@ void run_test()
     moved.push_back(group->getElement("step2"));
     nested_group->add(moved);
 
-    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step3"), "configuration 4");
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step3"), 3, "configuration 4");
   }
 
   {
@@ -308,7 +327,7 @@ void run_test()
     std::cout << "Connecting external output -> step2.in1" << std::endl;
     group->connectSlots("nested.external output", "step2.in1");
 
-    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), "configuration 5");
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), 2, "configuration 5");
   }
 
   {
@@ -328,7 +347,7 @@ void run_test()
     std::cout << "Connecting step1.out -> external output" << std::endl;
     nested_group->connectSlots("step1.out", "external output.input");
 
-    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), "configuration 6");
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), 2, "configuration 6");
   }
 
   {
@@ -348,7 +367,7 @@ void run_test()
     std::cout << "Connecting external input -> step2.in1" << std::endl;
     nested_group->connectSlots("external input.output", "step2.in1");
 
-    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 7");
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), 2, "configuration 7");
   }
 
   {
@@ -368,7 +387,7 @@ void run_test()
     std::cout << "Connecting step1.out -> external input" << std::endl;
     group->connectSlots("step1.out", "nested.external input");
 
-    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 8");
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), 2, "configuration 8");
   }
 
   // this should trigger any non-looped steps connected to group inputs
@@ -400,7 +419,7 @@ void run_test()
     moved.push_back(group->getElement("step2"));
     nested_group->add(moved);
 
-    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 9");
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), 5, "configuration 9");
   }
 
   {
@@ -446,7 +465,7 @@ void run_test()
     moved.push_back(group->getElement("step2"));
     nested_nested_group->add(moved);
 
-    test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step3"), "configuration 11");
+    test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step3"), 3, "configuration 11");
   }
 
   {
@@ -481,7 +500,7 @@ void run_test()
     more_moved.push_back(group->getElement("step3"));
     also_nested_group->add(more_moved);
 
-    test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"), "configuration 12");
+    test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"), 4, "configuration 12");
   }
 }
 
@@ -497,7 +516,7 @@ int main(int argc, char** argv)
   app.exec();
 
   std::cout << "Superfluous trigger calls: " << num_superfluous_triggers << std::endl;
-  std::cout << "Test finished with " << global_errors + num_superfluous_triggers << " error(s)." << std::endl;
+  std::cout << "Test finished with " << global_errors << " error(s)." << std::endl;
   std::cout << "These are the failed test configurations:" << std::endl;
   for (auto fail : failed_configurations)
   {
