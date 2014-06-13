@@ -108,6 +108,7 @@ CEDAR_GENERATE_POINTER_TYPES(TriggerTest);
 
 int global_errors = 0;
 int num_superfluous_triggers = 0;
+std::vector<std::string> failed_configurations;
 
 void test_group(TriggerTestPtr source, TriggerTestPtr sink, const std::string& testName)
 {
@@ -122,11 +123,13 @@ void test_group(TriggerTestPtr source, TriggerTestPtr sink, const std::string& t
   {
     ++global_errors;
     std::cout << "Sink step was not triggered in " << testName << std::endl;
+    failed_configurations.push_back(testName + " failed to trigger the sink.");
   }
   else if (sink->mTriggerCount > 1)
   {
     ++num_superfluous_triggers;
     std::cout << "Sink step was triggered multiple (" << sink->mTriggerCount << ") times in " << testName << std::endl;
+    failed_configurations.push_back(testName + " triggered sink more than once.");
   }
   std::cout << ">>> Done testing configuration." << std::endl;
 }
@@ -255,10 +258,90 @@ void run_test()
     test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step3"), "configuration 4");
   }
 
-  // this should trigger any non-looped steps connected to group inputs
   {
     std::cout << "==================================" << std::endl;
     std::cout << " Checking group configuration 5" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->addConnector("external output", false);
+    nested_group->add(boost::make_shared<TriggerTest>(), "step1");
+    group->add(boost::make_shared<TriggerTest>(), "step2");
+
+    std::cout << "Connecting step1.out -> external output" << std::endl;
+    nested_group->connectSlots("step1.out", "external output.input");
+    std::cout << "Connecting external output -> step2.in1" << std::endl;
+    group->connectSlots("nested.external output", "step2.in1");
+
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), "configuration 5");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 6" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->addConnector("external output", false);
+    nested_group->add(boost::make_shared<TriggerTest>(), "step1");
+    group->add(boost::make_shared<TriggerTest>(), "step2");
+
+    std::cout << "Connecting external output -> step2.in1" << std::endl;
+    group->connectSlots("nested.external output", "step2.in1");
+    std::cout << "Connecting step1.out -> external output" << std::endl;
+    nested_group->connectSlots("step1.out", "external output.input");
+
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), "configuration 6");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 7" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->addConnector("external input", true);
+    group->add(boost::make_shared<TriggerTest>(), "step1");
+    nested_group->add(boost::make_shared<TriggerTest>(), "step2");
+
+    std::cout << "Connecting step1.out -> external input" << std::endl;
+    group->connectSlots("step1.out", "nested.external input");
+    std::cout << "Connecting external input -> step2.in1" << std::endl;
+    nested_group->connectSlots("external input.output", "step2.in1");
+
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 7");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 8" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->addConnector("external input", true);
+    group->add(boost::make_shared<TriggerTest>(), "step1");
+    nested_group->add(boost::make_shared<TriggerTest>(), "step2");
+
+    std::cout << "Connecting external input -> step2.in1" << std::endl;
+    nested_group->connectSlots("external input.output", "step2.in1");
+    std::cout << "Connecting step1.out -> external input" << std::endl;
+    group->connectSlots("step1.out", "nested.external input");
+
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 8");
+  }
+
+  // this should trigger any non-looped steps connected to group inputs
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 9" << std::endl;
     std::cout << "==================================" << std::endl << std::endl;
 
     GroupPtr group(new Group());
@@ -283,7 +366,7 @@ void run_test()
     moved.push_back(group->getElement("step2"));
     nested_group->add(moved);
 
-    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 5");
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 9");
   }
 }
 
@@ -300,6 +383,11 @@ int main(int argc, char** argv)
 
   std::cout << "Superfluous trigger calls: " << num_superfluous_triggers << std::endl;
   std::cout << "Test finished with " << global_errors + num_superfluous_triggers << " error(s)." << std::endl;
+  std::cout << "These are the failed test configurations:" << std::endl;
+  for (auto fail : failed_configurations)
+  {
+    std::cout << fail << std::endl;
+  }
 
   return global_errors;
 }
