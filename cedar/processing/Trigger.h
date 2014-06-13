@@ -110,6 +110,11 @@ public:
   //!@brief saves a configuration to a ConfigurationNode
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
+  cedar::proc::Triggerable* getOwner() const
+  {
+    return this->mpOwner;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -160,8 +165,18 @@ private:
 
   void exploreSink
   (
+    cedar::proc::TriggerablePtr source,
     cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
     cedar::proc::sinks::GroupSinkPtr startSink,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& to_explore
+  );
+
+  void exploreGroupTarget
+  (
+    cedar::proc::TriggerablePtr source,
+    cedar::proc::GroupPtr listener_group,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
     cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
     std::vector<cedar::proc::TriggerablePtr>& to_explore
   );

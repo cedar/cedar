@@ -61,6 +61,9 @@
 //!@todo Only added for debugging, remove afterwards
 #include "cedar/auxiliaries/NamedConfigurable.h"
 
+//#define DEBUG_TRIGGER_TREE_EXPLORATION
+//#define DEBUG_TRIGGERING
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,17 +96,71 @@ cedar::proc::Trigger::~Trigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string nameTriggerable(cedar::proc::Triggerable* toName)
+{
+  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(toName))
+  {
+    return named->getName();
+  }
+  else
+  {
+    return std::string("unnamed triggerable");
+  }
+}
+
+std::string nameTriggerable(cedar::proc::TriggerablePtr toName)
+{
+  return nameTriggerable(toName.get());
+}
+
+std::string nameTrigger(cedar::proc::Trigger* trigger)
+{
+  std::string str;
+
+  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(trigger))
+  {
+    str += named->getName();
+  }
+  str += " (";
+  str += cedar::aux::toString(trigger);
+  str += ")";
+  if (trigger->getOwner())
+  {
+    str += " owned by ";
+    if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(trigger->getOwner()))
+    {
+      str += named->getName();
+    }
+    str += " (";
+    str += cedar::aux::toString(trigger->getOwner());
+    str += ")";
+  }
+  return str;
+}
+
+std::string nameTrigger(cedar::proc::TriggerPtr trigger)
+{
+  return nameTrigger(trigger.get());
+}
+
 void cedar::proc::Trigger::exploreSink
      (
+       cedar::proc::TriggerablePtr source,
        cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
        cedar::proc::sinks::GroupSinkPtr startSink,
        cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
        std::vector<cedar::proc::TriggerablePtr>& to_explore
      )
 {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */  std::cout << "+ exploreSink called for " << nameTriggerable(source.get()) << std::endl;
+#endif
   auto listener_group = startSink->getGroup();
   if (!listener_group)
   {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "  + no listener group found." << std::endl;
+#endif
     // this can happen during deletion of a group; thus, just ignore the step
     return;
   }
@@ -114,12 +171,19 @@ void cedar::proc::Trigger::exploreSink
   auto parent_group = listener_group->getGroup();
   if (!parent_group)
   {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "  + no parent group found." << std::endl;
+#endif
     // this can happen during deletion of a group; thus, just ignore the step
     return;
   }
 
   std::vector<cedar::proc::DataConnectionPtr> connections;
   parent_group->getDataConnectionsFrom(listener_group, output_slot->getName(), connections);
+
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "  + exploring " << connections.size() << " connections" << std::endl;
+#endif
 
   for (auto connection : connections)
   {
@@ -129,7 +193,13 @@ void cedar::proc::Trigger::exploreSink
 
     if (auto sink = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(target))
     {
-      this->exploreSink(sourceNode, sink, graph, to_explore);
+      // if the target is a group sink, we need to explore further
+      this->exploreSink(source, sourceNode, sink, graph, to_explore);
+    }
+    else if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(target))
+    {
+      // if the target is a group, we need to explore its inputs
+      this->exploreGroupTarget(listener_group, group, sourceNode, graph, to_explore);
     }
     else
     {
@@ -146,6 +216,61 @@ void cedar::proc::Trigger::exploreSink
 }
 
 
+void cedar::proc::Trigger::exploreGroupTarget
+     (
+       cedar::proc::TriggerablePtr source,
+       cedar::proc::GroupPtr targetGroup,
+       cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
+       cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+       std::vector<cedar::proc::TriggerablePtr>& to_explore
+     )
+{
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "+ exploreGroupTarget called for " << nameTriggerable(source.get()) << std::endl;
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "+   targetGroup is " << targetGroup->getName() << std::endl;
+#endif
+  auto source_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(source);
+  CEDAR_DEBUG_ASSERT(source_connectable);
+  auto parent_group = targetGroup->getGroup();
+  if (!parent_group)
+  {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "+ returning: no parent group. " << std::endl;
+#endif
+    // this can happen during deletion of a group; thus, just ignore the step
+    return;
+  }
+
+  for (auto slot : source_connectable->getOrderedDataSlots(cedar::proc::DataRole::OUTPUT))
+  {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "+ treating slot " << slot->getName() << std::endl;
+#endif
+    std::vector<cedar::proc::DataConnectionPtr> connections;
+    parent_group->getDataConnectionsFrom(source_connectable, slot->getName(), connections);
+
+    for (auto connection : connections)
+    {
+      auto target_slot = connection->getTarget();
+      if (target_slot->getParentPtr() != targetGroup.get())
+      {
+        continue;
+      }
+
+      auto group_source = targetGroup->getElement<cedar::proc::sources::GroupSource>(target_slot->getName());
+
+      if (!graph.hasNodeForPayload(group_source))
+      {
+        graph.addNodeForPayload(group_source);
+        to_explore.push_back(group_source);
+      }
+
+      auto listener_node = graph.getNodeByPayload(group_source);
+      graph.addEdge(sourceNode, listener_node);
+    }
+  }
+}
+
 void cedar::proc::Trigger::explore
      (
        cedar::proc::TriggerablePtr source,
@@ -155,6 +280,10 @@ void cedar::proc::Trigger::explore
        bool sourceIsTrigger
      )
 {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "+ explore called for " << nameTriggerable(source.get()) << std::endl;
+#endif
+
   cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr source_node;
   if (sourceIsTrigger)
   {
@@ -186,46 +315,48 @@ void cedar::proc::Trigger::explore
     // leading to lots of redundant computation.
     if (auto listener_group = boost::dynamic_pointer_cast<cedar::proc::Group>(listener))
     {
-      auto source_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(source);
-      CEDAR_DEBUG_ASSERT(source_connectable);
-      auto source_group = source_connectable->getGroup();
-      if (!source_group)
-      {
-        // this can happen during deletion of a group; thus, just ignore the step
-        continue;
-      }
+      this->exploreGroupTarget(source, listener_group, source_node, graph, to_explore);
 
-      for (auto slot : source_connectable->getOrderedDataSlots(cedar::proc::DataRole::OUTPUT))
-      {
-        std::vector<cedar::proc::DataConnectionPtr> connections;
-        source_group->getDataConnectionsFrom(source_connectable, slot->getName(), connections);
-
-        for (auto connection : connections)
-        {
-          auto target_slot = connection->getTarget();
-          if (target_slot->getParentPtr() != listener_group.get())
-          {
-            continue;
-          }
-
-          auto group_source = listener_group->getElement<cedar::proc::sources::GroupSource>(target_slot->getName());
-
-          if (!graph.hasNodeForPayload(group_source))
-          {
-            graph.addNodeForPayload(group_source);
-            to_explore.push_back(group_source);
-          }
-
-          auto listener_node = graph.getNodeByPayload(group_source);
-          graph.addEdge(source_node, listener_node);
-        }
-      }
+//      auto source_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(source);
+//      CEDAR_DEBUG_ASSERT(source_connectable);
+//      auto source_group = source_connectable->getGroup();
+//      if (!source_group)
+//      {
+//        // this can happen during deletion of a group; thus, just ignore the step
+//        continue;
+//      }
+//
+//      for (auto slot : source_connectable->getOrderedDataSlots(cedar::proc::DataRole::OUTPUT))
+//      {
+//        std::vector<cedar::proc::DataConnectionPtr> connections;
+//        source_group->getDataConnectionsFrom(source_connectable, slot->getName(), connections);
+//
+//        for (auto connection : connections)
+//        {
+//          auto target_slot = connection->getTarget();
+//          if (target_slot->getParentPtr() != listener_group.get())
+//          {
+//            continue;
+//          }
+//
+//          auto group_source = listener_group->getElement<cedar::proc::sources::GroupSource>(target_slot->getName());
+//
+//          if (!graph.hasNodeForPayload(group_source))
+//          {
+//            graph.addNodeForPayload(group_source);
+//            to_explore.push_back(group_source);
+//          }
+//
+//          auto listener_node = graph.getNodeByPayload(group_source);
+//          graph.addEdge(source_node, listener_node);
+//        }
+//      }
     }
     // Special case: listener is a group sink. Analogous to the case above, group sinks lead to a trigger connection to
     // the steps outside of the group.
     else if (auto listener_sink = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(listener))
     {
-      this->exploreSink(source_node, listener_sink, graph, to_explore);
+      this->exploreSink(source, source_node, listener_sink, graph, to_explore);
 //      auto listener_group = listener_sink->getGroup();
 //      if (!listener_group)
 //      {
@@ -320,23 +451,9 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
 {
   //!@todo Here and in buildTriggerGraph, there are a lot of dynamic casts. Can this be solved better with a bunch of virtual functions?
 //!@todo Debug outputs - remove
-  std::cout << " U Updating triggering order of ";
-  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
-  {
-    std::cout << named->getName();
-  }
-  std::cout << " (" << this << ")";
-  if (this->mpOwner)
-  {
-    std::cout << " owned by ";
-    if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpOwner))
-    {
-      std::cout << named->getName();
-    }
-    std::cout << " (" << this->mpOwner << ")";
-  }
-
-  std::cout << std::endl;
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " U Updating triggering order of " << nameTrigger(this) << std::endl;
+#endif
 
   // check if this trigger was already visited during the current wave of graph generation
   if (visited.find(this) != visited.end())
@@ -483,61 +600,29 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 
   QReadLocker lock(this->mTriggeringOrder.getLockPtr());
 
-  std::cout << "> Triggering ";
-  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
-  {
-    std::cout << named->getName();
-  }
-  std::cout << " (" << this << ")";
-  if (this->mpOwner)
-  {
-    std::cout << " owned by ";
-    if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpOwner))
-    {
-      std::cout << named->getName();
-    }
-    std::cout << " (" << this->mpOwner << ")";
-  }
-  std::cout << std::endl;
+#ifdef DEBUG_TRIGGERING
+/* DEBUG_TRIGGERING */  std::cout << "> Triggering " << nameTrigger(this) << std::endl;
+#endif
 
   for (auto order_triggerables_pair : this->mTriggeringOrder.member())
   {
     auto triggerables = order_triggerables_pair.second;
     for (cedar::proc::TriggerablePtr triggerable : triggerables)
     {
-      std::cout << "  > Triggering chain item ";
-      if (auto named = boost::dynamic_pointer_cast<cedar::aux::NamedConfigurable>(triggerable))
-      {
-        std::cout << named->getName();
-      }
-      std::cout << " (" << triggerable.get() << ")" << std::endl;
+#ifdef DEBUG_TRIGGERING
+/* DEBUG_TRIGGERING */ std::cout << "  > Triggering chain item " << nameTriggerable(triggerable) << std::endl;
+#endif
 
       triggerable->onTrigger(arguments, this_ptr);
 
-      std::cout << "  < Done triggering chain item ";
-      if (auto named = boost::dynamic_pointer_cast<cedar::aux::NamedConfigurable>(triggerable))
-      {
-        std::cout << named->getName();
-      }
-      std::cout << " (" << triggerable.get() << ")" << std::endl;
+#ifdef DEBUG_TRIGGERING
+/* DEBUG_TRIGGERING */ std::cout << "  < Done triggering chain item " << nameTriggerable(triggerable) << std::endl;
+#endif
     }
   }
-  std::cout << "< Done triggering ";
-  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
-  {
-    std::cout << named->getName();
-  }
-  std::cout << " (" << this << ")";
-  if (this->mpOwner)
-  {
-    std::cout << " owned by ";
-    if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpOwner))
-    {
-      std::cout << named->getName();
-    }
-    std::cout << " (" << this->mpOwner << ")";
-  }
-  std::cout << std::endl;
+#ifdef DEBUG_TRIGGERING
+/* DEBUG_TRIGGERING */ std::cout << "< Done triggering " << nameTrigger(this) << std::endl;
+#endif
 }
 
 void cedar::proc::Trigger::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr)
