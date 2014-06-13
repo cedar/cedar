@@ -258,24 +258,25 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
 
 void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown)
 {
+  //!@todo Here and in buildTriggerGraph, there are a lot of dynamic casts. Can this be solved better with a bunch of virtual functions?
 //!@todo Debug outputs - remove
-//  std::cout << " U Updating triggering order of ";
-//  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
-//  {
-//    std::cout << named->getName();
-//  }
-//  std::cout << " (" << this << ")";
-//  if (this->mpOwner)
-//  {
-//    std::cout << " owned by ";
-//    if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpOwner))
-//    {
-//      std::cout << named->getName();
-//    }
-//    std::cout << " (" << this->mpOwner << ")";
-//  }
-//
-//  std::cout << std::endl;
+  std::cout << " U Updating triggering order of ";
+  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
+  {
+    std::cout << named->getName();
+  }
+  std::cout << " (" << this << ")";
+  if (this->mpOwner)
+  {
+    std::cout << " owned by ";
+    if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpOwner))
+    {
+      std::cout << named->getName();
+    }
+    std::cout << " (" << this->mpOwner << ")";
+  }
+
+  std::cout << std::endl;
 
   // check if this trigger was already visited during the current wave of graph generation
   if (visited.find(this) != visited.end())
@@ -373,6 +374,19 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
       CEDAR_ASSERT(trigger);
       trigger->updateTriggeringOrder(visited, true, false);
     }
+
+    // also, if the owner of this trigger is a group, update the triggering order of all sinks
+    if (auto group = dynamic_cast<cedar::proc::Group*>(this->mpOwner))
+    {
+      for (auto name_connector_type_pair : group->getConnectorMap())
+      {
+        if (!name_connector_type_pair.second)
+        {
+          auto sink = boost::static_pointer_cast<cedar::proc::sinks::GroupSink>(group->getElement(name_connector_type_pair.first));
+          sink->getFinishedTrigger()->updateTriggeringOrder(visited, true, false);
+        }
+      }
+    }
   }
 }
 
@@ -381,42 +395,63 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
   //!@todo Remove debug outputs here
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
-//  QReadLocker lock(this->mTriggeringOrder.getLockPtr());
-//  std::cout << "> Triggering ";
-//  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
-//  {
-//    std::cout << named->getName();
-//  }
-//  std::cout << " (" << this << ")" << std::endl;
+  QReadLocker lock(this->mTriggeringOrder.getLockPtr());
+
+  std::cout << "> Triggering ";
+  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
+  {
+    std::cout << named->getName();
+  }
+  std::cout << " (" << this << ")";
+  if (this->mpOwner)
+  {
+    std::cout << " owned by ";
+    if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpOwner))
+    {
+      std::cout << named->getName();
+    }
+    std::cout << " (" << this->mpOwner << ")";
+  }
+  std::cout << std::endl;
 
   for (auto order_triggerables_pair : this->mTriggeringOrder.member())
   {
     auto triggerables = order_triggerables_pair.second;
     for (cedar::proc::TriggerablePtr triggerable : triggerables)
     {
-//      std::cout << "  > Triggering chain item ";
-//      if (auto named = boost::dynamic_pointer_cast<cedar::aux::NamedConfigurable>(triggerable))
-//      {
-//        std::cout << named->getName();
-//      }
-//      std::cout << " (" << triggerable.get() << ")" << std::endl;
+      std::cout << "  > Triggering chain item ";
+      if (auto named = boost::dynamic_pointer_cast<cedar::aux::NamedConfigurable>(triggerable))
+      {
+        std::cout << named->getName();
+      }
+      std::cout << " (" << triggerable.get() << ")" << std::endl;
 
       triggerable->onTrigger(arguments, this_ptr);
 
-//      std::cout << "  < Done triggering chain item ";
-//      if (auto named = boost::dynamic_pointer_cast<cedar::aux::NamedConfigurable>(triggerable))
-//      {
-//        std::cout << named->getName();
-//      }
-//      std::cout << " (" << triggerable.get() << ")" << std::endl;
+      std::cout << "  < Done triggering chain item ";
+      if (auto named = boost::dynamic_pointer_cast<cedar::aux::NamedConfigurable>(triggerable))
+      {
+        std::cout << named->getName();
+      }
+      std::cout << " (" << triggerable.get() << ")" << std::endl;
     }
   }
-//  std::cout << "< Done triggering ";
-//  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
-//  {
-//    std::cout << named->getName();
-//  }
-//  std::cout << " (" << this << ")" << std::endl;
+  std::cout << "< Done triggering ";
+  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
+  {
+    std::cout << named->getName();
+  }
+  std::cout << " (" << this << ")";
+  if (this->mpOwner)
+  {
+    std::cout << " owned by ";
+    if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this->mpOwner))
+    {
+      std::cout << named->getName();
+    }
+    std::cout << " (" << this->mpOwner << ")";
+  }
+  std::cout << std::endl;
 }
 
 void cedar::proc::Trigger::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr)
