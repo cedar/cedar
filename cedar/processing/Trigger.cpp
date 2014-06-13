@@ -43,8 +43,12 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Element.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/sources/GroupSource.h"
+#include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/auxiliaries/GraphTemplate.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -96,6 +100,7 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
 
   auto this_node = graph.addNodeForPayload(this_ptr);
 
+  // first, we look at all the triggerables that this trigger is connected to
   {
     QReadLocker lock(this->mListeners.getLockPtr());
     for (auto listener : this->mListeners.member())
@@ -105,13 +110,55 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
         continue;
       }
 
-      to_explore.push_back(listener);
-      auto listener_node = graph.addNodeForPayload(listener);
-      graph.addEdge(this_node, listener_node);
+      //!@todo This code is completely redundant with the else if below
+      if (auto listener_sink = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(listener))
+      {
+        auto listener_group = listener_sink->getGroup();
+        if (!listener_group)
+        {
+          // this can happen during deletion of a group; thus, just ignore the step
+          continue;
+        }
+
+        auto output_slot = listener_group->getOutputSlot(listener_sink->getName());
+        CEDAR_ASSERT(output_slot);
+
+        auto parent_group = listener_group->getGroup();
+        if (!parent_group)
+        {
+          // this can happen during deletion of a group; thus, just ignore the step
+          continue;
+        }
+
+        std::vector<cedar::proc::DataConnectionPtr> connections;
+        parent_group->getDataConnectionsFrom(listener_group, output_slot->getName(), connections);
+
+        for (auto connection : connections)
+        {
+          auto target_slot = connection->getTarget();
+          auto target = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target_slot->getParentPtr()->shared_from_this());
+          CEDAR_ASSERT(target);
+
+          if (!graph.hasNodeForPayload(target))
+          {
+            graph.addNodeForPayload(target);
+            to_explore.push_back(target);
+          }
+
+          auto target_node = graph.getNodeByPayload(target);
+          graph.addEdge(this_node, target_node);
+        }
+      }
+      else
+      {
+        to_explore.push_back(listener);
+        auto listener_node = graph.addNodeForPayload(listener);
+        graph.addEdge(this_node, listener_node);
+      }
     }
   }
 
-  while(!to_explore.empty())
+  while (!to_explore.empty())
   {
     cedar::proc::TriggerablePtr source = to_explore.back();
     to_explore.pop_back();
@@ -131,19 +178,97 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
     // append all listeners of this step; they all have a distance of one, because they follow this step directly
     for (auto listener : done_trigger->mListeners.member())
     {
-      if (listener->isLooped())
+      if (auto listener_group = boost::dynamic_pointer_cast<cedar::proc::Group>(listener))
       {
-        continue;
-      }
+        auto source_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(source);
+        CEDAR_DEBUG_ASSERT(source_connectable);
+        auto source_group = source_connectable->getGroup();
+        if (!source_group)
+        {
+          // this can happen during deletion of a group; thus, just ignore the step
+          continue;
+        }
 
-      if (!graph.hasNodeForPayload(listener))
+        for (auto slot : source_connectable->getOrderedDataSlots(cedar::proc::DataRole::OUTPUT))
+        {
+          std::vector<cedar::proc::DataConnectionPtr> connections;
+          source_group->getDataConnectionsFrom(source_connectable, slot->getName(), connections);
+
+          for (auto connection : connections)
+          {
+            auto target_slot = connection->getTarget();
+            if (target_slot->getParentPtr() != listener_group.get())
+            {
+              continue;
+            }
+
+            auto group_source = listener_group->getElement<cedar::proc::sources::GroupSource>(target_slot->getName());
+
+            if (!graph.hasNodeForPayload(group_source))
+            {
+              graph.addNodeForPayload(group_source);
+              to_explore.push_back(group_source);
+            }
+
+            auto listener_node = graph.getNodeByPayload(group_source);
+            graph.addEdge(source_node, listener_node);
+          }
+        }
+      }
+      else if (auto listener_sink = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(listener))
       {
-        graph.addNodeForPayload(listener);
-        to_explore.push_back(listener);
-      }
+        auto listener_group = listener_sink->getGroup();
+        if (!listener_group)
+        {
+          // this can happen during deletion of a group; thus, just ignore the step
+          continue;
+        }
 
-      auto listener_node = graph.getNodeByPayload(listener);
-      graph.addEdge(source_node, listener_node);
+        auto output_slot = listener_group->getOutputSlot(listener_sink->getName());
+        CEDAR_ASSERT(output_slot);
+
+        auto parent_group = listener_group->getGroup();
+        if (!parent_group)
+        {
+          // this can happen during deletion of a group; thus, just ignore the step
+          continue;
+        }
+
+        std::vector<cedar::proc::DataConnectionPtr> connections;
+        parent_group->getDataConnectionsFrom(listener_group, output_slot->getName(), connections);
+
+        for (auto connection : connections)
+        {
+          auto target_slot = connection->getTarget();
+          auto target = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target_slot->getParentPtr()->shared_from_this());
+          CEDAR_ASSERT(target);
+
+          if (!graph.hasNodeForPayload(target))
+          {
+            graph.addNodeForPayload(target);
+            to_explore.push_back(target);
+          }
+
+          auto target_node = graph.getNodeByPayload(target);
+          graph.addEdge(this_node, target_node);
+        }
+      }
+      else
+      {
+        if (listener->isLooped())
+        {
+          continue;
+        }
+
+        if (!graph.hasNodeForPayload(listener))
+        {
+          graph.addNodeForPayload(listener);
+          to_explore.push_back(listener);
+        }
+
+        auto listener_node = graph.getNodeByPayload(listener);
+        graph.addEdge(source_node, listener_node);
+      }
     }
   }
 }
@@ -249,19 +374,47 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
   }
 }
 
+#include "cedar/auxiliaries/NamedConfigurable.h"
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   QReadLocker lock(this->mTriggeringOrder.getLockPtr());
+//  std::cout << "> Triggering ";
+//  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
+//  {
+//    std::cout << named->getName();
+//  }
+//  std::cout << " (" << this << ")" << std::endl;
+
   for (auto order_triggerables_pair : this->mTriggeringOrder.member())
   {
     auto triggerables = order_triggerables_pair.second;
     for (cedar::proc::TriggerablePtr triggerable : triggerables)
     {
+//      std::cout << "  > Triggering chain item ";
+//      if (auto named = boost::dynamic_pointer_cast<cedar::aux::NamedConfigurable>(triggerable))
+//      {
+//        std::cout << named->getName();
+//      }
+//      std::cout << " (" << triggerable.get() << ")" << std::endl;
+
       triggerable->onTrigger(arguments, this_ptr);
+
+//      std::cout << "  < Done triggering chain item ";
+//      if (auto named = boost::dynamic_pointer_cast<cedar::aux::NamedConfigurable>(triggerable))
+//      {
+//        std::cout << named->getName();
+//      }
+//      std::cout << " (" << triggerable.get() << ")" << std::endl;
     }
   }
+//  std::cout << "< Done triggering ";
+//  if (auto named = dynamic_cast<cedar::aux::NamedConfigurable*>(this))
+//  {
+//    std::cout << named->getName();
+//  }
+//  std::cout << " (" << this << ")" << std::endl;
 }
 
 void cedar::proc::Trigger::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr)
