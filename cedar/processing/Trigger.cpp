@@ -361,6 +361,31 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
           done->updateTriggeringOrder(visited, false, true);
         }
       }
+
+      // also, if the owner of this trigger is a group, update the triggering order of all sinks
+      if (auto group_source = dynamic_cast<cedar::proc::sources::GroupSource*>(this->mpOwner))
+      {
+        // get all connections leading to the group input that corresponds to the source
+        auto group = group_source->getGroup();
+        if (group) // can be a nullptr if the group is being destroyed
+        {
+          auto parent_group = group->getGroup();
+
+          if (parent_group) // can be a nullptr if the group is being destroyed
+          {
+            std::vector<cedar::proc::DataConnectionPtr> connections;
+            parent_group->getDataConnectionsTo(group, group_source->getName(), connections);
+
+            // update the triggering order of all the steps connected to the group's input
+            for (auto connection : connections)
+            {
+              auto source = dynamic_cast<cedar::proc::Triggerable*>(connection->getSource()->getParentPtr());
+              CEDAR_DEBUG_ASSERT(source);
+              source->getFinishedTrigger()->updateTriggeringOrder(visited, false, true);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -376,6 +401,7 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
     }
 
     // also, if the owner of this trigger is a group, update the triggering order of all sinks
+    //!@todo This might do more than needed; in principle, only the slots sinks actually affected need to be updated
     if (auto group = dynamic_cast<cedar::proc::Group*>(this->mpOwner))
     {
       for (auto name_connector_type_pair : group->getConnectorMap())
