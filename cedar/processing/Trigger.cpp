@@ -133,7 +133,6 @@ void cedar::proc::Trigger::explore
     // leading to lots of redundant computation.
     if (auto listener_group = boost::dynamic_pointer_cast<cedar::proc::Group>(listener))
     {
-      std::cout << "CASE!" << std::endl;
       auto source_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(source);
       CEDAR_DEBUG_ASSERT(source_connectable);
       auto source_group = source_connectable->getGroup();
@@ -236,13 +235,19 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   // This is a workaround for Triggerable not being able to use shared_from_this. Element has it, Triggerable does not.
-  CEDAR_DEBUG_ASSERT(this->mpOwner != nullptr);
-  auto element = dynamic_cast<cedar::proc::Element*>(this->mpOwner);
-  CEDAR_DEBUG_ASSERT(element != nullptr);
-  auto owner_ptr = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element->shared_from_this());
-  CEDAR_DEBUG_ASSERT(owner_ptr);
+  if (this->mpOwner != nullptr)
+  {
+    auto element = dynamic_cast<cedar::proc::Element*>(this->mpOwner);
+    CEDAR_DEBUG_ASSERT(element != nullptr);
+    auto owner_ptr = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element->shared_from_this());
+    CEDAR_DEBUG_ASSERT(owner_ptr);
 
-  this->explore(owner_ptr, this_ptr, graph, to_explore, true);
+    this->explore(owner_ptr, this_ptr, graph, to_explore, true);
+  }
+  else
+  {
+    this->explore(this_ptr, this_ptr, graph, to_explore, true);
+  }
 
   while (!to_explore.empty())
   {
