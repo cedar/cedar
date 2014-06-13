@@ -45,8 +45,10 @@
 #include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/GraphTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/sinks/GroupSink.fwd.h"
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 
@@ -154,6 +156,14 @@ private:
     cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
     std::vector<cedar::proc::TriggerablePtr>& toExplore,
     bool sourceIsTrigger
+  );
+
+  void exploreSink
+  (
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
+    cedar::proc::sinks::GroupSinkPtr startSink,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& to_explore
   );
 
   //--------------------------------------------------------------------------------------------------------------------
