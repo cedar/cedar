@@ -120,6 +120,10 @@ void test_trigger(cedar::proc::LoopedTriggerPtr trigger, TriggerTestPtr sink, co
   sink->resetData();
   std::cout << ">>> Triggering source." << std::endl;
   trigger->singleStep();
+  // wait for processing of the trigger chain
+  //!@todo Is there a better way than just randomly waiting?
+  cedar::aux::usleep(1000);
+
   if (sink->mTriggerCount == 0)
   {
     ++global_errors;

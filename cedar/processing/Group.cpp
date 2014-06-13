@@ -1767,25 +1767,14 @@ void cedar::proc::Group::removeAllConnectors()
 
 void cedar::proc::Group::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr trigger)
 {
-//  for (auto connector : this->_mConnectors->getValue())
-//  {
-//    auto name = connector.first;
-//
-//    if (connector.second)
-//    {
-//      auto source = boost::static_pointer_cast<cedar::proc::sources::GroupSource>(this->getElement(name));
-//      source->onTrigger(args, trigger);
-//    }
-//  }
-//  if (this->isLooped())
-//  {
-//    // trigger every looped element in this group
-//    for (auto triggerable : this->mLoopedTriggerables)
-//    {
-//      triggerable->onTrigger(args, trigger);
-//    }
-//    this->getFinishedTrigger()->trigger();
-//  }
+  if (this->isLooped())
+  {
+    // trigger every looped element in this group
+    for (auto triggerable : this->mLoopedTriggerables)
+    {
+      triggerable->onTrigger(args, trigger);
+    }
+  }
 }
 
 void cedar::proc::Group::waitForProcessing()
