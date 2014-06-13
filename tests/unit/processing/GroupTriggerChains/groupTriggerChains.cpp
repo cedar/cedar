@@ -433,7 +433,7 @@ void run_test()
     group->add(boost::make_shared<TriggerTest>(), "step3");
 
     std::cout << "Connecting step1.out -> step2.in1" << std::endl;
-    nested_group->connectSlots("step1.out", "step2.in1");
+    group->connectSlots("step1.out", "step2.in1");
     std::cout << "Connecting step2.out -> step3.in1" << std::endl;
     group->connectSlots("step2.out", "step3.in1");
 
