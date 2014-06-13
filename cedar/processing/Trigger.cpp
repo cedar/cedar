@@ -133,6 +133,7 @@ void cedar::proc::Trigger::explore
     // leading to lots of redundant computation.
     if (auto listener_group = boost::dynamic_pointer_cast<cedar::proc::Group>(listener))
     {
+      std::cout << "CASE!" << std::endl;
       auto source_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(source);
       CEDAR_DEBUG_ASSERT(source_connectable);
       auto source_group = source_connectable->getGroup();

@@ -1177,7 +1177,8 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
   mDataConnections.push_back(cedar::proc::DataConnectionPtr(new DataConnection(source_slot, target_slot)));
 
   CEDAR_DEBUG_ASSERT(p_target);
-  if (!p_target->isLooped())
+  //!@todo Replace isLooped || ... by a new p_target->acceptsDoneTriggerConnections() function?
+  if (!p_target->isLooped() || boost::dynamic_pointer_cast<cedar::proc::Group>(p_target))
   {
     try
     {
