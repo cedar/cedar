@@ -147,6 +147,15 @@ private:
 
   void buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph);
 
+  void explore
+  (
+    cedar::proc::TriggerablePtr source,
+    cedar::proc::TriggerPtr trigger,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& toExplore,
+    bool sourceIsTrigger
+  );
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

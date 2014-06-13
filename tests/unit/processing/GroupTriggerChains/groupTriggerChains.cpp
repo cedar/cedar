@@ -164,6 +164,7 @@ void run_test()
     std::cout << "Connecting step3.out -> step4.in2" << std::endl;
     group->connectSlots("step3.out", "step4.in2");
 
+    std::cout << "Moving steps to nested group." << std::endl;
     std::list<cedar::proc::ElementPtr> moved;
     moved.push_back(group->getElement("step2"));
     moved.push_back(group->getElement("step3"));
@@ -194,6 +195,7 @@ void run_test()
     std::cout << "Connecting step3.out -> step4.in2" << std::endl;
     group->connectSlots("step3.out", "step4.in2");
 
+    std::cout << "Moving steps to nested group." << std::endl;
     std::list<cedar::proc::ElementPtr> moved;
     moved.push_back(group->getElement("step4"));
     nested_group->add(moved);
@@ -223,6 +225,7 @@ void run_test()
     std::cout << "Connecting step3.out -> step4.in2" << std::endl;
     group->connectSlots("step3.out", "step4.in2");
 
+    std::cout << "Moving steps to nested group." << std::endl;
     std::list<cedar::proc::ElementPtr> moved;
     moved.push_back(group->getElement("step1"));
     nested_group->add(moved);
@@ -247,6 +250,7 @@ void run_test()
     std::cout << "Connecting step2.out -> step3.in1" << std::endl;
     group->connectSlots("step2.out", "step3.in1");
 
+    std::cout << "Moving steps to nested group." << std::endl;
     std::list<cedar::proc::ElementPtr> moved;
     moved.push_back(group->getElement("step1"));
     moved.push_back(group->getElement("step2"));
@@ -279,6 +283,7 @@ void run_test()
     std::cout << "Connecting step3.out -> step4.in1" << std::endl;
     group->connectSlots("step3.out", "step4.in2");
 
+    std::cout << "Moving steps to nested group." << std::endl;
     std::list<cedar::proc::ElementPtr> moved;
     moved.push_back(group->getElement("step2"));
     nested_group->add(moved);
