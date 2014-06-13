@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/exceptions.h"
@@ -412,8 +413,9 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   // a) This step has not been triggered as part of a trigger chain. This is the case if trigger is NULL.
   // b) The step is looped. In this case it is the start of a trigger chain
   // c) The step is not triggered by anyone. This can happen, e.g., if it has no inputs. This also makes it the start
-  //    of a trigger chain.
-  if (!trigger || this->isLooped() || !this->isTriggered())
+  //    of a trigger chain. The exception here are group sources because they are triggered from the outside (but via a
+  //    special mechanism in Trigger::buildTriggerGraph)
+  if (!trigger || this->isLooped() || (!this->isTriggered() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this)))
   {
 //    this->getFinishedTrigger()->trigger();
     // trigger subsequent steps in a non-blocking manner
