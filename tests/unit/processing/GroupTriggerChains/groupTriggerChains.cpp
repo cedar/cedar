@@ -37,8 +37,10 @@
 // LOCAL INCLUDES
 
 // CEDAR INCLUDES
+#include "cedar/processing/sources/Noise.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
@@ -109,6 +111,29 @@ CEDAR_GENERATE_POINTER_TYPES(TriggerTest);
 int global_errors = 0;
 int num_superfluous_triggers = 0;
 std::vector<std::string> failed_configurations;
+
+void test_trigger(cedar::proc::LoopedTriggerPtr trigger, TriggerTestPtr sink, const std::string& testName)
+{
+  using cedar::proc::Group;
+  using cedar::proc::GroupPtr;
+
+  sink->resetData();
+  std::cout << ">>> Triggering source." << std::endl;
+  trigger->singleStep();
+  if (sink->mTriggerCount == 0)
+  {
+    ++global_errors;
+    std::cout << "Sink step was not triggered in " << testName << std::endl;
+    failed_configurations.push_back(testName + " failed to trigger the sink.");
+  }
+  else if (sink->mTriggerCount > 1)
+  {
+    ++num_superfluous_triggers;
+    std::cout << "Sink step was triggered multiple (" << sink->mTriggerCount << ") times in " << testName << std::endl;
+    failed_configurations.push_back(testName + " triggered sink more than once.");
+  }
+  std::cout << ">>> Done testing configuration." << std::endl;
+}
 
 void test_group(TriggerTestPtr source, TriggerTestPtr sink, const std::string& testName)
 {
@@ -372,6 +397,52 @@ void run_test()
     nested_group->add(moved);
 
     test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 9");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 10" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    nested_group->setIsLooped(true);
+    group->add(nested_group, "nested");
+    group->add(boost::make_shared<cedar::proc::LoopedTrigger>(), "trigger");
+    nested_group->add(boost::make_shared<cedar::proc::sources::Noise>(), "noise");
+    nested_group->add(boost::make_shared<TriggerTest>(), "step1");
+    std::cout << "Connecting noise -> step1.in1" << std::endl;
+    nested_group->connectSlots("noise.random", "step1.in1");
+    group->connectTrigger(group->getElement<cedar::proc::LoopedTrigger>("trigger"), nested_group);
+
+    test_trigger(group->getElement<cedar::proc::LoopedTrigger>("trigger"), nested_group->getElement<TriggerTest>("step1"), "configuration 10");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 11" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    GroupPtr nested_nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->add(nested_nested_group, "nested nested");
+    group->add(boost::make_shared<TriggerTest>(), "step1");
+    group->add(boost::make_shared<TriggerTest>(), "step2");
+    group->add(boost::make_shared<TriggerTest>(), "step3");
+
+    std::cout << "Connecting step1.out -> step2.in1" << std::endl;
+    nested_group->connectSlots("step1.out", "step2.in1");
+    std::cout << "Connecting step2.out -> step3.in1" << std::endl;
+    group->connectSlots("step2.out", "step3.in1");
+
+    std::cout << "Moving steps to nested group." << std::endl;
+    std::list<cedar::proc::ElementPtr> moved;
+    moved.push_back(group->getElement("step2"));
+    nested_nested_group->add(moved);
+
+    test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step3"), "configuration 11");
   }
 }
 
