@@ -226,10 +226,36 @@ void run_test()
 
     test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"),  "configuration 3");
   }
-  // this should trigger any non-looped steps connected to group inputs
+
   {
     std::cout << "==================================" << std::endl;
     std::cout << " Checking group configuration 4" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    group->add(boost::make_shared<TriggerTest>(), "step1");
+    group->add(boost::make_shared<TriggerTest>(), "step2");
+    group->add(boost::make_shared<TriggerTest>(), "step3");
+
+    std::cout << "Connecting step1.out -> step2.in1" << std::endl;
+    group->connectSlots("step1.out", "step2.in1");
+    std::cout << "Connecting step2.out -> step3.in1" << std::endl;
+    group->connectSlots("step2.out", "step3.in1");
+
+    std::list<cedar::proc::ElementPtr> moved;
+    moved.push_back(group->getElement("step1"));
+    moved.push_back(group->getElement("step2"));
+    nested_group->add(moved);
+
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step3"), "configuration 4");
+  }
+
+  // this should trigger any non-looped steps connected to group inputs
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 5" << std::endl;
     std::cout << "==================================" << std::endl << std::endl;
 
     GroupPtr group(new Group());
@@ -254,7 +280,7 @@ void run_test()
     moved.push_back(group->getElement("step2"));
     nested_group->add(moved);
 
-    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 4");
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), "configuration 5");
   }
 }
 
