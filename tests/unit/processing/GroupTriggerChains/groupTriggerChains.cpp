@@ -89,19 +89,24 @@ public:
 
   void compute(const cedar::proc::Arguments&)
   {
-    std::cout << "Computing " << this->getName() << std::endl;
+    std::cout << "Computing " << this->getName();
     ++mTriggerCount;
     unsigned int in1 = 0;
     unsigned int in2 = 0;
-    if (this->getInput("in1"))
+    auto data_1 = this->getInput("in1");
+    if (auto uint_1 = boost::dynamic_pointer_cast<ConstUIntData>(data_1))
     {
-      in1 = this->getInput("in1")->getData<unsigned int>();
+      in1 = uint_1->getData();
     }
-    if (this->getInput("in2"))
+    auto data_2 = this->getInput("in2");
+    if (auto uint_2 = boost::dynamic_pointer_cast<ConstUIntData>(data_2))
     {
-      in2 = this->getInput("in2")->getData<unsigned int>();
+      in2 = uint_2->getData();
     }
-    this->mDataOut->setData(in1+in2+1);
+    unsigned int new_data = in1+in2+1;
+
+    std::cout << "; new data is " << new_data << std::endl;
+    this->mDataOut->setData(new_data);
   }
 
   void resetData()
@@ -134,7 +139,7 @@ void test_trigger(cedar::proc::LoopedTriggerPtr trigger, TriggerTestPtr sink, co
   trigger->singleStep();
   // wait for processing of the trigger chain
   //!@todo Is there a better way than just randomly waiting?
-  cedar::aux::usleep(1000);
+  cedar::aux::usleep(10000);
 
   if (sink->mTriggerCount == 0)
   {
@@ -177,6 +182,7 @@ void test_group(TriggerTestPtr source, TriggerTestPtr sink, unsigned int data, c
   {
     ++global_errors;
     std::cout << "Sink step does not contain correct data in " << testName << std::endl;
+    std::cout << "  Expected: " << data << ", got " << sink->mDataOut->getData() << std::endl;
     failed_configurations.push_back(testName + " did not compute the correct data.");
   }
   std::cout << ">>> Done testing configuration." << std::endl;
@@ -419,7 +425,7 @@ void run_test()
     moved.push_back(group->getElement("step2"));
     nested_group->add(moved);
 
-    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), 5, "configuration 9");
+    test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"), 5, "configuration 9");
   }
 
   {
