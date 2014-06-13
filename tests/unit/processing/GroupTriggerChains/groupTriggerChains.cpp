@@ -86,6 +86,7 @@ public:
 
   void compute(const cedar::proc::Arguments&)
   {
+    std::cout << "Computing " << this->getName() << std::endl;
     ++mTriggerCount;
   }
 
@@ -115,6 +116,7 @@ void test_group(TriggerTestPtr source, TriggerTestPtr sink, const std::string& t
 
   source->resetData();
   sink->resetData();
+  std::cout << ">>> Triggering source." << std::endl;
   source->onTrigger();
   if (sink->mTriggerCount == 0)
   {
@@ -124,8 +126,9 @@ void test_group(TriggerTestPtr source, TriggerTestPtr sink, const std::string& t
   else if (sink->mTriggerCount > 1)
   {
     ++num_superfluous_triggers;
-    std::cout << "Sink step was triggered multiple times in " << testName << std::endl;
+    std::cout << "Sink step was triggered multiple (" << sink->mTriggerCount << ") times in " << testName << std::endl;
   }
+  std::cout << ">>> Done testing configuration." << std::endl;
 }
 
 
@@ -158,7 +161,7 @@ void run_test()
     group->connectSlots("step1.out", "step3.in1");
     std::cout << "Connecting step2.out -> step4.in1" << std::endl;
     group->connectSlots("step2.out", "step4.in1");
-    std::cout << "Connecting step3.out -> step4.in1" << std::endl;
+    std::cout << "Connecting step3.out -> step4.in2" << std::endl;
     group->connectSlots("step3.out", "step4.in2");
 
     std::list<cedar::proc::ElementPtr> moved;
@@ -188,7 +191,7 @@ void run_test()
     group->connectSlots("step1.out", "step3.in1");
     std::cout << "Connecting step2.out -> step4.in1" << std::endl;
     group->connectSlots("step2.out", "step4.in1");
-    std::cout << "Connecting step3.out -> step4.in1" << std::endl;
+    std::cout << "Connecting step3.out -> step4.in2" << std::endl;
     group->connectSlots("step3.out", "step4.in2");
 
     std::list<cedar::proc::ElementPtr> moved;
@@ -217,7 +220,7 @@ void run_test()
     group->connectSlots("step1.out", "step3.in1");
     std::cout << "Connecting step2.out -> step4.in1" << std::endl;
     group->connectSlots("step2.out", "step4.in1");
-    std::cout << "Connecting step3.out -> step4.in1" << std::endl;
+    std::cout << "Connecting step3.out -> step4.in2" << std::endl;
     group->connectSlots("step3.out", "step4.in2");
 
     std::list<cedar::proc::ElementPtr> moved;
