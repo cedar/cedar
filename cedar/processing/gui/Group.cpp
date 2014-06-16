@@ -1162,29 +1162,24 @@ void cedar::proc::gui::Group::checkTriggerConnection
        bool added
      )
 {
-  /* A signal is emitted regardless of the missing representation. This fails in finding "processingDone" in the current
-   * group and results in an InvalidNameException. This exception is caught here. A debug assert assures that no other
-   * element caused this exception.
-   */
-  cedar::proc::gui::TriggerItem* source_element;
-  try
-  {
-    source_element
-      = dynamic_cast<cedar::proc::gui::TriggerItem*>
-        (
-          this->mpScene->getGraphicsItemFor
-          (
-            this->getGroup()->getElement(source->getName()).get()
-          )
-        );
-  }
-  catch(cedar::aux::InvalidNameException& exc)
+  if (!this->getGroup()->nameExists(source->getName()))
   {
     CEDAR_ASSERT(source->getName() == "processingDone");
     return;
   }
-  cedar::proc::gui::GraphicsBase* target_element
-    = this->mpScene->getGraphicsItemFor
+  /* A signal is emitted regardless of the missing representation. This fails in finding "processingDone" in the current
+   * group and results in an InvalidNameException. This exception is caught here. A debug assert assures that no other
+   * element caused this exception.
+   */
+  auto source_element = dynamic_cast<cedar::proc::gui::TriggerItem*>
+                        (
+                          this->mpScene->getGraphicsItemFor
+                          (
+                            this->getGroup()->getElement(source->getName()).get()
+                          )
+                        );
+
+  auto target_element = this->mpScene->getGraphicsItemFor
       (
         this->getGroup()->getElement(boost::dynamic_pointer_cast<cedar::proc::Element>(target)->getName()).get()
       );
