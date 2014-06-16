@@ -362,6 +362,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
   try
   {
+    CEDAR_DEBUG_ASSERT(arguments.get() != nullptr);
     // call the compute function with the given arguments
     this->compute(*(arguments.get()));
   }

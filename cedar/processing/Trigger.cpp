@@ -210,7 +210,10 @@ void cedar::proc::Trigger::exploreSink
       }
 
       auto target_node = graph.getNodeByPayload(target);
-      graph.addEdge(sourceNode, target_node);
+      if (!graph.edgeExists(sourceNode, target_node))
+      {
+        graph.addEdge(sourceNode, target_node);
+      }
     }
   }
 }
@@ -230,7 +233,13 @@ void cedar::proc::Trigger::exploreGroupTarget
 /* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "+   targetGroup is " << targetGroup->getName() << std::endl;
 #endif
   auto source_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(source);
-  CEDAR_DEBUG_ASSERT(source_connectable);
+  if (!source_connectable)
+  {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "+ returning: source is not connectable. " << std::endl;
+#endif
+    return;
+  }
   auto parent_group = targetGroup->getGroup();
   if (!parent_group)
   {
@@ -266,7 +275,10 @@ void cedar::proc::Trigger::exploreGroupTarget
       }
 
       auto listener_node = graph.getNodeByPayload(group_source);
-      graph.addEdge(sourceNode, listener_node);
+      if (!graph.edgeExists(sourceNode, listener_node))
+      {
+        graph.addEdge(sourceNode, listener_node);
+      }
     }
   }
 }
@@ -337,7 +349,10 @@ void cedar::proc::Trigger::explore
       }
 
       auto listener_node = graph.getNodeByPayload(listener);
-      graph.addEdge(source_node, listener_node);
+      if (!graph.edgeExists(source_node, listener_node))
+      {
+        graph.addEdge(source_node, listener_node);
+      }
     }
   }
 }
