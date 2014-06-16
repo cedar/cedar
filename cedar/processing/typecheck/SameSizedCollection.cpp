@@ -84,9 +84,9 @@ cedar::proc::DataSlot::VALIDITY
     for (size_t i = 0; i < external_slot->getDataCount(); ++i)
     {
       auto slot_mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(external_slot->getData(i));
-      if (cedar::aux::math::getDimensionalityOf(slot_mat_data->getData()))
+      if (slot_mat_data)
       {
-        // If 0d data is not allowed, we just take the first mat data we can find.
+        // If 0d data is not allowed, we just take the first mat data we can find (if it is 0d, all others must be as well).
         // Otherwise, we look for the first non-0d mat data.
         if (!this->mAllow0D || slot_mat_data->getDimensionality() > 0)
         {
