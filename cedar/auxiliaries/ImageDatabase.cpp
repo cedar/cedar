@@ -197,6 +197,16 @@ void cedar::aux::ImageDatabase::addCommandLineOptions(cedar::aux::CommandLinePar
 
   parser.defineValue
   (
+    "sample-testing-tags",
+    "Tag combination to use for selecting the testing samples.",
+    "test",
+    0,
+    sample_selection_group_name
+  );
+
+
+  parser.defineValue
+  (
     "restrict-sample-selection",
     "An instruction on how to restrict the sample selection. Possible instructions are: \n"
     "  \"unrestricted\": no restrictions,\n"
@@ -944,6 +954,7 @@ std::set<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::getTest
 {
   std::set<cedar::aux::ImageDatabase::ImagePtr> images;
 
+  //!@todo redundant code with getTrainingImages; they only differ in some strings
   std::string mode = parser.getValue<std::string>("sample-testing-selection-mode");
   //!@todo This should be an enum
   if (mode == "not_in_training_set")
