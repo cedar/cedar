@@ -45,8 +45,10 @@
 #include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/GraphTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/sinks/GroupSink.fwd.h"
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 
@@ -108,6 +110,11 @@ public:
   //!@brief saves a configuration to a ConfigurationNode
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
+  cedar::proc::Triggerable* getOwner() const
+  {
+    return this->mpOwner;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -146,6 +153,33 @@ private:
   }
 
   void buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph);
+
+  void explore
+  (
+    cedar::proc::TriggerablePtr source,
+    cedar::proc::TriggerPtr trigger,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& toExplore,
+    bool sourceIsTrigger
+  );
+
+  void exploreSink
+  (
+    cedar::proc::TriggerablePtr source,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
+    cedar::proc::sinks::GroupSinkPtr startSink,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& to_explore
+  );
+
+  void exploreGroupTarget
+  (
+    cedar::proc::TriggerablePtr source,
+    cedar::proc::GroupPtr listener_group,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& to_explore
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
