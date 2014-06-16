@@ -67,6 +67,11 @@ cedar::proc::DataSlot::VALIDITY
   auto external_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ConstExternalData>(slot);
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
+    if (mat_data->isEmpty())
+    {
+      return this->validityBad();
+    }
+
     // if 0d matrices are allowed and the data is 0d, accept it
     if (this->mAllow0D && mat_data->getDimensionality() == 0)
     {
