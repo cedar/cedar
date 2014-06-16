@@ -1190,7 +1190,10 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
     }
 
     // trigger the connected target once, establishing a validity of the target
-    p_target->onTrigger();
+    if (!boost::dynamic_pointer_cast<cedar::proc::Group>(p_target))
+    {
+      p_target->onTrigger();
+    }
   }
   // inform any interested listeners of this new connection
   this->signalDataConnectionChanged
@@ -1657,7 +1660,7 @@ cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDat
 
   cedar::proc::TriggerablePtr triggerable_target = this->getElement<cedar::proc::Triggerable>(target_name);
   CEDAR_DEBUG_ASSERT(triggerable_target);
-  if (!triggerable_target->isLooped())
+  if (!triggerable_target->isLooped() || boost::dynamic_pointer_cast<cedar::proc::Group>(triggerable_target))
   {
     target_name = connection->getTarget()->getParent(); // reset target_name
     // check that both Connectables are not connected through some other DataSlots
