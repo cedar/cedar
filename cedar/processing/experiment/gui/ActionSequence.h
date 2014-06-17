@@ -50,6 +50,7 @@
 
 // SYSTEM INCLUDES
 #include <QFrame>
+#include <QListWidget>
 #include <QBoxLayout>
 
 
@@ -143,7 +144,7 @@ private:
   QVBoxLayout* conditionRow;
 
   //!@brief The layout where the Actions will be displayed
-  QVBoxLayout* mActions;
+  QListWidget* mActions;
 
 }; // class cedar::proc::experiment::gui::ActionSequence
 
