@@ -289,12 +289,23 @@ void cedar::proc::Trigger::explore
        cedar::proc::TriggerPtr trigger,
        cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
        std::vector<cedar::proc::TriggerablePtr>& to_explore,
-       bool sourceIsTrigger
+       bool sourceIsTrigger,
+       std::set<cedar::proc::TriggerablePtr>& explored
      )
 {
 #ifdef DEBUG_TRIGGER_TREE_EXPLORATION
 /* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "+ explore called for " << nameTriggerable(source.get()) << std::endl;
 #endif
+
+  if (explored.find(source) != explored.end())
+  {
+    // triggerable was already treated, skip it.
+    return;
+  }
+  else
+  {
+    explored.insert(source);
+  }
 
   cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr source_node;
   if (sourceIsTrigger)
@@ -361,6 +372,7 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
 {
   // root node corresponding to this trigger
   std::vector<cedar::proc::TriggerablePtr> to_explore;
+  std::set<cedar::proc::TriggerablePtr> explored;
 
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
@@ -372,11 +384,11 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
     auto owner_ptr = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element->shared_from_this());
     CEDAR_DEBUG_ASSERT(owner_ptr);
 
-    this->explore(owner_ptr, this_ptr, graph, to_explore, true);
+    this->explore(owner_ptr, this_ptr, graph, to_explore, true, explored);
   }
   else
   {
-    this->explore(this_ptr, this_ptr, graph, to_explore, true);
+    this->explore(this_ptr, this_ptr, graph, to_explore, true, explored);
   }
 
   while (!to_explore.empty())
@@ -388,7 +400,7 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
     //!@todo Is getting the finished trigger thread-safe?
     cedar::proc::TriggerPtr done_trigger = source->getFinishedTrigger();
 
-    this->explore(source, done_trigger, graph, to_explore, false);
+    this->explore(source, done_trigger, graph, to_explore, false, explored);
   }
 }
 

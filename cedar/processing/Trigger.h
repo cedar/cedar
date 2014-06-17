@@ -160,7 +160,8 @@ private:
     cedar::proc::TriggerPtr trigger,
     cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
     std::vector<cedar::proc::TriggerablePtr>& toExplore,
-    bool sourceIsTrigger
+    bool sourceIsTrigger,
+    std::set<cedar::proc::TriggerablePtr>& explored
   );
 
   void exploreSink
