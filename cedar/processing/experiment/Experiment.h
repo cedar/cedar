@@ -189,6 +189,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Sets the group of this experiment
+  void setGroup(cedar::proc::GroupPtr group);
+
   //!@brief Returns the file name of this experiment
   const std::string& getFileName() const;
 
