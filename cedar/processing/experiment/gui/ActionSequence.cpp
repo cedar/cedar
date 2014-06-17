@@ -68,7 +68,7 @@ mCondition(NULL),
 mSequence(sequence),
 mpParent(pParent),
 conditionRow(new QVBoxLayout),
-mActions (new QListWidget)
+mActions (new ActionListWidget)
 {
   this->setLayout(mLayout);
   this->conditionRow->setAlignment(Qt::AlignTop);
@@ -232,3 +232,17 @@ void cedar::proc::experiment::gui::ActionSequence::clear(QLayout* layout)
     }
 }
 
+void cedar::proc::experiment::gui::ActionSequence::ActionListWidget::dragEnterEvent(QDragEnterEvent* event)
+{
+  QListWidget::dragEnterEvent(event);
+  this->mStartDragPos = this->currentRow();
+}
+
+void cedar::proc::experiment::gui::ActionSequence::ActionListWidget::dropEvent(QDropEvent* event)
+{
+  QListWidget::dropEvent(event);
+  this->mDropPos = this->currentRow();
+
+  //############!@todo Imeplement##################
+  //mSequence->moveActions(mDropPos,mStartDragPos);
+}

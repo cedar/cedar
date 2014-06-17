@@ -68,7 +68,16 @@ class cedar::proc::experiment::gui::ActionSequence : public QFrame
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+private:
+  class ActionListWidget : public QListWidget
+  {
+    public:
+      void dragEnterEvent(QDragEnterEvent* event);
+      void dropEvent(QDropEvent* event);
+    private:
+      int mStartDragPos;
+      int mDropPos;
+  };
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -144,7 +153,7 @@ private:
   QVBoxLayout* conditionRow;
 
   //!@brief The layout where the Actions will be displayed
-  QListWidget* mActions;
+  ActionListWidget* mActions;
 
 }; // class cedar::proc::experiment::gui::ActionSequence
 
