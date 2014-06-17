@@ -454,7 +454,7 @@ void cedar::proc::experiment::Experiment::saveGroupState()
 
 void cedar::proc::experiment::Experiment::resetGroupState()
 {
-  //!@todo fix exception
+  //!@todo fix exception // wrong reset
   for (auto name_element_pair : this->mGroup->getElements())
   {
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
