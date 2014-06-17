@@ -68,7 +68,7 @@ mCondition(NULL),
 mSequence(sequence),
 mpParent(pParent),
 conditionRow(new QVBoxLayout),
-mActions (new QVBoxLayout)
+mActions (new QListWidget)
 {
   this->setLayout(mLayout);
   this->conditionRow->setAlignment(Qt::AlignTop);
@@ -78,6 +78,9 @@ mActions (new QVBoxLayout)
   QPalette p = this->palette();
   p.setColor(backgroundRole(), QColor(212,208,200));
   this->setPalette(p);
+
+  mActions->setDragDropMode(QAbstractItemView::InternalMove);
+  mActions->setDefaultDropAction(Qt::MoveAction);
 
   update();
 
@@ -152,15 +155,13 @@ void cedar::proc::experiment::gui::ActionSequence::update()
   QVBoxLayout* actionBoxLayout = new QVBoxLayout;
   actionBox->setLayout(actionBoxLayout);
   actionBoxLayout->addWidget(actions_text);
-  QFrame* actionListBox = new QFrame();
-  actionListBox->setLayout(mActions);
-  actionListBox->setFrameShape(QFrame::Box);
-  actionListBox->setFrameShadow(QFrame::Sunken);
-  actionBoxLayout->addWidget(actionListBox);
+  actionBoxLayout->addWidget(mActions);
   actionBox->setAutoFillBackground(true);
   p = actionBox->palette();
   p.setColor(backgroundRole(), QColor(230,230,210));
   actionBox->setPalette(p);
+  mActions->setAutoFillBackground(true);
+  mActions->setPalette(p);
   body->addWidget(actionBox);
   try
   {
@@ -191,19 +192,26 @@ void cedar::proc::experiment::gui::ActionSequence::updateCondition()
 
 void cedar::proc::experiment::gui::ActionSequence::updateActions()
 {
-  clear(mActions);
+  mActions->clear();
 
   for (cedar::proc::experiment::action::ActionPtr action : mSequence->getActions())
   {
     cedar::proc::experiment::gui::ExperimentItemWidget* actionWidget =
         new cedar::proc::experiment::gui::ExperimentItemWidget();
     actionWidget->display(action);
-    QHBoxLayout* row = new QHBoxLayout();
+    QListWidgetItem* item = new QListWidgetItem();
+    QWidget* itemWidget = new QWidget();
+    QHBoxLayout* itemLayout = new QHBoxLayout();
+    itemWidget->setLayout(itemLayout);
     std::string name = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->getTypeId(action);
-    row->addWidget(new QLabel(QString::fromStdString(name)));
-    row->addWidget(actionWidget);
-    mActions->addLayout(row);
+    QLabel* itemLabel = new QLabel(QString::fromStdString(name));
+    itemLayout->addWidget(itemLabel);
+    itemLayout->addWidget(actionWidget);
+    item->setSizeHint(QSize(0,85));
+    mActions->addItem(item);
+    mActions->setItemWidget(item,itemWidget);
   }
+  mActions->setMinimumHeight(mSequence->getActions().size()*85+5);
 }
 
 void cedar::proc::experiment::gui::ActionSequence::clear(QLayout* layout)
