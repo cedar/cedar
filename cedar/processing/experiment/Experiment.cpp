@@ -472,3 +472,8 @@ void cedar::proc::experiment::Experiment::resetGroupState()
    */
   saveGroupState();
 }
+
+void cedar::proc::experiment::Experiment::setGroup(cedar::proc::GroupPtr group)
+{
+  this->mGroup = group;
+}
