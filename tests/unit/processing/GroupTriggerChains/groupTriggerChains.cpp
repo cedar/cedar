@@ -58,6 +58,10 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+int global_errors = 0;
+int num_superfluous_triggers = 0;
+std::vector<std::string> failed_configurations;
+
 typedef cedar::aux::DataTemplate<unsigned int> UIntData;
 CEDAR_GENERATE_POINTER_TYPES(UIntData);
 
@@ -125,10 +129,6 @@ public:
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TriggerTest);
-
-int global_errors = 0;
-int num_superfluous_triggers = 0;
-std::vector<std::string> failed_configurations;
 
 void test_trigger(cedar::proc::LoopedTriggerPtr trigger, TriggerTestPtr sink, const std::string& testName)
 {
@@ -555,6 +555,53 @@ void run_test()
     group->connectSlots("nested.external output", "step2.in1");
 
     test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), 0, "configuration 14");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 15" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->addConnector("external input", true);
+    group->add(boost::make_shared<TriggerTest>(true), "step1");
+    nested_group->add(boost::make_shared<TriggerTest>(true), "step2");
+
+    std::cout << "Connecting external input -> step2.in1" << std::endl;
+    nested_group->connectSlots("external input.output", "step2.in1");
+    std::cout << "Connecting step1.out -> external input" << std::endl;
+    group->connectSlots("step1.out", "nested.external input");
+
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), 0, "configuration 15");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 16" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->addConnector("external input", true);
+    nested_group->addConnector("external input 2", true);
+    group->add(boost::make_shared<TriggerTest>(true), "step1");
+    nested_group->add(boost::make_shared<TriggerTest>(true), "step2");
+    nested_group->add(boost::make_shared<TriggerTest>(true), "step3");
+
+    std::cout << "Connecting step1.out -> external input" << std::endl;
+    group->connectSlots("step1.out", "nested.external input");
+    std::cout << "Connecting step1.out -> external input 2" << std::endl;
+    group->connectSlots("step1.out", "nested.external input 2");
+    std::cout << "Connecting external input -> step2.in1" << std::endl;
+    nested_group->connectSlots("external input.output", "step2.in1");
+    std::cout << "Connecting external input 2 -> step3.in1" << std::endl;
+    nested_group->connectSlots("external input 2.output", "step3.in1");
+
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), 0, "configuration 16");
+    test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step3"), 0, "configuration 16");
   }
 }
 
