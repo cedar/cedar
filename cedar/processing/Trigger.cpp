@@ -569,7 +569,7 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 #ifdef DEBUG_TRIGGERING
 /* DEBUG_TRIGGERING */ std::cout << "  > Triggering chain item " << nameTriggerable(triggerable) << std::endl;
 #endif
-
+      CEDAR_DEBUG_ASSERT(!triggerable->isLooped());
       triggerable->onTrigger(arguments, this_ptr);
 
 #ifdef DEBUG_TRIGGERING
