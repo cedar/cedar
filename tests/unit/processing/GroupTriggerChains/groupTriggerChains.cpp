@@ -64,8 +64,9 @@ CEDAR_GENERATE_POINTER_TYPES(UIntData);
 class TriggerTest : public cedar::proc::Step
 {
 public:
-  TriggerTest()
+  TriggerTest(bool looped = false)
   :
+  cedar::proc::Step(looped),
   mTriggerCount(0),
   mDataOut(new UIntData(0))
   {
@@ -165,20 +166,27 @@ void test_group(TriggerTestPtr source, TriggerTestPtr sink, unsigned int data, c
   sink->resetData();
   std::cout << ">>> Triggering source." << std::endl;
   source->onTrigger();
-  if (sink->mTriggerCount == 0)
+  if (!sink->isLooped() && sink->mTriggerCount == 0)
   {
     ++global_errors;
     std::cout << "Sink step was not triggered in " << testName << std::endl;
     failed_configurations.push_back(testName + " failed to trigger the sink.");
   }
-  else if (sink->mTriggerCount > 1)
+  else if (!sink->isLooped() && sink->mTriggerCount > 1)
   {
     ++num_superfluous_triggers;
     ++global_errors;
     std::cout << "Sink step was triggered multiple (" << sink->mTriggerCount << ") times in " << testName << std::endl;
     failed_configurations.push_back(testName + " triggered sink more than once.");
   }
-  if (sink->mDataOut->getData() != data)
+  else if (sink->isLooped() && sink->mTriggerCount > 0)
+  {
+    ++num_superfluous_triggers;
+    ++global_errors;
+    std::cout << "Looped sink step was triggered (" << sink->mTriggerCount << " times) in " << testName << std::endl;
+    failed_configurations.push_back(testName + " triggered looped sink .");
+  }
+  if (!sink->isLooped() && sink->mDataOut->getData() != data)
   {
     ++global_errors;
     std::cout << "Sink step does not contain correct data in " << testName << std::endl;
@@ -507,6 +515,46 @@ void run_test()
     also_nested_group->add(more_moved);
 
     test_group(group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step4"), 4, "configuration 12");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 13" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->addConnector("external output", false);
+    nested_group->add(boost::make_shared<TriggerTest>(), "step1");
+    group->add(boost::make_shared<TriggerTest>(true), "step2");
+
+    std::cout << "Connecting external output -> step2.in1" << std::endl;
+    group->connectSlots("nested.external output", "step2.in1");
+    std::cout << "Connecting step1.out -> external output" << std::endl;
+    nested_group->connectSlots("step1.out", "external output.input");
+
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), 0, "configuration 13");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 14" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group(new Group());
+    group->add(nested_group, "nested");
+    nested_group->addConnector("external output", false);
+    nested_group->add(boost::make_shared<TriggerTest>(), "step1");
+    group->add(boost::make_shared<TriggerTest>(true), "step2");
+
+    std::cout << "Connecting step1.out -> external output" << std::endl;
+    nested_group->connectSlots("step1.out", "external output.input");
+    std::cout << "Connecting external output -> step2.in1" << std::endl;
+    group->connectSlots("nested.external output", "step2.in1");
+
+    test_group(nested_group->getElement<TriggerTest>("step1"), group->getElement<TriggerTest>("step2"), 0, "configuration 14");
   }
 }
 
