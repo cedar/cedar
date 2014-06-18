@@ -1876,32 +1876,25 @@ std::vector<cedar::proc::OwnedDataPtr> cedar::proc::Group::getRealSources
     // now try to decide what to do with the target of the current connection
 
     // first case: this is a step, but not a connector
-    if
-    (
-      this->getElement<cedar::proc::Step>(connection->getSource()->getParent())
-      && !this->getElement<cedar::proc::sources::GroupSource>(connection->getSource()->getParent())
-    )
+    auto source = this->getElement(connection->getSource()->getParent());
+    auto source_step = boost::dynamic_pointer_cast<cedar::proc::Step>(source);
+    auto source_group = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(source);
+    if (source_step && !source_group)
     {
-      real_sources.push_back
-                   (
-                     this->getElement<cedar::proc::Step>
-                           (
-                             connection->getSource()->getParent())->getOutputSlot(connection->getSource()->getName()
-                           )
-                   );
+      real_sources.push_back(source_step->getOutputSlot(connection->getSource()->getName()));
     }
     // second case: this is a connector, we have to follow this connection
-    else if (auto source = this->getElement<cedar::proc::sources::GroupSource>(connection->getSource()->getParent()))
+    else if (source_group)
     {
       // is this group the target group? we can return the group source input as target
       if (this == targetGroup.get())
       {
-        real_sources.push_back(source->getOutputSlot(connection->getSource()->getName()));
+        real_sources.push_back(source_group->getOutputSlot(connection->getSource()->getName()));
       }
       // now determine the connector input slot of this group and call this function on the parent group
       else
       {
-        DataSlotPtr target_slot = this->getInputSlot(source->getName());
+        DataSlotPtr target_slot = this->getInputSlot(source_group->getName());
         auto more_sources = this->getGroup()->getRealSources(target_slot, targetGroup);
         real_sources.insert(real_sources.end(), more_sources.begin(), more_sources.end());
       }
