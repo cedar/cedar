@@ -68,7 +68,7 @@ mCondition(NULL),
 mSequence(sequence),
 mpParent(pParent),
 conditionRow(new QVBoxLayout),
-mActions (new ActionListWidget)
+mActions (new ActionListWidget(this))
 {
   this->setLayout(mLayout);
   this->conditionRow->setAlignment(Qt::AlignTop);
@@ -160,8 +160,14 @@ void cedar::proc::experiment::gui::ActionSequence::update()
   p = actionBox->palette();
   p.setColor(backgroundRole(), QColor(230,230,210));
   actionBox->setPalette(p);
-  mActions->setAutoFillBackground(true);
-  mActions->setPalette(p);
+  mActions->setAlternatingRowColors(true);
+  mActions->setStyleSheet("QListWidget {"
+                          "               background-color: rgb(230,230,210);"
+                          "               alternate-background-color: rgb(200,200,180);"
+                          "               selection-background-color: rgb(240,210,210);"
+                          "            }"
+                          "");
+
   body->addWidget(actionBox);
   try
   {
@@ -193,6 +199,7 @@ void cedar::proc::experiment::gui::ActionSequence::updateCondition()
 void cedar::proc::experiment::gui::ActionSequence::updateActions()
 {
   mActions->clear();
+  int itemheight = 55;
 
   for (cedar::proc::experiment::action::ActionPtr action : mSequence->getActions())
   {
@@ -202,16 +209,17 @@ void cedar::proc::experiment::gui::ActionSequence::updateActions()
     QListWidgetItem* item = new QListWidgetItem();
     QWidget* itemWidget = new QWidget();
     QHBoxLayout* itemLayout = new QHBoxLayout();
+    itemLayout->setMargin(0);
     itemWidget->setLayout(itemLayout);
     std::string name = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->getTypeId(action);
     QLabel* itemLabel = new QLabel(QString::fromStdString(name));
     itemLayout->addWidget(itemLabel);
     itemLayout->addWidget(actionWidget);
-    item->setSizeHint(QSize(0,85));
+    item->setSizeHint(QSize(0,itemheight));
     mActions->addItem(item);
     mActions->setItemWidget(item,itemWidget);
   }
-  mActions->setMinimumHeight(mSequence->getActions().size()*85+5);
+  mActions->setMinimumHeight(mSequence->getActions().size()*itemheight+5);
 }
 
 void cedar::proc::experiment::gui::ActionSequence::clear(QLayout* layout)
@@ -241,8 +249,5 @@ void cedar::proc::experiment::gui::ActionSequence::ActionListWidget::dragEnterEv
 void cedar::proc::experiment::gui::ActionSequence::ActionListWidget::dropEvent(QDropEvent* event)
 {
   QListWidget::dropEvent(event);
-  this->mDropPos = this->currentRow();
-
-  //############!@todo Imeplement##################
-  //mSequence->moveActions(mDropPos,mStartDragPos);
+  this->mpParent->mSequence->moveAction(mStartDragPos, this->currentRow());
 }

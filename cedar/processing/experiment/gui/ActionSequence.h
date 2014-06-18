@@ -72,11 +72,13 @@ private:
   class ActionListWidget : public QListWidget
   {
     public:
+      ActionListWidget(ActionSequence* parent): QListWidget(parent),mpParent(parent),mStartDragPos(0){}
+    public:
       void dragEnterEvent(QDragEnterEvent* event);
       void dropEvent(QDropEvent* event);
     private:
+      ActionSequence* mpParent;
       int mStartDragPos;
-      int mDropPos;
   };
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

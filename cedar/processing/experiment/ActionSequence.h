@@ -86,6 +86,8 @@ public:
   //!@brief Returns the condition of this sequence
   cedar::proc::experiment::condition::ConditionPtr getCondition();
 
+  void moveAction(unsigned int actionIndex, unsigned int actionNewIndex);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
