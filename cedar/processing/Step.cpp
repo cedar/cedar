@@ -362,9 +362,17 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
   try
   {
-    CEDAR_DEBUG_ASSERT(arguments.get() != nullptr);
+    if (arguments.get() != nullptr)
+    {
     // call the compute function with the given arguments
-    this->compute(*(arguments.get()));
+      this->compute(*(arguments.get()));
+    }
+    else
+    {
+      // call the compute function with empty arguments
+      cedar::proc::Arguments args;
+      this->compute(args);
+    }
   }
   // catch exceptions and translate them to the given state/message
   catch(const cedar::aux::ExceptionBase& e)
