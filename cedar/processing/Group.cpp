@@ -1189,6 +1189,7 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
       // if the triggers are already connected, that's ok.
     }
 
+    //!@todo this has overlap with removeDataConnection - and is in addition a special case
     // trigger the connected target once, establishing a validity of the target
     if (!boost::dynamic_pointer_cast<cedar::proc::Group>(p_target))
     {
@@ -1683,7 +1684,10 @@ cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDat
         it = mDataConnections.erase(it);
 
         // recheck if the inputs of the target are still valid
-        triggerable_target->onTrigger();
+        if (!boost::dynamic_pointer_cast<cedar::proc::Group>(triggerable_target))
+        {
+          triggerable_target->onTrigger();
+        }
 
         // found another connection between those two Connectables, do not delete done trigger and return
         return it;
@@ -1699,6 +1703,7 @@ cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDat
     (*it)->disconnect();
     it = mDataConnections.erase(it);
 
+    //!@todo this has overlap with connectSlots - and is in addition a special case
     // recheck if the inputs of the target are still valid (groups do not have to be triggered at all)
     if (!boost::dynamic_pointer_cast<cedar::proc::Group>(triggerable_target))
     {
