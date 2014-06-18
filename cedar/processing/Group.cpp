@@ -1699,8 +1699,11 @@ cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDat
     (*it)->disconnect();
     it = mDataConnections.erase(it);
 
-    // recheck if the inputs of the target are still valid
-    triggerable_target->onTrigger();
+    // recheck if the inputs of the target are still valid (groups do not have to be triggered at all)
+    if (!boost::dynamic_pointer_cast<cedar::proc::Group>(triggerable_target))
+    {
+      triggerable_target->onTrigger();
+    }
   }
   else
   {
