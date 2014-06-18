@@ -51,6 +51,7 @@
 #include "cedar/processing/sinks/GroupSink.fwd.h"
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -74,6 +75,7 @@ class cedar::proc::Trigger : public cedar::proc::Element,
   friend class cedar::proc::Group;
   friend class cedar::proc::TriggerConnection;
   friend class cedar::proc::Triggerable;
+  friend class cedar::proc::Step;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

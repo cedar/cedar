@@ -44,6 +44,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -98,6 +99,8 @@ public:
 
   //!@brief copy a configuration to another instance of the same class (type check included)
   void copyTo(cedar::aux::ConfigurablePtr target) const;
+
+  virtual void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
