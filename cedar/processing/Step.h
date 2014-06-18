@@ -295,6 +295,9 @@ public:
   //! Returns the name of a given time measurement
   const std::string& getTimeMeasurementName(unsigned int id) const;
 
+  //! Updates the step's trigger chains
+  void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();

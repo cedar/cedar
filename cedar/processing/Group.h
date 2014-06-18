@@ -624,6 +624,15 @@ public:
     return !this->mLinkedGroupFile.isEmpty() && !this->mLinkedGroupName.empty();
   }
 
+  //! If set to true, trigger chains will not be updated.
+  bool holdTriggerChainUpdates() const;
+
+  //! If set to true, trigger chains will not be updated.
+  void setHoldTriggerChainUpdates(bool hold);
+
+  //! Updates the trigger chains of all steps.
+  void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -764,6 +773,8 @@ private:
 
   //! If non-empty, the name of the group that was imported from a file.
   std::string mLinkedGroupName;
+
+  bool mHoldTriggerChainUpdates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
