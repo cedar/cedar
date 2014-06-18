@@ -58,11 +58,12 @@
 #include <QWriteLocker>
 #include <algorithm>
 
-//!@todo Only added for debugging, remove afterwards
+// for debugging
 #include "cedar/auxiliaries/NamedConfigurable.h"
 
 //#define DEBUG_TRIGGER_TREE_EXPLORATION
 //#define DEBUG_TRIGGERING
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -375,6 +376,9 @@ void cedar::proc::Trigger::explore
 
 void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph)
 {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " U " << nameTrigger(this) << "->buildTriggerGraph()" << std::endl;
+#endif
   // root node corresponding to this trigger
   std::vector<cedar::proc::TriggerablePtr> to_explore;
   std::set<cedar::proc::TriggerablePtr> explored;
@@ -407,12 +411,27 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
 
     this->explore(source, done_trigger, graph, to_explore, false, explored);
   }
+
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " U done " << nameTrigger(this) << "->buildTriggerGraph()" << std::endl;
+#endif
 }
 
 void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown)
 {
+  if (this->mpOwner != nullptr)
+  {
+    auto connectable = dynamic_cast<cedar::proc::Connectable*>(this->mpOwner);
+    if (connectable != nullptr)
+    {
+      auto group = connectable->getGroup();
+      if (group && group->holdTriggerChainUpdates())
+      {
+        return;
+      }
+    }
+  }
   //!@todo Here and in buildTriggerGraph, there are a lot of dynamic casts. Can this be solved better with a bunch of virtual functions?
-//!@todo Debug outputs - remove
 #ifdef DEBUG_TRIGGER_TREE_EXPLORATION
 /* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " U Updating triggering order of " << nameTrigger(this) << std::endl;
 #endif
@@ -420,6 +439,9 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
   // check if this trigger was already visited during the current wave of graph generation
   if (visited.find(this) != visited.end())
   {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " U already visited: " << nameTrigger(this) << std::endl;
+#endif
     return;
   }
   else

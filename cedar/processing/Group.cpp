@@ -170,6 +170,7 @@ namespace
 cedar::proc::Group::Group()
 :
 Triggerable(false),
+mHoldTriggerChainUpdates(false),
 _mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap())),
 _mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false))
 {
@@ -197,6 +198,25 @@ cedar::proc::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Group::updateTriggerChains(std::set<cedar::proc::Trigger*>& visited)
+{
+  for (auto name_element_pair : this->mElements)
+  {
+    auto element = name_element_pair.second;
+    element->updateTriggerChains(visited);
+  }
+}
+
+bool cedar::proc::Group::holdTriggerChainUpdates() const
+{
+  return this->mHoldTriggerChainUpdates;
+}
+
+void cedar::proc::Group::setHoldTriggerChainUpdates(bool hold)
+{
+  this->mHoldTriggerChainUpdates = hold;
+}
 
 std::vector<std::string> cedar::proc::Group::listInvalidSteps() const
 {
@@ -1405,8 +1425,15 @@ std::set<std::string> cedar::proc::Group::getRequiredPlugins(const std::string& 
 
 void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& root)
 {
+  bool holding = this->holdTriggerChainUpdates();
+  this->setHoldTriggerChainUpdates(true);
+
   std::vector<std::string> exceptions;
   this->readConfiguration(root, exceptions);
+
+  this->setHoldTriggerChainUpdates(holding);
+  std::set<cedar::proc::Trigger*> visited;
+  this->updateTriggerChains(visited);
 
   if (!exceptions.empty())
   {
