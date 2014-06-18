@@ -128,6 +128,11 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::updateTriggerChains(std::set<cedar::proc::Trigger*>& visited)
+{
+  this->getFinishedTrigger()->updateTriggeringOrder(visited);
+}
+
 unsigned int cedar::proc::Step::registerTimeMeasurement(const std::string& measurement)
 {
   unsigned int id = this->mTimeMeasurementNames.size();
