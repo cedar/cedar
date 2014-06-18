@@ -58,7 +58,7 @@ cedar::proc::Element::~Element()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::Element::updateTriggerChains(std::set<cedar::proc::Trigger*>& visited)
+void cedar::proc::Element::updateTriggerChains(std::set<cedar::proc::Trigger*>& /*visited*/)
 {
   // empty default implementation
 }
