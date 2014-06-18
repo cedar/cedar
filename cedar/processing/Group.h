@@ -337,7 +337,7 @@ public:
    * @param sourceSlot The source slot.
    * @param targetSlot The target slot.
    */
-  void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
+  void disconnectSlots(cedar::proc::ConstOwnedDataPtr sourceSlot, cedar::proc::ConstExternalDataPtr targetSlot);
 
   /*!@brief Deletes the connections in the list.
    */
@@ -673,20 +673,20 @@ private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
-  std::vector<cedar::proc::DataSlotPtr> getRealTargets
-                                        (
-                                          cedar::proc::DataSlotPtr slot,
-                                          cedar::proc::ConstGroupPtr targetGroup
-                                        );
+  std::vector<cedar::proc::ExternalDataPtr> getRealTargets
+                                            (
+                                              cedar::proc::DataSlotPtr slot,
+                                              cedar::proc::ConstGroupPtr targetGroup
+                                            );
 
-  std::vector<cedar::proc::DataSlotPtr> getRealSources
-                                        (
-                                          cedar::proc::DataSlotPtr slot,
-                                          cedar::proc::ConstGroupPtr targetGroup
-                                        );
+  std::vector<cedar::proc::OwnedDataPtr> getRealSources
+                                         (
+                                           cedar::proc::DataSlotPtr slot,
+                                           cedar::proc::ConstGroupPtr targetGroup
+                                         );
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
-  static bool disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.

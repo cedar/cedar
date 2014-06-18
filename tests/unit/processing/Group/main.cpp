@@ -311,8 +311,8 @@ void run_test()
   network_left->add(gain_left, "left");
   cedar::proc::steps::StaticGainPtr gain_right(new cedar::proc::steps::StaticGain());
   network_left->add(gain_right, "right");
-  cedar::proc::DataSlotPtr output_slot = gain_left->getOutputSlot("output");
-  cedar::proc::DataSlotPtr input_slot = gain_right->getInputSlot("input");
+  auto output_slot = gain_left->getOutputSlot("output");
+  auto input_slot = gain_right->getInputSlot("input");
   network_left->connectSlots(output_slot, input_slot);
   to_move.clear();
   to_move.push_back(gain_right);
