@@ -224,3 +224,13 @@ cedar::aux::ConstDataPtr cedar::proc::ExternalData::getData(unsigned int index) 
     return cedar::aux::DataPtr();
   }
 }
+
+void cedar::proc::ExternalData::addIncomingConnection(cedar::proc::DataConnectionPtr newConnection)
+{
+  this->addConnection(newConnection);
+}
+
+void cedar::proc::ExternalData::removeIncomingConnection(cedar::proc::DataConnectionPtr removedConnection)
+{
+  this->removeConnection(removedConnection);
+}

@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Trigger.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -197,7 +198,10 @@ void cedar::proc::Triggerable::callOnStart()
   {
     for (auto listener : this->mFinished.member()->getListeners())
     {
-      listener->callOnStart();
+      if (!boost::dynamic_pointer_cast<cedar::proc::Group>(listener))
+      {
+        listener->callOnStart();
+      }
     }
   }
 }
@@ -251,7 +255,10 @@ void cedar::proc::Triggerable::callOnStop()
   {
     for (auto listener : this->mFinished.member()->getListeners())
     {
-      listener->callOnStop();
+      if (!boost::dynamic_pointer_cast<cedar::proc::Group>(listener))
+      {
+        listener->callOnStop();
+      }
     }
   }
 }

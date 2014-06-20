@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/TypeCheck.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/exceptions.h"
@@ -230,4 +231,34 @@ void cedar::proc::DataSlot::deleteParentPointer()
 void cedar::proc::DataSlot::resetParentPointer()
 {
   this->mpParent = NULL;
+}
+
+void cedar::proc::DataSlot::addConnection(cedar::proc::DataConnectionPtr newConnection)
+{
+  if (std::find(this->mConnections.begin(), this->mConnections.end(), newConnection) == this->mConnections.end())
+  {
+    this->mConnections.push_back(newConnection);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!");
+  }
+}
+
+void cedar::proc::DataSlot::removeConnection(cedar::proc::DataConnectionPtr removedConnection)
+{
+  auto it = std::find(this->mConnections.begin(), this->mConnections.end(), removedConnection);
+  if (it != this->mConnections.end())
+  {
+    this->mConnections.erase(it);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::MissingConnectionException, "This connection does not exist!");
+  }
+}
+
+std::vector<cedar::proc::DataConnectionPtr>& cedar::proc::DataSlot::getDataConnections()
+{
+  return this->mConnections;
 }

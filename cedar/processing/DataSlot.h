@@ -201,6 +201,7 @@ public:
   //! Writes the data in this slot to the given file.
   void readDataFromFile(const cedar::aux::Path& path);
   
+  std::vector<DataConnectionPtr>& getDataConnections();
   
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
@@ -244,6 +245,10 @@ protected:
   {
     this->signalDataRemoved(data);
   }
+
+  void addConnection(cedar::proc::DataConnectionPtr newConnection);
+
+  void removeConnection(cedar::proc::DataConnectionPtr removedConnection);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -298,6 +303,8 @@ private:
 
   //! The function object holding a reference to the type check functions for this slot.
   TypeCheckFunction mTypeCheck;
+
+  std::vector<cedar::proc::DataConnectionPtr> mConnections;
 
 }; // class cedar::proc::DataSlot
 

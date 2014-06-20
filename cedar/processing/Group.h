@@ -337,7 +337,7 @@ public:
    * @param sourceSlot The source slot.
    * @param targetSlot The target slot.
    */
-  void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
+  void disconnectSlots(cedar::proc::ConstOwnedDataPtr sourceSlot, cedar::proc::ConstExternalDataPtr targetSlot);
 
   /*!@brief Deletes the connections in the list.
    */
@@ -624,6 +624,15 @@ public:
     return !this->mLinkedGroupFile.isEmpty() && !this->mLinkedGroupName.empty();
   }
 
+  //! If set to true, trigger chains will not be updated.
+  bool holdTriggerChainUpdates() const;
+
+  //! If set to true, trigger chains will not be updated.
+  void setHoldTriggerChainUpdates(bool hold);
+
+  //! Updates the trigger chains of all steps.
+  void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -664,20 +673,20 @@ private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
-  std::vector<cedar::proc::DataSlotPtr> getRealTargets
-                                        (
-                                          cedar::proc::DataSlotPtr slot,
-                                          cedar::proc::ConstGroupPtr targetGroup
-                                        );
+  std::vector<cedar::proc::ExternalDataPtr> getRealTargets
+                                            (
+                                              cedar::proc::DataSlotPtr slot,
+                                              cedar::proc::ConstGroupPtr targetGroup
+                                            );
 
-  std::vector<cedar::proc::DataSlotPtr> getRealSources
-                                        (
-                                          cedar::proc::DataSlotPtr slot,
-                                          cedar::proc::ConstGroupPtr targetGroup
-                                        );
+  std::vector<cedar::proc::OwnedDataPtr> getRealSources
+                                         (
+                                           cedar::proc::DataSlotPtr slot,
+                                           cedar::proc::ConstGroupPtr targetGroup
+                                         );
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
-  static bool disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
@@ -764,6 +773,8 @@ private:
 
   //! If non-empty, the name of the group that was imported from a file.
   std::string mLinkedGroupName;
+
+  bool mHoldTriggerChainUpdates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
