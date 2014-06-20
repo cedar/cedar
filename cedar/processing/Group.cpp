@@ -1710,6 +1710,8 @@ cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDat
 
     // then, erase the connection
     (*it)->disconnect();
+    (*it)->getSource()->removeOutgoingConnection((*it));
+    (*it)->getTarget()->removeIncomingConnection((*it));
     it = mDataConnections.erase(it);
 
     //!@todo this has overlap with connectSlots - and is in addition a special case
@@ -1723,6 +1725,8 @@ cedar::proc::Group::DataConnectionVector::iterator cedar::proc::Group::removeDat
   {
 
     (*it)->disconnect();
+    (*it)->getSource()->removeOutgoingConnection((*it));
+    (*it)->getTarget()->removeIncomingConnection((*it));
     it = mDataConnections.erase(it);
   }
   return it;
