@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/TypeCheck.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/exceptions.h"
@@ -253,7 +254,7 @@ void cedar::proc::DataSlot::removeConnection(cedar::proc::DataConnectionPtr remo
   }
   else
   {
-    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection does not exist!");
+    CEDAR_THROW(cedar::proc::MissingConnectionException, "This connection does not exist!");
   }
 }
 
