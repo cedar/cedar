@@ -55,6 +55,7 @@
 cedar::processingCL::MainApplication::MainApplication(int argc, char** argv)
 {
   mParser.defineFlag("run", "Run the architecture after loading it.", 'r');
+  mParser.defineFlag("no-plugins", "Do not load default plugins.", 'p');
   mParser.defineValue("load", "Load an architecture.", 'l');
   mParser.parse(argc, argv, true);
 }
@@ -66,7 +67,11 @@ cedar::processingCL::MainApplication::MainApplication(int argc, char** argv)
 void cedar::processingCL::MainApplication::exec()
 {
   // load default plugins
-  cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
+  if (!this->mParser.hasParsedFlag("no-plugins"))
+  {
+    std::cout << "Loading PLUGINS" << std::endl;
+    cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
+  }
 
   // command line input processing
   if (this->mParser.hasParsedValue("load"))
