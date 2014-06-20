@@ -912,6 +912,11 @@ void cedar::aux::ImageDatabase::selectImages(std::set<ImagePtr>& images, cedar::
 
     this->selectImagesFromFirstNClasses(images, number);
   }
+  else if (instruction == "unrestricted")
+  {
+    // nothing to do: no restrictions apply
+    return;
+  }
   else
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "Instruction \"" + instruction + "\" is not known.");

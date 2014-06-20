@@ -127,7 +127,17 @@ void cedar::proc::steps::Sum::sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat
       }
       else
       {
-        CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, sum))
+        if (!cedar::aux::math::matrixSizesEqual(input_mat, sum))
+        {
+          if (input_dim == 1)
+          {
+            sum = cedar::aux::math::canonicalRowVector(0.0 * input_mat.clone());
+          }
+          else
+          {
+            sum = 0.0 * input_mat.clone();
+          }
+        }
 
         cv::Mat to_add;
         if (input_dim == 1)
