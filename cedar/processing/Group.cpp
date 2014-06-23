@@ -2356,3 +2356,34 @@ void cedar::proc::Group::pruneUnusedConnectors()
     this->removeConnector(item.first, item.second);
   }
 }
+
+std::vector<cedar::proc::ConstElementPtr> cedar::proc::Group::findElementsAcrossGroups(boost::function<bool(cedar::proc::ConstElementPtr)> matcher) const
+{
+  std::vector<cedar::proc::ConstElementPtr> found_elements;
+  auto elements = this->getElements();
+  for (auto element : elements)
+  {
+    if (matcher(element.second))
+    {
+      found_elements.push_back(element.second);
+    }
+    else if (auto group = boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(element.second))
+    {
+      auto more_elements = group->findElementsAcrossGroups(matcher);
+      found_elements.insert(found_elements.end(), more_elements.begin(), more_elements.end());
+    }
+  }
+  return found_elements;
+}
+
+std::vector<cedar::proc::ConstElementPtr> cedar::proc::Group::findElementsAcrossGroupsFullName(const std::string& fullName) const
+{
+  auto function = [] (cedar::proc::ConstElementPtr element, const std::string& name) -> bool {return (element->getName() == name);};
+  return this->findElementsAcrossGroups(boost::bind<bool>(function, _1, fullName));
+}
+
+std::vector<cedar::proc::ConstElementPtr> cedar::proc::Group::findElementsAcrossGroupsContainsString(const std::string& string) const
+{
+  auto function = [] (cedar::proc::ConstElementPtr element, const std::string& part) -> bool {return (element->getName().find(part) != std::string::npos);};
+  return this->findElementsAcrossGroups(boost::bind<bool>(function, _1, string));
+}
