@@ -115,6 +115,12 @@ void cedar::proc::gui::ArchitectureConsistencyCheck::addIssue(size_t issueId, ce
 
 void cedar::proc::gui::ArchitectureConsistencyCheck::itemAction(int row, int)
 {
+  if (this->mIssues.size() == 0)
+  {
+    // no issues found, nothing to do
+    return;
+  }
+
   size_t issue_id = static_cast<size_t>(row);
   CEDAR_ASSERT(issue_id < this->mIssues.size());
   auto issue = this->mIssues.at(issue_id);
