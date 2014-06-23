@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/FindDialog.h"
 #include "cedar/processing/gui/AdvancedParameterLinker.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
 #include "cedar/processing/gui/PerformanceOverview.h"
@@ -98,6 +99,7 @@ mSuppressCloseDialog(false)
   // setup the (automatically generated) ui components
   this->setupUi(this);
 
+  mpFindDialog = new cedar::proc::gui::FindDialog(this, this->mpProcessingDrawer);
   mpPerformanceOverview = new cedar::proc::gui::PerformanceOverview(this);
 
   // manually added components
@@ -255,6 +257,7 @@ mSuppressCloseDialog(false)
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copyStep()));
   QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
+  QObject::connect(mpActionFind, SIGNAL(triggered()), this, SLOT(openFindDialog()));
 
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
 
@@ -293,9 +296,14 @@ cedar::proc::gui::Ide::~Ide()
 {
   this->mpLog->uninstallHandlers();
 
-  if (this->mpPerformanceOverview != NULL)
+  if (this->mpPerformanceOverview != nullptr)
   {
     delete this->mpPerformanceOverview;
+  }
+
+  if (this->mpFindDialog != nullptr)
+  {
+    delete this->mpFindDialog;
   }
 }
 
@@ -1465,4 +1473,19 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   }
 
   this->loadPlotGroupsIntoComboBox();
+}
+
+void cedar::proc::gui::Ide::openFindDialog()
+{
+  CEDAR_ASSERT(mpFindDialog != nullptr);
+
+  if (!mpFindDialog->isVisible())
+  {
+    mpFindDialog->setVisible(true);
+  }
+}
+
+cedar::proc::gui::ConstGroupPtr cedar::proc::gui::Ide::getGroup() const
+{
+  return this->mGroup;
 }

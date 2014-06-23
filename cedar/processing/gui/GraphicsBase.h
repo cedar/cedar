@@ -99,7 +99,8 @@ public:
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING,
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR,
     HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER,
-    HIGHLIGHTMODE_GROUP_MEMBER_LEAVING
+    HIGHLIGHTMODE_GROUP_MEMBER_LEAVING,
+    HIGHLIGHTMODE_SEARCH_RESULT
   };
 
   //!@brief enum  of base shapes for GraphicsBase
@@ -338,6 +339,8 @@ public:
 
   //! Color for groups being left
   static const QColor mColorGroupBeingLeft;
+
+  static const QColor mColorSearchResult;
 
   //! Color for target groups
   static const QColor mColorTargetGroup;

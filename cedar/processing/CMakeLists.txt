@@ -57,6 +57,7 @@ cedar_add_library(cedarproc
   gui/Connectable.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
+  gui/FindDialog.h
   gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
