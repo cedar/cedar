@@ -624,6 +624,10 @@ public:
     return !this->mLinkedGroupFile.isEmpty() && !this->mLinkedGroupName.empty();
   }
 
+  std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroupsFullName(const std::string& fullName) const;
+
+  std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroupsContainsString(const std::string& string) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -675,6 +679,8 @@ private:
                                           cedar::proc::DataSlotPtr slot,
                                           cedar::proc::ConstGroupPtr targetGroup
                                         );
+
+  std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroups(boost::function<bool(cedar::proc::ConstElementPtr)> matcher) const;
 
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
   static bool disconnectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);

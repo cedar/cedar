@@ -114,6 +114,8 @@
     <addaction name="mpActionPasteConfiguration"/>
     <addaction name="mpActionDuplicate"/>
     <addaction name="mpActionSelectAll"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionFind"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -828,6 +830,17 @@
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a file from which to load data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="mpActionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="toolTip">
+    <string>find an element</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

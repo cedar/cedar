@@ -62,6 +62,8 @@ const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(0, 76, 249);
 const QColor cedar::proc::gui::GraphicsBase::mColorGroupBeingLeft = QColor::fromRgb(200, 200, 200);
 const QColor cedar::proc::gui::GraphicsBase::mColorTargetGroup = QColor::fromRgb(125, 125, 255);
 
+const QColor cedar::proc::gui::GraphicsBase::mColorSearchResult = QColor::fromRgb(0, 127, 255);
+
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
 
@@ -532,6 +534,10 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
 
     case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
       pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
+      break;
+
+    case HIGHLIGHTMODE_SEARCH_RESULT:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mColorSearchResult);
       break;
 
     default:

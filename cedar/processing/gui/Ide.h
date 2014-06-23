@@ -53,6 +53,7 @@
 #include "cedar/processing/gui/ElementClassList.fwd.h"
 #include "cedar/processing/gui/Ide.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/FindDialog.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -252,6 +253,11 @@ public slots:
   //!@brief copy configuration to target step(s)
   void pasteStepConfiguration();
 
+  //!@brief copy one step to buffer
+  void openFindDialog();
+
+  cedar::proc::gui::ConstGroupPtr getGroup() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -372,6 +378,8 @@ private:
 
   //! Whether the save on close dialog should be suppressed.
   bool mSuppressCloseDialog;
+
+  cedar::proc::gui::FindDialog* mpFindDialog;
 
 }; // class cedar::MainWindow
 
