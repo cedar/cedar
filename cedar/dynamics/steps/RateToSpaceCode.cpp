@@ -137,6 +137,7 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
   QObject::connect(_mOutputSizes.get(), SIGNAL(valueChanged()), this, SLOT(outputSizesChanged()));
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(_mIsCyclic.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

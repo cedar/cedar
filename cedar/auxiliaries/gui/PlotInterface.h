@@ -38,6 +38,7 @@
 #define CEDAR_AUX_GUI_PLOT_INTERFACE_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Configurable.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Data.fwd.h"
@@ -49,7 +50,7 @@
 
 /*!@brief A unified interface for widgets that plot instances of cedar::proc::Data.
  */
-class cedar::aux::gui::PlotInterface : public QWidget
+class cedar::aux::gui::PlotInterface : public QWidget, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

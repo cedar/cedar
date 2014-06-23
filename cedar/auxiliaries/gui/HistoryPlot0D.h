@@ -42,7 +42,8 @@
 #ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+#include "cedar/auxiliaries/gui/QwtLinePlot.h"
+#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -59,105 +60,34 @@
 #include <deque>
 #include <vector>
 
-//!@cond SKIPPED_DOCUMENTATION
-namespace cedar
-{
-  namespace aux
-  {
-    namespace gui
-    {
-      namespace detail
-      {
-        /* This is an internal class of ImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
-         *
-         * Don't use it outside of the ImagePlot!
-         */
-        class HistoryPlot0DWorker : public QObject
-        {
-          Q_OBJECT
-
-          public:
-            HistoryPlot0DWorker(cedar::aux::gui::HistoryPlot0D* pPlot)
-            :
-            mpPlot(pPlot)
-            {
-            }
-
-          public slots:
-            void convert();
-
-          signals:
-            void done();
-
-          public:
-            cedar::aux::gui::HistoryPlot0D *mpPlot;
-        };
-        CEDAR_GENERATE_POINTER_TYPES(HistoryPlot0DWorker);
-      }
-    }
-  }
-}
-//!@endcond
 
 /*!@brief A time-based plot for 0D values. Displays a history of this value from a certain point in the past up to now.
- *
- * More detailed description of the class.
  */
 class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::gui::detail::HistoryPlot0DWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  struct CurveInfo
+private:
+  struct PlotData
   {
-    CurveInfo();
+    //! Data used for storing the history of the activation.
+    cedar::aux::MatDataPtr mHistory;
 
-    ~CurveInfo();
+    //! Data from which the history is being recorded.
+    cedar::aux::ConstMatDataPtr mData;
 
-    void setData(cedar::aux::ConstDataPtr data);
-
-    double getDataValue() const;
-
-    //! The data of this curve, as generic data pointer
-    cedar::aux::ConstDataPtr mData;
-
-    //! The data of this curve, as double data
-    //!@todo Can this be removed? I think that by now, double data inherits MatData...
-    cedar::aux::ConstDoubleDataPtr mDoubleData;
-
-    //! The data of this curve, as matrix data
-    cedar::aux::ConstMatDataPtr mMatData;
-
-    //! The data of this curve, as matrix data
-    cedar::aux::ConstUnitDataPtr mUnitData;
-
-    //! The qwt curve
-    QwtPlotCurve* mCurve;
-
-    //! y values of plot, stored as double-ended queue
-    std::deque<double> mXValues;
-
-    //! y values of plot, stored as vector (needed to pass this to qwt plot because deque is not stored linearly)
-    std::vector<double> mXArray;
-
-    //! y values of plot, stored as double-ended queue
-    std::deque<double> mYValues;
-
-    //! y values of plot, stored as vector (needed to pass this to qwt plot because deque is not stored linearly)
-    std::vector<double> mYArray;
-
+    //! X axis labels for the data
+    std::deque<cedar::unit::Time> mXLabels;
   };
-  CEDAR_GENERATE_POINTER_TYPES(CurveInfo);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -187,16 +117,11 @@ public:
   //!@brief Check if the given data can be detached from the plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
 
-signals:
-  //!@brief Signals the worker thread to convert the data to the plot's internal format.
-  void convert();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief create and handle the context menu
-  void contextMenuEvent(QContextMenuEvent *pEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -208,13 +133,11 @@ private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
   void doDetach(cedar::aux::ConstDataPtr data);
 
-  double getDataValue(size_t index);
+  //! Takes the current data and puts it into the history
+  void advanceHistory();
 
-  void applyStyle(size_t lineId, QwtPlotCurve *pCurve);
-
-private slots:
-  void showLegend(bool show = true);
-  void conversionDone();
+  //! Resets the history to contain only the current state.
+  void clear();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -222,30 +145,19 @@ private slots:
 protected:
   // none yet
 private:
-  std::vector<CurveInfoPtr> mCurves;
+  //! Subplot used for plotting the history matrix.
+  //!@todo This can probably also be done using Vtk; or: make a generic cedar::aux::gui::LinePlot interface?
+#ifdef CEDAR_USE_QWT
+  cedar::aux::gui::QwtLinePlot* mpHistoryPlot;
+#endif // CEDAR_USE_QWT
 
-  //!@brief the current widget that holds the plot
-  QWidget* mpCurrentPlotWidget;
-
-  //!@brief a plot
-  QwtPlot* mpPlot;
+  //! Data used for storing the history of the activation.
+  std::vector<PlotData> mPlotData;
 
   //!@brief number of steps in the past, which are still plotted
   size_t mMaxHistorySize;
 
-  //! Thread in which conversion of mat data to qwt triple is done.
-  QThread* mpWorkerThread;
-
-  //! Worker object.
-  cedar::aux::gui::detail::HistoryPlot0DWorkerPtr mWorker;
-
-  //! A vector containing all the colors used for plot lines.
-  static std::vector<QColor> mLineColors;
-
-  //! A vector containing all the line stypes for the plot.
-  static std::vector<Qt::PenStyle> mLineStyles;
-
-  static boost::posix_time::ptime mPlotStartTime;
+  int mTimerId;
 
 }; // class cedar::aux::gui::HistoryPlot0D
 

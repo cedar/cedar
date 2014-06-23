@@ -41,6 +41,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
@@ -73,6 +75,10 @@ mIsAdvanced(false)
 
 cedar::aux::Configurable::~Configurable()
 {
+  for (auto parameter_connection_pair : this->mNameChangedConnections)
+  {
+    parameter_connection_pair.second.disconnect();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -157,9 +163,9 @@ void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType) co
   cedar::aux::lock(this->mParameterLocks, lockType);
 }
 
-void cedar::aux::Configurable::unlockParameters() const
+void cedar::aux::Configurable::unlockParameters(cedar::aux::LOCK_TYPE lockType) const
 {
-  cedar::aux::unlock(this->mParameterLocks);
+  cedar::aux::unlock(this->mParameterLocks, lockType);
 }
 
 void cedar::aux::Configurable::updateLockSet()
@@ -206,13 +212,52 @@ cedar::aux::ConstConfigurablePtr cedar::aux::Configurable::getConfigurableChild(
 
   CEDAR_ASSERT(path_components.size() != 0);
 
-  Children::const_iterator iter = this->mChildren.find(path_components.at(0));
+  cedar::aux::ConstConfigurablePtr child;
+  const auto& first_path = path_components.at(0);
+  Children::const_iterator iter = this->mChildren.find(first_path);
+  size_t index_start = first_path.find('[');
+  size_t index_end = first_path.find(']');
   if (iter == this->mChildren.end())
+  {
+    auto param_iter = this->mParameterAssociations.find(first_path);
+    /*!@todo This should probably be solved differently: have two superclasses:
+     *       ParameterWithConfigurable and ParameterWithConfigurables
+     *       That way, this would generalize to, e.g., ObjectMapParameter.
+     */
+    if (param_iter != this->mParameterAssociations.end())
+    {
+      auto parameter = *(param_iter->second);
+      if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+      {
+        child = object_parameter->getConfigurable();
+      }
+    }
+    else if (index_start != std::string::npos && index_end != std::string::npos)
+    {
+      std::string name = first_path.substr(0, index_start);
+      auto param_iter = this->mParameterAssociations.find(name);
+      if (param_iter != this->mParameterAssociations.end())
+      {
+        auto parameter = *(param_iter->second);
+        if (auto list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+        {
+          std::string index_str = first_path.substr(index_start + 1, index_end - index_start - 1);
+          unsigned int index = cedar::aux::fromString<unsigned int>(index_str);
+          child = list_parameter->configurableAt(index);
+        }
+      }
+    }
+  }
+  else
+  {
+    child = iter->second;
+  }
+
+  if (!child)
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "Child \"" + path + "\" not found.");
   }
 
-  cedar::aux::ConstConfigurablePtr child = iter->second;
   if (path_components.size() == 1)
   {
     return child;
@@ -258,6 +303,7 @@ cedar::aux::ConstParameterPtr cedar::aux::Configurable::getParameter(const std::
     --last;
     subpath_components.insert(subpath_components.begin(), first, last);
     std::string subpath = cedar::aux::join(subpath_components, ".");
+
     p_configurable = this->getConfigurableChild(subpath).get();
   }
 
@@ -267,6 +313,72 @@ cedar::aux::ConstParameterPtr cedar::aux::Configurable::getParameter(const std::
     CEDAR_THROW(cedar::aux::UnknownNameException, "Parameter \"" + path + "\" was not found.");
   }
   return *(iter->second);
+}
+
+
+std::string cedar::aux::Configurable::findParameterPath(cedar::aux::ParameterPtr findParameter) const
+{
+  // first, check if the parameter belongs to this configurable
+  if (findParameter->getOwner() == this)
+  {
+    return findParameter->getName();
+  }
+
+  // then, check if it belongs to any of the children of this
+  for (auto name_child_pair : this->mChildren)
+  {
+    const auto& child_name = name_child_pair.first;
+    const auto& child = name_child_pair.second;
+
+    try
+    {
+      std::string subpath = child->findParameterPath(findParameter);
+      return child_name + "." + subpath;
+    }
+    catch (cedar::aux::NotFoundException)
+    {
+      // ok, keep looking
+    }
+  }
+
+  //!@todo All these special cases for object (list) parameters should be solved with a common interface
+  // check if it is part of an object parameter
+  for (auto parameter : this->mParameterList)
+  {
+    if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+    {
+      auto child = object_parameter->getConfigurable();
+
+      try
+      {
+        std::string subpath = child->findParameterPath(findParameter);
+        return object_parameter->getName() + "." + subpath;
+      }
+      catch (cedar::aux::NotFoundException)
+      {
+        // ok, keep looking
+      }
+    }
+    else if (auto object_list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+    {
+      for (size_t i = 0; i < object_list_parameter->size(); ++i)
+      {
+        auto child = object_list_parameter->configurableAt(i);
+
+        try
+        {
+          std::string subpath = child->findParameterPath(findParameter);
+          return object_list_parameter->getName() + "[" + cedar::aux::toString(i) + "]." + subpath;
+        }
+        catch (cedar::aux::NotFoundException)
+        {
+          // ok, keep looking
+        }
+      }
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::NotFoundException, "Could not locate parameter \"" + findParameter->getName() + "\".");
 }
 
 
@@ -389,10 +501,101 @@ void cedar::aux::Configurable::writeCsv(const std::string& filename, const char 
   writeCsvConfiguration(new_filename, configuration, separator);
 }
 
+void cedar::aux::Configurable::parameterNameChanged(const std::string& oldName, const std::string& newName)
+{
+  auto assoc_iter = this->mParameterAssociations.find(oldName);
+  auto assoc = assoc_iter->second;
+
+  CEDAR_ASSERT(assoc_iter != this->mParameterAssociations.end());
+  this->mParameterAssociations.erase(assoc_iter);
+
+  this->mParameterAssociations[newName] = assoc;
+}
+
+std::string cedar::aux::Configurable::getUniqueParameterName(const std::string& baseName) const
+{
+  auto assoc_iter = this->mParameterAssociations.find(baseName);
+
+  if (assoc_iter == this->mParameterAssociations.end())
+  {
+    return baseName;
+  }
+
+  unsigned int ctr = 2;
+  while (true)
+  {
+    std::string new_name = baseName + " " + cedar::aux::toString(ctr);
+    if (this->mParameterAssociations.find(new_name) == this->mParameterAssociations.end())
+    {
+      return new_name;
+    }
+    ++ctr;
+  }
+
+  return baseName;
+}
+
+void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)
+{
+  QWriteLocker locker (&mConfigurableLock);
+  auto name = parameter->getName();
+
+  auto assoc_iter = this->mParameterAssociations.find(name);
+  if (assoc_iter != this->mParameterAssociations.end())
+  {
+    this->mParameterAssociations.erase(assoc_iter);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Failed to find parameter \"" + name + "\" in association list. Ignoring.",
+      "void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)"
+    );
+  }
+
+  auto iter = std::find(this->mParameterList.begin(), this->mParameterList.end(), parameter);
+  if (iter != this->mParameterList.end())
+  {
+    this->mParameterList.erase(iter);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Failed to find parameter \"" + name + "\" in parameter list. Ignoring.",
+      "void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)"
+    );
+  }
+
+  auto signal_iter = this->mNameChangedConnections.find(parameter);
+  if (signal_iter != this->mNameChangedConnections.end())
+  {
+    signal_iter->second.disconnect();
+    this->mNameChangedConnections.erase(signal_iter);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Failed to find parameter \"" + name + "\" in parameter connection list. Ignoring.",
+      "void cedar::aux::Configurable::unregisterParameter(cedar::aux::Parameter* parameter)"
+    );
+  }
+
+  this->updateLockSet();
+
+  locker.unlock();
+
+  this->signalParameterRemoved(parameter);
+}
+
 void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* parameter)
 {
+  QWriteLocker locker (&mConfigurableLock);
+
   //!@todo Make a global function for checking names. This function might then also be used for step/data/... names.
-  const std::string& name = parameter->getName();
+  auto name = parameter->getName();
   if (name.find(".") != std::string::npos)
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "\"" + name + "\" is an invalid name because it contains a '.'.");
@@ -413,7 +616,14 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* paramete
   --last_iter;
   this->mParameterAssociations[name] = last_iter;
 
+  this->mNameChangedConnections[parameter]
+    = parameter->connectToNameChangedSignal(boost::bind(&cedar::aux::Configurable::parameterNameChanged, this, _1, _2));
+
   this->updateLockSet();
+
+  locker.unlock();
+
+  this->signalParameterAdded(parameter);
 }
 
 const cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters() const

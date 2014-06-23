@@ -41,7 +41,7 @@ else(CEDAR_USE_VTK)
 endif(CEDAR_USE_VTK)
 
 if (CEDAR_USE_QWT)
-  set(qwt_moc_files gui/HistoryPlot0D.h gui/QwtLinePlot.h gui/MatrixVectorPlot.h)
+  set(qwt_moc_files gui/QwtLinePlot.h gui/MatrixVectorPlot.h)
 else(CEDAR_USE_QWT)
   set(qwt_moc_files "")
 endif(CEDAR_USE_QWT)
@@ -62,6 +62,8 @@ cedar_add_library(cedaraux
   MOC_HEADERS
   ThreadWrapper.h
   detail/ThreadWorker.h
+  CallFunctionInThreadALot.h
+  detail/CallFunctionInThreadALotWorker.h
   LoopedThread.h
   LocalCoordinateFrame.h
   gl/ObjectVisualization.h
@@ -70,6 +72,7 @@ cedar_add_library(cedaraux
   gui/BaseWidget.h
   gui/BoolParameter.h
   gui/BoolVectorParameter.h
+  gui/Configurable.h
   gui/DataPlotter.h
   gui/DirectoryParameter.h
   gui/DoubleParameter.h
@@ -78,32 +81,35 @@ cedar_add_library(cedaraux
   gui/ExceptionDialog.h
   gui/FileParameter.h
   gui/FrequencyParameter.h
+  gui/HistoryPlot.h
+  gui/ImagePlot.h
   gui/IntParameter.h
+  gui/IntVectorParameter.h
   gui/LengthParameter.h
+  gui/LocalCoordinateFrameWidget.h
   gui/Log.h
+  gui/MatrixPlot.h
+  gui/MatrixSlicePlot3D.h
   gui/ObjectParameter.h
   gui/ObjectListParameter.h
-  gui/Parameter.h
-  gui/LocalCoordinateFrameWidget.h
   gui/ObjectVisualizationWidget.h
+  gui/Parameter.h
+  gui/PlaneAngleParameter.h
+  gui/PlotInterface.h
   gui/PluginInfoDialog.h
   gui/PluginManagerDialog.h
-  gui/Viewer.h
-  gui/SceneWidget.h
   gui/PropertyPane.h
-  gui/PlaneAngleParameter.h
+  gui/QImagePlot.h
+  gui/ResourceDialog.h
+  gui/SceneWidget.h
   gui/StringParameter.h
+  gui/StringVectorParameter.h
+  gui/ThreadedPlot.h
   gui/TimeParameter.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
-  gui/IntVectorParameter.h
   gui/VelocityParameter.h
-  gui/ResourceDialog.h
-  gui/PlotInterface.h
-  gui/HistoryPlot.h
-  gui/MatrixPlot.h
-  gui/MatrixSlicePlot3D.h
-  gui/ImagePlot.h
+  gui/Viewer.h
   ${qwt_moc_files}
   ${vtk_moc_files}
   ${qwtplot3d_moc_files}
@@ -112,6 +118,9 @@ cedar_add_library(cedaraux
   convolution/KernelList.h
   convolution/Engine.h
   Parameter.h
+  Settings.h
+  ParameterLink.h
+  EquationParameterLink.h
   kernel/Separable.h
   kernel/Kernel.h
   kernel/Gauss.h

@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -68,7 +68,6 @@ unsigned int global_errors;
 void run_test()
 {
   using cedar::proc::LoopedTrigger;
-  using cedar::proc::Manager;
 
   global_errors = 0;
 
@@ -84,7 +83,7 @@ void run_test()
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Setup1.json ... ";
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   network->readJson("Setup1.json");
   std::cout << "done." << std::endl;
 

@@ -205,7 +205,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
   }
 
   // stop grabbing thread if running
-  bool restart_grabber = LoopedThread::isRunning();
+  bool restart_grabber = LoopedThread::isRunningNolocking();
   if (restart_grabber)
   {
     this->stop();

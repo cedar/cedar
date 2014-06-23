@@ -40,7 +40,7 @@
 #include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/testingUtilities/measurementFunctions.h"
 
 // SYSTEM INCLUDES
@@ -59,15 +59,15 @@ void event_loop()
 
 void measure(unsigned int sourceDim, unsigned int targetDim, unsigned int repetitions)
 {
-  using cedar::proc::Network;
-  using cedar::proc::NetworkPtr;
+  using cedar::proc::Group;
+  using cedar::proc::GroupPtr;
   using cedar::proc::steps::Projection;
   using cedar::proc::steps::ProjectionPtr;
   using cedar::proc::ProjectionMappingParameter;
   using cedar::proc::sources::GaussInput;
   using cedar::proc::sources::GaussInputPtr;
 
-  NetworkPtr network(new Network());
+  GroupPtr network(new Group());
   network->readJson("base.json");
 
   auto projection = network->getElement<Projection>("projection");

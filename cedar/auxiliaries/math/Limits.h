@@ -74,6 +74,9 @@ namespace cedar
   {
     namespace math
     {
+      /*! Helper class for dealing with units. Via template-specialization, this class can be used to inform
+       *  the limits about the default units for certain quantities.
+       */
       template<class Unit>
       class UnitHelper
       {

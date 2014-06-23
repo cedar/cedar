@@ -59,11 +59,11 @@
 
 
 /*!@brief All settings concerning the currently visible widgets of the ui: sizes, where they are docked and so on.
- *
- * More detailed description of the class.
  */
-class cedar::proc::gui::Settings : public cedar::aux::Configurable
+class cedar::proc::gui::Settings : public QObject, public cedar::aux::Configurable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ public:
   {
     public:
       //!@brief standard constructor
-      DockSettings();
+      DockSettings(bool defaultVisible = true);
 
       //!@brief gets visibility and floating state from a QDockWidget
       void getFrom(QDockWidget *pDock);
@@ -92,6 +92,9 @@ public:
       cedar::aux::BoolParameterPtr mVisible;
       //!@brief flag if widget is free-floating or docked
       cedar::aux::BoolParameterPtr mFloating;
+
+      //! Geometry of the widget
+      cedar::aux::StringParameterPtr mGeometry;
   };
 
   //!@cond SKIPPED_DOCUMENTATION
@@ -142,6 +145,24 @@ public:
       static cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode> mType;
   };
 
+  class UserDefinedColor
+  {
+    public:
+      UserDefinedColor(const std::string& stringToParse);
+
+      bool hasName() const;
+      const std::string& getName() const;
+
+      QColor toQColor() const;
+
+    private:
+      std::string mName;
+
+      std::string mDefinition;
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(UserDefinedColor);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -170,6 +191,9 @@ public:
   DockSettingsPtr propertiesSettings();
   //!@brief returns the settings concerning the docking behavior for the steps widget
   DockSettingsPtr stepsSettings();
+
+  //! Settings for cedar's boost control widget.
+  DockSettingsPtr boostCtrlSettings();
 
   //!@brief stores the state of the main window
   void storeMainWindow(QMainWindow *pWindow);
@@ -248,6 +272,11 @@ public:
     return this->_mElementListShowsDeprecated;
   }
 
+  const std::vector<UserDefinedColorPtr>& getUserDefinedColors() const
+  {
+    return this->mUserDefinedColors;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -257,8 +286,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void userDefinedColorStringsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -288,6 +317,9 @@ private:
   //!@brief the settings concerning the docking behavior for the property pane
   DockSettingsPtr mProperties;
   
+  //! Settings for the boost control widget.
+  DockSettingsPtr mBoostCtrlSettgings;
+
   //!@brief list of bytes coming from Qt (sizes, ...)
   cedar::aux::StringParameterPtr mMainWindowGeometry;
 
@@ -329,6 +361,12 @@ private:
 
   //! Whether or not the element list should display deprecated element types.
   cedar::aux::BoolParameterPtr _mElementListShowsDeprecated;
+
+  //!@brief A list of colors defined by the user; these can be used, e.g., to color the sticky notes.
+  cedar::aux::StringVectorParameterPtr _mUserDefinedColors;
+
+  //! Vector that holds all the user-defined colors parsed from the strings.
+  std::vector<UserDefinedColorPtr> mUserDefinedColors;
 
 }; // class cedar::proc::gui::Settings
 

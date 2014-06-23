@@ -55,8 +55,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::kuka::KinematicChain::KinematicChain()
 :
-mCommandedJointPosition(LBR_MNJ),
-mMeasuredJointPosition(LBR_MNJ),
+mCommandedJointPosition(LBR_MNJ, 0),
+mMeasuredJointPosition(LBR_MNJ, 0),
 _mRemoteHost(new cedar::aux::StringParameter(this, "remote host", "NULL")),
 _mServerPort(new cedar::aux::IntParameter(this, "server port", 0))
 {
@@ -173,7 +173,7 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
  */
 void cedar::dev::kuka::KinematicChain::start()
 {
-  if (isRunning())
+  if (isRunningNolocking())
   {
     return;
   }

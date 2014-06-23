@@ -71,6 +71,9 @@ public:
   //!@brief return the size of the vector
   virtual size_t size() const = 0;
 
+  //!@brief clear vector
+  virtual void clear() = 0;
+
   /*!@brief Returns the object with the given index.
    *
    * @todo There needs to be a const variant of this.

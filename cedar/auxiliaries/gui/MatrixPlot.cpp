@@ -120,6 +120,22 @@ mTitle("")
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::MatrixPlot::readConfiguration(const cedar::aux::ConfigurationNode& configuration)
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->readConfiguration(configuration);
+  }
+}
+
+void cedar::aux::gui::MatrixPlot::writeConfiguration(cedar::aux::ConfigurationNode& configuration) const
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->writeConfiguration(configuration);
+  }
+}
+
 bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
   if (this->mpCurrentPlotWidget == nullptr)

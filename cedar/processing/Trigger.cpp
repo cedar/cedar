@@ -73,14 +73,14 @@ cedar::proc::Trigger::~Trigger()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  QReadLocker lock(&mpListenersLock);
+  QReadLocker lock(this->mListeners.getLockPtr());
 
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  for (auto listener : this->mListeners.member())
   {
-    this->mListeners.at(i)->noLongerTriggeredBy(boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this()));
+    listener->noLongerTriggeredBy(boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this()));
   }
 
-  this->mListeners.clear();
+  this->mListeners.member().clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -97,11 +97,9 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
   auto this_node = graph.addNodeForPayload(this_ptr);
 
   {
-    QReadLocker lock(&this->mpListenersLock);
-    for (auto iter = this->mListeners.begin(); iter != this->mListeners.end(); ++iter)
+    QReadLocker lock(this->mListeners.getLockPtr());
+    for (auto listener : this->mListeners.member())
     {
-      auto listener = *iter;
-
       if (listener->isLooped())
       {
         continue;
@@ -126,14 +124,13 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
     auto source_node = graph.getNodeByPayload(source);
 
     // get the done trigger
+    //!@todo Is getting the finished trigger thread-safe?
     cedar::proc::TriggerPtr done_trigger = source->getFinishedTrigger();
 
-    QReadLocker lock(&done_trigger->mpListenersLock);
+    QReadLocker lock(done_trigger->mListeners.getLockPtr());
     // append all listeners of this step; they all have a distance of one, because they follow this step directly
-    for (auto iter = done_trigger->mListeners.begin(); iter != done_trigger->mListeners.end(); ++iter)
+    for (auto listener : done_trigger->mListeners.member())
     {
-      auto listener = *iter;
-
       if (listener->isLooped())
       {
         continue;
@@ -151,8 +148,18 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
   }
 }
 
-void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDown)
+void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown)
 {
+  // check if this trigger was already visited during the current wave of graph generation
+  if (visited.find(this) != visited.end())
+  {
+    return;
+  }
+  else
+  {
+    // we did not visit this trigger yet - add it to the set of visited triggers
+    visited.insert(this);
+  }
   // build the triggering graph for this trigger
   cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr> graph;
   this->buildTriggerGraph(graph);
@@ -184,8 +191,8 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
 
   // we (should) now have a map assigning a distance to all triggerables triggered by this trigger
   // now we need to transform it to a usable structures
-  QWriteLocker lock_w(&mpListenersLock);
-  this->mTriggeringOrder.clear();
+  QWriteLocker lock_w(this->mTriggeringOrder.getLockPtr());
+  this->mTriggeringOrder.member().clear();
 
   for (auto dist_iter = distances.begin(); dist_iter != distances.end(); ++dist_iter)
   {
@@ -199,12 +206,12 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
     }
 
     auto distance = dist_iter->second;
-    auto iter = this->mTriggeringOrder.find(distance);
-    if (iter == this->mTriggeringOrder.end())
+    auto iter = this->mTriggeringOrder.member().find(distance);
+    if (iter == this->mTriggeringOrder.member().end())
     {
-      this->mTriggeringOrder[distance] = std::set<cedar::proc::TriggerablePtr>();
-      iter = this->mTriggeringOrder.find(distance);
-      CEDAR_DEBUG_ASSERT(iter != this->mTriggeringOrder.end());
+      this->mTriggeringOrder.member()[distance] = std::set<cedar::proc::TriggerablePtr>();
+      iter = this->mTriggeringOrder.member().find(distance);
+      CEDAR_DEBUG_ASSERT(iter != this->mTriggeringOrder.member().end());
     }
 
     iter->second.insert(triggerable);
@@ -212,30 +219,32 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
 
   lock_w.unlock();
 
-  // recursively update the triggering order for all triggers triggered by this one
-  QReadLocker lock_r(&mpListenersLock);
-  if (recurseDown)
   {
-    for (auto iter = this->mListeners.begin(); iter != this->mListeners.end(); ++iter)
+    // recursively update the triggering order for all triggers triggered by this one
+    QReadLocker lock_r(this->mListeners.getLockPtr());
+    if (recurseDown)
     {
-      cedar::proc::TriggerablePtr listener = *iter;
-
-      if (listener->mFinished)
+      for (cedar::proc::TriggerablePtr listener : this->mListeners.member())
       {
-        cedar::proc::TriggerPtr done = listener->mFinished;
-        done->updateTriggeringOrder(false, true);
+        QReadLocker lock_r_finished(listener->mFinished.getLockPtr());
+        cedar::proc::TriggerPtr done = listener->mFinished.member();
+        if (done)
+        {
+          done->updateTriggeringOrder(visited, false, true);
+        }
       }
     }
   }
 
   // recursively update the triggering order for all triggers by which this one is triggered
-  if (recurseUp && this->mpOwner != NULL)
+  if (recurseUp && this->mpOwner != nullptr)
   {
-    for (auto iter = this->mpOwner->mTriggersListenedTo.begin(); iter != this->mpOwner->mTriggersListenedTo.end(); ++iter)
+    QReadLocker lock_r(this->mpOwner->mTriggersListenedTo.getLockPtr());
+    for (const auto& trigger_weak : this->mpOwner->mTriggersListenedTo.member())
     {
-      auto trigger = iter->lock();
+      auto trigger = trigger_weak.lock();
       CEDAR_ASSERT(trigger);
-      trigger->updateTriggeringOrder(true, false);
+      trigger->updateTriggeringOrder(visited, true, false);
     }
   }
 }
@@ -243,15 +252,13 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
-  QReadLocker lock(&mpListenersLock);
 
-  for (auto iter = this->mTriggeringOrder.begin(); iter != this->mTriggeringOrder.end(); ++iter)
+  QReadLocker lock(this->mTriggeringOrder.getLockPtr());
+  for (auto order_triggerables_pair : this->mTriggeringOrder.member())
   {
-    auto triggerables = iter->second;
-    for (auto triggerable_iter = triggerables.begin(); triggerable_iter != triggerables.end(); ++triggerable_iter)
+    auto triggerables = order_triggerables_pair.second;
+    for (cedar::proc::TriggerablePtr triggerable : triggerables)
     {
-      cedar::proc::TriggerablePtr triggerable = *triggerable_iter;
-
       triggerable->onTrigger(arguments, this_ptr);
     }
   }
@@ -265,12 +272,12 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
 {
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
-  QWriteLocker lock(&mpListenersLock);
+  QWriteLocker lock(this->mListeners.getLockPtr());
   std::vector<cedar::proc::TriggerablePtr>::iterator iter;
   iter = this->find(triggerable);
-  if (iter == this->mListeners.end())
+  if (iter == this->mListeners.member().end())
   {
-    this->mListeners.push_back(triggerable);
+    this->mListeners.member().push_back(triggerable);
     triggerable->triggeredBy(this_ptr);
     
     //!@todo Can this be removed (because MultiTriggers don't exist anymore)
@@ -280,14 +287,15 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
     }
 
     lock.unlock();
-    this->updateTriggeringOrder();
+    std::set<cedar::proc::Trigger*> visited;
+    this->updateTriggeringOrder(visited);
   }
 }
 
 bool cedar::proc::Trigger::isListener(cedar::proc::TriggerablePtr triggerable) const
 {
-  QReadLocker lock(&mpListenersLock);
-  return this->find(triggerable) != this->mListeners.end();
+  QReadLocker lock(this->mListeners.getLockPtr());
+  return this->find(triggerable) != this->mListeners.member().end();
 }
 
 void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr triggerable)
@@ -299,20 +307,21 @@ void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
 {
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
-  QWriteLocker lock(&mpListenersLock);
+  QWriteLocker lock(this->mListeners.getLockPtr());
   std::vector<cedar::proc::TriggerablePtr>::iterator iter;
   iter = this->find(triggerable);
-  if (iter != this->mListeners.end())
+  if (iter != this->mListeners.member().end())
   {
     if (cedar::proc::Trigger* trigger = dynamic_cast<cedar::proc::Trigger*>(triggerable))
     {
       trigger->notifyDisconnected(this_ptr);
     }
-    this->mListeners.erase(iter);
+    this->mListeners.member().erase(iter);
     triggerable->noLongerTriggeredBy(this_ptr);
 
     lock.unlock();
-    this->updateTriggeringOrder();
+    std::set<cedar::proc::Trigger*> visited;
+    this->updateTriggeringOrder(visited);
   }
 }
 
@@ -326,45 +335,46 @@ void cedar::proc::Trigger::notifyDisconnected(cedar::proc::TriggerPtr /* trigger
 
 std::vector<cedar::proc::TriggerablePtr>::iterator cedar::proc::Trigger::find(cedar::proc::Triggerable* triggerable)
 {
-  for (auto iter = this->mListeners.begin(); iter != this->mListeners.end(); ++iter)
+  for (auto iter = this->mListeners.member().begin(); iter != this->mListeners.member().end(); ++iter)
   {
     if (iter->get() == triggerable)
     {
       return iter;
     }
   }
-  return this->mListeners.end();
+  return this->mListeners.member().end();
 }
 
 std::vector<cedar::proc::TriggerablePtr>::iterator cedar::proc::Trigger::find(cedar::proc::TriggerablePtr triggerable)
 {
-  return std::find(this->mListeners.begin(), this->mListeners.end(), triggerable);
+  return std::find(this->mListeners.member().begin(), this->mListeners.member().end(), triggerable);
 }
 
 std::vector<cedar::proc::TriggerablePtr>::const_iterator
   cedar::proc::Trigger::find(cedar::proc::TriggerablePtr step) const
 {
-  return std::find(this->mListeners.begin(), this->mListeners.end(), step);
+  return std::find(this->mListeners.member().begin(), this->mListeners.member().end(), step);
 }
 
 const std::vector<cedar::proc::TriggerablePtr>& cedar::proc::Trigger::getListeners() const
 {
-  return this->mListeners;
+  return this->mListeners.member();
 }
 
 void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& node)
 {
   this->cedar::aux::Configurable::writeConfiguration(node);
 
-  QReadLocker lock(&mpListenersLock);
+  QReadLocker lock(this->mListeners.getLockPtr());
   cedar::aux::ConfigurationNode listeners;
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  for (cedar::proc::TriggerablePtr triggerable : this->mListeners.member())
   {
-    cedar::proc::TriggerablePtr& step = this->mListeners.at(i);
-    cedar::aux::ConfigurationNode listener(boost::dynamic_pointer_cast<cedar::proc::Element>(step)->getName());
+    cedar::aux::ConfigurationNode listener(boost::dynamic_pointer_cast<cedar::proc::Element>(triggerable)->getName());
     listeners.push_back(cedar::aux::ConfigurationNode::value_type("", listener));
   }
   if (!listeners.empty())
+  {
     node.add_child("listeners", listeners);
+  }
 }
 

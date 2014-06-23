@@ -96,7 +96,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  unsigned int mTimestepMeasurementId;
 
 }; // class cedar::dyn::Dynamics
 

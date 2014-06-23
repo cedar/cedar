@@ -82,6 +82,16 @@ public:
 
   virtual cv::Mat compute(const cv::Mat& values) const;
 
+  inline double getBeta() const
+  {
+    return this->_mBeta->getValue();
+  }
+
+  inline void setBeta(double beta)
+  {
+    this->_mBeta->setValue(beta);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -43,6 +43,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/IntrusivePtrBase.h"
+#include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LockerBase.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
@@ -74,6 +78,41 @@ class cedar::aux::Parameter : public QObject, public cedar::aux::IntrusivePtrBas
   friend class cedar::aux::Configurable;
 
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! An RAII-based locker for parameters.
+  class ReadLocker : public cedar::aux::LockerBase
+  {
+  public:
+    ReadLocker(cedar::aux::Parameter* parameter)
+    :
+    cedar::aux::LockerBase
+    (
+      boost::bind(&cedar::aux::Parameter::lockForRead, parameter),
+      boost::bind(&cedar::aux::Parameter::unlock, parameter)
+    )
+    {
+    }
+  };
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+
+  class WriteLocker : public cedar::aux::LockerBase
+  {
+  public:
+    WriteLocker(cedar::aux::Parameter* parameter)
+    :
+    cedar::aux::LockerBase
+    (
+      boost::bind(&cedar::aux::Parameter::lockForWrite, parameter),
+      boost::bind(&cedar::aux::Parameter::unlock, parameter)
+    )
+    {
+    }
+  };
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -87,6 +126,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Set the owner of the parameter. Can only be called if the parameter doesn't have an owner yet.
+  void setOwner(cedar::aux::Configurable *pOwner);
+
+  //! Resets the owner of the parameter.
+  void unsetOwner();
+
   //!@brief get the flag "read automatically"
   bool getReadAutomatically() const;
   //!@brief set the flag "read automatically"
@@ -113,6 +158,12 @@ public:
   bool isHidden() const;
   //!@brief set flag if this parameter is hidden (for GUI)
   void setHidden(bool hide);
+
+  //! Whether the parameter is linked to other parameters.
+  bool isLinked() const;
+
+  //! Sets whether the parameter is linked to other parameters. This shouldn't be called by users.
+  void setLinked(bool linked);
 
   /*!@brief   Marks this parameter as advanced.
    *
@@ -146,8 +197,7 @@ public:
   }
 
   //!@brief Returns the name of the object.
-  //!@return Name of the object.
-  const std::string& getName() const;
+  std::string getName() const;
 
   //!@brief Sets the name of the object to the given name.
   //!@param name New name of the object.
@@ -189,6 +239,20 @@ public:
    */
   void addDeprecatedName(const std::string& deprecatedName);
 
+  /*! @brief If possible, copies the value from another parameter into this parameter.
+   *
+   * The default implementation always throws an exception.
+   */
+  virtual void copyValueFrom(cedar::aux::ConstParameterPtr other);
+
+  /*!@brief Checks if this parameter can copy its value from the given one.
+   */
+  virtual bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
+
+public:
+  //! Signal that is emitted whenever the name of the parameter changes. The first string is the old name, the second the new one.
+  CEDAR_DECLARE_SIGNAL(NameChanged, void(const std::string&, const std::string&));
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -222,7 +286,7 @@ private:
   cedar::aux::Configurable *mpOwner;
 
   //! The name of the parameter.
-  std::string mName;
+  cedar::aux::LockableMember<std::string> mName;
 
   //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
   bool mAutoRead;
@@ -241,6 +305,11 @@ private:
 
   //! Flag that indicates whether this parameter is advanced.
   bool mAdvanced;
+
+  bool mIsLinked;
+
+  //! Type of the last lock.
+  mutable cedar::aux::LOCK_TYPE mLastLockType;
 
   //! Lock for the parameter.
   mutable QReadWriteLock* mpLock;

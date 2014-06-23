@@ -82,12 +82,12 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::Preshape::Preshape()
 :
-mActivation(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
+mActivation(new cedar::aux::MatData(cv::Mat::zeros(50,50,CV_32F))),
 _mDimensionality
 (
   new cedar::aux::UIntParameter(this, "dimensionality", 2, cedar::aux::UIntParameter::LimitType::positiveZero(4))
 ),
-_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 5000)),
+_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 5000)),
 _mTimeScaleBuildUp
 (
   new cedar::aux::DoubleParameter(this, "time scale build up", 10.0, cedar::aux::DoubleParameter::LimitType::positive())
@@ -100,7 +100,8 @@ _mTimeScaleDecay
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
-  this->declareOutput("activation", mActivation);
+  auto activation_slot = this->declareOutput("activation", mActivation);
+  activation_slot->setSerializable(true);
 
   this->declareInput("input", true);
   this->declareInput("peak detector", false);

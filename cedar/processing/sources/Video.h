@@ -55,7 +55,7 @@
 // SYSTEM INCLUDES
 
 
-//!@brief A video file  source for the processingIde
+//!@brief A video file source for the processing framework.
 class cedar::proc::sources::Video
 :
 public cedar::proc::sources::GrabberBase

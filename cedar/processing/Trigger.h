@@ -44,11 +44,11 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
-#include "cedar/processing/Manager.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -69,8 +69,7 @@ class cedar::proc::Trigger : public cedar::proc::Element,
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Manager;
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
   friend class cedar::proc::TriggerConnection;
   friend class cedar::proc::Triggerable;
 
@@ -139,7 +138,7 @@ private:
    *
    * @todo Describe this properly.
    */
-  void updateTriggeringOrder(bool recurseUp = true, bool recurseDown = true);
+  void updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp = true, bool recurseDown = true);
 
   void setOwner(cedar::proc::Triggerable* owner)
   {
@@ -156,13 +155,10 @@ protected:
   cedar::proc::Triggerable* mpOwner;
 
   //! List of listeners.
-  std::vector<cedar::proc::TriggerablePtr> mListeners;
+  cedar::aux::LockableMember<std::vector<cedar::proc::TriggerablePtr> > mListeners;
 
   //! List of the triggerables following this one
-  std::map<unsigned int, std::set<cedar::proc::TriggerablePtr> > mTriggeringOrder;
-
-  //! Lock for the listeners list.
-  mutable QReadWriteLock mpListenersLock;
+  cedar::aux::LockableMember< std::map<unsigned int, std::set<cedar::proc::TriggerablePtr> > > mTriggeringOrder;
 
 private:
   // none yet

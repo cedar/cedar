@@ -91,7 +91,7 @@ namespace cedar
             void convert();
 
           signals:
-            void done();
+            void done(double min, double max);
             void dataChanged();
 
           public:
@@ -140,7 +140,7 @@ private:
     }
 
     //!@brief (Re-)initializes the x and y value arrays.
-    void buildArrays(unsigned int new_size);
+    void buildArrays(unsigned int new_size, double& min, double& max);
 
     //!@brief the displayed data
     cedar::aux::ConstMatDataPtr mMatData;
@@ -244,7 +244,7 @@ private:
 private slots:
   void showLegend(bool show = true);
 
-  void conversionDone();
+  void conversionDone(double min, double max);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

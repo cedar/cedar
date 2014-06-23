@@ -47,3 +47,12 @@ std::string cedar::aux::versionNumberToString(unsigned int version)
   res += "." + cedar::aux::toString(CEDAR_GET_VERSION_BUGFIX(version));
   return res;
 }
+
+std::string cedar::aux::removeWhiteSpaces(const std::string& stringFromWhichToRemoveWhiteSpaces)
+{
+  std::string result = cedar::aux::erase(stringFromWhichToRemoveWhiteSpaces, " ");
+  result = cedar::aux::erase(result, "\n");
+  result = cedar::aux::erase(result, "\r");
+  return result;
+}
+

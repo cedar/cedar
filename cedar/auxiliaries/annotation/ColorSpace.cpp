@@ -142,6 +142,18 @@ std::string cedar::aux::annotation::ColorSpace::getChannelCode() const
       case ChromaticBlue:
         code += "Cb";
         break;
+
+      case Lab_L:
+        code += "L";
+        break;
+
+      case Lab_a:
+        code += "a";
+        break;
+
+      case Lab_b:
+        code += "b";
+        break;
     }
   }
   return code;
@@ -230,6 +242,9 @@ const std::string& cedar::aux::annotation::ColorSpace::channelTypeToString
     channel_type_strings[Luminance] = "Luminance";
     channel_type_strings[ChromaticRed] = "ChromaticRed";
     channel_type_strings[ChromaticBlue] = "ChromaticBlue";
+    channel_type_strings[Lab_L] = "Lab_L";
+    channel_type_strings[Lab_a] = "Lab_a";
+    channel_type_strings[Lab_b] = "Lab_b";
   }
 
   CEDAR_DEBUG_ASSERT(channel_type_strings.find(type) != channel_type_strings.end());

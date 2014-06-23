@@ -82,6 +82,12 @@ public:
   //!@brief Returns a string that describes the data in CSV format. Should be overridden for all inheriting classes.
   virtual void serializeHeader(std::ostream& stream) const;
 
+  //! Serializes the data into a format that can later be read by a call to deserialize. Must be implemented in subclasses.
+  virtual void serialize(std::ostream& stream) const;
+
+  //! Reads data that has been written using the serialize method. Must be implemented in subclasses.
+  virtual void deserialize(std::istream& stream);
+
   //!@brief Returns the lock associated with this data object.
   QReadWriteLock& getLock();
 

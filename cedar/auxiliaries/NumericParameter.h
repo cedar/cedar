@@ -94,40 +94,13 @@ public:
    */
   NumericParameter
   (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& defaultValue,
+    cedar::aux::Configurable *pOwner = nullptr,
+    const std::string& name = "",
+    const T& defaultValue = static_cast<T>(0),
     const LimitType& limits = LimitType::full()
   )
   :
   cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(limits)
-  {
-  }
-
-  //!@brief The constructor.
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& minimum,
-    const T& maximum
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mLimits(minimum, maximum)
-  {
-  }
-
-  //!@brief The constructor.
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const LimitType& limits = LimitType::full()
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
   mLimits(limits)
   {
   }

@@ -103,7 +103,10 @@ _mLoopMode
   this->modeChanged();
 
   //this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::prepareStart, this));
-  this->connectToStopSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this, _1));
+  this->connectToQuitSignal(boost::bind(&cedar::aux::LoopedThread::processStop, this ));
+
+  mStartConnection = this->connectToStartSignal(boost::bind(&cedar::aux::LoopedThread::makeParametersConst, this, true));
+  mStopConnection = this->connectToStopSignal(boost::bind(&cedar::aux::LoopedThread::makeParametersConst, this, false));
 }
 
 cedar::aux::LoopedThread::~LoopedThread()
@@ -114,9 +117,27 @@ cedar::aux::LoopedThread::~LoopedThread()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
+void cedar::aux::LoopedThread::makeParametersConst(bool makeConst)
+{
+  // first, apply restrictions that come from the selected mode
+  this->modeChanged();
+
+  // the loop mode itself is not affected by this, so this must be made const/unconst every time
+  this->_mLoopMode->setConstant(makeConst);
+
+  // then, make everything else const if set to do so (if not, the restrictions from above are kept)
+  if (makeConst)
+  {
+    this->_mIdleTime->setConstant(makeConst);
+    this->_mStepSize->setConstant(makeConst);
+    this->_mSimulatedTime->setConstant(makeConst);
+  }
+}
+
+void cedar::aux::LoopedThread::stopStatistics()
 {
   // is intentionally thread un-safe
+  bool suppressWarning = false; // @todo: write a set function for this
 
   unsigned long numberOfSteps = mpWorker->getNumberOfSteps();
 
@@ -142,7 +163,7 @@ void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
 
 void cedar::aux::LoopedThread::singleStep()
 {
-  if (!this->isRunning()) // use thread-safe variant  
+  if (!this->isRunningNolocking()) //!@todo use thread-safe variant
   {
     switch (_mLoopMode->getValue())
     {
@@ -167,9 +188,9 @@ void cedar::aux::LoopedThread::singleStep()
   }
 }
 
-void cedar::aux::LoopedThread::processStop(bool suppressWarning)
+void cedar::aux::LoopedThread::processStop()
 {
-  stopStatistics(suppressWarning);
+  stopStatistics();
 }
 
 void cedar::aux::LoopedThread::setStepSize(cedar::unit::Time stepSize)

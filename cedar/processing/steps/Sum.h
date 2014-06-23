@@ -80,12 +80,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Determines whether the data item can be connected to the slot.
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::ConstDataPtr data
-                                  ) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

@@ -104,10 +104,10 @@ namespace
     // define field plot again, but this time with image plots
     //!@todo different icon
     ElementDeclaration::PlotDefinition field_image_plot_data("field plot (image)", ":/cedar/dynamics/gui/field_image_plot.svg");
-    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot"));
-    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot"));
-    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::OUTPUT, "activation", true, "cedar::aux::gui::ImagePlot"));
-    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::OUTPUT, "sigmoided activation", false, "cedar::aux::gui::ImagePlot"));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::OUTPUT, "activation", true, "cedar::aux::gui::ImagePlot")));
+    field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::OUTPUT, "sigmoided activation", false, "cedar::aux::gui::ImagePlot")));
     declaration->definePlot(field_image_plot_data);
 
     ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
@@ -186,7 +186,7 @@ _mSizes
     this,
     "sizes",
     2,
-    10,
+    50,
     cedar::aux::UIntParameter::LimitType::positive(5000)
   )
 ),
@@ -219,6 +219,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("lateral kernel", this->_mLateralKernelConvolution->getCombinedKernel());
   this->declareBuffer("neural noise kernel", this->_mNoiseCorrelationKernelConvolution->getCombinedKernel());
   this->declareBuffer("input sum", mInputSum);
+  this->declareBuffer("noise", this->mInputNoise);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
 

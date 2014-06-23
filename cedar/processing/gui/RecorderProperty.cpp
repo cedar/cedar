@@ -69,6 +69,7 @@ cedar::proc::gui::RecorderProperty::RecorderProperty(cedar::proc::gui::RecorderW
   mCheckBox = new QCheckBox();
   mCheckBox->setChecked(registered);
   connect(mCheckBox, SIGNAL(stateChanged(int)), this, SLOT(registerRecordData(int)));
+  connect(mCheckBox, SIGNAL(stateChanged(int)), this, SIGNAL(changed()));
   this->addWidget(mCheckBox);
 
   //Create spin box.
@@ -94,6 +95,7 @@ cedar::proc::gui::RecorderProperty::RecorderProperty(cedar::proc::gui::RecorderW
   }
   mStepSize->setEnabled(registered);
   connect(mStepSize, SIGNAL(valueChanged(int)), this, SLOT(updateStepSize(int)));
+  connect(mStepSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
   mStepSize->setSuffix(" ms");
   this->addWidget(mStepSize);
   

@@ -64,6 +64,27 @@ cedar::aux::annotation::Annotation(copyFrom)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::aux::annotation::Dimensions::hasSamplingPositions(unsigned int dimension) const
+{
+  return this->mDimensionSamplingPositions.size() > dimension && !this->mDimensionSamplingPositions.at(dimension).empty();
+}
+
+const std::vector<double>& cedar::aux::annotation::Dimensions::getSamplingPositions(unsigned int dimension) const
+{
+  CEDAR_ASSERT(this->hasSamplingPositions(dimension));
+
+  return this->mDimensionSamplingPositions.at(dimension);
+}
+
+void cedar::aux::annotation::Dimensions::setSamplingPositions(unsigned int dimension, const std::vector<double>& positions)
+{
+  if (this->mDimensionSamplingPositions.size() <= dimension)
+  {
+    this->mDimensionSamplingPositions.resize(dimension + 1, std::vector<double>());
+  }
+  this->mDimensionSamplingPositions.at(dimension) = positions;
+}
+
 void cedar::aux::annotation::Dimensions::setLabel(unsigned int dimension, const std::string& label)
 {
   CEDAR_ASSERT(dimension < this->mDimensions.size());

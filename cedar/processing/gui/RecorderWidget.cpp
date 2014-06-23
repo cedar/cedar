@@ -109,7 +109,9 @@ void cedar::proc::gui::RecorderWidget::refreshWidget()
 
       for (unsigned int i = 0; i < dataSlots.size(); i++)
       {
-        mMainLayout->addLayout(new RecorderProperty(this, mStepToConfigure->getName(), dataSlots[i]));
+        auto property = new RecorderProperty(this, mStepToConfigure->getName(), dataSlots[i]);
+        mMainLayout->addLayout(property);
+        QObject::connect(property, SIGNAL(changed()), this, SIGNAL(settingsChanged()));
       }
     }
   }
