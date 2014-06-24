@@ -130,3 +130,13 @@ bool cedar::proc::OwnedData::isShared() const
 {
   return this->mIsShared;
 }
+
+void cedar::proc::OwnedData::addOutgoingConnection(cedar::proc::DataConnectionPtr newConnection)
+{
+  this->addConnection(newConnection);
+}
+
+void cedar::proc::OwnedData::removeOutgoingConnection(cedar::proc::DataConnectionPtr removedConnection)
+{
+  this->removeConnection(removedConnection);
+}

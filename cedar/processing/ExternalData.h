@@ -131,6 +131,10 @@ public:
 
   cedar::aux::LOCK_TYPE getLockType() const;
 
+  void addIncomingConnection(cedar::proc::DataConnectionPtr newConnection);
+
+  void removeIncomingConnection(cedar::proc::DataConnectionPtr removedConnection);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

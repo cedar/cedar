@@ -57,6 +57,12 @@ cedar::proc::Element::~Element()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Element::updateTriggerChains(std::set<cedar::proc::Trigger*>& /*visited*/)
+{
+  // empty default implementation
+}
+
 void cedar::proc::Element::setNetwork(cedar::proc::GroupPtr network)
 {
   this->setGroup(network);

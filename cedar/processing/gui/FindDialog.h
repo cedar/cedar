@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataConnection.h
+    File:        FindDialog.h
 
     Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 21
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2014 06 23
 
     Description:
 
@@ -34,84 +34,88 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_CONNECTION_H
-#define CEDAR_PROC_DATA_CONNECTION_H
+#ifndef CEDAR_PROC_GUI_FIND_DIALOG_H
+#define CEDAR_PROC_GUI_FIND_DIALOG_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/ui_FindDialog.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/DataConnection.fwd.h"
-#include "cedar/processing/OwnedData.fwd.h"
-#include "cedar/processing/ExternalData.fwd.h"
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/gui/FindDialog.fwd.h"
+#include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
+#include "cedar/processing/gui/View.fwd.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif
+#include <vector>
+#include <QStatusBar>
 
 
-/*!@brief   This is a class that represents a connection between two data slots.
- *
- * @remarks This class is used internally in the processing framework, do not use it directly.
+/*!@brief A widget for conveniently controlling the boosts in a network.
  */
-class cedar::proc::DataConnection
+class cedar::proc::gui::FindDialog : public QDialog, public Ui_FindDialog
 {
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataConnection(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
-  //!@brief Destructor
-  ~DataConnection();
+  FindDialog(QWidget* parent, cedar::proc::gui::View* pView);
+
+  //!@brief The destructor.
+  ~FindDialog();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief test if the given source and target are the same for this connection (i.e. are those two DataSlots connected
-  // via this DataConnection
-  bool equals(cedar::proc::ConstOwnedDataPtr source, cedar::proc::ConstExternalDataPtr target) const;
 
-  //!@brief test if the given source and target are parents of the slots of this DataConnection
-  bool connects(cedar::proc::ConstConnectablePtr source, cedar::proc::ConstConnectablePtr target) const;
-
-  /*!@brief Removes the connection between source and target.
-   *
-   * Source and target will be null after this call.
-   */
-  void disconnect();
-
-  //!@brief get the source of this connection
-  cedar::proc::ConstOwnedDataPtr getSource() const;
-
-  //!@brief get the target of this connection
-  cedar::proc::ConstExternalDataPtr getTarget() const;
-
-  //!@brief get the source of this connection
-  cedar::proc::OwnedDataPtr getSource();
-
-  //!@brief get the target of this connection
-  cedar::proc::ExternalDataPtr getTarget();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void closeEvent(QCloseEvent* event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  std::string getDataSlotIdentifier(cedar::proc::DataSlotPtr slot);
+
+private slots:
+
+  //!
+  void searchStringChangedChanged();
+  void checkButtonAvailability();
+  void findNext();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief the source DataSlot of this connection
-  cedar::proc::OwnedDataWeakPtr mSource;
-  //!@brief the target DataSlot of this connection
-  cedar::proc::ExternalDataWeakPtr mTarget;
+  // none yet
 private:
-  bool mAlreadyDisconnected;
-}; // class cedar::proc::DataConnection
+  QStatusBar* mpBar;
+  cedar::proc::gui::View* mpView;
+  std::vector<cedar::proc::ConstElementPtr> mFoundElements;
+  bool mSearchStringChanged;
+  unsigned int mFindIndex;
+  cedar::proc::gui::GraphicsBase* mpLastHighlightedItem;
 
-#endif // CEDAR_PROC_DATA_CONNECTION_H
+}; // class cedar::proc::gui::FindDialog
+
+#endif // CEDAR_PROC_GUI_FIND_DIALOG_H
+

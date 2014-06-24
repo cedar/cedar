@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/exceptions.h"
@@ -126,6 +127,11 @@ cedar::proc::Step::~Step()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Step::updateTriggerChains(std::set<cedar::proc::Trigger*>& visited)
+{
+  this->getFinishedTrigger()->updateTriggeringOrder(visited);
+}
 
 unsigned int cedar::proc::Step::registerTimeMeasurement(const std::string& measurement)
 {
@@ -361,8 +367,17 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
   try
   {
+    if (arguments.get() != nullptr)
+    {
     // call the compute function with the given arguments
-    this->compute(*(arguments.get()));
+      this->compute(*(arguments.get()));
+    }
+    else
+    {
+      // call the compute function with empty arguments
+      cedar::proc::Arguments args;
+      this->compute(args);
+    }
   }
   // catch exceptions and translate them to the given state/message
   catch(const cedar::aux::ExceptionBase& e)
@@ -412,8 +427,9 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   // a) This step has not been triggered as part of a trigger chain. This is the case if trigger is NULL.
   // b) The step is looped. In this case it is the start of a trigger chain
   // c) The step is not triggered by anyone. This can happen, e.g., if it has no inputs. This also makes it the start
-  //    of a trigger chain.
-  if (!trigger || this->isLooped() || !this->isTriggered())
+  //    of a trigger chain. The exception here are group sources because they are triggered from the outside (but via a
+  //    special mechanism in Trigger::buildTriggerGraph)
+  if (!trigger || this->isLooped() || (!this->isTriggered() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this)))
   {
 //    this->getFinishedTrigger()->trigger();
     // trigger subsequent steps in a non-blocking manner
