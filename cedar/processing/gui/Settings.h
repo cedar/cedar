@@ -145,14 +145,27 @@ public:
       static cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode> mType;
   };
 
+  /*! Structure for reading and storing a user-defined color from a string.
+   *
+   *  Such strings have the form "colorname=colorspace(x,y,...)" where x, y, ... are the values for the color channels.
+   *  Available color channels are:
+   *  <ul>
+   *    <li>rgb: three integers in the range [0, 255] specify the red, green and blue component of the color.</li>
+   *  </ul>
+   */
   class UserDefinedColor
   {
     public:
+      //! Constructs the color from the given string.
       UserDefinedColor(const std::string& stringToParse);
 
+      //! Returns true if a name has been set.
       bool hasName() const;
+
+      //! Returns the name given to the color.
       const std::string& getName() const;
 
+      //! Parses the color string and returns the encoded color as a QColor.
       QColor toQColor() const;
 
     private:

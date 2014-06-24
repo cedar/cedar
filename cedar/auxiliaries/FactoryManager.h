@@ -58,13 +58,13 @@ namespace cedar
 {
   namespace aux
   {
-    // use template specialization to derive the const version of the base type pointer.
+    //! Uses template specialization to provide the const version of the base type pointer.
     template<typename TPtr>
     class ConstPtrProvider
     {
     };
 
-    // specialization for shared_ptr
+    //! Specialization for shared_ptr.
     template<typename T>
     class ConstPtrProvider<boost::shared_ptr<T> >
     {
@@ -72,7 +72,7 @@ namespace cedar
         typedef boost::shared_ptr<const T> ConstBaseTypePtr;
     };
 
-    // specialization for intrusive_ptr
+    //! Specialization for intrusive_ptr.
     template<typename T>
     class ConstPtrProvider<boost::intrusive_ptr<T> >
     {

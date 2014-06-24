@@ -94,6 +94,8 @@ public:
 
   typedef std::map<std::string, double> Variables;
 
+  /*! Represents a node in an arithmetic expression tree.
+   */
   class Value
   {
   public:
@@ -112,6 +114,8 @@ public:
       virtual bool canEvaluate() const = 0;
   };
 
+  /*! Represents a constant value in an arithmetic expression tree.
+   */
   class ConstantValue : public Value
   {
     public:
@@ -156,9 +160,12 @@ public:
       double mValue;
   };
 
+  /*! Represents a variable in an arithmetic expression tree.
+   */
   class Variable : public Value
   {
     public:
+      //! Constructor that takes the identifier of the variable.
       Variable(const std::string& variable)
       :
       mVariable(variable)
@@ -197,7 +204,7 @@ public:
       std::string mVariable;
   };
 
-
+  //! Factor node in an arithmetic expression tree.
   class Factor
   {
     public:
@@ -226,6 +233,7 @@ public:
       ValuePtr mValue;
   };
 
+  //! Term node in an arithmetic expression tree.
   class Term
   {
     public:
@@ -264,6 +272,7 @@ public:
       std::vector<FactorPtr> mFactors;
   };
 
+  //! Expression node in an arithmetic expression tree.
   class Expression : public Value
   {
     public:

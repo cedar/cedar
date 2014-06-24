@@ -1324,6 +1324,7 @@ const std::vector<cedar::proc::gui::StickyNote* > cedar::proc::gui::Scene::getSt
   return this->mStickyNotes;
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 class GroupSelectDialog : public QDialog
 {
 public:
@@ -1355,6 +1356,7 @@ public:
 
   QComboBox* mpGroupNamesBox;
 };
+//!@endcond
 
 void cedar::proc::gui::Scene::importGroup(bool link)
 {

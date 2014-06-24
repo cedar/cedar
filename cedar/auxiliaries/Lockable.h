@@ -77,6 +77,8 @@ public:
 
 public:
   /*! @brief A RAII-based locker for lockables. Will automatically unlock when the locker is destroyed.
+   *
+   * @see cedar::aux::LockerBase
    */
   class Locker : public cedar::aux::LockerBase
   {
@@ -125,6 +127,10 @@ public:
   CEDAR_GENERATE_POINTER_TYPES(Locker);
 
 public:
+  /*! An RAII-based read-locker for cedar::aux::Lockables.
+   *
+   * @see cedar::aux::LockerBase
+   */
   class ReadLocker : public Locker
   {
   public:
@@ -143,6 +149,10 @@ public:
 
   CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
 
+  /*! An RAII-based write-locker for cedar::aux::Lockables.
+   *
+   * @see cedar::aux::LockerBase
+   */
   class WriteLocker : public Locker
   {
   public:

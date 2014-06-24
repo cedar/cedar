@@ -50,6 +50,7 @@
 // private nested classes
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@cond SKIPPED_DOCUMENTATION
 class cedar::proc::gui::PerformanceOverview::TimeCellItem : public QTableWidgetItem
 {
 public:
@@ -124,6 +125,7 @@ private:
 private:
   bool mIsRunning;
 };
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
