@@ -22,98 +22,129 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Matrix.h
+    File:        SpaceCodeToRateMatrix.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 12 11
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2014 06 11
 
-    Description: Header file for the class cedar::proc::typecheck::Matrix.
+    Description: Header file for the class cedar::dyn::SpaceCodeToRateMatrix.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_TYPECHECK_MATRIX_H
-#define CEDAR_PROC_TYPECHECK_MATRIX_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_DYN_SPACE_CODE_TO_RATE_MATRIX_H
+#define CEDAR_DYN_SPACE_CODE_TO_RATE_MATRIX_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/TypeCheck.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/typecheck/Matrix.fwd.h"
+#include "cedar/dynamics/steps/SpaceCodeToRateMatrix.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 
+// SYSTEM INCLUDES
 
-/*!@brief Typecheck that can perform various checks on a matrix.
+
+/*!@todo describe.
  *
- *        Commonly, this is intended to test for combinations of matrix attributes, e.g., certain types and
- *        dimensionalities.
+ * @todo describe more.
  */
-class cedar::proc::typecheck::Matrix : public cedar::proc::typecheck::TypeCheck
+class cedar::dyn::SpaceCodeToRateMatrix : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Matrix();
+  //!@brief The standard constructor.
+  SpaceCodeToRateMatrix();
+
+  //!@brief Destructor
+  virtual ~SpaceCodeToRateMatrix();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Add an accepted dimensionality. By default, all dimensionalities are accepted.
-  void addAcceptedDimensionality(unsigned int dimensionality);
-
-  //! Adds a range of dimensionalities to be accepted by the check.
-  void addAcceptedDimensionalityRange(unsigned int lowest, unsigned int highest);
-
-  //! Add an accepted matrix type. By default, all dimensionalities are accepted.
-  void addAcceptedType(int type);
-
-  //! Add an accepted amount of channels. By default, all channels are accepted.
-  void addAcceptedChannel(unsigned int numberOfChannels);
-
-  //! Sets whether the matrix can be empty
-  void acceptsEmptyMatrix(bool accepts);
-
-  //! Performs the actual check.
-  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
+  // none yet
+public slots:
+  //!@brief This slot is connected to the valueChanged() event of the limit parameters.
+  void limitsChanged();
+  //!@brief This slot takes care of size changes.
+  void outputSizesChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+
+  inline void setLowerLimit(double limit)
+  {
+    _mLowerLimit->setValue(limit);
+  }
+
+  inline void setUpperLimit(double limit)
+  {
+    _mUpperLimit->setValue(limit);
+  }
+
+  inline double getLowerLimit()
+  {
+    return _mLowerLimit->getValue();
+  }
+
+  inline double getUpperLimit()
+  {
+    return _mUpperLimit->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
+
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
+  cedar::aux::MatDataPtr mWeights;
 private:
-  std::vector<unsigned int> mAcceptedDimensionalities;
+  double mInterval;
 
-  std::vector<unsigned int> mAcceptedNumberOfChannels;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief the lower limit of the mapped interval
+  cedar::aux::DoubleParameterPtr _mLowerLimit;
 
-  std::vector<int> mAcceptedTypes;
+  //!@brief the upper limit of the mapped interval
+  cedar::aux::DoubleParameterPtr _mUpperLimit;
 
-  bool mAcceptsEmptyMatrix;
+private:
+  // none yet
 
-}; // class cedar::proc::typecheck::Matrix
+}; // class cedar::dyn::SpaceCodeToRateMatrix
 
-#endif // CEDAR_PROC_TYPECHECK_MATRIX_H
+#endif // CEDAR_DYN_SPACE_CODE_TO_RATE_MATRIX_H
 

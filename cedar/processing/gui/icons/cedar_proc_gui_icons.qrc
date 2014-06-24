@@ -24,6 +24,7 @@
     <file>steps/broken_icon.svg</file>
     <file>steps/absolute_value.svg</file>
     <file>steps/camera_grabber.svg</file>
+    <file>steps/channel_merge.svg</file>
     <file>steps/channel_split.svg</file>
     <file>steps/color_conversion.svg</file>
     <file>steps/component_multiply.svg</file>
@@ -56,6 +57,7 @@
     <file>steps/projection.svg</file>
     <file>steps/resize.svg</file>
     <file>steps/sum.svg</file>
+    <file>steps/space_code_to_rate_matrix.svg</file>
     <file>steps/unit_converter.svg</file>
     <file>steps/transferFunction.svg</file>
     <file>steps/video_grabber.svg</file>

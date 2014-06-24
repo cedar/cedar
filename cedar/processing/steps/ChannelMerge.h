@@ -22,98 +22,102 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Matrix.h
+    File:        ChannelMerge.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 12 11
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2014 06 11
 
-    Description: Header file for the class cedar::proc::typecheck::Matrix.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_TYPECHECK_MATRIX_H
-#define CEDAR_PROC_TYPECHECK_MATRIX_H
+#ifndef CEDAR_PROC_STEPS_CHANNEL_MERGE_H
+#define CEDAR_PROC_STEPS_CHANNEL_MERGE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/TypeCheck.h"
+#include "cedar/processing/Step.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/typecheck/Matrix.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
+#include "cedar/processing/steps/ChannelMerge.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <string>
 
 
-/*!@brief Typecheck that can perform various checks on a matrix.
- *
- *        Commonly, this is intended to test for combinations of matrix attributes, e.g., certain types and
- *        dimensionalities.
+/*!@brief A processing step that converts an image from one color space to another.
  */
-class cedar::proc::typecheck::Matrix : public cedar::proc::typecheck::TypeCheck
+class cedar::proc::steps::ChannelMerge : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Matrix();
+  //!@brief The standard constructor.
+  ChannelMerge();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Add an accepted dimensionality. By default, all dimensionalities are accepted.
-  void addAcceptedDimensionality(unsigned int dimensionality);
-
-  //! Adds a range of dimensionalities to be accepted by the check.
-  void addAcceptedDimensionalityRange(unsigned int lowest, unsigned int highest);
-
-  //! Add an accepted matrix type. By default, all dimensionalities are accepted.
-  void addAcceptedType(int type);
-
-  //! Add an accepted amount of channels. By default, all channels are accepted.
-  void addAcceptedChannel(unsigned int numberOfChannels);
-
-  //! Sets whether the matrix can be empty
-  void acceptsEmptyMatrix(bool accepts);
-
-  //! Performs the actual check.
-  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+
+  std::string generateDataName(unsigned int channel) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 private:
-  std::vector<unsigned int> mAcceptedDimensionalities;
+  std::vector<cedar::aux::ConstMatDataPtr> mChannels;
+  cedar::aux::annotation::ConstColorSpacePtr mInputColorSpaceAnnotation;
 
-  std::vector<unsigned int> mAcceptedNumberOfChannels;
+  cedar::aux::MatDataPtr mOutput;
 
-  std::vector<int> mAcceptedTypes;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-  bool mAcceptsEmptyMatrix;
+private:
+  // none yet
 
-}; // class cedar::proc::typecheck::Matrix
+}; // class cedar::proc::steps::ChannelMerge
 
-#endif // CEDAR_PROC_TYPECHECK_MATRIX_H
+#endif // CEDAR_PROC_STEPS_CHANNEL_MERGE_H
 
