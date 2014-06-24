@@ -22,40 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Matrix.h
+    File:        VideoSink.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 12 11
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2014 06 24
 
-    Description: Header file for the class cedar::proc::typecheck::Matrix.
+    Description: Header file for the class cedar::proc::sinks::VideoSink.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_TYPECHECK_MATRIX_H
-#define CEDAR_PROC_TYPECHECK_MATRIX_H
+#ifndef CEDAR_PROC_SINKS_VIDEO_SINK_H
+#define CEDAR_PROC_SINKS_VIDEO_SINK_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/TypeCheck.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/typecheck/Matrix.fwd.h"
+#include "cedar/processing/sinks/VideoSink.fwd.h"
 
 // SYSTEM INCLUDES
-#include <vector>
+#include <opencv2/opencv.hpp>
 
 
-/*!@brief Typecheck that can perform various checks on a matrix.
+/*!@todo describe.
  *
- *        Commonly, this is intended to test for combinations of matrix attributes, e.g., certain types and
- *        dimensionalities.
+ * @todo describe more.
  */
-class cedar::proc::typecheck::Matrix : public cedar::proc::typecheck::TypeCheck
+class cedar::proc::sinks::VideoSink : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -65,29 +66,20 @@ class cedar::proc::typecheck::Matrix : public cedar::proc::typecheck::TypeCheck
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Matrix();
+  //!@brief The standard constructor.
+  VideoSink();
+
+  //!@brief Destructor
+  virtual ~VideoSink();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Add an accepted dimensionality. By default, all dimensionalities are accepted.
-  void addAcceptedDimensionality(unsigned int dimensionality);
-
-  //! Adds a range of dimensionalities to be accepted by the check.
-  void addAcceptedDimensionalityRange(unsigned int lowest, unsigned int highest);
-
-  //! Add an accepted matrix type. By default, all dimensionalities are accepted.
-  void addAcceptedType(int type);
-
-  //! Add an accepted amount of channels. By default, all channels are accepted.
-  void addAcceptedNumberOfChannels(unsigned int numberOfChannels);
-
-  //! Sets whether the matrix can be empty
-  void acceptsEmptyMatrix(bool accepts);
-
-  //! Performs the actual check.
-  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
+  //!@brief Writes the output matrix to a video file.
+  void compute(const cedar::proc::Arguments& arguments);
+  void onStart();
+  void onStop();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -104,16 +96,23 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 private:
-  std::vector<unsigned int> mAcceptedDimensionalities;
+  cv::VideoWriter mVideoWriter;
+  double mCurrentFrameDuration;
 
-  std::vector<unsigned int> mAcceptedNumberOfChannels;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-  std::vector<int> mAcceptedTypes;
+private:
+  cedar::aux::FileParameterPtr _mOutputFileName;
+  cedar::aux::DoubleParameterPtr _mFrameRate;
 
-  bool mAcceptsEmptyMatrix;
+}; // class cedar::proc::sinks::VideoSink
 
-}; // class cedar::proc::typecheck::Matrix
-
-#endif // CEDAR_PROC_TYPECHECK_MATRIX_H
+#endif // CEDAR_PROC_SINKS_VIDEO_SINK_H
 
