@@ -85,7 +85,7 @@ public:
 public slots:
 
   //!@brief This slot should be invoked, when the video in the VideoGrabber has changed.
-  void updateVideo();
+  void updateVideo(bool emitOutputPropertyChanged = true);
 
   //!@brief This slot should be invoked, when the speed factor in the VideoGrabber has changed.
   void updateSpeedFactor();
