@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Video.h
+    File:        ChannelMerge.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2014 06 11
 
     Description:
 
@@ -34,47 +34,45 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_VIDEO_H
-#define CEDAR_PROC_SOURCES_VIDEO_H
+#ifndef CEDAR_PROC_STEPS_CHANNEL_MERGE_H
+#define CEDAR_PROC_STEPS_CHANNEL_MERGE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/VideoGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
-#include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/sources/Video.fwd.h"
+#include "cedar/auxiliaries/MatData.fwd.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
+#include "cedar/processing/steps/ChannelMerge.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
-//!@brief A video file source for the processing framework.
-class cedar::proc::sources::Video
-:
-public cedar::proc::sources::GrabberBase
+/*!@brief A processing step that converts an image from one color space to another.
+ */
+class cedar::proc::steps::ChannelMerge : public cedar::proc::Step
 {
-  Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Video();
-
-  //!@brief Destructor
-  ~Video();
+  ChannelMerge();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -82,44 +80,22 @@ public:
 public:
   // none yet
 
-public slots:
-
-  //!@brief This slot should be invoked, when the video in the VideoGrabber has changed.
-  void updateVideo(bool emitOutputPropertyChanged = true);
-
-  //!@brief This slot should be invoked, when the speed factor in the VideoGrabber has changed.
-  void updateSpeedFactor();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void reset();
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::VideoGrabberPtr getVideoGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getVideoGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
+  std::string generateDataName(unsigned int channel) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -127,11 +103,10 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the time between two frames. Depends on the frame rate of the video
-  cedar::unit::Time mFrameDuration;
+  std::vector<cedar::aux::ConstMatDataPtr> mChannels;
+  cedar::aux::annotation::ConstColorSpacePtr mInputColorSpaceAnnotation;
 
-  //!@brief the time elapsed since the last frame is displayed
-  cedar::unit::Time mTimeElapsed;
+  cedar::aux::MatDataPtr mOutput;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -141,6 +116,8 @@ protected:
 
 private:
   // none yet
-}; // class cedar::proc::sources::Video
-#endif // CEDAR_PROC_SOURCES_VIDEO_H
+
+}; // class cedar::proc::steps::ChannelMerge
+
+#endif // CEDAR_PROC_STEPS_CHANNEL_MERGE_H
 
