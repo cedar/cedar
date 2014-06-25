@@ -131,7 +131,8 @@ void cedar::proc::sources::Video::reset()
 {
   if (this->getVideoGrabber()->applyParameter())
   {
-    updateVideo();
+    // assuming that a reset does not change the output size, do not emit a (blocking) signal
+    updateVideo(false);
   }
   else
   {
@@ -156,7 +157,7 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
     {
       const cedar::proc::StepTime& step_time = dynamic_cast<const cedar::proc::StepTime&>(arguments);
       const cedar::unit::Time& t = step_time.getStepTime();
-      mTimeElapsed += t;
+      this->mTimeElapsed += t;
     }
     catch (const std::bad_cast& e)
     {
@@ -164,24 +165,27 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
     }
 
     //!@todo: scroll forward, if fps is much larger than steptime
-    if (mTimeElapsed > mFrameDuration)
+    if (this->mTimeElapsed > mFrameDuration)
     {
       this->getVideoGrabber()->grab();
       this->mImage->setData(this->getVideoGrabber()->getImage());
-      this->mTimeElapsed = 0.0 * cedar::unit::seconds;
+      this->mTimeElapsed -= mFrameDuration;
     }
   }
 }
 
 
-void cedar::proc::sources::Video::updateVideo()
+void cedar::proc::sources::Video::updateVideo(bool emitOutputPropertyChanged)
 {
   this->mImage->setData(this->getVideoGrabber()->getImage());
   //!@todo fix getFps() to include frequency as unit
   mFrameDuration = 1.0 / this->getVideoGrabber()->getFramerate() * cedar::unit::seconds;
   mTimeElapsed = 0.0 * cedar::unit::seconds;
   mRecording->setValue(this->getVideoGrabber()->isRecording());
-  this->emitOutputPropertiesChangedSignal("Video");
+  if (emitOutputPropertyChanged)
+  {
+    this->emitOutputPropertiesChangedSignal("Video");
+  }
 }
 
 void cedar::proc::sources::Video::updateSpeedFactor()
