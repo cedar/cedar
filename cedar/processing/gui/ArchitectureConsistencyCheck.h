@@ -44,10 +44,10 @@
 #include "cedar/processing/gui/ui_ArchitectureConsistencyCheck.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/consistency/ConsistencyIssue.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
-#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/Scene.fwd.h"
 #include "cedar/processing/gui/View.fwd.h"
 
@@ -78,7 +78,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! Sets the network whose consistency is to be checked.
-  void setNetwork(cedar::proc::gui::NetworkPtr network);
+  void setGroup(cedar::proc::gui::GroupPtr network);
 
   //! Clears all issues.
   void clear();
@@ -113,8 +113,8 @@ private:
 protected:
   // none yet
 private:
-  //! Network being checked.
-  cedar::proc::gui::NetworkPtr mNetwork;
+  //! Group being checked.
+  cedar::proc::gui::GroupPtr mGroup;
 
   //! Scene in which the network is being displayed.
   cedar::proc::gui::Scene* mpScene;

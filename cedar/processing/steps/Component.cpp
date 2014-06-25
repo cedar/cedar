@@ -182,7 +182,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
 void cedar::proc::steps::Component::componentChanged()
 {
   //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
-  this->clearDataSlots();
+  this->removeAllDataSlots();
 
   cedar::dev::ComponentPtr component;
   try

@@ -45,9 +45,12 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
+#include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LockerBase.h"
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/CallFunctionInThreadALot.fwd.h"
 #include "cedar/auxiliaries/BoolParameter.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/Step.fwd.h"
@@ -90,7 +93,7 @@ class cedar::proc::Step : public QObject,
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -98,6 +101,80 @@ class cedar::proc::Step : public QObject,
 public:
   //! Map from action names to their corresponding functions.
   typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
+
+public:
+  /*! An RAII-based class for locking steps.
+   *
+   * @remarks Using this class directly is not recommended. Usually, cedar::proc::Step::ReadLocker or  WriteLocker will
+   *          do the trick.
+   */
+  class Locker : public cedar::aux::LockerBase
+  {
+    public:
+      //! Constructor.
+      Locker(cedar::proc::StepPtr step, cedar::aux::LOCK_TYPE type)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::proc::Step::lock, step, type),
+        boost::bind(&cedar::proc::Step::unlock, step, type)
+      )
+      {
+      }
+
+      //! Constructor.
+      Locker(cedar::proc::Step* step, cedar::aux::LOCK_TYPE type)
+      :
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::proc::Step::lock, step, type),
+        boost::bind(&cedar::proc::Step::unlock, step, type)
+      )
+      {
+      }
+  };
+
+public:
+  /*! An RAII-based class for locking steps for writing.
+   */
+  class ReadLocker : public Locker
+  {
+  public:
+    ReadLocker(cedar::proc::StepPtr step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_READ)
+    {
+    }
+
+    ReadLocker(cedar::proc::Step* step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_READ)
+    {
+    }
+  };
+
+  /*! An RAII-based class for locking steps for reading.
+   */
+  class WriteLocker : public Locker
+  {
+  public:
+    WriteLocker(cedar::proc::StepPtr step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_WRITE)
+    {
+    }
+
+    WriteLocker(cedar::proc::Step* step)
+    :
+    Locker(step, cedar::aux::LOCK_TYPE_WRITE)
+    {
+    }
+  };
+
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -108,6 +185,8 @@ public:
 
   //!@brief The standard constructor.
   Step(bool isLooped = false);
+
+  ~Step();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -201,6 +280,24 @@ public:
 
   bool isRecorded() const;
 
+  //! Returns the last measurement that has been made for the given id.
+  cedar::unit::Time getLastTimeMeasurement(unsigned int id) const;
+
+  //! Returns the average of all present measurements that has been made for the given id.
+  cedar::unit::Time getTimeMeasurementAverage(unsigned int id) const;
+
+  //! Checks whether a measurement for the given id is present.
+  bool hasTimeMeasurement(unsigned int id) const;
+
+  //! Returns the number of time measurements registered for the step.
+  unsigned int getNumberOfTimeMeasurements() const;
+
+  //! Returns the name of a given time measurement
+  const std::string& getTimeMeasurementName(unsigned int id) const;
+
+  //! Updates the step's trigger chains
+  void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -216,7 +313,7 @@ protected:
   /*!@brief Adds a trigger to the step.
    *
    *        After calling this method, this step will be aware that this trigger belongs to it. Among other things, this
-   *        means that the processingIde will be able to show this trigger and allow to connect it.
+   *        means that the cedar GUI will be able to show this trigger and allow to connect it.
    */
   void addTrigger(cedar::proc::TriggerPtr trigger);
 
@@ -296,13 +393,18 @@ protected:
    *
    * @remarks Usually, this should only be called automatically.
    */
-  void unlock() const;
+  void unlock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
 
-  /*!@brief Redetermines the validity for an input slot.
-   *
-   * @param slot The slot to revalidate.
-   */
   void revalidateInputSlot(const std::string& slot);
+
+  /*!@brief Registers a new type of measurement for the step.
+   * @returns A unique identifyer for accessing this measurement.
+   */
+  unsigned int registerTimeMeasurement(const std::string& measurement);
+
+  /*! @brief Sets the measuement with the given id.
+   */
+  void setTimeMeasurement(unsigned int id, const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -322,6 +424,7 @@ private:
   virtual void reset();
 
   /*!@brief Sets the current execution time measurement.
+   * @todo Rename to ComputeTimeMeasurement
    */
   void setRunTimeMeasurement(const cedar::unit::Time& time);
 
@@ -366,28 +469,28 @@ private:
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;
 
-  //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Time> mMovingAverageIterationTime;
+  //! Map from ID to measurement name.
+  std::map<unsigned int, std::string> mTimeMeasurementNames;
+
+  //! List of all the measurements available for the step.
+  std::vector<cedar::aux::LockableMember<cedar::aux::MovingAverage<cedar::unit::Time> > > mTimeMeasurements;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Time> mLockingTime;
+  unsigned int mComputeTimeId;
+
+  //!@brief Moving average of the iteration time.
+  unsigned int mLockingTimeId;
 
   //!@brief Moving average of the time between compute calls.
-  cedar::aux::MovingAverage<cedar::unit::Time> mRoundTime;
+  unsigned int mRoundTimeId;
 
   boost::posix_time::ptime mPreciseLastComputeCall;
 
-  //!@brief Lock for the last iteration time.
-  mutable QReadWriteLock mLastIterationTimeLock;
-
-  //!@brief Lock for the last iteration time.
-  mutable QReadWriteLock mLockTimeLock;
-
-  //!@brief Lock for the round time.
-  mutable QReadWriteLock mRoundTimeLock;
-
   //! Whether the step should lock its inputs and outputs automatically.
   bool mAutoLockInputsAndOutputs;
+
+  //! Used for calling this->getFinishedTrigger() in a separate thread
+  cedar::aux::CallFunctionInThreadALotPtr mFinishedCaller;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

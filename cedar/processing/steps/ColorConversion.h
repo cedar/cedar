@@ -81,6 +81,7 @@ public:
         mType.type()->def(cedar::aux::Enum(HSV, "HSV"));
         mType.type()->def(cedar::aux::Enum(YUV, "YUV"));
         mType.type()->def(cedar::aux::Enum(YCrCb, "YCrCb"));
+        mType.type()->def(cedar::aux::Enum(Lab, "Lab"));
       }
 
       //! @returns A const reference to the base enum object.
@@ -106,6 +107,8 @@ public:
       static const Id YUV = 3;
       //! Alias for YUV
       static const Id YCrCb = 4;
+      //! Alias for LAB
+      static const Id Lab = 5;
 
     private:
       static cedar::aux::EnumType<ColorSpace> mType;

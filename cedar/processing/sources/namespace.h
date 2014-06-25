@@ -52,8 +52,7 @@
   #include <boost/smart_ptr.hpp>
 #endif
 
-#warning Do not include this header any more. Use cedar's new forward declaration headers instead.
-
+#warning Do not include this header any more. Use the new forward declaration headers instead.
 
 #include "cedar/processing/sources/Boost.fwd.h"
 #include "cedar/processing/sources/BoxInput.fwd.h"

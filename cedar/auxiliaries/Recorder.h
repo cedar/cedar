@@ -164,7 +164,7 @@ protected:
    *              By calling stop, the calling thread waits until all recorded data has been written to disk.
    *!todo: docu is wrong, should be private, no?
    */
-  void processStop(bool suppressWarning);
+  void processQuit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

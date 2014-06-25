@@ -93,9 +93,9 @@ public:
 
   //!@brief The constructor.
   NumericVectorParameter(
-                          cedar::aux::Configurable *pOwner,
-                          const std::string& name,
-                          const std::vector<T>& defaultValues,
+                          cedar::aux::Configurable *pOwner = nullptr,
+                          const std::string& name = "",
+                          const std::vector<T>& defaultValues = std::vector<T>(),
                           const LimitType& limits = LimitType::full()
                         )
   :

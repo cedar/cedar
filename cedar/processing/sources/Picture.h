@@ -51,7 +51,7 @@
 // SYSTEM INCLUDES
 
 
-//!@brief A picture file source for the processingIde
+//!@brief A picture file source for the processing framework.
 class cedar::proc::sources::Picture
 :
 public cedar::proc::sources::GrabberBase
@@ -77,6 +77,12 @@ public:
 public:
   //!@brief Loads the given file into the picture source.
   void setSourceFileName(const std::string& imagePath);
+
+  //! Returns the mat data pointer containing the current picture.
+  cedar::aux::MatDataPtr getImage();
+
+  //! Returns the mat data pointer containing the current picture.
+  cedar::aux::ConstMatDataPtr getImage() const;
 
 public slots:
   //!@brief a slot that takes care of updating the output picture

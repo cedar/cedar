@@ -43,8 +43,8 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/consistency/LoopedStepNotConnected.h"
-#include "cedar/processing/Network.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -73,14 +73,14 @@ mpView(pView)
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::gui::ArchitectureConsistencyCheck::setNetwork(cedar::proc::gui::NetworkPtr network)
+void cedar::proc::gui::ArchitectureConsistencyCheck::setGroup(cedar::proc::gui::GroupPtr network)
 {
-  this->mNetwork = network;
+  this->mGroup = network;
 }
 
 void cedar::proc::gui::ArchitectureConsistencyCheck::recheck()
 {
-  this->mIssues = this->mNetwork->getNetwork()->checkConsistency();
+  this->mIssues = this->mGroup->getGroup()->checkConsistency();
 
   this->clear();
 

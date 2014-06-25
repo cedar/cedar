@@ -40,6 +40,7 @@
 #include "PlotWidget.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/Group.h"
 
 
 // SYSTEM INCLUDES
@@ -55,12 +56,12 @@
 
 cedar::proc::gui::PlotWidget::PlotWidget
 (
-    cedar::proc::StepPtr step,
+    cedar::proc::ConnectablePtr connectable,
     const cedar::proc::ElementDeclaration::DataList& data
 )
 :
 mDataList(data),
-mStep(step),
+mConnectable(connectable),
 mGridSpacing(2),
 mColumns(2),
 mpLayout(new QGridLayout())
@@ -184,7 +185,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   {
     try
     {
-      cedar::proc::DataSlotPtr p_slot = mStep->getSlot
+      cedar::proc::DataSlotPtr p_slot = mConnectable->getSlot
       (
         data_item->getParameter<cedar::aux::EnumParameter>("id")->getValue(),
         data_item->getParameter<cedar::aux::StringParameter>("name")->getValue()
@@ -204,7 +205,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
         // handle disconnection of slot-input
         this->mSignalConnections.push_back
         (
-          p_input_slot->connectToExternalDataRemoved
+          p_input_slot->connectToDataRemovedSignal
           (
             boost::bind
             (
@@ -218,7 +219,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
         // react to addition of input to a slot
         this->mSignalConnections.push_back
         (
-          p_input_slot->connectToExternalDataAdded
+          p_input_slot->connectToDataSetSignal
           (
             boost::bind
             (
@@ -267,6 +268,8 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   }
   // if there is only one plot and it is a multiplot, we need no label
   
+  //!@todo This can fail in some circumstances (possibly connected to when a step moves a buffer to the outputs)
+  CEDAR_ASSERT(!this->mPlotGridMap.empty());
   auto p_current_labeled_plot = mPlotGridMap.begin()->second;
   if (mPlotGridMap.size() == 1 && p_current_labeled_plot->mIsMultiPlot)
   {
@@ -454,12 +457,50 @@ void cedar::proc::gui::PlotWidget::remove_qgridlayout_widget(QWidget* widget)
 // save this plot_widget in configuration node
 void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  root.put("step", this->mStep->getName());
+  std::string step_name = this->mConnectable->getName();
+  auto group = this->mConnectable->getGroup();
+  CEDAR_ASSERT(group);
+  //!@todo shouldn't this use the root group's method for finding the item's path?
+  while (group->getGroup()) // group->getName() != "root")
+  {
+    step_name = group->getName() + "." + step_name;
+    group = group->getGroup();
+  }
+  root.put("step", step_name);
   root.put("position_x", this->parentWidget()->x());
   root.put("position_y", this->parentWidget()->y());
   root.put("width", this->parentWidget()->width());
   root.put("height", this->parentWidget()->height());
   root.put_child("data_list", serialize(this->mDataList));
+
+  cedar::aux::ConfigurationNode plot_settings;
+  for (int row = 0; row < this->mpLayout->rowCount(); ++row)
+  {
+    for (int col = 0; col < this->mpLayout->columnCount(); ++col)
+    {
+      auto layout_item = this->mpLayout->itemAtPosition(row, col);
+      if (auto widget_item = dynamic_cast<QWidgetItem*>(layout_item))
+      {
+        if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(widget_item->widget()))
+        {
+          cedar::aux::ConfigurationNode cfg, plot_cfg;
+          cfg.put("row", row);
+          cfg.put("col", col);
+          plot->writeConfiguration(plot_cfg);
+          if (!plot_cfg.empty())
+          {
+            cfg.push_back(cedar::aux::ConfigurationNode::value_type("plot configuration", plot_cfg));
+          }
+          plot_settings.push_back(cedar::aux::ConfigurationNode::value_type("", cfg));
+        }
+      }
+    }
+  }
+
+  if (!plot_settings.empty())
+  {
+    root.put_child("plot configurations", plot_settings);
+  }
 }
 
 // serialize the datalist for storing it in a configuration node
@@ -478,8 +519,9 @@ cedar::aux::ConfigurationNode cedar::proc::gui::PlotWidget::serialize(const ceda
 }
 
 // restore plotwidget from a configuration node and add it to the respective step
-void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::StepItem* pStepItem)
+void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::Connectable* pConnectable)
 {
+  //!@todo These should really check if these nodes exist; if one doesn't, this will lead to trouble...
   int width = node.get<int>("width");
   int height = node.get<int>("height");
   int x = node.get<int>("position_x");
@@ -495,6 +537,39 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
     data_list.push_back(p_plot_data);
   }
   
-  auto p_plot_widget = new cedar::proc::gui::PlotWidget(pStepItem->getStep(), data_list);
-  pStepItem->addPlotWidget(p_plot_widget, x, y, width, height);
+  auto p_plot_widget = new cedar::proc::gui::PlotWidget(pConnectable->getConnectable(), data_list);
+  pConnectable->addPlotWidget(p_plot_widget, x, y, width, height);
+
+
+  auto settings_iter = node.find("plot configurations");
+  if (settings_iter != node.not_found())
+  {
+    for (auto cfg_iter : settings_iter->second)
+    {
+      auto cfg = cfg_iter.second;
+      auto row_iter = cfg.find("row");
+      auto col_iter = cfg.find("col");
+      if (row_iter == cfg.not_found() || col_iter == cfg.not_found())
+      {
+        continue;
+      }
+      int row = row_iter->second.get_value<int>();
+      int col = col_iter->second.get_value<int>();
+
+      auto widget_item = dynamic_cast<QWidgetItem*>(p_plot_widget->mpLayout->itemAtPosition(row, col));
+      if (!widget_item)
+      {
+        continue;
+      }
+
+      if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(widget_item->widget()))
+      {
+        auto plot_cfg_iter = cfg.find("plot configuration");
+        if (plot_cfg_iter != cfg.not_found())
+        {
+          plot->readConfiguration(plot_cfg_iter->second);
+        }
+      }
+    }
+  }
 }

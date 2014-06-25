@@ -48,19 +48,19 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
   {
     namespace annotation
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Annotatable);
+      //!@endcond
     }
   }
 }
 
-//!@endcond
 
 #endif // CEDAR_AUX_ANNOTATION_ANNOTATABLE_FWD_H
 

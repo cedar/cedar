@@ -124,7 +124,9 @@
 
 #ifdef CEDAR_COMPILER_MSVC
 #define CEDAR_DECLARE_DEPRECATE_MACRO(name) __declspec(deprecated) static inline void name ## _MACRO (void) { ; }
+#define CEDAR_CURRENT_FUNCTION_NAME __FUNCSIG__
 #elif defined CEDAR_COMPILER_GCC
+#define CEDAR_CURRENT_FUNCTION_NAME __PRETTY_FUNCTION__
 #define CEDAR_DECLARE_DEPRECATE_MACRO(name) static inline void __attribute__((deprecated)) name ## _MACRO (void) { ; }
 #else
 #error CEDAR_DECLARE_DEPRECATE_MACRO is not implemented for this compiler.

@@ -67,6 +67,9 @@ public:
   //!@brief The standard constructor.
   MatDataPlot(QWidget *pParent = NULL);
 
+  //! Constructor that immediately plots data.
+  MatDataPlot(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent = NULL);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -79,6 +82,10 @@ public:
 
   //!@brief Check if the given data can be detached from the plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
+
+  void writeConfiguration(cedar::aux::ConfigurationNode& configuration) const;
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,6 +100,8 @@ private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
   void doDetach(cedar::aux::ConstDataPtr data);
 
+  void initLayout();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,7 +112,7 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
 }; // class cedar::aux::gui::MatDataPlot
 

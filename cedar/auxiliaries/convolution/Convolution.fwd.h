@@ -48,19 +48,18 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
   {
     namespace conv
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Convolution);
+      //!@endcond
     }
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_AUX_CONV_CONVOLUTION_FWD_H
 

@@ -95,12 +95,14 @@ install a patched version of *qwtplot3d* (0.3), which sadly is no longer
 available anywhere else on the web. We are working on removing this dependency
 from cedar but for now it is necessary for 3D plotting of data.
 
-### Mac OS X 10.8.x
-We recommend using [homebrew](http://mxcl.github.com/homebrew/) to install the
+### Mac OS X 10.8.x & 10.9.x
+We highly recommend using [homebrew](http://mxcl.github.com/homebrew/) to install the
 above dependencies. Homebrew has recipes for all of cedar's dependencies
-except for *qwtplot3d*.
+except for *qwtplot3d*. *qwtplot3d* does not compile on 10.9.x.
 
-#### Installing qwtplot3d
+Your Clang version should be up to date, i.e. `Apple LLVM version 5.x (based on LLVM 3.3svn)` or newer. Just install the most recent XCode and you should be good to go.
+
+#### Installing qwtplot3d on OS X 10.8.x
 Download the source code of *qwtplot3d* from our
 [repository](https://bitbucket.org/cedar/dependencies/downloads/qwtplot3d-0.3.0-patched.tar.gz)
 then open a terminal and go to the folder containing the downloaded file. Run
@@ -133,13 +135,12 @@ environment.
     
     sudo ln -s "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Versions/6/qwt" "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/qwt"
 
-#### Install GCC (optional)
-**NOTE: You can try to compile cedar with Clang. If you run into problems, updating to the newest Clang version might solve them.**
+#### Do use homebrew
+As afore-mentioned we highly recommend to use homebrew to install all of cedar's dependencies. If you do that installing cedar is a breeze. If you do run into trouble it's because your system isn't *ready to brew*. `brew doctor` will help you with that. Just enter `brew doctor` into your shell and follow the instructions until the *doctor* tells you that your system is *ready to brew*.
 
-To compile cedar **we recommend** using the GCC compiler version 4.4.5 or newer. The probably the easiest way to install GCC on Mac OSX is to use the Homebrew [formula](https://github.com/Homebrew/homebrew-dupes/blob/master/gcc.rb).
-Follow its instructions to install homebrew/dupes/gcc. When configuring cedar with
-CMake, change the compiler to GCC. You can do this by using *ccmake*: Switch to
-advanced mode and then set the value of `CMAKE_CXX_COMPILER` to `/usr/bin/llvm-g++`.
+You may not find all dependencies you need in the default homebrew formula repository, you will have to `brew tap homebrew/sciences` and maybe `brew tap homebrew/versions`. Usually homebrew can help you to find what you need, please refer to the [homebrew manual](https://github.com/Homebrew/homebrew/wiki) for that.
+
+Also be attentive to which version of a dependency you install. A common pitfall is that `brew install vtk` will install vtk 6.x while we recommend to use vtk 5.10 which has a separate formula `vtk5` which will not show up until you have tapped `homebrew/versions`. An easy way to find out the version a formula will install is to call `brew info [formula-name]` without the brackets.
 
 ### Other operating systems
 
@@ -268,9 +269,9 @@ processing framework:
 
         cd [your cedar directory]/bin
 
-2. Start the processing framework:
+2. Start cedar's GUI:
 
-        ./processingIde
+        ./cedar
 
 3. Now, drag and drop elements from the top onto the working area and connect
    them up.

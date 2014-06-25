@@ -74,6 +74,9 @@ namespace cedar
   {
     namespace math
     {
+      /*! Helper class for dealing with units. Via template-specialization, this class can be used to inform
+       *  the limits about the default units for certain quantities.
+       */
       template<class Unit>
       class UnitHelper
       {
@@ -84,6 +87,7 @@ namespace cedar
         }
       };
 
+      //! Template specialization of cedar::aux::math::UnitHelper for cedar::unit::Time.
       template<>
       class UnitHelper<cedar::unit::Time>
       {
@@ -94,6 +98,7 @@ namespace cedar
         }
       };
 
+      //! Template specialization of cedar::aux::math::UnitHelper for cedar::unit::Length.
       template<>
       class UnitHelper<cedar::unit::Length>
       {
@@ -104,6 +109,7 @@ namespace cedar
         }
       };
 
+      //! Template specialization of cedar::aux::math::UnitHelper for cedar::unit::Velocity.
       template<>
       class UnitHelper<cedar::unit::Velocity>
       {
@@ -114,6 +120,7 @@ namespace cedar
         }
       };
 
+      //! Template specialization of cedar::aux::math::UnitHelper for cedar::unit::Acceleration.
       template<>
       class UnitHelper<cedar::unit::Acceleration>
       {
@@ -124,6 +131,7 @@ namespace cedar
         }
       };
 
+      //! Template specialization of cedar::aux::math::UnitHelper for cedar::unit::Frequency.
       template<>
       class UnitHelper<cedar::unit::Frequency>
       {
@@ -134,6 +142,7 @@ namespace cedar
         }
       };
 
+      //! Template specialization of cedar::aux::math::UnitHelper for cedar::unit::AngularVelocity.
       template<>
       class UnitHelper<cedar::unit::AngularVelocity>
       {
@@ -144,6 +153,7 @@ namespace cedar
         }
       };
 
+      //! Template specialization of cedar::aux::math::UnitHelper for cedar::unit::PlaneAngle.
       template<>
       class UnitHelper<cedar::unit::PlaneAngle>
       {
@@ -154,6 +164,7 @@ namespace cedar
         }
       };
 
+      //! Helper class for getting several limit numbers of numbers of different c++ types.
       template <typename T>
       class NumericHelper
       {
@@ -188,6 +199,7 @@ namespace cedar
         }
       };
 
+      //! Specialization of cedar::aux::math::NumericHelper for quantities.
       template<class Unit, class T>
       class NumericHelper<boost::units::quantity<Unit, T> >
       {

@@ -191,10 +191,12 @@ _mTransformationDirection
 ),
 _mSamplesPerDegree(new cedar::aux::DoubleParameter(this, "samples per degree", 1, 0.001, 100)),
 _mSamplesPerDistance(new cedar::aux::DoubleParameter(this, "samples per distance", 1, 0.001, 100)),
-_mNumberOfRows(new cedar::aux::UIntParameter(this, "rows size", 10, cedar::aux::UIntParameter::LimitType::positive())),
-_mNumberOfCols(new cedar::aux::UIntParameter(this, "cols size", 10, cedar::aux::UIntParameter::LimitType::positive())),
+_mNumberOfRows(new cedar::aux::UIntParameter(this, "rows size", 50, cedar::aux::UIntParameter::LimitType::positive())),
+_mNumberOfCols(new cedar::aux::UIntParameter(this, "cols size", 50, cedar::aux::UIntParameter::LimitType::positive())),
 _mMagnitudeForward(new cedar::aux::DoubleParameter(this, "magnitude forward", 10, 0, 1000)),
-_mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 10, 0, 1000))
+_mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 10, 0, 1000)),
+_mFillCenter(new cedar::aux::BoolParameter(this, "fill center", false)),
+_mSlicedDimension(new cedar::aux::UIntParameter(this, "sliced dimension", 0, cedar::aux::UIntParameter::LimitType(0, 2)))
 {
   // matrix in original coordinates that has to be transformed
   this->declareInput("input", true);
@@ -207,6 +209,8 @@ _mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 
   // create maps
   this->createMap();
 
+  this->_mSlicedDimension->setConstant(true);
+
   QObject::connect(this->_mTransformationDirection.get(), SIGNAL(valueChanged()), this, SLOT(transformDirectionChanged()));
   QObject::connect(this->_mTransformationType.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(this->_mSamplesPerDegree.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
@@ -215,6 +219,9 @@ _mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 
   QObject::connect(this->_mNumberOfCols.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(this->_mMagnitudeForward.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(this->_mMagnitudeBackward.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(this->_mFillCenter.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(this->_mSlicedDimension.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+
 
   this->applyAnnotations();
 }
@@ -275,6 +282,30 @@ void cedar::proc::steps::CoordinateTransformation::transformDirectionChanged()
   this->recompute();
 }
 
+void cedar::proc::steps::CoordinateTransformation::getSetup(int& dim0, int& dim1, int sliced_dimension)
+{
+  CEDAR_ASSERT(sliced_dimension < 3);
+  switch (sliced_dimension)
+  {
+    case 0:
+      dim0 = 1;
+      dim1 = 2;
+      break;
+
+    case 1:
+      dim0 = 0;
+      dim1 = 2;
+      break;
+
+    case 2:
+      dim0 = 0;
+      dim1 = 1;
+      break;
+  }
+  CEDAR_ASSERT(dim0 < 3);
+  CEDAR_ASSERT(dim1 < 3);
+}
+
 // The arguments are unused here
 void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Arguments&)
 {
@@ -317,26 +348,32 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
   else
   {
     CEDAR_DEBUG_ASSERT(this->mInput->getDimensionality() == 3);
+    CEDAR_DEBUG_ASSERT(output.dims == 3);
 
+    //!@todo The special case dim_sliced == 0 can be implemented more efficiently
+    int dim_sliced = this->_mSlicedDimension->getValue();
+    int dim_0, dim_1;
+    getSetup(dim_0, dim_1, dim_sliced);
 
     cv::Range range[3];
-    range[0] = cv::Range::all();
-    range[1] = cv::Range::all();
-    cv::Mat output_slice = cv::Mat(output.size[0], output.size[1], output.type());
+    range[dim_0] = cv::Range::all();
+    range[dim_1] = cv::Range::all();
+    cv::Mat output_slice = cv::Mat(output.size[dim_0], output.size[dim_1], output.type());
     std::vector<int> dst_sizes(3);
-    dst_sizes[0] = output.size[0];
-    dst_sizes[1] = output.size[1];
-    dst_sizes[2] = 1;
+    dst_sizes[dim_0] = output.size[dim_0];
+    dst_sizes[dim_1] = output.size[dim_1];
+    dst_sizes[dim_sliced] = 1;
 
-    for (int d3 = 0; d3 < this->mInput->getData().size[2]; ++d3)
+    for (int d3 = 0; d3 < this->mInput->getData().size[dim_sliced]; ++d3)
     {
-      range[2] = cv::Range(d3, d3 + 1);
+      range[dim_sliced].start = d3;
+      range[dim_sliced].end = d3 + 1;
 
       // extract 2d slices
       //!@todo Find a way to avoid this clone
       cv::Mat slice_3d = input(range).clone();
       // create a header for the current slice
-      cv::Mat input_slice = cv::Mat(input.size[0], input.size[1], input.type(), slice_3d.data);
+      cv::Mat input_slice = cv::Mat(input.size[dim_0], input.size[dim_1], input.type(), slice_3d.data);
 
       output_slice.setTo(0.0);
 
@@ -360,8 +397,13 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
 
 void cedar::proc::steps::CoordinateTransformation::recompute()
 {
+  cv::Mat old_output = this->mOutput->getData();
   this->createMap();
-  emitOutputPropertiesChangedSignal("result");
+
+  if (!cedar::aux::math::matrixSizesEqual(old_output, this->mOutput->getData()))
+  {
+    emitOutputPropertiesChangedSignal("result");
+  }
   this->onTrigger();
 }
 
@@ -419,8 +461,11 @@ void cedar::proc::steps::CoordinateTransformation::getRowColSize
   }
   else
   {
-    rows = static_cast<unsigned int>(mat.size[0]);
-    cols = static_cast<unsigned int>(mat.size[1]);
+    int sliced_dim = this->_mSlicedDimension->getValue();
+    int dim_0, dim_1;
+    getSetup(dim_0, dim_1, sliced_dim);
+    rows = static_cast<unsigned int>(mat.size[dim_0]);
+    cols = static_cast<unsigned int>(mat.size[dim_1]);
   }
 }
 
@@ -578,6 +623,12 @@ void cedar::proc::steps::CoordinateTransformation::createCartLogPolarMapBackward
   backward_map_x = cv::Mat(map_rows, map_cols, CV_32F);
   backward_map_y = cv::Mat(map_rows, map_cols, CV_32F);
 
+  float offset = 0.0f;
+  if (this->_mFillCenter->getValue() == true)
+  {
+    offset = 1.0f;
+  }
+
   for (unsigned int r = 0; r < map_rows; ++r)
   {
     for (unsigned int c = 0; c < map_cols; ++c)
@@ -594,7 +645,7 @@ void cedar::proc::steps::CoordinateTransformation::createCartLogPolarMapBackward
                   (
                     pow(static_cast<float>(c) - static_cast<float>(map_cols) / 2.0, 2.0)
                     + pow(static_cast<float>(r) - static_cast<float>(map_rows) / 2.0, 2.0)
-                  );
+                  ) + offset;
       backward_map_x.at<float>(r, c) = magnitude_backward * log(rho) * this->_mSamplesPerDistance->getValue();
       backward_map_y.at<float>(r, c) = angle * this->_mSamplesPerDegree->getValue();
     }
@@ -619,11 +670,17 @@ void cedar::proc::steps::CoordinateTransformation::allocateOutput(int rows, int 
   {
     CEDAR_DEBUG_ASSERT(this->mInput->getDimensionality() == 3);
 
+    int dim_sliced = this->_mSlicedDimension->getValue();
+    int dim_0, dim_1;
+    getSetup(dim_0, dim_1, dim_sliced);
+
+    cv::Mat input = this->mInput->getData();
+
     int sizes[3];
-    sizes[0] = rows;
-    sizes[1] = cols;
-    sizes[2] = this->mInput->getData().size[2];
-    this->mOutput->setData(0.0 * cv::Mat(3, sizes, this->mInput->getData().type()));
+    sizes[dim_0] = rows;
+    sizes[dim_1] = cols;
+    sizes[dim_sliced] = input.size[dim_sliced];
+    this->mOutput->setData(0.0 * cv::Mat(3, sizes, input.type()));
   }
 }
 
@@ -649,6 +706,8 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
   {
     return;
   }
+
+  this->_mSlicedDimension->setConstant(this->mInput->getDimensionality() < 3);
 
   // remember old values to recognize if output properties changed
   cv::Mat old_output = this->mOutput->getData();

@@ -11,9 +11,11 @@ beneficial or even necessary.
 @subsection BeginnersTutorials Beginners' Tutorials
 - @link ProcessingGuiTutorial Processing gui @endlink
 - @link DFTTutorial DFT tutorial @endlink
+- @link GroupsTutorial Groups tutorial @endlink
 - @ref ProjectsWithCedar
 - @link ProcessingFrameworkTutorial Processing framework @endlink
 - @ref ConfigurableAndParameters
+- @link TemplatesTutorial Templates tutorial @endlink
 - @link CommandLineParser cedar's command line parser@endlink
 @subsection AdvancedTutorials Advanced Tutorials
 - @ref LoggingWithCedar

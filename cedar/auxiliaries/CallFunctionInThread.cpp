@@ -52,6 +52,7 @@ cedar::aux::CallFunctionInThread::CallFunctionInThread
 )
 : mFunction(fun)
 {
+  setReallocateOnStart(false); // we get a lot of quick re-starts
 }
 
 cedar::aux::CallFunctionInThread::~CallFunctionInThread()

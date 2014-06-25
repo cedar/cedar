@@ -48,7 +48,8 @@ likely to undergo major changes:
 
 known issues
 ============
-  - cedardyn is not properly loaded on some OSs (mainly Windows) when using processingIde. If you want to use its
+  - Groups can sometimes lead to bad performance (very long round times). We are investigating this issue.
+  - cedardyn is not properly loaded on some OSs (mainly Windows) when using cedar. If you want to use its
     content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
     this plugin to be loaded on every start.
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
@@ -67,7 +68,30 @@ known issues
 Unreleased
 ==========
 
-none
+- processingIde
+  - The processingIde is now simply called cedar. Conversely, the processingCL is now called cedar-shell.
+
+- cedar
+  - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters of a
+    step, but is otherwise quite similar to the old one.
+  - Group templates can now be added in two ways:
+    1. They can be copied into the current architecture. Any changes to the original template will not be reflected.
+    2. They can be linked into the architecture. Only the file- and groupname will be stored, and the group will be re-
+       loaded from the stored file every time the architecture is loaded. Note: linked groups cannot be edited to avoid
+       conflicts. Any edits must be made to the file containing the imported group.
+    To link in templates, hold ctrl while dragging them from the elements tab.
+      
+- cedar::proc
+  - DataSlots can now be marked as serializable. What this means is that the data stored in them will be stored in the
+    architecture when it is saved, and restored later on when it is loaded. In addition, users can manually save and
+    load data for these slots from the right-click menu of step items.
+  - Groups now work as intended: one can freely move elements between groups, existing connections are preserved, using 
+    group connectors if necessary. In the gui, grouping is drag-and-drop-based.
+  - Step configurations can now be copied and pasted in the GUI using Ctrl+C and Ctrl+Shift+V.
+  - cedar now allows to slow down or speed up the global timers, effectively allowing for (0.0,2.0] x real-time.
+  - cedar now notices if there were any changes made to an architecture and notifies the user about this when closing a file.
+  - Looped triggers now have a tool tip showing statistics.
+  - Improved performance of triggering chains.
 
 Released versions
 =================

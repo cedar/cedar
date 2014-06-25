@@ -64,7 +64,7 @@ class cedar::proc::gui::StickyNote: public cedar::proc::gui::GraphicsBase
 
 public:
   //!@brief the constructor
-  StickyNote(cedar::proc::gui::Scene* pParent, int x, int y, int width = 120, int height = 70, std::string text = "");
+  StickyNote(cedar::proc::gui::Scene* pParent, float x, float y, float width = 120, float height = 70, std::string text = "");
 
   //!@brief the destructor
   ~StickyNote();

@@ -86,6 +86,17 @@ void cedar::aux::gui::PlotManager::declare(cedar::aux::gui::ConstPlotDeclaration
   mPlotTypeDeclarations[getNormalizedTypeName(declaration->getClassName())] = declaration;
 }
 
+cedar::aux::gui::ConstPlotDeclarationPtr cedar::aux::gui::PlotManager::getDeclaration(const std::string& plotClassName) const
+{
+  std::string normalized_name = getNormalizedTypeName(plotClassName);
+  auto iter = this->mPlotTypeDeclarations.find(normalized_name);
+  if (iter == this->mPlotTypeDeclarations.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Plot declaration for \"" + plotClassName + "\" (a.k.a. \"" + normalized_name + "\") not found.");
+  }
+  return iter->second;
+}
+
 cedar::aux::gui::ConstPlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDeclarationFor
                                          (
                                            cedar::aux::ConstDataPtr data

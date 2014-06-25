@@ -106,9 +106,14 @@ public:
   //!@brief removes all kernels from the list
   inline void clear()
   {
-    for (size_t i = 0; i < this->mKernels.size(); ++i)
+    if (this->mKernels.size() > 0)
     {
-      this->mKernelRemovedSignal(i);
+      // have to do this in reverse order
+      for (size_t i = this->mKernels.size() - 1; i > 0; --i)
+      {
+        this->mKernelRemovedSignal(i);
+      }
+      this->mKernelRemovedSignal(0);
     }
     this->mKernels.clear();
   }

@@ -37,12 +37,16 @@
 // CEDAR INCLUDES
 #include "cedar/processing/typecheck/TypeCheck.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <fstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -60,7 +64,7 @@ mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
 mRole(role),
-mIsPromoted(false)
+mIsSerializable(false)
 {
 }
 
@@ -71,6 +75,56 @@ cedar::proc::DataSlot::~DataSlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::DataSlot::setSerializable(bool serializable)
+{
+  this->mIsSerializable = serializable;
+}
+
+bool cedar::proc::DataSlot::isSerializable() const
+{
+  return this->mIsSerializable;
+}
+
+void cedar::proc::DataSlot::writeDataToFile(const cedar::aux::Path& path) const
+{
+  CEDAR_ASSERT(this->isSerializable());
+  CEDAR_ASSERT(this->getData());
+
+  std::ofstream stream(path.absolute().toString());
+  this->getData()->serialize(stream);
+}
+
+void cedar::proc::DataSlot::readDataFromFile(const cedar::aux::Path& path)
+{
+  CEDAR_ASSERT(this->isSerializable());
+  CEDAR_ASSERT(this->getData());
+
+  std::ifstream stream(path.absolute().toString());
+  this->getData()->deserialize(stream);
+}
+
+void cedar::proc::DataSlot::clear()
+{
+  this->clearInternal();
+}
+
+
+void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
+{
+  this->setDataInternal(data);
+
+  this->signalDataSet(data);
+  this->signalDataChanged();
+}
+
+void cedar::proc::DataSlot::removeData(cedar::aux::DataPtr data)
+{
+  this->removeDataInternal(data);
+
+  this->signalDataRemoved(data);
+  this->signalDataChanged();
+}
 
 void cedar::proc::DataSlot::setCheck(const TypeCheckFunction& check)
 {
@@ -123,7 +177,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
 void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
 {
   this->mValidity = validity;
-  this->mValidityChanged();
+  this->signalValidityChanged();
 }
 
 bool cedar::proc::DataSlot::isMandatory() const
@@ -164,22 +218,47 @@ bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) co
   return (parent.get() == mpParent);
 }
 
-void cedar::proc::DataSlot::promote()
-{
-  this->mIsPromoted = true;
-}
-
-void cedar::proc::DataSlot::demote()
-{
-  this->mIsPromoted = false;
-}
-
-bool cedar::proc::DataSlot::isPromoted() const
-{
-  return this->mIsPromoted;
-}
-
 void cedar::proc::DataSlot::setName(const std::string& name)
 {
   this->mName = name;
+}
+
+void cedar::proc::DataSlot::deleteParentPointer()
+{
+  this->resetParentPointer();
+}
+
+void cedar::proc::DataSlot::resetParentPointer()
+{
+  this->mpParent = NULL;
+}
+
+void cedar::proc::DataSlot::addConnection(cedar::proc::DataConnectionPtr newConnection)
+{
+  if (std::find(this->mConnections.begin(), this->mConnections.end(), newConnection) == this->mConnections.end())
+  {
+    this->mConnections.push_back(newConnection);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!");
+  }
+}
+
+void cedar::proc::DataSlot::removeConnection(cedar::proc::DataConnectionPtr removedConnection)
+{
+  auto it = std::find(this->mConnections.begin(), this->mConnections.end(), removedConnection);
+  if (it != this->mConnections.end())
+  {
+    this->mConnections.erase(it);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::MissingConnectionException, "This connection does not exist!");
+  }
+}
+
+std::vector<cedar::proc::DataConnectionPtr>& cedar::proc::DataSlot::getDataConnections()
+{
+  return this->mConnections;
 }

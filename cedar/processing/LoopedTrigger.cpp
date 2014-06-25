@@ -42,13 +42,14 @@
 // CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/auxiliaries/MovingAverage.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -97,14 +98,14 @@ cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std:
 :
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
-//mWait(new cedar::aux::BoolParameter(this, "wait", true)),
-mStarted(false)
+mStarted(false),
+mStatistics(new TimeAverage(50))
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
   this->connectToStartSignal(boost::bind(&cedar::proc::LoopedTrigger::prepareStart, this));
-  this->connectToStopSignal(boost::bind(&cedar::proc::LoopedTrigger::processStop, this, _1));
+  this->connectToQuitSignal(boost::bind(&cedar::proc::LoopedTrigger::processQuit, this ));
 }
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
@@ -117,10 +118,12 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 
 /*! This method takes care of changing the step's name in the registry as well.
+ *
+ * @todo Solve this with boost signals/slots; that way, this can be moved to cedar::proc::Element
  */
 void cedar::proc::LoopedTrigger::onNameChanged()
 {
-  if (cedar::proc::NetworkPtr parent_network = this->mRegisteredAt.lock())
+  if (cedar::proc::GroupPtr parent_network = this->getGroup())
   {
     // update the name
     parent_network->updateObjectName(this);
@@ -133,7 +136,7 @@ void cedar::proc::LoopedTrigger::onNameChanged()
 void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr triggerable)
 {
   this->cedar::proc::Trigger::removeListener(triggerable);
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     triggerable->callOnStop();
   }
@@ -142,7 +145,7 @@ void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr trig
 void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr triggerable)
 {
   this->cedar::proc::Trigger::addListener(triggerable);
-  if (this->isRunning())
+  if (this->isRunningNolocking())
   {
     triggerable->callOnStart();
   }
@@ -163,15 +166,18 @@ void cedar::proc::LoopedTrigger::prepareStart()
 
   emit triggerStarting();
 
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->callOnStart();
+    QReadLocker locker(this->mListeners.getLockPtr());
+    for (auto listener : this->mListeners.member())
+    {
+      listener->callOnStart();
+    }
   }
 
   emit triggerStarted();
 }
 
-void cedar::proc::LoopedTrigger::processStop(bool)
+void cedar::proc::LoopedTrigger::processQuit()
 {
   QMutexLocker locker(&mStartedMutex);
   if (!this->mStarted)
@@ -184,24 +190,31 @@ void cedar::proc::LoopedTrigger::processStop(bool)
 
   emit triggerStopping();
 
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->callOnStop();
+    QReadLocker locker(this->mListeners.getLockPtr());
+    for (auto listener : this->mListeners.member())
+    {
+      listener->callOnStop();
+    }
   }
 
   emit triggerStopped();
 }
 
-//!@todo this should take a cedar::unit::Time as argument
 void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 {
   cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime(time));
 
-  //!@todo Is this right?
+  QReadLocker locker(this->mListeners.getLockPtr());
   auto this_ptr = boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this());
-  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  for (const auto& listener : this->mListeners.member())
   {
-    this->mListeners.at(i)->onTrigger(arguments, this_ptr);
+    listener->onTrigger(arguments, this_ptr);
   }
-//  this->trigger(arguments);
+  this->mStatistics->append(time);
+}
+
+cedar::proc::LoopedTrigger::ConstTimeAveragePtr cedar::proc::LoopedTrigger::getStatistics() const
+{
+  return this->mStatistics;
 }

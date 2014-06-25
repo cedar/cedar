@@ -37,7 +37,7 @@
 // cedar includes
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/units/prefixes.h"
 
 // global includes
@@ -78,7 +79,7 @@ class EmptyMatrixProvider : public cedar::proc::Step
 CEDAR_GENERATE_POINTER_TYPES(EmptyMatrixProvider);
 
 
-unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr testStep)
+unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testStep)
 {
   // try connecting steps of different types
   unsigned int i = 0;
@@ -156,7 +157,7 @@ unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr test
   return i;
 }
 
-int main(int, char**)
+void run_tests()
 {
   // Filter out mem-debug messages so the output reamins readable
   cedar::aux::logFilter::TypePtr memdebug_filter(new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_MEM_DEBUG));
@@ -171,7 +172,7 @@ int main(int, char**)
   for (auto declaration_iter = declarations.begin(); declaration_iter != declarations.end(); ++declaration_iter)
   {
     cedar::aux::ConstPluginDeclarationPtr declaration = *declaration_iter;
-    cedar::proc::NetworkPtr network(new cedar::proc::Network());
+    cedar::proc::GroupPtr network(new cedar::proc::Group());
     cedar::proc::ElementPtr elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
     {
@@ -205,5 +206,15 @@ int main(int, char**)
     }
   }
 
-  return errors;
+  QCoreApplication::exit(errors);
+}
+
+int main(int argc, char** argv)
+{
+  QCoreApplication app(argc, argv);
+
+  cedar::aux::CallFunctionInThread caller(boost::bind(&run_tests));
+  caller.start();
+
+  return app.exec();
 }

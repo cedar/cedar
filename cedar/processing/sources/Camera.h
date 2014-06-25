@@ -52,7 +52,7 @@
 // SYSTEM INCLUDES
 
 
-//!@brief A camera source for the processingIde
+//!@brief A camera source for the processing framework.
 class cedar::proc::sources::Camera
 :
 public cedar::proc::sources::GrabberBase

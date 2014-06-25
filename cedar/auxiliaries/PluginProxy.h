@@ -127,6 +127,9 @@ public:
   //!@brief search known directories for this plugin.
   static std::string findPlugin(const std::string& pluginName);
 
+  //!@brief search for a file that is relative to the folder containing the plugin
+  static std::string findPluginFile(const std::string& fileName);
+
   //!@brief search for this plugin in the given workspace.
   static std::string findPlugin(const std::string& pluginName, const std::string& workspace);
 

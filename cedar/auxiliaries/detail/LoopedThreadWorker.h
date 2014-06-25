@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/detail/ThreadWorker.h"
 
 // FORWARD DECLARATIONS
@@ -113,6 +114,9 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     double getMaxStepsTaken();
 
   private:
+    void globalTimeFactorChanged(double newFactor);
+
+  private:
     //! we keep a pointer to the wrapper
     cedar::aux::LoopedThread* mpWrapper;
 
@@ -122,6 +126,10 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     double mSumOfStepsTaken;
     //!@brief
     double mMaxStepsTaken;
+
+    //! Used for multiplying all step times.
+    cedar::aux::LockableMember<double> mTimeFactor;
+
     //!@brief remember time stamps of last step
     boost::posix_time::ptime mLastTimeStepStart;
     //!@brief remember time stamps of last step
@@ -137,6 +145,8 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     mutable QReadWriteLock mLastTimeStepStartLock;
     //! lock for mLastTimeStepEnd
     mutable QReadWriteLock mLastTimeStepEndLock;
+
+    boost::signals2::scoped_connection mGlobalTimeFactorConnection;
 };
 
 

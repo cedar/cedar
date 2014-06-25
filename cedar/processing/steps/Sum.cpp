@@ -40,6 +40,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
+#include "cedar/processing/typecheck/SameSizedCollection.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
@@ -89,7 +90,10 @@ cedar::proc::steps::Sum::Sum()
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 {
   // declare all data
-  this->declareInputCollection("terms");
+  auto input_slot = this->declareInputCollection("terms");
+  cedar::proc::typecheck::SameSizedCollection input_check(/* allow0d = */ true, /* allow1Dtranspositions = */ true);
+  input_slot->setCheck(input_check);
+
   this->declareOutput("sum", this->mOutput);
 
   this->mInputs = this->getInputSlot("terms");
@@ -123,7 +127,17 @@ void cedar::proc::steps::Sum::sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat
       }
       else
       {
-        CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, sum))
+        if (!cedar::aux::math::matrixSizesEqual(input_mat, sum))
+        {
+          if (input_dim == 1)
+          {
+            sum = cedar::aux::math::canonicalRowVector(0.0 * input_mat.clone());
+          }
+          else
+          {
+            sum = 0.0 * input_mat.clone();
+          }
+        }
 
         cv::Mat to_add;
         if (input_dim == 1)
@@ -146,48 +160,6 @@ void cedar::proc::steps::Sum::sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat
 void cedar::proc::steps::Sum::compute(const cedar::proc::Arguments&)
 {
   cedar::proc::steps::Sum::sumSlot(this->mInputs, this->mOutput->getData(), false);
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
-                                (
-                                  cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::ConstDataPtr data
-                                ) const
-{
-  // First, let's make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(slot->getName() == "terms")
-
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
-  {
-    if (mat_data->isEmpty())
-    {
-      return cedar::proc::DataSlot::VALIDITY_ERROR;
-    }
-
-    if (this->mInputs->getDataCount() > 0)
-    {
-      for (size_t i = 0; i < this->mInputs->getDataCount(); ++i)
-      {
-        const cv::Mat& mat
-          = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(i))->getData();
-        if
-        (
-          mat.type() != mat_data->getData().type()
-          || !cedar::aux::math::matrixSizesEqual(mat, mat_data->getData())
-        )
-        {
-          return cedar::proc::DataSlot::VALIDITY_ERROR;
-        }
-      }
-    }
-    // Mat data is accepted.
-    return cedar::proc::DataSlot::VALIDITY_VALID;
-  }
-  else
-  {
-    // Everything else is rejected.
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
 }
 
 void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputName*/)
@@ -228,7 +200,7 @@ void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputN
     //!@todo Only notify when something actually changed.
     this->lock(cedar::aux::LOCK_TYPE_READ);
     this->compute(cedar::proc::Arguments());
-    this->unlock();
+    this->unlock(cedar::aux::LOCK_TYPE_READ);
     this->emitOutputPropertiesChangedSignal("sum");
     this->onTrigger();
   }

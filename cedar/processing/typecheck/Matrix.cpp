@@ -71,6 +71,10 @@ void cedar::proc::typecheck::Matrix::addAcceptedDimensionalityRange(unsigned int
   }
 }
 
+void cedar::proc::typecheck::Matrix::addAcceptedNumberOfChannels(unsigned int numberOfChannels)
+{
+  this->mAcceptedNumberOfChannels.push_back(numberOfChannels);
+}
 
 void cedar::proc::typecheck::Matrix::addAcceptedType(int type)
 {
@@ -123,6 +127,20 @@ cedar::proc::DataSlot::VALIDITY
       }
     }
     if (!dim_ok)
+    {
+      return this->validityBad();
+    }
+
+    bool channel_ok = this->mAcceptedNumberOfChannels.empty(); // if empty, everything is accepted
+    for (size_t i = 0; i < this->mAcceptedNumberOfChannels.size(); ++i)
+    {
+      if (static_cast<unsigned int>(mat_data->getData().channels()) == this->mAcceptedNumberOfChannels.at(i))
+      {
+        channel_ok = true;
+        break;
+      }
+    }
+    if (!channel_ok)
     {
       return this->validityBad();
     }

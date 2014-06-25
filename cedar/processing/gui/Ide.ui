@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Processing IDE</string>
+   <string>cedar</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icons/cedar_proc_gui_icons.qrc">
@@ -73,6 +73,9 @@
     <addaction name="mpActionLoad"/>
     <addaction name="mpRecentFiles"/>
     <addaction name="separator"/>
+    <addaction name="mpActionSaveSerializableData"/>
+    <addaction name="mpActionLoadSerializableData"/>
+    <addaction name="separator"/>
     <addaction name="mpActionExportSVG"/>
     <addaction name="separator"/>
     <addaction name="mpActionExit"/>
@@ -84,7 +87,7 @@
     <addaction name="mpThreadsStartAll"/>
     <addaction name="mpThreadsSingleStep"/>
     <addaction name="mpThreadsStopAll"/>
-    <addaction name="mpActionResetRootNetwork"/>
+    <addaction name="mpActionResetRootGroup"/>
    </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
@@ -107,8 +110,12 @@
     </property>
     <addaction name="mpActionManagePlugins"/>
     <addaction name="separator"/>
+    <addaction name="mpActionCopy"/>
+    <addaction name="mpActionPasteConfiguration"/>
     <addaction name="mpActionDuplicate"/>
     <addaction name="mpActionSelectAll"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionFind"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -132,6 +139,7 @@
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
@@ -263,7 +271,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
+          <widget class="cedar::aux::gui::Configurable" name="mpPropertyTable"/>
          </item>
         </layout>
        </widget>
@@ -405,6 +413,7 @@
    <addaction name="mpThreadsStartAll"/>
    <addaction name="mpThreadsStopAll"/>
    <addaction name="mpThreadsSingleStep"/>
+   <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
@@ -452,10 +461,13 @@
   </action>
   <action name="mpActionLoad">
    <property name="text">
-    <string>Load ...</string>
+    <string>Open file ...</string>
+   </property>
+   <property name="toolTip">
+    <string>Load an architecture file</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+L</string>
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="mpActionExit">
@@ -543,7 +555,7 @@
     <string>About...</string>
    </property>
   </action>
-  <action name="mpActionResetRootNetwork">
+  <action name="mpActionResetRootGroup">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
@@ -783,6 +795,54 @@
     <string>Performance overview ...</string>
    </property>
   </action>
+  <action name="mpActionCopy">
+   <property name="text">
+    <string>Copy step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="mpActionPasteConfiguration">
+   <property name="text">
+    <string>Paste step configuration</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+V</string>
+   </property>
+  </action>
+  <action name="mpActionParameterLinker">
+   <property name="text">
+    <string>Parameter linking ...</string>
+   </property>
+  </action>
+  <action name="mpActionSaveSerializableData">
+   <property name="text">
+    <string>Save serializable data ...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a location to save all data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="mpActionLoadSerializableData">
+   <property name="text">
+    <string>Load serializable data ...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a file from which to load data in slots that are marked as serializable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="mpActionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="toolTip">
+    <string>find an element</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -791,9 +851,9 @@
    <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
-   <class>cedar::proc::gui::PropertyPane</class>
+   <class>cedar::aux::gui::Configurable</class>
    <extends>QTableWidget</extends>
-   <header>cedar/processing/gui/PropertyPane.h</header>
+   <header>cedar/auxiliaries/gui/Configurable.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::proc::gui::ArchitectureToolBox</class>

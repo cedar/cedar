@@ -147,6 +147,16 @@ public:
     return this->mValues.find(key);
   }
 
+  void erase(const std::string& key)
+  {
+    this->mValues.erase(key);
+  }
+
+  bool empty()
+  {
+    return this->mValues.empty();
+  }
+
   //!@brief checks if a value is already contained in this vector
   bool contains(const T& value) const
   {

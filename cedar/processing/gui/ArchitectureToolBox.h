@@ -53,7 +53,7 @@
 
 /*!@brief This is the toolbox that contains the architecture tools.
  *
- *        This widget can be found in the processingIde.
+ *        This widget can be found in cedar's GUI.
  */
 class cedar::proc::gui::ArchitectureToolBox : public cedar::proc::gui::ToolBox
 {

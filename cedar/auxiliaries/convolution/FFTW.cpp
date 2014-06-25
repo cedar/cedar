@@ -311,6 +311,8 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
    * 010    001
    */
 
+  CEDAR_DEBUG_ASSERT(matrix.dims == kernel.dims);
+
   cv::Mat output = matrix.clone();
   output = 0.0;
   std::vector<cv::Range> region;
@@ -384,8 +386,9 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
       continue;
     }
 
-  // if 1.0 is missing, the temporary cv::Mat view onto output is replaced by kernel, instead of setting the values
-  // at the specified region to the values of kernel (1.0 * kernel returns a cv::MatExpr, not cv::Mat...)
+    // if 1.0 is missing, the temporary cv::Mat view onto output is replaced by kernel, instead of setting the values
+    // at the specified region to the values of kernel (1.0 * kernel returns a cv::MatExpr, not cv::Mat...)
+
     output(&(output_index.front())) = 1.0 * kernel(&(kernel_index.front()));
   }
   return output;

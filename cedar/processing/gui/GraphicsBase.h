@@ -50,6 +50,8 @@
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/gui/Connection.fwd.h"
 #include "cedar/processing/gui/GraphicsBase.fwd.h"
+#include "cedar/processing/gui/ResizeHandle.fwd.h"
+#include "cedar/processing/gui/Scene.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsItem>
@@ -66,6 +68,11 @@
 class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::Scene;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // static constants
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -80,7 +87,7 @@ public:
   //!@brief group DATA ITEM
   const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 2;
   //!@brief group for NETWORK
-  const static GraphicsGroup GRAPHICS_GROUP_NETWORK = 1 << 3;
+  const static GraphicsGroup GRAPHICS_GROUP_GROUP = 1 << 3;
   //!@brief group UNKNOWN
   const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
 
@@ -91,7 +98,9 @@ public:
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET,
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING,
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR,
-    HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER
+    HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER,
+    HIGHLIGHTMODE_GROUP_MEMBER_LEAVING,
+    HIGHLIGHTMODE_SEARCH_RESULT
   };
 
   //!@brief enum  of base shapes for GraphicsBase
@@ -142,6 +151,9 @@ public:
   //!@brief get pen of the shape (e.g. to look up thickness of shape line)
   QPen getOutlinePen() const;
 
+  //! Returns the brush used for filling the item's shape
+  QBrush getOutlineBrush() const;
+
   //!@brief This method highlights this item according to how it can connect to the source.
   void highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource);
 
@@ -168,6 +180,12 @@ public:
 
   //!@brief set width of this GraphicsBase
   void setWidth(qreal width);
+
+  //! Sets the size (width and height) of the object.
+  void setSize(qreal width, qreal height);
+
+  //!@brief Sets the bounds of the item.
+  void setBounds(const QRectF& rect);
 
   //!@brief add a Connection to this GraphicsBase
   void addConnection(Connection* pConnection);
@@ -221,9 +239,25 @@ public:
     return this->mElement;
   }
 
+  //! Can be implemented to react to changes of the items size.
+  virtual void sizeChanged();
+
+  //! Returns the brush used for highlighting potential target groups.
+  static QBrush getTargetGroupBrush();
+
+  //! Returns the brush used for highlighting when one of the child items is potentially leaving. :(
+  static QBrush getLeavingGroupBrush();
+
   /*! Can be overridden in inheriting classes in order to upadte the item's tooltip before it is displayed.
    */
   virtual void updateToolTip();
+
+  virtual void setReadOnly(bool readOnly);
+
+  bool isReadOnly() const
+  {
+    return this->mReadOnly;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -234,6 +268,9 @@ protected:
 
   //!@brief deal with changes to this instance (e.g. position changes)
   QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+
+  //! Called whenever the item is added to a scene.
+  virtual void itemSceneHasChanged();
 
   /*!@brief Sets the base shape of the item.
    *
@@ -263,12 +300,29 @@ protected:
   //! Sets the fill stype
   void setFillStyle(Qt::BrushStyle style, bool update = true);
 
+  //! Set whether or not this item is resizeable.
+  void setResizeable(bool resizeable);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void itemSelectedChanged(bool selected);
+
+  void updateResizeHandles(bool show);
+
+  void clearResizeHandles();
+
+  bool canResize() const;
+  
   //! Called whenever the item has been selected or deselected.
   virtual void itemSelected(bool selected);
+
+  //! Draws the base shape of the item on the given painter
+  void drawShape(QPainter* painter);
+
+  //! For non-basic shapes (i.e., any that require mPath to be valid), updates the points on the path.
+  void updateShape();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -282,6 +336,14 @@ public:
   static const QColor mValidityColorError;
   //!@brief color for state "unknown"
   static const QColor mValidityColorUnknown;
+
+  //! Color for groups being left
+  static const QColor mColorGroupBeingLeft;
+
+  static const QColor mColorSearchResult;
+
+  //! Color for target groups
+  static const QColor mColorTargetGroup;
   
   //!@brief color for outline
   static const QColor mDefaultOutlineColor;
@@ -319,6 +381,15 @@ private:
 
   //!@brief Whether the item snaps to the grid.
   bool mSnapToGrid;
+
+  //! Whether or not resizing is allowed.
+  bool mResizeable;
+
+  //! Whether the item is in read-only mode
+  bool mReadOnly;
+
+  //! Resize handle.
+  std::vector<cedar::proc::gui::ResizeHandle*> mpResizeHandles;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

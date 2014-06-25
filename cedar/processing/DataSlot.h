@@ -39,15 +39,16 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/DataRole.h"
+#include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/Data.fwd.h"
+#include "cedar/auxiliaries/Path.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
-#include "cedar/processing/PromotedExternalData.fwd.h"
-#include "cedar/processing/PromotedOwnedData.fwd.h"
+#include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -73,9 +74,7 @@ public boost::enable_shared_from_this<cedar::proc::DataSlot>
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
-  friend class cedar::proc::Network;
-  friend class cedar::proc::PromotedExternalData;
-  friend class cedar::proc::PromotedOwnedData;
+  friend class cedar::proc::Group;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -156,20 +155,8 @@ public:
   //!@brief set the current validity of this slot
   virtual void setValidity(VALIDITY validity);
 
-  //!@brief Removes all data from the slot.
-  virtual void clear() = 0;
-
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
-
-  //! promote this slot
-  void promote();
-
-  //! demote this slot
-  void demote();
-
-  //! states if this slot is promoted
-  bool isPromoted() const;
 
   //!@brief get the pointer of this slot's parent
   cedar::proc::Connectable* getParentPtr();
@@ -195,21 +182,73 @@ public:
    */
   cedar::proc::DataSlot::VALIDITY checkValidityOf(cedar::aux::ConstDataPtr data) const;
 
-  //! connect to the validity changed signal
-  inline boost::signals2::connection connectToValidityChangedSignal
-                                     (
-                                       boost::function<void ()> slot
-                                     )
-  {
-    return this->mValidityChanged.connect(slot);
-  }
+  //! Returns the lock type for this data slot.
+  virtual cedar::aux::LOCK_TYPE getLockType() const = 0;
+
+  /*! @brief Marks the data slot as serializable.
+   *
+   *         Serializable data slots are automatically written to architectures, and can be read and written from
+   *         user-given files.
+   */
+  void setSerializable(bool serializable);
+
+  //! Returns whether the slot is marked serializable.
+  bool isSerializable() const;
+
+  //! Writes the data in this slot to the given file.
+  void writeDataToFile(const cedar::aux::Path& path) const;
+
+  //! Writes the data in this slot to the given file.
+  void readDataFromFile(const cedar::aux::Path& path);
+  
+  std::vector<DataConnectionPtr>& getDataConnections();
+  
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals and slots
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(ValidityChanged, void());
+public:
+  CEDAR_DECLARE_SIGNAL(DataChanged, void());
+public:
+  CEDAR_DECLARE_SIGNAL(DataSet, void(cedar::aux::DataPtr data));
+public:
+  CEDAR_DECLARE_SIGNAL(DataRemoved, void(cedar::aux::DataPtr data));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief set the internal DataPtr managed by this slot
-  virtual void setData(cedar::aux::DataPtr data) = 0;
+  //! Set the internal DataPtr of this slot.
+  void setData(cedar::aux::DataPtr data);
+
+  //! Remove the DataPtr from this slot. Child classes decide how to handle this.
+  void removeData(cedar::aux::DataPtr data);
+
+  //! Clears all data in the slot.
+  void clear();
+
+  //! Emits the DataChanged signal.
+  void emitDataChanged()
+  {
+    this->signalDataChanged();
+  }
+
+  //! Emits the DataAdded signal.
+  void emitDataSet(cedar::aux::DataPtr data)
+  {
+    this->signalDataSet(data);
+  }
+
+  //! Emits the DataRemoved signal.
+  void emitDataRemoved(cedar::aux::DataPtr data)
+  {
+    this->signalDataRemoved(data);
+  }
+
+  void addConnection(cedar::proc::DataConnectionPtr newConnection);
+
+  void removeConnection(cedar::proc::DataConnectionPtr removedConnection);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -221,15 +260,27 @@ private:
   //! Returns the type check function object for this slot.
   const TypeCheckFunction& getCheck() const;
 
+  //!@brief deprecated due to bad name, see resetParentPointer
+  CEDAR_DECLARE_DEPRECATED(void deleteParentPointer());
+
+  //!@brief sets the parent pointer to NULL
+  void resetParentPointer();
+
+  //! To be overridden by child classes.
+  virtual void setDataInternal(cedar::aux::DataPtr data) = 0;
+
+  //! To be overridden by child classes.
+  virtual void removeDataInternal(cedar::aux::DataPtr data) = 0;
+
+  //!@brief Removes all data from the slot.
+  virtual void clearInternal() = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! The parent that owns the slot.
   cedar::proc::Connectable* mpParent;
-
-  //! Signal that is emitted when the validity of the data slot changes.
-  boost::signals2::signal<void ()> mValidityChanged;
 
 private:
   //!@brief flag if this slot must be connected
@@ -247,11 +298,13 @@ private:
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
 
-  //! Promoted flag
-  bool mIsPromoted;
+  //! Holds whether the slot is marked as serializable.
+  bool mIsSerializable;
 
   //! The function object holding a reference to the type check functions for this slot.
   TypeCheckFunction mTypeCheck;
+
+  std::vector<cedar::proc::DataConnectionPtr> mConnections;
 
 }; // class cedar::proc::DataSlot
 
