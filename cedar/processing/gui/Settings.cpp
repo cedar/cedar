@@ -124,6 +124,13 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                                    true
                                  );
 
+  this->_mHighlightHoveredConnections = new cedar::aux::BoolParameter
+      (
+        ui_settings.get(),
+        "highlight connections of data slots when hovering",
+        true
+      );
+
   cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
   this->addConfigurableChild("displaySettings", display_settings);
   mUseGraphicsItemShadowEffects = cedar::aux::BoolParameterPtr

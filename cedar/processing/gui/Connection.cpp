@@ -69,7 +69,8 @@ mpArrowStart(0),
 mpArrowEnd(0),
 mValidity(CONNECT_NOT_SET),
 mSmartMode(false),
-mHighlight(false)
+mHighlight(false),
+mHighlightHover(false)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
@@ -155,6 +156,11 @@ bool cedar::proc::gui::Connection::isTriggerConnection() const
 {
   return this->mpSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
          || this->mpTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER;
+}
+
+void cedar::proc::gui::Connection::setHighlightedByHovering(bool highlight)
+{
+  this->mHighlightHover = highlight;
 }
 
 void cedar::proc::gui::Connection::setHighlightedBySelection(bool highlight)
@@ -414,6 +420,11 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
     QColor new_color = this->highlightColor(pen.color());
 
     pen.setColor(new_color);
+    pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
+  }
+
+  if (this->mHighlightHover && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightHoveredConnections())
+  {
     pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
   }
 

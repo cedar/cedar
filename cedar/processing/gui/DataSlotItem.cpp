@@ -266,7 +266,23 @@ void cedar::proc::gui::DataSlotItem::hoverEnterEvent(QGraphicsSceneHoverEvent* p
   this->generateTooltip();
 
   this->cedar::proc::gui::GraphicsBase::hoverEnterEvent(pEvent);
+
+  for (auto connection : this->getConnections())
+  {
+    connection->setHighlightedByHovering(true);
+  }
 }
+
+void cedar::proc::gui::DataSlotItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  this->cedar::proc::gui::GraphicsBase::hoverLeaveEvent(pEvent);
+
+  for (auto connection : this->getConnections())
+  {
+    connection->setHighlightedByHovering(false);
+  }
+}
+
 
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {

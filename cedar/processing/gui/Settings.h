@@ -273,6 +273,12 @@ public:
     return this->_mHighlightConnections->getValue();
   }
 
+  //! Returns whether or not connections of selected steps should be highlighted.
+  inline bool getHighlightHoveredConnections() const
+  {
+    return this->_mHighlightHoveredConnections->getValue();
+  }
+
   //! Returns whether or not deprecated steps should be displayed in the element list.
   bool getElementListShowsDeprecated() const;
 
@@ -356,6 +362,9 @@ private:
 
   //!@brief Disables or enables highlighting of the connections of selected steps.
   cedar::aux::BoolParameterPtr _mHighlightConnections;
+
+  //! Enables or disables the highlighting of hovered connections.
+  cedar::aux::BoolParameterPtr _mHighlightHoveredConnections;
 
   //! Default display mode for steps.
   cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;

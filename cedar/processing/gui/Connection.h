@@ -98,6 +98,9 @@ public:
   //! Sets whether the connection is highlighted due to one of its owners being selected.
   void setHighlightedBySelection(bool highlight);
 
+  //! Sets whether the connection is highlighted due to the mouse hovering over a data slot.
+  void setHighlightedByHovering(bool highlight);
+
   //! Returns true if this is a trigger connection.
   bool isTriggerConnection() const;
 
@@ -141,6 +144,9 @@ private:
 
   //! Whether or not to highlight the connection.
   bool mHighlight;
+
+  //! Whether or not to highlight the connection due to mouse hovering.
+  bool mHighlightHover;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H
