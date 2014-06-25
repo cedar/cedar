@@ -22,125 +22,129 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Video.h
+    File:        SpaceCodeToRateMatrix.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2014 06 11
 
-    Description:
+    Description: Header file for the class cedar::dyn::SpaceCodeToRateMatrix.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_VIDEO_H
-#define CEDAR_PROC_SOURCES_VIDEO_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_DYN_SPACE_CODE_TO_RATE_MATRIX_H
+#define CEDAR_DYN_SPACE_CODE_TO_RATE_MATRIX_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/VideoGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
-#include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/units/Time.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/sources/Video.fwd.h"
+#include "cedar/dynamics/steps/SpaceCodeToRateMatrix.fwd.h"
+
+// SYSTEM INCLUDES
+#include <vector>
 
 // SYSTEM INCLUDES
 
 
-//!@brief A video file source for the processing framework.
-class cedar::proc::sources::Video
-:
-public cedar::proc::sources::GrabberBase
+/*!@todo describe.
+ *
+ * @todo describe more.
+ */
+class cedar::dyn::SpaceCodeToRateMatrix : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Video();
+  SpaceCodeToRateMatrix();
 
   //!@brief Destructor
-  ~Video();
+  virtual ~SpaceCodeToRateMatrix();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet
-
 public slots:
-
-  //!@brief This slot should be invoked, when the video in the VideoGrabber has changed.
-  void updateVideo(bool emitOutputPropertyChanged = true);
-
-  //!@brief This slot should be invoked, when the speed factor in the VideoGrabber has changed.
-  void updateSpeedFactor();
+  //!@brief This slot is connected to the valueChanged() event of the limit parameters.
+  void limitsChanged();
+  //!@brief This slot takes care of size changes.
+  void outputSizesChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void reset();
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::VideoGrabberPtr getVideoGrabber()
+  inline void setLowerLimit(double limit)
   {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mpGrabber
-           );
+    _mLowerLimit->setValue(limit);
   }
 
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getVideoGrabber() const
+  inline void setUpperLimit(double limit)
   {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mpGrabber
-           );
+    _mUpperLimit->setValue(limit);
+  }
+
+  inline double getLowerLimit()
+  {
+    return _mLowerLimit->getValue();
+  }
+
+  inline double getUpperLimit()
+  {
+    return _mUpperLimit->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
-  //!@brief the time between two frames. Depends on the frame rate of the video
-  cedar::unit::Time mFrameDuration;
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
 
-  //!@brief the time elapsed since the last frame is displayed
-  cedar::unit::Time mTimeElapsed;
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
+  cedar::aux::MatDataPtr mWeights;
+private:
+  double mInterval;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief the lower limit of the mapped interval
+  cedar::aux::DoubleParameterPtr _mLowerLimit;
+
+  //!@brief the upper limit of the mapped interval
+  cedar::aux::DoubleParameterPtr _mUpperLimit;
 
 private:
   // none yet
-}; // class cedar::proc::sources::Video
-#endif // CEDAR_PROC_SOURCES_VIDEO_H
+
+}; // class cedar::dyn::SpaceCodeToRateMatrix
+
+#endif // CEDAR_DYN_SPACE_CODE_TO_RATE_MATRIX_H
 

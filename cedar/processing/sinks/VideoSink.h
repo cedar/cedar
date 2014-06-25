@@ -22,46 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Video.h
+    File:        VideoSink.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2014 06 24
 
-    Description:
+    Description: Header file for the class cedar::proc::sinks::VideoSink.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_VIDEO_H
-#define CEDAR_PROC_SOURCES_VIDEO_H
+#ifndef CEDAR_PROC_SINKS_VIDEO_SINK_H
+#define CEDAR_PROC_SINKS_VIDEO_SINK_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/VideoGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/units/Time.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/sources/Video.fwd.h"
+#include "cedar/processing/sinks/VideoSink.fwd.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
 
 
-//!@brief A video file source for the processing framework.
-class cedar::proc::sources::Video
-:
-public cedar::proc::sources::GrabberBase
+/*!@todo describe.
+ *
+ * @todo describe more.
+ */
+class cedar::proc::sinks::VideoSink : public cedar::proc::Step
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,24 +67,19 @@ public cedar::proc::sources::GrabberBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Video();
+  VideoSink();
 
   //!@brief Destructor
-  ~Video();
+  virtual ~VideoSink();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
-
-public slots:
-
-  //!@brief This slot should be invoked, when the video in the VideoGrabber has changed.
-  void updateVideo(bool emitOutputPropertyChanged = true);
-
-  //!@brief This slot should be invoked, when the speed factor in the VideoGrabber has changed.
-  void updateSpeedFactor();
+  //!@brief Writes the output matrix to a video file.
+  void compute(const cedar::proc::Arguments& arguments);
+  void onStart();
+  void onStop();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,26 +91,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void reset();
-
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::VideoGrabberPtr getVideoGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
-
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getVideoGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -127,11 +99,8 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the time between two frames. Depends on the frame rate of the video
-  cedar::unit::Time mFrameDuration;
-
-  //!@brief the time elapsed since the last frame is displayed
-  cedar::unit::Time mTimeElapsed;
+  cv::VideoWriter mVideoWriter;
+  double mCurrentFrameDuration;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -140,7 +109,10 @@ protected:
   // none yet
 
 private:
-  // none yet
-}; // class cedar::proc::sources::Video
-#endif // CEDAR_PROC_SOURCES_VIDEO_H
+  cedar::aux::FileParameterPtr _mOutputFileName;
+  cedar::aux::DoubleParameterPtr _mFrameRate;
+
+}; // class cedar::proc::sinks::VideoSink
+
+#endif // CEDAR_PROC_SINKS_VIDEO_SINK_H
 
