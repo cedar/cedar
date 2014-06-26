@@ -59,6 +59,7 @@ class cedar::proc::gui::ResizeHandle : public QGraphicsRectItem
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! handle placement
   enum Direction
   {
     NORTH_EAST,
@@ -83,18 +84,23 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! update handle position
   void updatePosition();
 
+  //! returns vector of handle placements
   static const std::vector<cedar::proc::gui::ResizeHandle::Direction>& directions();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! react to mouse press event
   void mousePressEvent(QGraphicsSceneMouseEvent* pEvent);
 
+  //! react to mouse release event
   void mouseReleaseEvent(QGraphicsSceneMouseEvent* pEvent);
 
+  //! react to item change
   QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
   //--------------------------------------------------------------------------------------------------------------------
