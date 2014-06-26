@@ -182,6 +182,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // this constructor is deprecated because steps are no longer executed in their own thread
+  //!@brief A deprecated constructor. Do not use it anymore!
   CEDAR_DECLARE_DEPRECATED(Step(bool runInThread, bool isLooped));
 
   //!@brief The standard constructor.
@@ -279,6 +280,7 @@ public:
     return this->mBusy;
   }
 
+  //! Returns if this step is marked as being recorded.
   bool isRecorded() const;
 
   //! Returns the last measurement that has been made for the given id.

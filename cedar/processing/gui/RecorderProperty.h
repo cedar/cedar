@@ -82,6 +82,7 @@ private slots:
   void updateStepSize(int value);
 
 signals:
+  //! signals change
   void changed();
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -100,6 +100,7 @@ public:
   //!@brief copy a configuration to another instance of the same class (type check included)
   void copyTo(cedar::aux::ConfigurablePtr target) const;
 
+  //!@brief updates the trigger chains of this element
   virtual void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
   //--------------------------------------------------------------------------------------------------------------------

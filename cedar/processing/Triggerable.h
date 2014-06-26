@@ -228,6 +228,7 @@ protected:
          Triggerable::State state = Triggerable::STATE_EXCEPTION
        ) throw();
 
+  //! Returns the number of start calls.
   unsigned int numberOfStartCalls() const;
 
   //--------------------------------------------------------------------------------------------------------------------

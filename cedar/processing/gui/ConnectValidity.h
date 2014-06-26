@@ -49,6 +49,7 @@ namespace cedar
   {
     namespace gui
     {
+      //!@brief validity of connections
       enum ConnectValidity
       {
         CONNECT_YES,

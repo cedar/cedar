@@ -67,6 +67,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+  //! a map of template names to group template definitions
   typedef std::map<std::string, cedar::proc::ConstGroupDeclarationPtr> GroupDeclarationMap;
 private:
   //--------------------------------------------------------------------------------------------------------------------
@@ -83,6 +84,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief add a new declaration to the manager
   void addDeclaration(cedar::proc::ConstGroupDeclarationPtr declaration);
 
   /*! Adds a group template to the given group.
@@ -101,6 +103,7 @@ public:
   )
   const;
 
+  //!@brief get all definitions
   const GroupDeclarationMap& getDefinitions() const;
 
   //--------------------------------------------------------------------------------------------------------------------

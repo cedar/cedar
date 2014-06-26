@@ -105,8 +105,10 @@ public:
   //!@brief sets the color of the note;
   void setColor(QColor color);
 
+  //!@brief set the font size
   void setFontSize(int s);
 
+  //!@brief returns the font size
   int getFontSize();
 
 

@@ -69,10 +69,12 @@ namespace cedar
       cedar::aux::Singleton<cedar::proc::ElementManager>
       ElementManagerSingleton;
 
+    //! A manager for element declarations
     typedef
       cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
       ElementDeclarationManager;
 
+    //! A manager for element factories
     typedef
       cedar::aux::FactoryManager<cedar::proc::ElementPtr>
       ElementFactoryManager;

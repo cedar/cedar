@@ -200,7 +200,8 @@ public:
 
   //! Writes the data in this slot to the given file.
   void readDataFromFile(const cedar::aux::Path& path);
-  
+
+  //! Get all data connections currently connected to this slot
   std::vector<DataConnectionPtr>& getDataConnections();
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -246,8 +247,10 @@ protected:
     this->signalDataRemoved(data);
   }
 
+  //! Adds a connection to the list of connections currently connected to this slot
   void addConnection(cedar::proc::DataConnectionPtr newConnection);
 
+  //! Removes a connection from the list of connections currently connected to this slot
   void removeConnection(cedar::proc::DataConnectionPtr removedConnection);
 
   //--------------------------------------------------------------------------------------------------------------------

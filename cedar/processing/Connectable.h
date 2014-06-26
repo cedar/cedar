@@ -163,9 +163,9 @@ public:
    *  rechecking it. If the current validity is cedar::proc::DataSlot::VALIDITY_UNKNOWN, the slot's validity is determined
    *  by calling the cedar::proc::Connectable::determineInputValidity method.
    *
-   *  @param slot the slot that needs checking, specified via its smart pointer.
+   *  @param slotWeak the slot that needs checking, specified via its smart pointer.
    */
-  cedar::proc::DataSlot::VALIDITY updateInputValidity(cedar::proc::DataSlotWeakPtr slot);
+  cedar::proc::DataSlot::VALIDITY updateInputValidity(cedar::proc::DataSlotWeakPtr slotWeak);
 
   //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slotName);
@@ -189,6 +189,7 @@ public:
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
+  //! Writes data to a configuration tree node
   virtual void writeData(cedar::aux::ConfigurationNode& stored_data) const;
 
   //! Writes data marked as serializable to the given file.
