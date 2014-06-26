@@ -297,17 +297,20 @@ public:
   //! deselect all items
   void selectNone();
 
-  /*!brief Adds a sticky node to the current scene
+  /*!brief Adds a sticky note to the current scene
    */
   void addStickyNote();
+
+  //! adds a sticky note of given size at given position
   cedar::proc::gui::StickyNote* addStickyNote(float x, float y, float witdh, float height, std::string text, int fontSize = 10, QColor color = QColor(255,255,110));
 
   //! Removes a sticky note
   void removeStickyNote(StickyNote* note);
 
-  // Gets all sticky notes
+  //! Gets all sticky notes
   const std::vector<cedar::proc::gui::StickyNote* > getStickyNotes() const;
 
+  //! emits a scene changed signal
   void emitSceneChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

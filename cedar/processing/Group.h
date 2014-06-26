@@ -426,8 +426,8 @@ public:
 
   /*!@brief Writes all the connections ending at a target connectable into a vector.
    *
-   * @param source             The connectable target.
-   * @param sourceDataSlotName The name of the slot at which connections end.
+   * @param target             The connectable target.
+   * @param targetDataSlotName The name of the slot at which connections end.
    * @param connections        Vector into which the connections are written.
    */
   void getDataConnectionsTo(
@@ -599,7 +599,7 @@ public:
   //! Removes the parameter link and from this group.
   void removeParameterLink(cedar::aux::ParameterLinkPtr link);
 
-  //!@brief
+  //!@brief set loopiness of this group
   void setIsLooped(bool looped);
 
   // make sure to create a list of all looped triggerables on start

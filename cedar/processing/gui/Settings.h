@@ -291,6 +291,7 @@ public:
     return this->_mElementListShowsDeprecated;
   }
 
+  //! returns all user-defined colors
   const std::vector<UserDefinedColorPtr>& getUserDefinedColors() const
   {
     return this->mUserDefinedColors;

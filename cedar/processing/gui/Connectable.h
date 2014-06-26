@@ -61,7 +61,7 @@
 #include <map>
 #include <vector>
 
-/*!@brie A gui base class for all items that represent cedar::proc::Connectables.
+/*!@brief A gui base class for all items that represent cedar::proc::Connectables.
  */
 class cedar::proc::gui::Connectable : public QObject, public cedar::proc::gui::GraphicsBase
 {
@@ -372,6 +372,7 @@ protected:
   //!@brief The current display mode of the step.
   cedar::proc::gui::Connectable::DisplayMode::Id mDisplayMode;
 
+  //!@brief the decoration symbolizing that this connectable is being recorded
   DecorationPtr mpRecordedDecoration;
 
   //! The decorations for this connectable.

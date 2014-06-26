@@ -63,9 +63,10 @@ class cedar::proc::gui::ConnectorItem : public cedar::proc::gui::GraphicsBase
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  //!@brief The constructor for a GroupSource.
   ConnectorItem(cedar::proc::sources::GroupSourcePtr source);
 
+  //!@brief The constructor for a GroupSink.
   ConnectorItem(cedar::proc::sinks::GroupSinkPtr sink);
 
   //--------------------------------------------------------------------------------------------------------------------
