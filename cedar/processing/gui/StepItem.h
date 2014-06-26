@@ -211,9 +211,6 @@ private:
   //! The height of newly created steps.
   static const qreal mDefaultHeight;
 
-  boost::signals2::scoped_connection mSlotAddedConnection;
-  boost::signals2::scoped_connection mSlotRemovedConnection;
-
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;
 

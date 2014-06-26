@@ -304,14 +304,6 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::emitStepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(handleStepNameChanged()));
-
-  mSlotAddedConnection.disconnect();
-  mSlotRemovedConnection.disconnect();
-
-  mSlotAddedConnection
-    = step->connectToSlotAddedSignal(boost::bind(&cedar::proc::gui::StepItem::slotAdded, this, _1, _2));
-  mSlotRemovedConnection
-    = step->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::StepItem::slotRemoved, this, _1, _2));
 }
 
 void cedar::proc::gui::StepItem::updateIconGeometry()
