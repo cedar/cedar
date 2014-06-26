@@ -76,17 +76,21 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! set a group to monitor
   void setGroup(cedar::proc::GroupPtr group);
 
 public slots:
+  //! refresh all measurements
   void refresh();
 
+  //! react to a change in auto refresh
   void autoRefreshToggled(bool enabled);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! the timer event for auto refresh
   void timerEvent(QTimerEvent*);
 
   //--------------------------------------------------------------------------------------------------------------------

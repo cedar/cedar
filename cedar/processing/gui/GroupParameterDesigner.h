@@ -101,13 +101,17 @@ private:
   cedar::aux::ParameterPtr parameterFromItem(QTreeWidgetItem* pItem) const;
 
 signals:
+  //! signal that a parameter was added
   void customParameterAdded(QVariant pointer);
 
+  //! signal that a parameter was removed
   void customParameterRemoved(QVariant pointer);
 
 private slots:
+  //! react if a parameter was added
   void customParameterAddedSlot(QVariant pointer);
 
+  //! react if a parameter was removed
   void customParameterRemovedSlot(QVariant pointer);
 
   void addClicked();

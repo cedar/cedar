@@ -210,16 +210,22 @@ public:
   void changeStepName(const std::string& from, const std::string& to);
 
 public slots:
+  /*! sets the recording state of all steps
+   * @todo why is this done here? why is this done for all steps if one changes??
+   */
   void stepRecordStateChanged();
 
+  //! set collapsedness of this group
   void setCollapsed(bool collapsed);
 
+  //! handes a change in step name
   void handleStepNameChanged(const std::string& from, const std::string& to);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! handles removal of a slot
   void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------

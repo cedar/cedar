@@ -52,7 +52,7 @@
 #include <string>
 
 
-/*!@todo describe.
+/*!@todo Defines a template group, which can be found in a given file.
  *
  * @todo describe more.
  */
@@ -92,6 +92,7 @@ public:
   //! Returns the group name associated with this declaration.
   std::string getGroupName() const;
 
+  //! Returns a nonsense string :)
   std::string getPluginType() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -121,7 +122,9 @@ protected:
   // none yet
 
 private:
+  //! the filename where this group is defined
   cedar::aux::Path mFileName;
+  //! the name of the group
   std::string mGroupName;
 
 }; // class cedar::proc::GroupDeclaration

@@ -112,6 +112,7 @@ public:
   //!@brief saves a configuration to a ConfigurationNode
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
+  //!@brief returns the owner of this trigger (used mainly for processing done triggers)
   cedar::proc::Triggerable* getOwner() const
   {
     return this->mpOwner;
