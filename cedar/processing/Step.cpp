@@ -89,9 +89,6 @@ mAutoLockInputsAndOutputs(true)
   // create the finished trigger singleton.
   this->getFinishedTrigger();
 
-  this->mFinishedCaller = boost::make_shared<cedar::aux::CallFunctionInThreadALot>(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
-  this->mFinishedCaller->start();
-
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
@@ -110,9 +107,6 @@ mAutoLockInputsAndOutputs(true)
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();
-
-  this->mFinishedCaller = boost::make_shared<cedar::aux::CallFunctionInThreadALot>(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
-  this->mFinishedCaller->start();
 
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -431,31 +425,12 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   //    special mechanism in Trigger::buildTriggerGraph)
   if (!trigger || this->isLooped() || (!this->isTriggered() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this)))
   {
-//    this->getFinishedTrigger()->trigger();
     // trigger subsequent steps in a non-blocking manner
     if (this->isLooped())
     {
-      if (!this->mFinishedCaller->isExecuting())
+      if (!this->mFinishedChainResult.isStarted() || this->mFinishedChainResult.isFinished())
       {
-        try
-        {
-          this->mFinishedCaller->execute();
-        }
-        catch (const cedar::aux::ThreadingErrorException& e)
-        {
-          //!@todo Sometimes, the thread wrapper throws an exception. I'm not sure why ...
-          static bool warned_about_threading_error = false;
-          if (!warned_about_threading_error)
-          {
-            warned_about_threading_error = true;
-            cedar::aux::LogSingleton::getInstance()->debugMessage
-            (
-              "A threading exception occurred while triggering the successors of step \"" + this->getName() + "\". The "
-              "exception was: " + e.exceptionInfo() + ". Will not warn about this again.",
-              "cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::Trigger)"
-            );
-          }
-        }
+        this->mFinishedChainResult = QtConcurrent::run(boost::bind(&cedar::proc::Trigger::trigger, this->getFinishedTrigger(), cedar::proc::ArgumentsPtr()));
       }
     }
     else

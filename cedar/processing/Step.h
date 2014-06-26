@@ -50,13 +50,14 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/CallFunctionInThreadALot.fwd.h"
 #include "cedar/auxiliaries/BoolParameter.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QThread>
+#include <QtConcurrentRun>
+#include <QFuture>
 #include <QReadWriteLock>
 #include <QMutex>
 #ifndef Q_MOC_RUN
@@ -489,8 +490,8 @@ private:
   //! Whether the step should lock its inputs and outputs automatically.
   bool mAutoLockInputsAndOutputs;
 
-  //! Used for calling this->getFinishedTrigger() in a separate thread
-  cedar::aux::CallFunctionInThreadALotPtr mFinishedCaller;
+  //! Used to test if the trigger chain attached to this step is finished or not.
+  QFuture<void> mFinishedChainResult;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
