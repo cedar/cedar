@@ -83,6 +83,7 @@ public:
   class Locker : public cedar::aux::LockerBase
   {
     public:
+      //! Constructor. Takes a lockable and the lock set to be locked.
       Locker(LockablePtr lockable, LockSetHandle lockSet = 0)
       :
       cedar::aux::LockerBase
@@ -93,6 +94,7 @@ public:
       {
       }
 
+      //! Constructor. Takes a lockable and the lock set to be locked.
       Locker(Lockable* lockable, LockSetHandle lockSet = 0)
       :
       cedar::aux::LockerBase
@@ -103,6 +105,7 @@ public:
       {
       }
 
+      //! Constructor. Takes a lockable and the lock set to be locked, as well as the type of locking to be done.
       Locker(Lockable* lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
       :
       cedar::aux::LockerBase
@@ -113,6 +116,7 @@ public:
       {
       }
 
+      //! Constructor. Takes a lockable and the lock set to be locked, as well as the type of locking to be done.
       Locker(LockablePtr lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
       :
       cedar::aux::LockerBase
@@ -134,12 +138,14 @@ public:
   class ReadLocker : public Locker
   {
   public:
+    //! Constructor.
     ReadLocker(LockablePtr lockable, LockSetHandle lockSet = 0)
     :
     Locker(lockable, cedar::aux::LOCK_TYPE_READ, lockSet)
     {
     }
 
+    //! Constructor.
     ReadLocker(Lockable* lockable, LockSetHandle lockSet = 0)
     :
     Locker(lockable, cedar::aux::LOCK_TYPE_READ, lockSet)
@@ -156,12 +162,14 @@ public:
   class WriteLocker : public Locker
   {
   public:
+    //! Constructor.
     WriteLocker(LockablePtr lockable, LockSetHandle lockSet = 0)
     :
     Locker(lockable, cedar::aux::LOCK_TYPE_WRITE, lockSet)
     {
     }
 
+    //! Constructor.
     WriteLocker(Lockable* lockable, LockSetHandle lockSet = 0)
     :
     Locker(lockable, cedar::aux::LOCK_TYPE_WRITE, lockSet)
@@ -213,6 +221,7 @@ protected:
   //!@brief Retrieves the handle for a given lock set name.
   LockSetHandle getLockSetHandle(const std::string& lockSet) const;
 
+  //! Returns the set of locks stored for the given lock set handle.
   const Locks& getLocks(LockSetHandle lockSet = 0) const;
 
   //--------------------------------------------------------------------------------------------------------------------

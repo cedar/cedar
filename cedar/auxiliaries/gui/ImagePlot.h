@@ -109,6 +109,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! Reacts to a click on the image plot.
   void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
   //--------------------------------------------------------------------------------------------------------------------

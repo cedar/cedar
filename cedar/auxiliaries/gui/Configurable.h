@@ -63,7 +63,7 @@
 
 /*!@brief A widget to display and manipulate the parameters of cedar::aux::Configurables.
  *
- * @remarks This widget is intended to replace the old cedar::aux/proc::PropertyPane in the long run.
+ * @remarks This widget is intended to replace the old PropertyPane in the long run.
  */
 class cedar::aux::gui::Configurable : public QWidget
 {
@@ -86,6 +86,7 @@ public:
   //!@brief The standard constructor.
   Configurable(QWidget* pParent = NULL);
 
+  //! Destructor.
   ~Configurable();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,6 +96,7 @@ public:
   /*!@brief Displays the parameters & configurable children for a given configurable.
    *
    * @param configurable The configurable to display.
+   * @param readOnly     If true, the configurable cannot be edited, only displayed.
    */
   void display(cedar::aux::ConfigurablePtr configurable, bool readOnly = false);
 
@@ -103,9 +105,11 @@ public:
   void clear();
 
 public slots:
+  //! Resizes the rows to fit their contents.
   void fitRowsToContents();
 
 signals:
+  //! Emitted, whenever a parameter in the widget changes.
   void settingsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -152,10 +156,13 @@ private:
   void translateParameterNameChangedSignal(const std::string& oldName, const std::string& newName);
 
 signals:
+  //! Emitted, whenever a parameter is added to the displayed configurable.
   void parameterAdded(QString path);
 
+  //! Emitted, whenever a parameter is removed from the displayed configurable.
   void parameterRemoved(QVariant parameter);
 
+  //! Emitted, whenever a parameter in the displayed configurable is renamed.
   void parameterRenamed(QString oldName, QString newName);
 
 private slots:

@@ -77,6 +77,7 @@ class cedar::aux::detail::CallFunctionInThreadALotWorker : public cedar::aux::de
     void work(); // virtual in parent
 
   public slots:
+    //! Executes the work function.
     void executeSlot();
 
   private:

@@ -148,6 +148,7 @@ public:
 protected:
   // none yet
 signals:
+  //! Emitted, when the combined kernel is updated.
   void combinedKernelUpdated();
 
   //--------------------------------------------------------------------------------------------------------------------

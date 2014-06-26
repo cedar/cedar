@@ -62,24 +62,31 @@ namespace cedar
       class ValuePolicy
       {
       public:
+        //! Type that is read from the configuration.
         typedef std::string ReadType;
 
+        //! Constructor.
         ValuePolicy();
 
+        //! Constructor.
         ValuePolicy(const cedar::aux::Enum& value);
 
 
       protected:
+        //! Sets the enum type to be used.
         void setEnum(cedar::aux::EnumBasePtr enumDeclaration);
 
+        //! Returns the value of the parameter as a string.
         std::string getValuePrivate() const;
 
+        //! Sets the value in the parameter using a string.
         void setValuePrivate(const ReadType& value);
 
       protected:
         //! A pointer to the enum used by this parameter
         cedar::aux::EnumBasePtr mEnumDeclaration;
 
+        //! Stored value.
         cedar::aux::Enum mValue;
       };
     }

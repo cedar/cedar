@@ -69,8 +69,10 @@ namespace cedar
       class ValuePolicy
       {
       public:
+        //! Specifies the type to be read from the configuration tree.
         typedef T ReadType;
 
+        //! Stores the given value.
         ValuePolicy(const T& value)
         :
         mValue(value)
@@ -78,17 +80,20 @@ namespace cedar
         }
 
       protected:
+        //! Returns the stored value.
         const T& getValuePrivate() const
         {
           return this->mValue;
         }
 
+        //! Sets the value, using the read type.
         void setValuePrivate(const ReadType& value)
         {
           this->mValue = value;
         }
 
       protected:
+        //! The stored value.
         T mValue;
       };
     }
@@ -252,11 +257,13 @@ public:
     mValidator = validator;
   }
 
+  //! Checks if the parameter can be copied from the other parameter.
   bool canCopyFrom(cedar::aux::ConstParameterPtr other) const
   {
     return static_cast<bool>(boost::dynamic_pointer_cast<ConstSelfType>(other));
   }
 
+  //! Copies the parameter value from another parameter.
   void copyValueFrom(cedar::aux::ConstParameterPtr other)
   {
     if (auto other_self = boost::dynamic_pointer_cast<ConstSelfType>(other))

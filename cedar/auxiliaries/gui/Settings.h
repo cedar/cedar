@@ -103,6 +103,7 @@ public:
   //! Whether or not memory output is generated.
   unsigned int getMaximumNumberOfLogEntries() const;
 
+  //! Returns the maximal number of entries allowed for the log entry.
   cedar::aux::UIntParameterPtr getMaximalNumberOfLogEntriesParameter() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -148,6 +149,7 @@ namespace cedar
   {
     namespace gui
     {
+      //! Singleton for the settings object.
       typedef cedar::aux::Singleton<cedar::aux::gui::Settings> SettingsSingleton;
     }
   }

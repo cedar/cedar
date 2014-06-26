@@ -54,6 +54,7 @@
 #include <QPushButton>
 
 
+//!@cond SKIPPED_DOCUMENTATION
 //! Widget used for displaying the image.
 class cedar::aux::gui::QImagePlot::ImageDisplay : public QLabel
 {
@@ -75,6 +76,7 @@ public:
 
   cedar::aux::gui::QImagePlot* mpPlot;
 };
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -125,6 +127,7 @@ _mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 
   );
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 {
   this->mpMin = new QLabel("min");
@@ -156,6 +159,7 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
   p_layout->setRowStretch(1, 1);
   this->setLayout(p_layout);
 }
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -340,6 +344,7 @@ void cedar::aux::gui::QImagePlot::displayMatrix(const cv::Mat& matrix)
                  ).rgbSwapped();
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::QImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEvent)
 {
   if (!this->pixmap())
@@ -355,6 +360,7 @@ void cedar::aux::gui::QImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEv
 
   this->mpPlot->plotClicked(pEvent, image_x, image_y);
 }
+//!@endcond
 
 void cedar::aux::gui::QImagePlot::fillContextMenu(QMenu&)
 {
@@ -389,6 +395,7 @@ void cedar::aux::gui::QImagePlot::showLegendChanged()
   }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::QImagePlotLegend::updateMinMax(double min, double max)
 {
   int precision = 2;
@@ -401,3 +408,4 @@ void cedar::aux::gui::detail::QImagePlotLegend::updateMinMax(double min, double 
   this->mpMin->setText(QString("%1").arg(min, 0, 'g', precision));
   this->mpMax->setText(QString("%1").arg(max, 0, 'g', precision));
 }
+//!@endcond

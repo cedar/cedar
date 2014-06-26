@@ -52,6 +52,8 @@
 
 
 /*!@brief A class for representing paths to files and directories.
+ *
+ * @todo This should really use/be merged with cedar::aux::PathTemplate.
  */
 class cedar::aux::Path
 {
@@ -93,8 +95,10 @@ public:
   //! Returns true if the stored path is a path to a resource, false otherwise.
   bool isResource() const;
 
+  //! Returns true if the path is an absolute path.
   bool isAbsolute() const;
 
+  //! Returns true if the path is relative.
   bool isRelative() const;
 
   //! Returns true if the path is relative to a plugin folder, i.e., starts with the protocol plugin://
@@ -158,10 +162,13 @@ public:
   //! Returns the last element in the path
   const std::string& getLast() const;
 
+  //! Appends another component to the path.
   void appendComponent(const std::string& component);
 
+  //! Returns the separator for paths (depends on the operating system).
   static std::string separator();
 
+  //! Compares two paths.
   bool operator< (const cedar::aux::Path& other) const;
 
   //--------------------------------------------------------------------------------------------------------------------

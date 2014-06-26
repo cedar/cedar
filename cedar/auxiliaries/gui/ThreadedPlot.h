@@ -75,6 +75,7 @@ public:
   //!@brief The standard constructor.
   ThreadedPlot(QWidget* pParent = NULL);
 
+  //! Destructor.
   ~ThreadedPlot();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -84,20 +85,26 @@ public:
   // none yet
 
 signals :
+  //! Signals, that the conversion of the data has failed.
   void conversionFailedSignal();
 
+//! Signals, that the conversion of the data is complete.
   void conversionDoneSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! Upates the plot.
   void timerEvent(QTimerEvent* /* pEvent */);
 
+  //! Starts the plot.
   void start();
 
+  //! Stops the plot.
   void stop();
 
+  //! Waits for plotting to finish.
   void wait();
 
   //--------------------------------------------------------------------------------------------------------------------

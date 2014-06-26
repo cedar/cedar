@@ -56,6 +56,7 @@ namespace cedar
     class CharSeparator
     {
       public:
+        //! Returns the separator used for the path.
         static StorageT separator()
         {
           StorageT separator;
@@ -79,15 +80,20 @@ class cedar::aux::PathTemplate
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! The string type used for storing components of the path.
   typedef StorageT StringType;
+
+  //! Type of separator used.
   typedef SeparatorT SeparatorType;
 
 private:
+  //! The type of this class (for meta-programming reasons...)
   typedef PathTemplate<SeparatorType, StringType> SelfType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
+  //! Writes the path to a stream.
   friend std::ostream& operator<< (std::ostream& stream, const SelfType& path)
   {
     stream << path.toString();
@@ -98,12 +104,14 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Constructs a path from a string.
   PathTemplate(const StringType& path = StringType())
   {
     // append the vector above to the path
     this->fromString(path);
   }
 
+  //! Constructs a path from a const char string.
   PathTemplate(const char* path)
   {
     // append the vector above to the path
@@ -114,27 +122,32 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Clears the path.
   void clear()
   {
     this->mComponents.clear();
   }
 
+  //! Appends a component to the path.
   void append(const std::vector<StringType>& path)
   {
     // append the vector above to the path
     this->mComponents.insert(this->mComponents.end(), path.begin(), path.end());
   }
 
+  //! Appends another path to this path.
   void append(const SelfType& other)
   {
     this->append(other.mComponents);
   }
 
+  //! Converts the path to a string.
   StringType toString() const
   {
     return cedar::aux::join(this->mComponents, SeparatorType::separator());
   }
 
+  //! Returns the number of components in the path.
   size_t getElementCount() const
   {
     return this->mComponents.size();
@@ -143,6 +156,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public operators
   //--------------------------------------------------------------------------------------------------------------------
+  //! Concatenates two paths.
   SelfType operator+(const SelfType& other) const
   {
     SelfType copy(*this);
@@ -150,11 +164,13 @@ public:
     return copy;
   }
 
+  //! Concatenates two paths.
   friend StringType operator+(const StringType& string, const SelfType& path)
   {
     return string + path.toString();
   }
 
+  //! Automatic string conversion operator for the path.
   operator StringType() const
   {
     return this->toString();

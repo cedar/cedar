@@ -87,6 +87,7 @@ public:
    * @param longName    Long name of the parameter. Should not contain spaces.
    * @param description Description to show to the user.
    * @param shortName   Short name of the command. Leave 0 to ignore.
+   * @param group       Logical group of the parameter. Mainly used for the help function.
    */
   void defineFlag
   (
@@ -99,9 +100,11 @@ public:
   /*!@brief Defines a command line value, i.e., an option that must be given a value. If the option is not present, the
    *        parser will return the default value.
    *
-   * @param longName    Long name of the option.
-   * @param description Description of the option.
-   * @param shortName   Optional short name of the option.
+   * @param longName     Long name of the option.
+   * @param description  Description of the option.
+   * @param defaultValue The default value to be used when the user does not specify anything.
+   * @param shortName    Optional short name of the option.
+   * @param group        Logical group of the parameter. Mainly used for the help function.
    */
   template <typename T>
   void defineValue
@@ -122,6 +125,7 @@ public:
    * @param longName    Long name of the option.
    * @param description Description of the option.
    * @param shortName   Optional short name of the option.
+   * @param group       Logical group of the parameter. Mainly used for the help function.
    */
   void defineValue
   (

@@ -65,14 +65,19 @@ namespace cedar
       {
       protected:
         CEDAR_GENERATE_POINTER_TYPES(ValueType);
+
+        //! Singleton used to allocate new objects.
         typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<ValueTypePtr> > FactorySingleton;
 
       public:
+        //! Returns the configurable with the given key.
         virtual cedar::aux::ConfigurablePtr configurableAt(const std::string& key) = 0;
 
+        //! Returns the configurable with the given key.
         virtual cedar::aux::ConstConfigurablePtr configurableAt(const std::string& key) const = 0;
 
       protected:
+        //! Allocates an object and applies the given configuration to it.
         ValueTypePtr allocate(const cedar::aux::ConfigurationNode& node) const
         {
           const std::string& object_type = node.begin()->first;
@@ -120,11 +125,14 @@ namespace cedar
         }
 
       protected:
+        //! Uses the given configuration to allocate an object and stores it with the given key.
         void readObject(const std::string& key, const cedar::aux::ConfigurationNode& node)
         {
           this->mObjectMap[key] = this->allocate(node);
         }
 
+        //! Stores tje configuration of the object with the given key in the given configuration tree.
+        //!@todo Should be named writeObject.
         void storeObject(const std::string& key, cedar::aux::ConfigurationNode& node) const
         {
           typename AllocationPolicy<ValueType>::ConstValueTypePtr value = (*this)[key];
@@ -137,11 +145,13 @@ namespace cedar
           node.push_back(cedar::aux::ConfigurationNode::value_type(type_id, value_node));
         }
 
+        //! Returns the map in which the objects are stored.
         const std::map<std::string, typename AllocationPolicy<ValueType>::ValueTypePtr>& storage() const
         {
           return this->mObjectMap;
         }
 
+        //! Returns the map in which the objects are stored.
         std::map<std::string, typename AllocationPolicy<ValueType>::ValueTypePtr>& storage()
         {
           return this->mObjectMap;
@@ -203,11 +213,13 @@ namespace cedar
         }
 
       protected:
+        //! Allocates the given configuration for the given key.
         void readObject(const std::string& key, const cedar::aux::ConfigurationNode& node)
         {
           mConfigurations[key] = node;
         }
 
+        //! Stores the configuration of the object with the given key in the given configuration tree.
         void storeObject(const std::string& key, cedar::aux::ConfigurationNode& node) const
         {
 //          typename AllocationPolicy::ValueTypePtr value = iter->second;
@@ -220,21 +232,25 @@ namespace cedar
 //          node.push_back(cedar::aux::ConfigurationNode::value_type(type_id, value_node));
         }
 
+        //! Returns the container of the objects.
         const std::map<std::string, cedar::aux::ConfigurationNode>& storage() const
         {
           return this->mConfigurations;
         }
 
+        //! Returns the container of the objects.
         std::map<std::string, cedar::aux::ConfigurationNode>& storage()
         {
           return this->mConfigurations;
         }
 
+        //! Tests, if an object has been allocated.
         bool objectExists(const std::string& key) const
         {
           return this->mObjectMap.find(key) != this->mObjectMap.end() && this->mObjectMap[key];
         }
 
+        //! Makes sure that an object with the given key exists. If it doesn't exists, a new one is allocated.
         void ensureKeyExists(const std::string& key) const
         {
           if (!this->objectExists(key))
@@ -249,6 +265,7 @@ namespace cedar
           return mConfigurations.find(key) != mConfigurations.end();
         }
 
+        //! Allocates an object with the given key using a configuration that has previously been stored.
         void allocateKey(const std::string& key) const
         {
           //!@todo make this a proper exception
@@ -280,9 +297,16 @@ class cedar::aux::ObjectMapParameterTemplate : public cedar::aux::Parameter, pub
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Iterator used by the map.
   typedef typename TAllocationPolicy::iterator iterator;
+
+  //! Constant iterator used by the map.
   typedef typename TAllocationPolicy::const_iterator const_iterator;
+
+  //! Reverse iterator used by the map.
   typedef typename TAllocationPolicy::reverse_iterator reverse_iterator;
+
+  //! Constant reverse iterator used by the map.
   typedef typename TAllocationPolicy::const_reverse_iterator const_reverse_iterator;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -383,7 +407,8 @@ public:
     return (*this)[key];
   }
 
-  /*!
+  /*! Returns the configurable with the given key.
+   *
    * @remarks This method must be overridden because ConfigurablePtr and ValueTypePtr are not considered covariant types.
    */
   cedar::aux::ConfigurablePtr configurableAt(const std::string& key)
@@ -391,6 +416,10 @@ public:
     return (*this)[key];
   }
 
+  /*! Returns the configurable with the given key.
+   *
+   * @remarks This method must be overridden because ConfigurablePtr and ValueTypePtr are not considered covariant types.
+   */
   cedar::aux::ConstConfigurablePtr configurableAt(const std::string& key) const
   {
     return (*this)[key];

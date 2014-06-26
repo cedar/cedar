@@ -157,6 +157,7 @@ public slots:
   void showLegend(bool show);
 
 signals:
+  //! Signals a change in the minimal and maximal values in the plotted data.
   void minMaxChanged(double min, double max);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -180,17 +181,20 @@ protected:
    */
   void displayMatrix(const cv::Mat& matrix);
 
+  //! Notifies the image plot if a legend can be displayed or not.
   void setLegendAvailable(bool available)
   {
     this->mLegendAvailable = available;
   }
 
+  //! If set to true, fixed values can be set for the minimum and maximum of the plot.
   void setValueScalingEnabled(bool enabled)
   {
     mValueScalingAvailable = enabled;
   }
 
 protected slots:
+  //! Updates the minimum and maximum of the plot.
   void updateMinMax(double min, double max);
 
   //! Enables automatic scaling.

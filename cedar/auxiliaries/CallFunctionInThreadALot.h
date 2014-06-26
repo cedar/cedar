@@ -137,6 +137,7 @@ private:
   void processStop();
 
 signals:
+  //! Signals, that the function should be executed.
   void executeSignal(); 
 
   //----------------------------------------------------------------------------

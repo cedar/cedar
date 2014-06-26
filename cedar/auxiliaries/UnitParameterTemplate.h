@@ -67,6 +67,7 @@ namespace cedar
 {
   namespace aux
   {
+    //! Extracts a unit from a string. Done via template specialization.
     template <typename T>
     inline boost::units::quantity<T> getUnitFromPostFix(const std::string& /* postFix */)
     {
@@ -77,6 +78,7 @@ namespace cedar
     }
 
 
+    //! Specialization of cedar::aux::getUnitFromPostFix for dimensionless units.
     template <>
     inline boost::units::quantity<boost::units::si::dimensionless> getUnitFromPostFix(const std::string& postFix)
     {
@@ -271,12 +273,12 @@ namespace cedar
     template <typename T>
     struct UnitTranslator
     {
-      // boost-specific name, do not change or stuff will break!
+      //! boost-specific name, do not change or stuff will break!
       typedef std::string internal_type;
-      // boost-specific name, do not change or stuff will break!
+      //! boost-specific name, do not change or stuff will break!
       typedef boost::units::quantity<T> external_type;
 
-      // Converts a string to bool
+      //! Converts a string to a quantity.
       boost::optional<external_type> get_value(const internal_type& str)
       {
         // normalize all white space to a single space
@@ -319,7 +321,7 @@ namespace cedar
         return boost::optional<external_type>(number * cedar::aux::parseUnitString<T>(unit_str));
       }
 
-      // Converts a unit to string
+      //! Converts a unit to string.
       boost::optional<internal_type> put_value(const external_type& unit)
       {
         std::stringstream stream;
@@ -361,7 +363,7 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  //!@brief Constructor that takes a default value.
   UnitParameterTemplate
   (
     cedar::aux::Configurable *pOwner,
@@ -375,6 +377,7 @@ public:
   {
   }
 
+  //! Constructor without default value.
   UnitParameterTemplate
   (
     cedar::aux::Configurable* pOwner,

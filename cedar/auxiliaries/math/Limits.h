@@ -81,6 +81,7 @@ namespace cedar
       class UnitHelper
       {
         public:
+        //! Returns the default quantity for the given unit.
         static inline Unit unit()
         {
           BOOST_STATIC_ASSERT(sizeof(Unit) == 0);
@@ -92,6 +93,7 @@ namespace cedar
       class UnitHelper<cedar::unit::Time>
       {
       public:
+        //! Returns the default quantity for times.
         static inline cedar::unit::Time unit()
         {
           return cedar::unit::DEFAULT_TIME_UNIT;
@@ -103,6 +105,7 @@ namespace cedar
       class UnitHelper<cedar::unit::Length>
       {
       public:
+        //! Returns the default quantity for lengths.
         static inline cedar::unit::Length unit()
         {
           return cedar::unit::DEFAULT_LENGTH_UNIT;
@@ -114,6 +117,7 @@ namespace cedar
       class UnitHelper<cedar::unit::Velocity>
       {
       public:
+        //! Returns the default quantity for velocities.
         static inline cedar::unit::Velocity unit()
         {
           return cedar::unit::DEFAULT_VELOCITY_UNIT;
@@ -125,6 +129,7 @@ namespace cedar
       class UnitHelper<cedar::unit::Acceleration>
       {
       public:
+        //! Returns the default quantity for accelerations.
         static inline cedar::unit::Acceleration unit()
         {
           return cedar::unit::DEFAULT_ACCELERATION_UNIT;
@@ -136,6 +141,7 @@ namespace cedar
       class UnitHelper<cedar::unit::Frequency>
       {
       public:
+        //! Returns the default quantity for Frequency.
         static inline cedar::unit::Frequency unit()
         {
           return cedar::unit::DEFAULT_FREQUENCY_UNIT;
@@ -147,6 +153,7 @@ namespace cedar
       class UnitHelper<cedar::unit::AngularVelocity>
       {
       public:
+        //! Returns the default quantity for AngularVelocity.
         static inline cedar::unit::AngularVelocity unit()
         {
           return cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
@@ -158,22 +165,28 @@ namespace cedar
       class UnitHelper<cedar::unit::PlaneAngle>
       {
       public:
+        //! Returns the default quantity for PlaneAngle.
         static inline cedar::unit::PlaneAngle unit()
         {
           return cedar::unit::DEFAULT_PLANE_ANGLE_UNIT;
         }
       };
 
-      //! Helper class for getting several limit numbers of numbers of different c++ types.
+      /*!@brief Helper class for getting several limit numbers of numbers of different c++ types.
+       *
+       *        This is mainly necessary in order to be able to deal with units.
+       */
       template <typename T>
       class NumericHelper
       {
       public:
+        //! Returns the zero value of the type.
         static inline T zero()
         {
           return static_cast<T>(0);
         }
 
+        //! Returns the smallest negative number representable by the type.
         static inline T smallestNegative()
         {
           if (std::numeric_limits<T>::is_integer)
@@ -186,6 +199,7 @@ namespace cedar
           }
         }
 
+        //! Returns the smallest positive number representable by the type.
         static inline T smallestPositive()
         {
           if (std::numeric_limits<T>::is_integer)
@@ -205,16 +219,19 @@ namespace cedar
       {
         typedef boost::units::quantity<Unit, T> Quantity;
         public:
+        //! Returns a quantity that is zero.
         static inline Quantity zero()
         {
           return static_cast<double>(0) * UnitHelper<Quantity>::unit();
         }
 
+        //! Returns the smallest negative quantity representable by the data type.
         static inline Quantity smallestNegative()
         {
           return -1 * boost::numeric::bounds<T>::smallest() * UnitHelper<Quantity>::unit();
         }
 
+        //! Returns the smallest positive quantity representable by the data type.
         static inline Quantity smallestPositive()
         {
           return boost::numeric::bounds<T>::smallest() * UnitHelper<Quantity>::unit();
@@ -433,14 +450,19 @@ namespace boost
     template<class Unit, class T>
     struct bounds<boost::units::quantity<Unit, T> >
     {
+      //! Returns the lowest possible value.
       static boost::units::quantity<Unit, T> lowest()
       {
         return boost::numeric::bounds<T>::lowest() * cedar::aux::math::UnitHelper<boost::units::quantity<Unit, T> >::unit();
       }
+
+      //! Returns the highest possible value.
       static boost::units::quantity<Unit, T> highest()
       {
         return boost::numeric::bounds<T>::highest() * cedar::aux::math::UnitHelper<boost::units::quantity<Unit, T> >::unit();
       }
+
+      //! Returns the smallest, non-zero value.
       static boost::units::quantity<Unit, T> smallest()
       {
         return boost::numeric::bounds<T>::smallest() * cedar::aux::math::UnitHelper<boost::units::quantity<Unit, T> >::unit();

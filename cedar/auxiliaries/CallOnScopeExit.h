@@ -88,12 +88,19 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*! Calls the function. It will then no longer be called when the object is destroyed, unless
+    * cedar::aux::CallOnScopeExit::resetCall is called.
+    */
   void callNow()
   {
     this->mCall = false;
     this->mFunctionToCall();
   }
 
+  /*! Resets the internal call variable, meaning, that the function will again be called when the object is destroyed.
+   *
+   * @see cedar::aux::CallOnScopeExit::callNow
+   */
   void resetCall()
   {
     this->mCall = true;

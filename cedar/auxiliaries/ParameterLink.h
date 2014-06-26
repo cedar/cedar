@@ -78,10 +78,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Sets the parameters linked by this parameter link.
   void setLinkedParameters(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target);
 
+  //! Returns the source parameter.
   cedar::aux::ParameterPtr getSource() const;
 
+  //! Returns the target parameter.
   cedar::aux::ParameterPtr getTarget() const;
 
   //! Sets the source of the link. Will link the parameters if a target is already set.
@@ -96,6 +99,7 @@ public:
   //! Sets the target of the link to a nullptr.
   void unsetTarget();
 
+  //! Checks if the two parameter can be linked to each other.
   bool canLink(cedar::aux::ParameterPtr source, cedar::aux::ParameterPtr target);
 
   //--------------------------------------------------------------------------------------------------------------------

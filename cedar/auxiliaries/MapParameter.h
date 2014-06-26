@@ -142,16 +142,19 @@ public:
     return this->mValues.end();
   }
 
+  //! Finds the given key in the map and returns an iterator to the corresponding element.
   const_iterator find(const std::string& key) const
   {
     return this->mValues.find(key);
   }
 
+  //! Erases the given key and its element from the map.
   void erase(const std::string& key)
   {
     this->mValues.erase(key);
   }
 
+  //! Checks if the map is empty.
   bool empty()
   {
     return this->mValues.empty();
@@ -198,6 +201,7 @@ public:
     }
   }
 
+  //! Returns the value with the given index.
   T get(const std::string& index, bool lock = true) const
   {
     T copy;

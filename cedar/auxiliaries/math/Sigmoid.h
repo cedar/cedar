@@ -95,10 +95,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief threshold of the sigmoid
   cedar::aux::DoubleParameterPtr mThreshold;
 private:
-  //!@brief threshold of the sigmoid
+  // none yet
 };
 
 #endif  // CEDAR_AUX_MATH_SIGMOID_H

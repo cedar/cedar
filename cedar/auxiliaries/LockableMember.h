@@ -63,6 +63,7 @@ class cedar::aux::LockableMember
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Constructs the member, using the default constructor of the type that is stored.
   LockableMember()
   :
   mMember(),
@@ -70,6 +71,7 @@ public:
   {
   }
 
+  //! Constructs the member, using a fixed value.
   LockableMember(const T& member)
   :
   mMember(member),

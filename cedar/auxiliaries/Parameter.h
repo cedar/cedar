@@ -88,6 +88,7 @@ public:
   class ReadLocker : public cedar::aux::LockerBase
   {
   public:
+    //! Constructor.
     ReadLocker(cedar::aux::Parameter* parameter)
     :
     cedar::aux::LockerBase
@@ -107,6 +108,7 @@ public:
   class WriteLocker : public cedar::aux::LockerBase
   {
   public:
+    //! Constructor.
     WriteLocker(cedar::aux::Parameter* parameter)
     :
     cedar::aux::LockerBase

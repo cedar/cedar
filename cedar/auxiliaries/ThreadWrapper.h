@@ -121,6 +121,8 @@ public:
    * @see requestStop()
    */
   void stop(unsigned int timeout = UINT_MAX); 
+
+  //! Deprecated. Use the other stop function instead.
   CEDAR_DECLARE_DEPRECATED( void stop(unsigned int timeout, bool suppressWarning) );
   //! @todo: delete deprecated function in future version
 

@@ -65,6 +65,7 @@ class cedar::aux::ImageDatabase
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type used for representing the id of classes.
   typedef unsigned int ClassId;
 
   /*! A base class for all kinds of image annotations.
@@ -83,11 +84,13 @@ public:
   class ETH80Annotation : public Annotation
   {
     public:
+      //! Sets the path to the file containing the segmentation mask of a sample.
       void setSegmentationMask(const cedar::aux::Path& maskPath)
       {
         this->mSegmentationMask = maskPath;
       }
 
+      //! Returns a path to the segmentation mask of the annotated sample.
       const cedar::aux::Path& getSegmentationMask() const
       {
         return this->mSegmentationMask;
@@ -98,39 +101,50 @@ public:
   };
   CEDAR_GENERATE_POINTER_TYPES(ETH80Annotation);
 
-  /*! An annotation containing information about object pose.
+  /*! An annotation containing ground-truth information about object pose.
+   *
+   * @todo Switch to boost::optional instead of using a bool for each pose component.
    */
   class ObjectPoseAnnotation : public Annotation
   {
   public:
+    //! Constructor.
     ObjectPoseAnnotation();
 
+    //! Sets the position of the sample.
     void setPosition(double dxFromCenter, double dyFromCenter);
 
+    //! Sets the orientation of the sample.
     void setOrientation(double orientation);
 
+    //! Sets the scale of the sample.
     void setScale(double factor);
 
+    //! Returns the x position of the sample.
     double getX() const
     {
       return this->mX;
     }
 
+    //! Returns the y position of the sample.
     double getY() const
     {
       return this->mY;
     }
 
+    //! Returns the orientation of the sample.
     double getOrientation() const
     {
       return this->mOrientation;
     }
 
+    //! Returns the scale of the sample.
     double getScale() const
     {
       return this->mScale;
     }
 
+    //! Checks, if a scale annotation is present.
     bool hasScaleAnnotation() const
     {
       return this->mHasScale;
@@ -153,41 +167,53 @@ public:
   class Image
   {
   public:
+    //! Constructor.
     Image();
 
+    //! Sets the path to the image.
     void setFileName(const cedar::aux::Path& fileName);
 
+    //! Returns the path to the image.
     const cedar::aux::Path& getFileName() const
     {
       return this->mFileName;
     }
 
+    //! Sets the correct class id for the image.
     void setClassId(ClassId classId);
 
+    //! Returns the correct class id for the image.
     ClassId getClassId() const
     {
       return this->mClassId;
     }
 
+    //! Appends a set of tags to the image.
     void appendTags(const std::string&);
 
+    //! Returns the set of tags set for this image.
     const std::set<std::string>& getTags() const
     {
       return this->mTags;
     }
 
+    //! Sets an annotation for the given id.
     void setAnnotation(const std::string& annotationId, AnnotationPtr annotation);
 
+    //! Checks, if an annotation is present for the given id.
     bool hasAnnotation(const std::string& annotationId) const;
 
+    //! Returns an annotation with a specific id.
     ConstAnnotationPtr getAnnotation(const std::string& annotationId) const;
 
+    //! Returns an annotation with the given id, cast to a specific type.
     template <typename T>
     boost::shared_ptr<T> getAnnotation(const std::string& annotationId)
     {
       return boost::const_pointer_cast<T>(static_cast<const Image*>(this)->getAnnotation<const T>(annotationId));
     }
 
+    //! Returns an annotation with the given id, cast to a specific type.
     template <typename T>
     boost::shared_ptr<T> getAnnotation(const std::string& annotationId) const
     {
@@ -206,8 +232,10 @@ public:
       }
     }
 
+    //! Returns the number of rows in the image. Note, that this is slow because the image may be read during this call.
     unsigned int getImageRows() const;
 
+    //! Returns the number of columns in the image. Note, that this is slow because the image may be read during this call.
     unsigned int getImageColumns() const;
 
     //! Checks whether the given tag is one of the tags set for this image.
@@ -234,10 +262,13 @@ public:
   class Type
   {
     public:
+      //! Type of the id values of the enum class.
       typedef cedar::aux::EnumId Id;
 
-    public:
+      //! Type of the enum class.
       typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+      //! Registers the enum values in the enum class.
       static void construct()
       {
         mType.type()->def(cedar::aux::Enum(ScanFolder, "ScanFolder"));
@@ -245,18 +276,24 @@ public:
         mType.type()->def(cedar::aux::Enum(COIL100, "COIL100"));
       }
 
+      //! Returns the base enum type.
       static const cedar::aux::EnumBase& type()
       {
         return *(mType.type());
       }
+
+      //! Returns the base enum type as a pointer.
       static const cedar::aux::ImageDatabase::Type::TypePtr& typePtr()
       {
         return mType.type();
       }
 
     public:
+      //! Scans a folder for all images in it. Only files with names matching the format class.tag1,tag2,... are used.
       static const Id ScanFolder = 0;
+      //! Reads the cropped-close variant of the ETH-80 database.
       static const Id ETH80CroppedClose = 1;
+      //! Reads the COIL-100 database.
       static const Id COIL100 = 2;
 
     protected:
@@ -276,6 +313,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Checks, if the given class is present in the database.
   bool hasClass(const std::string& className) const;
 
   /*!@brief Returns all images with a given tag.
@@ -293,10 +331,12 @@ public:
    */
   std::set<ImagePtr> getImagesWithAnyTags(const std::vector<std::string>& tags) const;
 
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_DECLARE_DEPRECATED(std::set<ImagePtr> getImagesWithTags(const std::string& tags) const)
   {
     return this->getImagesWithAnyTags(tags);
   }
+  //!@endcond
 
   /*!@brief Returns all images that have all of the given tags.
    *
@@ -308,6 +348,7 @@ public:
    */
   std::set<ImagePtr> getImagesWithAllTags(const std::vector<std::string>& tags) const;
 
+  //! Reads the database from the given path, using the given type.
   void readDatabase(const cedar::aux::Path& path, const std::string& dataBaseType);
 
   /*!@brief Reads the database using the settings from the given command line parser.

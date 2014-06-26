@@ -69,6 +69,7 @@ namespace cedar
     class ConstPtrProvider<boost::shared_ptr<T> >
     {
       public:
+        //! Returns boost::shared_ptr<const T> for any boost::shared_ptr<T>
         typedef boost::shared_ptr<const T> ConstBaseTypePtr;
     };
 
@@ -77,6 +78,7 @@ namespace cedar
     class ConstPtrProvider<boost::intrusive_ptr<T> >
     {
       public:
+        //! Returns boost::intrusive_ptr<const T> for any boost::intrusive_ptr<T>
         typedef boost::intrusive_ptr<const T> ConstBaseTypePtr;
     };
   }
