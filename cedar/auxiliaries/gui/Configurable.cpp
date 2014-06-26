@@ -134,6 +134,7 @@ void cedar::aux::gui::Configurable::DataDelegate::widgetDestroyed(QObject* remov
   }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 class cedar::aux::gui::Configurable::ParameterItem : public QTreeWidgetItem
 {
 public:
@@ -170,6 +171,7 @@ public:
 private:
   cedar::aux::ParameterPtr mParameter;
 };
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

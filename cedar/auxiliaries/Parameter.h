@@ -81,7 +81,10 @@ class cedar::aux::Parameter : public QObject, public cedar::aux::IntrusivePtrBas
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! An RAII-based locker for parameters.
+  /*! An RAII-based read-locker for parameters.
+   *
+   * @see cedar::aux::LockerBase
+   */
   class ReadLocker : public cedar::aux::LockerBase
   {
   public:
@@ -97,6 +100,10 @@ public:
   };
   CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
 
+  /*! An RAII-based write-locker for parameters.
+   *
+   * @see cedar::aux::LockerBase
+   */
   class WriteLocker : public cedar::aux::LockerBase
   {
   public:

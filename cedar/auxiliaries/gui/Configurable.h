@@ -73,9 +73,9 @@ class cedar::aux::gui::Configurable : public QWidget
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@cond SKIPPED_DOCUMENTATION
   class DataDelegate;
 
+  //!@cond SKIPPED_DOCUMENTATION
   class ParameterItem;
   //!@endcond
 
@@ -189,19 +189,28 @@ private:
 
 }; // class cedar::aux::gui::Configurable
 
-//!@cond SKIPPED_DOCUMENTATION
-// This is an internal class of the Configurable widget. Not intended for use outside of it.
+/*!@brief Internal class for putting the correct widget types into the QTreeWidget used by
+ *        cedar::aux::gui::Configurable.
+ *
+ * @see the documentation for QTreeWidget and Qt's Model/View concept for details on data delegates.
+ * @remarks This is an internal class of the Configurable widget. Not intended for use outside of it. It is only in the
+ *          header because it needs to be processed by the meta-object compiler.
+ */
 class cedar::aux::gui::Configurable::DataDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 public:
+  //! Constructor for the DataDelegate.
   DataDelegate(cedar::aux::ConfigurablePtr pConfigurable, cedar::aux::gui::Configurable* configurableWidget, bool readOnly = false);
 
+  //! Destructor.
   ~DataDelegate();
 
+  //! This method decides which type of widget should be opened for which kind of parameter.
   QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem& option, const QModelIndex &index) const;
 
 public slots:
+  //! Reacts to when a widget in the tree is being destroyed.
   void widgetDestroyed(QObject* removed);
 
 private:
@@ -214,7 +223,6 @@ private:
 
   bool mReadOnly;
 };
-//!@endcond
 
 #endif // CEDAR_AUX_GUI_CONFIGURABLE_H
 
