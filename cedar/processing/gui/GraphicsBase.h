@@ -252,8 +252,10 @@ public:
    */
   virtual void updateToolTip();
 
+  //!@brief sets the "read only"-ness
   virtual void setReadOnly(bool readOnly);
 
+  //!@brief returns whether this graphics base is read-only
   bool isReadOnly() const
   {
     return this->mReadOnly;
@@ -340,6 +342,7 @@ public:
   //! Color for groups being left
   static const QColor mColorGroupBeingLeft;
 
+  //! Color for search results
   static const QColor mColorSearchResult;
 
   //! Color for target groups

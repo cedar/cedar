@@ -99,6 +99,7 @@ public:
    */
   void resetTo(cedar::proc::gui::GroupPtr network);
 
+  //! set if close dialog should be suppressed
   void suppressCloseDialog(bool suppress)
   {
     this->mSuppressCloseDialog = suppress;
@@ -256,6 +257,7 @@ public slots:
   //!@brief copy one step to buffer
   void openFindDialog();
 
+  //! return the gui root group
   cedar::proc::gui::ConstGroupPtr getGroup() const;
 
   //--------------------------------------------------------------------------------------------------------------------

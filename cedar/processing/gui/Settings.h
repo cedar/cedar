@@ -398,6 +398,7 @@ namespace cedar
   {
     namespace gui
     {
+      //!@brief a singleton for gui settings
       typedef cedar::aux::Singleton<cedar::proc::gui::Settings> SettingsSingleton;
     }
   }
