@@ -124,6 +124,7 @@ cedar::proc::gui::Connectable::~Connectable()
     (*it)->close();
   }
   mSlotAddedConnection.disconnect();
+  mSlotRenamedConnection.disconnect();
   mSlotRemovedConnection.disconnect();
 }
 
@@ -354,7 +355,7 @@ void cedar::proc::gui::Connectable::slotRemoved(cedar::proc::DataRole::Id role, 
 
 void cedar::proc::gui::Connectable::reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name)
 {
-  cedar::proc::gui::DataSlotItem* p_item = NULL;
+  cedar::proc::gui::DataSlotItem* p_item = nullptr;
 
   DataSlotMap::iterator iter = this->mSlotMap.find(role);
   CEDAR_ASSERT(iter != this->mSlotMap.end());
@@ -362,10 +363,13 @@ void cedar::proc::gui::Connectable::reactToSlotRemoved(cedar::proc::DataRole::Id
   DataSlotNameMap& name_map = iter->second;
   DataSlotNameMap::iterator name_iter = name_map.find(name.toStdString());
 
-  CEDAR_ASSERT(name_iter != name_map.end());
-  p_item = name_iter->second;
-  name_map.erase(name_iter);
-  delete p_item;
+  if (name_iter != name_map.end())
+  {
+    p_item = name_iter->second;
+    name_map.erase(name_iter);
+    delete p_item;
+    p_item = nullptr;
+  }
 
   this->updateDataSlotPositions();
 }
@@ -436,10 +440,10 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   cedar::proc::ConstElementDeclarationPtr elem_decl
     = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
 
-  if (this->mpIconDisplay != NULL)
+  if (this->mpIconDisplay != nullptr)
   {
     delete this->mpIconDisplay;
-    this->mpIconDisplay = NULL;
+    this->mpIconDisplay = nullptr;
   }
   this->mpIconDisplay = new QGraphicsSvgItem(elem_decl->determinedIconPath(), this);
 
