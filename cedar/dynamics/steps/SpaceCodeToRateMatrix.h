@@ -53,9 +53,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief Transforms a space-feature coded activation matrix to a rate-coded matrix.
  *
- * @todo describe more.
+ * @todo Put the equation here, and explain the concept in more detail.
  */
 class cedar::dyn::SpaceCodeToRateMatrix : public cedar::proc::Step
 {
