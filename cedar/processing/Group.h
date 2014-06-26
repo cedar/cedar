@@ -93,6 +93,13 @@ class cedar::proc::Group : public QThread, public cedar::proc::Connectable, publ
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief A structure that holds information about parameter links.
+   *
+   * This structure is responsible for storing the source- and target element of parameter links, as well as the link
+   * between them.
+   *
+   * Its main purpose is to remember what kinds of element parameters are linked together for later storing these links.
+   */
   struct ParameterLinkInfo
   {
     std::string getSourceElementPath() const;

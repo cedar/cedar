@@ -426,6 +426,10 @@ namespace boost
 {
   namespace numeric
   {
+    /*!@brief Specialization of boost::numeric::bounds for unit types.
+     *
+     * This is necessary to determine the different default limits in cedar::aux::math::Limits.
+     */
     template<class Unit, class T>
     struct bounds<boost::units::quantity<Unit, T> >
     {

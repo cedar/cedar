@@ -56,6 +56,10 @@ namespace cedar
   {
     namespace allocationPolicies
     {
+      /*!@brief Base class for allocation policies used by cedar::aux::ObjectMapParameterTemplate.
+       *
+       * These policies determine when objects in the parameter are allocated.
+       */
       template <typename ValueType>
       class AllocationPolicy
       {
@@ -80,6 +84,11 @@ namespace cedar
         }
       };
 
+      /*!@brief Allocation policy that instantly allocates objects.
+       *
+       * All objects in a parameter using this policy are directly created when they are being read from a configuration
+       * file.
+       */
       template <typename ValueType>
       class Instantly : public AllocationPolicy<ValueType>
       {
@@ -144,7 +153,11 @@ namespace cedar
       };
 
 
-
+      /*!@brief Allocation policy that allocates objects when they are needed.
+       *
+       * When the configuration is being read, only configurations are stored for each key in the parameter. Objects are
+       * only allocated with the stored configuration when they are actually being accessed.
+       */
       template <typename ValueType>
       class OnDemand : public AllocationPolicy<ValueType>
       {

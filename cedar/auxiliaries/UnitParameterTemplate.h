@@ -254,11 +254,20 @@ namespace cedar
 } // namespace cedar
 
 
-// Custom translator for bool (only supports std::string)
 namespace cedar
 {
   namespace aux
   {
+    /*!@brief A base class for translating units from and to strings.
+     *
+     * This class makes heavy use of template specialization for the different units, mainly of
+     * cedar::aux::parseUnitString. These specializations can usually be found in the header corresponding to the
+     * parameter for that unit.
+     *
+     * For example, for a cedar::units::Length, these can be found in cedar/aux/LengthParameter.h
+     *
+     * @tparam T type of unit to be translated from or to a boost::units::quantity<T>.
+     */
     template <typename T>
     struct UnitTranslator
     {
@@ -310,7 +319,7 @@ namespace cedar
         return boost::optional<external_type>(number * cedar::aux::parseUnitString<T>(unit_str));
       }
 
-      // Converts a bool to string
+      // Converts a unit to string
       boost::optional<internal_type> put_value(const external_type& unit)
       {
         std::stringstream stream;
@@ -322,6 +331,7 @@ namespace cedar
 }
 
 //  Specialize translator_between to specify our own way of reading units
+//!@cond SKIPPED_DOCUMENTATION
 namespace boost
 {
   namespace property_tree
@@ -333,11 +343,10 @@ namespace boost
     };
   } // namespace property_tree
 } // namespace boost
+//!@endcond
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A template class for parameters that store values with attached units.
  */
 template <class T>
 class cedar::aux::UnitParameterTemplate : public cedar::aux::NumericParameter<boost::units::quantity<T> >
