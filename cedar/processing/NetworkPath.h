@@ -69,6 +69,7 @@ public:
   //!@brief The standard constructor.
   NetworkPath(const String& path = String());
 
+  //!@brief Constructor accepting a c string
   NetworkPath(const char* path);
 
   //--------------------------------------------------------------------------------------------------------------------

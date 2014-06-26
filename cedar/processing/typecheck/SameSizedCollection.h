@@ -49,7 +49,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@breif Type check for a slot that is a collection of matrices of the same size.
+/*!@brief Type check for a slot that is a collection of matrices of the same size.
  */
 class cedar::proc::typecheck::SameSizedCollection : public cedar::proc::typecheck::TypeCheck
 {

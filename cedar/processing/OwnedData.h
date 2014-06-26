@@ -68,16 +68,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief get the data of this slot
   cedar::aux::DataPtr getData();
 
+  //!@brief get the const data of this slot
   cedar::aux::ConstDataPtr getData() const;
 
+  //!@brief returns if this is a shared slot (i.e., a group forwarding the data of a non-group element)
   bool isShared() const;
 
+  //!@brief returns the lock type
   cedar::aux::LOCK_TYPE getLockType() const;
 
+  //!@brief Adds an outgoing connection to the list of connections from this slot
   void addOutgoingConnection(cedar::proc::DataConnectionPtr newConnection);
 
+  //!@brief Removes an outgoing connection from the list of connections from this slot
   void removeOutgoingConnection(cedar::proc::DataConnectionPtr removedConnection);
 
   //--------------------------------------------------------------------------------------------------------------------
