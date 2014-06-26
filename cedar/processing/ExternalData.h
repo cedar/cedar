@@ -112,8 +112,7 @@ public:
     return this->mData.size();
   }
 
-  /*!@brief   Checks if the data pointer is already stored in this slot's collection.
-   */
+  //!@brief   Checks if the data pointer is already stored in this slot's collection.
   bool hasData(cedar::aux::ConstDataPtr data) const;
 
   /*!@brief   Sets whether or not this slot is a collection, i.e., accepts multiple data pointers.
@@ -121,18 +120,19 @@ public:
    */
   void setCollection(bool isCollection);
 
-  /*!@brief   Returns whether this slot is a collection of multiple data pointers.
-   */
+  //!@brief   Returns whether this slot is a collection of multiple data pointers.
   bool isCollection() const;
 
-  /*!@brief Clears all data from the slot.
-   */
+  //!@brief Clears all data from the slot.
   void clearInternal();
 
+  //!@brief Returns the lock type.
   cedar::aux::LOCK_TYPE getLockType() const;
 
+  //!@brief Adds an incoming connection to the list of connections to this slot
   void addIncomingConnection(cedar::proc::DataConnectionPtr newConnection);
 
+  //!@brief Removes an incoming connection from the list of connections to this slot
   void removeIncomingConnection(cedar::proc::DataConnectionPtr removedConnection);
 
   //--------------------------------------------------------------------------------------------------------------------

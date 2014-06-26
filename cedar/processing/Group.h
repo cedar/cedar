@@ -126,6 +126,7 @@ public:
   };
 
  signals:
+  //! Signals when a step name changes.
   void stepNameChanged(const std::string& from, const std::string& to);
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -149,9 +150,15 @@ public:
   //! Const iterator type of the element map.
   typedef ElementMap::const_iterator ElementMapConstIterator;
 
+  //! A map of external connectors and their roles (input/output)
   typedef std::map<std::string, bool> ConnectorMap;
+
+  //! A map parameter of external connectors and their roles (input/output)
   typedef cedar::aux::MapParameter<bool> ConnectorMapParameter;
+
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ConnectorMapParameter);
+  //!@endcond
 
 
   friend class cedar::proc::sinks::GroupSink;
@@ -253,10 +260,13 @@ public:
    */
   void add(std::list<cedar::proc::ElementPtr> elements);
 
+  //!@brief adds an external connector of the specified type to the group
   void addConnector(const std::string& name, bool input);
 
+  //!@brief renames an external connector of the specified type
   void renameConnector(const std::string& oldName, const std::string& newName, bool input);
 
+  //!@brief removes an external connector of the specified type from the group
   void removeConnector(const std::string& name, bool input);
 
   /*!@brief Duplicates an existing element.
@@ -394,7 +404,8 @@ public:
                            const std::string& sourceDataName,
                            std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
-                         
+
+  //!@brief const version of getDataConnections
   void getDataConnections(
                            cedar::proc::ConstConnectablePtr source,
                            const std::string& sourceDataName,
@@ -550,22 +561,31 @@ public:
    */
   void waitForProcessing();
 
+  //!@brief returns the map of all external connectors
   const ConnectorMap& getConnectorMap();
 
+  //!@brief checks if a connector name already exists
   bool hasConnector(const std::string& name) const;
 
+  //!@brief returns a generic, unused connector name
   std::string getNewConnectorName(bool inputConnector) const;
 
+  //!@brief checks if group itself or any child group contains the given element
   bool contains(cedar::proc::ConstElementPtr element) const;
 
+  //!@brief returns if this is the root group
   bool isRoot() const;
 
+  //!@brief imports a given group from a given configuration file
   cedar::proc::ElementPtr importGroupFromFile(const std::string& groupName, const std::string& fileName);
 
+  //!@brief imports a given group from a given configuration file and links it to said file
   cedar::proc::ElementPtr createLinkedGroup(const std::string& groupName, const std::string& fileName);
 
+  //!@brief read linked content from a group
   void readLinkedGroup(const std::string& groupName, const cedar::aux::Path& fileName);
 
+  //!@brief imports a given step from a given configuration file
   cedar::proc::ElementPtr importStepFromFile(const std::string& stepName, const std::string& fileName);
 
   //! Adds a parameter link to the list of links in this group. Does NOT link the parameters.
@@ -594,8 +614,10 @@ public:
   //!@brief this function removes all unused connectors, i.e., connectors that have zero incoming or outgoing connections
   void pruneUnusedConnectors();
 
+  //!@brief adds a custom parameter for this group
   cedar::aux::ParameterPtr addCustomParameter(const std::string& type, const std::string& name);
 
+  //!@brief removes a custom parameter from this group
   void removeCustomParameter(const std::string& name);
 
   /*! Returns the list of custom parameters added to this group. Custom parameters are those that have been added by the
@@ -631,8 +653,10 @@ public:
     return !this->mLinkedGroupFile.isEmpty() && !this->mLinkedGroupName.empty();
   }
 
+  //!@brief finds all elements in this group and child groups that match the given name
   std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroupsFullName(const std::string& fullName) const;
 
+  //!@brief finds all elements in this group and child groups that partially match the given string
   std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroupsContainsString(const std::string& string) const;
 
   //! If set to true, trigger chains will not be updated.
@@ -677,28 +701,36 @@ private:
   //!@brief revalidates all outgoing connections of a slot
   void revalidateConnections(const std::string& sender);
 
+  //!@brief adds all connectors from the list of stored connectors
   void processConnectors();
 
+  //!@brief removes all connectors from this group
   void removeAllConnectors();
 
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
+  //!@brief searches for non-group targets of a data slot, traversing all outgoing connections across groups
   std::vector<cedar::proc::ExternalDataPtr> getRealTargets
                                             (
                                               cedar::proc::DataSlotPtr slot,
                                               cedar::proc::ConstGroupPtr targetGroup
                                             );
 
+  //!@brief searches for non-group sources of a data slot, traversing all incoming connections across groups
   std::vector<cedar::proc::OwnedDataPtr> getRealSources
                                          (
                                            cedar::proc::DataSlotPtr slot,
                                            cedar::proc::ConstGroupPtr targetGroup
                                          );
 
+  //!@brief searches for elements specified by a matcher function
   std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroups(boost::function<bool(cedar::proc::ConstElementPtr)> matcher) const;
 
+  //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+
+  //!@brief disconnects two slots across groups, removing/merging connectors if necessary
   static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
 private slots:
@@ -787,14 +819,18 @@ private:
   //! If non-empty, the name of the group that was imported from a file.
   std::string mLinkedGroupName;
 
+  //! Flag if trigger chain updates should be executed (during connecting/loading)
   bool mHoldTriggerChainUpdates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-   ConnectorMapParameterPtr _mConnectors;
-   cedar::aux::BoolParameterPtr _mIsLooped;
+  //! map of all external connectors of this group
+  ConnectorMapParameterPtr _mConnectors;
+
+  //! loopiness of this group
+  cedar::aux::BoolParameterPtr _mIsLooped;
 
 }; // class cedar::proc::Group
 
