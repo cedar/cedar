@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/QImagePlot.h"
+#include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
@@ -92,6 +93,7 @@ _mAutoScaling(new cedar::aux::BoolParameter(this, "automatic value scaling", tru
 _mShowLegend(new cedar::aux::BoolParameter(this, "show legend", false)),
 _mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 0.0, 1.0))
 {
+  this->setColorJet(cedar::aux::ColorGradient::getDefaultPlotColorJet());
   auto p_layout = new QHBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
@@ -136,23 +138,16 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
   this->mpMin->setMinimumWidth(35);
   this->mpMax->setMinimumWidth(35);
 
-  auto p_gradient = new QFrame();
-  p_gradient->setSizePolicy(QSizePolicy::Fixed, p_gradient->sizePolicy().verticalPolicy());
-  p_gradient->setFixedWidth(20);
-  p_gradient->setFrameStyle(QFrame::Box);
+  this->mpGradientDisplay = new QFrame();
+  this->mpGradientDisplay->setSizePolicy(QSizePolicy::Fixed, this->mpGradientDisplay->sizePolicy().verticalPolicy());
+  this->mpGradientDisplay->setFixedWidth(20);
+  this->mpGradientDisplay->setFrameStyle(QFrame::Box);
 
-  this->mGradient = QLinearGradient(0, 0, 0, 1);
-  this->mGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-  cedar::aux::gui::QImagePlot::fillColorizationGradient(this->mGradient);
-
-  QPalette palette = p_gradient->palette();
-  palette.setBrush(QPalette::Window, QBrush(this->mGradient));
-  p_gradient->setAutoFillBackground(true);
-  p_gradient->setPalette(palette);
+  this->mpGradientDisplay->setAutoFillBackground(true);
 
   auto p_layout = new QGridLayout();
   p_layout->setContentsMargins(1, 1, 1, 1);
-  p_layout->addWidget(p_gradient, 0, 0, 3, 1);
+  p_layout->addWidget(this->mpGradientDisplay, 0, 0, 3, 1);
   p_layout->addWidget(this->mpMax, 0, 1);
   p_layout->addWidget(this->mpMin, 2, 1);
   p_layout->setColumnStretch(1, 1);
@@ -164,6 +159,62 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::QImagePlot::setColorJet(cedar::aux::ColorGradientPtr gradient)
+{
+  this->mColorGradient = gradient;
+
+  if (this->mpLegend)
+  {
+    this->mpLegend->setGradient(this->mColorGradient);
+  }
+}
+
+void cedar::aux::gui::detail::QImagePlotLegend::setGradient(cedar::aux::ColorGradientPtr gradient)
+{
+  this->mGradient = QLinearGradient(0, 1, 0, 0);
+  for (auto stop_color_pair : gradient->getStops())
+  {
+    this->mGradient.setColorAt(static_cast<qreal>(stop_color_pair.first), stop_color_pair.second);
+  }
+  this->mGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+
+  QPalette palette = this->mpGradientDisplay->palette();
+  palette.setBrush(QPalette::Window, QBrush(this->mGradient));
+  this->mpGradientDisplay->setPalette(palette);
+}
+
+cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize) const
+{
+  double min = 0, max = 0;
+  if (this->isAutoScaling())
+  {
+    cv::minMaxLoc(toColorize, &min, &max);
+  }
+  else
+  {
+    min = this->_mValueLimits->getLowerLimit();
+    max = this->_mValueLimits->getUpperLimit();
+  }
+  return this->colorizeMatrix
+  (
+    toColorize,
+    !this->isAutoScaling(),
+    min,
+    max
+  );
+}
+
+cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize, bool applyLimits, double min, double max) const
+{
+  return this->mColorGradient->applyTo
+  (
+    toColorize,
+    applyLimits,
+    min,
+    max
+  );
+}
 
 void cedar::aux::gui::QImagePlot::setAutomaticScaling()
 {
@@ -234,16 +285,6 @@ void cedar::aux::gui::QImagePlot::valueLimitsChanged()
   {
     this->mpLegend->updateMinMax(this->getValueLimits().getLower(), this->getValueLimits().getUpper());
   }
-}
-
-void cedar::aux::gui::QImagePlot::fillColorizationGradient(QGradient& gradient)
-{
-  gradient.setColorAt(static_cast<qreal>(1.0), QColor(0, 0, 127));
-  gradient.setColorAt(static_cast<qreal>(1.0 - 32.0 / 256.0), QColor(0, 0, 255));
-  gradient.setColorAt(static_cast<qreal>(1.0 - 96.0 / 256.0), QColor(0, 255, 255));
-  gradient.setColorAt(static_cast<qreal>(1.0 - 160.0 / 256.0), QColor(255, 255, 0));
-  gradient.setColorAt(static_cast<qreal>(1.0 - 224.0 / 256.0), QColor(255, 0, 0));
-  gradient.setColorAt(static_cast<qreal>(0.0), QColor(127, 0, 0));
 }
 
 void cedar::aux::gui::QImagePlot::setSmoothScaling(bool smooth)
@@ -392,6 +433,7 @@ void cedar::aux::gui::QImagePlot::showLegendChanged()
   if (this->mpLegend)
   {
     this->mpLegend->setVisible(show);
+    this->mpLegend->setGradient(this->mColorGradient);
   }
 }
 
