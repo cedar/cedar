@@ -282,16 +282,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     max = this->getValueLimits().getUpper();
   }
 #endif // OpenCV version
-  cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
-  scaled.convertTo(mSliceMatrixByte, CV_8U);
 
   if (this->isAutoScaling())
   {
     emit minMaxChanged(min, max);
   }
 
-  mSliceMatrixByteC3 = cedar::aux::gui::ImagePlot::colorizedMatrix(mSliceMatrixByte);
-
+  mSliceMatrixByteC3 = this->colorizeMatrix(this->mSliceMatrix);
   mSliceMatrixByteC3.setTo(0xFFFFFF, frame);
 
   this->displayMatrix(mSliceMatrixByteC3);

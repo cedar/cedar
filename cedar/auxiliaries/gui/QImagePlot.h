@@ -48,6 +48,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
+#include "cedar/auxiliaries/ColorGradient.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMenu>
@@ -83,11 +84,16 @@ namespace cedar
           //! Updates the minimum and maximum value displayed by the legend.
           void updateMinMax(double min, double max);
 
+          //! Applies the colors of the graident to the legend.
+          void setGradient(cedar::aux::ColorGradientPtr gradient);
+
         private:
           QLabel* mpMin;
           QLabel* mpMax;
 
           QLinearGradient mGradient;
+
+          QFrame* mpGradientDisplay;
         };
         //!@endcond
       } // namespace detail
@@ -119,10 +125,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
-  /*! Fills the gradient used for colorization into a QGradient
-  */
-  static void fillColorizationGradient(QGradient& gradient);
-
   /*! Sets fixed limits for the plot values.
    */
   void setLimits(double min, double max);
@@ -193,6 +195,12 @@ protected:
     mValueScalingAvailable = enabled;
   }
 
+  //! Colorizes the matrix.
+  cv::Mat colorizeMatrix(const cv::Mat& toColorize) const;
+
+  //! Colorizes the matrix with the given minimum and maximum.
+  cv::Mat colorizeMatrix(const cv::Mat& toColorize, bool applyLimits, double min, double max) const;
+
 protected slots:
   //! Updates the minimum and maximum of the plot.
   void updateMinMax(double min, double max);
@@ -212,6 +220,8 @@ private:
 
   virtual void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
+  void setColorJet(cedar::aux::ColorGradientPtr gradient);
+
 private slots:
   void queryFixedValueScale();
 
@@ -219,6 +229,10 @@ private slots:
   void showLegendChanged();
   
   void valueLimitsChanged();
+
+  void colorJetChanged();
+
+  void colorJetActionTriggered();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -243,6 +257,9 @@ private:
   //! Legend (if any).
   cedar::aux::gui::detail::QImagePlotLegend* mpLegend;
 
+  //! The color gradient to be used.
+  cedar::aux::ColorGradientPtr mColorGradient;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -261,6 +278,9 @@ private:
 
   //! Limits for fixed scaling.
   cedar::aux::math::DoubleLimitsParameterPtr _mValueLimits;
+
+  //! Color scale to use.
+  cedar::aux::EnumParameterPtr _mColorJet;
 
 }; // class cedar::aux::gui::QImagePlot
 

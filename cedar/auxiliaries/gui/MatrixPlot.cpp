@@ -281,6 +281,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
 const std::vector<cedar::aux::gui::ColorValueRGBA>& cedar::aux::gui::MatrixPlot::getStandardColorVector()
 {
+  //!@todo Use cedar::aux::ColorGradient instead
   if (cedar::aux::gui::MatrixPlot::mStandardColorVector.empty())
   {
     cedar::aux::gui::ColorValueRGBA rgb;
