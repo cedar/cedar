@@ -230,6 +230,10 @@ private slots:
   
   void valueLimitsChanged();
 
+  void colorJetChanged();
+
+  void colorJetActionTriggered();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -274,6 +278,9 @@ private:
 
   //! Limits for fixed scaling.
   cedar::aux::math::DoubleLimitsParameterPtr _mValueLimits;
+
+  //! Color scale to use.
+  cedar::aux::EnumParameterPtr _mColorJet;
 
 }; // class cedar::aux::gui::QImagePlot
 

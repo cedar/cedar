@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/EnumType.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ColorGradient.fwd.h"
@@ -59,6 +60,35 @@ class cedar::aux::ColorGradient
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  class StandardGradients
+  {
+  public:
+    //! Type of the enum.
+    typedef cedar::aux::EnumId Id;
+
+    //! Pointer to the enumeration type.
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    //! Constructs the enumeration values.
+    static void construct();
+
+    //! Returns the enum base class.
+    static const cedar::aux::EnumBase& type();
+
+    //! Returns a pointer to the enum base class.
+    static const TypePtr& typePtr();
+
+
+    //! Default color gradient for plots.
+    static const Id PlotDefault = 0;
+
+    //! Grayscale gradient.
+    static const Id Gray = 1;
+
+  private:
+    static cedar::aux::EnumType<cedar::aux::ColorGradient::StandardGradients> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -74,9 +104,13 @@ public:
 
   cv::Mat applyTo(const cv::Mat& matrix, bool limits = false, double min = 0.0, double max = 1.0);
 
+  const std::map<double, QColor>& getStops() const;
+
   static ColorGradientPtr getDefaultPlotColorJet();
 
-  const std::map<double, QColor>& getStops() const;
+  static ColorGradientPtr getPlotGrayColorJet();
+
+  static ColorGradientPtr getStandardGradient(const cedar::aux::Enum& id);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

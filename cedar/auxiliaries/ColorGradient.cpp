@@ -44,12 +44,53 @@
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::EnumType<cedar::aux::ColorGradient::StandardGradients>
+  cedar::aux::ColorGradient::StandardGradients::mType("cedar::aux::ColorGradient::StandardGradients::");
+
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::aux::ColorGradient::StandardGradients::Id cedar::aux::ColorGradient::StandardGradients::PlotDefault;
+const cedar::aux::ColorGradient::StandardGradients::Id cedar::aux::ColorGradient::StandardGradients::Gray;
+#endif // CEDAR_COMPILER_MSVC
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::ColorGradient::StandardGradients::construct()
+{
+  mType.type()->def(cedar::aux::Enum(cedar::aux::ColorGradient::StandardGradients::PlotDefault, "PlotDefault", "Default Plot Gradient"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::ColorGradient::StandardGradients::Gray, "Gray", "Grayscale Gradient"));
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getStandardGradient(const cedar::aux::Enum& id)
+{
+  switch (id.id())
+  {
+    default:
+    case cedar::aux::ColorGradient::StandardGradients::PlotDefault:
+      return cedar::aux::ColorGradient::getDefaultPlotColorJet();
+
+    case cedar::aux::ColorGradient::StandardGradients::Gray:
+      return cedar::aux::ColorGradient::getPlotGrayColorJet();
+  }
+}
+
+const cedar::aux::EnumBase& cedar::aux::ColorGradient::StandardGradients::type()
+{
+  return *cedar::aux::ColorGradient::StandardGradients::mType.type();
+}
+
+const cedar::aux::ColorGradient::StandardGradients::TypePtr& cedar::aux::ColorGradient::StandardGradients::typePtr()
+{
+  return cedar::aux::ColorGradient::StandardGradients::mType.type();
+}
 
 const std::map<double, QColor>& cedar::aux::ColorGradient::getStops() const
 {
@@ -70,6 +111,21 @@ cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getDefaultPlotColorJet()
     gradient->setStop(0.625, QColor::fromRgbF(1.0, 1.0, 0.0));
     gradient->setStop(0.875, QColor::fromRgbF(1.0, 0.0, 0.0));
     gradient->setStop(1.000, QColor::fromRgbF(0.5, 0.0, 0.0));
+  }
+
+  return gradient;
+}
+
+cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotGrayColorJet()
+{
+  static cedar::aux::ColorGradientPtr gradient;
+  //!@todo Locking?
+  if (!gradient)
+  {
+    gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
+
+    gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.0));
+    gradient->setStop(1.000, QColor::fromRgbF(1.0, 1.0, 1.0));
   }
 
   return gradient;

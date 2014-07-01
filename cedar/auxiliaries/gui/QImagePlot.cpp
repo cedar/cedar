@@ -91,7 +91,8 @@ mpLegend(nullptr),
 _mSmoothScaling(new cedar::aux::BoolParameter(this, "smooth scaling", true)),
 _mAutoScaling(new cedar::aux::BoolParameter(this, "automatic value scaling", true)),
 _mShowLegend(new cedar::aux::BoolParameter(this, "show legend", false)),
-_mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 0.0, 1.0))
+_mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 0.0, 1.0)),
+_mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGradient::StandardGradients::typePtr(), cedar::aux::ColorGradient::StandardGradients::PlotDefault))
 {
   this->setColorJet(cedar::aux::ColorGradient::getDefaultPlotColorJet());
   auto p_layout = new QHBoxLayout();
@@ -127,6 +128,14 @@ _mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 
     this,
     SLOT(valueLimitsChanged())
   );
+
+  QObject::connect
+  (
+    this->_mColorJet.get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(colorJetChanged())
+  );
 }
 
 //!@cond SKIPPED_DOCUMENTATION
@@ -159,6 +168,13 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::QImagePlot::colorJetChanged()
+{
+  auto enum_id = this->_mColorJet->getValue();
+  auto gradient = cedar::aux::ColorGradient::getStandardGradient(enum_id);
+  this->setColorJet(gradient);
+}
 
 void cedar::aux::gui::QImagePlot::setColorJet(cedar::aux::ColorGradientPtr gradient)
 {
@@ -307,6 +323,16 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   p_legend->setChecked(this->mpLegend != NULL && this->mpLegend->isVisible());
   p_legend->setEnabled(this->mLegendAvailable);
 
+  QMenu* p_jet = menu.addMenu("color jet");
+  for (auto enum_id : cedar::aux::ColorGradient::StandardGradients::type().list())
+  {
+    auto p_action = p_jet->addAction(QString::fromStdString(enum_id.prettyString()));
+    p_action->setCheckable(true);
+    p_action->setData(static_cast<unsigned int>(enum_id.id()));
+    p_action->setChecked(enum_id == this->_mColorJet->getValue());
+    QObject::connect(p_action, SIGNAL(triggered()), this, SLOT(colorJetActionTriggered()));
+  }
+
   QMenu* p_scaling = menu.addMenu("value scaling");
   p_scaling->setEnabled(this->mValueScalingAvailable);
 
@@ -323,6 +349,15 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   this->fillContextMenu(menu);
 
   menu.exec(pEvent->globalPos());
+}
+
+void cedar::aux::gui::QImagePlot::colorJetActionTriggered()
+{
+  auto p_action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_action);
+  auto id = static_cast<cedar::aux::ColorGradient::StandardGradients::Id>(p_action->data().toUInt());
+  auto enum_id = cedar::aux::ColorGradient::StandardGradients::type().get(id);
+  this->_mColorJet->setValue(enum_id, true);
 }
 
 void cedar::aux::gui::QImagePlot::resizeEvent(QResizeEvent * /*pEvent*/)
