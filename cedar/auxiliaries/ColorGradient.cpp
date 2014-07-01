@@ -53,6 +53,7 @@ cedar::aux::EnumType<cedar::aux::ColorGradient::StandardGradients>
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::aux::ColorGradient::StandardGradients::Id cedar::aux::ColorGradient::StandardGradients::PlotDefault;
 const cedar::aux::ColorGradient::StandardGradients::Id cedar::aux::ColorGradient::StandardGradients::Gray;
+const cedar::aux::ColorGradient::StandardGradients::Id cedar::aux::ColorGradient::StandardGradients::GrayInverse;
 #endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,6 +64,7 @@ void cedar::aux::ColorGradient::StandardGradients::construct()
 {
   mType.type()->def(cedar::aux::Enum(cedar::aux::ColorGradient::StandardGradients::PlotDefault, "PlotDefault", "Default Plot Gradient"));
   mType.type()->def(cedar::aux::Enum(cedar::aux::ColorGradient::StandardGradients::Gray, "Gray", "Grayscale Gradient"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::ColorGradient::StandardGradients::GrayInverse, "GrayInverse", "Inverse grayscale Gradient"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,6 +81,9 @@ cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getStandardGradient(cons
 
     case cedar::aux::ColorGradient::StandardGradients::Gray:
       return cedar::aux::ColorGradient::getPlotGrayColorJet();
+
+    case cedar::aux::ColorGradient::StandardGradients::GrayInverse:
+      return cedar::aux::ColorGradient::getPlotInverseGrayColorJet();
   }
 }
 
@@ -126,6 +131,21 @@ cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotGrayColorJet()
 
     gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.0));
     gradient->setStop(1.000, QColor::fromRgbF(1.0, 1.0, 1.0));
+  }
+
+  return gradient;
+}
+
+cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotInverseGrayColorJet()
+{
+  static cedar::aux::ColorGradientPtr gradient;
+  //!@todo Locking?
+  if (!gradient)
+  {
+    gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
+
+    gradient->setStop(0.000, QColor::fromRgbF(1.0, 1.0, 1.0));
+    gradient->setStop(1.000, QColor::fromRgbF(0.0, 0.0, 0.0));
   }
 
   return gradient;

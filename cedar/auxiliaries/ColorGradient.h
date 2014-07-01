@@ -86,6 +86,9 @@ public:
     //! Grayscale gradient.
     static const Id Gray = 1;
 
+    //! Inverted grayscale gradient.
+    static const Id GrayInverse = 2;
+
   private:
     static cedar::aux::EnumType<cedar::aux::ColorGradient::StandardGradients> mType;
   };
@@ -109,6 +112,8 @@ public:
   static ColorGradientPtr getDefaultPlotColorJet();
 
   static ColorGradientPtr getPlotGrayColorJet();
+
+  static ColorGradientPtr getPlotInverseGrayColorJet();
 
   static ColorGradientPtr getStandardGradient(const cedar::aux::Enum& id);
 
