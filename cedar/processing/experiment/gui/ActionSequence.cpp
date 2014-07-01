@@ -41,7 +41,9 @@
 #include "cedar/processing/experiment/gui/ActionSequence.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/action/Action.h"
 #include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
+#include "cedar/processing/experiment/gui/ObjectListItemParameter.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
@@ -195,21 +197,31 @@ void cedar::proc::experiment::gui::ActionSequence::updateActions()
   mActions->clear();
 
   for (cedar::proc::experiment::action::ActionPtr action : mSequence->getActions())
-  {
+  {/*
     cedar::proc::experiment::gui::ExperimentItemWidget* actionWidget =
         new cedar::proc::experiment::gui::ExperimentItemWidget();
     actionWidget->display(action);
-    QListWidgetItem* item = new QListWidgetItem();
     QWidget* itemWidget = new QWidget();
     QHBoxLayout* itemLayout = new QHBoxLayout();
     itemWidget->setLayout(itemLayout);
     std::string name = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->getTypeId(action);
     QLabel* itemLabel = new QLabel(QString::fromStdString(name));
     itemLayout->addWidget(itemLabel);
-    itemLayout->addWidget(actionWidget);
-    item->setSizeHint(QSize(0,85));
+    itemLayout->addWidget(actionWidget);*/
+
+    cedar::proc::experiment::action::Action::ActionParameterPtr actionParameter;
+    actionParameter =  new cedar::proc::experiment::action::Action::ActionParameter
+        (NULL,"",action);
+
+
+    cedar::proc::experiment::gui::ObjectListItemParameter* itemWidget = new cedar::proc::experiment::gui::ObjectListItemParameter(this);
+    itemWidget->setParameter(actionParameter);
+
+    QListWidgetItem* item = new QListWidgetItem();
     mActions->addItem(item);
+    item->setSizeHint(QSize(0,85));
     mActions->setItemWidget(item,itemWidget);
+
   }
   mActions->setMinimumHeight(mSequence->getActions().size()*85+5);
 }

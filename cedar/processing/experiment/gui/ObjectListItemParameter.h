@@ -22,39 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentItemWidget.h
+    File:        ObjectListItemParameter.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 19
+    Date:        2014 06 17
 
-    Description: Header file for the class cedar::proc::experiment::gui::ExperimentItemWidget.
+    Description: Header file for the class cedar::proc::experiment::gui::ObjectListItemParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_GUI_EXPERIMENT_ITEM_WIDGET_H
-#define CEDAR_PROC_EXPERIMENT_GUI_EXPERIMENT_ITEM_WIDGET_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_OBJECT_LIST_ITEM_PARAMETER_H
+#define CEDAR_PROC_EXPERIMENT_GUI_OBJECT_LIST_ITEM_PARAMETER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/gui/ObjectParameter.h"
+#include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/gui/ExperimentItemWidget.fwd.h"
+#include "cedar/processing/experiment/gui/ObjectListItemParameter.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
-#include <QLayout>
 
-
-/*!@brief Widget to display Actions and Conditions by parsing their parameters
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::experiment::gui::ExperimentItemWidget : public QWidget
+class cedar::proc::experiment::gui::ObjectListItemParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -70,17 +71,19 @@ class cedar::proc::experiment::gui::ExperimentItemWidget : public QWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExperimentItemWidget(QWidget* parent = NULL);
+  ObjectListItemParameter(QWidget* pParent);
 
   //!@brief Destructor
-  virtual ~ExperimentItemWidget();
+  virtual ~ObjectListItemParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Sets the Configurable to display
-  void display(cedar::aux::ConfigurablePtr experimentItem);
+  // none yet
+public slots:
+  //!@brief handles a change of the associated parameter
+  void parameterPointerChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,8 +95,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Clear all widgets out of a layout. If layout==NUll, the main layout will be cleared.
-  void clear(QLayout* layout = NULL);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -102,10 +104,6 @@ protected:
   // none yet
 private:
   // none yet
-private slots:
-
-  //!@brief Updates the widget when a ObjectParameter has changed
-  void objectParameterChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -114,9 +112,10 @@ protected:
   // none yet
 
 private:
-  // none yet
+  cedar::aux::gui::Parameter* mpObjectSelector;
+  cedar::proc::experiment::gui::ExperimentItemWidget* mpObjectItem;
 
-}; // class cedar::proc::experiment::gui::ExperimentItemWidget
+}; // class cedar::proc::experiment::gui::ObjectListItemParameter
 
-#endif // CEDAR_PROC_EXPERIMENT_GUI_EXPERIMENT_ITEM_WIDGET_H
+#endif // CEDAR_PROC_EXPERIMENT_GUI_OBJECT_LIST_ITEM_PARAMETER_H
 
