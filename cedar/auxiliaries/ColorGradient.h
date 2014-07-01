@@ -22,100 +22,107 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImagePlot.h
+    File:        ColorGradient.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2014 06 27
 
-    Description:
+    Description: Header file for the class cedar::aux::ColorGradient.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
-#define CEDAR_AUX_GUI_IMAGE_PLOT_H
+#ifndef CEDAR_AUX_COLOR_GRADIENT_H
+#define CEDAR_AUX_COLOR_GRADIENT_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/QImagePlot.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/auxiliaries/annotation/Annotation.fwd.h"
-#include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
-#include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
 #include "cedar/auxiliaries/ColorGradient.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
-#include <vector>
+#include <opencv2/opencv.hpp>
+#include <QColor>
 
 
-/*!@brief A plot for images.
+/*!@brief Represents a gradient of colors.
+ *
+ * Can be used to colorize grayscale matrices.
  */
-class cedar::aux::gui::ImagePlot : public cedar::aux::gui::QImagePlot
+class cedar::aux::ColorGradient
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! Enum for quickly accessing the type of the data displayed by the viewer.
-  enum DataType
+public:
+  class StandardGradients
   {
-    DATA_TYPE_IMAGE,
-    DATA_TYPE_MAT,
-    DATA_TYPE_UNKNOWN
+  public:
+    //! Type of the enum.
+    typedef cedar::aux::EnumId Id;
+
+    //! Pointer to the enumeration type.
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    //! Constructs the enumeration values.
+    static void construct();
+
+    //! Returns the enum base class.
+    static const cedar::aux::EnumBase& type();
+
+    //! Returns a pointer to the enum base class.
+    static const TypePtr& typePtr();
+
+
+    //! Default color gradient for plots.
+    static const Id PlotDefault = 0;
+
+    //! Grayscale gradient.
+    static const Id Gray = 1;
+
+  private:
+    static cedar::aux::EnumType<cedar::aux::ColorGradient::StandardGradients> mType;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  ImagePlot(QWidget *pParent = NULL);
-
-  //!@brief Constructor that plots some data.
-  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
-
-  ~ImagePlot();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+  void setStop(double location, const QColor& color);
+
+  cv::Mat applyTo(const cv::Mat& matrix, bool limits = false, double min = 0.0, double max = 1.0);
+
+  const std::map<double, QColor>& getStops() const;
+
+  static ColorGradientPtr getDefaultPlotColorJet();
+
+  static ColorGradientPtr getPlotGrayColorJet();
+
+  static ColorGradientPtr getStandardGradient(const cedar::aux::Enum& id);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Reacts to a click on the image plot.
-  void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
-   *        channels.
-   */
-  cv::Mat threeChannelGrayscale(const cv::Mat& in) const;
-  
-  void construct();
-
-  bool doConversion();
+  void updateLookupTable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -123,15 +130,26 @@ private:
 protected:
   // none yet
 private:
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+  //! Lookup table for red.
+  std::vector<char> mLookupTableR;
+  //! Lookup table for green.
+  std::vector<char> mLookupTableG;
+  //! Lookup table for blue.
+  std::vector<char> mLookupTableB;
 
-  //! The color space annotation of the data (if present).
-  cedar::aux::annotation::ConstColorSpacePtr mDataColorSpace;
+  //! Colors to be applied along with their locations.
+  std::map<double, QColor> mGradientColors;
 
-  //! Type of the data.
-  DataType mDataType;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-}; // class cedar::aux::gui::ImagePlot
+private:
+  // none yet
 
-#endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
+}; // class cedar::aux::ColorGradient
+
+#endif // CEDAR_AUX_COLOR_GRADIENT_H
+

@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -79,15 +80,6 @@ namespace
 
   bool registered = registerPlot();
 }
-
-//----------------------------------------------------------------------------------------------------------------------
-// static members
-//----------------------------------------------------------------------------------------------------------------------
-
-std::vector<char> cedar::aux::gui::ImagePlot::mLookupTableR;
-std::vector<char> cedar::aux::gui::ImagePlot::mLookupTableG;
-std::vector<char> cedar::aux::gui::ImagePlot::mLookupTableB;
-QReadWriteLock cedar::aux::gui::ImagePlot::mLookupTableLock;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -337,135 +329,6 @@ bool cedar::aux::gui::ImagePlot::doConversion()
 }
 //!@endcond
 
-cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits, double min, double max)
-{
-  QReadLocker lookup_readlock(&mLookupTableLock);
-  if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
-  {
-    lookup_readlock.unlock();
-    QWriteLocker lookup_writelock(&mLookupTableLock);
-    // retest condition, might have changed since elevation of the lock
-    if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
-    {
-      const size_t steps = 256;
-      const std::vector<cedar::aux::gui::ColorValueRGBA>& standard
-        = cedar::aux::gui::MatrixPlot::getStandardColorVector();
-      mLookupTableR.resize(steps, 0);
-      mLookupTableG.resize(steps, 0);
-      mLookupTableB.resize(steps, 0);
-
-      for (size_t v = 0; v < steps; ++v)
-      {
-        char& r = mLookupTableR.at(v);
-        char& g = mLookupTableG.at(v);
-        char& b = mLookupTableB.at(v);
-
-        size_t closest_standard = (v * standard.size()) / steps;
-        size_t lower_closest = (closest_standard * steps) / standard.size();
-        size_t upper_closest = ((closest_standard + 1) * steps) / standard.size();
-
-        CEDAR_DEBUG_ASSERT(closest_standard < standard.size());
-
-        double r_lower = static_cast<double>(standard.at(closest_standard).red) * 255.0;
-        double g_lower = static_cast<double>(standard.at(closest_standard).green) * 255.0;
-        double b_lower = static_cast<double>(standard.at(closest_standard).blue) * 255.0;
-        if (closest_standard + 1 < standard.size())
-        {
-          double r_upper = static_cast<double>(standard.at(closest_standard + 1).red);
-          double g_upper = static_cast<double>(standard.at(closest_standard + 1).green);
-          double b_upper = static_cast<double>(standard.at(closest_standard + 1).blue);
-
-          double factor = static_cast<double>(v - lower_closest) / static_cast<double>(upper_closest - lower_closest);
-
-          double d_r = (1.0 - factor) * r_lower + factor * r_upper;
-          double d_g = (1.0 - factor) * g_lower + factor * g_upper;
-          double d_b = (1.0 - factor) * b_lower + factor * b_upper;
-          r = static_cast<char>(d_r);
-          g = static_cast<char>(d_g);
-          b = static_cast<char>(d_b);
-        }
-        else
-        {
-          r = r_lower;
-          g = g_lower;
-          b = b_lower;
-        }
-      }
-    }
-    lookup_writelock.unlock();
-    lookup_readlock.relock();
-  }
-
-  // accept only char type matrices
-
-  int channels = matrix.channels();
-
-  int rows = matrix.rows * channels;
-  int cols = matrix.cols;
-
-  if (matrix.isContinuous())
-  {
-    cols *= rows;
-    rows = 1;
-  }
-
-  cv::Mat in_converted;
-
-  if (matrix.type() != CV_8UC1)
-  {
-    switch (matrix.type())
-    {
-      case CV_32F:
-      {
-        cv::Mat scaled = (matrix - min) / (max - min) * 255.0;
-        scaled.convertTo(in_converted, CV_8UC1);
-        break;
-      }
-      default:
-        matrix.convertTo(in_converted, CV_8UC1);
-        break;
-    }
-  }
-  else
-  {
-    in_converted = matrix;
-  }
-
-  cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
-
-  const unsigned char* p_in;
-  unsigned char* p_converted;
-  for (int i = 0; i < rows; ++i)
-  {
-    p_in = in_converted.ptr<unsigned char>(i);
-    p_converted = converted.ptr<unsigned char>(i);
-    for (int j = 0; j < cols; ++j)
-    {
-      size_t v = static_cast<size_t>(p_in[j]);
-
-      CEDAR_DEBUG_ASSERT(v < mLookupTableB.size());
-      CEDAR_DEBUG_ASSERT(v < mLookupTableG.size());
-      CEDAR_DEBUG_ASSERT(v < mLookupTableR.size());
-
-      // channel 0
-      p_converted[3 * j + 0] = mLookupTableB.at(v);
-      // channel 1
-      p_converted[3 * j + 1] = mLookupTableG.at(v);
-      // channel 2
-      p_converted[3 * j + 2] = mLookupTableR.at(v);
-    }
-  }
-
-  if (limits)
-  {
-    cv::Mat min_vals = (matrix < min);
-    cv::Mat max_vals = (matrix > max);
-    converted.setTo(0xFFFFFF, min_vals | max_vals);
-  }
-
-  return converted;
-}
-
 cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
 {
   CEDAR_DEBUG_ASSERT(in.channels() == 1);
@@ -567,17 +430,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
     case DATA_TYPE_MAT:
     {
-      double min = 0, max = 0;
-      if (this->isAutoScaling())
-      {
-        cv::minMaxLoc(in, &min, &max);
-      }
-      else
-      {
-        min = this->getValueLimits().getLower();
-        max = this->getValueLimits().getUpper();
-      }
-      return cedar::aux::gui::ImagePlot::colorizedMatrix(in, !this->isAutoScaling(), min, max);
+      return this->colorizeMatrix(in);
     }
   }
 }
