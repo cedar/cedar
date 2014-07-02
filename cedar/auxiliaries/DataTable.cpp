@@ -129,8 +129,17 @@ cedar::aux::ConstDataPtr cedar::aux::DataTable::Row::getData(const std::string& 
 {
   size_t index = this->mTable->getDataColumnIndex(dataColumn);
   auto iter = this->mData.find(index);
+  CEDAR_ASSERT(iter != this->mData.end());
   return iter->second;
 }
+
+bool cedar::aux::DataTable::Row::hasData(const std::string& dataColumn) const
+{
+  size_t index = this->mTable->getDataColumnIndex(dataColumn);
+  auto iter = this->mData.find(index);
+  return iter != this->mData.end();
+}
+
 
 cedar::aux::ConstDataTablePtr cedar::aux::DataTable::RowCollection::getTable() const
 {

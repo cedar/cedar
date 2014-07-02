@@ -117,6 +117,9 @@ public:
       //! Returns the data for the given data column.
       cedar::aux::ConstDataPtr getData(const std::string& dataColumn) const;
 
+      //! Checks if data for the given column is present.
+      bool hasData(const std::string& dataColumn) const;
+
       //! Checks if a value for the given id is present.
       bool hasId(const std::string& idName) const;
 
