@@ -187,7 +187,7 @@ public:
   void insert(size_t index, BaseTypePtr object)
   {
     this->mObjectList.insert(this->mObjectList.begin() + index, object);
-    this->mObjectAdded(this->mObjectList.size() - 1);
+    this->mObjectAdded(index);
     this->emitChangedSignal();
   }
 
