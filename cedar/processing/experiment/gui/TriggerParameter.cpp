@@ -71,6 +71,7 @@ cedar::aux::gui::Parameter(pParent)
 mpTrigger(new QComboBox)
 {
   this->setLayout(new QHBoxLayout);
+  this->layout()->setMargin(0);
   this->layout()->addWidget(new QLabel(QString::fromStdString("Trigger: ")));
   this->layout()->addWidget(mpTrigger);
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));

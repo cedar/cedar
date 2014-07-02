@@ -52,8 +52,10 @@ cedar_add_library(cedarproc
   MOC_HEADERS
   experiment/Experiment.h
   experiment/StepPropertyParameter.h
+  experiment/gui/ActionListParameter.h
   experiment/gui/ActionSequence.h
   experiment/gui/ExperimentItemWidget.h
+  experiment/gui/ObjectListItemParameter.h
   experiment/gui/StepPropertyParameter.h
   experiment/gui/TriggerParameter.h
   gui/AdvancedParameterLinker.h
