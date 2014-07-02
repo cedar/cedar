@@ -54,6 +54,7 @@ cedar::proc::experiment::gui::ExperimentItemWidget::ExperimentItemWidget(QWidget
 QWidget(parent)
 {
   this->setLayout(new QHBoxLayout);
+  this->layout()->setMargin(0);
 }
 
 cedar::proc::experiment::gui::ExperimentItemWidget::~ExperimentItemWidget()

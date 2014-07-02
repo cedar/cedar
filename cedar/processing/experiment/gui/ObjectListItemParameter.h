@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,44 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSequence.h
+    File:        ObjectListItemParameter.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 06 17
 
-    Description: Header file for the class cedar::proc::experiment::gui::ActionSequence.
+    Description: Header file for the class cedar::proc::experiment::gui::ObjectListItemParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
-#define CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_OBJECT_LIST_ITEM_PARAMETER_H
+#define CEDAR_PROC_EXPERIMENT_GUI_OBJECT_LIST_ITEM_PARAMETER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/gui/ObjectParameter.h"
+#include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/gui/ActionSequence.fwd.h"
-#include "cedar/processing/experiment/ActionSequence.fwd.h"
-#include "cedar/processing/gui/ExperimentDialog.fwd.h"
-#include "cedar/processing/experiment/gui/ExperimentItemWidget.fwd.h"
+#include "cedar/processing/experiment/gui/ObjectListItemParameter.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QFrame>
-#include <QListWidget>
-#include <QBoxLayout>
 
-
-/*!@brief The GUI implementation of cedar::proc::experiment::ActionSequence
+/*!@todo describe.
  *
+ * @todo describe more.
  */
-class cedar::proc::experiment::gui::ActionSequence : public QFrame
+class cedar::proc::experiment::gui::ObjectListItemParameter : public cedar::aux::gui::Parameter
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,10 +71,10 @@ class cedar::proc::experiment::gui::ActionSequence : public QFrame
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ActionSequence(cedar::proc::experiment::ActionSequencePtr sequence, cedar::proc::gui::ExperimentDialog* pParent);
+  ObjectListItemParameter(QWidget* pParent);
 
   //!@brief Destructor
-  virtual ~ActionSequence();
+  virtual ~ObjectListItemParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -85,8 +82,9 @@ public:
 public:
   // none yet
 public slots:
-  //!@brief updates the widgets inside the action sequence
-  void update();
+  //!@brief handles a change of the associated parameter
+  void parameterPointerChanged();
+  void valueChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,17 +96,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Clears all the Widgets of a layout
-  void clear(QLayout* layout);
-
-
-private slots:
-  //!@brief Deletes this action sequence
-  void remove();
-
-  //!@brief Updates the condition
-  void updateCondition();
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -125,23 +113,10 @@ protected:
   // none yet
 
 private:
-  //!@brief The main layout of this widget
-  QVBoxLayout* mLayout;
+  cedar::aux::gui::Parameter* mpObjectSelector;
+  cedar::proc::experiment::gui::ExperimentItemWidget* mpObjectItem;
 
-  //!@brief The condition widget
-  cedar::proc::experiment::gui::ExperimentItemWidget* mCondition;
+}; // class cedar::proc::experiment::gui::ObjectListItemParameter
 
-  //!@brief The pointer to the displayed action sequence
-  cedar::proc::experiment::ActionSequencePtr mSequence;
-
-  //!@brief The parent widget
-  cedar::proc::gui::ExperimentDialog* mpParent;
-
-  //!@brief The row that displays the condition
-  QVBoxLayout* conditionRow;
-
-
-}; // class cedar::proc::experiment::gui::ActionSequence
-
-#endif // CEDAR_PROC_EXPERIMENT_GUI_ACTION_SEQUENCE_H
+#endif // CEDAR_PROC_EXPERIMENT_GUI_OBJECT_LIST_ITEM_PARAMETER_H
 

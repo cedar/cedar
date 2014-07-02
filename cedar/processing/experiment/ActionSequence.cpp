@@ -118,9 +118,3 @@ cedar::proc::experiment::condition::ConditionPtr cedar::proc::experiment::Action
 	return this->_mCondition->getValue();
 }
 
-void cedar::proc::experiment::ActionSequence::moveAction(unsigned int actionIndex, unsigned int actionNewIndex)
-{
-  cedar::proc::experiment::action::ActionPtr action = this->_mActionSet->at(actionIndex);
-  this->_mActionSet->removeObject(actionIndex);
-  this->_mActionSet->insert(actionNewIndex, action);
-}

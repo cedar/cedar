@@ -92,7 +92,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Clear all widgets out of a layout. If layout==NUll, the main lauout would be cleared.
+  //!@brief Clear all widgets out of a layout. If layout==NUll, the main layout will be cleared.
   void clear(QLayout* layout = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------

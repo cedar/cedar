@@ -77,6 +77,7 @@ mpPropertyCopy(NULL)
 {
 
   QHBoxLayout* layout = new QHBoxLayout;
+  layout->setMargin(0);
   this->setLayout(layout);
   layout->addWidget(new QLabel(QString::fromStdString("Step: ")));
   layout->addWidget(mpStep);
