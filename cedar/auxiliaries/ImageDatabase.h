@@ -410,6 +410,8 @@ public:
   //! Shuffles a set of images.
   static std::vector<ImagePtr> shuffle(const std::set<ImagePtr>& images);
 
+  //! Returns the image corresponding to the given file path.
+  ImagePtr findImageByFilename(const cedar::aux::Path& fileName) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

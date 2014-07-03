@@ -135,6 +135,19 @@ unsigned int cedar::aux::ImageDatabase::Image::getImageColumns() const
   return static_cast<unsigned int>(this->mImage.cols);
 }
 
+cedar::aux::ImageDatabase::ImagePtr cedar::aux::ImageDatabase::findImageByFilename(const cedar::aux::Path& fileName) const
+{
+  for (auto image : this->mImages)
+  {
+    if (image->getFileName() == fileName)
+    {
+      return image;
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::NotFoundException, "An image with the filename \"" + fileName.toString() + "\" could not be found.");
+}
+
 std::vector<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::shuffle(const std::set<ImagePtr>& images)
 {
   std::vector<cedar::aux::ImageDatabase::ImagePtr> shuffled;
