@@ -171,6 +171,9 @@ public:
   //! Compares two paths.
   bool operator< (const cedar::aux::Path& other) const;
 
+  //! Compares two paths.
+  bool operator== (const cedar::aux::Path& other) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -82,6 +82,30 @@ cedar::aux::Path::~Path()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::aux::Path::operator== (const cedar::aux::Path& other) const
+{
+  //!@todo This would not detect that some/dir == some/../some/dir and other, similar cases.
+  if (other.mComponents.size() != this->mComponents.size())
+  {
+    return false;
+  }
+
+  auto this_iter = this->mComponents.begin();
+  auto other_iter = other.mComponents.begin();
+  for (; this_iter != this->mComponents.end() && other_iter != other.mComponents.end(); ++this_iter, ++other_iter)
+  {
+    const auto& this_component = *this_iter;
+    const auto& other_component = *other_iter;
+
+    if (this_component != other_component)
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 bool cedar::aux::Path::operator< (const cedar::aux::Path& other) const
 {
   if (other.mComponents.size() < this->mComponents.size())
