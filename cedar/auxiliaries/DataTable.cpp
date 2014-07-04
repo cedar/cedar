@@ -199,7 +199,10 @@ size_t cedar::aux::DataTable::IndexMap::getOrCreateIndex(const std::string& inde
 size_t cedar::aux::DataTable::IndexMap::getIndex(const std::string& indexName) const
 {
   auto iter = this->map.left.find(indexName);
-  CEDAR_ASSERT(iter != this->map.left.end());
+  if (iter == this->map.left.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "The index for identifier \"" + indexName + "\" was not found in this table.");
+  }
   return iter->second;
 }
 
