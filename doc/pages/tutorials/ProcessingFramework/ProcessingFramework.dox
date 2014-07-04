@@ -490,7 +490,7 @@ example in @ref ProcessingTutorialDataValidation). With automatic type checking,
 as follows:
 @code
 // ...
-#include <cedar/processing/typechek/DerivedFrom.h>
+#include <cedar/processing/typecheck/DerivedFrom.h>
 // ...
 
   SimpleSummation::SimpleSummation()
