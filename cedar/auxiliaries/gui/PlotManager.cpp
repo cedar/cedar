@@ -149,5 +149,9 @@ cedar::aux::gui::ConstPlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaul
 
   // otherwise, automatically determine a default plot (the first one in the vector)
   auto decls = closest_node->getData();
+  if (decls.size() == 0)
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find a plot declaration for this type of data.")
+  }
   return decls.at(0);
 }
