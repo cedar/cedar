@@ -325,6 +325,14 @@ cedar::aux::DataTable::ConstRowCollectionPtr cedar::aux::DataTable::RowCollectio
   return this->select(boost::bind<bool>(selector, _1, id, value));
 }
 
+void cedar::aux::DataTable::RowCollection::forAll(const boost::function<void(ConstRowPtr)>& valueFunction) const
+{
+  for (auto row : this->mRows)
+  {
+    valueFunction(row);
+  }
+}
+
 double cedar::aux::DataTable::RowCollection::sum(const boost::function<double(ConstRowPtr)>& valueFunction) const
 {
   double sum = 0.0;

@@ -167,6 +167,10 @@ public:
     */
     ConstRowCollectionPtr selectById(const std::string& id, const std::string& idValue) const;
 
+    /*! Runs the given function for all rows in this collection.
+     */
+    void forAll(const boost::function<void(ConstRowPtr)>& valueFunction) const;
+
     /*! Runs the given function for all rows in this collection and returns the average of the results.
      */
     double average(const boost::function<double(ConstRowPtr)>& valueFunction) const;
