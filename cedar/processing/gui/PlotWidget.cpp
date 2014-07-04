@@ -111,33 +111,42 @@ void cedar::proc::gui::PlotWidget::processSlot
   // get the plot_class
   std::string plot_declaration = dataItem->getParameter<cedar::aux::StringParameter>("plotDeclaration")->getValue();
   auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(pData)->getData();
-  auto decl = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(pData);
-  
-  for(auto declaration : declarations)
+  cedar::aux::gui::ConstPlotDeclarationPtr decl;
+  try
   {
-    if(declaration->getClassName() == plot_declaration)
+    decl = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(pData);
+  }
+  catch (cedar::aux::NotFoundException&)
+  {
+    return;
+  }
+  
+  for (auto declaration : declarations)
+  {
+    if (declaration->getClassName() == plot_declaration)
     {
       decl = declaration;
       break;
     }
   }
 
-  auto plot_declaration_does_match = [&](LabeledPlotPtr p_labeled_plot){
+  auto plot_declaration_does_match = [&](LabeledPlotPtr p_labeled_plot)
+  {
     // no plot_declaration matches any declaration.
-    
     return (plot_declaration == "" || p_labeled_plot->mpPlotDeclaration->getClassName() == plot_declaration);
   };
-  auto can_append_p_data_to = [&](LabeledPlotPtr p_labeled_plot){
+  auto can_append_p_data_to = [&](LabeledPlotPtr p_labeled_plot)
+  {
     return (dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(p_labeled_plot->mpPlotter)
             && static_cast<cedar::aux::gui::MultiPlotInterface*>(p_labeled_plot->mpPlotter)->canAppend(pData));
   };
 
   LabeledPlotPtr p_current_labeled_plot;
   bool do_append = false;
-  for(auto plot_grid_map_item : this->mPlotGridMap)
+  for (auto plot_grid_map_item : this->mPlotGridMap)
   {
     auto p_labeled_plot = plot_grid_map_item.second;
-    if(plot_declaration_does_match(p_labeled_plot) && can_append_p_data_to(p_labeled_plot))
+    if (plot_declaration_does_match(p_labeled_plot) && can_append_p_data_to(p_labeled_plot))
     {
       p_current_labeled_plot = p_labeled_plot;
       do_append = true;
@@ -145,7 +154,7 @@ void cedar::proc::gui::PlotWidget::processSlot
     }
   }
 
-  if(do_append)
+  if (do_append)
     // if we did not find a plotter that matches the declaration AND can append data we create a new plotter
   {
     tryAppendDataToPlot(pData, title, p_current_labeled_plot);
@@ -411,7 +420,12 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
 )
 {
   auto plot_grid_map_item = mPlotGridMap.find(pData);
-  CEDAR_DEBUG_ASSERT(plot_grid_map_item != mPlotGridMap.end());
+  // if this data is not displayed, we do not have to remove it
+  //!@todo investigate why this happens in the first place!
+  if (plot_grid_map_item == mPlotGridMap.end())
+  {
+    return;
+  }
 
   auto labeled_plot = plot_grid_map_item->second;
 
