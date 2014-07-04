@@ -1,0 +1,171 @@
+#=======================================================================================================================
+#
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        setup.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: General setup of cedar.
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+########################################################################################################################
+# CMake setup of cedar
+########################################################################################################################
+
+
+########################################################################################################################
+# general settings
+
+# set the project name
+project(cedar)
+
+# check whether this is an out-of-source build
+if( CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR AND NOT MSVC_IDE )
+  message(FATAL_ERROR "In-source builds are not allowed. Please create a directory and run cmake from there, passing
+                       the path to this source directory as the last argument. This process created the file
+                       'CMakeCache.txt' and the directory 'CMakeFiles'. Please delete them.")
+endif()
+
+if (CEDAR_BUILD_DEBUG_VERSION)
+  set (CMAKE_BUILD_TYPE debug)
+  add_definitions( -D_DEBUG )
+else(CEDAR_BUILD_DEBUG_VERSION)
+  set (CMAKE_BUILD_TYPE release)
+endif(CEDAR_BUILD_DEBUG_VERSION)
+
+# set the directory for source code
+set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
+# directory for all tests
+set (CEDAR_TEST_DIR             "${CEDAR_HOME}/tests")
+# directory for all unit tests
+set (CEDAR_UNIT_TEST_DIR        "${CEDAR_TEST_DIR}/unit")
+# directory for all performance tests
+set (CEDAR_PERFORMANCE_TEST_DIR        "${CEDAR_TEST_DIR}/performance")
+# directory for all interactive tests
+set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_TEST_DIR}/interactive")
+# directory for all tools
+set (CEDAR_EXECUTABLES_DIR      "${CEDAR_HOME}/executables")
+# directory for examples
+set (CEDAR_EXAMPLES_DIR         "${CEDAR_HOME}/examples")
+# determine build directory, if not set
+if (NOT CEDAR_BUILD_DIR)
+  set (CEDAR_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+
+# default output directory for lib files
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
+# default output directory for exe files
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}")
+
+# append a 'cedar' subdirectory to the header install directory, so that the includes are bundled
+set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
+
+# set cedar's resource installation directory
+set(CEDAR_RESOURCE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/cedar")
+
+# Shared or static libraries?
+if (CEDAR_BUILD_STATIC_LIBS)
+  set (CEDAR_LIB_TYPE STATIC)
+else (CEDAR_BUILD_STATIC_LIBS)
+  set (CEDAR_LIB_TYPE SHARED)
+endif (CEDAR_BUILD_STATIC_LIBS)
+
+# include the cedar library directory in the library search path
+link_directories(${CEDAR_LIB_DIR})
+# add the cedar home directory to the ones that need to be included
+include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
+
+# for MSVC: set the debug flag (by default, MSVC sets _DEBUG rather than DEBUG
+if (MSVC)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
+endif(MSVC)
+
+########################################################################################################################
+# check compiler version
+if (CMAKE_COMPILER_IS_GNUCC)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                    OUTPUT_VARIABLE GCC_VERSION)
+    string(REGEX MATCHALL "[0-9]+" GCC_VERSION_COMPONENTS ${GCC_VERSION})
+    list(GET GCC_VERSION_COMPONENTS 0 GCC_MAJOR)
+    list(GET GCC_VERSION_COMPONENTS 1 GCC_MINOR)
+    if (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
+      set(CEDAR_ISSUES ${CEDAR_ISSUES} "Your gcc version (${GCC_MAJOR}.${GCC_MINOR}) is outdated. Please consider an\n  upgrade to version >= 4.6.\n\n")
+    else (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
+      set(CEDAR_ISSUES "${CEDAR_ISSUES}")
+    endif (GCC_MAJOR LESS 4 OR GCC_MINOR LESS 6)
+endif(CMAKE_COMPILER_IS_GNUCC)
+
+########################################################################################################################
+# add preprocessor definitions 
+
+if (CMAKE_COMPILER_IS_GNUCC)
+  add_definitions(-Wall -Wextra)
+  add_definitions(-std=gnu++0x)
+  	
+  if (WIN32)
+	add_definitions(-Wno-unused-local-typedefs)
+  endif(WIN32)
+
+elseif (MSVC)
+  add_definitions(-W2
+                  -D_SCL_SECURE_NO_WARNINGS
+                  -wd4250 # disable warning about inheritance working as expected
+                  )
+  # Allow sorting projects into subfodlers (to make solutions more usable)
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif (CMAKE_COMPILER_IS_GNUCC)
+
+# add definitions for clang
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  add_definitions(-std=c++11 -stdlib=libc++)
+endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+
+add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
+
+if (WIN32)
+  set(CMAKE_DEBUG_POSTFIX "d") # TODO for linux too?
+  add_definitions(-DWIN32_LEAN_AND_MEAN)
+endif (WIN32)
+
+string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)
+if (buildTypeLower MATCHES debug)
+  message("-- Building in \"DEBUG\" mode.")
+  add_definitions(-DDEBUG)
+else(buildTypeLower MATCHES debug)
+  message("-- Building in \"RELEASE\" mode.")
+  add_definitions(-DRELEASE)
+endif(buildTypeLower MATCHES debug)
+
+# extract name of the computer that cedar is being built on
+site_name(CEDAR_BUILT_ON_MACHINE)
+
+# configure the file exposing internal cmake variables to cedar
+configure_file("${CEDAR_HOME}/cmake/resources/internals.h.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar/internals.h")

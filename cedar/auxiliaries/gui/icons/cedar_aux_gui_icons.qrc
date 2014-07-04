@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="/cedar/auxiliaries/gui">
+    <file>error.svg</file>
+    <file>warning.svg</file>
+    <file>memory.svg</file>
+    <file>message.svg</file>
+    <file>debug.svg</file>
+    <file>trashcan.svg</file>
+    <file>singleStep.svg</file>
+    <file>start.svg</file>
+    <file>stop.svg</file>
+    <file>record.svg</file>
+    <file>recordStop.svg</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,123 @@
+#=======================================================================================================================
+#
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        CMakeLists.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description:
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+if (CEDAR_USE_VTK)
+  set(vtk_moc_files gui/VtkLinePlot.h gui/VtkSurfacePlot.h gui/VtkMatrixPlot.h)
+else(CEDAR_USE_VTK)
+  set(vtk_moc_files "")
+endif(CEDAR_USE_VTK)
+
+if (CEDAR_USE_QWT)
+  set(qwt_moc_files gui/HistoryPlot0D.h gui/QwtLinePlot.h gui/MatrixVectorPlot.h)
+else(CEDAR_USE_QWT)
+  set(qwt_moc_files "")
+endif(CEDAR_USE_QWT)
+
+if (CEDAR_USE_QWTPLOT3D)
+  set(qwtplot3d_moc_files gui/QwtSurfacePlot.h)
+else(CEDAR_USE_QWTPLOT3D)
+  set(qwtplot3d_moc_files "")
+endif(CEDAR_USE_QWTPLOT3D)
+
+if (CEDAR_USE_FFTW)  
+  set(fftw_moc_files convolution/FFTW.h)
+else (CEDAR_USE_FFTW)
+  set(fftw_moc_files "")
+endif (CEDAR_USE_FFTW)
+
+cedar_add_library(cedaraux
+  MOC_HEADERS
+  ThreadWrapper.h
+  detail/ThreadWorker.h
+  LoopedThread.h
+  LocalCoordinateFrame.h
+  gl/ObjectVisualization.h
+  gui/AccelerationParameter.h
+  gui/AngularVelocityParameter.h
+  gui/BaseWidget.h
+  gui/BoolParameter.h
+  gui/BoolVectorParameter.h
+  gui/DataPlotter.h
+  gui/DirectoryParameter.h
+  gui/DoubleParameter.h
+  gui/DoubleVectorParameter.h
+  gui/EnumParameter.h
+  gui/ExceptionDialog.h
+  gui/FileParameter.h
+  gui/FrequencyParameter.h
+  gui/IntParameter.h
+  gui/LengthParameter.h
+  gui/Log.h
+  gui/ObjectParameter.h
+  gui/ObjectListParameter.h
+  gui/Parameter.h
+  gui/LocalCoordinateFrameWidget.h
+  gui/ObjectVisualizationWidget.h
+  gui/PluginInfoDialog.h
+  gui/PluginManagerDialog.h
+  gui/Viewer.h
+  gui/SceneWidget.h
+  gui/PropertyPane.h
+  gui/PlaneAngleParameter.h
+  gui/StringParameter.h
+  gui/TimeParameter.h
+  gui/UIntParameter.h
+  gui/UIntVectorParameter.h
+  gui/IntVectorParameter.h
+  gui/VelocityParameter.h
+  gui/ResourceDialog.h
+  gui/PlotInterface.h
+  gui/HistoryPlot.h
+  gui/MatrixPlot.h
+  gui/MatrixSlicePlot3D.h
+  gui/ImagePlot.h
+  ${qwt_moc_files}
+  ${vtk_moc_files}
+  ${qwtplot3d_moc_files}
+  ${fftw_moc_files}
+  convolution/Convolution.h
+  convolution/KernelList.h
+  convolution/Engine.h
+  Parameter.h
+  kernel/Separable.h
+  kernel/Kernel.h
+  kernel/Gauss.h
+  kernel/Box.h
+  RESOURCES
+  gui/icons/cedar_aux_gui_icons.qrc
+  LINK_LIBRARIES
+  cedarunits
+)
