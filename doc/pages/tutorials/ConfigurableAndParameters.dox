@@ -1,0 +1,248 @@
+/*!
+
+@page ConfigurableAndParameters Tutorials: Configurable and Parameters
+
+There are two important components of cedar's parameter system: parameters, i.e., members of a class that can be
+manipulated by the user either via a file or a user interface, and the class cedar::aux::Configurable which is
+responsible for organizing a set of parameters into a logical group and also takes care of organizing the writing and
+reading process.
+
+The goal of the Configurable class is to provide a simple yet powerful tool that shifts the burden of serializing
+class settings away from the class programmer and into cedar while still allowing for a large amount of flexibility in
+case the provided methods are insufficient for the user's needs.
+
+@remarks The code in this tutorial is included in [your cedar]/examples/auxiliaries/Configurable/Tutorial and the
+         corresponding compiled executable in [your cedar]/bin/examples/ConfigurableTutorial.
+
+
+@section BasicUsage Beginner's Tutorial: Basic Usage
+
+In order to use the Parameter framework, a class must inherit cedar::aux::Configurable:
+@code
+#include <cedar/auxiliaries/Configurable.h>
+
+class MyConfigurableClass : public cedar::aux::Configurable
+{
+  public:
+    // constructor -- we'll show what goes in here later
+    MyConfigurableClass()
+    {
+    }
+};
+@endcode
+
+Now, adding a parameter only requires two simple things: adding a member for the parameter and initializing it. We'll do
+this in the constructor shown above:
+@code
+#include <cedar/auxiliaries/Configurable.h>
+#include <cedar/auxiliaries/DoubleParameter.h>
+
+class MyConfigurableClass : public cedar::aux::Configurable
+{
+  private:
+    // standard member declaration
+    cedar::aux::DoubleParameterPtr mMyParameter;
+  public:
+    MyConfigurableClass()
+    : // this starts the member initialization list
+    // now let's initialize the member:
+    mMyParameter
+    (
+      new cedar::aux::DoubleParameter
+      (
+        this, // this tells the parameter what configurable it belongs to
+        "my parameter", // this is the name of the parameter; it is used to identify it in the configurtion file
+                        // as well as the user interface
+        1.0, // this is the default value for the parameter; if you leave this out, an exception is thrown when there
+             // is no value specified for the parameter in a configuration file
+        0.0, // the minimum value the parameter can have
+        100.0 // the maximum value for the parameter
+      )
+    )
+    {
+    }
+};
+@endcode
+
+And that's it.
+
+@remarks The minimum and maximum value are currently not checked when reading from files/when the value is set by the
+         user. This will be fixed in a future version.
+         
+Now, in order to access the member, we write a get and a set method:
+@code
+  // .. still in MyConfigurableClass
+  public:
+    inline double getMyParameter() const
+    {
+      return this->mMyParameter->getValue();
+    }
+    
+    inline void setMyParameter(double newValue)
+    {
+      // note, that you have to call setValue because this also emits a signal notifying anyone interested of the change
+      // this is also explained in later tutorials
+      this->mMyParameter->setValue(newValue);
+    }
+  // ..
+@endcode
+
+@remarks It is considered best practice to write these get and set methods for each parameter in your class. They don't
+         necessarily have to be inline and public, though.
+
+Now, in order to write the configuration, we simply need the following code:
+@code
+// first, we generate the pointer types for our class; this saves us some typing
+CEDAR_GENERATE_POINTER_TYPES(MyConfigurableClass); // include cedar/defines.h for this
+
+// ..
+{
+  // ..
+  
+  // assume this is your main method or a similar code
+  MyConfigurableClassPtr my_object(new MyConfigurableClass());
+  
+  // let's set some value for our parameter:
+  my_object->setMyParameter(5.0);
+  
+  // now we can write this to a file:
+  my_object->writeJson("my_config_file.json");
+  
+  // we can now create a second object and read the same file:
+  MyConfigurableClassPtr second_object(new MyConfigurableClass());
+  second_object->readJson("my_config_file.json");
+  
+  std::cout << "Read parameter value: " << second_object->getMyParameter() << std::endl;
+  
+  // ..
+} 
+@endcode
+
+
+@section DealingWithChange Beginner's Tutorial: Dealing with Change
+
+If you want to expose your parameters in a user interface, you'll also have to deal with changes made to parameters
+during run time. To do this, your class will have to inherit QObject and declare a slot to connect to the parameter's
+valueChanged() signal in your constructor:
+@code
+// ..
+  { // inside class constructor
+    // ..
+    // note that you need to write this->mMyParameter.get(); this returns the raw pointer to the parameter
+    QObject::connect(this->mMyParameter.get(), SIGNAL(valueChanged()), this, SLOT(yourSlotFunction()));
+    // ..
+  }
+// ..
+
+@endcode
+
+
+@section DealingWithChange Beginner's Tutorial: Displaying the Configurable in a Widget
+
+If your class inherits cedar::aux::Configurable, you can use cedar::aux::gui::PropertyPane to display it. Just write:
+@code
+#include <cedar/auxiliaries/gui/PropertyPane.h>
+// ..
+  cedar::aux::gui::PropertyPane *p_pane = new cedar::aux::gui::PropertyPane();
+  p_pane->show(); // makes qt show the widget
+  p_pane->display(my_configurable_object);
+@endcode
+This widget allows you to manipulate all the parameters of your object.
+
+@remarks In the future, we plan to provide a new version of the widget that uses QTreeView instead of the current
+         QTableWidget implementation. 
+
+
+@section OverviewOfParameterTypes Overview over the Different Parameter Types
+
+cedar already ships with a number of different parameter types, each with a proper widget for manipulating the data in,
+e.g., a cedar::aux::gui::PropertyPane. The most primitive parameter types can be found in cedar::aux and include
+cedar::aux::DoubleParameter, cedar::aux::UIntParameter, cedar::aux::BoolParameter and others. See the inheritance
+diagram for cedar::aux::Parameter to get a full overview.
+
+If those parameter types do not fit your needs, you can also implement your own ones, as explained
+@ref ImplementingCustomParameterTypes "in a later tutorial".
+
+
+@section ParameterGroupsAndChildren Intermediate Tutorial: Configurable Children and Parameter Groups
+
+In some cases, a class that is Configurable may have members that are Configurable as well. Let A and B be configurable
+classes. Then, if B has a member of type A, this member can be added as a configurable child:
+@code
+class A : public cedar::aux::Configurable
+{
+  // ..
+};
+
+class B : public cedar::aux::Configurable
+{
+  private:
+    // note that this has to be a pointer
+    APtr mAMember;
+    // ...
+    
+  public:
+    B()
+    :
+    // ...
+    {
+      // this declares mAMember as a child
+      this->addConfigurableChild("a_member", mAMember);
+    }
+};
+@endcode
+
+The declaration of mAMember means that in the configuration file, the settings of mAMember will appear within the
+settings for B, as a subnode with the name "a_member". 
+
+It is also possible to place parameters into logical groups using the addConfigurableChild method. The process is
+straight forward: create a new configurable object, add the parameters to be grouped to it and add it as a child to your
+class:
+@code
+class GroupDemo : public cedar::aux::Configurable
+{
+  private:
+    cedar::aux::DoubleParameterPtr mAParameter;
+    
+  public:
+    GroupDemo()
+    {
+      // note that initialization of parameters is no longer done in the initializer list
+      
+      // create configurable to represent the group
+      cedar::aux::ConfigurablePtr group(new cedar::aux::Configurable());
+      
+      // add the group as a child
+      this->addConfigurableChild("my group", group);
+      
+      // add parameters to the group
+      mAParameter = cedar::aux::DoubleParameterPtr
+                    (
+                      new cedar::aux::DoubleParameter
+                      (
+                        group.get(), // this adds the parameter to the group; note, that the .get() is required but
+                                     // doesn't violate the smartpointiness of the parameter because
+                                     // cedar::aux::DoubleParameterPtr is defined as an intrusive_ptr
+                        "a parameter", // rest looks the same as introduced above
+                        1.0,
+                        0.0,
+                        100.0
+                      )
+                    );
+    }
+};
+@endcode
+
+
+@section DynamicObjectListParameters Advanced Tutorial: Storing (Lists of) Objects of Different Types
+
+
+@section ImplementingCustomParameterTypes Advanced Tutorial: Implementing a Custom Parameter Type
+
+@subsection ImplementingCustomParameterTypes_Parameter Implementing the Parameter
+
+@todo Mention here that the pointers to parameters must be boost::intrusive_ptr
+
+@subsection ImplementingCustomParameterTypes_Widget Implementing the Widget
+
+*/
