@@ -24,13 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp,
-#                Mathis Richter,
-#                Stephan Zibner
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-#                mathis.richter@ini.ruhr-uni-bochum.de,
-#                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 05 23
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2014 03 13
 #
 #   Description:
 #

@@ -71,6 +71,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! get the component
   inline cedar::dev::ComponentPtr getComponent() const
   {
     return this->_mComponent->getValue();

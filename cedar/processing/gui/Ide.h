@@ -52,7 +52,8 @@
 #include "cedar/processing/gui/BoostControl.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"
 #include "cedar/processing/gui/Ide.fwd.h"
-#include "cedar/processing/gui/Network.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/FindDialog.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -62,7 +63,7 @@
 #include <map>
 
 
-/*!@brief This is the main window of the processingIde application.
+/*!@brief This is the main window of the cedar application.
  */
 class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
 {
@@ -96,7 +97,13 @@ public:
 
   /*!@brief Resets the current scene and displays the new network.
    */
-  void resetTo(cedar::proc::gui::NetworkPtr network);
+  void resetTo(cedar::proc::gui::GroupPtr network);
+
+  //! set if close dialog should be suppressed
+  void suppressCloseDialog(bool suppress)
+  {
+    this->mSuppressCloseDialog = suppress;
+  }
 
 public slots:
   /*!@brief Slot that displays notifications.
@@ -125,11 +132,17 @@ public slots:
 
   /*!@brief Slot that is connected to the "save" item in the file menu.
    */
-  void save();
+  bool save();
 
   /*!@brief Slot that is connected to the "save as" item in the file menu.
    */
-  void saveAs();
+  bool saveAs();
+
+  //! Allows the user to choose a destination for saving the data of serializable data slots in all steps.
+  bool saveSerializableDataAs();
+
+  //! Allows the user to choose a source for loading data into serializable data slots of all steps.
+  bool loadSerializableData();
 
   /*!@brief Slot that is connected to the "load" item in the file menu.
    */
@@ -169,7 +182,7 @@ public slots:
 
   /*!@brief Resets the root network
    */
-  void resetRootNetwork();
+  void resetRootGroup();
 
   /*!@brief Opens a dialog that lets the user export the current scene as an SVG
    */
@@ -198,6 +211,10 @@ public slots:
   /*!@brief Opens a boost control widget.
    */
   void showBoostControl();
+
+  /*! Opens the parameter linker
+   */
+  void openParameterLinker();
 
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
@@ -230,6 +247,18 @@ public slots:
   {
     return this->mpLog;
   }
+
+  //!@brief copy one step to buffer
+  void copyStep();
+
+  //!@brief copy configuration to target step(s)
+  void pasteStepConfiguration();
+
+  //!@brief copy one step to buffer
+  void openFindDialog();
+
+  //! return the gui root group
+  cedar::proc::gui::ConstGroupPtr getGroup() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -287,7 +316,19 @@ private:
   //!@brief populates the Plot Groups Combobox with available Plot Groups
   void loadPlotGroupsIntoComboBox();
 
-  void setNetwork(cedar::proc::gui::NetworkPtr network);
+  void setGroup(cedar::proc::gui::GroupPtr group);
+
+  void setArchitectureChanged(bool changed);
+
+  //! Check if the user wants to save. Returns false if the action currently being taken should be cancelled.
+  bool checkSave();
+
+private slots:
+  void globalTimeFactorSliderChanged(int newValue);
+
+  void globalTimeFactorSpinboxChanged(double value);
+
+  void architectureChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -299,7 +340,9 @@ private:
   std::map<std::string, cedar::proc::gui::ElementClassList*> mElementClassListWidgets;
 
   //! The network currently displayed.
-  cedar::proc::gui::NetworkPtr mNetwork;
+  cedar::proc::gui::GroupPtr mGroup;
+
+  cedar::proc::StepPtr mLastCopiedStep;
 
   //! Architecture consistency check widget.
   cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;
@@ -309,6 +352,9 @@ private:
 
   //! Dock widget for the consistency checker.
   QDockWidget* mpConsistencyDock;
+
+  //! Dock widget for the boost control
+  QDockWidget* mpBoostControlDock;
 
   QString mDefaultWindowTitle;
 
@@ -323,8 +369,19 @@ private:
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
-  // Combobox to select plot groups
+  //! Combobox to select plot groups
   QComboBox* mpPlotGroupsComboBox;
+
+  //! Spinbox for controlling the global time step.
+  QDoubleSpinBox* mpGlobalTimeFactor;
+
+  //! Spinbox for controlling the global time step.
+  QSlider* mpGlobalTimeFactorSlider;
+
+  //! Whether the save on close dialog should be suppressed.
+  bool mSuppressCloseDialog;
+
+  cedar::proc::gui::FindDialog* mpFindDialog;
 
 }; // class cedar::MainWindow
 

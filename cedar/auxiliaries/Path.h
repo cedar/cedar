@@ -48,9 +48,12 @@
 // SYSTEM INCLUDES
 #include <deque>
 #include <string>
+#include <vector>
 
 
 /*!@brief A class for representing paths to files and directories.
+ *
+ * @todo This should really use/be merged with cedar::aux::PathTemplate.
  */
 class cedar::aux::Path
 {
@@ -87,12 +90,19 @@ public:
    *
    *        If the stored path is a resource, the location of the resource is looked up.
    */
-  cedar::aux::Path absolute() const;
+  cedar::aux::Path absolute(bool showInLog = true) const;
 
   //! Returns true if the stored path is a path to a resource, false otherwise.
   bool isResource() const;
 
+  //! Returns true if the path is an absolute path.
   bool isAbsolute() const;
+
+  //! Returns true if the path is relative.
+  bool isRelative() const;
+
+  //! Returns true if the path is relative to a plugin folder, i.e., starts with the protocol plugin://
+  bool isPluginRelative() const;
 
   //! Returns true if there are no entries in this path, i.e., the path is "".
   bool isEmpty() const;
@@ -118,6 +128,16 @@ public:
    */
   std::string getFileNameOnly() const;
 
+  /*! Returns the filename without extension
+   */
+  std::string getFileNameWithoutExtension() const;
+
+  /*! Returns the extension of the file.
+   *
+   * For example, for "a/folder/foo.bar", this function will return "bar"
+   */
+  std::string getExtension() const;
+
   //! Appends the given path to this one.
   cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
 
@@ -133,6 +153,27 @@ public:
   //! Test whether the path points to a directory.
   bool isDirectory() const;
 
+  //! Lists all the direct subdirectories of this path.
+  std::vector<cedar::aux::Path> listSubdirectories() const;
+
+  //! Lists all the files that are in the path.
+  std::vector<cedar::aux::Path> listFiles() const;
+
+  //! Returns the last element in the path
+  const std::string& getLast() const;
+
+  //! Appends another component to the path.
+  void appendComponent(const std::string& component);
+
+  //! Returns the separator for paths (depends on the operating system).
+  static std::string separator();
+
+  //! Compares two paths.
+  bool operator< (const cedar::aux::Path& other) const;
+
+  //! Compares two paths.
+  bool operator== (const cedar::aux::Path& other) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -143,7 +184,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  static void splitFileNameAndExtension(const std::string& fileNameAndExtension, std::string& fileName, std::string& extension);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -159,6 +200,7 @@ private:
 
   static const std::string M_PROTOCOL_ABSOLUTE_STR;
   static const std::string M_PROTOCOL_RESOURCE_STR;
+  static const std::string M_PROTOCOL_PLUGIN_STR;
 
 }; // class cedar::aux::Path
 

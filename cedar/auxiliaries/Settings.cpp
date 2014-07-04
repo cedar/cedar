@@ -105,6 +105,9 @@ _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", f
                                  );
 #endif // CEDAR_USE_FFTW
 
+  this->_mGlobalTimeFactor = new cedar::aux::DoubleParameter(this, "global time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positive());
+  QObject::connect(this->_mGlobalTimeFactor.get(), SIGNAL(valueChanged()), this, SLOT(qGlobalTimeFactorChanged()));
+
   try
   {
     this->load();
@@ -139,6 +142,25 @@ cedar::aux::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::Settings::setGlobalTimeFactor(double factor)
+{
+  this->_mGlobalTimeFactor->setValue(factor, true);
+}
+
+double cedar::aux::Settings::getGlobalTimeFactor() const
+{
+  QReadLocker locker(this->_mGlobalTimeFactor->getLock());
+  double copy = this->_mGlobalTimeFactor->getValue();
+  locker.unlock();
+  return copy;
+}
+
+void cedar::aux::Settings::qGlobalTimeFactorChanged()
+{
+  double copy = this->getGlobalTimeFactor();
+  this->signalGlobalTimeFactorChanged(copy);
+}
 
 cedar::aux::DirectoryParameterPtr cedar::aux::Settings::getRecorderWorkspaceParameter() const
 {

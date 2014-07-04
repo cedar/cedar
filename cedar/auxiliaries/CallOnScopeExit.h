@@ -70,21 +70,41 @@ public:
   //!@brief The standard constructor.
   CallOnScopeExit(const boost::function<void ()>& function)
   :
-  mFunctionToCall(function)
+  mFunctionToCall(function),
+  mCall(true)
   {
   }
 
   //!@brief Destructor
-  ~CallOnScopeExit()
+  virtual ~CallOnScopeExit()
   {
-    mFunctionToCall();
+    if (this->mCall)
+    {
+      this->mFunctionToCall();
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*! Calls the function. It will then no longer be called when the object is destroyed, unless
+    * cedar::aux::CallOnScopeExit::resetCall is called.
+    */
+  void callNow()
+  {
+    this->mCall = false;
+    this->mFunctionToCall();
+  }
+
+  /*! Resets the internal call variable, meaning, that the function will again be called when the object is destroyed.
+   *
+   * @see cedar::aux::CallOnScopeExit::callNow
+   */
+  void resetCall()
+  {
+    this->mCall = true;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -105,6 +125,8 @@ protected:
   // none yet
 private:
   boost::function<void ()> mFunctionToCall;
+
+  bool mCall;
 
 }; // class cedar::aux::CallOnScopeExit
 

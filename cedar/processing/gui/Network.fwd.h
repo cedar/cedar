@@ -48,19 +48,8 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
-namespace cedar
-{
-  namespace proc
-  {
-    namespace gui
-    {
-      CEDAR_DECLARE_PROC_CLASS(Network);
-    }
-  }
-}
-
-//!@endcond
+#warning cedar::proc::gui::Network was renamed to cedar::proc::gui::Group. Please include Group.fwd.h instead of this header.
+#include "cedar/processing/gui/Group.fwd.h"
 
 #endif // CEDAR_PROC_GUI_NETWORK_FWD_H
 

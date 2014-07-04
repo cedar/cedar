@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/sources/Boost.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Element.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
@@ -51,6 +51,7 @@
 // SYSTEM INCLUDES
 #include <QHeaderView>
 
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,7 +61,7 @@ cedar::proc::gui::BoostControl::BoostControl()
   this->setupUi(this);
 
   QObject::connect(this, SIGNAL(elementAddedSignal(QString)), this, SLOT(elementAdded(QString)));
-  QObject::connect(this, SIGNAL(boostRemovedSignal(QString)), this, SLOT(boostRemoved(QString)));
+  QObject::connect(this, SIGNAL(elementRemovedSignal(QString)), this, SLOT(elementRemoved(QString)));
 
   this->mpBoostTree->header()->setResizeMode(0, QHeaderView::Stretch);
   this->mpBoostTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
@@ -68,93 +69,161 @@ cedar::proc::gui::BoostControl::BoostControl()
 
 cedar::proc::gui::BoostControl::~BoostControl()
 {
-  if (this->mNetwork)
-  {
-    this->mElementAddedConnection.disconnect();
-    this->mElementRemovedConnection.disconnect();
-  }
+  this->disconnectSignals();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::BoostControl::setNetwork(cedar::proc::NetworkPtr network)
+void cedar::proc::gui::BoostControl::disconnectSignals()
 {
-  if (this->mNetwork)
+  for (auto connection : this->mElementAddedConnections)
   {
-    this->mElementAddedConnection.disconnect();
-    this->mElementRemovedConnection.disconnect();
+    connection.disconnect();
   }
+  for (auto connection : this->mElementRemovedConnections)
+  {
+    connection.disconnect();
+  }
+}
+
+void cedar::proc::gui::BoostControl::setGroup(cedar::proc::GroupPtr group)
+{
+  this->disconnectSignals();
 
   this->mpBoostTree->clear();
-  this->mBoostNames.clear();
+  this->mElementNames.clear();
 
-  this->mNetwork = network;
+  this->mGroup = group;
 
-  for (auto iter = this->mNetwork->getElements().begin(); iter != this->mNetwork->getElements().end(); ++iter)
+  this->addGroup(this->mGroup);
+}
+
+void cedar::proc::gui::BoostControl::addGroup(cedar::proc::GroupPtr group)
+{
+  for (const auto& name_element_pair : group->getElements())
   {
-    this->translateElementAddedSignal(iter->second);
+    this->translateElementAddedSignal(name_element_pair.second);
   }
 
-  this->mElementAddedConnection
-    = this->mNetwork->connectToNewElementAddedSignal(boost::bind(&cedar::proc::gui::BoostControl::translateElementAddedSignal, this, _1));
-  this->mElementRemovedConnection
-    = this->mNetwork->connectToElementRemovedSignal(boost::bind(&cedar::proc::gui::BoostControl::translateElementRemovedSignal, this, _1));
+  this->mElementAddedConnections.push_back
+  (
+    group->connectToNewElementAddedSignal
+    (
+      boost::bind(&cedar::proc::gui::BoostControl::translateElementAddedSignal, this, _1)
+    )
+  );
+
+  this->mElementRemovedConnections.push_back
+  (
+    group->connectToElementRemovedSignal
+    (
+      boost::bind(&cedar::proc::gui::BoostControl::translateElementRemovedSignal, this, _1)
+    )
+  );
 }
 
 void cedar::proc::gui::BoostControl::translateElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
-  if (auto boost = boost::dynamic_pointer_cast<cedar::proc::sources::ConstBoost>(element))
+  auto iter = this->mElementNames.find(element.get());
+  if (iter != this->mElementNames.end())
   {
-    auto iter = this->mBoostNames.find(boost.get());
-    if (iter != this->mBoostNames.end())
-    {
-      this->mBoostNames.erase(iter);
-    }
+    QString name = iter->second;
+    this->mElementNames.erase(iter);
 
-    emit boostRemovedSignal(QString::fromStdString(element->getName()));
+    emit elementRemovedSignal(name);
   }
 }
 
-void cedar::proc::gui::BoostControl::boostRemoved(QString elementName)
+void cedar::proc::gui::BoostControl::elementRemoved(QString elementName)
 {
   auto items = this->mpBoostTree->findItems(elementName, 0);
 
-  for (int i = 0; i < items.size(); ++i)
+  QTreeWidgetItemIterator it(this->mpBoostTree);
+  while (*it)
   {
-    delete items.at(i);
+    QTreeWidgetItem* p_item = *it;
+    if (p_item->data(0, Qt::UserRole).toString() == elementName)
+    {
+      delete p_item;
+      return;
+    }
+    ++it;
   }
 }
 
 void cedar::proc::gui::BoostControl::translateElementAddedSignal(cedar::proc::ElementPtr element)
 {
-  emit elementAddedSignal(QString::fromStdString(element->getName()));
+  std::string path = this->mGroup->findPath(element);
+  emit elementAddedSignal(QString::fromStdString(path));
+}
+
+QTreeWidgetItem* cedar::proc::gui::BoostControl::getGroupItem(const std::string& elementPath)
+{
+  std::vector<std::string> subpaths;
+  cedar::aux::split(elementPath, ".", subpaths);
+
+  CEDAR_ASSERT(!subpaths.empty());
+
+  subpaths.pop_back();
+
+  QTreeWidgetItem* p_last = this->mpBoostTree->invisibleRootItem();
+  for (const auto& subpath : subpaths)
+  {
+    QTreeWidgetItem* p_item = nullptr;
+    for (int i = 0; i < p_last->childCount(); ++i)
+    {
+      auto child = p_last->child(i);
+      if (child->text(0).toStdString() == subpath)
+      {
+        p_item = child;
+      }
+    }
+    if (p_item == nullptr)
+    {
+      p_item = new QTreeWidgetItem();
+      p_item->setText(0, QString::fromStdString(subpath));
+      p_last->addChild(p_item);
+      p_item->setExpanded(true);
+    }
+    p_last = p_item;
+  }
+
+  return p_last;
 }
 
 void cedar::proc::gui::BoostControl::elementAdded(QString elementName)
 {
-  cedar::proc::ElementPtr element = this->mNetwork->getElement(elementName.toStdString());
+  cedar::proc::ElementPtr element = this->mGroup->getElement(elementName.toStdString());
 
-  if (cedar::proc::sources::BoostPtr boost = boost::dynamic_pointer_cast<cedar::proc::sources::Boost>(element))
+  if (auto boost = boost::dynamic_pointer_cast<cedar::proc::sources::Boost>(element))
   {
     this->addBoost(boost);
   }
+  else if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+  {
+    std::string path = this->mGroup->findPath(group);
+
+    this->connectRenameSignal(group);
+
+    this->addGroup(group);
+  }
 }
 
-void cedar::proc::gui::BoostControl::boostNameChanged()
+void cedar::proc::gui::BoostControl::elementNameChanged()
 {
   auto name = cedar::aux::asserted_cast<cedar::aux::Parameter*>(QObject::sender());
-  auto boost = dynamic_cast<cedar::proc::sources::Boost*>(name->getOwner());
+  auto element = dynamic_cast<cedar::proc::Element*>(name->getOwner());
 
-  auto iter = this->mBoostNames.find(boost);
-  if (iter == this->mBoostNames.end())
+  auto iter = this->mElementNames.find(element);
+  if (iter == this->mElementNames.end())
   {
-    return; // can happen if the boost is just now being deleted
+    return; // can happen if the element is being deleted
   }
 
   QString old_name = iter->second;
-  QString new_name = QString::fromStdString(boost->getName());
+  QString new_name = QString::fromStdString(this->mGroup->findPath(element));
 
   auto items = this->mpBoostTree->findItems(old_name, 0);
 
@@ -163,23 +232,31 @@ void cedar::proc::gui::BoostControl::boostNameChanged()
     items.at(i)->setText(0, new_name);
   }
 
-  this->mBoostNames[boost] = new_name;
+  this->mElementNames[element] = new_name;
+}
+
+void cedar::proc::gui::BoostControl::connectRenameSignal(cedar::proc::ElementPtr element)
+{
+  cedar::aux::ParameterPtr name = element->getParameter("name");
+  QObject::connect(name.get(), SIGNAL(valueChanged()), this, SLOT(elementNameChanged()));
 }
 
 void cedar::proc::gui::BoostControl::addBoost(cedar::proc::sources::BoostPtr boost)
 {
-  this->mBoostNames[boost.get()] = QString::fromStdString(boost->getName());
+  std::string path = this->mGroup->findPath(boost);
+  this->mElementNames[boost.get()] = QString::fromStdString(path);
 
-  cedar::aux::ParameterPtr name = boost->getParameter("name");
-  QObject::connect(name.get(), SIGNAL(valueChanged()), this, SLOT(boostNameChanged()));
+  this->connectRenameSignal(boost);
 
   QStringList labels;
   labels << QString::fromStdString(boost->getName());
 
   auto p_item = new QTreeWidgetItem(labels);
+  p_item->setData(0, Qt::UserRole, QString::fromStdString(path));
   p_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-  this->mpBoostTree->invisibleRootItem()->addChild(p_item);
+  auto group_item = this->getGroupItem(path);
+  group_item->addChild(p_item);
 
   cedar::aux::ParameterPtr active_parameter = boost->getParameter("active");
   cedar::aux::gui::Parameter* p_enabler

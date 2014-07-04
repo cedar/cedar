@@ -45,7 +45,7 @@
 #include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 
@@ -76,26 +76,34 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setNetwork(cedar::proc::NetworkPtr network);
+  //! set a group to monitor
+  void setGroup(cedar::proc::GroupPtr group);
 
 public slots:
+  //! refresh all measurements
   void refresh();
+
+  //! react to a change in auto refresh
+  void autoRefreshToggled(bool enabled);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! the timer event for auto refresh
+  void timerEvent(QTimerEvent*);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void addGroup(cedar::proc::ConstGroupPtr group);
+
   void addStepRow(cedar::proc::ConstStepPtr step);
 
   void clear();
 
-  void addMeasurement(cedar::unit::Time measurement, int row, int column);
+  void addMeasurement(cedar::unit::Time measurement, int row, int column, bool isRunning);
 
   void addUnAvailableMeasurement(int row, int column);
 
@@ -105,7 +113,9 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::NetworkPtr mNetwork;
+  cedar::proc::GroupPtr mGroup;
+
+  int mTimerId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

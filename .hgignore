@@ -6,6 +6,7 @@ bin
 lib
 logs
 *.log
+*.orig
 Linux-*
 Darwin-*
 debug*

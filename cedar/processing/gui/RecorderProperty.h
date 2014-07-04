@@ -81,6 +81,9 @@ private slots:
   //!@brief Informs the recorder that the step size for this slot has changed. 
   void updateStepSize(int value);
 
+signals:
+  //! signals change
+  void changed();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

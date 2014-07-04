@@ -161,7 +161,7 @@ int testConfiguration
   }
   thread.stop();
   thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
-  if (thread.isRunning())
+  if (thread.isRunningNolocking())
   {
     std::cout << "ERROR: the thread didn't exit properly." << std::endl;
     ++errors;
@@ -183,7 +183,7 @@ void runTests()
   thread.wait(cedar::unit::Time(1.0 * cedar::unit::second));
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
-  if (thread.isRunning())
+  if (thread.isRunningNolocking())
   {
     std::cout << "... Thread NOT stopped! error" << std::endl;
     errors++;
@@ -198,7 +198,7 @@ void runTests()
   thread.start();
   thread.stop();
 
-  if (thread.isRunning())
+  if (thread.isRunningNolocking())
   {
     std::cout << "... Thread NOT stopped! error" << std::endl;
     errors++;

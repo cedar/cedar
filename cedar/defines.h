@@ -61,6 +61,15 @@
 // macros
 //----------------------------------------------------------------------------------------------------------------------
 
+/*! @def CEDAR_ALLOW_UNUSED(X)
+ *  Allows a type, variable or other local declaration to not be used.
+ */
+#ifdef CEDAR_COMPILER_GCC
+#define CEDAR_ALLOW_UNUSED(X) X __attribute__((unused))
+#else
+#define CEDAR_ALLOW_UNUSED(X) X
+#endif
+
 /*! @def     CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
  *
  *  @brief   Automatically declares the smart pointer types  of a class within a namespace block.
@@ -73,16 +82,16 @@
  *           }
  */
 #define CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME) \
-  typedef const CLASS_NAME Const ## CLASS_NAME; \
-  typedef boost::shared_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
-  typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr; \
-  typedef boost::weak_ptr<CLASS_NAME> CLASS_NAME ## WeakPtr; \
-  typedef boost::weak_ptr<const CLASS_NAME> Const ## CLASS_NAME ## WeakPtr
+  CEDAR_ALLOW_UNUSED(typedef const CLASS_NAME Const ## CLASS_NAME); \
+  CEDAR_ALLOW_UNUSED(typedef boost::shared_ptr<CLASS_NAME> CLASS_NAME ## Ptr); \
+  CEDAR_ALLOW_UNUSED(typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr); \
+  CEDAR_ALLOW_UNUSED(typedef boost::weak_ptr<CLASS_NAME> CLASS_NAME ## WeakPtr); \
+  CEDAR_ALLOW_UNUSED(typedef boost::weak_ptr<const CLASS_NAME> Const ## CLASS_NAME ## WeakPtr)
 
 #define CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME) \
-  typedef const CLASS_NAME Const ## CLASS_NAME; \
-  typedef boost::intrusive_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
-  typedef boost::intrusive_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr
+  CEDAR_ALLOW_UNUSED(typedef const CLASS_NAME Const ## CLASS_NAME); \
+  CEDAR_ALLOW_UNUSED(typedef boost::intrusive_ptr<CLASS_NAME> CLASS_NAME ## Ptr); \
+  CEDAR_ALLOW_UNUSED(typedef boost::intrusive_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr)
 
 /*! @def     CEDAR_DECLARE_CLASS(CLASS_NAME)
  *
@@ -124,7 +133,9 @@
 
 #ifdef CEDAR_COMPILER_MSVC
 #define CEDAR_DECLARE_DEPRECATE_MACRO(name) __declspec(deprecated) static inline void name ## _MACRO (void) { ; }
+#define CEDAR_CURRENT_FUNCTION_NAME __FUNCSIG__
 #elif defined CEDAR_COMPILER_GCC
+#define CEDAR_CURRENT_FUNCTION_NAME __PRETTY_FUNCTION__
 #define CEDAR_DECLARE_DEPRECATE_MACRO(name) static inline void __attribute__((deprecated)) name ## _MACRO (void) { ; }
 #else
 #error CEDAR_DECLARE_DEPRECATE_MACRO is not implemented for this compiler.

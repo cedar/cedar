@@ -41,6 +41,8 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/DataConnection.fwd.h"
+#include "cedar/processing/OwnedData.fwd.h"
+#include "cedar/processing/ExternalData.fwd.h"
 
 // SYSTEM INCLUDES
 
@@ -56,7 +58,7 @@ class cedar::proc::DataConnection
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  DataConnection(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
   //!@brief Destructor
   ~DataConnection();
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,7 +67,7 @@ public:
 public:
   //!@brief test if the given source and target are the same for this connection (i.e. are those two DataSlots connected
   // via this DataConnection
-  bool equals(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target) const;
+  bool equals(cedar::proc::ConstOwnedDataPtr source, cedar::proc::ConstExternalDataPtr target) const;
 
   //!@brief test if the given source and target are parents of the slots of this DataConnection
   bool connects(cedar::proc::ConstConnectablePtr source, cedar::proc::ConstConnectablePtr target) const;
@@ -77,16 +79,16 @@ public:
   void disconnect();
 
   //!@brief get the source of this connection
-  cedar::proc::ConstDataSlotPtr getSource() const;
+  cedar::proc::ConstOwnedDataPtr getSource() const;
 
   //!@brief get the target of this connection
-  cedar::proc::ConstDataSlotPtr getTarget() const;
+  cedar::proc::ConstExternalDataPtr getTarget() const;
 
   //!@brief get the source of this connection
-  cedar::proc::DataSlotPtr getSource();
+  cedar::proc::OwnedDataPtr getSource();
 
   //!@brief get the target of this connection
-  cedar::proc::DataSlotPtr getTarget();
+  cedar::proc::ExternalDataPtr getTarget();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,18 +99,19 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  cedar::proc::DataSlotPtr getRealTarget() const;
+
+  std::string getDataSlotIdentifier(cedar::proc::DataSlotPtr slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief the source DataSlot of this connection
-  cedar::proc::DataSlotWeakPtr mSource;
+  cedar::proc::OwnedDataWeakPtr mSource;
   //!@brief the target DataSlot of this connection
-  cedar::proc::DataSlotWeakPtr mTarget;
+  cedar::proc::ExternalDataWeakPtr mTarget;
 private:
-  // none yet
+  bool mAlreadyDisconnected;
 }; // class cedar::proc::DataConnection
 
 #endif // CEDAR_PROC_DATA_CONNECTION_H

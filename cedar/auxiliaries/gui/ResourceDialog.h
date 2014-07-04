@@ -52,9 +52,7 @@
 #include <vector>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A dialog for selecting a file from cedar's resources.
  */
 class cedar::aux::gui::ResourceDialog : public QDialog, public Ui_ResourceDialog
 {
@@ -82,9 +80,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Opens a resource dialog and queries a resource from the user, then returns it.
   static cedar::aux::Path openResource
   (
-    QWidget* pParent = NULL,
+    QWidget* pParent = nullptr,
     const std::vector<std::string>& extensions = std::vector<std::string>()
   );
 

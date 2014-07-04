@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Element.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 
 // SYSTEM INCLUDES
 
@@ -57,21 +57,42 @@ cedar::proc::Element::~Element()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::Element::setNetwork(cedar::proc::NetworkPtr network)
-{
-  // set the parent registry
-  this->mRegisteredAt = network;
 
-  // emit signal
-  this->mNetworkChanged();
+void cedar::proc::Element::updateTriggerChains(std::set<cedar::proc::Trigger*>& /*visited*/)
+{
+  // empty default implementation
 }
 
-cedar::proc::NetworkPtr cedar::proc::Element::getNetwork()
+void cedar::proc::Element::setNetwork(cedar::proc::GroupPtr network)
+{
+  this->setGroup(network);
+}
+
+cedar::proc::GroupPtr cedar::proc::Element::getNetwork()
+{
+  return this->getGroup();
+}
+
+cedar::proc::ConstGroupPtr cedar::proc::Element::getNetwork() const
+{
+  return this->getGroup();
+}
+
+void cedar::proc::Element::setGroup(cedar::proc::GroupPtr group)
+{
+  // set the parent registry
+  this->mRegisteredAt = group;
+
+  // emit signal
+  this->mGroupChanged();
+}
+
+cedar::proc::GroupPtr cedar::proc::Element::getGroup()
 {
   return this->mRegisteredAt.lock();
 }
 
-cedar::proc::ConstNetworkPtr cedar::proc::Element::getNetwork() const
+cedar::proc::ConstGroupPtr cedar::proc::Element::getGroup() const
 {
   return this->mRegisteredAt.lock();
 }
@@ -83,15 +104,50 @@ void cedar::proc::Element::validateName(const std::string& newName) const
     CEDAR_THROW(cedar::aux::ValidationFailedException, "This name contains an invalid character (\".\")");
   }
 
-  if (cedar::proc::ConstNetworkPtr network = this->getNetwork())
+  // nothing to do if the name is the same
+  if (newName == this->getName())
+  {
+    return;
+  }
+
+  if (cedar::proc::ConstGroupPtr network = this->getGroup())
   {
     if (network->nameExists(newName))
     {
       CEDAR_THROW
       (
         cedar::aux::ValidationFailedException,
-        "There is already an element of this name in this element's network."
+        "There is already an element with the name \"" + newName + "\" in this element's group."
       );
     }
+  }
+}
+
+void cedar::proc::Element::copyFrom(cedar::aux::ConstConfigurablePtr src)
+{
+  // check type
+  if (typeid(*this) != typeid(*src))
+  {
+    CEDAR_THROW(cedar::aux::TypeMismatchException, "cannot copy if types do not match");
+  }
+  cedar::aux::ConfigurationNode root;
+  src->writeConfiguration(root);
+  root.put("name", this->getName());
+  this->readConfiguration(root);
+}
+
+void cedar::proc::Element::copyTo(cedar::aux::ConfigurablePtr target) const
+{
+  // check type
+  if (typeid(*this) != typeid(*target))
+  {
+    CEDAR_THROW(cedar::aux::TypeMismatchException, "cannot copy if types do not match");
+  }
+  cedar::aux::ConfigurationNode root;
+  this->writeConfiguration(root);
+  if (auto elem = boost::dynamic_pointer_cast<cedar::proc::Element>(target))
+  {
+    root.put("name", elem->getName());
+    target->readConfiguration(root);
   }
 }

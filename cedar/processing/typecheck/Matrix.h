@@ -80,6 +80,9 @@ public:
   //! Add an accepted matrix type. By default, all dimensionalities are accepted.
   void addAcceptedType(int type);
 
+  //! Add an accepted amount of channels. By default, all channels are accepted.
+  void addAcceptedNumberOfChannels(unsigned int numberOfChannels);
+
   //! Sets whether the matrix can be empty
   void acceptsEmptyMatrix(bool accepts);
 
@@ -103,6 +106,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   std::vector<unsigned int> mAcceptedDimensionalities;
+
+  std::vector<unsigned int> mAcceptedNumberOfChannels;
 
   std::vector<int> mAcceptedTypes;
 

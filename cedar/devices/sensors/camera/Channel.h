@@ -204,7 +204,7 @@ public:
 
   /*! @brief Set a new backendtype to the used channel.
    *
-   * This will also change some visible attributes to various parameters in the processingIde
+   * This will also change some visible attributes to various parameters in the gui
    *
    * @param backendType The wanted backend as enum parameter
    */

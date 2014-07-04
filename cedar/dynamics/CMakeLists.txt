@@ -45,6 +45,7 @@ cedar_add_library(cedardyn
                   fields/NeuralField.h
                   fields/Preshape.h
                   steps/RateMatrixToSpaceCode.h
+                  steps/SpaceCodeToRateMatrix.h
                   steps/RateToSpaceCode.h
                   steps/SerialOrder.h
                   steps/SpaceToRateCode.h

@@ -48,12 +48,10 @@ likely to undergo major changes:
 
 known issues
 ============
-  - cedardyn is not properly loaded on some OSs (mainly Windows) when using processingIde. If you want to use its
+  - cedardyn is not properly loaded on some OSs (mainly Windows) when using cedar. If you want to use its
     content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
     this plugin to be loaded on every start.
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
-  - network functionality in the processing framework has several issues; for now, we recommend not using it because
-    there are some annoying bugs related to it (it's deactivated in the gui anyway).
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
   - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
@@ -63,11 +61,40 @@ known issues
     own programs exit and the stack contains cedar::aux::Log::getMemoryDebugFlag(), this may be the cause. As a
     workaround, make sure to reset all smart pointers at the end of your main method (the usual cause are global-scope
     smart pointers that send a log message after the log singleton was freed.)
+  - In rare cases, moving elements into groups breaks the triggering chain, which leads to steps not being iterated
+    correctly. This can be fixed by saving and loading the architecture. If you encounter such a (reproducible)
+    situation, please let us know.
 
 Unreleased
 ==========
 
-none
+- processingIde
+  - The processingIde is now simply called cedar. Conversely, the processingCL is now called cedar-shell.
+
+- cedar
+  - There is now a new configurable widget. It uses a far more appropriate tree view for displaying parameters of a
+    step, but is otherwise quite similar to the old one.
+      
+- cedar::proc
+  - DataSlots can now be marked as serializable. What this means is that the data stored in them will be stored in the
+    architecture when it is saved, and restored later on when it is loaded. In addition, users can manually save and
+    load data for these slots from the right-click menu of step items.
+  - Groups now work as intended: one can freely move elements between groups, existing connections are preserved, using 
+    group connectors if necessary. In the gui, grouping is drag-and-drop-based.
+  - Group templates can now be added in two ways:
+    1. They can be copied into the current architecture. Any changes to the original template will not be reflected.
+    2. They can be linked into the architecture. Only the file- and groupname will be stored, and the group will be re-
+       loaded from the stored file every time the architecture is loaded. Note: linked groups cannot be edited to avoid
+       conflicts. Any edits must be made to the file containing the imported group.
+    To link in templates, hold ctrl while dragging them from the elements tab.
+  - Step configurations can now be copied and pasted in the GUI using Ctrl+C and Ctrl+Shift+V.
+  - In the GUI, one can use Ctrl+F to bring up a search window to center on specific steps
+  - cedar now allows to slow down or speed up the global timers, effectively allowing for (0.0,2.0] x real-time.
+  - cedar now notices if there were any changes made to an architecture and notifies the user about this when closing a
+    file.
+  - Looped triggers now have a tool tip showing statistics.
+  - Improved performance of triggering chains.
+  - Improved loading and connecting time for large architectures.
 
 Released versions
 =================

@@ -102,6 +102,11 @@ public:
     return result;
   }
 
+  /*!@brief Computes the transfer function for each element in the matrix.
+   *
+   * @remarks The default implementation iterates over the matrix and calls the other compute function. Override this in
+   *          the child classes to increase performance.
+   */
   virtual cv::Mat compute(const cv::Mat& values) const;
 
   //--------------------------------------------------------------------------------------------------------------------

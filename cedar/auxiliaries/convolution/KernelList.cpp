@@ -70,7 +70,7 @@ void cedar::aux::conv::KernelList::append(cedar::aux::kernel::KernelPtr kernel)
 void cedar::aux::conv::KernelList::remove(size_t index)
 {
   CEDAR_ASSERT(index < this->size());
-  this->mKernels.at(index)->disconnect(this, SIGNAL(kernelUpdated()));
+  this->mKernels.at(index)->disconnect(this, SLOT(calculateCombinedKernel()));
   this->mKernels.erase(this->mKernels.begin() + index);
   calculateCombinedKernel();
   this->mKernelRemovedSignal(index);
@@ -95,7 +95,7 @@ void cedar::aux::conv::KernelList::calculateCombinedKernel()
       if (dim != this->getKernel(i)->getDimensionality())
       {
         // inconsistency, happens while kernels are being updated, ignore
-        CEDAR_THROW(cedar::aux::DimensionalityMismatchException, "not all kernels in this list have the same size");
+        return;
       }
     }
   }

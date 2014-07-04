@@ -51,6 +51,7 @@
 #endif
 #include <string>
 #include <QList>
+#include <QReadWriteLock>
 
 /*!@brief This class visualizes several objects in the same environment
  *
@@ -160,6 +161,8 @@ private:
   QList<cedar::aux::gl::ObjectVisualizationPtr> mObjectVisualizations;
   // list of viewers currently displaying this scene
   QList<cedar::aux::gui::Viewer*> mViewers;
+  
+  mutable QReadWriteLock mObjectVisualizationLock;
 };
 
 #endif  // CEDAR_AUX_GL_SCENE_H

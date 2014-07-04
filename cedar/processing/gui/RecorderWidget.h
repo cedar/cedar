@@ -88,11 +88,16 @@ public:
 
   void emitStepRegisteredinRecorder();
 public slots:
+  //! update the name
   void updateName();
 
 
 signals:
+  //! signal that a new step is registered in recorder
   void stepRegisteredinRecorder();
+
+  //! signal that the settings changed
+  void settingsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

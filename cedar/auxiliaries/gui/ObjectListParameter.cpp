@@ -186,7 +186,7 @@ void cedar::aux::gui::ObjectListParameter::appendObjectToInstanceList(int index)
   this->mpInstanceSelector->addItem(label);
 
   // The object's index should always correspond to the index in the combo box.
-  CEDAR_DEBUG_ASSERT(index == this->mpInstanceSelector->count() - 1);
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(index == this->mpInstanceSelector->count() - 1);
 }
 
 void cedar::aux::gui::ObjectListParameter::removeClicked()

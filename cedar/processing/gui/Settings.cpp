@@ -75,6 +75,7 @@ mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
+mBoostCtrlSettgings(new cedar::proc::gui::Settings::DockSettings(false)),
 mMainWindowGeometry(new cedar::aux::StringParameter(this, "mainWindowGeometry", "")),
 mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 {
@@ -85,7 +86,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("steps", mSteps);
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
-
+  ui_settings->addConfigurableChild("boost control", mBoostCtrlSettgings);
 
   cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
   this->addConfigurableChild("slot growth", slot_growth);
@@ -122,6 +123,13 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                                    "highlight connections of selected steps",
                                    true
                                  );
+
+  this->_mHighlightHoveredConnections = new cedar::aux::BoolParameter
+      (
+        ui_settings.get(),
+        "highlight connections of data slots when hovering",
+        true
+      );
 
   cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
   this->addConfigurableChild("displaySettings", display_settings);
@@ -178,13 +186,42 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
         )
       );
 
+  std::vector<std::string> default_user_colors;
+  default_user_colors.push_back("blue=rgb(110,110,255)");
+  default_user_colors.push_back("red=rgb(255,110,110)");
+  default_user_colors.push_back("green=rgb(110,255,110)");
+  default_user_colors.push_back("cyan=rgb(110,255,255)");
+  default_user_colors.push_back("magenta=rgb(255,110,255)");
+  default_user_colors.push_back("yellow=rgb(255,255,110)");
+  this->_mUserDefinedColors = new cedar::aux::StringVectorParameter(this, "user-defined colors", default_user_colors);
+
   this->load();
 }
 
-cedar::proc::gui::Settings::DockSettings::DockSettings()
+cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string& stringToParse)
+{
+  std::vector<std::string> components;
+  cedar::aux::split(stringToParse, "=", components);
+  if (components.size() == 2)
+  {
+    this->mName = components.at(0);
+    this->mDefinition = components.at(1);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Bad user color string: \"" + stringToParse + "\".",
+      "cedar::proc::gui::Settings::UserDefinedColor::UserDefinedColor(const std::string&)"
+    );
+  }
+}
+
+cedar::proc::gui::Settings::DockSettings::DockSettings(bool defaultVisible)
 :
-mVisible(new cedar::aux::BoolParameter(this, "visible", true)),
-mFloating(new cedar::aux::BoolParameter(this, "floating", false))
+mVisible(new cedar::aux::BoolParameter(this, "visible", defaultVisible)),
+mFloating(new cedar::aux::BoolParameter(this, "floating", false)),
+mGeometry(new cedar::aux::StringParameter(this, "geometry", ""))
 {
 }
 
@@ -196,6 +233,85 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Settings::userDefinedColorStringsChanged()
+{
+  this->mUserDefinedColors.clear();
+
+  for (const auto& string : this->_mUserDefinedColors->getValue())
+  {
+    UserDefinedColorPtr color(new UserDefinedColor(string));
+    this->mUserDefinedColors.push_back(color);
+  }
+}
+
+bool cedar::proc::gui::Settings::UserDefinedColor::hasName() const
+{
+  return !this->mName.empty();
+}
+
+const std::string& cedar::proc::gui::Settings::UserDefinedColor::getName() const
+{
+  return this->mName;
+}
+
+QColor cedar::proc::gui::Settings::UserDefinedColor::toQColor() const
+{
+  size_t open = this->mDefinition.find("(");
+  if (open == std::string::npos)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Malformed color definition: opening '(' not found in \"" + this->mDefinition + "\".",
+      "cedar::proc::gui::Settings::UserDefinedColor::toQColor() const"
+    );
+    return QColor(100, 100, 100);
+  }
+  if (this->mDefinition.at(this->mDefinition.size() - 1) != ')')
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Malformed color definition: closing ')' must be last character in \"" + this->mDefinition + "\".",
+      "cedar::proc::gui::Settings::UserDefinedColor::toQColor() const"
+    );
+    return QColor(100, 100, 100);
+  }
+
+  std::string protocol = this->mDefinition.substr(0, open);
+  std::string value_str = this->mDefinition.substr(open + 1, this->mDefinition.size() - open - 2);
+
+  std::vector<std::string> values;
+  cedar::aux::split(value_str, ",", values);
+
+  if (values.size() != 3)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Malformed color definition: wrong number of colors in string \"" + this->mDefinition + "\".",
+      "cedar::proc::gui::Settings::UserDefinedColor::toQColor() const"
+    );
+    return QColor(100, 100, 100);
+  }
+
+  if (protocol == "rgb")
+  {
+    int r = cedar::aux::fromString<int>(values.at(0));
+    int g = cedar::aux::fromString<int>(values.at(1));
+    int b = cedar::aux::fromString<int>(values.at(2));
+    return QColor::fromRgb(r, g, b);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Unknown protocol \"" + protocol + "\" in color definition.",
+      "cedar::proc::gui::Settings::UserDefinedColor::toQColor() const"
+    );
+    return QColor(100, 100, 100);
+  }
+
+  return QColor(100, 100, 100);
+}
 
 bool cedar::proc::gui::Settings::getElementListShowsDeprecated() const
 {
@@ -303,12 +419,31 @@ void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
 {
   this->mVisible->setValue(pDock->isVisible());
   this->mFloating->setValue(pDock->isFloating());
+
+  QByteArray window_geometry = pDock->saveGeometry();
+  QByteArray window_geometry_hex = window_geometry.toHex();
+  this->mGeometry->setValue(window_geometry_hex.constData());
 }
 
 void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
 {
   pDock->setVisible(this->mVisible->getValue());
   pDock->setFloating(this->mFloating->getValue());
+
+  if (!this->mGeometry->getValue().empty())
+  {
+    QByteArray window_geometry_hex(this->mGeometry->getValue().c_str());
+    QByteArray window_geometry = QByteArray::fromHex(window_geometry_hex);
+    if (!pDock->restoreGeometry(window_geometry))
+    {
+      std::cout << "Could not restore geometry of dock widget." << std::endl;
+    }
+  }
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::boostCtrlSettings()
+{
+  return this->mBoostCtrlSettgings;
 }
 
 cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::logSettings()
@@ -347,6 +482,8 @@ void cedar::proc::gui::Settings::load()
     );
     //!@todo Restore defaults
   }
+
+  this->userDefinedColorStringsChanged();
 }
 
 void cedar::proc::gui::Settings::save()

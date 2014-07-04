@@ -42,7 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LockType.h"
-#include "cedar/auxiliaries/CallOnScopeExit.h"
+#include "cedar/auxiliaries/LockerBase.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Lockable.fwd.h"
@@ -75,41 +75,109 @@ public:
   //! Storage for locks in this class.
   typedef std::multiset<std::pair<QReadWriteLock*, cedar::aux::LOCK_TYPE> > Locks;
 
+public:
   /*! @brief A RAII-based locker for lockables. Will automatically unlock when the locker is destroyed.
+   *
+   * @see cedar::aux::LockerBase
    */
-  class Locker : private cedar::aux::CallOnScopeExit
+  class Locker : public cedar::aux::LockerBase
   {
     public:
+      //! Constructor. Takes a lockable and the lock set to be locked.
       Locker(LockablePtr lockable, LockSetHandle lockSet = 0)
       :
-      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
       {
-        lockable->lockAll(lockSet);
       }
 
+      //! Constructor. Takes a lockable and the lock set to be locked.
       Locker(Lockable* lockable, LockSetHandle lockSet = 0)
       :
-      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
       {
-        lockable->lockAll(lockSet);
       }
 
+      //! Constructor. Takes a lockable and the lock set to be locked, as well as the type of locking to be done.
       Locker(Lockable* lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
       :
-      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockType, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
       {
-        lockable->lockAll(lockType, lockSet);
       }
 
+      //! Constructor. Takes a lockable and the lock set to be locked, as well as the type of locking to be done.
       Locker(LockablePtr lockable, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0)
       :
-      cedar::aux::CallOnScopeExit(boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet))
+      cedar::aux::LockerBase
+      (
+        boost::bind(&cedar::aux::Lockable::lockAll, lockable, lockType, lockSet),
+        boost::bind(&cedar::aux::Lockable::unlockAll, lockable, lockSet)
+      )
       {
-        lockable->lockAll(lockType, lockSet);
       }
   };
 
   CEDAR_GENERATE_POINTER_TYPES(Locker);
+
+public:
+  /*! An RAII-based read-locker for cedar::aux::Lockables.
+   *
+   * @see cedar::aux::LockerBase
+   */
+  class ReadLocker : public Locker
+  {
+  public:
+    //! Constructor.
+    ReadLocker(LockablePtr lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_READ, lockSet)
+    {
+    }
+
+    //! Constructor.
+    ReadLocker(Lockable* lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_READ, lockSet)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+
+  /*! An RAII-based write-locker for cedar::aux::Lockables.
+   *
+   * @see cedar::aux::LockerBase
+   */
+  class WriteLocker : public Locker
+  {
+  public:
+    //! Constructor.
+    WriteLocker(LockablePtr lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_WRITE, lockSet)
+    {
+    }
+
+    //! Constructor.
+    WriteLocker(Lockable* lockable, LockSetHandle lockSet = 0)
+    :
+    Locker(lockable, cedar::aux::LOCK_TYPE_WRITE, lockSet)
+    {
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -153,6 +221,7 @@ protected:
   //!@brief Retrieves the handle for a given lock set name.
   LockSetHandle getLockSetHandle(const std::string& lockSet) const;
 
+  //! Returns the set of locks stored for the given lock set handle.
   const Locks& getLocks(LockSetHandle lockSet = 0) const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -169,6 +238,10 @@ private:
 
       case cedar::aux::LOCK_TYPE_WRITE:
         pLock->lockForWrite();
+        break;
+
+      case cedar::aux::LOCK_TYPE_DONT_LOCK:
+        // do nothing
         break;
     }
   }

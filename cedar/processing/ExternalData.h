@@ -112,43 +112,28 @@ public:
     return this->mData.size();
   }
 
-  /*!@brief   Checks if the data pointer is already stored in this slot's collection.
-   */
+  //!@brief   Checks if the data pointer is already stored in this slot's collection.
   bool hasData(cedar::aux::ConstDataPtr data) const;
-
-  /*!@brief   Removes the data pointer from the slot's collection.
-   */
-  void removeData(cedar::aux::ConstDataPtr data);
 
   /*!@brief   Sets whether or not this slot is a collection, i.e., accepts multiple data pointers.
    * @remarks This function throws unless the role of this slot is input.
    */
   void setCollection(bool isCollection);
 
-  /*!@brief   Returns whether this slot is a collection of multiple data pointers.
-   */
+  //!@brief   Returns whether this slot is a collection of multiple data pointers.
   bool isCollection() const;
 
-  /*!@brief register a function pointer with this function to react to any changes in the list of external data in this
-   *        slot (i.e., data added, data removed.)
-   */
-  boost::signals2::connection connectToExternalDataChanged(boost::function<void ()> slot);
+  //!@brief Clears all data from the slot.
+  void clearInternal();
 
-  /*!@brief Register a function to react to the removal of external data in this slot.
-   *
-   *        The connected function receives the removed data as first argument.
-   */
-  boost::signals2::connection connectToExternalDataRemoved(boost::function<void (cedar::aux::ConstDataPtr)> slot);
+  //!@brief Returns the lock type.
+  cedar::aux::LOCK_TYPE getLockType() const;
 
-  /*!@brief Register a function to react to the addition of external data in this slot.
-   *
-   *        The connected function receives the added data as first argument.
-   */
-  boost::signals2::connection connectToExternalDataAdded(boost::function<void (cedar::aux::ConstDataPtr)> slot);
+  //!@brief Adds an incoming connection to the list of connections to this slot
+  void addIncomingConnection(cedar::proc::DataConnectionPtr newConnection);
 
-  /*!@brief Clears all data from the slot.
-   */
-  void clear();
+  //!@brief Removes an incoming connection from the list of connections to this slot
+  void removeIncomingConnection(cedar::proc::DataConnectionPtr removedConnection);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -164,37 +149,34 @@ private:
    *
    * @remarks If the step is a collection, this function calls addData. Otherwise, it calls setData(data, 0).
    */
-  void setData(cedar::aux::DataPtr data);
+  void setDataInternal(cedar::aux::DataPtr data);
 
   /*!@brief   Sets the data pointer of the given index.
    */
-  void setData(cedar::aux::DataPtr data, unsigned int index);
+  void setDataInternal(cedar::aux::DataPtr data, unsigned int index);
 
   /*!@brief   Appends a data pointer to the list of data.
    *
    * @remarks This function only makes sense when the slot is a collection.
    */
-  void addData(cedar::aux::DataPtr data);
+  void addDataInternal(cedar::aux::DataPtr data);
+
+  /*!@brief   Removes the data pointer from the slot's collection.
+   */
+  void removeDataInternal(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief a boost signal that is emitted if a new external data is set
-  boost::signals2::signal<void ()> mExternalDataChanged;
+  // none yet
+
 private:
   //!@brief Vector of data references connected to this slot.
   std::vector<cedar::aux::DataWeakPtr> mData;
 
   //!@brief Whether this slot can have multiple data items.
   bool mIsCollection;
-
-  //!@brief A boost signal that is emitted when external data is removed from this slot's list.
-  boost::signals2::signal<void (cedar::aux::ConstDataPtr)> mExternalDataRemoved;
-
-  //!@brief A boost signal that is emitted when external data is added from this slot's list.
-  boost::signals2::signal<void (cedar::aux::ConstDataPtr)> mExternalDataAdded;
-
 }; // class cedar::proc::ExternalData
 
 #endif // CEDAR_PROC_EXTERNAL_DATA_H

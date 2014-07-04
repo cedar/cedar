@@ -80,7 +80,20 @@ public:
    */
   virtual double compute(double value) const;
 
+  //! Overriden for efficiency.
   virtual cv::Mat compute(const cv::Mat& values) const;
+
+  //! Returns the beta (slope) of the sigmoid.
+  inline double getBeta() const
+  {
+    return this->_mBeta->getValue();
+  }
+
+  //! Sets the beta (slope) of the sigmoid.
+  inline void setBeta(double beta)
+  {
+    this->_mBeta->setValue(beta);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

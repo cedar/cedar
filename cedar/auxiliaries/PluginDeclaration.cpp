@@ -135,3 +135,8 @@ void cedar::aux::PluginDeclaration::setSource(const std::string& source)
 {
   this->mSource = source;
 }
+
+std::string cedar::aux::PluginDeclaration::getClassName() const
+{
+  return mClassName;
+}

@@ -166,6 +166,18 @@ public:
     this->_mSizes->set(dim, size);
   }
 
+  //! Returns the resting level (h) of the field.
+  inline double getRestingLevel() const
+  {
+    return this->mRestingLevel->getValue();
+  }
+
+  //! Sets the resting level (h) of the field.
+  inline void setRestingLevel(double restingLevel) const
+  {
+    return this->mRestingLevel->setValue(restingLevel, true);
+  }
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();

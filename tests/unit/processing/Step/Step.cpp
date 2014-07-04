@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 
@@ -130,7 +130,7 @@ int testStartingStopping()
 {
   int errors = 0;
 
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   StartStopTesterPtr step1(new StartStopTester());
   StartStopTesterPtr step2(new StartStopTester());
   StartStopTesterPtr step3(new StartStopTester());

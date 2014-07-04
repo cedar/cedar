@@ -48,19 +48,18 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
   {
     namespace logFilter
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(All);
+      //!@endcond
     }
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_AUX_LOG_FILTER_ALL_FWD_H
 

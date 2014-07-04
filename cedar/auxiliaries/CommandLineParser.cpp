@@ -40,6 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/EnumBase.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -94,6 +96,15 @@ cedar::aux::CommandLineParser::CommandLineParser()
 
 void cedar::aux::CommandLineParser::setParsedValue(const std::string& longName, const std::string& value)
 {
+  auto enum_iter = this->mEnumValues.find(longName);
+  if (enum_iter != this->mEnumValues.end())
+  {
+    auto enum_base_ptr = enum_iter->second;
+    if (enum_base_ptr->get(value) == cedar::aux::Enum::UNDEFINED)
+    {
+      CEDAR_THROW(cedar::aux::InvalidValueException, "Invalid value \"" + value + "\"specified for command line parameter \"" + longName + "\". See --help for more details.");
+    }
+  }
   this->mParsedValues[longName] = value;
 }
 
@@ -161,7 +172,22 @@ void cedar::aux::CommandLineParser::readConfiguration(cedar::aux::ConfigurationN
       for (auto iter = flags_node.begin(); iter != flags_node.end(); ++iter)
       {
         auto long_name = iter->first;
-        auto value = iter->second.get_value<bool>();
+        bool value;
+        try
+        {
+          value = iter->second.get_value<bool>();
+        }
+        catch(boost::property_tree::ptree_bad_data)
+        {
+          cedar::aux::LogSingleton::getInstance()->error
+          (
+            "Could not parse command-line value for flag \"" + long_name
+            + "\" from file. Did you use the right file format?",
+            "void cedar::aux::CommandLineParser::readConfiguration(cedar::aux::ConfigurationNode&)"
+          );
+          continue;
+        }
+
         this->setParsedFlag(long_name, value);
       }
     }
@@ -277,6 +303,38 @@ void cedar::aux::CommandLineParser::defineValue
   this->defineOption(longName, description, shortName, group);
 }
 
+void cedar::aux::CommandLineParser::defineEnum
+     (
+       const std::string& longName,
+       const std::string& description,
+       cedar::aux::EnumBasePtr enumType,
+       char shortName,
+       const std::string& group
+     )
+{
+  this->defineOption(longName, description, shortName, group);
+  this->mEnumValues[longName] = enumType;
+}
+
+void cedar::aux::CommandLineParser::defineEnum
+(
+  const std::string& longName,
+  const std::string& description,
+  cedar::aux::EnumBasePtr enumType,
+  cedar::aux::EnumId defaultValue,
+  char shortName,
+  const std::string& group
+)
+{
+  this->defineEnum(longName, description, enumType, shortName, group);
+  this->setDefaultValue(longName, enumType->get(defaultValue).name());
+}
+
+bool cedar::aux::CommandLineParser::isEnum(const std::string& longName) const
+{
+  return this->mEnumValues.find(longName) != this->mEnumValues.end();
+}
+
 void cedar::aux::CommandLineParser::defineValueInt
      (
        const std::string& longName,
@@ -288,6 +346,11 @@ void cedar::aux::CommandLineParser::defineValueInt
 {
   this->defineValue(longName, description, shortName, group);
 
+  this->setDefaultValue(longName, defaultValue);
+}
+
+void cedar::aux::CommandLineParser::setDefaultValue(const std::string& longName, const std::string& defaultValue)
+{
   CEDAR_ASSERT(this->mDefaultValues.find(longName) == this->mDefaultValues.end());
   this->mDefaultValues[longName] = defaultValue;
 }
@@ -650,6 +713,25 @@ void cedar::aux::CommandLineParser::writeHelp(std::ostream& stream) const
       if (this->hasDefaultValue(long_name))
       {
         stream << "    " << "Default value: " << this->getDefaultValue(long_name) << std::endl;
+      }
+
+      if (this->isEnum(long_name))
+      {
+        stream << "    Possible Values are: ";
+        bool first = true;
+        for (auto value : this->mEnumValues.find(long_name)->second->list())
+        {
+          if (first)
+          {
+            first = false;
+          }
+          else
+          {
+            stream << ", ";
+          }
+          stream << "\"" << value.name() << "\"";
+        }
+        stream << std::endl;
       }
 
       stream << std::endl;

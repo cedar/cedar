@@ -137,8 +137,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! creates a tool tip if the mouse cursor hovers over this object
+  //! creates a tool tip if the mouse cursor hovers over this object and highlights the connections from this slot.
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
+
+  //! Removes the highlighting of the connections from this slot.
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
 signals:
   //! Signal that is emitted whenever the validity of attached connections changes.

@@ -44,9 +44,11 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/auxiliaries/MovingAverage.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -63,6 +65,17 @@ class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! An average over time measures
+  typedef cedar::aux::MovingAverage<cedar::unit::Time> TimeAverage;
+
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES(TimeAverage);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -102,6 +115,9 @@ public:
   {
     stop();
   }
+
+  //! Returns the current time measurement statistics
+  ConstTimeAveragePtr getStatistics() const;
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -146,7 +162,7 @@ private:
   void prepareStart();
 
   //! Called when the trigger is started.
-  void processStop(bool);
+  void processQuit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -169,6 +185,8 @@ private:
 
   //! Used to prevent multiple start calls to the trigger.
   QMutex mStartedMutex;
+
+  TimeAveragePtr mStatistics;
 
 }; // class cedar::proc::LoopedTrigger
 

@@ -43,7 +43,8 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -76,13 +77,31 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::NetworkPtr network);
+  CEDAR_DECLARE_DEPRECATED(void setNetwork(cedar::proc::GroupPtr network));
+
+  //!@brief sets the group at which this element is registered
+  void setGroup(cedar::proc::GroupPtr group);
 
   //!@brief get the network at which this element is registered
-  cedar::proc::NetworkPtr getNetwork();
+  CEDAR_DECLARE_DEPRECATED(cedar::proc::GroupPtr getNetwork());
 
   //!@brief get the network at which this element is registered as const
-  cedar::proc::ConstNetworkPtr getNetwork() const;
+  CEDAR_DECLARE_DEPRECATED(cedar::proc::ConstGroupPtr getNetwork() const);
+
+  //!@brief get the group at which this element is registered
+  cedar::proc::GroupPtr getGroup();
+
+  //!@brief get the group at which this element is registered as const
+  cedar::proc::ConstGroupPtr getGroup() const;
+
+  //!@brief copy a configuration from another instance of the same class (type check included)
+  void copyFrom(cedar::aux::ConstConfigurablePtr src);
+
+  //!@brief copy a configuration to another instance of the same class (type check included)
+  void copyTo(cedar::aux::ConfigurablePtr target) const;
+
+  //!@brief updates the trigger chains of this element
+  virtual void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -91,7 +110,7 @@ protected:
   //! connects to network changed signal
   inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
   {
-    return this->mNetworkChanged.connect(slot);
+    return this->mGroupChanged.connect(slot);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -104,11 +123,13 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! the network this element is registered at
-  cedar::proc::NetworkWeakPtr mRegisteredAt;
+  // none yet
 private:
+  //! the network this element is registered at
+  cedar::proc::GroupWeakPtr mRegisteredAt;
+
   //! Signal that is emitted whenever the element's network changes
-  boost::signals2::signal<void()> mNetworkChanged;
+  boost::signals2::signal<void()> mGroupChanged;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

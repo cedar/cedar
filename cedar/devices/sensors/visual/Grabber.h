@@ -663,12 +663,12 @@ private:
    */
   void prepareStart();
 
-  /*! @brief Stop the grabbing thread
+  /*! @brief Called when grabbing thread quits (finishes)
    *
-   *          This method invokes internally LoopedThread::stop() and does
+   *          This method does
    *          some cleanup like stopRecording or set the measured FPS to zero
    */
-  void processStop(bool);
+  void processQuit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

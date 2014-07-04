@@ -122,6 +122,17 @@ cedar::proc::sources::Picture::~Picture()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::MatDataPtr cedar::proc::sources::Picture::getImage()
+{
+  return this->mImage;
+}
+
+cedar::aux::ConstMatDataPtr cedar::proc::sources::Picture::getImage() const
+{
+  return this->mImage;
+}
+
 void cedar::proc::sources::Picture::setSourceFileName(const std::string& imagePath)
 {
   this->getPictureGrabber()->setSourceFile(imagePath);

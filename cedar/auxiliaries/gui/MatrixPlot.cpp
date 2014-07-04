@@ -120,6 +120,22 @@ mTitle("")
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::MatrixPlot::readConfiguration(const cedar::aux::ConfigurationNode& configuration)
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->readConfiguration(configuration);
+  }
+}
+
+void cedar::aux::gui::MatrixPlot::writeConfiguration(cedar::aux::ConfigurationNode& configuration) const
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->writeConfiguration(configuration);
+  }
+}
+
 bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
   if (this->mpCurrentPlotWidget == nullptr)
@@ -265,6 +281,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
 const std::vector<cedar::aux::gui::ColorValueRGBA>& cedar::aux::gui::MatrixPlot::getStandardColorVector()
 {
+  //!@todo Use cedar::aux::ColorGradient instead
   if (cedar::aux::gui::MatrixPlot::mStandardColorVector.empty())
   {
     cedar::aux::gui::ColorValueRGBA rgb;

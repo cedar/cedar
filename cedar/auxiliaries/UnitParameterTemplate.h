@@ -67,6 +67,7 @@ namespace cedar
 {
   namespace aux
   {
+    //! Extracts a unit from a string. Done via template specialization.
     template <typename T>
     inline boost::units::quantity<T> getUnitFromPostFix(const std::string& /* postFix */)
     {
@@ -77,6 +78,7 @@ namespace cedar
     }
 
 
+    //! Specialization of cedar::aux::getUnitFromPostFix for dimensionless units.
     template <>
     inline boost::units::quantity<boost::units::si::dimensionless> getUnitFromPostFix(const std::string& postFix)
     {
@@ -254,20 +256,29 @@ namespace cedar
 } // namespace cedar
 
 
-// Custom translator for bool (only supports std::string)
 namespace cedar
 {
   namespace aux
   {
+    /*!@brief A base class for translating units from and to strings.
+     *
+     * This class makes heavy use of template specialization for the different units, mainly of
+     * cedar::aux::parseUnitString. These specializations can usually be found in the header corresponding to the
+     * parameter for that unit.
+     *
+     * For example, for a cedar::units::Length, these can be found in cedar/aux/LengthParameter.h
+     *
+     * @tparam T type of unit to be translated from or to a boost::units::quantity<T>.
+     */
     template <typename T>
     struct UnitTranslator
     {
-      // boost-specific name, do not change or stuff will break!
+      //! boost-specific name, do not change or stuff will break!
       typedef std::string internal_type;
-      // boost-specific name, do not change or stuff will break!
+      //! boost-specific name, do not change or stuff will break!
       typedef boost::units::quantity<T> external_type;
 
-      // Converts a string to bool
+      //! Converts a string to a quantity.
       boost::optional<external_type> get_value(const internal_type& str)
       {
         // normalize all white space to a single space
@@ -310,7 +321,7 @@ namespace cedar
         return boost::optional<external_type>(number * cedar::aux::parseUnitString<T>(unit_str));
       }
 
-      // Converts a bool to string
+      //! Converts a unit to string.
       boost::optional<internal_type> put_value(const external_type& unit)
       {
         std::stringstream stream;
@@ -322,6 +333,7 @@ namespace cedar
 }
 
 //  Specialize translator_between to specify our own way of reading units
+//!@cond SKIPPED_DOCUMENTATION
 namespace boost
 {
   namespace property_tree
@@ -333,11 +345,10 @@ namespace boost
     };
   } // namespace property_tree
 } // namespace boost
+//!@endcond
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A template class for parameters that store values with attached units.
  */
 template <class T>
 class cedar::aux::UnitParameterTemplate : public cedar::aux::NumericParameter<boost::units::quantity<T> >
@@ -352,7 +363,7 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  //!@brief Constructor that takes a default value.
   UnitParameterTemplate
   (
     cedar::aux::Configurable *pOwner,
@@ -366,6 +377,7 @@ public:
   {
   }
 
+  //! Constructor without default value.
   UnitParameterTemplate
   (
     cedar::aux::Configurable* pOwner,

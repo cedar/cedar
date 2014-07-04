@@ -42,13 +42,13 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
+#include "cedar/processing/sources/GroupSource.h"
+#include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/PromotedExternalData.h"
-#include "cedar/processing/PromotedOwnedData.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -81,6 +81,9 @@ mMagneticScale(1.0)
 {
   this->setParentItem(pParent);
   this->generateTooltip();
+
+  this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
+
   if (cedar::proc::ExternalDataPtr ext_data = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(slot))
   {
     if (ext_data->isCollection())
@@ -93,6 +96,11 @@ mMagneticScale(1.0)
       this->setOutlineColor(QColor(140, 140, 140));
     }
     mSlotConnection = ext_data->connectToValidityChangedSignal(boost::bind(&cedar::proc::gui::DataSlotItem::translateValidityChangedSignal, this));
+
+    if (ext_data->isCollection())
+    {
+      this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
+    }
   }
 
   QObject::connect(this, SIGNAL(connectionValidityChanged()), this, SLOT(updateConnectionValidity()));
@@ -139,6 +147,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
                                     cedar::proc::gui::GraphicsBase* pTarget
                                   ) const
 {
+  //!@todo Much of this functionality should probably be in proc rather than proc::gui.
   if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::CONNECT_NO)
   {
     return cedar::proc::gui::CONNECT_NO;
@@ -166,16 +175,21 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
     return cedar::proc::gui::CONNECT_NO;
   }
 
-  // ... is this a promoted item?
-  if (p_target_slot->getSlot()->isPromoted())
+  // ... source and target are not in the same network
+  if (this->getSlot()->getParentPtr()->getGroup() != p_target_slot->getSlot()->getParentPtr()->getGroup())
   {
     return cedar::proc::gui::CONNECT_NO;
   }
 
-  // ... source and target are not in the same network
-  if (this->getSlot()->getParentPtr()->getNetwork() != p_target_slot->getSlot()->getParentPtr()->getNetwork())
+  // check if the source/target are connectors for networks
+  if
+  (
+    dynamic_cast<const cedar::proc::sources::GroupSource*>(this->getSlot()->getParentPtr())
+    ||
+    dynamic_cast<const cedar::proc::sinks::GroupSink*>(this->getSlot()->getParentPtr())
+  )
   {
-    return cedar::proc::gui::CONNECT_NO;
+    return cedar::proc::gui::CONNECT_YES;
   }
 
   // a step cannot connect to itself
@@ -188,14 +202,17 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
       && p_target_slot->mSlot->getRole() == cedar::proc::DataRole::INPUT)
   {
     cedar::proc::DataSlot::VALIDITY validity = cedar::proc::DataSlot::VALIDITY_UNKNOWN;
-    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_target))
+
+    // special case: group connectors don't have a target item (it is hidden)
+    if (p_target == NULL)
     {
-      validity = p_step_item->getStep()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
+      validity = cedar::proc::DataSlot::VALIDITY_VALID;
     }
-    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_target))
+    else if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_target))
     {
-      validity = p_network_item->getNetwork()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
+      validity = connectable->getConnectable()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
+
 
     CEDAR_ASSERT(validity != cedar::proc::DataSlot::VALIDITY_UNKNOWN);
 
@@ -220,57 +237,23 @@ cedar::proc::gui::Connection* cedar::proc::gui::DataSlotItem::connectTo(cedar::p
   return new cedar::proc::gui::Connection(this, pTarget);
 }
 
-void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
+void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
-  cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
   CEDAR_DEBUG_ASSERT(p_scene);
 
   QMenu menu;
 
   if (this->scene()->selectedItems().size() > 1)
   {
-    p_scene->networkGroupingContextMenuEvent(menu);
     menu.exec(event->screenPos());
     return;
   }
-  QAction* p_promote_action = menu.addAction("promote slot");
-  // no slot can be promoted to the root network
-  if
-  (
-    (this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->getNetwork())
-      || this->mSlot->isPromoted() || this->getNumberOfConnections() != 0
-  )
-  {
-    p_promote_action->setEnabled(false);
-  }
-  QAction *p_demote_action = menu.addAction("demote slot");
-  p_demote_action->setEnabled(false);
-  // no slot can be demoted, if it was not promoted before
-  if
-  (
-    (boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(this->mSlot)
-      || boost::dynamic_pointer_cast<cedar::proc::PromotedOwnedData>(this->mSlot))
-      && this->getNumberOfConnections() == 0
-  )
-  {
-    p_demote_action->setEnabled(true);
-  }
+
   QAction *a = menu.exec(event->screenPos());
 
   if (a == NULL)
     return;
-
-  if (a == p_promote_action)
-  {
-    // Promote in the underlying non-gui. This automatically sends a signal, which creates the GUI representation.
-    this->mSlot->getParentPtr()->getNetwork()->promoteSlot(this->mSlot);
-  }
-  if (a == p_demote_action)
-  {
-    // Demote in the underlying non-gui. This automatically sends a signal, which removes the GUI representation.
-    cedar::proc::Network* network = static_cast<cedar::proc::Network*>(this->mSlot->getParentPtr());
-    network->demoteSlot(this->mSlot->getRole(), this->mSlot->getName());
-  }
 }
 
 const std::string& cedar::proc::gui::DataSlotItem::getName() const
@@ -283,33 +266,48 @@ void cedar::proc::gui::DataSlotItem::hoverEnterEvent(QGraphicsSceneHoverEvent* p
   this->generateTooltip();
 
   this->cedar::proc::gui::GraphicsBase::hoverEnterEvent(pEvent);
+
+  for (auto connection : this->getConnections())
+  {
+    connection->setHighlightedByHovering(true);
+  }
 }
+
+void cedar::proc::gui::DataSlotItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  this->cedar::proc::gui::GraphicsBase::hoverLeaveEvent(pEvent);
+
+  for (auto connection : this->getConnections())
+  {
+    connection->setHighlightedByHovering(false);
+  }
+}
+
 
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   painter->save(); // save current painter settings
-  this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
-  if (cedar::proc::ExternalDataPtr ext_data = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(mSlot))
-  {
-    if (ext_data->isCollection())
-    {
-      this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
-    }
-  }
-  if (mSlot->isPromoted())
-  {
-    this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_CROSS);
-  }
   this->paintFrame(painter, style, widget);
-
   painter->restore(); // restore saved painter settings
 }
 
 void cedar::proc::gui::DataSlotItem::generateTooltip()
 {
   QString tool_tip;
-  tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
-  tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
+  if
+  (
+    dynamic_cast<cedar::proc::sources::GroupSource*>(this->getSlot()->getParentPtr()) ||
+    dynamic_cast<cedar::proc::sinks::GroupSink*>(this->getSlot()->getParentPtr())
+  )
+  {
+    tool_tip += "network connector: ";
+    tool_tip += "<b>" + QString::fromStdString(this->getSlot()->getParentPtr()->getName()) + "</b>";
+  }
+  else
+  {
+    tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
+    tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
+  }
   if (this->mSlot->getData())
   {
     tool_tip += "<hr />";

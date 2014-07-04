@@ -54,9 +54,9 @@
 #include <string>
 
 
-/*!@todo describe.
+/*!@brief A data class template that holds data with a unit.
  *
- * @todo describe more.
+ * @tparam T The quantity of the unit to be held (e.g., cedar::unit::Time)
  */
 template <typename T>
 class cedar::aux::UnitDataTemplate : public cedar::aux::UnitData
@@ -65,7 +65,10 @@ class cedar::aux::UnitDataTemplate : public cedar::aux::UnitData
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Quantity type corresponding to T
   typedef T Quantity;
+
+  //! The unit type.
   typedef typename Quantity::unit_type Unit;
 
 private:
@@ -91,11 +94,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Returns the suffix for the unit.
   std::string getSuffix() const
   {
     return boost::units::symbol_string(Unit());
   }
 
+  //! Returns the quantity as a double value. To be used in conjunction with getSuffix().
   double doubleValueForSuffix() const
   {
     return this->mData.value();
@@ -119,6 +124,7 @@ public:
     this->mData = data;
   }
 
+  //! Copies the quantity from another data object.
   void copyValueFrom(cedar::aux::ConstDataPtr data)
   {
     if (ConstSelfTypePtr self_type_ptr = boost::dynamic_pointer_cast<ConstSelfType>(data))

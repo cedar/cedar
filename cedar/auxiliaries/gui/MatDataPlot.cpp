@@ -80,9 +80,25 @@ namespace
 
 cedar::aux::gui::MatDataPlot::MatDataPlot(QWidget *pParent)
 :
-cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(nullptr)
+cedar::aux::gui::MultiPlotInterface(pParent)
 {
+  this->initLayout();
+}
+
+cedar::aux::gui::MatDataPlot::MatDataPlot(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent)
+:
+cedar::aux::gui::MultiPlotInterface(pParent)
+{
+  this->initLayout();
+
+  this->plot(data, title);
+}
+
+
+void cedar::aux::gui::MatDataPlot::initLayout()
+{
+  mpCurrentPlotWidget = nullptr;
+
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
 
@@ -93,6 +109,22 @@ mpCurrentPlotWidget(nullptr)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::MatDataPlot::readConfiguration(const cedar::aux::ConfigurationNode& configuration)
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->readConfiguration(configuration);
+  }
+}
+
+void cedar::aux::gui::MatDataPlot::writeConfiguration(cedar::aux::ConfigurationNode& configuration) const
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->writeConfiguration(configuration);
+  }
+}
 
 bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
@@ -170,7 +202,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
   }
 
   // color space-annotated data
-  try
+  if (this->mData->hasAnnotation<cedar::aux::annotation::ColorSpace>())
   {
     // data should be plotted as an image
     cedar::aux::annotation::ConstColorSpacePtr color_space = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
@@ -178,12 +210,9 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
-  }
 
   // disparity-annotated data
-  try
+  if (this->mData->hasAnnotation<cedar::aux::annotation::Disparity>())
   {
     // data should be plotted as an image
     auto color_space = this->mData->getAnnotation<cedar::aux::annotation::Disparity>();
@@ -191,21 +220,15 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
-  }
 
   // depth-annotated data
-  try
+  if (this->mData->hasAnnotation<cedar::aux::annotation::Depth>())
   {
     //data should be plotted as an image
     auto colorSpace = this->mData->getAnnotation<cedar::aux::annotation::Depth>();
     cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
-  }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
   }
 
   if (this->mpCurrentPlotWidget == nullptr)

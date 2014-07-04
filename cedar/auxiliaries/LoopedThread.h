@@ -275,7 +275,7 @@ protected:
   //----------------------------------------------------------------------------
 private:
   //! end counting the statistics. is not thread-safe
-  void stopStatistics(bool suppressWarnings); 
+  void stopStatistics(); 
 
   //! overwritten method. return the new worker object for LoopedThread
   cedar::aux::detail::ThreadWorker* resetWorker();
@@ -287,8 +287,10 @@ private:
   virtual void step(cedar::unit::Time time) = 0;
 
   //! slot called when the thread finishes via stop().
-  void processStop(bool suppressWarning);
+  void processStop();
 
+  //! Called when the thread is started and stopped; marks some parameters that cannot be changed at runtime const.
+  void makeParametersConst(bool makeConst);
 
 private slots:
   void modeChanged();
@@ -300,6 +302,9 @@ protected:
 private:
   //! keep our own pointer of the worker. it is guaranteed that it is still valid when we use it in work() and stopStatistics()
   cedar::aux::detail::LoopedThreadWorker* mpWorker;
+
+  boost::signals2::scoped_connection mStartConnection;
+  boost::signals2::scoped_connection mStopConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

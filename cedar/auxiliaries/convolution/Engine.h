@@ -176,6 +176,7 @@ public:
 protected:
   // none yet
 signals:
+  //! Signals that the kernel list stored in the engine has changed.
   void kernelListChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -45,6 +45,8 @@
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Settings.fwd.h"
@@ -52,6 +54,7 @@
 #include "cedar/auxiliaries/StringSetParameter.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
 #include <vector>
@@ -60,8 +63,10 @@
 
 /*!@brief A singleton class for storing user-specific parameters related to the auxiliary library of cedar.
  */
-class cedar::aux::Settings : public cedar::aux::Configurable
+class cedar::aux::Settings : public QObject, public cedar::aux::Configurable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friend
   //--------------------------------------------------------------------------------------------------------------------
@@ -189,6 +194,15 @@ public:
   //! Swaps the order of the given plugin paths.
   void swapPluginSearchPaths(unsigned int first, unsigned int second);
 
+  //! Sets the global time factor.
+  void setGlobalTimeFactor(double factor);
+
+  //! Returns the global time factor.
+  double getGlobalTimeFactor() const;
+
+public:
+  CEDAR_DECLARE_SIGNAL(GlobalTimeFactorChanged, void(double));
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -198,8 +212,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void qGlobalTimeFactorChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -245,6 +259,9 @@ protected:
 
   //! Planning strategy of FFTW.
   cedar::aux::EnumParameterPtr _mFFTWPlanningStrategy;
+
+  //! Planning strategy of FFTW.
+  cedar::aux::DoubleParameterPtr _mGlobalTimeFactor;
 
 private:
   // none yet
