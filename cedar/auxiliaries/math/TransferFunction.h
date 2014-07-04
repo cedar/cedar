@@ -82,11 +82,6 @@ public:
   virtual float compute(float value) const;
 
   /*!@brief this function calculates the TransferFunction function for an n-dimensional matrix.
-   *
-   * @todo write a non-templated function, which checks the type flag of cv::Mat and calls the correct templated compute
-   * function
-   *
-   * @todo Make a virtual version of this function that can be overloaded for faster TransferFunction calculation.
    */
   template<typename T>
   cv::Mat compute(const cv::Mat& values) const

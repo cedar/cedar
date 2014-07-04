@@ -427,7 +427,6 @@ private:
   virtual void reset();
 
   /*!@brief Sets the current execution time measurement.
-   * @todo Rename to ComputeTimeMeasurement
    */
   void setRunTimeMeasurement(const cedar::unit::Time& time);
 

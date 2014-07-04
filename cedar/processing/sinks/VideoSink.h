@@ -52,7 +52,7 @@
 #include <opencv2/opencv.hpp>
 
 
-/*!@todo describe.
+/*!@brief Writes its input into a video file.
  *
  * @todo describe more.
  */

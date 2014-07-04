@@ -50,7 +50,7 @@
 
 /*!@brief A class to use stereo images.
  *
- * @todo More detailed description of the class.
+ * Contains two matrices, one for the left and one for the right image.
  *
  */
 

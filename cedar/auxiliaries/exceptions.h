@@ -129,13 +129,10 @@ private:
 }; // class cedar::aux::PluginNotFoundException
 
 /*!@brief Exception that occurs when a plugin cannot be loaded.
- *
- * @todo This exception is too generic.
  */
 class cedar::aux::PluginException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::PluginException
-
 
 /*!@brief Exception that occurs when a unique id appears twice.
  */
