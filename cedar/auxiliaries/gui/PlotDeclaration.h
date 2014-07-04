@@ -148,13 +148,12 @@ public:
 
   void declare() const
   {
-    try
+    if (cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->canFind<DataType>())
     {
-      std::vector<cedar::aux::gui::ConstPlotDeclarationPtr>& declarations =
-        cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
+      auto& declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
       declarations.push_back(this->shared_from_this());
     }
-    catch(cedar::aux::UnknownTypeException&)
+    else
     {
       std::vector<cedar::aux::gui::ConstPlotDeclarationPtr> declarations;
       declarations.push_back(this->shared_from_this());
