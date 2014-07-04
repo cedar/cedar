@@ -318,13 +318,8 @@ unsigned int cedar::aux::math::minIndex1D(const cv::Mat matrix)
 double cedar::aux::math::min(const cv::Mat matrix)
 {
   double min;
-  cv::minMaxLoc(matrix, &min );
+  cv::minMaxLoc(matrix, &min);
   return min;
-}
-
-void cedar::aux::math::write(cv::Mat matrix)
-{
-  cedar::aux::write(matrix);
 }
 
 template <typename T>

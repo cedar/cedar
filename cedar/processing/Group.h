@@ -371,16 +371,8 @@ public:
   /*!@brief Deletes all connections from a given data slot.
    * @param connectable The slot's parent.
    * @param slot Identifier of the data slot.
-   *
-   * @todo check for duplicate functions
    */
   void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
-
-  /*!@brief Deletes all connections from a given data slot.
-   * @param connectable The slot's parent.
-   * @param slot Identifier of the data slot.
-   */
-  //void disconnectSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
 
   /*!@brief Deletes all connections to the given data slot.
    * @param connectable The slot's parent.

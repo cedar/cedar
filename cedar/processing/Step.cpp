@@ -256,10 +256,10 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (cedar::proc::GroupPtr parent_network = this->getGroup())
+  if (cedar::proc::GroupPtr parent_group = this->getGroup())
   {
     // update the name
-    parent_network->updateObjectName(this);
+    parent_group->updateObjectName(this);
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();

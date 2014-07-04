@@ -867,9 +867,6 @@ void cedar::proc::gui::Connectable::fillPlots
        std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
      )
 {
-  /*typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
-  typedef cedar::aux::gui::PlotDeclarationManager::ConstNodePtr ConstPlotNodePtr;*/
-
   for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
       enum_it != cedar::proc::DataRole::type().list().end();
       ++enum_it)

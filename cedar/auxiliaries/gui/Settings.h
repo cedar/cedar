@@ -135,7 +135,6 @@ protected:
 
 private:
   //!@brief Parameter representing the maximum number of log entries
-  //!@todo this should be moved to aux::gui::Settings once unstable is merged
   cedar::aux::UIntParameterPtr _mMaximumNumberOfLogEntries;
 
   //!@brief Directory, where the PluginLoadDialog is supposed to open.
