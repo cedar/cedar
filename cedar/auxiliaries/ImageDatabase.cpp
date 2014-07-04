@@ -52,6 +52,8 @@
 
 cedar::aux::EnumType<cedar::aux::ImageDatabase::Type> cedar::aux::ImageDatabase::Type::mType("cedar::aux::ImageDatabase::Type::");
 
+const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_POSE_ANNOTATION_NAME = "object pose";
+
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::aux::ImageDatabase::Type::Id cedar::aux::ImageDatabase::Type::ScanFolder;
 #endif // CEDAR_COMPILER_MSVC
@@ -464,7 +466,7 @@ void cedar::aux::ImageDatabase::readAnnotations(const cedar::aux::Path& path)
         {
           current_image = left;
           image = this->findImageWithFilenameNoPath(current_image);
-          image->setAnnotation("object pose", ObjectPoseAnnotationPtr(new ObjectPoseAnnotation()));
+          image->setAnnotation(M_STANDARD_OBJECT_POSE_ANNOTATION_NAME, ObjectPoseAnnotationPtr(new ObjectPoseAnnotation()));
         }
         else
         {
@@ -478,7 +480,7 @@ void cedar::aux::ImageDatabase::readAnnotations(const cedar::aux::Path& path)
             int x = cedar::aux::fromString<int>(position_str[0]);
             int y = cedar::aux::fromString<int>(position_str[1]);
 
-            auto annotation = image->getAnnotation<ObjectPoseAnnotation>("object pose");
+            auto annotation = image->getAnnotation<ObjectPoseAnnotation>(M_STANDARD_OBJECT_POSE_ANNOTATION_NAME);
             double region_rows, region_cols;
             region_cols = static_cast<double>(image->getImageColumns());
             region_rows = static_cast<double>(image->getImageRows());
@@ -491,13 +493,13 @@ void cedar::aux::ImageDatabase::readAnnotations(const cedar::aux::Path& path)
           }
           else if (left == "orientation")
           {
-            auto annotation = image->getAnnotation<ObjectPoseAnnotation>("object pose");
+            auto annotation = image->getAnnotation<ObjectPoseAnnotation>(M_STANDARD_OBJECT_POSE_ANNOTATION_NAME);
             double phi = cedar::aux::fromString<double>(right);
             annotation->setOrientation(phi);
           }
           else if (left == "scale-factor")
           {
-            auto annotation = image->getAnnotation<ObjectPoseAnnotation>("object pose");
+            auto annotation = image->getAnnotation<ObjectPoseAnnotation>(M_STANDARD_OBJECT_POSE_ANNOTATION_NAME);
             double scale = cedar::aux::fromString<double>(right);
             annotation->setScale(scale);
           }

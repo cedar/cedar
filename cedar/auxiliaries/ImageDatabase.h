@@ -459,6 +459,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Standard name used for storing object pose annotations.
+  static const std::string M_STANDARD_OBJECT_POSE_ANNOTATION_NAME;
 protected:
   // none yet
 private:
