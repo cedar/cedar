@@ -348,7 +348,8 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
 
 void cedar::proc::steps::Projection::expand0DtoND()
 {
-  CEDAR_DEBUG_ASSERT(mInput->getData().size[0] == 1)
+  CEDAR_DEBUG_ASSERT(mInput->getData().size[0] == 1);
+  CEDAR_DEBUG_ASSERT(mInput->getData().type() == CV_32F);
 
   // set all values of the output matrix to the single value of the input
   mOutput->getData() = cv::Scalar(mInput->getData().at<float>(0));
