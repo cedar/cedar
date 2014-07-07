@@ -44,7 +44,6 @@
 #include "cedar/processing/experiment/action/Action.h"
 #include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
 #include "cedar/processing/experiment/gui/ActionListParameter.h"
-#include "cedar/processing/experiment/gui/ObjectListItemParameter.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/gui/Parameter.h"

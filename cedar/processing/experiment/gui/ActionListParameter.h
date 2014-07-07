@@ -96,6 +96,8 @@ public slots:
   void addAction();
   void updateList();
   void parameterPointerChanged();
+  void actionParameterChanged();
+  void actionParameterRemoved();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
