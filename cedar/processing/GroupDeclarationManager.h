@@ -52,7 +52,7 @@
 // SYSTEM INCLUDES
 #include <map>
 
-/*!@todo describe.
+/*!@brief Manages declarations of group templates.
  *
  * @todo describe more.
  */

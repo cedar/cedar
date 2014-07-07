@@ -110,11 +110,6 @@ namespace cedar
       //! Returns the index of the global minimum of a matrix.
       CEDAR_AUX_LIB_EXPORT unsigned int minIndex1D(const cv::Mat matrix);
 
-      //! writes the matrix into the shell properly organized by columns and rows
-      //!\todo rework (template for copy & paste code)
-      //!\todo add log file capability
-      CEDAR_DECLARE_DEPRECATED(CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix));
-
       //!@brief a templated round function
       template <typename T> inline T round(T val)
       {

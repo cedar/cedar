@@ -182,8 +182,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
 
   cv::Mat matrix_64;
   cv::Mat kernel_64;
-  //!@todo Why not != CV_64F?
-  if (matrix.type() == CV_32F)
+  if (matrix.type() != CV_64F)
   {
     matrix.convertTo(matrix_64, CV_64F);
   }
@@ -193,8 +192,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     matrix_64 = matrix;
   }
 
-  //!@todo Why not != CV_64F?
-  if (kernel.type() == CV_32F)
+  if (kernel.type() != CV_64F)
   {
     kernel.convertTo(kernel_64, CV_64F);
   }
@@ -256,7 +254,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     const_cast<double*>(matrix_64.ptr<double>()),
     mMatrixBuffer
   );
-//  fftw_execute(kernel_plan_forward);
+
   QWriteLocker write_lock(&this->mKernelTransformLock);
   if (this->mRetransformKernel)
   {
@@ -279,7 +277,6 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   }
 
   // transform interaction back to time domain (ifft)
-//  fftw_execute(matrix_plan_backward);
   fftw_execute_dft_c2r
   (
     cedar::aux::conv::FFTW::getBackwardPlan(cedar::aux::math::getDimensionalityOf(output), mat_sizes),
@@ -287,15 +284,11 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     const_cast<double*>(output.ptr<double>())
   );
 
-//  fftw_free(matrix_fourier);
-//  fftw_free(result_fourier);
-//  fftw_free(kernel_fourier);
-  if (matrix.type() == CV_32F)
+  if (matrix.type() != CV_64F)
   {
-    cv::Mat output_32;
-    //!@todo Why not replace CV_32F by matrix.type() (if matrix.type() != CV_64F)?
-    output.convertTo(output_32, CV_32F);
-    return output_32;
+    cv::Mat output_type;
+    output.convertTo(output_type, matrix.type());
+    return output_type;
   }
   else
   {

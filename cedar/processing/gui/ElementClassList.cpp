@@ -148,7 +148,7 @@ void cedar::proc::gui::ElementClassList::showList(const std::string& categoryNam
 
   for (auto iter = entries.begin(); iter != entries.end(); ++iter)
   {
-    cedar::proc::ElementManager::ConstBasePluginDeclarationPtr class_id = *iter;
+    cedar::proc::ElementDeclarationManager::ConstBasePluginDeclarationPtr class_id = *iter;
     auto elem_decl = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(class_id);
     CEDAR_ASSERT(elem_decl);
 
