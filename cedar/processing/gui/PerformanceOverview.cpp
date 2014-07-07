@@ -145,6 +145,8 @@ mTimerId(0)
   // sort everything by the compute time (second column)
   this->mpStepTimeOverview->sortByColumn(1);
 
+  this->autoRefreshToggled(this->mpAutoRefresh->isChecked());
+
   QObject::connect(this->mpAutoRefresh, SIGNAL(toggled(bool)), this, SLOT(autoRefreshToggled(bool)));
 }
 
