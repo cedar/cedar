@@ -287,11 +287,6 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
   }
 }
 
-void cedar::proc::steps::MatrixSlice::reset()
-{
-  this->updateDimensionality();
-}
-
 void cedar::proc::steps::MatrixSlice::rangeChanged()
 {
   if (!this->mInput)
