@@ -154,12 +154,6 @@ private:
 
   void inputConnectionChanged(const std::string& inputName);
 
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-  (
-    cedar::proc::ConstDataSlotPtr,
-    cedar::aux::ConstDataPtr data
-  ) const;
-
 private slots:
   void recompute();
 
