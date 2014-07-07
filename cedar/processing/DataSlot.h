@@ -97,7 +97,7 @@ public:
 
   //! Type of the function that is called for type checks.
   typedef
-    boost::function<VALIDITY (cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr)>
+    boost::function<VALIDITY (cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr, std::string&)>
     TypeCheckFunction;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -204,6 +204,8 @@ public:
   //! Get all data connections currently connected to this slot
   std::vector<DataConnectionPtr>& getDataConnections();
   
+  const std::string& getValidityInfo() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------
@@ -297,6 +299,8 @@ private:
 
   //! Text of the slot, i.e., the text that is displayed to the user (ignored if empty).
   std::string mText;
+
+  mutable std::string mValidityInfo;
 
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;

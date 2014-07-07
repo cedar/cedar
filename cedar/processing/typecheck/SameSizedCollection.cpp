@@ -60,7 +60,7 @@ mAllow1DTranspositions(allow1DTranspositions)
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::DataSlot::VALIDITY
-  cedar::proc::typecheck::SameSizedCollection::check(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data)
+  cedar::proc::typecheck::SameSizedCollection::check(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data, std::string& info)
   const
 {
   //!@todo Should this be necessary? Aren't typechecks always performed on input slots?
@@ -69,6 +69,7 @@ cedar::proc::DataSlot::VALIDITY
   {
     if (mat_data->isEmpty())
     {
+      info = "Got an empty matrix, but cannot handle empty matrices.";
       return this->validityBad();
     }
 
@@ -113,5 +114,6 @@ cedar::proc::DataSlot::VALIDITY
   }
 
   // if none of the above returned valid, well, tough luck.
+  info = "Not all matrices are of same size.";
   return this->validityBad();
 }

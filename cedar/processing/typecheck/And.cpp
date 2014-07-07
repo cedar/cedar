@@ -51,11 +51,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::DataSlot::VALIDITY
-  cedar::proc::typecheck::And::check(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
+  cedar::proc::typecheck::And::check(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data, std::string& info) const
 {
   for (const auto& check : this->mChecks)
   {
-    if (check(slot, data) != this->validityOk())
+    if (check(slot, data, info) != this->validityOk())
     {
       return this->validityBad();
     }

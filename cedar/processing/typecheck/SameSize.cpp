@@ -57,12 +57,13 @@ void cedar::proc::typecheck::SameSize::addSlot(cedar::proc::DataSlotWeakPtr slot
 }
 
 cedar::proc::DataSlot::VALIDITY
-  cedar::proc::typecheck::SameSize::check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const
+  cedar::proc::typecheck::SameSize::check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data, std::string& info) const
 {
   auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
   if (!mat_data)
   {
+    info = "Expected MatData, but got something different.";
     return this->validityBad();
   }
 
@@ -75,6 +76,7 @@ cedar::proc::DataSlot::VALIDITY
       auto slot_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
       if (slot_data && !cedar::aux::math::matrixSizesEqual(mat_data->getData(), slot_data->getData()))
       {
+        info = "The size of this matrix does not match the size of the matrix in slot " + slot->getName() + ".";
         return this->validityBad();
       }
     }

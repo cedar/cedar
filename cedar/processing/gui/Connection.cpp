@@ -219,6 +219,9 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
     return;
   }
   mValidity = validity;
+
+  this->setToolTip(QString::fromStdString(cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(mpTarget)->getSlot()->getValidityInfo()));
+
   QPen pen = this->pen();
   pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
   this->setPen(pen);
