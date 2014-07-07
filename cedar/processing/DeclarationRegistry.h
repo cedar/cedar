@@ -64,7 +64,7 @@ namespace cedar
 
     //! Sinleton of the element manager.
     typedef
-      cedar::aux::Singleton<cedar::proc::ElementManager>
+      cedar::aux::Singleton<cedar::proc::ElementDeclarationManager>
       ElementManagerSingleton;
 
     //! A manager for element factories
