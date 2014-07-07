@@ -138,6 +138,9 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
         testStep->onTrigger(arguments);
       }
 
+      // try a reset
+      testStep->callReset();
+
       for (unsigned int i = 0; i < inputs.size(); ++i)
       {
         network->disconnectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
