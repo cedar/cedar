@@ -61,6 +61,7 @@ class cedar::aux::ColorGradient
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! an enum for standard gradients
   class StandardGradients
   {
   public:
@@ -103,18 +104,25 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! set a color at a specific location along the gradient
   void setStop(double location, const QColor& color);
 
+  //! applies the color gradient to a matrix
   cv::Mat applyTo(const cv::Mat& matrix, bool limits = false, double min = 0.0, double max = 1.0);
 
+  //! get a map of all color stops along the gradient
   const std::map<double, QColor>& getStops() const;
 
+  //! get the default gradient color jet
   static ColorGradientPtr getDefaultPlotColorJet();
 
+  //! get a gray scale gradient color jet
   static ColorGradientPtr getPlotGrayColorJet();
 
+  //! get an inverse gray scale gradient color jet
   static ColorGradientPtr getPlotInverseGrayColorJet();
 
+  //! get a gradient from enum
   static ColorGradientPtr getStandardGradient(const cedar::aux::Enum& id);
 
   //--------------------------------------------------------------------------------------------------------------------
