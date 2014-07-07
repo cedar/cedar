@@ -63,7 +63,7 @@ class cedar::proc::typecheck::And : public cedar::proc::typecheck::TypeCheck
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
+  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data, std::string& info) const;
 
   //! Adds a check. Checks are performed in the order in which they are added.
   void addCheck(cedar::proc::DataSlot::TypeCheckFunction check);

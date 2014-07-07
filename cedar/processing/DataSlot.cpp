@@ -148,7 +148,9 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::checkValidityOf(cedar::au
     CEDAR_THROW(cedar::proc::NoCheckException, "No check set for data slot \"" + this->getName() + "\".");
   }
 
-  return this->getCheck()(this->shared_from_this(), data);
+  // reset validity string
+  mValidityInfo = "";
+  return this->getCheck()(this->shared_from_this(), data, mValidityInfo);
 }
 
 void cedar::proc::DataSlot::setText(const std::string& text)
@@ -261,4 +263,9 @@ void cedar::proc::DataSlot::removeConnection(cedar::proc::DataConnectionPtr remo
 std::vector<cedar::proc::DataConnectionPtr>& cedar::proc::DataSlot::getDataConnections()
 {
   return this->mConnections;
+}
+
+const std::string& cedar::proc::DataSlot::getValidityInfo() const
+{
+  return this->mValidityInfo;
 }

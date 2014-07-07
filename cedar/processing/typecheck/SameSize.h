@@ -71,7 +71,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
+  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data, std::string& info) const;
 
   /*! Adds a slot to check. All the slots with this typecheck will always have the same size as all of these slots.
    */
