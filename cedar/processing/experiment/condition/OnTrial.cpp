@@ -74,7 +74,7 @@ cedar::proc::experiment::condition::OnTrial::~OnTrial()
 bool cedar::proc::experiment::condition::OnTrial::check()
 {
   Experiment* p_experiment = cedar::proc::experiment::ExperimentSuperviserSingleton::getInstance()->getExperiment();
-  if (p_experiment->getActualTrial() == _mTrial->getValue() && p_experiment->isOnInit())
+  if (p_experiment->getActualTrial() == _mTrial->getValue())
   {
     return true;
   }
