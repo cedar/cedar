@@ -66,7 +66,14 @@ namespace cedar
         }
         else if (flipFirst)
         {
-          flip_code = 0;
+          if (input.rows == 1)
+          {
+            flip_code = 1;
+          }
+          else
+          {
+            flip_code = 0;
+          }
         }
         else if (flipSecond)
         {
