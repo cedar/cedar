@@ -228,7 +228,7 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
         (
           new cedar::aux::CallFunctionInThread
           (
-            boost::bind(&cedar::proc::LoopedTrigger::stop, looped_trigger, UINT_MAX, false)
+            boost::bind(&cedar::proc::LoopedTrigger::stop, looped_trigger, UINT_MAX)
           )
         );
   }

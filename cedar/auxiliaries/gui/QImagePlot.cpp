@@ -56,6 +56,7 @@
 
 
 //!@cond SKIPPED_DOCUMENTATION
+
 //! Widget used for displaying the image.
 class cedar::aux::gui::QImagePlot::ImageDisplay : public QLabel
 {
@@ -77,6 +78,7 @@ public:
 
   cedar::aux::gui::QImagePlot* mpPlot;
 };
+
 //!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1048,7 +1048,6 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
 
 void cedar::proc::Connectable::updateTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data)
 {
-  //!@todo May want to move connections into data slots rather than the networks; then this case would not be necessary any more
   auto group = this->getGroup();
   if (!group)
   {
@@ -1076,7 +1075,6 @@ void cedar::proc::Connectable::updateTargetSlots(cedar::proc::DataSlotWeakPtr sl
 
 void cedar::proc::Connectable::freeTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data)
 {
-  //!@todo May want to move connections into data slots rather than the networks; then this case would not be necessary any more
   auto group = this->getGroup();
   if (!group)
   {

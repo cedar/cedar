@@ -65,7 +65,6 @@ namespace cedar
         }
     };
 
-    //!@todo Move to namespace header
     template <typename SeparatorT, typename StorageT = std::string> class PathTemplate;
   }
 }

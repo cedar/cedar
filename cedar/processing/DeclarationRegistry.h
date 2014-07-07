@@ -57,22 +57,15 @@ namespace cedar
 {
   namespace proc
   {
-    //!@todo These typedefs are redundant
-    /*! Manages declarations of element classes.
-     */
-    typedef
-      cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
-      ElementManager;
-
-    //! Sinleton of the element manager.
-    typedef
-      cedar::aux::Singleton<cedar::proc::ElementManager>
-      ElementManagerSingleton;
-
     //! A manager for element declarations
     typedef
       cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
       ElementDeclarationManager;
+
+    //! Sinleton of the element manager.
+    typedef
+      cedar::aux::Singleton<cedar::proc::ElementDeclarationManager>
+      ElementManagerSingleton;
 
     //! A manager for element factories
     typedef

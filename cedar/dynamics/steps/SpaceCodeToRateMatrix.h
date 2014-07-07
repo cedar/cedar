@@ -127,6 +127,8 @@ protected:
 
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
+
+  //!@brief The weight matrix.
   cedar::aux::MatDataPtr mWeights;
 private:
   double mInterval;

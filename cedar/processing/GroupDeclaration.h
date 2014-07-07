@@ -52,7 +52,7 @@
 #include <string>
 
 
-/*!@todo Defines a template group, which can be found in a given file.
+/*!@brief Defines a template group, which can be found in a given file.
  *
  * @todo describe more.
  */

@@ -94,9 +94,6 @@
      <string>Windows</string>
     </property>
     <addaction name="separator"/>
-    <addaction name="mpActionShowRobotManager"/>
-    <addaction name="separator"/>
-    <addaction name="mpActionArchitectureConsistencyCheck"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -108,8 +105,6 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="mpActionManagePlugins"/>
-    <addaction name="separator"/>
     <addaction name="mpActionCopy"/>
     <addaction name="mpActionPasteConfiguration"/>
     <addaction name="mpActionDuplicate"/>
@@ -141,6 +136,8 @@
     <addaction name="mpActionPerformanceOverview"/>
     <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
+    <addaction name="mpActionManagePlugins"/>
+    <addaction name="mpActionShowRobotManager"/>
     <addaction name="mpActionSettings"/>
    </widget>
    <addaction name="menuFile"/>
@@ -577,7 +574,7 @@
   </action>
   <action name="mpActionShowRobotManager">
    <property name="text">
-    <string>Robot Manager ...</string>
+    <string>Robot manager ...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>

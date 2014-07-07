@@ -95,6 +95,7 @@ Unreleased
   - Looped triggers now have a tool tip showing statistics.
   - Improved performance of triggering chains.
   - Improved loading and connecting time for large architectures.
+  - Reordered some menu entries in cedar. The 'Manage plugins ..." dialog is now found under Tools.
 
 Released versions
 =================
