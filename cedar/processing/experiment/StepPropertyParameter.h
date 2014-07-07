@@ -81,7 +81,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepPropertyParameter(cedar::aux::Configurable *pOwner, const std::string&);
+  StepPropertyParameter(cedar::aux::Configurable *pOwner, const std::string& name);
 
   //!@brief Destructor
   virtual ~StepPropertyParameter();
