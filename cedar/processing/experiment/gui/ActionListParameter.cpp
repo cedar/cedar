@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/gui/ObjectParameter.h"
 
 // SYSTEM INCLUDES
-#include <QVBoxLayout>
+#include <QBoxLayout>
 #include <QPushButton>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -80,14 +80,14 @@ mActionListWidget(new ActionListWidget(this))
   this->layout()->setMargin(0);
   this->layout()->addWidget(mActionListWidget);
   QPushButton* add = new QPushButton();
-  add->setText(QString::fromStdString("+"));
+  add->setText(QString::fromStdString("Add Action"));
   this->layout()->addWidget(add);
   connect(add,SIGNAL(clicked()),this,SLOT(addAction()));
+  connect(this,SIGNAL(parameterPointerChanged()),this,SLOT(parameterPointerChanged()));
 }
 
 cedar::proc::experiment::gui::ActionListParameter::~ActionListParameter()
 {
-  connect(this,SIGNAL(parameterPointerChanged()),this,SLOT(parameterPointerChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -108,22 +108,33 @@ void cedar::proc::experiment::gui::ActionListParameter::updateList()
   mActionListWidget->clear();
   for(unsigned int i=0; i < mActionListParameter->size(); i++)
   {
+
     cedar::proc::experiment::action::ActionPtr action = mActionListParameter->at(i);
     QListWidgetItem* item = new QListWidgetItem();
     item->setSizeHint(QSize(0,45));
     QWidget* itemWidget = new QWidget;
-    QVBoxLayout* itemWidgetLayout = new QVBoxLayout();
+    QHBoxLayout* itemWidgetLayout = new QHBoxLayout();
     itemWidgetLayout->setMargin(5);
     itemWidget->setLayout(itemWidgetLayout);
-    cedar::proc::experiment::action::Action::ActionParameterPtr actionParameter
+
+
+    QPushButton* remove = new QPushButton();
+    remove->setText(QString::fromStdString("-"));
+    remove->setFixedSize(35,25);
+    remove->setObjectName(QString::number(i));
+    itemWidgetLayout->addWidget(remove);
+    connect(remove,SIGNAL(clicked()),this,SLOT(actionParameterRemoved()));
+
+    cedar::aux::ObjectParameterPtr actionParameter
         (
-            new cedar::proc::experiment::action::Action::ActionParameter(NULL,"",action)
+            new cedar::proc::experiment::action::Action::ActionParameter(NULL,std::to_string(i),action)
 
         );
     cedar::aux::gui::Parameter* parameterWidget = new cedar::aux::gui::ObjectParameter();
     parameterWidget->setParameter(actionParameter);
     itemWidgetLayout->addWidget(parameterWidget);
 
+    connect(actionParameter.get(),SIGNAL(valueChanged()),this,SLOT(actionParameterChanged()));
     auto itemProperties = new cedar::proc::experiment::gui::ExperimentItemWidget();
     itemProperties->display(action);
     itemWidgetLayout->addWidget(itemProperties);
@@ -131,6 +142,7 @@ void cedar::proc::experiment::gui::ActionListParameter::updateList()
     this->mActionListWidget->addItem(item);
     this->mActionListWidget->setItemWidget(item,itemWidget);
   }
+  this->mActionListWidget->setMinimumHeight(mActionListParameter->size()*45+5);
 }
 
 void cedar::proc::experiment::gui::ActionListParameter::parameterPointerChanged()
@@ -139,7 +151,23 @@ void cedar::proc::experiment::gui::ActionListParameter::parameterPointerChanged(
       boost::dynamic_pointer_cast<cedar::proc::experiment::action::Action::ActionListParameter>(this->getParameter());
   updateList();
 }
-
+void cedar::proc::experiment::gui::ActionListParameter::actionParameterChanged()
+{
+  auto sender = dynamic_cast<cedar::aux::ObjectParameter*>(QObject::sender());
+  int number;
+  std::istringstream ( sender->getName() ) >> number;
+  this->mActionListParameter->removeObject(number);
+  auto action = boost::dynamic_pointer_cast<cedar::proc::experiment::action::Action>(sender->getConfigurable());
+  this->mActionListParameter->insert(number,action);
+  this->updateList();
+}
+void cedar::proc::experiment::gui::ActionListParameter::actionParameterRemoved()
+{
+  auto sender = dynamic_cast<QPushButton*>(QObject::sender());
+  int number = sender->objectName().toInt();
+  this->mActionListParameter->removeObject(number);
+  this->updateList();
+}
 void cedar::proc::experiment::gui::ActionListParameter::ActionListWidget::dragEnterEvent(QDragEnterEvent* event)
 {
   QListWidget::dragEnterEvent(event);
