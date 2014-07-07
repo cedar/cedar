@@ -407,7 +407,7 @@ namespace cedar
           return false;
         }
 
-        if (dim_a <= 1)
+        if (dim_a == 1)
         {
           unsigned int size_a = get1DMatrixSize(matrixA);
           unsigned int size_b = get1DMatrixSize(matrixB);
