@@ -67,6 +67,17 @@ known issues
 
 Unreleased
 ==========
+  
+  Nothing yet!
+
+
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+Version 4.0.0
+-------------
 
 - processingIde
   - The processingIde is now simply called cedar. Conversely, the processingCL is now called cedar-shell.
@@ -96,11 +107,6 @@ Unreleased
   - Improved performance of triggering chains.
   - Improved loading and connecting time for large architectures.
   - Reordered some menu entries in cedar. The 'Manage plugins ..." dialog is now found under Tools.
-
-Released versions
-=================
-
-The following are the changes made in the release versions.
 
 Version 3.0.0
 -------------

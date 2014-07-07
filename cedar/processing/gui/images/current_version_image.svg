@@ -14,8 +14,8 @@
    height="191.9375"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="current_version_image_fire_witch.svg"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="current_version_image_crimson_king.svg"
    inkscape:export-filename="/home/lompolbx/Pictures/moonchild_desktop_alt.png"
    inkscape:export-xdpi="142.5284"
    inkscape:export-ydpi="142.5284">
@@ -24,19 +24,19 @@
     <linearGradient
        id="linearGradient3802">
       <stop
-         style="stop-color:#845b4b;stop-opacity:1;"
+         style="stop-color:#420808;stop-opacity:1;"
          offset="0"
          id="stop3804" />
       <stop
          id="stop3812"
          offset="0.34615386"
-         style="stop-color:#ff6d00;stop-opacity:1;" />
+         style="stop-color:#bc0000;stop-opacity:1;" />
       <stop
          id="stop3810"
          offset="0.66469431"
-         style="stop-color:#ffc200;stop-opacity:1;" />
+         style="stop-color:#fb2e00;stop-opacity:1;" />
       <stop
-         style="stop-color:#ffc761;stop-opacity:1;"
+         style="stop-color:#ff4904;stop-opacity:1;"
          offset="1"
          id="stop3816" />
     </linearGradient>
@@ -284,8 +284,8 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.8643314"
-     inkscape:cx="174.19354"
-     inkscape:cy="71.196741"
+     inkscape:cx="143.23455"
+     inkscape:cy="84.431429"
      inkscape:document-units="px"
      inkscape:current-layer="layer9"
      showgrid="false"
@@ -396,7 +396,7 @@
      style="display:inline"
      transform="translate(-172.93067,-400.70852)">
     <g
-       style="display:inline;fill:#000000;fill-opacity:1"
+       style="display:inline;fill:#ffffff;fill-opacity:1"
        id="g3688"
        transform="matrix(0.6015694,0,0,0.6015694,230.52661,279.36666)">
       <text
@@ -404,13 +404,13 @@
          id="text3684"
          y="481.02283"
          x="-72.445229"
-         style="font-size:72px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-size:72px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          xml:space="preserve"><tspan
-           style="font-size:95px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L Semi-Bold"
+           style="font-size:95px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L Semi-Bold"
            y="481.02283"
            x="-72.445229"
            id="tspan3686"
-           sodipodi:role="line">cedar 3.0</tspan></text>
+           sodipodi:role="line">cedar 4.0</tspan></text>
     </g>
   </g>
 </svg>
