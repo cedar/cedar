@@ -98,8 +98,6 @@ private:
 
   void allocateOutputMatrix();
 
-  void reset();
-
   void updateDimensionality();
 
   //--------------------------------------------------------------------------------------------------------------------
