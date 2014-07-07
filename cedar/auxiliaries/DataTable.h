@@ -144,7 +144,7 @@ public:
       DataTablePtr mTable;
   };
 
-
+  //! A collection of rows
   class RowCollection
   {
   public:
@@ -220,6 +220,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! get the table
   RowCollectionPtr getTable();
 
   /*! Creates a counter, i.e., a row containing signed integer numbers.
