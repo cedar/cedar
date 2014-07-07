@@ -125,6 +125,16 @@ _mRangeUpper
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cv::Range cedar::proc::steps::MatrixSlice::getRange(unsigned int dimension) const
+{
+  cv::Range range;
+  CEDAR_ASSERT(dimension < this->_mRangeLower->size());
+  CEDAR_ASSERT(dimension < this->_mRangeUpper->size());
+  range.start = static_cast<int>(this->_mRangeLower->at(dimension));
+  range.end = static_cast<int>(this->_mRangeUpper->at(dimension));
+  return range;
+}
+
 void cedar::proc::steps::MatrixSlice::setRanges(const std::vector<cv::Range>& ranges)
 {
   cedar::proc::Step::WriteLocker locker(this);
@@ -205,7 +215,11 @@ void cedar::proc::steps::MatrixSlice::updateDimensionality()
     this->_mRangeUpper->blockSignals(upper_blocked);
   }
 
-  this->allocateOutputMatrix();
+  if (this->allInputsValid())
+  {
+    this->allocateOutputMatrix();
+  }
+  this->onTrigger();
 }
 
 void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()

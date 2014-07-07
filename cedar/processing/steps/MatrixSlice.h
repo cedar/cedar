@@ -75,6 +75,9 @@ public:
    */
   void setRanges(const std::vector<cv::Range>& ranges);
 
+  //! Returns the range for the given dimension.
+  cv::Range getRange(unsigned int dimension) const;
+
 public slots:
   //! Called when the selected range of the slice changes.
   void rangeChanged();
