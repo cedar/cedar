@@ -215,7 +215,11 @@ void cedar::proc::steps::MatrixSlice::updateDimensionality()
     this->_mRangeUpper->blockSignals(upper_blocked);
   }
 
-  this->allocateOutputMatrix();
+  if (this->allInputsValid())
+  {
+    this->allocateOutputMatrix();
+  }
+  this->onTrigger();
 }
 
 void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
