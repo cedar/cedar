@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/units/UnitMatrix.h"
+#include "cedar/units/version.h"
 
 // SYSTEM INCLUDES
 #include <boost/units/make_scaled_unit.hpp>

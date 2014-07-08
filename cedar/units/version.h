@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,42 +22,31 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Frequency.h
+    File:        version.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2013 02 14
+    Maintainer:  Stephan Zibner
 
-    Description: This is a header for all frequency-related units.
+    Email:       stephan.zibner@ini.rub.de
+
+    Date:        2014 07 08
+
+    Description: Version file for cedar::units.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_FREQUENCY_H
-#define CEDAR_UNITS_FREQUENCY_H
+#ifndef CEDAR_UNITS_VERSION_H
+#define CEDAR_UNITS_VERSION_H
 
 // CEDAR INCLUDES
-#include "cedar/units/UnitMatrix.h"
-#include "cedar/units/version.h"
+#include "cedar/units/lib.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/frequency.hpp>
 
-namespace cedar
-{
-  namespace unit
-  {
-    typedef boost::units::quantity<boost::units::si::frequency> Frequency;
-    using boost::units::si::hertz;
+/*! Defined to indicate that the new unit framework is in effect. This can be used to keep software compatible with
+ *  multiple versions of cedar.
+ */
+#define CEDAR_UNIT_FRAMEWORK_V2
 
-    //!@brief template concretion for frequency
-    typedef UnitMatrix<boost::units::si::frequency> FrequencyMatrix;
-
-    //!@brief default unit for frequency
-    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::Frequency DEFAULT_FREQUENCY_UNIT;
-  }
-}
-
-#endif // CEDAR_UNITS_FREQUENCY_H
+#endif // CEDAR_UNITS_VERSION_H
