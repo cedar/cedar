@@ -860,7 +860,30 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
 
           if (auto slot_item = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target))
           {
-            QToolTip::showText(pMouseEvent->screenPos(), QString::fromStdString(slot_item->getName()), this->mpMainWindow);
+            if (slot_item->getSlot()->getValidityInfo().empty())
+            {
+              QToolTip::showText
+              (
+                pMouseEvent->screenPos(),
+                QString::fromStdString
+                (
+                  "connecting to: " + slot_item->getName()
+                ),
+                this->mpMainWindow
+              );
+            }
+            else
+            {
+              QToolTip::showText
+              (
+                pMouseEvent->screenPos(),
+                QString::fromStdString
+                (
+                  slot_item->getName() + " reports: " + slot_item->getSlot()->getValidityInfo()
+                ),
+                this->mpMainWindow
+              );
+            }
           }
         }
       }
