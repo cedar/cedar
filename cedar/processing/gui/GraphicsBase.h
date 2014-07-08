@@ -305,6 +305,12 @@ protected:
   //! Set whether or not this item is resizeable.
   void setResizeable(bool resizeable);
 
+  /*! Emits a changed event in the item's scene (if the item has a scene).
+   *
+   * @param alwaysEmit The event is always emmited, even for items that usually don't emit it.
+   */
+  void emitChangedEventToScene(bool alwaysEmit = false);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

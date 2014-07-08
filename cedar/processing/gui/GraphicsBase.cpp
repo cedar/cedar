@@ -130,6 +130,15 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GraphicsBase::emitChangedEventToScene(bool alwaysEmit)
+{
+  bool is_data_slot_item = ((this->mGroup & GRAPHICS_GROUP_DATA_ITEM) > 0);
+  if ((alwaysEmit || !is_data_slot_item) && this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+  }
+}
+
 void cedar::proc::gui::GraphicsBase::setReadOnly(bool readOnly)
 {
   this->mReadOnly = readOnly;
@@ -220,10 +229,7 @@ void cedar::proc::gui::GraphicsBase::setBounds(const QRectF& rect)
 void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
 {
   this->mHeight->setValue(static_cast<double>(height));
-  if (this->scene())
-  {
-    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
-  }
+  this->emitChangedEventToScene();
   this->update();
   this->sizeChanged();
 }
@@ -231,10 +237,7 @@ void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
 void cedar::proc::gui::GraphicsBase::setWidth(qreal width)
 {
   this->mWidth->setValue(static_cast<double>(width));
-  if (this->scene())
-  {
-    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
-  }
+  this->emitChangedEventToScene();
   this->update();
   this->sizeChanged();
 }
@@ -343,10 +346,7 @@ bool cedar::proc::gui::GraphicsBase::hasGuiConnectionTo(GraphicsBase const* pTar
 
 void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection* pConnection)
 {
-  if (this->scene())
-  {
-    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
-  }
+  this->emitChangedEventToScene(true); // we always emit a changed event when a connection is added
   this->mConnections.push_back(pConnection);
 }
 
@@ -366,10 +366,7 @@ void cedar::proc::gui::GraphicsBase::removeConnection(cedar::proc::gui::Connecti
     mConnections.erase(it);
   }
 
-  if (this->scene())
-  {
-    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
-  }
+  this->emitChangedEventToScene();
 }
 
 void cedar::proc::gui::GraphicsBase::removeAllConnections()
@@ -674,9 +671,9 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
         this->mpResizeHandles.at(i)->updatePosition();
       }
 
-      if (this->scene() && this->mGroup != GRAPHICS_GROUP_DATA_ITEM && this->mGroup != GRAPHICS_GROUP_NONE)
+      if (this->mGroup != GRAPHICS_GROUP_DATA_ITEM && this->mGroup != GRAPHICS_GROUP_NONE)
       {
-        cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+        this->emitChangedEventToScene();
       }
       break;
     }

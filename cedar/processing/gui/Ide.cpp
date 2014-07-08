@@ -279,11 +279,6 @@ mSuppressCloseDialog(false)
                    this,
                    SLOT(architectureChanged()));
 
-  QObject::connect(this->mpProcessingDrawer->getScene(),
-                   SIGNAL(sceneChanged()),
-                   this,
-                   SLOT(architectureChanged()));
-
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
@@ -1473,6 +1468,14 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   }
 
   this->loadPlotGroupsIntoComboBox();
+
+  QObject::connect
+  (
+    this->mpProcessingDrawer->getScene(),
+    SIGNAL(sceneChanged()),
+    this,
+    SLOT(architectureChanged())
+  );
 }
 
 void cedar::proc::gui::Ide::openFindDialog()
