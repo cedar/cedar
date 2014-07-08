@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SameSizedCollection.cpp
+    File:        SameTypeCollection.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 01 06
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2014 07 08
 
-    Description: Source file for the class cedar::proc::typecheck::SameSizedCollection.
+    Description: Source file for the class cedar::proc::typecheck::SameTypeCollection.
 
     Credits:
 
@@ -38,29 +38,18 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/typecheck/SameSizedCollection.h"
+#include "cedar/processing/typecheck/SameTypeCollection.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::typecheck::SameSizedCollection::SameSizedCollection(bool allow0D, bool allow1DTranspositions)
-:
-mAllow0D(allow0D),
-mAllow1DTranspositions(allow1DTranspositions)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::DataSlot::VALIDITY
-  cedar::proc::typecheck::SameSizedCollection::check(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data, std::string& info)
+  cedar::proc::typecheck::SameTypeCollection::check(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data, std::string& info)
   const
 {
   //!@todo Should this be necessary? Aren't typechecks always performed on input slots?
@@ -73,12 +62,6 @@ cedar::proc::DataSlot::VALIDITY
       return this->validityBad();
     }
 
-    // if 0d matrices are allowed and the data is 0d, accept it
-    if (this->mAllow0D && mat_data->getDimensionality() == 0)
-    {
-      return this->validityOk();
-    }
-
     // find data for comparing the size
     cedar::aux::ConstMatDataPtr data_to_compare;
 
@@ -87,33 +70,19 @@ cedar::proc::DataSlot::VALIDITY
       auto slot_mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(external_slot->getData(i));
       if (slot_mat_data && slot_mat_data != data)
       {
-        // If 0d data is not allowed, we just take the first mat data we can find (if it is 0d, all others must be as well).
-        // Otherwise, we look for the first non-0d mat data.
-        if (!this->mAllow0D || slot_mat_data->getDimensionality() > 0)
-        {
-          data_to_compare = slot_mat_data;
-          break;
-        }
+        data_to_compare = slot_mat_data;
       }
     }
 
     // If we didn't find data to compare to, this is the first valid data for the slot, accept it.
     // Otherwise, only accept if the sizes match
-    if (!data_to_compare || data_to_compare->getData().size == mat_data->getData().size)
+    if (!data_to_compare || data_to_compare->getData().type() == mat_data->getData().type())
     {
       return this->validityOk();
-    }
-    // If sizes don't match but 1D transpositions are allowed, check if both data objects are 1D and have the same length
-    else if (this->mAllow1DTranspositions && data_to_compare->getDimensionality() == 1 && mat_data->getDimensionality() == 1)
-    {
-      if (cedar::aux::math::get1DMatrixSize(data_to_compare->getData()) && cedar::aux::math::get1DMatrixSize(mat_data->getData()))
-      {
-        return this->validityOk();
-      }
     }
   }
 
   // if none of the above returned valid, well, tough luck.
-  info = "Not all matrices are of same size.";
+  info = "Not all matrices are of same type.";
   return this->validityBad();
 }

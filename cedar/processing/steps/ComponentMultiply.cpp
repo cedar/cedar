@@ -37,6 +37,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/steps/ComponentMultiply.h"
 #include "cedar/processing/typecheck/SameSizedCollection.h"
+#include "cedar/processing/typecheck/SameTypeCollection.h"
+#include "cedar/processing/typecheck/And.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -91,7 +93,12 @@ cedar::proc::steps::ComponentMultiply::ComponentMultiply()
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 {
   auto input = this->declareInputCollection("operands");
-  input->setCheck(cedar::proc::typecheck::SameSizedCollection(true));
+  cedar::proc::typecheck::SameSizedCollection size_check(true);
+  cedar::proc::typecheck::SameTypeCollection type_check;
+  cedar::proc::typecheck::And sum_check;
+  sum_check.addCheck(size_check);
+  sum_check.addCheck(type_check);
+  input->setCheck(sum_check);
   this->declareOutput("product", mOutput);
 
   this->mInputs = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(this->getInputSlot("operands"));

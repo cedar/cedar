@@ -41,6 +41,8 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/typecheck/SameSizedCollection.h"
+#include "cedar/processing/typecheck/SameTypeCollection.h"
+#include "cedar/processing/typecheck/And.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
@@ -92,7 +94,12 @@ mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
   // declare all data
   auto input_slot = this->declareInputCollection("terms");
   cedar::proc::typecheck::SameSizedCollection input_check(/* allow0d = */ true, /* allow1Dtranspositions = */ true);
-  input_slot->setCheck(input_check);
+  cedar::proc::typecheck::SameTypeCollection type_check;
+  cedar::proc::typecheck::And sum_check;
+  sum_check.addCheck(input_check);
+  sum_check.addCheck(type_check);
+
+  input_slot->setCheck(sum_check);
 
   this->declareOutput("sum", this->mOutput);
 
