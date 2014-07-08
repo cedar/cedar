@@ -107,6 +107,8 @@ Version 4.0.0
   - Improved performance of triggering chains.
   - Improved loading and connecting time for large architectures.
   - Reordered some menu entries in cedar. The 'Manage plugins ..." dialog is now found under Tools.
+  - Data slots and connections give feedback about their validity and possible errors. This only works for elements
+    using input type checks.
 
 Version 3.0.0
 -------------
