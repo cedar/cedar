@@ -38,6 +38,7 @@
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Trigger.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
@@ -54,8 +55,11 @@ mTarget(target)
   {
     // add the target to the list of listeners
     source->addListener(target);
-    // add parent to target
-    target->setParentTrigger(source);
+    // add parent to target if it is a looped trigger
+    if (boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(source))
+    {
+      target->setParentTrigger(source);
+    }
   }
   catch (cedar::aux::ExceptionBase& exc)
   {
@@ -87,7 +91,10 @@ cedar::proc::TriggerConnection::~TriggerConnection()
   if (source_shared && target_shared)
   {
     source_shared->removeListener(target_shared);
-    target_shared->setParentTrigger(cedar::proc::TriggerPtr());
+    if (boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(source_shared))
+    {
+      target_shared->setParentTrigger(cedar::proc::TriggerPtr());
+    }
   }
 }
 //----------------------------------------------------------------------------------------------------------------------

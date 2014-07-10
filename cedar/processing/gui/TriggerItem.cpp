@@ -48,6 +48,7 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
@@ -169,7 +170,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
   {
     if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(p_connectable->getConnectable()))
     {
-      if (triggerable->getParentTrigger() || this->mTrigger->isListener(triggerable))
+      if (!triggerable->isLooped() || triggerable->getParentTrigger() || this->mTrigger->isListener(triggerable))
       {
         return cedar::proc::gui::CONNECT_NO;
       }
