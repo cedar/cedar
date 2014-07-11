@@ -1711,12 +1711,12 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   else if (a->parentWidget() == p_rename_input_menu)
   {
     std::string oldName = a->text().toStdString();
-    QString newName = QInputDialog::getText(0, "Enter a new name", "Name", QLineEdit::Normal);
+    QString newName = QInputDialog::getText(0, "Enter a new name", "Name", QLineEdit::Normal, QString::fromStdString(oldName));
     if (!newName.isEmpty())
     {
       if (this->getGroup()->hasConnector(newName.toStdString()))
       {
-        QMessageBox::critical(NULL, "New name exists", "A connector of this name already exists.");
+        QMessageBox::critical(nullptr, "New name exists", "A connector of this name already exists.");
       }
       else
       {
@@ -1728,12 +1728,12 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   else if (a->parentWidget() == p_rename_output_menu)
   {
     std::string oldName = a->text().toStdString();
-    QString newName = QInputDialog::getText(0, "Enter a new name", "Name", QLineEdit::Normal);
+    QString newName = QInputDialog::getText(0, "Enter a new name", "Name", QLineEdit::Normal, QString::fromStdString(oldName));
     if (!newName.isEmpty())
     {
       if (this->getGroup()->hasConnector(newName.toStdString()))
       {
-        QMessageBox::critical(NULL, "New name exists", "A connector of this name already exists.");
+        QMessageBox::critical(nullptr, "New name exists", "A connector of this name already exists.");
       }
       else
       {
