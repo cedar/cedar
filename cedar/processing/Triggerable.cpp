@@ -137,6 +137,14 @@ void cedar::proc::Triggerable::triggeredBy(cedar::proc::TriggerPtr trigger)
 {
   QWriteLocker locker(this->mTriggersListenedTo.getLockPtr());
   this->mTriggersListenedTo.member().insert(trigger);
+
+  if (trigger->getOwner() != nullptr)
+  {
+    if (trigger->getOwner()->isStarted())
+    {
+      this->callOnStart();
+    }
+  }
 }
 
 void cedar::proc::Triggerable::noLongerTriggeredBy(cedar::proc::TriggerPtr trigger)
@@ -145,6 +153,14 @@ void cedar::proc::Triggerable::noLongerTriggeredBy(cedar::proc::TriggerPtr trigg
   auto iter = this->mTriggersListenedTo.member().find(trigger);
   CEDAR_ASSERT(iter != this->mTriggersListenedTo.member().end());
   this->mTriggersListenedTo.member().erase(iter);
+
+  if (trigger->getOwner() != nullptr)
+  {
+    if (trigger->getOwner()->isStarted())
+    {
+      this->callOnStop();
+    }
+  }
 }
 
 boost::signals2::connection cedar::proc::Triggerable::connectToStateChanged(boost::function<void ()> slot)
