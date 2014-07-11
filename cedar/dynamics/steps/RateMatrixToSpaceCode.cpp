@@ -323,11 +323,13 @@ void cedar::dyn::RateMatrixToSpaceCode::inputConnectionChanged(const std::string
     mDimensionality = mInput->getDimensionality() + 1;
 
     // This should always work since other types should not be accepted.
+    this->redetermineInputValidity("values");
     this->outputSizesChanged();
   }
 
   if (inputName == "values")
   {
+    this->redetermineInputValidity("bin map");
     this->outputSizesChanged();
   }
 }
