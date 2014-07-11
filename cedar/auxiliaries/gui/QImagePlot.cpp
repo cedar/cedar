@@ -204,7 +204,7 @@ void cedar::aux::gui::detail::QImagePlotLegend::setGradient(cedar::aux::ColorGra
 
 cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize) const
 {
-  double min = 0, max = 0;
+  double min = -std::numeric_limits<double>::max(), max = std::numeric_limits<double>::max();
   if (this->isAutoScaling())
   {
     cv::minMaxLoc(toColorize, &min, &max);

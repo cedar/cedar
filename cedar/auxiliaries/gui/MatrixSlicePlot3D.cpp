@@ -288,7 +288,8 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     emit minMaxChanged(min, max);
   }
 
-  mSliceMatrixByteC3 = this->colorizeMatrix(this->mSliceMatrix);
+  // we need to explicitly pass the min and max values here so the one-values from the frame get ignored properly
+  mSliceMatrixByteC3 = this->colorizeMatrix(this->mSliceMatrix, !this->isAutoScaling(), min, max);
   mSliceMatrixByteC3.setTo(0xFFFFFF, frame);
 
   this->displayMatrix(mSliceMatrixByteC3);
