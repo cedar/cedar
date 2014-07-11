@@ -320,7 +320,9 @@ bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
   {
 //  case CV_8UC1:
     case CV_32FC1:
-//  case CV_64FC1:
+#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
+  case CV_64FC1:
+#endif
     {
       this->slicesFromMat(cloned_mat);
       break;
