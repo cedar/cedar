@@ -249,6 +249,7 @@ cv::Mat cedar::aux::ColorGradient::applyTo(const cv::Mat& matrix, bool limits, d
     switch (matrix.type())
     {
       case CV_32F:
+      case CV_64F:
       {
         cv::Mat scaled = (matrix - min) / (max - min) * 255.0;
         scaled.convertTo(in_converted, CV_8UC1);
