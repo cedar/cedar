@@ -193,8 +193,8 @@ void cedar::dyn::SpaceCodeToRateMatrix::outputSizesChanged()
     this->mWeights->setData(cedar::aux::math::ramp(CV_32F, this->mInput->getData().size[2], this->getLowerLimit(), this->getUpperLimit()));
     this->mWeights->unlock();
   }
-  this->onTrigger();
   this->emitOutputPropertiesChangedSignal("output");
+  this->onTrigger();
 }
 
 void cedar::dyn::SpaceCodeToRateMatrix::limitsChanged()
