@@ -1481,7 +1481,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   QMenu* menu = this->mpMenuArchitecturePlots;
   menu->clear();
 
-  const auto& plots = this->mGroup->getArchitecturePlots();
+  const auto& plots = this->mGroup->getArchitectureWidgets();
   if (plots.empty())
   {
     auto action = menu->addAction("none");
@@ -1502,7 +1502,7 @@ void cedar::proc::gui::Ide::architecturePlotActionTriggered()
   auto sender = dynamic_cast<QAction*>(QObject::sender());
   CEDAR_DEBUG_ASSERT(sender);
   std::string name = sender->text().toStdString();
-  this->mGroup->showArchitecturePlot(name);
+  this->mGroup->showArchitectureWidget(name);
 }
 
 void cedar::proc::gui::Ide::openFindDialog()
