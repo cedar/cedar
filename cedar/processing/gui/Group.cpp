@@ -230,16 +230,16 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitecturePlots() const
+const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
 {
-  return this->_mArchitecturePlots;
+  return this->_mArchitectureWidgets;
 }
 
-void cedar::proc::gui::Group::showArchitecturePlot(const std::string& name)
+void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
 {
-  auto plot_iter = this->_mArchitecturePlots.find(name);
+  auto plot_iter = this->_mArchitectureWidgets.find(name);
 
-  if (plot_iter == this->_mArchitecturePlots.end())
+  if (plot_iter == this->_mArchitectureWidgets.end())
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "No architecture plot with the name \"" + name
                                                   + "\" was found in the group \"" + this->getGroup()->getName() + "\".");
@@ -806,7 +806,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
       this->mPlotGroupsNode = plot_groups->second;
     }
 
-    auto architecture_plots_iter = node.find("architecture plots");
+    auto architecture_plots_iter = node.find("architecture widgets");
     if (architecture_plots_iter != node.not_found())
     {
       // _mArchitecturePlots
@@ -815,7 +815,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
       {
         const auto& key = pair.first;
         const auto& value = pair.second;
-        this->_mArchitecturePlots[key] = value.get_value<std::string>();
+        this->_mArchitectureWidgets[key] = value.get_value<std::string>();
       }
     }
 
@@ -933,11 +933,11 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
   // write architecture plots
   {
     cedar::aux::ConfigurationNode architecture_plots;
-    for (const auto& pair : this->_mArchitecturePlots)
+    for (const auto& pair : this->_mArchitectureWidgets)
     {
       architecture_plots.put(pair.first, pair.second.toString(true));
     }
-    generic.put_child("architecture plots", architecture_plots);
+    generic.put_child("architecture widgets", architecture_plots);
   }
 
   if (this->mBackgroundColor.isValid())
