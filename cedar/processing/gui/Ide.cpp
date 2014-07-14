@@ -1476,6 +1476,33 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
     this,
     SLOT(architectureChanged())
   );
+
+  // update architecture plots
+  QMenu* menu = this->mpMenuArchitecturePlots;
+  menu->clear();
+
+  const auto& plots = this->mGroup->getArchitecturePlots();
+  if (plots.empty())
+  {
+    auto action = menu->addAction("none");
+    action->setEnabled(false);
+  }
+  else
+  {
+    for (const auto& name_path_pair : plots)
+    {
+      QAction* action = menu->addAction(QString::fromStdString(name_path_pair.first));
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(architecturePlotActionTriggered()));
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::architecturePlotActionTriggered()
+{
+  auto sender = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(sender);
+  std::string name = sender->text().toStdString();
+  this->mGroup->showArchitecturePlot(name);
 }
 
 void cedar::proc::gui::Ide::openFindDialog()
