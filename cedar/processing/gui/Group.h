@@ -209,6 +209,12 @@ public:
   //! search and replace every occurance of 'from' with 'to' in the plot groups node
   void changeStepName(const std::string& from, const std::string& to);
 
+  //! Returns the architecture plots for this group.
+  const std::map<std::string, cedar::aux::Path>& getArchitecturePlots() const;
+
+  //! Displays the architecture plot with the given name.
+  void showArchitecturePlot(const std::string& name);
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??
@@ -405,6 +411,9 @@ private:
 
   //! Height of the group in its uncollapsed state.
   cedar::aux::DoubleParameterPtr _mUncollapsedHeight;
+
+  //! Map containing all the architecture plots. Keys are the names of the plots, values the paths to the files defining them.
+  std::map<std::string, cedar::aux::Path> _mArchitecturePlots;
 
 }; // class cedar::proc::gui::GroupFile
 
