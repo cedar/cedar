@@ -184,7 +184,7 @@ void cedar::dyn::SpaceCodeToRateMatrix::outputSizesChanged()
   {
     return;
   }
-  if (this->mInput->getData().dims == 3)
+  if (this->mInput->getData().dims == 3 && this->mInput->getData().size[2] > 1)
   {
     this->mOutput->lockForWrite();
     this->mOutput->setData(cv::Mat::zeros(this->mInput->getData().size[0], this->mInput->getData().size[1], CV_32F));
@@ -215,7 +215,7 @@ void cedar::dyn::SpaceCodeToRateMatrix::limitsChanged()
 
   if (this->mInput)
   {
-    if (this->mInput->getData().dims == 3)
+    if (this->mInput->getData().dims == 3 && this->mInput->getData().size[2] > 1)
     {
       this->mWeights->lockForWrite();
       this->mWeights->setData
