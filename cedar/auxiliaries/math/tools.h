@@ -377,9 +377,10 @@ namespace cedar
       template <typename T>
       inline cv::Mat ramp(int mat_type, int size, T lower, T upper)
       {
+        CEDAR_ASSERT(size > 1);
         cv::Mat result(size, 1, mat_type);
         T difference = upper - lower;
-        T step = difference / static_cast<T>(size);
+        T step = difference / static_cast<T>(size - 1);
         int index;
         T value;
         for (index = 0, value = lower; index < size; ++index, value += step)
