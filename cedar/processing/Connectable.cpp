@@ -484,7 +484,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::updateInputValidity(ce
     );
   }
 
-  // if the validty is indetermined (unknown), try to find it out
+  // if the validity is indetermined (unknown), try to find it out
   if (slot->getValidity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
   {
     // get the data object in the slot.
@@ -1111,6 +1111,9 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, cedar::aux::DataPtr d
   }
   locker.unlock();
 
+  // reset the validity to unknown before removing data - this allows a connectable
+  // to re-evalute its slots after disconnect
+  slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   slot->removeData(data);
 }
 

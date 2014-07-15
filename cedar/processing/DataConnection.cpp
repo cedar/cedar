@@ -140,7 +140,7 @@ void cedar::proc::DataConnection::disconnect()
       try
       {
         cedar::proc::ExternalDataPtr real_target = this->getTarget();
-        this->getTarget()->getParentPtr()->freeInput(real_target->getName(), source->getData());
+        real_target->getParentPtr()->freeInput(real_target->getName(), source->getData());
       }
       catch (cedar::proc::ConnectionMemberDeletedException)
       {
