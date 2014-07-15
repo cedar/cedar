@@ -248,7 +248,7 @@ void cedar::dyn::SpaceToRateCode::reset()
 
 void cedar::dyn::SpaceToRateCode::limitsChanged()
 {
-  if (this->mInput)
+  if (this->mInput && mInput->getDimensionality() == 1 && mInput->getData().type() == CV_32F)
   {
     mRamp = cedar::aux::math::ramp(CV_32F, this->mInput->getData().rows, this->getLowerLimit(), this->getUpperLimit());
   }
