@@ -49,9 +49,7 @@
 // SYSTEM INCLUDES
 #include <QComboBox>
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief The GUI implementation of cedar::proc::experiment::gui::TriggerParameter
  */
 class cedar::proc::experiment::gui::TriggerParameter : public cedar::aux::gui::Parameter
 {

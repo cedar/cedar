@@ -105,7 +105,7 @@ protected:
 
 private:
 
-}; // class cedar::proc::experiment::ActionStart
+}; // class cedar::proc::experiment::action::StartAllTriggers
 
 #endif // CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_H
 

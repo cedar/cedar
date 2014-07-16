@@ -107,7 +107,7 @@ private:
   //!@brief The value by the parameter should be increased
   cedar::proc::experiment::StepPropertyParameterPtr _mStepParamter;
 
-}; // class cedar::proc::experiment::ActionIncreaseParameter
+}; // class cedar::proc::experiment::action::ParameterAdd
 
 #endif // CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_H
 

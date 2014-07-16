@@ -50,9 +50,8 @@
 // SYSTEM INCLUDES
 #include <QListWidget>
 
-/*!@todo describe.
+/*!@brieg A GUI implementation of cedar::proc::experiment::action::Action::ActionListParamter
  *
- * @todo describe more.
  */
 class cedar::proc::experiment::gui::ActionListParameter : public cedar::aux::gui::Parameter
 {
@@ -65,6 +64,8 @@ class cedar::proc::experiment::gui::ActionListParameter : public cedar::aux::gui
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  //!@brief A widget for displaying and communicating with the ActionList
   class ActionListWidget : public QListWidget
   {
     public:
@@ -73,7 +74,10 @@ public:
       void dragEnterEvent(QDragEnterEvent* event);
       void dropEvent(QDropEvent* event);
     private:
+      //!@brief Reference the the ActionListParamter.
       ActionListParameter* mpParent;
+
+      //!@brief When a drag event has been started, this will save the current position of the Action in the list.
       int mStartDragPos;
   };
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,10 +97,19 @@ public:
   // none yet
 
 public slots:
+  //!@brief Adds a new Action to the ActionList.
   void addAction();
+
+  //!@brief Redraws the ActionListWidget.
   void updateList();
+
+  //!@brief Triggered when the ActionListParameter has changed.
   void parameterPointerChanged();
+
+  //!@brief Triggered when a Action in the list has changed.
   void actionParameterChanged();
+
+  //!@brief  Triggered when a Action in the list has been removed.
   void actionParameterRemoved();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -117,7 +130,10 @@ private:
 protected:
   // none yet
 private:
+  //!@brief Reference to the ActionListParameter.
   cedar::proc::experiment::action::Action::ActionListParameterPtr mActionListParameter;
+
+  //!@brief The Widget to display the ActionList.
   ActionListWidget* mActionListWidget;
 
 
