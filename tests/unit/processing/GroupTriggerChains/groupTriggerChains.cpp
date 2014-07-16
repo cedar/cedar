@@ -603,6 +603,39 @@ void run_test()
     test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), 0, "configuration 16");
     test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step3"), 0, "configuration 16");
   }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 17" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group_1(new Group());
+    group->add(nested_group_1, "nested1");
+    nested_group_1->addConnector("output", false);
+    nested_group_1->add(boost::make_shared<TriggerTest>(true), "step");
+
+    GroupPtr nested_group_2(new Group());
+    group->add(nested_group_2, "nested2");
+    nested_group_2->addConnector("input", true);
+    nested_group_2->add(boost::make_shared<TriggerTest>(false), "step");
+
+    auto trigger = boost::make_shared<cedar::proc::LoopedTrigger>();
+    group->add(trigger, "trigger");
+    group->connectTrigger(trigger, nested_group_1);
+    group->connectTrigger(trigger, nested_group_2);
+
+    std::cout << "Connecting nested1.step -> nested1.output" << std::endl;
+    nested_group_1->connectSlots("step.out", "output.input");
+
+    std::cout << "Connecting nested1.output -> nested2.input" << std::endl;
+    group->connectSlots("nested1.output", "nested2.input");
+
+    std::cout << "Connecting nested1.output -> nested2.input" << std::endl;
+    nested_group_2->connectSlots("input.output", "step.in1");
+
+    test_trigger(trigger, nested_group_1->getElement<TriggerTest>("step"), "configuration 17");
+  }
 }
 
 int main(int argc, char** argv)
