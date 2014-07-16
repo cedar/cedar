@@ -634,7 +634,18 @@ void cedar::proc::Trigger::updateTriggeringOrderRecurseUpSource(cedar::proc::sou
       source_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(sink).get();
       CEDAR_DEBUG_ASSERT(source_triggerable != nullptr);
     }
+    else if (auto source_group_source = dynamic_cast<cedar::proc::sources::GroupSource*>(source_triggerable))
+    {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " following group source" << std::endl;
+#endif
+      this->updateTriggeringOrderRecurseUpSource(source_group_source, visited);
+      return;
+    }
 
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " -> updating triggering order of " << nameTriggerable(source_triggerable) << std::endl;
+#endif
     source_triggerable->updateTriggeringOrder(visited, true, false);
   }
 }
