@@ -136,7 +136,7 @@ void test_trigger(cedar::proc::LoopedTriggerPtr trigger, TriggerTestPtr sink, co
   using cedar::proc::GroupPtr;
 
   sink->resetData();
-  std::cout << ">>> Triggering source." << std::endl;
+  std::cout << ">>> Triggering looped trigger." << std::endl;
   trigger->singleStep();
   // wait for processing of the trigger chain
   //!@todo Is there a better way than just randomly waiting?
@@ -613,28 +613,30 @@ void run_test()
     GroupPtr nested_group_1(new Group());
     group->add(nested_group_1, "nested1");
     nested_group_1->addConnector("output", false);
-    nested_group_1->add(boost::make_shared<TriggerTest>(true), "step");
+    nested_group_1->add(boost::make_shared<TriggerTest>(true), "step1");
+    nested_group_1->setIsLooped(true);
 
     GroupPtr nested_group_2(new Group());
     group->add(nested_group_2, "nested2");
     nested_group_2->addConnector("input", true);
-    nested_group_2->add(boost::make_shared<TriggerTest>(false), "step");
+    nested_group_2->add(boost::make_shared<TriggerTest>(false), "step2");
+    nested_group_2->setIsLooped(true);
+
+    std::cout << "Connecting nested1.step1 -> nested1.output" << std::endl;
+    nested_group_1->connectSlots("step1.out", "output.input");
+
+    std::cout << "Connecting nested1.output -> nested2.input" << std::endl;
+    group->connectSlots("nested1.output", "nested2.input");
+
+    std::cout << "Connecting nested2.input -> nested2.step2.input" << std::endl;
+    nested_group_2->connectSlots("input.output", "step2.in1");
 
     auto trigger = boost::make_shared<cedar::proc::LoopedTrigger>();
     group->add(trigger, "trigger");
     group->connectTrigger(trigger, nested_group_1);
     group->connectTrigger(trigger, nested_group_2);
 
-    std::cout << "Connecting nested1.step -> nested1.output" << std::endl;
-    nested_group_1->connectSlots("step.out", "output.input");
-
-    std::cout << "Connecting nested1.output -> nested2.input" << std::endl;
-    group->connectSlots("nested1.output", "nested2.input");
-
-    std::cout << "Connecting nested1.output -> nested2.input" << std::endl;
-    nested_group_2->connectSlots("input.output", "step.in1");
-
-    test_trigger(trigger, nested_group_1->getElement<TriggerTest>("step"), "configuration 17");
+    test_trigger(trigger, nested_group_2->getElement<TriggerTest>("step2"), "configuration 17");
   }
 }
 
