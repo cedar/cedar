@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/ArchitectureWidget.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
@@ -228,6 +229,28 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
+{
+  return this->_mArchitectureWidgets;
+}
+
+void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
+{
+  auto plot_iter = this->_mArchitectureWidgets.find(name);
+
+  if (plot_iter == this->_mArchitectureWidgets.end())
+  {
+    CEDAR_THROW(cedar::aux::InvalidNameException, "No architecture plot with the name \"" + name
+                                                  + "\" was found in the group \"" + this->getGroup()->getName() + "\".");
+  }
+
+  auto widget = new cedar::proc::gui::ArchitectureWidget(this->getGroup(), this->mpMainWindow);
+  widget->readJson(plot_iter->second.absolute().toString());
+
+  auto dock = this->createDockWidget(name, widget);
+  dock->show();
+}
 
 void cedar::proc::gui::Group::lastReadConfigurationChanged()
 {
@@ -783,6 +806,19 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
       this->mPlotGroupsNode = plot_groups->second;
     }
 
+    auto architecture_plots_iter = node.find("architecture widgets");
+    if (architecture_plots_iter != node.not_found())
+    {
+      // _mArchitecturePlots
+      const auto& architecture_plots = architecture_plots_iter->second;
+      for (auto pair : architecture_plots)
+      {
+        const auto& key = pair.first;
+        const auto& value = pair.second;
+        this->_mArchitectureWidgets[key] = value.get_value<std::string>();
+      }
+    }
+
     auto color_node = node.find("background color");
     if (color_node != node.not_found())
     {
@@ -892,6 +928,16 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
     generic.put_child("open plots", node);
     // add plot groups to architecture
     generic.put_child("plot groups", this->mPlotGroupsNode);
+  }
+
+  // write architecture plots
+  {
+    cedar::aux::ConfigurationNode architecture_plots;
+    for (const auto& pair : this->_mArchitectureWidgets)
+    {
+      architecture_plots.put(pair.first, pair.second.toString(true));
+    }
+    generic.put_child("architecture widgets", architecture_plots);
   }
 
   if (this->mBackgroundColor.isValid())
