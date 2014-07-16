@@ -76,6 +76,15 @@ cedar::proc::Triggerable::~Triggerable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Triggerable::updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown)
+{
+  QReadLocker locker(this->mFinished.getLockPtr());
+  if (this->mFinished.member())
+  {
+    this->mFinished.member()->updateTriggeringOrder(visited, recurseUp, recurseDown);
+  }
+}
+
 bool cedar::proc::Triggerable::isStarted() const
 {
   QMutexLocker locker(this->mpStartCallsLock);

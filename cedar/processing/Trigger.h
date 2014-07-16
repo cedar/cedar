@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/GraphTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/sources/GroupSource.fwd.h"
 #include "cedar/processing/sinks/GroupSink.fwd.h"
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
@@ -149,6 +150,9 @@ private:
    * @todo Describe this properly.
    */
   void updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp = true, bool recurseDown = true);
+
+  //! Updates the triggering order of the source recursively, going upwards the triggering chains.
+  void updateTriggeringOrderRecurseUpSource(cedar::proc::sources::GroupSource* source, std::set<cedar::proc::Trigger*>& visited);
 
   void setOwner(cedar::proc::Triggerable* owner)
   {

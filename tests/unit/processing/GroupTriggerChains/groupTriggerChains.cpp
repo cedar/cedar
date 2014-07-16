@@ -622,13 +622,13 @@ void run_test()
     nested_group_2->add(boost::make_shared<TriggerTest>(false), "step2");
     nested_group_2->setIsLooped(true);
 
-    std::cout << "Connecting nested1.step1 -> nested1.output" << std::endl;
+    std::cout << std::endl << "Connecting nested1.step1 -> nested1.output" << std::endl;
     nested_group_1->connectSlots("step1.out", "output.input");
 
-    std::cout << "Connecting nested1.output -> nested2.input" << std::endl;
+    std::cout << std::endl << "Connecting nested1.output -> nested2.input" << std::endl;
     group->connectSlots("nested1.output", "nested2.input");
 
-    std::cout << "Connecting nested2.input -> nested2.step2.input" << std::endl;
+    std::cout << std::endl << "Connecting nested2.input -> nested2.step2.input" << std::endl;
     nested_group_2->connectSlots("input.output", "step2.in1");
 
     auto trigger = boost::make_shared<cedar::proc::LoopedTrigger>();
