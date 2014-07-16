@@ -231,6 +231,9 @@ protected:
   //! Returns the number of start calls.
   unsigned int numberOfStartCalls() const;
 
+  //! Updates the triggering order of the triggerable. Effectively, calls updateTriggeringOrder on the finished trigger.
+  virtual void updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
