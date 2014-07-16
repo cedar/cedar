@@ -747,7 +747,21 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
   for (auto it = elements.begin(); it != elements.end(); )
   {
     // check if the name already exists
-    if (this->nameExists((*it)->getName()))
+    const std::string& name = (*it)->getName();
+    if (this->hasConnector(name))
+    {
+      // if so, output a warning ...
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Element " + (*it)->getName() + " cannot have the same name as group inputs and outputs in group " + this->getName() + ".",
+        "cedar::proc::Group::addElements(std::list<cedar::proc::ElementPtr> elements)"
+      );
+
+      // ... and remove the element from the list of elements to be moved
+      //!@todo Can we deal with this in a better way than just ignoring the element? Maybe rename it?
+      it = elements.erase(it);
+    }
+    else if (this->nameExists((*it)->getName()))
     {
       // if so, output a warning ...
       cedar::aux::LogSingleton::getInstance()->warning
