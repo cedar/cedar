@@ -302,9 +302,13 @@ private:
    */
   void executeAcionSequences(bool initial = false);
 
+  //!@brief Emits the group changed signal if called.
   void groupChanged(cedar::proc::ConstElementPtr element);
 
+  //!@brief Saves the actual state of the group. This can be useful to restore this state at the end of the experiment.
   void saveGroupState();
+
+  //!@brief Restores the saved state of the group.
   void resetGroupState();
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -351,6 +355,7 @@ private:
   //!@brief The list of action sequences containing to the experiment
   ActionSequencelListParameterPtr _mActionSequences;
 
+  //!@brief The state of the group before the experiment has been started.
   cedar::aux::ConfigurationNode mGroupState;
 
 

@@ -108,7 +108,7 @@ void cedar::proc::experiment::gui::ActionListParameter::updateList()
   mActionListWidget->clear();
   for(unsigned int i=0; i < mActionListParameter->size(); i++)
   {
-
+    // Create ActionWidget
     cedar::proc::experiment::action::ActionPtr action = mActionListParameter->at(i);
     QListWidgetItem* item = new QListWidgetItem();
     item->setSizeHint(QSize(0,45));
@@ -117,7 +117,7 @@ void cedar::proc::experiment::gui::ActionListParameter::updateList()
     itemWidgetLayout->setMargin(5);
     itemWidget->setLayout(itemWidgetLayout);
 
-
+    //Create remove Action button
     QPushButton* remove = new QPushButton();
     remove->setText(QString::fromStdString("-"));
     remove->setFixedSize(35,25);
@@ -125,6 +125,7 @@ void cedar::proc::experiment::gui::ActionListParameter::updateList()
     itemWidgetLayout->addWidget(remove);
     connect(remove,SIGNAL(clicked()),this,SLOT(actionParameterRemoved()));
 
+    //Create Action selector
     cedar::aux::ObjectParameterPtr actionParameter
         (
             new cedar::proc::experiment::action::Action::ActionParameter(NULL,std::to_string(i),action)
@@ -133,8 +134,9 @@ void cedar::proc::experiment::gui::ActionListParameter::updateList()
     cedar::aux::gui::Parameter* parameterWidget = new cedar::aux::gui::ObjectParameter();
     parameterWidget->setParameter(actionParameter);
     itemWidgetLayout->addWidget(parameterWidget);
-
     connect(actionParameter.get(),SIGNAL(valueChanged()),this,SLOT(actionParameterChanged()));
+
+    //Create Action control
     auto itemProperties = new cedar::proc::experiment::gui::ExperimentItemWidget();
     itemProperties->display(action);
     itemWidgetLayout->addWidget(itemProperties);

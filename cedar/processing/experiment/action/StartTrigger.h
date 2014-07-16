@@ -50,9 +50,8 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief Action to start a trigger in the architecture.
  *
- * @todo describe more.
  */
 class cedar::proc::experiment::action::StartTrigger : public cedar::proc::experiment::action::Action
 {
@@ -103,6 +102,7 @@ protected:
   // none yet
 
 private:
+  //!@brief The Trigger to start
   cedar::proc::experiment::TriggerParameterPtr mTrigger;
 
 }; // class cedar::proc::experiment::condition::StartTrigger

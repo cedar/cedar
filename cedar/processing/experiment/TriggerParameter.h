@@ -48,9 +48,8 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief a parameter to choose a certain trigger from the architecture
  *
- * @todo describe more.
  */
 class cedar::proc::experiment::TriggerParameter : public cedar::aux::Parameter
 {
@@ -88,7 +87,10 @@ public:
   //!@brief Checks if this parameter can copy its value from the given one.
   bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
 
+  //!@brief Sets the trigger.
   void setTrigger(const std::string& triggerName);
+
+  //!@brief Returns the current trigger.
   const std::string& getTrigger();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,6 +120,7 @@ protected:
   // none yet
 
 private:
+  //!@brief The name of the trigger
   std::string mTrigger;
 
 }; // class cedar::proc::experiment::TriggerParameter
