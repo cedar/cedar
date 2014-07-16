@@ -136,7 +136,7 @@ void test_trigger(cedar::proc::LoopedTriggerPtr trigger, TriggerTestPtr sink, co
   using cedar::proc::GroupPtr;
 
   sink->resetData();
-  std::cout << ">>> Triggering source." << std::endl;
+  std::cout << ">>> Triggering looped trigger." << std::endl;
   trigger->singleStep();
   // wait for processing of the trigger chain
   //!@todo Is there a better way than just randomly waiting?
@@ -602,6 +602,110 @@ void run_test()
 
     test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step2"), 0, "configuration 16");
     test_group(group->getElement<TriggerTest>("step1"), nested_group->getElement<TriggerTest>("step3"), 0, "configuration 16");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 17" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+    /* Configuration 17:
+     +-Grp-(looped)+   +-Grp-(looped)-+
+     |             |   |              |
+     | +-loopd-+   |   |   +-------+  |
+     | | Step  |o-o|o-o|o-o| Step  |  |
+     | +-------+   |   |   +-------+  |
+     +-------------+   +--------------+
+     */
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group_1(new Group());
+    group->add(nested_group_1, "nested1");
+    nested_group_1->addConnector("output", false);
+    nested_group_1->add(boost::make_shared<TriggerTest>(true), "step1");
+    nested_group_1->setIsLooped(true);
+
+    GroupPtr nested_group_2(new Group());
+    group->add(nested_group_2, "nested2");
+    nested_group_2->addConnector("input", true);
+    nested_group_2->add(boost::make_shared<TriggerTest>(false), "step2");
+    nested_group_2->setIsLooped(true);
+
+    std::cout << std::endl << "Connecting nested1.step1 -> nested1.output" << std::endl;
+    nested_group_1->connectSlots("step1.out", "output.input");
+
+    std::cout << std::endl << "Connecting nested1.output -> nested2.input" << std::endl;
+    group->connectSlots("nested1.output", "nested2.input");
+
+    std::cout << std::endl << "Connecting nested2.input -> nested2.step2.input" << std::endl;
+    nested_group_2->connectSlots("input.output", "step2.in1");
+
+    auto trigger = boost::make_shared<cedar::proc::LoopedTrigger>();
+    group->add(trigger, "trigger");
+    group->connectTrigger(trigger, nested_group_1);
+    group->connectTrigger(trigger, nested_group_2);
+
+    test_trigger(trigger, nested_group_2->getElement<TriggerTest>("step2"), "configuration 17");
+  }
+
+  {
+    std::cout << "==================================" << std::endl;
+    std::cout << " Checking group configuration 18" << std::endl;
+    std::cout << "==================================" << std::endl << std::endl;
+    /* Configuration 18:
+     +-Grp-(looped)------+    +-Grp-(looped)-------+
+     | +-Grp-(looped)+   |    |   +-Grp-(looped)-+ |
+     | |             |   |    |   |              | |
+     | | +-loopd-+   |   |    |   |   +-------+  | |
+     | | | Step  |o-o|o-o|o--o|o-o|o-o| Step  |  | |
+     | | +-------+   |   |    |   |   +-------+  | |
+     | +-------------+   |    |   +--------------+ |
+     +-------------------+    +--------------------+
+     */
+
+    GroupPtr group(new Group());
+    GroupPtr nested_group_1(new Group());
+    nested_group_1->setIsLooped(true);
+    group->add(nested_group_1, "nested1");
+    nested_group_1->addConnector("output_1", false);
+
+    GroupPtr nested_group_1_1(new Group());
+    nested_group_1_1->setIsLooped(true);
+    nested_group_1->add(nested_group_1_1, "nested1_1");
+    nested_group_1_1->addConnector("output_1_1", false);
+    nested_group_1_1->add(boost::make_shared<TriggerTest>(true), "step1");
+
+    GroupPtr nested_group_2(new Group());
+    nested_group_2->setIsLooped(true);
+    group->add(nested_group_2, "nested2");
+    nested_group_2->addConnector("input_2", true);
+
+    GroupPtr nested_group_2_2(new Group());
+    nested_group_2_2->setIsLooped(true);
+    nested_group_2->add(nested_group_2_2, "nested2_2");
+    nested_group_2_2->addConnector("input_2_2", true);
+    nested_group_2_2->add(boost::make_shared<TriggerTest>(false), "step2");
+
+    std::cout << std::endl << "Connecting nested1_1.step1 -> nested1_1.output" << std::endl;
+    nested_group_1_1->connectSlots("step1.out", "output_1_1.input");
+
+    std::cout << std::endl << "Connecting nested1_1.output -> nested1.sink" << std::endl;
+    nested_group_1->connectSlots("nested1_1.output_1_1", "output_1.input");
+
+    std::cout << std::endl << "Connecting nested1.output -> nested2.input" << std::endl;
+    group->connectSlots("nested1.output_1", "nested2.input_2");
+
+    std::cout << std::endl << "Connecting nested2.input -> nested2_2.sink" << std::endl;
+    nested_group_2->connectSlots("input_2.output", "nested2_2.input_2_2");
+
+    std::cout << std::endl << "Connecting nested2_2.input -> nested2_2.step2.input" << std::endl;
+    nested_group_2_2->connectSlots("input_2_2.output", "step2.in1");
+
+    auto trigger = boost::make_shared<cedar::proc::LoopedTrigger>();
+    group->add(trigger, "trigger");
+    group->connectTrigger(trigger, nested_group_1);
+    group->connectTrigger(trigger, nested_group_2);
+
+    test_trigger(trigger, nested_group_2_2->getElement<TriggerTest>("step2"), "configuration 18");
   }
 }
 

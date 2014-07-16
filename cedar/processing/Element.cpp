@@ -104,15 +104,26 @@ void cedar::proc::Element::validateName(const std::string& newName) const
     CEDAR_THROW(cedar::aux::ValidationFailedException, "This name contains an invalid character (\".\")");
   }
 
-  // nothing to do if the name is the same
-  if (newName == this->getName())
+  if (newName.empty())
   {
-    return;
+    CEDAR_THROW
+    (
+      cedar::aux::ValidationFailedException,
+      "This element cannot have an empty name."
+    );
   }
 
-  if (cedar::proc::ConstGroupPtr network = this->getGroup())
+  if (cedar::proc::ConstGroupPtr group = this->getGroup())
   {
-    if (network->nameExists(newName))
+    if (group->hasConnector(newName))
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::ValidationFailedException,
+        "This element cannot have the same name as inputs or outputs of its group."
+      );
+    }
+    else if (group->nameExists(newName))
     {
       CEDAR_THROW
       (
@@ -121,6 +132,8 @@ void cedar::proc::Element::validateName(const std::string& newName) const
       );
     }
   }
+
+  // nothing to do if the name does not violate any of the constraints, return
 }
 
 void cedar::proc::Element::copyFrom(cedar::aux::ConstConfigurablePtr src)

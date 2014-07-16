@@ -305,6 +305,9 @@ void cedar::proc::Trigger::explore
 
   if (explored.find(source) != explored.end())
   {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << "- leaving explore for " << nameTriggerable(source.get()) << " (already visited)" << std::endl;
+#endif
     // triggerable was already treated, skip it.
     return;
   }
@@ -561,13 +564,22 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
       trigger->updateTriggeringOrder(visited, true, false);
     }
 
+    // if this trigger is owned by a group source, we also have to explore its group
+    if (auto source = dynamic_cast<cedar::proc::sources::GroupSource*>(this->mpOwner))
+    {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+      /* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " calling updateTriggeringOrder(up=true, down=false) for group source" << std::endl;
+#endif
+      this->updateTriggeringOrderRecurseUpSource(source, visited);
+    }
+
     // also, if the owner of this trigger is a group, update the triggering order of all sinks
     //!@todo This might do more than needed; in principle, only the slots sinks actually affected need to be updated
     if (auto group = dynamic_cast<cedar::proc::Group*>(this->mpOwner))
     {
       for (auto name_connector_type_pair : group->getConnectorMap())
       {
-        if (!name_connector_type_pair.second)
+        if (!name_connector_type_pair.second) // connector is an output/sink
         {
           auto sink = boost::static_pointer_cast<cedar::proc::sinks::GroupSink>(group->getElement(name_connector_type_pair.first));
           sink->getFinishedTrigger()->updateTriggeringOrder(visited, true, false);
@@ -575,7 +587,69 @@ void cedar::proc::Trigger::updateTriggeringOrder(std::set<cedar::proc::Trigger*>
       }
     }
   }
+
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " F Final triggering order for " << nameTrigger(this) << std::endl;
+/* DEBUG_TRIGGER_TREE_EXPLORATION */  QReadLocker r_lock(this->mTriggeringOrder.getLockPtr());
+/* DEBUG_TRIGGER_TREE_EXPLORATION */  for (auto distance_triggerable_set_pair : this->mTriggeringOrder.member())
+/* DEBUG_TRIGGER_TREE_EXPLORATION */  {
+/* DEBUG_TRIGGER_TREE_EXPLORATION */    std::cout << "Distance: " << distance_triggerable_set_pair.first << std::endl;
+/* DEBUG_TRIGGER_TREE_EXPLORATION */
+/* DEBUG_TRIGGER_TREE_EXPLORATION */    for (auto triggerable : distance_triggerable_set_pair.second)
+/* DEBUG_TRIGGER_TREE_EXPLORATION */    {
+/* DEBUG_TRIGGER_TREE_EXPLORATION */      std::cout << "  " << nameTriggerable(triggerable) << std::endl;
+/* DEBUG_TRIGGER_TREE_EXPLORATION */    }
+/* DEBUG_TRIGGER_TREE_EXPLORATION */  }
+#endif
 }
+
+void cedar::proc::Trigger::updateTriggeringOrderRecurseUpSource(cedar::proc::sources::GroupSource* source, std::set<cedar::proc::Trigger*>& visited)
+{
+  auto group = source->getGroup();
+  if (!group)
+  {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " Returning: no group set." << std::endl;
+#endif
+
+    // this can happen during construction and destruction.
+    return;
+  }
+
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " Iterating connections." << std::endl;
+#endif
+  for (auto connection : group->getInputSlot(source->getName())->getDataConnections())
+  {
+    auto source_triggerable = dynamic_cast<cedar::proc::Triggerable*>(connection->getSource()->getParentPtr());
+    CEDAR_DEBUG_ASSERT(source_triggerable);
+
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " source_triggerable: " << nameTriggerable(source_triggerable) << std::endl;
+#endif
+
+    if (auto source_group = dynamic_cast<cedar::proc::Group*>(source_triggerable))
+    {
+      auto sink = source_group->getElement<cedar::proc::sinks::GroupSink>(connection->getSource()->getName());
+      source_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(sink).get();
+      CEDAR_DEBUG_ASSERT(source_triggerable != nullptr);
+    }
+    else if (auto source_group_source = dynamic_cast<cedar::proc::sources::GroupSource*>(source_triggerable))
+    {
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " following group source" << std::endl;
+#endif
+      this->updateTriggeringOrderRecurseUpSource(source_group_source, visited);
+      return;
+    }
+
+#ifdef DEBUG_TRIGGER_TREE_EXPLORATION
+/* DEBUG_TRIGGER_TREE_EXPLORATION */ std::cout << " -> updating triggering order of " << nameTriggerable(source_triggerable) << std::endl;
+#endif
+    source_triggerable->updateTriggeringOrder(visited, true, false);
+  }
+}
+
 
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
