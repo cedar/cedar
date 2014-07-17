@@ -576,6 +576,8 @@ void cedar::proc::gui::Ide::showSettingsDialog()
 
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 {
+  //!@todo How this should really work: ste this in the settings singleton, then scenes react to parameter changes in there.
+  cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid(triggered);
   this->mpProcessingDrawer->getScene()->setSnapToGrid(triggered);
 }
 
@@ -656,8 +658,6 @@ void cedar::proc::gui::Ide::restoreSettings()
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
 
   cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);
-
-  mpActionShowHideGrid->setChecked(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid());
 }
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
@@ -1448,6 +1448,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mGroup->addElementsToScene();
   this->mpPropertyTable->clear();
+  this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
 
   this->updateTriggerStartStopThreadCallers();
