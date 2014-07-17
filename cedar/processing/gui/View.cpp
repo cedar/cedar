@@ -108,14 +108,18 @@ void cedar::proc::gui::View::setWidgets
 
 void cedar::proc::gui::View::resetViewport()
 {
+  auto trigger_display_mode = cedar::proc::gui::Scene::MODE_SHOW_ALL;
   if (this->mpScene)
   {
+    trigger_display_mode = this->mpScene->getTriggerDisplayMode();
     delete this->mpScene;
     this->mpScene = nullptr;
   }
 
   this->mpScene = new cedar::proc::gui::Scene(this);
   this->setScene(this->mpScene);
+
+  this->mpScene->setTriggerDisplayMode(trigger_display_mode);
 
   if (mpMainWindow != nullptr)
   {
