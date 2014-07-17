@@ -328,6 +328,10 @@ protected:
 
   //! write all open child widgets to a configuration node
   void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const;
+
+  /*! Returns a formatted string that can be used for labels/window titles.
+   */
+  std::string getNameForTitle() const;
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

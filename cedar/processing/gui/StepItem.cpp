@@ -554,6 +554,7 @@ void cedar::proc::gui::StepItem::loadDataClicked()
   }
 }
 
+//!@todo Why isn't this function in gui::Connectable?
 void cedar::proc::gui::StepItem::openDefinedPlotAction()
 {
   QAction* p_action = dynamic_cast<QAction*>(QObject::sender());
@@ -589,7 +590,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction()
   }
 
   auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->getStep(), elem_decl->definedPlots()[list_index].mData);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->getStep()->getName(), p_plot_widget, p_action->data().toPoint());
+  auto p_dock_widget = this->createDockWidgetForPlots(this->getNameForTitle(), p_plot_widget, p_action->data().toPoint());
   
   p_dock_widget->show();
 }
