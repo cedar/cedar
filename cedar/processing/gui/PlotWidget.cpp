@@ -67,7 +67,6 @@ mTitle(pLabel.toStdString())
 {
   this->mpTitleLayout = new QHBoxLayout();
   this->mpTitleLayout->setContentsMargins(0, 0, 0, 0);
-  this->mpTitleLayout->addWidget(this->mpLabel);
 
   this->mpPlotSelector = new QPushButton();
   this->mpPlotSelector->setFixedSize(20, 20);
@@ -77,8 +76,10 @@ mTitle(pLabel.toStdString())
 
   this->mpPlotContainer = new QWidget();
   auto layout = new QVBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
   this->mpPlotContainer->setLayout(layout);
   this->mpTitleLayout->addWidget(this->mpPlotSelector);
+  this->mpTitleLayout->addWidget(this->mpLabel);
 
   this->openPlotFromDeclaration(decalarationToUse);
 };
