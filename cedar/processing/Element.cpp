@@ -58,6 +58,21 @@ cedar::proc::Element::~Element()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::proc::Element::getFullPath() const
+{
+  std::string path = this->getName();
+
+  cedar::proc::ConstGroupPtr parent = this->getGroup();
+
+  while (parent && !parent->isRoot())
+  {
+    path = parent->getName() + "." + path;
+    parent = parent->getGroup();
+  }
+
+  return path;
+}
+
 void cedar::proc::Element::updateTriggerChains(std::set<cedar::proc::Trigger*>& /*visited*/)
 {
   // empty default implementation
