@@ -55,6 +55,7 @@
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -85,6 +86,38 @@ public:
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestModule);
+
+int test_looped_group_cycle()
+{
+  std::cout << "Testing a cycle in connections between looped groups." << std::endl;
+  cedar::proc::GroupPtr root(new cedar::proc::Group());
+  cedar::proc::GroupPtr group1(new cedar::proc::Group());
+  cedar::proc::GroupPtr group2(new cedar::proc::Group());
+
+  root->add(group1, "group1");
+  root->add(group2, "group2");
+
+  cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger());
+  root->add(trigger, "trigger");
+
+  group1->addConnector("input", true);
+  group2->addConnector("input", true);
+  group1->addConnector("output", false);
+  group2->addConnector("output", false);
+
+  root->connectSlots("group1.output", "group2.input");
+  root->connectSlots("group2.output", "group1.input");
+  group1->connectSlots("input.output", "output.input");
+  group2->connectSlots("input.output", "output.input");
+
+  trigger->start();
+
+  cedar::aux::sleep(0.25 * cedar::unit::seconds);
+
+  trigger->stop();
+
+  return 0;
+}
 
 void run_test()
 {
@@ -367,11 +400,12 @@ void run_test()
     group->renameConnector("test_out", "test_out2", false);
   }
 
+  errors += test_looped_group_cycle();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
 
-  QApplication::exit(0);
+  QApplication::exit(errors);
 }
 
 int main(int argc, char** argv)
