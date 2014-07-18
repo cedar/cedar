@@ -91,6 +91,8 @@ private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
+  void validateName(const std::string& newName) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
