@@ -223,10 +223,7 @@ void cedar::proc::Triggerable::callOnStart()
   {
     for (auto listener : this->mFinished.member()->getListeners())
     {
-      if (!boost::dynamic_pointer_cast<cedar::proc::Group>(listener))
-      {
         listener->callOnStart();
-      }
     }
   }
 }
@@ -280,10 +277,7 @@ void cedar::proc::Triggerable::callOnStop()
   {
     for (auto listener : this->mFinished.member()->getListeners())
     {
-      if (!boost::dynamic_pointer_cast<cedar::proc::Group>(listener))
-      {
         listener->callOnStop();
-      }
     }
   }
 }

@@ -357,6 +357,17 @@ void run_test()
   group_2->add(moved_gains);
   group_1->add(moved_gains);
 
+  {
+    std::cout << "testing renaming of group connectors" << std::endl;
+
+    cedar::proc::GroupPtr group(new cedar::proc::Group());
+    group->addConnector("test_in", true);
+    group->renameConnector("test_in", "test_in2", true);
+    group->addConnector("test_out", false);
+    group->renameConnector("test_out", "test_out2", false);
+  }
+
+
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
 
