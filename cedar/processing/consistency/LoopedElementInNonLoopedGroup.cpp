@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedStepNotConnected.cpp
+    File:        LoopedElementInNonLoopedGroup.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 06 20
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2014 07 18
 
     Description:
 
@@ -38,8 +38,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/consistency/LoopedStepNotConnected.h"
-#include "cedar/processing/Step.h"
+#include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
+#include "cedar/processing/Element.h"
 
 // SYSTEM INCLUDES
 
@@ -47,9 +47,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::LoopedStepNotConnected::LoopedStepNotConnected(cedar::proc::StepPtr unconnectedStep)
+cedar::proc::LoopedElementInNonLoopedGroup::LoopedElementInNonLoopedGroup(cedar::proc::ElementPtr unconnectedElement)
 :
-mUnconnectedStep(unconnectedStep)
+mUnconnectedElement(unconnectedElement)
 {
 }
 
@@ -57,7 +57,7 @@ mUnconnectedStep(unconnectedStep)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::proc::LoopedStepNotConnected::getDescription() const
+std::string cedar::proc::LoopedElementInNonLoopedGroup::getDescription() const
 {
-  return "The step \"" + this->mUnconnectedStep->getName() + "\" is not connected to a looped trigger.";
+  return "The looped element \"" + this->mUnconnectedElement->getName() + "\" is placed in a group which is not looped itself.";
 }
