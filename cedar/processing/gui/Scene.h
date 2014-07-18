@@ -291,6 +291,13 @@ public:
     this->handleTriggerModeChange();
   }
 
+  /*! Returns the current display mode for triggers.
+   */
+  TRIGGER_CONNECTION_MODE getTriggerDisplayMode() const
+  {
+    return this->mTriggerMode;
+  }
+
   //! select all items
   void selectAll();
 

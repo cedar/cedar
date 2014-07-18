@@ -111,6 +111,8 @@ mDraggingItems(false)
   mMousePosY = 0;
   // connect signals/slots
   QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
+
+  this->setSnapToGrid(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid());
 }
 
 cedar::proc::gui::Scene::~Scene()
@@ -218,7 +220,6 @@ bool cedar::proc::gui::Scene::getSnapToGrid() const
 void cedar::proc::gui::Scene::setSnapToGrid(bool snap)
 {
   this->mSnapToGrid = snap;
-
   this->resetBackgroundColor();
 }
 
