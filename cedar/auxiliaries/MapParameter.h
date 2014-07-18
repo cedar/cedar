@@ -160,10 +160,23 @@ public:
     return this->mValues.empty();
   }
 
-  //!@brief checks if a value is already contained in this vector
-  bool contains(const T& value) const
+  //!@brief checks if a key is already contained in this map
+  bool containsKey(const std::string& key) const
   {
-    return this->mValues.find(value) != this->mValues.end();
+    return this->mValues.find(key) != this->mValues.end();
+  }
+
+  //!@brief checks if a value is already contained in this map
+  bool containsValue(const T& value) const
+  {
+    for (const auto& pair : this->mValues)
+    {
+      if (pair.second == value)
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   //!@brief return the size of the vector
