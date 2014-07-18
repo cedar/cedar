@@ -114,6 +114,10 @@ void cedar::proc::sources::GroupSource::setData(cedar::aux::DataPtr data)
 
 void cedar::proc::sources::GroupSource::resetData()
 {
-  this->setOutput("output", mEmptyData);
-  this->emitOutputPropertiesChangedSignal("output");
+  // check if an output is set; if so, unset it
+  if (this->getOutput("output") != this->mEmptyData)
+  {
+    this->setOutput("output", mEmptyData);
+    this->emitOutputPropertiesChangedSignal("output");
+  }
 }
