@@ -1731,13 +1731,13 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     QString name = QInputDialog::getText(0, "Enter a name", "Name", QLineEdit::Normal, default_name);
     if (!name.isEmpty())
     {
-      if (this->getGroup()->hasConnector(name.toStdString()))
-      {
-        QMessageBox::critical(NULL, "Name exists", "A connector of this name already exists.");
-      }
-      else
+      try
       {
         this->getGroup()->addConnector(name.toStdString(), (a == p_add_input));
+      }
+      catch (cedar::aux::DuplicateNameException& e)
+      {
+        QMessageBox::critical(nullptr, "Could not add connector.", QString::fromStdString(e.getMessage()));
       }
     }
   }
