@@ -61,6 +61,7 @@ cedar_add_library(cedarproc
   gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
+  gui/PlotWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
   gui/RecorderWidget.h

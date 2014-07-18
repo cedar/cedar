@@ -90,6 +90,12 @@ private:
 
   cedar::aux::ConstDataPtr findData(const std::string& path) const;
 
+  void readDataNode(const cedar::aux::ConfigurationNode& node, std::string& dataPath, std::string& title);
+
+  QWidget* readPlot(const cedar::aux::ConfigurationNode& entry);
+
+  QWidget* readLabel(const cedar::aux::ConfigurationNode& entry);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
