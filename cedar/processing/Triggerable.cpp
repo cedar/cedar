@@ -218,12 +218,15 @@ void cedar::proc::Triggerable::callOnStart()
 
   locker.unlock();
 
-  QReadLocker lock_r(this->mFinished.getLockPtr());
-  if (mFinished.member())
+  if (this->mStartCalls == 1)
   {
-    for (auto listener : this->mFinished.member()->getListeners())
+    QReadLocker lock_r(this->mFinished.getLockPtr());
+    if (mFinished.member())
     {
-        listener->callOnStart();
+      for (auto listener : this->mFinished.member()->getListeners())
+      {
+          listener->callOnStart();
+      }
     }
   }
 }
@@ -272,12 +275,15 @@ void cedar::proc::Triggerable::callOnStop()
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 
   // can only call subsequent listeners if the finished trigger exists
-  QReadLocker lock_r(this->mFinished.getLockPtr());
-  if (this->mFinished.member())
+  if (this->mStartCalls == 0)
   {
-    for (auto listener : this->mFinished.member()->getListeners())
+    QReadLocker lock_r(this->mFinished.getLockPtr());
+    if (this->mFinished.member())
     {
-        listener->callOnStop();
+      for (auto listener : this->mFinished.member()->getListeners())
+      {
+          listener->callOnStop();
+      }
     }
   }
 }
