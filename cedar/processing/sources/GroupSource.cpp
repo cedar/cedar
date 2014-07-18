@@ -94,6 +94,12 @@ cedar::proc::sources::GroupSource::~GroupSource()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::sources::GroupSource::validateName(const std::string& newName) const
+{
+  this->validateNameStringFormat(newName);
+  // we don't call the normal validation method here because it checks that this step doesn't have the same name as a
+  // group connector, which would lead to trouble as this step needs to have just that.
+}
 
 void cedar::proc::sources::GroupSource::compute(const cedar::proc::Arguments& /*arguments*/)
 {
@@ -108,6 +114,10 @@ void cedar::proc::sources::GroupSource::setData(cedar::aux::DataPtr data)
 
 void cedar::proc::sources::GroupSource::resetData()
 {
-  this->setOutput("output", mEmptyData);
-  this->emitOutputPropertiesChangedSignal("output");
+  // check if an output is set; if so, unset it
+  if (this->getOutput("output") != this->mEmptyData)
+  {
+    this->setOutput("output", mEmptyData);
+    this->emitOutputPropertiesChangedSignal("output");
+  }
 }

@@ -95,6 +95,13 @@ cedar::proc::sinks::GroupSink::~GroupSink()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::sinks::GroupSink::validateName(const std::string& newName) const
+{
+  this->validateNameStringFormat(newName);
+  // we don't call the normal validation method here because it checks that this step doesn't have the same name as a
+  // group connector, which would lead to trouble as this step needs to have just that.
+}
+
 void cedar::proc::sinks::GroupSink::compute(const cedar::proc::Arguments& /*arguments*/)
 {
   // nothing to do here!
