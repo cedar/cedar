@@ -94,6 +94,12 @@ cedar::proc::sources::GroupSource::~GroupSource()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::sources::GroupSource::validateName(const std::string& newName) const
+{
+  this->validateNameStringFormat(newName);
+  // we don't call the normal validation method here because it checks that this step doesn't have the same name as a
+  // group connector, which would lead to trouble as this step needs to have just that.
+}
 
 void cedar::proc::sources::GroupSource::compute(const cedar::proc::Arguments& /*arguments*/)
 {

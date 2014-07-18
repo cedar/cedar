@@ -113,11 +113,15 @@ protected:
     return this->mGroupChanged.connect(slot);
   }
 
+  /*! Checks if the given string is a valid name for an element. Valid strings, among other things, cannot contain dots.
+   */
+  void validateNameStringFormat(const std::string& newName) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void validateName(const std::string& newName) const;
+  virtual void validateName(const std::string& newName) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
