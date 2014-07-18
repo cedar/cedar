@@ -112,7 +112,7 @@ cedar::proc::ConstGroupPtr cedar::proc::Element::getGroup() const
   return this->mRegisteredAt.lock();
 }
 
-void cedar::proc::Element::validateName(const std::string& newName) const
+void cedar::proc::Element::validateNameStringFormat(const std::string& newName) const
 {
   if (newName.find('.') != std::string::npos)
   {
@@ -127,6 +127,11 @@ void cedar::proc::Element::validateName(const std::string& newName) const
       "This element cannot have an empty name."
     );
   }
+}
+
+void cedar::proc::Element::validateName(const std::string& newName) const
+{
+  this->validateNameStringFormat(newName);
 
   if (cedar::proc::ConstGroupPtr group = this->getGroup())
   {
