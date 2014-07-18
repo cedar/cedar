@@ -966,22 +966,26 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
 
 void cedar::proc::Group::addConnector(const std::string& name, bool input)
 {
-  if
-  (
-    this->nameExists(name)
-  )
+  if (this->_mConnectors->find(name) != this->_mConnectors->end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name + "\". It is already taken.");
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name +
+        "\" because there is already a connector with this name."
+    );
+  }
+
+  if (this->nameExists(name))
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "Cannot add a connector with the name \"" + name +
+      "\" because there is an element with the same name inside the group."
+    );
   }
   // check if connector is in map of connectors
-  if (_mConnectors->find(name) != _mConnectors->end())
-  {
-    // do nothing for now
-  }
-  else
-  {
-    _mConnectors->set(name, input);
-  }
+  this->_mConnectors->set(name, input);
 
   if (input)
   {
