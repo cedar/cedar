@@ -55,6 +55,7 @@
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -85,6 +86,80 @@ public:
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestModule);
+
+class FieldCheat : public cedar::dyn::NeuralField
+{
+public:
+  bool inputsValid()
+  {
+    return this->allInputsValid();
+  }
+};
+CEDAR_GENERATE_POINTER_TYPES(FieldCheat);
+
+int test_input_revalidation()
+{
+  std::cout << "Testing revalidation of group slots." << std::endl;
+  int errors = 0;
+  cedar::proc::GroupPtr root(new cedar::proc::Group());
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
+  root->add(group, "group");
+  group->addConnector("input", true);
+
+  FieldCheatPtr field1(new FieldCheat());
+  FieldCheatPtr field2(new FieldCheat());
+  root->add(field1, "field1");
+  group->add(field2, "field2");
+
+  root->connectSlots("field1.sigmoided activation", "group.input");
+  group->connectSlots("input.output", "field2.input");
+
+  field1->setDimensionality(field1->getDimensionality() - 1);
+
+  if (field2->inputsValid())
+  {
+    std::cout << "ERROR: validity of nested field was not updated properly." << std::endl;
+    ++errors;
+  }
+
+
+  return errors;
+}
+
+int test_looped_group_cycle()
+{
+  std::cout << "Testing a cycle in connections between looped groups." << std::endl;
+  cedar::proc::GroupPtr root(new cedar::proc::Group());
+  cedar::proc::GroupPtr group1(new cedar::proc::Group());
+  cedar::proc::GroupPtr group2(new cedar::proc::Group());
+
+  root->add(group1, "group1");
+  root->add(group2, "group2");
+
+  cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger());
+  root->add(trigger, "trigger");
+
+  group1->addConnector("input", true);
+  group2->addConnector("input", true);
+  group1->addConnector("output", false);
+  group2->addConnector("output", false);
+
+  root->connectSlots("group1.output", "group2.input");
+  root->connectSlots("group2.output", "group1.input");
+  group1->connectSlots("input.output", "output.input");
+  group2->connectSlots("input.output", "output.input");
+
+  std::cout << "Starting triggers" << std::endl;
+  trigger->start();
+
+  std::cout << "Waiting." << std::endl;
+  cedar::aux::sleep(0.25 * cedar::unit::seconds);
+
+  std::cout << "Stopping triggers" << std::endl;
+  trigger->stop();
+
+  return 0;
+}
 
 void run_test()
 {
@@ -367,11 +442,13 @@ void run_test()
     group->renameConnector("test_out", "test_out2", false);
   }
 
+  errors += test_looped_group_cycle();
+  errors += test_input_revalidation();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
 
-  QApplication::exit(0);
+  QApplication::exit(errors);
 }
 
 int main(int argc, char** argv)
