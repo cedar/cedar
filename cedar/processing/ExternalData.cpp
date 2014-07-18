@@ -185,7 +185,10 @@ void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data, unsign
   // if there is data at the given index, signal its removal
   if (cedar::aux::DataPtr old_data = this->mData.at(index).lock())
   {
-    this->emitDataRemoved(old_data);
+    if (old_data != data)
+    {
+      this->emitDataRemoved(old_data);
+    }
   }
 
   this->mData.at(index) = data;
