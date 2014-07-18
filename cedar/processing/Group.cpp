@@ -971,7 +971,7 @@ void cedar::proc::Group::addConnector(const std::string& name, bool input)
     CEDAR_THROW
     (
       cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name +
-        "\" because there is already a connector with this name."
+        "\" to group \"" + this->getFullPath() + "\" because there is already a connector with this name."
     );
   }
 
@@ -981,9 +981,15 @@ void cedar::proc::Group::addConnector(const std::string& name, bool input)
     (
       cedar::aux::DuplicateNameException,
       "Cannot add a connector with the name \"" + name +
-      "\" because there is an element with the same name inside the group."
+      "\" to group \"" + this->getFullPath() + "\"because there is an element with the same name inside the group."
     );
   }
+
+  this->addConnectorInternal(name, input);
+}
+
+void cedar::proc::Group::addConnectorInternal(const std::string& name, bool input)
+{
   // check if connector is in map of connectors
   this->_mConnectors->set(name, input);
 
@@ -1795,7 +1801,7 @@ void cedar::proc::Group::processConnectors()
 {
   for (auto it = _mConnectors->begin(); it != _mConnectors->end(); ++it)
   {
-    this->addConnector(it->first, it->second);
+    this->addConnectorInternal(it->first, it->second);
   }
 }
 
