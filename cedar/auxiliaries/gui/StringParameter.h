@@ -74,6 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  void setReadOnly(bool readOnly);
 
 public slots:
   //!@brief handles a change of the associated parameter

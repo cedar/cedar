@@ -104,7 +104,7 @@ QWidget* cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pPar
     QObject::connect(p_widget, SIGNAL(heightChanged()), this->mConfigurableWidget, SLOT(fitRowsToContents()), Qt::QueuedConnection);
     QObject::connect(parameter.get(), SIGNAL(valueChanged()), this->mConfigurableWidget, SIGNAL(settingsChanged()));
     p_ret = p_widget;
-    p_ret->setEnabled(!this->mReadOnly);
+    p_widget->setReadOnly(this->mReadOnly);
   }
   catch (cedar::aux::UnknownTypeException& e)
   {
