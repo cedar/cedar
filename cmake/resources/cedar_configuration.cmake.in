@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 #
 #    This file is part of cedar.
 #
@@ -46,5 +46,7 @@ endif(QT4_FOUND)
 
 # Include directories for cedar's dependencies
 include_directories(@CEDAR_EXPORTED_INCLUDE_DIRS@)
+
+set(CEDAR_OPENCV_CMAKE_DIR @CEDAR_OPENCV_CMAKE_DIR@)
 
 set(CEDAR_EXTERNAL_LIBS @CEDAR_THIRD_PARTY_LIBS@ @QT_LIBRARIES@)

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -37,10 +37,13 @@
 // CEDAR INCLUDES
 #include "cedar/processing/steps/ComponentMultiply.h"
 #include "cedar/processing/typecheck/SameSizedCollection.h"
+#include "cedar/processing/typecheck/SameTypeCollection.h"
+#include "cedar/processing/typecheck/And.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -90,7 +93,12 @@ cedar::proc::steps::ComponentMultiply::ComponentMultiply()
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 {
   auto input = this->declareInputCollection("operands");
-  input->setCheck(cedar::proc::typecheck::SameSizedCollection(true));
+  cedar::proc::typecheck::SameSizedCollection size_check(true);
+  cedar::proc::typecheck::SameTypeCollection type_check;
+  cedar::proc::typecheck::And sum_check;
+  sum_check.addCheck(size_check);
+  sum_check.addCheck(type_check);
+  input->setCheck(sum_check);
   this->declareOutput("product", mOutput);
 
   this->mInputs = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(this->getInputSlot("operands"));
@@ -114,6 +122,8 @@ void cedar::proc::steps::ComponentMultiply::inputConnectionChanged(const std::st
     mOutput->getData() = in_mat.clone();
     mOutput->getData() = cv::Scalar(1);
   }
+  this->emitOutputPropertiesChangedSignal("product");
+  this->onTrigger();
 }
 
 void cedar::proc::steps::ComponentMultiply::compute(const cedar::proc::Arguments&)

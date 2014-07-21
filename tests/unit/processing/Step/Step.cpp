@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 
@@ -130,7 +130,7 @@ int testStartingStopping()
 {
   int errors = 0;
 
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  cedar::proc::GroupPtr network(new cedar::proc::Group());
   StartStopTesterPtr step1(new StartStopTester());
   StartStopTesterPtr step2(new StartStopTester());
   StartStopTesterPtr step3(new StartStopTester());
@@ -190,6 +190,52 @@ int testStartingStopping()
   return errors;
 }
 
+class ThrowsInAction : public cedar::proc::Step
+{
+public:
+  ThrowsInAction()
+  :
+  mData(new cedar::aux::MatData())
+  {
+    this->declareOutput("output", this->mData);
+
+    this->registerFunction("throwSomething", boost::bind(&ThrowsInAction::throwSomething, this));
+  }
+
+private:
+  void compute(const cedar::proc::Arguments&)
+  {
+  }
+
+  void throwSomething()
+  {
+    CEDAR_ASSERT(false);
+  }
+
+private:
+  cedar::aux::MatDataPtr mData;
+};
+CEDAR_GENERATE_POINTER_TYPES(ThrowsInAction);
+
+int testThrowInAction()
+{
+  ThrowsInActionPtr step(new ThrowsInAction());
+
+  std::cout << "Testing throwing something from a step action." << std::endl;
+  try
+  {
+    step->callAction("throwSomething");
+  }
+  catch (...)
+  {
+    // ok, there's supposed to be an exception here ...
+  }
+
+  // ... but was the data unlocked properly?
+  step->onTrigger();
+  return 0;
+}
+
 // global variable:
 int global_errors;
 
@@ -217,6 +263,7 @@ void run_test()
   }
 
   global_errors += testStartingStopping();
+  global_errors += testThrowInAction();
 
   std::cout << "test finished with " << global_errors << " error(s)." << std::endl;
 }

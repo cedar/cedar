@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,6 +41,8 @@
 #include "cedar/auxiliaries/ObjectParameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/ObjectParameterTemplate.fwd.h"
@@ -93,7 +95,7 @@ public:
   :
   cedar::aux::ObjectParameter(pOwner, name, true)
   {
-    this->mDefault = defaultObject;
+    this->mDefault = cedar::aux::replace(cedar::aux::objectTypeToString(defaultObject), "::", ".");
 
     this->makeDefault();
   }
@@ -106,7 +108,7 @@ public:
   //!@brief set parameter to default
   virtual void makeDefault()
   {
-    this->setValue(this->mDefault);
+    this->setType(this->mDefault);
   }
 
   //!@brief Set this parameter to a value read from a configuration node
@@ -207,7 +209,7 @@ private:
   BaseTypePtr mObject;
 
   //!@brief The default object instance.
-  BaseTypePtr mDefault;
+  std::string mDefault;
 
 }; // class cedar::aux::ObjectParameterTemplate
 

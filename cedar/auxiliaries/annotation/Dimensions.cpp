@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -63,6 +63,27 @@ cedar::aux::annotation::Annotation(copyFrom)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::annotation::Dimensions::hasSamplingPositions(unsigned int dimension) const
+{
+  return this->mDimensionSamplingPositions.size() > dimension && !this->mDimensionSamplingPositions.at(dimension).empty();
+}
+
+const std::vector<double>& cedar::aux::annotation::Dimensions::getSamplingPositions(unsigned int dimension) const
+{
+  CEDAR_ASSERT(this->hasSamplingPositions(dimension));
+
+  return this->mDimensionSamplingPositions.at(dimension);
+}
+
+void cedar::aux::annotation::Dimensions::setSamplingPositions(unsigned int dimension, const std::vector<double>& positions)
+{
+  if (this->mDimensionSamplingPositions.size() <= dimension)
+  {
+    this->mDimensionSamplingPositions.resize(dimension + 1, std::vector<double>());
+  }
+  this->mDimensionSamplingPositions.at(dimension) = positions;
+}
 
 void cedar::aux::annotation::Dimensions::setLabel(unsigned int dimension, const std::string& label)
 {

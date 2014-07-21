@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -42,9 +42,10 @@
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/StepItem.h"
-#include "cedar/processing/consistency/LoopedStepNotConnected.h"
-#include "cedar/processing/Network.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/consistency/LoopedElementNotConnected.h"
+#include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -73,14 +74,15 @@ mpView(pView)
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::gui::ArchitectureConsistencyCheck::setNetwork(cedar::proc::gui::NetworkPtr network)
+void cedar::proc::gui::ArchitectureConsistencyCheck::setGroup(cedar::proc::gui::GroupPtr network)
 {
-  this->mNetwork = network;
+  this->mGroup = network;
+  this->clear();
 }
 
 void cedar::proc::gui::ArchitectureConsistencyCheck::recheck()
 {
-  this->mIssues = this->mNetwork->getNetwork()->checkConsistency();
+  this->mIssues = this->mGroup->getGroup()->checkConsistency();
 
   this->clear();
 
@@ -115,11 +117,21 @@ void cedar::proc::gui::ArchitectureConsistencyCheck::addIssue(size_t issueId, ce
 
 void cedar::proc::gui::ArchitectureConsistencyCheck::itemAction(int row, int)
 {
+  if (this->mIssues.size() == 0)
+  {
+    // no issues found, nothing to do
+    return;
+  }
+
   size_t issue_id = static_cast<size_t>(row);
   CEDAR_ASSERT(issue_id < this->mIssues.size());
   auto issue = this->mIssues.at(issue_id);
-  if (auto looped_not_connected = boost::dynamic_pointer_cast<cedar::proc::LoopedStepNotConnected>(issue))
+  if (auto looped_not_connected = boost::dynamic_pointer_cast<cedar::proc::LoopedElementNotConnected>(issue))
   {
-    this->mpView->centerOn(mpScene->getStepItemFor(looped_not_connected->getUnconnectedStep().get()));
+    this->mpView->centerOn(mpScene->getGraphicsItemFor(looped_not_connected->getUnconnectedElement().get()));
+  }
+  else if (auto looped_not_connected = boost::dynamic_pointer_cast<cedar::proc::LoopedElementInNonLoopedGroup>(issue))
+  {
+    this->mpView->centerOn(mpScene->getGraphicsItemFor(looped_not_connected->getUnconnectedElement().get()));
   }
 }

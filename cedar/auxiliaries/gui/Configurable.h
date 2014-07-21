@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -55,11 +55,15 @@
 #endif // Q_MOC_RUN
 #include <QWidget>
 #include <QTreeWidget>
+#include <QStyledItemDelegate>
+#include <map>
+#include <string>
+#include <set>
 
 
 /*!@brief A widget to display and manipulate the parameters of cedar::aux::Configurables.
  *
- * @remarks This widget is intended to replace the old cedar::aux/proc::PropertyPane in the long run.
+ * @remarks This widget is intended to replace the old PropertyPane in the long run.
  */
 class cedar::aux::gui::Configurable : public QWidget
 {
@@ -71,7 +75,9 @@ class cedar::aux::gui::Configurable : public QWidget
 private:
   class DataDelegate;
 
+  //!@cond SKIPPED_DOCUMENTATION
   class ParameterItem;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -80,6 +86,7 @@ public:
   //!@brief The standard constructor.
   Configurable(QWidget* pParent = NULL);
 
+  //! Destructor.
   ~Configurable();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,15 +96,21 @@ public:
   /*!@brief Displays the parameters & configurable children for a given configurable.
    *
    * @param configurable The configurable to display.
+   * @param readOnly     If true, the configurable cannot be edited, only displayed.
    */
-  void display(cedar::aux::ConfigurablePtr configurable);
+  void display(cedar::aux::ConfigurablePtr configurable, bool readOnly = false);
 
   /*!@brief Clears the widget and removes any displayed parameters.
    */
   void clear();
 
 public slots:
+  //! Resizes the rows to fit their contents.
   void fitRowsToContents();
+
+signals:
+  //! Emitted, whenever a parameter in the widget changes.
+  void settingsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -121,6 +134,8 @@ private:
 
   void updateChangeState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
 
+  void updateLinkState(QTreeWidgetItem* item, cedar::aux::Parameter* pParameter);
+
   QTreeWidgetItem* getItemForParameter(cedar::aux::Parameter* parameter);
 
   QString getPathFromItem(QTreeWidgetItem* item);
@@ -141,10 +156,13 @@ private:
   void translateParameterNameChangedSignal(const std::string& oldName, const std::string& newName);
 
 signals:
+  //! Emitted, whenever a parameter is added to the displayed configurable.
   void parameterAdded(QString path);
 
+  //! Emitted, whenever a parameter is removed from the displayed configurable.
   void parameterRemoved(QVariant parameter);
 
+  //! Emitted, whenever a parameter in the displayed configurable is renamed.
   void parameterRenamed(QString oldName, QString newName);
 
 private slots:
@@ -177,6 +195,41 @@ private:
   std::map<cedar::aux::Parameter*, boost::signals2::connection> mParameterRenamedConnections;
 
 }; // class cedar::aux::gui::Configurable
+
+/*!@brief Internal class for putting the correct widget types into the QTreeWidget used by
+ *        cedar::aux::gui::Configurable.
+ *
+ * @see the documentation for QTreeWidget and Qt's Model/View concept for details on data delegates.
+ * @remarks This is an internal class of the Configurable widget. Not intended for use outside of it. It is only in the
+ *          header because it needs to be processed by the meta-object compiler.
+ */
+class cedar::aux::gui::Configurable::DataDelegate : public QStyledItemDelegate
+{
+  Q_OBJECT
+public:
+  //! Constructor for the DataDelegate.
+  DataDelegate(cedar::aux::ConfigurablePtr pConfigurable, cedar::aux::gui::Configurable* configurableWidget, bool readOnly = false);
+
+  //! Destructor.
+  ~DataDelegate();
+
+  //! This method decides which type of widget should be opened for which kind of parameter.
+  QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem& option, const QModelIndex &index) const;
+
+public slots:
+  //! Reacts to when a widget in the tree is being destroyed.
+  void widgetDestroyed(QObject* removed);
+
+private:
+  cedar::aux::ConfigurablePtr mpConfigurable;
+
+  cedar::aux::gui::Configurable* mConfigurableWidget;
+
+  // set storing all opened editors - during the destructor call, all remaining editors are deleted
+  mutable std::set<QObject*> mOpenedEditors;
+
+  bool mReadOnly;
+};
 
 #endif // CEDAR_AUX_GUI_CONFIGURABLE_H
 

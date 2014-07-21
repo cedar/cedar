@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Trigger.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -74,6 +75,22 @@ cedar::proc::Triggerable::~Triggerable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Triggerable::updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown)
+{
+  QReadLocker locker(this->mFinished.getLockPtr());
+  if (this->mFinished.member())
+  {
+    this->mFinished.member()->updateTriggeringOrder(visited, recurseUp, recurseDown);
+  }
+}
+
+bool cedar::proc::Triggerable::isStarted() const
+{
+  QMutexLocker locker(this->mpStartCallsLock);
+  bool started = (this->mStartCalls > 0);
+  return started;
+}
 
 bool cedar::proc::Triggerable::exceptionWrappedCall
      (
@@ -129,6 +146,14 @@ void cedar::proc::Triggerable::triggeredBy(cedar::proc::TriggerPtr trigger)
 {
   QWriteLocker locker(this->mTriggersListenedTo.getLockPtr());
   this->mTriggersListenedTo.member().insert(trigger);
+
+  if (trigger->getOwner() != nullptr)
+  {
+    if (trigger->getOwner()->isStarted())
+    {
+      this->callOnStart();
+    }
+  }
 }
 
 void cedar::proc::Triggerable::noLongerTriggeredBy(cedar::proc::TriggerPtr trigger)
@@ -137,6 +162,14 @@ void cedar::proc::Triggerable::noLongerTriggeredBy(cedar::proc::TriggerPtr trigg
   auto iter = this->mTriggersListenedTo.member().find(trigger);
   CEDAR_ASSERT(iter != this->mTriggersListenedTo.member().end());
   this->mTriggersListenedTo.member().erase(iter);
+
+  if (trigger->getOwner() != nullptr)
+  {
+    if (trigger->getOwner()->isStarted())
+    {
+      this->callOnStop();
+    }
+  }
 }
 
 boost::signals2::connection cedar::proc::Triggerable::connectToStateChanged(boost::function<void ()> slot)
@@ -185,12 +218,15 @@ void cedar::proc::Triggerable::callOnStart()
 
   locker.unlock();
 
-  QReadLocker lock_r(this->mFinished.getLockPtr());
-  if (mFinished.member())
+  if (this->mStartCalls == 1)
   {
-    for (auto listener : this->mFinished.member()->getListeners())
+    QReadLocker lock_r(this->mFinished.getLockPtr());
+    if (mFinished.member())
     {
-      listener->callOnStart();
+      for (auto listener : this->mFinished.member()->getListeners())
+      {
+          listener->callOnStart();
+      }
     }
   }
 }
@@ -239,12 +275,15 @@ void cedar::proc::Triggerable::callOnStop()
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 
   // can only call subsequent listeners if the finished trigger exists
-  QReadLocker lock_r(this->mFinished.getLockPtr());
-  if (this->mFinished.member())
+  if (this->mStartCalls == 0)
   {
-    for (auto listener : this->mFinished.member()->getListeners())
+    QReadLocker lock_r(this->mFinished.getLockPtr());
+    if (this->mFinished.member())
     {
-      listener->callOnStop();
+      for (auto listener : this->mFinished.member()->getListeners())
+      {
+          listener->callOnStop();
+      }
     }
   }
 }
@@ -265,7 +304,7 @@ void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState
 cedar::proc::Triggerable::State cedar::proc::Triggerable::getState() const
 {
   QReadLocker locker(this->mState.getLockPtr());
-  auto copy = this->mState.member().mState;
+  cedar::proc::Triggerable::State copy = this->mState.member().mState;
   return copy;
 }
 
@@ -298,4 +337,11 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getFinishedTrigger()
     lock_r.relock();
   }
   return this->mFinished.member();
+}
+
+unsigned int cedar::proc::Triggerable::numberOfStartCalls() const
+{
+  QMutexLocker locker(this->mpStartCallsLock);
+  unsigned int calls = this->mStartCalls;
+  return calls;
 }

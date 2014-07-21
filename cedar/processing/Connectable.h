@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -49,9 +49,10 @@
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Network.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/sources/GroupSource.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -67,8 +68,9 @@ class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux:
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
   friend class cedar::proc::Step;
+  friend class cedar::proc::sources::GroupSource;
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
@@ -150,10 +152,10 @@ public:
   void setInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Removes a connection to another Connectable's output.
-  void freeInput(const std::string& name, cedar::aux::ConstDataPtr data);
+  void freeInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Returns a specific data pointer stored in this Connectable.
-  cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
+  cedar::aux::ConstDataPtr getData(DataRole::Id role, const std::string& name) const;
 
   /*! @brief Checks the validity of a slot.
    *
@@ -161,9 +163,9 @@ public:
    *  rechecking it. If the current validity is cedar::proc::DataSlot::VALIDITY_UNKNOWN, the slot's validity is determined
    *  by calling the cedar::proc::Connectable::determineInputValidity method.
    *
-   *  @param slot the slot that needs checking, specified via its smart pointer.
+   *  @param slotWeak the slot that needs checking, specified via its smart pointer.
    */
-  cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
+  cedar::proc::DataSlot::VALIDITY updateInputValidity(cedar::proc::DataSlotWeakPtr slotWeak);
 
   //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slotName);
@@ -185,6 +187,20 @@ public:
   //! Returns a copy of the vector of the names of invalid input slots. This method is thread-safe.
   std::vector<std::string> getInvalidInputNames() const;
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  //! Writes data to a configuration tree node
+  virtual void writeData(cedar::aux::ConfigurationNode& stored_data) const;
+
+  //! Writes data marked as serializable to the given file.
+  void writeDataFile(const cedar::aux::Path& file) const;
+
+  //! Writes data marked as serializable to the given file.
+  void readDataFile(const cedar::aux::Path& file);
+
+  //! Writes data marked as serializable to the configuration node.
+  virtual void readData(const cedar::aux::ConfigurationNode& root);
+
   //!@brief Parses a data and Connectable name without specifying a role.
   static void parseDataNameNoRole
               (
@@ -197,6 +213,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  virtual void revalidateInputSlot(const std::string& slot);
+
   /*!@brief Declares an input slot.
    * @param name name of the declared input
    * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the
@@ -209,12 +231,6 @@ protected:
    * @remarks This is equivalent to calling declareInput(name, false) and makeInputCollection(name).
    */
   cedar::proc::DataSlotPtr declareInputCollection(const std::string& name);
-
-  //!@brief Declares a buffer slot.
-  CEDAR_DECLARE_DEPRECATED(void declareBuffer(const std::string& name));
-
-  //!@brief Declares an output slot.
-  CEDAR_DECLARE_DEPRECATED(void declareOutput(const std::string& name));
 
   //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
   cedar::proc::DataSlotPtr declareBuffer(const std::string& name, cedar::aux::DataPtr data);
@@ -239,12 +255,6 @@ protected:
   {
     this->removeSlot(DataRole::OUTPUT, name);
   }
-
-  //!@brief Declares a new promoted slot.
-  void declarePromotedData(DataSlotPtr promotedSlot);
-
-  //!@brief Removes a promoted slot.
-  void removePromotedData(DataRole::Id role, const std::string& name);
 
   //!@brief Sets the data pointer for the buffer called name.
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
@@ -277,21 +287,21 @@ protected:
   void renameInput(const std::string& oldName, const std::string& newName);
 
   //! does this input slot exist?
-  inline bool hasInputSlot(const std::string& name)
+  inline bool hasInputSlot(const std::string& name, bool lock = true)
   {
-    return this->hasSlot(DataRole::INPUT, name);
+    return this->hasSlot(DataRole::INPUT, name, lock);
   }
 
   //! does this buffer exist?
-  inline bool hasBufferSlot(const std::string& name)
+  inline bool hasBufferSlot(const std::string& name, bool lock = true)
   {
-    return this->hasSlot(DataRole::BUFFER, name);
+    return this->hasSlot(DataRole::BUFFER, name, lock);
   }
 
   //! does this output slot exist?
-  inline bool hasOutputSlot(const std::string& name)
+  inline bool hasOutputSlot(const std::string& name, bool lock = true)
   {
-    return this->hasSlot(DataRole::OUTPUT, name);
+    return this->hasSlot(DataRole::OUTPUT, name, lock);
   }
 
   /*!@brief   Sets the isCollection member of the corresponding data slot to the given value.
@@ -370,7 +380,7 @@ protected:
 
   /*!@brief Removes all declared data slots.
    */
-  void clearDataSlots();
+  void removeAllDataSlots();
 
   /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
    *        changed.
@@ -387,14 +397,29 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@todo updateTargetSlots and freeTargetSlots share a lot of code!
+  void updateTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data);
+  void freeTargetSlots(cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::DataPtr data);
+
+  void dataAddedToSlot(DataRole::Id role, cedar::proc::DataSlotWeakPtr slotWeak, cedar::aux::ConstDataPtr data);
+
   //!@brief Removes a slot from the connectable.
   void removeSlot(DataRole::Id role, const std::string& name);
 
   //!@brief Checks if the connectable has a slot with the given role and name.
-  bool hasSlot(DataRole::Id role, const std::string& name) const;
+  bool hasSlot(DataRole::Id role, const std::string& name, bool lock = true) const;
+
+  //! Renames a slot.
+  void renameSlot(DataRole::Id role, const std::string& oldName, const std::string& newName);
 
   //!@brief Declares a new piece of data in the connectable.
-  cedar::proc::DataSlotPtr declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+  cedar::proc::DataSlotPtr declareData
+                           (
+                             DataRole::Id role,
+                             const std::string& name,
+                             bool mandatory = true,
+                             bool isShared = false
+                           );
 
   /*!@brief Sets the data pointer for the slot of the given name and role.
    */
@@ -402,7 +427,7 @@ private:
 
   /*!@brief Sets the data pointer of the slot with the given name and role to zero.
    */
-  void freeData(DataRole::Id role, const std::string& name);
+  void freeData(DataRole::Id role, cedar::aux::DataPtr data, const std::string& name);
 
   /*!@brief (Re-)Checks that all mandatory connections are actually set to non-zero data.
    *
@@ -415,9 +440,6 @@ private:
   /*!@brief Removed the lock from this cedar::aux::Lockable.
    */
   void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet);
-
-  //!@brief Returns the map of data slots for a given role (the non-const version of getDataSlots(DataRole::Id role)).
-  cedar::proc::Connectable::SlotMap& getSlotMap(DataRole::Id role);
 
 
   //!@brief Returns the map of data slots for a given role.
@@ -440,11 +462,35 @@ private:
                                             cedar::aux::ConstDataPtr data
                                           ) const;
 
+  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
+   *
+   */
+  void callInputConnectionChanged(const std::string& slot);
+
+  //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
+  cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);
+
+  //! Returns the slot map for the given role. If none exists, throws an exception.
+  SlotMap& getSlotMap(cedar::proc::DataRole::Id role);
+
+  //! Returns the slot map for the given role. If none exists, throws an exception.
+  const SlotMap& getSlotMap(cedar::proc::DataRole::Id role) const;
+
+  //! Returns an iterator to the slot. Throws if the slot is not found.
+  SlotMap::iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name);
+
+  //! Returns an iterator to the slot. Throws if the slot is not found.
+  SlotMap::const_iterator findSlot(cedar::proc::DataRole::Id role, const std::string& name) const;
+
+  void callInputConnectionChangedFor(cedar::proc::DataSlotWeakPtr slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
   //--------------------------------------------------------------------------------------------------------------------
 public:
   CEDAR_DECLARE_SIGNAL(SlotAdded, void (cedar::proc::DataRole::Id, const std::string&));
+public:
+  CEDAR_DECLARE_SIGNAL(SlotRenamed, void (cedar::proc::DataRole::Id, const std::string&, const std::string&));
 public:
   CEDAR_DECLARE_SIGNAL(SlotRemoved, void (cedar::proc::DataRole::Id, const std::string&));
 public:
@@ -452,7 +498,7 @@ public:
 
 private:
   //!@brief a connection to a signal emitted by an external data slot
-  boost::signals2::scoped_connection mSlotConnection;
+  boost::signals2::connection mSlotConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

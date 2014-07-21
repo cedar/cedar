@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -55,7 +55,7 @@
 // SYSTEM INCLUDES
 
 
-//!@brief A video file  source for the processingIde
+//!@brief A video file source for the processing framework.
 class cedar::proc::sources::Video
 :
 public cedar::proc::sources::GrabberBase
@@ -85,7 +85,7 @@ public:
 public slots:
 
   //!@brief This slot should be invoked, when the video in the VideoGrabber has changed.
-  void updateVideo();
+  void updateVideo(bool emitOutputPropertyChanged = true);
 
   //!@brief This slot should be invoked, when the speed factor in the VideoGrabber has changed.
   void updateSpeedFactor();

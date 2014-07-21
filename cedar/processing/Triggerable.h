@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -137,7 +137,7 @@ public:
   void setParentTrigger(cedar::proc::TriggerPtr parent);
 
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
-  inline bool isLooped() const
+  virtual bool isLooped() const
   {
     return this->mIsLooped;
   }
@@ -186,6 +186,9 @@ public:
     return triggered;
   }
 
+  //! Returns true if the step is started, i.e., if the last onStart call was not followed by an onStop call.
+  bool isStarted() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -225,6 +228,12 @@ protected:
          Triggerable::State state = Triggerable::STATE_EXCEPTION
        ) throw();
 
+  //! Returns the number of start calls.
+  unsigned int numberOfStartCalls() const;
+
+  //! Updates the triggering order of the triggerable. Effectively, calls updateTriggeringOrder on the finished trigger.
+  virtual void updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -246,7 +255,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief Whether the connect function should automatically connect the triggers as well.
-  const bool mIsLooped;
+  bool mIsLooped;
 
   //!@brief If set, this is the trigger that triggers the step.
   cedar::proc::TriggerWeakPtr mParentTrigger;

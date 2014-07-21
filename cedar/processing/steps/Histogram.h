@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -153,12 +153,6 @@ private:
   void compute(const cedar::proc::Arguments&);
 
   void inputConnectionChanged(const std::string& inputName);
-
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-  (
-    cedar::proc::ConstDataSlotPtr,
-    cedar::aux::ConstDataPtr data
-  ) const;
 
 private slots:
   void recompute();

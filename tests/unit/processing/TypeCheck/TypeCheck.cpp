@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -83,14 +83,14 @@ int main(int, char**)
   {
     cedar::proc::typecheck::TypeCheckPtr
       derived_from(new cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>());
-
-    if (derived_from->check(slot, mat_deriv) != cedar::proc::DataSlot::VALIDITY_VALID)
+    std::string info;
+    if (derived_from->check(slot, mat_deriv, info) != cedar::proc::DataSlot::VALIDITY_VALID)
     {
       std::cout << "ERROR: mat_deriv is not recognized by DerivedFrom<MatData>" << std::endl;
       ++errors;
     }
 
-    if (derived_from->check(slot, data_deriv) != cedar::proc::DataSlot::VALIDITY_ERROR)
+    if (derived_from->check(slot, data_deriv, info) != cedar::proc::DataSlot::VALIDITY_ERROR)
     {
       std::cout << "ERROR: data_deriv is recognized by DerivedFrom<MatData>" << std::endl;
       ++errors;

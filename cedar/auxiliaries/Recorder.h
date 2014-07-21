@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -122,21 +122,15 @@ public:
   void setRecordIntervalTime(const std::string& name, cedar::unit::Time recordInterval);
 
   /*!@brief Returns the specified record interval of the DataPtr 'name'.
-   *         It will return -1 if name was not registered
-   *         @todo this should throw an exception instead
    */
   cedar::unit::Time getRecordIntervalTime(const std::string& name) const;
 
   /*!@brief Returns the specified record interval of the DataPtr.
-   *         It will return -1 if name was not registered
-   *         @todo this should throw an exception instead
    */
   cedar::unit::Time getRecordIntervalTime(cedar::aux::ConstDataPtr data) const;
 
-
   //!@brief Checks if a DataPtr with a certain name is registered.
   bool isRegistered(const std::string& name) const;
-
 
   //!@brief Checks if a DataPtr with a certain DataPtr is registered.
   bool isRegistered(cedar::aux::ConstDataPtr data) const;

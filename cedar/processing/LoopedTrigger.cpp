@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,7 +42,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
@@ -118,10 +118,12 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 
 /*! This method takes care of changing the step's name in the registry as well.
+ *
+ * @todo Solve this with boost signals/slots; that way, this can be moved to cedar::proc::Element
  */
 void cedar::proc::LoopedTrigger::onNameChanged()
 {
-  if (cedar::proc::NetworkPtr parent_network = this->mRegisteredAt.lock())
+  if (cedar::proc::GroupPtr parent_network = this->getGroup())
   {
     // update the name
     parent_network->updateObjectName(this);

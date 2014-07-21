@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/detail/LoopedThreadWorker.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/units/Time.h"
@@ -48,13 +49,25 @@
 
 
 cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
-: mpWrapper(wrapper)
+:
+mpWrapper(wrapper),
+mTimeFactor(cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor())
 {
+  this->mGlobalTimeFactorConnection = cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
+  (
+    boost::bind(&cedar::aux::detail::LoopedThreadWorker::globalTimeFactorChanged, this, _1)
+  );
   initStatistics();
 }
 
 cedar::aux::detail::LoopedThreadWorker::~LoopedThreadWorker() 
 {
+}
+
+void cedar::aux::detail::LoopedThreadWorker::globalTimeFactorChanged(double newFactor)
+{
+  QWriteLocker locker(this->mTimeFactor.getLockPtr());
+  this->mTimeFactor.member() = newFactor;
 }
 
 void cedar::aux::detail::LoopedThreadWorker::work()
@@ -75,16 +88,20 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       setLastTimeStepStart( boost::posix_time::microsec_clock::universal_time() );
       setLastTimeStepEnd( boost::posix_time::microsec_clock::universal_time() );
 
-      boost::posix_time::time_duration time_difference;
+      boost::posix_time::time_duration time_difference_unitless;
 
       while (!safeStopRequested())
       {
+        QReadLocker locker(this->mTimeFactor.getLockPtr());
+        double time_factor = this->mTimeFactor.member();
+        locker.unlock();
+
         setLastTimeStepStart( getLastTimeStepEnd() );
         setLastTimeStepEnd( boost::posix_time::microsec_clock::universal_time() );
-        time_difference = getLastTimeStepEnd() - getLastTimeStepStart();
-        cedar::unit::Time time_difference_milli(time_difference.total_microseconds() * 0.001 * cedar::unit::milli * cedar::unit::seconds);
+        time_difference_unitless = getLastTimeStepEnd() - getLastTimeStepStart();
+        cedar::unit::Time time_difference(time_difference_unitless.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
         
-        mpWrapper->step(time_difference_milli);
+        mpWrapper->step(time_difference * time_factor);
 
         cedar::unit::Time idle_time = mpWrapper->getIdleTimeParameter();
         cedar::aux::sleep(idle_time);
@@ -95,7 +112,11 @@ void cedar::aux::detail::LoopedThreadWorker::work()
     {
       while (!safeStopRequested())
       {
-        mpWrapper->step(mpWrapper->getSimulatedTimeParameter());
+        QReadLocker locker(this->mTimeFactor.getLockPtr());
+        double time_factor = this->mTimeFactor.member();
+        locker.unlock();
+
+        mpWrapper->step(mpWrapper->getSimulatedTimeParameter() * time_factor);
         cedar::unit::Time idle_time = mpWrapper->getIdleTimeParameter();
         cedar::aux::sleep(idle_time);
       }
@@ -129,6 +150,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
       while (!safeStopRequested())
       {
+        QReadLocker locker(this->mTimeFactor.getLockPtr());
+        double time_factor = this->mTimeFactor.member();
+        locker.unlock();
+
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         double time = std::max<double>(0.0, static_cast<double>(sleep_duration.total_microseconds()));
@@ -154,7 +179,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
         // call step function
         cedar::unit::Time step_time(full_steps_taken * step_size.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
-        mpWrapper->step(step_time);
+        mpWrapper->step(step_time * time_factor);
 
         if (safeStopRequested())
           break;
@@ -185,6 +210,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
       while (!safeStopRequested())
       {
+        QReadLocker locker(this->mTimeFactor.getLockPtr());
+        double time_factor = this->mTimeFactor.member();
+        locker.unlock();
+
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
@@ -207,7 +236,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
         // call step function
         cedar::unit::Time step_time(steps_taken * step_size.total_microseconds() * cedar::unit::micro * cedar::unit::seconds);
-        mpWrapper->step(step_time);
+        mpWrapper->step(step_time * time_factor);
 
         if (safeStopRequested()) // a lot can happen in a step() //!@todo locking
           break;

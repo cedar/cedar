@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -277,14 +277,9 @@ public:
                   << " <" << this << ">" << std::endl;
         visited.insert(this->shared_from_this());
 
-        for
-        (
-          const_children_iterator iter = this->childrenBegin();
-          iter != this->childrenEnd();
-          ++iter
-        )
+        for (auto child : this->mChildren)
         {
-          (*iter)->print(indentation + " ", visited);
+          child->print(indentation + " ", visited);
         }
       }
 
@@ -297,14 +292,9 @@ public:
           bases.insert(this->shared_from_this());
         }
 
-        for
-        (
-          const_children_iterator iter = this->childrenBegin();
-          iter != this->childrenEnd();
-          ++iter
-        )
+        for (auto child : this->mChildren)
         {
-          (*iter)->findBases(instance, bases);
+          child->findBases(instance, bases);
         }
       }
 
@@ -319,13 +309,12 @@ public:
         else
         {
           // check all children
-          for (const_children_iterator iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
+          for (ConstNodePtr child : this->mChildren)
           {
-            ConstNodePtr child = *iter;
             // isDerived can avoid checking all the children; this should save some time.
             if (child->matchesDerived(instance))
             {
-              ConstNodePtr node = (*iter)->find(instance);
+              ConstNodePtr node = child->find(instance);
               if (node)
               {
                 return node;
@@ -750,6 +739,22 @@ public:
     this->mRootNode->template insert<T>(instance, data);
   }
 
+  /*!@brief Checks if a node with a type corresponding to the given instance can be found.
+   */
+  bool canFind(ConstRootTypePtr instance) const
+  {
+    ConstNodePtr node = this->getRootNode()->find(instance);
+
+    if (!node)
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+
   /*!@brief Returns all the data along the path of the instance.
    */
   ConstNodePtr find(ConstRootTypePtr instance) const
@@ -806,6 +811,15 @@ public:
   size_t size() const
   {
     return this->mRootNode->countConnected();
+  }
+
+  /*! Checks if the class can be found.
+   */
+  template <class T>
+  bool canFind() const
+  {
+    RootTypePtr instance(new T());
+    return this->canFind(instance);
   }
 
   /*!@brief Retrieves the node corresponding to the given type.

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -65,6 +65,11 @@ cedar::proc::ExternalData::~ExternalData()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::LOCK_TYPE cedar::proc::ExternalData::getLockType() const
+{
+  return cedar::aux::LOCK_TYPE_READ;
+}
+
 void cedar::proc::ExternalData::setCollection(bool isCollection)
 {
   CEDAR_ASSERT(this->getRole() == cedar::proc::DataRole::INPUT);
@@ -90,9 +95,9 @@ bool cedar::proc::ExternalData::hasData(cedar::aux::ConstDataPtr data) const
   return false;
 }
 
-void cedar::proc::ExternalData::clear()
+void cedar::proc::ExternalData::clearInternal()
 {
-  while(!this->mData.empty())
+  while (!this->mData.empty())
   {
     cedar::aux::DataPtr data = this->mData.back().lock();
     if (data)
@@ -106,7 +111,7 @@ void cedar::proc::ExternalData::clear()
   }
 }
 
-void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)
+void cedar::proc::ExternalData::removeDataInternal(cedar::aux::DataPtr data)
 {
   CEDAR_DEBUG_ASSERT(data);
   // Find the data entry.
@@ -132,12 +137,9 @@ void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)
 
   // Erase the data.
   this->mData.erase(iter);
-
-  this->mExternalDataRemoved(data);
-  this->mExternalDataChanged();
 }
 
-void cedar::proc::ExternalData::addData(cedar::aux::DataPtr data)
+void cedar::proc::ExternalData::addDataInternal(cedar::aux::DataPtr data)
 {
   CEDAR_DEBUG_ASSERT(this->isCollection());
 
@@ -146,29 +148,28 @@ void cedar::proc::ExternalData::addData(cedar::aux::DataPtr data)
   {
     if (!this->mData.at(i).lock())
     {
-      this->setData(data, i);
+      this->setDataInternal(data, i);
       return;
     }
   }
   // if there was no free slot, create one
   this->mData.push_back(data);
-  this->mExternalDataAdded(data);
-  this->mExternalDataChanged();
 }
 
-void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data)
+void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data)
 {
   if (this->isCollection())
   {
-    this->addData(data);
+    this->addDataInternal(data);
   }
   else
   {
-    this->setData(data, 0);
+    this->setDataInternal(data, 0);
   }
+  this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
 }
 
-void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data, unsigned int index)
+void cedar::proc::ExternalData::setDataInternal(cedar::aux::DataPtr data, unsigned int index)
 {
   // reset validity when the data changes.
   if (this->getRole() == cedar::proc::DataRole::INPUT)
@@ -184,12 +185,13 @@ void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data, unsigned int i
   // if there is data at the given index, signal its removal
   if (cedar::aux::DataPtr old_data = this->mData.at(index).lock())
   {
-    this->mExternalDataRemoved(old_data);
+    if (old_data != data)
+    {
+      this->emitDataRemoved(old_data);
+    }
   }
 
   this->mData.at(index) = data;
-  this->mExternalDataAdded(data);
-  this->mExternalDataChanged();
 }
 
 cedar::aux::DataPtr cedar::proc::ExternalData::getData()
@@ -226,23 +228,12 @@ cedar::aux::ConstDataPtr cedar::proc::ExternalData::getData(unsigned int index) 
   }
 }
 
-boost::signals2::connection cedar::proc::ExternalData::connectToExternalDataChanged(boost::function<void ()> slot)
+void cedar::proc::ExternalData::addIncomingConnection(cedar::proc::DataConnectionPtr newConnection)
 {
-  return mExternalDataChanged.connect(slot);
+  this->addConnection(newConnection);
 }
 
-boost::signals2::connection cedar::proc::ExternalData::connectToExternalDataRemoved
-                            (
-                              boost::function<void (cedar::aux::ConstDataPtr)> slot
-                            )
+void cedar::proc::ExternalData::removeIncomingConnection(cedar::proc::DataConnectionPtr removedConnection)
 {
-  return this->mExternalDataRemoved.connect(slot);
-}
-
-boost::signals2::connection cedar::proc::ExternalData::connectToExternalDataAdded
-                            (
-                              boost::function<void (cedar::aux::ConstDataPtr)> slot
-                            )
-{
-  return this->mExternalDataAdded.connect(slot);
+  this->removeConnection(removedConnection);
 }

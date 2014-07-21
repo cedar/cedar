@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -121,8 +121,6 @@ public:
    * @see requestStop()
    */
   void stop(unsigned int timeout = UINT_MAX); 
-  CEDAR_DECLARE_DEPRECATED( void stop(unsigned int timeout, bool suppressWarning) );
-  //! @todo: delete deprecated function in future version
 
   /*! start the thread and initialize the worker
    *
@@ -253,17 +251,6 @@ private:
    *
    */
   virtual cedar::aux::detail::ThreadWorker* resetWorker() = 0;
-
-  /*! deprecated: please use connectToStopSignal
-   *@todo: remove in future version
-   */
-  CEDAR_DECLARE_DEPRECATED(virtual void applyStop(bool suppressWarning));
-
-  /*! deprecated: please use connectToStopSignal
-   *@todo: remove in future version
-   */
-  CEDAR_DECLARE_DEPRECATED(virtual void applyStart());
-
 
   //! is the worker (still) in memory? thread-un-safe
   bool validWorker() const;

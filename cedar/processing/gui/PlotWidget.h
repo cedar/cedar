@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -55,12 +55,70 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QLabel>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QMenu>
 #include <map>
 #include <vector>
 #include <string>
 #include <list>
 #include <tuple>
 #include <utility>
+
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      namespace PlotWidgetPrivate
+      {
+        // This should be a private nested class, but that is not supported by the MOC.
+        class LabeledPlot : public QObject
+        {
+          Q_OBJECT
+        public:
+          // constructor
+          LabeledPlot
+          (
+            const QString& pLabel,
+            cedar::aux::ConstDataPtr pData,
+            cedar::proc::PlotDataPtr pPlotData,
+            const std::string& decalarationToUse = std::string()
+          );
+
+        private:
+          void fillPlotOptions(QMenu* menu);
+
+          void openPlotFromDeclaration(const std::string& decalarationToFind);
+
+        private slots:
+          void openDefaultPlot();
+
+          void openSpecificPlot();
+
+        public:
+          // members
+          cedar::aux::gui::ConstPlotDeclarationPtr mpPlotDeclaration;
+          QLabel* mpLabel;
+          QPushButton* mpPlotSelector;
+          QWidget* mpPlotContainer;
+          cedar::aux::gui::PlotInterface* mpPlotter;
+          QHBoxLayout* mpTitleLayout;
+          bool mIsMultiPlot;
+          cedar::aux::ConstDataPtr mpData;
+          cedar::proc::PlotDataPtr mpPlotData;
+          std::string mTitle;
+
+          std::map<cedar::aux::ConstDataPtr, const std::string> mMultiPlotData;
+        };
+        CEDAR_GENERATE_POINTER_TYPES(LabeledPlot);
+      }
+    }
+  }
+}
+//!@endcond
 
 /*!@todo Document this.
  */
@@ -70,28 +128,8 @@ class cedar::proc::gui::PlotWidget : public QWidget
   // types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  struct LabeledPlot
-  {
-    // constructor
-    LabeledPlot(QLabel* pLabel, cedar::aux::gui::ConstPlotDeclarationPtr pPlotDecl = cedar::aux::gui::ConstPlotDeclarationPtr())
-    :
-    mpPlotDeclaration(pPlotDecl),
-    mpLabel(pLabel),
-    mpPlotter(nullptr),
-    mIsMultiPlot(false)
-    {
-      if(mpPlotDeclaration)
-      {
-        mpPlotter = mpPlotDeclaration->createPlot();
-      }
-    };
-    // members
-    cedar::aux::gui::ConstPlotDeclarationPtr mpPlotDeclaration;
-    QLabel* mpLabel;
-    cedar::aux::gui::PlotInterface* mpPlotter;
-    bool mIsMultiPlot;
-  };
-
+  // pretend this is a nested class...
+  typedef cedar::proc::gui::PlotWidgetPrivate::LabeledPlot LabeledPlot;
   CEDAR_GENERATE_POINTER_TYPES(LabeledPlot);
 
   typedef std::pair<cedar::aux::ConstDataPtr, LabeledPlotPtr> PlotGridMapItem;
@@ -102,7 +140,7 @@ private:
 public:
   //!@brief The standard constructor.
   PlotWidget(
-    cedar::proc::StepPtr step,
+    cedar::proc::ConnectablePtr connectable,
     const cedar::proc::ElementDeclaration::DataList& data
   );
 
@@ -129,7 +167,7 @@ public:
   }
 
   //!@brief recover plot from configuration
-  static void createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::StepItem* pStepItem);
+  static void createAndShowFromConfiguration(const cedar::aux::ConfigurationNode& node, cedar::proc::gui::Connectable* pConnectable);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -145,7 +183,7 @@ private:
   void fillGridWithPlots();
   //!@brief creates a plot of the given data at a given slot, returns false if it created a new plot-widget, true if it appended to an existing one.
   void processSlot(cedar::aux::ConstDataPtr slot, cedar::proc::PlotDataPtr dataItem, const std::string& title);
-  void createAndAddPlotToGrid(cedar::aux::gui::ConstPlotDeclarationPtr decl, cedar::aux::ConstDataPtr pData, const std::string& title);
+  void createAndAddPlotToGrid(const std::string& decl, cedar::aux::ConstDataPtr pData, cedar::proc::PlotDataPtr dataItem, const std::string& title);
   void tryAppendDataToPlot(cedar::aux::ConstDataPtr pData, const std::string& title, LabeledPlotPtr currentLabeledPlot);
   //!@brief gets called if data is added to slot and adds a plot
   void addPlotOfExternalData(cedar::aux::ConstDataPtr pData, cedar::proc::ExternalDataPtr slot, cedar::proc::PlotDataPtr dataItem);
@@ -165,7 +203,7 @@ protected:
   // none yet
 private:
   cedar::proc::ElementDeclaration::DataList mDataList;
-  cedar::proc::StepPtr mStep;
+  cedar::proc::ConnectablePtr mConnectable;
   int mGridSpacing;
   int mColumns;
   QGridLayout* mpLayout;

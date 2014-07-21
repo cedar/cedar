@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -79,17 +79,21 @@ std::string cedar::aux::MatData::getDescription() const
       if (dim == 1)
       {
         description += cedar::aux::toString(cedar::aux::math::get1DMatrixSize(mat));
+        description += " (";
       }
-      else
+
+      for (int i = 0; i < mat.dims; ++i)
       {
-        for (unsigned int i = 0; i < dim; ++i)
+        if (i > 0)
         {
-          if (i > 0)
-          {
-            description += " x ";
-          }
-          description += cedar::aux::toString(mat.size[i]);
+          description += " x ";
         }
+        description += cedar::aux::toString(mat.size[i]);
+      }
+
+      if (dim == 1)
+      {
+        description += ")";
       }
     }
     description += "<br />";
@@ -102,15 +106,95 @@ std::string cedar::aux::MatData::getDescription() const
   return description;
 }
 
+void cedar::aux::MatData::serialize(std::ostream& stream) const
+{
+  this->serializeHeader(stream);
+  stream << std::endl;
+  this->serializeData(stream);
+}
+
+void cedar::aux::MatData::deserialize(std::istream& stream)
+{
+  // read header
+  std::string header;
+  std::getline(stream, header);
+
+  std::string data;
+  std::getline(stream, data);
+
+  std::vector<std::string> header_entries;
+  cedar::aux::split(header, ",", header_entries);
+
+  CEDAR_ASSERT(header_entries.size() > 2);
+  std::string data_type = header_entries.at(0);
+  std::string mat_type_str = header_entries.at(1);
+
+  CEDAR_ASSERT(data_type == "Mat");
+
+  int mat_type = cedar::aux::math::matrixTypeFromString(mat_type_str);
+  std::vector<int> sizes;
+
+  // read the matrix size
+  for (size_t i = 2; i < header_entries.size(); ++i)
+  {
+    sizes.push_back(cedar::aux::fromString<int>(header_entries.at(i)));
+  }
+
+  cv::Mat mat(static_cast<int>(sizes.size()), &sizes.front(), mat_type);
+
+  // read data
+  std::vector<std::string> data_entries;
+  cedar::aux::split(data, ",", data_entries);
+
+  std::vector<int> index(sizes.size(), 0);
+  // currently, not implemented for multiple channels
+  CEDAR_ASSERT(mat.channels() == 1);
+  for (const auto& data_str : data_entries)
+  {
+    switch (mat.type())
+    {
+      case CV_32F:
+        mat.at<float>(&index.front()) = cedar::aux::fromString<float>(data_str);
+        break;
+
+      default:
+        // not implemented for this type
+        CEDAR_ASSERT(false);
+    }
+    ++index[0];
+    for (int i = 0; i < mat.dims - 1; ++i)
+    {
+      if (index[i] >= mat.size[i])
+      {
+        index[i] = 0;
+        ++index[i+1];
+      }
+    }
+  }
+
+  QWriteLocker locker(this->mpLock);
+  this->setData(mat);
+}
+
 void cedar::aux::MatData::serializeData(std::ostream& stream) const
 {
   QReadLocker locker(this->mpLock);
   //creating index that addresses an element in the n dimensional Mat
   std::vector<int> index(mData.dims, 0);
 
+  bool first = true;
   //iterate  as long the last dimension has exceeded
   while (index[mData.dims-1] < mData.size[mData.dims-1])
   {
+    if (first)
+    {
+      first = false;
+    }
+    else
+    {
+      stream << ",";
+    }
+
     // get memory address of the element.
     uchar* element = mData.data;
     for (int i = 0; i < mData.dims; i++)
@@ -125,37 +209,37 @@ void cedar::aux::MatData::serializeData(std::ostream& stream) const
       {
         case CV_8U:
         {
-          stream << static_cast<int>(element[i]) << ",";
+          stream << static_cast<int>(element[i]);
           break;
         }
         case CV_8S:
         {
-          stream  << static_cast<int>(reinterpret_cast<schar*>(element)[i]) << ",";
+          stream << static_cast<int>(reinterpret_cast<schar*>(element)[i]);
           break;
         }
         case CV_16U:
         {
-          stream  << reinterpret_cast<unsigned short*>(element)[i] << ",";
+          stream << reinterpret_cast<unsigned short*>(element)[i];
           break;
         }
         case CV_16S:
         {
-          stream  << reinterpret_cast<short*>(element)[i] << ",";
+          stream << reinterpret_cast<short*>(element)[i];
           break;
         }
         case CV_32S:
         {
-          stream  << reinterpret_cast<int*>(element)[i] << ",";
+          stream << reinterpret_cast<int*>(element)[i];
           break;
         }
         case CV_32F:
         {
-          stream  << reinterpret_cast<float*>(element)[i] << ",";
+          stream << reinterpret_cast<float*>(element)[i];
           break;
         }
         case CV_64F:
         {
-          stream  << reinterpret_cast<double*>(element)[i] << ",";
+          stream << reinterpret_cast<double*>(element)[i];
           break;
         }
       }
@@ -183,7 +267,11 @@ void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
   stream << cedar::aux::math::matrixTypeToString(mData) << ",";
   for(int i =0; i < mData.dims;i++)
   {
-    stream << mData.size[i] << ",";
+    if (i > 0)
+    {
+      stream << ",";
+    }
+    stream << mData.size[i];
   }
 }
 

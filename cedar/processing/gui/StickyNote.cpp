@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -36,7 +36,8 @@
 
 
 // CEDAR INCLUDES
-#include "StickyNote.h"
+#include "cedar/processing/gui/StickyNote.h"
+#include "cedar/processing/gui/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QBrush>
@@ -77,11 +78,19 @@ cedar::proc::gui::GraphicsBase(width,height)
   setFlag(ItemIsFocusable);
 
   this->setZValue(0);
+
+  if (pParent)
+  {
+    pParent->emitSceneChanged();
+  }
 }
 
 cedar::proc::gui::StickyNote::~StickyNote()
 {
-
+  if (this->mpParent)
+  {
+    this->mpParent->emitSceneChanged();
+  }
 }
 QRectF cedar::proc::gui::StickyNote::boundingRect() const
 {
@@ -219,18 +228,20 @@ void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEve
 
   QMenu menu;
   QMenu* colors = menu.addMenu("color");
-  QAction *blue = colors->addAction("blue");
-  blue->setIcon(QIcon(":/colors/blue.svg"));
-  QAction *red = colors->addAction("red");
-  red->setIcon(QIcon(":/colors/red.svg"));
-  QAction *green = colors->addAction("green");
-  green->setIcon(QIcon(":/colors/green.svg"));
-  QAction *magenta = colors->addAction("magenta");
-  magenta->setIcon(QIcon(":/colors/purple.svg"));
-  QAction *cyan = colors->addAction("cyan");
-  cyan->setIcon(QIcon(":/colors/cyan.svg"));
-  QAction *yellow = colors->addAction("yellow");
-  yellow->setIcon(QIcon(":/colors/yellow.svg"));
+
+  for (auto color : cedar::proc::gui::SettingsSingleton::getInstance()->getUserDefinedColors())
+  {
+    if (color->hasName())
+    {
+      auto action = colors->addAction(QString::fromStdString(color->getName()));
+      QPixmap pm(16, 16);
+      QColor qcolor = color->toQColor();
+      pm.fill(qcolor);
+      action->setIcon(QIcon(pm));
+      action->setData(QVariant::fromValue(qcolor));
+    }
+  }
+
   QAction *other = colors->addAction("other");
 
   QMenu* fontsize = menu.addMenu("font size");
@@ -244,31 +255,7 @@ void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEve
   QAction *a = menu.exec(event->screenPos());
 
   //change colors
-  if (a == blue)
-  {
-    this->mColor = QColor(110,110,255);
-  }
-  else if (a == red)
-  {
-    this->mColor = QColor(255,110,110);
-  }
-  else if (a == green)
-  {
-    this->mColor = QColor(110,255,110);
-  }
-  else if (a == cyan)
-  {
-    this->mColor = QColor(110,255,255);
-  }
-  else if (a == magenta)
-  {
-    this->mColor = QColor(255,110,255);
-  }
-  else if (a == yellow)
-  {
-    this->mColor = QColor(255,255,110);
-  }
-  else if (a == other)
+  if (a == other)
   {
     QColor color = QColorDialog::getColor(this->mColor);
     if (color.isValid())
@@ -276,7 +263,6 @@ void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEve
       this->mColor = color;
     }
   }
-
   //set font size
   else if (a == xs)
   {
@@ -301,6 +287,14 @@ void cedar::proc::gui::StickyNote::contextMenuEvent(QGraphicsSceneContextMenuEve
   else if (a == xxl)
   {
     this->setFontSize(40);
+  }
+  else if (a != nullptr)
+  {
+    QColor action_color = a->data().value<QColor>();
+    if (action_color.isValid())
+    {
+      this->mColor = action_color;
+    }
   }
 
 

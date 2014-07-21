@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -97,6 +97,10 @@ public:
 
   //!@brief return vector of standard colors
   static const std::vector<cedar::aux::gui::ColorValueRGBA>& getStandardColorVector();
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
+
+  void writeConfiguration(cedar::aux::ConfigurationNode& configuration) const;
 
 public slots:
   /*!@brief Reacts to a change in the plotted data.

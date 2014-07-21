@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -161,10 +161,10 @@ public:
   void resetChangedStates(bool newChangedFlagValue) const;
 
   //!@brief copy a configuration from another instance of the same class (type check included)
-  void copyFrom(ConstConfigurablePtr src);
+  virtual void copyFrom(ConstConfigurablePtr src);
 
   //!@brief copy a configuration to another instance of the same class (type check included)
-  void copyTo(ConfigurablePtr target) const;
+  virtual void copyTo(ConfigurablePtr target) const;
 
   /*!@brief Returns the parameter associated with the path.
    */
@@ -196,7 +196,7 @@ public:
 
   /*!@brief Unlocks all parameters of the configurable.
    */
-  void unlockParameters() const;
+  void unlockParameters(cedar::aux::LOCK_TYPE lockType) const;
 
   //! Returns the number of advanced parameters & configurable children in this configurable.
   size_t countAdvanced() const;
@@ -221,13 +221,22 @@ public:
     return this->mIsAdvanced;
   }
 
+  /*!@brief Returns the path of the parameter, relative to this configurable.
+   *
+   *        If the parameter is directly attached to this object, this method returns just the name. Otherwise, it looks
+   *        through all configurable children and other parameters.
+   */
+  std::string findParameterPath(cedar::aux::ParameterPtr parameter) const;
+
   /*! Returns the name, or a number added to it if there is already a parameter with that name.
    */
   std::string getUniqueParameterName(const std::string& baseName) const;
 
 public:
+  //! (boost) Signal that is emitted whenever a parameter is added to the configurable.
   CEDAR_DECLARE_SIGNAL(ParameterAdded, void(cedar::aux::ParameterPtr));
 public:
+  //! (boost) Signal that is emitted whenever a parameter is removed from the configurable.
   CEDAR_DECLARE_SIGNAL(ParameterRemoved, void(cedar::aux::ParameterPtr));
 
   //--------------------------------------------------------------------------------------------------------------------

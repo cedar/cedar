@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -72,7 +72,8 @@ cedar::dev::Robot::~Robot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
+// these operators cause trouble with doxygen
+//!@cond SKIPPED_DOCUMENTATION
 std::ostream& cedar::dev::operator<<(std::ostream& stream, const cedar::dev::Robot& robot)
 {
   stream << "===============================================" << std::endl;
@@ -126,6 +127,7 @@ std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::RobotPtr 
   stream << cedar::dev::ConstRobotPtr(robot);
   return stream;
 }
+//!@endcond
 
 void cedar::dev::Robot::openChannels()
 {

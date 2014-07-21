@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -82,11 +82,6 @@ public:
   virtual float compute(float value) const;
 
   /*!@brief this function calculates the TransferFunction function for an n-dimensional matrix.
-   *
-   * @todo write a non-templated function, which checks the type flag of cv::Mat and calls the correct templated compute
-   * function
-   *
-   * @todo Make a virtual version of this function that can be overloaded for faster TransferFunction calculation.
    */
   template<typename T>
   cv::Mat compute(const cv::Mat& values) const
@@ -102,6 +97,11 @@ public:
     return result;
   }
 
+  /*!@brief Computes the transfer function for each element in the matrix.
+   *
+   * @remarks The default implementation iterates over the matrix and calls the other compute function. Override this in
+   *          the child classes to increase performance.
+   */
   virtual cv::Mat compute(const cv::Mat& values) const;
 
   //--------------------------------------------------------------------------------------------------------------------

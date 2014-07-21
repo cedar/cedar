@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/QImagePlot.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -118,6 +119,8 @@ private:
 
   void fillContextMenu(QMenu& menu);
 
+  unsigned int getSlicedDimension() const;
+
   static void getSetup(int& dim0, int& dim1, int slicedDimension);
 
 private slots:
@@ -138,12 +141,16 @@ private:
   cv::Mat mSliceSize;
   bool mDataIsSet;
 
-  //! desired columns of the slice plot
-  unsigned int mDesiredColumns;
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+private:
   //! Dimension along which the slices are made.
-  cedar::aux::LockableMember<unsigned int> mSlicedDimension;
+  cedar::aux::UIntParameterPtr _mSlicedDimension;
 
+  //! Number of desired columns of the slice plot.
+  cedar::aux::UIntParameterPtr _mDesiredColumns;
 }; // class cedar::aux::gui::MatrixSlicePlot3D
 
 #endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H

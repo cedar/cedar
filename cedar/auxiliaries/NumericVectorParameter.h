@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -93,9 +93,9 @@ public:
 
   //!@brief The constructor.
   NumericVectorParameter(
-                          cedar::aux::Configurable *pOwner,
-                          const std::string& name,
-                          const std::vector<T>& defaultValues,
+                          cedar::aux::Configurable *pOwner = nullptr,
+                          const std::string& name = "",
+                          const std::vector<T>& defaultValues = std::vector<T>(),
                           const LimitType& limits = LimitType::full()
                         )
   :

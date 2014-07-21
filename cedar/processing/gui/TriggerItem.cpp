@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -45,10 +45,10 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
@@ -78,10 +78,10 @@ cedar::proc::gui::TriggerItem::TriggerItem()
 cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
-                               ),
-mRunTimeMeasurementTimerId(0)
+                               )
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->construct();
@@ -93,10 +93,10 @@ cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
-                               ),
-mRunTimeMeasurementTimerId(0)
+                               )
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setTrigger(trigger);
@@ -117,7 +117,6 @@ void cedar::proc::gui::TriggerItem::construct()
     p_effect->setOffset(3.0, 3.0);
     this->setGraphicsEffect(p_effect);
   }
-  this->mRunTimeMeasurementTimerId = this->startTimer(1000);
 }
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
@@ -167,16 +166,19 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
     return cedar::proc::gui::CONNECT_NO;
   }
 
-  if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
+  if (cedar::proc::gui::Connectable* p_connectable = dynamic_cast<cedar::proc::gui::Connectable*>(pTarget))
   {
-    if(p_step_item->getStep()->getParentTrigger() || this->mTrigger->isListener(p_step_item->getStep()))
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(p_connectable->getConnectable()))
     {
-      return cedar::proc::gui::CONNECT_NO;
-    }
-    // ... source and target are not in the same network
-    else if (this->getTrigger()->getNetwork() != p_step_item->getStep()->getNetwork())
-    {
-      return cedar::proc::gui::CONNECT_NO;
+      if (!triggerable->isLooped() || triggerable->getParentTrigger() || this->mTrigger->isListener(triggerable))
+      {
+        return cedar::proc::gui::CONNECT_NO;
+      }
+      // ... source and target are not in the same group
+      else if (this->getTrigger()->getGroup() != p_connectable->getConnectable()->getGroup())
+      {
+        return cedar::proc::gui::CONNECT_NO;
+      }
     }
   }
 
@@ -192,8 +194,8 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
     {
       return cedar::proc::gui::CONNECT_NO;
     }
-    // ... source and target are not in the same network
-    else if (this->getTrigger()->getNetwork() != p_trigger_item->getTrigger()->getNetwork())
+    // ... source and target are not in the same group
+    else if (this->getTrigger()->getGroup() != p_trigger_item->getTrigger()->getGroup())
     {
       return cedar::proc::gui::CONNECT_NO;
     }
@@ -227,7 +229,7 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
         (
           new cedar::aux::CallFunctionInThread
           (
-            boost::bind(&cedar::proc::LoopedTrigger::stop, looped_trigger, UINT_MAX, false)
+            boost::bind(&cedar::proc::LoopedTrigger::stop, looped_trigger, UINT_MAX)
           )
         );
   }
@@ -261,7 +263,7 @@ void cedar::proc::gui::TriggerItem::triggerStopped()
 
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
-  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
   CEDAR_DEBUG_ASSERT(p_scene);
 
   if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->mTrigger))
@@ -272,7 +274,6 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     QAction *p_single = menu.addAction("single step");
 
     menu.addSeparator();
-    p_scene->networkGroupingContextMenuEvent(menu);
 
     if (looped_trigger->isRunningNolocking())
     {
@@ -308,7 +309,6 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
   else
   {
     QMenu menu;
-    p_scene->networkGroupingContextMenuEvent(menu);
     menu.exec(event->screenPos());
   }
 }
@@ -337,7 +337,7 @@ cedar::proc::gui::Connection* cedar::proc::gui::TriggerItem::connectTo(cedar::pr
   return new Connection(this, pTarget);
 }
 
-void cedar::proc::gui::TriggerItem::timerEvent(QTimerEvent* /* pEvent */)
+void cedar::proc::gui::TriggerItem::updateToolTip()
 {
   QString tool_tip
     = QString("<table>"

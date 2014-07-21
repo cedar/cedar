@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -158,12 +158,11 @@ void cedar::aux::Recorder::prepareStart()
   }
 
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
-  //!@todo std::numeric_limits<int>::max() will lock the GUI!!!!
-  cedar::unit::Time min(1000.0 * cedar::unit::milli * cedar::unit::seconds);// std::numeric_limits<int>::max() ;
+  cedar::unit::Time min(1000.0 * cedar::unit::milli * cedar::unit::seconds);
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    if(spec->getStepSize() < min)
+    if (spec->getStepSize() < min)
     {
       min = spec->getStepSize();
     }

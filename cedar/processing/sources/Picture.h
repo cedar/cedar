@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -51,7 +51,7 @@
 // SYSTEM INCLUDES
 
 
-//!@brief A picture file source for the processingIde
+//!@brief A picture file source for the processing framework.
 class cedar::proc::sources::Picture
 :
 public cedar::proc::sources::GrabberBase
@@ -77,6 +77,12 @@ public:
 public:
   //!@brief Loads the given file into the picture source.
   void setSourceFileName(const std::string& imagePath);
+
+  //! Returns the mat data pointer containing the current picture.
+  cedar::aux::MatDataPtr getImage();
+
+  //! Returns the mat data pointer containing the current picture.
+  cedar::aux::ConstMatDataPtr getImage() const;
 
 public slots:
   //!@brief a slot that takes care of updating the output picture

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -126,6 +126,9 @@ public:
 
   //!@brief search known directories for this plugin.
   static std::string findPlugin(const std::string& pluginName);
+
+  //!@brief search for a file that is relative to the folder containing the plugin
+  static std::string findPluginFile(const std::string& fileName);
 
   //!@brief search for this plugin in the given workspace.
   static std::string findPlugin(const std::string& pluginName, const std::string& workspace);

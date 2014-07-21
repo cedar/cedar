@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -52,6 +52,7 @@ cedar::dyn::Dynamics::Dynamics()
 :
 cedar::proc::Step(true)
 {
+  this->mTimestepMeasurementId = this->registerTimeMeasurement("time step");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,6 +63,9 @@ void cedar::dyn::Dynamics::compute(const cedar::proc::Arguments& arguments)
   try
   {
     const cedar::proc::StepTime& step_time = dynamic_cast<const cedar::proc::StepTime&>(arguments);
+
+    this->setTimeMeasurement(this->mTimestepMeasurementId, step_time.getStepTime());
+
     this->eulerStep(step_time.getStepTime());
   }
   catch (const std::bad_cast& e)

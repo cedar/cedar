@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -49,6 +49,8 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
+#include <QIcon>
+#include <QResource>
 
 
 /*!@todo describe.
@@ -83,7 +85,7 @@ public:
   virtual void declare() const = 0;
 
   //! Returns the class name associated with this declaration.
-  virtual std::string getClassName() const = 0;
+  virtual std::string getClassName() const;
 
   //! Returns the category of this declaration.
   inline const std::string& getCategory() const
@@ -158,6 +160,48 @@ public:
     return this->mSource;
   }
 
+  //!@brief set path to icon included in the graphical representation of this element
+  void setIconPath(const std::string& path)
+  {
+    this->mIconPath = path;
+  }
+
+  //!@brief get path to icon included in the graphical representation of this element
+  const std::string& getIconPath() const
+  {
+    return this->mIconPath;
+  }
+
+  //!@brief Returns the actual icon for the element.
+  QIcon getIcon() const
+  {
+    return QIcon(this->determinedIconPath());
+  }
+
+  /*! Returns the path for the icon to use; this will also return special icons if there is an error with the specified
+   * icons.
+   */
+  QString determinedIconPath() const
+  {
+    QResource existance_test(QString::fromStdString(this->getIconPath()));
+    if (existance_test.isValid())
+    {
+      auto icon = QIcon(QString::fromStdString(this->getIconPath()));
+      if (icon.isNull())
+      {
+        return ":/steps/no_icon.svg";
+      }
+      else
+      {
+        return QString::fromStdString(this->getIconPath());
+      }
+    }
+    else
+    {
+      return ":/steps/broken_icon.svg";
+    }
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -193,6 +237,9 @@ private:
 
   //! Source of the declaration. Empty for built-ins.
   std::string mSource;
+
+  //!@brief path to icon included in the graphical representation of this step
+  std::string mIconPath;
 
 }; // class cedar::aux::PluginDeclaration
 

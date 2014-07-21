@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -103,6 +103,7 @@ public:
   //! Whether or not memory output is generated.
   unsigned int getMaximumNumberOfLogEntries() const;
 
+  //! Returns the maximal number of entries allowed for the log entry.
   cedar::aux::UIntParameterPtr getMaximalNumberOfLogEntriesParameter() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,7 +135,6 @@ protected:
 
 private:
   //!@brief Parameter representing the maximum number of log entries
-  //!@todo this should be moved to aux::gui::Settings once unstable is merged
   cedar::aux::UIntParameterPtr _mMaximumNumberOfLogEntries;
 
   //!@brief Directory, where the PluginLoadDialog is supposed to open.
@@ -148,6 +148,7 @@ namespace cedar
   {
     namespace gui
     {
+      //! Singleton for the settings object.
       typedef cedar::aux::Singleton<cedar::aux::gui::Settings> SettingsSingleton;
     }
   }

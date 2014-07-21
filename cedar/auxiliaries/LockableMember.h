@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -63,15 +63,19 @@ class cedar::aux::LockableMember
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Constructs the member, using the default constructor of the type that is stored.
   LockableMember()
   :
-  mMember()
+  mMember(),
+  mLock(new LockType())
   {
   }
 
+  //! Constructs the member, using a fixed value.
   LockableMember(const T& member)
   :
-  mMember(member)
+  mMember(member),
+  mLock(new LockType())
   {
   }
 
@@ -94,13 +98,13 @@ public:
   //! Returns the associated lock.
   LockType& getLock() const
   {
-    return this->mLock;
+    return *(this->mLock.get());
   }
 
   //! Returns a pointer to associated lock. Use this method for things like QReadLocker etc.
   LockType* getLockPtr() const
   {
-    return &this->mLock;
+    return this->mLock.get();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -125,7 +129,7 @@ private:
   T mMember;
 
   //! Lock for the member.
-  mutable LockType mLock;
+  mutable boost::shared_ptr<LockType> mLock;
 
 }; // class cedar::aux::LockableMember
 

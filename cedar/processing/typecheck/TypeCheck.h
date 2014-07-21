@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -80,7 +80,7 @@ public:
    *        Override this function to implement your own validity check. Note, that this should either return
    *        validityOk() or validityBad(), rather than the direct constants.
    */
-  virtual cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr) const = 0;
+  virtual cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr, std::string& info) const = 0;
 
   /*!@brief The validity that is to be returned when the check succeeds.
    */
@@ -100,9 +100,9 @@ public:
    *
    *  @see check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr)
    */
-  cedar::proc::DataSlot::VALIDITY operator()(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
+  cedar::proc::DataSlot::VALIDITY operator()(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data, std::string& info) const
   {
-    return this->check(slot, data);
+    return this->check(slot, data, info);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

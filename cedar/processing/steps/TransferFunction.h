@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -87,13 +87,6 @@ public:
 public:
   //!@brief do this if the input changes
   void inputConnectionChanged(const std::string& inputName);
-
-  //!@brief determine if a given Data is a valid input
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr,
-                                    cedar::aux::ConstDataPtr
-                                  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

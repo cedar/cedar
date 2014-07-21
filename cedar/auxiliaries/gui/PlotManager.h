@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -84,6 +84,9 @@ public:
 
   //!@brief returns the default declaration for given data
   cedar::aux::gui::ConstPlotDeclarationPtr getDefaultDeclarationFor(cedar::aux::ConstDataPtr data);
+
+  //!@brief returns a declaration found by a string that contains a plot class name.
+  cedar::aux::gui::ConstPlotDeclarationPtr getDeclaration(const std::string& plotClassName) const;
 
   //!@brief set default
   template <typename DataType, typename PlotterType>

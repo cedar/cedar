@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -54,13 +54,16 @@
 cedar::proc::gui::View::View(QWidget *pParent)
 :
 QGraphicsView(pParent),
+mpScene(nullptr),
 mCurrentZoomLevel(static_cast<qreal>(1.0)),
 mScrollDx(static_cast<qreal>(0.0)),
 mScrollDy(static_cast<qreal>(0.0)),
-mpScrollTimer(new QTimer(this))
+mpScrollTimer(new QTimer(this)),
+mpMainWindow(nullptr),
+mpConigurableWidget(nullptr),
+mpRecorderWidget(nullptr)
 {
-  this->mpScene = new cedar::proc::gui::Scene(this);
-  this->setScene(this->mpScene);
+  this->resetViewport();
   this->setInteractive(true);
   this->setDragMode(QGraphicsView::RubberBandDrag);
   this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
@@ -75,6 +78,11 @@ mpScrollTimer(new QTimer(this))
   this->createZoomWidget();
 
   this->setZoomLevel(100);
+
+  setResizeAnchor(AnchorViewCenter);
+  setInteractive(true);
+  setTransformationAnchor(AnchorUnderMouse);
+  setDragMode(QGraphicsView::RubberBandDrag);
 }
 
 cedar::proc::gui::View::~View()
@@ -85,6 +93,49 @@ cedar::proc::gui::View::~View()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::View::setWidgets
+(
+  QMainWindow* pMainWindow,
+  cedar::aux::gui::Configurable* pConigurableWidget,
+  cedar::proc::gui::RecorderWidget* pRecorderWidget
+)
+{
+  this->mpMainWindow = pMainWindow;
+  this->mpConigurableWidget = pConigurableWidget;
+  this->mpRecorderWidget = pRecorderWidget;
+}
+
+void cedar::proc::gui::View::resetViewport()
+{
+  auto trigger_display_mode = cedar::proc::gui::Scene::MODE_SHOW_ALL;
+  if (this->mpScene)
+  {
+    trigger_display_mode = this->mpScene->getTriggerDisplayMode();
+    delete this->mpScene;
+    this->mpScene = nullptr;
+  }
+
+  this->mpScene = new cedar::proc::gui::Scene(this);
+  this->setScene(this->mpScene);
+
+  this->mpScene->setTriggerDisplayMode(trigger_display_mode);
+
+  if (mpMainWindow != nullptr)
+  {
+    this->mpScene->setMainWindow(mpMainWindow);
+  }
+
+  if (this->mpConigurableWidget)
+  {
+    this->mpScene->setConfigurableWidget(mpConigurableWidget);
+  }
+
+  if (this->mpRecorderWidget)
+  {
+    this->mpScene->setRecorderWidget(this->mpRecorderWidget);
+  }
+}
 
 void cedar::proc::gui::View::createZoomWidget()
 {
@@ -224,7 +275,7 @@ void cedar::proc::gui::View::scrollTimerEvent()
                             );
 }
 
-void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent *pEvent)
+void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent* pEvent)
 {
   // scroll the view if connecting to something close to the edge
   if (this->mpScene->getMode() == cedar::proc::gui::Scene::MODE_CONNECT)
@@ -274,7 +325,7 @@ cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
 
 void cedar::proc::gui::View::resizeEvent(QResizeEvent * pEvent)
 {
-  QWidget::resizeEvent(pEvent);
+  QGraphicsView::resizeEvent(pEvent);
 }
 
 
@@ -296,4 +347,42 @@ void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const Q
       break;
   }
   this->mpScene->setMode(mode, param);
+}
+
+void cedar::proc::gui::View::mousePressEvent(QMouseEvent* pEvent)
+{
+  if (pEvent->button() == Qt::MiddleButton)
+  {
+    // If there's a rubber band already started it doesn't autmatically get cleared when we switch to
+    // scroll hand mode. We should probably keep track of things properly but it seems to work if you just do this.
+    // I'm not sure why buttons has to be 0 here - if you just clear the left button it doesn't work.
+    QMouseEvent releaseEvent(QEvent::MouseButtonRelease, pEvent->pos(), pEvent->globalPos(),
+                 Qt::LeftButton, 0, pEvent->modifiers());
+    QGraphicsView::mouseReleaseEvent(&releaseEvent);
+
+    setDragMode(QGraphicsView::ScrollHandDrag);
+    // We need to pretend it is actually the left button that was pressed!
+    QMouseEvent fakeEvent(pEvent->type(), pEvent->pos(), pEvent->globalPos(),
+               Qt::LeftButton, pEvent->buttons() | Qt::LeftButton, pEvent->modifiers());
+    QGraphicsView::mousePressEvent(&fakeEvent);
+  }
+  else
+  {
+    QGraphicsView::mousePressEvent(pEvent);
+  }
+}
+
+void cedar::proc::gui::View::mouseReleaseEvent(QMouseEvent* pEvent)
+{
+  if (pEvent->button() == Qt::MiddleButton)
+  {
+    QMouseEvent fakeEvent(pEvent->type(), pEvent->pos(), pEvent->globalPos(),
+               Qt::LeftButton, pEvent->buttons() & ~Qt::LeftButton, pEvent->modifiers());
+    QGraphicsView::mouseReleaseEvent(&fakeEvent);
+    setDragMode(QGraphicsView::RubberBandDrag);
+  }
+  else
+  {
+    QGraphicsView::mouseReleaseEvent(pEvent);
+  }
 }

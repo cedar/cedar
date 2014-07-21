@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -58,7 +58,7 @@ public:
              cedar::proc::DataRole::Id role,
              const std::string& name,
              cedar::proc::Connectable* pParent,
-             bool isMandatory = true
+             bool isShared = false
            );
 
   //!@brief Destructor
@@ -68,23 +68,39 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief get the data of this slot
   cedar::aux::DataPtr getData();
 
+  //!@brief get the const data of this slot
   cedar::aux::ConstDataPtr getData() const;
 
-  void clear();
+  //!@brief returns if this is a shared slot (i.e., a group forwarding the data of a non-group element)
+  bool isShared() const;
+
+  //!@brief returns the lock type
+  cedar::aux::LOCK_TYPE getLockType() const;
+
+  //!@brief Adds an outgoing connection to the list of connections from this slot
+  void addOutgoingConnection(cedar::proc::DataConnectionPtr newConnection);
+
+  //!@brief Removes an outgoing connection from the list of connections from this slot
+  void removeOutgoingConnection(cedar::proc::DataConnectionPtr removedConnection);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setData(cedar::aux::DataPtr data);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void clearInternal();
+
+  void setDataInternal(cedar::aux::DataPtr data);
+
+  void removeDataInternal(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -93,6 +109,7 @@ protected:
   // none yet
 private:
   cedar::aux::DataPtr mData;
+  bool mIsShared;
 }; // class cedar::proc::OwnedData
 
 #endif // CEDAR_PROC_OWNED_DATA_H

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -202,7 +202,7 @@ private:
   //! @brief The ID of the Property.
   cedar::dev::sensors::camera::Property::Id mId;
 
-  //! @brief The displayed name in the property pane of the processingIde
+  //! @brief The displayed name in the property pane of the gui
   std::string mName;
 
   //! @brief A flag, if this property is supported by the used camera

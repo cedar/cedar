@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -142,15 +142,41 @@ public:
     return this->mValues.end();
   }
 
+  //! Finds the given key in the map and returns an iterator to the corresponding element.
   const_iterator find(const std::string& key) const
   {
     return this->mValues.find(key);
   }
 
-  //!@brief checks if a value is already contained in this vector
-  bool contains(const T& value) const
+  //! Erases the given key and its element from the map.
+  void erase(const std::string& key)
   {
-    return this->mValues.find(value) != this->mValues.end();
+    this->mValues.erase(key);
+  }
+
+  //! Checks if the map is empty.
+  bool empty()
+  {
+    return this->mValues.empty();
+  }
+
+  //!@brief checks if a key is already contained in this map
+  bool containsKey(const std::string& key) const
+  {
+    return this->mValues.find(key) != this->mValues.end();
+  }
+
+  //!@brief checks if a value is already contained in this map
+  bool containsValue(const T& value) const
+  {
+    for (const auto& pair : this->mValues)
+    {
+      if (pair.second == value)
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   //!@brief return the size of the vector
@@ -188,6 +214,7 @@ public:
     }
   }
 
+  //! Returns the value with the given index.
   T get(const std::string& index, bool lock = true) const
   {
     T copy;

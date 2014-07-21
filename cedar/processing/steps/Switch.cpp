@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -259,11 +259,11 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
     {
       if (this->mInput1)
       {
-        this->mOutput->setData(0.0 * this->mInput1->getData());
+        this->mOutput->setData(0.0 * this->mInput1->getData().clone());
       }
       else if (this->mInput2)
       {
-        this->mOutput->setData(0.0 * this->mInput2->getData());
+        this->mOutput->setData(0.0 * this->mInput2->getData().clone());
       }
     }
   }

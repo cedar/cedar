@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -69,7 +69,8 @@ mpArrowStart(0),
 mpArrowEnd(0),
 mValidity(CONNECT_NOT_SET),
 mSmartMode(false),
-mHighlight(false)
+mHighlight(false),
+mHighlightHover(false)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
@@ -157,6 +158,11 @@ bool cedar::proc::gui::Connection::isTriggerConnection() const
          || this->mpTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER;
 }
 
+void cedar::proc::gui::Connection::setHighlightedByHovering(bool highlight)
+{
+  this->mHighlightHover = highlight;
+}
+
 void cedar::proc::gui::Connection::setHighlightedBySelection(bool highlight)
 {
   mHighlight = highlight;
@@ -213,6 +219,15 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
     return;
   }
   mValidity = validity;
+
+  this->setToolTip
+  (
+    QString::fromStdString
+    (
+      cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(mpTarget)->getSlot()->getValidityInfo()
+    )
+  );
+
   QPen pen = this->pen();
   pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
   this->setPen(pen);
@@ -414,6 +429,11 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
     QColor new_color = this->highlightColor(pen.color());
 
     pen.setColor(new_color);
+    pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
+  }
+
+  if (this->mHighlightHover && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightHoveredConnections())
+  {
     pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
   }
 

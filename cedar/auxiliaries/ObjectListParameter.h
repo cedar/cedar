@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -70,6 +70,9 @@ public:
 
   //!@brief return the size of the vector
   virtual size_t size() const = 0;
+
+  //!@brief clear vector
+  virtual void clear() = 0;
 
   /*!@brief Returns the object with the given index.
    *

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -50,7 +50,7 @@
 
 /*!@brief A class to use stereo images.
  *
- * @todo More detailed description of the class.
+ * Contains two matrices, one for the left and one for the right image.
  *
  */
 

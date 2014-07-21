@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/annotation/Annotation.fwd.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.fwd.h"
 #include "cedar/auxiliaries/gui/ImagePlot.fwd.h"
+#include "cedar/auxiliaries/ColorGradient.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -96,19 +97,11 @@ public:
    */
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
-  /*!@brief Applies a color scale to a matrix.
-   *
-   * @param matrix Matrix to colorize
-   * @param limits Whether or not there are limits to the scaling.
-   * @param min    lower limit - if limits is true, values above this will be blacked out
-   * @param max    upper limit - if limits is true, values below this will be blacked out
-   */
-  static cv::Mat colorizedMatrix(cv::Mat matrix, bool limits = false, double min = 0.0, double max = 0.0);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! Reacts to a click on the image plot.
   void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -138,12 +131,6 @@ private:
 
   //! Type of the data.
   DataType mDataType;
-
-  static std::vector<char> mLookupTableR;
-  static std::vector<char> mLookupTableG;
-  static std::vector<char> mLookupTableB;
-
-  static QReadWriteLock mLookupTableLock;
 
 }; // class cedar::aux::gui::ImagePlot
 

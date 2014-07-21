@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/auxiliaries/annotation/Dimensions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleData.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -75,17 +76,13 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
-std::vector<QColor> cedar::aux::gui::HistoryPlot0D::mLineColors;
-std::vector<Qt::PenStyle> cedar::aux::gui::HistoryPlot0D::mLineStyles;
-boost::posix_time::ptime cedar::aux::gui::HistoryPlot0D::mPlotStartTime = boost::posix_time::microsec_clock::local_time();
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(nullptr)
+mpHistoryPlot(nullptr)
 {
   this->init();
 }
@@ -93,395 +90,200 @@ mpCurrentPlotWidget(nullptr)
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(nullptr)
+mpHistoryPlot(nullptr)
 {
   this->init();
   this->plot(data, title);
 }
 
-cedar::aux::gui::HistoryPlot0D::CurveInfo::CurveInfo()
-:
-mCurve(NULL)
-{
-}
-
 cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
 {
-  if (this->mpWorkerThread)
-  {
-    this->mpWorkerThread->quit();
-    this->mpWorkerThread->wait();
-    delete this->mpWorkerThread;
-    this->mpWorkerThread = nullptr;
-  }
-
-  this->mCurves.clear();
-}
-
-cedar::aux::gui::HistoryPlot0D::CurveInfo::~CurveInfo()
-{
-  if (mCurve != NULL)
-  {
-    mCurve->detach();
-  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::HistoryPlot0D::contextMenuEvent(QContextMenuEvent *pEvent)
-{
-  QMenu menu(this);
-  QAction *p_antialiasing = menu.addAction("antialiasing");
-  p_antialiasing->setCheckable(true);
-
-  bool combined = true;
-  for (size_t i = 0; i < this->mCurves.size(); ++i)
-  {
-    CurveInfoPtr curve = this->mCurves[i];
-    combined &= curve->mCurve->testRenderHint(QwtPlotItem::RenderAntialiased);
-  }
-  p_antialiasing->setChecked(combined);
-
-  QAction *p_legend = menu.addAction("legend");
-  p_legend->setCheckable(true);
-  QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
-  p_legend->setChecked(this->mpPlot->legend() != nullptr);
-
-  QAction *p_action = menu.exec(pEvent->globalPos());
-  if (p_action == nullptr)
-  {
-    return;
-  }
-
-  if (p_action == p_antialiasing)
-  {
-    for (size_t i = 0; i < this->mCurves.size(); ++i)
-    {
-      CurveInfoPtr curve = this->mCurves[i];
-      curve->mCurve->setRenderHint(QwtPlotItem::RenderAntialiased, p_action->isChecked());
-    }
-  }
-}
-
-void cedar::aux::gui::HistoryPlot0D::showLegend(bool show)
-{
-  if (show)
-  {
-    // show legend
-    auto p_legend = this->mpPlot->legend();
-    if (p_legend == nullptr)
-    {
-      p_legend = new QwtLegend();
-      p_legend->setFrameStyle(QFrame::Box);
-      p_legend->setFrameShadow(QFrame::Sunken);
-      this->mpPlot->insertLegend(p_legend, QwtPlot::BottomLegend);
-    }
-  }
-  else
-  {
-    // remove legend
-    delete this->mpPlot->legend();
-
-    // the following takes care of properly laying out everything again
-    QSize size = this->size();
-    this->resize(QSize(0, 0));
-    this->resize(size);
-  }
-}
-
 bool cedar::aux::gui::HistoryPlot0D::canAppend(cedar::aux::ConstDataPtr data) const
 {
-  cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-  cedar::aux::ConstUnitDataPtr unit_data = boost::dynamic_pointer_cast<cedar::aux::ConstUnitData>(data);
-  if (mat_data)
-  {
-    return mat_data->getDimensionality() == 0;
-  }
-  else if (unit_data)
-  {
-    // no curves yet, can append with no problem!
-    if (this->mCurves.empty())
-    {
-      return true;
-    }
-    // otherwise, there's already a curve, need to make sure it has the same suffix.
-    else
-    {
-      if (this->mCurves.front()->mUnitData && this->mCurves.front()->mUnitData->getSuffix() == unit_data->getSuffix())
-      {
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    }
-  }
-  else
+  auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+
+  if (!mat_data)
   {
     return false;
   }
+
+  QReadLocker locker(&mat_data->getLock());
+  if (mat_data->getDimensionality() != 0)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 bool cedar::aux::gui::HistoryPlot0D::canDetach(cedar::aux::ConstDataPtr data) const
 {
-  if(this->mpPlot != nullptr && this->mCurves.size() > 1)
+  for (const auto& plot_data : this->mPlotData)
   {
-    for(auto curve : this->mCurves)
+    if (plot_data.mData == data)
     {
-      if(curve->mData == data)
-      {
-        return true;
-      }
+      return true;
     }
   }
-  
   return false;
 }
 
 void cedar::aux::gui::HistoryPlot0D::init()
 {
+  mpHistoryPlot = new cedar::aux::gui::QwtLinePlot();
+  auto p_layout = new QVBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(p_layout);
+#ifdef CEDAR_USE_QWT
+  mpHistoryPlot = new cedar::aux::gui::QwtLinePlot();
+#endif // CEDAR_USE_QWT
+  p_layout->addWidget(this->mpHistoryPlot);
+
   mMaxHistorySize = 500;
 
-  this->mCurves.clear();
-  this->mCurves.push_back(CurveInfoPtr(new CurveInfo()));
-
-  QPalette palette = this->palette();
-  palette.setColor(QPalette::Window, Qt::white);
-  this->setPalette(palette);
-
-  QVBoxLayout *p_layout = new QVBoxLayout();
-  this->setLayout(p_layout);
-
-  this->mpPlot = new QwtPlot(this);
-  this->layout()->addWidget(mpPlot);
-  this->mpPlot->setAxisTitle(QwtPlot::xBottom, "time (s)");
-
-  mpWorkerThread = new QThread();
-  mWorker = cedar::aux::gui::detail::HistoryPlot0DWorkerPtr(new cedar::aux::gui::detail::HistoryPlot0DWorker(this));
-  mWorker->moveToThread(this->mpWorkerThread);
-
-  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
-  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
-
-  this->mpWorkerThread->start(QThread::LowPriority);
+  mTimerId = 0;
 }
 
-void cedar::aux::gui::HistoryPlot0D::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
+void cedar::aux::gui::HistoryPlot0D::advanceHistory()
 {
-  // initialize vectors, if this has not happened, yet
-  if (mLineColors.empty() || mLineStyles.empty())
+  cedar::unit::Time time_now = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  for (auto& plot_data : this->mPlotData)
   {
-    mLineColors.clear();
-    mLineStyles.clear();
+    QReadLocker data_locker(&plot_data.mData->getLock());
 
-    mLineColors.push_back(QColor(0, 121, 177));
-    mLineColors.push_back(QColor(48, 162, 26));
-    mLineColors.push_back(QColor(224, 49, 37));
-    mLineColors.push_back(QColor(217, 220, 0));
-    mLineColors.push_back(QColor(118, 0, 177));
-    mLineColors.push_back(QColor(46, 221, 190));
-    mLineColors.push_back(QColor(245, 156, 16));
+    if (plot_data.mData->getDimensionality() != 0)
+    {
+      data_locker.unlock();
+      emit dataChanged();
+      return;
+    }
 
-    mLineStyles.push_back(Qt::SolidLine);
-    mLineStyles.push_back(Qt::DashLine);
-    mLineStyles.push_back(Qt::DotLine);
-    mLineStyles.push_back(Qt::DashDotLine);
-    mLineStyles.push_back(Qt::DashDotDotLine);
-    mLineStyles.push_back(Qt::CustomDashLine);
+    cv::Mat now = plot_data.mData->getData().clone();
+    data_locker.unlock();
+
+    QWriteLocker hist_locker(&plot_data.mHistory->getLock());
+    const cv::Mat& current_hist = plot_data.mHistory->getData();
+
+    cv::Mat new_hist
+       = cv::Mat::zeros
+         (
+           std::min(current_hist.rows + 1, static_cast<int>(this->mMaxHistorySize)),
+           1,
+           now.type()
+         );
+
+    int start = 0;
+    int end = current_hist.rows;
+
+    if (current_hist.rows >= static_cast<int>(this->mMaxHistorySize))
+    {
+      start = 1;
+    }
+
+    cv::Mat slice = new_hist(cv::Range(0, end - start), cv::Range::all());
+    current_hist(cv::Range(start, end), cv::Range::all()).copyTo(slice);
+    cv::Mat slice2 = new_hist(cv::Range(new_hist.rows - 1, new_hist.rows), cv::Range::all());
+    now.copyTo(slice2);
+
+    plot_data.mHistory->setData(new_hist);
+
+    plot_data.mXLabels.push_back(time_now);
+
+    while (plot_data.mXLabels.size() > this->mMaxHistorySize)
+    {
+      plot_data.mXLabels.pop_front();
+    }
+
+    std::vector<double> time_values;
+    time_values.resize(plot_data.mXLabels.size());
+    for (size_t i = 0; i < plot_data.mXLabels.size(); ++i)
+    {
+      time_values.at(i) = (plot_data.mXLabels.at(i) - time_now) / (1.0 * cedar::unit::second);
+    }
+    auto time_annotation = plot_data.mHistory->getAnnotation<cedar::aux::annotation::Dimensions>();
+    time_annotation->setSamplingPositions(0, time_values);
+
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(static_cast<unsigned int>(new_hist.rows) == plot_data.mXLabels.size());
   }
+}
 
-  const size_t color_count = mLineColors.size();
-  const size_t style_count = mLineStyles.size();
-  const size_t max_line_id = mLineStyles.size() * mLineStyles.size();
-
-  size_t line_id = lineId % max_line_id;
-  size_t color_id = line_id % color_count;
-  size_t style_id = (line_id / color_count) % style_count;
-
-  // get old pen
-  QPen pen = pCurve->pen();
-
-  // modify accordingly
-  pen.setColor(mLineColors.at(color_id));
-  pen.setStyle(mLineStyles.at(style_id));
-  pen.setWidthF(2);
-
-  // pass pen back to curve
-  pCurve->setPen(pen);
+void cedar::aux::gui::HistoryPlot0D::clear()
+{
+  while (!this->mPlotData.empty())
+  {
+    auto& first = *this->mPlotData.begin();
+    this->detach(first.mData);
+  }
 }
 
 void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  this->mCurves.clear();
-  if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+  if (!this->canAppend(data))
   {
-    if (mat_data->getData().channels() != 1)
-    {
-      CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot plot data with more than one channel.");
-    }
+    CEDAR_THROW(cedar::aux::gui::InvalidPlotData, "Cannot plot this data.");
   }
+
+  this->clear();
+
   this->append(data, title);
 
-  this->startTimer(30);
-}
-
-double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
-{
-  CEDAR_DEBUG_ASSERT(index < this->mCurves.size());
-
-  // lock the data
-  QReadLocker data_locker(&this->mCurves[index]->mData->getLock());
-
-  // read out the double value
-  double val = 0.0;
-  if (this->mCurves[index]->mDoubleData)
+  if (mTimerId != 0)
   {
-    val = this->mCurves[index]->mDoubleData->getData();
-  }
-  else if (this->mCurves[index]->mUnitData)
-  {
-    val = this->mCurves[index]->mUnitData->doubleValueForSuffix();
-  }
-  else if (this->mCurves[index]->mMatData)
-  {
-    cv::Mat matrix = this->mCurves[index]->mMatData->getData();
-    // check if plot is no longer capable of displaying the data
-    if (cedar::aux::math::getDimensionalityOf(matrix) != 0 || matrix.empty())
-    {
-      data_locker.unlock();
-      emit dataChanged();
-      return 0.0;
-    }
-    val = cedar::aux::math::getMatrixEntry<double>(matrix, 0, 0);
+    this->killTimer(this->mTimerId);
   }
 
-  data_locker.unlock();
-  return val;
-}
-
-void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::ConstDataPtr data)
-{
-  this->mData = data;
-  this->mDoubleData = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data);
-  this->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-  this->mUnitData = boost::dynamic_pointer_cast<cedar::aux::ConstUnitData>(data);
-
-  if (!this->mDoubleData && !this->mMatData && !this->mUnitData)
-  {
-    CEDAR_THROW
-    (
-      cedar::aux::gui::InvalidPlotData,
-      "Could not cast to cedar::aux::DoubleData, cedar::aux::MatData or cedar::aux::UnitData "
-      "in cedar::aux::gui::HistoryPlot0D::CurveInfo::setData."
-    );
-  }
+  this->mTimerId = this->startTimer(30);
 }
 
 void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  CurveInfoPtr curve(new CurveInfo());
-  this->mCurves.push_back(curve);
-  size_t index = this->mCurves.size() - 1;
+  this->mPlotData.push_back(PlotData());
+  auto& plot_data = this->mPlotData.back();
+  plot_data.mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+  plot_data.mHistory = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat()));
 
-  curve->setData(data);
+  // initialize the new history to a 1x1 matrix.
+  QReadLocker locker(&plot_data.mData->getLock());
+  cv::Mat hist = plot_data.mData->getData().clone();
+  locker.unlock();
 
-  if (curve->mUnitData)
-  {
-    this->mpPlot->setAxisTitle(QwtPlot::yLeft, QString::fromStdString(curve->mUnitData->getSuffix()));
-  }
+  cv::Mat new_hist = cv::Mat::zeros(1, 1, hist.type());
 
-  curve->mCurve = new QwtPlotCurve(QString::fromStdString(title));
-  curve->mCurve->attach(this->mpPlot);
-  this->applyStyle(index, curve->mCurve);
+  hist.copyTo(new_hist);
+
+  QWriteLocker hlocker(&plot_data.mHistory->getLock());
+  plot_data.mHistory->setData(new_hist);
+  hlocker.unlock();
+
+  cedar::aux::annotation::DimensionsPtr time_annotation(new cedar::aux::annotation::Dimensions(1));
+  time_annotation->setLabel(0, "time [s]");
+  plot_data.mXLabels.clear();
+  plot_data.mXLabels.push_back(cedar::aux::GlobalClockSingleton::getInstance()->getTime());
+  plot_data.mHistory->setAnnotation(time_annotation);
+
+  this->mpHistoryPlot->append(plot_data.mHistory, title);
 }
 
 void cedar::aux::gui::HistoryPlot0D::doDetach(cedar::aux::ConstDataPtr data)
 {
-  auto new_end = std::remove_if(mCurves.begin(), mCurves.end(), [&](CurveInfoPtr curve_info){
-    return (curve_info->mData == data);
-  });
-  mCurves.erase(new_end, mCurves.end());
-}
-
-//!@cond SKIPPED_DOCUMENTATION
-void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
-{
-  for (size_t curve_index = 0; curve_index < this->mpPlot->mCurves.size(); ++curve_index)
+  for (auto iter = mPlotData.begin(); iter != mPlotData.end(); )
   {
-    cedar::aux::gui::HistoryPlot0D::CurveInfoPtr curve = this->mpPlot->mCurves[curve_index];
-
-    // update x value
-    using namespace cedar::unit;
-    Time time_quantity = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
-    unsigned int time = static_cast<unsigned int>(time_quantity / Time(1.0 * milli * second));
-
-    curve->mXValues.push_back(time);
-
-    while (curve->mXValues.size() > this->mpPlot->mMaxHistorySize)
+    if (iter->mData == data)
     {
-      curve->mXValues.pop_front();
+      this->mpHistoryPlot->detach(iter->mHistory);
+      iter = mPlotData.erase(iter);
     }
-
-    // update y value
-    curve->mYValues.push_back(this->mpPlot->getDataValue(curve_index));
-
-    while (curve->mYValues.size() > this->mpPlot->mMaxHistorySize)
+    else
     {
-      curve->mYValues.pop_front();
+      ++iter;
     }
-
-    // convert the x values to now - time
-    curve->mXArray.resize(curve->mXValues.size());
-    for (size_t i = 0; i < curve->mXValues.size(); ++i)
-    {
-      curve->mXArray.at(i) = static_cast<double>(curve->mXValues.at(i) - time)/1000.0;
-    }
-    curve->mYArray.assign(curve->mYValues.begin(), curve->mYValues.end());
-
-    CEDAR_DEBUG_ASSERT(curve->mXValues.size() == curve->mYValues.size());
-    CEDAR_DEBUG_ASSERT(curve->mXArray.size() == curve->mYArray.size());
   }
-
-  emit done();
-}
-//!@endcond
-
-void cedar::aux::gui::HistoryPlot0D::conversionDone()
-{
-  double x_min = std::numeric_limits<double>::max(), x_max = 1.0;
-  for (size_t curve_index = 0; curve_index < this->mCurves.size(); ++curve_index)
-  {
-    CurveInfoPtr curve = this->mCurves[curve_index];
-
-    x_min = std::min(x_min, curve->mXArray.front());
-    x_max = std::max(x_max, curve->mXArray.back());
-
-    // choose the right function depending on the qwt version
-#if (QWT_VERSION >= 0x060000)
-    curve->mCurve->setRawSamples
-    (
-      &curve->mXArray.front(),
-      &curve->mYArray.front(),
-      static_cast<int>(curve->mXValues.size())
-    );
-#elif (QWT_VERSION >= 0x050000)
-    curve->mCurve->setData
-    (
-      &curve->mXArray.front(),
-      &curve->mYArray.front(),
-      static_cast<int>(curve->mXValues.size())
-    );
-#else
-#error unsupported qwt version
-#endif
-  }
-
-  this->mpPlot->setAxisScale(QwtPlot::xBottom, x_min, x_max);
-
-  this->mpPlot->replot();
 }
 
 void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
@@ -491,7 +293,7 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
     return;
   }
 
-  emit convert();
+  this->advanceHistory();
 }
 
 #endif // CEDAR_USE_QWT

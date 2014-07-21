@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -85,6 +85,13 @@ elseif(CEDAR_HOME_INSTALLED)
   # includes and libraries of external dependencies
   include("${CEDAR_HOME_INSTALLED}/share/cedar/cedar_configuration.cmake")
 endif(CEDAR_HOME)
+
+# find OpenCV -- this is necessary because the opencv script sets some internal things (on windows)
+set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
+find_package(OpenCV REQUIRED)
+if (NOT OpenCV_FOUND)
+  message("Could not find opencv. You may experience problems linking to this library.")
+endif ()
 
 ## Macros ########################
 
@@ -180,7 +187,7 @@ macro(cedar_project_add_target)
   else (MSVC)
     target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn)
   endif(MSVC)
-    target_link_libraries(${target_name} ${CEDAR_EXTERNAL_LIBS})
+  target_link_libraries(${target_name} ${CEDAR_EXTERNAL_LIBS})
   
   foreach (dependency ${add_DEPENDS_ON})
     cedar_project_depends_on(${target_name} DEPENDS_ON ${dependency})

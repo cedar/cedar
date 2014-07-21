@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -218,6 +218,28 @@ namespace cedar
       return result;
     }
 
+    /*!@brief Function that checks whether a string starts with a given one.
+     *
+     * @returns True, if string starts with startsWith, false otherwise.
+     */
+    inline bool startsWith(const std::string& string, const std::string& startsWith)
+    {
+      if (string.length() < startsWith.length())
+      {
+        return false;
+      }
+
+      for (size_t i = 0; i < startsWith.size(); ++i)
+      {
+        if (string.at(i) != startsWith.at(i))
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     /*!@brief Function that checks whether a string ends with a given one.
      *
      * @returns True, if string ends with endsWith, false otherwise.
@@ -268,6 +290,10 @@ namespace cedar
     {
       return replace(haystack, needle, "");
     }
+
+    /*! Returns a copy of the given string that has no more white spaces
+     */
+    std::string removeWhiteSpaces(const std::string& stringFromWhichToRemoveWhiteSpaces);
 
     /*!@brief Template function that converts an STL string to a simple data type.
      *
@@ -340,6 +366,17 @@ namespace cedar
         {
           return -std::numeric_limits<double>::infinity();
         }
+        else if (string == "nan" || string == "-nan")
+        {
+          if (std::numeric_limits<double>::has_quiet_NaN)
+          {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
+          else
+          {
+            return std::numeric_limits<double>::signaling_NaN();
+          }
+        }
         else
         {
           CEDAR_THROW
@@ -369,6 +406,17 @@ namespace cedar
         else if (string == "-inf" || string == "-1.#INF" )
         {
           return -std::numeric_limits<float>::infinity();
+        }
+        else if (string == "nan" || string == "-nan")
+        {
+          if (std::numeric_limits<float>::has_quiet_NaN)
+          {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+          else
+          {
+            return std::numeric_limits<float>::signaling_NaN();
+          }
         }
         else
         {

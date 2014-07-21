@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -122,6 +122,17 @@ cedar::proc::sources::Picture::~Picture()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::MatDataPtr cedar::proc::sources::Picture::getImage()
+{
+  return this->mImage;
+}
+
+cedar::aux::ConstMatDataPtr cedar::proc::sources::Picture::getImage() const
+{
+  return this->mImage;
+}
+
 void cedar::proc::sources::Picture::setSourceFileName(const std::string& imagePath)
 {
   this->getPictureGrabber()->setSourceFile(imagePath);

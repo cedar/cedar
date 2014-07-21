@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 
@@ -43,25 +44,28 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::EnumParameter::EnumParameter(cedar::aux::Configurable *pOwner,
-                                         const std::string& name,
-                                         boost::shared_ptr<cedar::aux::EnumBase> enumBase)
+cedar::aux::EnumParameter::EnumParameter
+(
+  cedar::aux::Configurable *pOwner,
+  const std::string& name,
+  cedar::aux::EnumBasePtr enumBase,
+  cedar::aux::EnumId defaultValue
+)
 :
-cedar::aux::Parameter(pOwner, name, false),
-mEnumDeclaration(enumBase)
+cedar::aux::EnumParameter::Super(pOwner, name, enumBase->get(defaultValue))
+{
+  this->setEnum(enumBase);
+  this->makeDefault();
+}
+
+cedar::aux::EnumParameterDetails::ValuePolicy::ValuePolicy()
 {
 }
 
-cedar::aux::EnumParameter::EnumParameter(cedar::aux::Configurable *pOwner,
-                                         const std::string& name,
-                                         boost::shared_ptr<cedar::aux::EnumBase> enumBase,
-                                         cedar::aux::EnumId defaultValue)
+cedar::aux::EnumParameterDetails::ValuePolicy::ValuePolicy(const cedar::aux::Enum& value)
 :
-cedar::aux::Parameter(pOwner, name, true),
-mDefault(defaultValue),
-mEnumDeclaration(enumBase)
+mValue(value)
 {
-  this->makeDefault();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +75,7 @@ mEnumDeclaration(enumBase)
 void cedar::aux::EnumParameter::disable(cedar::aux::EnumId value)
 {
   this->mDisabledValues.insert(value);
-  if (!this->isEnabled(this->mValue))
+  if (!this->isEnabled(this->getValue()))
   {
     this->selectFirstEnabled();
   }
@@ -86,7 +90,7 @@ void cedar::aux::EnumParameter::enable(cedar::aux::EnumId value)
   }
 
   // if the current value is one of the disabled ones (this can happen, e.g., if all are disabled) select a new one
-  if (!this->isEnabled(this->mValue))
+  if (!this->isEnabled(this->getValue()))
   {
     this->selectFirstEnabled();
   }
@@ -134,23 +138,10 @@ bool cedar::aux::EnumParameter::isEnabled(cedar::aux::EnumId value) const
   return this->mDisabledValues.find(value) == this->mDisabledValues.end();
 }
 
-cedar::aux::Enum cedar::aux::EnumParameter::getValue() const
-{
-  return this->mEnumDeclaration->get(this->mValue);
-}
-
 void cedar::aux::EnumParameter::setValue(cedar::aux::EnumId enumId, bool lock)
 {
-  if (lock)
-  {
-    this->lockForRead();
-  }
-  this->mValue = enumId;
-  if (lock)
-  {
-    this->unlock();
-  }
-  this->emitChangedSignal();
+  cedar::aux::Enum value = this->getEnumDeclaration().get(enumId);
+  this->cedar::aux::EnumParameter::Super::setValue(value, lock);
 }
 
 void cedar::aux::EnumParameter::setValue(const std::string& enumId, bool lock)
@@ -158,19 +149,17 @@ void cedar::aux::EnumParameter::setValue(const std::string& enumId, bool lock)
   this->setValue(this->mEnumDeclaration->get(enumId), lock);
 }
 
-void cedar::aux::EnumParameter::readFromNode(const cedar::aux::ConfigurationNode& root)
+void cedar::aux::EnumParameterDetails::ValuePolicy::setEnum(cedar::aux::EnumBasePtr enumDeclaration)
 {
-  this->mValue = mEnumDeclaration->get(root.get_value<std::string>());
-  this->emitChangedSignal();
+  this->mEnumDeclaration = enumDeclaration;
 }
 
-void cedar::aux::EnumParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
+std::string cedar::aux::EnumParameterDetails::ValuePolicy::getValuePrivate() const
 {
-  root.put(this->getName(), this->getValue().name());
+  return this->mValue.name();
 }
 
-void cedar::aux::EnumParameter::makeDefault()
+void cedar::aux::EnumParameterDetails::ValuePolicy::setValuePrivate(const ReadType& value)
 {
-  this->mValue = this->mDefault;
-  this->emitChangedSignal();
+  this->mValue = this->mEnumDeclaration->get(value);
 }

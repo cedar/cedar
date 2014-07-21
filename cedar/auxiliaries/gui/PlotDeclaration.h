@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -148,13 +148,12 @@ public:
 
   void declare() const
   {
-    try
+    if (cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->canFind<DataType>())
     {
-      std::vector<cedar::aux::gui::ConstPlotDeclarationPtr>& declarations =
-        cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
+      auto& declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
       declarations.push_back(this->shared_from_this());
     }
-    catch(cedar::aux::UnknownTypeException&)
+    else
     {
       std::vector<cedar::aux::gui::ConstPlotDeclarationPtr> declarations;
       declarations.push_back(this->shared_from_this());

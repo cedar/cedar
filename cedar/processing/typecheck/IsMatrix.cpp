@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -52,7 +52,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::DataSlot::VALIDITY
-  cedar::proc::typecheck::IsMatrix::check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const
+  cedar::proc::typecheck::IsMatrix::check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data, std::string& info) const
 {
   if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
@@ -61,6 +61,6 @@ cedar::proc::DataSlot::VALIDITY
       return this->validityOk();
     }
   }
-
+  info = "Expected MatData, but got something else.";
   return this->validityBad();
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -289,6 +289,8 @@ private:
   //! slot called when the thread finishes via stop().
   void processStop();
 
+  //! Called when the thread is started and stopped; marks some parameters that cannot be changed at runtime const.
+  void makeParametersConst(bool makeConst);
 
 private slots:
   void modeChanged();
@@ -300,6 +302,9 @@ protected:
 private:
   //! keep our own pointer of the worker. it is guaranteed that it is still valid when we use it in work() and stopStatistics()
   cedar::aux::detail::LoopedThreadWorker* mpWorker;
+
+  boost::signals2::scoped_connection mStartConnection;
+  boost::signals2::scoped_connection mStopConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

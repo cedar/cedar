@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -88,11 +88,16 @@ public:
 
   void emitStepRegisteredinRecorder();
 public slots:
+  //! update the name
   void updateName();
 
 
 signals:
+  //! signal that a new step is registered in recorder
   void stepRegisteredinRecorder();
+
+  //! signal that the settings changed
+  void settingsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
