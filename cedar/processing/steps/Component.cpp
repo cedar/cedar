@@ -99,10 +99,8 @@ void cedar::proc::steps::Component::onStart()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
-    //!@todo Stop io thread here
-//    component->startIO();
+    component->startDevice();
   }
-
 }
 
 void cedar::proc::steps::Component::onStop()
@@ -111,10 +109,8 @@ void cedar::proc::steps::Component::onStop()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
-    //!@todo Start io thread here
-//    component->stopIO();
+    component->stopDevice();
   }
-
 }
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
@@ -147,6 +143,30 @@ void cedar::proc::steps::Component::componentChanged()
 {
   //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
   this->removeAllDataSlots();
+
+  if (!this->hasComponent())
+  {
+    return;
+  }
+
+  auto component = this->getComponent();
+  auto measurements = component->getInstalledMeasurementTypes();
+
+  for (const auto& measurement : measurements)
+  {
+    std::string name = cedar::aux::toString(measurement);
+    auto data = component->getDeviceMeasurementData(measurement);
+    this->declareOutput(name, data);
+  }
+
+  // list of data types
+//  static std::vector<cedar::dev::Component::DataType> types;
+//  if (types.empty())
+//  {
+//    types.push_back(cedar::dev::Component::COMMANDED);
+//    types.push_back(cedar::dev::Component::MEASURED);
+//  }
+
 
   //!@todo Reimplement
   /*

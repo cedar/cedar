@@ -50,6 +50,13 @@
 #include <vector>
 #include <string>
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::dev::Component::ComponentDataType cedar::dev::kteam::InfraredSensorSerial::M_IR_VALUES_ID = 0;
+
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
 //----------------------------------------------------------------------------------------------------------------------
@@ -75,7 +82,9 @@ cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial()
 _mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N")),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
 {
-  //!@todo this has to be fixed
+  this->installMeasurementType(M_IR_VALUES_ID);
+  this->setMeasurementDimensionality(M_IR_VALUES_ID, 8);
+  this->registerDeviceMeasurementHook(M_IR_VALUES_ID, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
 //  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
 }
 
@@ -92,10 +101,10 @@ cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
   return mValues->getData();
 }
 
-void cedar::dev::kteam::InfraredSensorSerial::updateIrValues()
+cv::Mat cedar::dev::kteam::InfraredSensorSerial::updateIrValues()
 {
   // the left and right encoder value will be saved in this vector
-  cv::Mat& infrared_values = this->mValues->getData();
+  cv::Mat infrared_values = cv::Mat::zeros(8, 1, CV_32F); //= this->mValues->getData();
 
   // cast the channel into a serial channel
   cedar::dev::kteam::SerialChannelPtr serial_channel = convertToSerialChannel(getChannel());
@@ -127,4 +136,6 @@ void cedar::dev::kteam::InfraredSensorSerial::updateIrValues()
     "Received infrared values"
   );
 #endif // DEBUG_VERBOSE
+
+  return infrared_values;
 }
