@@ -489,7 +489,7 @@ std::cout << "ERROR: reregistering transformation hook measurment from " << from
 
   }
 
-  void cedar::dev::Component::stepDevice(double time)
+  void cedar::dev::Component::stepDevice(cedar::unit::Time time)
   {
     // its important to get the currently scheduled commands out first
     // (think safety first). this assumes serial communication, of course
@@ -497,7 +497,7 @@ std::cout << "ERROR: reregistering transformation hook measurment from " << from
     stepDeviceMeasurements(time); // note, the post-measurements transformations also take time
   }
 
-  void cedar::dev::Component::stepDeviceCommands(double)
+  void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   {
 #if 1
     // todo: check locking in this function, forgot some stuff ...
@@ -600,7 +600,7 @@ std::cout << "ERROR: reregistering transformation hook measurment from " << from
   }
 
   // update the Device Cache
-void cedar::dev::Component::stepDeviceMeasurements(double)
+void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
 {
   std::vector< ComponentDataType > types_to_transform;
   std::vector< ComponentDataType > types_we_measured;;
@@ -925,7 +925,7 @@ void cedar::dev::Component::processStart()
 
 
   // todo: test that mUserCommands is empty!
-
+  cedar::unit::Time time = 0.0 * cedar::unit::seconds;
   if (!mInitialUserSubmittedCommands.member().empty())
   {
      // do as if the initial user command was the user command
@@ -933,10 +933,10 @@ void cedar::dev::Component::processStart()
      
      mUserCommandBuffer.member() = mInitialUserSubmittedCommands.member();
      lock1.unlock();
-     stepDeviceCommands(0.0);
+     stepDeviceCommands(time);
   }
 
   // get measurements (blocking!) when the thread is started ...
-  stepDeviceMeasurements(0.0);
+  stepDeviceMeasurements(time);
 }
 
