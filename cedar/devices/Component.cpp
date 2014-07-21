@@ -193,14 +193,6 @@ mChannel(channel)
       boost::bind(&cedar::dev::Component::resetDeviceCommandBufferUnlocked, this, _1),
       type
     );
-//    auto found = mDeviceSubmittedCommands.member().find(type);
-//
-//    if (found == mDeviceSubmittedCommands.member().end()
-//        || found->second->getData().empty())
-//    {
-//      // cast away const for lazy init to work
-//      resetDeviceCommandBufferUnlocked(type);
-//    }
   }
 
   void cedar::dev::Component::resetUserMeasurementBufferUnlocked(ComponentDataType type)
@@ -225,18 +217,6 @@ mChannel(channel)
       boost::bind(&cedar::dev::Component::resetUserMeasurementBufferUnlocked, this, _1),
       type
     );
-//    auto found = mUserMeasurementsBuffer.member().find(type);
-//
-//  // problem: NEED to initialize with correct value!
-//    if (found == mUserMeasurementsBuffer.member().end()
-//        || found->second.empty())
-//    {
-//  // TODO: throw!
-//
-//      // lazy initialization
-//      // cast away const for lazy init to work
-//      resetUserMeasurementBufferUnlocked(type);
-//    }
   }
 
   void cedar::dev::Component::resetPreviousDeviceMeasurementBufferUnlocked(ComponentDataType type)
@@ -261,18 +241,6 @@ mChannel(channel)
       boost::bind(&cedar::dev::Component::resetPreviousDeviceMeasurementBufferUnlocked, this, _1),
       type
     );
-//    auto found = mPreviousDeviceMeasurementsBuffer.member().find(type);
-//
-//  // problem: NEED to initialize with correct value!
-//    if (found == mPreviousDeviceMeasurementsBuffer.member().end()
-//        || found->second.empty())
-//    {
-//  // TODO: throw!
-//
-//      // lazy initialization
-//      // cast away const for lazy init to work
-//      resetPreviousDeviceMeasurementBufferUnlocked(type);
-//    }
   }
 
 
@@ -302,14 +270,6 @@ mChannel(channel)
       boost::bind(&cedar::dev::Component::resetDeviceMeasurementBufferUnlocked, this, _1),
       type
     );
-//    auto found = mDeviceRetrievedMeasurements.member().find(type);
-//
-//    if (found == mDeviceRetrievedMeasurements.member().end()
-//        || found->second.empty())
-//    {
-//      // cast away const for lazy init to work
-//      resetDeviceMeasurementBufferUnlocked(type);
-//    }
   }
 
   void cedar::dev::Component::installCommandType(ComponentDataType type)
@@ -335,6 +295,7 @@ mChannel(channel)
   {
     {
       //!@todo As this isn't locked in a canonical lock order, this may lead to deadlocks; use cedar::aux::Lockable?
+      //!@todo This can be done using cedar::aux::LockSet, but we must write a LockSetLocker first
       QWriteLocker lock2(mUserMeasurementsBuffer.getLockPtr());
       QWriteLocker lock2b(mPreviousDeviceMeasurementsBuffer.getLockPtr());
       QWriteLocker lock4(mDeviceRetrievedMeasurements.getLockPtr());
@@ -693,8 +654,8 @@ void cedar::dev::Component::updateUserMeasurements()
   QWriteLocker lock2(mUserMeasurementsBuffer.getLockPtr());
   QWriteLocker lock3(mDeviceRetrievedMeasurements.getLockPtr());
 
+  // todo: are these really deep copies? -> no, mDeviceRetrievedMeasurements contains data ptrs
   mPreviousDeviceMeasurementsBuffer.member() = mUserMeasurementsBuffer.member();
-    // todo: is this really a deep copy?
   mUserMeasurementsBuffer.member() = mDeviceRetrievedMeasurements.member();
   //!@todo What was the purpose of this clear? reimplement
 //  mDeviceRetrievedMeasurements.member().clear();
@@ -707,7 +668,15 @@ void cedar::dev::Component::updateUserMeasurements()
 
 void cedar::dev::Component::startDevice()
 {
-  // todo: warn if no measurements and no commands are set:wu
+  if (this->mInstalledCommandTypes.empty() && this->mInstalledMeasurementTypes.empty())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "No commands or measurements set in device",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
+
   mDeviceThread->start();
 }
 
