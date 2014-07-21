@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -49,7 +49,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@breif Type check for a slot that is a collection of matrices of the same size.
+/*!@brief Type check for a slot that is a collection of matrices of the same size.
  */
 class cedar::proc::typecheck::SameSizedCollection : public cedar::proc::typecheck::TypeCheck
 {
@@ -61,13 +61,19 @@ class cedar::proc::typecheck::SameSizedCollection : public cedar::proc::typechec
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  SameSizedCollection(bool allow0D = false);
+  /*! The constructor.
+   *
+   * @param allow0D Allow 0D inputs, regardless of the size of the other data in the slot.
+   * @param allow1DTranspositions If some of the data in the slot has the size 1xN, while other data has size Nx1, the
+   *                              check would normally reject this data. This behavior can be changed with this flag.
+   */
+  SameSizedCollection(bool allow0D = false, bool allow1DTranspositions = false);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
+  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data, std::string& info) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,6 +95,7 @@ protected:
 private:
   bool mAllow0D;
 
+  bool mAllow1DTranspositions;
 }; // class cedar::proc::typecheck::SameSizedCollection
 
 #endif // CEDAR_PROC_TYPECHECK_SAME_SIZED_COLLECTION_H

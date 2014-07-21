@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -68,7 +68,8 @@ namespace cedar
 CEDAR_AUX_SINGLETON(ParameterFactoryManager);
 CEDAR_AUX_SINGLETON(ParameterDeclarationManager);
 
-
+/*! Declaration used for exposing parameters to cedar's plugin system.
+ */
 template <typename ParameterTypePtr>
 class cedar::aux::ParameterDeclaration
 :

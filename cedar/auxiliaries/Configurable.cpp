@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -163,9 +163,9 @@ void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType) co
   cedar::aux::lock(this->mParameterLocks, lockType);
 }
 
-void cedar::aux::Configurable::unlockParameters() const
+void cedar::aux::Configurable::unlockParameters(cedar::aux::LOCK_TYPE lockType) const
 {
-  cedar::aux::unlock(this->mParameterLocks);
+  cedar::aux::unlock(this->mParameterLocks, lockType);
 }
 
 void cedar::aux::Configurable::updateLockSet()
@@ -313,6 +313,72 @@ cedar::aux::ConstParameterPtr cedar::aux::Configurable::getParameter(const std::
     CEDAR_THROW(cedar::aux::UnknownNameException, "Parameter \"" + path + "\" was not found.");
   }
   return *(iter->second);
+}
+
+
+std::string cedar::aux::Configurable::findParameterPath(cedar::aux::ParameterPtr findParameter) const
+{
+  // first, check if the parameter belongs to this configurable
+  if (findParameter->getOwner() == this)
+  {
+    return findParameter->getName();
+  }
+
+  // then, check if it belongs to any of the children of this
+  for (auto name_child_pair : this->mChildren)
+  {
+    const auto& child_name = name_child_pair.first;
+    const auto& child = name_child_pair.second;
+
+    try
+    {
+      std::string subpath = child->findParameterPath(findParameter);
+      return child_name + "." + subpath;
+    }
+    catch (cedar::aux::NotFoundException)
+    {
+      // ok, keep looking
+    }
+  }
+
+  //!@todo All these special cases for object (list) parameters should be solved with a common interface
+  // check if it is part of an object parameter
+  for (auto parameter : this->mParameterList)
+  {
+    if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+    {
+      auto child = object_parameter->getConfigurable();
+
+      try
+      {
+        std::string subpath = child->findParameterPath(findParameter);
+        return object_parameter->getName() + "." + subpath;
+      }
+      catch (cedar::aux::NotFoundException)
+      {
+        // ok, keep looking
+      }
+    }
+    else if (auto object_list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+    {
+      for (size_t i = 0; i < object_list_parameter->size(); ++i)
+      {
+        auto child = object_list_parameter->configurableAt(i);
+
+        try
+        {
+          std::string subpath = child->findParameterPath(findParameter);
+          return object_list_parameter->getName() + "[" + cedar::aux::toString(i) + "]." + subpath;
+        }
+        catch (cedar::aux::NotFoundException)
+        {
+          // ok, keep looking
+        }
+      }
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::NotFoundException, "Could not locate parameter \"" + findParameter->getName() + "\".");
 }
 
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -71,6 +71,10 @@ void cedar::proc::typecheck::Matrix::addAcceptedDimensionalityRange(unsigned int
   }
 }
 
+void cedar::proc::typecheck::Matrix::addAcceptedNumberOfChannels(unsigned int numberOfChannels)
+{
+  this->mAcceptedNumberOfChannels.push_back(numberOfChannels);
+}
 
 void cedar::proc::typecheck::Matrix::addAcceptedType(int type)
 {
@@ -83,7 +87,7 @@ void cedar::proc::typecheck::Matrix::acceptsEmptyMatrix(bool accepts)
 }
 
 cedar::proc::DataSlot::VALIDITY
-  cedar::proc::typecheck::Matrix::check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const
+  cedar::proc::typecheck::Matrix::check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data, std::string& info) const
 {
   if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
@@ -95,6 +99,7 @@ cedar::proc::DataSlot::VALIDITY
       }
       else
       {
+        info = "Got an empty matrix, but cannot handle empty matrices.";
         return this->validityBad();
       }
     }
@@ -110,6 +115,7 @@ cedar::proc::DataSlot::VALIDITY
     }
     if (!type_ok)
     {
+      info = "Cannot handle this matrix type.";
       return this->validityBad();
     }
 
@@ -124,11 +130,28 @@ cedar::proc::DataSlot::VALIDITY
     }
     if (!dim_ok)
     {
+      info = "Cannot handle this dimensionality.";
+      return this->validityBad();
+    }
+
+    bool channel_ok = this->mAcceptedNumberOfChannels.empty(); // if empty, everything is accepted
+    for (size_t i = 0; i < this->mAcceptedNumberOfChannels.size(); ++i)
+    {
+      if (static_cast<unsigned int>(mat_data->getData().channels()) == this->mAcceptedNumberOfChannels.at(i))
+      {
+        channel_ok = true;
+        break;
+      }
+    }
+    if (!channel_ok)
+    {
+      info = "Cannot handle this amount of channels.";
       return this->validityBad();
     }
 
     return this->validityOk();
   }
 
+  info = "Expected MatData, but got something else.";
   return this->validityBad();
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -61,8 +61,6 @@
 #endif // CEDAR_COMPILER_GCC
 #include <iostream>
 
-#define CATCH_EXCEPTIONS_IN_GUI
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +69,8 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 :
 QApplication(argc, argv),
 mpIde (NULL),
-mLastExceptionType(NONE)
+mLastExceptionType(NONE),
+mCatchExceptions(true)
 {
   QStringList args = QCoreApplication::arguments();
 
@@ -90,11 +89,20 @@ mLastExceptionType(NONE)
     'l'
   );
 
+  parser.defineFlag
+  (
+    "dont-catch-exceptions",
+    "When specified, unhandled exceptions will not be caught by the gui. This means that such an exception will crash "
+    "the program. Helpful for debugging.",
+    'e'
+  );
+
   parser.parse(argc, argv);
   parser.writeSummary();
 
   bool no_plugins = parser.hasParsedFlag("no-plugins");
   bool no_log_redirect = parser.hasParsedFlag("no-log");
+  this->mCatchExceptions = !parser.hasParsedFlag("dont-catch-exceptions");
 
   this->mpIde = new cedar::proc::gui::Ide(!no_plugins, !no_log_redirect);
 
@@ -223,43 +231,44 @@ void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
 bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent)
 {
   //!@todo Make this flag a setting?
-#ifdef CATCH_EXCEPTIONS_IN_GUI
-  try
+  if (this->mCatchExceptions)
   {
-#endif // CATCH_EXCEPTIONS_IN_GUI
+    try
+    {
+      return QApplication::notify(pReceiver,pEvent);
+    }
+    catch(const cedar::aux::ExceptionBase& e)
+    {
+      QWriteLocker locker(&mLastExceptionInfoLock);
+      this->mLastCedarException = e;
+      this->mLastExceptionType = CEDAR_EXCEPTION;
+      locker.unlock();
 
+      emit showExceptionDialogSignal();
+    }
+    catch(const std::exception& e)
+    {
+      QWriteLocker locker(&mLastExceptionInfoLock);
+      this->mLastStdExceptionWhat = e.what();
+      this->mLastStdExceptionType = cedar::aux::unmangleName(typeid(e));
+      this->mLastExceptionType = STD_EXCEPTION;
+      locker.unlock();
+
+      emit showExceptionDialogSignal();
+    }
+    catch(...)
+    {
+      QWriteLocker locker(&mLastExceptionInfoLock);
+      this->mLastExceptionType = UNKNOWN_EXCEPTION;
+      locker.unlock();
+
+      emit showExceptionDialogSignal();
+    }
+  }
+  else // this->mCatchExceptions
+  {
     return QApplication::notify(pReceiver,pEvent);
-
-#ifdef CATCH_EXCEPTIONS_IN_GUI
   }
-  catch(const cedar::aux::ExceptionBase& e)
-  {
-    QWriteLocker locker(&mLastExceptionInfoLock);
-    this->mLastCedarException = e;
-    this->mLastExceptionType = CEDAR_EXCEPTION;
-    locker.unlock();
-
-    emit showExceptionDialogSignal();
-  }
-  catch(const std::exception& e)
-  {
-    QWriteLocker locker(&mLastExceptionInfoLock);
-    this->mLastStdExceptionWhat = e.what();
-    this->mLastStdExceptionType = cedar::aux::unmangleName(typeid(e));
-    this->mLastExceptionType = STD_EXCEPTION;
-    locker.unlock();
-
-    emit showExceptionDialogSignal();
-  }
-  catch(...)
-  {
-    QWriteLocker locker(&mLastExceptionInfoLock);
-    this->mLastExceptionType = UNKNOWN_EXCEPTION;
-    locker.unlock();
-
-    emit showExceptionDialogSignal();
-  }
-#endif // CATCH_EXCEPTIONS_IN_GUI
   return false;
 }
 

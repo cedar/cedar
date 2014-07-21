@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -48,16 +48,15 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
   {
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
+    //!@endcond
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_AUX_THREAD_WRAPPER_FWD_H
 

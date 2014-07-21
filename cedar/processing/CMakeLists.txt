@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -50,22 +50,28 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
+  gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
+  gui/Connectable.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
+  gui/FindDialog.h
+  gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
+  gui/PlotWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
   gui/RecorderWidget.h
   gui/RecorderProperty.h
   gui/Scene.h
+  gui/Settings.h
   gui/SettingsDialog.h
   gui/StepItem.h
   gui/TriggerItem.h
-  gui/Network.h
+  gui/Group.h
   gui/ToolBox.h
   gui/View.h
   sources/BoxInput.h
@@ -84,6 +90,7 @@ cedar_add_library(cedarproc
   steps/StaticGain.h
   steps/UnitConverter.h
   steps/Histogram.h
+  steps/ScalarDivision.h
   steps/Threshold.h
   steps/TransferFunction.h
   sources/Boost.h
@@ -94,7 +101,7 @@ cedar_add_library(cedarproc
   sources/Camera.h
   steps/Projection.h
   steps/Resize.h
-  Network.h
+  Group.h
   Step.h
   LoopedTrigger.h
   ${libdc_moc_headers}

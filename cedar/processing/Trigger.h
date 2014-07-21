@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -45,11 +45,14 @@
 #include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/GraphTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/sources/GroupSource.fwd.h"
+#include "cedar/processing/sinks/GroupSink.fwd.h"
 #include "cedar/auxiliaries/GraphTemplate.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
-#include "cedar/processing/Manager.fwd.h"
+#include "cedar/processing/Step.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -70,10 +73,10 @@ class cedar::proc::Trigger : public cedar::proc::Element,
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::Manager;
-  friend class cedar::proc::Network;
+  friend class cedar::proc::Group;
   friend class cedar::proc::TriggerConnection;
   friend class cedar::proc::Triggerable;
+  friend class cedar::proc::Step;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -110,6 +113,12 @@ public:
   //!@brief saves a configuration to a ConfigurationNode
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
+  //!@brief returns the owner of this trigger (used mainly for processing done triggers)
+  cedar::proc::Triggerable* getOwner() const
+  {
+    return this->mpOwner;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -140,7 +149,10 @@ private:
    *
    * @todo Describe this properly.
    */
-  void updateTriggeringOrder(bool recurseUp = true, bool recurseDown = true);
+  void updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp = true, bool recurseDown = true);
+
+  //! Updates the triggering order of the source recursively, going upwards the triggering chains.
+  void updateTriggeringOrderRecurseUpSource(cedar::proc::sources::GroupSource* source, std::set<cedar::proc::Trigger*>& visited);
 
   void setOwner(cedar::proc::Triggerable* owner)
   {
@@ -148,6 +160,34 @@ private:
   }
 
   void buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph);
+
+  void explore
+  (
+    cedar::proc::TriggerablePtr source,
+    cedar::proc::TriggerPtr trigger,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& toExplore,
+    bool sourceIsTrigger,
+    std::set<cedar::proc::TriggerablePtr>& explored
+  );
+
+  void exploreSink
+  (
+    cedar::proc::TriggerablePtr source,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
+    cedar::proc::sinks::GroupSinkPtr startSink,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& to_explore
+  );
+
+  void exploreGroupTarget
+  (
+    cedar::proc::TriggerablePtr source,
+    cedar::proc::GroupPtr listener_group,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>::NodePtr sourceNode,
+    cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph,
+    std::vector<cedar::proc::TriggerablePtr>& to_explore
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

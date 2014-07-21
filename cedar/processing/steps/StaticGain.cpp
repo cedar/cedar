@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -122,16 +122,31 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-  if(!this->mInput)
+  bool output_changed = false;
+  if (!this->mInput)
   {
-    return;
+    this->mOutput->setData(cv::Mat());
+    output_changed = true;
+  }
+  else
+  {
+    // Let's get a reference to the input matrix.
+    const cv::Mat& input = this->mInput->getData();
+
+    // check if the input is different from the output
+    if (input.type() != this->mOutput->getData().type() || input.size != this->mOutput->getData().size)
+    {
+      output_changed = true;
+    }
+
+    // Make a copy to create a matrix of the same type, dimensions, ...
+    this->mOutput->setData(input.clone());
+
+    this->mOutput->copyAnnotationsFrom(this->mInput);
   }
 
-  // Let's get a reference to the input matrix.
-  const cv::Mat& input = this->mInput->getData();
-  // Make a copy to create a matrix of the same type, dimensions, ...
-  this->mOutput->setData(input.clone());
-
-  this->mOutput->copyAnnotationsFrom(this->mInput);
-  this->emitOutputPropertiesChangedSignal("output");
+  if (output_changed)
+  {
+    this->emitOutputPropertiesChangedSignal("output");
+  }
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -202,6 +202,7 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     }
 
     this->mOutput->copyAnnotationsFrom(this->mMatrix);
+    //!@todo This is only correct when the mode of the convolution is "same:
     this->mOutput->setData(this->mMatrix->getData().clone());
 
     this->inputDimensionalityChanged();

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -82,6 +82,10 @@ public:
 
   //!@brief Check if the given data can be detached from the plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
+
+  void writeConfiguration(cedar::aux::ConfigurationNode& configuration) const;
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

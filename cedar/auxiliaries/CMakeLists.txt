@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -41,7 +41,7 @@ else(CEDAR_USE_VTK)
 endif(CEDAR_USE_VTK)
 
 if (CEDAR_USE_QWT)
-  set(qwt_moc_files gui/HistoryPlot0D.h gui/QwtLinePlot.h gui/MatrixVectorPlot.h)
+  set(qwt_moc_files gui/QwtLinePlot.h gui/MatrixVectorPlot.h)
 else(CEDAR_USE_QWT)
   set(qwt_moc_files "")
 endif(CEDAR_USE_QWT)
@@ -103,6 +103,7 @@ cedar_add_library(cedaraux
   gui/ResourceDialog.h
   gui/SceneWidget.h
   gui/StringParameter.h
+  gui/StringVectorParameter.h
   gui/ThreadedPlot.h
   gui/TimeParameter.h
   gui/UIntParameter.h
@@ -117,6 +118,9 @@ cedar_add_library(cedaraux
   convolution/KernelList.h
   convolution/Engine.h
   Parameter.h
+  Settings.h
+  ParameterLink.h
+  EquationParameterLink.h
   kernel/Separable.h
   kernel/Kernel.h
   kernel/Gauss.h

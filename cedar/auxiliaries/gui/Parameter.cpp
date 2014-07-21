@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -68,6 +68,11 @@ cedar::aux::gui::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::aux::gui::Parameter::setReadOnly(bool readOnly)
+{
+  this->setDisabled(readOnly);
+}
+
 void cedar::aux::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParameter)
 {
   // disconnect old slots if a parameter was already set

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -129,13 +129,10 @@ private:
 }; // class cedar::aux::PluginNotFoundException
 
 /*!@brief Exception that occurs when a plugin cannot be loaded.
- *
- * @todo This exception is too generic.
  */
 class cedar::aux::PluginException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::PluginException
-
 
 /*!@brief Exception that occurs when a unique id appears twice.
  */
@@ -171,6 +168,12 @@ class cedar::aux::NoDefaultException : public cedar::aux::ExceptionBase
 /*!@brief Exception that occurs when a name is not valid (e.g. contains special characters).
  */
 class cedar::aux::InvalidNameException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception that occurs when a value is not valid.
+ */
+class cedar::aux::InvalidValueException : public cedar::aux::ExceptionBase
 {
 };
 

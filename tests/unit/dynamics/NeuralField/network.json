@@ -8,18 +8,17 @@
         "cedar.dynamics.NeuralField":
         {
             "name": "Field",
-            "threaded": "false",
             "resting level": "-5",
             "time scale": "100",
             "global inhibition": "-0.01",
-            "dimensionality": "3",
+            "activation as output": "false",
+            "discrete metric (workaround)": "false",
+            "dimensionality": "2",
             "sizes":
             [
                 "20",
-                "20",
                 "20"
             ],
-            "activation as output": "false",
             "input noise gain": "0.1",
             "sigmoid":
             {
@@ -27,10 +26,34 @@
                 "threshold": "0",
                 "beta": "100"
             },
-            "lateral kernels": "",
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "normalize": "true",
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
             "lateral kernel convolution":
             {
-                "borderType": "Zero",
+                "borderType": "Cyclic",
                 "mode": "Same",
                 "engine":
                 {
@@ -39,10 +62,9 @@
             },
             "noise correlation kernel":
             {
-                "dimensionality": "3",
+                "dimensionality": "2",
                 "anchor":
                 [
-                    "0",
                     "0",
                     "0"
                 ],
@@ -50,12 +72,133 @@
                 "sigmas":
                 [
                     "3",
-                    "3",
                     "3"
                 ],
+                "normalize": "true",
                 "shifts":
                 [
                     "0",
+                    "0"
+                ],
+                "limit": "5"
+            }
+        },
+        "cedar.dynamics.NeuralField":
+        {
+            "name": "Field 1",
+            "resting level": "-5",
+            "time scale": "100",
+            "global inhibition": "-0.01",
+            "activation as output": "false",
+            "discrete metric (workaround)": "false",
+            "dimensionality": "2",
+            "sizes":
+            [
+                "20",
+                "20"
+            ],
+            "input noise gain": "0.1",
+            "sigmoid":
+            {
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "100"
+            },
+            "lateral kernels":
+            {
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "normalize": "true",
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                },
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "normalize": "true",
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                },
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "anchor":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "normalize": "true",
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                }
+            },
+            "lateral kernel convolution":
+            {
+                "borderType": "Cyclic",
+                "mode": "Same",
+                "engine":
+                {
+                    "type": "cedar.aux.conv.OpenCV"
+                }
+            },
+            "noise correlation kernel":
+            {
+                "dimensionality": "2",
+                "anchor":
+                [
+                    "0",
+                    "0"
+                ],
+                "amplitude": "0",
+                "sigmas":
+                [
+                    "3",
+                    "3"
+                ],
+                "normalize": "true",
+                "shifts":
+                [
                     "0",
                     "0"
                 ],
@@ -68,14 +211,14 @@
         "cedar.processing.LoopedTrigger":
         {
             "name": "Main Trigger",
-            "step size": "1",
-            "idle time": "0.01",
-            "simulated time": "1",
+            "step size": "0.001 s",
+            "idle time": "1e-05 s",
+            "simulated time": "0.001 s",
             "loop mode": "Fixed",
-            "wait": "true",
             "listeners":
             [
-                "Field"
+                "Field",
+                "Field 1"
             ]
         }
     },
@@ -93,6 +236,15 @@
             "positionY": "272"
         },
         {
+            "type": "step",
+            "step": "Field 1",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "479",
+            "positionY": "235"
+        },
+        {
             "type": "trigger",
             "trigger": "Main Trigger",
             "width": "30",
@@ -100,5 +252,16 @@
             "positionX": "272",
             "positionY": "184"
         }
-    ]
+    ],
+    "ui generic":
+    {
+        "network": "root",
+        "open plots": "",
+        "plot groups": "",
+        "width": "33.578125",
+        "height": "30",
+        "smart mode": "false",
+        "positionX": "-15",
+        "positionY": "-75"
+    }
 }

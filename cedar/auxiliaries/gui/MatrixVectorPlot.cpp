@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -210,7 +210,7 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
 
   size_t line_id = mPlotSeriesVector.size();
 
-  mpLock->lockForWrite();
+  QWriteLocker locker(mpLock);
   mPlotSeriesVector.push_back(plot_series);
 
   plot_series->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
@@ -225,10 +225,10 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
   plot_series->mpCurve = new QwtPlotCurve(title.c_str());
   applyStyle(line_id, plot_series->mpCurve);
 
-  data->lockForRead();
+  QReadLocker data_locker(&data->getLock());
   const cv::Mat& mat = plot_series->mMatData->getData();
   size_t num = cedar::aux::math::get1DMatrixSize(mat);
-  data->unlock();
+  data_locker.unlock();
 
   // skip if the matrix is empty
   if (num == 0)
@@ -247,7 +247,7 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
 #endif
   plot_series->mpCurve->attach(this->mpPlot);
 
-  mpLock->unlock();
+  locker.unlock();
 
   this->startTimer(30);
 }
@@ -290,9 +290,9 @@ void cedar::aux::gui::MatrixVectorPlot::clearMarkers()
 
 void cedar::aux::gui::MatrixVectorPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  mpLock->lockForWrite();
+  QWriteLocker locker(this->mpLock);
   mPlotSeriesVector.clear();
-  mpLock->unlock();
+  locker.unlock();
 
   this->append(data, title);
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -116,6 +116,7 @@ _mInterpolationType(new cedar::aux::EnumParameter(this,
   auto input_slot = this->declareInput("input");
 
   cedar::proc::typecheck::Matrix input_check;
+  input_check.addAcceptedDimensionalityRange(1, 16);
   input_slot->setCheck(input_check);
 
   this->declareOutput("output", mOutput);
@@ -337,8 +338,13 @@ void cedar::proc::steps::Resize::updateOutputMatrixSize()
     sizes.push_back(static_cast<int>(this->_mOutputSize->at(i)));
   }
   cv::Mat new_output_mat = cv::Mat(size, &sizes.at(0), input.type(), cv::Scalar(0));
+  bool changed = (new_output_mat.size != this->mOutput->getData().size || new_output_mat.type() != this->mOutput->getData().type());
   this->mOutput->setData(new_output_mat);
-  this->emitOutputPropertiesChangedSignal("output");
+
+  if (changed)
+  {
+    this->emitOutputPropertiesChangedSignal("output");
+  }
 }
 
 void cedar::proc::steps::Resize::recompute()

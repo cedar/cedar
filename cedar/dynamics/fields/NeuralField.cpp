@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/processing/steps/Sum.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -218,6 +219,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareBuffer("lateral kernel", this->_mLateralKernelConvolution->getCombinedKernel());
   this->declareBuffer("neural noise kernel", this->_mNoiseCorrelationKernelConvolution->getCombinedKernel());
   this->declareBuffer("input sum", mInputSum);
+  this->declareBuffer("noise", this->mInputNoise);
 
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
 
@@ -569,40 +571,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
 void cedar::dyn::NeuralField::updateInputSum()
 {
-  cedar::proc::ExternalDataPtr input_slot = this->getInputSlot("input");
-  cv::Mat& input_sum = this->mInputSum->getData();
-
-  input_sum = cv::Scalar(0);
-
-  // add all inputs to d_u
-  for (size_t i = 0; i < input_slot->getDataCount(); ++i)
-  {
-    cedar::aux::DataPtr input = input_slot->getData(i);
-    if (input)
-    {
-      QReadLocker locker(&input->getLock());
-      cv::Mat& input_mat = input->getData<cv::Mat>();
-
-      unsigned int input_dim = cedar::aux::math::getDimensionalityOf(input_mat);
-      if (input_dim == 0)
-      {
-        input_sum += cedar::aux::math::getMatrixEntry<double>(input_mat, 0, 0);
-      }
-      else
-      {
-        CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, input_sum))
-
-        if (this->getDimensionality() == 1)
-        {
-          input_sum += cedar::aux::math::canonicalRowVector(input_mat);
-        }
-        else
-        {
-          input_sum += input_mat;
-        }
-      }
-    }
-  }
+  cedar::proc::steps::Sum::sumSlot(this->getInputSlot("input"), this->mInputSum->getData(), true);
 }
 
 bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) const

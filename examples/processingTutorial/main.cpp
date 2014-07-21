@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -38,29 +38,29 @@
 
 ======================================================================================================================*/
 
-#include <cedar/processing/Network.h>
+#include <cedar/processing/Group.h>
 #include <cedar/processing/sources/GaussInput.h>
 #include "SimpleSummation.h" // header for the class we have written above
 
 int main(int, char**) // we don't use the arguments here
 {
-  // create a network
-  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  // create a group
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
 
   boost::shared_ptr<SimpleSummation> sum(new SimpleSummation());
-  // This adds the sum step to the network under the name "sum".
-  network->add(sum, "sum");
+  // This adds the sum step to the group under the name "sum".
+  group->add(sum, "sum");
 
   // Gauss inputs
   cedar::proc::sources::GaussInputPtr gauss1(new cedar::proc::sources::GaussInput());
-  network->add(gauss1, "gauss1");
+  group->add(gauss1, "gauss1");
   cedar::proc::sources::GaussInputPtr gauss2(new cedar::proc::sources::GaussInput());
-  network->add(gauss2, "gauss2");
+  group->add(gauss2, "gauss2");
 
   // connect the first gauss to the sum
-  network->connectSlots("gauss1.Gauss input", "sum.operand1");
+  group->connectSlots("gauss1.Gauss input", "sum.operand1");
   // connect the second gauss to the sum
-  network->connectSlots("gauss2.Gauss input", "sum.operand2");
+  group->connectSlots("gauss2.Gauss input", "sum.operand2");
 
   return 0;
 }

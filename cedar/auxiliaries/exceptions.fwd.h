@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -57,6 +57,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
     CEDAR_DECLARE_AUX_CLASS(InvalidPathException);
+    CEDAR_DECLARE_AUX_CLASS(InvalidValueException);
     CEDAR_DECLARE_AUX_CLASS(MalformedConfigurationTreeException);
     CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);

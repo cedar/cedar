@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -70,8 +70,13 @@ class cedar::aux::DataTemplate : public cedar::aux::Data
 public:
   //! The type being stored in this data object.
   typedef T DataType;
+
+  //! The type of this data class.
   typedef cedar::aux::DataTemplate<T> SelfType;
+
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(SelfType);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -116,6 +121,7 @@ public:
     this->mData = data;
   }
 
+  //! Copies the value in this data object from the given data.
   void copyValueFrom(cedar::aux::ConstDataPtr data)
   {
     if (ConstSelfTypePtr self_type_ptr = boost::dynamic_pointer_cast<ConstSelfType>(data))
@@ -128,6 +134,7 @@ public:
     }
   }
 
+  //! Returns a deep copy of this data object.
   cedar::aux::DataPtr clone() const
   {
     return SelfTypePtr(new SelfType(this->getData()));

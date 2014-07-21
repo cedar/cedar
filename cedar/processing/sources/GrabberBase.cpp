@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -52,7 +52,7 @@
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(true),
-mImage(new cedar::aux::MatData(cv::Mat::zeros(3, 4, CV_8UC3))),
+mImage(new cedar::aux::MatData(cv::Mat())),
 mRecording(new cedar::aux::BoolParameter(this, "record", false))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);

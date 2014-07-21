@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -129,7 +129,11 @@ public:
    */
   bool isObjectInstanceOf(BaseClassPtr pointer) const
   {
-    return !!boost::dynamic_pointer_cast<PluginClass>(pointer);
+    if (pointer)
+    {
+      return typeid(PluginClass) == typeid(*pointer);
+    }
+    return false;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

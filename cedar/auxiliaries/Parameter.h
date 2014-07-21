@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -43,7 +43,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/IntrusivePtrBase.h"
+#include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LockerBase.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
@@ -74,6 +76,50 @@ class cedar::aux::Parameter : public QObject, public cedar::aux::IntrusivePtrBas
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::aux::Configurable;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*! An RAII-based read-locker for parameters.
+   *
+   * @see cedar::aux::LockerBase
+   */
+  class ReadLocker : public cedar::aux::LockerBase
+  {
+  public:
+    //! Constructor.
+    ReadLocker(cedar::aux::Parameter* parameter)
+    :
+    cedar::aux::LockerBase
+    (
+      boost::bind(&cedar::aux::Parameter::lockForRead, parameter),
+      boost::bind(&cedar::aux::Parameter::unlock, parameter)
+    )
+    {
+    }
+  };
+  CEDAR_GENERATE_POINTER_TYPES(ReadLocker);
+
+  /*! An RAII-based write-locker for parameters.
+   *
+   * @see cedar::aux::LockerBase
+   */
+  class WriteLocker : public cedar::aux::LockerBase
+  {
+  public:
+    //! Constructor.
+    WriteLocker(cedar::aux::Parameter* parameter)
+    :
+    cedar::aux::LockerBase
+    (
+      boost::bind(&cedar::aux::Parameter::lockForWrite, parameter),
+      boost::bind(&cedar::aux::Parameter::unlock, parameter)
+    )
+    {
+    }
+  };
+  CEDAR_GENERATE_POINTER_TYPES(WriteLocker);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -121,6 +167,12 @@ public:
   bool isHidden() const;
   //!@brief set flag if this parameter is hidden (for GUI)
   void setHidden(bool hide);
+
+  //! Whether the parameter is linked to other parameters.
+  bool isLinked() const;
+
+  //! Sets whether the parameter is linked to other parameters. This shouldn't be called by users.
+  void setLinked(bool linked);
 
   /*!@brief   Marks this parameter as advanced.
    *
@@ -196,6 +248,16 @@ public:
    */
   void addDeprecatedName(const std::string& deprecatedName);
 
+  /*! @brief If possible, copies the value from another parameter into this parameter.
+   *
+   * The default implementation always throws an exception.
+   */
+  virtual void copyValueFrom(cedar::aux::ConstParameterPtr other);
+
+  /*!@brief Checks if this parameter can copy its value from the given one.
+   */
+  virtual bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
+
 public:
   //! Signal that is emitted whenever the name of the parameter changes. The first string is the old name, the second the new one.
   CEDAR_DECLARE_SIGNAL(NameChanged, void(const std::string&, const std::string&));
@@ -252,6 +314,11 @@ private:
 
   //! Flag that indicates whether this parameter is advanced.
   bool mAdvanced;
+
+  bool mIsLinked;
+
+  //! Type of the last lock.
+  mutable cedar::aux::LOCK_TYPE mLastLockType;
 
   //! Lock for the parameter.
   mutable QReadWriteLock* mpLock;

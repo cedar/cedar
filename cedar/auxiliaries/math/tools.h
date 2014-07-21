@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -110,11 +110,6 @@ namespace cedar
       //! Returns the index of the global minimum of a matrix.
       CEDAR_AUX_LIB_EXPORT unsigned int minIndex1D(const cv::Mat matrix);
 
-      //! writes the matrix into the shell properly organized by columns and rows
-      //!\todo rework (template for copy & paste code)
-      //!\todo add log file capability
-      CEDAR_DECLARE_DEPRECATED(CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix));
-
       //!@brief a templated round function
       template <typename T> inline T round(T val)
       {
@@ -175,6 +170,9 @@ namespace cedar
 
       //!@brief Returns a string corresponding to the given matrix's type
       std::string matrixTypeToString(const cv::Mat& matrix);
+
+      //! Converts a string representation, e.g., "CV_32F" to the corresponding type value, e.g., CV_32F
+      int matrixTypeFromString(const std::string& typeStr);
 
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(const cv::Mat& matrix)
@@ -379,9 +377,10 @@ namespace cedar
       template <typename T>
       inline cv::Mat ramp(int mat_type, int size, T lower, T upper)
       {
+        CEDAR_ASSERT(size > 1);
         cv::Mat result(size, 1, mat_type);
         T difference = upper - lower;
-        T step = difference / static_cast<T>(size);
+        T step = difference / static_cast<T>(size - 1);
         int index;
         T value;
         for (index = 0, value = lower; index < size; ++index, value += step)
@@ -409,7 +408,7 @@ namespace cedar
           return false;
         }
 
-        if (dim_a <= 1)
+        if (dim_a == 1)
         {
           unsigned int size_a = get1DMatrixSize(matrixA);
           unsigned int size_b = get1DMatrixSize(matrixB);

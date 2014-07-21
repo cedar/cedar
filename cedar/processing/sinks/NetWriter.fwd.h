@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -48,7 +48,6 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 
 #ifdef CEDAR_USE_YARP
 
@@ -58,14 +57,15 @@ namespace cedar
   {
     namespace sinks
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(NetWriter);
+      //!@endcond
     }
   }
 }
 
 #endif // CEDAR_USE_YARP
 
-//!@endcond
 
 #endif // CEDAR_PROC_SINKS_NET_WRITER_FWD_H
 

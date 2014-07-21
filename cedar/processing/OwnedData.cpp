@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/OwnedData.h"
+#include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
@@ -50,10 +51,11 @@ cedar::proc::OwnedData::OwnedData(
                                    cedar::proc::DataRole::Id role,
                                    const std::string& name,
                                    cedar::proc::Connectable* pParent,
-                                   bool isMandatory
+                                   bool isShared
                                  )
 :
-cedar::proc::DataSlot(role, name, pParent, isMandatory)
+cedar::proc::DataSlot(role, name, pParent, true),
+mIsShared(isShared)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
@@ -69,12 +71,32 @@ cedar::proc::OwnedData::~OwnedData()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::OwnedData::clear()
+cedar::aux::LOCK_TYPE cedar::proc::OwnedData::getLockType() const
 {
-  this->mData.reset();
+  if (this->isShared())
+  {
+    return cedar::aux::LOCK_TYPE_DONT_LOCK;
+  }
+  else
+  {
+    return cedar::aux::LOCK_TYPE_WRITE;
+  }
 }
 
-void cedar::proc::OwnedData::setData(cedar::aux::DataPtr data)
+void cedar::proc::OwnedData::removeDataInternal(cedar::aux::DataPtr data)
+{
+  // should always remove the data actually in this slot.
+  CEDAR_NON_CRITICAL_ASSERT(this->mData == data);
+  this->mData.reset();
+  data->setOwner(NULL);
+}
+
+void cedar::proc::OwnedData::clearInternal()
+{
+  this->removeData(this->mData);
+}
+
+void cedar::proc::OwnedData::setDataInternal(cedar::aux::DataPtr data)
 {
   CEDAR_DEBUG_ASSERT(data);
   // reset validity when the data changes.
@@ -83,7 +105,15 @@ void cedar::proc::OwnedData::setData(cedar::aux::DataPtr data)
     this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   }
 
+  if (this->mData)
+  {
+    this->removeData(this->mData);
+  }
+
   this->mData = data;
+
+  CEDAR_DEBUG_ASSERT(this->mpParent != NULL);
+  this->mData->setOwner(this->mpParent);
 }
 
 cedar::aux::DataPtr cedar::proc::OwnedData::getData()
@@ -94,4 +124,19 @@ cedar::aux::DataPtr cedar::proc::OwnedData::getData()
 cedar::aux::ConstDataPtr cedar::proc::OwnedData::getData() const
 {
   return this->mData;
+}
+
+bool cedar::proc::OwnedData::isShared() const
+{
+  return this->mIsShared;
+}
+
+void cedar::proc::OwnedData::addOutgoingConnection(cedar::proc::DataConnectionPtr newConnection)
+{
+  this->addConnection(newConnection);
+}
+
+void cedar::proc::OwnedData::removeOutgoingConnection(cedar::proc::DataConnectionPtr removedConnection)
+{
+  this->removeConnection(removedConnection);
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -137,8 +137,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! creates a tool tip if the mouse cursor hovers over this object
+  //! creates a tool tip if the mouse cursor hovers over this object and highlights the connections from this slot.
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
+
+  //! Removes the highlighting of the connections from this slot.
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
 signals:
   //! Signal that is emitted whenever the validity of attached connections changes.

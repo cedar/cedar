@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -48,16 +48,15 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace unit
   {
+    //!@cond SKIPPED_DOCUMENTATION
     template <typename DimensionType> struct UnitMatrix;
+    //!@endcond
   }
 }
-
-//!@endcond
 
 #endif // CEDAR_UNIT_UNIT_MATRIX_FWD_H
 

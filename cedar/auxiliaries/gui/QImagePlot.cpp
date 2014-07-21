@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/QImagePlot.h"
+#include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
@@ -53,6 +54,8 @@
 #include <QDoubleSpinBox>
 #include <QPushButton>
 
+
+//!@cond SKIPPED_DOCUMENTATION
 
 //! Widget used for displaying the image.
 class cedar::aux::gui::QImagePlot::ImageDisplay : public QLabel
@@ -76,6 +79,8 @@ public:
   cedar::aux::gui::QImagePlot* mpPlot;
 };
 
+//!@endcond
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,12 +88,15 @@ public:
 cedar::aux::gui::QImagePlot::QImagePlot(QWidget* pParent)
 :
 cedar::aux::gui::ThreadedPlot(pParent),
-mAutoScaling(true),
-mSmoothScaling(true),
-mLegendAvailable(false)
+mLegendAvailable(false),
+mpLegend(nullptr),
+_mSmoothScaling(new cedar::aux::BoolParameter(this, "smooth scaling", true)),
+_mAutoScaling(new cedar::aux::BoolParameter(this, "automatic value scaling", true)),
+_mShowLegend(new cedar::aux::BoolParameter(this, "show legend", false)),
+_mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 0.0, 1.0)),
+_mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGradient::StandardGradients::typePtr(), cedar::aux::ColorGradient::StandardGradients::PlotDefault))
 {
-  this->mpLegend = NULL;
-
+  this->setColorJet(cedar::aux::ColorGradient::getDefaultPlotColorJet());
   auto p_layout = new QHBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
@@ -106,8 +114,33 @@ mLegendAvailable(false)
     this,
     SLOT(updateMinMax(double, double))
   );
+
+  QObject::connect
+  (
+    this->_mShowLegend.get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(showLegendChanged())
+  );
+
+  QObject::connect
+  (
+    this->_mValueLimits.get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(valueLimitsChanged())
+  );
+
+  QObject::connect
+  (
+    this->_mColorJet.get(),
+    SIGNAL(valueChanged()),
+    this,
+    SLOT(colorJetChanged())
+  );
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 {
   this->mpMin = new QLabel("min");
@@ -116,46 +149,103 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
   this->mpMin->setMinimumWidth(35);
   this->mpMax->setMinimumWidth(35);
 
-  auto p_gradient = new QFrame();
-  p_gradient->setSizePolicy(QSizePolicy::Fixed, p_gradient->sizePolicy().verticalPolicy());
-  p_gradient->setFixedWidth(20);
-  p_gradient->setFrameStyle(QFrame::Box);
+  this->mpGradientDisplay = new QFrame();
+  this->mpGradientDisplay->setSizePolicy(QSizePolicy::Fixed, this->mpGradientDisplay->sizePolicy().verticalPolicy());
+  this->mpGradientDisplay->setFixedWidth(20);
+  this->mpGradientDisplay->setFrameStyle(QFrame::Box);
 
-  this->mGradient = QLinearGradient(0, 0, 0, 1);
-  this->mGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-  cedar::aux::gui::QImagePlot::fillColorizationGradient(this->mGradient);
-
-  QPalette palette = p_gradient->palette();
-  palette.setBrush(QPalette::Window, QBrush(this->mGradient));
-  p_gradient->setAutoFillBackground(true);
-  p_gradient->setPalette(palette);
+  this->mpGradientDisplay->setAutoFillBackground(true);
 
   auto p_layout = new QGridLayout();
   p_layout->setContentsMargins(1, 1, 1, 1);
-  p_layout->addWidget(p_gradient, 0, 0, 3, 1);
+  p_layout->addWidget(this->mpGradientDisplay, 0, 0, 3, 1);
   p_layout->addWidget(this->mpMax, 0, 1);
   p_layout->addWidget(this->mpMin, 2, 1);
   p_layout->setColumnStretch(1, 1);
   p_layout->setRowStretch(1, 1);
   this->setLayout(p_layout);
 }
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::QImagePlot::colorJetChanged()
+{
+  auto enum_id = this->_mColorJet->getValue();
+  auto gradient = cedar::aux::ColorGradient::getStandardGradient(enum_id);
+  this->setColorJet(gradient);
+}
+
+void cedar::aux::gui::QImagePlot::setColorJet(cedar::aux::ColorGradientPtr gradient)
+{
+  this->mColorGradient = gradient;
+
+  if (this->mpLegend)
+  {
+    this->mpLegend->setGradient(this->mColorGradient);
+  }
+}
+
+void cedar::aux::gui::detail::QImagePlotLegend::setGradient(cedar::aux::ColorGradientPtr gradient)
+{
+  this->mGradient = QLinearGradient(0, 1, 0, 0);
+  for (auto stop_color_pair : gradient->getStops())
+  {
+    this->mGradient.setColorAt(static_cast<qreal>(stop_color_pair.first), stop_color_pair.second);
+  }
+  this->mGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+
+  QPalette palette = this->mpGradientDisplay->palette();
+  palette.setBrush(QPalette::Window, QBrush(this->mGradient));
+  this->mpGradientDisplay->setPalette(palette);
+}
+
+cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize) const
+{
+  double min = -std::numeric_limits<double>::max(), max = std::numeric_limits<double>::max();
+  if (this->isAutoScaling())
+  {
+    cv::minMaxLoc(toColorize, &min, &max);
+  }
+  else
+  {
+    min = this->_mValueLimits->getLowerLimit();
+    max = this->_mValueLimits->getUpperLimit();
+  }
+  return this->colorizeMatrix
+  (
+    toColorize,
+    !this->isAutoScaling(),
+    min,
+    max
+  );
+}
+
+cv::Mat cedar::aux::gui::QImagePlot::colorizeMatrix(const cv::Mat& toColorize, bool applyLimits, double min, double max) const
+{
+  return this->mColorGradient->applyTo
+  (
+    toColorize,
+    applyLimits,
+    min,
+    max
+  );
+}
+
 void cedar::aux::gui::QImagePlot::setAutomaticScaling()
 {
-  this->mAutoScaling = true;
+  this->_mAutoScaling->setValue(true);
 }
 
 void cedar::aux::gui::QImagePlot::setLimits(double min, double max)
 {
   this->updateMinMax(min, max);
 
-  this->mValueLimits.setLower(min);
-  this->mValueLimits.setUpper(max);
-  this->mAutoScaling = false;
+  this->_mValueLimits->setLowerLimit(min);
+  this->_mValueLimits->setUpperLimit(max);
+  this->_mAutoScaling->setValue(false);
 }
 
 void cedar::aux::gui::QImagePlot::queryFixedValueScale()
@@ -172,7 +262,7 @@ void cedar::aux::gui::QImagePlot::queryFixedValueScale()
   p_layout->addWidget(p_lower, 0, 1);
   p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
   p_lower->setMaximum(boost::numeric::bounds<double>::highest());
-  p_lower->setValue(this->mValueLimits.getLower());
+  p_lower->setValue(this->getValueLimits().getLower());
 
   p_label = new QLabel("upper limit:");
   p_layout->addWidget(p_label, 1, 0);
@@ -181,7 +271,7 @@ void cedar::aux::gui::QImagePlot::queryFixedValueScale()
   p_layout->addWidget(p_upper, 1, 1);
   p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
   p_upper->setMaximum(boost::numeric::bounds<double>::highest());
-  p_upper->setValue(this->mValueLimits.getUpper());
+  p_upper->setValue(this->getValueLimits().getUpper());
 
   auto p_buttons = new QDialogButtonBox();
   p_buttons->addButton(QDialogButtonBox::Ok);
@@ -207,19 +297,17 @@ void cedar::aux::gui::QImagePlot::updateMinMax(double min, double max)
   }
 }
 
-void cedar::aux::gui::QImagePlot::fillColorizationGradient(QGradient& gradient)
+void cedar::aux::gui::QImagePlot::valueLimitsChanged()
 {
-  gradient.setColorAt(static_cast<qreal>(1.0), QColor(0, 0, 127));
-  gradient.setColorAt(static_cast<qreal>(1.0 - 32.0 / 256.0), QColor(0, 0, 255));
-  gradient.setColorAt(static_cast<qreal>(1.0 - 96.0 / 256.0), QColor(0, 255, 255));
-  gradient.setColorAt(static_cast<qreal>(1.0 - 160.0 / 256.0), QColor(255, 255, 0));
-  gradient.setColorAt(static_cast<qreal>(1.0 - 224.0 / 256.0), QColor(255, 0, 0));
-  gradient.setColorAt(static_cast<qreal>(0.0), QColor(127, 0, 0));
+  if (!this->isAutoScaling() && this->mpLegend)
+  {
+    this->mpLegend->updateMinMax(this->getValueLimits().getLower(), this->getValueLimits().getUpper());
+  }
 }
 
 void cedar::aux::gui::QImagePlot::setSmoothScaling(bool smooth)
 {
-  this->mSmoothScaling = smooth;
+  this->_mSmoothScaling->setValue(smooth);
 }
 
 void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
@@ -229,7 +317,7 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   auto p_smooth = menu.addAction("smooth");
   p_smooth->setCheckable(true);
   QObject::connect(p_smooth, SIGNAL(toggled(bool)), this, SLOT(setSmoothScaling(bool)));
-  p_smooth->setChecked(this->mSmoothScaling);
+  p_smooth->setChecked(this->isSmoothScaling());
 
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
@@ -237,22 +325,41 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   p_legend->setChecked(this->mpLegend != NULL && this->mpLegend->isVisible());
   p_legend->setEnabled(this->mLegendAvailable);
 
+  QMenu* p_jet = menu.addMenu("color jet");
+  for (auto enum_id : cedar::aux::ColorGradient::StandardGradients::type().list())
+  {
+    auto p_action = p_jet->addAction(QString::fromStdString(enum_id.prettyString()));
+    p_action->setCheckable(true);
+    p_action->setData(static_cast<unsigned int>(enum_id.id()));
+    p_action->setChecked(enum_id == this->_mColorJet->getValue());
+    QObject::connect(p_action, SIGNAL(triggered()), this, SLOT(colorJetActionTriggered()));
+  }
+
   QMenu* p_scaling = menu.addMenu("value scaling");
   p_scaling->setEnabled(this->mValueScalingAvailable);
 
   auto p_auto_scale = p_scaling->addAction("automatic");
   p_auto_scale->setCheckable(true);
-  p_auto_scale->setChecked(this->mAutoScaling);
+  p_auto_scale->setChecked(this->isAutoScaling());
   QObject::connect(p_auto_scale, SIGNAL(triggered()), this, SLOT(setAutomaticScaling()));
 
   auto p_fixed_scaling = p_scaling->addAction("fixed ...");
   p_fixed_scaling->setCheckable(true);
-  p_fixed_scaling->setChecked(!this->mAutoScaling);
+  p_fixed_scaling->setChecked(!this->isAutoScaling());
   QObject::connect(p_fixed_scaling, SIGNAL(triggered()), this, SLOT(queryFixedValueScale()));
 
   this->fillContextMenu(menu);
 
   menu.exec(pEvent->globalPos());
+}
+
+void cedar::aux::gui::QImagePlot::colorJetActionTriggered()
+{
+  auto p_action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_action);
+  auto id = static_cast<cedar::aux::ColorGradient::StandardGradients::Id>(p_action->data().toUInt());
+  auto enum_id = cedar::aux::ColorGradient::StandardGradients::type().get(id);
+  this->_mColorJet->setValue(enum_id, true);
 }
 
 void cedar::aux::gui::QImagePlot::resizeEvent(QResizeEvent * /*pEvent*/)
@@ -272,7 +379,7 @@ void cedar::aux::gui::QImagePlot::resizePixmap()
     )
   {
     Qt::TransformationMode transformation_mode;
-    if (this->mSmoothScaling)
+    if (this->isSmoothScaling())
     {
       transformation_mode = Qt::SmoothTransformation;
     }
@@ -315,6 +422,7 @@ void cedar::aux::gui::QImagePlot::displayMatrix(const cv::Mat& matrix)
                  ).rgbSwapped();
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::QImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEvent)
 {
   if (!this->pixmap())
@@ -330,6 +438,7 @@ void cedar::aux::gui::QImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEv
 
   this->mpPlot->plotClicked(pEvent, image_x, image_y);
 }
+//!@endcond
 
 void cedar::aux::gui::QImagePlot::fillContextMenu(QMenu&)
 {
@@ -343,7 +452,13 @@ void cedar::aux::gui::QImagePlot::plotClicked(QMouseEvent* /* pEvent */, double 
 
 void cedar::aux::gui::QImagePlot::showLegend(bool show)
 {
-  if (this->mpLegend == NULL)
+  this->_mShowLegend->setValue(show);
+}
+
+void cedar::aux::gui::QImagePlot::showLegendChanged()
+{
+  bool show = this->_mShowLegend->getValue();
+  if (show && this->mpLegend == nullptr)
   {
     auto p_layout = cedar::aux::asserted_cast<QHBoxLayout*>(this->layout());
     this->mpLegend = new cedar::aux::gui::detail::QImagePlotLegend();
@@ -352,9 +467,14 @@ void cedar::aux::gui::QImagePlot::showLegend(bool show)
     p_layout->setStretch(1, 0);
   }
 
-  this->mpLegend->setVisible(show);
+  if (this->mpLegend)
+  {
+    this->mpLegend->setVisible(show);
+    this->mpLegend->setGradient(this->mColorGradient);
+  }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::QImagePlotLegend::updateMinMax(double min, double max)
 {
   int precision = 2;
@@ -367,3 +487,4 @@ void cedar::aux::gui::detail::QImagePlotLegend::updateMinMax(double min, double 
   this->mpMin->setText(QString("%1").arg(min, 0, 'g', precision));
   this->mpMax->setText(QString("%1").arg(max, 0, 'g', precision));
 }
+//!@endcond

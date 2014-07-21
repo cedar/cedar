@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -179,6 +179,13 @@ public:
     parameter->unlock();
 
     WidgetPolicy::setValue(this->mpWidget, value);
+  }
+
+  //! Override from the parent class.
+  void setReadOnly(bool readOnly)
+  {
+    CEDAR_DEBUG_ASSERT(this->mpWidget != nullptr);
+    this->mpWidget->setReadOnly(readOnly);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

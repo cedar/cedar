@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -70,8 +70,12 @@ class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! An average over time measures
   typedef cedar::aux::MovingAverage<cedar::unit::Time> TimeAverage;
+
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(TimeAverage);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -112,6 +116,7 @@ public:
     stop();
   }
 
+  //! Returns the current time measurement statistics
   ConstTimeAveragePtr getStatistics() const;
 
 public slots:

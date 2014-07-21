@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -287,7 +287,7 @@ void cedar::aux::gui::QwtSurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
 
 void cedar::aux::gui::QwtSurfacePlot::applyLabels()
 {
-  try
+  if (this->mMatData->hasAnnotation<cedar::aux::annotation::Dimensions>())
   {
     cedar::aux::annotation::ConstDimensionsPtr dimensions
       = this->mMatData->getAnnotation<cedar::aux::annotation::Dimensions>();
@@ -313,10 +313,6 @@ void cedar::aux::gui::QwtSurfacePlot::applyLabels()
         "cedar::aux::gui::QwtSurfacePlot::plot"
       );
     }
-  }
-  catch (cedar::aux::AnnotationNotFoundException&)
-  {
-    // ok, no annotation found
   }
 }
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -71,6 +71,13 @@ public:
 public:
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
+  /*! Sets the range cut out by this step.
+   */
+  void setRanges(const std::vector<cv::Range>& ranges);
+
+  //! Returns the range for the given dimension.
+  cv::Range getRange(unsigned int dimension) const;
+
 public slots:
   //! Called when the selected range of the slice changes.
   void rangeChanged();
@@ -90,8 +97,6 @@ private:
   void inputConnectionChanged(const std::string& inputName);
 
   void allocateOutputMatrix();
-
-  void reset();
 
   void updateDimensionality();
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -69,16 +69,18 @@ public:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
 
+  /*! A helper function that calculates the sum of all matrices in the given slot.
+   *
+   * @remarks This function assumes that the output matrix, sum, is initialized to the appropriate size, and that all
+   *          matrices in the slot are the same size (0D matrices are treated as scalar additions).
+   */
+  static void sumSlot(cedar::proc::ExternalDataPtr slot, cv::Mat& sum, bool lock = false);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Determines whether the data item can be connected to the slot.
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::ConstDataPtr data
-                                  ) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

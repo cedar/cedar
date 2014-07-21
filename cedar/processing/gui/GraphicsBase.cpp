@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,11 +40,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/GraphicsBase.h"
-#include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Network.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
@@ -60,6 +58,11 @@ const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(170, 218, 24);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(0, 76, 249);
+
+const QColor cedar::proc::gui::GraphicsBase::mColorGroupBeingLeft = QColor::fromRgb(200, 200, 200);
+const QColor cedar::proc::gui::GraphicsBase::mColorTargetGroup = QColor::fromRgb(125, 125, 255);
+
+const QColor cedar::proc::gui::GraphicsBase::mColorSearchResult = QColor::fromRgb(0, 127, 255);
 
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
@@ -80,6 +83,8 @@ mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
 mFillStyle(Qt::SolidPattern),
 mSnapToGrid(true),
+mResizeable(false),
+mReadOnly(false),
 mWidth
 (
   new cedar::aux::DoubleParameter
@@ -110,11 +115,61 @@ mAllowedConnectTargets(canConnectTo)
 cedar::proc::gui::GraphicsBase::~GraphicsBase()
 {
   this->disconnect();
+
+  if (!this->mpResizeHandles.empty())
+  {
+    for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+    {
+      delete this->mpResizeHandles.at(i);
+    }
+    this->mpResizeHandles.clear();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::GraphicsBase::emitChangedEventToScene(bool alwaysEmit)
+{
+  bool is_data_slot_item = ((this->mGroup & GRAPHICS_GROUP_DATA_ITEM) > 0);
+  if ((alwaysEmit || !is_data_slot_item) && this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->emitSceneChanged();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::setReadOnly(bool readOnly)
+{
+  this->mReadOnly = readOnly;
+
+  if (readOnly)
+  {
+    this->clearResizeHandles();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::itemSceneHasChanged()
+{
+  // empty default implementation
+}
+
+void cedar::proc::gui::GraphicsBase::setResizeable(bool resizeable)
+{
+  this->mResizeable = resizeable;
+
+  this->clearResizeHandles();
+}
+
+void cedar::proc::gui::GraphicsBase::sizeChanged()
+{
+  // nothing to do
+}
+
+void cedar::proc::gui::GraphicsBase::updateToolTip()
+{
+  // empty default implementation
+}
 
 void cedar::proc::gui::GraphicsBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
@@ -125,8 +180,13 @@ void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
 {
   this->mShape = shape;
 
+  this->updateShape();
+}
+
+void cedar::proc::gui::GraphicsBase::updateShape()
+{
   mPath = QPainterPath();
-  switch (shape)
+  switch (this->mShape)
   {
     case BASE_SHAPE_DIAMOND:
       mPath.moveTo(0, this->height() / static_cast<qreal>(2));
@@ -149,20 +209,45 @@ void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
       break;
 
     default:
-      CEDAR_THROW(cedar::aux::UnhandledValueException, "Unhandled shape in cedar::proc::gui::GraphicsBase::setBaseShape");
+      CEDAR_THROW(cedar::aux::UnhandledValueException, "Unhandled shape in cedar::proc::gui::GraphicsBase::updateShape()");
   }
+}
+
+void cedar::proc::gui::GraphicsBase::setBounds(const QRectF& rect)
+{
+  const QRectF& current_bounds = this->boundingRect();
+  qreal offset_w = current_bounds.width() - this->width();
+  qreal offset_h = current_bounds.height() - this->height();
+  this->mWidth->setValue(rect.width() - offset_w);
+  this->mHeight->setValue(rect.height() - offset_h);
+  // shift the position by the change from the old to the new bounding rect
+  this->setPos(this->pos() - this->boundingRect().topLeft() + rect.topLeft());
+//  this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
 {
   this->mHeight->setValue(static_cast<double>(height));
+  this->emitChangedEventToScene();
   this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setWidth(qreal width)
 {
   this->mWidth->setValue(static_cast<double>(width));
+  this->emitChangedEventToScene();
   this->update();
+  this->sizeChanged();
+}
+
+void cedar::proc::gui::GraphicsBase::setSize(qreal width, qreal height)
+{
+  this->mHeight->setValue(static_cast<double>(height));
+  this->mWidth->setValue(static_cast<double>(width));
+  this->update();
+  this->sizeChanged();
 }
 
 void cedar::proc::gui::GraphicsBase::setOutlineColor(const QColor& color)
@@ -230,7 +315,11 @@ void cedar::proc::gui::GraphicsBase::readConfiguration(const cedar::aux::Configu
   {
     // ok, y not set
   }
+
+  bool snap_to_grid = this->mSnapToGrid;
+  this->mSnapToGrid = false;
   this->setPos(x, y);
+  this->mSnapToGrid = snap_to_grid;
 }
 
 void cedar::proc::gui::GraphicsBase::writeConfiguration(cedar::aux::ConfigurationNode& root) const
@@ -257,6 +346,7 @@ bool cedar::proc::gui::GraphicsBase::hasGuiConnectionTo(GraphicsBase const* pTar
 
 void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection* pConnection)
 {
+  this->emitChangedEventToScene(true); // we always emit a changed event when a connection is added
   this->mConnections.push_back(pConnection);
 }
 
@@ -275,6 +365,8 @@ void cedar::proc::gui::GraphicsBase::removeConnection(cedar::proc::gui::Connecti
   {
     mConnections.erase(it);
   }
+
+  this->emitChangedEventToScene();
 }
 
 void cedar::proc::gui::GraphicsBase::removeAllConnections()
@@ -318,8 +410,7 @@ void cedar::proc::gui::GraphicsBase::setHighlightMode(cedar::proc::gui::Graphics
 
 QRectF cedar::proc::gui::GraphicsBase::boundingRect() const
 {
-  qreal padding = static_cast<qreal>(1.0);
-  return QRectF(QPointF(-padding, -padding), QSizeF(this->width() + padding, this->height() + padding));
+  return QRectF(QPointF(0, 0), QSizeF(this->width(), this->height()));
 }
 
 bool cedar::proc::gui::GraphicsBase::canConnect() const
@@ -358,6 +449,55 @@ const cedar::proc::gui::GraphicsBase::GraphicsGroup& cedar::proc::gui::GraphicsB
   return this->mGroup;
 }
 
+QBrush cedar::proc::gui::GraphicsBase::getTargetGroupBrush()
+{
+  QBrush brush;
+  brush.setColor(mColorTargetGroup);
+  brush.setStyle(Qt::BDiagPattern);
+  return brush;
+}
+
+QBrush cedar::proc::gui::GraphicsBase::getLeavingGroupBrush()
+{
+  QBrush brush;
+  brush.setColor(mColorGroupBeingLeft);
+  brush.setStyle(Qt::BDiagPattern);
+  return brush;
+}
+
+QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
+{
+  switch (this->mHighlightMode)
+  {
+    case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
+      return cedar::proc::gui::GraphicsBase::getTargetGroupBrush();
+
+    case HIGHLIGHTMODE_GROUP_MEMBER_LEAVING:
+      return cedar::proc::gui::GraphicsBase::getLeavingGroupBrush();
+
+    default:
+    case HIGHLIGHTMODE_NONE:
+    {
+      QBrush brush;
+      QColor color = this->mFillColor;
+      if (this->mReadOnly)
+      {
+        if (color.hsvHue() == -1)
+        {
+          color = QColor::fromHsv(color.hsvHue(), color.hsvSaturation(), color.value() - 30);
+        }
+        else
+        {
+          color = QColor::fromHsv(color.hsvHue(), color.hsvSaturation() / 2, color.value());
+        }
+      }
+      brush.setColor(color);
+      brush.setStyle(this->mFillStyle);
+      return brush;
+    }
+  }
+}
+
 QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
 {
   QPen pen;
@@ -365,49 +505,81 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
   {
     pen.setStyle(Qt::DashLine);
   }
-  pen.setColor(this->mOutlineColor);
+
+  if (this->mHighlightMode != HIGHLIGHTMODE_NONE)
+  {
+    pen.setWidthF(2);
+  }
+  // determine what pen to use for highlighting
+  switch (this->mHighlightMode)
+  {
+    case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+      break;
+
+    case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mColorTargetGroup);
+      break;
+
+    case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorError);
+      break;
+
+    case HIGHLIGHTMODE_GROUP_MEMBER_LEAVING:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mColorGroupBeingLeft);
+      break;
+
+    case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
+      break;
+
+    case HIGHLIGHTMODE_SEARCH_RESULT:
+      pen.setColor(cedar::proc::gui::GraphicsBase::mColorSearchResult);
+      break;
+
+    default:
+    case HIGHLIGHTMODE_NONE:
+      pen.setColor(this->mOutlineColor);
+  }
+
   return pen;
 }
 
-
 void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-  painter->save();
-
-  QRectF bounds(QPointF(0, 0), QSizeF(this->width(), this->height()));
-  qreal roundedness = 4;
-
   // draw the base shape
   if (mDrawBackground)
   {
     painter->save();
-    painter->setPen(QPen(Qt::NoPen));
-    QBrush brush;
-    brush.setColor(this->mFillColor);
-    brush.setStyle(this->mFillStyle);
-    painter->setBrush(brush);
-    switch (this->mShape)
+    QBrush brush = this->getOutlineBrush();
+
+    // for non-solid patterns, we draw a white background
+    if (brush.style() != Qt::SolidPattern)
     {
-      case BASE_SHAPE_RECT:
-        painter->drawRoundedRect(bounds, roundedness, roundedness);
-        break;
-
-      case BASE_SHAPE_ROUND:
-        painter->drawEllipse(bounds);
-        break;
-
-      case BASE_SHAPE_DIAMOND:
-      case BASE_SHAPE_CROSS:
-        painter->drawPath(mPath);
-        break;
+      QBrush solid_background(Qt::white);
+      painter->setBrush(solid_background);
+      QPen invisible_pen(Qt::NoPen);
+      painter->setPen(invisible_pen);
+      this->drawShape(painter);
     }
+
+    painter->setPen(this->getOutlinePen());
+    painter->setBrush(this->getOutlineBrush());
+
+    this->drawShape(painter);
+
     painter->restore();
   }
+}
 
+void cedar::proc::gui::GraphicsBase::drawShape(QPainter* painter)
+{
+  const qreal roundedness = static_cast<qreal>(4);
+  QRectF bounds(QPointF(0, 0), QSizeF(this->width(), this->height()));
+
+  // draw the base shape
   if (mDrawBackground)
   {
-    painter->save();
-    painter->setPen(this->getOutlinePen());
     switch (this->mShape)
     {
       case BASE_SHAPE_RECT:
@@ -420,59 +592,14 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
 
       case BASE_SHAPE_DIAMOND:
       case BASE_SHAPE_CROSS:
-        painter->drawPath(mPath);
-        break;
-    }
-    painter->restore();
-  }
-
-  // draw the highlight
-  if (this->mHighlightMode != HIGHLIGHTMODE_NONE)
-  {
-    // determine what pen to use for highlighting
-    QPen highlight_pen;
-    highlight_pen.setWidthF(2);
-    switch (this->mHighlightMode)
-    {
-      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
-      case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
-        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
-        break;
-
-      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
-        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorError);
-        break;
-
-      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
-        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
-        break;
-
-      default:
-        break;
-    }
-
-    // draw the shape using the hightlight pen
-    QRectF highlight_bounds(QPointF(1, 1), QSizeF(this->width() - 1, this->height() - 1));
-    painter->setPen(highlight_pen);
-    switch (this->mShape)
-    {
-      case BASE_SHAPE_RECT:
-        painter->drawRoundedRect(highlight_bounds, roundedness, roundedness);
-        break;
-
-      case BASE_SHAPE_ROUND:
-        painter->drawEllipse(highlight_bounds);
-        break;
-
-      case BASE_SHAPE_DIAMOND:
-      case BASE_SHAPE_CROSS:
+        //!@todo This really only needs to be called if the shape changes.
+        this->updateShape();
         painter->drawPath(mPath);
         break;
     }
   }
-
-  painter->restore();
 }
+
 
 const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity validity)
 {
@@ -501,6 +628,17 @@ void cedar::proc::gui::GraphicsBase::itemSelected(bool)
   // empty default implementation
 }
 
+void cedar::proc::gui::GraphicsBase::itemSelectedChanged(bool selected)
+{
+  // if the item was deselected, it is not part of the list of selected items; thus, remove its handles
+  if (!selected)
+  {
+    this->updateResizeHandles(false);
+  }
+
+  this->itemSelected(selected);
+}
+
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
   qreal grid_size = 8.0;
@@ -527,12 +665,28 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     case QGraphicsItem::ItemPositionHasChanged:
     {
       this->updateConnections();
+
+      for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+      {
+        this->mpResizeHandles.at(i)->updatePosition();
+      }
+
+      if (this->mGroup != GRAPHICS_GROUP_DATA_ITEM && this->mGroup != GRAPHICS_GROUP_NONE)
+      {
+        this->emitChangedEventToScene();
+      }
+      break;
+    }
+    
+    case QGraphicsItem::ItemSelectedHasChanged:
+    {
+      this->itemSelectedChanged(value.toBool());
       break;
     }
 
-    case QGraphicsItem::ItemSelectedHasChanged:
+    case QGraphicsItem::ItemSceneHasChanged:
     {
-      this->itemSelected(value.toBool());
+      this->itemSceneHasChanged();
       break;
     }
 
@@ -540,6 +694,44 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
       break;
   }
   return QGraphicsItem::itemChange(change, value);
+}
+
+void cedar::proc::gui::GraphicsBase::updateResizeHandles(bool show)
+{
+  if (this->canResize() && show)
+  {
+    for (size_t i = 0; i < cedar::proc::gui::ResizeHandle::directions().size(); ++i)
+    {
+      this->mpResizeHandles.push_back
+      (
+        new cedar::proc::gui::ResizeHandle
+        (
+          this,
+          this->mpResizeHandles,
+          cedar::proc::gui::ResizeHandle::directions().at(i)
+        )
+      );
+    }
+  }
+  else
+  {
+    this->clearResizeHandles();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::clearResizeHandles()
+{
+  for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
+  {
+    delete this->mpResizeHandles.at(i);
+  }
+  this->mpResizeHandles.clear();
+}
+
+bool cedar::proc::gui::GraphicsBase::canResize() const
+{
+  // currently, only networks can be resized
+  return this->mResizeable && !this->mReadOnly;
 }
 
 void cedar::proc::gui::GraphicsBase::updateConnections()

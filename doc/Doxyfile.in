@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -1287,7 +1287,9 @@ PREDEFINED             = CEDAR_USE_FFTW \
                          CEDAR_INSTANTIATE_DEV_TEMPLATE \
                          CEDAR_INSTANTIATE_PROC_TEMPLATE \
                          CEDAR_INSTANTIATE_DYN_TEMPLATE \
-                         CEDAR_INSTANTIATE_TESTING_UTILITIES_TEMPLATE
+                         CEDAR_INSTANTIATE_TESTING_UTILITIES_TEMPLATE \
+                         CEDAR_GENERATE_POINTER_TYPES(NAME)=1 \
+                         CEDAR_DECLARE_SIGNAL(NAME,SIGNATURE)=1
                          
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

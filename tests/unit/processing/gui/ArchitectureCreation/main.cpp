@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -46,11 +46,11 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
 
@@ -76,15 +76,15 @@ int testArchitecture1(cedar::proc::gui::Ide *pIde)
 
   cedar::proc::gui::View *p_view = pIde->getArchitectureView();
   cedar::proc::gui::Scene *p_scene = p_view->getScene();
-  cedar::proc::gui::NetworkPtr p_gui_network = p_scene->getRootNetwork();
-  cedar::proc::NetworkPtr network = p_gui_network->getNetwork();
+  cedar::proc::gui::GroupPtr p_gui_network = p_scene->getRootGroup();
+  cedar::proc::GroupPtr network = p_gui_network->getGroup();
 
   // first, add some items to the scene
-  cedar::proc::ElementPtr field = p_scene->addElement("cedar.dynamics.NeuralField", QPointF(180, 240));
+  cedar::proc::ElementPtr field = p_scene->createElement(network, "cedar.dynamics.NeuralField", QPointF(180, 240));
   simulateEventLoop();
   /* cedar::proc::gui::StepItem* p_field_item = */p_scene->getStepItemFor(dynamic_cast<cedar::proc::Step*>(field.get()));
 
-  cedar::proc::ElementPtr gauss = p_scene->addElement("cedar.processing.sources.GaussInput", QPointF(-80, 240));
+  cedar::proc::ElementPtr gauss = p_scene->createElement(network, "cedar.processing.sources.GaussInput", QPointF(-80, 240));
   simulateEventLoop();
   /*cedar::proc::gui::StepItem* p_gauss_item = */p_scene->getStepItemFor(dynamic_cast<cedar::proc::Step*>(gauss.get()));
 

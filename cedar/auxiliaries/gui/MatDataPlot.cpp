@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -110,6 +110,22 @@ void cedar::aux::gui::MatDataPlot::initLayout()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::MatDataPlot::readConfiguration(const cedar::aux::ConfigurationNode& configuration)
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->readConfiguration(configuration);
+  }
+}
+
+void cedar::aux::gui::MatDataPlot::writeConfiguration(cedar::aux::ConfigurationNode& configuration) const
+{
+  if (auto configurable = dynamic_cast<cedar::aux::Configurable*>(this->mpCurrentPlotWidget))
+  {
+    configurable->writeConfiguration(configuration);
+  }
+}
+
 bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
   if (this->mpCurrentPlotWidget == nullptr)
@@ -186,7 +202,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
   }
 
   // color space-annotated data
-  try
+  if (this->mData->hasAnnotation<cedar::aux::annotation::ColorSpace>())
   {
     // data should be plotted as an image
     cedar::aux::annotation::ConstColorSpacePtr color_space = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
@@ -194,12 +210,9 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
-  }
 
   // disparity-annotated data
-  try
+  if (this->mData->hasAnnotation<cedar::aux::annotation::Disparity>())
   {
     // data should be plotted as an image
     auto color_space = this->mData->getAnnotation<cedar::aux::annotation::Disparity>();
@@ -207,21 +220,15 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
-  }
 
   // depth-annotated data
-  try
+  if (this->mData->hasAnnotation<cedar::aux::annotation::Depth>())
   {
     //data should be plotted as an image
     auto colorSpace = this->mData->getAnnotation<cedar::aux::annotation::Depth>();
     cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
-  }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
   }
 
   if (this->mpCurrentPlotWidget == nullptr)

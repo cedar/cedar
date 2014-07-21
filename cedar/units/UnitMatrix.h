@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -79,6 +79,7 @@ public:
   // methods
   //--------------------------------------------------------------------------------------------------------------------
 
+  //! Returns a deep copy of the unit matrix.
   SelfType clone() const
   {
     return SelfType(this->matrix.clone(), this->unit);

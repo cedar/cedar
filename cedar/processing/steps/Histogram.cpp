@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,6 +40,9 @@
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Histogram.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/typecheck/SameSize.h"
+#include "cedar/processing/typecheck/And.h"
+#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/assert.h"
@@ -116,8 +119,22 @@ _mNormalizationType
   )
 )
 {
-  this->declareInput("input");
-  this->declareInput("mask", false);
+  auto input_slot = this->declareInput("input");
+  auto mask_slot = this->declareInput("mask", false);
+
+  // define checks
+  cedar::proc::typecheck::And input_check;
+  cedar::proc::typecheck::SameSize same_check;
+  cedar::proc::typecheck::Matrix matrix_check;
+  matrix_check.addAcceptedDimensionalityRange(0, 2);
+  same_check.addSlot(input_slot);
+  same_check.addSlot(mask_slot);
+  input_check.addCheck(same_check);
+  input_check.addCheck(matrix_check);
+
+  // set checks
+  input_slot->setCheck(input_check);
+  mask_slot->setCheck(input_check);
 
   this->declareBuffer("raw histogram", this->mRawHistogram);
 
@@ -221,40 +238,4 @@ void cedar::proc::steps::Histogram::compute(const cedar::proc::Arguments&)
       break;
     }
   }
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Histogram::determineInputValidity
-                                                               (
-                                                                 cedar::proc::ConstDataSlotPtr slot,
-                                                                 cedar::aux::ConstDataPtr data
-                                                               ) const
-{
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
-  {
-    if (cedar::aux::math::getDimensionalityOf(mat_data->getData()) > 2)
-    {
-      return cedar::proc::DataSlot::VALIDITY_ERROR;
-    }
-    else if
-    (
-      slot->getName() == "image"
-      && this->mMask
-      && !cedar::aux::math::matrixSizesEqual(mat_data->getData(), this->mMask->getData()))
-    {
-      return cedar::proc::DataSlot::VALIDITY_ERROR;
-    }
-    else if
-    (
-      slot->getName() == "mask"
-      && this->mInputImage
-      && !cedar::aux::math::matrixSizesEqual(mat_data->getData(), this->mInputImage->getData()))
-    {
-      return cedar::proc::DataSlot::VALIDITY_ERROR;
-    }
-    else
-    {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
-    }
-  }
-  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }

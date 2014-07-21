@@ -53,15 +53,25 @@
       <item row="2" column="1">
        <widget class="cedar::aux::gui::BoolParameter" name="mpHighlightConnections" native="true"/>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
          <string>Maximum number of log messages</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="cedar::aux::gui::UIntParameter" name="mpMaximumNumberOfLogMessages" native="true"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Highlight connections when hovering over slots</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="cedar::aux::gui::BoolParameter" name="mpHighlightHoveredConnection" native="true"/>
       </item>
      </layout>
     </widget>

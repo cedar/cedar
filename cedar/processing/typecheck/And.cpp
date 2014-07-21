@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -51,11 +51,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::DataSlot::VALIDITY
-  cedar::proc::typecheck::And::check(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
+  cedar::proc::typecheck::And::check(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data, std::string& info) const
 {
   for (const auto& check : this->mChecks)
   {
-    if (check(slot, data) != this->validityOk())
+    if (check(slot, data, info) != this->validityOk())
     {
       return this->validityBad();
     }

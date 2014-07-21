@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -398,11 +398,6 @@ bool cedar::aux::ThreadWrapper::isValidThread() const
   return mpThread != NULL;
 }
 
-void cedar::aux::ThreadWrapper::stop(unsigned int time, bool /*suppressWarning*/ )
-{
-  cedar::aux::ThreadWrapper::stop(time);
-}
-
 void cedar::aux::ThreadWrapper::stop(unsigned int time)
 {
   if (mDestructing) // quick abort, see below
@@ -516,16 +511,6 @@ boost::signals2::connection cedar::aux::ThreadWrapper::connectToQuitSignal(boost
 boost::signals2::connection cedar::aux::ThreadWrapper::connectToStartSignal(boost::function<void ()> slot)
 {
   return mStartSignal.connect(slot);
-}
-
-void cedar::aux::ThreadWrapper::applyStart()
-{
-  // deprecated
-}
-
-void cedar::aux::ThreadWrapper::applyStop(bool)
-{
-  // deprecated
 }
 
 void cedar::aux::ThreadWrapper::setReallocateOnStart(bool doit)

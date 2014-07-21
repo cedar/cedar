@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -35,9 +35,9 @@
 #=======================================================================================================================
 
 # set cedar version information
-set (CEDAR_VERSION_MAJOR 3)
+set (CEDAR_VERSION_MAJOR 4)
 set (CEDAR_VERSION_MINOR 0)
-set (CEDAR_VERSION_BUGFIX 4)
+set (CEDAR_VERSION_BUGFIX 5)
 
 # combined version
 set (CEDAR_VERSION "${CEDAR_VERSION_MAJOR}.${CEDAR_VERSION_MINOR}.${CEDAR_VERSION_BUGFIX}")

@@ -23,7 +23,7 @@ Before you start, keep in mind that this software is still under development and
 Please start your processing gui right now. If you do not know how to do this, take a look at 
 @link ProcessingGuiTutorial this @endlink tutorial.  
 
-@section DFTTutorialFirstArchFirstStep A samle architecture - linking peaks in cedar
+@section DFTTutorialFirstArchFirstStep A sample architecture - linking peaks in cedar
 
 In this section, you will assemble a small DFT architecture that links two one-dimensional estimates along arbitrary 
 metrics, represented by peaks in one-dimensional neural fields, in a two-dimensional neural field by projecting ridges 

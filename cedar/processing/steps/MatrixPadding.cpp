@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -101,7 +101,7 @@ _mBorderType
 {
   auto input_slot = this->declareInput("input");
   cedar::proc::typecheck::Matrix input_check;
-  input_check.addAcceptedDimensionalityRange(2, 3);
+  input_check.addAcceptedDimensionalityRange(1, 3);
   input_slot->setCheck(input_check);
 
   this->declareOutput("padded", this->mPadded);
@@ -153,10 +153,17 @@ void cedar::proc::steps::MatrixPadding::compute2D()
   int top, bottom;
   int left, right;
 
-  CEDAR_DEBUG_ASSERT(this->_mPaddedSize->size() == 2);
+  CEDAR_DEBUG_ASSERT(this->_mPaddedSize->size() >= 1);
 
   top = bottom = this->_mPaddedSize->at(0);
-  left = right = this->_mPaddedSize->at(1);
+  if (this->_mPaddedSize->size() >= 2)
+  {
+    left = right = this->_mPaddedSize->at(1);
+  }
+  else
+  {
+    left = right = 0;
+  }
 
   int border_type = cedar::aux::conv::BorderType::toCvConstant(this->_mBorderType->getValue());
 
@@ -310,7 +317,7 @@ void cedar::proc::steps::MatrixPadding::inputConnectionChanged(const std::string
 {
   this->mInput = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
 
-  if (this->mInput)
+  if (this->mInput && this->mInput->getDimensionality() > 0)
   {
     this->_mPaddedSize->resize(this->mInput->getDimensionality());
 
@@ -320,7 +327,7 @@ void cedar::proc::steps::MatrixPadding::inputConnectionChanged(const std::string
 
 void cedar::proc::steps::MatrixPadding::updateOutputSize()
 {
-  if (this->mInput)
+  if (this->mInput && this->mInput->getDimensionality() > 0)
   {
     const cv::Mat& input = this->mInput->getData();
     std::vector<int> dest_size(static_cast<size_t>(input.dims));

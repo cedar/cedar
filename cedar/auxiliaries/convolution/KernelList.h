@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -106,9 +106,14 @@ public:
   //!@brief removes all kernels from the list
   inline void clear()
   {
-    for (size_t i = 0; i < this->mKernels.size(); ++i)
+    if (this->mKernels.size() > 0)
     {
-      this->mKernelRemovedSignal(i);
+      // have to do this in reverse order
+      for (size_t i = this->mKernels.size() - 1; i > 0; --i)
+      {
+        this->mKernelRemovedSignal(i);
+      }
+      this->mKernelRemovedSignal(0);
     }
     this->mKernels.clear();
   }
@@ -143,6 +148,7 @@ public:
 protected:
   // none yet
 signals:
+  //! Emitted, when the combined kernel is updated.
   void combinedKernelUpdated();
 
   //--------------------------------------------------------------------------------------------------------------------

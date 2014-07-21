@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -57,22 +57,17 @@ namespace cedar
 {
   namespace proc
   {
-    //!@todo These typedefs are redundant
-    /*! Manages declarations of element classes.
-     */
-    typedef
-      cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
-      ElementManager;
-
-    //! Sinleton of the element manager.
-    typedef
-      cedar::aux::Singleton<cedar::proc::ElementManager>
-      ElementManagerSingleton;
-
+    //! A manager for element declarations
     typedef
       cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
       ElementDeclarationManager;
 
+    //! Sinleton of the element manager.
+    typedef
+      cedar::aux::Singleton<cedar::proc::ElementDeclarationManager>
+      ElementManagerSingleton;
+
+    //! A manager for element factories
     typedef
       cedar::aux::FactoryManager<cedar::proc::ElementPtr>
       ElementFactoryManager;

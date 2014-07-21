@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -53,7 +53,7 @@
 
 /*!@brief This is the toolbox that contains the architecture tools.
  *
- *        This widget can be found in the processingIde.
+ *        This widget can be found in cedar's GUI.
  */
 class cedar::proc::gui::ArchitectureToolBox : public cedar::proc::gui::ToolBox
 {

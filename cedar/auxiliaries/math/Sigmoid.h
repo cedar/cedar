@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -95,10 +95,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief threshold of the sigmoid
   cedar::aux::DoubleParameterPtr mThreshold;
 private:
-  //!@brief threshold of the sigmoid
+  // none yet
 };
 
 #endif  // CEDAR_AUX_MATH_SIGMOID_H

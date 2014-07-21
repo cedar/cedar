@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -50,9 +50,7 @@
 #include <string>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief Superclass for all data classes that hold data with units attached to them.
  */
 class cedar::aux::UnitData : public cedar::aux::Data
 {
@@ -85,7 +83,7 @@ public:
 
   /*!@brief Returns the value of the unit as a double, given the suffix returned by getSuffix().
    *
-   * @example If this contains 0.5 s, this will return 0.5.
+   * For example, if this contains 0.5 s, this will return 0.5.
    *
    * @remarks This must be implemented in all subclasses.
    */

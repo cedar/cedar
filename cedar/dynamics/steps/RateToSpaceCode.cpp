@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -256,7 +256,14 @@ void cedar::dyn::RateToSpaceCode::outputSizesChanged()
   {
     sizes_signed.push_back(_mOutputSizes->at(i));
   }
-  cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
+
+  while (sizes_signed.size() < 2)
+  {
+    sizes_signed.push_back(1);
+  }
+
+  cv::Mat new_matrix(static_cast<int>(sizes_signed.size()), &(sizes_signed.front()), CV_32F, 0.0);
+
   this->mOutput->setData(new_matrix);
   this->emitOutputPropertiesChangedSignal("output");
   this->recompute();

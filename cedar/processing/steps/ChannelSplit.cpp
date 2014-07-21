@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -171,7 +171,7 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
   // reset channels
   for (size_t i = 0; i < this->mChannelData.size(); ++i)
   {
-    this->mChannelData.at(i)->setData(cv::Mat::zeros(2, 2, this->mInput->getData().type()));
+    this->mChannelData.at(i)->setData(cv::Mat());
   }
 
   this->mChannels.resize(num_channels);
@@ -180,6 +180,11 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
 
   if (cedar::aux::math::getDimensionalityOf(this->mInput->getData()) > 2)
   {
+    // there are now empty matrices, notify the subsequent steps
+    for (size_t i = 0; i < this->mChannelData.size(); ++i)
+    {
+      this->emitOutputPropertiesChangedSignal(this->generateDataName(i));
+    }
     return;
   }
 

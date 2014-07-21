@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -137,6 +137,7 @@ private:
   void processStop();
 
 signals:
+  //! Signals, that the function should be executed.
   void executeSignal(); 
 
   //----------------------------------------------------------------------------

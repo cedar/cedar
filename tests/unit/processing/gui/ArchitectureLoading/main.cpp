@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -46,11 +46,11 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/processing/Network.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
 
@@ -64,7 +64,7 @@ int verifyArchitecture1(cedar::proc::gui::Ide *pIde)
 
   cedar::proc::gui::View *p_view = pIde->getArchitectureView();
   cedar::proc::gui::Scene *p_scene = p_view->getScene();
-  cedar::proc::NetworkPtr network = p_scene->getRootNetwork()->getNetwork();
+  cedar::proc::GroupPtr network = p_scene->getRootGroup()->getGroup();
 
   cedar::proc::TriggerPtr trigger;
   cedar::proc::gui::TriggerItem *p_trigger = NULL;

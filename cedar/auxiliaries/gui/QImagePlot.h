@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -43,10 +43,12 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 #include "cedar/auxiliaries/gui/ThreadedPlot.h"
-#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
+#include "cedar/auxiliaries/ColorGradient.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMenu>
@@ -82,12 +84,18 @@ namespace cedar
           //! Updates the minimum and maximum value displayed by the legend.
           void updateMinMax(double min, double max);
 
+          //! Applies the colors of the graident to the legend.
+          void setGradient(cedar::aux::ColorGradientPtr gradient);
+
         private:
           QLabel* mpMin;
           QLabel* mpMax;
 
           QLinearGradient mGradient;
+
+          QFrame* mpGradientDisplay;
         };
+        //!@endcond
       } // namespace detail
     }
   }
@@ -117,13 +125,30 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
-  /*! Fills the gradient used for colorization into a QGradient
-  */
-  static void fillColorizationGradient(QGradient& gradient);
-
   /*! Sets fixed limits for the plot values.
    */
   void setLimits(double min, double max);
+
+  /*! Whether the scale of the plot is determined automatically.
+   */
+  bool isAutoScaling() const
+  {
+    return this->_mAutoScaling->getValue();
+  }
+
+  /*! Whether the plot is pixelated or smoothed.
+   */
+  bool isSmoothScaling() const
+  {
+    return this->_mSmoothScaling->getValue();
+  }
+
+  /*! Returns the currently set value limits.
+   */
+  const cedar::aux::math::Limits<double>& getValueLimits() const
+  {
+    return this->_mValueLimits->getValue();
+  }
 
 public slots:
   /*!@brief Set the scaling mode of the plot.
@@ -134,6 +159,7 @@ public slots:
   void showLegend(bool show);
 
 signals:
+  //! Signals a change in the minimal and maximal values in the plotted data.
   void minMaxChanged(double min, double max);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -157,17 +183,26 @@ protected:
    */
   void displayMatrix(const cv::Mat& matrix);
 
+  //! Notifies the image plot if a legend can be displayed or not.
   void setLegendAvailable(bool available)
   {
     this->mLegendAvailable = available;
   }
 
+  //! If set to true, fixed values can be set for the minimum and maximum of the plot.
   void setValueScalingEnabled(bool enabled)
   {
     mValueScalingAvailable = enabled;
   }
 
+  //! Colorizes the matrix.
+  cv::Mat colorizeMatrix(const cv::Mat& toColorize) const;
+
+  //! Colorizes the matrix with the given minimum and maximum.
+  cv::Mat colorizeMatrix(const cv::Mat& toColorize, bool applyLimits, double min, double max) const;
+
 protected slots:
+  //! Updates the minimum and maximum of the plot.
   void updateMinMax(double min, double max);
 
   //! Enables automatic scaling.
@@ -185,9 +220,20 @@ private:
 
   virtual void plotClicked(QMouseEvent* pEvent, double relativeImageX, double relativeImageY);
 
+  void setColorJet(cedar::aux::ColorGradientPtr gradient);
+
 private slots:
   void queryFixedValueScale();
+
+  //! Updates the visibility of the legend.
+  void showLegendChanged();
   
+  void valueLimitsChanged();
+
+  void colorJetChanged();
+
+  void colorJetActionTriggered();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -195,21 +241,12 @@ protected:
   //! Label used for displaying the image.
   ImageDisplay* mpImageDisplay;
 
-  //! Whether scaling of plots is determined automatically or fixed.
-  bool mAutoScaling;
-
-  //! Limits for fixed scaling.
-  cedar::aux::math::Limits<double> mValueLimits;
-
 private:
   //! Converted image.
   QImage mImage;
 
   //! Lock for mImage.
   QReadWriteLock mImageLock;
-
-  //! Whether the matrix should be smoothed during scaling.
-  bool mSmoothScaling;
 
   //! Whether or not a legend is available
   bool mLegendAvailable;
@@ -220,6 +257,9 @@ private:
   //! Legend (if any).
   cedar::aux::gui::detail::QImagePlotLegend* mpLegend;
 
+  //! The color gradient to be used.
+  cedar::aux::ColorGradientPtr mColorGradient;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -227,7 +267,20 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! Whether the matrix should be smoothed during scaling.
+  cedar::aux::BoolParameterPtr _mSmoothScaling;
+
+  //! Whether scaling of plots is determined automatically or fixed.
+  cedar::aux::BoolParameterPtr _mAutoScaling;
+
+  //! Whether scaling of plots is determined automatically or fixed.
+  cedar::aux::BoolParameterPtr _mShowLegend;
+
+  //! Limits for fixed scaling.
+  cedar::aux::math::DoubleLimitsParameterPtr _mValueLimits;
+
+  //! Color scale to use.
+  cedar::aux::EnumParameterPtr _mColorJet;
 
 }; // class cedar::aux::gui::QImagePlot
 

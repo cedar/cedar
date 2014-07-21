@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -36,7 +36,7 @@
 
 # You may choose to use either a local or an installed version of cedar
 # The directory of the local cedar version to use
-set(CEDAR_HOME "~/workspace/src/cedar.unstable")
+set(CEDAR_HOME "~/src/cedar.release")
 # The install directory of cedar (without subfolders such as include/ or lib/)
 #set(CEDAR_HOME_INSTALLED "/usr/local")
 

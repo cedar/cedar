@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -204,7 +204,7 @@ public:
 
   /*! @brief Set a new backendtype to the used channel.
    *
-   * This will also change some visible attributes to various parameters in the processingIde
+   * This will also change some visible attributes to various parameters in the gui
    *
    * @param backendType The wanted backend as enum parameter
    */

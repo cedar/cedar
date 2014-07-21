@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -326,9 +326,9 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
 
   if (dimensionality == 0)
   {
-    this->lockAll();
+    cedar::aux::Lockable::Locker locker(this);
     this->mOutput->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
-    this->unlockAll();
+    locker.unlock();
   }
   else
   {
@@ -340,15 +340,16 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
       sizes[dim] = _mOutputDimensionSizes->at(dim);
     }
 
-    this->lockAll();
+    cedar::aux::Lockable::Locker locker(this);
     this->mOutput->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
-    this->unlockAll();
+    locker.unlock();
   }
 }
 
 void cedar::proc::steps::Projection::expand0DtoND()
 {
-  CEDAR_DEBUG_ASSERT(mInput->getData().size[0] == 1)
+  CEDAR_DEBUG_ASSERT(mInput->getData().size[0] == 1);
+  CEDAR_DEBUG_ASSERT(mInput->getData().type() == CV_32F);
 
   // set all values of the output matrix to the single value of the input
   mOutput->getData() = cv::Scalar(mInput->getData().at<float>(0));

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,12 +41,16 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Enum.h"
+#include "cedar/auxiliaries/EnumBase.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/CommandLineParser.fwd.h"
 #include "cedar/auxiliaries/Path.fwd.h"
+#include "cedar/auxiliaries/EnumBase.fwd.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -83,6 +87,7 @@ public:
    * @param longName    Long name of the parameter. Should not contain spaces.
    * @param description Description to show to the user.
    * @param shortName   Short name of the command. Leave 0 to ignore.
+   * @param group       Logical group of the parameter. Mainly used for the help function.
    */
   void defineFlag
   (
@@ -95,9 +100,11 @@ public:
   /*!@brief Defines a command line value, i.e., an option that must be given a value. If the option is not present, the
    *        parser will return the default value.
    *
-   * @param longName    Long name of the option.
-   * @param description Description of the option.
-   * @param shortName   Optional short name of the option.
+   * @param longName     Long name of the option.
+   * @param description  Description of the option.
+   * @param defaultValue The default value to be used when the user does not specify anything.
+   * @param shortName    Optional short name of the option.
+   * @param group        Logical group of the parameter. Mainly used for the help function.
    */
   template <typename T>
   void defineValue
@@ -118,11 +125,48 @@ public:
    * @param longName    Long name of the option.
    * @param description Description of the option.
    * @param shortName   Optional short name of the option.
+   * @param group       Logical group of the parameter. Mainly used for the help function.
    */
   void defineValue
   (
     const std::string& longName,
     const std::string& description,
+    char shortName = 0,
+    const std::string& group = std::string()
+  );
+
+  /*!@brief Defines a command line value that is determined from an enum class.
+   *
+   * @param longName     Long name of the option.
+   * @param description  Description of the option.
+   * @param enumType     Enum class to be used for translating values from and to strings.
+   * @param defaultValue Default value for the parameter.
+   * @param shortName    Optional short name of the option.
+   * @param group        Group of the option; used for displaying the help text.
+   */
+  void defineEnum
+  (
+    const std::string& longName,
+    const std::string& description,
+    cedar::aux::EnumBasePtr enumType,
+    cedar::aux::EnumId defaultValue,
+    char shortName = 0,
+    const std::string& group = std::string()
+  );
+
+  /*!@brief Defines a command line value that is determined from an enum class.
+   *
+   * @param longName    Long name of the option.
+   * @param description Description of the option.
+   * @param enumType    Enum class to be used for translating values from and to strings.
+   * @param shortName   Optional short name of the option.
+   * @param group       Group of the option; used for displaying the help text.
+   */
+  void defineEnum
+  (
+    const std::string& longName,
+    const std::string& description,
+    cedar::aux::EnumBasePtr enumType,
     char shortName = 0,
     const std::string& group = std::string()
   );
@@ -192,6 +236,10 @@ public:
    */
   const std::vector<std::string>& getUnparsedValues() const;
 
+  /*! Sets the default value for a given command line option.
+   */
+  void setDefaultValue(const std::string& longName, const std::string& defaultValue);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -220,6 +268,8 @@ private:
        );
 
   bool isFlag(const std::string& longName) const;
+
+  bool isEnum(const std::string& longName) const;
 
   const std::string& getLongName(char shortName);
 
@@ -264,6 +314,9 @@ private:
   //! Contains all defined commands and their associated default values.
   std::map<std::string, std::string> mDefaultValues;
 
+  //! A map of all enum values and their associated enum types
+  std::map<std::string, cedar::aux::EnumBasePtr> mEnumValues;
+
   //! Options stored in here are flags.
   std::set<std::string> mFlags;
 
@@ -294,6 +347,20 @@ private:
   static std::string M_CFG_FILE_INCLUDE_TAG;
 
 }; // class cedar::aux::CommandLineParser
+
+namespace cedar
+{
+  namespace aux
+  {
+    //! Specialization of the getValue method for enums.
+    template <> inline cedar::aux::Enum CommandLineParser::getValue(const std::string& longName) const
+    {
+      //!@todo Proper exception: the given parameter is not an enum parameter.
+      CEDAR_ASSERT(this->isEnum(longName));
+      return this->mEnumValues.find(longName)->second->get(this->getValue(longName));
+    }
+  }
+}
 
 #endif // CEDAR_AUX_COMMAND_LINE_PARSER_H
 

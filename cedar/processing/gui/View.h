@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -74,7 +74,7 @@ class cedar::proc::gui::View : public QGraphicsView
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  View(QWidget *pParent = NULL);
+  View(QWidget *pParent = nullptr);
 
   //!@brief Destructor
   ~View();
@@ -83,6 +83,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Sets the main widgets for the view.
+  void setWidgets
+  (
+    QMainWindow* pMainWindow,
+    cedar::aux::gui::Configurable* pConigurableWidget,
+    cedar::proc::gui::RecorderWidget* pRecorderWidget
+  );
+
   //!@brief return the displayed scene
   cedar::proc::gui::Scene* getScene();
 
@@ -117,6 +125,9 @@ public:
   {
   }
 
+  //! Resets the viewport, i.e., redetermines the size of the scene and adapts the scroll bars accordingly.
+  void resetViewport();
+
 public slots:
   /*!@brief Changes the current zoom level of the architecture.
    */
@@ -137,6 +148,16 @@ protected:
 
   //!@brief Handles mouse move events.
   void mouseMoveEvent(QMouseEvent *pEvent);
+
+  /*!@brief We have to trick Qt to allow middle button drag mode,
+   * see https://bugreports.qt-project.org/browse/QTBUG-7328 for a bug report
+   */
+  void mousePressEvent(QMouseEvent* pEvent);
+
+  /*!@brief We have to trick Qt to allow middle button drag mode,
+   * see https://bugreports.qt-project.org/browse/QTBUG-7328 for a bug report
+   */
+  void mouseReleaseEvent(QMouseEvent* pEvent);
 
 signals:
   //!@brief reacts to a change in zoom level
@@ -191,6 +212,15 @@ private:
 
   //!@brief Timer used for scrolling.
   QTimer *mpScrollTimer;
+
+  QPointF mLastPoint;
+
+  QMainWindow* mpMainWindow;
+
+  cedar::aux::gui::Configurable* mpConigurableWidget;
+
+  cedar::proc::gui::RecorderWidget* mpRecorderWidget;
+
 }; // class ProcessingView
 
 #endif // CEDAR_PROC_VIEW_H

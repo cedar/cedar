@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -81,6 +81,9 @@ public:
 
   //!@brief get the parameter, which is graphically represented by this instance
   cedar::aux::ParameterPtr getParameter();
+
+  //! Makes the parameter read-only. Child classes can override this to provide specific read-only variants of their widgets.
+  virtual void setReadOnly(bool readOnly);
 
 signals:
   //!@brief this signal is emitted whenever a new parameter is linked to this graphical representation

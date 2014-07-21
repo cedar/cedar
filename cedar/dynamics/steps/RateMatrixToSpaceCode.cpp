@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -323,11 +323,13 @@ void cedar::dyn::RateMatrixToSpaceCode::inputConnectionChanged(const std::string
     mDimensionality = mInput->getDimensionality() + 1;
 
     // This should always work since other types should not be accepted.
+    this->redetermineInputValidity("values");
     this->outputSizesChanged();
   }
 
   if (inputName == "values")
   {
+    this->redetermineInputValidity("bin map");
     this->outputSizesChanged();
   }
 }

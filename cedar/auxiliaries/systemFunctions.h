@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -69,7 +69,7 @@ namespace cedar
      *          Lastly, the function looks in the cedar install directory.
      *
      */
-    CEDAR_AUX_LIB_EXPORT std::string locateResource(const std::string& resourcePath);
+    CEDAR_AUX_LIB_EXPORT std::string locateResource(const std::string& resourcePath, bool showInLog = true);
 
     /*!@brief   Lists all the paths that are searched for resources.
      *

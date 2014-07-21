@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -101,7 +101,7 @@ public:
 
   /*! @brief This signal is raised, if the grabber will be recreated
    *
-   *   This signal is used from the processingIde Camera step to annotate a new imagesize
+   *   This signal is used from the gui Camera step to annotate a new imagesize
    */
   void frameSizeChanged();
 

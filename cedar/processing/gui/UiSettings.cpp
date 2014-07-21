@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -66,6 +66,7 @@ QWidget(pParent)
   this->mpGrowthFactor->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScaling);
   this->mpSensitivity->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingSensitivity);
   this->mpHighlightConnections->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightConnections);
+  this->mpHighlightHoveredConnection->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mHighlightHoveredConnections);
   this->mpMaximumNumberOfLogMessages->setParameter(cedar::aux::gui::SettingsSingleton::getInstance()->getMaximalNumberOfLogEntriesParameter());
 }
 

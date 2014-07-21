@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -80,11 +80,14 @@ public:
   //! Add an accepted matrix type. By default, all dimensionalities are accepted.
   void addAcceptedType(int type);
 
+  //! Add an accepted amount of channels. By default, all channels are accepted.
+  void addAcceptedNumberOfChannels(unsigned int numberOfChannels);
+
   //! Sets whether the matrix can be empty
   void acceptsEmptyMatrix(bool accepts);
 
   //! Performs the actual check.
-  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const;
+  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data, std::string& info) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -103,6 +106,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   std::vector<unsigned int> mAcceptedDimensionalities;
+
+  std::vector<unsigned int> mAcceptedNumberOfChannels;
 
   std::vector<int> mAcceptedTypes;
 

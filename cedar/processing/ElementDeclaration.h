@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -58,8 +58,6 @@
 #include "cedar/auxiliaries/Singleton.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QIcon>
-#include <QResource>
 #include <vector>
 #include <string>
 
@@ -129,48 +127,6 @@ public:
   std::string getPluginType() const
   {
     return "processing step";
-  }
-
-  //!@brief set path to icon included in the graphical representation of this element
-  void setIconPath(const std::string& path)
-  {
-    this->mIconPath = path;
-  }
-
-  //!@brief get path to icon included in the graphical representation of this element
-  const std::string& getIconPath() const
-  {
-    return this->mIconPath;
-  }
-
-  //!@brief Returns the actual icon for the element.
-  QIcon getIcon() const
-  {
-    return QIcon(this->determinedIconPath());
-  }
-
-  /*! Returns the path for the icon to use; this will also return special icons if there is an error with the specified
-   * icons.
-   */
-  QString determinedIconPath() const
-  {
-    QResource existance_test(QString::fromStdString(this->getIconPath()));
-    if (existance_test.isValid())
-    {
-      auto icon = QIcon(QString::fromStdString(this->getIconPath()));
-      if (icon.isNull())
-      {
-        return ":/steps/no_icon.svg";
-      }
-      else
-      {
-        return QString::fromStdString(this->getIconPath());
-      }
-    }
-    else
-    {
-      return ":/steps/broken_icon.svg";
-    }
   }
 
   //!@brief Method for setting the description of the element.
