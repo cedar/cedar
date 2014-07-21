@@ -75,7 +75,8 @@ cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial()
 _mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N")),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
 {
-  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
+  //!@todo this has to be fixed
+//  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
 }
 
 cedar::dev::kteam::InfraredSensorSerial::~InfraredSensorSerial()

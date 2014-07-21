@@ -116,6 +116,11 @@ public:
   CEDAR_DECLARE_DEPRECATED(bool isRunning());
   CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
   CEDAR_DECLARE_DEPRECATED(void stopTimer());
+
+  void setStepSize(const cedar::unit::Time& time);
+  void setIdleTime(const cedar::unit::Time& time);
+  bool isRunningNolocking();
+
   unsigned int getDeviceStepSize();
 
   //!@brief Returns the channel associated with the component.

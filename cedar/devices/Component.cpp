@@ -713,6 +713,16 @@ void cedar::dev::Component::setIdleTime(double d)
   mDeviceThread->setIdleTime(d);
 }
 
+void setStepSize(const cedar::unit::Time& time)
+{
+  mDeviceThread->setStepSize(time);
+}
+
+void setIdleTime(const cedar::unit::Time& time)
+{
+  mDeviceThread->setIdleTime(time);
+}
+
 void cedar::dev::Component::setSimulatedTime(double d)
 {
   mDeviceThread->setSimulatedTime(d);
@@ -721,6 +731,11 @@ void cedar::dev::Component::setSimulatedTime(double d)
 bool cedar::dev::Component::isRunning()
 {
   return mDeviceThread->isRunning();
+}
+
+bool cedar::dev::Component::isRunningNolocking()
+{
+  return mDeviceThread->isRunningNolocking();
 }
 
 void cedar::dev::Component::startTimer(double d)
