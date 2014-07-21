@@ -141,6 +141,13 @@ public:
 
   void processStart();
 
+  void startDevice();
+  void stopDevice();
+
+  std::vector<ComponentDataType> getInstalledMeasurementTypes() const;
+
+  cedar::aux::DataPtr getDeviceMeasurementData(const ComponentDataType &type);
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -157,9 +164,6 @@ protected:
   {
     this->mSlot = slot;
   }
-
-  void startDevice(); // todo: public?
-  void stopDevice(); // todo: public?
 
   void installCommandType(ComponentDataType type);
   void installMeasurementType(ComponentDataType type);
