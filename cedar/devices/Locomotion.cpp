@@ -45,9 +45,26 @@
 
 // SYSTEM INCLUDES
 
+
+//------------------------------------------------------------------------------
+// static variables
+//------------------------------------------------------------------------------
+
+const cedar::dev::Component::ComponentDataType cedar::dev::Locomotion::FORWARD_VELOCITY = 1;
+const cedar::dev::Component::ComponentDataType cedar::dev::Locomotion::TURNING_RATE = 2;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::Locomotion::init()
+{
+  installCommandAndMeasurementType( cedar::dev::Locomotion::FORWARD_VELOCITY );
+  installCommandAndMeasurementType( cedar::dev::Locomotion::TURNING_RATE );
+
+  setCommandAndMeasurementDimensionality( cedar::dev::Locomotion::FORWARD_VELOCITY, 1 );
+  setCommandAndMeasurementDimensionality( cedar::dev::Locomotion::TURNING_RATE, 1 );
+
+}
 
 cedar::dev::Locomotion::Locomotion()
 :
@@ -82,8 +99,7 @@ _mTurningRateLimits
       )
 )
 {
-  this->addCommandedData("turning rate", this->mTurningRate, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
-  this->addCommandedData("forward velocity", this->mForwardVelocity, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
+  init();
 }
 
 // constructor taking an externally created channel
@@ -121,9 +137,7 @@ _mTurningRateLimits
       )
 )
 {
-  //!@todo It is inefficient to call two different functions for setting turning rate and velocity, there should be only one call.
-  this->addCommandedData("turning rate", this->mTurningRate, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
-  this->addCommandedData("forward velocity", this->mForwardVelocity, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
+  init();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
