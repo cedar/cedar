@@ -22,42 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedStepNotConnected.fwd.h
+    File:        LoopedElementNotConnected.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 06
+    Date:        2013 06 20
 
-    Description: Forward declaration file for the class cedar::proc::LoopedStepNotConnected.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_LOOPED_STEP_NOT_CONNECTED_FWD_H
-#define CEDAR_PROC_LOOPED_STEP_NOT_CONNECTED_FWD_H
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/processing/consistency/LoopedElementNotConnected.h"
+#include "cedar/processing/Element.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::LoopedElementNotConnected::LoopedElementNotConnected(cedar::proc::ElementPtr unconnectedElement)
+:
+mUnconnectedElement(unconnectedElement)
 {
-  namespace proc
-  {
-    CEDAR_DECLARE_PROC_CLASS(LoopedStepNotConnected);
-  }
 }
 
-//!@endcond
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
 
-#endif // CEDAR_PROC_LOOPED_STEP_NOT_CONNECTED_FWD_H
-
+std::string cedar::proc::LoopedElementNotConnected::getDescription() const
+{
+  return "The element \"" + this->mUnconnectedElement->getName() + "\" is not connected to a looped trigger.";
+}
