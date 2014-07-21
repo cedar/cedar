@@ -131,6 +131,8 @@ private:
 
   void applyForwardVelocity();
 
+  void init();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -140,6 +142,9 @@ protected:
 
   //! desired turning rate of the robot [rad/s]
   cedar::aux::AngularVelocityDataPtr mTurningRate;
+
+  static const cedar::dev::Component::ComponentDataType FORWARD_VELOCITY;
+  static const cedar::dev::Component::ComponentDataType TURNING_RATE;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
