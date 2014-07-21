@@ -42,7 +42,8 @@
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/StepItem.h"
-#include "cedar/processing/consistency/LoopedStepNotConnected.h"
+#include "cedar/processing/consistency/LoopedElementNotConnected.h"
+#include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/auxiliaries/assert.h"
@@ -76,6 +77,7 @@ mpView(pView)
 void cedar::proc::gui::ArchitectureConsistencyCheck::setGroup(cedar::proc::gui::GroupPtr network)
 {
   this->mGroup = network;
+  this->clear();
 }
 
 void cedar::proc::gui::ArchitectureConsistencyCheck::recheck()
@@ -124,8 +126,12 @@ void cedar::proc::gui::ArchitectureConsistencyCheck::itemAction(int row, int)
   size_t issue_id = static_cast<size_t>(row);
   CEDAR_ASSERT(issue_id < this->mIssues.size());
   auto issue = this->mIssues.at(issue_id);
-  if (auto looped_not_connected = boost::dynamic_pointer_cast<cedar::proc::LoopedStepNotConnected>(issue))
+  if (auto looped_not_connected = boost::dynamic_pointer_cast<cedar::proc::LoopedElementNotConnected>(issue))
   {
-    this->mpView->centerOn(mpScene->getStepItemFor(looped_not_connected->getUnconnectedStep().get()));
+    this->mpView->centerOn(mpScene->getGraphicsItemFor(looped_not_connected->getUnconnectedElement().get()));
+  }
+  else if (auto looped_not_connected = boost::dynamic_pointer_cast<cedar::proc::LoopedElementInNonLoopedGroup>(issue))
+  {
+    this->mpView->centerOn(mpScene->getGraphicsItemFor(looped_not_connected->getUnconnectedElement().get()));
   }
 }

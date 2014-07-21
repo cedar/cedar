@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedStepNotConnected.h
+    File:        LoopedElementNotConnected.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_LOOPED_STEP_NOT_CONNECTED_H
-#define CEDAR_PROC_LOOPED_STEP_NOT_CONNECTED_H
+#ifndef CEDAR_PROC_LOOPED_ELEMENT_NOT_CONNECTED_H
+#define CEDAR_PROC_LOOPED_ELEMENT_NOT_CONNECTED_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,10 +44,10 @@
 #include "cedar/processing/consistency/ConsistencyIssue.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/consistency/LoopedStepNotConnected.fwd.h"
+#include "cedar/processing/consistency/LoopedElementNotConnected.fwd.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/Element.fwd.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -55,7 +55,7 @@
 
 /*!@brief A consistency issue that indicates a looped step that is not connected to a looped trigger.
  */
-class cedar::proc::LoopedStepNotConnected : public cedar::proc::ConsistencyIssue
+class cedar::proc::LoopedElementNotConnected : public cedar::proc::ConsistencyIssue
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -66,16 +66,16 @@ class cedar::proc::LoopedStepNotConnected : public cedar::proc::ConsistencyIssue
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedStepNotConnected(cedar::proc::StepPtr unconnectedStep);
+  LoopedElementNotConnected(cedar::proc::ElementPtr unconnectedElement);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! Returns the looped step that is not connected to a looped trigger.
-  cedar::proc::StepPtr getUnconnectedStep() const
+  cedar::proc::ElementPtr getUnconnectedElement() const
   {
-    return this->mUnconnectedStep;
+    return this->mUnconnectedElement;
   }
 
   std::string getDescription() const;
@@ -98,10 +98,10 @@ private:
 protected:
   // none yet
 private:
-  //! The unconnected step.
-  cedar::proc::StepPtr mUnconnectedStep;
+  //! The unconnected element.
+  cedar::proc::ElementPtr mUnconnectedElement;
 
-}; // class cedar::proc::LoopedStepNotConnected
+}; // class cedar::proc::LoopedElementNotConnected
 
-#endif // CEDAR_PROC_LOOPED_STEP_NOT_CONNECTED_H
+#endif // CEDAR_PROC_LOOPED_ELEMENT_NOT_CONNECTED_H
 

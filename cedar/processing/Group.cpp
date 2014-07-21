@@ -72,7 +72,8 @@
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 
-#include "cedar/processing/consistency/LoopedStepNotConnected.h"
+#include "cedar/processing/consistency/LoopedElementNotConnected.h"
+#include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -399,32 +400,60 @@ std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Group::checkConsisten
   // Check for looped steps that are not connected to looped triggers
   for (auto iter : this->getElements())
   {
-    cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter.second);
+    cedar::proc::TriggerablePtr triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(iter.second);
 
-    if (!step)
+    if (!triggerable)
+    {
+      continue;
+    }
+    // trigger do not have to be connected to other triggers
+    if (boost::dynamic_pointer_cast<cedar::proc::Trigger>(triggerable))
     {
       continue;
     }
 
-    if (step->isLooped())
+    if (triggerable->isLooped())
     {
       bool is_triggered = false;
+      bool parent_not_triggered = false;
       // check if there is a looped trigger to which this element is connected
       for (size_t i = 0; i < looped_triggers.size(); ++i)
       {
         cedar::proc::LoopedTriggerPtr trigger = looped_triggers[i];
-        if (trigger->isListener(step))
+        if (trigger->isListener(triggerable))
         {
           is_triggered = true;
           break;
         }
       }
 
-      if (!is_triggered)
+      // element will be triggered by this group, there will already be a warning if the group is not connected to a trigger
+      if (this->isLooped())
       {
-        issues.push_back(boost::make_shared<cedar::proc::LoopedStepNotConnected>(step));
+        is_triggered = true;
+      }
+      else if (!this->isLooped() && !this->isRoot())
+      {
+        parent_not_triggered = true;
+      }
+
+      if (!is_triggered && !parent_not_triggered)
+      {
+        issues.push_back(boost::make_shared<cedar::proc::LoopedElementNotConnected>(iter.second));
+      }
+
+      if (parent_not_triggered)
+      {
+        issues.push_back(boost::make_shared<cedar::proc::LoopedElementInNonLoopedGroup>(iter.second));
       }
     } // end is looped
+
+    if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(triggerable))
+    {
+      // this element is a group itself, we should step into it and check the consistency of its content as well
+      auto more_issues = group->checkConsistency();
+      issues.insert(issues.end(), more_issues.begin(), more_issues.end());
+    }
   }
 
   return issues;
