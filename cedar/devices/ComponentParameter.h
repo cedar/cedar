@@ -88,6 +88,9 @@ public:
   //! Returns the string-representation of the currently selected component.
   std::string getStringRepresentation() const;
 
+  //! Checks if a component has been assigned to the component slot in this parameter.
+  bool hasComponentSlot() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

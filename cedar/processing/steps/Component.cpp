@@ -95,67 +95,30 @@ _mComponent(new cedar::dev::ComponentParameter(this, "component"))
 
 void cedar::proc::steps::Component::onStart()
 {
-  try
+  this->_mComponent->setConstant(true);
+  if (this->hasComponent())
   {
-    if (auto component = this->getComponent())
-    {
-      if (auto channel = component->getChannel())
-      {
-        if (!channel->isOpen())
-        {
-          this->mConnectedOnStart = true;
-          channel->open();
-        }
-      }
-    }
+    auto component = this->getComponent();
+    //!@todo Stop io thread here
+//    component->startIO();
   }
-  catch (cedar::dev::NoComponentSelectedException)
-  {
-    // ok, don't do anything in this case.
-  }
+
 }
 
 void cedar::proc::steps::Component::onStop()
 {
-  try
+  this->_mComponent->setConstant(false);
+  if (this->hasComponent())
   {
-    if (auto component = this->getComponent())
-    {
-      if (auto channel = component->getChannel())
-      {
-        if (this->mConnectedOnStart)
-        {
-          channel->close();
-          this->mConnectedOnStart = false;
-        }
-      }
-    }
+    auto component = this->getComponent();
+    //!@todo Start io thread here
+//    component->stopIO();
   }
-  catch (cedar::dev::NoComponentSelectedException)
-  {
-    // ok, don't do anything in this case.
-  }
+
 }
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
-  this->getComponent()->updateMeasuredValues();
-
-  // read values from the inputs
-  std::vector<std::string> data_names = this->getComponent()->getDataNames(cedar::dev::Component::COMMANDED);
-  for (auto name_iter = data_names.begin(); name_iter != data_names.end(); ++name_iter)
-  {
-    const std::string& name = *name_iter;
-    cedar::aux::ConstDataPtr data = this->getInput(name);
-
-    if (data)
-    {
-      this->getComponent()->getCommandedData(name)->copyValueFrom(data);
-    }
-  }
-
-  // update the commands
-  this->getComponent()->updateCommandedValues();
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputValidity
@@ -167,16 +130,17 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
   const std::string& name = slot->getName();
 
   // only commanded data are inputs
-  cedar::aux::ConstDataPtr component_data = this->getComponent()->getCommandedData(name);
-
-  if (typeid(*component_data) == typeid(*data))
-  {
-    return cedar::proc::DataSlot::VALIDITY_VALID;
-  }
-  else
-  {
+  //!@todo Reimplement
+//  cedar::aux::ConstDataPtr component_data = this->getComponent()->getCommandedData(name);
+//
+//  if (typeid(*component_data) == typeid(*data))
+//  {
+//    return cedar::proc::DataSlot::VALIDITY_VALID;
+//  }
+//  else
+//  {
     return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
+//  }
 }
 
 void cedar::proc::steps::Component::componentChanged()
@@ -184,6 +148,8 @@ void cedar::proc::steps::Component::componentChanged()
   //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
   this->removeAllDataSlots();
 
+  //!@todo Reimplement
+  /*
   cedar::dev::ComponentPtr component;
   try
   {
@@ -223,4 +189,5 @@ void cedar::proc::steps::Component::componentChanged()
       }
     }
   }
+  */
 }
