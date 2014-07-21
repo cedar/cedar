@@ -86,6 +86,27 @@ mChannel(channel)
   //----------------------------------------------------------------------------------------------------------------------
   // methods
   //----------------------------------------------------------------------------------------------------------------------
+  std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getInstalledMeasurementTypes() const
+  {
+    //!@todo Locking?
+    auto copy = this->mInstalledMeasurementTypes;
+    return copy;
+  }
+
+  cedar::aux::DataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type) //!@todo Const?
+  {
+    //!@todo Check that the measurement type exists
+
+    QReadLocker locker(this->mDeviceRetrievedMeasurements.getLockPtr());
+    this->lazyInitializeDeviceMeasurementBufferUnlocked(type);
+
+    auto iter = this->mDeviceRetrievedMeasurements.member().find(type);
+    CEDAR_DEBUG_ASSERT(iter != this->mDeviceRetrievedMeasurements.member().end());
+
+    auto ptr_copy = iter->second;
+    return ptr_copy;
+  }
+
   void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, unsigned int dim)
   {
     // todo: locking
@@ -266,6 +287,10 @@ mChannel(channel)
 
     auto dim = found->second;
 
+    if (!mDeviceRetrievedMeasurements.member()[type])
+    {
+      mDeviceRetrievedMeasurements.member()[type] = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat()));
+    }
     mDeviceRetrievedMeasurements.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
   }
 
@@ -608,7 +633,8 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
   // lock measurements 
   QWriteLocker lock1(mDeviceRetrievedMeasurements.getLockPtr());
 
-  mDeviceRetrievedMeasurements.member().clear();
+  //!@todo What was the purpose of this clear? reimplement
+//  mDeviceRetrievedMeasurements.member().clear();
 
   // thinks I can get directly from HW:
   for( auto& type : mInstalledMeasurementTypes )
@@ -670,7 +696,8 @@ void cedar::dev::Component::updateUserMeasurements()
   mPreviousDeviceMeasurementsBuffer.member() = mUserMeasurementsBuffer.member();
     // todo: is this really a deep copy?
   mUserMeasurementsBuffer.member() = mDeviceRetrievedMeasurements.member();
-  mDeviceRetrievedMeasurements.member().clear();
+  //!@todo What was the purpose of this clear? reimplement
+//  mDeviceRetrievedMeasurements.member().clear();
 
   lock1.unlock();
   lock2.unlock();
