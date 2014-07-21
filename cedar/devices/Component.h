@@ -110,18 +110,17 @@ public:
 public:
   CEDAR_DECLARE_DEPRECATED(void start());
   CEDAR_DECLARE_DEPRECATED(void stop());
-  CEDAR_DECLARE_DEPRECATED(void setStepSize(double));
-  CEDAR_DECLARE_DEPRECATED(void setIdleTime(double));
-  CEDAR_DECLARE_DEPRECATED(void setSimulatedTime(double));
   CEDAR_DECLARE_DEPRECATED(bool isRunning());
   CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
   CEDAR_DECLARE_DEPRECATED(void stopTimer());
 
+  //!@ check if these functions have to be exposed at all (may at least be changed to protected visibility)
   void setStepSize(const cedar::unit::Time& time);
   void setIdleTime(const cedar::unit::Time& time);
+  void setSimulatedTime(const cedar::unit::Time& time);
   bool isRunningNolocking();
 
-  unsigned int getDeviceStepSize();
+  cedar::unit::Time getDeviceStepSize();
 
   //!@brief Returns the channel associated with the component.
   inline cedar::dev::ChannelPtr getChannel() const

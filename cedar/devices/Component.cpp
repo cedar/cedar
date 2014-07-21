@@ -60,7 +60,7 @@ void cedar::dev::Component::init()
 
 
     mDeviceThread->connectToStartSignal(boost::bind(&cedar::dev::Component::processStart, this));
-    mDeviceThread->setStepSize(10);
+    mDeviceThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   }
 
   // constructor
@@ -301,8 +301,9 @@ mChannel(channel)
 
   void cedar::dev::Component::installCommandAndMeasurementType(ComponentDataType type)
   {
-    registerCommandType( type );
-    registerMeasurementType( type );
+    //!@todo add these functions
+//    registerCommandType( type );
+//    registerMeasurementType( type );
   }
 
   void cedar::dev::Component::resetComponent()
@@ -698,34 +699,24 @@ void cedar::dev::Component::stop()
   stopDevice();
 }
 
-unsigned int cedar::dev::Component::getDeviceStepSize()
+cedar::unit::Time cedar::dev::Component::getDeviceStepSize()
 {
   return mDeviceThread->getStepSize();
 }
 
-void cedar::dev::Component::setStepSize(double d)
-{
-  mDeviceThread->setStepSize(d);
-}
-
-void cedar::dev::Component::setIdleTime(double d)
-{
-  mDeviceThread->setIdleTime(d);
-}
-
-void setStepSize(const cedar::unit::Time& time)
+void cedar::dev::Component::setStepSize(const cedar::unit::Time& time)
 {
   mDeviceThread->setStepSize(time);
 }
 
-void setIdleTime(const cedar::unit::Time& time)
+void cedar::dev::Component::setIdleTime(const cedar::unit::Time& time)
 {
   mDeviceThread->setIdleTime(time);
 }
 
-void cedar::dev::Component::setSimulatedTime(double d)
+void cedar::dev::Component::setSimulatedTime(const cedar::unit::Time& time)
 {
-  mDeviceThread->setSimulatedTime(d);
+  mDeviceThread->setSimulatedTime(time);
 }
 
 bool cedar::dev::Component::isRunning()
@@ -738,7 +729,7 @@ bool cedar::dev::Component::isRunningNolocking()
   return mDeviceThread->isRunningNolocking();
 }
 
-void cedar::dev::Component::startTimer(double d)
+void cedar::dev::Component::startTimer(double)
 {
   // this does nothing. think
 }
@@ -880,50 +871,51 @@ cv::Mat cedar::dev::Component::getDeviceMeasurementBufferUnlocked(ComponentDataT
 
 cv::Mat cedar::dev::Component::integrateDevice(cv::Mat data, ComponentDataType type)
 {
-  double timestep;
-
-  timestep= mDeviceThread->getStepSize();
+  cedar::unit::Time timestep = mDeviceThread->getStepSize();
+  double unitless = timestep / (1.0 * cedar::unit::second);
 
   QReadLocker lock(mUserMeasurementsBuffer.getLockPtr());
-  return ( data * ( timestep / 1000.0 ) ) + getUserMeasurementBufferUnlocked(type);;
+  //!@todo check if this uses the right time step to integrate
+  cv::Mat result = data * unitless + getUserMeasurementBufferUnlocked(type);
+  return result;
 }
 
 cv::Mat cedar::dev::Component::integrateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2)
 {
-  double timestep;
-
-  timestep= mDeviceThread->getStepSize();
+  cedar::unit::Time timestep = mDeviceThread->getStepSize();
+  double unitless = timestep / (1.0 * cedar::unit::second);
 
   QReadLocker lock(mUserMeasurementsBuffer.getLockPtr());
-  return ( ( data * (timestep / 1000.0 ) + getUserMeasurementBufferUnlocked(type1) )
-           * ( timestep / 1000.0 ) )
-         + getUserMeasurementBufferUnlocked(type2);
+  //!@todo check if this uses the right time step to integrate
+  cv::Mat result = ( ( data * unitless + getUserMeasurementBufferUnlocked(type1) )
+      * unitless )
+    + getUserMeasurementBufferUnlocked(type2);
+  return result;
 }
 
 // todo: also used for commands
 cv::Mat cedar::dev::Component::differentiateDevice(cv::Mat data, ComponentDataType type)
 {
-  double timestep;
-
-  timestep= mDeviceThread->getStepSize();
+  cedar::unit::Time timestep = mDeviceThread->getStepSize();
+  double unitless = timestep / (1.0 * cedar::unit::second);
 
 // todo: check locking here
+  //!@todo check if this uses the right time step to differentiate
   return ( data - getPreviousDeviceMeasurementBufferUnlocked(type) )
-         / ( timestep / 1000.0 );
+         / unitless;
 }
 
 // todo: also used for commands
 cv::Mat cedar::dev::Component::differentiateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2)
 {
-  double timestep;
-
-  timestep= mDeviceThread->getStepSize();
+  cedar::unit::Time timestep = mDeviceThread->getStepSize();
+  double unitless = timestep / (1.0 * cedar::unit::second);
 
 // todo: check locking here
-  return ( ( data - getPreviousDeviceMeasurementBufferUnlocked(type1) )
-           / ( timestep / 1000.0 ) 
-           - getPreviousDeviceMeasurementBufferUnlocked(type2) )
-         / ( timestep / 1000.0 );
+  //!@todo check if this uses the right time step to differentiate
+  cv::Mat result = (( data - getPreviousDeviceMeasurementBufferUnlocked(type1) )  / unitless
+      - getPreviousDeviceMeasurementBufferUnlocked(type2) ) / unitless;
+  return result;
 }
 
 
