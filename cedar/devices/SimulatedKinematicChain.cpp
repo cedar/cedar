@@ -47,14 +47,13 @@
 
 cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
 {
-  //!@todo add these functions
-//  registerIOCommandHook( cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAngles, this, _1 ) );
-//  registerIOCommandHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedVelocities, this, _1 ) );
-//  registerIOCommandHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAccelerations, this, _1 ) );
-  //!@todo add these functions
-//  registerIOMeasurementHook( cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this ) );
-//  registerIOMeasurementHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities, this ) );
-//  registerIOMeasurementHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations, this ) );
+  registerDeviceCommandHook( cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAngles, this, _1 ) );
+  registerDeviceCommandHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedVelocities, this, _1 ) );
+  registerDeviceCommandHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAccelerations, this, _1 ) );
+
+  registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this ) );
+  registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities, this ) );
+  registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations, this ) );
 }
 
 cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
