@@ -216,24 +216,6 @@ private:
 
   void updateUserMeasurements();
 
-  void setUserCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
-  void setUserCommandIndexUnlocked(ComponentDataType &type, int index, double value);
-  void setInitialUserCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
-  cv::Mat getUserCommandBufferUnlocked(ComponentDataType &type) const;
-
-  void setUserMeasurementBufferUnlocked(ComponentDataType &type, cv::Mat);
-  cv::Mat getUserMeasurementBufferUnlocked(ComponentDataType &type) const;
-  double  getUserMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
-  cv::Mat getPreviousDeviceMeasurementBufferUnlocked(ComponentDataType &type) const;
-  double  getPreviousDeviceMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
-
-  void setDeviceCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
-  cv::Mat getDeviceCommandBufferUnlocked(ComponentDataType &type) const;
-
-  void setDeviceMeasurementBufferUnlocked(ComponentDataType &type, cv::Mat);
-  cv::Mat getDeviceMeasurementBufferUnlocked(ComponentDataType &type) const;
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

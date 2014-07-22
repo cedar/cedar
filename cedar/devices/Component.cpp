@@ -513,11 +513,6 @@ void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat
   this->mCommandData->setUserBuffer(type, data);
 }
 
-void cedar::dev::Component::setUserCommandBufferUnlocked(ComponentDataType& type, cv::Mat data)
-{
-  this->mCommandData->setUserBufferUnlocked(type, data);
-}
-
 void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
   // todo: lazyInitialize for command restrictions
@@ -528,18 +523,13 @@ void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, 
 
   // todo: there is no lock here. I think we dont need one, sure?
 
-  setInitialUserCommandBufferUnlocked(type, data);
+  this->mCommandData->mInitialUserSubmittedData.member()[type]->setData(data.clone());
 }
 
 
 void cedar::dev::Component::setUserCommandBufferIndex(ComponentDataType type, int index, double value)
 {
   this->mCommandData->setUserBufferIndex(type, index, value);
-}
-
-void cedar::dev::Component::setUserCommandIndexUnlocked(ComponentDataType& type,int index, double value)
-{
-  this->mCommandData->setUserBufferIndexUnlocked(type, index, value);
 }
 
 cv::Mat cedar::dev::Component::getUserMeasurementBuffer(ComponentDataType type) const
@@ -647,7 +637,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   cv::Mat userData, ioData;
   {
     QReadLocker lock(this->mCommandData->mUserBuffer.getLockPtr());
-    userData = getUserCommandBufferUnlocked( type_from_user ).clone();
+    userData = this->mCommandData->getUserBufferUnlocked( type_from_user ).clone();
   }
 
   // do we need to transform the input?
@@ -817,64 +807,6 @@ void cedar::dev::Component::stopTimer()
 {
 }
 
-
-void cedar::dev::Component::setInitialUserCommandBufferUnlocked(ComponentDataType& type, cv::Mat data)
-{
-  this->mCommandData->mInitialUserSubmittedData.member()[ type ]->setData(data.clone());
-}
-
-cv::Mat cedar::dev::Component::getUserCommandBufferUnlocked(ComponentDataType& type) const
-{
-  return this->mCommandData->getUserBufferUnlocked(type);
-}
-
-
-void cedar::dev::Component::setUserMeasurementBufferUnlocked(ComponentDataType& type, cv::Mat data)
-{
-  this->mMeasurementData->setUserBufferUnlocked(type, data);
-}
-
-
-cv::Mat cedar::dev::Component::getUserMeasurementBufferUnlocked(ComponentDataType& type) const
-{
-  return this->mMeasurementData->getUserBufferUnlocked(type);
-}
-
-double cedar::dev::Component::getUserMeasurementIndexUnlocked(ComponentDataType& type, int index) const
-{
-  return this->mMeasurementData->getUserDataIndexUnlocked(type, index);
-}
-
-cv::Mat cedar::dev::Component::getPreviousDeviceMeasurementBufferUnlocked(ComponentDataType& type) const
-{
-  return this->mMeasurementData->getPreviousDeviceBufferUnlocked(type);
-}
-
-double cedar::dev::Component::getPreviousDeviceMeasurementIndexUnlocked(ComponentDataType& type, int index) const
-{
-  return this->mMeasurementData->getPreviousDeviceBufferIndexUnlocked(type, index);
-}
-
-void cedar::dev::Component::setDeviceCommandBufferUnlocked(ComponentDataType& type, cv::Mat data)
-{
-  this->mCommandData->setDeviceSubmittedBufferUnlocked(type, data);
-}
-
-cv::Mat cedar::dev::Component::getDeviceCommandBufferUnlocked(ComponentDataType& type) const
-{
-  return this->mCommandData->getDeviceSubmittedBufferUnlocked(type);
-}
-
-void cedar::dev::Component::setDeviceMeasurementBufferUnlocked(ComponentDataType& type, cv::Mat data)
-{
-  this->mMeasurementData->setDeviceRetrievedBuffer(type, data);
-}
-
-cv::Mat cedar::dev::Component::getDeviceMeasurementBufferUnlocked(ComponentDataType& type) const
-{
-  return this->mMeasurementData->getDeviceRetrievedBufferUnlocked(type);
-}
-
 cv::Mat cedar::dev::Component::integrateDevice(cv::Mat data, ComponentDataType type)
 {
   cedar::unit::Time timestep = mDeviceThread->getStepSize();
@@ -882,7 +814,7 @@ cv::Mat cedar::dev::Component::integrateDevice(cv::Mat data, ComponentDataType t
 
   QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
   //!@todo check if this uses the right time step to integrate
-  cv::Mat result = data * unitless + getUserMeasurementBufferUnlocked(type);
+  cv::Mat result = data * unitless + this->mMeasurementData->getUserBufferUnlocked(type);
   return result;
 }
 
@@ -893,9 +825,9 @@ cv::Mat cedar::dev::Component::integrateDeviceTwice(cv::Mat data, ComponentDataT
 
   QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
   //!@todo check if this uses the right time step to integrate
-  cv::Mat result = ( ( data * unitless + getUserMeasurementBufferUnlocked(type1) )
+  cv::Mat result = ( ( data * unitless + this->mMeasurementData->getUserBufferUnlocked(type1) )
       * unitless )
-    + getUserMeasurementBufferUnlocked(type2);
+    + this->mMeasurementData->getUserBufferUnlocked(type2);
   return result;
 }
 
@@ -907,7 +839,7 @@ cv::Mat cedar::dev::Component::differentiateDevice(cv::Mat data, ComponentDataTy
 
 // todo: check locking here
   //!@todo check if this uses the right time step to differentiate
-  return ( data - getPreviousDeviceMeasurementBufferUnlocked(type) )
+  return ( data - this->mMeasurementData->getPreviousDeviceBufferUnlocked(type) )
          / unitless;
 }
 
@@ -919,8 +851,8 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cv::Mat data, ComponentD
 
 // todo: check locking here
   //!@todo check if this uses the right time step to differentiate
-  cv::Mat result = (( data - getPreviousDeviceMeasurementBufferUnlocked(type1) )  / unitless
-      - getPreviousDeviceMeasurementBufferUnlocked(type2) ) / unitless;
+  cv::Mat result = (( data - this->mMeasurementData->getPreviousDeviceBufferUnlocked(type1) )  / unitless
+      - this->mMeasurementData->getPreviousDeviceBufferUnlocked(type2) ) / unitless;
   return result;
 }
 
