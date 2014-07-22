@@ -98,6 +98,8 @@ public:
   /*!@brief starts the looped thread
    *
    * the KinematicChain class does some things in this function that are not needed
+   *
+   * @todo check if start still has to be overwritten
    */
   virtual void start();
 
@@ -155,8 +157,6 @@ private:
    * @param commandMode establish command mode if true
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-
 
   //!@brief copies data from the FRI to member variables for access from outside the loop thread
   void copyFromFRI();

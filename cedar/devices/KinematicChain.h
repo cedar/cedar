@@ -71,7 +71,6 @@ class cedar::dev::KinematicChain
 public cedar::dev::Component
 {
   Q_OBJECT
-  
 
 public:
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,17 +110,6 @@ public:
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
   //!@endcond
 
-
-  //----------------------------------------------------------------------------
-  // parameters
-  //----------------------------------------------------------------------------
-public:
-
-protected:
-  // none yet
-private:
-  // none yet
-
   //----------------------------------------------------------------------------
   // constructors and destructor
   //----------------------------------------------------------------------------
@@ -144,8 +132,6 @@ public slots:
 public:
   //!@brief updates the geometry to the current configuration of the kinematic chain DONT CALL IT YOURSELF
   CEDAR_DECLARE_DEPRECATED( void updateTransformations() );  // TODO FORWARD KIN
-
-
 
   //----------------------------------------------------------------------------
   // public methods
@@ -340,12 +326,6 @@ public:
    */
   void setJointAccelerations(const std::vector<double>& accelerations);
 
-
-
-
-
-
-
   /*!@brief returns a smart-pointer to the local coordinate frame of the end-effector
    *
    * @return smart-pointer to the end-effector
@@ -516,17 +496,11 @@ public:
    */
   cv::Mat calculateEndEffectorAcceleration();
 
-
-
-
-
-
-
   /*!@brief get joints of a named initial configuration
    *
    * @return    joint values of the initial configuration
    */
-  cv::Mat getInitialConfiguration(std::string name);
+  cv::Mat getInitialConfiguration(const std::string& name);
 
   /*!@brief get the vector of all initial configuration names
    *
@@ -555,7 +529,7 @@ public:
   // prefer using @addInitialConfiguration
   void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
   //!@brief set the currently valid initial configuration and apply it (i.e. move the manipulator to that configuration)
-  bool applyInitialConfiguration(std::string s);
+  bool applyInitialConfiguration(const std::string& name);
   //!@brief apply the named initial configuration by index
   //
   // Prefer using @applyInitialConfiguration(string) for accessing named configurations
@@ -578,15 +552,22 @@ private:
   //!@brief set the currently valid initial configuration, do not move the manipulator
   // 
   // See also @applyInitialConfiguration
-  bool setCurrentInitialConfiguration(const std::string &s);
+  bool setCurrentInitialConfiguration(const std::string& s);
 
   //!@brief: test validity of initial configurations
   void checkInitialConfigurations();
 
   //----------------------------------------------------------------------------
+  // parameters
+  //----------------------------------------------------------------------------
+protected:
+  // none yet
+private:
+  // none yet
+
+  //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
-public:
 protected:
   static const cedar::dev::Component::ComponentDataType JOINT_ANGLES;
   static const cedar::dev::Component::ComponentDataType JOINT_VELOCITIES;
@@ -599,8 +580,6 @@ private:
 
   //! the forward kinematic model
   ForwardKinematicsPtr mForwardKinematics;
-
-
 
   //!@brief map of the named initial configurations
   std::map< std::string, cv::Mat > mInitialConfigurations;
