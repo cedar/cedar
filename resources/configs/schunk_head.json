@@ -1,0 +1,86 @@
+{
+	"name": "Schunk Head",
+	"root coordinate frame":
+	{
+		"initial translation":
+		[
+			"0.0",
+			"0.0",
+			"0.0"
+		],
+		"initial rotation":
+		[
+			"1.0", "0.0", "0.0",
+			"0.0", "1.0", "0.0",
+			"0.0", "0.0", "1.0"
+		]
+	},
+	"end-effector coordinate frame":
+	{
+		"initial translation":
+		[
+			"0.0",
+			"-0.005",
+			"0.859"
+		],
+		"initial rotation":
+		[
+			"1.0", "0.0", "0.0",
+			"0.0", "0.0", "1.0",
+			"0.0", "-1.0", "0.0"
+		]
+	},
+    "joints":
+    {
+	    "cedar.dev.robot.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-3.1415927",
+				"upper limit": "3.1415927"
+			},
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
+			},
+			"position":
+			[
+				"0.0", 
+				"0.0",
+				"0.565"
+			],
+			"axis":
+			[
+				"0.0", 
+				"0.0",
+				"-1.0"
+			]
+		},
+	    "cedar.dev.robot.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-3.1415927",
+				"upper limit": "3.1415927"
+			},
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
+			},
+			"position":
+			[
+				"0.0", 
+				"0.0",
+				"0.655"
+			],
+			"axis":
+			[
+				"1.0", 
+				"0.0",
+				"0.0"
+			]
+		}
+	}
+}
