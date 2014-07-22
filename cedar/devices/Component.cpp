@@ -235,6 +235,25 @@ class cedar::dev::Component::DataCollection
       //  std::cout << "registered user command trafo from " << from << " to: " << to << std::endl;
     }
 
+    boost::optional<TransformationFunctionType> findTransformationHook(ComponentDataType from, ComponentDataType to) const
+    {
+      auto found_outer = this->mTransformationHooks.find(from);
+
+      if (found_outer != this->mTransformationHooks.end())
+      {
+        const auto& inner = found_outer->second;
+        auto found_inner = inner.find(to);
+
+        if (found_inner != inner.end())
+        {
+          return found_inner->second;
+        }
+      }
+
+      // if one of the maps doesn't contain one of the keys, return an empty value
+      return boost::optional<TransformationFunctionType>();
+    }
+
   private:
     cv::Mat getBuffer(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
     {
@@ -638,27 +657,18 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   // do we need to transform the input?
   if (type_for_Device != type_from_user)
   {
-    //!@todo Can this be moved to DataCollection?
-    // does a transformation exist?
-    auto found1 = this->mCommandData->mTransformationHooks.find(type_from_user);
-    if (found1 == this->mCommandData->mTransformationHooks.end())
+    auto hook = this->mCommandData->findTransformationHook(type_from_user, type_for_Device);
+
+    if (!hook)
     {
       // todo throw:
-//  std::cout << "missing appropriate transformation from command (" << type_from_user << std::endl;
+//  std::cout << "missing appropriate transformation to Device command for:" << type_for_Device << " (from: " << type_from_user << ")" << std::endl;
       return;
-    }
-
-    auto found2 = found1->second.find(type_for_Device);
-    if (found2 == found1->second.end())
-    {
-      // todo throw:
-//  std::cout << "missing appropriate transformation to Device command for:" << type_for_Device << " (from: " << type_from_user << ")" << std::endl;    
-      return;
-
     }
 
     QReadLocker lock1(this->mMeasurementData->mUserBuffer.getLockPtr());
-    ioData = (found2->second)(userData);
+    // call hook
+    ioData = hook.get()(userData);
   }
   else
   {
@@ -718,20 +728,11 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
     bool nothing_found = true;
     for ( auto& measured_type : types_we_measured )
     {
-      //!@todo Move finding of transformation hook to DataCollection
-      auto found1 = mMeasurementData->mTransformationHooks.find( measured_type );
-
-      if (found1 != mMeasurementData->mTransformationHooks.end())
+      auto hook = this->mMeasurementData->findTransformationHook(measured_type, missing_type);
+      if (hook.is_initialized())
       {
-
-        auto found2 = (found1->second).find( missing_type );
-
-        if (found2 != (found1->second).end())
-        {
-          this->mMeasurementData->mDeviceRetrievedData.member()[ missing_type ]->setData((found2->second)( this->mMeasurementData->mDeviceRetrievedData.member()[ measured_type ]->getData() ));
-          nothing_found = false;
-          break;
-        }
+        // call measurement hook
+        hook.get()(this->mMeasurementData->mDeviceRetrievedData.member()[ measured_type ]->getData());
       }
     }
   }
