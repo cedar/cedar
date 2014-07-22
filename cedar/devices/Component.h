@@ -146,9 +146,17 @@ public:
   void startDevice();
   void stopDevice();
 
+  //! Returns a list of all installed measurement types.
   std::vector<ComponentDataType> getInstalledMeasurementTypes() const;
 
+  //! Returns a list of all installed command types.
+  std::vector<ComponentDataType> getInstalledCommandTypes() const;
+
+  //! Returns the data that contains the current measurements.
   cedar::aux::DataPtr getDeviceMeasurementData(const ComponentDataType &type);
+
+  //! Returns the data that contains the commands that will be sent to the device.
+  cedar::aux::DataPtr getDeviceCommandData(const ComponentDataType &type);
 
 signals:
   void updatedUserMeasurementSignal();
