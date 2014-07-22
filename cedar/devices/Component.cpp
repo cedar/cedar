@@ -368,14 +368,25 @@ cedar::dev::Component::~Component()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
 std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getInstalledMeasurementTypes() const
 {
   return this->mMeasurementData->getInstalledTypes();
 }
 
+std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getInstalledCommandTypes() const
+{
+  return this->mCommandData->getInstalledTypes();
+}
+
 cedar::aux::DataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type) //!@todo Const?
 {
   return this->mMeasurementData->getDeviceData(type);
+}
+
+cedar::aux::DataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type) //!@todo Const?
+{
+  return this->mCommandData->getDeviceData(type);
 }
 
 void cedar::dev::Component::setCommandDimensionality(ComponentDataType type, unsigned int dim)

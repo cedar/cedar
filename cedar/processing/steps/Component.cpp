@@ -126,7 +126,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
   const std::string& name = slot->getName();
 
   // only commanded data are inputs
-  //!@todo Reimplement
+  //!@todo Reimplement the validity check.
 //  cedar::aux::ConstDataPtr component_data = this->getComponent()->getCommandedData(name);
 //
 //  if (typeid(*component_data) == typeid(*data))
@@ -157,5 +157,14 @@ void cedar::proc::steps::Component::componentChanged()
     std::string name = cedar::aux::toString(measurement);
     auto data = component->getDeviceMeasurementData(measurement);
     this->declareOutput(name, data);
+  }
+
+  auto commands = component->getInstalledCommandTypes();
+
+  for (const auto& command : commands)
+  {
+    std::string name = cedar::aux::toString(command);
+    //!@todo On inputConnectionChanged, incoming data must be set at the component.
+    this->declareInput(name);
   }
 }
