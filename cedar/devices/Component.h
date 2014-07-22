@@ -252,8 +252,6 @@ private:
 
   std::map< ComponentDataType, CommandFunctionType > mSubmitCommandHooks;
   std::map< ComponentDataType, MeasurementFunctionType > mRetrieveMeasurementHooks;
-  TransformationHookContainerType mCommandTransformationHooks;
-  TransformationHookContainerType mMeasurementTransformationHooks;
 
   boost::optional<ComponentDataType> mDeviceCommandSelection;
 

@@ -205,6 +205,36 @@ class cedar::dev::Component::DataCollection
       return this->getBufferIndexUnlocked(mPreviousDeviceBuffer, type, index);
     }
 
+    void registerTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
+    {
+      // todo checks
+      // todo locks
+
+
+      auto found = this->mTransformationHooks.find( from );
+
+      if (found == this->mTransformationHooks.end())
+      {
+        this->mTransformationHooks[ from ] = InnerTransformationHookContainerType{ {to, fun} };
+      }
+      else
+      {
+        auto found2 = (found->second).find( to );
+        if (found2 == (found->second).end())
+        {
+          (found->second)[ to ] = fun;
+        }
+        else
+        {
+          std::cout << "ERROR: reregistering transformation hook cmd from " << from << " to " << to << std::endl;
+          // TODO: throw
+
+          return;
+        }
+      }
+      //  std::cout << "registered user command trafo from " << from << " to: " << to << std::endl;
+    }
+
   private:
     cv::Mat getBuffer(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
     {
@@ -324,6 +354,10 @@ class cedar::dev::Component::DataCollection
 
     // Cache for the user-interface
     cedar::aux::LockableMember< BufferDataType > mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
+
+    TransformationHookContainerType mTransformationHooks;
+//    TransformationHookContainerType mCommandTransformationHooks;
+//    TransformationHookContainerType mMeasurementTransformationHooks;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -510,10 +544,6 @@ double cedar::dev::Component::getPreviousDeviceMeasurementBufferIndex(ComponentD
   return this->mMeasurementData->getPreviousDeviceBufferIndex(type, index);
 }
 
-
-
-
-
 void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, CommandFunctionType fun)
 {
   // todo checks
@@ -530,62 +560,12 @@ void cedar::dev::Component::registerDeviceMeasurementHook(ComponentDataType type
 
 void cedar::dev::Component::registerUserCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
 {
-  // todo checks
-  // todo locks
-
-
-  auto found = mCommandTransformationHooks.find( from );
-
-  if (found == mCommandTransformationHooks.end())
-  {
-    mCommandTransformationHooks[ from ] = InnerTransformationHookContainerType{ {to, fun} };
-  }
-  else
-  {
-    auto found2 = (found->second).find( to );
-    if (found2 == (found->second).end())
-    {
-      (found->second)[ to ] = fun;
-    }
-    else
-    {
-      std::cout << "ERROR: reregistering transformation hook cmd from " << from << " to " << to << std::endl;
-      // TODO: throw
-
-      return;
-    }
-  }
-//  std::cout << "registered user command trafo from " << from << " to: " << to << std::endl;  
+  this->mCommandData->registerTransformationHook(from, to, fun);
 }
 
 void cedar::dev::Component::registerDeviceMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
 {
-  // todo checks
-  // todo locks
-
-  auto found = mMeasurementTransformationHooks.find( from );
-
-  if (found == mMeasurementTransformationHooks.end())
-  {
-    mMeasurementTransformationHooks[ from ] = InnerTransformationHookContainerType{ {to, fun} };
-  }
-  else
-  {
-    auto found2 = (found->second).find( to );
-    if (found2 == (found->second).end())
-    {
-      (found->second)[ to ] = fun;
-    }
-    else
-    {
-std::cout << "ERROR: reregistering transformation hook measurment from " << from << " to " << to << std::endl;
-      // TODO: throw
-
-      return;
-    }
-  }
-//  std::cout << "registered Device measurement trafo from " << from << " to: " << to << std::endl;  
-
+  this->mMeasurementData->registerTransformationHook(from, to, fun);
 }
 
 void cedar::dev::Component::stepDevice(cedar::unit::Time time)
@@ -658,9 +638,10 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   // do we need to transform the input?
   if (type_for_Device != type_from_user)
   {
+    //!@todo Can this be moved to DataCollection?
     // does a transformation exist?
-    auto found1 = mCommandTransformationHooks.find(type_from_user);
-    if (found1 == mCommandTransformationHooks.end())
+    auto found1 = this->mCommandData->mTransformationHooks.find(type_from_user);
+    if (found1 == this->mCommandData->mTransformationHooks.end())
     {
       // todo throw:
 //  std::cout << "missing appropriate transformation from command (" << type_from_user << std::endl;
@@ -737,9 +718,10 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
     bool nothing_found = true;
     for ( auto& measured_type : types_we_measured )
     {
-      auto found1 = mMeasurementTransformationHooks.find( measured_type );
+      //!@todo Move finding of transformation hook to DataCollection
+      auto found1 = mMeasurementData->mTransformationHooks.find( measured_type );
 
-      if (found1 != mMeasurementTransformationHooks.end())
+      if (found1 != mMeasurementData->mTransformationHooks.end())
       {
 
         auto found2 = (found1->second).find( missing_type );
