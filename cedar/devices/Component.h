@@ -158,6 +158,12 @@ public:
   //! Returns the data that contains the commands that will be sent to the device.
   cedar::aux::DataPtr getDeviceCommandData(const ComponentDataType &type);
 
+  //! Returns the name for the given command.
+  std::string getNameForCommandType(ComponentDataType type) const;
+
+  //! Returns the name for the given measurement.
+  std::string getNameForMeasurementType(ComponentDataType type) const;
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -175,9 +181,9 @@ protected:
     this->mSlot = slot;
   }
 
-  void installCommandType(ComponentDataType type);
-  void installMeasurementType(ComponentDataType type);
-  void installCommandAndMeasurementType(ComponentDataType type);
+  void installCommandType(ComponentDataType type, const std::string& name);
+  void installMeasurementType(ComponentDataType type, const std::string& name);
+  void installCommandAndMeasurementType(ComponentDataType type, const std::string& name);
 
   void setCommandDimensionality(ComponentDataType type, unsigned int dim);
   void setMeasurementDimensionality(ComponentDataType type, unsigned int dim);

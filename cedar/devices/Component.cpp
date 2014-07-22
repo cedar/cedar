@@ -55,11 +55,22 @@
 class cedar::dev::Component::DataCollection
 {
   public:
-    void installType(cedar::dev::Component::ComponentDataType type)
+    void installType(cedar::dev::Component::ComponentDataType type, const std::string& name)
     {
       QWriteLocker locker(this->mInstalledTypes.getLockPtr());
+      QWriteLocker locker_b(this->mInstalledNames.getLockPtr());
       // lazyInitialize whether already registered and throw TODO
       mInstalledTypes.member().push_back(type);
+      mInstalledNames.member()[type] = name;
+    }
+
+    std::string getNameForType(cedar::dev::Component::ComponentDataType type) const
+    {
+      QWriteLocker locker(this->mInstalledNames.getLockPtr());
+      auto iter = this->mInstalledNames.member().find(type);
+      CEDAR_ASSERT(iter != this->mInstalledNames.member().end());
+      std::string copy = iter->second;
+      return copy;
     }
 
     std::vector<cedar::dev::Component::ComponentDataType> getInstalledTypes() const
@@ -376,6 +387,8 @@ class cedar::dev::Component::DataCollection
 
   private:
     cedar::aux::LockableMember<std::vector<cedar::dev::Component::ComponentDataType> > mInstalledTypes;
+
+    cedar::aux::LockableMember<std::map<cedar::dev::Component::ComponentDataType, std::string> > mInstalledNames;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -421,6 +434,16 @@ cedar::dev::Component::~Component()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::dev::Component::getNameForCommandType(ComponentDataType type) const
+{
+  return this->mCommandData->getNameForType(type);
+}
+
+std::string cedar::dev::Component::getNameForMeasurementType(ComponentDataType type) const
+{
+  return this->mMeasurementData->getNameForType(type);
+}
+
 std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getInstalledMeasurementTypes() const
 {
   return this->mMeasurementData->getInstalledTypes();
@@ -457,20 +480,20 @@ void cedar::dev::Component::setCommandAndMeasurementDimensionality(ComponentData
   setMeasurementDimensionality(type, dim);
 }
 
-void cedar::dev::Component::installCommandType(ComponentDataType type)
+void cedar::dev::Component::installCommandType(ComponentDataType type, const std::string& name)
 {
-  this->mCommandData->installType(type);
+  this->mCommandData->installType(type, name);
 }
 
-void cedar::dev::Component::installMeasurementType(ComponentDataType type)
+void cedar::dev::Component::installMeasurementType(ComponentDataType type, const std::string& name)
 {
-  this->mCommandData->installType(type);
+  this->mMeasurementData->installType(type, name);
 }
 
-void cedar::dev::Component::installCommandAndMeasurementType(ComponentDataType type)
+void cedar::dev::Component::installCommandAndMeasurementType(ComponentDataType type, const std::string& name)
 {
-  installCommandType(type);
-  installMeasurementType(type);
+  this->installCommandType(type, name);
+  this->installMeasurementType(type, name);
 }
 
 void cedar::dev::Component::resetComponent()

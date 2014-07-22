@@ -154,7 +154,7 @@ void cedar::proc::steps::Component::componentChanged()
 
   for (const auto& measurement : measurements)
   {
-    std::string name = cedar::aux::toString(measurement);
+    std::string name = component->getNameForMeasurementType(measurement);
     auto data = component->getDeviceMeasurementData(measurement);
     this->declareOutput(name, data);
   }
@@ -163,7 +163,7 @@ void cedar::proc::steps::Component::componentChanged()
 
   for (const auto& command : commands)
   {
-    std::string name = cedar::aux::toString(command);
+    std::string name = component->getNameForCommandType(command);
     //!@todo On inputConnectionChanged, incoming data must be set at the component.
     this->declareInput(name);
   }

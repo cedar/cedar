@@ -58,8 +58,8 @@ const cedar::dev::Component::ComponentDataType cedar::dev::Locomotion::TURNING_R
 
 void cedar::dev::Locomotion::init()
 {
-  installCommandAndMeasurementType( cedar::dev::Locomotion::FORWARD_VELOCITY );
-  installCommandAndMeasurementType( cedar::dev::Locomotion::TURNING_RATE );
+  installCommandAndMeasurementType( cedar::dev::Locomotion::FORWARD_VELOCITY, "Forward Velocity" );
+  installCommandAndMeasurementType( cedar::dev::Locomotion::TURNING_RATE, "Turning Rate" );
 
   setCommandAndMeasurementDimensionality( cedar::dev::Locomotion::FORWARD_VELOCITY, 1 );
   setCommandAndMeasurementDimensionality( cedar::dev::Locomotion::TURNING_RATE, 1 );
