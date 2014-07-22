@@ -90,6 +90,8 @@ private:
 public:
 
 private:
+  class DataCollection;
+  CEDAR_GENERATE_POINTER_TYPES(DataCollection);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -246,30 +248,16 @@ private:
   cedar::dev::ChannelPtr mChannel;
   cedar::dev::ComponentSlotWeakPtr mSlot;
 
+  DataCollectionPtr mMeasurementData;
+  DataCollectionPtr mCommandData;
+
   //! the Device-thread's wrapper
   std::unique_ptr< cedar::aux::LoopFunctionInThread > mDeviceThread;
-
-  std::vector< ComponentDataType > mInstalledCommandTypes;
-  std::vector< ComponentDataType > mInstalledMeasurementTypes;
-
-  std::map< ComponentDataType, unsigned int > mInstalledCommandDimensions;
-  std::map< ComponentDataType, unsigned int > mInstalledMeasurementDimensions;
 
   std::map< ComponentDataType, CommandFunctionType > mSubmitCommandHooks;
   std::map< ComponentDataType, MeasurementFunctionType > mRetrieveMeasurementHooks;
   TransformationHookContainerType mCommandTransformationHooks;
   TransformationHookContainerType mMeasurementTransformationHooks;
-
-  // Cache for the user-interface
-  cedar::aux::LockableMember< BufferDataType > mUserCommandBuffer;
-  cedar::aux::LockableMember< BufferDataType > mUserMeasurementsBuffer;
-  cedar::aux::LockableMember< BufferDataType > mPreviousDeviceMeasurementsBuffer;
-
-  decltype(mUserCommandBuffer) mInitialUserSubmittedCommands;
-
-  // Cache for the Device-interface
-  cedar::aux::LockableMember< BufferDataType > mDeviceSubmittedCommands;
-  cedar::aux::LockableMember< BufferDataType > mDeviceRetrievedMeasurements;
 
   boost::optional<ComponentDataType> mDeviceCommandSelection;
 
