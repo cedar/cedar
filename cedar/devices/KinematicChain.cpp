@@ -459,10 +459,10 @@ void cedar::dev::KinematicChain::init()
 {
   connect( this, SIGNAL(updatedUserMeasurementSignal()), this, SLOT(updatedUserMeasurementSlot()), Qt::DirectConnection );
 
-  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_ANGLES );
-  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_VELOCITIES );
-  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_ACCELERATIONS );
-//  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_TORQUES );
+  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_ANGLES, "Joint Angles" );
+  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_VELOCITIES, "Joint Velocities" );
+  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, "Joint Accelerations" );
+//  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques" );
 
   registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
   registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateDeviceTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );

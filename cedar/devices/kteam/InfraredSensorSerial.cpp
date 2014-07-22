@@ -82,7 +82,7 @@ cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial()
 _mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N")),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
 {
-  this->installMeasurementType(M_IR_VALUES_ID);
+  this->installMeasurementType(M_IR_VALUES_ID, "IR values");
   this->setMeasurementDimensionality(M_IR_VALUES_ID, 8);
   this->registerDeviceMeasurementHook(M_IR_VALUES_ID, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
 //  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
