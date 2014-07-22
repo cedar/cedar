@@ -104,7 +104,8 @@ cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
 cv::Mat cedar::dev::kteam::InfraredSensorSerial::updateIrValues()
 {
   // the left and right encoder value will be saved in this vector
-  cv::Mat infrared_values = cv::Mat::zeros(8, 1, CV_32F); //= this->mValues->getData();
+  //!@todo This allocates a new matrix every time the values are retrieved -- not a problem here due to the small size, but what about other cases? (e.g., camera image)
+  cv::Mat infrared_values = cv::Mat::zeros(8, 1, CV_32F);
 
   // cast the channel into a serial channel
   cedar::dev::kteam::SerialChannelPtr serial_channel = convertToSerialChannel(getChannel());
