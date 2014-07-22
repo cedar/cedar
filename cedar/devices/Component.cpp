@@ -46,6 +46,8 @@
 
 #define COMPONENT_CV_MAT_TYPE CV_64F
 
+//!@todo Replace asserts by proper exceptions.
+
 //----------------------------------------------------------------------------------------------------------------------
 // private class
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,14 +57,21 @@ class cedar::dev::Component::DataCollection
   public:
     void installType(cedar::dev::Component::ComponentDataType type)
     {
+      QWriteLocker locker(this->mInstalledTypes.getLockPtr());
       // lazyInitialize whether already registered and throw TODO
-      mInstalledTypes.push_back(type);
+      mInstalledTypes.member().push_back(type);
     }
 
     std::vector<cedar::dev::Component::ComponentDataType> getInstalledTypes() const
     {
-      //!@todo Locking?
-      return this->mInstalledTypes;
+      QReadLocker locker(this->mInstalledTypes.getLockPtr());
+      auto copy = this->mInstalledTypes.member();
+      return copy;
+    }
+
+    std::vector<cedar::dev::Component::ComponentDataType> getInstalledTypesUnlocked() const
+    {
+      return this->mInstalledTypes.member();
     }
 
     cedar::aux::DataPtr getDeviceData(const cedar::dev::Component::ComponentDataType &type)
@@ -82,6 +91,7 @@ class cedar::dev::Component::DataCollection
     {
       // todo: locking
       // todo: lazyInitialize if already registered type
+
       mInstalledDimensions[type] = dim;
     }
 
@@ -220,17 +230,11 @@ class cedar::dev::Component::DataCollection
       else
       {
         auto found2 = (found->second).find( to );
-        if (found2 == (found->second).end())
-        {
-          (found->second)[ to ] = fun;
-        }
-        else
-        {
-          std::cout << "ERROR: reregistering transformation hook cmd from " << from << " to " << to << std::endl;
-          // TODO: throw
 
-          return;
-        }
+        // there cannot be a transformation hook set already
+        CEDAR_ASSERT(found2 == (found->second).end());
+
+        (found->second)[ to ] = fun;
       }
       //  std::cout << "registered user command trafo from " << from << " to: " << to << std::endl;
     }
@@ -346,19 +350,13 @@ class cedar::dev::Component::DataCollection
     {
       auto found = mInstalledDimensions.find(type);
 
-      if (found == mInstalledDimensions.end())
-      {
-        // todo
-      }
-
+      CEDAR_ASSERT(found != mInstalledDimensions.end());
       auto dim = found->second;
 
       bufferData.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
     }
 
   public:
-    std::vector<cedar::dev::Component::ComponentDataType> mInstalledTypes;
-
     //!@todo the distinction between submitted and received may not be necessary as only measurements seem to receive, and only command submit
     cedar::aux::LockableMember<BufferDataType> mDeviceRetrievedData;
 
@@ -375,8 +373,9 @@ class cedar::dev::Component::DataCollection
     cedar::aux::LockableMember< BufferDataType > mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
 
     TransformationHookContainerType mTransformationHooks;
-//    TransformationHookContainerType mCommandTransformationHooks;
-//    TransformationHookContainerType mMeasurementTransformationHooks;
+
+  private:
+    cedar::aux::LockableMember<std::vector<cedar::dev::Component::ComponentDataType> > mInstalledTypes;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -483,7 +482,7 @@ void cedar::dev::Component::resetComponent()
     QWriteLocker lock2b(this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr());
     QWriteLocker lock4(this->mMeasurementData->mDeviceRetrievedData.getLockPtr());
 
-    for (ComponentDataType &type : this->mMeasurementData->mInstalledTypes)
+    for (ComponentDataType &type : this->mMeasurementData->getInstalledTypesUnlocked())
     {
       this->mMeasurementData->resetUserBufferUnlocked(type);
       this->mMeasurementData->resetPreviousDeviceBufferUnlocked(type);
@@ -495,7 +494,7 @@ void cedar::dev::Component::resetComponent()
     QWriteLocker lock1(this->mCommandData->mUserBuffer.getLockPtr());
     QWriteLocker lock3(this->mCommandData->mDeviceSubmittedData.getLockPtr());
 
-    for(ComponentDataType &type : this->mCommandData->mInstalledTypes)
+    for(ComponentDataType &type : this->mCommandData->getInstalledTypes())
     {
       this->mCommandData->resetUserBufferUnlocked(type);
       this->mCommandData->resetDeviceSubmittedBufferUnlocked(type);
@@ -565,14 +564,16 @@ double cedar::dev::Component::getPreviousDeviceMeasurementBufferIndex(ComponentD
 
 void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, CommandFunctionType fun)
 {
-  // todo checks
+  // cannot replace existing hook
+  CEDAR_ASSERT(this->mSubmitCommandHooks.find(type) == this->mSubmitCommandHooks.end());
   // todo locks
   mSubmitCommandHooks[ type ] = fun;
 }
 
 void cedar::dev::Component::registerDeviceMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
 {
-  // todo checks
+  // cannot replace existing hook
+  CEDAR_ASSERT(this->mRetrieveMeasurementHooks.find(type) == this->mRetrieveMeasurementHooks.end());
   // todo locks
   mRetrieveMeasurementHooks[ type ] = fun;
 }
@@ -638,12 +639,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   else
   {
     // guess Device type to use. easy if there is only one hook
-    if (mSubmitCommandHooks.size() > 1)
-    {
-// todo: throw
-//  std::cout << "error: cannot guess what Device command to send ... " << type_for_Device  << std::endl;
-      return;
-    }
+    CEDAR_ASSERT(mSubmitCommandHooks.size() == 1);
 
     type_for_Device = mSubmitCommandHooks.begin()->first;
   }
@@ -659,12 +655,8 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   {
     auto hook = this->mCommandData->findTransformationHook(type_from_user, type_for_Device);
 
-    if (!hook)
-    {
-      // todo throw:
-//  std::cout << "missing appropriate transformation to Device command for:" << type_for_Device << " (from: " << type_from_user << ")" << std::endl;
-      return;
-    }
+    // hook must exist
+    CEDAR_ASSERT(hook);
 
     QReadLocker lock1(this->mMeasurementData->mUserBuffer.getLockPtr());
     // call hook
@@ -676,12 +668,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   }
 
   auto hook_found = mSubmitCommandHooks.find(type_for_Device);
-  if (hook_found == mSubmitCommandHooks.end())
-  {
-//  std::cout << "set hook not found" << std::endl;    
-    // todo
-    return;
-  }
+  CEDAR_ASSERT (hook_found != mSubmitCommandHooks.end());
 
   (hook_found->second)(ioData);
 #endif
@@ -702,7 +689,7 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
 //  mDeviceRetrievedMeasurements.member().clear();
 
   // thinks I can get directly from HW:
-  for( auto& type : this->mMeasurementData->mInstalledTypes )
+  for (const auto& type : this->mMeasurementData->getInstalledTypes())
   {
 //  std::cout << " test"  << type <<    std::endl;
     auto found = mRetrieveMeasurementHooks.find( type );
@@ -764,7 +751,7 @@ void cedar::dev::Component::updateUserMeasurements()
 
 void cedar::dev::Component::startDevice()
 {
-  if (this->mCommandData->mInstalledTypes.empty() && this->mMeasurementData->mInstalledTypes.empty())
+  if (this->mCommandData->getInstalledTypes().empty() && this->mMeasurementData->getInstalledTypes().empty())
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
