@@ -216,32 +216,20 @@ private:
 
   void updateUserMeasurements();
 
-  void lazyInitializeMember(cedar::aux::LockableMember<std::map< ComponentDataType, cedar::aux::MatDataPtr> >& lockableMember, boost::function<void (ComponentDataType)> initFun, ComponentDataType type);
-
-  void resetUserCommandBufferUnlocked(ComponentDataType type);
-  void lazyInitializeUserCommandBufferUnlocked(ComponentDataType type);
   void setUserCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
   void setUserCommandIndexUnlocked(ComponentDataType &type, int index, double value);
   void setInitialUserCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
   cv::Mat getUserCommandBufferUnlocked(ComponentDataType &type) const;
 
-  void resetUserMeasurementBufferUnlocked(ComponentDataType type);
-  void resetPreviousDeviceMeasurementBufferUnlocked(ComponentDataType type);
-  void lazyInitializeUserMeasurementBufferUnlocked(ComponentDataType type);
-  void lazyInitializePreviousDeviceMeasurementBufferUnlocked(ComponentDataType type);
   void setUserMeasurementBufferUnlocked(ComponentDataType &type, cv::Mat);
   cv::Mat getUserMeasurementBufferUnlocked(ComponentDataType &type) const;
   double  getUserMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
   cv::Mat getPreviousDeviceMeasurementBufferUnlocked(ComponentDataType &type) const;
   double  getPreviousDeviceMeasurementIndexUnlocked(ComponentDataType &type, int index) const;
 
-  void resetDeviceCommandBufferUnlocked(ComponentDataType type);
-  void lazyInitializeDeviceCommandBufferUnlocked(ComponentDataType type);
   void setDeviceCommandBufferUnlocked(ComponentDataType &type, cv::Mat);
   cv::Mat getDeviceCommandBufferUnlocked(ComponentDataType &type) const;
 
-  void resetDeviceMeasurementBufferUnlocked(ComponentDataType type);
-  void lazyInitializeDeviceMeasurementBufferUnlocked(ComponentDataType type);
   void setDeviceMeasurementBufferUnlocked(ComponentDataType &type, cv::Mat);
   cv::Mat getDeviceMeasurementBufferUnlocked(ComponentDataType &type) const;
 
