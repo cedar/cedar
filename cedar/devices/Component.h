@@ -86,6 +86,27 @@ private:
   friend class cedar::dev::ComponentSlot;
 
   //--------------------------------------------------------------------------------------------------------------------
+  // exceptions
+  //--------------------------------------------------------------------------------------------------------------------
+  //! Exception that is thrown when a type that is not installed is requested.
+  class TypeNotFoundException : public cedar::aux::NotFoundException {};
+
+  //! Exception that is thrown when a hook is set that already exists.
+  class DuplicateHookException : public cedar::aux::DuplicateIdException {};
+
+  //! Exception that is thrown when a transformation hook is set that already exists.
+  class DuplicateTransformationHookException : public DuplicateHookException {};
+
+  //! Exception that is thrown when a dimensionality is not provided.
+  class DimensionalityNotSetException : public cedar::aux::ExceptionBase {};
+
+  //! Exception that is thrown when a hook is not found.
+  class HookNotFoundException : public cedar::aux::NotFoundException {};
+
+  //! Exception that is thrown when the device type could not be guessed.
+  class CouldNotGuessDeviceTypeException : public cedar::aux::ExceptionBase {};
+
+  //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
