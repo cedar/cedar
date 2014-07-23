@@ -93,7 +93,9 @@ public:
    */
   inline cedar::dev::RobotPtr getRobot() const
   {
-    return mRobot;
+    auto robot = mRobot.lock();
+    CEDAR_ASSERT(robot);
+    return robot;
   }
 
   /*!@brief Returns the component currently docked to this component slot.
@@ -136,7 +138,7 @@ protected:
 
 private:
   //! robot the component slot belongs to
-  cedar::dev::RobotPtr mRobot;
+  cedar::dev::RobotWeakPtr mRobot;
 
   //! component that is currently docked to this slot
   cedar::dev::ComponentPtr mComponent;
