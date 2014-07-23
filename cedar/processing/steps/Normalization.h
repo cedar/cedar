@@ -91,6 +91,9 @@ private:
 
   void normalizeAlongAllDimensions();
 
+  // Returns 1/norm and makes sure the result is neither inf nor 0.
+  double safeNormInverse(double norm) const;
+
 private slots:
   void recompute();
 
