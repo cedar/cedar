@@ -1,0 +1,125 @@
+{
+  "component slots":
+  {
+    "drive":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.DriveSerial":
+          {
+            "command set speed": "D",
+            "command set encoder": "P",
+            "command get encoder": "Q"
+          }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.epuck.YarpDrive":
+          {
+            "motor commands port": "motorCommands",
+            "encoder values port": "encoderValues"
+          }
+        }
+      },
+      "common component parameters":
+      {
+        "number of pulses per revolution": "1000",
+        "encoder limits":
+        {
+          "lower limit": "-32768",
+          "upper limit": "32767"
+        },
+        "wheel distance": "0.053 m",
+        "wheel radius": "0.0205 m",
+        "hardware speed limits":
+        {
+          "lower limit": "-1.0 m s^-1",
+          "upper limit": "1.0 m s^-1"
+        },
+        "forward velocity limits":
+        {
+          "lower limit": "-1.0 m s^-1",
+          "upper limit": "1.0 m s^-1"
+        },
+        "turning rate limits":
+        {
+          "lower limit": "-3.141 rad s^-1",
+          "upper limit": "3.141 rad s^-1"
+        }
+      }
+    },
+    "ambient light sensor":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.InfraredSensorSerial":
+          {
+            "command get infrared": "O"
+          }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.InfraredSensorYarp":
+          {
+            "sensor port": "ambientSensors"
+          }
+        }
+      }
+    },
+    "proximity sensor":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.InfraredSensorSerial":
+          {
+            "command get infrared": "N"
+          }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.InfraredSensorYarp":
+          {
+            "sensor port": "proximitySensors"
+          }
+        }
+      }
+    },
+    "acceleration sensor":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.epuck.AccelerationSensorSerial":
+          {
+            "command get acceleration": "A"
+          }
+        }
+      }
+    },
+    "led":
+    {
+      "available components":
+      {
+        "serial":
+        {
+          "cedar.dev.kteam.LedSerial":
+          {
+            "command set state": "L"
+          }
+        }
+      }
+    }
+  },
+  "channels":
+  {
+    "serial": "cedar.dev.kteam.SerialChannel",
+    "yarp": "cedar.dev.YarpChannel<cv.Mat>"
+  }
+}
