@@ -806,7 +806,6 @@ void cedar::dev::Component::updateUserMeasurements()
   cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::LockSetLocker locker(locks); //@todo: this segfaults
-//@todo re-add
 
   // todo: are these really deep copies? -> no, mDeviceRetrievedMeasurements contains data ptrs
   this->mMeasurementData->mPreviousDeviceBuffer.member() = this->mMeasurementData->mUserBuffer.member();
@@ -814,8 +813,7 @@ void cedar::dev::Component::updateUserMeasurements()
   //!@todo What was the purpose of this clear? reimplement
 //  this->mMeasurementData->mDeviceRetrievedData.member().clear();
 
-//  locker.unlock(); //@todo: see above
-//@todo re-add
+  locker.unlock(); //@todo: see above
 
   emit updatedUserMeasurementSignal();
 }
