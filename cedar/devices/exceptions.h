@@ -110,4 +110,13 @@ class cedar::dev::InvalidComponentPathException : public cedar::aux::ExceptionBa
 {
 };
 
+//!@brief Thrown when a joint index is out of range.
+class cedar::dev::JointIndexOutOfRangeException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Thrown when a vector of joints does not match the expected number of joints.
+class cedar::dev::JointNumberMismatchException : public cedar::aux::ExceptionBase
+{
+};
 #endif // CEDAR_DEV_EXCEPTIONS_H

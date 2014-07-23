@@ -40,16 +40,17 @@
 // CEDAR INCLUDES
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/devices/lib.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 
 #include "cedar/devices/ForwardKinematics.fwd.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/math/DoubleLimitsParameter.fwd.h"
 #include "cedar/devices/KinematicChain.fwd.h"
 
 // SYSTEM INCLUDES
@@ -71,7 +72,6 @@ class cedar::dev::KinematicChain
 public cedar::dev::Component
 {
   Q_OBJECT
-  
 
 public:
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ public:
   };
 
   //!@brief describes the hardware properties of a joint.
-  struct Joint : cedar::aux::Configurable
+  struct CEDAR_DEV_LIB_EXPORT Joint : cedar::aux::Configurable
   {
     //! constructor
     Joint();
@@ -106,21 +106,12 @@ public:
   typedef boost::shared_ptr<cedar::dev::KinematicChain::Joint> JointPtr;
   //!@brief a parameter for a list of joint objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::dev::KinematicChain::Joint> JointListParameter;
+  //!@brief a factory that allows allocating joints
+  typedef cedar::aux::FactoryManager<cedar::dev::KinematicChain::JointPtr> JointFactoryManager;
 
   //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
   //!@endcond
-
-
-  //----------------------------------------------------------------------------
-  // parameters
-  //----------------------------------------------------------------------------
-public:
-
-protected:
-  // none yet
-private:
-  // none yet
 
   //----------------------------------------------------------------------------
   // constructors and destructor
@@ -144,8 +135,6 @@ public slots:
 public:
   //!@brief updates the geometry to the current configuration of the kinematic chain DONT CALL IT YOURSELF
   CEDAR_DECLARE_DEPRECATED( void updateTransformations() );  // TODO FORWARD KIN
-
-
 
   //----------------------------------------------------------------------------
   // public methods
@@ -340,12 +329,6 @@ public:
    */
   void setJointAccelerations(const std::vector<double>& accelerations);
 
-
-
-
-
-
-
   /*!@brief returns a smart-pointer to the local coordinate frame of the end-effector
    *
    * @return smart-pointer to the end-effector
@@ -516,17 +499,11 @@ public:
    */
   cv::Mat calculateEndEffectorAcceleration();
 
-
-
-
-
-
-
   /*!@brief get joints of a named initial configuration
    *
    * @return    joint values of the initial configuration
    */
-  cv::Mat getInitialConfiguration(std::string name);
+  cv::Mat getInitialConfiguration(const std::string& name);
 
   /*!@brief get the vector of all initial configuration names
    *
@@ -555,7 +532,7 @@ public:
   // prefer using @addInitialConfiguration
   void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
   //!@brief set the currently valid initial configuration and apply it (i.e. move the manipulator to that configuration)
-  bool applyInitialConfiguration(std::string s);
+  bool applyInitialConfiguration(const std::string& name);
   //!@brief apply the named initial configuration by index
   //
   // Prefer using @applyInitialConfiguration(string) for accessing named configurations
@@ -578,15 +555,22 @@ private:
   //!@brief set the currently valid initial configuration, do not move the manipulator
   // 
   // See also @applyInitialConfiguration
-  bool setCurrentInitialConfiguration(const std::string &s);
+  bool setCurrentInitialConfiguration(const std::string& s);
 
   //!@brief: test validity of initial configurations
   void checkInitialConfigurations();
 
   //----------------------------------------------------------------------------
+  // parameters
+  //----------------------------------------------------------------------------
+protected:
+  // none yet
+private:
+  // none yet
+
+  //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
-public:
 protected:
   static const cedar::dev::Component::ComponentDataType JOINT_ANGLES;
   static const cedar::dev::Component::ComponentDataType JOINT_VELOCITIES;
@@ -600,8 +584,6 @@ private:
   //! the forward kinematic model
   ForwardKinematicsPtr mForwardKinematics;
 
-
-
   //!@brief map of the named initial configurations
   std::map< std::string, cv::Mat > mInitialConfigurations;
   //!@brief the current initial configuration name
@@ -609,4 +591,17 @@ private:
   //!@brief lock for the initial configuration datas
   QReadWriteLock mCurrentInitialConfigurationLock;
 }; // class cedar::dev::robot::KinematicChain
+
+#include "cedar/auxiliaries/FactoryManager.h"
+
+CEDAR_DEV_EXPORT_SINGLETON(cedar::dev::KinematicChain::JointFactoryManager);
+
+namespace cedar
+{
+  namespace dev
+  {
+    //!@brief The singleton instance of the joint factory manager.
+    typedef cedar::aux::Singleton<cedar::dev::KinematicChain::JointFactoryManager> JointFactoryManagerSingleton;
+  }
+}
 #endif // CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H

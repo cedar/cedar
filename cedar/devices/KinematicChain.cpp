@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/exceptions.h"
 #include "cedar/devices/ForwardKinematics.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
@@ -58,17 +59,9 @@ namespace
 {
   bool registered()
   {
-    cedar::aux::Singleton
-          <
-            cedar::aux::FactoryManager<cedar::dev::KinematicChain::JointPtr>
-          >
-          ::getInstance()->registerType<cedar::dev::KinematicChain::JointPtr>();
+    cedar::dev::JointFactoryManagerSingleton::getInstance()->registerType<cedar::dev::KinematicChain::JointPtr>();
 
-    cedar::aux::Singleton
-          <
-            cedar::aux::FactoryManager<cedar::dev::KinematicChain::JointPtr>
-          >
-          ::getInstance()->addDeprecatedName<cedar::dev::KinematicChain::JointPtr>("cedar.dev.robot.KinematicChain.Joint");
+    cedar::dev::JointFactoryManagerSingleton::getInstance()->addDeprecatedName<cedar::dev::KinematicChain::JointPtr>("cedar.dev.robot.KinematicChain.Joint");
 
     return true;
   }
@@ -96,7 +89,7 @@ cedar::dev::KinematicChain::KinematicChain
 )
 :
 mpJoints(new JointListParameter(this, "joints")),
-mForwardKinematics( new cedar::dev::ForwardKinematics(this, pEndEffector) )
+mForwardKinematics(new cedar::dev::ForwardKinematics(this, pEndEffector))
 {
   init();
 }
@@ -166,15 +159,18 @@ unsigned int cedar::dev::KinematicChain::getNumberOfJoints() const
 
 double cedar::dev::KinematicChain::getJointAngle(unsigned int index) const
 {
-  if (index >= getNumberOfJoints())
+  if (index >= this->getNumberOfJoints())
   {
-    // TODO: this should throw an exception
-    return 0.0;
+    CEDAR_THROW
+    (
+      cedar::dev::JointIndexOutOfRangeException,
+      "Joint index " + cedar::aux::toString(index)
+      + " exceeds number of joints, which is " + cedar::aux::toString(this->getNumberOfJoints()) + "."
+    );
   }
 
-  auto angles = getUserMeasurementBufferIndex( JOINT_ANGLES, index );
-
-  return angles;
+  //!@todo doesn't this function also check for violations of joint range?
+  return getUserMeasurementBufferIndex(JOINT_ANGLES, index);
 }
 
 cv::Mat cedar::dev::KinematicChain::getJointAngles() const
@@ -194,12 +190,16 @@ cv::Mat cedar::dev::KinematicChain::getJointAnglesMatrix() const
 
 double cedar::dev::KinematicChain::getJointVelocity(unsigned int index) const
 {
-  if (index >= getNumberOfJoints())
+  if (index >= this->getNumberOfJoints())
   {
-    // TODO: this should be an exception
-    return 0.0;
+    CEDAR_THROW
+    (
+      cedar::dev::JointIndexOutOfRangeException,
+      "Joint index " + cedar::aux::toString(index)
+      + " exceeds number of joints, which is " + cedar::aux::toString(this->getNumberOfJoints()) + "."
+    );
   }
-
+  //!@todo doesn't this function also check for violations of joint range?
   return getUserMeasurementBufferIndex( JOINT_VELOCITIES, index );
 }
 
@@ -221,18 +221,22 @@ cv::Mat cedar::dev::KinematicChain::getJointVelocitiesMatrix() const
 
 double cedar::dev::KinematicChain::getJointAcceleration(unsigned int index) const
 {
-  if (index >= getNumberOfJoints())
+  if (index >= this->getNumberOfJoints())
   {
-    // TODO: this should be an exception
-    return 0.0;
+    CEDAR_THROW
+    (
+      cedar::dev::JointIndexOutOfRangeException,
+      "Joint index " + cedar::aux::toString(index)
+      + " exceeds number of joints, which is " + cedar::aux::toString(this->getNumberOfJoints()) + "."
+    );
   }
-
-  return getUserMeasurementBufferIndex( JOINT_ACCELERATIONS, index );
+  //!@todo doesn't this function also check for violations of joint range?
+  return getUserMeasurementBufferIndex(JOINT_ACCELERATIONS, index);
 }
 
 cv::Mat cedar::dev::KinematicChain::getJointAccelerations() const
 {
-  return getUserMeasurementBuffer( JOINT_ACCELERATIONS );
+  return getUserMeasurementBuffer(JOINT_ACCELERATIONS);
 }
 
 cv::Mat cedar::dev::KinematicChain::getCachedJointAccelerations() const
@@ -247,22 +251,20 @@ cv::Mat cedar::dev::KinematicChain::getJointAccelerationsMatrix() const
 
 void cedar::dev::KinematicChain::setJointAngle(unsigned int index, double value)
 {
-  if (index >= getNumberOfJoints())
+  if (index >= this->getNumberOfJoints())
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
-      "Index out of range when setting joint angle for joint "
-        + cedar::aux::toString(index)
-        + "!",
-      "cedar::dev::KinematicChain::setJointAngle(unsigned int, double)"
+      cedar::dev::JointIndexOutOfRangeException,
+      "Joint index " + cedar::aux::toString(index)
+      + " exceeds number of joints, which is " + cedar::aux::toString(this->getNumberOfJoints()) + "."
     );
-    return;
   }
   //!@todo use applyVelocityLimits()?
   value = std::max<double>(value, getJoint(index)->_mpAngleLimits->getLowerLimit());
   value= std::min<double>(value, getJoint(index)->_mpAngleLimits->getUpperLimit());
-
-  setUserCommandBufferIndex( JOINT_ANGLES, index, value );
+  //!@todo doesn't this function also check for violations of joint range?
+  setUserCommandBufferIndex(JOINT_ANGLES, index, value);
 }
 
 
@@ -270,25 +272,22 @@ void cedar::dev::KinematicChain::setJointAngles(const std::vector<double>& angle
 {
   //!@todo: for security reasons setting angles should be only allowed in STOP or ANGLE mode. except initial set!
 
-  if(angles.size() != getNumberOfJoints())
+  if (angles.size() != getNumberOfJoints())
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
+      cedar::dev::JointNumberMismatchException,
       "You provided a vector of angles with the wrong size (angles: "
-        + cedar::aux::toString(angles.size())
-        + " != no. of joints: "
-        + cedar::aux::toString(getNumberOfJoints())
-        + ")!",
-      "cedar::dev::KinematicChain::setJointAngles(const std::vector<double>&)"
+              + cedar::aux::toString(angles.size())
+              + " != no. of joints: "
+              + cedar::aux::toString(getNumberOfJoints())
+              + ")!"
     );
-    return;
   }
-
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
-    double angle = angles[i];
-
-    setJointAngle(i, angle);
+    //!@todo doesn't this function also check for violations of joint range?
+    setJointAngle(i, angles[i]);
   }
 }
 
@@ -296,16 +295,15 @@ void cedar::dev::KinematicChain::setJointAngles(const cv::Mat& angles)
 {
   if (angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
-      "You provided a vector of angles with the wrong size (angles: "
+      cedar::dev::JointNumberMismatchException,
+      "You provided a matrix of angles with the wrong size (angles: "
         + cedar::aux::toString(angles.rows) + "x" + cedar::aux::toString(angles.cols)
         + " != expected: "
         + cedar::aux::toString(getNumberOfJoints())
-        + "x1)!",
-      "cedar::dev::KinematicChain::setJointAngles(const cv::Mat&)"
+        + "x1)!"
     );
-    return;
   }
 
   cv::Mat new_angles = angles.clone();
@@ -317,169 +315,224 @@ void cedar::dev::KinematicChain::setJointAngles(const cv::Mat& angles)
     angle = std::max<double>(angle, getJoint(i)->_mpAngleLimits->getLowerLimit());
     angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
-    new_angles.at<double>(i,0)= angle;
+    new_angles.at<double>(i,0) = angle;
   }
-
+  //!@todo doesn't this function also check for violations of joint range?
   setUserCommandBuffer(JOINT_ANGLES, new_angles);
 }
 
 void cedar::dev::KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
-  if (index >= getNumberOfJoints())
+  if (index >= this->getNumberOfJoints())
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
-      "Index out of range when setting velocity for joint "
-        + cedar::aux::toString(index)
-        + "!",
-      "cedar::dev::KinematicChain::setJointVelocity(unsigned int, double)"
+      cedar::dev::JointIndexOutOfRangeException,
+      "Joint index " + cedar::aux::toString(index)
+      + " exceeds number of joints, which is " + cedar::aux::toString(this->getNumberOfJoints()) + "."
     );
-    return;
   }
   //!@todo use applyVelocityLimits()?
   velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
   velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
-
-  setUserCommandBufferIndex( JOINT_VELOCITIES, index, velocity );
+  //!@todo doesn't this function also check for violations of joint range?
+  setUserCommandBufferIndex(JOINT_VELOCITIES, index, velocity);
 }
 
 void cedar::dev::KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
   if (velocities.size() != getNumberOfJoints())
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
-      "You provided a vector of velocities with the wrong size (provided: "
-        + cedar::aux::toString(velocities.size())
-        + " != expected: "
-        + cedar::aux::toString(getNumberOfJoints())
-        + ")!",
-      "cedar::dev::KinematicChain::setJointVelocities(const std::vector<double>&)"
+      cedar::dev::JointNumberMismatchException,
+      "You provided a vector of velocities with the wrong size (velocities: "
+              + cedar::aux::toString(velocities.size())
+              + " != no. of joints: "
+              + cedar::aux::toString(getNumberOfJoints())
+              + ")!"
     );
-    return;
   }
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     // locking done in setJointVelocity()
+    //!@todo doesn't this function also check for violations of joint range?
     setJointVelocity(i, velocities[i]);
   }
 }
 
 void cedar::dev::KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
-  if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
+  if (velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
-      "You provided a matrix of velocities with the wrong size (provided: "
+      cedar::dev::JointNumberMismatchException,
+      "You provided a matrix of velocities with the wrong size (velocities: "
         + cedar::aux::toString(velocities.rows) + "x" + cedar::aux::toString(velocities.cols)
         + " != expected: "
         + cedar::aux::toString(getNumberOfJoints())
-        + "x1)!",
-      "cedar::dev::KinematicChain::setJointVelocities(const cv::Mat&)"
+        + "x1)!"
     );
-    return;
   }
 
   cv::Mat new_vels = velocities.clone();
 
   // TODO: test limits
-
+  //!@todo doesn't this function also check for violations of joint range?
   setUserCommandBuffer( JOINT_VELOCITIES, new_vels );
 }
 
 void cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
-  if (index >= getNumberOfJoints())
+  if (index >= this->getNumberOfJoints())
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
-      "Index out of range when setting acceleration for joint "
-        + cedar::aux::toString(index)
-        + "!",
-      "cedar::dev::KinematicChain::setJointAcceleration(unsigned int, double)"
+      cedar::dev::JointIndexOutOfRangeException,
+      "Joint index " + cedar::aux::toString(index)
+      + " exceeds number of joints, which is " + cedar::aux::toString(this->getNumberOfJoints()) + "."
     );
-    return;
   }
-
-  setUserCommandBufferIndex( JOINT_ACCELERATIONS, index, acceleration );
+  //!@todo doesn't this function also check for violations of joint range?
+  setUserCommandBufferIndex(JOINT_ACCELERATIONS, index, acceleration);
 }
 
 void cedar::dev::KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
-  if(accelerations.size() != getNumberOfJoints())
+  if (accelerations.size() != getNumberOfJoints())
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
-      "You provided a vector of accelerations with the wrong size (provided: "
-        + cedar::aux::toString(accelerations.size())
-        + " != expected: "
-        + cedar::aux::toString(getNumberOfJoints())
-        + ")!",
-      "cedar::dev::KinematicChain::setJointAccelerations(const std::vector<double>&)"
+      cedar::dev::JointNumberMismatchException,
+      "You provided a vector of accelerations with the wrong size (accelerations: "
+              + cedar::aux::toString(accelerations.size())
+              + " != no. of joints: "
+              + cedar::aux::toString(getNumberOfJoints())
+              + ")!"
     );
-    return;
   }
 
-  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
+    //!@todo doesn't this function also check for violations of joint range?
     setJointAcceleration(i, accelerations[i]);
   }
 }
 
 void cedar::dev::KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
-  if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
+  if (accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    CEDAR_THROW
     (
-      "You provided a matrix of accelerations with the wrong size (provided: "
+      cedar::dev::JointNumberMismatchException,
+      "You provided a matrix of accelerations with the wrong size (accelerations: "
         + cedar::aux::toString(accelerations.rows) + "x" + cedar::aux::toString(accelerations.cols)
         + " != expected: "
         + cedar::aux::toString(getNumberOfJoints())
-        + "x1)!",
-      "cedar::dev::KinematicChain::setJointAccelerations(const cv::Mat&)"
+        + "x1)!"
     );
-    return;
   }
 
   cv::Mat new_accels = accelerations.clone();
   // todo: test limits
-
-  setUserCommandBuffer( JOINT_ACCELERATIONS, new_accels );
-  return;
+  //!@todo doesn't this function also check for violations of joint range?
+  setUserCommandBuffer(JOINT_ACCELERATIONS, new_accels);
 }
-
 
 // TODO: applyJointLimits, applyJointVelocityLimits, etc
 
-
 void cedar::dev::KinematicChain::init()
 {
-  connect( this, SIGNAL(updatedUserMeasurementSignal()), this, SLOT(updatedUserMeasurementSlot()), Qt::DirectConnection );
+  connect
+  (
+    this,
+    SIGNAL(updatedUserMeasurementSignal()),
+    this,
+    SLOT(updatedUserMeasurementSlot()), Qt::DirectConnection
+  );
 
-  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_ANGLES, "Joint Angles" );
-  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_VELOCITIES, "Joint Velocities" );
-  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, "Joint Accelerations" );
-//  installCommandAndMeasurementType( cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques" );
+  installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ANGLES, "Joint Angles");
+  installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_VELOCITIES, "Joint Velocities");
+  installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, "Joint Accelerations");
+//  installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques");
 
-  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateDeviceTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-  registerUserCommandTransformationHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES )  );
+  registerUserCommandTransformationHook
+  (
+    cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
+    cedar::dev::KinematicChain::JOINT_VELOCITIES,
+    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+  );
+  registerUserCommandTransformationHook
+  (
+    cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
+    cedar::dev::KinematicChain::JOINT_ANGLES,
+    boost::bind
+    (
+      &cedar::dev::Component::integrateDeviceTwice,
+      this,
+      _1,
+      cedar::dev::KinematicChain::JOINT_ANGLES,
+      cedar::dev::KinematicChain::JOINT_VELOCITIES
+    )
+  );
+  registerUserCommandTransformationHook
+  (
+    cedar::dev::KinematicChain::JOINT_VELOCITIES,
+    cedar::dev::KinematicChain::JOINT_ANGLES,
+    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES)
+  );
 
-  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::Component::integrateDeviceTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
+  registerDeviceMeasurementTransformationHook
+  (
+    cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
+    cedar::dev::KinematicChain::JOINT_VELOCITIES,
+    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+  );
+  registerDeviceMeasurementTransformationHook
+  (
+    cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
+    cedar::dev::KinematicChain::JOINT_ANGLES,
+    boost::bind
+    (
+      &cedar::dev::Component::integrateDeviceTwice,
+      this,
+      _1,
+      cedar::dev::KinematicChain::JOINT_ANGLES,
+      cedar::dev::KinematicChain::JOINT_VELOCITIES
+    )
+  );
 
-  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES )  );
-  registerDeviceMeasurementTransformationHook( cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::Component::differentiateDeviceTwice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES, cedar::dev::KinematicChain::JOINT_VELOCITIES )  );
-
+  registerDeviceMeasurementTransformationHook
+  (
+    cedar::dev::KinematicChain::JOINT_VELOCITIES,
+    cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
+    boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+  );
+  registerDeviceMeasurementTransformationHook
+  (
+    cedar::dev::KinematicChain::JOINT_ANGLES,
+    cedar::dev::KinematicChain::JOINT_VELOCITIES,
+    boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES)
+  );
+  registerDeviceMeasurementTransformationHook
+  (
+      cedar::dev::KinematicChain::JOINT_ANGLES,
+      cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
+      boost::bind
+      (
+        &cedar::dev::Component::differentiateDeviceTwice,
+        this,
+        _1,
+        cedar::dev::KinematicChain::JOINT_ANGLES,
+        cedar::dev::KinematicChain::JOINT_VELOCITIES
+      )
+  );
 
   this->addConfigurableChild("root coordinate frame", mForwardKinematics->getRootCoordinateFrame());
   this->addConfigurableChild("end-effector coordinate frame", mForwardKinematics->getEndEffectorCoordinateFrame());
-
-
 
 
   cedar::dev::KinematicChain::JointPtr default_joint(new cedar::dev::KinematicChain::Joint);
@@ -489,10 +542,10 @@ void cedar::dev::KinematicChain::init()
   default_joint->_mpAxis->pushBack(0);
   default_joint->_mpAxis->pushBack(0);
   default_joint->_mpAxis->pushBack(1);
-  default_joint->_mpAngleLimits->setLowerLimit(-2*cedar::aux::math::pi);
-  default_joint->_mpAngleLimits->setUpperLimit(2*cedar::aux::math::pi);
-  default_joint->_mpVelocityLimits->setLowerLimit(-2*cedar::aux::math::pi);
-  default_joint->_mpVelocityLimits->setUpperLimit(2*cedar::aux::math::pi);
+  default_joint->_mpAngleLimits->setLowerLimit(-2 * cedar::aux::math::pi);
+  default_joint->_mpAngleLimits->setUpperLimit(2 * cedar::aux::math::pi);
+  default_joint->_mpVelocityLimits->setLowerLimit(-2 * cedar::aux::math::pi);
+  default_joint->_mpVelocityLimits->setUpperLimit(2 * cedar::aux::math::pi);
   this->mpJoints->pushBack(default_joint);
   initializeFromJointList();
 
@@ -667,10 +720,6 @@ cv::Mat cedar::dev::KinematicChain::calculateEndEffectorAcceleration()
   return mForwardKinematics->calculateEndEffectorAcceleration();
 }
 
-
-
-
-
 const cedar::dev::KinematicChain::JointPtr cedar::dev::KinematicChain::getJoint
 (
   unsigned int index
@@ -679,14 +728,12 @@ const cedar::dev::KinematicChain::JointPtr cedar::dev::KinematicChain::getJoint
   return mpJoints->at(index);
 }
 
-
-
 void cedar::dev::KinematicChain::setInitialConfigurations(std::map<std::string, cv::Mat> configs)
 {
   QWriteLocker wlock(&mCurrentInitialConfigurationLock);
 
   mInitialConfigurations.clear();
-  for( std::map< std::string, cv::Mat >::const_iterator it = configs.begin(); it != configs.end(); ++it)
+  for (auto it = configs.begin(); it != configs.end(); ++it)
   {
     mInitialConfigurations[ it->first ] = it->second.clone();
     // it is important to clone the cv::Mats!
@@ -745,7 +792,8 @@ void cedar::dev::KinematicChain::checkInitialConfigurations()
   {
     rlock.unlock();
     // ... set a default initial configuration:
-    addInitialConfiguration("zeros", cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1) ); // note, this recurses back to checkInitialConfigurations() but not into this if-branch
+    addInitialConfiguration("zeros", cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1) );
+    // note, this recurses back to checkInitialConfigurations() but not into this if-branch
     return;
   }
 
@@ -771,17 +819,17 @@ bool cedar::dev::KinematicChain::setCurrentInitialConfiguration(const std::strin
   return true; //TODO: should this use a return value to communicate potential errors?
 }
 
-bool cedar::dev::KinematicChain::applyInitialConfiguration(std::string s)
+bool cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& name)
 {
   QReadLocker rlock(&mCurrentInitialConfigurationLock);
 std::cout  << "  HIER0 "  << std::endl;      
 
-  auto f = mInitialConfigurations.find(s);
+  auto f = mInitialConfigurations.find(name);
   if (f != mInitialConfigurations.end())
   {
     rlock.unlock();
 
-    setCurrentInitialConfiguration(s);
+    setCurrentInitialConfiguration(name);
 
 // TODO: --> to its own virtual method ...
     // better to drive slowly to this configuration ...
@@ -792,8 +840,8 @@ std::cout  << "  HIER0 "  << std::endl;
     else
     {
       // todo: !
-std::cout  << "  HIER1 "  << std::endl;      
-      setInitialUserCommandBuffer( cedar::dev::KinematicChain::JOINT_ANGLES, f->second );
+      std::cout  << "  HIER1 "  << std::endl;
+      setInitialUserCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
       //setJointAngles( f->second );
     }
 
@@ -825,7 +873,7 @@ bool cedar::dev::KinematicChain::applyInitialConfiguration(unsigned int index)
   }
 
   unsigned int j = 0;
-  for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  for (auto it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
   {
     if (index == j)
     {
@@ -844,7 +892,7 @@ unsigned int cedar::dev::KinematicChain::getCurrentInitialConfigurationIndex()
   QReadLocker lock(&mCurrentInitialConfigurationLock);
   unsigned int j = 0;
 
-  for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  for (auto it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++)
   {
     if (it->first == mCurrentInitialConfiguration)
     {
@@ -859,16 +907,16 @@ unsigned int cedar::dev::KinematicChain::getCurrentInitialConfigurationIndex()
   return 0;
 }
 
-cv::Mat cedar::dev::KinematicChain::getInitialConfiguration(std::string s)
+cv::Mat cedar::dev::KinematicChain::getInitialConfiguration(const std::string& name)
 {
   QReadLocker lock(&mCurrentInitialConfigurationLock);
 
-  auto f = mInitialConfigurations.find(s);
+  auto f = mInitialConfigurations.find(name);
   if (f == mInitialConfigurations.end())
   {
     CEDAR_THROW( cedar::aux::InvalidNameException,
                  "You requested initial configuration "
-                 + s + " which is not registered. "
+                 + name + " which is not registered. "
                  "Use addInitialConfiguration().");
   }
 
@@ -880,7 +928,7 @@ std::vector<std::string> cedar::dev::KinematicChain::getInitialConfigurationIndi
   QReadLocker lock(&mCurrentInitialConfigurationLock);
   std::vector<std::string> result;
 
-  for( std::map<std::string,cv::Mat>::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); ++it )
+  for (auto it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); ++it)
   {
     result.push_back( (*it).first );
   }
@@ -901,7 +949,7 @@ cv::Mat cedar::dev::KinematicChain::getCurrentInitialConfiguration()
                 "Use addInitialConfiguration().");
   }
 
-  return mInitialConfigurations[ mCurrentInitialConfiguration ];
+  return mInitialConfigurations[mCurrentInitialConfiguration];
 }
 
 void cedar::dev::KinematicChain::updatedUserMeasurementSlot()

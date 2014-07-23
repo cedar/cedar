@@ -103,6 +103,10 @@ std::string cedar::aux::unmangleName(const char* mangledName)
   {
     name = name.substr(6);
   }
+  else if (name.find("struct ") == 0 && name.size() > 7)
+  {
+    name = name.substr(7);
+  }
   return name;
 #endif // CEDAR_COMPILER_GCC
 }
