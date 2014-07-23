@@ -54,6 +54,8 @@ cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
   registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this ) );
   registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities, this ) );
   registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations, this ) );
+
+  this->applyDeviceCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
 }
 
 cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
@@ -66,9 +68,7 @@ cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
 void cedar::dev::SimulatedKinematicChain::sendSimulatedAngles(cv::Mat mat)
 {
   QWriteLocker lock(&mSimulationLock);
-
-std::cout << "\n\n\n\n  write angles \n\n\n" << mat << std::endl;
-  mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ] = mat.clone();
+  mSimulation[cedar::dev::KinematicChain::JOINT_ANGLES] = mat.clone();
 }
 
 void cedar::dev::SimulatedKinematicChain::sendSimulatedVelocities(cv::Mat mat)
