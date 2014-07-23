@@ -142,9 +142,9 @@ void test()
   cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(0) - 0.1)
-      || !cedar::aux::math::isZero(test_arm_velocity->getJointAngle(1) - 0.2)
-      || !cedar::aux::math::isZero(test_arm_velocity->getJointAngle(2) - 0.15)
-      || !cedar::aux::math::isZero(test_arm_velocity->getJointAngle(3) - 0.25)
+      || !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(1) - 0.2)
+      || !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(2) - 0.15)
+      || !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(3) - 0.25)
       )
   {
     errors++;
