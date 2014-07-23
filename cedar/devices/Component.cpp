@@ -87,9 +87,20 @@ class cedar::dev::Component::DataCollection
       return this->mInstalledTypes.member();
     }
 
+    bool hasType(const cedar::dev::Component::ComponentDataType &type) const
+    {
+      QReadLocker locker(this->mInstalledNames.getLockPtr());
+      bool found = (this->mInstalledNames.member().find(type) != this->mInstalledNames.member().end());
+      return found;
+    }
+
     cedar::aux::DataPtr getDeviceData(const cedar::dev::Component::ComponentDataType &type)
     {
-      //!@todo Check that the measurement type exists
+      if (!this->hasType(type))
+      {
+        CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type does not exist.");
+      }
+
       QReadLocker locker(this->mDeviceRetrievedData.getLockPtr());
       this->lazyInitializeDeviceBufferUnlocked(type);
 
@@ -480,12 +491,22 @@ std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::get
   return this->mCommandData->getInstalledTypes();
 }
 
-cedar::aux::DataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type) //!@todo Const?
+cedar::aux::DataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type)
 {
   return this->mMeasurementData->getDeviceData(type);
 }
 
-cedar::aux::DataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type) //!@todo Const?
+cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type) const
+{
+  return this->mMeasurementData->getDeviceData(type);
+}
+
+cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type) const
+{
+  return this->mCommandData->getDeviceData(type);
+}
+
+cedar::aux::DataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type)
 {
   return this->mCommandData->getDeviceData(type);
 }
@@ -555,7 +576,10 @@ void cedar::dev::Component::resetComponent()
 
 void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
 {
-  // todo check for registered
+  if (!this->mCommandData->hasType(type))
+  {
+    CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type is not installed.");
+  }
   mDeviceCommandSelection = type;
 }
 
@@ -670,13 +694,20 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
     // safe only if there was only one command hook registered
     if (this->mCommandData->mUserBuffer.member().size() > 1)
     {
-        // @todo: throw
-      std::cout << "error: setted too many commands of different types! ... " <<  std::endl;
-      for (auto &what : this->mCommandData->mUserBuffer.member() )
+      std::string set_commands;
+      for (const auto &what : this->mCommandData->mUserBuffer.member() )
       {
-        std::cout << " " << what.first << std::endl;
-      } // @todo: now that types have names. use those
-      return;
+        if (!set_commands.empty())
+        {
+          set_commands += ", ";
+        }
+        set_commands += this->getNameForCommandType(what.first);
+      }
+      CEDAR_THROW
+      (
+        CouldNotGuessCommandTypeException,
+        "Could not guess the type of the command because too many commands have been set. Set commands are: " + set_commands
+      );
     }
 
     // we know the map has exactly one entry
@@ -748,7 +779,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
 {
   std::vector< ComponentDataType > types_to_transform;
-  std::vector< ComponentDataType > types_we_measured;;
+  std::vector< ComponentDataType > types_we_measured;
 
   // lock measurements 
   QWriteLocker lock1(this->mMeasurementData->mDeviceRetrievedData.getLockPtr());
@@ -780,7 +811,7 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
 
   for (auto& missing_type : types_to_transform )
   {
-    bool nothing_found = true;
+    // bool nothing_found = true; //!@todo What is the purpose of this?
     for ( auto& measured_type : types_we_measured )
     {
       auto hook = this->mMeasurementData->findTransformationHook(measured_type, missing_type);
@@ -805,7 +836,7 @@ void cedar::dev::Component::updateUserMeasurements()
   cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
   cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-  cedar::aux::LockSetLocker locker(locks); //@todo: this segfaults
+  cedar::aux::LockSetLocker locker(locks);
 
   // todo: are these really deep copies? -> no, mDeviceRetrievedMeasurements contains data ptrs
   this->mMeasurementData->mPreviousDeviceBuffer.member() = this->mMeasurementData->mUserBuffer.member();
@@ -813,7 +844,7 @@ void cedar::dev::Component::updateUserMeasurements()
   //!@todo What was the purpose of this clear? reimplement
 //  this->mMeasurementData->mDeviceRetrievedData.member().clear();
 
-  locker.unlock(); //@todo: see above
+  locker.unlock();
 
   emit updatedUserMeasurementSignal();
 }
