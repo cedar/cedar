@@ -805,7 +805,7 @@ void cedar::dev::Component::updateUserMeasurements()
   cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
   cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-//  cedar::aux::LockSetLocker locker(locks); //@todo: this segfaults
+  cedar::aux::LockSetLocker locker(locks); //@todo: this segfaults
 //@todo re-add
 
   // todo: are these really deep copies? -> no, mDeviceRetrievedMeasurements contains data ptrs
