@@ -53,6 +53,7 @@
 #include "cedar/devices/RobotManager.fwd.h"
 #include "cedar/devices/Sensor.fwd.h"
 #include "cedar/devices/SerialChannel.fwd.h"
+#include "cedar/devices/YarpChannel.fwd.h"
 
 namespace cedar
 {
@@ -65,10 +66,6 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(NetworkChannel);
     CEDAR_DECLARE_DEV_CLASS(Odometry);
     CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
-
-#ifdef CEDAR_USE_YARP
-    template <typename T> class YarpChannel;
-#endif
 
     // exceptions
     CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
