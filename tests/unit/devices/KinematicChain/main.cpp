@@ -218,7 +218,6 @@ int main()
   test_arm->setJointAngle(3, cedar::aux::math::pi*0.5);
   test_arm->setJointVelocity(1, 1);
   test_arm->setJointVelocity(2, 1);
-  test_arm->updateTransformations();
   if
   (
     !cedar::aux::math::isZero(test_arm->getJointAngle(0) - (0.0))
@@ -238,7 +237,6 @@ int main()
   acceleration_test_arm->setJointVelocity(1, 1.2);
   acceleration_test_arm->setJointAcceleration(0, 2.1);
   acceleration_test_arm->setJointAcceleration(1, 2.2);
-  acceleration_test_arm->updateTransformations();
   if
   (
     !cedar::aux::math::isZero(acceleration_test_arm->getJointAcceleration(0) - (2.1))
@@ -479,7 +477,6 @@ int main()
   complex_test_arm->setJointAngles(theta);
   complex_test_arm->setJointVelocities(thetaDot);
   complex_test_arm->setJointAccelerations(thetaTwoDot);
-  complex_test_arm->updateTransformations();
 
   // compute variable values
   cv::Mat root_transformation = complex_test_arm->getRootCoordinateFrame()->getTransformation();
@@ -530,7 +527,6 @@ int main()
     complex_test_arm->getJointVelocities()
     + delta_t*complex_test_arm->getJointAccelerations()
   );
-  complex_test_arm->updateTransformations();
 
   // compute new values
   cv::Mat p0_new = root_transformation * complex_test_arm->getJointTransformation(0) * p_local;
