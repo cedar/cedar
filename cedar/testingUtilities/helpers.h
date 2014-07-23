@@ -73,6 +73,11 @@
 #define CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE(ERROR_VAR_NAME, WHAT) \
     CEDAR_UNIT_TEST_PRINT_SUCCESS("Did not throw an exception when " WHAT); \
   } \
+  catch (const cedar::aux::ExceptionBase& e) \
+  {\
+    CEDAR_UNIT_TEST_PRINT_FAILURE("threw an exception when " WHAT); \
+    std::cout << "Exception info: " << e.exceptionInfo() << std::endl; \
+  }\
   catch (...)\
   {\
     ++ERROR_VAR_NAME; \
