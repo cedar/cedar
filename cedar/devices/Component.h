@@ -106,6 +106,9 @@ private:
   //! Exception that is thrown when the device type could not be guessed.
   class CouldNotGuessDeviceTypeException : public cedar::aux::ExceptionBase {};
 
+  //! Exception that is thrown when the command type could not be guessed.
+  class CouldNotGuessCommandTypeException : public cedar::aux::ExceptionBase {};
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -178,8 +181,14 @@ public:
   //! Returns the data that contains the current measurements.
   cedar::aux::DataPtr getDeviceMeasurementData(const ComponentDataType &type);
 
+  //! Returns the data that contains the current measurements.
+  cedar::aux::ConstDataPtr getDeviceMeasurementData(const ComponentDataType &type) const;
+
   //! Returns the data that contains the commands that will be sent to the device.
   cedar::aux::DataPtr getDeviceCommandData(const ComponentDataType &type);
+
+  //! Returns the data that contains the commands that will be sent to the device.
+  cedar::aux::ConstDataPtr getDeviceCommandData(const ComponentDataType &type) const;
 
   //! Returns the name for the given command.
   std::string getNameForCommandType(ComponentDataType type) const;
