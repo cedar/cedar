@@ -39,21 +39,25 @@
 #include "cedar/devices/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include <QApplication>
 
+unsigned int errors;
 
-int main()
+void test()
 {
-  // the number of errors encountered in this test
-  int errors = 0;
-  
   // create instance of test class
   std::cout << "testing position control ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_arm_position(new cedar::dev::SimulatedKinematicChain());
   test_arm_position->readJson("test_arm.json");
+  test_arm_position->addInitialConfiguration("peter", cv::Mat::zeros(test_arm_position->getNumberOfJoints(), 1, CV_64F));
+  test_arm_position->applyInitialConfiguration("peter");
+  test_arm_position->startDevice();
   
   //--------------------------------------------------------------------------------------------------------------------
   // single angle
@@ -63,6 +67,7 @@ int main()
   test_arm_position->setJointAngle(1, 2.0);
   test_arm_position->setJointAngle(2, cedar::aux::math::pi/2);
   test_arm_position->setJointAngle(3, sqrt(2.0));
+  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_position->getJointAngle(0) - 1.0)
       || !cedar::aux::math::isZero(test_arm_position->getJointAngle(1) - 2.0)
@@ -84,6 +89,7 @@ int main()
   angle_vector.push_back(2.5);
   angle_vector.push_back(3.5);
   test_arm_position->setJointAngles(angle_vector);
+  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero<double>(test_arm_position->getJointAngle(0) - 0.5)
       || !cedar::aux::math::isZero<double>(test_arm_position->getJointAngle(1) - 1.5)
@@ -105,6 +111,7 @@ int main()
   angle_matrix.at<double>(2, 0) = 0.3;
   angle_matrix.at<double>(3, 0) = 0.4;
   test_arm_position->setJointAngles(angle_matrix);
+  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_position->getJointAngles().at<double>(0, 0) - 0.1)
       || !cedar::aux::math::isZero(test_arm_position->getJointAngles().at<double>(1, 0) - 0.2)
@@ -120,6 +127,9 @@ int main()
   std::cout << "testing velocity control ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_arm_velocity(new cedar::dev::SimulatedKinematicChain());
   test_arm_velocity->readJson("test_arm.json");
+  test_arm_velocity->addInitialConfiguration("peter", cv::Mat::zeros(test_arm_position->getNumberOfJoints(), 1, CV_64F));
+  test_arm_velocity->applyInitialConfiguration("peter");
+  test_arm_velocity->startDevice();
 
   //--------------------------------------------------------------------------------------------------------------------
   // single angle velocity
@@ -129,6 +139,7 @@ int main()
   test_arm_velocity->setJointVelocity(1, 0.2);
   test_arm_velocity->setJointVelocity(2, 0.15);
   test_arm_velocity->setJointVelocity(3, 0.25);
+  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(0) - 0.1)
       || !cedar::aux::math::isZero(test_arm_velocity->getJointAngle(1) - 0.2)
@@ -150,6 +161,7 @@ int main()
   velocity_vector.push_back(2.5);
   velocity_vector.push_back(3.5);
   test_arm_velocity->setJointVelocities(velocity_vector);
+  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero<double>(test_arm_velocity->getJointVelocity(0) - 0.5)
       || !cedar::aux::math::isZero<double>(test_arm_velocity->getJointVelocity(1) - 1.5)
@@ -171,6 +183,7 @@ int main()
   velocity_matrix.at<double>(2, 0) = 0.3;
   velocity_matrix.at<double>(3, 0) = 0.4;
   test_arm_velocity->setJointVelocities(velocity_matrix);
+  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_velocity->getJointVelocities().at<double>(0, 0) - 0.1)
       || !cedar::aux::math::isZero(test_arm_velocity->getJointVelocities().at<double>(1, 0) - 0.2)
@@ -181,7 +194,20 @@ int main()
     errors++;
     std::cout << "ERROR with setJointVelocities(matrix) or getJointVelocities()" << std::endl;
   }
+}
 
+
+int main(int argc, char** argv)
+{
+  QApplication app(argc, argv);
+  // the number of errors encountered in this test
+  errors = 0;
+
+  cedar::aux::CallFunctionInThread caller(boost::bind(&test));
+
+  caller.start();
+
+  app.exec();
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
