@@ -40,16 +40,17 @@
 // CEDAR INCLUDES
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/devices/lib.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 
 #include "cedar/devices/ForwardKinematics.fwd.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/math/DoubleLimitsParameter.fwd.h"
 #include "cedar/devices/KinematicChain.fwd.h"
 
 // SYSTEM INCLUDES
@@ -86,7 +87,7 @@ public:
   };
 
   //!@brief describes the hardware properties of a joint.
-  struct Joint : cedar::aux::Configurable
+  struct CEDAR_DEV_LIB_EXPORT Joint : cedar::aux::Configurable
   {
     //! constructor
     Joint();
@@ -105,6 +106,8 @@ public:
   typedef boost::shared_ptr<cedar::dev::KinematicChain::Joint> JointPtr;
   //!@brief a parameter for a list of joint objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::dev::KinematicChain::Joint> JointListParameter;
+  //!@brief a factory that allows allocating joints
+  typedef cedar::aux::FactoryManager<cedar::dev::KinematicChain::JointPtr> JointFactoryManager;
 
   //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
@@ -588,4 +591,17 @@ private:
   //!@brief lock for the initial configuration datas
   QReadWriteLock mCurrentInitialConfigurationLock;
 }; // class cedar::dev::robot::KinematicChain
+
+#include "cedar/auxiliaries/FactoryManager.h"
+
+CEDAR_DEV_EXPORT_SINGLETON(cedar::dev::KinematicChain::JointFactoryManager);
+
+namespace cedar
+{
+  namespace dev
+  {
+    //!@brief The singleton instance of the joint factory manager.
+    typedef cedar::aux::Singleton<cedar::dev::KinematicChain::JointFactoryManager> JointFactoryManagerSingleton;
+  }
+}
 #endif // CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H

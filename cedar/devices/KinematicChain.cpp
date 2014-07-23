@@ -59,17 +59,9 @@ namespace
 {
   bool registered()
   {
-    cedar::aux::Singleton
-          <
-            cedar::aux::FactoryManager<cedar::dev::KinematicChain::JointPtr>
-          >
-          ::getInstance()->registerType<cedar::dev::KinematicChain::JointPtr>();
+    cedar::dev::JointFactoryManagerSingleton::getInstance()->registerType<cedar::dev::KinematicChain::JointPtr>();
 
-    cedar::aux::Singleton
-          <
-            cedar::aux::FactoryManager<cedar::dev::KinematicChain::JointPtr>
-          >
-          ::getInstance()->addDeprecatedName<cedar::dev::KinematicChain::JointPtr>("cedar.dev.robot.KinematicChain.Joint");
+    cedar::dev::JointFactoryManagerSingleton::getInstance()->addDeprecatedName<cedar::dev::KinematicChain::JointPtr>("cedar.dev.robot.KinematicChain.Joint");
 
     return true;
   }

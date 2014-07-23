@@ -54,6 +54,14 @@ namespace test
       {
       }
   };
+
+  struct TestStruct
+  {
+    public:
+      void fn()
+      {
+      }
+  };
 }
 
 int main()
@@ -71,6 +79,18 @@ int main()
   else
   {
     std::cout << "Name properly unmangled to \"" << unmangled_test_class << "\"" << std::endl;
+  }
+
+  std::string unmangled_test_struct = cedar::aux::unmangleName(typeid(test::TestStruct));
+  if (unmangled_test_struct != "test::TestStruct")
+  {
+    std::cout << "Faild to properly unmangle name for test::TestStruct; result is \""
+             << unmangled_test_struct << "\"" << std::endl;
+    ++errors;
+  }
+  else
+  {
+    std::cout << "Name properly unmangled to \"" << unmangled_test_struct << "\"" << std::endl;
   }
 
   return errors;
