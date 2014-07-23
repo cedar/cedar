@@ -81,8 +81,10 @@ public:
 
   void initializeFromJointList();
 
+  // @todo: deprecate
   void calculateCartesianJacobian( const cv::Mat& point, unsigned int jointIndex, cv::Mat& result, unsigned int coordinateFrame);
   cv::Mat calculateCartesianJacobian( const cv::Mat& point, unsigned int jointIndex, unsigned int coordinateFrame);
+  // @todo: deprecate
   void calculateCartesianJacobianTemporalDerivative( const cv::Mat& point, unsigned int jointIndex, cv::Mat& result, unsigned int coordinateFrame);
   cv::Mat calculateCartesianJacobianTemporalDerivative( const cv::Mat& point, unsigned int jointIndex, unsigned int coordinateFrame);
   cv::Mat calculateVelocity( const cv::Mat& point, unsigned int jointIndex, unsigned int coordinateFrame); 
