@@ -83,7 +83,6 @@ int main(int argc, char **argv)
   scene_widget->show();
   widget_trunk.show();
   viewer.startTimer(50);
-  trunk->startTimer(20);
   a.exec();
 
   return 0;

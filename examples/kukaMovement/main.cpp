@@ -86,11 +86,8 @@ private:
   void step(cedar::unit::Time)
   {
 std::cout << "in example step" << std::endl;
-    // update state variables
-    mpArm->updateTransformations();
 
-    // if movable, calculate and pass movement command
-    if (mpArm->isMovable())
+    if (1)
     {
       // calculate direction of movement
       cv::Mat vector_to_target_hom
@@ -229,7 +226,6 @@ int main(int argc, char **argv)
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
-  arm->updateTransformations();
   target->setTranslation(cedar::unit::LengthMatrix(arm->calculateEndEffectorPosition(), 1.0 * cedar::unit::meters));
   cedar::aux::gl::ObjectVisualizationPtr sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   sphere->setDrawAsWireFrame(true);
@@ -259,7 +255,6 @@ int main(int argc, char **argv)
 
   // clean up
   worker.stop();
-  worker.wait();
   arm->stopDevice();
   if (use_hardware)
   {
