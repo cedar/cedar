@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,20 +22,23 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        RobotManager.fwd.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 07 23
 
-    Description: Namespace file for cedar::dev::robot.
+    Description: Forward declaration file for the class cedar::dev::RobotManager.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_NAMESPACE_H
-#define CEDAR_DEV_ROBOT_NAMESPACE_H
+#ifndef CEDAR_DEV_ROBOT_MANAGER_FWD_H
+#define CEDAR_DEV_ROBOT_MANAGER_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
@@ -43,27 +46,19 @@
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
-#endif
+#endif // Q_MOC_RUN
+
 
 namespace cedar
 {
   namespace dev
   {
-    /*! @brief Namespace for all robot interfaces. */
-    namespace robot
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(Component);
-      CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);
-      CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
-      CEDAR_DECLARE_DEV_CLASS(Locomotion);
-      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
-      CEDAR_DECLARE_DEV_CLASS(Odometry);
-      CEDAR_DECLARE_DEV_CLASS(Robot);
-      CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
-      //!@endcond
-    }
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_DEV_CLASS(RobotManager);
+    //!@endcond
   }
 }
 
-#endif // CEDAR_DEV_ROBOT_NAMESPACE_H
+
+#endif // CEDAR_DEV_ROBOT_MANAGER_FWD_H
+

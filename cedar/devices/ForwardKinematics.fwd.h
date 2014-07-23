@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,48 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.cpp
+    File:        ForwardKinematics.fwd.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2012 02 15
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        2014 02 28
 
-    Description: Implementation of the @em cedar::tests::unit::dev::TestKinematicChain class.
+    Description: Forward declaration file for the class cedar::dev::ForwardKinematics.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_FORWARD_KINEMATICS_FWD_H
+#define CEDAR_DEV_FORWARD_KINEMATICS_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "tests/unit/devices/KinematicChain/TestKinematicChain.h"
+#include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//! constructor
-TestKinematicChain::TestKinematicChain()
-:
-cedar::dev::KinematicChain()
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-  
+  namespace dev
+  {
+    CEDAR_DECLARE_DEV_CLASS(ForwardKinematics);
+  }
 }
 
-//! destructor
-TestKinematicChain::~TestKinematicChain()
-{
+//!@endcond
 
-}
+#endif // CEDAR_DEV_FORWARD_KINEMATICS_FWD_H
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-bool TestKinematicChain::isMovable() const
-{
-  return true;
-}

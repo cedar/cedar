@@ -95,67 +95,26 @@ _mComponent(new cedar::dev::ComponentParameter(this, "component"))
 
 void cedar::proc::steps::Component::onStart()
 {
-  try
+  this->_mComponent->setConstant(true);
+  if (this->hasComponent())
   {
-    if (auto component = this->getComponent())
-    {
-      if (auto channel = component->getChannel())
-      {
-        if (!channel->isOpen())
-        {
-          this->mConnectedOnStart = true;
-          channel->open();
-        }
-      }
-    }
-  }
-  catch (cedar::dev::NoComponentSelectedException)
-  {
-    // ok, don't do anything in this case.
+    auto component = this->getComponent();
+    component->startDevice();
   }
 }
 
 void cedar::proc::steps::Component::onStop()
 {
-  try
+  this->_mComponent->setConstant(false);
+  if (this->hasComponent())
   {
-    if (auto component = this->getComponent())
-    {
-      if (auto channel = component->getChannel())
-      {
-        if (this->mConnectedOnStart)
-        {
-          channel->close();
-          this->mConnectedOnStart = false;
-        }
-      }
-    }
-  }
-  catch (cedar::dev::NoComponentSelectedException)
-  {
-    // ok, don't do anything in this case.
+    auto component = this->getComponent();
+    component->stopDevice();
   }
 }
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
-  this->getComponent()->updateMeasuredValues();
-
-  // read values from the inputs
-  std::vector<std::string> data_names = this->getComponent()->getDataNames(cedar::dev::Component::COMMANDED);
-  for (auto name_iter = data_names.begin(); name_iter != data_names.end(); ++name_iter)
-  {
-    const std::string& name = *name_iter;
-    cedar::aux::ConstDataPtr data = this->getInput(name);
-
-    if (data)
-    {
-      this->getComponent()->getCommandedData(name)->copyValueFrom(data);
-    }
-  }
-
-  // update the commands
-  this->getComponent()->updateCommandedValues();
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputValidity
@@ -167,16 +126,17 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
   const std::string& name = slot->getName();
 
   // only commanded data are inputs
-  cedar::aux::ConstDataPtr component_data = this->getComponent()->getCommandedData(name);
-
-  if (typeid(*component_data) == typeid(*data))
-  {
-    return cedar::proc::DataSlot::VALIDITY_VALID;
-  }
-  else
-  {
+  //!@todo Reimplement the validity check.
+//  cedar::aux::ConstDataPtr component_data = this->getComponent()->getCommandedData(name);
+//
+//  if (typeid(*component_data) == typeid(*data))
+//  {
+//    return cedar::proc::DataSlot::VALIDITY_VALID;
+//  }
+//  else
+//  {
     return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
+//  }
 }
 
 void cedar::proc::steps::Component::componentChanged()
@@ -184,43 +144,27 @@ void cedar::proc::steps::Component::componentChanged()
   //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
   this->removeAllDataSlots();
 
-  cedar::dev::ComponentPtr component;
-  try
-  {
-    component = this->_mComponent->getValue();
-  }
-  catch (cedar::dev::NoComponentSelectedException& exc)
+  if (!this->hasComponent())
   {
     return;
   }
 
-  // static because this doesn't change for different instances
-  static std::vector<cedar::dev::Component::DataType> types;
-  if (types.empty())
+  auto component = this->getComponent();
+  auto measurements = component->getInstalledMeasurementTypes();
+
+  for (const auto& measurement : measurements)
   {
-    types.push_back(cedar::dev::Component::COMMANDED);
-    types.push_back(cedar::dev::Component::MEASURED);
+    std::string name = component->getNameForMeasurementType(measurement);
+    auto data = component->getDeviceMeasurementData(measurement);
+    this->declareOutput(name, data);
   }
 
-  for (auto type_it = types.begin(); type_it != types.end(); ++type_it)
+  auto commands = component->getInstalledCommandTypes();
+
+  for (const auto& command : commands)
   {
-    cedar::dev::Component::DataType type = *type_it;
-
-    std::vector<std::string> data_names = component->getDataNames(type);
-
-    for (auto name_iter = data_names.begin(); name_iter != data_names.end(); ++name_iter)
-    {
-      const std::string& name = *name_iter;
-      switch (type)
-      {
-        case cedar::dev::Component::COMMANDED:
-          this->declareInput(name, false);
-          break;
-
-        case cedar::dev::Component::MEASURED:
-          this->declareOutput(name, component->getMeasuredData(name));
-          break;
-      }
-    }
+    std::string name = component->getNameForCommandType(command);
+    //!@todo On inputConnectionChanged, incoming data must be set at the component.
+    this->declareInput(name);
   }
 }

@@ -40,20 +40,46 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/devices/namespace.h"
+#include "cedar/auxiliaries/LoopFunctionInThread.h"
+#include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/devices/Channel.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
 #include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES
+#include <opencv/cv.h>
+#include <boost/function.hpp>
+#include <boost/optional.hpp>
+#include <QReadWriteLock>
+#include <QObject>
+
 #include <vector>
 #include <map>
 
 /*!@brief Base class for components of robots.
  */
-class cedar::dev::Component : public cedar::aux::NamedConfigurable
+class cedar::dev::Component : public QObject,
+                              public cedar::aux::NamedConfigurable
 {
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // typedefs
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef boost::function< void (cv::Mat) > CommandFunctionType;
+  typedef boost::function< cv::Mat () >     MeasurementFunctionType;
+  typedef boost::function< cv::Mat (cv::Mat) > TransformationFunctionType;
+  typedef unsigned int                      ComponentDataType;
+  typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
+private:
+  typedef std::map< ComponentDataType, TransformationFunctionType > InnerTransformationHookContainerType;
+  typedef std::map< ComponentDataType, InnerTransformationHookContainerType > TransformationHookContainerType;
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -63,18 +89,10 @@ class cedar::dev::Component : public cedar::aux::NamedConfigurable
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  enum DataType
-  {
-    MEASURED,
-    COMMANDED
-  };
 
 private:
-  struct DataSlot
-  {
-    cedar::aux::DataPtr mData;
-    boost::function<void ()> mUpdateFunction;
-  };
+  class DataCollection;
+  CEDAR_GENERATE_POINTER_TYPES(DataCollection);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -93,6 +111,20 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  CEDAR_DECLARE_DEPRECATED(void start());
+  CEDAR_DECLARE_DEPRECATED(void stop());
+  CEDAR_DECLARE_DEPRECATED(bool isRunning());
+  CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
+  CEDAR_DECLARE_DEPRECATED(void stopTimer());
+
+  //!@ check if these functions have to be exposed at all (may at least be changed to protected visibility)
+  void setStepSize(const cedar::unit::Time& time);
+  void setIdleTime(const cedar::unit::Time& time);
+  void setSimulatedTime(const cedar::unit::Time& time);
+  bool isRunningNolocking();
+
+  cedar::unit::Time getDeviceStepSize();
+
   //!@brief Returns the channel associated with the component.
   inline cedar::dev::ChannelPtr getChannel() const
   {
@@ -104,17 +136,37 @@ public:
     this->mChannel = channel;
   }
 
-  std::vector<std::string> getDataNames(cedar::dev::Component::DataType type) const;
+  // utility Transformations
+  cv::Mat integrateDevice(cv::Mat data, ComponentDataType type);
+  cv::Mat integrateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
+  cv::Mat differentiateDevice(cv::Mat data, ComponentDataType type);
+  cv::Mat differentiateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
 
-  cedar::aux::DataPtr getCommandedData(const std::string& name) const;
+  void processStart();
 
-  cedar::aux::DataPtr getMeasuredData(const std::string& name) const;
+  void startDevice();
+  void stopDevice();
 
-  void updateMeasuredValues();
+  //! Returns a list of all installed measurement types.
+  std::vector<ComponentDataType> getInstalledMeasurementTypes() const;
 
-  void updateCommandedValues();
+  //! Returns a list of all installed command types.
+  std::vector<ComponentDataType> getInstalledCommandTypes() const;
 
-  void updateValues(cedar::dev::Component::DataType type);
+  //! Returns the data that contains the current measurements.
+  cedar::aux::DataPtr getDeviceMeasurementData(const ComponentDataType &type);
+
+  //! Returns the data that contains the commands that will be sent to the device.
+  cedar::aux::DataPtr getDeviceCommandData(const ComponentDataType &type);
+
+  //! Returns the name for the given command.
+  std::string getNameForCommandType(ComponentDataType type) const;
+
+  //! Returns the name for the given measurement.
+  std::string getNameForMeasurementType(ComponentDataType type) const;
+
+signals:
+  void updatedUserMeasurementSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -129,23 +181,47 @@ protected:
   {
     this->mSlot = slot;
   }
- 
-  void addCommandedData(const std::string& name, cedar::aux::DataPtr data, boost::function<void()> updateFun);
 
-  void addMeasuredData(const std::string& name, cedar::aux::DataPtr data, boost::function<void()> updateFun);
+  void installCommandType(ComponentDataType type, const std::string& name);
+  void installMeasurementType(ComponentDataType type, const std::string& name);
+  void installCommandAndMeasurementType(ComponentDataType type, const std::string& name);
+
+  void setCommandDimensionality(ComponentDataType type, unsigned int dim);
+  void setMeasurementDimensionality(ComponentDataType type, unsigned int dim);
+  void setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim);
+
+  void registerDeviceCommandHook(ComponentDataType type, CommandFunctionType fun);
+  void registerDeviceMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
+
+  void registerUserCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+  void registerDeviceMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+
+  void setUserCommandBuffer(ComponentDataType type, cv::Mat);
+  void setUserCommandBufferIndex(ComponentDataType type, int index, double value);
+  void setInitialUserCommandBuffer(ComponentDataType type, cv::Mat);
+
+  cv::Mat getUserMeasurementBuffer(ComponentDataType type) const;
+  double  getUserMeasurementBufferIndex(ComponentDataType type, int index) const;
+
+  cv::Mat getPreviousDeviceMeasurementBuffer(ComponentDataType type) const;
+  double  getPreviousDeviceMeasurementBufferIndex(ComponentDataType type, int index) const;
+
+  void applyDeviceCommandsAs(ComponentDataType type);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void addData
-  (
-    cedar::dev::Component::DataType type,
-    const std::string& name, cedar::aux::DataPtr data,
-    boost::function<void()> updateFun
-  );
+  void init();
 
-  cedar::aux::DataPtr getData(cedar::dev::Component::DataType type, const std::string& name) const;
+  void resetComponent();
+
+  void stepDevice(cedar::unit::Time); //!todo: make friend to LoopFunctionInThread
+  void stepDeviceCommands(cedar::unit::Time);
+  void stepDeviceMeasurements(cedar::unit::Time);
+
+  void updateUserMeasurements();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -154,12 +230,19 @@ protected:
   // none yet
 
 private:
-  //! channel of communication
   cedar::dev::ChannelPtr mChannel;
   cedar::dev::ComponentSlotWeakPtr mSlot;
 
-  //! The data of the channel, i.e., measured and commanded values.
-  std::map<cedar::dev::Component::DataType, std::map<std::string, DataSlot> > mData;
+  DataCollectionPtr mMeasurementData;
+  DataCollectionPtr mCommandData;
+
+  //! the Device-thread's wrapper
+  std::unique_ptr< cedar::aux::LoopFunctionInThread > mDeviceThread;
+
+  std::map< ComponentDataType, CommandFunctionType > mSubmitCommandHooks;
+  std::map< ComponentDataType, MeasurementFunctionType > mRetrieveMeasurementHooks;
+
+  boost::optional<ComponentDataType> mDeviceCommandSelection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

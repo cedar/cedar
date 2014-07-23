@@ -160,7 +160,6 @@ int main(int argc, char **argv)
 
   // clean up
   test_arm->stop();
-  test_arm->wait();
 
   return 0;
 }

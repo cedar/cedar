@@ -117,7 +117,6 @@ int main(int argc, char **argv)
   a.exec();
 
   test_arm->stop();
-  test_arm->wait();
 
   return 0;
 }

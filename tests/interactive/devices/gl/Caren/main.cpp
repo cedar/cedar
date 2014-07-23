@@ -228,9 +228,6 @@ int main(int argc, char **argv)
   caren_trunk->stop();
   caren_arm->stop();
   caren_head->stop();
-  caren_trunk->wait();
-  caren_arm->wait();
-  caren_head->wait();
 
   return 0;
 }

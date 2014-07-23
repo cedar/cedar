@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,48 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.cpp
+    File:        YarpChannel.fwd.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2012 02 15
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2014 07 23
 
-    Description: Implementation of the @em cedar::tests::unit::dev::TestKinematicChain class.
+    Description: Forward declaration file for the class cedar::dev::YarpChannel.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_YARP_CHANNEL_FWD_H
+#define CEDAR_DEV_YARP_CHANNEL_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "tests/unit/devices/KinematicChain/TestKinematicChain.h"
+#include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//! constructor
-TestKinematicChain::TestKinematicChain()
-:
-cedar::dev::KinematicChain()
+namespace cedar
 {
-  
+  namespace dev
+  {
+    //!@cond SKIPPED_DOCUMENTATION
+#ifdef CEDAR_USE_YARP
+    template <typename T> class YarpChannel;
+#endif
+    //!@endcond
+  }
 }
 
-//! destructor
-TestKinematicChain::~TestKinematicChain()
-{
 
-}
+#endif // CEDAR_DEV_YARP_CHANNEL_FWD_H
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-bool TestKinematicChain::isMovable() const
-{
-  return true;
-}
