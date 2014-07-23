@@ -59,6 +59,20 @@
     ++ERROR_VAR_NAME; \
   }
 
+/*! Tests a condition. If the condition fails, increases an error variable and prints a custom message. Also prints a message
+ *  on success.
+ */
+#define CEDAR_UNIT_TEST_CONDITION_CUSTOM_MESSAGE(ERROR_VAR_NAME, CONDITION, MESSAGE) \
+  if ((CONDITION)) \
+  { \
+    CEDAR_UNIT_TEST_PRINT_SUCCESS("Condition: " #CONDITION); \
+  } \
+  else \
+  { \
+    CEDAR_UNIT_TEST_PRINT_FAILURE("Condition: " #CONDITION ", " MESSAGE); \
+    ++ERROR_VAR_NAME; \
+  }
+
 #define CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION() try {
 #define CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(ERROR_VAR_NAME, WHAT) \
     ++ERROR_VAR_NAME; \
