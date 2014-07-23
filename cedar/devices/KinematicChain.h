@@ -362,13 +362,13 @@ public:
    * @param result    Jacobian of the given point, in base coordinates, 3 \f$\times\f$ N matrix, where N = number of joints
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    */
-  void calculateCartesianJacobian
+  CEDAR_DECLARE_DEPRECATED( void calculateCartesianJacobian
   (
     const cv::Mat& point,
     unsigned int jointIndex,
     cv::Mat& result,
     unsigned int coordinateFrame
-  );
+  ) );
 
   /*!@brief calculates Cartesian Jacobian of a point/vector
    * slightly slower than calculateJacobian()
@@ -393,13 +393,13 @@ public:
    * @param result    Jacobian of the given point, in base coordinates, 3 \f$\times\f$ N matrix, where N = number of joints
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    */
-  void calculateCartesianJacobianTemporalDerivative
+  CEDAR_DECLARE_DEPRECATED(void calculateCartesianJacobianTemporalDerivative
   (
     const cv::Mat& point,
     unsigned int jointIndex,
     cv::Mat& result,
     unsigned int coordinateFrame
-  );
+  ) );
 
   /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector given in homogeneous
    * coordinates of the relevant joint frame
