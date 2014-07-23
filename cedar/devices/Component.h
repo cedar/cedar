@@ -186,6 +186,8 @@ public:
   //! Returns the name for the given measurement.
   std::string getNameForMeasurementType(ComponentDataType type) const;
 
+  void applyDeviceCommandsAs(ComponentDataType type);
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -227,7 +229,6 @@ protected:
   cv::Mat getPreviousDeviceMeasurementBuffer(ComponentDataType type) const;
   double  getPreviousDeviceMeasurementBufferIndex(ComponentDataType type, int index) const;
 
-  void applyDeviceCommandsAs(ComponentDataType type);
 
 
   //--------------------------------------------------------------------------------------------------------------------

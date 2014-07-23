@@ -108,17 +108,17 @@ class cedar::dev::Component::DataCollection
       mInstalledDimensions[type] = dim;
     }
 
-    cv::Mat getDeviceRetrievedBufferUnlocked(ComponentDataType& type)
+    cv::Mat getDeviceRetrievedBufferUnlocked(ComponentDataType type)
     {
       return this->getBufferUnlocked(mDeviceRetrievedData, type);
     }
 
-    void setDeviceRetrievedBuffer(ComponentDataType& type, cv::Mat data)
+    void setDeviceRetrievedBuffer(ComponentDataType type, cv::Mat data)
     {
       this->setData(mDeviceRetrievedData, type, data);
     }
 
-    void setDeviceRetrievedBufferUnlocked(ComponentDataType& type, cv::Mat data)
+    void setDeviceRetrievedBufferUnlocked(ComponentDataType type, cv::Mat data)
     {
       this->setDataUnlocked(mDeviceRetrievedData, type, data);
     }
@@ -128,12 +128,12 @@ class cedar::dev::Component::DataCollection
       this->resetBufferUnlocked(mDeviceRetrievedData, type);
     }
 
-    cv::Mat getDeviceSubmittedBufferUnlocked(ComponentDataType& type)
+    cv::Mat getDeviceSubmittedBufferUnlocked(ComponentDataType type)
     {
       return this->getBufferUnlocked(mDeviceSubmittedData, type);
     }
 
-    void setDeviceSubmittedBufferUnlocked(ComponentDataType& type, cv::Mat data)
+    void setDeviceSubmittedBufferUnlocked(ComponentDataType type, cv::Mat data)
     {
       this->setDataUnlocked(mDeviceSubmittedData, type, data);
     }
@@ -173,7 +173,7 @@ class cedar::dev::Component::DataCollection
       this->setData(mUserBuffer, type, data);
     }
 
-    void setUserBufferUnlocked(const ComponentDataType& type, const cv::Mat& data)
+    void setUserBufferUnlocked(const ComponentDataType type, const cv::Mat& data)
     {
       this->setDataUnlocked(mUserBuffer, type, data);
     }
@@ -183,7 +183,7 @@ class cedar::dev::Component::DataCollection
       this->setDataIndex(mUserBuffer, type, index, value);
     }
 
-    void setUserBufferIndexUnlocked(const ComponentDataType& type, int index, double value)
+    void setUserBufferIndexUnlocked(const ComponentDataType type, int index, double value)
     {
       this->setDataIndexUnlocked(mUserBuffer, type, index, value);
     }
@@ -198,12 +198,12 @@ class cedar::dev::Component::DataCollection
       return this->getBufferIndex(mUserBuffer, type, index);
     }
 
-    cv::Mat getUserBufferUnlocked(ComponentDataType& type) const
+    cv::Mat getUserBufferUnlocked(ComponentDataType type) const
     {
       return this->getBufferUnlocked(mUserBuffer, type);
     }
 
-    double getUserDataIndexUnlocked(ComponentDataType& type, int index) const
+    double getUserDataIndexUnlocked(ComponentDataType type, int index) const
     {
       return getBufferIndexUnlocked(mUserBuffer, type, index);
     }
@@ -290,7 +290,7 @@ class cedar::dev::Component::DataCollection
       return ret;
     }
 
-    cv::Mat getBufferUnlocked(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType& type) const
+    cv::Mat getBufferUnlocked(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
     {
       //!@todo CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! Mutti there is a CONST CAST here!
       const_cast<DataCollection*>(this)->lazyInitializeUnlocked(const_cast<cedar::aux::LockableMember<BufferDataType>&>(bufferData), type);
@@ -324,7 +324,7 @@ class cedar::dev::Component::DataCollection
       return getBufferUnlocked(bufferData, type).at<double>(index, 0);
     }
 
-    void setData(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType& type, const cv::Mat& data)
+    void setData(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, const cv::Mat& data)
     {
       // todo: lazyInitialize for command restrictions
 
@@ -335,13 +335,13 @@ class cedar::dev::Component::DataCollection
       setDataUnlocked(bufferData, type, data);
     }
 
-    void setDataUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType& type, const cv::Mat& data)
+    void setDataUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, const cv::Mat& data)
     {
       lazyInitializeUnlocked(bufferData, type);
       bufferData.member()[type]->setData(data.clone());
     }
 
-    void setDataIndex(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType& type, int index, double value)
+    void setDataIndex(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, int index, double value)
     {
       // todo: lazyInitialize for command restrictions
 
@@ -352,7 +352,7 @@ class cedar::dev::Component::DataCollection
       setDataIndexUnlocked(bufferData, type, index, value);
     }
 
-    void setDataIndexUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType& type, int index, double value)
+    void setDataIndexUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, int index, double value)
     {
       lazyInitializeUnlocked(bufferData, type);
       bufferData.member()[type]->getData().at<double>(index, 0) = value;
@@ -392,7 +392,9 @@ class cedar::dev::Component::DataCollection
     }
 
   public:
-    //!@todo the distinction between submitted and received may not be necessary as only measurements seem to receive, and only command submit
+    //@todo: most of these should probably be private
+
+    //!@todo the distinction between submitted and received may not be necessary as only measurements seem to receive, and only command submit. js: YES
     cedar::aux::LockableMember<BufferDataType> mDeviceRetrievedData;
 
     // Cache for the Device-interface
@@ -659,7 +661,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   }
   if (mSubmitCommandHooks.size() == 0)
   {
-    // todo: throw
+    // @todo: throw
     return;
   }
 
@@ -668,12 +670,12 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
     // safe only if there was only one command hook registered
     if (this->mCommandData->mUserBuffer.member().size() > 1)
     {
-        // todo: throw
+        // @todo: throw
       std::cout << "error: setted too many commands of different types! ... " <<  std::endl;
       for (auto &what : this->mCommandData->mUserBuffer.member() )
       {
         std::cout << " " << what.first << std::endl;
-      }
+      } // @todo: now that types have names. use those
       return;
     }
 
@@ -695,8 +697,8 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
       CEDAR_THROW
       (
         cedar::dev::Component::CouldNotGuessDeviceTypeException,
-        "Could not guess device type: too many submit hooks. Please select a device type manually."
-      );
+        "Could not guess device type: too many submit hooks. Please select a device type manually." 
+      ); 
     }
 
     type_for_Device = mSubmitCommandHooks.begin()->first;
@@ -717,7 +719,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
     if (!hook)
     {
       std::string user_type_str = this->mCommandData->getNameForType(type_from_user);
-      std::string device_type_str = this->mCommandData->getNameForType(type_from_user);
+      std::string device_type_str = this->mCommandData->getNameForType(type_for_Device);
       CEDAR_THROW(cedar::dev::Component::HookNotFoundException, "Could not find a command hook from \"" + user_type_str + "\" to \"" + device_type_str + "\".");
     }
 
@@ -763,7 +765,7 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
     if (found != mRetrieveMeasurementHooks.end())
     {
       // execute the hook:
-      this->mMeasurementData->mDeviceRetrievedData.member()[ type ]->setData((found->second)());
+      this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, (found->second)() );
       types_we_measured.push_back( type );
 //std::cout << "we measured a tyep for: " << type << std::endl;      
 //std::cout << "  it was: " <<  this->mMeasurementData->mDeviceRetrievedData[ type ] << std::endl;
@@ -803,7 +805,8 @@ void cedar::dev::Component::updateUserMeasurements()
   cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
   cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-  cedar::aux::LockSetLocker locker(locks);
+//  cedar::aux::LockSetLocker locker(locks); //@todo: this segfaults
+//@todo re-add
 
   // todo: are these really deep copies? -> no, mDeviceRetrievedMeasurements contains data ptrs
   this->mMeasurementData->mPreviousDeviceBuffer.member() = this->mMeasurementData->mUserBuffer.member();
@@ -811,7 +814,8 @@ void cedar::dev::Component::updateUserMeasurements()
   //!@todo What was the purpose of this clear? reimplement
 //  this->mMeasurementData->mDeviceRetrievedData.member().clear();
 
-  locker.unlock();
+//  locker.unlock(); //@todo: see above
+//@todo re-add
 
   emit updatedUserMeasurementSignal();
 }

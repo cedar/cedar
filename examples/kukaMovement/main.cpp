@@ -85,6 +85,7 @@ private:
   // step function calculating and passing the movement command for each time step
   void step(cedar::unit::Time)
   {
+std::cout << "in example step" << std::endl;
     // update state variables
     mpArm->updateTransformations();
 
@@ -200,11 +201,15 @@ int main(int argc, char **argv)
     {"near zero", cv::Mat( 7, 1, CV_64F, initial_config1) },
     // add your configs here ...
   };
+
+  arm->applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES );
   arm->setInitialConfigurations( initial_configs );
 
   // set simulated arm to initial configuration
   if (!use_hardware)
+  {
     arm->applyInitialConfiguration("near zero");
+  }
 
   // create the scene for the visualization
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
