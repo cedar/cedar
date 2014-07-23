@@ -370,6 +370,7 @@ class cedar::dev::Component::DataCollection
       else // already initialized
       {
         //!@todo throw an AlreadyInitializedException here
+        //       js: I would allow that
         return;
       }
     }
@@ -570,6 +571,12 @@ void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, 
   // todo: throw if not empty
 
   // todo: there is no lock here. I think we dont need one, sure?
+
+  auto found = this->mCommandData->mInitialUserSubmittedData.member().find(type);
+  if (found == this->mCommandData->mInitialUserSubmittedData.member().end())
+  {
+    this->mCommandData->mInitialUserSubmittedData.member()[type] =  cedar::aux::MatDataPtr(new cedar::aux::MatData());
+  }
 
   this->mCommandData->mInitialUserSubmittedData.member()[type]->setData(data.clone());
 }
