@@ -504,7 +504,6 @@ void cedar::dev::KinematicChain::init()
       cedar::dev::KinematicChain::JOINT_VELOCITIES
     )
   );
-
   registerDeviceMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
@@ -822,7 +821,6 @@ bool cedar::dev::KinematicChain::setCurrentInitialConfiguration(const std::strin
 bool cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& name)
 {
   QReadLocker rlock(&mCurrentInitialConfigurationLock);
-std::cout  << "  HIER0 "  << std::endl;      
 
   auto f = mInitialConfigurations.find(name);
   if (f != mInitialConfigurations.end())
@@ -839,8 +837,7 @@ std::cout  << "  HIER0 "  << std::endl;
     }
     else
     {
-      // todo: !
-      std::cout  << "  HIER1 "  << std::endl;
+      // @todo: !
       setInitialUserCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
       //setJointAngles( f->second );
     }

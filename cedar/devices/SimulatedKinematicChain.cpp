@@ -94,18 +94,20 @@ cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles()
      // mSimulation ist leer !!!!
      // HIER HIER HIER HIER
 
-std::cout << "  in retrieveSimulatedAngles: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ] << std::endl;
+//std::cout << "  in retrieveSimulatedAngles: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ] << std::endl;
   return mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ].clone();
 }
 
 cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities()
 {
+//std::cout << "  in retrieveSimulatedVels: " << mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ] << std::endl;
   // todo: lock
   return mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ].clone();
 }
 
 cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations()
 {
+//std::cout << "  in retrieveSimulatedAccels: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS ] << std::endl;
   return mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS].clone();
 }
 

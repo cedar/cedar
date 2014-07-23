@@ -571,11 +571,13 @@ private:
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
-protected:
+public:
   static const cedar::dev::Component::ComponentDataType JOINT_ANGLES;
   static const cedar::dev::Component::ComponentDataType JOINT_VELOCITIES;
   static const cedar::dev::Component::ComponentDataType JOINT_ACCELERATIONS;
   static const cedar::dev::Component::ComponentDataType JOINT_TORQUES;
+
+protected:
 
 private:
   //! vector of all joints
