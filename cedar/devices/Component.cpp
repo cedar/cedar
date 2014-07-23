@@ -36,8 +36,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/Component.h"
-#include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/devices/Channel.h"
+#include "cedar/auxiliaries/LoopFunctionInThread.h"
+#include "cedar/auxiliaries/threadingUtilities.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
@@ -499,11 +500,11 @@ void cedar::dev::Component::installCommandAndMeasurementType(ComponentDataType t
 void cedar::dev::Component::resetComponent()
 {
   {
-    //!@todo As this isn't locked in a canonical lock order, this may lead to deadlocks; use cedar::aux::Lockable?
-    //!@todo This can be done using cedar::aux::LockSet, but we must write a LockSetLocker first
-    QWriteLocker lock2(this->mMeasurementData->mUserBuffer.getLockPtr());
-    QWriteLocker lock2b(this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr());
-    QWriteLocker lock4(this->mMeasurementData->mDeviceRetrievedData.getLockPtr());
+    cedar::aux::LockSet locks;
+    cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::LockSetLocker locker(locks);
 
     for (ComponentDataType &type : this->mMeasurementData->getInstalledTypesUnlocked())
     {
@@ -514,8 +515,10 @@ void cedar::dev::Component::resetComponent()
   }
 
   {
-    QWriteLocker lock1(this->mCommandData->mUserBuffer.getLockPtr());
-    QWriteLocker lock3(this->mCommandData->mDeviceSubmittedData.getLockPtr());
+    cedar::aux::LockSet locks;
+    cedar::aux::append(locks, this->mCommandData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::append(locks, this->mCommandData->mDeviceSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::LockSetLocker locker(locks);
 
     for(ComponentDataType &type : this->mCommandData->getInstalledTypes())
     {
@@ -746,9 +749,11 @@ void cedar::dev::Component::updateUserMeasurements()
 {
   // lock Device cache todo
   // lock caches
-  QReadLocker lock1(this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr());
-  QWriteLocker lock2(this->mMeasurementData->mUserBuffer.getLockPtr());
-  QWriteLocker lock3(this->mMeasurementData->mDeviceRetrievedData.getLockPtr());
+  cedar::aux::LockSet locks;
+  cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+  cedar::aux::append(locks, this->mMeasurementData->mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+  cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+  cedar::aux::LockSetLocker locker(locks);
 
   // todo: are these really deep copies? -> no, mDeviceRetrievedMeasurements contains data ptrs
   this->mMeasurementData->mPreviousDeviceBuffer.member() = this->mMeasurementData->mUserBuffer.member();
@@ -756,8 +761,7 @@ void cedar::dev::Component::updateUserMeasurements()
   //!@todo What was the purpose of this clear? reimplement
 //  this->mMeasurementData->mDeviceRetrievedData.member().clear();
 
-  lock1.unlock();
-  lock2.unlock();
+  locker.unlock();
 
   emit updatedUserMeasurementSignal();
 }
