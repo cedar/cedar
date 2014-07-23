@@ -47,8 +47,6 @@
 
 #define COMPONENT_CV_MAT_TYPE CV_64F
 
-//!@todo Replace asserts by proper exceptions.
-
 //----------------------------------------------------------------------------------------------------------------------
 // private class
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,7 +67,10 @@ class cedar::dev::Component::DataCollection
     {
       QWriteLocker locker(this->mInstalledNames.getLockPtr());
       auto iter = this->mInstalledNames.member().find(type);
-      CEDAR_ASSERT(iter != this->mInstalledNames.member().end());
+      if (iter == this->mInstalledNames.member().end())
+      {
+        CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The requested type is not installed.");
+      }
       std::string copy = iter->second;
       return copy;
     }
@@ -244,7 +245,17 @@ class cedar::dev::Component::DataCollection
         auto found2 = (found->second).find( to );
 
         // there cannot be a transformation hook set already
-        CEDAR_ASSERT(found2 == (found->second).end());
+        if (found2 != (found->second).end())
+        {
+          std::string from_str = this->getNameForType(from);
+          std::string to_str = this->getNameForType(to);
+
+          CEDAR_THROW
+          (
+            cedar::dev::Component::DuplicateTransformationHookException,
+            "A transformation hook from \"" + from_str + "\" to \"" + to_str + "\" is already set."
+          );
+        }
 
         (found->second)[ to ] = fun;
       }
@@ -362,7 +373,14 @@ class cedar::dev::Component::DataCollection
     {
       auto found = mInstalledDimensions.find(type);
 
-      CEDAR_ASSERT(found != mInstalledDimensions.end());
+      if (found == mInstalledDimensions.end())
+      {
+        CEDAR_THROW
+        (
+          cedar::dev::Component::DimensionalityNotSetException,
+          "Cannot reset buffer: no dimensionality set for \"" + this->getNameForType(type) + "\"."
+        );
+      }
       auto dim = found->second;
 
       bufferData.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
@@ -581,7 +599,10 @@ double cedar::dev::Component::getPreviousDeviceMeasurementBufferIndex(ComponentD
 void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, CommandFunctionType fun)
 {
   // cannot replace existing hook
-  CEDAR_ASSERT(this->mSubmitCommandHooks.find(type) == this->mSubmitCommandHooks.end());
+  if (this->mSubmitCommandHooks.find(type) != this->mSubmitCommandHooks.end())
+  {
+    CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A command hook is already set for \"" + this->getNameForCommandType(type) + "\".");
+  }
   // todo locks
   mSubmitCommandHooks[ type ] = fun;
 }
@@ -589,7 +610,10 @@ void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, Co
 void cedar::dev::Component::registerDeviceMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
 {
   // cannot replace existing hook
-  CEDAR_ASSERT(this->mRetrieveMeasurementHooks.find(type) == this->mRetrieveMeasurementHooks.end());
+  if (this->mRetrieveMeasurementHooks.find(type) != this->mRetrieveMeasurementHooks.end())
+  {
+    CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A measurement hook is already set for \"" + this->getNameForMeasurementType(type) + "\".");
+  }
   // todo locks
   mRetrieveMeasurementHooks[ type ] = fun;
 }
@@ -655,7 +679,14 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   else
   {
     // guess Device type to use. easy if there is only one hook
-    CEDAR_ASSERT(mSubmitCommandHooks.size() == 1);
+    if (mSubmitCommandHooks.size() != 1)
+    {
+      CEDAR_THROW
+      (
+        cedar::dev::Component::CouldNotGuessDeviceTypeException,
+        "Could not guess device type: too many submit hooks. Please select a device type manually."
+      );
+    }
 
     type_for_Device = mSubmitCommandHooks.begin()->first;
   }
@@ -672,7 +703,12 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
     auto hook = this->mCommandData->findTransformationHook(type_from_user, type_for_Device);
 
     // hook must exist
-    CEDAR_ASSERT(hook);
+    if (!hook)
+    {
+      std::string user_type_str = this->mCommandData->getNameForType(type_from_user);
+      std::string device_type_str = this->mCommandData->getNameForType(type_from_user);
+      CEDAR_THROW(cedar::dev::Component::HookNotFoundException, "Could not find a command hook from \"" + user_type_str + "\" to \"" + device_type_str + "\".");
+    }
 
     QReadLocker lock1(this->mMeasurementData->mUserBuffer.getLockPtr());
     // call hook
@@ -684,7 +720,10 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   }
 
   auto hook_found = mSubmitCommandHooks.find(type_for_Device);
-  CEDAR_ASSERT (hook_found != mSubmitCommandHooks.end());
+  if (hook_found == mSubmitCommandHooks.end())
+  {
+    CEDAR_THROW(cedar::dev::Component::HookNotFoundException, "Could not find a submit hook for \"" + this->mMeasurementData->getNameForType(type_for_Device) + "\".");
+  }
 
   (hook_found->second)(ioData);
 #endif
