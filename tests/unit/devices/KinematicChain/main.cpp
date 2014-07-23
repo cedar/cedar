@@ -306,8 +306,8 @@ int main()
   origin.at<double>( 3, 0 ) = 1;
   cv::Mat jacobian_1 = cv::Mat::zeros(3, 4, CV_64FC1);
   cv::Mat jacobian_3 = cv::Mat::zeros(3, 4, CV_64FC1);
-  test_arm->calculateCartesianJacobian(origin, 1, jacobian_1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
-  test_arm->calculateCartesianJacobian(origin, 3, jacobian_3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  jacobian_1 = test_arm->calculateCartesianJacobian(origin, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  jacobian_3 = test_arm->calculateCartesianJacobian(origin, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
   if (
       // Jacobian of joint 1
       !cedar::aux::math::isZero(jacobian_1.at<double>(0, 0) - 0)
