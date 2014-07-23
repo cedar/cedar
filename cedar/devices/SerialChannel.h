@@ -44,6 +44,9 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/devices/SerialChannel.fwd.h"
+
 // SYSTEM INCLUDES
 #include <QObject>
 #include <boost/utility.hpp>
@@ -52,7 +55,7 @@
 
 
 //!@brief Channel to serial devies, based on Boost ASIO.
-class cedar::dev::SerialChannel : public QObject, public Channel
+class cedar::dev::SerialChannel : public QObject, public cedar::dev::Channel
 {
   Q_OBJECT
 

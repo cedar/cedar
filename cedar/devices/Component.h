@@ -44,9 +44,10 @@
 #include "cedar/auxiliaries/LockableMember.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/devices/Channel.h"
-#include "cedar/devices/namespace.h"
 
-// FORWARD DECLARATDeviceNS
+// FORWARD DECLARATIONS
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
 #include "cedar/auxiliaries/Data.fwd.h"
 
 // SYSTEM INCLUDES

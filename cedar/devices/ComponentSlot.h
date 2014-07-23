@@ -38,13 +38,15 @@
 #define CEDAR_DEV_COMPONENT_SLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/FactoryManager.fwd.h"
+#include "cedar/devices/Component.fwd.h"
+#include "cedar/devices/ComponentSlot.fwd.h"
+#include "cedar/devices/Robot.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/enable_shared_from_this.hpp>
