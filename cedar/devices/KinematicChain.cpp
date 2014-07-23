@@ -94,12 +94,6 @@ mForwardKinematics(new cedar::dev::ForwardKinematics(this, pEndEffector))
   init();
 }
 
-
-//! destructor
-cedar::dev::KinematicChain::~KinematicChain()
-{
-}
-
 //! constructor
 cedar::dev::KinematicChain::Joint::Joint()
 :

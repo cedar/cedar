@@ -90,13 +90,13 @@ int main(int argc, char **argv)
   widget_arm.show();
   widget_head.show();
 
-  p_cora_arm->startTimer(50.0);
-  p_cora_head->startTimer(50.0);
+  p_cora_arm->startDevice();
+  p_cora_head->startDevice();
   viewer.startTimer(50);
   a.exec();
 
-  p_cora_arm->stop();
-  p_cora_head->stop();
+  p_cora_arm->stopDevice();
+  p_cora_head->stopDevice();
   cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::second));
 
   return 0;

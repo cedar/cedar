@@ -109,8 +109,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-
 private:
   class DataCollection;
   CEDAR_GENERATE_POINTER_TYPES(DataCollection);
@@ -132,7 +130,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  // replaced by startDevice()
   CEDAR_DECLARE_DEPRECATED(void start());
+
+  // replaced by stopDevice()
   CEDAR_DECLARE_DEPRECATED(void stop());
   CEDAR_DECLARE_DEPRECATED(bool isRunning());
   CEDAR_DECLARE_DEPRECATED(void startTimer(double d));

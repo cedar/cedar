@@ -123,8 +123,6 @@ public:
     cedar::aux::LocalCoordinateFramePtr pEndEffector
       = cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame())
   );
-  //!@brief destructor
-  virtual ~KinematicChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // Qt slots
@@ -182,6 +180,7 @@ public:
    *
    * @return    vector of joint angles
    */
+  // replaced by getJointAngles()
   CEDAR_DECLARE_DEPRECATED(cv::Mat getCachedJointAngles() const);
 
   /*!@brief get current state of all joint angles
@@ -209,6 +208,7 @@ public:
    */
   cv::Mat getJointVelocities() const;
 
+  // Replaced by getJointVelocities()
   CEDAR_DECLARE_DEPRECATED(cv::Mat getCachedJointVelocities() const);
 
   /*!@brief get current state of a single joint acceleration
@@ -230,6 +230,7 @@ public:
    */
   cv::Mat getJointAccelerations() const;
 
+  // Replaced by getJointAccelerations()
   CEDAR_DECLARE_DEPRECATED(cv::Mat getCachedJointAccelerations() const);
 
   /*!@brief set current state of a single joint angle

@@ -521,14 +521,14 @@ int main()
   double delta_t = 1e-07;
   complex_test_arm->setJointAngles
   (
-    complex_test_arm->getCachedJointAngles()
-    + delta_t*complex_test_arm->getCachedJointVelocities()
-    + delta_t*delta_t*complex_test_arm->getCachedJointAccelerations()
+    complex_test_arm->getJointAngles()
+    + delta_t*complex_test_arm->getJointVelocities()
+    + delta_t*delta_t*complex_test_arm->getJointAccelerations()
   );
   complex_test_arm->setJointVelocities
   (
-    complex_test_arm->getCachedJointVelocities()
-    + delta_t*complex_test_arm->getCachedJointAccelerations()
+    complex_test_arm->getJointVelocities()
+    + delta_t*complex_test_arm->getJointAccelerations()
   );
   complex_test_arm->updateTransformations();
 

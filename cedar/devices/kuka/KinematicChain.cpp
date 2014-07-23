@@ -207,7 +207,7 @@ void cedar::dev::kuka::KinematicChain::step(cedar::unit::Time)
         case 1:
         // increase speed for all joints
         //!@todo this most likely does something stupid - why would we integrate measured vels and accs?
-        setJointVelocities(getCachedJointVelocities() + getCachedJointAccelerations() * mpFriRemote->getSampleTime());
+        setJointVelocities(getJointVelocities() + getJointAccelerations() * mpFriRemote->getSampleTime());
         case 2:
           // change position for all joints
           for (unsigned i=0; i<LBR_MNJ; i++)

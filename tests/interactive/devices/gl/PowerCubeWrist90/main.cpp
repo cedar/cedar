@@ -82,7 +82,7 @@ int main(int argc, char **argv)
   scene_widget->show();
   widget_head.show();
   viewer.startTimer(50);
-  head->startTimer(20);
+  head->startDevice();
   a.exec();
 
   return 0;

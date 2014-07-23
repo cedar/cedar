@@ -218,16 +218,16 @@ int main(int argc, char **argv)
   viewer.show();
   camera_viewer.show();
 
-  caren_trunk->startTimer(50.0);
-  caren_arm->startTimer(50.0);
-  caren_head->startTimer(50.0);
+  caren_trunk->startDevice();
+  caren_arm->startDevice();
+  caren_head->startDevice();
   viewer.startTimer(50);
   camera_viewer.startTimer(50);
   a.exec();
 
-  caren_trunk->stop();
-  caren_arm->stop();
-  caren_head->stop();
+  caren_trunk->stopDevice();
+  caren_arm->stopDevice();
+  caren_head->stopDevice();
 
   return 0;
 }

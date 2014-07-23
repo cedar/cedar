@@ -253,14 +253,14 @@ int main(int argc, char **argv)
   worker.setStepSize(arm->getDeviceStepSize());
 
   // start everything
-  arm->start();
+  arm->startDevice();
   worker.start();
   a.exec();
 
   // clean up
   worker.stop();
   worker.wait();
-  arm->stop();
+  arm->stopDevice();
   if (use_hardware)
   {
     delete p_fri_status_widget;
