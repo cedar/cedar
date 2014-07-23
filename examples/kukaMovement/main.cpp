@@ -199,7 +199,6 @@ int main(int argc, char **argv)
     // add your configs here ...
   };
 
-  arm->applyDeviceCommandsAs( cedar::dev::KinematicChain::JOINT_ANGLES );
   arm->setInitialConfigurations( initial_configs );
 
   // set simulated arm to initial configuration
