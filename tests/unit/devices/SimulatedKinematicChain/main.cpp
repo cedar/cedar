@@ -55,8 +55,10 @@ void test()
   std::cout << "testing position control ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_arm_position(new cedar::dev::SimulatedKinematicChain());
   test_arm_position->readJson("test_arm.json");
-  test_arm_position->addInitialConfiguration("peter", cv::Mat::zeros(test_arm_position->getNumberOfJoints(), 1, CV_64F));
-  test_arm_position->applyInitialConfiguration("peter");
+  test_arm_position->addInitialConfiguration("near zero", cv::Mat::zeros(test_arm_position->getNumberOfJoints(), 1, CV_64F) 
+                                                      // dont start in singular point:
+                                                      + 0.001 );
+  test_arm_position->applyInitialConfiguration("near zero");
   test_arm_position->startDevice();
   
   //--------------------------------------------------------------------------------------------------------------------
