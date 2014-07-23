@@ -180,15 +180,18 @@ namespace cedar
     {
       public:
         //! Constructor.
-        LockSetLocker(cedar::aux::LockSet& lockSet)
+        LockSetLocker(const cedar::aux::LockSet& lockSet)
         :
         cedar::aux::LockerBase
         (
           boost::bind(&cedar::aux::LockSetLocker::applyLock, this),
-          boost::bind(&cedar::aux::LockSetLocker::applyUnlock, this)
+          boost::bind(&cedar::aux::LockSetLocker::applyUnlock, this),
+          false // because we need to access mLockSet (which will not be initialized if relock and thus applyLock is
+                // called here), we do not let the superclass constructor call relock but rather do it below
         ),
         mLockSet(lockSet)
         {
+          this->relock();
         }
 
       private:
@@ -203,7 +206,7 @@ namespace cedar
         }
 
       private:
-        cedar::aux::LockSet& mLockSet;
+        cedar::aux::LockSet mLockSet;
     };
   }
 }

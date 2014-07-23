@@ -39,6 +39,7 @@
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/testingUtilities/helpers.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -60,23 +61,17 @@ public:
 
     //TODO test if exception is thrown when same type is installed again
 
-    {
-      CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
-      this->getNameForCommandType(1);
-      CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "retrieving name of uninstalled command type.");
-    }
+    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
+    this->getNameForCommandType(1);
+    CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "retrieving name of uninstalled command type.");
 
-    {
-      this->installMeasurementType(0, "measurement0");
-      auto name = this->getNameForMeasurementType(0);
-      CEDAR_UNIT_TEST_CONDITION(errors, name == "measurement0");
-    }
+    this->installMeasurementType(0, "measurement0");
+    auto name = this->getNameForMeasurementType(0);
+    CEDAR_UNIT_TEST_CONDITION(errors, name == "measurement0");
 
-    {
-      CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
-      this->getNameForMeasurementType(1);
-      CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "retrieving name of uninstalled measurement type.");
-    }
+    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
+    this->getNameForMeasurementType(1);
+    CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "retrieving name of uninstalled measurement type.");
 
     return errors;
   }
@@ -84,8 +79,8 @@ public:
   int testHookChecks()
   {
     int errors = 0;
-    auto dummy_command_hook = [](cv::Mat) {};
 
+    auto dummy_command_hook = [](cv::Mat) {};
     CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
     this->registerDeviceCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
     CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "registering a hook for an uninstalled command type.");
@@ -154,6 +149,30 @@ public:
     return errors;
   }
 
+
+  int testLoop()
+  {
+    int errors = 0;
+
+    std::cout << " installing measurements" << std::endl;
+    this->installMeasurementType(0, "measurement");
+    this->setMeasurementDimensionality(0, 10);
+
+    this->installCommandType(0, "command");
+    this->setCommandDimensionality(0, 10);
+
+    std::cout << " starting device" << std::endl;
+    this->startDevice();
+
+    std::cout << " sleeping" << std::endl;
+    cedar::aux::sleep(0.1 * cedar::unit::seconds);
+
+    std::cout << " stopping device" << std::endl;
+    this->stopDevice();
+
+    return errors;
+  }
+
 };
 CEDAR_GENERATE_POINTER_TYPES(TestComponent);
 
@@ -180,12 +199,17 @@ int test_hook_checks()
 int test_hook_data()
 {
   std::cout << "Testing hook setting." << std::endl;
-  int errors = 0;
 
   TestComponentPtr component(new TestComponent());
-  errors += component->testHookData();
+  return component->testHookData();
+}
 
-  return errors;
+int test_loop()
+{
+  std::cout << "Testing component loop." << std::endl;
+
+  TestComponentPtr component(new TestComponent());
+  return component->testLoop();
 }
 
 void run_test()
@@ -196,6 +220,7 @@ void run_test()
   errors += test_type_installing();
   errors += test_hook_checks();
   errors += test_hook_data();
+  errors += test_loop();
 
   QApplication::exit(errors);
 }
