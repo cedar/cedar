@@ -39,8 +39,10 @@
 #define CEDAR_DEV_SENSOR_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/devices/Sensor.fwd.h"
 
 // SYSTEM INCLUDES
 

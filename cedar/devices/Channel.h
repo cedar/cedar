@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/devices/Channel.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>

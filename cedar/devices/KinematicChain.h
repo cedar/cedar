@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/math/Limits.h"
-#include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
@@ -51,6 +50,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.fwd.h"
+#include "cedar/devices/KinematicChain.fwd.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

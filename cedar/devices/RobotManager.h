@@ -45,6 +45,9 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Path.h"
 
+// FORWARD DECLARATION
+#include "cedar/devices/RobotManager.fwd.h"
+
 // SYSTEM INCLUDES
 #include <boost/signals2.hpp>
 #include <map>
