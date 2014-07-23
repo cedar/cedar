@@ -719,6 +719,10 @@ private:
   //!@brief searches for elements specified by a matcher function
   std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroups(boost::function<bool(cedar::proc::ConstElementPtr)> matcher) const;
 
+  /*!@brief A function that adds a connector even if the name alread exists. Used during loading
+   */
+  void addConnectorInternal(const std::string& name, bool input);
+
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
