@@ -351,10 +351,15 @@ class cedar::dev::Component::DataCollection
     {
       auto found = bufferData.member().find(type);
 
-      if (found == bufferData.member().end() || found->second->getData().empty())
+      if (found == bufferData.member().end())
       {
-        // cast away const for lazy init to work
+        bufferData.member()[type] = cedar::aux::MatDataPtr(new cedar::aux::MatData());
         resetBufferUnlocked(bufferData, type);
+      }
+      else // already initialized
+      {
+        //!@todo throw an AlreadyInitializedException here
+        return;
       }
     }
 
@@ -364,7 +369,6 @@ class cedar::dev::Component::DataCollection
 
       CEDAR_ASSERT(found != mInstalledDimensions.end());
       auto dim = found->second;
-
       bufferData.member()[type]->setData(cv::Mat::zeros(dim, 1, COMPONENT_CV_MAT_TYPE));
     }
 
