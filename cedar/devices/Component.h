@@ -173,10 +173,10 @@ public:
   void stopDevice();
 
   //! Returns a list of all installed measurement types.
-  std::vector<ComponentDataType> getInstalledMeasurementTypes() const;
+  std::set<ComponentDataType> getInstalledMeasurementTypes() const;
 
   //! Returns a list of all installed command types.
-  std::vector<ComponentDataType> getInstalledCommandTypes() const;
+  std::set<ComponentDataType> getInstalledCommandTypes() const;
 
   //! Returns the data that contains the current measurements.
   cedar::aux::DataPtr getDeviceMeasurementData(const ComponentDataType &type);
@@ -275,6 +275,8 @@ private:
   std::map< ComponentDataType, MeasurementFunctionType > mRetrieveMeasurementHooks;
 
   boost::optional<ComponentDataType> mDeviceCommandSelection;
+
+  std::set<ComponentDataType> mUserCommandUsed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -47,13 +47,13 @@
 
 cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
 {
-  registerDeviceCommandHook( cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAngles, this, _1 ) );
-  registerDeviceCommandHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedVelocities, this, _1 ) );
-  registerDeviceCommandHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAccelerations, this, _1 ) );
+  registerDeviceCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAngles, this, _1));
+  registerDeviceCommandHook(cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedVelocities, this, _1));
+  registerDeviceCommandHook(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAccelerations, this, _1));
 
-  registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this ) );
-  registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities, this ) );
-  registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations, this ) );
+  registerDeviceMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this));
+//  registerDeviceMeasurementHook(cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities, this));
+//  registerDeviceMeasurementHook(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations, this));
 
   this->applyDeviceCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
 
@@ -70,6 +70,7 @@ cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
 void cedar::dev::SimulatedKinematicChain::sendSimulatedAngles(cv::Mat mat)
 {
   QWriteLocker lock(&mSimulationLock);
+//  std::cout << "  write pos " << mat << std::endl;
   mSimulation[cedar::dev::KinematicChain::JOINT_ANGLES] = mat.clone();
 }
 
@@ -77,7 +78,7 @@ void cedar::dev::SimulatedKinematicChain::sendSimulatedVelocities(cv::Mat mat)
 {
   QWriteLocker lock(&mSimulationLock);
 
-std::cout << "  write vels " << mat << std::endl;
+//std::cout << "  write vels " << mat << std::endl;
   mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ] = mat.clone();
 }
 
@@ -85,31 +86,26 @@ void cedar::dev::SimulatedKinematicChain::sendSimulatedAccelerations(cv::Mat mat
 {
   QWriteLocker lock(&mSimulationLock);
 
-std::cout << "  write accels " << mat << std::endl;
+//std::cout << "  write accels " << mat << std::endl;
   mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS ] = mat.clone();
 }
 
 cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles()
 {
-
-     // HIER HIER HIER HIER
-     // mSimulation ist leer !!!!
-     // HIER HIER HIER HIER
-
-//std::cout << "  in retrieveSimulatedAngles: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ] << std::endl;
+//  std::cout << "  in retrieveSimulatedAngles: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ] << std::endl;
   return mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ].clone();
 }
 
 cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities()
 {
-//std::cout << "  in retrieveSimulatedVels: " << mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ] << std::endl;
+//  std::cout << "  in retrieveSimulatedVels: " << mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ] << std::endl;
   // todo: lock
   return mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ].clone();
 }
 
 cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations()
 {
-//std::cout << "  in retrieveSimulatedAccels: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS ] << std::endl;
+//  std::cout << "  in retrieveSimulatedAccels: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS ] << std::endl;
   return mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS].clone();
 }
 
@@ -131,5 +127,8 @@ void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
     }
     this->addInitialConfiguration("default", cv::Mat::zeros(number_of_joints, 1, CV_64F) + 0.001);
     this->applyInitialConfiguration("default");
+    mSimulation[cedar::dev::KinematicChain::JOINT_ANGLES] = cv::Mat::zeros(number_of_joints, 1, CV_64F);
+    mSimulation[cedar::dev::KinematicChain::JOINT_VELOCITIES] = cv::Mat::zeros(number_of_joints, 1, CV_64F);
+    mSimulation[cedar::dev::KinematicChain::JOINT_ACCELERATIONS] = cv::Mat::zeros(number_of_joints, 1, CV_64F);
   }
 }
