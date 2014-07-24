@@ -130,9 +130,17 @@ std::string cedar::dev::SerialChannel::writeAndReadLocked(const std::string& com
 
 void cedar::dev::SerialChannel::write(std::string command)
 {
+  CEDAR_ASSERT(this->isOpen());
   // append the command delimiter to the sent command
   command.append(mCommandDelimiter);
-  boost::asio::write(mPort, boost::asio::buffer(command.c_str(), command.size()));
+  try
+  {
+    boost::asio::write(mPort, boost::asio::buffer(command.c_str(), command.size()));
+  }
+  catch (const std::exception& e)
+  {
+    CEDAR_THROW(cedar::dev::SerialChannel::WriteException, "Error during writing. Error is: " + std::string(e.what()));
+  }
 
 #ifdef DEBUG_VERBOSE
   std::ostringstream message;
@@ -346,15 +354,28 @@ void cedar::dev::SerialChannel::openHook()
   }
 
   // open the serial port
+  //!@todo Handle errors during opening
   mPort.open(_mDevicePath->getValue());
   mPort.set_option(boost::asio::serial_port_base::baud_rate(_mBaudRate->getValue()));
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    "Successfully opened port " + getDevicePath(),
-    "cedar::dev::SerialChannel",
-    "Serial channel opened"
-  );
+  if (mPort.is_open())
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Successfully opened port " + getDevicePath(),
+      "cedar::dev::SerialChannel",
+      "Serial channel opened"
+    );
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Port " + getDevicePath() + " not opened.",
+      "cedar::dev::SerialChannel",
+      "Serial channel error"
+    );
+  }
 }
 
 void cedar::dev::SerialChannel::closeHook()
