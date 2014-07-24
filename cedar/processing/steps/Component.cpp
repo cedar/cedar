@@ -99,6 +99,14 @@ void cedar::proc::steps::Component::onStart()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
+
+    auto channel = component->getChannel();
+    if (channel && !channel->isOpen())
+    {
+      channel->open();
+      this->mConnectedOnStart = true;
+    }
+
     component->startDevice();
   }
 }
@@ -110,11 +118,35 @@ void cedar::proc::steps::Component::onStop()
   {
     auto component = this->getComponent();
     component->stopDevice();
+
+    auto channel = component->getChannel();
+    if (channel && channel->isOpen() && this->mConnectedOnStart)
+    {
+      channel->close();
+      this->mConnectedOnStart = false;
+    }
   }
 }
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
+  if (!this->hasRole(cedar::proc::DataRole::INPUT))
+  {
+    return;
+  }
+
+  auto component = this->getComponent();
+  // copy data from the input slots to the command slots of the component
+  for (auto name_slot_pair : this->getDataSlots(cedar::proc::DataRole::INPUT))
+  {
+    const auto& name = name_slot_pair.first;
+    auto slot = name_slot_pair.second;
+
+    auto command_type = component->getCommandTypeForName(name);
+
+    auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
+    component->setUserCommandBuffer(command_type, mat_data->getData());
+  }
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputValidity
@@ -125,18 +157,40 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
 {
   const std::string& name = slot->getName();
 
-  // only commanded data are inputs
-  //!@todo Reimplement the validity check.
-//  cedar::aux::ConstDataPtr component_data = this->getComponent()->getCommandedData(name);
-//
-//  if (typeid(*component_data) == typeid(*data))
-//  {
-//    return cedar::proc::DataSlot::VALIDITY_VALID;
-//  }
-//  else
-//  {
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
-//  }
+  if (!this->hasComponent())
+  {
+    return cedar::proc::DataSlot::VALIDITY_WARNING;
+  }
+
+  if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+  {
+    if (mat_data->getData().type() != CV_64F)
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
+
+    auto type = this->getComponent()->getCommandTypeForName(name);
+    // check that the matrix has the same dimensionality as the command it is connecting to
+    unsigned int size = this->getComponent()->getCommandDimensionality(type);
+
+    if (size == 1 && mat_data->getDimensionality() == 0)
+    {
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+
+    if ((size > 1 && mat_data->getDimensionality() != 1))
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
+
+    if (size == cedar::aux::math::get1DMatrixSize(mat_data->getData()))
+    {
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+  }
+
+  // if nothing valid was found, return an error
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::proc::steps::Component::componentChanged()
