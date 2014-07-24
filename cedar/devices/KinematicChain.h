@@ -525,11 +525,13 @@ public:
   cv::Mat getCurrentInitialConfiguration();
 
   //!@brief add one initial configuration
-  void addInitialConfiguration(const std::string &name, const cv::Mat &config);
+  void addInitialConfiguration(const std::string& name, const cv::Mat& config);
   //!@brief delete one initial configuration
-  void deleteInitialConfiguration(const std::string &name);
+  void deleteInitialConfiguration(const std::string& name);
+  //!@brief check if initial configuration exists
+  bool hasInitialConfiguration(const std::string& name);
+
   //!@brief set the named map of initial configurations
-  //
   // prefer using @addInitialConfiguration
   void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
   //!@brief set the currently valid initial configuration and apply it (i.e. move the manipulator to that configuration)
@@ -579,10 +581,10 @@ public:
   static const cedar::dev::Component::ComponentDataType JOINT_TORQUES;
 
 protected:
-
-private:
   //! vector of all joints
   JointListParameterPtr mpJoints;
+
+private:
 
   //! the forward kinematic model
   ForwardKinematicsPtr mForwardKinematics;

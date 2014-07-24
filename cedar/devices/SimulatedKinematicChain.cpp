@@ -56,6 +56,8 @@ cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
   registerDeviceMeasurementHook( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations, this ) );
 
   this->applyDeviceCommandsAs(cedar::dev::KinematicChain::JOINT_ANGLES);
+
+  connect(this->mpJoints.get(), SIGNAL(valueChanged()), this, SLOT(updateInitialConfiguration()));
 }
 
 cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
@@ -115,4 +117,19 @@ cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations()
 bool cedar::dev::SimulatedKinematicChain::isMovable() const
 {
   return true;
+}
+
+void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
+{
+  auto number_of_joints = this->getNumberOfJoints();
+  std::cout << "Creating initial configuration for: " << number_of_joints << " joints" << std::endl;
+  if (number_of_joints > 0)
+  {
+    if (this->hasInitialConfiguration("default"))
+    {
+      this->deleteInitialConfiguration("default");
+    }
+    this->addInitialConfiguration("default", cv::Mat::zeros(number_of_joints, 1, CV_64F) + 0.001);
+    this->applyInitialConfiguration("default");
+  }
 }
