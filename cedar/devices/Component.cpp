@@ -75,6 +75,20 @@ class cedar::dev::Component::DataCollection
       return copy;
     }
 
+    cedar::dev::Component::ComponentDataType getTypeForName(const std::string& name) const
+    {
+      QWriteLocker locker(this->mInstalledNames.getLockPtr());
+      for (auto type_name_pair : this->mInstalledNames.member())
+      {
+        if (type_name_pair.second == name)
+        {
+          auto copy = type_name_pair.first;
+          return copy;
+        }
+      }
+      CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "No type with the name \"" + name + "\" was found.");
+    }
+
     std::vector<cedar::dev::Component::ComponentDataType> getInstalledTypes() const
     {
       QReadLocker locker(this->mInstalledTypes.getLockPtr());
@@ -117,6 +131,16 @@ class cedar::dev::Component::DataCollection
       // todo: lazyInitialize if already registered type
 
       mInstalledDimensions[type] = dim;
+    }
+
+    unsigned int getDimensionality(cedar::dev::Component::ComponentDataType type) const
+    {
+      auto iter = this->mInstalledDimensions.find(type);
+      if (iter == this->mInstalledDimensions.end())
+      {
+        CEDAR_THROW(DimensionalityNotSetException, "No dimensionality set for the given type.");
+      }
+      return iter->second;
     }
 
     cv::Mat getDeviceRetrievedBufferUnlocked(ComponentDataType type)
@@ -466,6 +490,16 @@ cedar::dev::Component::~Component()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+unsigned int cedar::dev::Component::getCommandDimensionality(ComponentDataType type) const
+{
+  return this->mCommandData->getDimensionality(type);
+}
+
+cedar::dev::Component::ComponentDataType cedar::dev::Component::getCommandTypeForName(const std::string& name) const
+{
+  return this->mCommandData->getTypeForName(name);
+}
+
 std::string cedar::dev::Component::getNameForCommandType(ComponentDataType type) const
 {
   return this->mCommandData->getNameForType(type);
@@ -474,6 +508,11 @@ std::string cedar::dev::Component::getNameForCommandType(ComponentDataType type)
 std::string cedar::dev::Component::getNameForMeasurementType(ComponentDataType type) const
 {
   return this->mMeasurementData->getNameForType(type);
+}
+
+cedar::dev::Component::ComponentDataType cedar::dev::Component::getMeasurementTypeForName(const std::string& name) const
+{
+  return this->mMeasurementData->getTypeForName(name);
 }
 
 std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getInstalledMeasurementTypes() const
