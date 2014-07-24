@@ -241,6 +241,18 @@ class cedar::dev::Component::DataCollection
       return this->getBuffer(mUserBuffer, type);
     }
 
+    cedar::aux::ConstMatDataPtr getUserData(ComponentDataType type) const
+    {
+      //!@todo lock and check type
+      return this->mUserBuffer.member().find(type)->second;
+    }
+
+    cedar::aux::MatDataPtr getUserData(ComponentDataType type)
+    {
+      //!@todo lock and check type
+      return this->mUserBuffer.member().find(type)->second;
+    }
+
     double getUserBufferIndex(ComponentDataType type, int index) const
     {
       return this->getBufferIndex(mUserBuffer, type, index);
@@ -552,14 +564,14 @@ std::set<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getIns
   return this->mCommandData->getInstalledTypes();
 }
 
-cedar::aux::DataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type)
+cedar::aux::DataPtr cedar::dev::Component::getMeasurementData(const ComponentDataType &type)
 {
-  return this->mMeasurementData->getDeviceData(type);
+  return this->mMeasurementData->getUserData(type);
 }
 
-cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type) const
+cedar::aux::ConstDataPtr cedar::dev::Component::getMeasurementData(const ComponentDataType &type) const
 {
-  return this->mMeasurementData->getDeviceData(type);
+  return this->mMeasurementData->getUserData(type);
 }
 
 cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type) const

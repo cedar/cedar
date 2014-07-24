@@ -209,7 +209,7 @@ void cedar::proc::steps::Component::componentChanged()
   for (const auto& measurement : measurements)
   {
     std::string name = component->getNameForMeasurementType(measurement);
-    auto data = component->getDeviceMeasurementData(measurement);
+    auto data = component->getMeasurementData(measurement);
     this->declareOutput(name, data);
   }
 
