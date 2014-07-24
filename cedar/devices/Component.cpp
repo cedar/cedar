@@ -102,7 +102,7 @@ class cedar::dev::Component::DataCollection
       }
 
       QReadLocker locker(this->mDeviceRetrievedData.getLockPtr());
-      this->lazyInitializeDeviceBufferUnlocked(type);
+      this->lazyInitializeUnlocked(this->mDeviceRetrievedData, type);
 
       auto iter = this->mDeviceRetrievedData.member().find(type);
       CEDAR_DEBUG_ASSERT(iter != this->mDeviceRetrievedData.member().end());
@@ -167,11 +167,6 @@ class cedar::dev::Component::DataCollection
     void lazyInitializeUserBufferUnlocked(ComponentDataType type)
     {
       this->lazyInitializeUnlocked(mUserBuffer, type);
-    }
-
-    void lazyInitializeDeviceBufferUnlocked(ComponentDataType type)
-    {
-      this->lazyInitializeUnlocked(mDeviceSubmittedData, type);
     }
 
     void lazyInitializePreviousDeviceBufferUnlocked(ComponentDataType type)
