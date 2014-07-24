@@ -99,6 +99,14 @@ void cedar::proc::steps::Component::onStart()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
+
+    auto channel = component->getChannel();
+    if (channel && !channel->isOpen())
+    {
+      channel->open();
+      this->mConnectedOnStart = true;
+    }
+
     component->startDevice();
   }
 }
@@ -110,6 +118,13 @@ void cedar::proc::steps::Component::onStop()
   {
     auto component = this->getComponent();
     component->stopDevice();
+
+    auto channel = component->getChannel();
+    if (channel && channel->isOpen() && this->mConnectedOnStart)
+    {
+      channel->close();
+      this->mConnectedOnStart = false;
+    }
   }
 }
 
