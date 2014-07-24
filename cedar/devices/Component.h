@@ -179,10 +179,10 @@ public:
   std::set<ComponentDataType> getInstalledCommandTypes() const;
 
   //! Returns the data that contains the current measurements.
-  cedar::aux::DataPtr getDeviceMeasurementData(const ComponentDataType &type);
+  cedar::aux::DataPtr getMeasurementData(const ComponentDataType &type);
 
   //! Returns the data that contains the current measurements.
-  cedar::aux::ConstDataPtr getDeviceMeasurementData(const ComponentDataType &type) const;
+  cedar::aux::ConstDataPtr getMeasurementData(const ComponentDataType &type) const;
 
   //! Returns the data that contains the commands that will be sent to the device.
   cedar::aux::DataPtr getDeviceCommandData(const ComponentDataType &type);
