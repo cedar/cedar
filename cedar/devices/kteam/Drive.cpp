@@ -49,14 +49,32 @@
 #include <vector>
 #include <boost/units/cmath.hpp>
 
+
+//------------------------------------------------------------------------------
+// static variables
+//------------------------------------------------------------------------------
+
+const cedar::dev::Component::ComponentDataType cedar::dev::kteam::Drive::ENCODERS = 200;
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::kteam::Drive::init()
+{
+  installCommandAndMeasurementType( cedar::dev::kteam::Drive::ENCODERS, "Encoders" );
+
+  setCommandAndMeasurementDimensionality( cedar::dev::kteam::Drive::ENCODERS, 2 );
+
+}
+
+
 cedar::dev::kteam::Drive::Drive()
 :
 _mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1)),
 _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", 0, -32768, 0, 32767, 0, 32767))
 {
+  init();
 }
 
 cedar::dev::kteam::Drive::Drive(cedar::dev::ChannelPtr channel)
@@ -65,6 +83,7 @@ cedar::dev::DifferentialDrive(channel),
 _mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1)),
 _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", 0, -32768, 0, 32767, 0, 32767))
 {
+  init();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,14 +107,6 @@ cedar::aux::math::IntLimitsParameterPtr cedar::dev::kteam::Drive::getEncoderLimi
 
 void cedar::dev::kteam::Drive::reset()
 {
-  // stop the robot
-  stop();
-
-  // reset the encoder values of the robot to zero
-  std::vector<int> encoders(2);
-  encoders[0] = 0;
-  encoders[1] = 0;
-  setEncoders(encoders);
 }
 
 std::vector<cedar::unit::Frequency> cedar::dev::kteam::Drive::convertWheelSpeedToPulses
@@ -151,3 +162,25 @@ void cedar::dev::kteam::Drive::setWheelSpeedPulses(const std::vector<cedar::unit
   std::vector<cedar::unit::Velocity> wheel_speeds = convertPulsesToWheelSpeed(wheelSpeedPulses);
   this->setWheelSpeed(wheel_speeds);
 }
+  
+std::vector<int> cedar::dev::kteam::Drive::getEncoders() const
+{
+  cv::Mat mat = getUserMeasurementBuffer( ENCODERS );
+  std::vector<int> ret;
+
+  ret.push_back( mat.at<double>(0,0) );
+  ret.push_back( mat.at<double>(1,0) );
+
+  return ret;
+}
+
+void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
+{
+  cv::Mat mat = cv::Mat(2, 1, CV_64F);
+
+  mat.at<double>(0,0) = encoders[0];
+  mat.at<double>(1,0) = encoders[1];
+
+  setUserCommandBuffer( ENCODERS, mat );
+}
+

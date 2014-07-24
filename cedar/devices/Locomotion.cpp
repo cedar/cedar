@@ -68,8 +68,6 @@ void cedar::dev::Locomotion::init()
 
 cedar::dev::Locomotion::Locomotion()
 :
-mForwardVelocity(new cedar::aux::VelocityData(0.0 * cedar::unit::meters_per_second)),
-mTurningRate(new cedar::aux::AngularVelocityData(0.0 * cedar::unit::radians_per_second)),
 _mForwardVelocityLimits
 (
   new cedar::aux::math::VelocityLimitsParameter
@@ -106,8 +104,6 @@ _mTurningRateLimits
 cedar::dev::Locomotion::Locomotion(cedar::dev::ChannelPtr channel)
 :
 cedar::dev::Component(channel),
-mForwardVelocity(new cedar::aux::VelocityData(0.0 * cedar::unit::meters_per_second)),
-mTurningRate(new cedar::aux::AngularVelocityData(0.0 * cedar::unit::radians_per_second)),
 _mForwardVelocityLimits
 (
   new cedar::aux::math::VelocityLimitsParameter
@@ -143,25 +139,67 @@ _mTurningRateLimits
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::dev::Locomotion::applyTurningRate()
+void cedar::dev::Locomotion::setForwardVelocity(cedar::unit::Velocity forwardVelocity)
 {
-  this->setTurningRate(this->mTurningRate->getData());
+  setForwardVelocityAndTurningRate(forwardVelocity, getTurningRate());
 }
 
-void cedar::dev::Locomotion::applyForwardVelocity()
+void cedar::dev::Locomotion::setTurningRate(cedar::unit::AngularVelocity turningRate)
 {
-  this->setForwardVelocity(this->mForwardVelocity->getData());
+  setForwardVelocityAndTurningRate(getForwardVelocity(), turningRate);
+}
+
+void cedar::dev::Locomotion::setForwardVelocityAndTurningRate
+     (
+       cedar::unit::Velocity forwardVelocity,
+       cedar::unit::AngularVelocity turningRate
+     )
+{
+  cv::Mat forward_matrix = cv::Mat(1,1,CV_64F);
+  cv::Mat turning_matrix = cv::Mat(1,1,CV_64F);
+
+  //@todo: use a generic limit mechanism
+  thresholdForwardVelocity(forwardVelocity);
+  thresholdTurningRate(turningRate);
+
+  forward_matrix.at<double>(0,0) = forwardVelocity / cedar::unit::DEFAULT_VELOCITY_UNIT;
+  turning_matrix.at<double>(0,0) = turningRate / cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
+
+  setUserCommandBuffer( cedar::dev::Locomotion::FORWARD_VELOCITY, forward_matrix);
+  setUserCommandBuffer( cedar::dev::Locomotion::TURNING_RATE, turning_matrix);
+
+/*
+  cedar::unit::Velocity left_wheel_speed = 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT;
+  cedar::unit::Velocity right_wheel_speed = 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT;
+  convertToWheelSpeed(forwardVelocity, turningRate, left_wheel_speed, right_wheel_speed);
+
+  thresholdToHardwareLimits(left_wheel_speed, right_wheel_speed);
+
+  mWheelSpeed[0] = left_wheel_speed;
+  mWheelSpeed[1] = right_wheel_speed;
+
+  cedar::unit::AngularVelocity turning_rate;
+  cedar::unit::Velocity forward_velocity;
+  convertToForwardVelocityAndTurningRate(left_wheel_speed, right_wheel_speed, forward_velocity, turning_rate);
+  this->mTurningRate->setData(turning_rate);
+  this->mForwardVelocity->setData(forward_velocity);
+
+  sendMovementCommand();
+*/
 }
 
 cedar::unit::Velocity cedar::dev::Locomotion::getForwardVelocity() const
 {
-  return mForwardVelocity->getData();
+  cv::Mat ret = getUserMeasurementBuffer( cedar::dev::Locomotion::FORWARD_VELOCITY );
+
+  return ret.at<double>(0,0) * cedar::unit::DEFAULT_VELOCITY_UNIT;
 }
 
 cedar::unit::AngularVelocity cedar::dev::Locomotion::getTurningRate() const
 {
-  return mTurningRate->getData();
+  cv::Mat ret = getUserMeasurementBuffer( cedar::dev::Locomotion::TURNING_RATE );
+
+  return ret.at<double>(0,0) * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
 }
 
 void cedar::dev::Locomotion::thresholdForwardVelocity(cedar::unit::Velocity& forwardVelocity) const
@@ -182,3 +220,4 @@ void cedar::dev::Locomotion::stop()
     0.0 * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT
   );
 }
+
