@@ -190,6 +190,7 @@ void test()
     errors++;
     std::cout << "ERROR with setJointVelocities(matrix) or getJointVelocities()" << std::endl;
   }
+  QApplication::exit(errors);
 }
 
 
