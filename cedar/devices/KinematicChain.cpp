@@ -776,6 +776,18 @@ void cedar::dev::KinematicChain::deleteInitialConfiguration(const std::string &n
   checkInitialConfigurations();
 }
 
+bool cedar::dev::KinematicChain::hasInitialConfiguration(const std::string& name)
+{
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  auto found = mInitialConfigurations.find(name);
+  if (found != mInitialConfigurations.end())
+  {
+    return true;
+  }
+  return false;
+}
+
 void cedar::dev::KinematicChain::checkInitialConfigurations()
 {
   QReadLocker rlock(&mCurrentInitialConfigurationLock);

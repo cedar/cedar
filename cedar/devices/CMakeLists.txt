@@ -49,6 +49,7 @@ cedar_add_library(cedardev
                   MOC_HEADERS
                   Component.h
                   KinematicChain.h
+                  SimulatedKinematicChain.h
                   SerialChannel.h
                   Odometry.h
                   gui/KinematicChainWidget.h

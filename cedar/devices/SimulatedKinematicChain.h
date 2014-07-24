@@ -50,6 +50,7 @@
  */
 class cedar::dev::SimulatedKinematicChain : public cedar::dev::KinematicChain
 {
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,6 +70,9 @@ public:
    */
   bool isMovable() const;
 
+public slots:
+  //!@brief reacts to a change in the number of joints and sets an almost-zero initial configuration
+  void updateInitialConfiguration();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
