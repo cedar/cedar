@@ -122,7 +122,7 @@ bool cedar::dev::SimulatedKinematicChain::isMovable() const
 void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
 {
   auto number_of_joints = this->getNumberOfJoints();
-  std::cout << "Creating initial configuration for: " << number_of_joints << " joints" << std::endl;
+
   if (number_of_joints > 0)
   {
     if (this->hasInitialConfiguration("default"))
