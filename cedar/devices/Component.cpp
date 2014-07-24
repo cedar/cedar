@@ -128,12 +128,15 @@ class cedar::dev::Component::DataCollection
       }
 
       QReadLocker locker(this->mDeviceRetrievedData.getLockPtr());
-//      this->lazyInitializeUnlocked(this->mDeviceRetrievedData, type);
 
       auto iter = this->mDeviceRetrievedData.member().find(type);
       CEDAR_DEBUG_ASSERT(iter != this->mDeviceRetrievedData.member().end());
 
       auto ptr_copy = iter->second;
+      if (!iter->second || iter->second->getData().empty())
+      {
+        CEDAR_THROW(cedar::dev::Component::DimensionalityNotSetException, "The data does not exist.");
+      }
       return ptr_copy;
     }
 
