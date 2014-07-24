@@ -35,12 +35,15 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Log.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/SerialChannel.h"
 #include "cedar/devices/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
+#include <QTime>
 #include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,28 +72,49 @@ namespace
 
 void cedar::dev::kteam::SerialChannel::postOpenHook()
 {
+  bool sent = false;
+  std::string answer;
   // send a dummy-message
-  //!@todo we may not have to send a dummy command here, maybe it is possible to clear the read buffer without it
-  std::string answer = this->writeAndReadLocked("D,0,0");
-
-  // 'd,' or 'z,' expected, else init failed
-  if (answer.size() < 2 || (answer[0] != 'd' && answer[0] != 'z') || answer[1] != ',')
+  QTime timer;
+  timer.start();
+  while (!sent && timer.elapsed() < 10000) //!@todo Make timeout configurable
   {
-    CEDAR_THROW
-    (
-      cedar::dev::SerialCommunicationException,
-      "Initialization of serial communication failed: received wrong answer (" + answer + ")."
-    );
-  }
+    try
+    {
+      //!@todo we may not have to send a dummy command here, maybe it is possible to clear the read buffer without it
+      answer = this->writeAndReadLocked("D,0,0");
+      // 'd,' or 'z,' expected, else init failed
+      if (answer.size() < 2 || (answer[0] != 'd' && answer[0] != 'z') || answer[1] != ',')
+      {
+        CEDAR_THROW
+        (
+          cedar::dev::SerialCommunicationException,
+          "Initialization of serial communication failed: received wrong answer (" + answer + ")."
+        );
+      }
 #ifdef DEBUG
-  else
-  {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Drive: Initialization successful (Answer: '" + answer + "')",
-      "cedar::dev::kteam::epuck::Drive::initialize()",
-      "Drive successfully initialized"
-    );
-  }
+      else
+      {
+        cedar::aux::LogSingleton::getInstance()->debugMessage
+        (
+          "Drive: Initialization successful (Answer: '" + answer + "')",
+          "cedar::dev::kteam::epuck::Drive::initialize()",
+          "Drive successfully initialized"
+        );
+      }
 #endif
+      sent = true;
+    }
+    catch (const cedar::dev::SerialChannel::WriteException& e)
+    {
+      // skip
+      cedar::aux::sleep(0.1 * cedar::unit::seconds);
+    }
+  }
+
+  if (!sent)
+  {
+    this->close();
+    CEDAR_THROW(ConnectionTimeOutException, "Failed to connect within 10 seconds.");
+  }
 }

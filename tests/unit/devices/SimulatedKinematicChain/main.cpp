@@ -74,6 +74,7 @@ void test()
       )
   {
     errors++;
+    std::cout << test_arm_position->getJointAngles() << std::endl;
     std::cout << "ERROR with setJointAngle() or getJointAngle()" << std::endl;
   }
   
@@ -96,6 +97,7 @@ void test()
       )
   {
     errors++;
+    std::cout << test_arm_position->getJointAngles() << std::endl;
     std::cout << "ERROR with setJointAngles() or getCachedJointAngles()" << std::endl;
   }
 
@@ -118,8 +120,10 @@ void test()
       )
   {
     errors++;
+    std::cout << test_arm_position->getJointAngles() << std::endl;
     std::cout << "ERROR with setJointAngles() or getCachedJointAngles()" << std::endl;
   }
+  test_arm_position->stopDevice();
   
   // create instance of test class
   std::cout << "testing velocity control ..." << std::endl;
@@ -130,12 +134,12 @@ void test()
   //--------------------------------------------------------------------------------------------------------------------
   // single angle velocity
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: single angle velocity functions" << std::endl;
+  std::cout << "test: single velocity functions" << std::endl;
   test_arm_velocity->setJointVelocity(0, 0.1);
   test_arm_velocity->setJointVelocity(1, 0.2);
   test_arm_velocity->setJointVelocity(2, 0.15);
   test_arm_velocity->setJointVelocity(3, 0.25);
-  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
+  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(0) - 0.1)
       || !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(1) - 0.2)
@@ -144,20 +148,22 @@ void test()
       )
   {
     errors++;
+    std::cout << test_arm_velocity->getJointAngles() << std::endl;
+    std::cout << test_arm_velocity->getJointVelocities() << std::endl;
     std::cout << "ERROR with setJointVelocity() or getJointVelocity()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // std::vector of angle values
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: std::vector angle functions" << std::endl;
+  std::cout << "test: std::vector velocity functions" << std::endl;
   std::vector<double> velocity_vector;
   velocity_vector.push_back(0.5);
   velocity_vector.push_back(1.5);
   velocity_vector.push_back(2.5);
   velocity_vector.push_back(3.5);
   test_arm_velocity->setJointVelocities(velocity_vector);
-  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
+  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero<double>(test_arm_velocity->getJointVelocity(0) - 0.5)
       || !cedar::aux::math::isZero<double>(test_arm_velocity->getJointVelocity(1) - 1.5)
@@ -166,20 +172,22 @@ void test()
       )
   {
     errors++;
+    std::cout << test_arm_velocity->getJointAngles() << std::endl;
+    std::cout << test_arm_velocity->getJointVelocities() << std::endl;
     std::cout << "ERROR with setJointVelocities(vector) or getJointVelocities()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // cv::Mat of angle values
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: cv::Mat angle functions" << std::endl;
+  std::cout << "test: cv::Mat velocity functions" << std::endl;
   cv::Mat velocity_matrix = cv::Mat::zeros(4, 1, CV_64FC1);
   velocity_matrix.at<double>(0, 0) = 0.1;
   velocity_matrix.at<double>(1, 0) = 0.2;
   velocity_matrix.at<double>(2, 0) = 0.3;
   velocity_matrix.at<double>(3, 0) = 0.4;
   test_arm_velocity->setJointVelocities(velocity_matrix);
-  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
+  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_velocity->getJointVelocities().at<double>(0, 0) - 0.1)
       || !cedar::aux::math::isZero(test_arm_velocity->getJointVelocities().at<double>(1, 0) - 0.2)
@@ -188,8 +196,93 @@ void test()
       )
   {
     errors++;
+    std::cout << test_arm_velocity->getJointAngles() << std::endl;
+    std::cout << test_arm_velocity->getJointVelocities() << std::endl;
     std::cout << "ERROR with setJointVelocities(matrix) or getJointVelocities()" << std::endl;
   }
+  test_arm_velocity->stopDevice();
+
+  // create instance of test class
+  std::cout << "testing acceleration control ..." << std::endl;
+  cedar::dev::SimulatedKinematicChainPtr test_arm_acceleration(new cedar::dev::SimulatedKinematicChain());
+  test_arm_acceleration->readJson("test_arm.json");
+  test_arm_acceleration->startDevice();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // single angle acceleration
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout << "test: single acceleration functions" << std::endl;
+  test_arm_acceleration->setJointAcceleration(0, 0.001);
+  test_arm_acceleration->setJointAcceleration(1, 0.002);
+  test_arm_acceleration->setJointAcceleration(2, 0.0015);
+  test_arm_acceleration->setJointAcceleration(3, 0.0025);
+  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  if (
+      !cedar::aux::math::isZero(test_arm_acceleration->getJointAcceleration(0) - 0.001)
+      || !cedar::aux::math::isZero(test_arm_acceleration->getJointAcceleration(1) - 0.002)
+      || !cedar::aux::math::isZero(test_arm_acceleration->getJointAcceleration(2) - 0.0015)
+      || !cedar::aux::math::isZero(test_arm_acceleration->getJointAcceleration(3) - 0.0025)
+      )
+  {
+    errors++;
+    std::cout << test_arm_acceleration->getJointAngles() << std::endl;
+    std::cout << test_arm_acceleration->getJointVelocities() << std::endl;
+    std::cout << test_arm_acceleration->getJointAccelerations() << std::endl;
+    std::cout << "ERROR with setJointAcceleration() or getJointAcceleration()" << std::endl;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // std::vector of acceleration values
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout << "test: std::vector Acceleration functions" << std::endl;
+  std::vector<double> acceleration_vector;
+  acceleration_vector.push_back(0.005);
+  acceleration_vector.push_back(0.004);
+  acceleration_vector.push_back(0.003);
+  acceleration_vector.push_back(0.002);
+  test_arm_acceleration->setJointAccelerations(acceleration_vector);
+  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  if (
+      !cedar::aux::math::isZero<double>(test_arm_acceleration->getJointAcceleration(0) - acceleration_vector.at(0))
+      || !cedar::aux::math::isZero<double>(test_arm_acceleration->getJointAcceleration(1) - acceleration_vector.at(1))
+      || !cedar::aux::math::isZero<double>(test_arm_acceleration->getJointAcceleration(2) - acceleration_vector.at(2))
+      || !cedar::aux::math::isZero<double>(test_arm_acceleration->getJointAcceleration(3) - acceleration_vector.at(3))
+      )
+  {
+    errors++;
+    std::cout << test_arm_acceleration->getJointAngles() << std::endl;
+    std::cout << test_arm_acceleration->getJointVelocities() << std::endl;
+    std::cout << test_arm_acceleration->getJointAccelerations() << std::endl;
+    std::cout << "ERROR with setJointAccelerations(vector) or getJointAccelerations()" << std::endl;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // cv::Mat of acceleration values
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout << "test: cv::Mat Acceleration functions" << std::endl;
+  cv::Mat acceleration_matrix = cv::Mat::zeros(4, 1, CV_64FC1);
+  acceleration_matrix.at<double>(0, 0) = 0.001;
+  acceleration_matrix.at<double>(1, 0) = 0.002;
+  acceleration_matrix.at<double>(2, 0) = 0.003;
+  acceleration_matrix.at<double>(3, 0) = 0.004;
+  test_arm_acceleration->setJointAccelerations(acceleration_matrix);
+  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  if (
+      !cedar::aux::math::isZero(test_arm_acceleration->getJointAccelerations().at<double>(0, 0) - acceleration_matrix.at<double>(0, 0))
+      || !cedar::aux::math::isZero(test_arm_acceleration->getJointAccelerations().at<double>(1, 0) - acceleration_matrix.at<double>(1, 0))
+      || !cedar::aux::math::isZero(test_arm_acceleration->getJointAccelerations().at<double>(2, 0) - acceleration_matrix.at<double>(2, 0))
+      || !cedar::aux::math::isZero(test_arm_acceleration->getJointAccelerations().at<double>(3, 0) - acceleration_matrix.at<double>(3, 0))
+      )
+  {
+    errors++;
+    std::cout << test_arm_acceleration->getJointAngles() << std::endl;
+    std::cout << test_arm_acceleration->getJointVelocities() << std::endl;
+    std::cout << test_arm_acceleration->getJointAccelerations() << std::endl;
+    std::cout << "ERROR with setJointAccelerations(matrix) or getJointAccelerations()" << std::endl;
+  }
+  test_arm_acceleration->stopDevice();
+
+  QApplication::exit(errors);
 }
 
 

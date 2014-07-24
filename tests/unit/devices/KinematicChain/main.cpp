@@ -42,15 +42,18 @@
 #include "tests/unit/devices/KinematicChain/TestKinematicChain.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/units/UnitMatrix.h"
 
 // SYSTEM INCLUDES
-CEDAR_GENERATE_POINTER_TYPES(TestKinematicChain);
+#include <QApplication>
 
-int main()
+CEDAR_GENERATE_POINTER_TYPES(TestKinematicChain);
+unsigned int errors;
+
+void test()
 {
   // the number of errors encountered in this test
-  int errors = 0;
   
   // create instance of test class
   TestKinematicChainPtr test_arm(new TestKinematicChain());
@@ -58,10 +61,12 @@ int main()
   TestKinematicChainPtr complex_test_arm(new TestKinematicChain());
   std::cout << "reading configuration from test_arm->json" << std::endl;
   test_arm->readJson("test_arm.json");
+  test_arm->startDevice();
   acceleration_test_arm->readJson("acceleration_test_arm.json");
-  std::string complex_test_arm_configuration_file = cedar::aux::locateResource("configs/complex_test_arm.json");
+  acceleration_test_arm->startDevice();
+  std::string complex_test_arm_configuration_file = cedar::aux::locateResource("configs/complex_test_arm.json", false);
   complex_test_arm->readJson(complex_test_arm_configuration_file);
-
+  complex_test_arm->startDevice();
   cv::Mat theta;
   cv::Mat thetaDot;
   cv::Mat thetaTwoDot;
@@ -70,7 +75,7 @@ int main()
   // check configuration
   //--------------------------------------------------------------------------------------------------------------------
 
-  std::cout << "checking the root coordinate frame..." << std::endl;
+  std::cout << "checking the root coordinate frame translation" << std::endl;
   cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_arm->getRootCoordinateFrame();
   if
   (
@@ -90,8 +95,14 @@ int main()
   {
     errors++;
     std::cout << "ERROR with root coordinate frame translation, read:" << std::endl;
-    std::cout << rootCoordinateFrame->getTranslation().matrix;
+    cedar::aux::write(rootCoordinateFrame->getTranslation().matrix);
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
+  std::cout << "checking the root coordinate frame rotation" << std::endl;
   cv::Mat rootRotation = rootCoordinateFrame->getRotation();
   if
   (
@@ -109,6 +120,10 @@ int main()
     errors++;
     std::cout << "ERROR with root coordinate frame rotation, read:" << std::endl;
     cedar::aux::write(rootRotation);
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
   }
 
   std::cout << "checking the end-effector coordinate frame..." << std::endl;
@@ -131,8 +146,13 @@ int main()
   {
     errors++;
     std::cout << "ERROR with end-effector coordinate frame translation, read:" << std::endl;
-    std::cout << endEffectorCoordinateFrame->getTranslation();
+    std::cout << endEffectorCoordinateFrame->getTranslation().matrix << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
   cv::Mat eefRotation = endEffectorCoordinateFrame->getRotation();
   if
   (
@@ -151,6 +171,10 @@ int main()
     std::cout << "ERROR with end-effector coordinate frame rotation, read:" << std::endl;
     cedar::aux::write(eefRotation);
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
 
   std::cout << "checking the first joint ..." << std::endl;
   cedar::dev::KinematicChain::JointPtr joint = test_arm->getJoint(0);
@@ -167,6 +191,7 @@ int main()
               << joint->_mpPosition->at(1) << ", "
               << joint->_mpPosition->at(2) << std::endl;
   }
+
   if
   (
     !cedar::aux::math::isZero(joint->_mpAxis->at(0) - (0.0))
@@ -212,7 +237,12 @@ int main()
     errors++;
     std::cout << "ERROR with getNumberOfJoints(), read: " << test_arm->getNumberOfJoints() << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
   
+
   std::cout << "test: set/get joint angle/velocity functions" << std::endl;
   test_arm->setJointAngle(2, -cedar::aux::math::pi*0.5);
   test_arm->setJointAngle(3, cedar::aux::math::pi*0.5);
@@ -231,6 +261,11 @@ int main()
     errors++;
     std::cout << "ERROR with set/get joint acceleration" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
   acceleration_test_arm->setJointAngle(0, 0.1);
   acceleration_test_arm->setJointAngle(1, 0.2);
   acceleration_test_arm->setJointVelocity(0, 1.1);
@@ -246,6 +281,11 @@ int main()
     errors++;
     std::cout << "ERROR with set/get joint acceleration" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // transformations
@@ -297,6 +337,11 @@ int main()
     errors++;
     std::cout << "ERROR with calculateTransformations() or getJointTransformation()" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // Jacobians
@@ -356,6 +401,11 @@ int main()
     errors++;
     std::cout << "ERROR with calculateCartesianJacobian()" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
 
   std::cout << "test: calculateSpatialJacobian" << std::endl;
   cv::Mat spatial_jacobian = test_arm->calculateSpatialJacobian(test_arm->getNumberOfJoints()-1);
@@ -392,6 +442,11 @@ int main()
     errors++;
     std::cout << "ERROR with spatialJacobian()" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector position
@@ -407,6 +462,10 @@ int main()
   {
     errors++;
     std::cout << "ERROR with calculateEndEffectorPosition()" << std::endl;
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -436,6 +495,10 @@ int main()
     errors++;
     std::cout << "ERROR with calculateEndEffectorTransformation()" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector jacobian
@@ -459,6 +522,10 @@ int main()
   {
     errors++;
     std::cout << "ERROR with calculateEndEffectorJacobian()" << std::endl;
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -581,6 +648,10 @@ int main()
     errors++;
     std::cout << "ERROR with calculateVelocity()" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // acceleration
@@ -596,6 +667,10 @@ int main()
     errors++;
     std::cout << "ERROR with calculateAcceleration()" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // spatial Jacobian temporal derivative
@@ -607,6 +682,10 @@ int main()
   {
     errors++;
     std::cout << "ERROR with calculateSpatialJacobianTemporalDerivative(...)" << std::endl;
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -620,6 +699,10 @@ int main()
     errors++;
     std::cout << "ERROR with calculateCartesianJacobianTemporalDerivative(...)" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector velocity
@@ -629,6 +712,10 @@ int main()
   {
     errors++;
     std::cout << "ERROR with calculateEndEffectorVelocity()" << std::endl;
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -640,10 +727,25 @@ int main()
     errors++;
     std::cout << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
   }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // end of test function
-  //--------------------------------------------------------------------------------------------------------------------
+  QApplication::exit(errors);
+}
+
+int main(int argc, char** argv)
+{
+  QApplication app(argc, argv);
+  // the number of errors encountered in this test
+  errors = 0;
+
+  cedar::aux::CallFunctionInThread caller(boost::bind(&test));
+
+  caller.start();
+
+  app.exec();
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

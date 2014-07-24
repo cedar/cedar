@@ -173,10 +173,10 @@ public:
   void stopDevice();
 
   //! Returns a list of all installed measurement types.
-  std::vector<ComponentDataType> getInstalledMeasurementTypes() const;
+  std::set<ComponentDataType> getInstalledMeasurementTypes() const;
 
   //! Returns a list of all installed command types.
-  std::vector<ComponentDataType> getInstalledCommandTypes() const;
+  std::set<ComponentDataType> getInstalledCommandTypes() const;
 
   //! Returns the data that contains the current measurements.
   cedar::aux::DataPtr getDeviceMeasurementData(const ComponentDataType &type);
@@ -193,10 +193,21 @@ public:
   //! Returns the name for the given command.
   std::string getNameForCommandType(ComponentDataType type) const;
 
+  //! Returns the command type associated with the given name.
+  ComponentDataType getCommandTypeForName(const std::string& name) const;
+
   //! Returns the name for the given measurement.
   std::string getNameForMeasurementType(ComponentDataType type) const;
 
+  //! Returns the measurement type associated with the given name.
+  ComponentDataType getMeasurementTypeForName(const std::string& name) const;
+
   void applyDeviceCommandsAs(ComponentDataType type);
+
+  //! Returns the dimensionality (size) of the given command type.
+  unsigned int getCommandDimensionality(ComponentDataType type) const;
+
+  void setUserCommandBuffer(ComponentDataType type, cv::Mat);
 
 signals:
   void updatedUserMeasurementSignal();
@@ -229,7 +240,6 @@ protected:
   void registerUserCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
   void registerDeviceMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
 
-  void setUserCommandBuffer(ComponentDataType type, cv::Mat);
   void setUserCommandBufferIndex(ComponentDataType type, int index, double value);
   void setInitialUserCommandBuffer(ComponentDataType type, cv::Mat);
 
@@ -275,6 +285,8 @@ private:
   std::map< ComponentDataType, MeasurementFunctionType > mRetrieveMeasurementHooks;
 
   boost::optional<ComponentDataType> mDeviceCommandSelection;
+
+  std::set<ComponentDataType> mUserCommandUsed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
