@@ -630,6 +630,11 @@ double cedar::dev::Component::getPreviousDeviceMeasurementBufferIndex(ComponentD
 
 void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, CommandFunctionType fun)
 {
+  if (!this->mCommandData->hasType(type))
+  {
+    CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "Cannot register command hook: type is not installed.");
+  }
+
   // cannot replace existing hook
   if (this->mSubmitCommandHooks.find(type) != this->mSubmitCommandHooks.end())
   {
@@ -641,6 +646,11 @@ void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, Co
 
 void cedar::dev::Component::registerDeviceMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
 {
+  if (!this->mMeasurementData->hasType(type))
+  {
+    CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "Cannot register measurement hook: type is not installed.");
+  }
+
   // cannot replace existing hook
   if (this->mRetrieveMeasurementHooks.find(type) != this->mRetrieveMeasurementHooks.end())
   {
