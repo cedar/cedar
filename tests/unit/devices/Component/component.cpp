@@ -173,6 +173,17 @@ public:
     return errors;
   }
 
+  void installTestMeasurement()
+  {
+    this->installMeasurementType(0, "test measurement");
+    this->setMeasurementDimensionality(0, 1);
+    this->registerDeviceMeasurementHook(0, boost::bind(&TestComponent::makeTestMeasurement, this));
+  }
+
+  cv::Mat makeTestMeasurement() const
+  {
+    return 1.234 * cv::Mat::ones(1, 1, CV_32F);
+  }
 };
 CEDAR_GENERATE_POINTER_TYPES(TestComponent);
 
@@ -212,6 +223,30 @@ int test_loop()
   return component->testLoop();
 }
 
+int test_measurements()
+{
+  std::cout << "Testing measurements." << std::endl;
+
+  int errors = 0;
+
+  TestComponentPtr component(new TestComponent());
+  component->installTestMeasurement();
+  component->startDevice();
+  cedar::aux::sleep(0.05 * cedar::unit::second);
+  component->stopDevice();
+
+  auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(component->getDeviceMeasurementData(0));
+  CEDAR_UNIT_TEST_CONDITION(errors, mat_data.get() != nullptr);
+  cv::Mat measurement = mat_data->getData();
+  CEDAR_UNIT_TEST_CONDITION(errors, measurement.rows == 1);
+  CEDAR_UNIT_TEST_CONDITION(errors, measurement.cols == 1);
+  CEDAR_UNIT_TEST_CONDITION(errors, measurement.type() == CV_32F);
+  CEDAR_UNIT_TEST_CONDITION(errors, measurement.at<float>(0, 0) == 1.234);
+  std::cout << "Measurement matrix: " << measurement << std::endl;
+
+  return errors;
+}
+
 void run_test()
 {
   int errors = 0;
@@ -221,6 +256,7 @@ void run_test()
   errors += test_hook_checks();
   errors += test_hook_data();
   errors += test_loop();
+  errors += test_measurements();
 
   QApplication::exit(errors);
 }
