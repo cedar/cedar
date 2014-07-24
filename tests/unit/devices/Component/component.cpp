@@ -131,7 +131,7 @@ public:
       this->registerDeviceMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
 
       CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
-      this->getDeviceMeasurementData(0);
+      this->getMeasurementData(0);
       CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "getting device measurement data that doesn't have a dimensionality set.");
 
       CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
@@ -140,7 +140,7 @@ public:
 
       cedar::aux::DataPtr data;
       CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
-      data = this->getDeviceMeasurementData(0);
+      data = this->getMeasurementData(0);
       CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE(errors, "getting measurement data.");
 
       CEDAR_UNIT_TEST_CONDITION(errors, data.get() != nullptr);
@@ -182,6 +182,7 @@ public:
 
   cv::Mat makeTestMeasurement() const
   {
+    std::cout << "Making measurement." << std::endl;
     return 1.234 * cv::Mat::ones(1, 1, CV_32F);
   }
 };
@@ -235,13 +236,13 @@ int test_measurements()
   cedar::aux::sleep(0.05 * cedar::unit::second);
   component->stopDevice();
 
-  auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(component->getDeviceMeasurementData(0));
+  auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(component->getMeasurementData(0));
   CEDAR_UNIT_TEST_CONDITION(errors, mat_data.get() != nullptr);
   cv::Mat measurement = mat_data->getData();
   CEDAR_UNIT_TEST_CONDITION(errors, measurement.rows == 1);
   CEDAR_UNIT_TEST_CONDITION(errors, measurement.cols == 1);
   CEDAR_UNIT_TEST_CONDITION(errors, measurement.type() == CV_32F);
-  CEDAR_UNIT_TEST_CONDITION(errors, measurement.at<float>(0, 0) == 1.234);
+  CEDAR_UNIT_TEST_CONDITION(errors, cedar::aux::math::isZero(measurement.at<float>(0, 0) - 1.234f));
   std::cout << "Measurement matrix: " << measurement << std::endl;
 
   return errors;
