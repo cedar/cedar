@@ -278,6 +278,7 @@ void cedar::dev::KinematicChain::setJointAngles(const std::vector<double>& angle
               + ")!"
     );
   }
+  //!@todo put this in a matrix and use setJointAngles(matrix)
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     //!@todo doesn't this function also check for violations of joint range?
@@ -468,8 +469,8 @@ void cedar::dev::KinematicChain::init()
       &cedar::dev::Component::integrateDeviceTwice,
       this,
       _1,
-      cedar::dev::KinematicChain::JOINT_ANGLES,
-      cedar::dev::KinematicChain::JOINT_VELOCITIES
+      cedar::dev::KinematicChain::JOINT_VELOCITIES,
+      cedar::dev::KinematicChain::JOINT_ANGLES
     )
   );
   registerUserCommandTransformationHook
@@ -554,7 +555,7 @@ void cedar::dev::KinematicChain::initializeFromJointList()
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_ANGLES, num );
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_VELOCITIES, num );
   setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_ACCELERATIONS, num );
-  setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_TORQUES, num );
+//  setCommandAndMeasurementDimensionality( cedar::dev::KinematicChain::JOINT_TORQUES, num );
 
 }
 
