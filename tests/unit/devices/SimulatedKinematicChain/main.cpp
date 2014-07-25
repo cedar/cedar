@@ -746,10 +746,6 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   cv::randn(thetaDot, cv::Scalar(0), cv::Scalar(1));
   cv::randn(thetaTwoDot, cv::Scalar(0), cv::Scalar(1));
 
-  complex_test_arm->applyInitialConfiguration("default");
-  cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
-
-  complex_test_arm->clearUserCommand();
   complex_test_arm->setJointAngles(theta);
   cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
 
