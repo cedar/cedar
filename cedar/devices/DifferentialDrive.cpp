@@ -175,7 +175,7 @@ cedar::aux::math::VelocityLimitsParameterPtr cedar::dev::DifferentialDrive::getH
 std::vector<cedar::unit::Velocity> cedar::dev::DifferentialDrive::getWheelSpeed() const
 {
   std::vector<cedar::unit::Velocity> ret;
-  cv::Mat mat = getUserMeasurementBuffer( cedar::dev::DifferentialDrive::WHEEL_SPEED );
+  cv::Mat mat = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED))->getData();
 
   ret.push_back( mat.at<double>(0,0) * cedar::unit::DEFAULT_VELOCITY_UNIT );
   ret.push_back( mat.at<double>(1,0) * cedar::unit::DEFAULT_VELOCITY_UNIT );

@@ -674,6 +674,16 @@ cedar::aux::ConstDataPtr cedar::dev::Component::getMeasurementData(const Compone
   return this->mMeasurementData->getUserData(type);
 }
 
+cedar::aux::DataPtr cedar::dev::Component::getUserCommandData(const ComponentDataType &type)
+{
+  return this->mCommandData->getUserData(type);
+}
+
+cedar::aux::ConstDataPtr cedar::dev::Component::getUserCommandData(const ComponentDataType &type) const
+{
+  return this->mCommandData->getUserData(type);
+}
+
 cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type) const
 {
   return this->mCommandData->getDeviceData(type);
