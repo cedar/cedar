@@ -197,6 +197,10 @@ public:
   //! Returns the data that contains the commands that will be sent to the device.
   cedar::aux::ConstDataPtr getDeviceCommandData(const ComponentDataType &type) const;
 
+  cedar::aux::DataPtr getUserCommandData(const ComponentDataType &type);
+
+  cedar::aux::ConstDataPtr getUserCommandData(const ComponentDataType &type) const;
+
   //! Returns the name for the given command.
   std::string getNameForCommandType(ComponentDataType type) const;
 
