@@ -829,6 +829,8 @@ bool cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
 {
   QReadLocker rlock(&mCurrentInitialConfigurationLock);
 
+  clearUserCommand();
+
   auto f = mInitialConfigurations.find(name);
   if (f != mInitialConfigurations.end())
   {
@@ -858,6 +860,7 @@ bool cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
     "Doing nothing.",
     "cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string)"
   );
+
   return false;
 }
 
