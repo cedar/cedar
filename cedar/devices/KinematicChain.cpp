@@ -827,6 +827,8 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
 {
   QReadLocker rlock(&mCurrentInitialConfigurationLock);
 
+  clearUserCommand();
+
   auto f = mInitialConfigurations.find(name);
   if (f != mInitialConfigurations.end())
   {
