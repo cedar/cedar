@@ -39,11 +39,33 @@
 
 #include <iostream>
 
+#ifdef CEDAR_OS_LINUX
+  #define CEDAR_UNIT_TEST_BEGIN_RED_FONT "\033[0;31m"
+  #define CEDAR_UNIT_TEST_BEGIN_GREEN_FONT "\033[0;32m"
+  #define CEDAR_UNIT_TEST_BEGIN_LIGHT_GRAY_FONT "\033[1;30m"
+  #define CEDAR_UNIT_TEST_END_FONT "\033[m"
+#else // CEDAR_OS_LINUX
+  #define CEDAR_UNIT_TEST_BEGIN_RED_FONT ""
+  #define CEDAR_UNIT_TEST_BEGIN_GREEN_FONT ""
+  #define CEDAR_UNIT_TEST_BEGIN_LIGHT_GRAY_FONT ""
+  #define CEDAR_UNIT_TEST_END_FONT ""
+#endif // CEDAR_OS_LINUX
+
 #define CEDAR_UNIT_TEST_PRINT_SUCCESS(MESSAGE) \
-    std::cout << "Line " << __LINE__ << ": passed. " << MESSAGE << std::endl;\
+    std::cout << "Line " << __LINE__ << ": " << CEDAR_UNIT_TEST_BEGIN_GREEN_FONT << "passed" << CEDAR_UNIT_TEST_END_FONT << ". " << MESSAGE << std::endl;\
 
 #define CEDAR_UNIT_TEST_PRINT_FAILURE(MESSAGE) \
-    std::cout << "Line " << __LINE__ << ": FAILED. " << MESSAGE << std::endl;\
+    std::cout << "Line " << __LINE__ << ": " << CEDAR_UNIT_TEST_BEGIN_RED_FONT << "FAILED" << CEDAR_UNIT_TEST_END_FONT << ". " << MESSAGE << std::endl;\
+
+
+#define CEDAR_UNIT_TEST_PRINT_CONDITION_SUCCESS(CONDITION) \
+    std::string message; \
+    message += CEDAR_UNIT_TEST_BEGIN_LIGHT_GRAY_FONT;\
+    message += "Condition: ";\
+    message += CONDITION;\
+    message += CEDAR_UNIT_TEST_END_FONT;\
+    CEDAR_UNIT_TEST_PRINT_SUCCESS(message); \
+
 
 /*! Tests a condition. If the condition fails, increases an error variable and prints a message. Also prints a message
  *  on success.
@@ -51,7 +73,7 @@
 #define CEDAR_UNIT_TEST_CONDITION(ERROR_VAR_NAME, CONDITION) \
   if ((CONDITION)) \
   { \
-    CEDAR_UNIT_TEST_PRINT_SUCCESS("Condition: " #CONDITION); \
+    CEDAR_UNIT_TEST_PRINT_CONDITION_SUCCESS(#CONDITION); \
   } \
   else \
   { \
@@ -65,7 +87,7 @@
 #define CEDAR_UNIT_TEST_CONDITION_CUSTOM_MESSAGE(ERROR_VAR_NAME, CONDITION, MESSAGE) \
   if ((CONDITION)) \
   { \
-    CEDAR_UNIT_TEST_PRINT_SUCCESS("Condition: " #CONDITION); \
+    CEDAR_UNIT_TEST_PRINT_CONDITION_SUCCESS(#CONDITION); \
   } \
   else \
   { \
@@ -80,12 +102,12 @@
   } \
   catch (...)\
   {\
-    CEDAR_UNIT_TEST_PRINT_SUCCESS("threw an exception when " WHAT); \
+    CEDAR_UNIT_TEST_PRINT_CONDITION_SUCCESS("threw an exception when " WHAT); \
   }
 
 #define CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE() try {
 #define CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE(ERROR_VAR_NAME, WHAT) \
-    CEDAR_UNIT_TEST_PRINT_SUCCESS("Did not throw an exception when " WHAT); \
+    CEDAR_UNIT_TEST_PRINT_CONDITION_SUCCESS("Did not throw an exception when " WHAT); \
   } \
   catch (const cedar::aux::ExceptionBase& e) \
   {\
