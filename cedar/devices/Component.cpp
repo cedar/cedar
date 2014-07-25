@@ -658,6 +658,7 @@ void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
 
 void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
+  this->checkExclusivenessOfCommand(type);
   this->mCommandData->setUserBuffer(type, data);
   this->mUserCommandUsed.insert(type);
 }
@@ -684,6 +685,7 @@ void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, 
 
 void cedar::dev::Component::setUserCommandBufferIndex(ComponentDataType type, int index, double value)
 {
+  this->checkExclusivenessOfCommand(type);
   this->mCommandData->setUserBufferIndex(type, index, value);
   this->mUserCommandUsed.insert(type);
 }
@@ -1087,3 +1089,19 @@ void cedar::dev::Component::processStart()
   stepDeviceMeasurements(time);
 }
 
+void cedar::dev::Component::clearUserCommand()
+{
+  this->mUserCommandUsed.clear();
+}
+
+void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
+{
+  if (this->mUserCommandUsed.size() > 0)
+  {
+    if (this->mUserCommandUsed.find(type) == this->mUserCommandUsed.end())
+    {
+      // a different command type is already set, throw!
+      CEDAR_THROW(CouldNotGuessCommandTypeException, "You used more than one type of commands. Component cannot handle this.");
+    }
+  }
+}

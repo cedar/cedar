@@ -282,6 +282,24 @@ void test()
   }
   test_arm_acceleration->stopDevice();
 
+  // create instance of test class
+  std::cout << "testing exclusiveness of commands ..." << std::endl;
+  cedar::dev::SimulatedKinematicChainPtr test_arm_exclusive(new cedar::dev::SimulatedKinematicChain());
+  test_arm_exclusive->readJson("test_arm.json");
+  test_arm_exclusive->startDevice();
+  try
+  {
+    test_arm_exclusive->setJointAngle(0, 1.0);
+    test_arm_exclusive->setJointVelocity(0, 0.1);
+    test_arm_exclusive->setJointAcceleration(0, 0.01);
+    errors++;
+    std::cout << "ERROR with exclusiveness of commands" << std::endl;
+  }
+  catch (const cedar::dev::Component::CouldNotGuessCommandTypeException& exc)
+  {
+    // all is well!
+  }
+
   QApplication::exit(errors);
 }
 
