@@ -122,22 +122,7 @@ class cedar::dev::Component::DataCollection
 
     cedar::aux::DataPtr getDeviceData(const cedar::dev::Component::ComponentDataType &type)
     {
-      if (!this->hasType(type))
-      {
-        CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type does not exist.");
-      }
-
-      QReadLocker locker(this->mDeviceRetrievedData.getLockPtr());
-
-      auto iter = this->mDeviceRetrievedData.member().find(type);
-      CEDAR_DEBUG_ASSERT(iter != this->mDeviceRetrievedData.member().end());
-
-      auto ptr_copy = iter->second;
-      if (!iter->second || iter->second->getData().empty())
-      {
-        CEDAR_THROW(cedar::dev::Component::DimensionalityNotSetException, "The data does not exist.");
-      }
-      return ptr_copy;
+      return this->getData(this->mDeviceRetrievedData, type);
     }
 
     void setDimensionality(cedar::dev::Component::ComponentDataType type, unsigned int dim)
@@ -241,6 +226,16 @@ class cedar::dev::Component::DataCollection
       return this->getBuffer(mUserBuffer, type);
     }
 
+    cedar::aux::ConstMatDataPtr getUserData(ComponentDataType type) const
+    {
+      return this->getData(this->mUserBuffer, type);
+    }
+
+    cedar::aux::MatDataPtr getUserData(ComponentDataType type)
+    {
+      return this->getData(this->mUserBuffer, type);
+    }
+
     double getUserBufferIndex(ComponentDataType type, int index) const
     {
       return this->getBufferIndex(mUserBuffer, type, index);
@@ -330,6 +325,31 @@ class cedar::dev::Component::DataCollection
     }
 
   private:
+    cedar::aux::MatDataPtr getData(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type)
+    {
+      return boost::const_pointer_cast<cedar::aux::MatData>(const_cast<ConstDataCollection*>(this)->getData(bufferData, type));
+    }
+
+    cedar::aux::ConstMatDataPtr getData(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
+    {
+      if (!this->hasType(type))
+      {
+        CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type does not exist.");
+      }
+
+      QReadLocker locker(bufferData.getLockPtr());
+
+      auto iter = bufferData.member().find(type);
+      CEDAR_DEBUG_ASSERT(iter != bufferData.member().end());
+
+      auto ptr_copy = iter->second;
+      if (!iter->second || iter->second->getData().empty())
+      {
+        CEDAR_THROW(cedar::dev::Component::DimensionalityNotSetException, "The data has not yet been initialized.");
+      }
+      return ptr_copy;
+    }
+
     cv::Mat getBuffer(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
     {
       QReadLocker lock(bufferData.getLockPtr());
@@ -457,14 +477,14 @@ class cedar::dev::Component::DataCollection
     // Cache for the Device-interface
     cedar::aux::LockableMember<BufferDataType> mDeviceSubmittedData; // was: mDeviceSubmittedCommands
 
-    std::map<ComponentDataType, unsigned int> mInstalledDimensions;
-
     cedar::aux::LockableMember<BufferDataType> mUserBuffer; // was: mUserCommandBuffer, mUserMeasurementsBuffer
 
-    decltype(mUserBuffer) mInitialUserSubmittedData; // was: mInitialUserSubmittedCommands
+    cedar::aux::LockableMember<BufferDataType> mInitialUserSubmittedData; // was: mInitialUserSubmittedCommands
 
     // Cache for the user-interface
-    cedar::aux::LockableMember< BufferDataType > mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
+    cedar::aux::LockableMember<BufferDataType> mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
+
+    std::map<ComponentDataType, unsigned int> mInstalledDimensions;
 
     TransformationHookContainerType mTransformationHooks;
 
@@ -552,14 +572,14 @@ std::set<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getIns
   return this->mCommandData->getInstalledTypes();
 }
 
-cedar::aux::DataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type)
+cedar::aux::DataPtr cedar::dev::Component::getMeasurementData(const ComponentDataType &type)
 {
-  return this->mMeasurementData->getDeviceData(type);
+  return this->mMeasurementData->getUserData(type);
 }
 
-cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceMeasurementData(const ComponentDataType &type) const
+cedar::aux::ConstDataPtr cedar::dev::Component::getMeasurementData(const ComponentDataType &type) const
 {
-  return this->mMeasurementData->getDeviceData(type);
+  return this->mMeasurementData->getUserData(type);
 }
 
 cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type) const
@@ -646,8 +666,10 @@ void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
 
 void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
+  this->checkExclusivenessOfCommand(type);
+  QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
   this->mCommandData->setUserBuffer(type, data);
-  this->mUserCommandUsed.insert(type);
+  this->mUserCommandUsed.member().insert(type);
 }
 
 void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, cv::Mat data)
@@ -672,8 +694,10 @@ void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, 
 
 void cedar::dev::Component::setUserCommandBufferIndex(ComponentDataType type, int index, double value)
 {
+  this->checkExclusivenessOfCommand(type);
+  QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
   this->mCommandData->setUserBufferIndex(type, index, value);
-  this->mUserCommandUsed.insert(type);
+  this->mUserCommandUsed.member().insert(type);
 }
 
 cv::Mat cedar::dev::Component::getUserMeasurementBuffer(ComponentDataType type) const
@@ -752,7 +776,8 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   // todo: check locking in this function, forgot some stuff ...
   ComponentDataType type_for_Device, type_from_user;
 
-  if (this->mUserCommandUsed.size() == 0)
+  QReadLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
+  if (this->mUserCommandUsed.member().size() == 0)
   {
     return; // this is not a problem
   }
@@ -765,10 +790,10 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   {
     // guess command type to use
     // safe only if there was only one command hook registered
-    if (this->mUserCommandUsed.size() > 1)
+    if (this->mUserCommandUsed.member().size() > 1)
     {
       std::string set_commands;
-      for (const auto &what : this->mUserCommandUsed)
+      for (const auto &what : this->mUserCommandUsed.member())
       {
         if (!set_commands.empty())
         {
@@ -784,8 +809,9 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
     }
 
     // we know the map has exactly one entry
-    type_from_user = *(this->mUserCommandUsed.begin());
+    type_from_user = *(this->mUserCommandUsed.member().begin());
   }
+  user_command_locker.unlock();
 
 //  this->mUserCommandUsed.clear();
 
@@ -1075,3 +1101,21 @@ void cedar::dev::Component::processStart()
   stepDeviceMeasurements(time);
 }
 
+void cedar::dev::Component::clearUserCommand()
+{
+  QWriteLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
+  this->mUserCommandUsed.member().clear();
+}
+
+void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
+{
+  QReadLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
+  if (this->mUserCommandUsed.member().size() > 0)
+  {
+    if (this->mUserCommandUsed.member().find(type) == this->mUserCommandUsed.member().end())
+    {
+      // a different command type is already set, throw!
+      CEDAR_THROW(CouldNotGuessCommandTypeException, "You used more than one type of commands. Component cannot handle this.");
+    }
+  }
+}
