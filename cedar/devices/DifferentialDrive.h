@@ -85,32 +85,13 @@ public:
   /*!@brief Returns the current speed of the wheels [in m/s].
    * @return Vector holding the wheel speed of the left (1st element) and right wheel (2nd element) [both in m/s]
    */
-  const std::vector<cedar::unit::Velocity>& getWheelSpeed() const;
+  std::vector<cedar::unit::Velocity> getWheelSpeed() const;
 
   /*!@brief Sets the speed of the left and right wheel.
    * @param[in] wheelSpeed The wheel speed of the left and right wheel to be set [in m/s].
    */
-  virtual void setWheelSpeed(const std::vector<cedar::unit::Velocity>& wheelSpeed);
+  void setWheelSpeed(const std::vector<cedar::unit::Velocity>& wheelSpeed);
 
-  /*!@brief Sets the speed of the wheels based on the given forward velocity.
-   * @param[in] forwardVelocity The forward velocity to be set [in m/s].
-   */
-  virtual void setForwardVelocity(cedar::unit::Velocity forwardVelocity);
-
-  /*!@brief Sets the speed of the wheels based on the given turning rate.
-   * @param[in] turningRate The turning rate to be set [in rad/s].
-   */
-  virtual void setTurningRate(cedar::unit::AngularVelocity turningRate);
-
-  /*!@brief Sets the speed of the wheels based on the given forward velocity and turning rate.
-   * @param[in] forwardVelocity The forward velocity to be set [in m/s].
-   * @param[in] turningRate     The turning rate to be set [in rad/s].
-   */
-  virtual void setForwardVelocityAndTurningRate
-               (
-                 cedar::unit::Velocity forwardVelocity,
-                 cedar::unit::AngularVelocity turningRate
-               );
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -130,6 +111,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void init();
+
   /*!@brief Converts a given forward velocity and turning rate into wheel speeds.
    * @param[in] forwardVelocity the given forward velocity of the robot [m/s]
    * @param[in] turningRate the given turning rate of the robot [rad/s]
@@ -161,12 +144,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  static const cedar::dev::Component::ComponentDataType WHEEL_SPEED;
+
 protected:
   // none yet
 
 private:
-  //! vector holding the current speed of the left (1st element) and right (2nd element) wheel [in m/s]
-  std::vector<cedar::unit::Velocity> mWheelSpeed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
