@@ -1,0 +1,25 @@
+{
+  "number of pulses per revolution": "1000",
+  "encoder limits":
+  {
+    "lower limit": "-32768",
+    "upper limit": "32767"
+  },
+  "wheel distance": "0.053",
+  "wheel radius": "0.0205",
+  "hardware speed limits":
+  {
+    "lower limit": "-1.0",
+    "upper limit": "1.0"
+  },
+  "forward velocity limits":
+  {
+    "lower limit": "-1.0",
+    "upper limit": "1.0"
+  },
+  "turning rate limits":
+  {
+    "lower limit": "-3.141",
+    "upper limit": "3.141"
+  }
+}
