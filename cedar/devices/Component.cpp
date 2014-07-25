@@ -477,14 +477,14 @@ class cedar::dev::Component::DataCollection
     // Cache for the Device-interface
     cedar::aux::LockableMember<BufferDataType> mDeviceSubmittedData; // was: mDeviceSubmittedCommands
 
-    std::map<ComponentDataType, unsigned int> mInstalledDimensions;
-
     cedar::aux::LockableMember<BufferDataType> mUserBuffer; // was: mUserCommandBuffer, mUserMeasurementsBuffer
 
-    decltype(mUserBuffer) mInitialUserSubmittedData; // was: mInitialUserSubmittedCommands
+    cedar::aux::LockableMember<BufferDataType> mInitialUserSubmittedData; // was: mInitialUserSubmittedCommands
 
     // Cache for the user-interface
-    cedar::aux::LockableMember< BufferDataType > mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
+    cedar::aux::LockableMember<BufferDataType> mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
+
+    std::map<ComponentDataType, unsigned int> mInstalledDimensions;
 
     TransformationHookContainerType mTransformationHooks;
 
@@ -667,8 +667,9 @@ void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
 void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
   this->checkExclusivenessOfCommand(type);
+  QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
   this->mCommandData->setUserBuffer(type, data);
-  this->mUserCommandUsed.insert(type);
+  this->mUserCommandUsed.member().insert(type);
 }
 
 void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, cv::Mat data)
@@ -694,8 +695,9 @@ void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, 
 void cedar::dev::Component::setUserCommandBufferIndex(ComponentDataType type, int index, double value)
 {
   this->checkExclusivenessOfCommand(type);
+  QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
   this->mCommandData->setUserBufferIndex(type, index, value);
-  this->mUserCommandUsed.insert(type);
+  this->mUserCommandUsed.member().insert(type);
 }
 
 cv::Mat cedar::dev::Component::getUserMeasurementBuffer(ComponentDataType type) const
@@ -774,7 +776,8 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   // todo: check locking in this function, forgot some stuff ...
   ComponentDataType type_for_Device, type_from_user;
 
-  if (this->mUserCommandUsed.size() == 0)
+  QReadLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
+  if (this->mUserCommandUsed.member().size() == 0)
   {
     return; // this is not a problem
   }
@@ -787,10 +790,10 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   {
     // guess command type to use
     // safe only if there was only one command hook registered
-    if (this->mUserCommandUsed.size() > 1)
+    if (this->mUserCommandUsed.member().size() > 1)
     {
       std::string set_commands;
-      for (const auto &what : this->mUserCommandUsed)
+      for (const auto &what : this->mUserCommandUsed.member())
       {
         if (!set_commands.empty())
         {
@@ -806,8 +809,9 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
     }
 
     // we know the map has exactly one entry
-    type_from_user = *(this->mUserCommandUsed.begin());
+    type_from_user = *(this->mUserCommandUsed.member().begin());
   }
+  user_command_locker.unlock();
 
 //  this->mUserCommandUsed.clear();
 
@@ -1099,14 +1103,16 @@ void cedar::dev::Component::processStart()
 
 void cedar::dev::Component::clearUserCommand()
 {
-  this->mUserCommandUsed.clear();
+  QWriteLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
+  this->mUserCommandUsed.member().clear();
 }
 
 void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
 {
-  if (this->mUserCommandUsed.size() > 0)
+  QReadLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
+  if (this->mUserCommandUsed.member().size() > 0)
   {
-    if (this->mUserCommandUsed.find(type) == this->mUserCommandUsed.end())
+    if (this->mUserCommandUsed.member().find(type) == this->mUserCommandUsed.member().end())
     {
       // a different command type is already set, throw!
       CEDAR_THROW(CouldNotGuessCommandTypeException, "You used more than one type of commands. Component cannot handle this.");

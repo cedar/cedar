@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/units/UnitMatrix.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -71,110 +72,14 @@ void test()
   cv::Mat thetaDot;
   cv::Mat thetaTwoDot;
   
-  //--------------------------------------------------------------------------------------------------------------------
-  // check configuration
-  //--------------------------------------------------------------------------------------------------------------------
+  test_arm->addInitialConfiguration("default", cv::Mat::zeros( test_arm->getNumberOfJoints(), 1, CV_64F) + 0.001);
+  test_arm->applyInitialConfiguration("default");
+ 
+  acceleration_test_arm->addInitialConfiguration("default", cv::Mat::zeros( acceleration_test_arm->getNumberOfJoints(), 1, CV_64F) + 0.001);
+  acceleration_test_arm->applyInitialConfiguration("default");
+  complex_test_arm->addInitialConfiguration("default", cv::Mat::zeros( complex_test_arm->getNumberOfJoints(), 1, CV_64F) + 0.001);
+  complex_test_arm->applyInitialConfiguration("default");
 
-  std::cout << "checking the root coordinate frame translation" << std::endl;
-  cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_arm->getRootCoordinateFrame();
-  if
-  (
-      !cedar::aux::math::isZero
-       (
-         rootCoordinateFrame->getTranslationX() / cedar::unit::DEFAULT_LENGTH_UNIT - 2.0
-       )
-    || !cedar::aux::math::isZero
-        (
-          rootCoordinateFrame->getTranslationY() / cedar::unit::DEFAULT_LENGTH_UNIT - 0.0
-        )
-    || !cedar::aux::math::isZero
-        (
-          rootCoordinateFrame->getTranslationZ() / cedar::unit::DEFAULT_LENGTH_UNIT - 0.0
-        )
-  )
-  {
-    errors++;
-    std::cout << "ERROR with root coordinate frame translation, read:" << std::endl;
-    cedar::aux::write(rootCoordinateFrame->getTranslation().matrix);
-  }
-  else
-  {
-    std::cout << "passed" << std::endl;
-  }
-
-  std::cout << "checking the root coordinate frame rotation" << std::endl;
-  cv::Mat rootRotation = rootCoordinateFrame->getRotation();
-  if
-  (
-    !cedar::aux::math::isZero(rootRotation.at<double>(0, 0) - (0.0))
-    || !cedar::aux::math::isZero(rootRotation.at<double>(0, 1) - (-1.0))
-    || !cedar::aux::math::isZero(rootRotation.at<double>(0, 2) - (0.0))
-    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 0) - (1.0))
-    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 1) - (0.0))
-    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 2) - (0.0))
-    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 0) - (0.0))
-    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 1) - (0.0))
-    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 2) - (1.0))
-  )
-  {
-    errors++;
-    std::cout << "ERROR with root coordinate frame rotation, read:" << std::endl;
-    cedar::aux::write(rootRotation);
-  }
-  else
-  {
-    std::cout << "passed" << std::endl;
-  }
-
-  std::cout << "checking the end-effector coordinate frame..." << std::endl;
-  cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_arm->getEndEffectorCoordinateFrame();
-  if
-  (
-       !cedar::aux::math::isZero
-        (
-          endEffectorCoordinateFrame->getTranslationX() / cedar::unit::DEFAULT_LENGTH_UNIT - 0.0
-        )
-    || !cedar::aux::math::isZero
-        (
-          endEffectorCoordinateFrame->getTranslationY() / cedar::unit::DEFAULT_LENGTH_UNIT - 2.0
-        )
-    || !cedar::aux::math::isZero
-        (
-          endEffectorCoordinateFrame->getTranslationZ() / cedar::unit::DEFAULT_LENGTH_UNIT - 8.0
-        )
-  )
-  {
-    errors++;
-    std::cout << "ERROR with end-effector coordinate frame translation, read:" << std::endl;
-    std::cout << endEffectorCoordinateFrame->getTranslation().matrix << std::endl;
-  }
-  else
-  {
-    std::cout << "passed" << std::endl;
-  }
-
-  cv::Mat eefRotation = endEffectorCoordinateFrame->getRotation();
-  if
-  (
-    !cedar::aux::math::isZero(eefRotation.at<double>(0, 0) - (1.0))
-    || !cedar::aux::math::isZero(eefRotation.at<double>(0, 1) - (0.0))
-    || !cedar::aux::math::isZero(eefRotation.at<double>(0, 2) - (0.0))
-    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 0) - (0.0))
-    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 1) - (1.0))
-    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 2) - (0.0))
-    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 0) - (0.0))
-    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 1) - (0.0))
-    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 2) - (1.0))
-  )
-  {
-    errors++;
-    std::cout << "ERROR with end-effector coordinate frame rotation, read:" << std::endl;
-    cedar::aux::write(eefRotation);
-  }
-  else
-  {
-    std::cout << "passed" << std::endl;
-  }
 
   std::cout << "checking the first joint ..." << std::endl;
   cedar::dev::KinematicChain::JointPtr joint = test_arm->getJoint(0);
@@ -246,20 +151,32 @@ void test()
   std::cout << "test: set/get joint angle/velocity functions" << std::endl;
   test_arm->setJointAngle(2, -cedar::aux::math::pi*0.5);
   test_arm->setJointAngle(3, cedar::aux::math::pi*0.5);
+
+  cedar::aux::sleep( test_arm->getDeviceStepSize() * 1.5 );
+
   test_arm->setJointVelocity(1, 1);
   test_arm->setJointVelocity(2, 1);
+
+  cedar::aux::sleep( test_arm->getDeviceStepSize() * 1.5 );
+
   if
   (
     !cedar::aux::math::isZero(test_arm->getJointAngle(0) - (0.0))
     || !cedar::aux::math::isZero(test_arm->getJointAngle(1) - (0.0))
-    || !cedar::aux::math::isZero(test_arm->getJointAngle(2) - (-cedar::aux::math::pi*0.5))
-    || !cedar::aux::math::isZero(test_arm->getJointAngle(3) - (cedar::aux::math::pi*0.5))
+    || !cedar::aux::math::isZero(test_arm->getJointAngle(2) - 0.0)
+    || !cedar::aux::math::isZero(test_arm->getJointAngle(3) - 0.0)
     || !cedar::aux::math::isZero(test_arm->getJointVelocity(1) - (1.0))
     || !cedar::aux::math::isZero(test_arm->getJointVelocity(2) - (1.0))
   )
   {
+std::cout << test_arm->getJointAngle(0) << std::endl;    
+std::cout << test_arm->getJointAngle(1) << std::endl;    
+std::cout << test_arm->getJointAngle(2) << std::endl;    
+std::cout << test_arm->getJointAngle(3) << std::endl;    
+std::cout << test_arm->getJointVelocity(1) << std::endl;    
+std::cout << test_arm->getJointVelocity(2) << std::endl;    
     errors++;
-    std::cout << "ERROR with set/get joint acceleration" << std::endl;
+    std::cout << "ERROR with set/get joint acceleration 1" << std::endl;
   }
   else
   {
@@ -268,10 +185,19 @@ void test()
 
   acceleration_test_arm->setJointAngle(0, 0.1);
   acceleration_test_arm->setJointAngle(1, 0.2);
+
+  cedar::aux::sleep( acceleration_test_arm->getDeviceStepSize() * 1.5 );
+
   acceleration_test_arm->setJointVelocity(0, 1.1);
   acceleration_test_arm->setJointVelocity(1, 1.2);
+
+  cedar::aux::sleep( acceleration_test_arm->getDeviceStepSize() * 1.5 );
+
   acceleration_test_arm->setJointAcceleration(0, 2.1);
   acceleration_test_arm->setJointAcceleration(1, 2.2);
+
+  cedar::aux::sleep( acceleration_test_arm->getDeviceStepSize() * 1.5 );
+
   if
   (
     !cedar::aux::math::isZero(acceleration_test_arm->getJointAcceleration(0) - (2.1))
@@ -279,7 +205,7 @@ void test()
   )
   {
     errors++;
-    std::cout << "ERROR with set/get joint acceleration" << std::endl;
+    std::cout << "ERROR with set/get joint acceleration 2" << std::endl;
   }
   else
   {
