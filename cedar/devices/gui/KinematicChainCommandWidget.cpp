@@ -97,9 +97,9 @@ void cedar::dev::gui::KinematicChainCommandWidget::setSingleStep(double singleSt
 
 void cedar::dev::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 {
-  // the kinematic chain has no working mode, anymore. this only has
-  // relevance for the user of this widget.
+  // we have to reset the used command in here
   mpModeBox->setCurrentIndex(mode);
+  mpKinematicChain->clearUserCommand();
   update();
 }
 
@@ -130,7 +130,8 @@ void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
 {
   // js: don't need to change the user selection mpModeBox->setCurrentIndex(1);
-  for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+  mpKinematicChain->clearUserCommand();
+  for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
   {
     mpKinematicChain->setJointVelocity(j, 0);
   }

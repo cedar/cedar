@@ -88,6 +88,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // exceptions
   //--------------------------------------------------------------------------------------------------------------------
+public:
   //! Exception that is thrown when a type that is not installed is requested.
   class TypeNotFoundException : public cedar::aux::NotFoundException {};
 
@@ -209,6 +210,9 @@ public:
 
   void setUserCommandBuffer(ComponentDataType type, cv::Mat);
 
+  //!@brief this function resets the internally used user command and allows to subsequently use a different type
+  void clearUserCommand();
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -249,8 +253,6 @@ protected:
   cv::Mat getPreviousDeviceMeasurementBuffer(ComponentDataType type) const;
   double  getPreviousDeviceMeasurementBufferIndex(ComponentDataType type, int index) const;
 
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -264,6 +266,9 @@ private:
   void stepDeviceMeasurements(cedar::unit::Time);
 
   void updateUserMeasurements();
+
+  //!@brief checks whether a given command type conflicts with already set commands and throws an exception if this happens
+  void checkExclusivenessOfCommand(ComponentDataType type);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -279,7 +284,7 @@ private:
   DataCollectionPtr mCommandData;
 
   //! the Device-thread's wrapper
-  std::unique_ptr< cedar::aux::LoopFunctionInThread > mDeviceThread;
+  std::unique_ptr<cedar::aux::LoopFunctionInThread> mDeviceThread;
 
   std::map< ComponentDataType, CommandFunctionType > mSubmitCommandHooks;
   std::map< ComponentDataType, MeasurementFunctionType > mRetrieveMeasurementHooks;
