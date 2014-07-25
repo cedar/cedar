@@ -327,12 +327,15 @@ void test()
   // check configuration
   //--------------------------------------------------------------------------------------------------------------------
 
-  test_arm_position->applyInitialConfiguration("default");
-  cedar::aux::sleep( test_arm_position->getDeviceStepSize() * 1.5 );
-  test_arm_position->stopDevice();
+  std::cout << "testing coordinate frames ..." << std::endl;
+  cedar::dev::SimulatedKinematicChainPtr test_coordinate_frames(new cedar::dev::SimulatedKinematicChain());
+  test_coordinate_frames->readJson("test_arm.json");
+  test_coordinate_frames->startDevice();
+  cedar::aux::sleep(test_coordinate_frames->getDeviceStepSize() * 1.5);
+  test_coordinate_frames->stopDevice();
 
   std::cout << "checking the root coordinate frame translation" << std::endl;
-  cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_arm_position->getRootCoordinateFrame();
+  cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_coordinate_frames->getRootCoordinateFrame();
 
   if
   (
@@ -381,7 +384,7 @@ void test()
   }
 
   std::cout << "checking the end-effector coordinate frame..." << std::endl;
-  cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_arm_position->getEndEffectorCoordinateFrame();
+  cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_coordinate_frames->getEndEffectorCoordinateFrame();
   if
   (
        !cedar::aux::math::isZero
