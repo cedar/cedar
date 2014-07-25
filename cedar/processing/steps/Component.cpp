@@ -46,8 +46,10 @@
 #include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
+#include <QHBoxLayout>
 #include <typeinfo>
 #include <vector>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // declaration
@@ -76,6 +78,132 @@ namespace
   bool declared = declare();
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// GUI for the group parameter
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::proc::details::ComponentStepGroupParameter,
+        cedar::proc::details::ComponentStepGroupParameterWidget
+      >();
+}
+
+cedar::proc::details::ComponentStepGroupParameterWidget::ComponentStepGroupParameterWidget()
+{
+  auto layout = new QHBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(layout);
+
+  this->mpSelector = new QComboBox();
+  layout->addWidget(this->mpSelector);
+
+  QObject::connect(this->mpSelector, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(selectedGroupChanged(const QString&)));
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::parameterChanged()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  CEDAR_ASSERT(parameter);
+
+  this->rebuildGroupList();
+
+  this->applyProperties();
+
+  QObject::connect(parameter.get(), SIGNAL(componentChanged()), this, SLOT(componentChanged()));
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::rebuildGroupList()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  CEDAR_ASSERT(parameter);
+
+  auto component = parameter->getComponent();
+  std::string current = parameter->getValue();
+
+  bool blocked = this->mpSelector->blockSignals(true);
+  this->mpSelector->clear();
+
+
+  this->mpSelector->addItem("all");
+  int select = 0;
+
+  if (component)
+  {
+    auto groups = component->listCommandGroups();
+
+    for (const auto& group : groups)
+    {
+      if (group == current)
+      {
+        select = this->mpSelector->count();
+      }
+      this->mpSelector->addItem(QString::fromStdString(group));
+    }
+  }
+  this->mpSelector->setCurrentIndex(select);
+  this->mpSelector->blockSignals(blocked);
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::propertiesChanged()
+{
+  this->applyProperties();
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::applyProperties()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  CEDAR_ASSERT(parameter);
+
+  this->mpSelector->setDisabled(parameter->isConstant());
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::componentChanged()
+{
+  this->rebuildGroupList();
+}
+
+void cedar::proc::details::ComponentStepGroupParameterWidget::selectedGroupChanged(const QString& group)
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::details::ComponentStepGroupParameter>(this->getParameter());
+  CEDAR_ASSERT(parameter);
+
+  if (group == "all")
+  {
+    parameter->setValue(std::string());
+  }
+  else
+  {
+    parameter->setValue(group.toStdString());
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// group parameter
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::details::ComponentStepGroupParameter::ComponentStepGroupParameter(cedar::aux::Configurable* owner, const std::string& name)
+:
+cedar::aux::ParameterTemplate<std::string>(owner, name, "")
+{
+}
+
+void cedar::proc::details::ComponentStepGroupParameter::setComponent(cedar::dev::ComponentPtr component)
+{
+  this->mComponent = component;
+
+  emit componentChanged();
+}
+
+cedar::dev::ComponentPtr cedar::proc::details::ComponentStepGroupParameter::getComponent()
+{
+  return this->mComponent;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,14 +212,35 @@ cedar::proc::steps::Component::Component()
 :
 cedar::proc::Step(true),
 mConnectedOnStart(false),
-_mComponent(new cedar::dev::ComponentParameter(this, "component"))
+_mComponent(new cedar::dev::ComponentParameter(this, "component")),
+_mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command group"))
 {
+  this->_mGroup->setConstant(true);
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChanged()));
+  QObject::connect(this->_mGroup.get(), SIGNAL(valueChanged()), this, SLOT(selectedGroupChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::steps::Component::hasComponent() const
+{
+  try
+  {
+    return this->_mComponent->hasComponentSlot() && static_cast<bool>(this->_mComponent->getValue());
+  }
+  catch (const cedar::dev::NoComponentSelectedException&)
+  {
+    return false;
+  }
+}
+
+
+void cedar::proc::steps::Component::selectedGroupChanged()
+{
+  this->rebuildInputs();
+}
 
 void cedar::proc::steps::Component::onStart()
 {
@@ -193,16 +342,41 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::steps::Component::componentChanged()
+void cedar::proc::steps::Component::rebuildInputs()
 {
-  //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
-  this->removeAllDataSlots();
+  this->removeAllSlots(cedar::proc::DataRole::INPUT);
 
   if (!this->hasComponent())
   {
     return;
   }
 
+  auto component = this->getComponent();
+  std::vector<cedar::dev::Component::ComponentDataType> commands;
+
+  std::string selected_group = this->_mGroup->getValue();
+  if (selected_group.empty())
+  {
+    auto installed_set = component->getInstalledCommandTypes();
+    commands.assign(installed_set.begin(), installed_set.end());
+  }
+  else
+  {
+    commands = component->getCommandsInGroup(selected_group);
+  }
+
+  for (const auto& command : commands)
+  {
+    std::string name = component->getNameForCommandType(command);
+    //!@todo On inputConnectionChanged, incoming data must be set at the component.
+    this->declareInput(name);
+  }
+}
+
+
+void cedar::proc::steps::Component::rebuildOutputs()
+{
+  this->removeAllSlots(cedar::proc::DataRole::OUTPUT);
   auto component = this->getComponent();
   auto measurements = component->getInstalledMeasurementTypes();
 
@@ -212,13 +386,20 @@ void cedar::proc::steps::Component::componentChanged()
     auto data = component->getMeasurementData(measurement);
     this->declareOutput(name, data);
   }
+}
 
-  auto commands = component->getInstalledCommandTypes();
-
-  for (const auto& command : commands)
+void cedar::proc::steps::Component::componentChanged()
+{
+  //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
+  if (!this->hasComponent())
   {
-    std::string name = component->getNameForCommandType(command);
-    //!@todo On inputConnectionChanged, incoming data must be set at the component.
-    this->declareInput(name);
+    return;
   }
+
+  this->rebuildOutputs();
+  this->rebuildInputs();
+
+  auto component = this->getComponent();
+  this->_mGroup->setConstant(!component->hasCommandGroups());
+  this->_mGroup->setComponent(component);
 }

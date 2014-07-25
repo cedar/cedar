@@ -70,6 +70,7 @@ _mCommandSetSpeed(new cedar::aux::StringParameter(this, "command set speed", "D"
 _mCommandSetEncoder(new cedar::aux::StringParameter(this, "command set encoder", "P")),
 _mCommandGetEncoder(new cedar::aux::StringParameter(this, "command get encoder", "Q"))
 {
+  this->init();
 }
 
 cedar::dev::kteam::DriveSerial::DriveSerial(cedar::dev::kteam::SerialChannelPtr channel)
@@ -79,6 +80,12 @@ _mCommandSetSpeed(new cedar::aux::StringParameter(this, "command set speed", "D"
 _mCommandSetEncoder(new cedar::aux::StringParameter(this, "command set encoder", "P")),
 _mCommandGetEncoder(new cedar::aux::StringParameter(this, "command get encoder", "Q"))
 {
+  this->init();
+}
+
+void cedar::dev::kteam::DriveSerial::init()
+{
+  this->registerDeviceCommandHook(cedar::dev::DifferentialDrive::WHEEL_SPEED, boost::bind(&cedar::dev::kteam::DriveSerial::sendMovementCommand, this));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,6 +98,7 @@ void cedar::dev::kteam::DriveSerial::sendMovementCommand()
   // of pulses per second (this is hardware-specific).
   // first: convert speed from m/s into Pulses/s ...
   std::vector<cedar::unit::Frequency> wheel_speed_pulses = convertWheelSpeedToPulses(getWheelSpeed());
+
 
   // construct the command string "D,x,y"
   // where x is the speed of the left wheel (in pulses/s)

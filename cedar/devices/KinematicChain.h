@@ -113,6 +113,13 @@ public:
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
   //!@endcond
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // exceptions
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Exception that is thrown when a type that is not installed is requested.
+  class InitialConfigurationNotFoundException : public cedar::aux::NotFoundException {};
+
   //----------------------------------------------------------------------------
   // constructors and destructor
   //----------------------------------------------------------------------------
@@ -535,11 +542,11 @@ public:
   // prefer using @addInitialConfiguration
   void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
   //!@brief set the currently valid initial configuration and apply it (i.e. move the manipulator to that configuration)
-  bool applyInitialConfiguration(const std::string& name);
+  void applyInitialConfiguration(const std::string& name);
   //!@brief apply the named initial configuration by index
   //
   // Prefer using @applyInitialConfiguration(string) for accessing named configurations
-  bool applyInitialConfiguration(unsigned int i);
+  void applyInitialConfiguration(unsigned int i);
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -590,7 +597,7 @@ private:
   ForwardKinematicsPtr mForwardKinematics;
 
   //!@brief map of the named initial configurations
-  std::map< std::string, cv::Mat > mInitialConfigurations;
+  std::map<std::string, cv::Mat> mInitialConfigurations;
   //!@brief the current initial configuration name
   std::string mCurrentInitialConfiguration;
   //!@brief lock for the initial configuration datas

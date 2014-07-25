@@ -104,6 +104,19 @@
   {\
     CEDAR_UNIT_TEST_PRINT_CONDITION_SUCCESS("threw an exception when " WHAT); \
   }
+#define CEDAR_UNIT_TEST_END_EXPECTING_SPECIFIC_EXCEPTION(ERROR_VAR_NAME, WHAT, TYPE) \
+    ++ERROR_VAR_NAME; \
+    CEDAR_UNIT_TEST_PRINT_FAILURE("did not throw an exception when " WHAT); \
+  } \
+  catch (TYPE& e) \
+  {\
+    CEDAR_UNIT_TEST_PRINT_CONDITION_SUCCESS("threw an exception when " WHAT); \
+  }\
+  catch (...)\
+  {\
+    ++ERROR_VAR_NAME; \
+    CEDAR_UNIT_TEST_PRINT_FAILURE("threw the wrong exception when " WHAT); \
+  }
 
 #define CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE() try {
 #define CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE(ERROR_VAR_NAME, WHAT) \

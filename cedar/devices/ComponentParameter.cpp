@@ -76,7 +76,7 @@ cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
   }
   CEDAR_THROW
   (
-    cedar::dev::NoComponentSelectedException, "The parameter" + this->getName() + "does not point to a component."
+    cedar::dev::NoComponentSelectedException, "The parameter \"" + this->getName() + "\" does not point to a component."
   );
 }
 
