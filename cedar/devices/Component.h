@@ -291,7 +291,7 @@ private:
 
   boost::optional<ComponentDataType> mDeviceCommandSelection;
 
-  std::set<ComponentDataType> mUserCommandUsed;
+  cedar::aux::LockableMember<std::set<ComponentDataType>> mUserCommandUsed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
