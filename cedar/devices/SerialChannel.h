@@ -65,6 +65,7 @@ class cedar::dev::SerialChannel : public QObject, public cedar::dev::Channel
 public:
   //! Exception that notifies the user if something goes wrong during writing.
   class WriteException : public cedar::aux::ExceptionBase {};
+  class BoostException : public cedar::aux::ExceptionBase {};
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
