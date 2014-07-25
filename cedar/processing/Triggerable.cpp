@@ -201,6 +201,7 @@ void cedar::proc::Triggerable::callOnStart()
   bool exception_occurred = false;
   if (this->mStartCalls == 0)
   {
+    locker.unlock();
     exception_occurred
       = this->exceptionWrappedCall
         (
@@ -208,6 +209,7 @@ void cedar::proc::Triggerable::callOnStart()
           "An exception occurred while calling onStart(). You can fix this by restarting the trigger. The exception is",
           cedar::proc::Triggerable::STATE_EXCEPTION_ON_START
         );
+    locker.relock();
   }
 
   // count how often this triggerable was started
@@ -216,7 +218,6 @@ void cedar::proc::Triggerable::callOnStart()
     ++this->mStartCalls;
   }
 
-  locker.unlock();
 
   if (this->mStartCalls == 1)
   {
@@ -263,14 +264,15 @@ void cedar::proc::Triggerable::callOnStop()
 
   if (this->mStartCalls == 0)
   {
+    locker.unlock();
     this->exceptionWrappedCall
     (
       boost::bind(&cedar::proc::Triggerable::onStop, this),
       "An exception occurred while calling onStop()"
     );
+    locker.relock();
   }
 
-  locker.unlock();
 
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 
