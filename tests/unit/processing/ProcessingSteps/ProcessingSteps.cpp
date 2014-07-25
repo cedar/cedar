@@ -51,6 +51,7 @@
 #include "cedar/auxiliaries/NullLogger.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/units/prefixes.h"
+#include "cedar/testingUtilities/helpers.h"
 
 // global includes
 #include <QApplication>
@@ -83,19 +84,12 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
 {
   // try connecting steps of different types
   unsigned int i = 0;
-  try
-  {
+  CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
     network->add(testStep, "testStep");
 
     // test if the step reacts properly when its parameters change (without an input)
-    for
-    (
-      cedar::aux::Configurable::ParameterList::iterator iter = testStep->getParameters().begin();
-      iter != testStep->getParameters().end();
-      ++iter
-    )
+    for (auto parameter : testStep->getParameters())
     {
-      cedar::aux::ParameterPtr parameter = *iter;
       std::cout << "Emitting valueChanged() of parameter \"" << parameter->getName() << "\"." << std::endl;
       parameter->emitChangedSignal();
 
@@ -107,56 +101,50 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
     }
 
     // how many inputs does this step have?
-    const cedar::proc::Connectable::SlotList& inputs = testStep->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
-    std::vector<std::string> sources;
-    sources.push_back("0D.boost");
-    sources.push_back("1D.Gauss input");
-    sources.push_back("2D.Gauss input");
-    sources.push_back("3D.Gauss input");
-    sources.push_back("double_0D.converted matrix");
-    sources.push_back("double_1D.converted matrix");
-    sources.push_back("double_2D.converted matrix");
-    sources.push_back("double_3D.converted matrix");
-    sources.push_back("emp.empty matrix");
-    for (unsigned int src = 0; src < sources.size(); ++src)
+    if (testStep->hasRole(cedar::proc::DataRole::INPUT))
     {
-      std::cout << "Connecting " << sources.at(src) << " to " << inputs.at(i)->getName() << std::endl;
-      for (unsigned int i = 0; i < inputs.size(); ++i)
+      const cedar::proc::Connectable::SlotList& inputs = testStep->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
+      std::vector<std::string> sources;
+      sources.push_back("0D.boost");
+      sources.push_back("1D.Gauss input");
+      sources.push_back("2D.Gauss input");
+      sources.push_back("3D.Gauss input");
+      sources.push_back("double_0D.converted matrix");
+      sources.push_back("double_1D.converted matrix");
+      sources.push_back("double_2D.converted matrix");
+      sources.push_back("double_3D.converted matrix");
+      sources.push_back("emp.empty matrix");
+      for (unsigned int src = 0; src < sources.size(); ++src)
       {
-        network->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
-      }
+        std::cout << "Connecting " << sources.at(src) << " to " << inputs.at(i)->getName() << std::endl;
+        for (unsigned int i = 0; i < inputs.size(); ++i)
+        {
+          network->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
+        }
 
-      if (!testStep->isLooped())
-      {
-        testStep->onTrigger();
-      }
-      else
-      {
-        // send a dummy step time
-        cedar::unit::Time time(0.1 * cedar::unit::milli * cedar::unit::seconds);
-        cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(time));
-        testStep->onTrigger(arguments);
-      }
+        if (!testStep->isLooped())
+        {
+          testStep->onTrigger();
+        }
+        else
+        {
+          // send a dummy step time
+          cedar::unit::Time time(0.1 * cedar::unit::milli * cedar::unit::seconds);
+          cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(time));
+          testStep->onTrigger(arguments);
+        }
 
-      // try a reset
-      testStep->callReset();
+        // try a reset
+        testStep->callReset();
 
-      for (unsigned int i = 0; i < inputs.size(); ++i)
-      {
-        network->disconnectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
+        for (unsigned int i = 0; i < inputs.size(); ++i)
+        {
+          network->disconnectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
+        }
       }
     }
     network->removeAll();
-  }
-  catch (cedar::proc::InvalidRoleException& exc)
-  {
-    // that's fine, it's a source
-  }
-  catch (cedar::aux::ExceptionBase& exc)
-  {
-    exc.printInfo();
-    ++i;
-  }
+  CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE(i, "testing step.");
   return i;
 }
 
