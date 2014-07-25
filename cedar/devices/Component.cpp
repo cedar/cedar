@@ -122,22 +122,7 @@ class cedar::dev::Component::DataCollection
 
     cedar::aux::DataPtr getDeviceData(const cedar::dev::Component::ComponentDataType &type)
     {
-      if (!this->hasType(type))
-      {
-        CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type does not exist.");
-      }
-
-      QReadLocker locker(this->mDeviceRetrievedData.getLockPtr());
-
-      auto iter = this->mDeviceRetrievedData.member().find(type);
-      CEDAR_DEBUG_ASSERT(iter != this->mDeviceRetrievedData.member().end());
-
-      auto ptr_copy = iter->second;
-      if (!iter->second || iter->second->getData().empty())
-      {
-        CEDAR_THROW(cedar::dev::Component::DimensionalityNotSetException, "The data does not exist.");
-      }
-      return ptr_copy;
+      return this->getData(this->mDeviceRetrievedData, type);
     }
 
     void setDimensionality(cedar::dev::Component::ComponentDataType type, unsigned int dim)
@@ -243,14 +228,12 @@ class cedar::dev::Component::DataCollection
 
     cedar::aux::ConstMatDataPtr getUserData(ComponentDataType type) const
     {
-      //!@todo lock and check type
-      return this->mUserBuffer.member().find(type)->second;
+      return this->getData(this->mUserBuffer, type);
     }
 
     cedar::aux::MatDataPtr getUserData(ComponentDataType type)
     {
-      //!@todo lock and check type
-      return this->mUserBuffer.member().find(type)->second;
+      return this->getData(this->mUserBuffer, type);
     }
 
     double getUserBufferIndex(ComponentDataType type, int index) const
@@ -342,6 +325,31 @@ class cedar::dev::Component::DataCollection
     }
 
   private:
+    cedar::aux::MatDataPtr getData(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type)
+    {
+      return boost::const_pointer_cast<cedar::aux::MatData>(const_cast<ConstDataCollection*>(this)->getData(bufferData, type));
+    }
+
+    cedar::aux::ConstMatDataPtr getData(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
+    {
+      if (!this->hasType(type))
+      {
+        CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "The given type does not exist.");
+      }
+
+      QReadLocker locker(bufferData.getLockPtr());
+
+      auto iter = bufferData.member().find(type);
+      CEDAR_DEBUG_ASSERT(iter != bufferData.member().end());
+
+      auto ptr_copy = iter->second;
+      if (!iter->second || iter->second->getData().empty())
+      {
+        CEDAR_THROW(cedar::dev::Component::DimensionalityNotSetException, "The data has not yet been initialized.");
+      }
+      return ptr_copy;
+    }
+
     cv::Mat getBuffer(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
     {
       QReadLocker lock(bufferData.getLockPtr());
