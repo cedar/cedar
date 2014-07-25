@@ -59,17 +59,25 @@ public:
       CEDAR_UNIT_TEST_CONDITION(errors, name == "command0");
     }
 
-    //TODO test if exception is thrown when same type is installed again
+    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION();
+    this->installCommandType(0, "command0");
+    CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "installing the same command type again.");
 
-    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
+    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION();
     this->getNameForCommandType(1);
     CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "retrieving name of uninstalled command type.");
 
-    this->installMeasurementType(0, "measurement0");
-    auto name = this->getNameForMeasurementType(0);
-    CEDAR_UNIT_TEST_CONDITION(errors, name == "measurement0");
+    {
+      this->installMeasurementType(0, "measurement0");
+      auto name = this->getNameForMeasurementType(0);
+      CEDAR_UNIT_TEST_CONDITION(errors, name == "measurement0");
+    }
 
-    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
+    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION();
+    this->installMeasurementType(0, "measurement0");
+    CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "installing the same measurement type again.");
+
+    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION();
     this->getNameForMeasurementType(1);
     CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "retrieving name of uninstalled measurement type.");
 
@@ -90,7 +98,19 @@ public:
     this->registerDeviceMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
     CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "registering a hook for an uninstalled measurement type.");
 
-    //!@todo Test duplicate registration
+    CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
+    this->installCommandAndMeasurementType(0, "test");
+    this->registerDeviceMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
+    this->registerDeviceCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
+    CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE(errors, "registering a measurement.");
+
+    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
+    this->registerDeviceMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
+    CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "registering measurement hook a second time");
+
+    CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
+    this->registerDeviceCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
+    CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "registering command hook a second time");
 
     return errors;
   }
