@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/testingUtilities/helpers.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -369,18 +370,46 @@ void test()
     // all is well!
   }
 
+  // create instance of test class
+  std::cout << "testing setting of initial configurations ..." << std::endl;
+  cedar::dev::SimulatedKinematicChainPtr test_arm_initial(new cedar::dev::SimulatedKinematicChain());
+  test_arm_initial->readJson("test_arm.json");
+
+  CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
+  test_arm_initial->applyInitialConfiguration("default");
+  CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE
+  (
+    errors,
+    "applying existing initial configuration."
+  );
+
+  CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION();
+  test_arm_initial->applyInitialConfiguration("peter");
+  CEDAR_UNIT_TEST_END_EXPECTING_SPECIFIC_EXCEPTION
+  (
+    errors,
+    "applying non-existing initial configuration.",
+    cedar::dev::KinematicChain::InitialConfigurationNotFoundException
+  );
+
   //--------------------------------------------------------------------------------------------------------------------
   // check configuration
   //--------------------------------------------------------------------------------------------------------------------
 
 //  test_arm_position->applyInitialConfiguration("default");
-  test_arm_position->setJointAngles( cv::Mat::zeros( test_arm_position->getNumberOfJoints(), 1, CV_64F) );
-  test_arm_position->startDevice();
-  cedar::aux::sleep( test_arm_position->getDeviceStepSize() * 1.5 );
-  test_arm_position->stopDevice();
+  std::cout << "testing coordinate frames ..." << std::endl;
+  cedar::dev::SimulatedKinematicChainPtr test_coordinate_frames(new cedar::dev::SimulatedKinematicChain());
+  test_coordinate_frames->readJson("test_arm.json");
+  test_coordinate_frames->startDevice();
+  test_coordinate_frames->setJointAngles( cv::Mat::zeros( test_arm_position->getNumberOfJoints(), 1, CV_64F) );
+  cedar::aux::sleep(test_coordinate_frames->getDeviceStepSize() * 1.5);
+  test_coordinate_frames->stopDevice();
+
+
+
 
   std::cout << "checking the root coordinate frame translation" << std::endl;
-  cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_arm_position->getRootCoordinateFrame();
+  cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_coordinate_frames->getRootCoordinateFrame();
 
   if
   (
@@ -429,7 +458,7 @@ void test()
   }
 
   std::cout << "checking the end-effector coordinate frame..." << std::endl;
-  cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_arm_position->getEndEffectorCoordinateFrame();
+  cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_coordinate_frames->getEndEffectorCoordinateFrame();
   if
   (
        !cedar::aux::math::isZero
@@ -481,8 +510,8 @@ void test()
   // transformations
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: transformations" << std::endl;
-  cv::Mat joint_transformation_1 = test_arm_position->getJointTransformation(1);
-  cv::Mat joint_transformation_3 = test_arm_position->getJointTransformation(3);
+  cv::Mat joint_transformation_1 = test_coordinate_frames->getJointTransformation(1);
+  cv::Mat joint_transformation_3 = test_coordinate_frames->getJointTransformation(3);
   if (
       // transformation to joint 1 frame
       !cedar::aux::math::isZero(joint_transformation_1.at<double>(0, 0) - 0)
@@ -555,8 +584,8 @@ void test()
   origin.at<double>( 3, 0 ) = 1;
   cv::Mat jacobian_1 = cv::Mat::zeros(3, 4, CV_64FC1);
   cv::Mat jacobian_3 = cv::Mat::zeros(3, 4, CV_64FC1);
-  jacobian_1 = test_arm_position->calculateCartesianJacobian(origin, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
-  jacobian_3 = test_arm_position->calculateCartesianJacobian(origin, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  jacobian_1 = test_coordinate_frames->calculateCartesianJacobian(origin, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  jacobian_3 = test_coordinate_frames->calculateCartesianJacobian(origin, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
   if (
       // Jacobian of joint 1
       !cedar::aux::math::isZero(jacobian_1.at<double>(0, 0) - 0)
@@ -579,7 +608,7 @@ void test()
         norm
         (
           jacobian_1
-          - test_arm_position->calculateCartesianJacobian(origin, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES)
+          - test_coordinate_frames->calculateCartesianJacobian(origin, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES)
         )
       )
       // Jacobian of joint 3
@@ -603,7 +632,7 @@ void test()
         norm
         (
           jacobian_3
-          - test_arm_position->calculateCartesianJacobian(origin, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES)
+          - test_coordinate_frames->calculateCartesianJacobian(origin, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES)
         )
       )
     )
@@ -620,7 +649,7 @@ std::cout << "test j3 " << jacobian_3 << std::endl;
   }
 
   std::cout << "test: calculateSpatialJacobian" << std::endl;
-  cv::Mat spatial_jacobian = test_arm_position->calculateSpatialJacobian(test_arm_position->getNumberOfJoints()-1);
+  cv::Mat spatial_jacobian = test_coordinate_frames->calculateSpatialJacobian(test_arm_position->getNumberOfJoints()-1);
   if (
       !cedar::aux::math::isZero(spatial_jacobian.at<double>(0, 0) - 0)
       || !cedar::aux::math::isZero(spatial_jacobian.at<double>(1, 0) - 0)
@@ -666,7 +695,7 @@ std::cout << " spatial " << spatial_jacobian << std::endl;
   // end-effector jacobian
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorJacobian" << std::endl;
-  cv::Mat end_effector_jacobian = test_arm_position->calculateEndEffectorJacobian();
+  cv::Mat end_effector_jacobian = test_coordinate_frames->calculateEndEffectorJacobian();
   if (
       !cedar::aux::math::isZero(end_effector_jacobian.at<double>(0, 0) - 0)
       || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(1, 0) - 8)
@@ -898,6 +927,7 @@ std::cout << a_eef << std::endl;
   {
     std::cout << "passed" << std::endl;
   }
+
 
   QApplication::exit(errors);
 }

@@ -60,10 +60,19 @@ int main(int argc, char **argv)
   head->readJson(head_configuration_file);
 
   // create gl visualization objects
-  cedar::dev::gl::PowerCubeWrist90Ptr head_visualization
-  (
-    new cedar::dev::gl::PowerCubeWrist90(head)
-  );
+  cedar::dev::gl::PowerCubeWrist90Ptr head_visualization;
+  try
+  {
+    head_visualization = cedar::dev::gl::PowerCubeWrist90Ptr
+                         (
+                           new cedar::dev::gl::PowerCubeWrist90(head)
+                         );
+  }
+  catch (cedar::aux::ResourceNotFoundException& exc)
+  {
+    std::cout << "Not all required meshes could be found. Please contact cedar support to get them." << std::endl;
+    return -1;
+  }
 
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene());
