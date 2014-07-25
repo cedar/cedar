@@ -324,7 +324,72 @@ class cedar::dev::Component::DataCollection
       return boost::optional<TransformationFunctionType>();
     }
 
+    void defineGroup(const std::string& groupName)
+    {
+      QWriteLocker locker(this->mGroups.getLockPtr());
+      if (this->hasGroupUnlocked(groupName))
+      {
+        CEDAR_THROW(cedar::dev::Component::DuplicateGroupNameException, "The group name \"" + groupName + "\" already exists.");
+      }
+      this->mGroups.member()[groupName] = std::vector<cedar::dev::Component::ComponentDataType>();
+    }
+
+    std::vector<std::string> listGroups() const
+    {
+      QReadLocker locker(this->mGroups.getLockPtr());
+      std::vector<std::string> groups;
+      groups.reserve(this->mGroups.member().size());
+      for (const auto& group_vector_pair : this->mGroups.member())
+      {
+        groups.push_back(group_vector_pair.first);
+      }
+      return groups;
+    }
+
+    void addTypeToGroup(const std::string& groupName, const ComponentDataType& commandType)
+    {
+      QWriteLocker locker(this->mGroups.getLockPtr());
+      auto iter = this->mGroups.member().find(groupName);
+      if (iter == this->mGroups.member().end())
+      {
+        CEDAR_THROW(GroupNameNotFoundException, "Could not find a group with the name \"" + groupName + "\".");
+      }
+      iter->second.push_back(commandType);
+    }
+
+    bool hasGroup(const std::string& groupName)
+    {
+      QReadLocker locker(this->mGroups.getLockPtr());
+      bool exists = this->hasGroupUnlocked(groupName);
+      return exists;
+    }
+
+    bool hasGroups() const
+    {
+      QReadLocker locker(this->mGroups.getLockPtr());
+      bool has_groups = this->mGroups.member().size() > 0;
+      return has_groups;
+    }
+
+    std::vector<ComponentDataType> getTypesInGroup(const std::string& groupName) const
+    {
+      QReadLocker locker(this->mGroups.getLockPtr());
+      auto iter = this->mGroups.member().find(groupName);
+      if (iter == this->mGroups.member().end())
+      {
+        CEDAR_THROW(GroupNameNotFoundException, "Could not find a group with the name \"" + groupName + "\".");
+      }
+
+      std::vector<ComponentDataType> copy = iter->second;
+      return copy;
+    }
+
   private:
+    bool hasGroupUnlocked(const std::string& groupName)
+    {
+      return this->mGroups.member().find(groupName) != this->mGroups.member().end();
+    }
+
     cedar::aux::MatDataPtr getData(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type)
     {
       return boost::const_pointer_cast<cedar::aux::MatData>(const_cast<ConstDataCollection*>(this)->getData(bufferData, type));
@@ -470,6 +535,8 @@ class cedar::dev::Component::DataCollection
     cedar::aux::LockableMember<std::set<cedar::dev::Component::ComponentDataType> > mInstalledTypes;
 
     cedar::aux::LockableMember<std::map<cedar::dev::Component::ComponentDataType, std::string> > mInstalledNames;
+
+    cedar::aux::LockableMember<std::map<std::string, std::vector<cedar::dev::Component::ComponentDataType> > > mGroups;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -515,6 +582,31 @@ cedar::dev::Component::~Component()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dev::Component::defineCommandGroup(const std::string& groupName)
+{
+  this->mCommandData->defineGroup(groupName);
+}
+
+std::vector<std::string> cedar::dev::Component::listCommandGroups() const
+{
+  return this->mCommandData->listGroups();
+}
+
+void cedar::dev::Component::addCommandTypeToGroup(const std::string& groupName, const ComponentDataType& commandType)
+{
+  this->mCommandData->addTypeToGroup(groupName, commandType);
+}
+
+bool cedar::dev::Component::hasCommandGroups() const
+{
+  return this->mCommandData->hasGroups();
+}
+
+std::vector<cedar::dev::Component::ComponentDataType> cedar::dev::Component::getCommandsInGroup(const std::string& groupName) const
+{
+  return this->mCommandData->getTypesInGroup(groupName);
+}
+
 unsigned int cedar::dev::Component::getCommandDimensionality(ComponentDataType type) const
 {
   return this->mCommandData->getDimensionality(type);
@@ -558,6 +650,16 @@ cedar::aux::DataPtr cedar::dev::Component::getMeasurementData(const ComponentDat
 cedar::aux::ConstDataPtr cedar::dev::Component::getMeasurementData(const ComponentDataType &type) const
 {
   return this->mMeasurementData->getUserData(type);
+}
+
+cedar::aux::DataPtr cedar::dev::Component::getUserCommandData(const ComponentDataType &type)
+{
+  return this->mCommandData->getUserData(type);
+}
+
+cedar::aux::ConstDataPtr cedar::dev::Component::getUserCommandData(const ComponentDataType &type) const
+{
+  return this->mCommandData->getUserData(type);
 }
 
 cedar::aux::ConstDataPtr cedar::dev::Component::getDeviceCommandData(const ComponentDataType &type) const
