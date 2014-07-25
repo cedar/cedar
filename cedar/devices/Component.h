@@ -89,8 +89,11 @@ private:
   // exceptions
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Exception that is thrown when a type that is not installed is requested.
+  //! Exception that is thrown when a buffer is initialized more than once.
   class AlreadyInitializedException : public cedar::aux::ExceptionBase {};
+
+  //! Exception that is thrown when a function that requires the component to be stopped is called during running.
+  class AlreadyRunningException : public cedar::aux::ExceptionBase {};
 
   //! Exception that is thrown when a type that is not installed is requested.
   class TypeNotFoundException : public cedar::aux::NotFoundException {};

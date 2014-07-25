@@ -754,20 +754,13 @@ void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat
 
 void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
-  // todo: lazyInitialize for command restrictions
-
-  // Device is not meant to be running
-  // todo: throw if already running!
-  // todo: throw if not empty
-
-  // todo: there is no lock here. I think we dont need one, sure?
-
-  auto found = this->mCommandData->mInitialUserSubmittedData.member().find(type);
-  if (found == this->mCommandData->mInitialUserSubmittedData.member().end())
+  if (this->isRunning())
   {
-    this->mCommandData->mInitialUserSubmittedData.member()[type] =  cedar::aux::MatDataPtr(new cedar::aux::MatData());
+    // cannot set initial commands if a component is already running
+    CEDAR_THROW(AlreadyRunningException, "Cannot set initial commands if device is running.");
   }
 
+  QWriteLocker(this->mCommandData->mInitialUserSubmittedData.getLockPtr());
   this->mCommandData->mInitialUserSubmittedData.member()[type]->setData(data.clone());
 }
 
