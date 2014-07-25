@@ -97,19 +97,29 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(scene->getSceneLimit());
 
   // create visualization objects
-  cedar::dev::gl::CarenPtr caren_visualization
-  (
-    new cedar::dev::gl::Caren
-    (
-      caren_trunk,
-      caren_arm,
-      caren_head,
-      palm,
-      finger_one,
-      finger_two,
-      finger_three
-    )
-  );
+  cedar::dev::gl::CarenPtr caren_visualization;
+  try
+  {
+    caren_visualization =
+      cedar::dev::gl::CarenPtr
+      (
+        new cedar::dev::gl::Caren
+        (
+          caren_trunk,
+          caren_arm,
+          caren_head,
+          palm,
+          finger_one,
+          finger_two,
+          finger_three
+        )
+      );
+  }
+  catch (cedar::aux::ResourceNotFoundException& exc)
+  {
+    std::cout << "Not all required meshes could be found. Please contact cedar support to get them." << std::endl;
+    return -1;
+  }
 
   // add visualization objects to scene
   scene->addObjectVisualization(caren_visualization);
