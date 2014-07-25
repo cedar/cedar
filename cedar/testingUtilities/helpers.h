@@ -39,11 +39,21 @@
 
 #include <iostream>
 
+#ifdef CEDAR_OS_LINUX
+  #define CEDAR_UNIT_TEST_BEGIN_RED_FONT "\033[0;31m"
+  #define CEDAR_UNIT_TEST_BEGIN_GREEN_FONT "\033[0;32m"
+  #define CEDAR_UNIT_TEST_END_FONT "\033[m"
+#else // CEDAR_OS_LINUX
+  #define CEDAR_UNIT_TEST_BEGIN_RED_FONT ""
+  #define CEDAR_UNIT_TEST_BEGIN_GREEN_FONT ""
+  #define CEDAR_UNIT_TEST_END_RED_FONT ""
+#endif // CEDAR_OS_LINUX
+
 #define CEDAR_UNIT_TEST_PRINT_SUCCESS(MESSAGE) \
-    std::cout << "Line " << __LINE__ << ": passed. " << MESSAGE << std::endl;\
+    std::cout << "Line " << __LINE__ << ": " << CEDAR_UNIT_TEST_BEGIN_GREEN_FONT << "passed" << CEDAR_UNIT_TEST_END_FONT << ". " << MESSAGE << std::endl;\
 
 #define CEDAR_UNIT_TEST_PRINT_FAILURE(MESSAGE) \
-    std::cout << "Line " << __LINE__ << ": FAILED. " << MESSAGE << std::endl;\
+    std::cout << "Line " << __LINE__ << ": " << CEDAR_UNIT_TEST_BEGIN_RED_FONT << "FAILED" << CEDAR_UNIT_TEST_END_FONT << ". " << MESSAGE << std::endl;\
 
 /*! Tests a condition. If the condition fails, increases an error variable and prints a message. Also prints a message
  *  on success.
