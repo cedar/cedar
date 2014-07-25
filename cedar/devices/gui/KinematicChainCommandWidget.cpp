@@ -129,13 +129,14 @@ void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
 {
-  // js: don't need to change the user selection mpModeBox->setCurrentIndex(1);
+  mpKeepMovingBox->setChecked(false);
   mpKinematicChain->clearUserCommand();
   for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
   {
     mpKinematicChain->setJointVelocity(j, 0);
   }
   update();
+  mpKinematicChain->clearUserCommand();
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::update()

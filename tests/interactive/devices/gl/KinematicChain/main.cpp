@@ -109,12 +109,12 @@ int main(int argc, char **argv)
   second_arm->setJointVelocity(2, .1);
   second_arm->setJointVelocity(3, .1);
 
-  test_arm->startDevice();
   second_arm->startDevice();
   viewer.startTimer(20);
   a.exec();
 
   test_arm->stopDevice();
+  second_arm->stopDevice();
 
   return 0;
 }
