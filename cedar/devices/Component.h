@@ -110,6 +110,12 @@ public:
   //! Exception that is thrown when the command type could not be guessed.
   class CouldNotGuessCommandTypeException : public cedar::aux::ExceptionBase {};
 
+  //! Thrown when a group name already exists.
+  class DuplicateGroupNameException : public cedar::aux::DuplicateNameException {};
+
+  //! Thrown when a group name cannot be found.
+  class GroupNameNotFoundException : public cedar::aux::NotFoundException {};
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -212,6 +218,22 @@ public:
 
   //!@brief this function resets the internally used user command and allows to subsequently use a different type
   void clearUserCommand();
+
+
+  //! Defines a new command group.
+  void defineCommandGroup(const std::string& groupName);
+
+  //! Lists all available command groups.
+  std::vector<std::string> listCommandGroups() const;
+
+  //! Adds a given command to the specified group.
+  void addCommandTypeToGroup(const std::string& groupName, const ComponentDataType& commandType);
+
+  //! Checks whether any command groups are defined for this component.
+  bool hasCommandGroups() const;
+
+  //! Returns the command types that are in the given command group.
+  std::vector<ComponentDataType> getCommandsInGroup(const std::string& groupName) const;
 
 signals:
   void updatedUserMeasurementSignal();
