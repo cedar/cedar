@@ -762,13 +762,11 @@ void cedar::dev::KinematicChain::deleteInitialConfiguration(const std::string &n
   auto found = mInitialConfigurations.find(name);
   if (found == mInitialConfigurations.end())
   {
-    cedar::aux::LogSingleton::getInstance()->warning
+    CEDAR_THROW
     (
-      "You are deleting the initial configuration " + name 
-      + " which doesn't exist.",
-      "cedar::dev::robot::KinematicChain::deleteInitialConfiguration(const std::string &name)"
+      InitialConfigurationNotFoundException,
+      "You are deleting the initial configuration " + name + " which doesn't exist."
     );
-    return;
   }
 
   mInitialConfigurations.erase(found);
@@ -825,7 +823,7 @@ bool cedar::dev::KinematicChain::setCurrentInitialConfiguration(const std::strin
   return true; //TODO: should this use a return value to communicate potential errors?
 }
 
-bool cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& name)
+void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& name)
 {
   QReadLocker rlock(&mCurrentInitialConfigurationLock);
 
@@ -848,32 +846,31 @@ bool cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
       setInitialUserCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
       //setJointAngles( f->second );
     }
-
-    return true;
+    return;
   }
 
-  cedar::aux::LogSingleton::getInstance()->warning
+  CEDAR_THROW
   (
-    "You tried to apply an initial configuration that was not registered. "
-    "Doing nothing.",
-    "cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string)"
+    InitialConfigurationNotFoundException,
+    "You tried to apply an initial configuration that was not registered."
   );
-  return false;
 }
 
 
-bool cedar::dev::KinematicChain::applyInitialConfiguration(unsigned int index)
+void cedar::dev::KinematicChain::applyInitialConfiguration(unsigned int index)
 {
   QReadLocker rlock(&mCurrentInitialConfigurationLock);
 
   if (index >= mInitialConfigurations.size())
   {
-    CEDAR_THROW(cedar::aux::InvalidNameException ,
-                "You tried to apply an initial configuration with index "
-                 + boost::lexical_cast<std::string>(index) 
-                 + "' which doesnt exist. Size: " 
-                 + boost::lexical_cast<std::string>(mInitialConfigurations.size()) );
-    return false;
+    CEDAR_THROW
+    (
+      InitialConfigurationNotFoundException,
+      "You tried to apply an initial configuration with index "
+                       + boost::lexical_cast<std::string>(index)
+                       + "' which doesn't exist. Size: "
+                       + boost::lexical_cast<std::string>(mInitialConfigurations.size())
+    );
   }
 
   unsigned int j = 0;
@@ -886,9 +883,6 @@ bool cedar::dev::KinematicChain::applyInitialConfiguration(unsigned int index)
     }
     j++;
   }
-
-  // you cant land here
-  return false;
 }
 
 unsigned int cedar::dev::KinematicChain::getCurrentInitialConfigurationIndex()

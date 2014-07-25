@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/testingUtilities/helpers.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -299,6 +300,29 @@ void test()
   {
     // all is well!
   }
+
+  // create instance of test class
+  std::cout << "testing setting of initial configurations ..." << std::endl;
+  cedar::dev::SimulatedKinematicChainPtr test_arm_initial(new cedar::dev::SimulatedKinematicChain());
+  test_arm_initial->readJson("test_arm.json");
+
+  CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
+  test_arm_initial->applyInitialConfiguration("default");
+  CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE
+  (
+    errors,
+    "applying existing initial configuration."
+  );
+
+  CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION();
+  test_arm_initial->applyInitialConfiguration("peter");
+  CEDAR_UNIT_TEST_END_EXPECTING_SPECIFIC_EXCEPTION
+  (
+    errors,
+    "applying non-existing initial configuration.",
+    cedar::dev::KinematicChain::InitialConfigurationNotFoundException
+  );
+
 
   QApplication::exit(errors);
 }
