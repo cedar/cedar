@@ -90,7 +90,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! Exception that is thrown when a type that is not installed is requested.
+  class AlreadyInitializedException : public cedar::aux::ExceptionBase {};
+
+  //! Exception that is thrown when a type that is not installed is requested.
   class TypeNotFoundException : public cedar::aux::NotFoundException {};
+
+  //! Exception that is thrown when a hook is set that already exists.
+  class DuplicateTypeException : public cedar::aux::DuplicateIdException {};
 
   //! Exception that is thrown when a hook is set that already exists.
   class DuplicateHookException : public cedar::aux::DuplicateIdException {};

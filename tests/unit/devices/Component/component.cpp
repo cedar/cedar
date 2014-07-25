@@ -75,7 +75,12 @@ public:
 
     CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION();
     this->installMeasurementType(0, "measurement0");
-    CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "installing the same measurement type again.");
+    CEDAR_UNIT_TEST_END_EXPECTING_SPECIFIC_EXCEPTION
+    (
+      errors,
+      "installing the same measurement type again.",
+      cedar::dev::Component::DuplicateTypeException
+    );
 
     CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION();
     this->getNameForMeasurementType(1);

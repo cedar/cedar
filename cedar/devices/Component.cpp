@@ -56,9 +56,12 @@ class cedar::dev::Component::DataCollection
   public:
     void installType(cedar::dev::Component::ComponentDataType type, const std::string& name)
     {
+      if (this->hasType(type))
+      {
+        CEDAR_THROW(DuplicateTypeException, "This type already exists.");
+      }
       QWriteLocker locker(this->mInstalledTypes.getLockPtr());
       QWriteLocker locker_b(this->mInstalledNames.getLockPtr());
-      // lazyInitialize whether already registered and throw TODO
       mInstalledTypes.member().insert(type);
       mInstalledNames.member()[type] = name;
       cedar::aux::LockSet lock_set;
@@ -273,15 +276,12 @@ class cedar::dev::Component::DataCollection
 
     void registerTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
     {
-      // todo checks
-      // todo locks
+      QWriteLocker locker(this->mTransformationHooks.getLockPtr());
+      auto found = this->mTransformationHooks.member().find(from);
 
-
-      auto found = this->mTransformationHooks.find( from );
-
-      if (found == this->mTransformationHooks.end())
+      if (found == this->mTransformationHooks.member().end())
       {
-        this->mTransformationHooks[ from ] = InnerTransformationHookContainerType{ {to, fun} };
+        this->mTransformationHooks.member()[from] = InnerTransformationHookContainerType{ {to, fun} };
       }
       else
       {
@@ -300,16 +300,16 @@ class cedar::dev::Component::DataCollection
           );
         }
 
-        (found->second)[ to ] = fun;
+        (found->second)[to] = fun;
       }
-      //  std::cout << "registered user command trafo from " << from << " to: " << to << std::endl;
     }
 
     boost::optional<TransformationFunctionType> findTransformationHook(ComponentDataType from, ComponentDataType to) const
     {
-      auto found_outer = this->mTransformationHooks.find(from);
+      QReadLocker locker(this->mTransformationHooks.getLockPtr());
+      auto found_outer = this->mTransformationHooks.member().find(from);
 
-      if (found_outer != this->mTransformationHooks.end())
+      if (found_outer != this->mTransformationHooks.member().end())
       {
         const auto& inner = found_outer->second;
         auto found_inner = inner.find(to);
@@ -360,15 +360,13 @@ class cedar::dev::Component::DataCollection
 
     cv::Mat getBufferUnlocked(const cedar::aux::LockableMember<BufferDataType>& bufferData, ComponentDataType type) const
     {
-      //!@todo CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! CONST CAST! Mutti there is a CONST CAST here!
       if (!this->hasType(type))
       {
-        CEDAR_ASSERT(false && "Type is not registered.");
+        CEDAR_THROW(TypeNotFoundException, "This type is not installed.");
       }
-//      const_cast<DataCollection*>(this)->lazyInitializeUnlocked(const_cast<cedar::aux::LockableMember<BufferDataType>&>(bufferData), type);
       auto found = bufferData.member().find(type);
 
-    // problem: NEED to initialize with correct value!
+      // problem: NEED to initialize with correct value!
       if (found == bufferData.member().end())
       {
         // todo: kann nicht passieren, throw
@@ -376,8 +374,6 @@ class cedar::dev::Component::DataCollection
         // todo: warning werfen, wenn letzte Messung zu lange her ...
         //!@todo this'll print a warning in case these things go wrong; replace by throw
         CEDAR_NON_CRITICAL_ASSERT(false && "This should not happen");
-        // lazy initialization
-        // cast away const for lazy init to work
       }
 
       return found->second->getData();
@@ -399,35 +395,23 @@ class cedar::dev::Component::DataCollection
 
     void setData(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, const cv::Mat& data)
     {
-      // todo: lazyInitialize for command restrictions
-
-      // todo: issue a console-warning something if Device is not running
-
       QWriteLocker lock(bufferData.getLockPtr());
-
       setDataUnlocked(bufferData, type, data);
     }
 
     void setDataUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, const cv::Mat& data)
     {
-//      lazyInitializeUnlocked(bufferData, type);
       bufferData.member()[type]->setData(data.clone());
     }
 
     void setDataIndex(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, int index, double value)
     {
-      // todo: lazyInitialize for command restrictions
-
-      // todo: issue a console-warning something if Device is not running
-
       QWriteLocker lock(bufferData.getLockPtr());
-
       setDataIndexUnlocked(bufferData, type, index, value);
     }
 
     void setDataIndexUnlocked(cedar::aux::LockableMember<BufferDataType>& bufferData, const ComponentDataType type, int index, double value)
     {
-//      lazyInitializeUnlocked(bufferData, type);
       CEDAR_DEBUG_ASSERT(bufferData.member()[type]);
       bufferData.member()[type]->getData().at<double>(index, 0) = value;
     }
@@ -439,16 +423,10 @@ class cedar::dev::Component::DataCollection
       if (found == bufferData.member().end())
       {
         bufferData.member()[type] = cedar::aux::MatDataPtr(new cedar::aux::MatData());
-//        resetBufferUnlocked(bufferData, type);
       }
       else // already initialized
       {
-        CEDAR_ASSERT(false && "initialized twice");
-        //!@todo we have to reset the allocated buffer to the right size here - but this call should appear somewhere else (checking if buffer is initialized and thus just has to be resetted)
-//        resetBufferUnlocked(bufferData, type);
-        //!@todo throw an AlreadyInitializedException here
-        //       js: I would allow that
-        return;
+        CEDAR_THROW(AlreadyInitializedException, "Cannot initialize a buffer that is already initialized.");
       }
     }
 
@@ -484,11 +462,11 @@ class cedar::dev::Component::DataCollection
     // Cache for the user-interface
     cedar::aux::LockableMember<BufferDataType> mPreviousDeviceBuffer; // was: mPreviousDeviceMeasurementsBuffer
 
+  private:
     std::map<ComponentDataType, unsigned int> mInstalledDimensions;
 
-    TransformationHookContainerType mTransformationHooks;
+    cedar::aux::LockableMember<TransformationHookContainerType> mTransformationHooks;
 
-  private:
     cedar::aux::LockableMember<std::set<cedar::dev::Component::ComponentDataType> > mInstalledTypes;
 
     cedar::aux::LockableMember<std::map<cedar::dev::Component::ComponentDataType, std::string> > mInstalledNames;
