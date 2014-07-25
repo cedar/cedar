@@ -282,6 +282,116 @@ void test()
   }
   test_arm_acceleration->stopDevice();
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // check configuration
+  //--------------------------------------------------------------------------------------------------------------------
+
+  test_arm_position->applyInitialConfiguration("default");
+  cedar::aux::sleep( test_arm_position->getDeviceStepSize() * 1.5 );
+  test_arm_position->stopDevice();
+
+  std::cout << "checking the root coordinate frame translation" << std::endl;
+  cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_arm_position->getRootCoordinateFrame();
+
+  if
+  (
+      !cedar::aux::math::isZero
+       (
+         rootCoordinateFrame->getTranslationX() / cedar::unit::DEFAULT_LENGTH_UNIT - 2.0
+       )
+    || !cedar::aux::math::isZero
+        (
+          rootCoordinateFrame->getTranslationY() / cedar::unit::DEFAULT_LENGTH_UNIT - 0.0
+        )
+    || !cedar::aux::math::isZero
+        (
+          rootCoordinateFrame->getTranslationZ() / cedar::unit::DEFAULT_LENGTH_UNIT - 0.0
+        )
+  )
+  {
+    errors++;
+    std::cout << "ERROR with root coordinate frame translation, read:" << std::endl;
+    cedar::aux::write(rootCoordinateFrame->getTranslation().matrix);
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
+  std::cout << "checking the root coordinate frame rotation" << std::endl;
+  cv::Mat rootRotation = rootCoordinateFrame->getRotation();
+  if
+  (
+    !cedar::aux::math::isZero(rootRotation.at<double>(0, 0) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(0, 1) - (-1.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(0, 2) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 0) - (1.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 1) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 2) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 0) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 1) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 2) - (1.0))
+  )
+  {
+    errors++;
+    std::cout << "ERROR with root coordinate frame rotation, read:" << std::endl;
+    cedar::aux::write(rootRotation);
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
+  std::cout << "checking the end-effector coordinate frame..." << std::endl;
+  cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_arm_position->getEndEffectorCoordinateFrame();
+  if
+  (
+       !cedar::aux::math::isZero
+        (
+          endEffectorCoordinateFrame->getTranslationX() / cedar::unit::DEFAULT_LENGTH_UNIT - 0.0
+        )
+    || !cedar::aux::math::isZero
+        (
+          endEffectorCoordinateFrame->getTranslationY() / cedar::unit::DEFAULT_LENGTH_UNIT - 2.0
+        )
+    || !cedar::aux::math::isZero
+        (
+          endEffectorCoordinateFrame->getTranslationZ() / cedar::unit::DEFAULT_LENGTH_UNIT - 8.0
+        )
+  )
+  {
+    errors++;
+    std::cout << "ERROR with end-effector coordinate frame translation, read:" << std::endl;
+    std::cout << endEffectorCoordinateFrame->getTranslation().matrix << std::endl;
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
+  cv::Mat eefRotation = endEffectorCoordinateFrame->getRotation();
+  if
+  (
+    !cedar::aux::math::isZero(eefRotation.at<double>(0, 0) - (1.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(0, 1) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(0, 2) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 0) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 1) - (1.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 2) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 0) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 1) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 2) - (1.0))
+  )
+  {
+    errors++;
+    std::cout << "ERROR with end-effector coordinate frame rotation, read:" << std::endl;
+    cedar::aux::write(eefRotation);
+  }
+  else
+  {
+    std::cout << "passed" << std::endl;
+  }
+
   QApplication::exit(errors);
 }
 
