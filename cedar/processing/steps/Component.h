@@ -136,10 +136,7 @@ public:
     return this->_mComponent->getValue();
   }
 
-  inline bool hasComponent() const
-  {
-    return this->_mComponent->hasComponentSlot() && static_cast<bool>(this->_mComponent->getValue());
-  }
+  bool hasComponent() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

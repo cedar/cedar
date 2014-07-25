@@ -224,6 +224,19 @@ _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command gro
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::steps::Component::hasComponent() const
+{
+  try
+  {
+    return this->_mComponent->hasComponentSlot() && static_cast<bool>(this->_mComponent->getValue());
+  }
+  catch (const cedar::dev::NoComponentSelectedException&)
+  {
+    return false;
+  }
+}
+
+
 void cedar::proc::steps::Component::selectedGroupChanged()
 {
   this->rebuildInputs();
@@ -332,6 +345,12 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputVal
 void cedar::proc::steps::Component::rebuildInputs()
 {
   this->removeAllSlots(cedar::proc::DataRole::INPUT);
+
+  if (!this->hasComponent())
+  {
+    return;
+  }
+
   auto component = this->getComponent();
   std::vector<cedar::dev::Component::ComponentDataType> commands;
 
