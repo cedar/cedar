@@ -68,7 +68,10 @@ known issues
 Unreleased
 ==========
   
-  Nothing yet!
+- cedar::proc
+  - You can now add special widgets to architectures that allow you to define special plots and more. These can be
+    opened from the cedar gui, and their layout and contents are read from files. See the "Architecture Widgets"
+    tutorial for details on how to use this feature.
 
 
 Released versions

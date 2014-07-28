@@ -103,6 +103,9 @@ public:
   //!@brief updates the trigger chains of this element
   virtual void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
+  //! Returns the full path of the element.
+  std::string getFullPath() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
