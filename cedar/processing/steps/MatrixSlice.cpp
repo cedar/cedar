@@ -224,6 +224,7 @@ void cedar::proc::steps::MatrixSlice::updateDimensionality()
 
 void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
 {
+  cedar::proc::Step::ReadLocker locker(this);
   if (!this->mInput || this->mInput->isEmpty())
   {
     return;
@@ -280,6 +281,8 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
   cv::Mat output = cv::Mat(static_cast<int>(sizes.size()), &sizes.front(), input.type(), cv::Scalar(0));
   cv::Mat old_output = this->mOutput->getData();
   this->mOutput->setData(output);
+
+  locker.unlock();
 
   if (output.type() != old_output.type() || !cedar::aux::math::matrixSizesEqual(output, old_output))
   {
