@@ -167,9 +167,13 @@ void cedar::proc::steps::Resize::compute(const cedar::proc::Arguments&)
       switch (this->_mInterpolationType->getValue())
       {
         default:
-          std::cout << "Unimplemented interpolation type in cedar::proc::steps::Resize::compute. "
-                    << "Defaulting to linear interpolation."
-                    << std::endl;
+          cedar::aux::LogSingleton::getInstance()->warning
+          (
+            "Unimplemented interpolation type selected for step \"" + this->getName() + "\". Defaulting to linear "
+            "interpolation.",
+            CEDAR_CURRENT_FUNCTION_NAME
+          );
+          this->_mInterpolationType->setValue(cedar::proc::steps::Resize::Interpolation::LINEAR);
         case cedar::proc::steps::Resize::Interpolation::LINEAR:
         {
           cedar::aux::MatrixIterator iter(output);
@@ -206,15 +210,19 @@ double cedar::proc::steps::Resize::linearInterpolationND
 
   for (int d = 0; d < target.dims; ++d)
   {
+    // calculate the factor by which the source must be resized
     double ratio = static_cast<double>(source.size[d]) / static_cast<double>(target.size[d]);
-    double real_index = targetIndex.at(d)*ratio;
-    int lower = floor(real_index);
-    int upper = ceil(real_index);
+    // project the target index back to the corresponding one in the source
+    double source_index = targetIndex.at(d) * ratio;
+    // determine the indices next to the source index
+    int lower = floor(source_index);
+    int upper = ceil(source_index);
     if(upper >= source.size[d])
       upper = source.size[d] - 1;
 
+    // write the indices into the vector of interpolated indices
     bounds.at(d) = std::make_pair(lower, upper);
-    interpolated_indices.at(d) = real_index;
+    interpolated_indices.at(d) = source_index;
   }
 
   // retrieve result
@@ -242,30 +250,36 @@ void cedar::proc::steps::Resize::linearInterpolationNDRecursion
   {
     // case 1: end of the recursion
     //         - this part interpolates between the actual values along each combination of dimensions.
-    unsigned int num = 1 << (source.dims - 1); // same as 2^(dims - 1)
-    interpolatedValues.resize(num);
+    unsigned int num_combinations = 1 << (source.dims - 1); // = 2^(dims - 1)
+    interpolatedValues.resize(num_combinations);
 
     int lower_index = bounds.at(currentDimension).first;
     double difference = interpolatedIndices.at(currentDimension) - static_cast<double>(lower_index);
 
     std::vector<int> index;
     index.resize(target.dims, 0);
-    for(unsigned int i = 0; i < num; ++i)
+    // iterate over all possible combinations
+    for(unsigned int i = 0; i < num_combinations; ++i)
     {
-
+      // build interpolation index: the first n - 1 dimensions
       for (size_t j = 0; j < static_cast<size_t>(source.dims) - 1; ++j)
       {
-        if ( (i & (1 << j)) > 0 )
+        // decide if the lower or upper bound is used
+        if ( (i & (1 << j)) > 0 ) // check if the j-th bit of i is 1; if so, use the lower bound, otherwise upper bound
           index.at(j) = bounds.at(j).first;
         else
           index.at(j) = bounds.at(j).second;
       }
 
+      // the last dimension is varied: lower value == lower bound in last dimension, ...
       index.back() = bounds.back().first;
       double lower_value = source.at<float>(&index.front());
+      // ... upper value is same index, but with upper bound in last dimension
       index.back() = bounds.back().second;
       double upper_value = source.at<float>(&index.front());
-      interpolatedValues.at(i) = lower_value * difference + (1.0 - difference) * upper_value;
+
+      // interpolate!
+      interpolatedValues.at(i) = difference * (lower_value - upper_value) + upper_value;
     }
   }
   else
@@ -285,7 +299,7 @@ void cedar::proc::steps::Resize::linearInterpolationNDRecursion
     double distance = interpolatedIndices.at(currentDimension) - static_cast<double>(lower_index);
 
     // process the result of the recursion
-    size_t num = 1 << (source.dims - 1); // 2^(dims - 1)
+    size_t num = 1 << currentDimension; // 2^(currentDimension)
     interpolatedValues.resize(num);
     for (size_t i = 0; i < num; ++i)
     {
