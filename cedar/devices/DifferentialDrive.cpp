@@ -177,8 +177,12 @@ std::vector<cedar::unit::Velocity> cedar::dev::DifferentialDrive::getWheelSpeed(
   std::vector<cedar::unit::Velocity> ret;
   cv::Mat mat = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(getUserCommandData(cedar::dev::DifferentialDrive::WHEEL_SPEED))->getData();
 
-  ret.push_back( mat.at<double>(0,0) * cedar::unit::DEFAULT_VELOCITY_UNIT );
-  ret.push_back( mat.at<double>(1,0) * cedar::unit::DEFAULT_VELOCITY_UNIT );
+  CEDAR_DEBUG_ASSERT(mat.type() == CV_64F);
+  CEDAR_DEBUG_ASSERT(mat.rows >= 2);
+  CEDAR_DEBUG_ASSERT(mat.cols >= 1);
+
+  ret.push_back(mat.at<double>(0,0) * cedar::unit::DEFAULT_VELOCITY_UNIT);
+  ret.push_back(mat.at<double>(1,0) * cedar::unit::DEFAULT_VELOCITY_UNIT);
 
   return ret;
 }
