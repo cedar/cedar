@@ -183,8 +183,9 @@ std::vector<cedar::unit::Velocity> cedar::dev::DifferentialDrive::getWheelSpeed(
   return ret;
 }
 
-void cedar::dev::DifferentialDrive::setWheelSpeed(const std::vector<cedar::unit::Velocity >& wheelSpeed)
+void cedar::dev::DifferentialDrive::setWheelSpeed(const std::vector<cedar::unit::Velocity>& wheelSpeed)
 {
+  CEDAR_ASSERT(wheelSpeed.size() == 2);
   cv::Mat mat = cv::Mat(2, 1, CV_64F);
 
   mat.at<double>(0,0) = wheelSpeed[0] / cedar::unit::DEFAULT_VELOCITY_UNIT;
@@ -234,9 +235,9 @@ void cedar::dev::DifferentialDrive::convertToForwardVelocityAndTurningRate
 
 bool cedar::dev::DifferentialDrive::applyBrakeNow()
 {
-  auto speeds = std::vector<cedar::unit::Velocity >{ 0 };
+  auto speeds = std::vector<cedar::unit::Velocity >{0, 0};
   
-  setWheelSpeed( speeds );
+  setWheelSpeed(speeds);
   return true;
 }
 
