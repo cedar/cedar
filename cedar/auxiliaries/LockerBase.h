@@ -51,7 +51,7 @@
 
 /*!@brief A base class for RAII-based lockers that behave similar to, e.g., QReadLocker
  */
-class cedar::aux::LockerBase : private cedar::aux::CallOnScopeExit
+class cedar::aux::LockerBase : protected cedar::aux::CallOnScopeExit
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
