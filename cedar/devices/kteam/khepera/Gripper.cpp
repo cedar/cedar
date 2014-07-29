@@ -90,3 +90,16 @@ void cedar::dev::kteam::khepera::Gripper::closeGripper()
 {
   this->setGripperPosition(false);
 }
+
+bool cedar::dev::kteam::khepera::Gripper::applyBrakeNow()
+{
+  // TODO
+  return false;
+}
+
+bool cedar::dev::kteam::khepera::Gripper::applyBrakeController()
+{
+  // TODO
+  return false;
+}
+

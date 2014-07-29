@@ -210,6 +210,18 @@ public:
     std::cout << "Making measurement." << std::endl;
     return 1.234 * cv::Mat::ones(1, 1, CV_32F);
   }
+
+private:
+  bool applyBrakeNow()
+  {
+    return true;
+  }
+
+  bool applyBrakeController()
+  {
+    return true;
+  }
+
 };
 CEDAR_GENERATE_POINTER_TYPES(TestComponent);
 

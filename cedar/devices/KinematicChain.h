@@ -570,6 +570,9 @@ private:
   //!@brief: test validity of initial configurations
   void checkInitialConfigurations();
 
+  virtual bool applyBrakeController();
+  virtual bool applyBrakeNow();
+
   //----------------------------------------------------------------------------
   // parameters
   //----------------------------------------------------------------------------

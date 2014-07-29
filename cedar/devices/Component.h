@@ -76,6 +76,8 @@ public:
   typedef boost::function< cv::Mat (cv::Mat) > TransformationFunctionType;
   typedef unsigned int                      ComponentDataType;
   typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
+  typedef boost::function< cv::Mat() >      ControllerCallback;
+
 private:
   typedef std::map< ComponentDataType, TransformationFunctionType > InnerTransformationHookContainerType;
   typedef std::map< ComponentDataType, InnerTransformationHookContainerType > TransformationHookContainerType;
@@ -132,6 +134,12 @@ private:
   class DataCollection;
   CEDAR_GENERATE_POINTER_TYPES(DataCollection);
 
+  struct ControllerCollection {
+    cedar::dev::Component::ComponentDataType  mBufferType;
+    cedar::dev::Component::ControllerCallback mCallback;
+  };
+  CEDAR_GENERATE_POINTER_TYPES(ControllerCollection);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -187,6 +195,10 @@ public:
 
   void startDevice();
   void stopDevice();
+
+  void startBraking(); // non-blocking. will set a Controller that smoothly brakes
+  void brakeNow();     // blocking. will try to instantly reduce velocity, high inertias possible
+  void crashbrake();   // last-resort braking, may disconnect device or even break the robot
 
   //! Returns a list of all installed measurement types.
   std::set<ComponentDataType> getInstalledMeasurementTypes() const;
@@ -248,6 +260,9 @@ public:
   //! Returns the command types that are in the given command group.
   std::vector<ComponentDataType> getCommandsInGroup(const std::string& groupName) const;
 
+  void clearController();
+  void setController( ComponentDataType buffer, cedar::dev::Component::ControllerCallback fun );
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -305,6 +320,10 @@ private:
   //!@brief checks whether a given command type conflicts with already set commands and throws an exception if this happens
   void checkExclusivenessOfCommand(ComponentDataType type);
 
+  virtual bool applyBrakeController() = 0; // returning FALSE will allow re-try
+  virtual bool applyBrakeNow() = 0;
+  virtual bool applyCrashbrake(); // defaults to applyBrakeNow()
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -327,6 +346,8 @@ private:
   boost::optional<ComponentDataType> mDeviceCommandSelection;
 
   cedar::aux::LockableMember<std::set<ComponentDataType>> mUserCommandUsed;
+
+  ControllerCollectionPtr mController; // @todo: make LockableMember
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

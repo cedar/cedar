@@ -848,9 +848,13 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 #if 1
   // todo: check locking in this function, forgot some stuff ...
   ComponentDataType type_for_Device, type_from_user;
+  cv::Mat userData, ioData;
 
   QReadLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
-  if (this->mUserCommandUsed.member().size() == 0)
+
+
+  if (this->mUserCommandUsed.member().size() == 0
+      && !this->mController)
   {
     return; // this is not a problem
   }
@@ -860,6 +864,12 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
     return;
   }
 
+  if (this->mController)
+  {
+    type_from_user = this->mController->mBufferType;
+    userData = (this->mController->mCallback)();
+  }
+  else // do not use Controller Callback:
   {
     // guess command type to use
     // safe only if there was only one command hook registered
@@ -883,16 +893,21 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 
     // we know the map has exactly one entry
     type_from_user = *(this->mUserCommandUsed.member().begin());
+
+    {
+      QReadLocker lock(this->mCommandData->mUserBuffer.getLockPtr());
+      userData = this->mCommandData->getUserBufferUnlocked(type_from_user).clone();
+    }
   }
   user_command_locker.unlock();
 
-//  this->mUserCommandUsed.clear();
+  //  this->mUserCommandUsed.clear();
 
   // evaluate command type for Device:
   if (mDeviceCommandSelection)
   {
-      type_for_Device = mDeviceCommandSelection.get();
-//  std::cout << "commands restricted to ... " << type_for_Device  << std::endl;    
+    type_for_Device = mDeviceCommandSelection.get();
+    //  std::cout << "commands restricted to ... " << type_for_Device  << std::endl;    
   }
   else
   {
@@ -900,20 +915,15 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
     if (mSubmitCommandHooks.size() != 1)
     {
       CEDAR_THROW
-      (
-        cedar::dev::Component::CouldNotGuessDeviceTypeException,
-        "Could not guess device type: too many submit hooks. Please select a device type manually." 
-      ); 
+        (
+         cedar::dev::Component::CouldNotGuessDeviceTypeException,
+         "Could not guess device type: too many submit hooks. Please select a device type manually." 
+        ); 
     }
 
     type_for_Device = mSubmitCommandHooks.begin()->first;
   }
 
-  cv::Mat userData, ioData;
-  {
-    QReadLocker lock(this->mCommandData->mUserBuffer.getLockPtr());
-    userData = this->mCommandData->getUserBufferUnlocked(type_from_user).clone();
-  }
 
   // do we need to transform the input?
   if (type_for_Device != type_from_user)
@@ -1037,6 +1047,7 @@ void cedar::dev::Component::startDevice()
 
 void cedar::dev::Component::stopDevice()
 {
+  brakeNow();
   mDeviceThread->stop();
 }
 
@@ -1192,3 +1203,52 @@ void cedar::dev::Component::checkExclusivenessOfCommand(ComponentDataType type)
     }
   }
 }
+
+void cedar::dev::Component::startBraking()
+{
+  clearUserCommand();
+  clearController();
+  if (!applyBrakeController())
+  {
+    //@todo try again and then default to brakeNow()
+    brakeNow();
+  }
+}
+
+void cedar::dev::Component::brakeNow()
+{
+  clearUserCommand();
+  clearController();
+  if (!applyBrakeNow())
+  {
+    //@todo: wait short time, try again and then panic
+  }
+}
+
+void cedar::dev::Component::crashbrake()
+{
+  applyCrashbrake();
+}
+
+bool cedar::dev::Component::applyCrashbrake()
+{
+  clearUserCommand();
+  clearController();
+  if (!applyBrakeNow()) // dummy default
+  {
+    // @todo: panic
+  }
+
+  return true;
+}
+
+void cedar::dev::Component::clearController()
+{
+  mController.reset();  
+}
+
+void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallback fun)
+{
+  mController= ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun } );
+}
+
