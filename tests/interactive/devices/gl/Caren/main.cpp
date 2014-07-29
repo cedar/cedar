@@ -97,19 +97,29 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(scene->getSceneLimit());
 
   // create visualization objects
-  cedar::dev::gl::CarenPtr caren_visualization
-  (
-    new cedar::dev::gl::Caren
-    (
-      caren_trunk,
-      caren_arm,
-      caren_head,
-      palm,
-      finger_one,
-      finger_two,
-      finger_three
-    )
-  );
+  cedar::dev::gl::CarenPtr caren_visualization;
+  try
+  {
+    caren_visualization =
+      cedar::dev::gl::CarenPtr
+      (
+        new cedar::dev::gl::Caren
+        (
+          caren_trunk,
+          caren_arm,
+          caren_head,
+          palm,
+          finger_one,
+          finger_two,
+          finger_three
+        )
+      );
+  }
+  catch (cedar::aux::ResourceNotFoundException& exc)
+  {
+    std::cout << "Not all required meshes could be found. Please contact cedar support to get them." << std::endl;
+    return -1;
+  }
 
   // add visualization objects to scene
   scene->addObjectVisualization(caren_visualization);
@@ -218,19 +228,16 @@ int main(int argc, char **argv)
   viewer.show();
   camera_viewer.show();
 
-  caren_trunk->startTimer(50.0);
-  caren_arm->startTimer(50.0);
-  caren_head->startTimer(50.0);
+  caren_trunk->startDevice();
+  caren_arm->startDevice();
+  caren_head->startDevice();
   viewer.startTimer(50);
   camera_viewer.startTimer(50);
   a.exec();
 
-  caren_trunk->stop();
-  caren_arm->stop();
-  caren_head->stop();
-  caren_trunk->wait();
-  caren_arm->wait();
-  caren_head->wait();
+  caren_trunk->stopDevice();
+  caren_arm->stopDevice();
+  caren_head->stopDevice();
 
   return 0;
 }

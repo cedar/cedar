@@ -153,14 +153,13 @@ int main(int argc, char **argv)
   // show widgets and start timers and threads
   viewer.show();
   camera_viewer.show();
-  test_arm->startTimer(20);
+  test_arm->startDevice();
   viewer.startTimer(20);
   camera_viewer.startTimer(20);
   a.exec();
 
   // clean up
-  test_arm->stop();
-  test_arm->wait();
+  test_arm->stopDevice();
 
   return 0;
 }

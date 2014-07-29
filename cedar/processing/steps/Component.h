@@ -43,11 +43,68 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/devices/ComponentParameter.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/Component.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QComboBox>
+
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace details
+    {
+      //!@todo This mixes GUI and step -- is this ok?
+      class ComponentStepGroupParameterWidget : public cedar::aux::gui::Parameter
+      {
+        Q_OBJECT
+
+      public:
+        ComponentStepGroupParameterWidget();
+
+        void parameterChanged();
+
+      private:
+        void applyProperties();
+
+        void propertiesChanged();
+
+        void rebuildGroupList();
+
+      private slots:
+        void componentChanged();
+        void selectedGroupChanged(const QString& group);
+
+      private:
+        QComboBox* mpSelector;
+      };
+
+      class ComponentStepGroupParameter : public cedar::aux::ParameterTemplate<std::string>
+      {
+        Q_OBJECT
+
+      public:
+        ComponentStepGroupParameter(cedar::aux::Configurable* owner, const std::string& name);
+
+        void setComponent(cedar::dev::ComponentPtr component);
+
+        cedar::dev::ComponentPtr getComponent();
+
+      signals:
+        void componentChanged();
+
+      private:
+        cedar::dev::ComponentPtr mComponent;
+      };
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentStepGroupParameter);
+    }
+  }
+}
 
 
 /*!@brief A step for bringing device components into a processing architecture.
@@ -59,6 +116,8 @@ class cedar::proc::steps::Component : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -76,6 +135,8 @@ public:
   {
     return this->_mComponent->getValue();
   }
+
+  bool hasComponent() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,8 +160,14 @@ private:
 
   void onStop();
 
+  void rebuildInputs();
+
+  void rebuildOutputs();
+
 private slots:
   void componentChanged();
+
+  void selectedGroupChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -119,6 +186,8 @@ protected:
 
 private:
   cedar::dev::ComponentParameterPtr _mComponent;
+
+  cedar::proc::details::ComponentStepGroupParameterPtr _mGroup;
 
 }; // class cedar::proc::steps::Component
 

@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/LockerBase.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -171,6 +172,42 @@ namespace cedar
         (*iter)->unlock();
       }
     }
+
+    /*! A RAII-based locker for cedar::aux::LockSet.
+     * @see cedar::aux::LockerBase.
+     */
+    class LockSetLocker : public cedar::aux::LockerBase
+    {
+      public:
+        //! Constructor.
+        LockSetLocker(const cedar::aux::LockSet& lockSet)
+        :
+        cedar::aux::LockerBase
+        (
+          boost::bind(&cedar::aux::LockSetLocker::applyLock, this),
+          boost::bind(&cedar::aux::LockSetLocker::applyUnlock, this),
+          false // because we need to access mLockSet (which will not be initialized if relock and thus applyLock is
+                // called here), we do not let the superclass constructor call relock but rather do it below
+        ),
+        mLockSet(lockSet)
+        {
+          this->relock();
+        }
+
+      private:
+        void applyLock()
+        {
+          cedar::aux::lock(this->mLockSet);
+        }
+
+        void applyUnlock()
+        {
+          cedar::aux::unlock(this->mLockSet);
+        }
+
+      private:
+        cedar::aux::LockSet mLockSet;
+    };
   }
 }
 

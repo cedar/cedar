@@ -63,15 +63,20 @@ cedar::dev::ComponentParameter::~ComponentParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::dev::ComponentParameter::hasComponentSlot() const
+{
+  return static_cast<bool>(this->mComponent);
+}
+
 cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
 {
-  if (this->mComponent)
+  if (this->hasComponentSlot())
   {
     return this->mComponent->getComponent();
   }
   CEDAR_THROW
   (
-    cedar::dev::NoComponentSelectedException, "The parameter" + this->getName() + "does not point to a component."
+    cedar::dev::NoComponentSelectedException, "The parameter \"" + this->getName() + "\" does not point to a component."
   );
 }
 
