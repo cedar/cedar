@@ -82,3 +82,13 @@ cedar::tests::unit::dev::Robot::TestComponent::~TestComponent()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+bool cedar::tests::unit::dev::Robot::TestComponent::applyBrakeNow()
+{
+  return true;
+}
+
+bool cedar::tests::unit::dev::Robot::TestComponent::applyBrakeController()
+{
+  return true;
+}
+

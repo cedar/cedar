@@ -232,3 +232,18 @@ void cedar::dev::DifferentialDrive::convertToForwardVelocityAndTurningRate
   turningRate = (rightWheelSpeed - leftWheelSpeed) / (wheel_distance / cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
+bool cedar::dev::DifferentialDrive::applyBrakeNow()
+{
+  auto speeds = std::vector<cedar::unit::Velocity >{ 0 };
+  
+  setWheelSpeed( speeds );
+  return true;
+}
+
+bool cedar::dev::DifferentialDrive::applyBrakeController()
+{
+  // TODO:
+  applyBrakeController();
+  return true;
+}
+
