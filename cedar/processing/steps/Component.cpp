@@ -218,6 +218,9 @@ _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command gro
   this->_mGroup->setConstant(true);
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChanged()));
   QObject::connect(this->_mGroup.get(), SIGNAL(valueChanged()), this, SLOT(selectedGroupChanged()));
+
+  this->mMeasurementTimeId = this->registerTimeMeasurement("step measurements time");
+  this->mCommandTimeId = this->registerTimeMeasurement("step commands time");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -295,6 +298,18 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 
     auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
     component->setUserCommandBuffer(command_type, mat_data->getData());
+  }
+
+  if (component->hasLastStepMeasurementsDuration())
+  {
+    auto time = component->retrieveLastStepMeasurementsDuration();
+    this->setTimeMeasurement(this->mMeasurementTimeId, time);
+  }
+
+  if (component->hasLastStepCommandsDuration())
+  {
+    auto time = component->retrieveLastStepCommandsDuration();
+    this->setTimeMeasurement(this->mCommandTimeId, time);
   }
 }
 

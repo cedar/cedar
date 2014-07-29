@@ -38,6 +38,7 @@
 #include "cedar/devices/Component.h"
 #include "cedar/devices/Channel.h"
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
+#include "cedar/auxiliaries/Timer.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 
 // SYSTEM INCLUDES
@@ -582,6 +583,37 @@ cedar::dev::Component::~Component()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::unit::Time cedar::dev::Component::retrieveLastStepMeasurementsDuration()
+{
+  QReadLocker locker(this->mLastStepMeasurementsTime.getLockPtr());
+  cedar::unit::Time last = this->mLastStepMeasurementsTime.member().get();
+  this->mLastStepMeasurementsTime.member().reset(); // clear last measurement
+  return last;
+}
+
+cedar::unit::Time cedar::dev::Component::retrieveLastStepCommandsDuration()
+{
+  QReadLocker locker(this->mLastStepCommandsTime.getLockPtr());
+  cedar::unit::Time last = this->mLastStepCommandsTime.member().get();
+  this->mLastStepCommandsTime.member().reset(); // clear last measurement
+  return last;
+}
+
+bool cedar::dev::Component::hasLastStepMeasurementsDuration() const
+{
+  QReadLocker locker(this->mLastStepMeasurementsTime.getLockPtr());
+  bool set = this->mLastStepMeasurementsTime.member().is_initialized();
+  return set;
+}
+
+bool cedar::dev::Component::hasLastStepCommandsDuration() const
+{
+  QReadLocker locker(this->mLastStepCommandsTime.getLockPtr());
+  bool set = this->mLastStepCommandsTime.member().is_initialized();
+  return set;
+}
+
+
 void cedar::dev::Component::defineCommandGroup(const std::string& groupName)
 {
   this->mCommandData->defineGroup(groupName);
@@ -845,6 +877,7 @@ void cedar::dev::Component::stepDevice(cedar::unit::Time time)
 
 void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 {
+  cedar::aux::Timer timer;
 #if 1
   // todo: check locking in this function, forgot some stuff ...
   ComponentDataType type_for_Device, type_from_user;
@@ -958,11 +991,16 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 
   //!@todo this should never be necessary
 //  this->mCommandData->mUserBuffer.member().clear();
+
+  QWriteLocker time_locker(this->mLastStepCommandsTime.getLockPtr());
+  this->mLastStepCommandsTime.member() = timer.elapsed();
 }
 
 // update the Device Cache
 void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
 {
+  cedar::aux::Timer timer;
+
   std::vector< ComponentDataType > types_to_transform;
   std::vector< ComponentDataType > types_we_measured;
 
@@ -1006,6 +1044,9 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
   lock1.unlock();
   // todo: make this non-blocking for this looped thread
   updateUserMeasurements();
+
+  QWriteLocker time_locker(this->mLastStepMeasurementsTime.getLockPtr());
+  this->mLastStepMeasurementsTime.member() = timer.elapsed();
 }
 
 void cedar::dev::Component::updateUserMeasurements()
