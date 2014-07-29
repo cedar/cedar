@@ -178,6 +178,12 @@ private:
   //! Remembers whether onStart connected the component/robot. If true, onStop will disconnect.
   bool mConnectedOnStart;
 
+  //! Id used for signaling "step measurement" times
+  unsigned int mMeasurementTimeId;
+
+  //! Id used for signaling "step command" times
+  unsigned int mCommandTimeId;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
