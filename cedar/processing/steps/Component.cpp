@@ -282,24 +282,9 @@ void cedar::proc::steps::Component::onStop()
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
-  if (!this->hasRole(cedar::proc::DataRole::INPUT))
-  {
-    return;
-  }
-
   auto component = this->getComponent();
-  // copy data from the input slots to the command slots of the component
-  for (auto name_slot_pair : this->getDataSlots(cedar::proc::DataRole::INPUT))
-  {
-    const auto& name = name_slot_pair.first;
-    auto slot = name_slot_pair.second;
 
-    auto command_type = component->getCommandTypeForName(name);
-
-    auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
-    component->setUserCommandBuffer(command_type, mat_data->getData());
-  }
-
+  // update time measurements
   if (component->hasLastStepMeasurementsDuration())
   {
     auto time = component->retrieveLastStepMeasurementsDuration();
@@ -310,6 +295,24 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
   {
     auto time = component->retrieveLastStepCommandsDuration();
     this->setTimeMeasurement(this->mCommandTimeId, time);
+  }
+
+  // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
+  if (!this->hasRole(cedar::proc::DataRole::INPUT))
+  {
+    return;
+  }
+
+  // copy data from the input slots to the command slots of the component
+  for (auto name_slot_pair : this->getDataSlots(cedar::proc::DataRole::INPUT))
+  {
+    const auto& name = name_slot_pair.first;
+    auto slot = name_slot_pair.second;
+
+    auto command_type = component->getCommandTypeForName(name);
+
+    auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
+    component->setUserCommandBuffer(command_type, mat_data->getData());
   }
 }
 
