@@ -75,6 +75,7 @@ cedar::dev::kteam::epuck::YarpDrive::YarpDrive()
 _mMotorCommandsPort(new cedar::aux::StringParameter(this, "motor commands port", "motorCommands")),
 _mEncoderValuesPort(new cedar::aux::StringParameter(this, "encoder values port", "encoderValues"))
 {
+  this->registerDeviceCommandHook(cedar::dev::DifferentialDrive::WHEEL_SPEED, boost::bind(&cedar::dev::kteam::epuck::YarpDrive::sendMovementCommand, this));
 }
 
 cedar::dev::kteam::epuck::YarpDrive::YarpDrive
@@ -87,6 +88,7 @@ mYarpChannel(channel),
 _mMotorCommandsPort(new cedar::aux::StringParameter(this, "motor commands port", "motorCommands")),
 _mEncoderValuesPort(new cedar::aux::StringParameter(this, "encoder values port", "encoderValues"))
 {
+  this->registerDeviceCommandHook(cedar::dev::DifferentialDrive::WHEEL_SPEED, boost::bind(&cedar::dev::kteam::epuck::YarpDrive::sendMovementCommand, this));
 }
 
 cedar::dev::kteam::epuck::YarpDrive::~YarpDrive()
@@ -97,7 +99,7 @@ cedar::dev::kteam::epuck::YarpDrive::~YarpDrive()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::kteam::epuck::YarpDrive::open()
+void cedar::dev::kteam::epuck::YarpDrive::registerChannels()
 {
   CEDAR_ASSERT(this->getChannel());
   mYarpChannel = boost::dynamic_pointer_cast<YarpMatChannel>(this->getChannel());
@@ -148,6 +150,6 @@ void cedar::dev::kteam::epuck::YarpDrive::sendMovementCommand()
 void cedar::dev::kteam::epuck::YarpDrive::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::dev::kteam::Drive::readConfiguration(node);
-  this->open();
+  this->registerChannels();
 }
 #endif
