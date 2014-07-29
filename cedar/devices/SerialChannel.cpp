@@ -349,6 +349,7 @@ bool cedar::dev::SerialChannel::isOpen() const
 
 void cedar::dev::SerialChannel::openHook()
 {
+  QWriteLocker lock(&(this->mLock));
   // the following parameters are not to be changed while the port is open
   _mDevicePath->setConstant(true);
   _mEscapedCommandDelimiter->setConstant(true);
@@ -387,6 +388,7 @@ void cedar::dev::SerialChannel::openHook()
 
 void cedar::dev::SerialChannel::closeHook()
 {
+  QWriteLocker lock(&(this->mLock));
   if (!isOpen())
   {
     return;

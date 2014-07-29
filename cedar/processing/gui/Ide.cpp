@@ -681,25 +681,6 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)
   this->setGroup(group);
 }
 
-void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
-{
-  this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
-                              (
-                                new cedar::aux::CallFunctionInThread
-                                (
-                                  boost::bind(&cedar::proc::Group::startTriggers, this->mGroup->getGroup(), true)
-                                )
-                              );
-
-  this->mStopThreadsCaller = cedar::aux::CallFunctionInThreadPtr
-                             (
-                               new cedar::aux::CallFunctionInThread
-                               (
-                                 boost::bind(&cedar::proc::Group::stopTriggers, this->mGroup->getGroup(), true)
-                               )
-                             );
-}
-
 void cedar::proc::gui::Ide::architectureToolFinished()
 {
   this->mpArchitectureToolBox->selectMode("mode.Select");
@@ -879,9 +860,7 @@ void cedar::proc::gui::Ide::startThreads()
   this->mpThreadsStopAll->setChecked(false);
   //start global timer
   cedar::aux::GlobalClockSingleton::getInstance()->start();
-  CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
-  // calls this->mGroup->getGroup()->startTriggers()
-  this->mStartThreadsCaller->start();
+  QtConcurrent::run(this->mGroup->getGroup().get(), &cedar::proc::Group::startTriggers, false);
 }
 
 void cedar::proc::gui::Ide::stepThreads()
@@ -903,9 +882,7 @@ void cedar::proc::gui::Ide::stopThreads()
   this->mpThreadsStopAll->setChecked(true);
   //stop global timer @!todo should the time be stoped here?
   //cedar::aux::GlobalClockSingleton::getInstance()->stop();
-  CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
-  // calls this->mGroup->getGroup()->stopTriggers()
-  this->mStopThreadsCaller->start();
+  QtConcurrent::run(this->mGroup->getGroup().get(), &cedar::proc::Group::stopTriggers, false);
 }
 
 void cedar::proc::gui::Ide::newFile()
@@ -1211,7 +1188,6 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->displayFilename(file.toStdString());
 
-  this->updateTriggerStartStopThreadCallers();
   this->loadPlotGroupsIntoComboBox();
 
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
@@ -1450,8 +1426,6 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   this->mpPropertyTable->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
-
-  this->updateTriggerStartStopThreadCallers();
 
   if (this->mpConsistencyChecker != NULL)
   {
