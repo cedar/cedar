@@ -240,6 +240,9 @@ public:
    */
   void setDefaultValue(const std::string& longName, const std::string& defaultValue);
 
+  //! set a description of the executable displayed during "help"
+  void setDescription(const std::string& description);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -345,6 +348,9 @@ private:
   static std::string M_UNGROUPED_OPTIONS_NAME;
 
   static std::string M_CFG_FILE_INCLUDE_TAG;
+
+  //! a string containing a description of the executable
+  std::string mDescription;
 
 }; // class cedar::aux::CommandLineParser
 
