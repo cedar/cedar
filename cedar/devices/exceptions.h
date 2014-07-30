@@ -45,23 +45,24 @@
 
 // SYSTEM INCLUDES
 
-//!@brief Exception that occurs when a robot does not respond to commands.
-class cedar::dev::UnresponsiveRobotException : public cedar::aux::ExceptionBase
-{
-}; // class cedar::aux::UnresponsiveRobotException
-
-//!@brief Exception that occurs when something goes wrong during serial communication with a robot.
-class cedar::dev::SerialCommunicationException : public cedar::aux::ExceptionBase
-{
-}; // class cedar::dev::SerialCommunicationException
 
 //!@brief Exception that occurs when something goes wrong during any communication with a robot.
 class cedar::dev::CommunicationException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::dev::CommunicationException
 
+//!@brief Exception that occurs when a robot does not respond to commands.
+class cedar::dev::UnresponsiveRobotException : public cedar::dev::CommunicationException
+{
+}; // class cedar::aux::UnresponsiveRobotException
+
+//!@brief Exception that occurs when something goes wrong during serial communication with a robot.
+class cedar::dev::SerialCommunicationException : public cedar::dev::CommunicationException
+{
+}; // class cedar::dev::SerialCommunicationException
+
 //!@brief Exception that occurs when a timeout expires.
-class cedar::dev::TimeoutException : public cedar::aux::ExceptionBase
+class cedar::dev::TimeoutException : public cedar::dev::CommunicationException
 {
 }; // class cedar::dev::TimeoutException
 
