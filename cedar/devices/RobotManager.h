@@ -118,6 +118,8 @@ public:
 
   void removeRobot(const std::string& robotName);
 
+  void renameRobot(const std::string& robotName, const std::string& newName);
+
   void loadRobotConfiguration(const std::string& robotName, const cedar::aux::Path& configuration);
 
   void loadRobotTemplateConfiguration(const std::string& robotName, const std::string& configurationName);
