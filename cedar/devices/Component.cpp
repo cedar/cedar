@@ -639,7 +639,9 @@ cedar::dev::Component::~Component()
   // try to send the stop request as early as possible ...
   mDeviceThread->requestStop();
 
-  brakeNow();
+  // virtual can't be called in the inherit. This is why all children
+  // must call it!
+  //brakeNow();
   mDeviceThread->stop();
 }
 
