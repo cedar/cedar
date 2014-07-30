@@ -201,6 +201,30 @@ void cedar::dev::RobotManager::addRobotName(const std::string& robotName)
   this->mRobotNameAddedSignal(robotName);
 }
 
+void cedar::dev::RobotManager::renameRobot(const std::string& robotName, const std::string& newName)
+{
+  auto old_robot = mRobotInstances.find(robotName);
+  if (old_robot == mRobotInstances.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + robotName + "\" could not be found.");
+  }
+  if (mRobotInstances.find(newName) != mRobotInstances.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "A robot with the name \"" + newName + "\" already exists.");
+  }
+  mRobotInstances[newName] = old_robot->second;
+  this->mRobotInstances.erase(old_robot);
+
+  auto old_info = mRobotInfos.find(robotName);
+  if (old_info != mRobotInfos.end())
+  {
+    mRobotInfos[newName] = old_info->second;
+    mRobotInfos.erase(old_info);
+  }
+
+  //!@todo send a signal that a name has changed
+}
+
 void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
 {
   auto instance_iter = mRobotInstances.find(robotName);
