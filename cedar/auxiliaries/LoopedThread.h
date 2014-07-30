@@ -263,6 +263,7 @@ public:
     return mpWorker->getLastTimeStepDuration();
   }
 
+  void waitUntilStepped() const;
 
   //----------------------------------------------------------------------------
   // protected methods
