@@ -951,9 +951,6 @@ void cedar::dev::Component::registerDeviceMeasurementTransformationHook(Componen
 
 void cedar::dev::Component::stepDevice(cedar::unit::Time time)
 {
-  // do not re-enter, do not stop/start and step at the same time
-  QMutexLocker lockerGeneral(&mGeneralAccessLock);
-
   // its important to get the currently scheduled commands out first
   // (think safety first). this assumes serial communication, of course
   try
@@ -1174,7 +1171,7 @@ void cedar::dev::Component::updateUserMeasurements()
 
 void cedar::dev::Component::startDevice()
 {
-  // do not re-enter, do not stop/start and step at the same time
+  // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
   if (this->mCommandData->getInstalledTypes().empty() && this->mMeasurementData->getInstalledTypes().empty())
@@ -1191,10 +1188,12 @@ void cedar::dev::Component::startDevice()
 
 void cedar::dev::Component::stopDevice()
 {
+  // do not re-enter, do not stop/start at the same time
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+
   brakeNow(); // this will wait for one step and need to access the Mutex below 
 
-  // do not re-enter, do not stop/start and step at the same time
-  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+  mDeviceThread->requestStop(); // stop more quickly
 
   mDeviceThread->stop();
 }
