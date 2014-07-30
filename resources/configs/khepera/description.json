@@ -94,7 +94,7 @@
         {
           "cedar.dev.kteam.khepera.GripperSerial":
           {
-            "command set gripper position": "T,1,d",
+            "command set gripper position": "T,1,D",
             "command get gripper position": "T,1,H,0",
             "answer get gripper position": "t,1,h",
             "command set arm position": "T,1,E",

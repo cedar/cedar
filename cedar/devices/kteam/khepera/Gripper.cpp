@@ -48,6 +48,13 @@
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+unsigned int cedar::dev::kteam::khepera::Gripper::GRIPPER_POSITION = 0;
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -79,6 +86,9 @@ void cedar::dev::kteam::khepera::Gripper::initialize()
 {
   _mArmPositionLimits->setDefaults(190, 249);
   _mArmPositionLimits->makeDefault();
+
+  this->installCommandType(GRIPPER_POSITION, "gripper position");
+  this->setCommandDimensionality(GRIPPER_POSITION, 1);
 }
 
 void cedar::dev::kteam::khepera::Gripper::openGripper()
