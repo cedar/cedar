@@ -69,6 +69,8 @@ public:
   //!@brief Constructor taking an externally created channel
   DifferentialDrive(cedar::dev::ChannelPtr channel);
 
+  ~DifferentialDrive();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
