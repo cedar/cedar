@@ -118,7 +118,12 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  static unsigned int GRIPPER_POSITION;
+
+  //!@todo: arm position (measure, command)
+  //!@todo: gripper resistivity (measure)
+  //!@todo: gripper optical sensor (measure)
+
 private:
   // none yet
 

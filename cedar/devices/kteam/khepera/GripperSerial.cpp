@@ -70,46 +70,48 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::kteam::khepera::GripperSerial::GripperSerial()
-:
-_mCommandSetGripperPosition(new cedar::aux::StringParameter(this, "command set gripper position", "T,1,d")),
-_mCommandGetGripperPosition(new cedar::aux::StringParameter(this, "command get gripper position", "T,1,H,0")),
-_mAnswerGetGripperPosition(new cedar::aux::StringParameter(this, "answer get gripper position", "t,1,h")),
-_mCommandSetArmPosition(new cedar::aux::StringParameter(this, "command set arm position", "T,1,E")),
-_mCommandGetArmPosition(new cedar::aux::StringParameter(this, "command get arm position", "T,1,H,1")),
-_mAnswerGetArmPosition(new cedar::aux::StringParameter(this, "answer get arm position", "t,1,h")),
-_mCommandGetGripperResistivity(new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F")),
-_mCommandGetGripperOpticalSensor
-(
-  new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G")
-)
 {
+  this->construct();
 }
 
 // constructor taking an externally created channel
 cedar::dev::kteam::khepera::GripperSerial::GripperSerial(cedar::dev::kteam::SerialChannelPtr channel)
 :
-cedar::dev::kteam::khepera::Gripper(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
-_mCommandSetGripperPosition(new cedar::aux::StringParameter(this, "command set gripper position", "T,1,d")),
-_mCommandGetGripperPosition(new cedar::aux::StringParameter(this, "command get gripper position", "T,1,H,0")),
-_mAnswerGetGripperPosition(new cedar::aux::StringParameter(this, "answer get gripper position", "t,1,h")),
-_mCommandSetArmPosition(new cedar::aux::StringParameter(this, "command set arm position", "T,1,E")),
-_mCommandGetArmPosition(new cedar::aux::StringParameter(this, "command get arm position", "T,1,H,1")),
-_mAnswerGetArmPosition(new cedar::aux::StringParameter(this, "answer get arm position", "t,1,h")),
-_mCommandGetGripperResistivity(new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F")),
-_mCommandGetGripperOpticalSensor
-(
-  new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G")
-)
+cedar::dev::kteam::khepera::Gripper(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel))
 {
+  this->construct();
 }
 
 cedar::dev::kteam::khepera::GripperSerial::~GripperSerial()
 {
 }
 
+void cedar::dev::kteam::khepera::GripperSerial::construct()
+{
+  this->_mCommandSetGripperPosition = new cedar::aux::StringParameter(this, "command set gripper position", "T,1,D");
+  this->_mCommandGetGripperPosition = new cedar::aux::StringParameter(this, "command get gripper position", "T,1,H,0");
+  this->_mAnswerGetGripperPosition = new cedar::aux::StringParameter(this, "answer get gripper position", "t,1,h");
+  this->_mCommandSetArmPosition = new cedar::aux::StringParameter(this, "command set arm position", "T,1,E");
+  this->_mCommandGetArmPosition = new cedar::aux::StringParameter(this, "command get arm position", "T,1,H,1");
+  this->_mAnswerGetArmPosition = new cedar::aux::StringParameter(this, "answer get arm position", "t,1,h");
+  this->_mCommandGetGripperResistivity = new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F");
+  this->_mCommandGetGripperOpticalSensor = new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G");
+
+  this->registerDeviceCommandHook(GRIPPER_POSITION, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::applyGripperPosition, this, _1));
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::kteam::khepera::GripperSerial::applyGripperPosition(cv::Mat openClose)
+{
+  CEDAR_DEBUG_ASSERT(openClose.type() == CV_64F);
+  CEDAR_DEBUG_ASSERT(openClose.rows > 0);
+  CEDAR_DEBUG_ASSERT(openClose.cols > 0);
+  double value = openClose.at<double>(0, 0);
+  this->setGripperPosition(value >= 1.0);
+}
 
 void cedar::dev::kteam::khepera::GripperSerial::setGripperPosition(bool position)
 {
