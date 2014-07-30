@@ -84,26 +84,21 @@ void cedar::dev::kteam::SerialChannel::postOpenHook()
       //!@todo we may not have to send a dummy command here, maybe it is possible to clear the read buffer without it
       answer = this->writeAndReadLocked("D,0,0");
       // 'd,' or 'z,' expected, else init failed
-      if (answer.size() < 2 || (answer[0] != 'd' && answer[0] != 'z') || answer[1] != ',')
+
+      if (answer.empty() || answer == "Command not found")
       {
-        CEDAR_THROW
-        (
-          cedar::dev::SerialCommunicationException,
-          "Initialization of serial communication failed: received wrong answer (" + answer + ")."
-        );
+        continue;
       }
-#ifdef DEBUG
-      else
+
+      switch (answer[0])
       {
-        cedar::aux::LogSingleton::getInstance()->debugMessage
-        (
-          "Drive: Initialization successful (Answer: '" + answer + "')",
-          "cedar::dev::kteam::epuck::Drive::initialize()",
-          "Drive successfully initialized"
-        );
+        case 'd':
+          sent = true;
+          break;
+
+        case 'z':
+          continue;
       }
-#endif
-      sent = true;
     }
     catch (const cedar::dev::SerialChannel::WriteException& e)
     {
@@ -117,4 +112,15 @@ void cedar::dev::kteam::SerialChannel::postOpenHook()
     this->close();
     CEDAR_THROW(ConnectionTimeOutException, "Failed to connect within 10 seconds.");
   }
+#ifdef DEBUG
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Drive: Initialization successful (Answer: '" + answer + "')",
+      "cedar::dev::kteam::epuck::Drive::initialize()",
+      "Drive successfully initialized"
+    );
+  }
+#endif
 }

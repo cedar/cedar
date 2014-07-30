@@ -210,6 +210,10 @@ void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor&
 
 void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEvent*)
 {
+  if (!mStep->hasComponent())
+  {
+    return;
+  }
 
   auto component = this->mStep->getComponent();
 
