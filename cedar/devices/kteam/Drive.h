@@ -97,6 +97,8 @@ public:
    */
   virtual void setWheelSpeedPulses(const std::vector<cedar::unit::Frequency>& wheelSpeedPulses);
 
+  cv::Mat pulsesToWheelSpeed(cv::Mat input);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -123,6 +125,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static const cedar::dev::Component::ComponentDataType ENCODERS;
+  static const cedar::dev::Component::ComponentDataType ENCODERS_CHANGE;
 
 protected:
   // none yet
