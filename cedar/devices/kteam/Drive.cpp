@@ -62,10 +62,8 @@ const cedar::dev::Component::ComponentDataType cedar::dev::kteam::Drive::ENCODER
 
 void cedar::dev::kteam::Drive::init()
 {
-  installCommandAndMeasurementType( cedar::dev::kteam::Drive::ENCODERS, "Encoders" );
-
-  setCommandAndMeasurementDimensionality( cedar::dev::kteam::Drive::ENCODERS, 2 );
-
+  installCommandAndMeasurementType(cedar::dev::kteam::Drive::ENCODERS, "Encoders");
+  setCommandAndMeasurementDimensionality(cedar::dev::kteam::Drive::ENCODERS, 2);
 }
 
 
