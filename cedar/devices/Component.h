@@ -373,6 +373,7 @@ private:
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepMeasurementsTime;
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepCommandsTime;
 
+  mutable QMutex mGeneralAccessLock;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

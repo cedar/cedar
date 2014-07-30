@@ -949,6 +949,9 @@ void cedar::dev::Component::registerDeviceMeasurementTransformationHook(Componen
 
 void cedar::dev::Component::stepDevice(cedar::unit::Time time)
 {
+  // do not re-enter, do not stop/start and step at the same time
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+
   // its important to get the currently scheduled commands out first
   // (think safety first). this assumes serial communication, of course
   try
@@ -974,7 +977,7 @@ void cedar::dev::Component::stepDevice(cedar::unit::Time time)
 void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 {
   cedar::aux::Timer timer;
-#if 1
+
   // todo: check locking in this function, forgot some stuff ...
   ComponentDataType type_for_Device, type_from_user;
   cv::Mat userData, ioData;
@@ -1083,7 +1086,6 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
   }
 
   (hook_found->second)(ioData);
-#endif
 
   //!@todo this should never be necessary
 //  this->mCommandData->mUserBuffer.member().clear();
@@ -1170,6 +1172,9 @@ void cedar::dev::Component::updateUserMeasurements()
 
 void cedar::dev::Component::startDevice()
 {
+  // do not re-enter, do not stop/start and step at the same time
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+
   if (this->mCommandData->getInstalledTypes().empty() && this->mMeasurementData->getInstalledTypes().empty())
   {
     cedar::aux::LogSingleton::getInstance()->warning
@@ -1184,6 +1189,9 @@ void cedar::dev::Component::startDevice()
 
 void cedar::dev::Component::stopDevice()
 {
+  // do not re-enter, do not stop/start and step at the same time
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+
   brakeNow();
   mDeviceThread->stop();
 }
