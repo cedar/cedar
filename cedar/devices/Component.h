@@ -196,6 +196,8 @@ public:
   void startDevice();
   void stopDevice();
 
+  void waitUntilCommunicated() const;
+
   void startBraking(); // non-blocking. will set a Controller that smoothly brakes
   void brakeNow();     // blocking. will try to instantly reduce velocity, high inertias possible
   void crashbrake();   // last-resort braking, may disconnect device or even break the robot
