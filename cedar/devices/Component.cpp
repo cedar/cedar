@@ -642,6 +642,7 @@ cedar::dev::Component::~Component()
   // virtual can't be called in the inherit. This is why all children
   // must call it!
   //brakeNow();
+
   mDeviceThread->stop();
 }
 
@@ -860,6 +861,8 @@ void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
 
 void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
+  CEDAR_DEBUG_ASSERT( mDeviceThread->isRunning() ); //@todo: change to warning
+
   this->checkExclusivenessOfCommand(type);
   QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
   this->mCommandData->setUserBuffer(type, data);
@@ -951,9 +954,6 @@ void cedar::dev::Component::registerDeviceMeasurementTransformationHook(Componen
 
 void cedar::dev::Component::stepDevice(cedar::unit::Time time)
 {
-  // do not re-enter, do not stop/start and step at the same time
-  QMutexLocker lockerGeneral(&mGeneralAccessLock);
-
   // its important to get the currently scheduled commands out first
   // (think safety first). this assumes serial communication, of course
   try
@@ -1174,7 +1174,7 @@ void cedar::dev::Component::updateUserMeasurements()
 
 void cedar::dev::Component::startDevice()
 {
-  // do not re-enter, do not stop/start and step at the same time
+  // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
   if (this->mCommandData->getInstalledTypes().empty() && this->mMeasurementData->getInstalledTypes().empty())
@@ -1191,10 +1191,12 @@ void cedar::dev::Component::startDevice()
 
 void cedar::dev::Component::stopDevice()
 {
+  // do not re-enter, do not stop/start at the same time
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+
   brakeNow(); // this will wait for one step and need to access the Mutex below 
 
-  // do not re-enter, do not stop/start and step at the same time
-  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+  mDeviceThread->requestStop(); // stop more quickly
 
   mDeviceThread->stop();
 }
@@ -1365,20 +1367,29 @@ void cedar::dev::Component::startBraking()
 
 void cedar::dev::Component::brakeNow()
 {
+  if (!isRunning())
+    return; // well ... nothing do, right?
+
   clearUserCommand();
   clearController();
+
   if (!applyBrakeNow())
   {
-    //@todo: wait short time, try again and then panic
+    //@todo: wait short time, try again and then panic TODO TODO
   }
   else
   {
+    CEDAR_DEBUG_ASSERT(mDeviceThread->isRunning());
+   
     // force sending the command
-    cedar::aux::sleep( mDeviceThread->getStepSize() * 1.5 );
+    mDeviceThread->waitUntilStepped();
 
     // paranoid:
     clearUserCommand(); 
     clearController();
+
+    // TODO: set lock on all incoming commands and controllers
+    // TODO: we also need to test if the vel measurements are 0
   }
 }
 
@@ -1407,5 +1418,13 @@ void cedar::dev::Component::clearController()
 void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallback fun)
 {
   mController= ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun } );
+}
+
+void cedar::dev::Component::waitUntilCommunicated() const
+{
+  CEDAR_ASSERT( mDeviceThread );
+  mDeviceThread->waitUntilStepped();
+
+  // include any waiting for synchronous responses here ...
 }
 

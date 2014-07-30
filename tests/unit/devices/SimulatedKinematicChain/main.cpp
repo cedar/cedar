@@ -39,7 +39,6 @@
 #include "cedar/devices/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/testingUtilities/helpers.h"
@@ -135,7 +134,8 @@ void test()
   test_arm_position->setJointAngle(1, 2.0);
   test_arm_position->setJointAngle(2, cedar::aux::math::pi/2);
   test_arm_position->setJointAngle(3, sqrt(2.0));
-  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_position->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_position->getJointAngle(0) - 1.0)
       || !cedar::aux::math::isZero(test_arm_position->getJointAngle(1) - 2.0)
@@ -158,7 +158,8 @@ void test()
   angle_vector.push_back(2.5);
   angle_vector.push_back(3.5);
   test_arm_position->setJointAngles(angle_vector);
-  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_position->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero<double>(test_arm_position->getJointAngle(0) - 0.5)
       || !cedar::aux::math::isZero<double>(test_arm_position->getJointAngle(1) - 1.5)
@@ -181,7 +182,8 @@ void test()
   angle_matrix.at<double>(2, 0) = 0.3;
   angle_matrix.at<double>(3, 0) = 0.4;
   test_arm_position->setJointAngles(angle_matrix);
-  cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_position->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(20.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_position->getJointAngles().at<double>(0, 0) - 0.1)
       || !cedar::aux::math::isZero(test_arm_position->getJointAngles().at<double>(1, 0) - 0.2)
@@ -209,7 +211,8 @@ void test()
   test_arm_velocity->setJointVelocity(1, 0.2);
   test_arm_velocity->setJointVelocity(2, 0.15);
   test_arm_velocity->setJointVelocity(3, 0.25);
-  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_velocity->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(0) - 0.1)
       || !cedar::aux::math::isZero(test_arm_velocity->getJointVelocity(1) - 0.2)
@@ -233,7 +236,8 @@ void test()
   velocity_vector.push_back(2.5);
   velocity_vector.push_back(3.5);
   test_arm_velocity->setJointVelocities(velocity_vector);
-  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_velocity->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero<double>(test_arm_velocity->getJointVelocity(0) - 0.5)
       || !cedar::aux::math::isZero<double>(test_arm_velocity->getJointVelocity(1) - 1.5)
@@ -257,7 +261,8 @@ void test()
   velocity_matrix.at<double>(2, 0) = 0.3;
   velocity_matrix.at<double>(3, 0) = 0.4;
   test_arm_velocity->setJointVelocities(velocity_matrix);
-  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_velocity->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_velocity->getJointVelocities().at<double>(0, 0) - 0.1)
       || !cedar::aux::math::isZero(test_arm_velocity->getJointVelocities().at<double>(1, 0) - 0.2)
@@ -286,7 +291,8 @@ void test()
   test_arm_acceleration->setJointAcceleration(1, 0.002);
   test_arm_acceleration->setJointAcceleration(2, 0.0015);
   test_arm_acceleration->setJointAcceleration(3, 0.0025);
-  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_acceleration->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_acceleration->getJointAcceleration(0) - 0.001)
       || !cedar::aux::math::isZero(test_arm_acceleration->getJointAcceleration(1) - 0.002)
@@ -311,7 +317,8 @@ void test()
   acceleration_vector.push_back(0.003);
   acceleration_vector.push_back(0.002);
   test_arm_acceleration->setJointAccelerations(acceleration_vector);
-  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_acceleration->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero<double>(test_arm_acceleration->getJointAcceleration(0) - acceleration_vector.at(0))
       || !cedar::aux::math::isZero<double>(test_arm_acceleration->getJointAcceleration(1) - acceleration_vector.at(1))
@@ -336,7 +343,8 @@ void test()
   acceleration_matrix.at<double>(2, 0) = 0.003;
   acceleration_matrix.at<double>(3, 0) = 0.004;
   test_arm_acceleration->setJointAccelerations(acceleration_matrix);
-  cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
+  test_arm_acceleration->waitUntilCommunicated();
+  //cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
   if (
       !cedar::aux::math::isZero(test_arm_acceleration->getJointAccelerations().at<double>(0, 0) - acceleration_matrix.at<double>(0, 0))
       || !cedar::aux::math::isZero(test_arm_acceleration->getJointAccelerations().at<double>(1, 0) - acceleration_matrix.at<double>(1, 0))
@@ -402,7 +410,8 @@ void test()
   test_coordinate_frames->readJson("test_arm.json");
   test_coordinate_frames->startDevice();
   test_coordinate_frames->setJointAngles( cv::Mat::zeros( test_arm_position->getNumberOfJoints(), 1, CV_64F) );
-  cedar::aux::sleep(test_coordinate_frames->getDeviceStepSize() * 1.5);
+  test_coordinate_frames->waitUntilCommunicated();
+  //cedar::aux::sleep(test_coordinate_frames->getDeviceStepSize() * 1.5);
   test_coordinate_frames->stopDevice();
 
 
@@ -747,15 +756,18 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   cv::randn(thetaTwoDot, cv::Scalar(0), cv::Scalar(1));
 
   complex_test_arm->setJointAngles(theta);
-  cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
+  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
+  complex_test_arm->waitUntilCommunicated();
 
   complex_test_arm->clearUserCommand();
   complex_test_arm->setJointVelocities(thetaDot);
-  cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
+  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
+  complex_test_arm->waitUntilCommunicated();
 
   complex_test_arm->clearUserCommand();
   complex_test_arm->setJointAccelerations(thetaTwoDot);
-  cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
+  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
+  complex_test_arm->waitUntilCommunicated();
 
   complex_test_arm->stopDevice();
 
@@ -805,7 +817,8 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
     complex_test_arm->getJointVelocities()
     + delta_t*complex_test_arm->getJointAccelerations()
   );
-  cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
+  complex_test_arm->waitUntilCommunicated();
+  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
   complex_test_arm->clearUserCommand();
   complex_test_arm->setJointAngles
   (
@@ -813,7 +826,8 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
     + delta_t*complex_test_arm->getJointVelocities()
     + delta_t*delta_t*complex_test_arm->getJointAccelerations()
   );
-  cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
+  complex_test_arm->waitUntilCommunicated();
+  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
   complex_test_arm->stopDevice();
 
   // compute new values
