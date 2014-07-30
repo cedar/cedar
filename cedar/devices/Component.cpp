@@ -39,6 +39,7 @@
 #include "cedar/devices/Channel.h"
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
@@ -576,6 +577,9 @@ cedar::dev::Component::~Component()
   // the thread will stopped when mDeviceThread is destructed, anyway, but we
   // try to send the stop request as early as possible ...
   mDeviceThread->requestStop();
+
+  brakeNow();
+  mDeviceThread->stop();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1222,6 +1226,11 @@ void cedar::dev::Component::brakeNow()
   if (!applyBrakeNow())
   {
     //@todo: wait short time, try again and then panic
+  }
+  else
+  {
+    // force sending the command
+    cedar::aux::sleep( mDeviceThread->getStepSize() * 1.5 );
   }
 }
 
