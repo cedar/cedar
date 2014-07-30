@@ -130,13 +130,18 @@ void cedar::dev::gui::KinematicChainCommandWidget::commandJoints()
 void cedar::dev::gui::KinematicChainCommandWidget::stopMovement()
 {
   mpKeepMovingBox->setChecked(false);
+
+  mpKinematicChain->brakeNow();
+
+#if 0
   mpKinematicChain->clearUserCommand();
   for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
   {
     mpKinematicChain->setJointVelocity(j, 0);
   }
+#endif  
   update();
-  mpKinematicChain->clearUserCommand();
+  //mpKinematicChain->clearUserCommand();
 }
 
 void cedar::dev::gui::KinematicChainCommandWidget::update()
@@ -224,7 +229,7 @@ void cedar::dev::gui::KinematicChainCommandWidget::initWindow()
   connect(copy_button, SIGNAL(pressed()), this, SLOT(update()));
 
   // stop button
-  QPushButton* stop_button = new QPushButton(QApplication::translate("KinematicChainWindow", "stop!"));
+  QPushButton* stop_button = new QPushButton(QApplication::translate("KinematicChainWindow", "brake now!"));
   mpGridLayout->addWidget(stop_button, 4, 0);
   connect(stop_button, SIGNAL(pressed()), this, SLOT(stopMovement()));
 
