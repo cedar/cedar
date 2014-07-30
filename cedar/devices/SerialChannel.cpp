@@ -245,6 +245,7 @@ std::string cedar::dev::SerialChannel::read()
         {
           mPort.cancel();
           CEDAR_THROW(cedar::dev::TimeoutException, "Timeout expired on receiving data on the serial channel.");
+          continue;
         }
         // if an error occurred on read
         case readError:
@@ -363,15 +364,36 @@ void cedar::dev::SerialChannel::openHook()
 
   // open the serial port
   //!@todo Handle errors during opening
-  mPort.open(_mDevicePath->getValue());
-  mPort.set_option(boost::asio::serial_port_base::baud_rate(_mBaudRate->getValue()));
+  boost::system::error_code error;
+  error = mPort.open(_mDevicePath->getValue(), error);
+
+  if (error)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error opening serial port: " + std::string(error.message()),
+      CEDAR_CURRENT_FUNCTION_NAME,
+      "Serial channel error"
+    );
+  }
+
+  error = mPort.set_option(boost::asio::serial_port_base::baud_rate(_mBaudRate->getValue()), error);
+  if (error)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error setting baud rate: " + std::string(error.message()),
+      CEDAR_CURRENT_FUNCTION_NAME,
+      "Serial channel error"
+    );
+  }
 
   if (mPort.is_open())
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
     (
       "Successfully opened port " + getDevicePath(),
-      "cedar::dev::SerialChannel",
+      CEDAR_CURRENT_FUNCTION_NAME,
       "Serial channel opened"
     );
   }
@@ -380,7 +402,7 @@ void cedar::dev::SerialChannel::openHook()
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Port " + getDevicePath() + " not opened.",
-      "cedar::dev::SerialChannel",
+      CEDAR_CURRENT_FUNCTION_NAME,
       "Serial channel error"
     );
   }
