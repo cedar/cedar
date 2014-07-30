@@ -1191,10 +1191,11 @@ void cedar::dev::Component::startDevice()
 
 void cedar::dev::Component::stopDevice()
 {
+  brakeNow(); // this will wait for one step and need to access the Mutex below 
+
   // do not re-enter, do not stop/start and step at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
-  brakeNow();
   mDeviceThread->stop();
 }
 
@@ -1374,6 +1375,10 @@ void cedar::dev::Component::brakeNow()
   {
     // force sending the command
     cedar::aux::sleep( mDeviceThread->getStepSize() * 1.5 );
+
+    // paranoid:
+    clearUserCommand(); 
+    clearController();
   }
 }
 
