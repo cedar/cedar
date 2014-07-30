@@ -22,36 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LockerBase.h
+    File:        Timer.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 03 19
+    Date:        2014 07 29
 
-    Description: Header file for the class cedar::aux::LockerBase.
+    Description: Header file for the class cedar::aux::Timer.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_LOCKER_BASE_H
-#define CEDAR_AUX_LOCKER_BASE_H
+#ifndef CEDAR_AUX_TIMER_H
+#define CEDAR_AUX_TIMER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/CallOnScopeExit.h"
+#include "cedar/units/Time.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/LockerBase.fwd.h"
+#include "cedar/auxiliaries/Timer.fwd.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/date_time/posix_time/posix_time_types.hpp>
+#endif // Q_MOC_RUN
 
 
-/*!@brief A base class for RAII-based lockers that behave similar to, e.g., QReadLocker
+/*!@brief A class for measuring time durations.
+ *
+ * @todo Replace measurements throughout cedar by this class. Non-exhaustive list of places that need to be changed:
+ *       - proc::Step
+ *       - aux::LoopedThread
  */
-class cedar::aux::LockerBase : protected cedar::aux::CallOnScopeExit
+class cedar::aux::Timer
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -61,25 +68,18 @@ class cedar::aux::LockerBase : protected cedar::aux::CallOnScopeExit
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief The constructor.
-   *
-   * @param lockFunction Function called when the locker is locked.
-   * @param unlockFunction Function called when the locker is unlocked.
-   * @param lockImmediately If true, this constructor will call the lock function. Note, that this can be a problem if
-   *        the @em lockFunction accesses members of the derived class, as those will not be initialized at this time.
-   *        If you set this to false, you should call relock() in the derived class.
-   */
-  LockerBase(const boost::function<void()>& lockFunction, const boost::function<void()>& unlockFunction, bool lockImmediately = true);
+  //!@brief The standard constructor.
+  Timer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Reacquires the lock.
-  void relock();
+  //! Returns how much time has elapsed since the last reset or creation of the timer.
+  cedar::unit::Time elapsed() const;
 
-  //! Releasese the lock.
-  void unlock();
+  //! Resets the timer.
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,9 +99,18 @@ private:
 protected:
   // none yet
 private:
-  boost::function<void()> mLockFunction;
+  boost::posix_time::ptime mStart;
 
-}; // class cedar::aux::LockerBase
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_AUX_LOCKER_BASE_H
+private:
+  // none yet
+
+}; // class cedar::aux::Timer
+
+#endif // CEDAR_AUX_TIMER_H
 
