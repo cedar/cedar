@@ -366,7 +366,7 @@ CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(void pluginDeclaration(cedar::aux::PluginDecl
 Upon loading the plugin, the processing framework calls the function declared here and imports everything declared in
 the cedar::proc::PluginDeclaration. Therefore, we declare our summation step in this function:
 @code
-#include "Plugin.h"
+#include "plugin.h"
 #include "SimpleSummation.h"
 
 #include <cedar/processing/ElementDeclaration.h>
@@ -377,7 +377,7 @@ void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin)
   (
     new cedar::proc::ElementDeclarationTemplate
     <
-    utilities::SimpleSummation
+    SimpleSummation
     >
     (
       "Utilities"

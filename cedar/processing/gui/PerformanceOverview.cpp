@@ -274,7 +274,7 @@ void cedar::proc::gui::PerformanceOverview::autoRefreshToggled(bool enabled)
 
 void cedar::proc::gui::PerformanceOverview::timerEvent(QTimerEvent*)
 {
-  if (this->mpAutoRefresh->isChecked())
+  if (this->isVisible() && this->mpAutoRefresh->isChecked())
   {
     this->refresh();
   }

@@ -263,6 +263,18 @@ public:
   void clearController();
   void setController( ComponentDataType buffer, cedar::dev::Component::ControllerCallback fun );
 
+  //! Checks if a new step measurements duration is available.
+  bool hasLastStepMeasurementsDuration() const;
+
+  //! Removes and returns the duration of the last step measurements call.
+  cedar::unit::Time retrieveLastStepMeasurementsDuration();
+
+  //! Checks if a new step measurements duration is available.
+  bool hasLastStepCommandsDuration() const;
+
+  //! Removes and returns the duration of the last step commands call.
+  cedar::unit::Time retrieveLastStepCommandsDuration();
+
 signals:
   void updatedUserMeasurementSignal();
 
@@ -348,6 +360,9 @@ private:
   cedar::aux::LockableMember<std::set<ComponentDataType>> mUserCommandUsed;
 
   ControllerCollectionPtr mController; // @todo: make LockableMember
+
+  cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepMeasurementsTime;
+  cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepCommandsTime;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

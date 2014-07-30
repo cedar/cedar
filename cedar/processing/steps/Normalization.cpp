@@ -248,16 +248,33 @@ void cedar::proc::steps::Normalization::normalizeAlongOneDimension(int normalize
 
           cv::Mat input_slice = input(&ranges.front());
           double norm = cv::norm(input_slice, type);
-          if (norm == 0.0)
-          {
-            norm = 1.0;
-          }
-          normalized_image(&ranges.front()) = input_slice / norm;
+          normalized_image(&ranges.front()) = input_slice * this->safeNormInverse(norm);
         }
       }
       break;
     }
   } // input.dims
+}
+
+double cedar::proc::steps::Normalization::safeNormInverse(double norm) const
+{
+  if (isinf(norm))
+  {
+    return 0.0;
+  }
+
+  if (isnan(norm))
+  {
+    return 1.0;
+  }
+
+  if (std::abs(norm) < std::numeric_limits<float>::min())
+  {
+    return 1.0;
+  }
+
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(!isnan(1.0 / norm) && !isinf(1.0 / norm));
+  return 1.0 / norm;
 }
 
 void cedar::proc::steps::Normalization::normalizeAlongAllDimensions()
@@ -267,9 +284,5 @@ void cedar::proc::steps::Normalization::normalizeAlongAllDimensions()
   cedar::proc::steps::NormalizationType::Id type = this->_mNormalizationType->getValue();
 
   double norm = cv::norm(input, type);
-  if (norm == 0.0)
-  {
-    norm = 1.0;
-  }
-  input.convertTo(normalized_image, CV_32F, 1.0 / norm);
+  input.convertTo(normalized_image, CV_32F, this->safeNormInverse(norm));
 }

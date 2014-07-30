@@ -218,6 +218,9 @@ _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command gro
   this->_mGroup->setConstant(true);
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChanged()));
   QObject::connect(this->_mGroup.get(), SIGNAL(valueChanged()), this, SLOT(selectedGroupChanged()));
+
+  this->mMeasurementTimeId = this->registerTimeMeasurement("step measurements time");
+  this->mCommandTimeId = this->registerTimeMeasurement("step commands time");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -279,12 +282,27 @@ void cedar::proc::steps::Component::onStop()
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
+  auto component = this->getComponent();
+
+  // update time measurements
+  if (component->hasLastStepMeasurementsDuration())
+  {
+    auto time = component->retrieveLastStepMeasurementsDuration();
+    this->setTimeMeasurement(this->mMeasurementTimeId, time);
+  }
+
+  if (component->hasLastStepCommandsDuration())
+  {
+    auto time = component->retrieveLastStepCommandsDuration();
+    this->setTimeMeasurement(this->mCommandTimeId, time);
+  }
+
+  // if no inputs are present, there is nothing to do (i.e., no inputs have to be passed to the component)
   if (!this->hasRole(cedar::proc::DataRole::INPUT))
   {
     return;
   }
 
-  auto component = this->getComponent();
   // copy data from the input slots to the command slots of the component
   for (auto name_slot_pair : this->getDataSlots(cedar::proc::DataRole::INPUT))
   {
