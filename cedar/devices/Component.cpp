@@ -37,8 +37,10 @@
 // CEDAR INCLUDES
 #include "cedar/devices/Component.h"
 #include "cedar/devices/Channel.h"
+#include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/auxiliaries/Timer.h"
+#include "cedar/auxiliaries/MovingAverage.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 
 // SYSTEM INCLUDES
@@ -55,6 +57,12 @@
 class cedar::dev::Component::DataCollection
 {
   public:
+    DataCollection()
+    :
+    mCommunicationErrorCount(20)
+    {
+    }
+
     void installType(cedar::dev::Component::ComponentDataType type, const std::string& name)
     {
       if (this->hasType(type))
@@ -385,6 +393,52 @@ class cedar::dev::Component::DataCollection
       return copy;
     }
 
+    double getCommunicationErrorRate() const
+    {
+      QReadLocker locker(this->mCommunicationErrorCount.getLockPtr());
+      double error_rate = 0.0;
+      if (this->mCommunicationErrorCount.member().size() > 0)
+      {
+        error_rate = this->mCommunicationErrorCount.member().getAverage();
+      }
+      return error_rate;
+    }
+
+    std::vector<std::string> getLastErrors() const
+    {
+      QReadLocker locker(mLastCommunicationErrorMessages.getLockPtr());
+      std::vector<std::string> errors;
+      errors.assign(this->mLastCommunicationErrorMessages.member().begin(), this->mLastCommunicationErrorMessages.member().end());
+      return errors;
+    }
+
+    void countSuccessfullCommunication()
+    {
+      QWriteLocker locker(mCommunicationErrorCount.getLockPtr());
+      mCommunicationErrorCount.member().append(0.0);
+    }
+
+    void countCommunicationError(const cedar::dev::CommunicationException& exception)
+    {
+      // count the error
+      {
+        QWriteLocker locker(mCommunicationErrorCount.getLockPtr());
+        mCommunicationErrorCount.member().append(1.0);
+      }
+
+      // log the error message
+      {
+        QWriteLocker locker(mLastCommunicationErrorMessages.getLockPtr());
+        mLastCommunicationErrorMessages.member().push_back(exception.exceptionInfo());
+
+        // remove any excess messages
+        while (this->mLastCommunicationErrorMessages.member().size() > 5)
+        {
+          this->mLastCommunicationErrorMessages.member().pop_front();
+        }
+      }
+    }
+
   private:
     bool hasGroupUnlocked(const std::string& groupName)
     {
@@ -538,6 +592,12 @@ class cedar::dev::Component::DataCollection
     cedar::aux::LockableMember<std::map<cedar::dev::Component::ComponentDataType, std::string> > mInstalledNames;
 
     cedar::aux::LockableMember<std::map<std::string, std::vector<cedar::dev::Component::ComponentDataType> > > mGroups;
+
+    //! A member that contains the counts of errors for the last stepDevice* calls.
+    cedar::aux::LockableMember<cedar::aux::MovingAverage<double> > mCommunicationErrorCount;
+
+    //! The last things that went wrong during communication.
+    cedar::aux::LockableMember<std::deque<std::string> > mLastCommunicationErrorMessages;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -582,6 +642,22 @@ cedar::dev::Component::~Component()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::vector<std::string> cedar::dev::Component::getLastCommandCommunicationErrors() const
+{
+  return this->mCommandData->getLastErrors();
+}
+
+std::vector<std::string> cedar::dev::Component::getLastMeasurementCommunicationErrors() const
+{
+  return this->mMeasurementData->getLastErrors();
+}
+
+void cedar::dev::Component::getCommunicationErrorRates(double& commands, double& measurements) const
+{
+  commands = this->mCommandData->getCommunicationErrorRate();
+  measurements = this->mMeasurementData->getCommunicationErrorRate();
+}
 
 cedar::unit::Time cedar::dev::Component::retrieveLastStepMeasurementsDuration()
 {
@@ -871,8 +947,24 @@ void cedar::dev::Component::stepDevice(cedar::unit::Time time)
 {
   // its important to get the currently scheduled commands out first
   // (think safety first). this assumes serial communication, of course
-  stepDeviceCommands(time);
-  stepDeviceMeasurements(time); // note, the post-measurements transformations also take time
+  try
+  {
+    stepDeviceCommands(time);
+    this->mCommandData->countSuccessfullCommunication();
+  }
+  catch (const cedar::dev::CommunicationException& e)
+  {
+    this->mCommandData->countCommunicationError(e);
+  }
+  try
+  {
+    stepDeviceMeasurements(time); // note, the post-measurements transformations also take time
+    this->mMeasurementData->countSuccessfullCommunication();
+  }
+  catch (const cedar::dev::CommunicationException& e)
+  {
+    this->mMeasurementData->countCommunicationError(e);
+  }
 }
 
 void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
