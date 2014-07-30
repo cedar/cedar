@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Gripper.cpp
+    File:        Arm.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 26
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 07 30
 
-    Description: Gripper that can be attached to the Khepera robot.
+    Description: Source file for the class cedar::dev::kteam::khepera::Arm.
 
     Credits:
 
@@ -38,12 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/casts.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/math/UIntLimitsParameter.h"
-#include "cedar/devices/kteam/khepera/Gripper.h"
-#include "cedar/devices/kteam/serialChannelHelperFunctions.h"
-#include "cedar/devices/kteam/SerialChannel.h"
+#include "cedar/devices/kteam/khepera/Arm.h"
 
 // SYSTEM INCLUDES
 
@@ -51,67 +46,36 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
-unsigned int cedar::dev::kteam::khepera::Gripper::GRIPPER_POSITION = 0;
-unsigned int cedar::dev::kteam::khepera::Gripper::OPTICAL_SENSOR = 1;
-unsigned int cedar::dev::kteam::khepera::Gripper::RESISTIVITY = 2;
-
+unsigned int cedar::dev::kteam::khepera::Arm::POSITION = 0;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::kteam::khepera::Gripper::Gripper()
-{
-  initialize();
-}
-
-// constructor taking an externally created channel
-cedar::dev::kteam::khepera::Gripper::Gripper(cedar::dev::ChannelPtr channel)
+cedar::dev::kteam::khepera::Arm::Arm()
 :
-cedar::dev::Component(channel)
+_mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm position limits", 0, 0, 255, 255, 0, 255))
 {
-  initialize();
-}
+  this->_mArmPositionLimits->setDefaults(190, 249);
+  this->_mArmPositionLimits->makeDefault();
 
-cedar::dev::kteam::khepera::Gripper::~Gripper()
-{
+  this->installCommandAndMeasurementType(POSITION, "arm position");
+  this->setCommandAndMeasurementDimensionality(POSITION, 1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::kteam::khepera::Gripper::initialize()
-{
-  this->installCommandType(GRIPPER_POSITION, "gripper position");
-  this->setCommandDimensionality(GRIPPER_POSITION, 1);
 
-  this->installMeasurementType(OPTICAL_SENSOR, "optical sensor");
-  this->setMeasurementDimensionality(OPTICAL_SENSOR, 1);
-
-  this->installMeasurementType(RESISTIVITY, "resistivity");
-  this->setMeasurementDimensionality(RESISTIVITY, 1);
-}
-
-void cedar::dev::kteam::khepera::Gripper::openGripper()
-{
-  this->setGripperPosition(true);
-}
-
-void cedar::dev::kteam::khepera::Gripper::closeGripper()
-{
-  this->setGripperPosition(false);
-}
-
-bool cedar::dev::kteam::khepera::Gripper::applyBrakeNow()
+bool cedar::dev::kteam::khepera::Arm::applyBrakeNow()
 {
   // TODO
   return false;
 }
 
-bool cedar::dev::kteam::khepera::Gripper::applyBrakeController()
+bool cedar::dev::kteam::khepera::Arm::applyBrakeController()
 {
   // TODO
   return false;
 }
-
