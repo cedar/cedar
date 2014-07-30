@@ -113,6 +113,12 @@ public:
   //! get a map of all color stops along the gradient
   const std::map<double, QColor>& getStops() const;
 
+  //! Checks if the gradient is empty.
+  bool empty() const;
+
+  //! Returns the (interpolated) color for the given position.
+  QColor getColor(double position) const;
+
   //! get the default gradient color jet
   static ColorGradientPtr getDefaultPlotColorJet();
 

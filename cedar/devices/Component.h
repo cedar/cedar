@@ -275,6 +275,15 @@ public:
   //! Removes and returns the duration of the last step commands call.
   cedar::unit::Time retrieveLastStepCommandsDuration();
 
+  //! Returns the error rate (number of communications failed / number of communications sent) for commands and measurements.
+  void getCommunicationErrorRates(double& commands, double& measurements) const;
+
+  //! Returns the last communication errors.
+  std::vector<std::string> getLastCommandCommunicationErrors() const;
+
+  //! Returns the last communication errors.
+  std::vector<std::string> getLastMeasurementCommunicationErrors() const;
+
 signals:
   void updatedUserMeasurementSignal();
 
