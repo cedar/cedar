@@ -215,10 +215,10 @@ void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEv
     return;
   }
 
-  auto component = this->mStep->getComponent();
 
-  if (component->isRunning())
+  if (this->mStep->isStarted())
   {
+    auto component = this->mStep->getComponent();
     double command_errors, measurement_errors;
     component->getCommunicationErrorRates(command_errors, measurement_errors);
 
