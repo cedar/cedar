@@ -86,6 +86,7 @@ _mCommandGetEncoder(new cedar::aux::StringParameter(this, "command get encoder",
 void cedar::dev::kteam::DriveSerial::init()
 {
   this->registerDeviceCommandHook(cedar::dev::DifferentialDrive::WHEEL_SPEED, boost::bind(&cedar::dev::kteam::DriveSerial::sendMovementCommand, this));
+  this->registerDeviceMeasurementHook(cedar::dev::kteam::Drive::ENCODERS, boost::bind(&cedar::dev::kteam::DriveSerial::retrieveEncoders, this));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
