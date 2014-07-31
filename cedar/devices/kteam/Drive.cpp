@@ -71,13 +71,13 @@ void cedar::dev::kteam::Drive::init()
   (
       cedar::dev::kteam::Drive::ENCODERS,
       cedar::dev::kteam::Drive::ENCODERS_CHANGE,
-      boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::kteam::Drive::ENCODERS)
+      boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::kteam::Drive::ENCODERS)
   );
   registerDeviceMeasurementTransformationHook
   (
-      cedar::dev::kteam::Drive::ENCODERS_CHANGE,
+      cedar::dev::kteam::Drive::ENCODERS,
       cedar::dev::kteam::Drive::WHEEL_SPEED,
-      boost::bind(&cedar::dev::kteam::Drive::pulsesToWheelSpeed, this, _1, cedar::dev::kteam::Drive::ENCODERS_CHANGE)
+      boost::bind(&cedar::dev::kteam::Drive::pulsesToWheelSpeed, this, _1, _2, cedar::dev::kteam::Drive::ENCODERS_CHANGE)
   );
 }
 
@@ -197,7 +197,7 @@ void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
   setUserCommandBuffer( ENCODERS, mat );
 }
 
-cv::Mat cedar::dev::kteam::Drive::pulsesToWheelSpeed(cv::Mat input, ComponentDataType type)
+cv::Mat cedar::dev::kteam::Drive::pulsesToWheelSpeed(cedar::unit::Time, cv::Mat, ComponentDataType type)
 {
   cv::Mat mat = cv::Mat(2, 1, CV_64F);
   std::vector<cedar::unit::Frequency> wheel_speed_pulses;
@@ -209,6 +209,5 @@ cv::Mat cedar::dev::kteam::Drive::pulsesToWheelSpeed(cv::Mat input, ComponentDat
   auto speed = this->convertPulsesToWheelSpeed(wheel_speed_pulses);
   mat.at<double>(0,0) = speed.at(0) / cedar::unit::meters_per_second;
   mat.at<double>(1,0) = speed.at(1) / cedar::unit::meters_per_second;
-  std::cout << mat;
   return mat;
 }

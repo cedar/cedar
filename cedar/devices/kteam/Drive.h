@@ -97,7 +97,7 @@ public:
    */
   virtual void setWheelSpeedPulses(const std::vector<cedar::unit::Frequency>& wheelSpeedPulses);
 
-  cv::Mat pulsesToWheelSpeed(cv::Mat input, ComponentDataType type);
+  cv::Mat pulsesToWheelSpeed(cedar::unit::Time dt, cv::Mat input, ComponentDataType type);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
