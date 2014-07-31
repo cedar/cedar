@@ -157,6 +157,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  static void handleCrash(); // called from the IDE
+
   // replaced by startCommunication()
   CEDAR_DECLARE_DEPRECATED(void start());
 
@@ -349,7 +351,7 @@ private:
 
   virtual bool applyBrakeController() = 0; // returning FALSE will allow re-try
   virtual bool applyBrakeNow() = 0;
-  virtual bool applyCrashbrake(); // defaults to applyBrakeNow()
+  virtual bool applyCrashbrake();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -382,6 +384,8 @@ private:
   mutable QMutex mGeneralAccessLock;
 
   bool mDestructWasPrepared; // helper bool
+
+  static std::set< cedar::dev::Component* > mRunningComponentInstances;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

@@ -72,3 +72,9 @@ bool cedar::dev::Sensor::applyBrakeNow()
   return true;
 }
 
+bool cedar::dev::Sensor::applyCrashbrake()
+{
+  return true;
+}
+
+

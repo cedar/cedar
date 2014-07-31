@@ -133,3 +133,15 @@ void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
     mSimulation[cedar::dev::KinematicChain::JOINT_ACCELERATIONS] = cv::Mat::zeros(number_of_joints, 1, CV_64F);
   }
 }
+
+bool cedar::dev::SimulatedKinematicChain::applyCrashbrake()
+{
+  //@todo: locking
+  mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ] = 
+    cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F );
+  mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS ] = 
+    cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F );
+
+  return true;
+}
+

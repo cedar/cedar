@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
@@ -225,6 +226,7 @@ int cedar::proc::gui::IdeApplication::exec()
 void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
 {
   cedar::dev::sensors::visual::Grabber::emergencyCleanup();
+  cedar::dev::Component::handleCrash();
   QApplication::exit(-1);
 }
 

@@ -73,3 +73,9 @@ bool cedar::dev::kteam::Led::applyBrakeNow()
   return true;
 }
 
+bool cedar::dev::kteam::Led::applyCrashbrake()
+{
+  return true;
+}
+
+

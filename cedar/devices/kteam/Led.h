@@ -90,6 +90,7 @@ protected:
 private:
   bool applyBrakeController();
   bool applyBrakeNow();
+  bool applyCrashbrake();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
