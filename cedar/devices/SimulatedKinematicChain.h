@@ -70,6 +70,8 @@ public:
    */
   bool isMovable() const;
 
+  bool applyCrashbrake();
+
 public slots:
   //!@brief reacts to a change in the number of joints and sets an almost-zero initial configuration
   void updateInitialConfiguration();

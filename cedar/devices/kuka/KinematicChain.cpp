@@ -281,5 +281,6 @@ bool cedar::dev::kuka::KinematicChain::isPowerOn() const
   mLock.unlock();
   return on;
 }
+
 #endif // CEDAR_USE_KUKA_FRI
 

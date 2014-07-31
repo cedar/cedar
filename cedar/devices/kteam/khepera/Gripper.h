@@ -107,6 +107,7 @@ private:
 
   virtual bool applyBrakeController();
   virtual bool applyBrakeNow();
+  virtual bool applyCrashbrake();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

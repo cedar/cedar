@@ -255,7 +255,6 @@ bool cedar::dev::DifferentialDrive::applyBrakeNow()
 bool cedar::dev::DifferentialDrive::applyBrakeController()
 {
   // TODO:
-  applyBrakeController();
-  return true;
+  return false;
 }
 

@@ -115,3 +115,9 @@ bool cedar::dev::kteam::khepera::Gripper::applyBrakeController()
   return false;
 }
 
+bool cedar::dev::kteam::khepera::Gripper::applyCrashbrake()
+{
+  // TODO
+  return false;
+}
+

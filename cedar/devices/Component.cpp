@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/MovingAverage.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
@@ -1218,6 +1219,7 @@ void cedar::dev::Component::startCommunication()
   }
 
   mDeviceThread->start();
+  mRunningComponentInstances.insert( this );
 }
 
 void cedar::dev::Component::stopCommunication()
@@ -1230,6 +1232,7 @@ void cedar::dev::Component::stopCommunication()
   mDeviceThread->requestStop(); // stop more quickly
 
   mDeviceThread->stop();
+  mRunningComponentInstances.erase( this );
 }
 
 void cedar::dev::Component::start()
@@ -1430,21 +1433,33 @@ void cedar::dev::Component::brakeNow()
   }
 }
 
-void cedar::dev::Component::crashbrake()
-{
-  applyCrashbrake();
-}
-
 bool cedar::dev::Component::applyCrashbrake()
 {
+  // dummy behaviour
   clearUserCommand();
   clearController();
   if (!applyBrakeNow()) // dummy default
   {
-    // @todo: panic
+    return false;
   }
+ 
+  // AND SEND ...
+  stepDeviceCommands( cedar::unit::DEFAULT_TIME_UNIT ); // this is a bit of a hack, but these are special circumstances
 
   return true;
+}
+
+
+
+void cedar::dev::Component::crashbrake()
+{
+  if (!applyCrashbrake())
+  {
+    std::cout << "[cedar PANIC] the shit has hit the fan!" << std::endl;
+  }
+  else
+  {
+  }
 }
 
 void cedar::dev::Component::clearController()
@@ -1463,5 +1478,24 @@ void cedar::dev::Component::waitUntilCommunicated() const
   mDeviceThread->waitUntilStepped();
 
   // include any waiting for synchronous responses here ...
+}
+
+// static member:
+std::set<cedar::dev::Component*> cedar::dev::Component::mRunningComponentInstances;
+
+
+void cedar::dev::Component::handleCrash()
+{
+  cedar::aux::LogSingleton::getInstance()->message
+                                           (
+                                             "Handling Crash for robotic Components",
+                                             "cedar::dev::Component::handleCrash()"
+                                           );
+  for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
+  {
+std::cout << "emergency crash braking Now for " << *component << std::endl;    
+    (*component)->crashbrake();
+  }
+
 }
 
