@@ -105,6 +105,8 @@ cedar::proc::gui::GraphicsBase(30, 30,
 
 void cedar::proc::gui::TriggerItem::construct()
 {
+  this->mStartingStopping = false;
+
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                | QGraphicsItem::ItemSendsGeometryChanges
@@ -249,16 +251,19 @@ void cedar::proc::gui::TriggerItem::writeConfiguration(cedar::aux::Configuration
 void cedar::proc::gui::TriggerItem::triggerStateChanging()
 {
   this->setFillColor(mValidityColorWarning);
+  this->mStartingStopping = true;
 }
 
 void cedar::proc::gui::TriggerItem::triggerStarted()
 {
   this->setFillColor(mValidityColorValid);
+  this->mStartingStopping = false;
 }
 
 void cedar::proc::gui::TriggerItem::triggerStopped()
 {
   this->setFillColor(mDefaultFillColor);
+  this->mStartingStopping = false;
 }
 
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
@@ -275,15 +280,12 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
 
     menu.addSeparator();
 
-    if (looped_trigger->isRunningNolocking())
-    {
-      p_start->setEnabled(false);
-      p_single->setEnabled(false);
-    }
-    else
-    {
-      p_stop->setEnabled(false);
-    }
+    bool can_start = !looped_trigger->isRunningNolocking() && !this->mStartingStopping;
+    bool can_stop = looped_trigger->isRunningNolocking() && !this->mStartingStopping;
+
+    p_start->setEnabled(can_start);
+    p_single->setEnabled(can_start);
+    p_stop->setEnabled(can_stop);
 
     QAction *a = menu.exec(event->screenPos());
 
