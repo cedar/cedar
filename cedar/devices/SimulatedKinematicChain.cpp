@@ -71,6 +71,7 @@ cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
 void cedar::dev::SimulatedKinematicChain::sendSimulatedAngles(cv::Mat mat)
 {
   QWriteLocker lock(&mSimulationLock);
+
 //  std::cout << "  write pos " << mat << std::endl;
   mSimulation[cedar::dev::KinematicChain::JOINT_ANGLES] = mat.clone();
 }
@@ -93,12 +94,16 @@ void cedar::dev::SimulatedKinematicChain::sendSimulatedAccelerations(cv::Mat mat
 
 cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles()
 {
+  QReadLocker lock(&mSimulationLock);
+
 //  std::cout << "  in retrieveSimulatedAngles: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ] << std::endl;
   return mSimulation[ cedar::dev::KinematicChain::JOINT_ANGLES ].clone();
 }
 
 cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities()
 {
+  QReadLocker lock(&mSimulationLock);
+
 //  std::cout << "  in retrieveSimulatedVels: " << mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ] << std::endl;
   // todo: lock
   return mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ].clone();
@@ -106,6 +111,8 @@ cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities()
 
 cv::Mat cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations()
 {
+  QReadLocker lock(&mSimulationLock);
+
 //  std::cout << "  in retrieveSimulatedAccels: " << mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS ] << std::endl;
   return mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS].clone();
 }
@@ -136,7 +143,8 @@ void cedar::dev::SimulatedKinematicChain::updateInitialConfiguration()
 
 bool cedar::dev::SimulatedKinematicChain::applyCrashbrake()
 {
-  //@todo: locking
+  QWriteLocker lock(&mSimulationLock);
+
   mSimulation[ cedar::dev::KinematicChain::JOINT_VELOCITIES ] = 
     cv::Mat::zeros( getNumberOfJoints(), 1, CV_64F );
   mSimulation[ cedar::dev::KinematicChain::JOINT_ACCELERATIONS ] = 
