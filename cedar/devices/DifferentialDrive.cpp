@@ -60,8 +60,8 @@ const cedar::dev::Component::ComponentDataType cedar::dev::DifferentialDrive::WH
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::DifferentialDrive::init()
 {
-  installCommandType(cedar::dev::DifferentialDrive::WHEEL_SPEED, "Wheel Speed");
-  setCommandDimensionality(cedar::dev::DifferentialDrive::WHEEL_SPEED, 2);
+  installCommandAndMeasurementType(cedar::dev::DifferentialDrive::WHEEL_SPEED, "Wheel Speed");
+  setCommandAndMeasurementDimensionality(cedar::dev::DifferentialDrive::WHEEL_SPEED, 2);
 
   std::string group = "differential drive interface";
   this->defineCommandGroup(group);
