@@ -259,7 +259,7 @@ void cedar::proc::steps::Component::onStart()
       this->mConnectedOnStart = true;
     }
 
-    component->startDevice();
+    component->startCommunication();
   }
 }
 
@@ -269,7 +269,7 @@ void cedar::proc::steps::Component::onStop()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
-    component->stopDevice();
+    component->stopCommunication();
 
     auto channel = component->getChannel();
     if (channel && channel->isOpen() && this->mConnectedOnStart)

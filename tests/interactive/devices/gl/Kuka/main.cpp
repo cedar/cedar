@@ -88,7 +88,7 @@ int main(int argc, char **argv)
   p_scene_widget->show();
   widget_arm.show();
   viewer.startTimer(20);
-  p_kuka_arm->startDevice();
+  p_kuka_arm->startCommunication();
   a.exec();
 
   return 0;

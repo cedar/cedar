@@ -82,7 +82,7 @@ int main(int argc, char **argv)
   cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
   scene_widget->show();
 
-  test_arm->startDevice();
+  test_arm->startCommunication();
   test_arm->setJointVelocity(0, 0.31);
   test_arm->setJointVelocity(1, -.045);
   test_arm->setJointVelocity(2, -.015);
@@ -109,12 +109,12 @@ int main(int argc, char **argv)
   second_arm->setJointVelocity(2, .1);
   second_arm->setJointVelocity(3, .1);
 
-  second_arm->startDevice();
+  second_arm->startCommunication();
   viewer.startTimer(20);
   a.exec();
 
-  test_arm->stopDevice();
-  second_arm->stopDevice();
+  test_arm->stopCommunication();
+  second_arm->stopCommunication();
 
   return 0;
 }

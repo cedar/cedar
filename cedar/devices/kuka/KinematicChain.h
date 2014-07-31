@@ -95,13 +95,6 @@ public:
    */
   virtual void setJointAngle(unsigned int index, double angle);
 
-  /*!@brief starts the looped thread
-   *
-   * the KinematicChain class does some things in this function that are not needed
-   *
-   * @todo check if start still has to be overwritten
-   */
-  virtual void start();
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 

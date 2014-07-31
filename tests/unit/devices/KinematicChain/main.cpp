@@ -62,9 +62,9 @@ void test()
   TestKinematicChainPtr acceleration_test_arm(new TestKinematicChain());
   std::cout << "reading configuration from test_arm->json" << std::endl;
   test_arm->readJson("test_arm.json");
-  test_arm->startDevice();
+  test_arm->startCommunication();
   acceleration_test_arm->readJson("acceleration_test_arm.json");
-  acceleration_test_arm->startDevice();
+  acceleration_test_arm->startCommunication();
 
   cv::Mat theta;
   cv::Mat thetaDot;

@@ -157,10 +157,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // replaced by startDevice()
+  // replaced by startCommunication()
   CEDAR_DECLARE_DEPRECATED(void start());
 
-  // replaced by stopDevice()
+  // replaced by stopCommunication()
   CEDAR_DECLARE_DEPRECATED(void stop());
   CEDAR_DECLARE_DEPRECATED(bool isRunning()); //@todo: rename to isCommunicating?
   CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
@@ -193,8 +193,8 @@ public:
 
   void processStart();
 
-  void startDevice();
-  void stopDevice();
+  void startCommunication();
+  void stopCommunication();
 
   void waitUntilCommunicated() const;
 

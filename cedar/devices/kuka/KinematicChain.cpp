@@ -110,8 +110,6 @@ void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::Confi
   this->setIdleTime(idle_time);
 
   // start the device
-  //!@todo do we have to start the device in this function? is this done somewhere else?
-  startDevice();
 
   mIsInit = true;
 }
@@ -165,20 +163,6 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
   }
 }
 
-/*
- * Overwritten start function of KinematicChain
- * the function inherited from KinematicChain does some things we do not want.
- */
-void cedar::dev::kuka::KinematicChain::start()
-{
-  if (this->isRunningNolocking())
-  {
-    return;
-  }
-
-  //QThread::start();
-  cedar::dev::KinematicChain::startDevice();
-}
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions
 //----------------------------------------------------------------------------------------------------------------------

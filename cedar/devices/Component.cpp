@@ -650,7 +650,7 @@ void cedar::dev::Component::prepareComponentDestructAbsolutelyRequired()
 #endif
 
   brakeNow();
-  stopDevice();
+  stopCommunication();
   mDestructWasPrepared= true;
 }
 
@@ -1203,7 +1203,7 @@ void cedar::dev::Component::updateUserMeasurements()
   emit updatedUserMeasurementSignal();
 }
 
-void cedar::dev::Component::startDevice()
+void cedar::dev::Component::startCommunication()
 {
   // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
@@ -1220,7 +1220,7 @@ void cedar::dev::Component::startDevice()
   mDeviceThread->start();
 }
 
-void cedar::dev::Component::stopDevice()
+void cedar::dev::Component::stopCommunication()
 {
   // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
@@ -1234,12 +1234,12 @@ void cedar::dev::Component::stopDevice()
 
 void cedar::dev::Component::start()
 {
-  startDevice();
+  startCommunication();
 }
 
 void cedar::dev::Component::stop()
 {
-  stopDevice();
+  stopCommunication();
 }
 
 cedar::unit::Time cedar::dev::Component::getDeviceStepSize()

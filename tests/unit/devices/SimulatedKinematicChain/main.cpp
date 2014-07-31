@@ -56,7 +56,7 @@ void test()
   std::cout << "testing position control ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_arm_position(new cedar::dev::SimulatedKinematicChain());
   test_arm_position->readJson("test_arm.json");
-  test_arm_position->startDevice();
+  test_arm_position->startCommunication();
   
   //--------------------------------------------------------------------------------------------------------------------
   // simple service functions
@@ -195,13 +195,13 @@ void test()
     std::cout << test_arm_position->getJointAngles() << std::endl;
     std::cout << "ERROR with setJointAngles() or getCachedJointAngles()" << std::endl;
   }
-  test_arm_position->stopDevice();
+  test_arm_position->stopCommunication();
   
   // create instance of test class
   std::cout << "testing velocity control ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_arm_velocity(new cedar::dev::SimulatedKinematicChain());
   test_arm_velocity->readJson("test_arm.json");
-  test_arm_velocity->startDevice();
+  test_arm_velocity->startCommunication();
 
   //--------------------------------------------------------------------------------------------------------------------
   // single angle velocity
@@ -275,13 +275,13 @@ void test()
     std::cout << test_arm_velocity->getJointVelocities() << std::endl;
     std::cout << "ERROR with setJointVelocities(matrix) or getJointVelocities()" << std::endl;
   }
-  test_arm_velocity->stopDevice();
+  test_arm_velocity->stopCommunication();
 
   // create instance of test class
   std::cout << "testing acceleration control ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_arm_acceleration(new cedar::dev::SimulatedKinematicChain());
   test_arm_acceleration->readJson("test_arm.json");
-  test_arm_acceleration->startDevice();
+  test_arm_acceleration->startCommunication();
 
   //--------------------------------------------------------------------------------------------------------------------
   // single angle acceleration
@@ -358,13 +358,13 @@ void test()
     std::cout << test_arm_acceleration->getJointAccelerations() << std::endl;
     std::cout << "ERROR with setJointAccelerations(matrix) or getJointAccelerations()" << std::endl;
   }
-  test_arm_acceleration->stopDevice();
+  test_arm_acceleration->stopCommunication();
 
   // create instance of test class
   std::cout << "testing exclusiveness of commands ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_arm_exclusive(new cedar::dev::SimulatedKinematicChain());
   test_arm_exclusive->readJson("test_arm.json");
-  test_arm_exclusive->startDevice();
+  test_arm_exclusive->startCommunication();
   try
   {
     test_arm_exclusive->setJointAngle(0, 1.0);
@@ -408,11 +408,11 @@ void test()
   std::cout << "testing coordinate frames ..." << std::endl;
   cedar::dev::SimulatedKinematicChainPtr test_coordinate_frames(new cedar::dev::SimulatedKinematicChain());
   test_coordinate_frames->readJson("test_arm.json");
-  test_coordinate_frames->startDevice();
+  test_coordinate_frames->startCommunication();
   test_coordinate_frames->setJointAngles( cv::Mat::zeros( test_arm_position->getNumberOfJoints(), 1, CV_64F) );
   test_coordinate_frames->waitUntilCommunicated();
   //cedar::aux::sleep(test_coordinate_frames->getDeviceStepSize() * 1.5);
-  test_coordinate_frames->stopDevice();
+  test_coordinate_frames->stopCommunication();
 
 
 
@@ -746,7 +746,7 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   cedar::dev::SimulatedKinematicChainPtr complex_test_arm(new cedar::dev::SimulatedKinematicChain());
   std::string complex_test_arm_configuration_file = cedar::aux::locateResource("configs/complex_test_arm.json", false);
   complex_test_arm->readJson(complex_test_arm_configuration_file);
-  complex_test_arm->startDevice();
+  complex_test_arm->startCommunication();
 
   theta = cv::Mat(4, 1, CV_64FC1);
   thetaDot = cv::Mat(4, 1, CV_64FC1);
@@ -769,7 +769,7 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
   complex_test_arm->waitUntilCommunicated();
 
-  complex_test_arm->stopDevice();
+  complex_test_arm->stopCommunication();
 
   // compute variable values
   cv::Mat root_transformation = complex_test_arm->getRootCoordinateFrame()->getTransformation();
@@ -810,7 +810,7 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   // make a small step for finite difference method
   double delta_t = 1e-07;
 
-  complex_test_arm->startDevice();
+  complex_test_arm->startCommunication();
   complex_test_arm->clearUserCommand();
   complex_test_arm->setJointVelocities
   (
@@ -828,7 +828,7 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   );
   complex_test_arm->waitUntilCommunicated();
   //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
-  complex_test_arm->stopDevice();
+  complex_test_arm->stopCommunication();
 
   // compute new values
   cv::Mat p0_new = root_transformation * complex_test_arm->getJointTransformation(0) * p_local;
