@@ -150,9 +150,22 @@ void cedar::aux::PluginDeclarationList::readDeclaration(const cedar::aux::Config
   }
   catch(const cedar::aux::UnknownNameException&)
   {
+    std::string message;
+    message += "Could not find a declaration for class \"";
+    message += class_id;
+    message += "\" while reading plugin declaration";
+
+    if (this->mDeclarations.size() > 0 && !this->mDeclarations.front()->getSource().empty())
+    {
+      message += " for ";
+      message += this->mDeclarations.front()->getSource();
+    }
+
+    message += ".";
+
     cedar::aux::LogSingleton::getInstance()->warning
     (
-      "Could not find a class declaration for class \"" + class_id + "\".",
+      "Could not find a declaration for class \"" + class_id + "\" while reading plugin declaration.",
       "cedar::aux::PluginDeclarationList::readDeclaration(const cedar::aux::ConfigurationNode&)"
     );
   }
