@@ -162,7 +162,9 @@ public:
 
   // replaced by stopCommunication()
   CEDAR_DECLARE_DEPRECATED(void stop());
-  CEDAR_DECLARE_DEPRECATED(bool isRunning()); //@todo: rename to isCommunicating?
+  CEDAR_DECLARE_DEPRECATED(bool isRunning());
+  bool isCommunicating();
+
   CEDAR_DECLARE_DEPRECATED(void startTimer(double d));
   CEDAR_DECLARE_DEPRECATED(void stopTimer());
 
