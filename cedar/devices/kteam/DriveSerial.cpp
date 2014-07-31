@@ -89,6 +89,11 @@ void cedar::dev::kteam::DriveSerial::init()
   this->registerDeviceMeasurementHook(cedar::dev::kteam::Drive::ENCODERS, boost::bind(&cedar::dev::kteam::DriveSerial::retrieveEncoders, this));
 }
 
+cedar::dev::kteam::DriveSerial::~DriveSerial()
+{
+  prepareComponentDestructAbsolutelyRequired();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------

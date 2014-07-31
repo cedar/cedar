@@ -56,6 +56,7 @@ cedar::dev::Component(channel)
 
 cedar::dev::kteam::Led::~Led()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

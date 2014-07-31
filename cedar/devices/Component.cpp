@@ -633,8 +633,39 @@ mChannel(channel)
   init();
 }
 
+// needs to be called by the end-point of the inheritance tree
+void cedar::dev::Component::prepareComponentDestructAbsolutelyRequired()
+{
+#if 0
+  // @todo: try this (comment-in)
+  if (mDestructWasPrepared)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "You called prepareComponentDestructAbsolutelyRequired() twice. "
+      "This may be a problem.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
+#endif
+
+  brakeNow();
+  stopDevice();
+  mDestructWasPrepared= true;
+}
+
 cedar::dev::Component::~Component()
 {
+  if (!mDestructWasPrepared)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You forget to call prepareComponentDestructAbsolutelyRequired() in the "
+      "child's destructor!",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
+
   // the thread will stopped when mDeviceThread is destructed, anyway, but we
   // try to send the stop request as early as possible ...
   mDeviceThread->requestStop();

@@ -326,6 +326,8 @@ protected:
   cv::Mat getPreviousDeviceMeasurementBuffer(ComponentDataType type) const;
   double  getPreviousDeviceMeasurementBufferIndex(ComponentDataType type, int index) const;
 
+  void prepareComponentDestructAbsolutelyRequired();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -376,6 +378,8 @@ private:
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepCommandsTime;
 
   mutable QMutex mGeneralAccessLock;
+
+  bool mDestructWasPrepared; // helper bool
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

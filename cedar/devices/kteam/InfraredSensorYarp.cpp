@@ -97,6 +97,7 @@ _mSensorPort(new cedar::aux::StringParameter(this, "sensor port", "proximitySens
 
 cedar::dev::kteam::InfraredSensorYarp::~InfraredSensorYarp()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

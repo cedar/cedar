@@ -90,6 +90,7 @@ mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
 
 cedar::dev::kteam::InfraredSensorSerial::~InfraredSensorSerial()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -62,6 +62,7 @@ cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
 
 cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

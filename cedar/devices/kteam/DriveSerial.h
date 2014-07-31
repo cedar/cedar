@@ -60,6 +60,8 @@ public:
   //!@brief Constructor taking an externally created channel
   DriveSerial(cedar::dev::kteam::SerialChannelPtr channel);
 
+  ~DriveSerial();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------

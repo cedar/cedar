@@ -66,11 +66,10 @@ _mServerPort(new cedar::aux::IntParameter(this, "server port", 0))
 
 cedar::dev::kuka::KinematicChain::~KinematicChain()
 {
+  prepareComponentDestructAbsolutelyRequired();
+
   if (mIsInit)
   {
-    // stop the looped Thread
-    stopDevice();
-    wait();
     // TODO The following line is not used at this point, the script "kukain.src" is not ready yet!
     // If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
     // it won't throw an exception, because the index is 0 and therefore valid
