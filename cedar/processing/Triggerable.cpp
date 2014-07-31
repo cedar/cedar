@@ -205,7 +205,7 @@ void cedar::proc::Triggerable::callOnStart()
       = this->exceptionWrappedCall
         (
           boost::bind(&cedar::proc::Triggerable::onStart, this),
-          "An exception occurred while calling onStart(). You can fix this by restarting the trigger. The exception is",
+          "An exception occurred while calling onStart(). You can try to fix this by restarting the trigger. The exception is",
           cedar::proc::Triggerable::STATE_EXCEPTION_ON_START
         );
   }
@@ -225,7 +225,7 @@ void cedar::proc::Triggerable::callOnStart()
     {
       for (auto listener : this->mFinished.member()->getListeners())
       {
-          listener->callOnStart();
+        listener->callOnStart();
       }
     }
   }
@@ -235,22 +235,11 @@ void cedar::proc::Triggerable::callOnStop()
 {
   // only call onStop if there is only one trigger left that started this triggerable
   QMutexLocker locker(this->mpStartCallsLock);
-  cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
-
   // count how often this was stopped
   if (this->mStartCalls == 0 && this->getState() != cedar::proc::Triggerable::STATE_EXCEPTION_ON_START)
   {
-    std::string name = "(unnamed step)";
-    if (named)
-    {
-      name = named->getName();
-    }
-    // should not happen, but to prevent lockups in the architecture, we just put out an error and stop doing stuff.
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Step \"" + name + "\" has an invalid start count.",
-      "void cedar::proc::Triggerable::callOnStop()"
-    );
+    // this is ok, it can happen in some circumstances
+    // e.g., cyclically connected groups (see unit test GroupOnStartStop)
     return;
   }
   else if (this->mStartCalls == 0 && this->getState() == cedar::proc::Triggerable::STATE_EXCEPTION_ON_START)
@@ -274,16 +263,12 @@ void cedar::proc::Triggerable::callOnStop()
 
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 
-  // can only call subsequent listeners if the finished trigger exists
-  if (this->mStartCalls == 0)
+  QReadLocker lock_r(this->mFinished.getLockPtr());
+  if (this->mFinished.member())
   {
-    QReadLocker lock_r(this->mFinished.getLockPtr());
-    if (this->mFinished.member())
+    for (auto listener : this->mFinished.member()->getListeners())
     {
-      for (auto listener : this->mFinished.member()->getListeners())
-      {
-          listener->callOnStop();
-      }
+      listener->callOnStop();
     }
   }
 }
