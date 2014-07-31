@@ -1267,6 +1267,12 @@ bool cedar::dev::Component::isRunning()
   return mDeviceThread->isRunning();
 }
 
+bool cedar::dev::Component::isCommunicating()
+{
+  //@todo: add a check if the channel is waiting for async feedback
+  return mDeviceThread->isRunning();
+}
+
 bool cedar::dev::Component::isRunningNolocking()
 {
   return mDeviceThread->isRunningNolocking();
