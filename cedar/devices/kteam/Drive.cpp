@@ -77,7 +77,7 @@ void cedar::dev::kteam::Drive::init()
   (
       cedar::dev::kteam::Drive::ENCODERS_CHANGE,
       cedar::dev::kteam::Drive::WHEEL_SPEED,
-      boost::bind(&cedar::dev::kteam::Drive::pulsesToWheelSpeed, this, _1)
+      boost::bind(&cedar::dev::kteam::Drive::pulsesToWheelSpeed, this, _1, cedar::dev::kteam::Drive::ENCODERS_CHANGE)
   );
 }
 
@@ -197,12 +197,15 @@ void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
   setUserCommandBuffer( ENCODERS, mat );
 }
 
-cv::Mat cedar::dev::kteam::Drive::pulsesToWheelSpeed(cv::Mat input)
+cv::Mat cedar::dev::kteam::Drive::pulsesToWheelSpeed(cv::Mat input, ComponentDataType type)
 {
   cv::Mat mat = cv::Mat(2, 1, CV_64F);
   std::vector<cedar::unit::Frequency> wheel_speed_pulses;
-  wheel_speed_pulses.push_back(cedar::unit::Frequency(input.at<double>(0,0) * cedar::unit::hertz));
-  wheel_speed_pulses.push_back(cedar::unit::Frequency(input.at<double>(1,0) * cedar::unit::hertz));
+  auto data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getMeasurementData(type));
+  QReadLocker read_lock(&(data->getLock()));
+  cv::Mat pulses = data->getData();
+  wheel_speed_pulses.push_back(cedar::unit::Frequency(pulses.at<double>(0,0) * cedar::unit::hertz));
+  wheel_speed_pulses.push_back(cedar::unit::Frequency(pulses.at<double>(1,0) * cedar::unit::hertz));
   auto speed = this->convertPulsesToWheelSpeed(wheel_speed_pulses);
   mat.at<double>(0,0) = speed.at(0) / cedar::unit::meters_per_second;
   mat.at<double>(1,0) = speed.at(1) / cedar::unit::meters_per_second;
