@@ -1008,7 +1008,7 @@ void cedar::dev::Component::stepDevice(cedar::unit::Time time)
   }
 }
 
-void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
+void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time dt)
 {
   cedar::aux::Timer timer;
 
@@ -1106,7 +1106,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 
     QReadLocker lock1(this->mMeasurementData->mUserBuffer.getLockPtr());
     // call hook
-    ioData = hook.get()(userData);
+    ioData = hook.get()(dt, userData);
   }
   else
   {
@@ -1129,7 +1129,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 }
 
 // update the Device Cache
-void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
+void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time dt)
 {
   cedar::aux::Timer timer;
 
@@ -1142,7 +1142,6 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
   // thinks I can get directly from HW:
   for (const auto& type : this->mMeasurementData->getInstalledTypes())
   {
-//  std::cout << " test"  << type <<    std::endl;
     auto found = mRetrieveMeasurementHooks.find( type );
 
     if (found != mRetrieveMeasurementHooks.end())
@@ -1167,8 +1166,10 @@ void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
       if (hook.is_initialized())
       {
         // call measurement hook
-        this->mMeasurementData->mDeviceRetrievedData.member()[missing_type]->setData(
-        hook.get()(this->mMeasurementData->mDeviceRetrievedData.member()[ measured_type ]->getData()));
+        this->mMeasurementData->mDeviceRetrievedData.member()[missing_type]->setData
+        (
+          hook.get()(dt, this->mMeasurementData->mDeviceRetrievedData.member()[measured_type]->getData())
+        );
       }
     }
   }
@@ -1290,13 +1291,12 @@ void cedar::dev::Component::stopTimer()
 {
 }
 
-cv::Mat cedar::dev::Component::integrateDevice(cv::Mat data, ComponentDataType type)
+cv::Mat cedar::dev::Component::integrateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type)
 {
 //  std::cout << "Integrate once!" << std::endl;
 //  std::cout << data << std::endl;
 //  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
-  cedar::unit::Time timestep = mDeviceThread->getStepSize();
-  double unitless = timestep / (1.0 * cedar::unit::second);
+  double unitless = dt / (1.0 * cedar::unit::second);
 //  std::cout << unitless << std::endl;
 //  std::cout << "Integrate once (FIN!)!" << std::endl;
   QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
@@ -1305,14 +1305,13 @@ cv::Mat cedar::dev::Component::integrateDevice(cv::Mat data, ComponentDataType t
   return result;
 }
 
-cv::Mat cedar::dev::Component::integrateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2)
+cv::Mat cedar::dev::Component::integrateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2)
 {
 //    std::cout << "Integrate twice!" << type1 << " " << type2 << std::endl;
 //    std::cout << data << std::endl;
 //    std::cout << this->mMeasurementData->getUserBufferUnlocked(type1) << std::endl;
 //    std::cout << this->mMeasurementData->getUserBufferUnlocked(type2) << std::endl;
-  cedar::unit::Time timestep = mDeviceThread->getStepSize();
-  double unitless = timestep / (1.0 * cedar::unit::second);
+  double unitless = dt / (1.0 * cedar::unit::second);
 //    std::cout << unitless << std::endl;
 //    std::cout << "Integrate twice (FIN!)!" << std::endl;
   QReadLocker lock(this->mMeasurementData->mUserBuffer.getLockPtr());
@@ -1324,13 +1323,12 @@ cv::Mat cedar::dev::Component::integrateDeviceTwice(cv::Mat data, ComponentDataT
 }
 
 // todo: also used for commands
-cv::Mat cedar::dev::Component::differentiateDevice(cv::Mat data, ComponentDataType type)
+cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type)
 {
 //  std::cout << "Differentiate once!" << std::endl;
 //  std::cout << data << std::endl;
 //  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
-  cedar::unit::Time timestep = mDeviceThread->getStepSize();
-  double unitless = timestep / (1.0 * cedar::unit::second);
+  double unitless = dt / (1.0 * cedar::unit::second);
 
 //  std::cout << unitless << std::endl;
 //  std::cout << "Differentiate once (FIN!)!" << std::endl;
@@ -1341,11 +1339,9 @@ cv::Mat cedar::dev::Component::differentiateDevice(cv::Mat data, ComponentDataTy
 }
 
 // todo: also used for commands
-cv::Mat cedar::dev::Component::differentiateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2)
+cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2)
 {
-  cedar::unit::Time timestep = mDeviceThread->getStepSize();
-  double unitless = timestep / (1.0 * cedar::unit::second);
-
+  double unitless = dt / (1.0 * cedar::unit::second);
 // todo: check locking here
   //!@todo check if this uses the right time step to differentiate
   cv::Mat result = (( data - this->mMeasurementData->getUserBufferUnlocked(type1) )  / unitless

@@ -463,7 +463,7 @@ void cedar::dev::KinematicChain::init()
   (
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
-    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
   registerUserCommandTransformationHook
   (
@@ -474,6 +474,7 @@ void cedar::dev::KinematicChain::init()
       &cedar::dev::Component::integrateDeviceTwice,
       this,
       _1,
+      _2,
       cedar::dev::KinematicChain::JOINT_VELOCITIES,
       cedar::dev::KinematicChain::JOINT_ANGLES
     )
@@ -482,14 +483,14 @@ void cedar::dev::KinematicChain::init()
   (
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     cedar::dev::KinematicChain::JOINT_ANGLES,
-    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES)
+    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_ANGLES)
   );
 
   registerDeviceMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
-    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+    boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
   registerDeviceMeasurementTransformationHook
   (
@@ -500,6 +501,7 @@ void cedar::dev::KinematicChain::init()
       &cedar::dev::Component::integrateDeviceTwice,
       this,
       _1,
+      _2,
       cedar::dev::KinematicChain::JOINT_ANGLES,
       cedar::dev::KinematicChain::JOINT_VELOCITIES
     )
@@ -508,13 +510,13 @@ void cedar::dev::KinematicChain::init()
   (
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
-    boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::KinematicChain::JOINT_VELOCITIES)
+    boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
   registerDeviceMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ANGLES,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
-    boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, cedar::dev::KinematicChain::JOINT_ANGLES)
+    boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_ANGLES)
   );
   registerDeviceMeasurementTransformationHook
   (
@@ -525,6 +527,7 @@ void cedar::dev::KinematicChain::init()
         &cedar::dev::Component::differentiateDeviceTwice,
         this,
         _1,
+        _2,
         cedar::dev::KinematicChain::JOINT_ANGLES,
         cedar::dev::KinematicChain::JOINT_VELOCITIES
       )
