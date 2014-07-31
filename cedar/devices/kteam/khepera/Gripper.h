@@ -81,14 +81,8 @@ public:
   //!@brief Closes the gripper.
   void closeGripper();
 
-  //!@brief Sets the arm position.
-  virtual void setArmPosition(unsigned int position) = 0;
-
   //!@brief Sets the position of the gripper (i.e., opens or closes it).
   virtual void setGripperPosition(bool open) = 0;
-
-  //!@brief Returns the current arm position.
-  virtual unsigned int getArmPosition() = 0;
 
   //!@brief Returns the gripper position.
   virtual unsigned int getGripperPosition() = 0;
@@ -118,7 +112,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  static unsigned int GRIPPER_POSITION;
+  static unsigned int RESISTIVITY;
+  static unsigned int OPTICAL_SENSOR;
+
 private:
   // none yet
 
@@ -126,8 +123,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! limits for the arm position
-  cedar::aux::math::UIntLimitsParameterPtr _mArmPositionLimits;
 
 private:
   // none yet
