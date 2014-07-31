@@ -91,7 +91,7 @@ int main(int argc, char **argv)
   scene_widget->show();
   widget_head.show();
   viewer.startTimer(50);
-  head->startDevice();
+  head->startCommunication();
   a.exec();
 
   return 0;

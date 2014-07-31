@@ -77,7 +77,7 @@ void run()
   // get the drive component, open the serial channel and start the hardware thread
   DriveSerialPtr drive_serial = boost::dynamic_pointer_cast<DriveSerial>(robot->getComponent("drive"));
   drive_serial->getChannel()->open();
-  drive_serial->startDevice();
+  drive_serial->startCommunication();
 
   // in a loop, receive new motor commands vai yarp and read out encoder values, subsequently forwarded via yarp
   cv::Mat encoder_matrix(2,1,CV_32F);

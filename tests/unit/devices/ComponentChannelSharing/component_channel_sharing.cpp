@@ -122,15 +122,15 @@ void run_test()
   channel->open();
 
   // start the components
-  component1->startDevice();
-  component2->startDevice();
+  component1->startCommunication();
+  component2->startCommunication();
 
   // wait for a bit
   cedar::aux::sleep(cedar::unit::Time(500.0 * cedar::unit::milli * cedar::unit::seconds));
 
   // stop the components
-  component1->stopDevice();
-  component2->stopDevice();
+  component1->stopCommunication();
+  component2->stopCommunication();
 
   // close the channel
   channel->close();
