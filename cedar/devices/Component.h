@@ -340,9 +340,9 @@ private:
 
   void resetComponent();
 
-  void stepDevice(cedar::unit::Time); //!todo: make friend to LoopFunctionInThread
-  void stepDeviceCommands(cedar::unit::Time);
-  void stepDeviceMeasurements(cedar::unit::Time);
+  void stepCommunication(cedar::unit::Time); //!todo: make friend to LoopFunctionInThread
+  void stepCommunicationCommands(cedar::unit::Time);
+  void stepCommunicationMeasurements(cedar::unit::Time);
 
   void updateUserMeasurements();
 

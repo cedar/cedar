@@ -595,7 +595,7 @@ class cedar::dev::Component::DataCollection
 
     cedar::aux::LockableMember<std::map<std::string, std::vector<cedar::dev::Component::ComponentDataType> > > mGroups;
 
-    //! A member that contains the counts of errors for the last stepDevice* calls.
+    //! A member that contains the counts of errors for the last stepCommunication* calls.
     cedar::aux::LockableMember<cedar::aux::MovingAverage<double> > mCommunicationErrorCount;
 
     //! The last things that went wrong during communication.
@@ -612,7 +612,7 @@ void cedar::dev::Component::init()
   this->mCommandData = cedar::dev::Component::DataCollectionPtr(new cedar::dev::Component::DataCollection());
   mDeviceThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
                                 new cedar::aux::LoopFunctionInThread(
-                                  boost::bind(&cedar::dev::Component::stepDevice,
+                                  boost::bind(&cedar::dev::Component::stepCommunication,
                                               this,
                                               _1) ));
 
@@ -984,13 +984,13 @@ void cedar::dev::Component::registerDeviceMeasurementTransformationHook(Componen
   this->mMeasurementData->registerTransformationHook(from, to, fun);
 }
 
-void cedar::dev::Component::stepDevice(cedar::unit::Time time)
+void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
 {
   // its important to get the currently scheduled commands out first
   // (think safety first). this assumes serial communication, of course
   try
   {
-    stepDeviceCommands(time);
+    stepCommunicationCommands(time);
     this->mCommandData->countSuccessfullCommunication();
   }
   catch (const cedar::dev::CommunicationException& e)
@@ -999,7 +999,7 @@ void cedar::dev::Component::stepDevice(cedar::unit::Time time)
   }
   try
   {
-    stepDeviceMeasurements(time); // note, the post-measurements transformations also take time
+    stepCommunicationMeasurements(time); // note, the post-measurements transformations also take time
     this->mMeasurementData->countSuccessfullCommunication();
   }
   catch (const cedar::dev::CommunicationException& e)
@@ -1008,7 +1008,7 @@ void cedar::dev::Component::stepDevice(cedar::unit::Time time)
   }
 }
 
-void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
+void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time)
 {
   cedar::aux::Timer timer;
 
@@ -1129,7 +1129,7 @@ void cedar::dev::Component::stepDeviceCommands(cedar::unit::Time)
 }
 
 // update the Device Cache
-void cedar::dev::Component::stepDeviceMeasurements(cedar::unit::Time)
+void cedar::dev::Component::stepCommunicationMeasurements(cedar::unit::Time)
 {
   cedar::aux::Timer timer;
 
@@ -1368,11 +1368,11 @@ void cedar::dev::Component::processStart()
      
      this->mCommandData->mUserBuffer.member() = this->mCommandData->mInitialUserSubmittedData.member();
      lock1.unlock();
-     stepDeviceCommands(time);
+     stepCommunicationCommands(time);
   }
 
   // get measurements (blocking!) when the thread is started ...
-  stepDeviceMeasurements(time);
+  stepCommunicationMeasurements(time);
 }
 
 void cedar::dev::Component::clearUserCommand()
@@ -1444,7 +1444,7 @@ bool cedar::dev::Component::applyCrashbrake()
   }
  
   // AND SEND ...
-  stepDeviceCommands( cedar::unit::DEFAULT_TIME_UNIT ); // this is a bit of a hack, but these are special circumstances
+  stepCommunicationCommands( cedar::unit::DEFAULT_TIME_UNIT ); // this is a bit of a hack, but these are special circumstances
 
   return true;
 }
