@@ -756,20 +756,15 @@ void test()
   cv::randn(thetaTwoDot, cv::Scalar(0), cv::Scalar(1));
 
   complex_test_arm->setJointAngles(theta);
-  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
   complex_test_arm->waitUntilCommunicated();
 
   complex_test_arm->clearUserCommand();
   complex_test_arm->setJointVelocities(thetaDot);
-  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
   complex_test_arm->waitUntilCommunicated();
 
   complex_test_arm->clearUserCommand();
   complex_test_arm->setJointAccelerations(thetaTwoDot);
-  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
   complex_test_arm->waitUntilCommunicated();
-
-//  complex_test_arm->stopCommunication();
 
   // compute variable values
   cv::Mat root_transformation = complex_test_arm->getRootCoordinateFrame()->getTransformation();
@@ -808,7 +803,7 @@ void test()
   );
 
   // make a small step for finite difference method
-  double delta_t = 1e-07;
+  double delta_t = complex_test_arm->getDeviceStepSize() / cedar::unit::DEFAULT_TIME_UNIT; //1e-07;
 
 //  complex_test_arm->startCommunication();
   complex_test_arm->clearUserCommand();
@@ -818,7 +813,6 @@ void test()
     + delta_t*complex_test_arm->getJointAccelerations()
   );
   complex_test_arm->waitUntilCommunicated();
-  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
   complex_test_arm->clearUserCommand();
   complex_test_arm->setJointAngles
   (
@@ -826,9 +820,6 @@ void test()
     + delta_t*complex_test_arm->getJointVelocities()
     + delta_t*delta_t*complex_test_arm->getJointAccelerations()
   );
-  complex_test_arm->waitUntilCommunicated();
-  //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
-//  complex_test_arm->stopCommunication();
 
   // compute new values
   cv::Mat p0_new = root_transformation * complex_test_arm->getJointTransformation(0) * p_local;
@@ -851,6 +842,7 @@ void test()
     complex_test_arm->getNumberOfJoints()-1,
     cedar::dev::KinematicChain::LOCAL_COORDINATES
   );
+
   cv::Mat p_eef_new = complex_test_arm->calculateEndEffectorPosition();
   cv::Mat v_eef_new = complex_test_arm->calculateEndEffectorVelocity();
   cv::Mat a_eef_new = complex_test_arm->calculateEndEffectorAcceleration();
@@ -868,23 +860,15 @@ void test()
   cv::Mat cartesian_jacobian_dot_numeric = (cartesian_jacobian_new - cartesian_jacobian) * 1 / delta_t;
   cv::Mat v_eef_numeric = (p_eef_new - p_eef) * 1 / delta_t;
   cv::Mat a_eef_numeric = (v_eef_new - v_eef) * 1 / delta_t;
-std::cout << "real    v : " << v_eef << std::endl;
-std::cout << "numeric v : " << v_eef_numeric << std::endl;
-std::cout << "real    a : " << a_eef << std::endl;
-std::cout << "numeric a : " << a_eef_numeric << std::endl;
-
-//  complex_test_arm->stopCommunication();
 
   //--------------------------------------------------------------------------------------------------------------------
   // spatial Jacobian temporal derivative
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
   if (
-      !cedar::aux::math::isZero(pow(norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6), 2))
+      !cedar::aux::math::isZero(pow(norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6), 2), 1e-5)
      )
   {
-//std::cout << spatial_jacobian_dot << std::endl;
-//std::cout << spatial_jacobian_dot_numeric << std::endl;
     errors++;
     std::cout << "ERROR with calculateSpatialJacobianTemporalDerivative(...)" << std::endl;
   }
@@ -898,7 +882,7 @@ std::cout << "numeric a : " << a_eef_numeric << std::endl;
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
   if (
-      !cedar::aux::math::isZero(pow(norm(cartesian_jacobian_dot - cartesian_jacobian_dot_numeric)/(cartesian_jacobian_dot.cols*3), 2))
+      !cedar::aux::math::isZero(pow(norm(cartesian_jacobian_dot - cartesian_jacobian_dot_numeric)/(cartesian_jacobian_dot.cols*3), 2), 1e-5)
      )
   {
     errors++;
@@ -913,7 +897,7 @@ std::cout << "numeric a : " << a_eef_numeric << std::endl;
   // end-effector velocity
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorVelocity" << std::endl;
-  if (!cedar::aux::math::isZero(pow(norm(v_eef - v_eef_numeric)/3.0, 2)))
+  if (!cedar::aux::math::isZero(pow(norm(v_eef - v_eef_numeric)/3.0, 2), 1e-4))
   {
     errors++;
     std::cout << "ERROR with calculateEndEffectorVelocity()" << std::endl;
@@ -927,10 +911,8 @@ std::cout << "numeric a : " << a_eef_numeric << std::endl;
   // end-effector acceleration
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorAcceleration" << std::endl;
-  if (!cedar::aux::math::isZero(pow(norm(a_eef - a_eef_numeric)/3.0, 2)))
+  if (!cedar::aux::math::isZero(pow(norm(a_eef - a_eef_numeric)/3.0, 2), 1e-3))
   {
-std::cout << a_eef_numeric << std::endl;    
-std::cout << a_eef << std::endl;    
     errors++;
     std::cout << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
   }
