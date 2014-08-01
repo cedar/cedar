@@ -1499,3 +1499,42 @@ std::cout << "emergency crash braking Now for " << *component << std::endl;
 
 }
 
+void cedar::dev::Component::brakeNowAllComponents()
+{
+  cedar::aux::LogSingleton::getInstance()->message
+                                           (
+                                             "Braking all Components (brake now)",
+                                             "cedar::dev::Component::brakeNow()"
+                                           );
+
+  for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
+  {
+    (*component)->brakeNow();
+  }
+
+}
+
+void cedar::dev::Component::startBrakingAllComponents()
+{
+  //!@todo: when startBraking works everywhere, delete these lines:
+  brakeNowAllComponents();
+  return;
+
+  cedar::aux::LogSingleton::getInstance()->message
+                                           (
+                                             "Braking all Components (start braking ...)",
+                                             "cedar::dev::Component::brakeNow()"
+                                           );
+
+  for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
+  {
+    (*component)->startBraking();
+  }
+
+}
+
+bool cedar::dev::Component::anyComponentsRunning()
+{
+  return mRunningComponentInstances.size() != 0;
+}
+

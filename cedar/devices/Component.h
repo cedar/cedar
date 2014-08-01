@@ -158,6 +158,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static void handleCrash(); // called from the IDE
+  static void brakeNowAllComponents(); 
+  static void startBrakingAllComponents(); 
+  static bool anyComponentsRunning();
 
   // replaced by startCommunication()
   CEDAR_DECLARE_DEPRECATED(void start());
