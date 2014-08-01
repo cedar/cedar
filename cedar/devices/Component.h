@@ -370,8 +370,8 @@ private:
   //! the Device-thread's wrapper
   std::unique_ptr<cedar::aux::LoopFunctionInThread> mDeviceThread;
 
-  std::map< ComponentDataType, CommandFunctionType > mSubmitCommandHooks;
-  std::map< ComponentDataType, MeasurementFunctionType > mRetrieveMeasurementHooks;
+  cedar::aux::LockableMember<std::map<ComponentDataType, CommandFunctionType> > mSubmitCommandHooks;
+  cedar::aux::LockableMember<std::map<ComponentDataType, MeasurementFunctionType> > mRetrieveMeasurementHooks;
 
   boost::optional<ComponentDataType> mDeviceCommandSelection;
 

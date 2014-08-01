@@ -639,6 +639,7 @@ void cedar::dev::Component::prepareComponentDestructAbsolutelyRequired()
 {
 #if 0
   // @todo: try this (comment-in)
+  // OL: I don't think this is a problem, this is a natural thing that happens if there is more than one child class in the hierarchy
   if (mDestructWasPrepared)
   {
     cedar::aux::LogSingleton::getInstance()->warning
@@ -951,13 +952,13 @@ void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, Co
     CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "Cannot register command hook: type is not installed.");
   }
 
+  QWriteLocker locker(this->mSubmitCommandHooks.getLockPtr());
   // cannot replace existing hook
-  if (this->mSubmitCommandHooks.find(type) != this->mSubmitCommandHooks.end())
+  if (this->mSubmitCommandHooks.member().find(type) != this->mSubmitCommandHooks.member().end())
   {
     CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A command hook is already set for \"" + this->getNameForCommandType(type) + "\".");
   }
-  // todo locks
-  mSubmitCommandHooks[ type ] = fun;
+  mSubmitCommandHooks.member()[ type ] = fun;
 }
 
 void cedar::dev::Component::registerDeviceMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
@@ -967,13 +968,13 @@ void cedar::dev::Component::registerDeviceMeasurementHook(ComponentDataType type
     CEDAR_THROW(cedar::dev::Component::TypeNotFoundException, "Cannot register measurement hook: type is not installed.");
   }
 
+  QWriteLocker locker(this->mRetrieveMeasurementHooks.getLockPtr());
   // cannot replace existing hook
-  if (this->mRetrieveMeasurementHooks.find(type) != this->mRetrieveMeasurementHooks.end())
+  if (this->mRetrieveMeasurementHooks.member().find(type) != this->mRetrieveMeasurementHooks.member().end())
   {
     CEDAR_THROW(cedar::dev::Component::DuplicateHookException, "A measurement hook is already set for \"" + this->getNameForMeasurementType(type) + "\".");
   }
-  // todo locks
-  mRetrieveMeasurementHooks[ type ] = fun;
+  mRetrieveMeasurementHooks.member()[ type ] = fun;
 }
 
 void cedar::dev::Component::registerUserCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
@@ -1030,7 +1031,10 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
   ComponentDataType type_for_Device, type_from_user;
   cv::Mat userData, ioData;
 
-  QReadLocker user_command_locker(this->mUserCommandUsed.getLockPtr());
+  cedar::aux::LockSet locks;
+  cedar::aux::append(locks, this->mUserCommandUsed.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+  cedar::aux::append(locks, this->mSubmitCommandHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+  cedar::aux::LockSetLocker locker(locks);
 
 
   if (this->mUserCommandUsed.member().size() == 0
@@ -1038,7 +1042,7 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
   {
     return; // this is not a problem
   }
-  if (mSubmitCommandHooks.size() == 0)
+  if (mSubmitCommandHooks.member().size() == 0)
   {
     // @todo: throw
     return;
@@ -1079,7 +1083,7 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
       userData = this->mCommandData->getUserBufferUnlocked(type_from_user).clone();
     }
   }
-  user_command_locker.unlock();
+  locker.unlock();
 
   //  this->mUserCommandUsed.clear();
 
@@ -1091,8 +1095,9 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
   }
   else
   {
+    QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
     // guess Device type to use. easy if there is only one hook
-    if (mSubmitCommandHooks.size() != 1)
+    if (mSubmitCommandHooks.member().size() != 1)
     {
       CEDAR_THROW
         (
@@ -1101,7 +1106,7 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
         ); 
     }
 
-    type_for_Device = mSubmitCommandHooks.begin()->first;
+    type_for_Device = mSubmitCommandHooks.member().begin()->first;
   }
 
 
@@ -1127,16 +1132,15 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
     ioData = userData.clone();
   }
 
-  auto hook_found = mSubmitCommandHooks.find(type_for_Device);
-  if (hook_found == mSubmitCommandHooks.end())
+  QReadLocker submit_command_hooks_locker(mSubmitCommandHooks.getLockPtr());
+  auto hook_found = mSubmitCommandHooks.member().find(type_for_Device);
+  if (hook_found == mSubmitCommandHooks.member().end())
   {
     CEDAR_THROW(cedar::dev::Component::HookNotFoundException, "Could not find a submit hook for \"" + this->mMeasurementData->getNameForType(type_for_Device) + "\".");
   }
 
   (hook_found->second)(ioData);
-
-  //!@todo this should never be necessary
-//  this->mCommandData->mUserBuffer.member().clear();
+  submit_command_hooks_locker.unlock();
 
   QWriteLocker time_locker(this->mLastStepCommandsTime.getLockPtr());
   this->mLastStepCommandsTime.member() = timer.elapsed();
@@ -1151,14 +1155,17 @@ void cedar::dev::Component::stepCommunicationMeasurements(cedar::unit::Time dt)
   std::vector< ComponentDataType > types_we_measured;
 
   // lock measurements 
-  QWriteLocker lock1(this->mMeasurementData->mDeviceRetrievedData.getLockPtr());
+  cedar::aux::LockSet locks;
+  cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+  cedar::aux::append(locks, this->mRetrieveMeasurementHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+  cedar::aux::LockSetLocker locker(locks);
 
   // thinks I can get directly from HW:
   for (const auto& type : this->mMeasurementData->getInstalledTypes())
   {
-    auto found = mRetrieveMeasurementHooks.find( type );
+    auto found = mRetrieveMeasurementHooks.member().find( type );
 
-    if (found != mRetrieveMeasurementHooks.end())
+    if (found != mRetrieveMeasurementHooks.member().end())
     {
       // execute the hook:
       this->mMeasurementData->setDeviceRetrievedBufferUnlocked(type, (found->second)() );
@@ -1188,7 +1195,7 @@ void cedar::dev::Component::stepCommunicationMeasurements(cedar::unit::Time dt)
     }
   }
 
-  lock1.unlock();
+  locker.unlock();
   // todo: make this non-blocking for this looped thread
   updateUserMeasurements();
 
@@ -1221,7 +1228,10 @@ void cedar::dev::Component::updateUserMeasurements()
 
 void cedar::dev::Component::startCommunication()
 {
-  this->mChannel->open();
+  if (this->mChannel)
+  {
+    this->mChannel->open();
+  }
 
   // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
@@ -1257,7 +1267,10 @@ void cedar::dev::Component::stopCommunication()
   // finally, step once to apply the brake commands
   brakeNow();
 
-  this->mChannel->close();
+  if (this->mChannel)
+  {
+    this->mChannel->close();
+  }
 }
 
 void cedar::dev::Component::start()
