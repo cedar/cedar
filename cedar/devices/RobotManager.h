@@ -44,6 +44,7 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATION
 #include "cedar/devices/RobotManager.fwd.h"
@@ -177,6 +178,13 @@ public:
    *         The slot must be given in the form "robot name.slot name".
    */
   cedar::dev::ComponentSlotPtr findComponentSlot(const std::string& componentPath) const;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals a change in a robot's name; first parameter: old name, second: new name.
+public:
+  CEDAR_DECLARE_SIGNAL(RobotNameChanged, void (const std::string&, const std::string&));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

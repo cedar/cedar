@@ -123,7 +123,6 @@ public:
 
 public slots:
   void robotDropped(const QString& robotName);
-  void robotNameChanged(const QString& robotName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -134,6 +133,9 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  void robotNameEditValueChanged(const QString& robotName);
+
 private:
   void robotRemoved(const std::string& robotName);
 
