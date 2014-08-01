@@ -344,8 +344,8 @@ private:
   void resetComponent();
 
   void stepCommunication(cedar::unit::Time); //!todo: make friend to LoopFunctionInThread
-  void stepCommunicationCommands(cedar::unit::Time);
-  void stepCommunicationMeasurements(cedar::unit::Time);
+  void stepCommandCommunication(cedar::unit::Time);
+  void stepMeasurementCommunication(cedar::unit::Time);
 
   void updateUserMeasurements();
 

@@ -990,7 +990,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   // (think safety first). this assumes serial communication, of course
   try
   {
-    stepCommunicationCommands(time);
+    stepCommandCommunication(time);
     this->mCommandData->countSuccessfullCommunication();
   }
   catch (const cedar::dev::CommunicationException& e)
@@ -999,7 +999,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   }
   try
   {
-    stepCommunicationMeasurements(time); // note, the post-measurements transformations also take time
+    stepMeasurementCommunication(time); // note, the post-measurements transformations also take time
     this->mMeasurementData->countSuccessfullCommunication();
   }
   catch (const cedar::dev::CommunicationException& e)
@@ -1008,7 +1008,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   }
 }
 
-void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time)
+void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time)
 {
   cedar::aux::Timer timer;
 
@@ -1129,7 +1129,7 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time)
 }
 
 // update the Device Cache
-void cedar::dev::Component::stepCommunicationMeasurements(cedar::unit::Time)
+void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time)
 {
   cedar::aux::Timer timer;
 
@@ -1368,11 +1368,11 @@ void cedar::dev::Component::processStart()
      
      this->mCommandData->mUserBuffer.member() = this->mCommandData->mInitialUserSubmittedData.member();
      lock1.unlock();
-     stepCommunicationCommands(time);
+     stepCommandCommunication(time);
   }
 
   // get measurements (blocking!) when the thread is started ...
-  stepCommunicationMeasurements(time);
+  stepMeasurementCommunication(time);
 }
 
 void cedar::dev::Component::clearUserCommand()
@@ -1444,7 +1444,7 @@ bool cedar::dev::Component::applyCrashbrake()
   }
  
   // AND SEND ...
-  stepCommunicationCommands( cedar::unit::DEFAULT_TIME_UNIT ); // this is a bit of a hack, but these are special circumstances
+  stepCommandCommunication( cedar::unit::DEFAULT_TIME_UNIT ); // this is a bit of a hack, but these are special circumstances
 
   return true;
 }
