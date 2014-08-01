@@ -55,6 +55,7 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
+#include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
@@ -243,6 +244,11 @@ mSuppressCloseDialog(false)
                    SIGNAL(triggered()),
                    this,
                    SLOT(resetRootGroup()));
+
+  QObject::connect(mpActionBrakeAllRobots,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(brakeAllRobots()));
 
   QObject::connect(mpActionExportSVG,
                    SIGNAL(triggered()),
@@ -529,6 +535,12 @@ void cedar::proc::gui::Ide::resetRootGroup()
   //cedar::aux::GlobalClockSingleton::getInstance()->reset();
   this->getLog()->outdateAllMessages();
   this->mGroup->getGroup()->reset();
+}
+
+void cedar::proc::gui::Ide::brakeAllRobots()
+{
+  // @todo: later use this: cedar::dev::Component::startBrakingAllComponents();
+  cedar::dev::Component::startBrakingAllComponents();
 }
 
 void cedar::proc::gui::Ide::showAboutDialog()

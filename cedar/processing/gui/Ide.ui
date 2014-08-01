@@ -422,6 +422,8 @@
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
+   <addaction name="mpActionBrakeAllRobots"/>
+   <addaction name="separator"/>
    <addaction name="mpActionBoostControl"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleSmartConnections"/>
@@ -573,6 +575,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="mpActionBrakeAllRobots">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/brakeall.svg</normaloff>:/toolbaricons/brakeall.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Brake all robots</string>
+   </property>
+   <property name="toolTip">
+    <string>Brake all running robot components</string>
    </property>
   </action>
   <action name="mpActionExportSVG">
