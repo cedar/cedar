@@ -131,6 +131,7 @@ std::string cedar::dev::SerialChannel::writeAndReadLocked(const std::string& com
 void cedar::dev::SerialChannel::write(std::string command)
 {
   CEDAR_ASSERT(this->isOpen());
+
   // append the command delimiter to the sent command
   command.append(mCommandDelimiter);
   try

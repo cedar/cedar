@@ -86,6 +86,7 @@ _mCommandGetAcceleration(new cedar::aux::StringParameter(this, "command get acce
 
 cedar::dev::kteam::epuck::AccelerationSensorSerial::~AccelerationSensorSerial()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

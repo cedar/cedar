@@ -211,7 +211,6 @@ cedar::dev::ComponentPtr cedar::proc::details::ComponentStepGroupParameter::getC
 cedar::proc::steps::Component::Component()
 :
 cedar::proc::Step(true),
-mConnectedOnStart(false),
 _mComponent(new cedar::dev::ComponentParameter(this, "component")),
 _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command group"))
 {
@@ -251,14 +250,6 @@ void cedar::proc::steps::Component::onStart()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
-
-    auto channel = component->getChannel();
-    if (channel && !channel->isOpen())
-    {
-      channel->open();
-      this->mConnectedOnStart = true;
-    }
-
     component->startCommunication();
   }
 }
@@ -269,14 +260,8 @@ void cedar::proc::steps::Component::onStop()
   if (this->hasComponent())
   {
     auto component = this->getComponent();
-    component->stopCommunication();
-
     auto channel = component->getChannel();
-    if (channel && channel->isOpen() && this->mConnectedOnStart)
-    {
-      channel->close();
-      this->mConnectedOnStart = false;
-    }
+    component->stopCommunication();
   }
 }
 
