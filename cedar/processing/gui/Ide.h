@@ -184,6 +184,11 @@ public slots:
    */
   void resetRootGroup();
 
+  /*!@brief brakes all running robots
+   */
+  void brakeAllRobots();
+
+
   /*!@brief Opens a dialog that lets the user export the current scene as an SVG
    */
   void exportSvg();

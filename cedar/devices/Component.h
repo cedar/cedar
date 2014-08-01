@@ -168,6 +168,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static void handleCrash(); // called from the IDE
+  static void brakeNowAllComponents(); 
+  static void startBrakingAllComponents(); 
+  static bool anyComponentsRunning();
 
   // replaced by startCommunication()
   CEDAR_DECLARE_DEPRECATED(void start());
@@ -350,9 +353,9 @@ private:
 
   void resetComponent();
 
-  void stepCommunication(cedar::unit::Time);
-  void stepCommunicationCommands(cedar::unit::Time);
-  void stepCommunicationMeasurements(cedar::unit::Time);
+  void stepCommunication(cedar::unit::Time); 
+  void stepCommandCommunication(cedar::unit::Time);
+  void stepMeasurementCommunication(cedar::unit::Time);
 
   void updateUserMeasurements();
 
