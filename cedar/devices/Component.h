@@ -96,7 +96,7 @@ public:
   class AlreadyInitializedException : public cedar::aux::ExceptionBase {};
 
   //! Exception that is thrown when a function that requires the component to be stopped is called during running.
-  class AlreadyRunningException : public cedar::aux::ExceptionBase {};
+  class AlreadyCommunicatingException : public cedar::aux::ExceptionBase {};
 
   //! Exception that is thrown when a type that is not installed is requested.
   class TypeNotFoundException : public cedar::aux::NotFoundException {};
@@ -128,12 +128,21 @@ public:
   //! Thrown when a group name cannot be found.
   class GroupNameNotFoundException : public cedar::aux::NotFoundException {};
 
+  //! Exception that is thrown when there are no submit hooks even though they are needed.
+  class NoSubmitHooksException : public cedar::aux::ExceptionBase {};
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
   class DataCollection;
   CEDAR_GENERATE_POINTER_TYPES(DataCollection);
+
+  class CommandDataCollection;
+  CEDAR_GENERATE_POINTER_TYPES(CommandDataCollection);
+
+  class MeasurementDataCollection;
+  CEDAR_GENERATE_POINTER_TYPES(MeasurementDataCollection);
 
   struct ControllerCollection {
     cedar::dev::Component::ComponentDataType  mBufferType;
@@ -341,7 +350,7 @@ private:
 
   void resetComponent();
 
-  void stepCommunication(cedar::unit::Time); //!todo: make friend to LoopFunctionInThread
+  void stepCommunication(cedar::unit::Time);
   void stepCommunicationCommands(cedar::unit::Time);
   void stepCommunicationMeasurements(cedar::unit::Time);
 
@@ -364,8 +373,8 @@ private:
   cedar::dev::ChannelPtr mChannel;
   cedar::dev::ComponentSlotWeakPtr mSlot;
 
-  DataCollectionPtr mMeasurementData;
-  DataCollectionPtr mCommandData;
+  MeasurementDataCollectionPtr mMeasurementData;
+  CommandDataCollectionPtr mCommandData;
 
   //! the Device-thread's wrapper
   std::unique_ptr<cedar::aux::LoopFunctionInThread> mDeviceThread;
@@ -377,7 +386,7 @@ private:
 
   cedar::aux::LockableMember<std::set<ComponentDataType>> mUserCommandUsed;
 
-  ControllerCollectionPtr mController; // @todo: make LockableMember
+  cedar::aux::LockableMember<ControllerCollectionPtr> mController;
 
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepMeasurementsTime;
   cedar::aux::LockableMember<boost::optional<cedar::unit::Time> > mLastStepCommandsTime;
@@ -385,6 +394,9 @@ private:
   mutable QMutex mGeneralAccessLock;
 
   bool mDestructWasPrepared; // helper bool
+
+  //! Integration time that is lost due to skipping stepCommunication calls.
+  cedar::unit::Time mLostTime;
 
   static std::set< cedar::dev::Component* > mRunningComponentInstances;
   //--------------------------------------------------------------------------------------------------------------------

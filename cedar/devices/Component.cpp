@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/bind.hpp>
+#include <boost/make_shared.hpp>
 #include <QReadLocker>
 #include <QWriteLocker>
 
@@ -65,6 +66,10 @@ class cedar::dev::Component::DataCollection
     {
     }
 
+    virtual ~DataCollection()
+    {
+    }
+
     void installType(cedar::dev::Component::ComponentDataType type, const std::string& name)
     {
       if (this->hasType(type))
@@ -75,18 +80,7 @@ class cedar::dev::Component::DataCollection
       QWriteLocker locker_b(this->mInstalledNames.getLockPtr());
       mInstalledTypes.member().insert(type);
       mInstalledNames.member()[type] = name;
-      cedar::aux::LockSet lock_set;
-      cedar::aux::append(lock_set, mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mDeviceSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mInitialUserSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::LockSetLocker lock_set_locker(lock_set);
-      this->lazyInitializeUnlocked(mDeviceRetrievedData, type);
-      this->lazyInitializeUnlocked(mDeviceSubmittedData, type);
-      this->lazyInitializeUnlocked(mUserBuffer, type);
-      this->lazyInitializeUnlocked(mPreviousDeviceBuffer, type);
-      this->lazyInitializeUnlocked(mInitialUserSubmittedData, type);
+      this->lazyInitializeMembers(type);
     }
 
     std::string getNameForType(cedar::dev::Component::ComponentDataType type) const
@@ -134,30 +128,11 @@ class cedar::dev::Component::DataCollection
       return found;
     }
 
-    cedar::aux::DataPtr getDeviceData(const cedar::dev::Component::ComponentDataType &type)
-    {
-      return this->getData(this->mDeviceRetrievedData, type);
-    }
-
     void setDimensionality(cedar::dev::Component::ComponentDataType type, unsigned int dim)
     {
-      cedar::aux::LockSet lock_set;
-      cedar::aux::append(lock_set, mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mDeviceSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::append(lock_set, mInitialUserSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
-      cedar::aux::LockSetLocker locker(lock_set);
       mInstalledDimensions[type] = dim;
 
-      if (this->hasType(type))
-      {
-        this->resetBufferUnlocked(mDeviceRetrievedData, type);
-        this->resetBufferUnlocked(mDeviceSubmittedData, type);
-        this->resetBufferUnlocked(mUserBuffer, type);
-        this->resetBufferUnlocked(mPreviousDeviceBuffer, type);
-        this->resetBufferUnlocked(mInitialUserSubmittedData, type);
-      }
+      this->resetBuffers(type);
     }
 
     unsigned int getDimensionality(cedar::dev::Component::ComponentDataType type) const
@@ -168,41 +143,6 @@ class cedar::dev::Component::DataCollection
         CEDAR_THROW(DimensionalityNotSetException, "No dimensionality set for the given type.");
       }
       return iter->second;
-    }
-
-    cv::Mat getDeviceRetrievedBufferUnlocked(ComponentDataType type)
-    {
-      return this->getBufferUnlocked(mDeviceRetrievedData, type);
-    }
-
-    void setDeviceRetrievedBuffer(ComponentDataType type, cv::Mat data)
-    {
-      this->setData(mDeviceRetrievedData, type, data);
-    }
-
-    void setDeviceRetrievedBufferUnlocked(ComponentDataType type, cv::Mat data)
-    {
-      this->setDataUnlocked(mDeviceRetrievedData, type, data);
-    }
-
-    cv::Mat getDeviceSubmittedBufferUnlocked(ComponentDataType type)
-    {
-      return this->getBufferUnlocked(mDeviceSubmittedData, type);
-    }
-
-    void setDeviceSubmittedBufferUnlocked(ComponentDataType type, cv::Mat data)
-    {
-      this->setDataUnlocked(mDeviceSubmittedData, type, data);
-    }
-
-    void resetDeviceRetrievedBufferUnlocked(ComponentDataType type)
-    {
-      this->resetBufferUnlocked(mDeviceRetrievedData, type);
-    }
-
-    void resetDeviceSubmittedBufferUnlocked(ComponentDataType type)
-    {
-      this->resetBufferUnlocked(mDeviceSubmittedData, type);
     }
 
     void resetUserBufferUnlocked(cedar::dev::Component::ComponentDataType type)
@@ -441,7 +381,34 @@ class cedar::dev::Component::DataCollection
       }
     }
 
-  private:
+  protected:
+    virtual void lazyInitializeMembers(cedar::dev::Component::ComponentDataType type)
+    {
+      cedar::aux::LockSet lock_set;
+      cedar::aux::append(lock_set, mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mInitialUserSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::LockSetLocker lock_set_locker(lock_set);
+      this->lazyInitializeUnlocked(mUserBuffer, type);
+      this->lazyInitializeUnlocked(mPreviousDeviceBuffer, type);
+      this->lazyInitializeUnlocked(mInitialUserSubmittedData, type);
+    }
+
+    virtual void resetBuffers(cedar::dev::Component::ComponentDataType type)
+    {
+      cedar::aux::LockSet lock_set;
+      cedar::aux::append(lock_set, mUserBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::append(lock_set, mInitialUserSubmittedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
+      cedar::aux::LockSetLocker locker(lock_set);
+      if (this->hasType(type))
+      {
+        this->resetBufferUnlocked(mUserBuffer, type);
+        this->resetBufferUnlocked(mPreviousDeviceBuffer, type);
+        this->resetBufferUnlocked(mInitialUserSubmittedData, type);
+      }
+    }
+
     bool hasGroupUnlocked(const std::string& groupName)
     {
       return this->mGroups.member().find(groupName) != this->mGroups.member().end();
@@ -571,12 +538,6 @@ class cedar::dev::Component::DataCollection
   public:
     //@todo: most of these should probably be private
 
-    //!@todo the distinction between submitted and received may not be necessary as only measurements seem to receive, and only command submit. js: YES
-    cedar::aux::LockableMember<BufferDataType> mDeviceRetrievedData;
-
-    // Cache for the Device-interface
-    cedar::aux::LockableMember<BufferDataType> mDeviceSubmittedData; // was: mDeviceSubmittedCommands
-
     cedar::aux::LockableMember<BufferDataType> mUserBuffer; // was: mUserCommandBuffer, mUserMeasurementsBuffer
 
     cedar::aux::LockableMember<BufferDataType> mInitialUserSubmittedData; // was: mInitialUserSubmittedCommands
@@ -602,14 +563,110 @@ class cedar::dev::Component::DataCollection
     cedar::aux::LockableMember<std::deque<std::string> > mLastCommunicationErrorMessages;
 };
 
+class cedar::dev::Component::MeasurementDataCollection : public cedar::dev::Component::DataCollection
+{
+public:
+  cedar::aux::DataPtr getDeviceData(const cedar::dev::Component::ComponentDataType &type)
+  {
+    return this->getData(this->mDeviceRetrievedData, type);
+  }
+
+  cv::Mat getDeviceRetrievedBufferUnlocked(ComponentDataType type)
+  {
+    return this->getBufferUnlocked(mDeviceRetrievedData, type);
+  }
+
+  void setDeviceRetrievedBuffer(ComponentDataType type, cv::Mat data)
+  {
+    this->setData(mDeviceRetrievedData, type, data);
+  }
+
+  void setDeviceRetrievedBufferUnlocked(ComponentDataType type, cv::Mat data)
+  {
+    this->setDataUnlocked(mDeviceRetrievedData, type, data);
+  }
+
+  void resetDeviceRetrievedBufferUnlocked(ComponentDataType type)
+  {
+    this->resetBufferUnlocked(mDeviceRetrievedData, type);
+  }
+
+public:
+  cedar::aux::LockableMember<BufferDataType> mDeviceRetrievedData;
+
+protected:
+  void lazyInitializeMembers(cedar::dev::Component::ComponentDataType type)
+  {
+    this->DataCollection::lazyInitializeMembers(type);
+
+    QWriteLocker locker(mDeviceRetrievedData.getLockPtr());
+    this->lazyInitializeUnlocked(mDeviceRetrievedData, type);
+  }
+
+  virtual void resetBuffers(cedar::dev::Component::ComponentDataType type)
+  {
+    this->DataCollection::resetBuffers(type);
+
+    QWriteLocker locker(mDeviceRetrievedData.getLockPtr());
+    if (this->hasType(type))
+    {
+      this->resetBufferUnlocked(mDeviceRetrievedData, type);
+    }
+  }
+};
+
+// comamnd data is also a measruement collection because the actual result of commanding the values is measured
+class cedar::dev::Component::CommandDataCollection : public cedar::dev::Component::MeasurementDataCollection
+{
+public:
+  cv::Mat getDeviceSubmittedBufferUnlocked(ComponentDataType type)
+  {
+    return this->getBufferUnlocked(mDeviceSubmittedData, type);
+  }
+
+  void setDeviceSubmittedBufferUnlocked(ComponentDataType type, cv::Mat data)
+  {
+    this->setDataUnlocked(mDeviceSubmittedData, type, data);
+  }
+
+  void resetDeviceSubmittedBufferUnlocked(ComponentDataType type)
+  {
+    this->resetBufferUnlocked(mDeviceSubmittedData, type);
+  }
+
+public:
+  // Cache for the Device-interface
+  cedar::aux::LockableMember<BufferDataType> mDeviceSubmittedData; // was: mDeviceSubmittedCommands
+
+protected:
+  void lazyInitializeMembers(cedar::dev::Component::ComponentDataType type)
+  {
+    this->MeasurementDataCollection::lazyInitializeMembers(type);
+
+    QWriteLocker locker(mDeviceSubmittedData.getLockPtr());
+    this->lazyInitializeUnlocked(mDeviceSubmittedData, type);
+  }
+
+  virtual void resetBuffers(cedar::dev::Component::ComponentDataType type)
+  {
+    this->MeasurementDataCollection::resetBuffers(type);
+
+    QWriteLocker locker(mDeviceSubmittedData.getLockPtr());
+    if (this->hasType(type))
+    {
+      this->resetBufferUnlocked(mDeviceSubmittedData, type);
+    }
+  }
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 void cedar::dev::Component::init()
 {
-  this->mMeasurementData = cedar::dev::Component::DataCollectionPtr(new cedar::dev::Component::DataCollection());
-  this->mCommandData = cedar::dev::Component::DataCollectionPtr(new cedar::dev::Component::DataCollection());
+  this->mMeasurementData = boost::make_shared<cedar::dev::Component::MeasurementDataCollection>();
+  this->mCommandData = boost::make_shared<cedar::dev::Component::CommandDataCollection>();
   mDeviceThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
                                 new cedar::aux::LoopFunctionInThread(
                                   boost::bind(&cedar::dev::Component::stepCommunication,
@@ -619,6 +676,7 @@ void cedar::dev::Component::init()
 
   mDeviceThread->connectToStartSignal(boost::bind(&cedar::dev::Component::processStart, this));
   mDeviceThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
+  this->mLostTime = 0.0 * cedar::unit::seconds;
 }
 
 // constructor
@@ -637,21 +695,7 @@ mChannel(channel)
 // needs to be called by the end-point of the inheritance tree
 void cedar::dev::Component::prepareComponentDestructAbsolutelyRequired()
 {
-#if 0
-  // @todo: try this (comment-in)
-  // OL: I don't think this is a problem, this is a natural thing that happens if there is more than one child class in the hierarchy
-  if (mDestructWasPrepared)
-  {
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      "You called prepareComponentDestructAbsolutelyRequired() twice. "
-      "This may be a problem.",
-      CEDAR_CURRENT_FUNCTION_NAME
-    );
-  }
-#endif
-
-  if (this->isRunning())
+  if (this->isCommunicating())
   {
     stopCommunication();
   }
@@ -895,9 +939,6 @@ void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
 
 void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
-  //!@todo This fails in the context of calling brakeNow() because singleStep is used instead of a running loop. Is this ok?
-  CEDAR_DEBUG_NON_CRITICAL_ASSERT( mDeviceThread->isRunning() );
-
   this->checkExclusivenessOfCommand(type);
   QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
   this->mCommandData->setUserBuffer(type, data);
@@ -906,10 +947,10 @@ void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat
 
 void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
-  if (this->isRunning())
+  if (this->isCommunicating())
   {
     // cannot set initial commands if a component is already running
-    CEDAR_THROW(AlreadyRunningException, "Cannot set initial commands if device is running.");
+    CEDAR_THROW(AlreadyCommunicatingException, "Cannot set initial commands if device is communicating.");
   }
 
   QWriteLocker(this->mCommandData->mInitialUserSubmittedData.getLockPtr());
@@ -992,11 +1033,15 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   // We cannot block in this call. Scenario:
   // stopCommunication is called, thus blocks the mutex, but waits for this function to finish, thus never exists
   // thus, if we cannot lock here, we skip the step
-  //!@todo If this happens in other circumstances, some dt is lost. This should be summed up here and added to the dt passed to the step* functions
   if (!mGeneralAccessLock.tryLock())
   {
+    this->mLostTime += time;
     return;
   }
+
+  // add the lost time to the dt sent to the step functions, then reset the lost time
+  cedar::unit::Time real_time = time + this->mLostTime;
+  this->mLostTime = 0.0 * cedar::unit::seconds;
 
   // lock was acquired, let's make sure its unlocked
   cedar::aux::CallOnScopeExit unlocker(boost::bind(&QMutex::unlock, &this->mGeneralAccessLock));
@@ -1005,7 +1050,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   // (think safety first). this assumes serial communication, of course
   try
   {
-    stepCommunicationCommands(time);
+    stepCommunicationCommands(real_time);
     this->mCommandData->countSuccessfullCommunication();
   }
   catch (const cedar::dev::CommunicationException& e)
@@ -1014,7 +1059,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   }
   try
   {
-    stepCommunicationMeasurements(time); // note, the post-measurements transformations also take time
+    stepCommunicationMeasurements(real_time); // note, the post-measurements transformations also take time
     this->mMeasurementData->countSuccessfullCommunication();
   }
   catch (const cedar::dev::CommunicationException& e)
@@ -1034,24 +1079,26 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
   cedar::aux::LockSet locks;
   cedar::aux::append(locks, this->mUserCommandUsed.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
   cedar::aux::append(locks, this->mSubmitCommandHooks.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
+  cedar::aux::append(locks, this->mController.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
   cedar::aux::LockSetLocker locker(locks);
 
 
-  if (this->mUserCommandUsed.member().size() == 0
-      && !this->mController)
+  // if there are neither user commands nor a controller, nothing needs to be done
+  if (this->mUserCommandUsed.member().size() == 0 && !this->mController.member())
   {
-    return; // this is not a problem
-  }
-  if (mSubmitCommandHooks.member().size() == 0)
-  {
-    // @todo: throw
     return;
   }
 
-  if (this->mController)
+  // if there are no submit hooks but there is stuff to submit, we have a problem
+  if (mSubmitCommandHooks.member().size() == 0)
   {
-    type_from_user = this->mController->mBufferType;
-    userData = (this->mController->mCallback)();
+    CEDAR_THROW(NoSubmitHooksException, "No submit hooks defined for commands.");
+  }
+
+  if (this->mController.member())
+  {
+    type_from_user = this->mController.member()->mBufferType;
+    userData = (this->mController.member()->mCallback)();
   }
   else // do not use Controller Callback:
   {
@@ -1180,7 +1227,6 @@ void cedar::dev::Component::stepCommunicationMeasurements(cedar::unit::Time dt)
 
   for (auto& missing_type : types_to_transform )
   {
-    // bool nothing_found = true; //!@todo What is the purpose of this?
     for (auto& measured_type : types_we_measured )
     {
       auto hook = this->mMeasurementData->findTransformationHook(measured_type, missing_type);
@@ -1205,7 +1251,9 @@ void cedar::dev::Component::stepCommunicationMeasurements(cedar::unit::Time dt)
 
 void cedar::dev::Component::updateUserMeasurements()
 {
-  // lock Device cache todo
+  // this is here to preserve lock order (getInstalledTypes locks internally)
+  auto measurement_types = this->mMeasurementData->getInstalledTypes();
+
   // lock caches
   cedar::aux::LockSet locks;
   cedar::aux::append(locks, this->mMeasurementData->mPreviousDeviceBuffer.getLockPtr(), cedar::aux::LOCK_TYPE_READ);
@@ -1213,8 +1261,7 @@ void cedar::dev::Component::updateUserMeasurements()
   cedar::aux::append(locks, this->mMeasurementData->mDeviceRetrievedData.getLockPtr(), cedar::aux::LOCK_TYPE_WRITE);
   cedar::aux::LockSetLocker locker(locks);
 
-  // todo: are these really deep copies? -> no, mDeviceRetrievedMeasurements contains data ptrs
-  for (auto type : this->mMeasurementData->getInstalledTypes())
+  for (auto type : measurement_types)
   {
     this->mMeasurementData->mPreviousDeviceBuffer.member()[type]->getData() = this->mMeasurementData->mUserBuffer.member()[type]->getData().clone();
     this->mMeasurementData->mUserBuffer.member()[type]->getData() = this->mMeasurementData->mDeviceRetrievedData.member()[type]->getData().clone();
@@ -1491,12 +1538,14 @@ void cedar::dev::Component::crashbrake()
 
 void cedar::dev::Component::clearController()
 {
-  mController.reset();  
+  QWriteLocker locker(mController.getLockPtr());
+  mController.member().reset();
 }
 
 void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Component::ControllerCallback fun)
 {
-  mController= ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun } );
+  QWriteLocker locker(mController.getLockPtr());
+  mController.member() = ControllerCollectionPtr( new cedar::dev::Component::ControllerCollection{ type, fun } );
 }
 
 void cedar::dev::Component::waitUntilCommunicated() const
