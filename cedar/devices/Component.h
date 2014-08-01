@@ -73,7 +73,7 @@ class cedar::dev::Component : public QObject,
 public:
   typedef boost::function< void (cv::Mat) > CommandFunctionType;
   typedef boost::function< cv::Mat () >     MeasurementFunctionType;
-  typedef boost::function< cv::Mat (cv::Mat) > TransformationFunctionType;
+  typedef boost::function< cv::Mat (cedar::unit::Time, cv::Mat) > TransformationFunctionType;
   typedef unsigned int                      ComponentDataType;
   typedef std::map< ComponentDataType, cedar::aux::MatDataPtr > BufferDataType;
   typedef boost::function< cv::Mat() >      ControllerCallback;
@@ -193,10 +193,10 @@ public:
   }
 
   // utility Transformations
-  cv::Mat integrateDevice(cv::Mat data, ComponentDataType type);
-  cv::Mat integrateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
-  cv::Mat differentiateDevice(cv::Mat data, ComponentDataType type);
-  cv::Mat differentiateDeviceTwice(cv::Mat data, ComponentDataType type1, ComponentDataType type2);
+  cv::Mat integrateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type);
+  cv::Mat integrateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2);
+  cv::Mat differentiateDevice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type);
+  cv::Mat differentiateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2);
 
   void processStart();
 
