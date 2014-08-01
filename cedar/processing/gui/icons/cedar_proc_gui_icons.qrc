@@ -30,7 +30,6 @@
     <file>steps/component_multiply.svg</file>
     <file>steps/convolution.svg</file>
     <file>steps/coordinate_transformation.svg</file>
-    <file>steps/field_temp.svg</file>
     <file>steps/flip.svg</file>
     <file>steps/gauss_input.svg</file>
     <file>steps/histogram.svg</file>

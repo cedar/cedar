@@ -22,45 +22,55 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementDeclarationTemplate.fwd.h
+    File:        ConnectableIconView.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 07
+    Date:        2014 08 01
 
-    Description: Forward declaration file for the class cedar::proc::ElementDeclarationTemplate.
+    Description: Source file for the class cedar::proc::gui::ConnectableIconView.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
-#define CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// FORWARD DECLARATIONS
-#include "cedar/processing/gui/ConnectableIconView.fwd.h"
-
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/processing/gui/ConnectableIconView.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::ConnectableIconView::ConnectableIconView()
 {
-  namespace proc
-  {
-    template <class DerivedClass, class IconView> class ElementDeclarationTemplate;
-  }
 }
 
-//!@endcond
+cedar::proc::gui::ConnectableIconView::~ConnectableIconView()
+{
+}
 
-#endif // CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::ConnectableIconView::setConnectable(cedar::proc::ConstConnectablePtr connectable)
+{
+  this->mConnectable = connectable;
+
+  this->connectableChanged();
+}
+
+void cedar::proc::gui::ConnectableIconView::connectableChanged()
+{
+  // default implementation is empty
+}
+
+cedar::proc::ConstConnectablePtr cedar::proc::gui::ConnectableIconView::getConnectable() const
+{
+  return this->mConnectable;
+}
