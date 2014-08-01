@@ -22,26 +22,23 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementDeclarationTemplate.fwd.h
+    File:        DefaultConnectableIconView.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 07
+    Date:        2014 08 01
 
-    Description: Forward declaration file for the class cedar::proc::ElementDeclarationTemplate.
+    Description: Forward declaration file for the class cedar::proc::gui::DefaultConnectableIconView.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
-#define CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
+#ifndef CEDAR_PROC_GUI_DEFAULT_CONNECTABLE_ICON_VIEW_FWD_H
+#define CEDAR_PROC_GUI_DEFAULT_CONNECTABLE_ICON_VIEW_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-
-// FORWARD DECLARATIONS
-#include "cedar/processing/gui/ConnectableIconView.fwd.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
@@ -51,16 +48,20 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
+
 namespace cedar
 {
   namespace proc
   {
-    template <class DerivedClass, class IconView> class ElementDeclarationTemplate;
+    namespace gui
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(DefaultConnectableIconView);
+      //!@endcond
+    }
   }
 }
 
-//!@endcond
 
-#endif // CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
+#endif // CEDAR_PROC_GUI_DEFAULT_CONNECTABLE_ICON_VIEW_FWD_H
 

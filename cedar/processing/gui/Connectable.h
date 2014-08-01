@@ -49,6 +49,7 @@
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
+#include "cedar/processing/gui/ConnectableIconView.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/PlotWidget.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
@@ -391,8 +392,8 @@ public:
   static const qreal M_DATA_SLOT_PADDING;
 
 protected:
-  //! SvgItem displaying the connectable's icon
-  QGraphicsSvgItem* mpIconDisplay;
+  //! Used to display the icon of the step.
+  cedar::proc::gui::ConnectableIconView* mpIconView;
 
   //!@brief the class id of the step
   cedar::aux::ConstPluginDeclarationPtr mClassId;

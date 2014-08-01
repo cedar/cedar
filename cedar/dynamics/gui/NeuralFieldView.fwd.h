@@ -22,45 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementDeclarationTemplate.fwd.h
+    File:        NeuralFieldView.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 07
+    Date:        2014 08 01
 
-    Description: Forward declaration file for the class cedar::proc::ElementDeclarationTemplate.
+    Description: Forward declaration file for the class cedar::dyn::gui::NeuralFieldView.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
-#define CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
+#ifndef CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_FWD_H
+#define CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// FORWARD DECLARATIONS
-#include "cedar/processing/gui/ConnectableIconView.fwd.h"
-
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/dynamics/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
+
 namespace cedar
 {
-  namespace proc
+  namespace dyn
   {
-    template <class DerivedClass, class IconView> class ElementDeclarationTemplate;
+    namespace gui
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_DYN_CLASS(NeuralFieldView);
+      //!@endcond
+    }
   }
 }
 
-//!@endcond
 
-#endif // CEDAR_PROC_ELEMENT_DECLARATION_TEMPLATE_FWD_H
+#endif // CEDAR_DYN_GUI_NEURAL_FIELD_VIEW_FWD_H
 

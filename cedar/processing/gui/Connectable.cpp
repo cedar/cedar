@@ -43,6 +43,7 @@
 #include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/DefaultConnectableIconView.h"
 #include "cedar/processing/steps/Component.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -93,7 +94,7 @@ cedar::proc::gui::GraphicsBase
   group,
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE
 ),
-mpIconDisplay(NULL),
+mpIconView(nullptr),
 mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mpMainWindow(pMainWindow),
 mInputOutputSlotOffset(static_cast<qreal>(0.0))
@@ -313,16 +314,10 @@ void cedar::proc::gui::Connectable::setReadOnly(bool readOnly)
 
 void cedar::proc::gui::Connectable::setIconBounds(const qreal& x, const qreal& y, const qreal& size)
 {
-  if (this->mpIconDisplay == NULL)
+  if (this->mpIconView != nullptr)
   {
-    return;
+    this->mpIconView->setBounds(x, y, size);
   }
-
-  this->mpIconDisplay->setPos(x, y);
-  qreal w = this->mpIconDisplay->boundingRect().width();
-  qreal h = this->mpIconDisplay->boundingRect().width();
-  qreal major = std::max(w, h);
-  this->mpIconDisplay->setScale(size / major);
 }
 
 void cedar::proc::gui::Connectable::setInputOutputSlotOffset(qreal offset)
@@ -541,16 +536,14 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   cedar::proc::ConstElementDeclarationPtr elem_decl
     = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
 
-  if (this->mpIconDisplay != nullptr)
+  if (this->mpIconView != nullptr)
   {
-    delete this->mpIconDisplay;
-    this->mpIconDisplay = nullptr;
+    delete this->mpIconView;
   }
-  this->mpIconDisplay = new QGraphicsSvgItem(elem_decl->determinedIconPath(), this);
 
-
-  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
-  this->mpIconDisplay->setCacheMode(QGraphicsItem::NoCache);
+  this->mpIconView = elem_decl->createIconView();
+  this->mpIconView->setParentItem(this);
+  this->mpIconView->setConnectable(this->getConnectable());
 
   this->addDataItems();
   mSlotAddedConnection
