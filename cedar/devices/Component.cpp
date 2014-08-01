@@ -1295,7 +1295,8 @@ void cedar::dev::Component::startCommunication()
   mDeviceThread->start();
   mRunningComponentInstances.insert( this );
 
-  // workaround to get at least 2 measurments to be able to differentiate
+  // workaround to get at least several measurments to be able to differentiate
+  mDeviceThread->waitUntilStepped();
   mDeviceThread->waitUntilStepped();
   mDeviceThread->waitUntilStepped();
 }
@@ -1418,7 +1419,13 @@ cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat
 //  std::cout << dt << std::endl;
 //  std::cout << "step size: " << this->mDeviceThread->getStepSize() << std::endl;
 //  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
+
   double unitless = dt / (1.0 * cedar::unit::second);
+
+  if (unitless == 0.0)
+  {
+    return cv::Mat::zeros( data.rows, data.cols, CV_64F ); 
+  }
 
 //  std::cout << unitless << std::endl;
 //  std::cout << "Differentiate once (FIN!)!" << std::endl;
@@ -1431,7 +1438,16 @@ cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat
 // todo: also used for commands
 cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2)
 {
+//  std::cout << "Differentiate twice!" << std::endl;
+//  std::cout << data << std::endl;
+//  std::cout << dt << std::endl;
+//  std::cout << "step size: " << this->mDeviceThread->getStepSize() << std::endl;
   double unitless = dt / (1.0 * cedar::unit::second);
+
+  if (unitless == 0.0)
+  {
+    return cv::Mat::zeros( data.rows, data.cols, CV_64F ); 
+  }
 // todo: check locking here
   //!@todo check if this uses the right time step to differentiate
   cv::Mat result = (( data - this->mMeasurementData->getUserBufferUnlocked(type1) )  / unitless
