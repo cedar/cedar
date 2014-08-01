@@ -134,6 +134,17 @@ mpChannelsNode(NULL)
   this->fillExistingRobots();
 
   this->mpSimpleRobotIconList->viewport()->setAcceptDrops(true);
+
+  mRobotRenamedConnection = cedar::dev::RobotManagerSingleton::getInstance()->connectToRobotNameChangedSignal
+  (
+    boost::bind
+    (
+      &cedar::dev::gui::RobotManager::robotRenamed,
+      this,
+      _1,
+      _2
+    )
+  );
 }
 
 cedar::dev::gui::RobotManager::~RobotManager()
@@ -146,6 +157,23 @@ cedar::dev::gui::RobotManager::~RobotManager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::RobotManager::robotRenamed(const std::string& oldName, const std::string& newName)
+{
+  //!@todo This should probably be emitted using Qt signals in case it gets called outside the GUI thread
+
+  for (int i = 0; i < this->mpRobotSelector->count(); ++i)
+  {
+    if (this->mpRobotSelector->itemText(i).toStdString() == oldName)
+    {
+      // update name and user data
+      this->mpRobotSelector->setItemText(i, QString::fromStdString(newName));
+      this->mpRobotSelector->setItemData(i, QString::fromStdString(newName));
+    }
+  }
+
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(false && "Could not find previous robot name in selector.");
+}
 
 void cedar::dev::gui::RobotManager::fillExistingRobots()
 {
