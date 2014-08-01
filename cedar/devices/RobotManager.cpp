@@ -222,7 +222,7 @@ void cedar::dev::RobotManager::renameRobot(const std::string& robotName, const s
     mRobotInfos.erase(old_info);
   }
 
-  //!@todo send a signal that a name has changed
+  this->signalRobotNameChanged(robotName, newName);
 }
 
 void cedar::dev::RobotManager::removeRobot(const std::string& robotName)

@@ -120,7 +120,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   QObject::connect(this->mpIcon, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
   QObject::connect(p_recycle_button, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-  QObject::connect(this->mpRobotNameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(robotNameChanged(const QString&)));
+  QObject::connect(this->mpRobotNameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(robotNameEditValueChanged(const QString&)));
 
   try
   {
@@ -374,7 +374,7 @@ QListWidgetItem* cedar::dev::gui::RobotCardIconHolder::itemFromMime(QDropEvent* 
   return p_source->item(r);
 }
 
-void cedar::dev::gui::RobotCard::robotNameChanged(const QString& robotName)
+void cedar::dev::gui::RobotCard::robotNameEditValueChanged(const QString& robotName)
 {
   cedar::dev::RobotManagerSingleton::getInstance()->renameRobot(mCurrentName, robotName.toStdString());
   mCurrentName = robotName.toStdString();
