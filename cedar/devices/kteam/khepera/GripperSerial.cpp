@@ -85,6 +85,7 @@ cedar::dev::kteam::khepera::Gripper(cedar::aux::asserted_pointer_cast<cedar::dev
 
 cedar::dev::kteam::khepera::GripperSerial::~GripperSerial()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 void cedar::dev::kteam::khepera::GripperSerial::construct()

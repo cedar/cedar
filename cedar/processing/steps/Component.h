@@ -175,9 +175,6 @@ private slots:
 protected:
   // none yet
 private:
-  //! Remembers whether onStart connected the component/robot. If true, onStop will disconnect.
-  bool mConnectedOnStart;
-
   //! Id used for signaling "step measurement" times
   unsigned int mMeasurementTimeId;
 

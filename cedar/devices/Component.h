@@ -55,6 +55,7 @@
 #include <boost/function.hpp>
 #include <boost/optional.hpp>
 #include <QReadWriteLock>
+#include <QMutex>
 #include <QObject>
 
 #include <vector>
