@@ -49,6 +49,11 @@
 class TestComponent : public cedar::dev::Component
 {
 public:
+  ~TestComponent()
+  {
+    prepareComponentDestructAbsolutelyRequired();
+  }
+
   int testTypeInstalling()
   {
     int errors = 0;
