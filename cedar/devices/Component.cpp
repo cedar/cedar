@@ -1221,6 +1221,10 @@ void cedar::dev::Component::startCommunication()
 
   mDeviceThread->start();
   mRunningComponentInstances.insert( this );
+
+  // workaround to get at least 2 measurments to be able to differentiate
+  mDeviceThread->waitUntilStepped();
+  mDeviceThread->waitUntilStepped();
 }
 
 void cedar::dev::Component::stopCommunication()
