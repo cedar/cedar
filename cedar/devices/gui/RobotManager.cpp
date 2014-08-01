@@ -169,6 +169,7 @@ void cedar::dev::gui::RobotManager::robotRenamed(const std::string& oldName, con
       // update name and user data
       this->mpRobotSelector->setItemText(i, QString::fromStdString(newName));
       this->mpRobotSelector->setItemData(i, QString::fromStdString(newName));
+      return;
     }
   }
 
