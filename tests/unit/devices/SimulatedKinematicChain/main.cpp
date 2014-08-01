@@ -646,8 +646,8 @@ void test()
       )
     )
   {
-std::cout << "test j1 " << jacobian_1 << std::endl;
-std::cout << "test j3 " << jacobian_3 << std::endl;
+//std::cout << "test j1 " << jacobian_1 << std::endl;
+//std::cout << "test j3 " << jacobian_3 << std::endl;
 
     errors++;
     std::cout << "ERROR with calculateCartesianJacobian()" << std::endl;
@@ -689,7 +689,7 @@ std::cout << "test j3 " << jacobian_3 << std::endl;
       || !cedar::aux::math::isZero(spatial_jacobian.at<double>(5, 3) - 0)
      )
   {
-std::cout << " spatial " << spatial_jacobian << std::endl;    
+//std::cout << " spatial " << spatial_jacobian << std::endl;    
     errors++;
     std::cout << "ERROR with spatialJacobian()" << std::endl;
   }
@@ -723,7 +723,7 @@ std::cout << " spatial " << spatial_jacobian << std::endl;
       || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(2, 3) - 0)
      )
   {
-std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;    
+//std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;    
     errors++;
     std::cout << "ERROR with calculateEndEffectorJacobian()" << std::endl;
   }
@@ -769,7 +769,7 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
   complex_test_arm->waitUntilCommunicated();
 
-  complex_test_arm->stopCommunication();
+//  complex_test_arm->stopCommunication();
 
   // compute variable values
   cv::Mat root_transformation = complex_test_arm->getRootCoordinateFrame()->getTransformation();
@@ -810,7 +810,7 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   // make a small step for finite difference method
   double delta_t = 1e-07;
 
-  complex_test_arm->startCommunication();
+//  complex_test_arm->startCommunication();
   complex_test_arm->clearUserCommand();
   complex_test_arm->setJointVelocities
   (
@@ -828,7 +828,7 @@ std::cout << "end eff jacobian " << end_effector_jacobian << std::endl;
   );
   complex_test_arm->waitUntilCommunicated();
   //cedar::aux::sleep( complex_test_arm->getDeviceStepSize() * 1.5 );
-  complex_test_arm->stopCommunication();
+//  complex_test_arm->stopCommunication();
 
   // compute new values
   cv::Mat p0_new = root_transformation * complex_test_arm->getJointTransformation(0) * p_local;
@@ -873,6 +873,7 @@ std::cout << "numeric v : " << v_eef_numeric << std::endl;
 std::cout << "real    a : " << a_eef << std::endl;
 std::cout << "numeric a : " << a_eef_numeric << std::endl;
 
+//  complex_test_arm->stopCommunication();
 
   //--------------------------------------------------------------------------------------------------------------------
   // spatial Jacobian temporal derivative
@@ -882,8 +883,8 @@ std::cout << "numeric a : " << a_eef_numeric << std::endl;
       !cedar::aux::math::isZero(pow(norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6), 2))
      )
   {
-std::cout << spatial_jacobian_dot << std::endl;
-std::cout << spatial_jacobian_dot_numeric << std::endl;
+//std::cout << spatial_jacobian_dot << std::endl;
+//std::cout << spatial_jacobian_dot_numeric << std::endl;
     errors++;
     std::cout << "ERROR with calculateSpatialJacobianTemporalDerivative(...)" << std::endl;
   }

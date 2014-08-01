@@ -1050,7 +1050,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   // (think safety first). this assumes serial communication, of course
   try
   {
-    stepCommunicationCommands(real_time);
+    stepCommandCommunication(real_time);
     this->mCommandData->countSuccessfullCommunication();
   }
   catch (const cedar::dev::CommunicationException& e)
@@ -1059,7 +1059,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   }
   try
   {
-    stepCommunicationMeasurements(real_time); // note, the post-measurements transformations also take time
+    stepMeasurementCommunication(real_time); // note, the post-measurements transformations also take time
     this->mMeasurementData->countSuccessfullCommunication();
   }
   catch (const cedar::dev::CommunicationException& e)
@@ -1068,7 +1068,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   }
 }
 
-void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
+void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
 {
   cedar::aux::Timer timer;
 
@@ -1194,7 +1194,7 @@ void cedar::dev::Component::stepCommunicationCommands(cedar::unit::Time dt)
 }
 
 // update the Device Cache
-void cedar::dev::Component::stepCommunicationMeasurements(cedar::unit::Time dt)
+void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
 {
   cedar::aux::Timer timer;
 
@@ -1294,6 +1294,11 @@ void cedar::dev::Component::startCommunication()
 
   mDeviceThread->start();
   mRunningComponentInstances.insert( this );
+
+  // workaround to get at least several measurments to be able to differentiate
+  mDeviceThread->waitUntilStepped();
+  mDeviceThread->waitUntilStepped();
+  mDeviceThread->waitUntilStepped();
 }
 
 void cedar::dev::Component::stopCommunication()
@@ -1411,8 +1416,16 @@ cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat
 {
 //  std::cout << "Differentiate once!" << std::endl;
 //  std::cout << data << std::endl;
+//  std::cout << dt << std::endl;
+//  std::cout << "step size: " << this->mDeviceThread->getStepSize() << std::endl;
 //  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
+
   double unitless = dt / (1.0 * cedar::unit::second);
+
+  if (unitless == 0.0)
+  {
+    return cv::Mat::zeros( data.rows, data.cols, CV_64F ); 
+  }
 
 //  std::cout << unitless << std::endl;
 //  std::cout << "Differentiate once (FIN!)!" << std::endl;
@@ -1425,7 +1438,16 @@ cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat
 // todo: also used for commands
 cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv::Mat data, ComponentDataType type1, ComponentDataType type2)
 {
+//  std::cout << "Differentiate twice!" << std::endl;
+//  std::cout << data << std::endl;
+//  std::cout << dt << std::endl;
+//  std::cout << "step size: " << this->mDeviceThread->getStepSize() << std::endl;
   double unitless = dt / (1.0 * cedar::unit::second);
+
+  if (unitless == 0.0)
+  {
+    return cv::Mat::zeros( data.rows, data.cols, CV_64F ); 
+  }
 // todo: check locking here
   //!@todo check if this uses the right time step to differentiate
   cv::Mat result = (( data - this->mMeasurementData->getUserBufferUnlocked(type1) )  / unitless
@@ -1448,11 +1470,11 @@ void cedar::dev::Component::processStart()
      
      this->mCommandData->mUserBuffer.member() = this->mCommandData->mInitialUserSubmittedData.member();
      lock1.unlock();
-     stepCommunicationCommands(time);
+     stepCommandCommunication(time);
   }
 
   // get measurements (blocking!) when the thread is started ...
-  stepCommunicationMeasurements(time);
+  stepMeasurementCommunication(time);
 }
 
 void cedar::dev::Component::clearUserCommand()
@@ -1518,7 +1540,7 @@ bool cedar::dev::Component::applyCrashbrake()
   }
  
   // AND SEND ...
-  stepCommunicationCommands( cedar::unit::DEFAULT_TIME_UNIT ); // this is a bit of a hack, but these are special circumstances
+  stepCommandCommunication( cedar::unit::DEFAULT_TIME_UNIT ); // this is a bit of a hack, but these are special circumstances
 
   return true;
 }
@@ -1573,5 +1595,44 @@ std::cout << "emergency crash braking Now for " << *component << std::endl;
     (*component)->crashbrake();
   }
 
+}
+
+void cedar::dev::Component::brakeNowAllComponents()
+{
+  cedar::aux::LogSingleton::getInstance()->message
+                                           (
+                                             "Braking all Components (brake now)",
+                                             "cedar::dev::Component::brakeNow()"
+                                           );
+
+  for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
+  {
+    (*component)->brakeNow();
+  }
+
+}
+
+void cedar::dev::Component::startBrakingAllComponents()
+{
+  //!@todo: when startBraking works everywhere, delete these lines:
+  brakeNowAllComponents();
+  return;
+
+  cedar::aux::LogSingleton::getInstance()->message
+                                           (
+                                             "Braking all Components (start braking ...)",
+                                             "cedar::dev::Component::brakeNow()"
+                                           );
+
+  for( auto component = begin(mRunningComponentInstances); component != end(mRunningComponentInstances); component++ )
+  {
+    (*component)->startBraking();
+  }
+
+}
+
+bool cedar::dev::Component::anyComponentsRunning()
+{
+  return mRunningComponentInstances.size() != 0;
 }
 
