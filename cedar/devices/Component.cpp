@@ -650,8 +650,10 @@ void cedar::dev::Component::prepareComponentDestructAbsolutelyRequired()
   }
 #endif
 
-  brakeNow();
-  stopCommunication();
+  if (this->isRunning())
+  {
+    stopCommunication();
+  }
   mDestructWasPrepared= true;
 }
 
@@ -661,8 +663,7 @@ cedar::dev::Component::~Component()
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
-      "You forget to call prepareComponentDestructAbsolutelyRequired() in the "
-      "child's destructor!",
+      "You forgot to call prepareComponentDestructAbsolutelyRequired() in the child's destructor!",
       CEDAR_CURRENT_FUNCTION_NAME
     );
   }
@@ -893,7 +894,8 @@ void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
 
 void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat data)
 {
-  CEDAR_DEBUG_ASSERT( mDeviceThread->isRunning() ); //@todo: change to warning
+  //!@todo This fails in the context of calling brakeNow() because singleStep is used instead of a running loop. Is this ok?
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT( mDeviceThread->isRunning() );
 
   this->checkExclusivenessOfCommand(type);
   QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
@@ -986,6 +988,18 @@ void cedar::dev::Component::registerDeviceMeasurementTransformationHook(Componen
 
 void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
 {
+  // We cannot block in this call. Scenario:
+  // stopCommunication is called, thus blocks the mutex, but waits for this function to finish, thus never exists
+  // thus, if we cannot lock here, we skip the step
+  //!@todo If this happens in other circumstances, some dt is lost. This should be summed up here and added to the dt passed to the step* functions
+  if (!mGeneralAccessLock.tryLock())
+  {
+    return;
+  }
+
+  // lock was acquired, let's make sure its unlocked
+  cedar::aux::CallOnScopeExit unlocker(boost::bind(&QMutex::unlock, &this->mGeneralAccessLock));
+
   // its important to get the currently scheduled commands out first
   // (think safety first). this assumes serial communication, of course
   try
@@ -1207,6 +1221,8 @@ void cedar::dev::Component::updateUserMeasurements()
 
 void cedar::dev::Component::startCommunication()
 {
+  this->mChannel->open();
+
   // do not re-enter, do not stop/start at the same time
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
@@ -1226,14 +1242,22 @@ void cedar::dev::Component::startCommunication()
 void cedar::dev::Component::stopCommunication()
 {
   // do not re-enter, do not stop/start at the same time
-  QMutexLocker lockerGeneral(&mGeneralAccessLock);
+  QMutexLocker locker_general(&mGeneralAccessLock);
 
-  brakeNow(); // this will wait for one step and need to access the Mutex below 
+  // first, stop the thread
+  mDeviceThread->requestStop();
 
-  mDeviceThread->requestStop(); // stop more quickly
-
+  // make sure it is actually stopped
   mDeviceThread->stop();
+
   mRunningComponentInstances.erase( this );
+
+  locker_general.unlock();
+
+  // finally, step once to apply the brake commands
+  brakeNow();
+
+  this->mChannel->close();
 }
 
 void cedar::dev::Component::start()
@@ -1403,9 +1427,6 @@ void cedar::dev::Component::startBraking()
 
 void cedar::dev::Component::brakeNow()
 {
-  if (!isRunning())
-    return; // well ... nothing do, right?
-
   clearUserCommand();
   clearController();
 
@@ -1415,16 +1436,13 @@ void cedar::dev::Component::brakeNow()
   }
   else
   {
-    CEDAR_DEBUG_ASSERT(mDeviceThread->isRunning());
-   
     // force sending the command
-    mDeviceThread->waitUntilStepped();
+    this->mDeviceThread->singleStep();
 
     // paranoid:
     clearUserCommand(); 
     clearController();
 
-    // TODO: set lock on all incoming commands and controllers
     // TODO: we also need to test if the vel measurements are 0
   }
 }

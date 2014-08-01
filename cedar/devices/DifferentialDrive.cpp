@@ -155,7 +155,7 @@ _mHardwareSpeedLimits
 
 cedar::dev::DifferentialDrive::~DifferentialDrive()
 {
-  cedar::dev::DifferentialDrive::brakeNow();
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -76,6 +76,11 @@ cedar::dev::kteam::khepera::ArmSerial::ArmSerial()
   this->registerDeviceMeasurementHook(POSITION, boost::bind(&cedar::dev::kteam::khepera::ArmSerial::measureArmPosition, this));
 }
 
+cedar::dev::kteam::khepera::ArmSerial::~ArmSerial()
+{
+  prepareComponentDestructAbsolutelyRequired();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
