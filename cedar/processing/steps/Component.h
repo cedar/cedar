@@ -1,0 +1,198 @@
+/*======================================================================================================================
+
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        Component.h
+
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 03 05
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+
+#ifndef CEDAR_PROC_STEPS_COMPONENT_H
+#define CEDAR_PROC_STEPS_COMPONENT_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+// CEDAR INCLUDES
+#include "cedar/processing/Step.h"
+#include "cedar/devices/ComponentParameter.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/Component.fwd.h"
+
+// SYSTEM INCLUDES
+#include <QComboBox>
+
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace details
+    {
+      //!@todo This mixes GUI and step -- is this ok?
+      class ComponentStepGroupParameterWidget : public cedar::aux::gui::Parameter
+      {
+        Q_OBJECT
+
+      public:
+        ComponentStepGroupParameterWidget();
+
+        void parameterChanged();
+
+      private:
+        void applyProperties();
+
+        void propertiesChanged();
+
+        void rebuildGroupList();
+
+      private slots:
+        void componentChanged();
+        void selectedGroupChanged(const QString& group);
+
+      private:
+        QComboBox* mpSelector;
+      };
+
+      class ComponentStepGroupParameter : public cedar::aux::ParameterTemplate<std::string>
+      {
+        Q_OBJECT
+
+      public:
+        ComponentStepGroupParameter(cedar::aux::Configurable* owner, const std::string& name);
+
+        void setComponent(cedar::dev::ComponentPtr component);
+
+        cedar::dev::ComponentPtr getComponent();
+
+      signals:
+        void componentChanged();
+
+      private:
+        cedar::dev::ComponentPtr mComponent;
+      };
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentStepGroupParameter);
+    }
+  }
+}
+
+
+/*!@brief A step for bringing device components into a processing architecture.
+ */
+class cedar::proc::steps::Component : public cedar::proc::Step
+{
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  Component();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! get the component
+  inline cedar::dev::ComponentPtr getComponent() const
+  {
+    return this->_mComponent->getValue();
+  }
+
+  bool hasComponent() const;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  void compute(const cedar::proc::Arguments&);
+
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::ConstDataPtr data
+                                  ) const;
+
+  void onStart();
+
+  void onStop();
+
+  void rebuildInputs();
+
+  void rebuildOutputs();
+
+private slots:
+  void componentChanged();
+
+  void selectedGroupChanged();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+private:
+  //! Id used for signaling "step measurement" times
+  unsigned int mMeasurementTimeId;
+
+  //! Id used for signaling "step command" times
+  unsigned int mCommandTimeId;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  cedar::dev::ComponentParameterPtr _mComponent;
+
+  cedar::proc::details::ComponentStepGroupParameterPtr _mGroup;
+
+}; // class cedar::proc::steps::Component
+
+#endif // CEDAR_PROC_STEPS_COMPONENT_H
+
