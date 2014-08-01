@@ -133,7 +133,7 @@ _mpVelocityLimits
 
 cedar::dev::KinematicChain::~KinematicChain()
 {
-  cedar::dev::KinematicChain::brakeNow();
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //------------------------------------------------------------------------------
