@@ -439,6 +439,22 @@ cedar::aux::PluginDeclaration* cedar::proc::gui::Scene::declarationFromDrop(QGra
   return nullptr;
 }
 
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::findConnectableItem(const QList<QGraphicsItem*>& items)
+{
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+    {
+      if (graphics_item->canConnect() && !graphics_item->isReadOnly())
+      {
+        return graphics_item;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
 void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent)
 {
   switch (this->mMode)
@@ -455,10 +471,13 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
         QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
         if (items.size() > 0)
         {
+          // find the first item under the mouse that inherits GraphicsBase and is connectable
+          mpConnectionStart = this->findConnectableItem(items);
+
           // check if the start item is a connectable thing.
-          if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
-               && mpConnectionStart->canConnect() && !mpConnectionStart->isReadOnly())
+          if (mpConnectionStart != nullptr)
           {
+            CEDAR_DEBUG_ASSERT(mpConnectionStart->canConnect());
             this->mMode = MODE_CONNECT;
             mpeParentView->setMode(cedar::proc::gui::Scene::MODE_CONNECT);
             this->connectModeProcessMousePress(pMouseEvent);
@@ -786,10 +805,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
 void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)
 {
-  if (mpNewConnectionIndicator != NULL)
+  if (mpNewConnectionIndicator != nullptr)
   {
     delete mpNewConnectionIndicator;
-    mpNewConnectionIndicator = NULL;
+    mpNewConnectionIndicator = nullptr;
   }
 
   if (pMouseEvent->button() != Qt::LeftButton)
@@ -802,9 +821,9 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
 
   if (items.size() > 0)
   {
-    // check if the start item is a connectable thing.
-    if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
-         && mpConnectionStart->canConnect())
+    mpConnectionStart = this->findConnectableItem(items);
+
+    if (this->mpConnectionStart != nullptr)
     {
       QPointF start = mpConnectionStart->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
       QLineF line(start, start);
@@ -827,7 +846,7 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
 
 void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent* pMouseEvent)
 {
-  if(mpNewConnectionIndicator != NULL)
+  if (mpNewConnectionIndicator != NULL)
   {
     QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();
 
