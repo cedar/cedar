@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/StaticGainView.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/processing/DataSlot.h"
@@ -59,7 +60,7 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::StaticGain>
+      new ElementDeclarationTemplate<cedar::proc::steps::StaticGain, cedar::proc::gui::StaticGainView>
       (
         "Utilities",
         "cedar.processing.StaticGain"
