@@ -400,7 +400,20 @@ void run_test()
   cedar::proc::GroupPtr network_importing(new cedar::proc::Group());
   network_importing->importGroupFromFile("network child", "Nested.json");
 
-  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("two-layer field", network_importing);
+  cedar::proc::GroupDeclarationPtr group_declaration
+                                 (
+                                   new cedar::proc::GroupDeclaration
+                                   (
+                                     "template",
+                                     "Template.json",
+                                     "template",
+                                     "test"
+                                   )
+                                 );
+  group_declaration->declare();
+
+  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("template", network_importing);
+  //!@todo check, if the template was loaded correctly
 
   // test connecting triggers to groups
   std::cout << "testing connecting triggers to groups" << std::endl;
