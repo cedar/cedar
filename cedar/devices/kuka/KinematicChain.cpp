@@ -62,16 +62,14 @@ _mServerPort(new cedar::aux::IntParameter(this, "server port", 0))
 {
   mIsInit = false;
   mpFriRemote = NULL;
-//  init();
 }
 
 cedar::dev::kuka::KinematicChain::~KinematicChain()
 {
-  if(mIsInit)
+  prepareComponentDestructAbsolutelyRequired();
+
+  if (mIsInit)
   {
-    // stop the looped Thread
-    stop();
-    wait();
     // TODO The following line is not used at this point, the script "kukain.src" is not ready yet!
     // If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
     // it won't throw an exception, because the index is 0 and therefore valid
@@ -101,18 +99,17 @@ void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::Confi
   {
     mpFriRemote = new friRemote(_mServerPort->getValue());
   }
-  //copy default values from the FRI
+  // copy default values from the FRI
   copyFromFRI();
 
-  //set step size and idle time for the looped thread
+  // set step size and idle time for the looped thread
   cedar::unit::Time step_size(12.0 * cedar::unit::milli * cedar::unit::seconds);
-  setStepSize(step_size);
+  this->setStepSize(step_size);
 
   cedar::unit::Time idle_time(0.01 * cedar::unit::milli * cedar::unit::seconds);
-  setIdleTime(idle_time);
+  this->setIdleTime(idle_time);
 
-  //start the thread
-  start();
+  // start the device
 
   mIsInit = true;
 }
@@ -150,7 +147,6 @@ double cedar::dev::kuka::KinematicChain::getJointAngle(unsigned int index) const
   return a;
 }
 
-
 void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double angle)
 {
   try
@@ -167,20 +163,6 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
   }
 }
 
-/*
- * Overwritten start function of KinematicChain
- * the function inherited from KinematicChain does some things we do not want.
- */
-void cedar::dev::kuka::KinematicChain::start()
-{
-  if (isRunningNolocking())
-  {
-    return;
-  }
-
-  //QThread::start();
-  cedar::dev::KinematicChain::start();
-}
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions
 //----------------------------------------------------------------------------------------------------------------------
@@ -207,7 +189,8 @@ void cedar::dev::kuka::KinematicChain::step(cedar::unit::Time)
       {
         case 1:
         // increase speed for all joints
-        setJointVelocities(getCachedJointVelocities() + getCachedJointAccelerations() * mpFriRemote->getSampleTime());
+        //!@todo this most likely does something stupid - why would we integrate measured vels and accs?
+        setJointVelocities(getJointVelocities() + getJointAccelerations() * mpFriRemote->getSampleTime());
         case 2:
           // change position for all joints
           for (unsigned i=0; i<LBR_MNJ; i++)
@@ -298,5 +281,6 @@ bool cedar::dev::kuka::KinematicChain::isPowerOn() const
   mLock.unlock();
   return on;
 }
+
 #endif // CEDAR_USE_KUKA_FRI
 

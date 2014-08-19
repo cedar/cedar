@@ -77,34 +77,21 @@ public:
   cedar::unit::AngularVelocity getTurningRate() const;
 
   //!@brief Stops the robot.
-  virtual void stop();
-
-  /*!@ Returns the (estimated) current forward velocity [in m/s].
-   *
-   * This value is usually estimated based on sensors of the robot
-   * (e.g., wheel encoders) and may differ from its real forward velocity.
-   */
-  //virtual double getEstimatedForwardVelocity() const = 0;
-
-  /*!@ Returns the (estimated) current turning rate [in rad/s].
-   *
-   * This value is usually estimated based on sensors of the robot
-   * (e.g., wheel encoders) and may differ from its real turning rate.
-   */
-  //virtual double getEstimatedTurningRate() const = 0;
+  //@todo: change to a new braking mechanisms
+  CEDAR_DECLARE_DEPRECATED( virtual void stop(); );
 
   //!@brief Sets the current forward velocity [in m/s] of the robot.
-  virtual void setForwardVelocity(cedar::unit::Velocity forwardVelocity) = 0;
+  void setForwardVelocity(cedar::unit::Velocity forwardVelocity);
 
   //!@brief Sets the turning rate [in rad/s] of the robot.
-  virtual void setTurningRate(cedar::unit::AngularVelocity turningRate) = 0;
+  void setTurningRate(cedar::unit::AngularVelocity turningRate);
 
   //!@brief Sets both the forward velocity [in m/s] and turning rate [in rad/s] of the robot.
-  virtual void setForwardVelocityAndTurningRate
+  void setForwardVelocityAndTurningRate
                (
                  cedar::unit::Velocity forwardVelocity,
                  cedar::unit::AngularVelocity turningRate
-               ) = 0;
+               );
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -120,26 +107,20 @@ protected:
    */
   virtual void thresholdTurningRate(cedar::unit::AngularVelocity& turningRate) const;
 
-  //!@brief Actually sends the movement commands to the robot.
-  virtual void sendMovementCommand() = 0;
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void applyTurningRate();
-
-  void applyForwardVelocity();
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! desired forward velocity [m/s]
-  cedar::aux::VelocityDataPtr mForwardVelocity;
 
-  //! desired turning rate of the robot [rad/s]
-  cedar::aux::AngularVelocityDataPtr mTurningRate;
+public:
+  static const cedar::dev::Component::ComponentDataType FORWARD_VELOCITY;
+  static const cedar::dev::Component::ComponentDataType TURNING_RATE;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

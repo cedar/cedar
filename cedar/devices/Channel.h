@@ -41,8 +41,10 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/devices/Channel.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -116,7 +118,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //! Increases the use count of the channel. If the use cound was zero before, the channel is opened.
+  //!@todo This is more of a quick fix, may want to rewrite things so this is solved via shared ptrs.
+  void increaseUseCount();
+
+  //! Decreases the use count of the channel. If the resulting use count is zero, the channel is closed.
+  void decreaseUseCount();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -125,8 +132,10 @@ protected:
   //! read/write lock for the channel
   QReadWriteLock mLock;
 
+
 private:
-  // none yet
+  //! Use count
+  unsigned int mUseCount;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

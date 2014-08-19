@@ -138,7 +138,7 @@ void cedar::dev::ComponentSlot::setChannel(const std::string& channel)
     configuration.insert(configuration.end(), tree.begin(), tree.end());
   }
 
-  this->getComponent()->setChannel(this->mRobot->getChannel(channel));
+  this->getComponent()->setChannel(this->getRobot()->getChannel(channel));
 
   this->getComponent()->readConfiguration(configuration);
 }

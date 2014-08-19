@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,97 +22,91 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Communication.h
+    File:        Arm.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 07 30
 
-    Description: This class provides a string-based communication with an external device.
+    Description: Header file for the class cedar::dev::kteam::khepera::Arm.
 
-    Credits:     Marc Sons (Author of msTransport.h this class is a revised and cedar-compatible version of)
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_COMMUNICATION_H
-#define CEDAR_DEV_COM_COMMUNICATION_H
+#ifndef CEDAR_DEV_KTEAM_KHEPERA_ARM_H
+#define CEDAR_DEV_KTEAM_KHEPERA_ARM_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/communication/namespace.h"
+#include "cedar/devices/Component.h"
+#include "cedar/auxiliaries/math/UIntLimitsParameter.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/devices/kteam/khepera/Arm.fwd.h"
 
 // SYSTEM INCLUDES
-#include <string>
-#include <QReadWriteLock>
 
-/*!@brief This class provides a string-based communication with an external device.
- *
- * This includes opening and closing the channel as well as sending and receiving strings. Examples for external
- * devices communicating per string are mobile robots (E-Puck, Khepera). It is also possible to lock the channel to
- * prevent read-/write-errors if multiple threads are accessing the device.
+
+/*!@brief Implementation of an arm component for Khepera robots.
  */
-class cedar::dev::com::Communication
+class cedar::dev::kteam::khepera::Arm : public cedar::dev::Component
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Initiates a new communication with an external device.
-  Communication();
-
-  //!@brief Ends the communication with the device.
-  virtual ~Communication ();
+  //!@brief The standard constructor.
+  Arm();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Opens the channel.
-  virtual void open() = 0;
+  //!@brief Sets the arm position.
+  virtual void setArmPosition(unsigned int position) = 0;
 
-  //!@brief Closes the channel.
-  virtual void close() = 0;
-
-  /*!@brief Sends a string to the device.
-   *@param command The string to be sent.
-   *@return 1 if sending was successful and 0 in case of an error.
-   */
-  virtual void send(const std::string& command) = 0;
-
-  /*!@brief  Receives a string from the device.
-   *
-   * @return The received string.
-   */
-  virtual std::string receive() = 0;
-
-  /*!@brief Locks the channel for reading or writing.
-   *
-   *This function locks the channel for reading or writing operations. If the channel is already locked, the calling
-   *thread is blocked until the channel is unlocked again. Always call unlock() after locking the channel!
-   */
-  void lock();
-
-  //!@brief Unlocks the channel. If the channel is currently not locked, this function has no effect.
-  void unlock();
+  //!@brief Returns the current arm position.
+  virtual unsigned int getArmPosition() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  virtual bool applyBrakeController();
+  virtual bool applyBrakeNow();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Implements the read-/write-lock.
-  QReadWriteLock mLock;
+  static unsigned int POSITION;
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //! limits for the arm position
+  cedar::aux::math::UIntLimitsParameterPtr _mArmPositionLimits;
 
 private:
-  //none yet
-}; // class cedar::dev::com::Communication
-#endif // CEDAR_DEV_COM_COMMUNICATION_H
+  // none yet
+
+}; // class cedar::dev::kteam::khepera::Arm
+
+#endif // CEDAR_DEV_KTEAM_KHEPERA_ARM_H
+

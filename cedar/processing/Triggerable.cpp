@@ -201,6 +201,7 @@ void cedar::proc::Triggerable::callOnStart()
   bool exception_occurred = false;
   if (this->mStartCalls == 0)
   {
+    locker.unlock();
     exception_occurred
       = this->exceptionWrappedCall
         (
@@ -208,6 +209,7 @@ void cedar::proc::Triggerable::callOnStart()
           "An exception occurred while calling onStart(). You can try to fix this by restarting the trigger. The exception is",
           cedar::proc::Triggerable::STATE_EXCEPTION_ON_START
         );
+    locker.relock();
   }
 
   // count how often this triggerable was started
@@ -216,10 +218,10 @@ void cedar::proc::Triggerable::callOnStart()
     ++this->mStartCalls;
   }
 
-  locker.unlock();
-
   if (this->mStartCalls == 1)
   {
+    // if we do not unlock the lock, we might run into circular onStart calls and deadlocks
+    locker.unlock();
     QReadLocker lock_r(this->mFinished.getLockPtr());
     if (mFinished.member())
     {
@@ -252,20 +254,22 @@ void cedar::proc::Triggerable::callOnStop()
 
   if (this->mStartCalls == 0)
   {
+    locker.unlock();
     this->exceptionWrappedCall
     (
       boost::bind(&cedar::proc::Triggerable::onStop, this),
       "An exception occurred while calling onStop()"
     );
+	  locker.relock();
   }
-
-  locker.unlock();
 
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 
   QReadLocker lock_r(this->mFinished.getLockPtr());
   if (this->mFinished.member())
   {
+    // if we do not unlock the lock, we might run into circular onStart calls and deadlocks
+    locker.unlock();
     for (auto listener : this->mFinished.member()->getListeners())
     {
       listener->callOnStop();

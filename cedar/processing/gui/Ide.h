@@ -184,6 +184,11 @@ public slots:
    */
   void resetRootGroup();
 
+  /*!@brief brakes all running robots
+   */
+  void brakeAllRobots();
+
+
   /*!@brief Opens a dialog that lets the user export the current scene as an SVG
    */
   void exportSvg();
@@ -306,9 +311,6 @@ private:
    */
   void displayFilename(const std::string& filename);
 
-  //! Updates the start and stop triggers threads.
-  void updateTriggerStartStopThreadCallers();
-
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
@@ -364,12 +366,6 @@ private:
 
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;
-
-  //! Used for starting all triggers in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
-
-  //! Used for stopping all triggers in a separate thread
-  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
 
   //! Combobox to select plot groups
   QComboBox* mpPlotGroupsComboBox;

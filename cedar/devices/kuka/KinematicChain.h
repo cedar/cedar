@@ -95,11 +95,6 @@ public:
    */
   virtual void setJointAngle(unsigned int index, double angle);
 
-  /*!@brief starts the looped thread
-   *
-   * the KinematicChain class does some things in this function that are not needed
-   */
-  virtual void start();
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
@@ -139,6 +134,7 @@ public:
    * @param time Unused.
    */
   void step(cedar::unit::Time time);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -155,8 +151,6 @@ private:
    * @param commandMode establish command mode if true
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-
 
   //!@brief copies data from the FRI to member variables for access from outside the loop thread
   void copyFromFRI();

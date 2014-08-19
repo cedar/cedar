@@ -35,11 +35,12 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Log.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/SerialChannel.h"
 #include "cedar/devices/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QTime>
@@ -76,7 +77,7 @@ void cedar::dev::kteam::SerialChannel::postOpenHook()
   // send a dummy-message
   QTime timer;
   timer.start();
-  while (!sent && timer.elapsed() < 100000) //!@todo Make timeout configurable
+  while (!sent && timer.elapsed() < 10000) //!@todo Make timeout configurable
   {
     try
     {
@@ -99,12 +100,7 @@ void cedar::dev::kteam::SerialChannel::postOpenHook()
           continue;
       }
     }
-    catch (const boost::system::system_error& e)
-    {
-      // skip
-      cedar::aux::sleep(0.1 * cedar::unit::seconds);
-    }
-    catch (const cedar::dev::SerialCommunicationException& e)
+    catch (const cedar::dev::SerialChannel::WriteException& e)
     {
       // skip
       cedar::aux::sleep(0.1 * cedar::unit::seconds);
@@ -114,7 +110,7 @@ void cedar::dev::kteam::SerialChannel::postOpenHook()
   if (!sent)
   {
     this->close();
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, "Failed to connect within 10 seconds.");
+    CEDAR_THROW(ConnectionTimeOutException, "Failed to connect within 10 seconds.");
   }
 #ifdef DEBUG
   else

@@ -45,6 +45,7 @@
 #include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/steps/Component.fwd.h"
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
@@ -122,12 +123,15 @@ protected:
   {
     public:
       //! Constructor.
-      Decoration(Connectable* pConnectable, const QString& icon, const QString& description, const QColor& bg = QColor(255, 255, 255));
+      Decoration(QGraphicsItem* pParent, const QString& icon, const QString& description, const QColor& bg = QColor(255, 255, 255));
 
       //! Destructor.
       ~Decoration()
       {
-        delete mpIcon;
+        if (mpIcon != nullptr)
+        {
+          delete mpIcon;
+        }
         delete mpRectangle;
       }
 
@@ -140,9 +144,16 @@ protected:
       //! Shows or hides the decoration.
       void setVisible(bool visible)
       {
-        this->mpIcon->setVisible(visible);
+        if (this->mpIcon)
+        {
+          this->mpIcon->setVisible(visible);
+        }
         this->mpRectangle->setVisible(visible);
       }
+
+      void setToolTip(const QString& toolTip);
+
+      void setBackgroundColor(const QColor& bg);
 
     private:
       QGraphicsSvgItem* mpIcon;
@@ -153,6 +164,19 @@ protected:
   };
 
   CEDAR_GENERATE_POINTER_TYPES(Decoration);
+
+  class DeviceQualityDecoration : public QObject, public Decoration
+  {
+    public:
+      DeviceQualityDecoration(QGraphicsItem* pParent, cedar::proc::steps::ComponentPtr step);
+
+    protected:
+      void timerEvent(QTimerEvent*);
+
+    private:
+      cedar::proc::steps::ComponentPtr mStep;
+  };
+  CEDAR_GENERATE_POINTER_TYPES(DeviceQualityDecoration);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -379,6 +403,9 @@ protected:
 
   //!@brief the decoration symbolizing that this connectable is being recorded
   DecorationPtr mpRecordedDecoration;
+
+  //!@brief The decoration indicating the quality of device communication.
+  DeviceQualityDecorationPtr mDeviceQuality;
 
   //! The decorations for this connectable.
   std::vector<DecorationPtr> mDecorations;
