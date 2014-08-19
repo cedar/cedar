@@ -363,7 +363,7 @@ void cedar::proc::gui::Ide::showBoostControl()
   {
     this->mpBoostControlDock = new QDockWidget(this);
     this->mpBoostControlDock->setFloating(true);
-    this->mpBoostControl = new cedar::proc::gui::BoostControl();
+    this->mpBoostControl = new cedar::proc::gui::BoostControl(this->mpProcessingDrawer);
     this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
     this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
     this->mpBoostControlDock->setWidget(this->mpBoostControl);
