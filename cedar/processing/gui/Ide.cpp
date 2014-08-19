@@ -456,7 +456,8 @@ void cedar::proc::gui::Ide::duplicateStep()
                 )
         )
         {
-          group->duplicate(new_pos - (center - p_base->pos()), p_base->getElement()->getName());
+          auto mapped = new_pos - group->scenePos();
+          group->duplicate(mapped - (center - p_base->pos()), p_base->getElement()->getName());
         }
       }
       catch (cedar::aux::ExceptionBase& exc)
