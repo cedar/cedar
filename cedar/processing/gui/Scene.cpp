@@ -344,22 +344,35 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
   }
 
 
-  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
-  if (p_item != this->mpDropTarget)
+//  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
+  auto items = this->items(pEvent->scenePos());
+  if (items.size() > 0)
+  {
+    auto p_item = findFirstGroupItem(items);
+    if (p_item != this->mpDropTarget)
+    {
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
+      {
+        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
+      {
+        if (!group->getGroup()->isLinked())
+        {
+          group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+        }
+      }
+      this->mpDropTarget = p_item;
+    }
+  }
+  else if (this->mpDropTarget) // nothing below the mouse pointer, but there is still something in our drop memory
   {
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
     {
       group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
     }
-
-    if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
-    {
-      if (!group->getGroup()->isLinked())
-      {
-        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-      }
-    }
-    this->mpDropTarget = p_item;
+    this->mpDropTarget = nullptr;
   }
 }
 
@@ -404,7 +417,7 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
         (
           group_declaration->getClassName(),
-          this->getRootGroup()->getGroup(),
+          target_group,
           pEvent->modifiers().testFlag(Qt::ControlModifier)
         );
     this->getGraphicsItemFor(elem.get())->setPos(mapped);
@@ -449,6 +462,19 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::findConnectableItem(con
       {
         return graphics_item;
       }
+    }
+  }
+
+  return nullptr;
+}
+
+cedar::proc::gui::Group* cedar::proc::gui::Scene::findFirstGroupItem(const QList<QGraphicsItem*>& items)
+{
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::Group*>(items[i]))
+    {
+      return graphics_item;
     }
   }
 
