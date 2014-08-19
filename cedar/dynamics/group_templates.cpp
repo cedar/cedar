@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetworkPath.cpp
+    File:        group_templates.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 07 25
+    Date:        2014 08 19
 
-    Description:
+    Description: Source file for the class cedar::dyn::group_templates.
 
     Credits:
 
@@ -38,32 +38,45 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/NetworkPath.h"
+#include "cedar/processing/GroupDeclaration.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
+// register the class
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::NetworkPath::NetworkPath()
-:
-cedar::proc::NetworkPath::PathType()
+namespace
 {
-}
+  bool declare()
+  {
+    cedar::proc::GroupDeclarationPtr group_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                       "two-layer field",
+                                       "resource://groupTemplates/fieldTemplates.json",
+                                       "two-layer",
+                                       "DFT"
+                                     )
+                                   );
+    group_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
+    group_declaration->declare();
 
-cedar::proc::NetworkPath::NetworkPath(const cedar::proc::NetworkPath::String& path)
-:
-cedar::proc::NetworkPath::PathType(path)
-{
-}
+    cedar::proc::GroupDeclarationPtr field_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                       "one-dimensional field",
+                                       "resource://groupTemplates/fieldTemplates.json",
+                                       "one-dimensional field",
+                                       "DFT"
+                                     )
+                                   );
+    field_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
+    field_declaration->declare();
 
-cedar::proc::NetworkPath::NetworkPath(const char* path)
-:
-cedar::proc::NetworkPath::PathType(path)
-{
-}
+    return true;
+  }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+  bool declared = declare();
+}
