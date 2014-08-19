@@ -69,6 +69,7 @@ cedar_add_library(cedarproc
   gui/Scene.h
   gui/Settings.h
   gui/SettingsDialog.h
+  gui/StaticGainView.h
   gui/StepItem.h
   gui/TriggerItem.h
   gui/Group.h
