@@ -252,6 +252,7 @@ void cedar::proc::gui::StepItem::updateStepState()
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
       this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
   }
+
   this->update();
 }
 
