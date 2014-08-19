@@ -417,7 +417,7 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
         (
           group_declaration->getClassName(),
-          this->getRootGroup()->getGroup(),
+          target_group,
           pEvent->modifiers().testFlag(Qt::ControlModifier)
         );
     this->getGraphicsItemFor(elem.get())->setPos(mapped);
