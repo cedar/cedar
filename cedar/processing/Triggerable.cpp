@@ -218,9 +218,10 @@ void cedar::proc::Triggerable::callOnStart()
     ++this->mStartCalls;
   }
 
-
   if (this->mStartCalls == 1)
   {
+    // if we do not unlock the lock, we might run into circular onStart calls and deadlocks
+    locker.unlock();
     QReadLocker lock_r(this->mFinished.getLockPtr());
     if (mFinished.member())
     {
@@ -259,15 +260,16 @@ void cedar::proc::Triggerable::callOnStop()
       boost::bind(&cedar::proc::Triggerable::onStop, this),
       "An exception occurred while calling onStop()"
     );
-    locker.relock();
+	  locker.relock();
   }
-
 
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 
   QReadLocker lock_r(this->mFinished.getLockPtr());
   if (this->mFinished.member())
   {
+    // if we do not unlock the lock, we might run into circular onStart calls and deadlocks
+    locker.unlock();
     for (auto listener : this->mFinished.member()->getListeners())
     {
       listener->callOnStop();
