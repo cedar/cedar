@@ -40,7 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Group.h"
-#include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupFileFormatV1.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -131,32 +130,6 @@ namespace
       }
     }
 #endif // CEDAR_COMPILER_MSVC
-
-    cedar::proc::GroupDeclarationPtr group_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "two-layer field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "two-layer",
-                                       "DFT"
-                                     )
-                                   );
-    group_declaration->setIconPath(":/steps/field_temp.svg");
-    group_declaration->declare();
-
-    cedar::proc::GroupDeclarationPtr field_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "one-dimensional field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "one-dimensional field",
-                                       "DFT"
-                                     )
-                                   );
-    field_declaration->setIconPath(":/steps/field_temp.svg");
-    field_declaration->declare();
 
     return true;
   }
