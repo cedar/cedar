@@ -42,7 +42,6 @@
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
-#include <QPushButton>
 #include <iostream>
 #include <QFileDialog>
 
@@ -72,16 +71,16 @@ cedar::aux::gui::Parameter(pParent)
   this->mpEdit->setReadOnly(true);
   p_layout->addWidget(this->mpEdit);
 
-  QPushButton *p_button = new QPushButton(">");
-  p_button->setMinimumWidth(20);
-  p_button->setMaximumWidth(30);
-  p_layout->addWidget(p_button);
+  this->mpButton = new QPushButton(">");
+  this->mpButton->setMinimumWidth(20);
+  this->mpButton->setMaximumWidth(30);
+  p_layout->addWidget(this->mpButton);
 
   p_layout->setContentsMargins(0, 0, 0, 0);
   p_layout->setStretch(0, 1);
   p_layout->setStretch(1, 0);
 
-  QObject::connect(p_button, SIGNAL(clicked()), this, SLOT(onBrowseClicked()));
+  QObject::connect(this->mpButton, SIGNAL(clicked()), this, SLOT(onBrowseClicked()));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
@@ -103,6 +102,16 @@ void cedar::aux::gui::FileParameter::parameterPointerChanged()
   this->mpEdit->setReadOnly(true);
 
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
+
+  this->propertiesChanged();
+}
+
+void cedar::aux::gui::FileParameter::propertiesChanged()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter());
+  cedar::aux::Parameter::ReadLocker locker(parameter.get());
+  this->mpEdit->setDisabled(parameter->isConstant());
+  this->mpButton->setDisabled(parameter->isConstant());
 }
 
 void cedar::aux::gui::FileParameter::parameterValueChanged()
