@@ -1140,18 +1140,10 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
     {
       return mGroup.get();
     }
-#ifdef DEBUG
-    if (element)
-    {
-      std::cout << "Could not find base item for element \"" << element->getName() << "\"" << std::endl;
-    }
-    else
-    {
-      std::cout << "Element is a null-pointer." << std::endl;
-    }
-#endif // DEBUG
+
     //!@todo This should not return null, but rather throw
-    return NULL;
+    // change affects at least: cedar::proc::gui::Group::getUiElementFor
+    return nullptr;
   }
   else
   {

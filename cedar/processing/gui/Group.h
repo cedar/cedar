@@ -232,6 +232,24 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  std::string getStringForElementType(cedar::proc::ConstElementPtr element) const;
+
+  void tryToRestoreUIConfiguration
+       (
+         cedar::aux::ConfigurationNode& conf,
+         cedar::proc::ElementPtr element,
+         cedar::proc::gui::GraphicsBase* pSceneElement
+       );
+
+  void tryToRestoreGroupUIConfiguration
+       (
+         cedar::aux::ConfigurationNode& conf,
+         cedar::proc::gui::GraphicsBase* pSceneElement
+       );
+
+  //! Restores the UI configurations for any elements that are in the scene.
+  void tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode& conf);
+
   //! Adds all the steps already in the group
   void addGuiItemsForGroup();
 
