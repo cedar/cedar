@@ -660,6 +660,12 @@ public:
   //! Updates the trigger chains of all steps.
   void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
+  //!@brief connects two slots across groups, allocating connectors if necessary
+  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+
+  //!@brief disconnects two slots across groups, removing/merging connectors if necessary
+  static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -718,12 +724,6 @@ private:
 
   //!@brief searches for elements specified by a matcher function
   std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroups(boost::function<bool(cedar::proc::ConstElementPtr)> matcher) const;
-
-  //!@brief connects two slots across groups, allocating connectors if necessary
-  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
-
-  //!@brief disconnects two slots across groups, removing/merging connectors if necessary
-  static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
