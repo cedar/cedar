@@ -283,11 +283,14 @@ void cedar::proc::steps::Convolution::addKernelToConvolution(cedar::aux::kernel:
 {
   kernel->setDimensionality(this->getDimensionality());
   this->getConvolution()->getKernelList()->append(kernel);
+  QObject::connect(kernel.get(), SIGNAL(kernelUpdated()), this, SLOT(recompute()));
 }
 
 void cedar::proc::steps::Convolution::removeKernelFromConvolution(size_t index)
 {
+  auto kernel = this->getConvolution()->getKernelList()->getKernel(index);
+  //!@todo remove this const cast
+  const_cast<cedar::aux::kernel::Kernel*>(kernel.get())->disconnect(SIGNAL(kernelUpdated()), this, SLOT(recompute()));
   this->getConvolution()->getKernelList()->remove(index);
-
   this->onTrigger();
 }
