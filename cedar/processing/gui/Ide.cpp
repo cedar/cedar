@@ -464,7 +464,7 @@ void cedar::proc::gui::Ide::duplicateStep()
   QPointF center(0.0, 0.0);
   for (int i = 0; i < items_to_duplicate.size(); ++i)
   {
-    center += items_to_duplicate.at(i)->pos();
+    center += items_to_duplicate.at(i)->scenePos();
   }
   center /= static_cast<qreal>(items_to_duplicate.size());
 
@@ -486,7 +486,8 @@ void cedar::proc::gui::Ide::duplicateStep()
         )
         {
           auto mapped = new_pos - group->scenePos();
-          group->duplicate(mapped - (center - p_base->pos()), p_base->getElement()->getName());
+          auto mapped_center = group->mapFromScene(center);
+          group->duplicate(mapped - (mapped_center - p_base->pos()), p_base->getElement()->getName());
         }
       }
       catch (cedar::aux::ExceptionBase& exc)
