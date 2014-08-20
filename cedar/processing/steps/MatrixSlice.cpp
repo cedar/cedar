@@ -247,10 +247,32 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
     CEDAR_DEBUG_ASSERT(d < this->_mRangeLower->size());
     CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
 
-    const unsigned int& lower = this->_mRangeLower->at(d);
-    const unsigned int& upper = this->_mRangeUpper->at(d);
+    int lower = static_cast<int>(this->_mRangeLower->at(d));
+    int upper = static_cast<int>(this->_mRangeUpper->at(d));
 
-    CEDAR_DEBUG_ASSERT(lower < upper);
+    // ensure that lower < upper, and that the interval isn't size 0 (i.e., lower != upper)
+    if (lower > upper)
+    {
+      std::swap(lower, upper);
+    }
+    else if (lower == upper)
+    {
+      if (upper < input.size[d])
+      {
+        upper += 1;
+      }
+      else
+      {
+        // this assertion should only fail if the matrix size is 0 in dimension d, which should not be possible
+        CEDAR_DEBUG_NON_CRITICAL_ASSERT(lower > 0);
+        lower -= 1;
+      }
+    }
+
+    // make sure that lower and upper don't exceed the matrix size
+    lower = cedar::aux::math::Limits<int>::limit(lower, 0, input.size[d] - 1);
+    upper = cedar::aux::math::Limits<int>::limit(upper, 0, input.size[d] - 1);
+
     mRanges.at(d) = cv::Range(lower, upper);
     sizes.at(d) = upper - lower;
   }

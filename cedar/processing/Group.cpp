@@ -40,7 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Group.h"
-#include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupFileFormatV1.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -131,32 +130,6 @@ namespace
       }
     }
 #endif // CEDAR_COMPILER_MSVC
-
-    cedar::proc::GroupDeclarationPtr group_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "two-layer field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "two-layer",
-                                       "DFT"
-                                     )
-                                   );
-    group_declaration->setIconPath(":/steps/field_temp.svg");
-    group_declaration->declare();
-
-    cedar::proc::GroupDeclarationPtr field_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "one-dimensional field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "one-dimensional field",
-                                       "DFT"
-                                     )
-                                   );
-    field_declaration->setIconPath(":/steps/field_temp.svg");
-    field_declaration->declare();
 
     return true;
   }
@@ -995,22 +968,32 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
 
 void cedar::proc::Group::addConnector(const std::string& name, bool input)
 {
-  if
-  (
-    this->nameExists(name)
-  )
+  if (this->_mConnectors->find(name) != this->_mConnectors->end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name + "\". It is already taken.");
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name +
+        "\" to group \"" + this->getFullPath() + "\" because there is already a connector with this name."
+    );
   }
+
+  if (this->nameExists(name))
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "Cannot add a connector with the name \"" + name +
+      "\" to group \"" + this->getFullPath() + "\"because there is an element with the same name inside the group."
+    );
+  }
+
+  this->addConnectorInternal(name, input);
+}
+
+void cedar::proc::Group::addConnectorInternal(const std::string& name, bool input)
+{
   // check if connector is in map of connectors
-  if (_mConnectors->find(name) != _mConnectors->end())
-  {
-    // do nothing for now
-  }
-  else
-  {
-    _mConnectors->set(name, input);
-  }
+  this->_mConnectors->set(name, input);
 
   if (input)
   {
@@ -1820,7 +1803,7 @@ void cedar::proc::Group::processConnectors()
 {
   for (auto it = _mConnectors->begin(); it != _mConnectors->end(); ++it)
   {
-    this->addConnector(it->first, it->second);
+    this->addConnectorInternal(it->first, it->second);
   }
 }
 

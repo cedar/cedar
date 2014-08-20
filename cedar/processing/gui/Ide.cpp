@@ -370,7 +370,7 @@ void cedar::proc::gui::Ide::showBoostControl()
   {
     this->mpBoostControlDock = new QDockWidget(this);
     this->mpBoostControlDock->setFloating(true);
-    this->mpBoostControl = new cedar::proc::gui::BoostControl();
+    this->mpBoostControl = new cedar::proc::gui::BoostControl(this->mpProcessingDrawer);
     this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
     this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
     this->mpBoostControlDock->setWidget(this->mpBoostControl);
@@ -446,6 +446,7 @@ void cedar::proc::gui::Ide::duplicateStep()
   QList<QGraphicsItem*> items_to_duplicate;
   for (auto item : selected)
   {
+    item->setSelected(false);
     bool add_to_list = true;
 
     // check if item is a connection
@@ -548,6 +549,10 @@ void cedar::proc::gui::Ide::duplicateStep()
           auto mapped = new_pos - group->scenePos();
           auto mapped_center = group->mapFromScene(center);
           auto p_new = group->duplicate(mapped - (mapped_center - p_base->pos()), p_base->getElement()->getName());
+          
+          // select the new item
+          p_new->setSelected(true);
+          
           // replace any slots with new ones
           for (auto& out : outgoing_slots)
           {
@@ -1350,9 +1355,9 @@ void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
     }
     case Qt::Key_Backspace:
     {
-         this->deleteSelectedElements();
-         break;
-       }
+      this->deleteSelectedElements();
+      break;
+    }
     // If the key is not handled by this widget, pass it on to the base widget.
     default:
       this->QMainWindow::keyPressEvent(pEvent);
@@ -1589,6 +1594,33 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
     this,
     SLOT(architectureChanged())
   );
+
+  // update architecture plots
+  QMenu* menu = this->mpMenuArchitecturePlots;
+  menu->clear();
+
+  const auto& plots = this->mGroup->getArchitectureWidgets();
+  if (plots.empty())
+  {
+    auto action = menu->addAction("none");
+    action->setEnabled(false);
+  }
+  else
+  {
+    for (const auto& name_path_pair : plots)
+    {
+      QAction* action = menu->addAction(QString::fromStdString(name_path_pair.first));
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(architecturePlotActionTriggered()));
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::architecturePlotActionTriggered()
+{
+  auto sender = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(sender);
+  std::string name = sender->text().toStdString();
+  this->mGroup->showArchitectureWidget(name);
 }
 
 void cedar::proc::gui::Ide::openFindDialog()

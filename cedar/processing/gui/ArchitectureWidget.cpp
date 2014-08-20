@@ -49,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <QGridLayout>
+#include <QLabel>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -87,6 +88,112 @@ T cedar::proc::gui::ArchitectureWidget::readOptional
   }
 }
 
+QWidget* cedar::proc::gui::ArchitectureWidget::readLabel(const cedar::aux::ConfigurationNode& entry)
+{
+  auto label = new QLabel();
+  std::string text = readOptional<std::string>(entry, "text", "");
+  label->setText(QString::fromStdString(text));
+  return label;
+}
+
+QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::ConfigurationNode& entry)
+{
+  auto data_i = entry.find("data");
+  //!@todo Exception
+  CEDAR_ASSERT(data_i != entry.not_found());
+  const auto& data_node = data_i->second;
+
+  // hidden knowledge: boost ptree represents arrays by nodes with empty keys
+  bool has_multiple_data = data_node.size() != 0 && data_node.begin()->first == "";
+
+  std::string first_data_path, first_data_title;
+
+  if (!has_multiple_data)
+  {
+    this->readDataNode(data_node, first_data_path, first_data_title);
+  }
+  else
+  {
+    this->readDataNode(data_node.begin()->second, first_data_path, first_data_title);
+  }
+
+  auto data = this->findData(first_data_path);
+
+  //!@todo Exception
+  CEDAR_ASSERT(data);
+
+  cedar::aux::gui::PlotInterface* plot = nullptr;
+  auto plot_type = readOptional<std::string>(entry, "plot type", "default");
+
+  cedar::aux::gui::ConstPlotDeclarationPtr declaration;
+  if (plot_type == "default")
+  {
+    declaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
+  }
+  else
+  {
+    try
+    {
+      declaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDeclaration(plot_type);
+    }
+    catch (cedar::aux::NotFoundException& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Cannot open plot: " + e.getMessage(),
+        CEDAR_CURRENT_FUNCTION_NAME
+      );
+
+      auto label = new QLabel(QString::fromStdString("Could not find plot declaration for \"" + plot_type + "\"."));
+      label->setWordWrap(true);
+      return label;
+    }
+  }
+  plot = declaration->createPlot();
+
+  plot->plot(data, first_data_title);
+
+  if (has_multiple_data)
+  {
+    auto multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(plot);
+    if (!multi_plot)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Cannot add more data: not a multi plot.",
+        CEDAR_CURRENT_FUNCTION_NAME
+      );
+      return plot;
+    }
+    auto iter = data_node.begin();
+    ++iter;
+
+    for (; iter != data_node.end(); ++iter)
+    {
+      std::string path, title;
+      this->readDataNode(iter->second, path, title);
+      auto data = this->findData(path);
+
+      //!@todo Exception
+      CEDAR_ASSERT(data);
+
+      if (multi_plot->canAppend(data))
+      {
+        multi_plot->append(data, title);
+      }
+      else
+      {
+        cedar::aux::LogSingleton::getInstance()->error
+        (
+          "Cannot add data \"" + path + "\": multiplot refuses.",
+          CEDAR_CURRENT_FUNCTION_NAME
+        );
+      }
+    }
+  }
+  return plot;
+}
+
 void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   auto entries_iter = node.find("entries");
@@ -110,116 +217,60 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
     auto column = readOptional<int>(entry, "column", 0);
     auto type = readOptional<std::string>(entry, "type", "plot");
 
-    grid_layout->setRowStretch(row, 1);
-    grid_layout->setColumnStretch(column, 1);
+    auto row_stretch = readOptional<int>(entry, "row stretch", 1);
+    auto column_stretch = readOptional<int>(entry, "column stretch", 1);
+    grid_layout->setRowStretch(row, row_stretch);
+    grid_layout->setColumnStretch(column, column_stretch);
 
     int column_span = readOptional<int>(entry, "column span", 1);
     int row_span = readOptional<int>(entry, "row span", 1);
 
-    auto data_i = entry.find("data");
-    //!@todo Exception
-    CEDAR_ASSERT(data_i != entry.not_found());
-    const auto& data_node = data_i->second;
-
-    std::string first_data_path;
-
-    if (data_node.size() == 0)
-    {
-      first_data_path = data_node.get_value<std::string>();
-    }
-    else
-    {
-      CEDAR_ASSERT(data_node.size() > 0);
-      first_data_path = data_node.begin()->second.get_value<std::string>();
-    }
-
-    auto data = this->findData(first_data_path);
-
-    //!@todo Exception
-    CEDAR_ASSERT(data);
-
-    cedar::aux::gui::PlotInterface* plot = nullptr;
+    QWidget* widget = nullptr;
     if (type == "plot")
     {
-      auto plot_type = readOptional<std::string>(entry, "plot type", "default");
-
-      cedar::aux::gui::ConstPlotDeclarationPtr declaration;
-      if (plot_type == "default")
-      {
-        declaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
-      }
-      else
-      {
-        try
-        {
-          declaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDeclaration(plot_type);
-        }
-        catch (cedar::aux::NotFoundException& e)
-        {
-          cedar::aux::LogSingleton::getInstance()->error
-          (
-            "Cannot open plot: " + e.getMessage(),
-            CEDAR_CURRENT_FUNCTION_NAME
-          );
-          return;
-        }
-      }
-      plot = declaration->createPlot();
+      widget = this->readPlot(entry);
+    }
+    else if (type == "label")
+    {
+      widget = this->readLabel(entry);
     }
     else
     {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Don't know how to process cell tpye \"" + type + "\".",
-        CEDAR_CURRENT_FUNCTION_NAME
-      );
-      return;
+      auto label = new QLabel(QString::fromStdString("Unknown cell type: \"" + type + "\"."));
+      label->setWordWrap(true);
+      widget = label;
     }
-    plot->plot(data, first_data_path);
 
-    grid_layout->addWidget(plot, row, column, row_span, column_span);
-
-    if (data_node.size() > 0)
+    if (widget != nullptr)
     {
-      auto multi_plot = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(plot);
-      if (!multi_plot)
+      grid_layout->addWidget(widget, row, column, row_span, column_span);
+
+      auto style = readOptional<std::string>(entry, "style sheet", "");
+      if (!style.empty())
       {
-        cedar::aux::LogSingleton::getInstance()->error
-        (
-          "Cannot add more data: not a multi plot.",
-          CEDAR_CURRENT_FUNCTION_NAME
-        );
-        return;
-      }
-      auto iter = data_node.begin();
-      ++iter;
-
-      for (; iter != data_node.end(); ++iter)
-      {
-        auto path = iter->second.get_value<std::string>();
-        auto data = this->findData(path);
-
-        //!@todo Exception
-        CEDAR_ASSERT(data);
-
-        if (multi_plot->canAppend(data))
-        {
-          multi_plot->append(data, path);
-        }
-        else
-        {
-          cedar::aux::LogSingleton::getInstance()->error
-          (
-            "Cannot add data \"" + path + "\": multiplot refuses.",
-            CEDAR_CURRENT_FUNCTION_NAME
-          );
-        }
+        widget->setStyleSheet(QString::fromStdString(style));
       }
     }
-    else
-    {
-      //!@todo error message
-    }
+  }
+}
+
+void cedar::proc::gui::ArchitectureWidget::readDataNode
+     (
+       const cedar::aux::ConfigurationNode& node,
+       std::string& dataPath,
+       std::string& title
+     )
+{
+  if (node.size() == 0)
+  {
+    dataPath = node.get_value<std::string>();
+    title = dataPath;
+  }
+  else
+  {
+    auto data = node.begin();
+    title = data->first;
+    dataPath = data->second.get_value<std::string>();
   }
 }
 
@@ -229,9 +280,37 @@ cedar::aux::ConstDataPtr cedar::proc::gui::ArchitectureWidget::findData(const st
   std::string data_name, step_path, step_path_rest, role;
   cedar::aux::splitLast(path, ".", step_path, data_name);
   cedar::aux::splitLast(step_path, "[", step_path_rest, role);
+
   if (!role.empty() && role.at(role.size() - 1) == ']')
   {
     role = role.substr(0, role.size() - 1);
+  }
+
+  if (role.empty())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "When opening architecture widget: No role found in data string \"" + path + "\".",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
+
+  if (data_name.empty())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "When opening architecture widget: No data name found in data string \"" + path + "\".",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
+
+  if (step_path.empty())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "When opening architecture widget: No step name found in data string \"" + path + "\".",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
 
   auto connectable = this->mGroup->getElement<cedar::proc::Connectable>(step_path_rest);

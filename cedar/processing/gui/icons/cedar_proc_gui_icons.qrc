@@ -30,7 +30,6 @@
     <file>steps/component_multiply.svg</file>
     <file>steps/convolution.svg</file>
     <file>steps/coordinate_transformation.svg</file>
-    <file>steps/field_temp.svg</file>
     <file>steps/flip.svg</file>
     <file>steps/gauss_input.svg</file>
     <file>steps/histogram.svg</file>
@@ -43,6 +42,9 @@
     <file>steps/serial_order.svg</file>
     <file>steps/space_to_rate_code.svg</file>
     <file>steps/static_gain.svg</file>
+    <file>steps/static_gain_green.svg</file>
+    <file>steps/static_gain_red.svg</file>
+    <file>steps/static_gain_zero.svg</file>
     <file>steps/switch.svg</file>
     <file>steps/threshold.svg</file>
     <file>steps/matrix_multiply.svg</file>

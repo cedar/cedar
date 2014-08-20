@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/MatrixTypeConverter.h"
+#include "cedar/processing/typecheck/Matrix.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
@@ -107,7 +108,10 @@ mConverted(new cedar::aux::MatData(cv::Mat())),
 // parameters
 _mTargetType(new cedar::aux::EnumParameter(this, "target type", MatrixType::typePtr(), MatrixType::Float))
 {
-  this->declareInput("matrix");
+  auto input_slot = this->declareInput("matrix");
+  cedar::proc::typecheck::Matrix mat_check;
+  input_slot->setCheck(mat_check);
+
   this->declareOutput("converted matrix", mConverted);
 
   QObject::connect(_mTargetType.get(), SIGNAL(valueChanged()), this, SLOT(targetTypeChanged()));
@@ -168,21 +172,5 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
   if (this->mMatrix)
   {
     this->onTrigger();
-  }
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::MatrixTypeConverter::determineInputValidity
-                                (
-                                  cedar::proc::ConstDataSlotPtr, // this step only has one slot
-                                  cedar::aux::ConstDataPtr data
-                                ) const
-{
-  if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
-  {
-    return cedar::proc::DataSlot::VALIDITY_VALID;
-  }
-  else
-  {
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
 }
