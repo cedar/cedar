@@ -440,22 +440,31 @@ void cedar::proc::gui::Ide::duplicateStep()
   QList<QGraphicsItem*> items_to_duplicate;
   for (auto item : selected)
   {
-    bool has_parent_in_selection = false;
-    // check if the item has a parent within the selection
-    for (auto sub_item : selected)
+    bool add_to_list = true;
+
+    // check if item is a connection
+    if (dynamic_cast<cedar::proc::gui::Connection*>(item))
     {
-      if (sub_item->isAncestorOf(item))
+      add_to_list = false;
+    }
+    else
+    {
+      // check if the item has a parent within the selection
+      for (auto sub_item : selected)
       {
-        // the parent should always be a group, otherwise, the item might not be duplicated correctly
-        CEDAR_DEBUG_NON_CRITICAL_ASSERT(dynamic_cast<cedar::proc::gui::Group*>(sub_item) != nullptr);
-        has_parent_in_selection = true;
-        break;
+        if (sub_item->isAncestorOf(item))
+        {
+          // the parent should always be a group, otherwise, the item might not be duplicated correctly
+          CEDAR_DEBUG_NON_CRITICAL_ASSERT(dynamic_cast<cedar::proc::gui::Group*>(sub_item) != nullptr);
+          add_to_list = false;
+          break;
+        }
       }
     }
 
     // if the item has a parent in the selection, that parent will take care of duplicating it
     // (this should only be the case for groups)
-    if (!has_parent_in_selection)
+    if (add_to_list)
     {
       items_to_duplicate.append(item);
     }
