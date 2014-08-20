@@ -95,7 +95,7 @@ QWidget* cedar::aux::gui::Configurable::DataDelegate::createEditor(QWidget *pPar
 
   cedar::aux::ParameterPtr parameter = this->mpConfigurable->getParameter(parameter_path);
 
-  QWidget* p_ret = NULL;
+  QWidget* p_ret = nullptr;
   try
   {
     cedar::aux::gui::Parameter *p_widget
@@ -548,7 +548,7 @@ void cedar::aux::gui::Configurable::clear()
 
   this->mpPropertyTree->clear();
   QAbstractItemDelegate * p_delegate = this->mpPropertyTree->itemDelegateForColumn(PARAMETER_EDITOR_COLUMN);
-  if (p_delegate != NULL)
+  if (p_delegate != nullptr)
   {
     delete p_delegate;
   }
@@ -562,25 +562,6 @@ void cedar::aux::gui::Configurable::clear()
   this->mParameterAddedConnection.disconnect();
   this->mParameterRemovedConnection.disconnect();
   this->mDisplayedConfigurable.reset();
-
-//  delete this->mpPropertyTree;
-//
-//  this->mpPropertyTree = new QTreeWidget();
-//  dynamic_cast<QVBoxLayout*>(this->layout())->addWidget(mpPropertyTree, 1);
-//  dynamic_cast<QVBoxLayout*>(this->layout())->setContentsMargins(0, 0, 0, 0);
-//  this->mpPropertyTree->setAlternatingRowColors(true);
-//
-//  // setup header
-//  this->mpPropertyTree->setColumnCount(2);
-//  QStringList header_labels;
-//  header_labels << "Property" << "Value";
-//  this->mpPropertyTree->setHeaderLabels(header_labels);
-//
-//  // make first section stretch
-//  this->mpPropertyTree->header()->setResizeMode(PARAMETER_NAME_COLUMN, QHeaderView::Interactive);
-//  this->mpPropertyTree->header()->setResizeMode(PARAMETER_EDITOR_COLUMN, QHeaderView::Stretch);
-//  this->mpPropertyTree->header()->resizeSection(PARAMETER_NAME_COLUMN, 150);
-
 }
 
 void cedar::aux::gui::Configurable::parameterChangeFlagChanged()

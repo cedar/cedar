@@ -117,6 +117,8 @@ mDraggingItems(false)
 
 cedar::proc::gui::Scene::~Scene()
 {
+  QObject::disconnect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
+
   this->clear();
 }
 
