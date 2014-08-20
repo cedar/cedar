@@ -20,8 +20,8 @@ This page contains the following sections:
 @section GuiTutorialFirstStep Tutorial: Starting the Gui 
 
 In this section, we will describe how to find and run the processing gui. Before using the processing gui, you have to
-compile a version of cedar or look for an installed version. The processing gui can be found in the binaries folder of 
-cedar (the default name is \b bin). There you will find an executable named cedar (with an additional file 
+compile a version of cedar or look for an installed version. The cedar gui can be found in the binaries folder of 
+cedar (the default name is \b bin). There you will find an executable named \b cedar (with an additional file 
 extension on some operating systems). Executing this file opens up the main window of cedar's gui. You are now 
 ready to make your first steps with this tool.
 
