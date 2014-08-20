@@ -108,19 +108,25 @@ void cedar::aux::gui::BoolParameter::propertiesChanged()
 
 void cedar::aux::gui::BoolParameter::stateChanged(int state)
 {
+  bool value = (state == Qt::Checked);
   cedar::aux::BoolParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
-  parameter->setValue(state == Qt::Checked, true);
+  if (value != parameter->getValue())
+  {
+    parameter->setValue(value, true);
+  }
 }
 
 void cedar::aux::gui::BoolParameter::parameterValueChanged()
 {
-  bool blocked = this->mpCheckBox->blockSignals(true);
-
   cedar::aux::BoolParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
 
-  this->mpCheckBox->setChecked(parameter->getValue());
-
-  this->mpCheckBox->blockSignals(blocked);
+  if (this->mpCheckBox->isChecked() != parameter->getValue())
+  {
+    // important: do not use setChecked here, as that is bugged and can lead to problems if the checkbox is immediately
+    // disabled.
+    // see: https://bugreports.qt-project.org/browse/qtbug-15309
+    this->mpCheckBox->setCheckState(parameter->getValue()? Qt::Checked : Qt::Unchecked);
+  }
 }

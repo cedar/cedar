@@ -660,6 +660,12 @@ public:
   //! Updates the trigger chains of all steps.
   void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
+  //!@brief connects two slots across groups, allocating connectors if necessary
+  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+
+  //!@brief disconnects two slots across groups, removing/merging connectors if necessary
+  static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -722,12 +728,6 @@ private:
   /*!@brief A function that adds a connector even if the name alread exists. Used during loading
    */
   void addConnectorInternal(const std::string& name, bool input);
-
-  //!@brief connects two slots across groups, allocating connectors if necessary
-  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
-
-  //!@brief disconnects two slots across groups, removing/merging connectors if necessary
-  static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.

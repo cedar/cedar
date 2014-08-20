@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <QLineEdit>
+#include <QPushButton>
 
 
 /*!@brief A widget for a cedar::aux::DirectoryParameter.
@@ -94,7 +95,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void propertiesChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -103,7 +104,10 @@ protected:
   // none yet
 private:
   //! QLineEdit used for displaying the parameter value.
-  QLineEdit *mpEdit;
+  QLineEdit* mpEdit;
+
+  //! Button used for opening the dialog for selecting a file.
+  QPushButton* mpButton;
 
 }; // class cedar::aux::gui::FileParameter
 
