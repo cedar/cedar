@@ -429,6 +429,7 @@ void cedar::proc::gui::Ide::exportSvg()
 
 void cedar::proc::gui::Ide::duplicateStep()
 {
+  //!@todo Move this functionality to proc::gui::Group
   // get current mouse position
   QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
   QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
@@ -437,13 +438,16 @@ void cedar::proc::gui::Ide::duplicateStep()
   QPointF center(0.0, 0.0);
   for (int i = 0; i < selected_items.size(); ++i)
   {
-	center += selected_items.at(i)->pos();
+    center += selected_items.at(i)->pos();
   }
   center /= static_cast<qreal>(selected_items.size());
 
   for (int i = 0; i < selected_items.size(); ++i)
   {
-    if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
+    auto selected_item = selected_items.at(i);
+    // deselect the old item
+    selected_item->setSelected(false);
+    if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_item))
     {
       try
       {
@@ -456,7 +460,10 @@ void cedar::proc::gui::Ide::duplicateStep()
                 )
         )
         {
-          group->duplicate(new_pos - (center - p_base->pos()), p_base->getElement()->getName());
+          auto duplicate = group->duplicate(new_pos - (center - p_base->pos()), p_base->getElement()->getName());
+
+          // select the new item
+          duplicate->setSelected(true);
         }
       }
       catch (cedar::aux::ExceptionBase& exc)
@@ -1238,9 +1245,9 @@ void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
     }
     case Qt::Key_Backspace:
     {
-         this->deleteSelectedElements();
-         break;
-       }
+      this->deleteSelectedElements();
+      break;
+    }
     // If the key is not handled by this widget, pass it on to the base widget.
     default:
       this->QMainWindow::keyPressEvent(pEvent);
