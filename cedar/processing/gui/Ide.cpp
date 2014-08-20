@@ -289,6 +289,12 @@ mSuppressCloseDialog(false)
 
 cedar::proc::gui::Ide::~Ide()
 {
+  if (this->mpPropertyTable != nullptr)
+  {
+    delete this->mpPropertyTable;
+    this->mpPropertyTable = nullptr;
+  }
+
   this->mpLog->uninstallHandlers();
 
   if (this->mpPerformanceOverview != nullptr)
