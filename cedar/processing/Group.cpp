@@ -540,11 +540,19 @@ std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifie
     return identifier;
   }
 
+  std::string base_str = identifier;
+
+  size_t last_number = identifier.find_last_not_of("0123456789");
+  if (last_number != std::string::npos && last_number != base_str.size() - 1)
+  {
+    base_str = identifier.substr(0, last_number);
+  }
+
   unsigned int count = 2;
   std::string result;
   do
   {
-    result = identifier +  " " + cedar::aux::toString(count);
+    result = base_str +  " " + cedar::aux::toString(count);
     ++count;
   }
   while (this->nameExists(result));
