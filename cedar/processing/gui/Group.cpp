@@ -323,7 +323,7 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::getUiElementFor(cedar::
 }
 
 
-void cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
 {
   auto to_duplicate = this->getGroup()->getElement(elementName);
   auto to_duplicate_ui = this->getUiElementFor(to_duplicate);
@@ -343,6 +343,7 @@ void cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::stri
   {
     group_item->restoreConnections();
   }
+  return duplicate_ui;
 }
 
 void cedar::proc::gui::Group::groupNameChanged()

@@ -53,6 +53,7 @@
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -468,7 +469,51 @@ void cedar::proc::gui::Ide::duplicateStep()
   }
   center /= static_cast<qreal>(items_to_duplicate.size());
 
+  std::vector<cedar::proc::DataConnectionPtr> duplicated_connections;
+  // now try to find all connections between duplicated items
+  for (auto connected_item : items_to_duplicate)
+  {
+    // first, try to get the underlying connectable and parent group for each item
+    if (auto p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(connected_item))
+    {
+      auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_base->getElement());
+      if (connectable)
+      {
+        auto group = connectable->getGroup();
+        if (group)
+        {
+          std::vector<cedar::proc::DataConnectionPtr> connections;
+          // get a list of all outgoing connections for this element
+          if (connectable->hasRole(cedar::proc::DataRole::OUTPUT))
+          {
+            for (auto slot : connectable->getDataSlots(cedar::proc::DataRole::OUTPUT))
+            {
+              std::vector<cedar::proc::DataConnectionPtr> more_connections;
+              group->getDataConnectionsFrom(connectable, slot.first, more_connections);
+              connections.insert(connections.end(), more_connections.begin(), more_connections.end());
+            }
+          }
+          // now check if any of these connections point to an element in the list of duplicates
+          for (auto con : connections)
+          {
+            auto target = this->mpProcessingDrawer->getScene()->getGraphicsItemFor(con->getTarget()->getParentPtr());
+            if (items_to_duplicate.contains(target))
+            {
+              duplicated_connections.push_back(con);
+            }
+          }
+        }
+      }
+    }
+  }
 
+  std::vector<std::pair<cedar::proc::Connectable*, cedar::proc::DataSlotPtr> > outgoing_slots;
+  std::vector<std::pair<cedar::proc::Connectable*, cedar::proc::DataSlotPtr> > receiving_slots;
+  for (auto con : duplicated_connections)
+  {
+    outgoing_slots.push_back(std::make_pair(con->getSource()->getParentPtr(), con->getSource()));
+    receiving_slots.push_back(std::make_pair(con->getTarget()->getParentPtr(), con->getTarget()));
+  }
   // perform the actual duplication
   for (int i = 0; i < items_to_duplicate.size(); ++i)
   {
@@ -486,7 +531,22 @@ void cedar::proc::gui::Ide::duplicateStep()
         )
         {
           auto mapped = new_pos - group->scenePos();
-          group->duplicate(mapped - (center - p_base->pos()), p_base->getElement()->getName());
+          auto p_new = group->duplicate(mapped - (center - p_base->pos()), p_base->getElement()->getName());
+          // replace any slots with new ones
+          for (auto& out : outgoing_slots)
+          {
+            if (out.first == p_base->getElement().get())
+            {
+              out.second = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_new->getElement())->getOutputSlot(out.second->getName());
+            }
+          }
+          for (auto& in : receiving_slots)
+          {
+            if (in.first == p_base->getElement().get())
+            {
+              in.second = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_new->getElement())->getInputSlot(in.second->getName());
+            }
+          }
         }
       }
       catch (cedar::aux::ExceptionBase& exc)
@@ -494,6 +554,12 @@ void cedar::proc::gui::Ide::duplicateStep()
         //!@todo Properly display an error message to the user.
       }
     }
+  }
+
+  // now duplicate connections between duplicated elements
+  for (unsigned int i = 0; i < outgoing_slots.size(); ++i)
+  {
+    cedar::proc::Group::connectAcrossGroups(outgoing_slots.at(i).second, receiving_slots.at(i).second);
   }
 }
 
