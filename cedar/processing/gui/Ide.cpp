@@ -433,17 +433,46 @@ void cedar::proc::gui::Ide::duplicateStep()
   QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
   QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
 
-  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
-  QPointF center(0.0, 0.0);
-  for (int i = 0; i < selected_items.size(); ++i)
-  {
-	center += selected_items.at(i)->pos();
-  }
-  center /= static_cast<qreal>(selected_items.size());
+  QList<QGraphicsItem*> selected = this->mpProcessingDrawer->getScene()->selectedItems();
 
-  for (int i = 0; i < selected_items.size(); ++i)
+  // create a list of all items to be duplicated (take out items that will be duplicated by selected groups)
+  QList<QGraphicsItem*> items_to_duplicate;
+  for (auto item : selected)
   {
-    if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
+    bool has_parent_in_selection = false;
+    // check if the item has a parent within the selection
+    for (auto sub_item : selected)
+    {
+      if (sub_item->isAncestorOf(item))
+      {
+        // the parent should always be a group, otherwise, the item might not be duplicated correctly
+        CEDAR_DEBUG_NON_CRITICAL_ASSERT(dynamic_cast<cedar::proc::gui::Group*>(sub_item) != nullptr);
+        has_parent_in_selection = true;
+        break;
+      }
+    }
+
+    // if the item has a parent in the selection, that parent will take care of duplicating it
+    // (this should only be the case for groups)
+    if (!has_parent_in_selection)
+    {
+      items_to_duplicate.append(item);
+    }
+  }
+
+  // determine the position offset of the duplicates as the average of the positions of all selected elements
+  QPointF center(0.0, 0.0);
+  for (int i = 0; i < items_to_duplicate.size(); ++i)
+  {
+    center += items_to_duplicate.at(i)->pos();
+  }
+  center /= static_cast<qreal>(items_to_duplicate.size());
+
+
+  // perform the actual duplication
+  for (int i = 0; i < items_to_duplicate.size(); ++i)
+  {
+    if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items_to_duplicate.at(i)))
     {
       try
       {
