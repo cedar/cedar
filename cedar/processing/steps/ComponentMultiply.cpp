@@ -111,10 +111,19 @@ mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 void cedar::proc::steps::ComponentMultiply::inputConnectionChanged(const std::string& inputName)
 {
   cedar::proc::ConstExternalDataPtr slot = this->getInputSlot(inputName);
+
+  // Find the first non-0d input. If all are 0d, just use the last one as a "template".
   cv::Mat in_mat;
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(slot->getData()))
+  for (unsigned int i = 0; i < this->mInputs->getDataCount(); ++i)
   {
-    in_mat = mat_data->getData().clone();
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(slot->getData(i)))
+    {
+      in_mat = mat_data->getData().clone();
+      if (mat_data->getDimensionality() != 0)
+      {
+        break;
+      }
+    }
   }
 
   if (!in_mat.empty())
