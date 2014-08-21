@@ -42,13 +42,160 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Group.h"
 
-
 // SYSTEM INCLUDES
-// none yet
 
 //----------------------------------------------------------------------------------------------------------------------
-// static members
+// private nested structs and classes
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::LabeledPlot
+(
+  const QString& pLabel,
+  cedar::aux::ConstDataPtr pData,
+  cedar::proc::PlotDataPtr pPlotData,
+  const std::string& decalarationToUse
+)
+:
+//mpPlotDeclaration(pPlotDecl),
+mpLabel(new QLabel(pLabel)),
+mpPlotSelector(nullptr),
+mpPlotter(nullptr),
+mIsMultiPlot(false),
+mpData(pData),
+mpPlotData(pPlotData),
+mTitle(pLabel.toStdString())
+{
+  this->mpTitleLayout = new QHBoxLayout();
+  this->mpTitleLayout->setContentsMargins(0, 0, 0, 0);
+
+  this->mpPlotSelector = new QPushButton();
+  this->mpPlotSelector->setFixedSize(20, 20);
+  auto menu = new QMenu();
+  this->fillPlotOptions(menu);
+  this->mpPlotSelector->setMenu(menu);
+
+  this->mpPlotContainer = new QWidget();
+  auto layout = new QVBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
+  this->mpPlotContainer->setLayout(layout);
+  this->mpTitleLayout->addWidget(this->mpPlotSelector);
+  this->mpTitleLayout->addWidget(this->mpLabel);
+
+  this->openPlotFromDeclaration(decalarationToUse);
+};
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(const std::string& decalarationToFind)
+{
+  // first, check if there are any declarations for the data at all
+  cedar::aux::gui::ConstPlotDeclarationPtr decl;
+  try
+  {
+    mpPlotDeclaration = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(mpData);
+  }
+  catch (cedar::aux::NotFoundException&)
+  {
+    return;
+  }
+
+  if (!decalarationToFind.empty())
+  {
+    // then, try to find one that matches the specified one
+    auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
+    for (auto declaration : declarations)
+    {
+      if (declaration->getClassName() == decalarationToFind)
+      {
+        mpPlotDeclaration = declaration;
+        break;
+      }
+    }
+  }
+
+  if (mpPlotDeclaration)
+  {
+    if (this->mpPlotter)
+    {
+      // remember the old data that was plotted
+      if (auto multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpPlotter))
+      {
+        const auto& map = multi->getDataMap();
+        mMultiPlotData.insert(map.begin(), map.end());
+      }
+
+      this->mpPlotContainer->layout()->removeWidget(this->mpPlotter);
+      delete this->mpPlotter;
+    }
+
+    // clear all remaining widgets from the plot container
+    while (this->mpPlotContainer->layout()->count() > 0)
+    {
+      auto item = this->mpPlotContainer->layout()->itemAt(0);
+      auto widget = item->widget();
+      this->mpPlotContainer->layout()->removeItem(item);
+      delete widget;
+    }
+
+    try
+    {
+      mpPlotter = mpPlotDeclaration->createPlot();
+      this->mpPlotter->plot(mpData, mTitle);
+      this->mpPlotContainer->layout()->addWidget(mpPlotter);
+      this->mpPlotData->setPlotDeclaration(mpPlotDeclaration->getClassName());
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      auto label = new QLabel("Could not open plot. Hover over this text for details.");
+      label->setWordWrap(true);
+      label->setToolTip(QString::fromStdString(e.exceptionInfo()));
+      this->mpPlotContainer->layout()->addWidget(label);
+    }
+
+    // append the remaining data
+    if (!mMultiPlotData.empty())
+    {
+      if (auto multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpPlotter))
+      {
+        for (auto data_name_pair : mMultiPlotData)
+        {
+          const auto& data = data_name_pair.first;
+          const auto& name = data_name_pair.second;
+
+          if (multi->canAppend(data))
+          {
+            multi->append(data, name);
+          }
+        }
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openDefaultPlot()
+{
+  // empty = default plot
+  this->openPlotFromDeclaration(std::string());
+}
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openSpecificPlot()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+  this->openPlotFromDeclaration(action->text().toStdString());
+}
+
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::fillPlotOptions(QMenu* menu)
+{
+  auto default_action = menu->addAction("default");
+  menu->addSeparator();
+  QObject::connect(default_action, SIGNAL(triggered()), this, SLOT(openDefaultPlot()));
+
+  auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
+  for (auto declaration : declarations)
+  {
+    auto action = menu->addAction(QString::fromStdString(declaration->getClassName()));
+    QObject::connect(action, SIGNAL(triggered()), this, SLOT(openSpecificPlot()));
+  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -110,25 +257,6 @@ void cedar::proc::gui::PlotWidget::processSlot
 {
   // get the plot_class
   std::string plot_declaration = dataItem->getParameter<cedar::aux::StringParameter>("plotDeclaration")->getValue();
-  auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(pData)->getData();
-  cedar::aux::gui::ConstPlotDeclarationPtr decl;
-  try
-  {
-    decl = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(pData);
-  }
-  catch (cedar::aux::NotFoundException&)
-  {
-    return;
-  }
-  
-  for (auto declaration : declarations)
-  {
-    if (declaration->getClassName() == plot_declaration)
-    {
-      decl = declaration;
-      break;
-    }
-  }
 
   auto plot_declaration_does_match = [&](LabeledPlotPtr p_labeled_plot)
   {
@@ -161,7 +289,7 @@ void cedar::proc::gui::PlotWidget::processSlot
   }
   else
   {
-    createAndAddPlotToGrid(decl, pData, title);
+    createAndAddPlotToGrid(plot_declaration, pData, dataItem, title);
   }
 }
 
@@ -190,7 +318,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
     };
 
   // iterate over all data slots
-  for(auto data_item : mDataList)
+  for (auto data_item : mDataList)
   {
     try
     {
@@ -202,7 +330,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
       title = p_slot->getText();
 
       // we need to treat external data differently
-      if(auto p_input_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(p_slot))
+      if (auto p_input_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(p_slot))
       {
         // could check if it's a collection with p_input_slot->isCollection();
         // but if it's not this loop should have just one iteration ...
@@ -271,7 +399,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   }
 
   // remove empty slots from the datalist
-  for(auto& invalid_data_item : invalid_data)
+  for (auto& invalid_data_item : invalid_data)
   {
     mDataList.erase(std::remove(mDataList.begin(), mDataList.end(), invalid_data_item), mDataList.end());
   }
@@ -328,21 +456,22 @@ std::tuple<int, int> cedar::proc::gui::PlotWidget::usingNextFreeGridSlot()
 
 void cedar::proc::gui::PlotWidget::createAndAddPlotToGrid
 (
-  cedar::aux::gui::ConstPlotDeclarationPtr decl,
+  const std::string& decl,
   cedar::aux::ConstDataPtr pData,
+  cedar::proc::PlotDataPtr dataItem,
   const std::string& title
 )
 {
   int row, column;
   // get the next free slot in the grid layout
   std::tie(row, column) = this->usingNextFreeGridSlot();
-  LabeledPlotPtr p_current_labeled_plot(new LabeledPlot(new QLabel(QString::fromStdString(title)), decl));
-  mpLayout->addWidget(p_current_labeled_plot->mpLabel, row, column);
+  LabeledPlotPtr p_current_labeled_plot(new LabeledPlot(QString::fromStdString(title), pData, dataItem, decl));
+
+  mpLayout->addLayout(p_current_labeled_plot->mpTitleLayout, row, column);
   mpLayout->setRowStretch(row, 0);
   try
   {
-    p_current_labeled_plot->mpPlotter->plot(pData, title);
-    mpLayout->addWidget(p_current_labeled_plot->mpPlotter, row + 1, column);
+    mpLayout->addWidget(p_current_labeled_plot->mpPlotContainer, row + 1, column);
     mpLayout->setRowStretch(row + 1, 1);
     // set column stretch in case the number of columns changed
     mpLayout->setColumnStretch(column, 1);
@@ -453,7 +582,7 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
 
     // now remove the widgets
     remove_qgridlayout_widget(labeled_plot->mpLabel);
-    remove_qgridlayout_widget(labeled_plot->mpPlotter);
+    remove_qgridlayout_widget(labeled_plot->mpPlotContainer);
     // remove the entry that maps the data to the now removed plot
     this->mPlotGridMap.erase(plot_grid_map_item);
     // when we go out of scope no pointer to this plotter should remain since we removed deleted its members' memory

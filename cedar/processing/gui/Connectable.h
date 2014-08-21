@@ -48,6 +48,7 @@
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
+#include "cedar/processing/gui/ConnectableIconView.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/PlotWidget.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
@@ -60,6 +61,7 @@
 #include <QMainWindow>
 #include <map>
 #include <vector>
+
 
 /*!@brief A gui base class for all items that represent cedar::proc::Connectables.
  */
@@ -143,12 +145,20 @@ protected:
         this->mpRectangle->setVisible(visible);
       }
 
+      //! Sets the backgroud color of the decoration.
+      void setBackgroundColor(const QColor& background);
+
+      //! Resets the backgroud color of the decoration to the default.
+      void resetBackgroundColor();
+
     private:
       QGraphicsSvgItem* mpIcon;
 
       QGraphicsRectItem* mpRectangle;
 
       QString mIconFile;
+
+      QColor mDefaultBackground;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(Decoration);
@@ -328,6 +338,10 @@ protected:
 
   //! write all open child widgets to a configuration node
   void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const;
+
+  /*! Returns a formatted string that can be used for labels/window titles.
+   */
+  std::string getNameForTitle() const;
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -343,6 +357,15 @@ private:
 
   void closeAllChildWidgets();
 
+  void translateStartedSignal();
+
+  void translateStoppedSignal();
+
+private slots:
+  void triggerableStarted();
+
+  void triggerableStopped();
+
 signals:
   //! translates a slot removed signal to Qt
   void reactToSlotRemovedSignal(cedar::proc::DataRole::Id role, QString name);
@@ -352,6 +375,13 @@ signals:
 
   //! translates a slot added signal to Qt
   void reactToSlotAddedSignal(cedar::proc::DataRole::Id role, QString name);
+
+  //! Emitted whenever the triggerable is started.
+  void triggerableStartedSignal();
+
+  //! Emitted whenever the triggerable is stopped.
+  void triggerableStoppedSignal();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -363,8 +393,8 @@ public:
   static const qreal M_DATA_SLOT_PADDING;
 
 protected:
-  //! SvgItem displaying the connectable's icon
-  QGraphicsSvgItem* mpIconDisplay;
+  //! Used to display the icon of the step.
+  cedar::proc::gui::ConnectableIconView* mpIconView;
 
   //!@brief the class id of the step
   cedar::aux::ConstPluginDeclarationPtr mClassId;
@@ -385,6 +415,8 @@ protected:
   std::vector<QWidget*> mChildWidgets;
 
 private:
+  DecorationPtr mpLoopedDecoration;
+
   //! An offset to be added to in- and output slot positions.
   qreal mInputOutputSlotOffset;
 
@@ -398,7 +430,8 @@ private:
   boost::signals2::connection mSlotRenamedConnection;
   boost::signals2::connection mSlotRemovedConnection;
 
-  DecorationPtr mpLoopedDecoration;
+  boost::signals2::scoped_connection mStartedConnection;
+  boost::signals2::scoped_connection mStoppedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
