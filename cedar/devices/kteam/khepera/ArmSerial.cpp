@@ -72,8 +72,8 @@ cedar::dev::kteam::khepera::ArmSerial::ArmSerial()
   this->_mCommandGetArmPosition = new cedar::aux::StringParameter(this, "command get arm position", "T,1,H,1");
   this->_mAnswerGetArmPosition = new cedar::aux::StringParameter(this, "answer get arm position", "t,1,h");
 
-  this->registerDeviceCommandHook(POSITION, boost::bind(&cedar::dev::kteam::khepera::ArmSerial::applyArmPosition, this, _1));
-  this->registerDeviceMeasurementHook(POSITION, boost::bind(&cedar::dev::kteam::khepera::ArmSerial::measureArmPosition, this));
+  this->registerDeviceSideCommandHook(POSITION, boost::bind(&cedar::dev::kteam::khepera::ArmSerial::applyArmPosition, this, _1));
+  this->registerDeviceSideMeasurementHook(POSITION, boost::bind(&cedar::dev::kteam::khepera::ArmSerial::measureArmPosition, this));
 }
 
 cedar::dev::kteam::khepera::ArmSerial::~ArmSerial()
