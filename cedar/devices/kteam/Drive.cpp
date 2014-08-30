@@ -67,13 +67,13 @@ void cedar::dev::kteam::Drive::init()
   setCommandAndMeasurementDimensionality(cedar::dev::kteam::Drive::ENCODERS, 2);
   installMeasurementType(cedar::dev::kteam::Drive::ENCODERS_CHANGE, "Change Rate of Encoders");
   setMeasurementDimensionality(cedar::dev::kteam::Drive::ENCODERS_CHANGE, 2);
-  registerDeviceMeasurementTransformationHook
+  registerDeviceSideMeasurementTransformationHook
   (
       cedar::dev::kteam::Drive::ENCODERS,
       cedar::dev::kteam::Drive::ENCODERS_CHANGE,
       boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::kteam::Drive::ENCODERS)
   );
-  registerDeviceMeasurementTransformationHook
+  registerDeviceSideMeasurementTransformationHook
   (
       cedar::dev::kteam::Drive::ENCODERS,
       cedar::dev::kteam::Drive::WHEEL_SPEED,
@@ -178,7 +178,7 @@ void cedar::dev::kteam::Drive::setWheelSpeedPulses(const std::vector<cedar::unit
   
 std::vector<int> cedar::dev::kteam::Drive::getEncoders() const
 {
-  cv::Mat mat = getUserMeasurementBuffer( ENCODERS );
+  cv::Mat mat = getUserSideMeasurementBuffer( ENCODERS );
   std::vector<int> ret;
 
   ret.push_back( mat.at<double>(0,0) );
@@ -194,7 +194,7 @@ void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
   mat.at<double>(0,0) = encoders[0];
   mat.at<double>(1,0) = encoders[1];
 
-  setUserCommandBuffer( ENCODERS, mat );
+  setUserSideCommandBuffer( ENCODERS, mat );
 }
 
 cv::Mat cedar::dev::kteam::Drive::pulsesToWheelSpeed(cedar::unit::Time, cv::Mat, ComponentDataType type)

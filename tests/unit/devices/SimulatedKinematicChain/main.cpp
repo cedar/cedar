@@ -803,7 +803,7 @@ void test()
   );
 
   // make a small step for finite difference method
-  double delta_t = complex_test_arm->getDeviceStepSize() / cedar::unit::DEFAULT_TIME_UNIT; //1e-07;
+  double delta_t = complex_test_arm->getCommunicationStepSize() / cedar::unit::DEFAULT_TIME_UNIT; //1e-07;
 
 //  complex_test_arm->startCommunication();
   complex_test_arm->clearUserCommand();

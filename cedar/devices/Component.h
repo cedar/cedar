@@ -189,7 +189,7 @@ public:
   void setSimulatedTime(const cedar::unit::Time& time);
   bool isRunningNolocking(); //@todo: rename to isCommunicatingNolocking() ?
 
-  cedar::unit::Time getDeviceStepSize();
+  cedar::unit::Time getCommunicationStepSize();
 
   //!@brief Returns the channel associated with the component.
   inline cedar::dev::ChannelPtr getChannel() const
@@ -258,7 +258,7 @@ public:
   //! Returns the dimensionality (size) of the given command type.
   unsigned int getCommandDimensionality(ComponentDataType type) const;
 
-  void setUserCommandBuffer(ComponentDataType type, cv::Mat);
+  void setUserSideCommandBuffer(ComponentDataType type, cv::Mat);
 
   //!@brief this function resets the internally used user command and allows to subsequently use a different type
   void clearUserCommand();
@@ -328,20 +328,20 @@ protected:
   void setMeasurementDimensionality(ComponentDataType type, unsigned int dim);
   void setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim);
 
-  void registerDeviceCommandHook(ComponentDataType type, CommandFunctionType fun);
-  void registerDeviceMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
+  void registerDeviceSideCommandHook(ComponentDataType type, CommandFunctionType fun);
+  void registerDeviceSideMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
 
-  void registerUserCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
-  void registerDeviceMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+  void registerUserSideCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+  void registerDeviceSideMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
 
-  void setUserCommandBufferIndex(ComponentDataType type, int index, double value);
-  void setInitialUserCommandBuffer(ComponentDataType type, cv::Mat);
+  void setUserSideCommandBufferIndex(ComponentDataType type, int index, double value);
+  void setInitialUserSideCommandBuffer(ComponentDataType type, cv::Mat);
 
-  cv::Mat getUserMeasurementBuffer(ComponentDataType type) const;
-  double  getUserMeasurementBufferIndex(ComponentDataType type, int index) const;
+  cv::Mat getUserSideMeasurementBuffer(ComponentDataType type) const;
+  double  getUserSideMeasurementBufferIndex(ComponentDataType type, int index) const;
 
-  cv::Mat getPreviousDeviceMeasurementBuffer(ComponentDataType type) const;
-  double  getPreviousDeviceMeasurementBufferIndex(ComponentDataType type, int index) const;
+  cv::Mat getPreviousDeviceSideMeasurementBuffer(ComponentDataType type) const;
+  double  getPreviousDeviceSideMeasurementBufferIndex(ComponentDataType type, int index) const;
 
   void prepareComponentDestructAbsolutelyRequired();
 
@@ -357,7 +357,7 @@ private:
   void stepCommandCommunication(cedar::unit::Time);
   void stepMeasurementCommunication(cedar::unit::Time);
 
-  void updateUserMeasurements();
+  void updateUserSideMeasurements();
 
   //!@brief checks whether a given command type conflicts with already set commands and throws an exception if this happens
   void checkExclusivenessOfCommand(ComponentDataType type);
@@ -380,7 +380,7 @@ private:
   CommandDataCollectionPtr mCommandData;
 
   //! the Device-thread's wrapper
-  std::unique_ptr<cedar::aux::LoopFunctionInThread> mDeviceThread;
+  std::unique_ptr<cedar::aux::LoopFunctionInThread> mCommunicationThread;
 
   cedar::aux::LockableMember<std::map<ComponentDataType, CommandFunctionType> > mSubmitCommandHooks;
   cedar::aux::LockableMember<std::map<ComponentDataType, MeasurementFunctionType> > mRetrieveMeasurementHooks;

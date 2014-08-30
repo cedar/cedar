@@ -169,12 +169,12 @@ double cedar::dev::KinematicChain::getJointAngle(unsigned int index) const
   }
 
   //!@todo doesn't this function also check for violations of joint range?
-  return getUserMeasurementBufferIndex(JOINT_ANGLES, index);
+  return getUserSideMeasurementBufferIndex(JOINT_ANGLES, index);
 }
 
 cv::Mat cedar::dev::KinematicChain::getJointAngles() const
 {
-  return getUserMeasurementBuffer( JOINT_ANGLES );
+  return getUserSideMeasurementBuffer( JOINT_ANGLES );
 }
 
 cv::Mat cedar::dev::KinematicChain::getCachedJointAngles() const
@@ -199,12 +199,12 @@ double cedar::dev::KinematicChain::getJointVelocity(unsigned int index) const
     );
   }
   //!@todo doesn't this function also check for violations of joint range?
-  return getUserMeasurementBufferIndex( JOINT_VELOCITIES, index );
+  return getUserSideMeasurementBufferIndex( JOINT_VELOCITIES, index );
 }
 
 cv::Mat cedar::dev::KinematicChain::getJointVelocities() const
 {
-  return getUserMeasurementBuffer( JOINT_VELOCITIES );
+  return getUserSideMeasurementBuffer( JOINT_VELOCITIES );
 }
 
 cv::Mat cedar::dev::KinematicChain::getCachedJointVelocities() const
@@ -230,12 +230,12 @@ double cedar::dev::KinematicChain::getJointAcceleration(unsigned int index) cons
     );
   }
   //!@todo doesn't this function also check for violations of joint range?
-  return getUserMeasurementBufferIndex(JOINT_ACCELERATIONS, index);
+  return getUserSideMeasurementBufferIndex(JOINT_ACCELERATIONS, index);
 }
 
 cv::Mat cedar::dev::KinematicChain::getJointAccelerations() const
 {
-  return getUserMeasurementBuffer(JOINT_ACCELERATIONS);
+  return getUserSideMeasurementBuffer(JOINT_ACCELERATIONS);
 }
 
 cv::Mat cedar::dev::KinematicChain::getCachedJointAccelerations() const
@@ -263,7 +263,7 @@ void cedar::dev::KinematicChain::setJointAngle(unsigned int index, double value)
   value = std::max<double>(value, getJoint(index)->_mpAngleLimits->getLowerLimit());
   value= std::min<double>(value, getJoint(index)->_mpAngleLimits->getUpperLimit());
   //!@todo doesn't this function also check for violations of joint range?
-  setUserCommandBufferIndex(JOINT_ANGLES, index, value);
+  setUserSideCommandBufferIndex(JOINT_ANGLES, index, value);
 }
 
 
@@ -318,7 +318,7 @@ void cedar::dev::KinematicChain::setJointAngles(const cv::Mat& angles)
     new_angles.at<double>(i,0) = angle;
   }
   //!@todo doesn't this function also check for violations of joint range?
-  setUserCommandBuffer(JOINT_ANGLES, new_angles);
+  setUserSideCommandBuffer(JOINT_ANGLES, new_angles);
 }
 
 void cedar::dev::KinematicChain::setJointVelocity(unsigned int index, double velocity)
@@ -336,7 +336,7 @@ void cedar::dev::KinematicChain::setJointVelocity(unsigned int index, double vel
   velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
   velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
   //!@todo doesn't this function also check for violations of joint range?
-  setUserCommandBufferIndex(JOINT_VELOCITIES, index, velocity);
+  setUserSideCommandBufferIndex(JOINT_VELOCITIES, index, velocity);
 }
 
 void cedar::dev::KinematicChain::setJointVelocities(const std::vector<double>& velocities)
@@ -381,7 +381,7 @@ void cedar::dev::KinematicChain::setJointVelocities(const cv::Mat& velocities)
 
   // TODO: test limits
   //!@todo doesn't this function also check for violations of joint range?
-  setUserCommandBuffer( JOINT_VELOCITIES, new_vels );
+  setUserSideCommandBuffer( JOINT_VELOCITIES, new_vels );
 }
 
 void cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
@@ -396,7 +396,7 @@ void cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, double
     );
   }
   //!@todo doesn't this function also check for violations of joint range?
-  setUserCommandBufferIndex(JOINT_ACCELERATIONS, index, acceleration);
+  setUserSideCommandBufferIndex(JOINT_ACCELERATIONS, index, acceleration);
 }
 
 void cedar::dev::KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
@@ -439,7 +439,7 @@ void cedar::dev::KinematicChain::setJointAccelerations(const cv::Mat& accelerati
   cv::Mat new_accels = accelerations.clone();
   // todo: test limits
   //!@todo doesn't this function also check for violations of joint range?
-  setUserCommandBuffer(JOINT_ACCELERATIONS, new_accels);
+  setUserSideCommandBuffer(JOINT_ACCELERATIONS, new_accels);
 }
 
 // TODO: applyJointLimits, applyJointVelocityLimits, etc
@@ -459,13 +459,13 @@ void cedar::dev::KinematicChain::init()
   installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, "Joint Accelerations");
 //  installCommandAndMeasurementType(cedar::dev::KinematicChain::JOINT_TORQUES, "Joint Torques");
 
-  registerUserCommandTransformationHook
+  registerUserSideCommandTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
-  registerUserCommandTransformationHook
+  registerUserSideCommandTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     cedar::dev::KinematicChain::JOINT_ANGLES,
@@ -479,20 +479,20 @@ void cedar::dev::KinematicChain::init()
       cedar::dev::KinematicChain::JOINT_ANGLES
     )
   );
-  registerUserCommandTransformationHook
+  registerUserSideCommandTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     cedar::dev::KinematicChain::JOINT_ANGLES,
     boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_ANGLES)
   );
 
-  registerDeviceMeasurementTransformationHook
+  registerDeviceSideMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     boost::bind(&cedar::dev::Component::integrateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
-  registerDeviceMeasurementTransformationHook
+  registerDeviceSideMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     cedar::dev::KinematicChain::JOINT_ANGLES,
@@ -506,19 +506,19 @@ void cedar::dev::KinematicChain::init()
       cedar::dev::KinematicChain::JOINT_VELOCITIES
     )
   );
-  registerDeviceMeasurementTransformationHook
+  registerDeviceSideMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
     boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_VELOCITIES)
   );
-  registerDeviceMeasurementTransformationHook
+  registerDeviceSideMeasurementTransformationHook
   (
     cedar::dev::KinematicChain::JOINT_ANGLES,
     cedar::dev::KinematicChain::JOINT_VELOCITIES,
     boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::KinematicChain::JOINT_ANGLES)
   );
-  registerDeviceMeasurementTransformationHook
+  registerDeviceSideMeasurementTransformationHook
   (
       cedar::dev::KinematicChain::JOINT_ANGLES,
       cedar::dev::KinematicChain::JOINT_ACCELERATIONS,
@@ -853,7 +853,7 @@ void cedar::dev::KinematicChain::applyInitialConfiguration(const std::string& na
     else
     {
       // @todo: !
-      setInitialUserCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
+      setInitialUserSideCommandBuffer(cedar::dev::KinematicChain::JOINT_ANGLES, f->second);
       //setJointAngles( f->second );
     }
     return;

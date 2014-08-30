@@ -667,15 +667,15 @@ void cedar::dev::Component::init()
 {
   this->mMeasurementData = boost::make_shared<cedar::dev::Component::MeasurementDataCollection>();
   this->mCommandData = boost::make_shared<cedar::dev::Component::CommandDataCollection>();
-  mDeviceThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
+  mCommunicationThread = std::unique_ptr<cedar::aux::LoopFunctionInThread>(
                                 new cedar::aux::LoopFunctionInThread(
                                   boost::bind(&cedar::dev::Component::stepCommunication,
                                               this,
                                               _1) ));
 
 
-  mDeviceThread->connectToStartSignal(boost::bind(&cedar::dev::Component::processStart, this));
-  mDeviceThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
+  mCommunicationThread->connectToStartSignal(boost::bind(&cedar::dev::Component::processStart, this));
+  mCommunicationThread->setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   this->mLostTime = 0.0 * cedar::unit::seconds;
 }
 
@@ -713,15 +713,15 @@ cedar::dev::Component::~Component()
     );
   }
 
-  // the thread will stopped when mDeviceThread is destructed, anyway, but we
+  // the thread will stopped when mCommunicationThread is destructed, anyway, but we
   // try to send the stop request as early as possible ...
-  mDeviceThread->requestStop();
+  mCommunicationThread->requestStop();
 
   // virtual can't be called in the inherit. This is why all children
   // must call it!
   //brakeNow();
 
-  mDeviceThread->stop();
+  mCommunicationThread->stop();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -937,7 +937,7 @@ void cedar::dev::Component::applyDeviceCommandsAs(ComponentDataType type)
   mDeviceCommandSelection = type;
 }
 
-void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat data)
+void cedar::dev::Component::setUserSideCommandBuffer(ComponentDataType type, cv::Mat data)
 {
   this->checkExclusivenessOfCommand(type);
   QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
@@ -945,7 +945,7 @@ void cedar::dev::Component::setUserCommandBuffer(ComponentDataType type, cv::Mat
   this->mUserCommandUsed.member().insert(type);
 }
 
-void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, cv::Mat data)
+void cedar::dev::Component::setInitialUserSideCommandBuffer(ComponentDataType type, cv::Mat data)
 {
   if (this->isCommunicating())
   {
@@ -958,7 +958,7 @@ void cedar::dev::Component::setInitialUserCommandBuffer(ComponentDataType type, 
 }
 
 
-void cedar::dev::Component::setUserCommandBufferIndex(ComponentDataType type, int index, double value)
+void cedar::dev::Component::setUserSideCommandBufferIndex(ComponentDataType type, int index, double value)
 {
   this->checkExclusivenessOfCommand(type);
   QWriteLocker locker(this->mUserCommandUsed.getLockPtr());
@@ -966,27 +966,27 @@ void cedar::dev::Component::setUserCommandBufferIndex(ComponentDataType type, in
   this->mUserCommandUsed.member().insert(type);
 }
 
-cv::Mat cedar::dev::Component::getUserMeasurementBuffer(ComponentDataType type) const
+cv::Mat cedar::dev::Component::getUserSideMeasurementBuffer(ComponentDataType type) const
 {
   return this->mMeasurementData->getUserBuffer(type);
 }
 
-double cedar::dev::Component::getUserMeasurementBufferIndex(ComponentDataType type, int index) const
+double cedar::dev::Component::getUserSideMeasurementBufferIndex(ComponentDataType type, int index) const
 {
   return this->mMeasurementData->getUserBufferIndex(type, index);
 }
 
-cv::Mat cedar::dev::Component::getPreviousDeviceMeasurementBuffer(ComponentDataType type) const
+cv::Mat cedar::dev::Component::getPreviousDeviceSideMeasurementBuffer(ComponentDataType type) const
 {
   return this->mMeasurementData->getPreviousDeviceBuffer(type);
 }
 
-double cedar::dev::Component::getPreviousDeviceMeasurementBufferIndex(ComponentDataType type, int index) const
+double cedar::dev::Component::getPreviousDeviceSideMeasurementBufferIndex(ComponentDataType type, int index) const
 {
   return this->mMeasurementData->getPreviousDeviceBufferIndex(type, index);
 }
 
-void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, CommandFunctionType fun)
+void cedar::dev::Component::registerDeviceSideCommandHook(ComponentDataType type, CommandFunctionType fun)
 {
   if (!this->mCommandData->hasType(type))
   {
@@ -1002,7 +1002,7 @@ void cedar::dev::Component::registerDeviceCommandHook(ComponentDataType type, Co
   mSubmitCommandHooks.member()[ type ] = fun;
 }
 
-void cedar::dev::Component::registerDeviceMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
+void cedar::dev::Component::registerDeviceSideMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
 {
   if (!this->mMeasurementData->hasType(type))
   {
@@ -1018,12 +1018,12 @@ void cedar::dev::Component::registerDeviceMeasurementHook(ComponentDataType type
   mRetrieveMeasurementHooks.member()[ type ] = fun;
 }
 
-void cedar::dev::Component::registerUserCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
+void cedar::dev::Component::registerUserSideCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
 {
   this->mCommandData->registerTransformationHook(from, to, fun);
 }
 
-void cedar::dev::Component::registerDeviceMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
+void cedar::dev::Component::registerDeviceSideMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
 {
   this->mMeasurementData->registerTransformationHook(from, to, fun);
 }
@@ -1243,13 +1243,13 @@ void cedar::dev::Component::stepMeasurementCommunication(cedar::unit::Time dt)
 
   locker.unlock();
   // todo: make this non-blocking for this looped thread
-  updateUserMeasurements();
+  updateUserSideMeasurements();
 
   QWriteLocker time_locker(this->mLastStepMeasurementsTime.getLockPtr());
   this->mLastStepMeasurementsTime.member() = timer.elapsed();
 }
 
-void cedar::dev::Component::updateUserMeasurements()
+void cedar::dev::Component::updateUserSideMeasurements()
 {
   // this is here to preserve lock order (getInstalledTypes locks internally)
   auto measurement_types = this->mMeasurementData->getInstalledTypes();
@@ -1292,13 +1292,13 @@ void cedar::dev::Component::startCommunication()
     );
   }
 
-  mDeviceThread->start();
+  mCommunicationThread->start();
   mRunningComponentInstances.insert( this );
 
   // workaround to get at least several measurments to be able to differentiate
-  mDeviceThread->waitUntilStepped();
-  mDeviceThread->waitUntilStepped();
-  mDeviceThread->waitUntilStepped();
+  mCommunicationThread->waitUntilStepped();
+  mCommunicationThread->waitUntilStepped();
+  mCommunicationThread->waitUntilStepped();
 }
 
 void cedar::dev::Component::stopCommunication()
@@ -1307,10 +1307,10 @@ void cedar::dev::Component::stopCommunication()
   QMutexLocker locker_general(&mGeneralAccessLock);
 
   // first, stop the thread
-  mDeviceThread->requestStop();
+  mCommunicationThread->requestStop();
 
   // make sure it is actually stopped
-  mDeviceThread->stop();
+  mCommunicationThread->stop();
 
   mRunningComponentInstances.erase( this );
 
@@ -1335,40 +1335,40 @@ void cedar::dev::Component::stop()
   stopCommunication();
 }
 
-cedar::unit::Time cedar::dev::Component::getDeviceStepSize()
+cedar::unit::Time cedar::dev::Component::getCommunicationStepSize()
 {
-  return mDeviceThread->getStepSize();
+  return mCommunicationThread->getStepSize();
 }
 
 void cedar::dev::Component::setStepSize(const cedar::unit::Time& time)
 {
-  mDeviceThread->setStepSize(time);
+  mCommunicationThread->setStepSize(time);
 }
 
 void cedar::dev::Component::setIdleTime(const cedar::unit::Time& time)
 {
-  mDeviceThread->setIdleTime(time);
+  mCommunicationThread->setIdleTime(time);
 }
 
 void cedar::dev::Component::setSimulatedTime(const cedar::unit::Time& time)
 {
-  mDeviceThread->setSimulatedTime(time);
+  mCommunicationThread->setSimulatedTime(time);
 }
 
 bool cedar::dev::Component::isRunning()
 {
-  return mDeviceThread->isRunning();
+  return mCommunicationThread->isRunning();
 }
 
 bool cedar::dev::Component::isCommunicating()
 {
   //@todo: add a check if the channel is waiting for async feedback
-  return mDeviceThread->isRunning();
+  return mCommunicationThread->isRunning();
 }
 
 bool cedar::dev::Component::isRunningNolocking()
 {
-  return mDeviceThread->isRunningNolocking();
+  return mCommunicationThread->isRunningNolocking();
 }
 
 void cedar::dev::Component::startTimer(double)
@@ -1417,7 +1417,7 @@ cv::Mat cedar::dev::Component::differentiateDevice(cedar::unit::Time dt, cv::Mat
 //  std::cout << "Differentiate once!" << std::endl;
 //  std::cout << data << std::endl;
 //  std::cout << dt << std::endl;
-//  std::cout << "step size: " << this->mDeviceThread->getStepSize() << std::endl;
+//  std::cout << "step size: " << this->mCommunicationThread->getStepSize() << std::endl;
 //  std::cout << this->mMeasurementData->getUserBufferUnlocked(type) << std::endl;
 
   double unitless = dt / (1.0 * cedar::unit::second);
@@ -1441,7 +1441,7 @@ cv::Mat cedar::dev::Component::differentiateDeviceTwice(cedar::unit::Time dt, cv
 //  std::cout << "Differentiate twice!" << std::endl;
 //  std::cout << data << std::endl;
 //  std::cout << dt << std::endl;
-//  std::cout << "step size: " << this->mDeviceThread->getStepSize() << std::endl;
+//  std::cout << "step size: " << this->mCommunicationThread->getStepSize() << std::endl;
   double unitless = dt / (1.0 * cedar::unit::second);
 
   if (unitless == 0.0)
@@ -1519,7 +1519,7 @@ void cedar::dev::Component::brakeNow()
   else
   {
     // force sending the command
-    this->mDeviceThread->singleStep();
+    this->mCommunicationThread->singleStep();
 
     // paranoid:
     clearUserCommand(); 
@@ -1572,8 +1572,8 @@ void cedar::dev::Component::setController(ComponentDataType type, cedar::dev::Co
 
 void cedar::dev::Component::waitUntilCommunicated() const
 {
-  CEDAR_ASSERT( mDeviceThread );
-  mDeviceThread->waitUntilStepped();
+  CEDAR_ASSERT( mCommunicationThread );
+  mCommunicationThread->waitUntilStepped();
 
   // include any waiting for synchronous responses here ...
 }

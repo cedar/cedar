@@ -245,7 +245,7 @@ int main(int argc, char **argv)
   // create the worker thread
   WorkerThread worker(arm, target);
   //worker.setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
-  worker.setStepSize(arm->getDeviceStepSize());
+  worker.setStepSize(arm->getCommunicationStepSize());
 
   // start everything
   arm->startCommunication();

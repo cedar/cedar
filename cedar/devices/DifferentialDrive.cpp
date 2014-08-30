@@ -202,7 +202,7 @@ void cedar::dev::DifferentialDrive::setWheelSpeed(const std::vector<cedar::unit:
   mat.at<double>(0,0) = wheelSpeed[0] / cedar::unit::DEFAULT_VELOCITY_UNIT;
   mat.at<double>(1,0) = wheelSpeed[1] / cedar::unit::DEFAULT_VELOCITY_UNIT;
 
-  setUserCommandBuffer( cedar::dev::DifferentialDrive::WHEEL_SPEED, mat );
+  setUserSideCommandBuffer( cedar::dev::DifferentialDrive::WHEEL_SPEED, mat );
 }
 
 

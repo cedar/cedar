@@ -297,7 +297,7 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
     auto command_type = component->getCommandTypeForName(name);
 
     auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
-    component->setUserCommandBuffer(command_type, mat_data->getData());
+    component->setUserSideCommandBuffer(command_type, mat_data->getData());
   }
 }
 
