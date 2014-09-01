@@ -146,4 +146,52 @@ Labels can be used to put text in a cell. They have the following format:
 }
 @endcode
 
+@section ArchitectureWidgets_Templates Row Contents: Templates
+
+If you have a structure that repeats (e.g., you always plot an elementary behavior group the same way), templates may
+simplify your live. Here's an example of how to make a template called EB and add it to the architecture widget:
+@code
+{
+    "templates":
+    {
+        "EB":
+        [
+            {
+                "row": "0",
+                "column": "0",
+                "row stretch": "0",
+                "type": "label",
+                "text": "<EB NAME>"
+            },
+            {
+                "row": "1",
+                "column": "0",
+                "data":
+                [
+                    {"intention": "<EB NAME>.intention node[BUFFER].activation"},
+                    {"intention output": "<EB NAME>.intention node[OUTPUT].sigmoided activation"},
+                    {"CoS": "<EB NAME>.CoS node[BUFFER].activation"},
+                    {"CoS output": "<EB NAME>.CoS node[OUTPUT].sigmoided activation"}
+                ]
+            }
+        ]
+    },
+    "entries":
+    [
+        {
+            "row": "2",
+            "column": "0",
+            "type": "template",
+            "template name": "EB",
+            "substitutions": 
+            {
+                "<EB NAME>": "EB learn object"
+            }
+        },
+    ]
+}
+@endcode
+Note, that templates are always instantiated with relative rows/columns, i.e., the label in the above example will be in
+row 2, the plot in row 3.
+
 */
