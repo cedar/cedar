@@ -50,6 +50,7 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
+  gui/stepViews/BoostView.h
   gui/stepViews/StaticGainView.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h

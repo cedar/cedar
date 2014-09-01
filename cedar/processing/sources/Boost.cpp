@@ -38,6 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/stepViews/BoostView.h"
 #include "cedar/processing/sources/Boost.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -58,7 +59,7 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::sources::Boost>
+      new ElementDeclarationTemplate<cedar::proc::sources::Boost, cedar::proc::gui::BoostView>
       (
         "Sources",
         "cedar.processing.sources.Boost"

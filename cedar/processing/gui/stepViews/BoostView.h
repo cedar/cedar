@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_STATIC_GAIN_VIEW_H
-#define CEDAR_PROC_GUI_STATIC_GAIN_VIEW_H
+#ifndef CEDAR_PROC_GUI_BOOST_VIEW_H
+#define CEDAR_PROC_GUI_BOOST_VIEW_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,7 +44,7 @@
 #include "cedar/processing/gui/DefaultConnectableIconView.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/stepViews/StaticGainView.fwd.h"
+#include "cedar/processing/gui/stepViews/BoostView.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -52,7 +52,7 @@
 
 /*!@brief Responsible for changing the icon of StaticGains.
  */
-class cedar::proc::gui::StaticGainView : public QObject, public cedar::proc::gui::DefaultConnectableIconView
+class cedar::proc::gui::BoostView : public QObject, public cedar::proc::gui::DefaultConnectableIconView
 {
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
-  void updateIconWeight();
+  void updateIcon();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -100,7 +100,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::gui::StaticGainView
+}; // class cedar::proc::gui::BoostView
 
-#endif // CEDAR_PROC_GUI_STATIC_GAIN_VIEW_H
+#endif // CEDAR_PROC_GUI_BOOST_VIEW_H
 
