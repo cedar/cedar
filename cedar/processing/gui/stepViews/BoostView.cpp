@@ -38,9 +38,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/stepViews/StaticGainView.h"
+#include "cedar/processing/gui/stepViews/BoostView.h"
 #include "cedar/processing/Connectable.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -52,29 +52,25 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::StaticGainView::connectableChanged()
+void cedar::proc::gui::BoostView::connectableChanged()
 {
   this->cedar::proc::gui::DefaultConnectableIconView::connectableChanged();
 
-  auto parameter = this->getConnectable()->getParameter("gain factor");
-  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(updateIconWeight()));
+  auto parameter = this->getConnectable()->getParameter("active");
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(updateIcon()));
 
-  this->updateIconWeight();
+  this->updateIcon();
 }
 
-void cedar::proc::gui::StaticGainView::updateIconWeight()
+void cedar::proc::gui::BoostView::updateIcon()
 {
-  auto parameter = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleParameter>(this->getConnectable()->getParameter("gain factor"));
-  if (parameter->getValue() > 0.0)
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::ConstBoolParameter>(this->getConnectable()->getParameter("active"));
+  if (parameter->getValue())
   {
-    this->setIconPath(":/steps/static_gain_green.svg");
-  }
-  else if (parameter->getValue() < 0.0)
-  {
-    this->setIconPath(":/steps/static_gain_red.svg");
+    this->setIconPath(":/steps/boost.svg");
   }
   else
   {
-    this->setIconPath(":/steps/static_gain_zero.svg");
+    this->setIconPath(":/steps/boost_off.svg");
   }
 }
