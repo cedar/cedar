@@ -121,6 +121,18 @@ You can write this as
 }
 @endcode
 
+If you want to specify settings for the plots themselves, you can do so by adding a "plot configuration" node:
+@code
+{
+    "data": {"activation": "0d field[BUFFER].activation"},
+    "plot configuration":
+    {
+        "y axis limits": {"lower limit": "-5", "upper limit": "5"},
+        "apply y axis limits": "true"
+    }
+}
+@endcode
+Note that the accepted settings depend on the plot class that is opened. 
 
 @section ArchitectureWidgets_Labels Row Contents: Labels
 
