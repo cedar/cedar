@@ -1174,7 +1174,11 @@ cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::N
 
     if (!group)
     {
-      CEDAR_THROW(cedar::aux::InvalidNameException, "The given name does not specify a proper path in this group.");
+      CEDAR_THROW
+      (
+        cedar::aux::InvalidNameException,
+        "The path \"" + name.toString() + "\" does not specify a proper path in the group \"" + this->getName() + "\"."
+      );
     }
 
     return group->getElement(rest);
