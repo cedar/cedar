@@ -122,7 +122,6 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::Config
   //!@todo Exception
   CEDAR_ASSERT(data);
 
-  cedar::aux::gui::PlotInterface* plot = nullptr;
   auto plot_type = readOptional<std::string>(entry, "plot type", "default");
 
   cedar::aux::gui::ConstPlotDeclarationPtr declaration;
@@ -149,9 +148,16 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::Config
       return label;
     }
   }
-  plot = declaration->createPlot();
+  cedar::aux::gui::PlotInterface* plot = declaration->createPlot();
+  CEDAR_DEBUG_ASSERT(plot != nullptr);
 
   plot->plot(data, first_data_title);
+
+  auto cfg_i = entry.find("plot configuration");
+  if (cfg_i != entry.not_found())
+  {
+    plot->readConfiguration(cfg_i->second);
+  }
 
   if (has_multiple_data)
   {
@@ -191,6 +197,7 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::Config
       }
     }
   }
+
   return plot;
 }
 
