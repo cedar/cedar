@@ -460,6 +460,13 @@ void cedar::proc::Group::startTriggers(bool wait)
     }
   }
 
+  std::set<GroupPtr> subgroups;
+  this->listSubgroups(subgroups);
+  for (auto subgroup : subgroups)
+  {
+    subgroup->startTriggers(wait);
+  }
+
   if (wait)
   {
     for (auto trigger : triggers)
@@ -482,6 +489,13 @@ void cedar::proc::Group::stopTriggers(bool wait)
     {
       trigger->stop();
     }
+  }
+
+  std::set<GroupPtr> subgroups;
+  this->listSubgroups(subgroups);
+  for (auto subgroup : subgroups)
+  {
+    subgroup->stopTriggers(wait);
   }
 
   if (wait)
@@ -574,6 +588,17 @@ void cedar::proc::Group::listSubgroups(std::set<cedar::proc::ConstGroupPtr>& sub
     {
       subgroups.insert(group);
     }
+  }
+}
+
+void cedar::proc::Group::listSubgroups(std::set<cedar::proc::GroupPtr>& subgroups)
+{
+  subgroups.clear();
+  std::set<cedar::proc::ConstGroupPtr> const_groups;
+  const_cast<const cedar::proc::Group*>(this)->listSubgroups(const_groups);
+  for (auto iter : const_groups)
+  {
+    subgroups.insert(boost::const_pointer_cast<cedar::proc::Group>(iter));
   }
 }
 
