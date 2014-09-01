@@ -490,9 +490,13 @@ public:
     return elements;
   }
 
-  /*!@brief This method lists all groups that are children of this group.
+  /*!@brief This method lists all groups that are children of this group (const).
    */
   void listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const;
+
+  /*!@brief This method lists all groups that are children of this group.
+   */
+  void listSubgroups(std::set<cedar::proc::GroupPtr>& subgroups);
 
   /*!@brief Returns a unique identifier containing the given string.
    *
