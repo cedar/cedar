@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/StaticGainView.h"
+#include "cedar/processing/gui/stepViews/StaticGainView.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/typecheck/IsMatrix.h"
 #include "cedar/processing/DataSlot.h"
