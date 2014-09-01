@@ -54,6 +54,7 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/DataConnection.h"
+#include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -95,7 +96,8 @@ mpPerformanceOverview(nullptr),
 mpConsistencyDock(nullptr),
 mpBoostControlDock(nullptr),
 mpBoostControl(nullptr),
-mSuppressCloseDialog(false)
+mSuppressCloseDialog(false),
+mpExperimentDialog(nullptr)
 {
   // setup the (automatically generated) ui components
   this->setupUi(this);
@@ -265,6 +267,7 @@ mSuppressCloseDialog(false)
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
+  QObject::connect(mpActionExperiments, SIGNAL(triggered()), this, SLOT(showExperimentDialog()));
 
   QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
   QObject::connect(mpActionParameterLinker, SIGNAL(triggered()), this, SLOT(openParameterLinker()));
@@ -391,6 +394,15 @@ void cedar::proc::gui::Ide::showBoostControl()
   {
     this->mpBoostControlDock->show();
   }
+}
+
+void cedar::proc::gui::Ide::showExperimentDialog()
+{
+  if (this->mpExperimentDialog == NULL)
+  {
+    this->mpExperimentDialog = new cedar::proc::gui::ExperimentDialog(this);
+  }
+  mpExperimentDialog->show();
 }
 
 void cedar::proc::gui::Ide::showConsistencyChecker()
@@ -748,6 +760,9 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
   // Without this, the GUI crashes when exiting in certain circumstances (see unit test gui_cedar)
   this->mpPropertyTable->clear();
   pEvent->accept();
+
+  // !@todo move this somewhere else?
+  delete this->mpExperimentDialog;
 }
 
 void cedar::proc::gui::Ide::storeSettings()
@@ -1557,6 +1572,10 @@ void cedar::proc::gui::Ide::loadPlotGroupsIntoComboBox()
   }
 }
 
+cedar::proc::gui::GroupPtr cedar::proc::gui::Ide::getGroup()
+{
+  return this->mGroup;
+}
 
 void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 {

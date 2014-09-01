@@ -142,6 +142,7 @@
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionExperiments"/>
     <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
@@ -800,7 +801,15 @@
     <string>Performance overview ...</string>
    </property>
   </action>
-  <action name="mpActionCopy">
+  <action name="mpActionExperiments">
+   <property name="text">
+    <string>Experiments...</string>
+   </property>
+   <property name="toolTip">
+    <string>Framwork for starting experiments</string>
+   </property>
+  </action>
+    <action name="mpActionCopy">
    <property name="text">
     <string>Copy step</string>
    </property>
@@ -808,6 +817,20 @@
     <string>Ctrl+C</string>
    </property>
   </action>
+  <action name="mpActionPasteConfiguration">
+   <property name="text">
+    <string>Paste step configuration</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+V</string>
+   </property>
+  </action>
+  <action name="mpActionParameterLinker">
+   <property name="text">
+    <string>Parameter linking ...</string>
+   </property>
+  </action>
+
   <action name="mpActionPasteConfiguration">
    <property name="text">
     <string>Paste step configuration</string>
