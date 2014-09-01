@@ -101,7 +101,6 @@ namespace cedar
         public:
           // members
           cedar::aux::gui::ConstPlotDeclarationPtr mpPlotDeclaration;
-          QLabel* mpLabel;
           QPushButton* mpPlotSelector;
           QWidget* mpPlotContainer;
           cedar::aux::gui::PlotInterface* mpPlotter;
@@ -112,6 +111,7 @@ namespace cedar
           std::string mTitle;
 
           std::map<cedar::aux::ConstDataPtr, const std::string> mMultiPlotData;
+          QLabel* mpLabel;
         };
         CEDAR_GENERATE_POINTER_TYPES(LabeledPlot);
       }
@@ -191,7 +191,14 @@ private:
   void removePlotOfExternalData(cedar::aux::ConstDataPtr pData);
   //!@brief returns the next free grid slot
   std::tuple<int, int> usingNextFreeGridSlot();
+
+  //! Returns (row, column) corresponding to the given LabeledPlot. Note, that this refers to the title row of the plot.
+  std::tuple<int, int> findGridPositionOf(LabeledPlotPtr plot);
+
   cedar::aux::ConfigurationNode serialize(const cedar::proc::ElementDeclaration::DataList& dataList) const;
+
+  //!@brief removes a widget from the grid layout
+  void removeFromQGridlayout(QLayoutItem* item);
 
   //!@brief removes a widget from the grid layout
   void remove_qgridlayout_widget(QWidget* widget);
