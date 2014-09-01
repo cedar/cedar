@@ -96,13 +96,21 @@ private:
 
   QWidget* readLabel(const cedar::aux::ConfigurationNode& entry);
 
+  void addEntry(const cedar::aux::ConfigurationNode& entry, int rowOffset = 0, int colOffset = 0);
+
+  void addTemplate(int row, int column, const cedar::aux::ConfigurationNode& entry);
+
+  void readTemplates(const cedar::aux::ConfigurationNode& templates);
+
+  void applySubstitutions(cedar::aux::ConfigurationNode& target, const cedar::aux::ConfigurationNode& substitutions);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  // none yet
+  std::map<std::string, cedar::aux::ConfigurationNode> mTemplates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

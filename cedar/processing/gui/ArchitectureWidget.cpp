@@ -50,6 +50,7 @@
 // SYSTEM INCLUDES
 #include <QGridLayout>
 #include <QLabel>
+#include <deque>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -201,6 +202,18 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::Config
   return plot;
 }
 
+void cedar::proc::gui::ArchitectureWidget::readTemplates(const cedar::aux::ConfigurationNode& templates)
+{
+  for (const auto& name_template_cfg_pair : templates)
+  {
+    const auto& name = name_template_cfg_pair.first;
+    const auto& template_cfg = name_template_cfg_pair.second;
+
+    //!@todo Check for duplicates
+    this->mTemplates[name] = template_cfg;
+  }
+}
+
 void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   auto entries_iter = node.find("entries");
@@ -214,49 +227,114 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
     return;
   }
 
-  auto grid_layout = dynamic_cast<QGridLayout*>(this->layout());
+  auto templates_iter = node.find("templates");
+  if (templates_iter != node.not_found())
+  {
+    this->readTemplates(templates_iter->second);
+  }
 
   for (const auto& entry_pair : entries_iter->second)
   {
     const auto& entry = entry_pair.second;
+    this->addEntry(entry);
+  }
+}
 
-    auto row = readOptional<int>(entry, "row", 0);
-    auto column = readOptional<int>(entry, "column", 0);
-    auto type = readOptional<std::string>(entry, "type", "plot");
+void cedar::proc::gui::ArchitectureWidget::addEntry(const cedar::aux::ConfigurationNode& entry, int rowOffset, int colOffset)
+{
+  auto grid_layout = cedar::aux::asserted_cast<QGridLayout*>(this->layout());
 
-    auto row_stretch = readOptional<int>(entry, "row stretch", 1);
-    auto column_stretch = readOptional<int>(entry, "column stretch", 1);
-    grid_layout->setRowStretch(row, row_stretch);
-    grid_layout->setColumnStretch(column, column_stretch);
+  auto row = readOptional<int>(entry, "row", 0) + rowOffset;
+  auto column = readOptional<int>(entry, "column", 0) + colOffset;
+  auto type = readOptional<std::string>(entry, "type", "plot");
 
-    int column_span = readOptional<int>(entry, "column span", 1);
-    int row_span = readOptional<int>(entry, "row span", 1);
+  auto row_stretch = readOptional<int>(entry, "row stretch", 1);
+  auto column_stretch = readOptional<int>(entry, "column stretch", 1);
+  grid_layout->setRowStretch(row, row_stretch);
+  grid_layout->setColumnStretch(column, column_stretch);
 
-    QWidget* widget = nullptr;
-    if (type == "plot")
+  int column_span = readOptional<int>(entry, "column span", 1);
+  int row_span = readOptional<int>(entry, "row span", 1);
+
+  QWidget* widget = nullptr;
+  if (type == "plot")
+  {
+    widget = this->readPlot(entry);
+  }
+  else if (type == "label")
+  {
+    widget = this->readLabel(entry);
+  }
+  else if (type == "template")
+  {
+    this->addTemplate(row, column, entry);
+  }
+  else
+  {
+    auto label = new QLabel(QString::fromStdString("Unknown cell type: \"" + type + "\"."));
+    label->setWordWrap(true);
+    widget = label;
+  }
+
+  if (widget != nullptr)
+  {
+    grid_layout->addWidget(widget, row, column, row_span, column_span);
+
+    auto style = readOptional<std::string>(entry, "style sheet", "");
+    if (!style.empty())
     {
-      widget = this->readPlot(entry);
+      widget->setStyleSheet(QString::fromStdString(style));
     }
-    else if (type == "label")
-    {
-      widget = this->readLabel(entry);
-    }
-    else
-    {
-      auto label = new QLabel(QString::fromStdString("Unknown cell type: \"" + type + "\"."));
-      label->setWordWrap(true);
-      widget = label;
-    }
+  }
+}
 
-    if (widget != nullptr)
-    {
-      grid_layout->addWidget(widget, row, column, row_span, column_span);
+void cedar::proc::gui::ArchitectureWidget::addTemplate(int row, int column, const cedar::aux::ConfigurationNode& entry)
+{
+  auto template_name = readOptional<std::string>(entry, "template name", "");
+  if (template_name.empty())
+  {
+    //!@todo error
+    return;
+  }
 
-      auto style = readOptional<std::string>(entry, "style sheet", "");
-      if (!style.empty())
-      {
-        widget->setStyleSheet(QString::fromStdString(style));
-      }
+  auto iter = this->mTemplates.find(template_name);
+  if (iter == this->mTemplates.end())
+  {
+    //!@todo error
+    return;
+  }
+
+  auto substitutions_i = entry.find("substitutions");
+  std::map<std::string, std::string> substitutions;
+
+  auto conf = iter->second;
+
+  // modify the configuration: apply substitutions
+  if (substitutions_i != entry.not_found())
+  {
+    this->applySubstitutions(conf, substitutions_i->second);
+  }
+
+  for (const auto& entry_pair : conf)
+  {
+    this->addEntry(entry_pair.second, row, column);
+  }
+}
+
+void cedar::proc::gui::ArchitectureWidget::applySubstitutions(cedar::aux::ConfigurationNode& target, const cedar::aux::ConfigurationNode& substitutions)
+{
+  for (const auto& key_value_pair : substitutions)
+  {
+    std::string key = key_value_pair.first;
+    std::string substitution = key_value_pair.second.get_value<std::string>();
+
+    for (auto& name_child_pair : target)
+    {
+      std::string data = name_child_pair.second.data();
+      data = cedar::aux::replace(data, key, substitution);
+      name_child_pair.second.data() = data;
+
+      this->applySubstitutions(name_child_pair.second, substitutions);
     }
   }
 }
