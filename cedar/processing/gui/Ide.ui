@@ -830,20 +830,6 @@
     <string>Parameter linking ...</string>
    </property>
   </action>
-
-  <action name="mpActionPasteConfiguration">
-   <property name="text">
-    <string>Paste step configuration</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+V</string>
-   </property>
-  </action>
-  <action name="mpActionParameterLinker">
-   <property name="text">
-    <string>Parameter linking ...</string>
-   </property>
-  </action>
   <action name="mpActionSaveSerializableData">
    <property name="text">
     <string>Save serializable data ...</string>
