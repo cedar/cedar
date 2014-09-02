@@ -107,14 +107,6 @@ _mSigmoid
   )
 )
 {
-  //!@todo due to bug (issue #883), we need to apply the threshold and beta manually
-  if (auto sigmoid = boost::dynamic_pointer_cast<cedar::aux::math::AbsSigmoid>(this->_mSigmoid->getValue()))
-  {
-    sigmoid->setThreshold(0.5);
-    sigmoid->setBeta(1000.0);
-  }
-
-
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
@@ -165,18 +157,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    /* if (cedar::dyn::ConstSpaceCodePtr input = boost::dynamic_pointer_cast<const cedar::dyn::SpaceCode>(data))
-    {
-      if (!this->isMatrixCompatibleInput(input->getData()))
-      {
-        return cedar::proc::DataSlot::VALIDITY_ERROR;
-      }
-      else
-      {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
-      }
-    }
-    else */ if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
