@@ -83,6 +83,9 @@ public:
   //! Add an accepted amount of channels. By default, all channels are accepted.
   void addAcceptedNumberOfChannels(unsigned int numberOfChannels);
 
+  //! Add accepted minimum size (size of vector determines dimensionality)
+  void addAcceptedMinimumSizes(std::vector<boost::optional<unsigned int> > minimumSizes);
+
   //! Sets whether the matrix can be empty
   void acceptsEmptyMatrix(bool accepts);
 
@@ -110,6 +113,8 @@ private:
   std::vector<unsigned int> mAcceptedNumberOfChannels;
 
   std::vector<int> mAcceptedTypes;
+
+  std::map<unsigned int, std::vector<boost::optional<unsigned int> > > mAcceptedMinimumSizes;
 
   bool mAcceptsEmptyMatrix;
 
