@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -93,6 +93,14 @@
     <property name="title">
      <string>Windows</string>
     </property>
+    <widget class="QMenu" name="mpMenuArchitecturePlots">
+     <property name="title">
+      <string>architecture widgets</string>
+     </property>
+     <addaction name="actionNone"/>
+    </widget>
+    <addaction name="separator"/>
+    <addaction name="mpMenuArchitecturePlots"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -134,6 +142,7 @@
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionExperiments"/>
     <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
@@ -216,8 +225,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>424</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -792,7 +801,15 @@
     <string>Performance overview ...</string>
    </property>
   </action>
-  <action name="mpActionCopy">
+  <action name="mpActionExperiments">
+   <property name="text">
+    <string>Experiments...</string>
+   </property>
+   <property name="toolTip">
+    <string>Framwork for starting experiments</string>
+   </property>
+  </action>
+    <action name="mpActionCopy">
    <property name="text">
     <string>Copy step</string>
    </property>
@@ -838,6 +855,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionNone">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>none</string>
    </property>
   </action>
  </widget>

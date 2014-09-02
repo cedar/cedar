@@ -69,4 +69,7 @@ mPlotDeclaration(new cedar::aux::StringParameter(this, "plotDeclaration", plotDe
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-// none yet
+void cedar::proc::PlotData::setPlotDeclaration(const std::string& newDeclaration)
+{
+  this->mPlotDeclaration->setValue(newDeclaration);
+}

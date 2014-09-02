@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Arguments.fwd.h"
@@ -188,6 +189,15 @@ public:
 
   //! Returns true if the step is started, i.e., if the last onStart call was not followed by an onStop call.
   bool isStarted() const;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(Started, void());
+
+public:
+  CEDAR_DECLARE_SIGNAL(Stopped, void());
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

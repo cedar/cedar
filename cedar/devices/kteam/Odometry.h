@@ -79,7 +79,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief Updates the current position.
+   *
+   * This function is called by timerEvent() of MobileRobotModel. It calls calculatePositionAndOrientation().
+   */
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -92,12 +96,6 @@ private:
    * @param[in] encoders the encoder values of the left and right wheel
    */
   void calculatePositionAndOrientation(const std::vector<int>& encoders);
-
-  /*!@brief Updates the current position.
-   *
-   * This function is called by timerEvent() of MobileRobotModel. It calls calculatePositionAndOrientation().
-   */
-  void update();
 
   /*!@brief Calculates the distance the robot has moved since the last update.
    * @param[in] oldEncoders the encoder values of both wheels at time step t-1

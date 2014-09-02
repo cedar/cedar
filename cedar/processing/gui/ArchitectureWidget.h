@@ -90,13 +90,27 @@ private:
 
   cedar::aux::ConstDataPtr findData(const std::string& path) const;
 
+  void readDataNode(const cedar::aux::ConfigurationNode& node, std::string& dataPath, std::string& title);
+
+  QWidget* readPlot(const cedar::aux::ConfigurationNode& entry);
+
+  QWidget* readLabel(const cedar::aux::ConfigurationNode& entry);
+
+  void addEntry(const cedar::aux::ConfigurationNode& entry, int rowOffset = 0, int colOffset = 0);
+
+  void addTemplate(int row, int column, const cedar::aux::ConfigurationNode& entry);
+
+  void readTemplates(const cedar::aux::ConfigurationNode& templates);
+
+  void applySubstitutions(cedar::aux::ConfigurationNode& target, const cedar::aux::ConfigurationNode& substitutions);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  // none yet
+  std::map<std::string, cedar::aux::ConfigurationNode> mTemplates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
