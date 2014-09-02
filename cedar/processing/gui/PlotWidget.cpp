@@ -207,12 +207,18 @@ cedar::proc::gui::PlotWidget::PlotWidget
     const cedar::proc::ElementDeclaration::DataList& data
 )
 :
-mDataList(data),
 mConnectable(connectable),
 mGridSpacing(2),
 mColumns(2),
 mpLayout(new QGridLayout())
 {  
+  // make a copy of the data to be plotted
+  this->mDataList.clear();
+  for (const auto& plot_data : data)
+  {
+    this->mDataList.push_back(boost::make_shared<cedar::proc::PlotData>(*plot_data));
+  }
+
   if (mDataList.empty())
   {
     return;
