@@ -7,7 +7,7 @@
     <file>steps/field_1d.svg</file>
     <file>steps/field_2d.svg</file>
     <file>steps/field_3d.svg</file>
-    <file>steps/field_4d.svg</file>
+    <file>steps/field_nd.svg</file>
     <file>steps/field_generic.svg</file>
   </qresource>
 </RCC>
