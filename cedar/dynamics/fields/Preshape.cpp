@@ -107,14 +107,6 @@ _mSigmoid
   )
 )
 {
-  //!@todo due to bug (issue #883), we need to apply the threshold and beta manually
-  if (auto sigmoid = boost::dynamic_pointer_cast<cedar::aux::math::AbsSigmoid>(this->_mSigmoid->getValue()))
-  {
-    sigmoid->setThreshold(0.5);
-    sigmoid->setBeta(1000.0);
-  }
-
-
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
