@@ -329,6 +329,9 @@ private:
   //! Check if the user wants to save. Returns false if the action currently being taken should be cancelled.
   bool checkSave();
 
+  //! Updates the architecture widget menu.
+  void updateArchitectureWidgetsMenu();
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
@@ -337,6 +340,8 @@ private slots:
   void architectureChanged();
 
   void architecturePlotActionTriggered();
+
+  void openManageArchitectureWidgetsDialog();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -212,6 +212,9 @@ public:
   //! Returns the architecture plots for this group.
   const std::map<std::string, cedar::aux::Path>& getArchitectureWidgets() const;
 
+  //! Sets the architecture widgets for this group.
+  void setArchitectureWidgets(const std::map<std::string, cedar::aux::Path>& newWidgets);
+
   //! Displays the architecture plot with the given name.
   void showArchitectureWidget(const std::string& name);
 

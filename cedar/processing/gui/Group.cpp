@@ -235,6 +235,11 @@ const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchi
   return this->_mArchitectureWidgets;
 }
 
+void cedar::proc::gui::Group::setArchitectureWidgets(const std::map<std::string, cedar::aux::Path>& newWidgets)
+{
+  this->_mArchitectureWidgets = newWidgets;
+}
+
 void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
 {
   auto plot_iter = this->_mArchitectureWidgets.find(name);
@@ -246,7 +251,15 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
   }
 
   auto widget = new cedar::proc::gui::ArchitectureWidget(this->getGroup(), this->mpMainWindow);
-  widget->readJson(plot_iter->second.absolute().toString());
+  cedar::aux::Path location = plot_iter->second;
+
+  if (location.isRelative() && !location.exists())
+  {
+    cedar::aux::Path architecture_path = this->mFileName;
+    location = architecture_path.getDirectory() + location;
+  }
+
+  widget->readJson(location);
 
   auto dock = this->createDockWidget(name, widget);
   dock->show();
