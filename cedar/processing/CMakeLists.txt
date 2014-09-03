@@ -57,6 +57,7 @@ cedar_add_library(cedarproc
   experiment/gui/ExperimentItemWidget.h
   experiment/gui/StepPropertyParameter.h
   experiment/gui/TriggerParameter.h
+  gui/ArchitectureWidgetList.h
   gui/stepViews/BoostView.h
   gui/stepViews/StaticGainView.h
   gui/AdvancedParameterLinker.h

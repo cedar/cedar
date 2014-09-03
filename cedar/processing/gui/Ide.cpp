@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/ArchitectureWidgetList.h"
 #include "cedar/processing/gui/FindDialog.h"
 #include "cedar/processing/gui/AdvancedParameterLinker.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
@@ -78,6 +79,7 @@
 #include <QFileDialog>
 #include <QDialogButtonBox>
 #include <QInputDialog>
+#include <QTableWidget>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/detail/json_parser_error.hpp>
 #endif
@@ -1614,9 +1616,18 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
     SLOT(architectureChanged())
   );
 
+  this->updateArchitectureWidgetsMenu();
+}
+
+void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
+{
   // update architecture plots
   QMenu* menu = this->mpMenuArchitecturePlots;
   menu->clear();
+
+  auto manage_action = menu->addAction("manage");
+  QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(openManageArchitectureWidgetsDialog()));
+  menu->addSeparator();
 
   const auto& plots = this->mGroup->getArchitectureWidgets();
   if (plots.empty())
@@ -1632,6 +1643,15 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
       QObject::connect(action, SIGNAL(triggered()), this, SLOT(architecturePlotActionTriggered()));
     }
   }
+}
+
+void cedar::proc::gui::Ide::openManageArchitectureWidgetsDialog()
+{
+  // create a list widget for managing architecture plots
+  auto dialog = new cedar::proc::gui::ArchitectureWidgetList(this, this->mGroup);
+  dialog->exec();
+
+  this->updateArchitectureWidgetsMenu();
 }
 
 void cedar::proc::gui::Ide::architecturePlotActionTriggered()
