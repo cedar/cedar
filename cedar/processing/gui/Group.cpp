@@ -246,7 +246,15 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
   }
 
   auto widget = new cedar::proc::gui::ArchitectureWidget(this->getGroup(), this->mpMainWindow);
-  widget->readJson(plot_iter->second.absolute().toString());
+  cedar::aux::Path location = plot_iter->second;
+
+  if (location.isRelative() && !location.exists())
+  {
+    cedar::aux::Path architecture_path = this->mFileName;
+    location = architecture_path.getDirectory() + location;
+  }
+
+  widget->readJson(location);
 
   auto dock = this->createDockWidget(name, widget);
   dock->show();
