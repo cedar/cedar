@@ -30,6 +30,8 @@ here. The final structureshould look something like this:
 @endcode
 This will allow you to open my_widget.json from cedar's gui.
 
+@remark You can also specify a path relative to the location of the architecture's json file itself. 
+
 Now to the more interesting part: the contents of architecture widget files (my_widget.json in the example above).
 
 Architecture widgets (cedar::proc::gui::ArchitectureWidget) are effectively a grid layout. In each cell of the grid
