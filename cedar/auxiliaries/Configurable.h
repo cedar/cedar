@@ -44,12 +44,12 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/Parameter.fwd.h"
-#include "cedar/auxiliaries/Path.fwd.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -106,10 +106,6 @@ public:
 public:
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  /*!@brief Reads the configuration of this object from the given json file.
-   */
-  void readJson(const std::string& filename);
 
   /*!@brief Reads the configuration of this object from the given json file.
    */

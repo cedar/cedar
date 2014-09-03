@@ -384,13 +384,8 @@ std::string cedar::aux::Configurable::findParameterPath(cedar::aux::ParameterPtr
 
 void cedar::aux::Configurable::readJson(const cedar::aux::Path& filename)
 {
-  this->readJson(filename.absolute().toString(false));
-}
-
-void cedar::aux::Configurable::readJson(const std::string& filename)
-{
   cedar::aux::ConfigurationNode configuration;
-  boost::property_tree::read_json(filename, configuration);
+  boost::property_tree::read_json(filename.absolute().toString(false), configuration);
   this->readConfiguration(configuration);
 }
 
