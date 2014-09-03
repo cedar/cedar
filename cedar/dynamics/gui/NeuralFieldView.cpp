@@ -83,11 +83,8 @@ void cedar::dyn::gui::NeuralFieldView::updateIconDimensionality()
       this->setIconPath(":/cedar/dynamics/gui/steps/field_3d.svg");
       break;
 
-    case 4:
-      this->setIconPath(":/cedar/dynamics/gui/steps/field_4d.svg");
-      break;
-
     default:
-      this->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
+      this->setIconPath(":/cedar/dynamics/gui/steps/field_nd.svg");
+      break;
   }
 }
