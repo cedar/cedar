@@ -96,7 +96,7 @@ public:
   cedar::aux::ObjectParameter(pOwner, name, true)
   {
     this->mDefault = cedar::aux::replace(cedar::aux::objectTypeToString(defaultObject), "::", ".");
-
+    this->mDefaultObject = defaultObject;
     this->makeDefault();
   }
 
@@ -109,6 +109,7 @@ public:
   virtual void makeDefault()
   {
     this->setType(this->mDefault);
+    this->mObject->copyFrom(this->mDefaultObject);
   }
 
   //!@brief Set this parameter to a value read from a configuration node
@@ -208,8 +209,10 @@ private:
   //!@brief The current object instance.
   BaseTypePtr mObject;
 
-  //!@brief The default object instance.
+  //!@brief The default object type.
   std::string mDefault;
+  //!@brief The default object instance.
+  BaseTypePtr mDefaultObject;
 
 }; // class cedar::aux::ObjectParameterTemplate
 

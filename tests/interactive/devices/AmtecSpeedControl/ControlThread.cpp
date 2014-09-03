@@ -52,14 +52,14 @@ ControlThread::ControlThread(
                               double idleTime
                             )
 :
-cedar::aux::LoopedThread(stepSize, idleTime)
+cedar::aux::LoopedThread(cedar::unit::Time(stepSize * cedar::unit::milli * cedar::unit::seconds), cedar::unit::Time(idleTime * cedar::unit::milli * cedar::unit::seconds))
 {
   mpKinematicChain = kinematicChain;
   return;
 }
 
 
-void ControlThread::step(double)
+void ControlThread::step(cedar::unit::Time)
 {
   double current_pos = mpKinematicChain->getJointAngle(JOINT);
   double current_vel = mpKinematicChain->getJointVelocity(JOINT);

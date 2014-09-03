@@ -38,6 +38,7 @@
 #include "ControlThread.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
@@ -67,11 +68,11 @@ int main(int /* argc */, char ** /* argv[] */)
     ControlThread thread(p_kinematic_chain, 100, 0.01);
     std::cout << "moving arm for 5s just by controling velocity..." << std::endl;
     thread.start();
-    thread.wait(5000);
+    cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
     thread.stop();
     thread.wait();
   }
-  catch(std::exception e)
+  catch (std::exception e)
   {
     std::cout << "Exception: " << e.what() << std::endl;
   }
