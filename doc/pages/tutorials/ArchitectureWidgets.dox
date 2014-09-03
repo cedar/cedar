@@ -12,23 +12,14 @@ writing them is not hard and can make it much easier to see what is going on in 
 To add an architecture widget, two things are required. One is the file defining the widget. The other is adding this
 file to your architecture.
 
-Say you have your architecture in a plugin called MyPlugin, and the subfolder widgets contains all your architecture
-widgets, in particular "my_widget.json". Then open your architecture in a text or json editor and locate the root
-group's "ui generic" node (make sure you get the root node, only the widgets in the root group are currently displayed).
-Under this node, there should be an entry "architecture widgets" (if it is not there, add it). Add a path to your widget
-here. The final structureshould look something like this:
-@code
-    "ui generic":
-    {
-        // other json stuff
-        "architecture widgets":
-        {
-            "my widget name": "plugin:\/\/MyPlugin\/widgets\/my_widget.json"
-        },
-        // other json stuff
-    }
-@endcode
-This will allow you to open my_widget.json from cedar's gui.
+Let's assume you'd already have a file defining your architecture widget called "my_widget.json". To add this, open your
+architecture in cedar's gui. Under "Windows" you will find an entry called "architecture widgets". Hit manage, and in
+the dialog that opens, click the add button. A new row will be added. Give your plot a name, e.g., "my widget". Udner
+path, you can specify what file to look for. If you enter "my_widget.json" here, the file will be opened relative to the
+location of the architecture you have loaded (or from the folder in which you started cedar). Note, that you can also
+use any kind of cedar path specification here, e.g., "plugin://MyPlugin/my_widget.json".
+
+@todo Write a tutorial on path specifications, add a reference here.
 
 Now to the more interesting part: the contents of architecture widget files (my_widget.json in the example above).
 
