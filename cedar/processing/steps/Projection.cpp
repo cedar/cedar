@@ -217,8 +217,14 @@ void cedar::proc::steps::Projection::reconfigure()
 
       if (mapped_indices.size() == 2)
       {
-        CEDAR_DEBUG_ASSERT(mapped_indices.at(0) != mapped_indices.at(1));
-
+        if (mapped_indices.at(0) == mapped_indices.at(1))
+        {
+          this->setState(
+                          cedar::proc::Triggerable::STATE_EXCEPTION,
+                          "Cannot map the same dimension onto multiple dimensions."
+                        );
+          return;
+        }
         bool swapped = mapped_indices.at(0) > mapped_indices.at(1);
 
         if (swapped)
