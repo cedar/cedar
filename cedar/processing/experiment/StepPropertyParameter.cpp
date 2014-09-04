@@ -80,7 +80,10 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
     {
       case PARAMETER:
       {
-        mParameterCopy->readFromNode(node.get_child("PropertyParameter"));
+        if (mParameterCopy)
+        {
+          mParameterCopy->readFromNode(node.get_child("PropertyParameter"));
+        }
         break;
       }
       case OUTPUT:
@@ -114,9 +117,12 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
   {
     case PARAMETER:
     {
-      cedar::aux::ConfigurationNode copy_node;
-      mParameterCopy->writeToNode(copy_node);
-      step_node.add_child("PropertyParameter",copy_node);
+      if (mParameterCopy)
+      {
+        cedar::aux::ConfigurationNode copy_node;
+        mParameterCopy->writeToNode(copy_node);
+        step_node.add_child("PropertyParameter",copy_node);
+      }
       break;
     }
     case OUTPUT:
@@ -286,11 +292,11 @@ const std::vector<std::string>& cedar::proc::experiment::StepPropertyParameter::
 
 void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
 {
-
   if (mStep == "" || mProperty == "")
   {
     return;
   }
+
   Experiment* experiment = ExperimentSuperviserSingleton::getInstance()->getExperiment();
   switch (mType)
   {
@@ -298,7 +304,7 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
     {
       cedar::aux::ParameterPtr parameter = experiment->getStepParameter(mStep,mProperty);
       std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
-      mParameterCopy= cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
+      mParameterCopy = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
       mParameterCopy->copyValueFrom(parameter);
       break;
     }
