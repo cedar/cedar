@@ -147,7 +147,7 @@ cedar::proc::DataSlot::VALIDITY
       {
         if (accepted_sizes->second.at(i).is_initialized())
         {
-          if (accepted_sizes->second.at(i).get() != static_cast<unsigned int>(mat_data->getData().size[i]))
+          if (accepted_sizes->second.at(i).get() > static_cast<unsigned int>(mat_data->getData().size[i]))
           {
             info = "The size of dimension " + cedar::aux::toString(i) + " is smaller than the required minimum size of "
                    + cedar::aux::toString(accepted_sizes->second.at(i).get()) + ".";
