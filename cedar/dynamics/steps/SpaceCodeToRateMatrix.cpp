@@ -117,6 +117,11 @@ _mUpperLimit
   cedar::proc::typecheck::Matrix matrix_check;
   matrix_check.addAcceptedDimensionality(3);
   matrix_check.addAcceptedType(CV_32F);
+  std::vector<boost::optional<unsigned int> > minimum_sizes;
+  minimum_sizes.push_back(boost::optional<unsigned int>());
+  minimum_sizes.push_back(boost::optional<unsigned int>());
+  minimum_sizes.push_back(boost::optional<unsigned int>(2));
+  matrix_check.addAcceptedMinimumSizes(minimum_sizes);
   input_slot->setCheck(matrix_check);
 
   this->declareBuffer("weights", mWeights);
