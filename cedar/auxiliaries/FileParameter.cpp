@@ -39,8 +39,29 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/ParameterDeclaration.h"
 
 // SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// parameter declaration
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registerParameter()
+  {
+    typedef cedar::aux::ParameterDeclaration<cedar::aux::FileParameterPtr> Declaration;
+    CEDAR_GENERATE_POINTER_TYPES(Declaration);
+
+    DeclarationPtr declaration(new Declaration("string", "cedar.aux.FileParameter"));
+    declaration->declare();
+
+    return true;
+  }
+
+  bool registered = registerParameter();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

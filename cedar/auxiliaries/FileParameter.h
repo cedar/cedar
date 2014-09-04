@@ -48,6 +48,8 @@
 #include <string>
 
 /*!@brief A parameter for directories on the file system.
+ *
+ *@todo Why doesn't this inherit ParameterTemplate<cedar::aux::Path>?
  */
 class cedar::aux::FileParameter : public cedar::aux::Parameter
 {
@@ -82,7 +84,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode);
+  FileParameter(cedar::aux::Configurable *pOwner = nullptr, const std::string& name = "", Mode mode = READ);
 
   //!@brief A variant of the standard constructor, adding a default value
   FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode, const std::string& defaultValue);
