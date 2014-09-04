@@ -231,9 +231,16 @@ void cedar::proc::steps::Convolution::readConfiguration(const cedar::aux::Config
   mKernelAddedConnection.disconnect();
   mKernelRemovedConnection.disconnect();
 
+  // the convolution must be read completely before it computed again; thus, disconnect the compute signal
+  QObject::disconnect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
+
   this->cedar::proc::Step::readConfiguration(node);
 
   this->transferKernelsToConvolution();
+
+  // reconnect compute signal & recompute the step
+  QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
+  this->recompute();
 
   // reconnect slots
   mKernelAddedConnection
