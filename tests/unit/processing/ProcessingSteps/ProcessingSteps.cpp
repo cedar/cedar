@@ -141,6 +141,14 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
       // try a reset
       testStep->callReset();
 
+      // try to re-read the configuration written by the step
+      {
+        std::cout << "Trying to re-read configuration into existing step." << std::endl;
+        cedar::aux::ConfigurationNode conf;
+        testStep->writeConfiguration(conf);
+        testStep->readConfiguration(conf);
+      }
+
       for (unsigned int i = 0; i < inputs.size(); ++i)
       {
         network->disconnectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
