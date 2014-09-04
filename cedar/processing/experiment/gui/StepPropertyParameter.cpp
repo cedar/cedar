@@ -67,14 +67,13 @@ namespace
 
 cedar::proc::experiment::gui::StepPropertyParameter::StepPropertyParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent)
-,
-mpStep(new QComboBox)
-,
-mpProperty(new QComboBox)
-,
-mpPropertyCopy(NULL)
+cedar::aux::gui::Parameter(pParent),
+mpStep(new QComboBox()),
+mpProperty(new QComboBox()),
+mpPropertyCopy(nullptr)
 {
+  this->mpStep->setEditable(true);
+  this->mpStep->setInsertPolicy(QComboBox::NoInsert);
 
   QHBoxLayout* layout = new QHBoxLayout;
   layout->setMargin(0);
@@ -85,9 +84,6 @@ mpPropertyCopy(NULL)
   layout->addWidget(mpProperty);
   //layout->addWidget(new QLabel(QString::fromStdString("=")));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-
-
-
 }
 
 cedar::proc::experiment::gui::StepPropertyParameter::~StepPropertyParameter()
