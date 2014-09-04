@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
 #include "cedar/auxiliaries/ObjectListParameter.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
@@ -381,11 +382,10 @@ std::string cedar::aux::Configurable::findParameterPath(cedar::aux::ParameterPtr
   CEDAR_THROW(cedar::aux::NotFoundException, "Could not locate parameter \"" + findParameter->getName() + "\".");
 }
 
-
-void cedar::aux::Configurable::readJson(const std::string& filename)
+void cedar::aux::Configurable::readJson(const cedar::aux::Path& filename)
 {
   cedar::aux::ConfigurationNode configuration;
-  boost::property_tree::read_json(filename, configuration);
+  boost::property_tree::read_json(filename.absolute().toString(false), configuration);
   this->readConfiguration(configuration);
 }
 

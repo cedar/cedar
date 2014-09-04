@@ -68,6 +68,11 @@ cedar::aux::gui::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::aux::gui::Parameter::setReadOnly(bool readOnly)
+{
+  this->setDisabled(readOnly);
+}
+
 void cedar::aux::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParameter)
 {
   // disconnect old slots if a parameter was already set

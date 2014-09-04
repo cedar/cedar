@@ -45,6 +45,8 @@
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/PlotData.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/gui/DefaultConnectableIconView.h"
+#include "cedar/processing/gui/ConnectableIconView.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
@@ -171,6 +173,8 @@ public:
     return this->mDefaultPlot;
   }
 
+  virtual cedar::proc::gui::ConnectableIconView* createIconView() const = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -218,7 +222,7 @@ private:
  *
  * @todo This class should get its own header file
  */
-template <class DerivedClass>
+template <class DerivedClass, class IconView = cedar::proc::gui::DefaultConnectableIconView>
 class cedar::proc::ElementDeclarationTemplate
     :
     public cedar::aux::PluginDeclarationTemplate
@@ -255,6 +259,11 @@ public:
     classId
   )
   {
+  }
+
+  cedar::proc::gui::ConnectableIconView* createIconView() const
+  {
+    return new IconView();
   }
 
   void declare() const
