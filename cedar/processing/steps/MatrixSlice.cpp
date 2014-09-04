@@ -352,7 +352,7 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
 
 void cedar::proc::steps::MatrixSlice::rangeChanged()
 {
-  if (!this->mInput)
+  if (!this->mInput || !this->allInputsValid())
   {
     return;
   }
