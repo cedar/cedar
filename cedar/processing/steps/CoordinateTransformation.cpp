@@ -397,6 +397,10 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
 
 void cedar::proc::steps::CoordinateTransformation::recompute()
 {
+  if (!this->allInputsValid())
+  {
+    return;
+  }
   cv::Mat old_output = this->mOutput->getData();
   this->createMap();
 
