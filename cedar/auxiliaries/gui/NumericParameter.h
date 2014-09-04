@@ -181,6 +181,13 @@ public:
     WidgetPolicy::setValue(this->mpWidget, value);
   }
 
+  //! Override from the parent class.
+  void setReadOnly(bool readOnly)
+  {
+    CEDAR_DEBUG_ASSERT(this->mpWidget != nullptr);
+    this->mpWidget->setReadOnly(readOnly);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

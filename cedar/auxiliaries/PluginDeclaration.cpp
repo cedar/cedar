@@ -68,6 +68,27 @@ cedar::aux::PluginDeclaration::~PluginDeclaration()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+QString cedar::aux::PluginDeclaration::determinedIconPath() const
+{
+  QResource existance_test(QString::fromStdString(this->getIconPath()));
+  if (existance_test.isValid())
+  {
+    auto icon = QIcon(QString::fromStdString(this->getIconPath()));
+    if (icon.isNull())
+    {
+      return ":/steps/no_icon.svg";
+    }
+    else
+    {
+      return QString::fromStdString(this->getIconPath());
+    }
+  }
+  else
+  {
+    return ":/steps/broken_icon.svg";
+  }
+}
+
 std::string cedar::aux::PluginDeclaration::getPluginType() const
 {
   return std::string();

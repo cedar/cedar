@@ -104,6 +104,14 @@ cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::HistoryPlot0D::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::aux::gui::MultiPlotInterface::readConfiguration(node);
+#ifdef CEDAR_USE_QWT
+  this->mpHistoryPlot->readConfiguration(node);
+#endif // CEDAR_USE_QWT
+}
+
 bool cedar::aux::gui::HistoryPlot0D::canAppend(cedar::aux::ConstDataPtr data) const
 {
   auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);

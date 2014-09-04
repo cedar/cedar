@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
@@ -106,10 +107,9 @@ public:
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  /*!@brief create a tree of type cedar::aux::ConfigurationNode from a json file and try to read the configuration
-   * afterward
+  /*!@brief Reads the configuration of this object from the given json file.
    */
-  void readJson(const std::string& filename);
+  void readJson(const cedar::aux::Path& filename);
 
   /*!@brief   Reads the configuration from an INI file.
    *

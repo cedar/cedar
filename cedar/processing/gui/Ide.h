@@ -50,6 +50,7 @@
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/gui/ExperimentDialog.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"
 #include "cedar/processing/gui/Ide.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
@@ -99,6 +100,8 @@ public:
    */
   void resetTo(cedar::proc::gui::GroupPtr network);
 
+  cedar::proc::gui::GroupPtr getGroup();
+  
   //! set if close dialog should be suppressed
   void suppressCloseDialog(bool suppress)
   {
@@ -225,6 +228,9 @@ public slots:
   //!@brief shows/hides all plot windows of every step
   void toggleVisibilityOfPlots(bool hidden = false);
 
+  //!@brief shows the experiment dialog widget
+  void showExperimentDialog();
+
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);
 
@@ -323,12 +329,19 @@ private:
   //! Check if the user wants to save. Returns false if the action currently being taken should be cancelled.
   bool checkSave();
 
+  //! Updates the architecture widget menu.
+  void updateArchitectureWidgetsMenu();
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
   void globalTimeFactorSpinboxChanged(double value);
 
   void architectureChanged();
+
+  void architecturePlotActionTriggered();
+
+  void openManageArchitectureWidgetsDialog();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -382,6 +395,9 @@ private:
   bool mSuppressCloseDialog;
 
   cedar::proc::gui::FindDialog* mpFindDialog;
+
+  //! Widget for creating and running experiments
+  cedar::proc::gui::ExperimentDialog* mpExperimentDialog;
 
 }; // class cedar::MainWindow
 

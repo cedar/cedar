@@ -183,6 +183,14 @@ public:
     return this->at(index);
   }
 
+  //!@brief add an object before the index position
+  void insert(size_t index, BaseTypePtr object)
+  {
+    this->mObjectList.insert(this->mObjectList.begin() + index, object);
+    this->mObjectAdded(index);
+    this->emitChangedSignal();
+  }
+
   //!@brief allocate and add an object at the end
   void pushBack(const std::string& typeId)
   {
