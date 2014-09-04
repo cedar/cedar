@@ -436,6 +436,9 @@ public:
    */
   const ElementMap& getElements() const;
 
+  //! Recursively lists all elements in the group and all its subgroups.
+  std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
+
   //!@deprecated Use getElements instead.
   CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
   {

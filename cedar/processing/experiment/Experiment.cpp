@@ -326,15 +326,13 @@ bool cedar::proc::experiment::Experiment::isOnInit()
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getGroupSteps()
 {
-  std::vector<std::string> ret;
-  for (auto name_element_pair : this->mGroup->getElements())
+  auto paths = this->mGroup->listAllElementPaths();
+  std::vector<std::string> path_strings;
+  for (const auto& path : paths)
   {
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
-    {
-      ret.push_back(name_element_pair.first);
-    }
+    path_strings.push_back(path.toString());
   }
-  return ret;
+  return path_strings;
 }
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getGroupTriggers()

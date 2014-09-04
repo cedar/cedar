@@ -97,27 +97,28 @@ cedar::proc::experiment::condition::CheckData::~CheckData()
 
 bool cedar::proc::experiment::condition::CheckData::check()
 {
+  //!@todo Use std::numeric_limits instead of DBL_MAX/MIN constants
   if (cedar::aux::ConstDataPtr data = _stepData->getData())
   {
     if (cedar::aux::ConstMatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
     {
       bool inRange = false;
       QReadLocker locker(&(value->getLock()));
-      switch(_mCompareMethode->getValue())
+      switch (_mCompareMethode->getValue())
       {
        case cedar::proc::experiment::Experiment::CompareMethod::Lower:
        {
-         inRange = cv::checkRange(value->getData(),true,NULL,-DBL_MAX,_desiredValue->getValue());
+         inRange = cv::checkRange(value->getData(), true, nullptr, -DBL_MAX, _desiredValue->getValue());
          break;
        }
        case cedar::proc::experiment::Experiment::CompareMethod::Greater:
        {
-         inRange = cv::checkRange(value->getData(),true,NULL,_desiredValue->getValue(),DBL_MAX);
+         inRange = cv::checkRange(value->getData(), true, nullptr, _desiredValue->getValue(), DBL_MAX);
          break;
        }
        case cedar::proc::experiment::Experiment::CompareMethod::Equal:
        {
-         inRange = cv::checkRange(value->getData(),true,NULL,_desiredValue->getValue(),_desiredValue->getValue());
+         inRange = cv::checkRange(value->getData(), true, nullptr, _desiredValue->getValue(), _desiredValue->getValue());
          break;
        }
       }

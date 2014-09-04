@@ -138,14 +138,12 @@ void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateSteps()
 {
-
   mpStep->clear();
   std::vector<std::string> steps = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getGroupSteps();
   for (std::string step : steps)
   {
-   mpStep->addItem(QString::fromStdString(step));
+    mpStep->addItem(QString::fromStdString(step));
   }
-
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
@@ -158,7 +156,7 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
 
   std::vector<std::string> properties;
-  switch(parameter->getType())
+  switch (parameter->getType())
   {
     case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
     {
