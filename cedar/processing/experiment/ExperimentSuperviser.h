@@ -127,7 +127,8 @@ protected:
   // none yet
 
 private:
-  //!@brief The experiment
+  //! The experiment
+  //!@todo Why isn't this a shared ptr?
   Experiment* mpExperiment;
 
   //!@brief Lock during the logging process
