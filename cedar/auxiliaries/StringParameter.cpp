@@ -22,31 +22,30 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UIntParameter.cpp
+    File:        StringParameter.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 04 28
+    Date:        2014 02 28
 
-    Description: This file is responsible for declaring UIntVectorParameter so that it can be instantiated at run-time.
+    Description: This file is responsible for declaring StringParameter so that it can be instantiated at run-time.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 
 namespace
 {
   bool registerParameter()
   {
-    typedef cedar::aux::ParameterDeclaration<cedar::aux::UIntVectorParameterPtr> Declaration;
+    typedef cedar::aux::ParameterDeclaration<cedar::aux::StringParameterPtr> Declaration;
     CEDAR_GENERATE_POINTER_TYPES(Declaration);
 
-    DeclarationPtr declaration(new Declaration("numeric", "cedar.aux.UIntVectorParameter"));
-    declaration->deprecatedName("cedar.aux.UIntVectorParameterPtr");
+    DeclarationPtr declaration(new Declaration("string", "cedar.aux.StringParameter"));
     declaration->declare();
 
     return true;
