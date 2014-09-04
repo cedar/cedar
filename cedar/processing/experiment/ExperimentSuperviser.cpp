@@ -51,7 +51,7 @@
 
 cedar::proc::experiment::ExperimentSuperviser::ExperimentSuperviser()
 :
-mpExperiment(NULL)
+mpExperiment(nullptr)
 ,
 mLogLock(new QReadWriteLock)
 {

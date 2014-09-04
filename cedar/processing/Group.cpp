@@ -173,6 +173,28 @@ cedar::proc::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::vector<cedar::proc::GroupPath> cedar::proc::Group::listAllElementPaths(const cedar::proc::GroupPath& base_path) const
+{
+  std::vector<cedar::proc::GroupPath> paths;
+
+  for (auto name_element_pair : this->mElements)
+  {
+    cedar::proc::GroupPath path = base_path;
+    path += name_element_pair.first;
+    paths.push_back(path);
+
+    if (auto subgroup = boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(name_element_pair.second))
+    {
+      cedar::proc::GroupPath subpath = base_path;
+      subpath += name_element_pair.first;
+      auto subpaths = subgroup->listAllElementPaths(subpath);
+      paths.insert(paths.end(), subpaths.begin(), subpaths.end());
+    }
+  }
+
+  return paths;
+}
+
 void cedar::proc::Group::updateTriggerChains(std::set<cedar::proc::Trigger*>& visited)
 {
   for (auto name_element_pair : this->mElements)
