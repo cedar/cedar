@@ -167,6 +167,7 @@ void cedar::proc::experiment::gui::ActionSequence::update()
   mLayout->addLayout(body);
 
 }
+
 void cedar::proc::experiment::gui::ActionSequence::updateCondition()
 {
   delete mCondition;

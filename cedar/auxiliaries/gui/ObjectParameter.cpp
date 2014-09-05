@@ -44,6 +44,7 @@
 // SYSTEM INCLUDES
 #include <QGridLayout>
 #include <QDialog>
+#include <QEvent>
 #include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,8 +73,16 @@ cedar::aux::gui::ObjectParameter::ObjectParameter()
   p_layout->setSpacing(spacing);
   this->setLayout(p_layout);
 
-  mpTypeSelector = new QComboBox();
-  mpTypeSelector->setToolTip("Select the type of the object.");
+  // create the widget used for selecting a type
+  this->mpTypeSelector = new QComboBox();
+  this->mpTypeSelector->setToolTip("Select the type of the object.");
+
+  // this sets up the event filter that prevents changes via mouse-wheel scrolling
+  // this was a problem because these widgets were often accidentally be changed while scrolling
+  this->mpTypeSelector->setFocusPolicy(Qt::StrongFocus);
+  this->mpTypeSelector->installEventFilter(this);
+
+  // add the widget
   p_layout->addWidget(mpTypeSelector, 0, 0);
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
@@ -86,6 +95,23 @@ cedar::aux::gui::ObjectParameter::~ObjectParameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::gui::ObjectParameter::eventFilter(QObject* object, QEvent* event)
+{
+  // check that the event is really a wheel event and refers to a combo box
+  if
+  (
+    event->type() == QEvent::Wheel &&
+    qobject_cast<QComboBox*>(object)
+  )
+  {
+    // if so, ignore the event
+    event->ignore();
+    return true;
+  }
+  // otherwise,
+  return QWidget::eventFilter(object, event);
+}
 
 QString cedar::aux::gui::ObjectParameter::prettyTypeId(const QString& typeId) const
 {
