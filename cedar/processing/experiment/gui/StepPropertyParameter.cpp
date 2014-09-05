@@ -75,6 +75,9 @@ mpPropertyCopy(nullptr)
   this->mpStep->setEditable(true);
   this->mpStep->setInsertPolicy(QComboBox::NoInsert);
 
+  this->mpProperty->setEditable(true);
+  this->mpProperty->setInsertPolicy(QComboBox::NoInsert);
+
   QHBoxLayout* layout = new QHBoxLayout;
   layout->setMargin(0);
   this->setLayout(layout);
