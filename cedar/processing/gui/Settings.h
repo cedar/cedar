@@ -214,6 +214,9 @@ public:
   void restoreMainWindow(QMainWindow *pWindow);
 
   //!@brief returns the last directory, from which an architecture was loaded
+  cedar::aux::DirectoryParameterPtr getExperimentDialogDirectory();
+
+  //!@brief returns the last directory, from which an architecture was loaded
   cedar::aux::DirectoryParameterPtr lastArchitectureLoadDialogDirectory();
 
   //!@brief returns the last directory, from which an architecture was loaded
@@ -345,6 +348,9 @@ private:
 
   //!@brief list of bytes coming from Qt (minimized, maximized, ...)
   cedar::aux::StringParameterPtr mMainWindowState;
+
+  //!@brief Directory, where the load dialog for architectures is supposed to open.
+  cedar::aux::DirectoryParameterPtr _mExperimentDialogDirectory;
 
   //!@brief Directory, where the load dialog for architectures is supposed to open.
   cedar::aux::DirectoryParameterPtr mArchitectureLoadDialogDirectory;
