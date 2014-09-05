@@ -164,16 +164,25 @@ void cedar::proc::sources::Picture::reset()
 
 void cedar::proc::sources::Picture::updatePicture()
 {
-  cv::Mat old_image = this->mImage->getData();
+  QReadLocker image_locker(&this->mImage->getLock());
+  cv::Mat old_image = this->mImage->getData().clone();
+  image_locker.unlock();
   // fill output with new image
-  this->lock(cedar::aux::LOCK_TYPE_READ);
+  cedar::proc::Step::ReadLocker step_locker(this);
   this->compute(cedar::proc::Arguments());
-  this->unlock();
+  step_locker.unlock();
+
+  image_locker.relock();
   cv::Mat new_image = this->mImage->getData();
   if (!cedar::aux::math::matrixSizesEqual(old_image, new_image) || old_image.type() != new_image.type())
   {
     this->annotateImage();
+    image_locker.unlock();
     this->emitOutputPropertiesChangedSignal("Picture");
+  }
+  else
+  {
+    image_locker.unlock();
   }
   onTrigger();
 }
