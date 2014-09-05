@@ -183,6 +183,7 @@ void cedar::proc::experiment::Experiment::startTrial()
 {
   mStopped=false;
   emit trialNumberChanged(mActualTrial);
+  cedar::aux::GlobalClockSingleton::getInstance()->reset();
   cedar::aux::GlobalClockSingleton::getInstance()->start();
 
   //start records
@@ -245,7 +246,6 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
   this->mStopGroup->start();
   cedar::aux::RecorderSingleton::getInstance()->stop();
   cedar::aux::GlobalClockSingleton::getInstance()->stop();
-  cedar::aux::GlobalClockSingleton::getInstance()->reset();
 
   // Apply the different reset types
   switch(reset)
