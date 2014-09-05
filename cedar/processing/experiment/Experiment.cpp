@@ -295,6 +295,7 @@ void cedar::proc::experiment::Experiment::executeAcionSequences(bool initial)
   this->mInit = initial;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
+    //!@todo This piece of code should be in ActionSequence
     if(action_sequence->getCondition()->check())
     {
       for(cedar::proc::experiment::action::ActionPtr action : action_sequence->getActions())
@@ -468,14 +469,6 @@ void cedar::proc::experiment::Experiment::resetGroupState()
       step->readConfiguration(step_node);
     }
   }
-
-  /* @todo ##########just a workaround###########
-   * @todo (OL) I've removed this workaround and cannot find any problems. This code can be removed if no problems occur
-   * + fix assertion:
-   * Non-critical assertion failed: index == this->mpInstanceSelector->count() - 1
-   * in file /home/cbodenstein/Documents/trial-framework/cedar/auxiliaries/gui/ObjectListParameter.cpp on line 189
-   */
-//  saveGroupState();
 }
 
 void cedar::proc::experiment::Experiment::setGroup(cedar::proc::GroupPtr group)
