@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ExperimentDialog.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/processing/experiment/ExperimentSuperviser.h"
@@ -115,12 +116,19 @@ void cedar::proc::gui::ExperimentDialog::save()
 
 void cedar::proc::gui::ExperimentDialog::saveAs()
 {
-  std::string old_file = this->experiment->getFileName();
-  std::string filename = QFileDialog::getSaveFileName(this,tr("Save Experiment"),tr(old_file.c_str()),tr("Experiment Files (*.json)")).toStdString();
+  auto location_dir = cedar::proc::gui::SettingsSingleton::getInstance()->getExperimentDialogDirectory();
+  std::string filename = QFileDialog::getSaveFileName
+      (
+        this,
+        tr("Save Experiment"),
+        location_dir->getValue().absolutePath(),
+        tr("Experiment Files (*.json)")
+      ).toStdString();
   if (!filename.empty())
   {
     this->experiment->setFileName(filename);
     this->experiment->writeJson(filename);
+    location_dir->setValue(QDir(QString::fromStdString(filename)));
   }
 }
 
@@ -128,10 +136,17 @@ void cedar::proc::gui::ExperimentDialog::saveAs()
 void cedar::proc::gui::ExperimentDialog::load()
 {
   this->experiment->setGroup(mParent->getGroup()->getGroup());
-  std::string old_file = this->experiment->getFileName();
-  std::string filename = QFileDialog::getOpenFileName(this,tr("Open Experiment"),tr(old_file.c_str()),tr("Experiment Files (*.json)")).toStdString();
+  auto location_dir = cedar::proc::gui::SettingsSingleton::getInstance()->getExperimentDialogDirectory();
+  std::string filename = QFileDialog::getOpenFileName
+          (
+            this,
+            tr("Open Experiment"),
+            location_dir->getValue().absolutePath(),
+            tr("Experiment Files (*.json)")
+          ).toStdString();
   if (!filename.empty())
   {
+    location_dir->setValue(QDir(QString::fromStdString(filename)));
     this->experiment->readJson(filename);
     this->experiment->setFileName(filename);
     this->nameEdit->setText(QString::fromStdString(this->experiment->getName()));
