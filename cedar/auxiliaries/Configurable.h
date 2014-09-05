@@ -232,6 +232,12 @@ public:
    */
   std::string getUniqueParameterName(const std::string& baseName) const;
 
+  /*! Lists all parameters in this configurable, including parameters of any configurable children.
+   *
+   *  @returns A list of parameter paths that can be used to retrieve the parameter with the getParameter() method.
+   */
+  std::vector<std::string> listAllParameters() const;
+
 public:
   //! (boost) Signal that is emitted whenever a parameter is added to the configurable.
   CEDAR_DECLARE_SIGNAL(ParameterAdded, void(cedar::aux::ParameterPtr));

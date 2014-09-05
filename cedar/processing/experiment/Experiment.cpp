@@ -348,31 +348,33 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getGroupTriggers()
   return ret;
 }
 
-std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string step, const std::vector<std::string>& allowedTypes)
+std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string stepPath, const std::vector<std::string>& allowedTypes)
 {
-  cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
+  cedar::proc::StepPtr step = this->mGroup->getElement<cedar::proc::Step>(stepPath);
 
+  std::vector<std::string> step_parameter_paths = step->listAllParameters();
   std::vector<std::string> ret;
-  for (cedar::aux::ParameterPtr parameter :  stepItem->getParameters())
+  for (const auto& parameter_path : step_parameter_paths)
   {
     try
     {
       // Check if parameter is registered in the DeclarationManager
+      auto parameter = step->getParameter(parameter_path);
       std::string parameter_type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
-      if(allowedTypes.size() > 0)
+      if (allowedTypes.size() > 0)
       {
-        for(std::string type : allowedTypes)
+        for (std::string type : allowedTypes)
         {
           if (type == parameter_type)
           {
-            ret.push_back(parameter->getName());
+            ret.push_back(parameter_path);
             break;
           }
         }
       }
       else
       {
-        ret.push_back(parameter->getName());
+        ret.push_back(parameter_path);
       }
     }
     catch(cedar::aux::UnknownTypeException e)
@@ -454,6 +456,7 @@ void cedar::proc::experiment::Experiment::saveGroupState()
   }
 }
 
+//!@todo This should be called loadGroupState() (or rename saveGroupState to storeGroupState, this one to restoreGroupState)
 void cedar::proc::experiment::Experiment::resetGroupState()
 {
   //!@todo fix exception // wrong reset
@@ -461,17 +464,18 @@ void cedar::proc::experiment::Experiment::resetGroupState()
   {
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
     {
-      cedar::aux::ConfigurationNode step_node = this->mGroupState.get_child(name_element_pair.first);
+      const cedar::aux::ConfigurationNode& step_node = this->mGroupState.get_child(name_element_pair.first);
       step->readConfiguration(step_node);
     }
   }
 
   /* @todo ##########just a workaround###########
+   * @todo (OL) I've removed this workaround and cannot find any problems. This code can be removed if no problems occur
    * + fix assertion:
    * Non-critical assertion failed: index == this->mpInstanceSelector->count() - 1
    * in file /home/cbodenstein/Documents/trial-framework/cedar/auxiliaries/gui/ObjectListParameter.cpp on line 189
    */
-  saveGroupState();
+//  saveGroupState();
 }
 
 void cedar::proc::experiment::Experiment::setGroup(cedar::proc::GroupPtr group)
