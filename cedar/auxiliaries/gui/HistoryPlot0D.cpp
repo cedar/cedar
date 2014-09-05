@@ -160,6 +160,11 @@ void cedar::aux::gui::HistoryPlot0D::init()
 
 void cedar::aux::gui::HistoryPlot0D::advanceHistory()
 {
+  if (!cedar::aux::GlobalClockSingleton::getInstance()->isRunning())
+  {
+    return;
+  }
+
   cedar::unit::Time time_now = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   for (auto& plot_data : this->mPlotData)
   {
@@ -178,31 +183,48 @@ void cedar::aux::gui::HistoryPlot0D::advanceHistory()
     QWriteLocker hist_locker(&plot_data.mHistory->getLock());
     const cv::Mat& current_hist = plot_data.mHistory->getData();
 
-    cv::Mat new_hist
-       = cv::Mat::zeros
-         (
-           std::min(current_hist.rows + 1, static_cast<int>(this->mMaxHistorySize)),
-           1,
-           now.type()
-         );
+    cv::Mat new_hist;
 
     int start = 0;
     int end = current_hist.rows;
 
-    if (current_hist.rows >= static_cast<int>(this->mMaxHistorySize))
+    // if the last time in the history lies in the future (i.e., the timer was reset), discard all the old history
+    if (plot_data.mXLabels.back() > time_now)
     {
-      start = 1;
+      plot_data.mXLabels.clear();
+      new_hist = now.clone();
+    }
+    else
+    {
+      new_hist
+             = cv::Mat::zeros
+               (
+                 std::min(current_hist.rows + 1, static_cast<int>(this->mMaxHistorySize)),
+                 1,
+                 now.type()
+               );
+
+      if (current_hist.rows >= static_cast<int>(this->mMaxHistorySize))
+      {
+        start = 1;
+      }
+
+      // copy the old histogram to the beginning of the new history
+      cv::Mat slice = new_hist(cv::Range(0, end - start), cv::Range::all());
+      current_hist(cv::Range(start, end), cv::Range::all()).copyTo(slice);
+
+      // append the new value at the end of the new history
+      cv::Mat slice2 = new_hist(cv::Range(new_hist.rows - 1, new_hist.rows), cv::Range::all());
+      now.copyTo(slice2);
     }
 
-    cv::Mat slice = new_hist(cv::Range(0, end - start), cv::Range::all());
-    current_hist(cv::Range(start, end), cv::Range::all()).copyTo(slice);
-    cv::Mat slice2 = new_hist(cv::Range(new_hist.rows - 1, new_hist.rows), cv::Range::all());
-    now.copyTo(slice2);
-
+    // assign the new history to the underlying line plot
     plot_data.mHistory->setData(new_hist);
 
+    // append the current time to the x labels
     plot_data.mXLabels.push_back(time_now);
 
+    // make sure the number of x values does not exceed the maximum history size
     while (plot_data.mXLabels.size() > this->mMaxHistorySize)
     {
       plot_data.mXLabels.pop_front();
