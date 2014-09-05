@@ -295,6 +295,7 @@ void cedar::proc::experiment::Experiment::executeAcionSequences(bool initial)
   this->mInit = initial;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
+    //!@todo This piece of code should be in ActionSequence
     if(action_sequence->getCondition()->check())
     {
       for(cedar::proc::experiment::action::ActionPtr action : action_sequence->getActions())
