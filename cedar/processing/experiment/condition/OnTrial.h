@@ -94,7 +94,8 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! Member for storing if the condition has fired before.
+  bool mHasFired;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
