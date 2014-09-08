@@ -79,28 +79,42 @@ _mCondition
   )
 )
 {
-
 }
+
 cedar::proc::experiment::ActionSequence::~ActionSequence()
 {
 
 }
 
-
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::experiment::ActionSequence::run()
+{
+  if (this->getCondition()->runCheck())
+  {
+    for (auto action : this->getActions())
+    {
+      action->run();
+    }
+  }
+}
+
+void cedar::proc::experiment::ActionSequence::prepareTrial()
+{
+  // the condition must be reset
+  this->_mCondition->getValue()->reset();
+}
+
 void cedar::proc::experiment::ActionSequence::addAction(cedar::proc::experiment::action::ActionPtr action)
 {
-	this->_mActionSet->pushBack(action);
+  this->_mActionSet->pushBack(action);
 }
 
 void cedar::proc::experiment::ActionSequence::setCondition(cedar::proc::experiment::condition::ConditionPtr condition)
 {
-	this->_mCondition->setValue(condition);
+  this->_mCondition->setValue(condition);
 }
 
 std::vector<cedar::proc::experiment::action::ActionPtr> cedar::proc::experiment::ActionSequence::getActions()
@@ -115,6 +129,6 @@ std::vector<cedar::proc::experiment::action::ActionPtr> cedar::proc::experiment:
 
 cedar::proc::experiment::condition::ConditionPtr cedar::proc::experiment::ActionSequence::getCondition()
 {
-	return this->_mCondition->getValue();
+  return this->_mCondition->getValue();
 }
 

@@ -73,14 +73,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //@brief Checks if a the current trial time is greater than the time provided by this condition
-  bool check();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //@brief Checks if a the current trial time is greater than the time provided by this condition
+  bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -94,8 +94,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief This flag will be used to check if this condition als already been triggered during this trial
-  bool mActivated;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

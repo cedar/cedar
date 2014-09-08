@@ -48,16 +48,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::proc::experiment::condition::Condition::Condition()
 {
-}
-cedar::proc::experiment::condition::Condition::~Condition()
-{
-
+  this->reset();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired)
+{
+  if (this->mHasFired && skipIfFired)
+  {
+    return false;
+  }
+  bool v = this->check();
+  if (v)
+  {
+    this->mHasFired = true;
+  }
+  return v;
+}
 
+void cedar::proc::experiment::condition::Condition::reset()
+{
+  this->mHasFired = false;
+}

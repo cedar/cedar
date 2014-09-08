@@ -70,26 +70,34 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-	//!@brief The Constructor
-	Condition();
-  //!@brief Destructor
-  ~Condition();
+  //!@brief The Constructor
+  Condition();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method has to be override by all derived classes
-   *         It should return true if the condition is fulfilled
+  /*! @brief Performs the actual ckeck.
+   *
+   * @param skipIfFired If true, the condition will return false if it returned true once before.
+   * @todo Should this be const?
    */
-  virtual bool check() = 0;
+  bool runCheck(bool skipIfFired = true);
 
+  /*! Resets the condition. If it is set to fire only once, this will allow it to fire again.
+   */
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief This method has to be override by all derived classes
+   *         It should return true if the condition is fulfilled
+   *
+   * @todo Should this be const?
+   */
+  virtual bool check() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -99,8 +107,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
 private:
+  //! Member for storing if the condition has fired before.
+  bool mHasFired;
 
 }; // class cedar::proc::experiment::Condition
 

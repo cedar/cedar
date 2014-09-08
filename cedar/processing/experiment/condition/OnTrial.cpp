@@ -60,7 +60,6 @@ namespace
 
 cedar::proc::experiment::condition::OnTrial::OnTrial()
 :
-mHasFired(false),
 _mTrial(new cedar::aux::UIntParameter(this,"on trial",1))
 {
 }
@@ -76,17 +75,5 @@ bool cedar::proc::experiment::condition::OnTrial::check()
 {
   Experiment* p_experiment = cedar::proc::experiment::ExperimentSuperviserSingleton::getInstance()->getExperiment();
   auto current_trial = p_experiment->getActualTrial();
-  //!@todo This (and the same thing in AtTime) should be solved by a sort of reset function
-  //! Also, this may be undesired behavior (i.e., users should possibly be able to change this)
-  //! -> should this be part of the superclass? I.e., a fire-on-change parameter?
-  if (current_trial < this->_mTrial->getValue())
-  {
-    this->mHasFired = false;
-  }
-  else if (!this->mHasFired && current_trial == this->_mTrial->getValue())
-  {
-    this->mHasFired = true;
-    return true;
-  }
-  return false;
+  return current_trial == this->_mTrial->getValue();
 }

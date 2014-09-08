@@ -84,10 +84,6 @@ _desiredValue( new cedar::aux::DoubleParameter(this,"DesiredValue",0.0))
   _stepData->setType(cedar::proc::experiment::StepPropertyParameter::OUTPUT);
 }
 
-cedar::proc::experiment::condition::PartialCheckData::~PartialCheckData()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
