@@ -50,8 +50,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
- bool declared = cedar::proc::experiment::ActionSequenceManagerSingleton::getInstance()->
-     registerType<cedar::proc::experiment::ActionSequencePtr>();
+  bool declared = cedar::proc::experiment::ActionSequenceManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::ActionSequencePtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,8 +67,7 @@ _mActionSet
     "ActionSet",
     std::vector<cedar::proc::experiment::action::ActionPtr>()
   )
-)
-,
+),
 _mCondition
 (
   new cedar::proc::experiment::condition::Condition::ConditionParameter
@@ -79,11 +78,6 @@ _mCondition
   )
 )
 {
-}
-
-cedar::proc::experiment::ActionSequence::~ActionSequence()
-{
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,6 +113,7 @@ void cedar::proc::experiment::ActionSequence::setCondition(cedar::proc::experime
 
 std::vector<cedar::proc::experiment::action::ActionPtr> cedar::proc::experiment::ActionSequence::getActions()
 {
+  //!@todo Does this need to make a copy?
   std::vector<cedar::proc::experiment::action::ActionPtr> ret;
   for (unsigned int i = 0; i < _mActionSet->size(); i++)
   {
