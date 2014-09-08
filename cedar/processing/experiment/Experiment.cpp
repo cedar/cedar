@@ -351,16 +351,16 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getGroupTriggers()
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string stepPath, const std::vector<std::string>& allowedTypes)
 {
-  cedar::proc::StepPtr step = this->mGroup->getElement<cedar::proc::Step>(stepPath);
+  cedar::aux::ConfigurablePtr configurable = this->mGroup->getElement(stepPath);
 
-  std::vector<std::string> step_parameter_paths = step->listAllParameters();
+  std::vector<std::string> step_parameter_paths = configurable->listAllParameters();
   std::vector<std::string> ret;
   for (const auto& parameter_path : step_parameter_paths)
   {
     try
     {
       // Check if parameter is registered in the DeclarationManager
-      auto parameter = step->getParameter(parameter_path);
+      auto parameter = configurable->getParameter(parameter_path);
       std::string parameter_type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
       if (allowedTypes.size() > 0)
       {
@@ -388,17 +388,17 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(
 
 cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(std::string step, std::string parameter)
 {
-  cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
+  cedar::aux::ConfigurablePtr stepItem =this->mGroup->getElement(step);
 
   return stepItem->getParameter(parameter);
 }
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getStepDatas(std::string step, cedar::proc::DataRole::Id role )
 {
-  cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
+  auto stepItem =this->mGroup->getElement<cedar::proc::Connectable>(step);
 
   std::vector<std::string> ret;
-  for (auto data :  stepItem->getDataSlots(role))
+  for (auto data : stepItem->getDataSlots(role))
   {
     ret.push_back(data.first);
   }
@@ -407,7 +407,7 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepDatas(std::
 
 cedar::aux::ConstDataPtr cedar::proc::experiment::Experiment::getStepData(std::string step, std::string value,cedar::proc::DataRole::Id role)
 {
-  cedar::proc::StepPtr stepItem =this->mGroup->getElement<cedar::proc::Step>(step);
+  auto stepItem = this->mGroup->getElement<cedar::proc::Connectable>(step);
   return stepItem->getData(role,value);
 }
 
@@ -415,24 +415,26 @@ unsigned int cedar::proc::experiment::Experiment::getActualTrial()
 {
   return this->mActualTrial;
 }
+
 bool cedar::proc::experiment::Experiment::hasStopped()
 {
   return mStopped;
 }
+
 bool cedar::proc::experiment::Experiment::checkActionSequences()
 {
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
-    if(boost::dynamic_pointer_cast<cedar::proc::experiment::condition::OnInit>(action_sequence->getCondition()))
+    if (boost::dynamic_pointer_cast<cedar::proc::experiment::condition::OnInit>(action_sequence->getCondition()))
     {
-      for(cedar::proc::experiment::action::ActionPtr action : action_sequence->getActions())
+      for (cedar::proc::experiment::action::ActionPtr action : action_sequence->getActions())
       {
-        if(boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartAllTriggers>(action))
+        if (boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartAllTriggers>(action))
         {
           return true;
         }
 
-        if(boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartTrigger>(action))
+        if (boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartTrigger>(action))
         {
           return true;
         }
