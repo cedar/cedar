@@ -122,9 +122,9 @@ _mActionSequences
     boost::bind(&cedar::proc::experiment::Experiment::groupChanged,this,_1)
   );
 }
+
 cedar::proc::experiment::Experiment::~Experiment()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ cedar::proc::experiment::Experiment::~Experiment()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::experiment::Experiment::groupChanged(cedar::proc::ConstElementPtr /*element*/)
 {
-  if(this->mStopped)
+  if (this->mStopped)
   {
     emit groupChanged();
   }
@@ -187,45 +187,45 @@ void cedar::proc::experiment::Experiment::startTrial()
     sequence->prepareTrial();
   }
 
-  mStopped=false;
-  emit trialNumberChanged(mActualTrial);
+  this->mStopped = false;
+  emit trialNumberChanged(this->mActualTrial);
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
   cedar::aux::GlobalClockSingleton::getInstance()->start();
 
   //start records
   std::stringstream ss;
-  ss << mActualTrial;
+  ss << this->mActualTrial;
   std::string trial_number = ss.str();
-  cedar::aux::RecorderSingleton::getInstance()->setSubfolder(mRecordFolderName+"/"+"Trial_"+trial_number+"_#T#");
+  cedar::aux::RecorderSingleton::getInstance()->setSubfolder(this->mRecordFolderName + "/" + "Trial_" + trial_number + "_#T#");
   cedar::aux::RecorderSingleton::getInstance()->start();
 }
 
 
 void cedar::proc::experiment::Experiment::startTrigger(const std::string& triggerName)
 {
-  if(mStopped)
+  if (this->mStopped)
   {
-    startTrial();
+    this->startTrial();
   }
   for (auto name_element_pair : this->mGroup->getElements())
+  {
+    if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(name_element_pair.second))
     {
-      if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(name_element_pair.second))
+      if (name_element_pair.first == triggerName)
       {
-        if(name_element_pair.first == triggerName)
+        if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
         {
-          if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
-          {
-            looped_trigger->start();
-          }
+          looped_trigger->start();
         }
       }
     }
+  }
 }
 
 
 void cedar::proc::experiment::Experiment::startAllTriggers()
 {
-  if(mStopped)
+  if (mStopped)
   {
     startTrial();
   }
@@ -282,17 +282,17 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
       break;
     }
   }
-  mActualTrial++;
+  this->mActualTrial++;
 
   // Stop the experiment if the actual trial exceeds the number of wanted trials
-  if ( mActualTrial >_mTrials->getValue() )
+  if (this->mActualTrial >_mTrials->getValue())
   {
     ExperimentSuperviserSingleton::getInstance()->requestStop();
     emit experimentRunning(false);
     resetGroupState();
-    mActualTrial  = 0;
+    mActualTrial = 0;
   }
-  mStopped=true;
+  mStopped = true;
   emit trialNumberChanged(mActualTrial);
 }
 
