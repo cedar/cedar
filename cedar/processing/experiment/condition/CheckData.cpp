@@ -87,9 +87,6 @@ _desiredValue
   _stepData->setType(cedar::proc::experiment::StepPropertyParameter::OUTPUT);
 }
 
-cedar::proc::experiment::condition::CheckData::~CheckData()
-{
-}
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------

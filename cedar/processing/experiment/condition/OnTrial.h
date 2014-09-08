@@ -73,14 +73,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Checks if the current trial has the number provided by this condition
-  bool check();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief Checks if the current trial has the number provided by this condition
+  bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -94,8 +94,7 @@ private:
 protected:
   // none yet
 private:
-  //! Member for storing if the condition has fired before.
-  bool mHasFired;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

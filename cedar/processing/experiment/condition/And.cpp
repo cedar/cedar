@@ -81,14 +81,10 @@ _mCondition2
  )
 {
 }
-cedar::proc::experiment::condition::And::~And()
-{
-
-}
 
 bool cedar::proc::experiment::condition::And::check()
 {
-  return _mCondition1->getValue()->check() && _mCondition2->getValue()->check();
+  return _mCondition1->getValue()->runCheck(false) && _mCondition2->getValue()->runCheck(false);
 }
 
 

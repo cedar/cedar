@@ -86,7 +86,11 @@ public:
   //!@brief Returns the condition of this sequence
   cedar::proc::experiment::condition::ConditionPtr getCondition();
 
+  //! Method called before a new trial is started.
+  void prepareTrial();
 
+  //! Checks the condition and, if it fires, runs the actions.
+  void run();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

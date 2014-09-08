@@ -160,7 +160,6 @@ void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions
 
 void cedar::proc::experiment::Experiment::run()
 {
-
   if (this->_mTrials->getValue() > 0 && checkActionSequences())
   {
     this->saveGroupState();
@@ -181,6 +180,13 @@ void cedar::proc::experiment::Experiment::cancel()
 
 void cedar::proc::experiment::Experiment::startTrial()
 {
+  // reset all action sequences
+  for (size_t i = 0; i < this->_mActionSequences->size(); ++i)
+  {
+    auto sequence = this->_mActionSequences->at(i);
+    sequence->prepareTrial();
+  }
+
   mStopped=false;
   emit trialNumberChanged(mActualTrial);
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
@@ -295,14 +301,7 @@ void cedar::proc::experiment::Experiment::executeAcionSequences(bool initial)
   this->mInit = initial;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
-    //!@todo This piece of code should be in ActionSequence
-    if(action_sequence->getCondition()->check())
-    {
-      for(cedar::proc::experiment::action::ActionPtr action : action_sequence->getActions())
-      {
-        action->run();
-      }
-    }
+    action_sequence->run();
   }
   this->mInit = false;
 }

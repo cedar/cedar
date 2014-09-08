@@ -61,10 +61,6 @@ cedar::proc::experiment::condition::OnInit::OnInit()
 {
 }
 
-cedar::proc::experiment::condition::OnInit::~OnInit()
-{
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
