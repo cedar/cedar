@@ -56,6 +56,8 @@
 
 
 /*!@brief A widget for setting up, save and load experiments
+ *
+ * @todo Rather than store a pointer to the Ide, this should just have a pointer to the group which gets updated by the Ide.
  */
 class cedar::proc::gui::ExperimentDialog : public QWidget, public Ui_ExperimentDialog
 {
@@ -82,6 +84,9 @@ public:
 public:
   cedar::proc::experiment::ExperimentPtr getExperiment();
 
+  //! Updates the group stored in the experiment. Must be called whenever the group of the Ide changes.
+  //!@todo See comment on group (don't store pointer to ide); replace this by a setGroup function.
+  void updateGroup();
 
 public slots:
   //!@brief Redraws the action sequences of the widget
@@ -143,7 +148,7 @@ private:
   cedar::proc::gui::Ide* mParent;
 
   //!@brief The pointer to the experiment
-  cedar::proc::experiment::ExperimentPtr experiment;
+  cedar::proc::experiment::ExperimentPtr mExperiment;
 
   //!@brief The timer to update the group time every second
   QTimer* mpGroupTime;

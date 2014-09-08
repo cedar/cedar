@@ -400,7 +400,7 @@ void cedar::proc::gui::Ide::showBoostControl()
 
 void cedar::proc::gui::Ide::showExperimentDialog()
 {
-  if (this->mpExperimentDialog == NULL)
+  if (this->mpExperimentDialog == nullptr)
   {
     this->mpExperimentDialog = new cedar::proc::gui::ExperimentDialog(this);
   }
@@ -1617,6 +1617,11 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   );
 
   this->updateArchitectureWidgetsMenu();
+
+  if (this->mpExperimentDialog != nullptr)
+  {
+    this->mpExperimentDialog->updateGroup();
+  }
 }
 
 void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
