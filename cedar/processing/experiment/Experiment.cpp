@@ -450,10 +450,10 @@ void cedar::proc::experiment::Experiment::saveGroupState()
   this->mGroupState.clear();
   for (auto name_element_pair : this->mGroup->getElements())
   {
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
+    if (auto element = boost::dynamic_pointer_cast<cedar::proc::Element>(name_element_pair.second))
     {
       cedar::aux::ConfigurationNode step_node;
-      step->writeConfiguration(step_node);
+      element->writeConfiguration(step_node);
       mGroupState.add_child(name_element_pair.first, step_node);
     }
   }
@@ -465,10 +465,10 @@ void cedar::proc::experiment::Experiment::resetGroupState()
   //!@todo fix exception // wrong reset
   for (auto name_element_pair : this->mGroup->getElements())
   {
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(name_element_pair.second))
+    if (auto element = boost::dynamic_pointer_cast<cedar::proc::Element>(name_element_pair.second))
     {
       const cedar::aux::ConfigurationNode& step_node = this->mGroupState.get_child(name_element_pair.first);
-      step->readConfiguration(step_node);
+      element->readConfiguration(step_node);
     }
   }
 }
