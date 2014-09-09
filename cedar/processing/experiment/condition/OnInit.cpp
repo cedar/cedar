@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 
 // SYSTEM INCLUDES
 
@@ -69,5 +69,5 @@ cedar::proc::experiment::condition::OnInit::OnInit()
 
 bool cedar::proc::experiment::condition::OnInit::check()
 {
-  return ExperimentSuperviserSingleton::getInstance()->getExperiment()->isOnInit();
+  return SupervisorSingleton::getInstance()->getExperiment()->isOnInit();
 }

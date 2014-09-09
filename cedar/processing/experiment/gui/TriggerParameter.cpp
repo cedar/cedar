@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/TriggerParameter.h"
 #include "cedar/processing/experiment/TriggerParameter.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 
 // SYSTEM INCLUDES
 #include <QBoxLayout>
@@ -108,7 +108,7 @@ void cedar::proc::experiment::gui::TriggerParameter::updateTriggers()
 {
 
   mpTrigger->clear();
-  std::vector<std::string> triggers = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getGroupTriggers();
+  std::vector<std::string> triggers = SupervisorSingleton::getInstance()->getExperiment()->getGroupTriggers();
   for (std::string trigger : triggers)
   {
     mpTrigger->addItem(QString::fromStdString(trigger));

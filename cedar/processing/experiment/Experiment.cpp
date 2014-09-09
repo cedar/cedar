@@ -44,7 +44,7 @@
 #include "cedar/processing/experiment/action/StartAllTriggers.h"
 #include "cedar/processing/experiment/action/StartTrigger.h"
 #include "cedar/processing/experiment/condition/OnInit.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -88,7 +88,7 @@ _mActionSequences
   )
 )
 {
-  ExperimentSuperviserSingleton::getInstance()->setExperiment(this);
+  SupervisorSingleton::getInstance()->setExperiment(this);
 
   // Create first action sequence
   ActionSequencePtr as = ActionSequencePtr(new ActionSequence());
@@ -167,13 +167,13 @@ void cedar::proc::experiment::Experiment::run()
     std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
     this->mRecordFolderName = this->_mName->getValue()+ "_" + time_stamp;
     this->mActualTrial = 1;
-    ExperimentSuperviserSingleton::getInstance()->start();
+    SupervisorSingleton::getInstance()->start();
     emit experimentRunning(true);
   }
 }
 void cedar::proc::experiment::Experiment::cancel()
 {
-  ExperimentSuperviserSingleton::getInstance()->requestStop();
+  SupervisorSingleton::getInstance()->requestStop();
   stopTrial();
   emit experimentRunning(false);
 }
@@ -287,7 +287,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
   // Stop the experiment if the actual trial exceeds the number of wanted trials
   if (this->mActualTrial >_mTrials->getValue())
   {
-    ExperimentSuperviserSingleton::getInstance()->requestStop();
+    SupervisorSingleton::getInstance()->requestStop();
     emit experimentRunning(false);
     resetGroupState();
     mActualTrial = 0;

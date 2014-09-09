@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/StepPropertyParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
@@ -217,7 +217,7 @@ cedar::proc::experiment::StepPropertyParameter::PropertyType cedar::proc::experi
 
 cedar::aux::ConstDataPtr cedar::proc::experiment::StepPropertyParameter::getData() const
 {
-  Experiment* experiment = ExperimentSuperviserSingleton::getInstance()->getExperiment();
+  Experiment* experiment = SupervisorSingleton::getInstance()->getExperiment();
   if (mType==OUTPUT)
   {
       if (cedar::aux::ConstDataPtr data = experiment->
@@ -245,7 +245,7 @@ cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getPara
   {
     return cedar::aux::ParameterPtr();
   }
-  return ExperimentSuperviserSingleton::getInstance()->
+  return SupervisorSingleton::getInstance()->
          getExperiment()->getStepParameter(mStep,mProperty);
 }
 
@@ -297,7 +297,7 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
     return;
   }
 
-  Experiment* experiment = ExperimentSuperviserSingleton::getInstance()->getExperiment();
+  Experiment* experiment = SupervisorSingleton::getInstance()->getExperiment();
   switch (mType)
   {
     case PARAMETER:

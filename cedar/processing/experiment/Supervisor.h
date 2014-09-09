@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
-#define CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
+#ifndef CEDAR_PROC_EXPERIMENT_SUPERVISOR_H
+#define CEDAR_PROC_EXPERIMENT_SUPERVISOR_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/ExperimentSuperviser.fwd.h"
+#include "cedar/processing/experiment/Supervisor.fwd.h"
 #include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
@@ -53,15 +53,14 @@
 /*!@brief This thread should continuously perform the action sequences of the experiment
  *
  */
-//@todo Superviser
-class cedar::proc::experiment::ExperimentSuperviser : public cedar::aux::LoopedThread
+class cedar::proc::experiment::Supervisor : public cedar::aux::LoopedThread
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
 
   // uses singleton template.
-  friend class cedar::aux::Singleton<ExperimentSuperviser>;
+  friend class cedar::aux::Singleton<Supervisor>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -81,10 +80,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief The private constructor.
-  ExperimentSuperviser();
+  Supervisor();
 public:
   //!@brief Destructor
-  virtual ~ExperimentSuperviser();
+  virtual ~Supervisor();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -136,7 +135,7 @@ private:
 
   //!@brief A memory list of the log
   std::vector<LogData> mLogList;
-}; // class cedar::proc::experiment::ExperimentController
+}; // class cedar::proc::experiment::Supervisor
 
 
 
@@ -148,11 +147,11 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::ExperimentSuperviser>);
-      typedef cedar::aux::Singleton<cedar::proc::experiment::ExperimentSuperviser> ExperimentSuperviserSingleton;
+      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::Supervisor>);
+      typedef cedar::aux::Singleton<cedar::proc::experiment::Supervisor> SupervisorSingleton;
     }
   }
 }
 
-#endif // CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_H
+#endif // CEDAR_PROC_EXPERIMENT_SUPERVISOR_H
 

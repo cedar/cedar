@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/action/SetParameter.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/processing/experiment/StepPropertyParameter.h"
 
