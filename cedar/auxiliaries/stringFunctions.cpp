@@ -40,6 +40,8 @@
 
 // SYSTEM INCLUDES
 #include <boost/optional.hpp>
+#include <iomanip>
+#include <sstream>
 
 std::string cedar::aux::versionNumberToString(unsigned int version)
 {
@@ -61,6 +63,14 @@ std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
 {
   struct TimeSubdiv
   {
+    TimeSubdiv(double max, const std::string& shortHandle, unsigned int precision)
+    :
+    max(max),
+    precision(precision),
+    short_handle(shortHandle)
+    {
+    }
+
     TimeSubdiv(double max, const std::string& shortHandle)
     :
     max(max),
@@ -75,6 +85,7 @@ std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
     }
 
     boost::optional<double> max;
+    boost::optional<unsigned int> precision;
     std::string short_handle;
   };
 
@@ -83,9 +94,9 @@ std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
   static std::vector<TimeSubdiv> time_subdivs;
   if (time_subdivs.empty())
   {
-    time_subdivs.push_back(TimeSubdiv(60.0, "s"));
-    time_subdivs.push_back(TimeSubdiv(60.0, "m"));
-    time_subdivs.push_back(TimeSubdiv(24.0, "h"));
+    time_subdivs.push_back(TimeSubdiv(60.0, "s", 2));
+    time_subdivs.push_back(TimeSubdiv(60.0, "m", 2));
+    time_subdivs.push_back(TimeSubdiv(24.0, "h", 2));
     time_subdivs.push_back(TimeSubdiv(365, "d"));
     time_subdivs.push_back(TimeSubdiv("y"));
   }
@@ -107,8 +118,18 @@ std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
     else
     {
       subtime = time_remaining;
+      time_remaining = 0.0;
     }
-    std::string subdiv_str = cedar::aux::toString(subtime / old_max) + subdiv.short_handle;
+    std::stringstream stream;
+    if (time_remaining > 0.0 && subdiv.precision)
+    {
+      // make the conversion zero-padded
+      stream << std::setw(subdiv.precision.get()) << std::setfill('0');
+    }
+
+    stream << (subtime / old_max);
+    stream << subdiv.short_handle;
+    std::string subdiv_str = stream.str();
     if (!time_str.empty())
     {
       subdiv_str += " ";
