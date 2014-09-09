@@ -88,7 +88,6 @@ void cedar::proc::experiment::gui::ExperimentItemWidget::display(cedar::aux::Con
     }
     else
     {
-      this->layout()->addWidget(new QLabel(QString::fromStdString(parameter->getName())));
       this->layout()->addWidget(parameterWidget);
     }
   }
