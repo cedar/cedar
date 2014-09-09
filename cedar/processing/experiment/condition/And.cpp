@@ -42,7 +42,6 @@
 #include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
 
 // SYSTEM INCLUDES
 

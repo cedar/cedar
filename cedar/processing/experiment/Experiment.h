@@ -56,7 +56,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/Experiment.fwd.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.fwd.h"
+#include "cedar/processing/experiment/Supervisor.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -65,7 +65,7 @@
 /*!@brief A class for creating and starting experiments with the current architecture.
  *
  *        It can be used to start multiple trials with different parameters.
- *        An instance will automaticly be registered to the ExperimentSuperviser, a thread to start, stop and log the
+ *        An instance will automatically be registered to the Supervisor, a thread to start, stop and log the
  *        experiment session.
  *
  */
@@ -80,7 +80,7 @@ class cedar::proc::experiment::Experiment : public QObject, public cedar::aux::N
   //--------------------------------------------------------------------------------------------------------------------
   // freinds
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::experiment::ExperimentSuperviser;
+  friend class cedar::proc::experiment::Supervisor;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types

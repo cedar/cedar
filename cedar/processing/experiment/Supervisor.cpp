@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/experiment/Experiment.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 
@@ -49,16 +49,15 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::ExperimentSuperviser::ExperimentSuperviser()
+cedar::proc::experiment::Supervisor::Supervisor()
 :
-mpExperiment(nullptr)
-,
+mpExperiment(nullptr),
 mLogLock(new QReadWriteLock)
 {
 
 }
 
-cedar::proc::experiment::ExperimentSuperviser::~ExperimentSuperviser()
+cedar::proc::experiment::Supervisor::~Supervisor()
 {
   delete mLogLock;
 }
@@ -70,23 +69,23 @@ cedar::proc::experiment::ExperimentSuperviser::~ExperimentSuperviser()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::experiment::ExperimentSuperviser::step(cedar::unit::Time)
+void cedar::proc::experiment::Supervisor::step(cedar::unit::Time)
 {
   bool init = this->mpExperiment->hasStopped();
   this->mpExperiment->executeAcionSequences(init);
 }
 
-void cedar::proc::experiment::ExperimentSuperviser::setExperiment(Experiment* experiment)
+void cedar::proc::experiment::Supervisor::setExperiment(Experiment* experiment)
 {
   this->mpExperiment = experiment;
 
 }
-cedar::proc::experiment::Experiment* cedar::proc::experiment::ExperimentSuperviser::getExperiment()
+cedar::proc::experiment::Experiment* cedar::proc::experiment::Supervisor::getExperiment()
 {
   return this->mpExperiment;
 }
 
-void cedar::proc::experiment::ExperimentSuperviser::log(std::string messageType, std::string message)
+void cedar::proc::experiment::Supervisor::log(std::string messageType, std::string message)
 {
   QWriteLocker locker(mLogLock);
 

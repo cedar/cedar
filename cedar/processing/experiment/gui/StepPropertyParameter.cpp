@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/StepPropertyParameter.h"
 #include "cedar/processing/experiment/StepPropertyParameter.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
@@ -138,7 +138,7 @@ void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()
 void cedar::proc::experiment::gui::StepPropertyParameter::updateSteps()
 {
   mpStep->clear();
-  std::vector<std::string> steps = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getGroupSteps();
+  std::vector<std::string> steps = SupervisorSingleton::getInstance()->getExperiment()->getGroupSteps();
   for (std::string step : steps)
   {
     mpStep->addItem(QString::fromStdString(step));
@@ -159,17 +159,17 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
   {
     case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
     {
-      properties = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getStepParameters(index, parameter->getAllowedTypes());
+      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepParameters(index, parameter->getAllowedTypes());
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::OUTPUT:
     {
-      properties = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::OUTPUT);
+      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::OUTPUT);
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::BUFFER:
     {
-      properties = ExperimentSuperviserSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::BUFFER);
+      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::BUFFER);
       break;
     }
   }

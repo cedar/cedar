@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/action/StartAllTriggers.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 
 // SYSTEM INCLUDES
 
@@ -75,7 +75,7 @@ cedar::proc::experiment::action::StartAllTriggers::~StartAllTriggers()
 
 void cedar::proc::experiment::action::StartAllTriggers::run()
 {
-  ExperimentSuperviserSingleton::getInstance()->getExperiment()->startAllTriggers();
+  cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment()->startAllTriggers();
 }
 
 

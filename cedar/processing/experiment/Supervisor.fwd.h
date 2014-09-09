@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_FWD_H
-#define CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_SUPERVISOR_FWD_H
+#define CEDAR_PROC_EXPERIMENT_SUPERVISOR_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -48,19 +48,18 @@
   #include <boost/smart_ptr.hpp>
 #endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace proc
   {
     namespace experiment
     {
-      CEDAR_DECLARE_PROC_CLASS(ExperimentSuperviser);
+//!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(Supervisor);
+//!@endcond
     }
   }
 }
 
-//!@endcond
-
-#endif // CEDAR_PROC_EXPERIMENT_EXPERIMENT_CONTROLLER_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_SUPERVISOR_FWD_H
 

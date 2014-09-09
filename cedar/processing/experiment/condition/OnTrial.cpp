@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/condition/OnTrial.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/experiment/Experiment.h"
 
 
@@ -73,7 +73,7 @@ cedar::proc::experiment::condition::OnTrial::~OnTrial()
 //----------------------------------------------------------------------------------------------------------------------
 bool cedar::proc::experiment::condition::OnTrial::check()
 {
-  Experiment* p_experiment = cedar::proc::experiment::ExperimentSuperviserSingleton::getInstance()->getExperiment();
+  Experiment* p_experiment = cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment();
   auto current_trial = p_experiment->getActualTrial();
   return current_trial == this->_mTrial->getValue();
 }

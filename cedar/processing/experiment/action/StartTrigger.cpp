@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/action/StartTrigger.h"
-#include "cedar/processing/experiment/ExperimentSuperviser.h"
+#include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 // SYSTEM INCLUDES
 
@@ -72,5 +72,5 @@ cedar::proc::experiment::action::StartTrigger::~StartTrigger()
 
 void cedar::proc::experiment::action::StartTrigger::run()
 {
-  ExperimentSuperviserSingleton::getInstance()->getExperiment()->startTrigger(mTrigger->getTrigger());
+  cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment()->startTrigger(mTrigger->getTrigger());
 }
