@@ -160,7 +160,7 @@ void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions
 
 void cedar::proc::experiment::Experiment::run()
 {
-  if (this->_mTrials->getValue() > 0 && checkActionSequences())
+  if (this->_mTrials->getValue() > 0)
   {
     this->saveGroupState();
     // Set record directory
