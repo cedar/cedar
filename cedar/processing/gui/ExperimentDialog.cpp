@@ -93,6 +93,8 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
 
 cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
 {
+  this->mExperiment->cancel();
+  mpGroupTime->stop();
   delete mpGroupTime;
 }
 
