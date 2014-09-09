@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStop.cpp
+    File:        WriteMessage.cpp
 
-    Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 09
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 09 09
 
-    Description: Source file for the class cedar::proc::experiment::ActionStop.
+    Description: Source file for the class cedar::proc::experiment::action::WriteMessage.
 
     Credits:
 
@@ -38,10 +38,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/StopAllTriggers.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/action/WriteMessage.h"
 #include "cedar/processing/experiment/Supervisor.h"
-
 
 // SYSTEM INCLUDES
 
@@ -52,30 +50,16 @@
 namespace
 {
   bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::action::StopAllTriggersPtr>();
+      registerType<cedar::proc::experiment::action::WriteMessagePtr>();
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::action::StopAllTriggers::StopAllTriggers()
+cedar::proc::experiment::action::WriteMessage::WriteMessage()
 :
-_mResetType
-(
-  new cedar::aux::EnumParameter
-  (
-    this,
-    "Reset type",
-    cedar::proc::experiment::Experiment::ResetType::typePtr(),
-    cedar::proc::experiment::Experiment::ResetType::Reset
-  )
-),
-_mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
-_mMessage(new cedar::aux::StringParameter(this,"Message",""))
-{
-}
-
-cedar::proc::experiment::action::StopAllTriggers::~StopAllTriggers()
+_mMessage(new cedar::aux::StringParameter(this, "Message", ""))
 {
 }
 
@@ -83,9 +67,12 @@ cedar::proc::experiment::action::StopAllTriggers::~StopAllTriggers()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::experiment::action::StopAllTriggers::run()
+void cedar::proc::experiment::action::WriteMessage::run()
 {
-  auto super = cedar::proc::experiment::SupervisorSingleton::getInstance();
-  super->getExperiment()->stopTrial(_mResetType->getValue());
-  super->log(_mSuccess->getValue()?"Trial success":"Trial failed",_mMessage->getValue());
+  const auto& message = this->_mMessage->getValue();
+
+  if (!message.empty())
+  {
+    cedar::proc::experiment::SupervisorSingleton::getInstance()->log("message", message);
+  }
 }
