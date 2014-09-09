@@ -73,6 +73,12 @@ public:
     public:
       void dragEnterEvent(QDragEnterEvent* event);
       void dropEvent(QDropEvent* event);
+
+      void emitLayoutUpdateRequired()
+      {
+//        emit layoutChanged();
+      }
+
     private:
       //!@brief Reference the the ActionListParamter.
       ActionListParameter* mpParent;
