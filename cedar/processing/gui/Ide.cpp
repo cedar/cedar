@@ -433,12 +433,14 @@ void cedar::proc::gui::Ide::showExperimentDialog()
   {
     this->mpExperimentDialog = new cedar::proc::gui::ExperimentDialog(this);
   }
-  mpExperimentDialog->show();
+  this->mpExperimentDialog->show();
+  this->mpExperimentDialog->raise();
+  this->mpExperimentDialog->activateWindow();
 }
 
 void cedar::proc::gui::Ide::showConsistencyChecker()
 {
-  if (this->mpConsistencyDock == NULL)
+  if (this->mpConsistencyDock == nullptr)
   {
     this->mpConsistencyDock = new QDockWidget(this);
     this->mpConsistencyDock->setFloating(true);
