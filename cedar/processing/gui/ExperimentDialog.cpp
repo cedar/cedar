@@ -121,15 +121,20 @@ void cedar::proc::gui::ExperimentDialog::save()
 void cedar::proc::gui::ExperimentDialog::saveAs()
 {
   auto location_dir = cedar::proc::gui::SettingsSingleton::getInstance()->getExperimentDialogDirectory();
+  QString filter = tr("Experiment Files (*.json)");
   std::string filename = QFileDialog::getSaveFileName
       (
         this,
         tr("Save Experiment"),
         location_dir->getValue().absolutePath(),
-        tr("Experiment Files (*.json)")
+        filter
       ).toStdString();
   if (!filename.empty())
   {
+    if (!cedar::aux::endsWith(filename, ".json"))
+    {
+      filename += ".json";
+    }
     this->mExperiment->setFileName(filename);
     this->mExperiment->writeJson(filename);
     location_dir->setValue(QDir(QString::fromStdString(filename)));
@@ -141,12 +146,13 @@ void cedar::proc::gui::ExperimentDialog::load()
 {
   this->updateGroup();
   auto location_dir = cedar::proc::gui::SettingsSingleton::getInstance()->getExperimentDialogDirectory();
+  QString filter = tr("Experiment Files (*.json)");
   std::string filename = QFileDialog::getOpenFileName
           (
             this,
             tr("Open Experiment"),
             location_dir->getValue().absolutePath(),
-            tr("Experiment Files (*.json)")
+            filter
           ).toStdString();
   if (!filename.empty())
   {
