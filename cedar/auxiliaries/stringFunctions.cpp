@@ -39,6 +39,7 @@
 #include "cedar/version.h"
 
 // SYSTEM INCLUDES
+#include <boost/optional.hpp>
 
 std::string cedar::aux::versionNumberToString(unsigned int version)
 {
@@ -56,3 +57,69 @@ std::string cedar::aux::removeWhiteSpaces(const std::string& stringFromWhichToRe
   return result;
 }
 
+std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
+{
+  struct TimeSubdiv
+  {
+    TimeSubdiv(double max, const std::string& shortHandle)
+    :
+    max(max),
+    short_handle(shortHandle)
+    {
+    }
+
+    TimeSubdiv(const std::string& shortHandle)
+    :
+    short_handle(shortHandle)
+    {
+    }
+
+    boost::optional<double> max;
+    std::string short_handle;
+  };
+
+  double time_in_seconds = time / (1.0 * cedar::unit::seconds);
+
+  static std::vector<TimeSubdiv> time_subdivs;
+  if (time_subdivs.empty())
+  {
+    time_subdivs.push_back(TimeSubdiv(60.0, "s"));
+    time_subdivs.push_back(TimeSubdiv(60.0, "m"));
+    time_subdivs.push_back(TimeSubdiv(24.0, "h"));
+    time_subdivs.push_back(TimeSubdiv(365, "d"));
+    time_subdivs.push_back(TimeSubdiv("y"));
+  }
+
+  std::string time_str;
+
+  double current_max = 1.0;
+  double time_remaining = time_in_seconds;
+  for (const auto& subdiv : time_subdivs)
+  {
+    double subtime;
+    double old_max = current_max;
+    if (subdiv.max)
+    {
+      current_max *= subdiv.max.get();
+      subtime = std::fmod(time_remaining, current_max);
+      time_remaining -= subtime;
+    }
+    else
+    {
+      subtime = time_remaining;
+    }
+    std::string subdiv_str = cedar::aux::toString(subtime / old_max) + subdiv.short_handle;
+    if (!time_str.empty())
+    {
+      subdiv_str += " ";
+    }
+    time_str = subdiv_str + time_str;
+
+    if (time_remaining <= 0.0)
+    {
+      break;
+    }
+  }
+
+  return time_str;
+}
