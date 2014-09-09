@@ -204,15 +204,22 @@ cedar::proc::experiment::ExperimentPtr cedar::proc::gui::ExperimentDialog::getEx
 
 void cedar::proc::gui::ExperimentDialog::runExperiment()
 {
-  if(this->mExperiment->checkActionSequences())
+  if (!this->mExperiment->checkActionSequences())
   {
-    this->mExperiment->run();
+    auto r = QMessageBox::warning
+             (
+               this,"No triggers started",
+               "None of the action sequences you have set up start any triggers. "
+               "Running the experiment might not have any effect. Start anyway?",
+               QMessageBox::Yes | QMessageBox::No
+             );
+
+    if (r == QMessageBox::No)
+    {
+      return;
+    }
   }
-  else
-  {
-    QMessageBox::warning(this,"Wrong configuration!",
-        "There should be at least one StartTrigger action in an OnInit condition.", QMessageBox::Ok);
-  }
+  this->mExperiment->run();
 }
 
 void cedar::proc::gui::ExperimentDialog::stopExperiment()
