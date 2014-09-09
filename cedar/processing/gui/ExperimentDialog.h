@@ -104,6 +104,9 @@ private:
   //!@brief Removes all ActionSequences from the widget
   void clearActionSequences();
 
+  //! Enables/disables all action widgets.
+  void setActionSequenceWidgetsEnabled(bool enabled);
+
 private slots:
   //!@brief Saves the experiment
   void save();

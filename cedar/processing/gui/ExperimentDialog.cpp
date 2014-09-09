@@ -226,17 +226,30 @@ void cedar::proc::gui::ExperimentDialog::experimentRunning(bool status)
   {
     this->runButton->setEnabled(false);
     this->stopButton->setEnabled(true);
-    this->scrollArea->setEnabled(false);
+    this->setActionSequenceWidgetsEnabled(false);
     this->mStatusText->setText(QString::fromStdString("Running"));
   }
   else
   {
     this->runButton->setEnabled(true);
     this->stopButton->setEnabled(false);
-    this->scrollArea->setEnabled(true);
+    this->setActionSequenceWidgetsEnabled(true);
     this->mStatusText->setText(QString::fromStdString("Stopped"));
   }
 }
+
+void cedar::proc::gui::ExperimentDialog::setActionSequenceWidgetsEnabled(bool enabled)
+{
+  for (int i = 0; i < this->mActionSequences->count(); ++i)
+  {
+    auto child = this->mActionSequences->itemAt(i)->widget();
+    if (auto action_sequence_widget = dynamic_cast<cedar::proc::experiment::gui::ActionSequence*>(child))
+    {
+      action_sequence_widget->setEnabled(enabled);
+    }
+  }
+}
+
 
 void cedar::proc::gui::ExperimentDialog::trialNumberChanged(int number)
 {
