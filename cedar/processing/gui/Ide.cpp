@@ -291,6 +291,9 @@ mpExperimentDialog(nullptr)
   );
 
   this->mpActionSave->setEnabled(true);
+
+  this->buildStatusBar();
+  this->startTimer(90);
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -317,6 +320,19 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::buildStatusBar()
+{
+  this->mpGlobalTimeLabel = new QLabel("simulation time");
+  this->statusBar()->addPermanentWidget(this->mpGlobalTimeLabel, 0);
+}
+
+void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
+{
+  cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  std::string formatted_time = cedar::aux::formatDuration(time);
+  this->mpGlobalTimeLabel->setText(QString("simulation time: ") + QString::fromStdString(formatted_time));
+}
 
 void cedar::proc::gui::Ide::setArchitectureChanged(bool changed)
 {
