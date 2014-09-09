@@ -51,18 +51,9 @@
 
 cedar::proc::experiment::Supervisor::Supervisor()
 :
-mpExperiment(nullptr),
-mLogLock(new QReadWriteLock)
+mpExperiment(nullptr)
 {
-
 }
-
-cedar::proc::experiment::Supervisor::~Supervisor()
-{
-  delete mLogLock;
-}
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -91,28 +82,8 @@ cedar::proc::experiment::Experiment* cedar::proc::experiment::Supervisor::getExp
 
 void cedar::proc::experiment::Supervisor::log(std::string messageType, std::string message)
 {
-  QWriteLocker locker(mLogLock);
-
   cedar::unit::Time time= cedar::aux::GlobalClockSingleton::getInstance()->getTime();
 
-  /* @todo Save Log in memory later
-   *
-   * const LogData data = {time, messageType, message};
-   * mLogList.push_back(data);
-   */
-
   std::string message_str = cedar::aux::formatDuration(time) + "\t[" + messageType + "]\t" + message;
-
   cedar::aux::LogSingleton::getInstance()->message(message_str, "experiment supervisor");
-
-  // Get file name
-  std::string file_name = mpExperiment->getFileName();
-  int lastindex = file_name.find_last_of(".");
-  file_name = file_name.substr(0, lastindex) + ".log";
-
-  //Open stream
-  std::ofstream output;
-  output.open(file_name, std::ios::out | std::ios::app);
-  output << message_str << std::endl;
-  output.close();
 }

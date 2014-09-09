@@ -48,6 +48,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/FileLog.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
@@ -158,10 +159,32 @@ void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions
   _mTrials->setValue(repetitions);
 }
 
+void cedar::proc::experiment::Experiment::installLog()
+{
+  std::string file_name = this->getFileName();
+  size_t lastindex = file_name.find_last_of(".");
+  file_name = file_name.substr(0, lastindex) + ".log";
+
+  this->mFileLogger = cedar::aux::FileLogPtr(new cedar::aux::FileLog(file_name, false));
+  cedar::aux::LogFilterPtr filter(new cedar::aux::logFilter::All());
+  filter->setRemovesMessages(false);
+  cedar::aux::LogSingleton::getInstance()->addLoggerAtFront(this->mFileLogger, filter);
+}
+
+void cedar::proc::experiment::Experiment::removeLog()
+{
+  if (this->mFileLogger)
+  {
+    cedar::aux::LogSingleton::getInstance()->removeLogger(this->mFileLogger);
+  }
+}
+
 void cedar::proc::experiment::Experiment::run()
 {
   if (this->_mTrials->getValue() > 0)
   {
+    this->installLog();
+
     this->saveGroupState();
     // Set record directory
     std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
@@ -183,6 +206,9 @@ void cedar::proc::experiment::Experiment::cancel()
 
 void cedar::proc::experiment::Experiment::startTrial()
 {
+  cedar::aux::GlobalClockSingleton::getInstance()->reset();
+  cedar::aux::GlobalClockSingleton::getInstance()->start();
+
   // reset all action sequences
   for (size_t i = 0; i < this->_mActionSequences->size(); ++i)
   {
@@ -192,9 +218,6 @@ void cedar::proc::experiment::Experiment::startTrial()
 
   this->mStopped = false;
   emit trialNumberChanged(this->mActualTrial);
-  cedar::aux::GlobalClockSingleton::getInstance()->reset();
-  cedar::aux::GlobalClockSingleton::getInstance()->start();
-
   //start records
   std::stringstream ss;
   ss << this->mActualTrial;
@@ -294,6 +317,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
     emit experimentRunning(false);
     resetGroupState();
     mActualTrial = 0;
+    this->removeLog();
   }
   mStopped = true;
   emit trialNumberChanged(mActualTrial);
