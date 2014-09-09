@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureWidgetList.h"
 #include "cedar/processing/gui/FindDialog.h"
@@ -285,6 +286,11 @@ mpExperimentDialog(nullptr)
                    this,
                    SLOT(architectureChanged()));
 
+  QObject::connect(cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
+                   SIGNAL(experimentRunning(bool)),
+                   this,
+                   SLOT(setSimulationControlsDisabled(bool)));
+
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
@@ -320,6 +326,13 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::setSimulationControlsDisabled(bool disabled)
+{
+  this->mpThreadsStartAll->setEnabled(!disabled);
+  this->mpThreadsStopAll->setEnabled(!disabled);
+  this->mpThreadsSingleStep->setEnabled(!disabled);
+}
 
 void cedar::proc::gui::Ide::buildStatusBar()
 {

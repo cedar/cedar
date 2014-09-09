@@ -77,8 +77,12 @@ void cedar::proc::experiment::Supervisor::step(cedar::unit::Time)
 
 void cedar::proc::experiment::Supervisor::setExperiment(Experiment* experiment)
 {
+  if (this->mpExperiment != nullptr)
+  {
+    QObject::disconnect(this->mpExperiment, SIGNAL(experimentRunning(bool)), this, SIGNAL(experimentRunning(bool)));
+  }
   this->mpExperiment = experiment;
-
+  QObject::connect(this->mpExperiment, SIGNAL(experimentRunning(bool)), this, SIGNAL(experimentRunning(bool)));
 }
 cedar::proc::experiment::Experiment* cedar::proc::experiment::Supervisor::getExperiment()
 {
