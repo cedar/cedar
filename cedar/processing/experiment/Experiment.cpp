@@ -426,12 +426,14 @@ cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(s
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getStepDatas(std::string step, cedar::proc::DataRole::Id role )
 {
-  auto stepItem =this->mGroup->getElement<cedar::proc::Connectable>(step);
-
   std::vector<std::string> ret;
-  for (auto data : stepItem->getDataSlots(role))
+
+  if (auto stepItem = this->mGroup->getElement<cedar::proc::Connectable>(step))
   {
-    ret.push_back(data.first);
+    for (auto data : stepItem->getDataSlots(role))
+    {
+      ret.push_back(data.first);
+    }
   }
   return ret;
 }
