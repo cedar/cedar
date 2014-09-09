@@ -732,6 +732,9 @@ private:
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
+
+  //!@brief Takes care of updating the list of looped triggerables if any of them change their state.
+  void onLoopedChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------
