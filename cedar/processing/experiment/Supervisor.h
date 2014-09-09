@@ -55,6 +55,8 @@
  */
 class cedar::proc::experiment::Supervisor : public cedar::aux::LoopedThread
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,6 +100,10 @@ public:
   //!@brief Logs a message and writes it to the log file;
   void log(std::string messageType, std::string message);
 
+signals:
+  //! Emitted whenever the experiment is started or stopped.
+  void experimentRunning(bool);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,6 +140,7 @@ private:
   QReadWriteLock* mLogLock;
 
   //!@brief A memory list of the log
+  //!@todo Why doesn't this use cedar's default log or a cedar::aux::DataTable?
   std::vector<LogData> mLogList;
 }; // class cedar::proc::experiment::Supervisor
 
