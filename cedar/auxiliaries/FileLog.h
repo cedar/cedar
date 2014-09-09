@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,84 +22,58 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.h
+    File:        FileLog.h
 
-    Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 09 09
 
-    Description: Header file for the class cedar::proc::experiment::ExperimentController.
+    Description: Header file for the class cedar::aux::FileLog.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_SUPERVISOR_H
-#define CEDAR_PROC_EXPERIMENT_SUPERVISOR_H
+#ifndef CEDAR_AUX_FILE_LOG_H
+#define CEDAR_AUX_FILE_LOG_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/LogInterface.h"
+#include "cedar/auxiliaries/Path.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/Supervisor.fwd.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/auxiliaries/FileLog.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
+#include <QMutex>
+#include <fstream>
 
-/*!@brief This thread should continuously perform the action sequences of the experiment
- *
+
+/*!@brief Writes log messages into a file.
  */
-class cedar::proc::experiment::Supervisor : public cedar::aux::LoopedThread
+class cedar::aux::FileLog : public cedar::aux::LogInterface
 {
-  Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-
-  // uses singleton template.
-  friend class cedar::aux::Singleton<Supervisor>;
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-
-  //!@brief A data structure to store all the DataPtr with time stamp (in ms) in a list.
-  struct LogData
-  {
-    cedar::unit::Time mLogTime;
-    std::string  mMessageType;
-    std::string mMessage;
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //!@brief The private constructor.
-  Supervisor();
+public:
+  //!@brief The standard constructor.
+  FileLog(const cedar::aux::Path& filePath, bool writeInfo = true);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Sets the experiment.
-  void setExperiment(Experiment* experiment);
-
-  //!@brief Returns the experimen
-  Experiment* getExperiment();
-
-  //!@brief Logs a message and writes it to the log file;
-  void log(std::string messageType, std::string message);
-
-signals:
-  //! Emitted whenever the experiment is started or stopped.
-  void experimentRunning(bool);
+  //!@brief Appends the given log message to the log file.
+  void message(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -111,8 +85,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Calls write in the specified interval.
-  void step(cedar::unit::Time);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -120,7 +93,10 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  cedar::aux::LockableMember<std::ofstream, QMutex> mLogFile;
+
+  //! Whether or not additional information is written. If false, only the log messages are written.
+  bool mWriteInfo;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -129,26 +105,9 @@ protected:
   // none yet
 
 private:
-  //! The experiment
-  //!@todo Why isn't this a shared ptr?
-  Experiment* mpExperiment;
-}; // class cedar::proc::experiment::Supervisor
+  // none yet
 
+}; // class cedar::aux::FileLog
 
-
-#include "cedar/auxiliaries/Singleton.h"
-
-namespace cedar
-{
-  namespace proc
-  {
-    namespace experiment
-    {
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::Supervisor>);
-      typedef cedar::aux::Singleton<cedar::proc::experiment::Supervisor> SupervisorSingleton;
-    }
-  }
-}
-
-#endif // CEDAR_PROC_EXPERIMENT_SUPERVISOR_H
+#endif // CEDAR_AUX_FILE_LOG_H
 

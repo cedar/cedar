@@ -55,6 +55,7 @@
 #include "cedar/processing/Element.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/FileLog.fwd.h"
 #include "cedar/processing/experiment/Experiment.fwd.h"
 #include "cedar/processing/experiment/Supervisor.fwd.h"
 
@@ -310,6 +311,10 @@ private:
 
   //!@brief Restores the saved state of the group.
   void resetGroupState();
+
+  void installLog();
+
+  void removeLog();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -338,6 +343,9 @@ private:
 
   std::string mRecordFolderName;
 
+  //! Logger used while the experiment is running.
+  cedar::aux::FileLogPtr mFileLogger;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -357,7 +365,6 @@ private:
 
   //!@brief The state of the group before the experiment has been started.
   cedar::aux::ConfigurationNode mGroupState;
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // connections

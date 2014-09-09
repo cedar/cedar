@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStop.cpp
+    File:        FileLog.cpp
 
-    Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 09
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 09 09
 
-    Description: Source file for the class cedar::proc::experiment::ActionStop.
+    Description: Source file for the class cedar::aux::FileLog.
 
     Credits:
 
@@ -38,54 +38,67 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/StopAllTriggers.h"
-#include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/Supervisor.h"
-
+#include "cedar/auxiliaries/FileLog.h"
 
 // SYSTEM INCLUDES
+#include <QMutexLocker>
 
-//----------------------------------------------------------------------------------------------------------------------
-// register class
-//----------------------------------------------------------------------------------------------------------------------
-
-namespace
-{
-  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::action::StopAllTriggersPtr>();
-}
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::action::StopAllTriggers::StopAllTriggers()
+cedar::aux::FileLog::FileLog(const cedar::aux::Path& filePath, bool writeInfo)
 :
-_mResetType
-(
-  new cedar::aux::EnumParameter
-  (
-    this,
-    "Reset type",
-    cedar::proc::experiment::Experiment::ResetType::typePtr(),
-    cedar::proc::experiment::Experiment::ResetType::Reset
-  )
-),
-_mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
-_mMessage(new cedar::aux::StringParameter(this,"Message",""))
+mWriteInfo(writeInfo)
 {
-}
-
-cedar::proc::experiment::action::StopAllTriggers::~StopAllTriggers()
-{
+  mLogFile.member().open(filePath.absolute().toString(false), std::ios_base::out | std::ios_base::app);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::experiment::action::StopAllTriggers::run()
+void cedar::aux::FileLog::message(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title)
 {
-  auto super = cedar::proc::experiment::SupervisorSingleton::getInstance();
-  super->log(_mSuccess->getValue()?"Trial success":"Trial failed",_mMessage->getValue());
-  super->getExperiment()->stopTrial(_mResetType->getValue());
+  QMutexLocker locker(mLogFile.getLockPtr());
+  auto& stream = this->mLogFile.member();
+
+  if (mWriteInfo)
+  {
+    stream << "[";
+    switch (level)
+    {
+      case cedar::aux::LOG_LEVEL_DEBUG:
+        stream << "debug      ";
+        break;
+
+      case cedar::aux::LOG_LEVEL_ERROR:
+        stream << "error      ";
+        break;
+
+      case cedar::aux::LOG_LEVEL_MEM_DEBUG:
+        stream << "memdebug   ";
+        break;
+
+      case cedar::aux::LOG_LEVEL_MESSAGE:
+        stream << "message    ";
+        break;
+
+      case cedar::aux::LOG_LEVEL_SYSTEM_INFO:
+        stream << "system info";
+        break;
+
+      case cedar::aux::LOG_LEVEL_WARNING:
+        stream << "warning    ";
+        break;
+    }
+    stream << "] ";
+  }
+
+  if (!title.empty())
+  {
+    stream << "(" << title << ") ";
+  }
+
+  stream << message << std::endl;
 }
