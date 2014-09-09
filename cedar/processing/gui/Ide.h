@@ -61,6 +61,7 @@
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
 #include <QComboBox>
+#include <QLabel>
 #include <map>
 
 
@@ -287,6 +288,9 @@ protected:
    */
   void closeEvent(QCloseEvent *pEvent);
 
+  //! Periodically updates certain information
+  void timerEvent(QTimerEvent*);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -331,6 +335,9 @@ private:
 
   //! Updates the architecture widget menu.
   void updateArchitectureWidgetsMenu();
+
+  //! Constructs the widgets in the status bar.
+  void buildStatusBar();
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
@@ -398,6 +405,9 @@ private:
 
   //! Widget for creating and running experiments
   cedar::proc::gui::ExperimentDialog* mpExperimentDialog;
+
+  //! Label used for displaying the current global time.
+  QLabel* mpGlobalTimeLabel;
 
 }; // class cedar::MainWindow
 
