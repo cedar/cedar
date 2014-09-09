@@ -59,7 +59,7 @@ mActionListParameter
 (
   new cedar::proc::experiment::action::Action::ActionListParameter
   (
-    NULL,
+    nullptr,
     "",
     std::vector<cedar::proc::experiment::action::ActionPtr>()
   )
@@ -76,12 +76,17 @@ mActionListWidget(new ActionListWidget(this))
                             "               selection-background-color: rgb(240,210,210);"
                             "            }"
                             "");
-  this->setLayout(new QVBoxLayout);
-  this->layout()->setMargin(0);
-  this->layout()->addWidget(mActionListWidget);
+  auto p_box_layout = new QVBoxLayout();
+  this->setLayout(p_box_layout);
+  p_box_layout->setMargin(0);
+  p_box_layout->addWidget(mActionListWidget);
   QPushButton* add = new QPushButton();
   add->setText(QString::fromStdString("Add Action"));
-  this->layout()->addWidget(add);
+  auto p_add_layout = new QHBoxLayout();
+  p_add_layout->addStretch(1);
+  p_add_layout->addWidget(add, 0);
+  p_add_layout->addStretch(1);
+  p_box_layout->addLayout(p_add_layout);
   connect(add,SIGNAL(clicked()),this,SLOT(addAction()));
   connect(this,SIGNAL(parameterPointerChanged()),this,SLOT(parameterPointerChanged()));
 }
@@ -106,45 +111,53 @@ void cedar::proc::experiment::gui::ActionListParameter::addAction()
 void cedar::proc::experiment::gui::ActionListParameter::updateList()
 {
   mActionListWidget->clear();
+  int size = 0;
   for(unsigned int i=0; i < mActionListParameter->size(); i++)
   {
     // Create ActionWidget
     cedar::proc::experiment::action::ActionPtr action = mActionListParameter->at(i);
     QListWidgetItem* item = new QListWidgetItem();
-    item->setSizeHint(QSize(0,45));
-    QWidget* itemWidget = new QWidget;
-    QHBoxLayout* itemWidgetLayout = new QHBoxLayout();
-    itemWidgetLayout->setMargin(5);
-    itemWidget->setLayout(itemWidgetLayout);
+//    item->setSizeHint(QSize(0,45));
+    QWidget* item_widget = new QWidget;
+    auto outer_layout = new QVBoxLayout();
+    outer_layout->setContentsMargins(3, 3, 3, 3);
+    outer_layout->setMargin(3);
+    auto inner_layout = new QHBoxLayout();
+    inner_layout->setContentsMargins(0, 0, 0, 0);
+    inner_layout->setMargin(3);
 
     //Create remove Action button
     QPushButton* remove = new QPushButton();
-    remove->setText(QString::fromStdString("-"));
-    remove->setFixedSize(35,25);
+    remove->setText("-");
+    remove->setFixedWidth(35);
     remove->setObjectName(QString::number(i));
-    itemWidgetLayout->addWidget(remove);
-    connect(remove,SIGNAL(clicked()),this,SLOT(actionParameterRemoved()));
+    inner_layout->addWidget(remove);
+    connect(remove, SIGNAL(clicked()), this, SLOT(actionParameterRemoved()));
 
     //Create Action selector
     cedar::aux::ObjectParameterPtr actionParameter
-        (
-            new cedar::proc::experiment::action::Action::ActionParameter(NULL,std::to_string(i),action)
-
-        );
-    cedar::aux::gui::Parameter* parameterWidget = new cedar::aux::gui::ObjectParameter();
-    parameterWidget->setParameter(actionParameter);
-    itemWidgetLayout->addWidget(parameterWidget);
-    connect(actionParameter.get(),SIGNAL(valueChanged()),this,SLOT(actionParameterChanged()));
+    (
+      new cedar::proc::experiment::action::Action::ActionParameter(nullptr, std::to_string(i), action)
+    );
+    cedar::aux::gui::Parameter* parameter_widget = new cedar::aux::gui::ObjectParameter();
+    parameter_widget->setParameter(actionParameter);
+    inner_layout->addWidget(parameter_widget);
+    outer_layout->addLayout(inner_layout);
+    connect(actionParameter.get(), SIGNAL(valueChanged()), this, SLOT(actionParameterChanged()));
 
     //Create Action control
-    auto itemProperties = new cedar::proc::experiment::gui::ExperimentItemWidget();
-    itemProperties->display(action);
-    itemWidgetLayout->addWidget(itemProperties);
+    auto item_properties = new cedar::proc::experiment::gui::ExperimentItemWidget();
+    item_properties->display(action);
+    outer_layout->addWidget(item_properties);
+    item_widget->setLayout(outer_layout);
+
+    item->setSizeHint(item_widget->sizeHint());
 
     this->mActionListWidget->addItem(item);
-    this->mActionListWidget->setItemWidget(item,itemWidget);
+    this->mActionListWidget->setItemWidget(item,item_widget);
+    size += item_widget->sizeHint().height();
   }
-  this->mActionListWidget->setMinimumHeight(mActionListParameter->size()*45+5);
+  this->mActionListWidget->setMinimumHeight(size + 3); // the +3 makes sure no scroll bar appears
 }
 
 void cedar::proc::experiment::gui::ActionListParameter::parameterPointerChanged()

@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
+#include <QFormLayout>
 #include <QLabel>
 
 
@@ -78,14 +79,11 @@ mpPropertyCopy(nullptr)
   this->mpProperty->setEditable(true);
   this->mpProperty->setInsertPolicy(QComboBox::NoInsert);
 
-  QHBoxLayout* layout = new QHBoxLayout;
+  auto layout = new QFormLayout();
   layout->setMargin(0);
   this->setLayout(layout);
-  layout->addWidget(new QLabel(QString::fromStdString("Step: ")));
-  layout->addWidget(mpStep);
-  layout->addWidget(new QLabel(QString::fromStdString("Property: ")));
-  layout->addWidget(mpProperty);
-  //layout->addWidget(new QLabel(QString::fromStdString("=")));
+  layout->addRow(new QLabel(QString::fromStdString("Step:")), mpStep);
+  layout->addRow(new QLabel(QString::fromStdString("Property:")), mpProperty);
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
