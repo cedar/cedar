@@ -118,13 +118,16 @@ int test_formatDuration()
   int errors = 0;
 
   std::cout << "Testing formatDuration" << std::endl;
-  errors += test_formatDuration(1.0 * cedar::unit::seconds, "1s");
-  errors += test_formatDuration(60.0 * cedar::unit::seconds, "1m 00s");
-  errors += test_formatDuration(90.0 * cedar::unit::seconds, "1m 30s");
-  errors += test_formatDuration(60.0 * 60.0 * cedar::unit::seconds, "1h 00m 00s");
-  errors += test_formatDuration(24.0 * 60.0 * 60.0 * cedar::unit::seconds, "1d 00h 00m 00s");
-  errors += test_formatDuration(365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "1y 0d 00h 00m 00s");
-  errors += test_formatDuration(100.0 * 365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "100y 0d 00h 00m 00s");
+  errors += test_formatDuration(1.0 * cedar::unit::seconds, "1.0s");
+  errors += test_formatDuration(11.11 * cedar::unit::seconds, "11.1s");
+  errors += test_formatDuration(60.0 * cedar::unit::seconds, "1m 00.0s");
+  errors += test_formatDuration(61.5678 * cedar::unit::seconds, "1m 01.6s");
+  errors += test_formatDuration(90.0 * cedar::unit::seconds, "1m 30.0s");
+  errors += test_formatDuration(60.0 * 60.0 * cedar::unit::seconds, "1h 00m 00.0s");
+  errors += test_formatDuration(24.0 * 60.0 * 60.0 * cedar::unit::seconds, "1d 00h 00m 00.0s");
+  errors += test_formatDuration(365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "1y 0d 00h 00m 00.0s");
+  errors += test_formatDuration(100.0 * 365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "100y 0d 00h 00m 00.0s");
+  errors += test_formatDuration(10000.0 * 365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "10000y 0d 00h 00m 00.0s");
 
 
   return errors;

@@ -299,7 +299,7 @@ mpExperimentDialog(nullptr)
   this->mpActionSave->setEnabled(true);
 
   this->buildStatusBar();
-  this->startTimer(90);
+  this->startTimer(100);
 }
 
 cedar::proc::gui::Ide::~Ide()

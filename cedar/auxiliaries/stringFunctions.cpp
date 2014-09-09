@@ -105,6 +105,7 @@ std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
 
   double current_max = 1.0;
   double time_remaining = time_in_seconds;
+  bool first = true;
   for (const auto& subdiv : time_subdivs)
   {
     double subtime;
@@ -121,10 +122,27 @@ std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
       time_remaining = 0.0;
     }
     std::stringstream stream;
+    // make the conversion zero-padded
+    unsigned int padding = 0;
+    if (first)
+    {
+      stream << std::setprecision(1);
+      stream << std::fixed;
+      padding = 2;
+      first = false;
+    }
+    else
+    {
+      if (!subdiv.precision)
+      {
+        stream << std::fixed;
+      }
+      stream << std::setprecision(0);
+    }
+
     if (time_remaining > 0.0 && subdiv.precision)
     {
-      // make the conversion zero-padded
-      stream << std::setw(subdiv.precision.get()) << std::setfill('0');
+      stream << std::setw(subdiv.precision.get() + padding) << std::setfill('0');
     }
 
     stream << (subtime / old_max);
