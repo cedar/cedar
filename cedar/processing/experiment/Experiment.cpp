@@ -165,6 +165,9 @@ void cedar::proc::experiment::Experiment::run()
     this->saveGroupState();
     // Set record directory
     std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
+
+    SupervisorSingleton::getInstance()->log("message", "New experiment started. Timestamp: " + time_stamp);
+
     this->mRecordFolderName = this->_mName->getValue()+ "_" + time_stamp;
     this->mActualTrial = 1;
     SupervisorSingleton::getInstance()->start();
