@@ -96,7 +96,7 @@ private:
     return cedar::aux::asserted_pointer_cast<cedar::aux::ObjectParameter>(this->getParameter());
   }
 
-  QString prettyTypeId(const QString& typeId) const;
+  void splitTypeId(const QString& typeId, QString& className) const;
 
 private slots:
   void parameterPointerChanged();

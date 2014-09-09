@@ -113,13 +113,12 @@ bool cedar::aux::gui::ObjectParameter::eventFilter(QObject* object, QEvent* even
   return QWidget::eventFilter(object, event);
 }
 
-QString cedar::aux::gui::ObjectParameter::prettyTypeId(const QString& typeId) const
+void cedar::aux::gui::ObjectParameter::splitTypeId(const QString& typeId, QString& className) const
 {
   QStringList parts = typeId.split('.');
-  QString class_id = parts.back();
-  parts.pop_back();
-  QString namespace_id = parts.join(".");
-  return class_id + " (" + namespace_id + ")";
+  className = parts.back();
+//  parts.pop_back();
+//  namespaceName = parts.join(".");
 }
 
 void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
@@ -140,8 +139,11 @@ void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
   for (size_t i = 0; i < types.size(); ++i)
   {
     QString type_id = QString::fromStdString(types.at(i));
-    this->mpTypeSelector->addItem(this->prettyTypeId(type_id));
+    QString class_name;
+    this->splitTypeId(type_id, class_name);
+    this->mpTypeSelector->addItem(class_name);
     this->mpTypeSelector->setItemData(i, type_id);
+    this->mpTypeSelector->setItemData(i, type_id, Qt::ToolTipRole);
     if (current_type == -1 && types.at(i) == parameter->getTypeId())
     {
       current_type = static_cast<int>(i);
