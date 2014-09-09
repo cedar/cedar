@@ -360,6 +360,11 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(
     {
       // Check if parameter is registered in the DeclarationManager
       auto parameter = configurable->getParameter(parameter_path);
+      // never allow "name" to be in the list of parameters
+      if (parameter->getName() == "name")
+      {
+        continue;
+      }
       std::string parameter_type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
       if (allowedTypes.size() > 0)
       {
