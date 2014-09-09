@@ -96,6 +96,7 @@ cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
 {
   delete mpGroupTime;
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -175,7 +176,8 @@ void cedar::proc::gui::ExperimentDialog::trialChanged()
 void cedar::proc::gui::ExperimentDialog::clearActionSequences()
 {
   QLayoutItem *child;
-  while ((child = this->mActionSequences->takeAt(0)) != 0) {
+  while ((child = this->mActionSequences->takeAt(0)) != 0)
+  {
     delete child->widget();
     delete child;
   }
@@ -256,11 +258,9 @@ void cedar::proc::gui::ExperimentDialog::redraw()
   }
 }
 
-
 void cedar::proc::gui::ExperimentDialog::timeUpdate()
 {
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
-  std::stringstream timeText;
-  timeText << time;
-  this->mTimeLabel->setText(QString::fromStdString(timeText.str()));
+  std::string formatted_time = cedar::aux::formatDuration(time);
+  this->mTimeLabel->setText(QString::fromStdString(formatted_time));
 }
