@@ -82,8 +82,9 @@ mpPropertyCopy(nullptr)
   auto layout = new QFormLayout();
   layout->setMargin(0);
   this->setLayout(layout);
-  layout->addRow(new QLabel(QString::fromStdString("Step:")), mpStep);
-  layout->addRow(new QLabel(QString::fromStdString("Property:")), mpProperty);
+  layout->addRow(new QLabel("Step"), mpStep);
+  layout->addRow(new QLabel("Property"), mpProperty);
+  layout->addRow(new QLabel("Value"), new QLabel("(select an element and parameter first)"));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
@@ -130,7 +131,6 @@ void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()
   parameter->setProperty(text.toStdString());
 
   updateValue();
-
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateSteps()
@@ -189,23 +189,28 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
   {
     case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
     {
+      auto layout = cedar::aux::asserted_cast<QFormLayout*>(this->layout());
       cedar::aux::ParameterPtr parameter_copy = parameter->getParameterCopy();
 
       if (!parameter_copy)
       {
         return;
       }
-      if (mpPropertyCopy)
+      if (this->mpPropertyCopy)
       {
-        delete mpPropertyCopy;
-        mpPropertyCopy=NULL;
+        delete this->mpPropertyCopy;
+        this->mpPropertyCopy = nullptr;
+      }
+      else
+      {
+        delete layout->itemAt(2, QFormLayout::FieldRole)->widget();
       }
       cedar::aux::gui::Parameter* parameter_widget =
           cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter_copy)->allocateRaw();
-      parameter_widget->setParent(this);
+//      parameter_widget->setParent(this);
       parameter_widget->setParameter(parameter_copy);
       mpPropertyCopy = parameter_widget;
-      this->layout()->addWidget(mpPropertyCopy);
+      layout->setWidget(2, QFormLayout::FieldRole, mpPropertyCopy);
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::OUTPUT:
