@@ -77,14 +77,14 @@ void cedar::proc::experiment::gui::ExperimentItemWidget::display(cedar::aux::Con
 
     if(auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
     {
-       QVBoxLayout* row = new QVBoxLayout;
-       row->setAlignment(Qt::AlignTop);
-       cedar::proc::experiment::gui::ExperimentItemWidget* another_widget = new cedar::proc::experiment::gui::ExperimentItemWidget();
-       another_widget->display(object_parameter->getConfigurable());
-       row->addWidget(parameterWidget);
-       row->addWidget(another_widget);
-       ((QBoxLayout*)this->layout())->addLayout(row);
-       connect(object_parameter.get(),SIGNAL(valueChanged()),this,SLOT(objectParameterChanged()));
+      QVBoxLayout* row = new QVBoxLayout;
+      row->setAlignment(Qt::AlignTop);
+      cedar::proc::experiment::gui::ExperimentItemWidget* another_widget = new cedar::proc::experiment::gui::ExperimentItemWidget();
+      another_widget->display(object_parameter->getConfigurable());
+      row->addWidget(parameterWidget);
+      row->addWidget(another_widget);
+      ((QBoxLayout*)this->layout())->addLayout(row);
+      connect(object_parameter.get(),SIGNAL(valueChanged()),this,SLOT(objectParameterChanged()));
     }
     else
     {
