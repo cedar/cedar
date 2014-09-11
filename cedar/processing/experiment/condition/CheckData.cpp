@@ -94,7 +94,6 @@ _desiredValue
 
 bool cedar::proc::experiment::condition::CheckData::check()
 {
-  //!@todo Use std::numeric_limits instead of DBL_MAX/MIN constants
   if (cedar::aux::ConstDataPtr data = _stepData->getData())
   {
     if (cedar::aux::ConstMatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
