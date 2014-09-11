@@ -1052,15 +1052,21 @@ void cedar::proc::Group::addConnectorInternal(const std::string& name, bool inpu
 
   if (input)
   {
-    this->declareInput(name, false);
-    cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
-    this->add(source, name);
+    if (!this->hasInputSlot(name))
+    {
+      this->declareInput(name, false);
+      cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
+      this->add(source, name);
+    }
   }
   else
   {
-    cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
-    this->declareSharedOutput(name, sink->getEmptyData());
-    this->add(sink, name);
+    if (!this->hasOutputSlot(name))
+    {
+      cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
+      this->declareSharedOutput(name, sink->getEmptyData());
+      this->add(sink, name);
+    }
   }
 }
 
