@@ -54,14 +54,17 @@ cedar::proc::experiment::action::Action::Action()
 {
 
 }
-cedar::proc::experiment::action::Action::~Action()
-{
-
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::experiment::action::Action::preExperiment()
+{
+  // empty default implementation
+}
 
+void cedar::proc::experiment::action::Action::postExperiment()
+{
+  // empty default implementation
+}

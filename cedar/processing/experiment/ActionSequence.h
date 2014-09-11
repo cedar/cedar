@@ -90,6 +90,12 @@ public:
   //! Checks the condition and, if it fires, runs the actions.
   void run();
 
+  //! To be called whenever an experiment is about to start.
+  void preExperiment();
+
+  //! To be called whenever an experiment was stopped.
+  void postExperiment();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

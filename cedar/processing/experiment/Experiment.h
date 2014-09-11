@@ -315,6 +315,12 @@ private:
   void installLog();
 
   void removeLog();
+
+  //! Called before an experiment is started.
+  void preExperiment();
+
+  //! Called after an experiment is stopped.
+  void postExperiment();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -333,6 +339,7 @@ private:
   cedar::aux::CallFunctionInThreadPtr mStopGroup;
 
   //!@brief The currently running trial. It is 0 if no trial is running
+  //!@todo This should be called mCurrentTrial
   unsigned int mActualTrial;
 
   //!@brief The flag stores if the experiment is on initial state

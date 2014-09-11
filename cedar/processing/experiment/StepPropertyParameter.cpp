@@ -68,6 +68,18 @@ cedar::proc::experiment::StepPropertyParameter::~StepPropertyParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::StepPropertyParameter::isParameterSelected() const
+{
+  if (this->getStep() == "" || this->getProperty() == "")
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+
 void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::aux::ConfigurationNode& node)
 {
   try

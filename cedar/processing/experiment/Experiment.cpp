@@ -159,6 +159,26 @@ void cedar::proc::experiment::Experiment::setTrialCount(unsigned int repetitions
   _mTrials->setValue(repetitions);
 }
 
+void cedar::proc::experiment::Experiment::preExperiment()
+{
+  this->installLog();
+
+  for (size_t i = 0; i < this->_mActionSequences->size(); ++i)
+  {
+    this->_mActionSequences->at(i)->preExperiment();
+  }
+}
+
+void cedar::proc::experiment::Experiment::postExperiment()
+{
+  this->removeLog();
+
+  for (size_t i = 0; i < this->_mActionSequences->size(); ++i)
+  {
+    this->_mActionSequences->at(i)->postExperiment();
+  }
+}
+
 void cedar::proc::experiment::Experiment::installLog()
 {
   std::string file_name = this->getFileName();
@@ -183,9 +203,9 @@ void cedar::proc::experiment::Experiment::run()
 {
   if (this->_mTrials->getValue() > 0)
   {
-    this->installLog();
+    this->preExperiment();
 
-    this->saveGroupState();
+//    this->saveGroupState();
     // Set record directory
     std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
 
@@ -315,10 +335,10 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
   {
     SupervisorSingleton::getInstance()->requestStop();
     emit experimentRunning(false);
-    resetGroupState();
+//    resetGroupState();
     mActualTrial = 0;
-    this->removeLog();
   }
+  this->postExperiment();
   mStopped = true;
   emit trialNumberChanged(mActualTrial);
 }

@@ -84,6 +84,22 @@ _mCondition
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::experiment::ActionSequence::preExperiment()
+{
+  for (size_t i = 0; i < this->_mActionSet->size(); ++i)
+  {
+    this->_mActionSet->at(i)->preExperiment();
+  }
+}
+
+void cedar::proc::experiment::ActionSequence::postExperiment()
+{
+  for (size_t i = 0; i < this->_mActionSet->size(); ++i)
+  {
+    this->_mActionSet->at(i)->postExperiment();
+  }
+}
+
 void cedar::proc::experiment::ActionSequence::run()
 {
   if (this->getCondition()->runCheck())

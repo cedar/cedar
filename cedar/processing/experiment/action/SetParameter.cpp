@@ -67,25 +67,41 @@ _mStepParameter
   _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
 }
 
-
-cedar::proc::experiment::action::SetParameter::~SetParameter()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
 void cedar::proc::experiment::action::SetParameter::run()
 {
-
-  if (_mStepParameter->getStep() == "" || _mStepParameter->getProperty() == "")
+  if (!_mStepParameter->isParameterSelected())
   {
     return;
   }
   cedar::aux::ParameterPtr parameter = _mStepParameter->getParameter();
   parameter->copyValueFrom(_mStepParameter->getParameterCopy());
-
 }
 
+void cedar::proc::experiment::action::SetParameter::preExperiment()
+{
+  if (!_mStepParameter->isParameterSelected())
+  {
+    return;
+  }
+
+  this->_mStepParameter->getParameter()->writeToNode(this->mOriginalParameterValue);
+}
+
+void cedar::proc::experiment::action::SetParameter::postExperiment()
+{
+  if (!_mStepParameter->isParameterSelected())
+  {
+    return;
+  }
+
+  //!@todo This "complicated" approach is only necessary due to the asymmetry in readFromNode/writeToNode. Fix that!
+  auto parameter = this->_mStepParameter->getParameter();
+  auto node_it = this->mOriginalParameterValue.find(parameter->getName());
+  CEDAR_DEBUG_ASSERT(node_it != this->mOriginalParameterValue.not_found());
+  parameter->readFromNode(node_it->second);
+  parameter->emitChangedSignal();
+}

@@ -78,8 +78,6 @@ private:
 public:
   //!@brief The standard constructor.
   Action();
-  //!@brief Destructor
-  ~Action();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -87,6 +85,12 @@ public:
 public:
   //!@brief This function should implement the things that this Action should do
   virtual void run() = 0;
+
+  //! Called before an experiment is started.
+  virtual void preExperiment();
+
+  //! Called after an experiment is stopped.
+  virtual void postExperiment();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
