@@ -88,6 +88,7 @@ void cedar::proc::experiment::action::SetParameter::preExperiment()
     return;
   }
 
+  cedar::aux::Parameter::ReadLocker locker(this->_mStepParameter->getParameter().get());
   this->_mStepParameter->getParameter()->writeToNode(this->mOriginalParameterValue);
 }
 
@@ -100,8 +101,10 @@ void cedar::proc::experiment::action::SetParameter::postExperiment()
 
   //!@todo This "complicated" approach is only necessary due to the asymmetry in readFromNode/writeToNode. Fix that!
   auto parameter = this->_mStepParameter->getParameter();
+  cedar::aux::Parameter::WriteLocker locker(parameter.get());
   auto node_it = this->mOriginalParameterValue.find(parameter->getName());
   CEDAR_DEBUG_ASSERT(node_it != this->mOriginalParameterValue.not_found());
   parameter->readFromNode(node_it->second);
+  locker.unlock();
   parameter->emitChangedSignal();
 }
