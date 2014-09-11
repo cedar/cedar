@@ -124,19 +124,15 @@ std::string cedar::aux::formatDuration(const cedar::unit::Time& time)
     std::stringstream stream;
     // make the conversion zero-padded
     unsigned int padding = 0;
+    stream << std::fixed;
     if (first)
     {
       stream << std::setprecision(1);
-      stream << std::fixed;
       padding = 2;
       first = false;
     }
     else
     {
-      if (!subdiv.precision)
-      {
-        stream << std::fixed;
-      }
       stream << std::setprecision(0);
     }
 

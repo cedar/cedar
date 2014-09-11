@@ -123,6 +123,7 @@ int test_formatDuration()
   errors += test_formatDuration(60.0 * cedar::unit::seconds, "1m 00.0s");
   errors += test_formatDuration(61.5678 * cedar::unit::seconds, "1m 01.6s");
   errors += test_formatDuration(90.0 * cedar::unit::seconds, "1m 30.0s");
+  errors += test_formatDuration(31.0 * 60.0 * cedar::unit::seconds + 30.0 * cedar::unit::seconds, "31m 30.0s");
   errors += test_formatDuration(60.0 * 60.0 * cedar::unit::seconds, "1h 00m 00.0s");
   errors += test_formatDuration(24.0 * 60.0 * 60.0 * cedar::unit::seconds, "1d 00h 00m 00.0s");
   errors += test_formatDuration(365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "1y 0d 00h 00m 00.0s");
