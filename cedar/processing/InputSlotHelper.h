@@ -143,6 +143,8 @@ namespace cedar
     private:
       boost::optional<int> mTypeOverride;
     };
+
+    CEDAR_GENERATE_POINTER_TYPES(CopyMatrixProperties);
   }
 }
 
