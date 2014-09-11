@@ -68,15 +68,16 @@ public:
   //!@brief The standard constructor.
   SetParameter();
 
-  //!@brief Destructor
-  virtual ~SetParameter();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Sets the parameter of a step to a desired value
   void run();
+
+  void preExperiment();
+
+  void postExperiment();
 
 public:
 
@@ -98,7 +99,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  cedar::aux::ConfigurationNode mOriginalParameterValue;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -109,7 +110,6 @@ protected:
 private:
   //!@brief The step parameter to set
   cedar::proc::experiment::StepPropertyParameterPtr _mStepParameter;
-
 
 }; // class cedar::proc::experiment::ActionSetParameter
 

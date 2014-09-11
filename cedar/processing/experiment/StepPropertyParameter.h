@@ -157,6 +157,9 @@ public:
    //!@brief Returns all types that are allowed
    const std::vector<std::string>& getAllowedTypes();
 
+   //! Returns true if a parameter is selected
+   bool isParameterSelected() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
