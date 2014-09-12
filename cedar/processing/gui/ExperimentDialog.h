@@ -138,8 +138,11 @@ private slots:
   //!@brief Tells the GUI when the actual trial number has changed
   void trialNumberChanged(int number);
 
-  //@brief Updates the group time in the GUI
+  //!@brief Updates the group time in the GUI
   void timeUpdate();
+
+  //! Slot for when the user checks the repeat slot.
+  void repeatChecked(bool);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

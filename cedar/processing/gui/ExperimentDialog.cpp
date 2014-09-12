@@ -77,6 +77,7 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
   connect(this->mExperiment.get(), SIGNAL(groupChanged()), this, SLOT(redraw()));
   connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(trialChanged()));
   connect(this->mAddActionSequence,SIGNAL(clicked()),this,SLOT(addActionSequence()));
+  connect(this->mpRepeat, SIGNAL(toggled(bool)), this, SLOT(repeatChecked(bool)));
 
   //Time update
   mpGroupTime = new QTimer(this);
@@ -101,6 +102,11 @@ cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::ExperimentDialog::repeatChecked(bool checked)
+{
+  this->mExperiment->setRepeating(checked);
+}
 
 void cedar::proc::gui::ExperimentDialog::updateGroup()
 {
@@ -161,6 +167,7 @@ void cedar::proc::gui::ExperimentDialog::load()
     location_dir->setValue(QDir(QString::fromStdString(filename)));
     this->mExperiment->readJson(filename);
     this->mExperiment->setFileName(filename);
+    this->mpRepeat->setChecked(this->mExperiment->getRepeating());
     this->nameEdit->setText(QString::fromStdString(this->mExperiment->getName()));
     this->repetitionSpinBox->setValue(this->mExperiment->getTrialCount());
   }

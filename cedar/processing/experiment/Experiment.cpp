@@ -87,7 +87,8 @@ _mActionSequences
     "ActionSequences",
     std::vector<ActionSequencePtr>()
   )
-)
+),
+_mRepeat(new cedar::aux::BoolParameter(this, "repeat", false))
 {
   SupervisorSingleton::getInstance()->setExperiment(this);
 
@@ -131,6 +132,17 @@ cedar::proc::experiment::Experiment::~Experiment()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::experiment::Experiment::setRepeating(bool repeats)
+{
+  this->_mRepeat->setValue(repeats);
+}
+
+bool cedar::proc::experiment::Experiment::getRepeating() const
+{
+  return this->_mRepeat->getValue();
+}
+
 void cedar::proc::experiment::Experiment::groupChanged(cedar::proc::ConstElementPtr /*element*/)
 {
   if (this->mStopped)
@@ -221,6 +233,9 @@ void cedar::proc::experiment::Experiment::cancel()
 {
   SupervisorSingleton::getInstance()->requestStop();
   stopTrial();
+  //!@todo It is unclear who is responsible for resetting the trial number (cf. stopTrial)
+  this->mActualTrial = 0;
+  emit trialNumberChanged(this->mActualTrial);
   emit experimentRunning(false);
 }
 
@@ -308,6 +323,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
     }
     case ResetType::Wait:
     {
+      //!@todo Why can't this wait time be changed?
       cedar::aux::usleep(1000000);
       break;
     }
@@ -319,6 +335,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
     case ResetType::Reload:
     {
       this->mGroup->reset();
+      //!@todo This won't work anymore, it should use pre/postExperiment
       this->resetGroupState();
       break;
     }
@@ -333,10 +350,17 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
   // Stop the experiment if the actual trial exceeds the number of wanted trials
   if (this->mActualTrial >_mTrials->getValue())
   {
-    SupervisorSingleton::getInstance()->requestStop();
-    emit experimentRunning(false);
-//    resetGroupState();
-    mActualTrial = 0;
+    if (!this->getRepeating())
+    {
+      SupervisorSingleton::getInstance()->requestStop();
+      emit experimentRunning(false);
+  //    resetGroupState();
+      mActualTrial = 0;
+    }
+    else
+    {
+      mActualTrial = 1;
+    }
   }
   this->postExperiment();
   mStopped = true;
@@ -345,6 +369,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
 
 void cedar::proc::experiment::Experiment::executeAcionSequences(bool initial)
 {
+  //!@todo Can this mInit stuff be replaced by using the new prepareExperiment function?
   this->mInit = initial;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {

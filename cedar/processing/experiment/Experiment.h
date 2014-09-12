@@ -275,6 +275,12 @@ public:
   //!@brief Checks if there is exactly one ActionStart in a ConditionOnInit
   bool checkActionSequences();
 
+  //! Sets the repeat flag of the experiment.
+  void setRepeating(bool repeats);
+
+  //! Returns the repeat flag of the experiment.
+  bool getRepeating() const;
+
 signals:
 
   //!@brief Should be emitted if the experiment has stopped
@@ -321,6 +327,7 @@ private:
 
   //! Called after an experiment is stopped.
   void postExperiment();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -372,6 +379,9 @@ private:
 
   //!@brief The state of the group before the experiment has been started.
   cedar::aux::ConfigurationNode mGroupState;
+
+  //! Whether or not the experiment is meant to repeat indefinitely.
+  cedar::aux::BoolParameterPtr _mRepeat;
 
   //--------------------------------------------------------------------------------------------------------------------
   // connections
