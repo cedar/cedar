@@ -465,11 +465,24 @@ void cedar::aux::ImageDatabase::readAnnotations(const cedar::aux::Path& path)
         if (right.empty())
         {
           current_image = left;
-          image = this->findImageWithFilenameNoPath(current_image);
-          image->setAnnotation(M_STANDARD_OBJECT_POSE_ANNOTATION_NAME, ObjectPoseAnnotationPtr(new ObjectPoseAnnotation()));
+          try
+          {
+            image = this->findImageWithFilenameNoPath(current_image);
+            image->setAnnotation(M_STANDARD_OBJECT_POSE_ANNOTATION_NAME, ObjectPoseAnnotationPtr(new ObjectPoseAnnotation()));
+          }
+          catch (cedar::aux::NotFoundException)
+          {
+            // make the image a nullptr, skip the reset of the annotations until the next image
+            image.reset();
+          }
         }
         else
         {
+          if (!image)
+          {
+            continue;
+          }
+
           if (left == "position")
           {
             CEDAR_ASSERT(right.size() > 3);
