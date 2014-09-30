@@ -77,6 +77,7 @@ Unreleased
     parameter. One such example is the static gain, which now changes its color based on the sign of the gain factor.
     Note, that this is optional, and the default behavior is the same as before.
   - Double-clicking a boost in the boost control widget now shows the boost in the architecture.
+  - In the settings of cedar, you can now choose the default plot that opens for 2d matrices.
 
 
 Released versions
