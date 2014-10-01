@@ -164,12 +164,12 @@ void cedar::proc::sources::Picture::reset()
 
 void cedar::proc::sources::Picture::updatePicture()
 {
+  cedar::proc::Step::ReadLocker locker(this);
   cv::Mat old_image = this->mImage->getData();
   // fill output with new image
-  this->lock(cedar::aux::LOCK_TYPE_READ);
   this->compute(cedar::proc::Arguments());
-  this->unlock();
   cv::Mat new_image = this->mImage->getData();
+  locker.unlock();
   if (!cedar::aux::math::matrixSizesEqual(old_image, new_image) || old_image.type() != new_image.type())
   {
     this->annotateImage();
