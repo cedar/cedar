@@ -730,6 +730,11 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
       this->mLoopedTriggerables.erase(item);
     }
 
+    if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(it->second))
+    {
+      group->getParameter("is looped").get()->disconnect(SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
+    }
+
     mElements.erase(it);
   }
 
@@ -1018,6 +1023,11 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     {
       triggerable->callOnStart();
     }
+  }
+
+  if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+  {
+    QObject::connect(group->getParameter("is looped").get(), SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
   }
 }
 
@@ -2477,4 +2487,50 @@ std::vector<cedar::proc::ConstElementPtr> cedar::proc::Group::findElementsAcross
 {
   auto function = [] (cedar::proc::ConstElementPtr element, const std::string& part) -> bool {return (element->getName().find(part) != std::string::npos);};
   return this->findElementsAcrossGroups(boost::bind<bool>(function, _1, string));
+}
+
+void cedar::proc::Group::onLoopedChanged()
+{
+  auto parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
+  if (parameter)
+  {
+    // get the parent configurable
+    auto parent = parameter->getOwner();
+    // try to cast to element
+    if (auto element = dynamic_cast<cedar::proc::Element*>(parent))
+    {
+      // get a non-const version of this element from the group
+      auto it = mElements.find(element->getName());
+      if (it != this->mElements.end())
+      {
+        // get the bool parameter
+        auto is_looped = it->second->getParameter<cedar::aux::BoolParameter>("is looped");
+        auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());
+        // check whether we have to add or remove the element from the list of triggerables
+        if (is_looped->getValue()) // add
+        {
+          if (triggerable)
+          {
+            this->mLoopedTriggerables.push_back(triggerable);
+            if (this->numberOfStartCalls())
+            {
+              triggerable->callOnStart();
+            }
+          }
+        }
+        else // remove
+        {
+          auto item = std::find(this->mLoopedTriggerables.begin(), this->mLoopedTriggerables.end(), triggerable);
+          if (item != this->mLoopedTriggerables.end())
+          {
+            if (this->numberOfStartCalls())
+            {
+              triggerable->callOnStop();
+            }
+            this->mLoopedTriggerables.erase(item);
+          }
+        }
+      }
+    }
+  }
 }
