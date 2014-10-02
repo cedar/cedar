@@ -360,6 +360,12 @@ void cedar::aux::gui::QwtLinePlot::plot(cedar::aux::ConstDataPtr data, const std
 
 void cedar::aux::gui::QwtLinePlot::init()
 {
+  this->_mApplyYAxisLimits = new cedar::aux::BoolParameter(this, "apply y axis limits", false);
+  this->_mYAxisLimits = new cedar::aux::math::DoubleLimitsParameter(this, "y axis limits", 0.0, 1.0);
+
+  QObject::connect(this->_mApplyYAxisLimits.get(), SIGNAL(valueChanged()), this, SLOT(yAxisScalingParametersChanged()));
+  QObject::connect(this->_mYAxisLimits.get(), SIGNAL(valueChanged()), this, SLOT(yAxisScalingParametersChanged()));
+
   QPalette palette = this->palette();
   palette.setColor(QPalette::Window, Qt::white);
   this->setPalette(palette);
@@ -432,7 +438,7 @@ void cedar::aux::gui::QwtLinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 
 void cedar::aux::gui::QwtLinePlot::setAutomaticYAxisScaling()
 {
-  this->mpPlot->setAxisAutoScale(QwtPlot::yLeft);
+  this->_mApplyYAxisLimits->setValue(false);
 }
 
 void cedar::aux::gui::QwtLinePlot::setFixedYAxisScaling()
@@ -479,7 +485,20 @@ void cedar::aux::gui::QwtLinePlot::setFixedYAxisScaling()
 
 void cedar::aux::gui::QwtLinePlot::setFixedYAxisScaling(double lower, double upper)
 {
-  this->mpPlot->setAxisScale(QwtPlot::yLeft, lower, upper);
+  this->_mYAxisLimits->setLimits(lower, upper);
+  this->_mApplyYAxisLimits->setValue(true);
+}
+
+void cedar::aux::gui::QwtLinePlot::yAxisScalingParametersChanged()
+{
+  if (this->_mApplyYAxisLimits->getValue() == true)
+  {
+    this->mpPlot->setAxisScale(QwtPlot::yLeft, this->_mYAxisLimits->getLowerLimit(), this->_mYAxisLimits->getUpperLimit());
+  }
+  else
+  {
+    this->mpPlot->setAxisAutoScale(QwtPlot::yLeft);
+  }
 }
 
 void cedar::aux::gui::QwtLinePlot::setFixedXAxisScaling(double lower, double upper)

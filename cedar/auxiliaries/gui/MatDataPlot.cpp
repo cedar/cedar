@@ -201,36 +201,21 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = nullptr;
   }
 
-  // color space-annotated data
-  if (this->mData->hasAnnotation<cedar::aux::annotation::ColorSpace>())
+  // color space-annotated data, disparity-annotated data or depth-annotated data
+  if
+  (
+    this->mData->hasAnnotation<cedar::aux::annotation::ColorSpace>()
+    || this->mData->hasAnnotation<cedar::aux::annotation::Disparity>()
+    || this->mData->hasAnnotation<cedar::aux::annotation::Depth>()
+  )
   {
     // data should be plotted as an image
-    cedar::aux::annotation::ConstColorSpacePtr color_space = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
     cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
 
-  // disparity-annotated data
-  if (this->mData->hasAnnotation<cedar::aux::annotation::Disparity>())
-  {
-    // data should be plotted as an image
-    auto color_space = this->mData->getAnnotation<cedar::aux::annotation::Disparity>();
-    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
-    p_plot->plot(this->mData, title);
-    this->mpCurrentPlotWidget = p_plot;
-  }
-
-  // depth-annotated data
-  if (this->mData->hasAnnotation<cedar::aux::annotation::Depth>())
-  {
-    //data should be plotted as an image
-    auto colorSpace = this->mData->getAnnotation<cedar::aux::annotation::Depth>();
-    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
-    p_plot->plot(this->mData, title);
-    this->mpCurrentPlotWidget = p_plot;
-  }
-
+  // no special plot has been opened yet
   if (this->mpCurrentPlotWidget == nullptr)
   {
     // data should be plotted as a matrix

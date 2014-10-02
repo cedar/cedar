@@ -60,6 +60,8 @@
 //------------------------------------------------------------------------------
 
 cedar::aux::Recorder::Recorder()
+:
+mSubFolder("recording_#T#")
 {
   mProjectName = "Unnamed";
 
@@ -139,13 +141,10 @@ void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 
 void cedar::aux::Recorder::createOutputDirectory()
 {
-#ifdef CEDAR_OS_WINDOWS
   mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
-                           + "/"+mProjectName+"/recording_"+ QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mmss").toStdString();
-#else // CEDAR_OS_WINDOWS
-  mOutputDirectory = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
-                       + "/"+mProjectName+"/recording_" + QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
-#endif // CEDAR_OS_WINDOWS
+                           + "/"+mProjectName+"/"+ mSubFolder ;
+  std::string time_stamp = this->getTimeStamp();
+  boost::replace_all(mOutputDirectory, "#T#", time_stamp);
   boost::filesystem::create_directories(mOutputDirectory);
 }
 
@@ -175,6 +174,9 @@ void cedar::aux::Recorder::prepareStart()
 
 void cedar::aux::Recorder::processQuit()
 {
+  // Resets the subdirectory if any was setted
+  mSubFolder = "recording_#T#";
+
   //Stop all DataSpectators.They will automatically write all containing data to file.
   mDataSpectatorCollection.stopAll();
 }
@@ -303,20 +305,11 @@ void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, c
 
 void cedar::aux::Recorder::takeSnapshot()
 {
-  std::string oldName = this->mProjectName;
-  this->mProjectName = oldName+"/Snapshots";
-  this->createOutputDirectory();
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
     spec->makeSnapshot();
   }
-  for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
-  {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-    spec->processQuit(); // @todo: is this clean?
-  }
-  this->mProjectName = oldName;
 }
 
 std::map<std::string, cedar::unit::Time> cedar::aux::Recorder::getRegisteredData() const
@@ -329,4 +322,32 @@ std::map<std::string, cedar::unit::Time> cedar::aux::Recorder::getRegisteredData
     registeredData[spec->getName()] = spec->getRecordIntervalTime();
   }
   return registeredData;
+}
+
+
+const std::string& cedar::aux::Recorder::getRecorderProjectName()
+{
+  return mProjectName;
+}
+
+
+void cedar::aux::Recorder::setSubfolder(const std::string& subfolderName)
+{
+  //throw exception if running
+  if(isRunningNolocking())
+  {
+    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot set ouput directory while recorder is running");
+  }
+
+  this->mSubFolder = subfolderName;
+}
+std::string cedar::aux::Recorder::getTimeStamp()
+{
+
+#ifdef CEDAR_OS_WINDOWS
+  return QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mmss").toStdString()
+
+#else // CEDAR_OS_WINDOWS
+   return QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
+#endif // CEDAR_OS_WINDOWS
 }

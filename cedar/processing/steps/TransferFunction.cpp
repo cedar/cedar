@@ -40,6 +40,7 @@
 #include "cedar/processing/steps/TransferFunction.h"
 
 // SYSTEM CEDAR INCLUDES
+#include <cedar/processing/typecheck/Matrix.h>
 #include <cedar/processing/ExternalData.h>
 #include <cedar/processing/exceptions.h>
 #include <cedar/processing/DeclarationRegistry.h>
@@ -110,31 +111,18 @@ _mTransferFunction
   this->_mTransferFunction->addDeprecatedName("sigmoid");
 
   //declare input and output
-  this->declareInput("input");
+  auto input_slot = this->declareInput("input");
+  cedar::proc::typecheck::Matrix input_check;
+  input_check.addAcceptedType(CV_32F);
+  input_check.acceptsEmptyMatrix(false);
+  input_slot->setCheck(input_check);
+
   this->declareOutput("sigmoided output", mOutput);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::TransferFunction::determineInputValidity
-                                                                      (
-                                                                        cedar::proc::ConstDataSlotPtr,
-                                                                        cedar::aux::ConstDataPtr data
-                                                                      ) const
-{
-  // check whether input is MatData
-  if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
-  {
-    //check if input is 32 bit float
-    if (!input->isEmpty() && input->getData().type() == CV_32F)
-    {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
-    }
-  }
-  return cedar::proc::DataSlot::VALIDITY_ERROR;
-}
 
 void cedar::proc::steps::TransferFunction::compute(const cedar::proc::Arguments&)
 {

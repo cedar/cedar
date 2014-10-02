@@ -178,6 +178,7 @@ void cedar::aux::DataTable::RowCollection::appendRow(RowPtr row)
 
 size_t cedar::aux::DataTable::IndexMap::createIndex(const std::string& indexName)
 {
+  CEDAR_ASSERT(!indexName.empty());
   size_t id = this->map.size();
   this->map.insert(boost::bimap<std::string, size_t>::value_type(indexName, id));
   return id;

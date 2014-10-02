@@ -47,8 +47,13 @@ cedar::aux::GlobalClock::GlobalClock()
 
 cedar::aux::GlobalClock::~GlobalClock()
 {
-
 }
+
+bool cedar::aux::GlobalClock::isRunning() const
+{
+  return this->mRunning;
+}
+
 void cedar::aux::GlobalClock::start()
 {
   //if timer on 0

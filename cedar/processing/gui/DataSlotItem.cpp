@@ -300,13 +300,13 @@ void cedar::proc::gui::DataSlotItem::generateTooltip()
     dynamic_cast<cedar::proc::sinks::GroupSink*>(this->getSlot()->getParentPtr())
   )
   {
-    tool_tip += "network connector: ";
+    tool_tip += "group connector: ";
     tool_tip += "<b>" + QString::fromStdString(this->getSlot()->getParentPtr()->getName()) + "</b>";
   }
   else
   {
     tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
-    tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
+    tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getText()) + "</b>";
   }
   if (this->mSlot->getData())
   {
