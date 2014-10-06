@@ -83,7 +83,7 @@ public:
   cedar::dev::Component(channel)
   {
     this->installMeasurementType(0, "test");
-    this->registerDeviceMeasurementHook(0, boost::bind(&TestComponent::pretendToMeasureSomething, this));
+    this->registerDeviceSideMeasurementHook(0, boost::bind(&TestComponent::pretendToMeasureSomething, this));
     this->setMeasurementDimensionality(0, 1);
   }
 
