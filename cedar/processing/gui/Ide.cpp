@@ -39,7 +39,9 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/ArchitectureWidgetList.h"
 #include "cedar/processing/gui/FindDialog.h"
 #include "cedar/processing/gui/AdvancedParameterLinker.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
@@ -54,6 +56,7 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/DataConnection.h"
+#include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -77,6 +80,7 @@
 #include <QFileDialog>
 #include <QDialogButtonBox>
 #include <QInputDialog>
+#include <QTableWidget>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/detail/json_parser_error.hpp>
 #endif
@@ -95,7 +99,8 @@ mpPerformanceOverview(nullptr),
 mpConsistencyDock(nullptr),
 mpBoostControlDock(nullptr),
 mpBoostControl(nullptr),
-mSuppressCloseDialog(false)
+mSuppressCloseDialog(false),
+mpExperimentDialog(nullptr)
 {
   // setup the (automatically generated) ui components
   this->setupUi(this);
@@ -265,6 +270,7 @@ mSuppressCloseDialog(false)
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
+  QObject::connect(mpActionExperiments, SIGNAL(triggered()), this, SLOT(showExperimentDialog()));
 
   QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
   QObject::connect(mpActionParameterLinker, SIGNAL(triggered()), this, SLOT(openParameterLinker()));
@@ -280,12 +286,20 @@ mSuppressCloseDialog(false)
                    this,
                    SLOT(architectureChanged()));
 
+  QObject::connect(cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
+                   SIGNAL(experimentRunning(bool)),
+                   this,
+                   SLOT(setSimulationControlsDisabled(bool)));
+
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
   );
 
   this->mpActionSave->setEnabled(true);
+
+  this->buildStatusBar();
+  this->startTimer(100);
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -312,6 +326,26 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::setSimulationControlsDisabled(bool disabled)
+{
+  this->mpThreadsStartAll->setEnabled(!disabled);
+  this->mpThreadsStopAll->setEnabled(!disabled);
+  this->mpThreadsSingleStep->setEnabled(!disabled);
+}
+
+void cedar::proc::gui::Ide::buildStatusBar()
+{
+  this->mpGlobalTimeLabel = new QLabel("simulation time");
+  this->statusBar()->addPermanentWidget(this->mpGlobalTimeLabel, 0);
+}
+
+void cedar::proc::gui::Ide::timerEvent(QTimerEvent*)
+{
+  cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  std::string formatted_time = cedar::aux::formatDuration(time);
+  this->mpGlobalTimeLabel->setText(QString("simulation time: ") + QString::fromStdString(formatted_time));
+}
 
 void cedar::proc::gui::Ide::setArchitectureChanged(bool changed)
 {
@@ -370,7 +404,7 @@ void cedar::proc::gui::Ide::showBoostControl()
   {
     this->mpBoostControlDock = new QDockWidget(this);
     this->mpBoostControlDock->setFloating(true);
-    this->mpBoostControl = new cedar::proc::gui::BoostControl();
+    this->mpBoostControl = new cedar::proc::gui::BoostControl(this->mpProcessingDrawer);
     this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
     this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
     this->mpBoostControlDock->setWidget(this->mpBoostControl);
@@ -393,9 +427,20 @@ void cedar::proc::gui::Ide::showBoostControl()
   }
 }
 
+void cedar::proc::gui::Ide::showExperimentDialog()
+{
+  if (this->mpExperimentDialog == nullptr)
+  {
+    this->mpExperimentDialog = new cedar::proc::gui::ExperimentDialog(this);
+  }
+  this->mpExperimentDialog->show();
+  this->mpExperimentDialog->raise();
+  this->mpExperimentDialog->activateWindow();
+}
+
 void cedar::proc::gui::Ide::showConsistencyChecker()
 {
-  if (this->mpConsistencyDock == NULL)
+  if (this->mpConsistencyDock == nullptr)
   {
     this->mpConsistencyDock = new QDockWidget(this);
     this->mpConsistencyDock->setFloating(true);
@@ -446,6 +491,7 @@ void cedar::proc::gui::Ide::duplicateStep()
   QList<QGraphicsItem*> items_to_duplicate;
   for (auto item : selected)
   {
+    item->setSelected(false);
     bool add_to_list = true;
 
     // check if item is a connection
@@ -548,6 +594,10 @@ void cedar::proc::gui::Ide::duplicateStep()
           auto mapped = new_pos - group->scenePos();
           auto mapped_center = group->mapFromScene(center);
           auto p_new = group->duplicate(mapped - (mapped_center - p_base->pos()), p_base->getElement()->getName());
+          
+          // select the new item
+          p_new->setSelected(true);
+          
           // replace any slots with new ones
           for (auto& out : outgoing_slots)
           {
@@ -743,6 +793,9 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
   // Without this, the GUI crashes when exiting in certain circumstances (see unit test gui_cedar)
   this->mpPropertyTable->clear();
   pEvent->accept();
+
+  // !@todo move this somewhere else?
+  delete this->mpExperimentDialog;
 }
 
 void cedar::proc::gui::Ide::storeSettings()
@@ -1350,9 +1403,9 @@ void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
     }
     case Qt::Key_Backspace:
     {
-         this->deleteSelectedElements();
-         break;
-       }
+      this->deleteSelectedElements();
+      break;
+    }
     // If the key is not handled by this widget, pass it on to the base widget.
     default:
       this->QMainWindow::keyPressEvent(pEvent);
@@ -1552,6 +1605,10 @@ void cedar::proc::gui::Ide::loadPlotGroupsIntoComboBox()
   }
 }
 
+cedar::proc::gui::GroupPtr cedar::proc::gui::Ide::getGroup()
+{
+  return this->mGroup;
+}
 
 void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 {
@@ -1589,6 +1646,56 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
     this,
     SLOT(architectureChanged())
   );
+
+  this->updateArchitectureWidgetsMenu();
+
+  if (this->mpExperimentDialog != nullptr)
+  {
+    this->mpExperimentDialog->updateGroup();
+  }
+}
+
+void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
+{
+  // update architecture plots
+  QMenu* menu = this->mpMenuArchitecturePlots;
+  menu->clear();
+
+  auto manage_action = menu->addAction("manage");
+  QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(openManageArchitectureWidgetsDialog()));
+  menu->addSeparator();
+
+  const auto& plots = this->mGroup->getArchitectureWidgets();
+  if (plots.empty())
+  {
+    auto action = menu->addAction("none");
+    action->setEnabled(false);
+  }
+  else
+  {
+    for (const auto& name_path_pair : plots)
+    {
+      QAction* action = menu->addAction(QString::fromStdString(name_path_pair.first));
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(architecturePlotActionTriggered()));
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::openManageArchitectureWidgetsDialog()
+{
+  // create a list widget for managing architecture plots
+  auto dialog = new cedar::proc::gui::ArchitectureWidgetList(this, this->mGroup);
+  dialog->exec();
+
+  this->updateArchitectureWidgetsMenu();
+}
+
+void cedar::proc::gui::Ide::architecturePlotActionTriggered()
+{
+  auto sender = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(sender);
+  std::string name = sender->text().toStdString();
+  this->mGroup->showArchitectureWidget(name);
 }
 
 void cedar::proc::gui::Ide::openFindDialog()

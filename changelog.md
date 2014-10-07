@@ -68,7 +68,16 @@ known issues
 Unreleased
 ==========
   
-  Nothing yet!
+- cedar::proc
+  - You can now add special widgets to architectures that allow you to define special plots and more. These can be
+    opened from the cedar gui, and their layout and contents are read from files. See the "Architecture Widgets"
+    tutorial for details on how to use this feature.
+  - ElementDeclarations can now provide a ConnectableIconView. This allows users to specify a custom class for
+    displaying the icon of a step. Among other things this can be used to change the icon based on the value of a
+    parameter. One such example is the static gain, which now changes its color based on the sign of the gain factor.
+    Note, that this is optional, and the default behavior is the same as before.
+  - Double-clicking a boost in the boost control widget now shows the boost in the architecture.
+  - In the settings of cedar, you can now choose the default plot that opens for 2d matrices.
 
 
 Released versions

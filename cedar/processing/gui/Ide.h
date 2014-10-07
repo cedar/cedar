@@ -50,6 +50,7 @@
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/gui/ExperimentDialog.fwd.h"
 #include "cedar/processing/gui/ElementClassList.fwd.h"
 #include "cedar/processing/gui/Ide.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
@@ -60,6 +61,7 @@
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
 #include <QComboBox>
+#include <QLabel>
 #include <map>
 
 
@@ -99,6 +101,8 @@ public:
    */
   void resetTo(cedar::proc::gui::GroupPtr network);
 
+  cedar::proc::gui::GroupPtr getGroup();
+  
   //! set if close dialog should be suppressed
   void suppressCloseDialog(bool suppress)
   {
@@ -225,6 +229,9 @@ public slots:
   //!@brief shows/hides all plot windows of every step
   void toggleVisibilityOfPlots(bool hidden = false);
 
+  //!@brief shows the experiment dialog widget
+  void showExperimentDialog();
+
   //!@brief Starts or stops the recorder function();
   void toggleRecorder(bool status);
 
@@ -281,6 +288,9 @@ protected:
    */
   void closeEvent(QCloseEvent *pEvent);
 
+  //! Periodically updates certain information
+  void timerEvent(QTimerEvent*);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -323,12 +333,24 @@ private:
   //! Check if the user wants to save. Returns false if the action currently being taken should be cancelled.
   bool checkSave();
 
+  //! Updates the architecture widget menu.
+  void updateArchitectureWidgetsMenu();
+
+  //! Constructs the widgets in the status bar.
+  void buildStatusBar();
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
   void globalTimeFactorSpinboxChanged(double value);
 
   void architectureChanged();
+
+  void architecturePlotActionTriggered();
+
+  void openManageArchitectureWidgetsDialog();
+
+  void setSimulationControlsDisabled(bool disabled);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -382,6 +404,12 @@ private:
   bool mSuppressCloseDialog;
 
   cedar::proc::gui::FindDialog* mpFindDialog;
+
+  //! Widget for creating and running experiments
+  cedar::proc::gui::ExperimentDialog* mpExperimentDialog;
+
+  //! Label used for displaying the current global time.
+  QLabel* mpGlobalTimeLabel;
 
 }; // class cedar::MainWindow
 

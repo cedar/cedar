@@ -74,6 +74,14 @@ void cedar::aux::Log::addLogger(cedar::aux::LogInterfacePtr logger, cedar::aux::
   this->mHandlers.push_back(handler);
 }
 
+void cedar::aux::Log::addLoggerAtFront(cedar::aux::LogInterfacePtr logger, cedar::aux::LogFilterPtr filter)
+{
+  LogHandler handler;
+  handler.mpFilter = filter;
+  handler.mpLogger = logger;
+  this->mHandlers.insert(this->mHandlers.begin(), handler);
+}
+
 void cedar::aux::Log::removeLogger(cedar::aux::LogInterfacePtr logger)
 {
   for (std::vector<LogHandler>::iterator i = this->mHandlers.begin(); i != this->mHandlers.end();)

@@ -40,6 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
@@ -126,6 +128,7 @@ const std::vector<cedar::proc::gui::ResizeHandle::Direction>& cedar::proc::gui::
 
 QVariant cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange change, const QVariant& value)
 {
+  qreal grid_size = 8.0;
   QPointF new_value = value.toPointF();
 
   switch (change)
@@ -135,6 +138,17 @@ QVariant cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange change, c
       qreal offset = M_HANDLE_SIZE / static_cast<qreal>(2.0);
       QPointF center = new_value - this->mpResizedItem->scenePos() + QPointF(offset, offset);
       QRectF bounds = this->mpResizedItem->boundingRect();
+
+      //!@todo This is redundant with the code in GraphicsBase
+      if
+      (
+        dynamic_cast<cedar::proc::gui::Scene*>(this->scene())
+        && dynamic_cast<cedar::proc::gui::Scene*>(this->scene())->getSnapToGrid()
+      )
+      {
+        center.rx() = cedar::aux::math::round(center.x() / grid_size) * grid_size;
+        center.ry() = cedar::aux::math::round(center.y() / grid_size) * grid_size;
+      }
 
       if (this->mPressed)
       {

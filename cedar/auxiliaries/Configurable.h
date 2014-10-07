@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/LockType.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
@@ -106,10 +107,9 @@ public:
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  /*!@brief create a tree of type cedar::aux::ConfigurationNode from a json file and try to read the configuration
-   * afterward
+  /*!@brief Reads the configuration of this object from the given json file.
    */
-  void readJson(const std::string& filename);
+  void readJson(const cedar::aux::Path& filename);
 
   /*!@brief   Reads the configuration from an INI file.
    *
@@ -231,6 +231,12 @@ public:
   /*! Returns the name, or a number added to it if there is already a parameter with that name.
    */
   std::string getUniqueParameterName(const std::string& baseName) const;
+
+  /*! Lists all parameters in this configurable, including parameters of any configurable children.
+   *
+   *  @returns A list of parameter paths that can be used to retrieve the parameter with the getParameter() method.
+   */
+  std::vector<std::string> listAllParameters() const;
 
 public:
   //! (boost) Signal that is emitted whenever a parameter is added to the configurable.

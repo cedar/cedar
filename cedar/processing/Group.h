@@ -436,6 +436,9 @@ public:
    */
   const ElementMap& getElements() const;
 
+  //! Recursively lists all elements in the group and all its subgroups.
+  std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
+
   //!@deprecated Use getElements instead.
   CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
   {
@@ -728,6 +731,10 @@ private:
 
   //!@brief searches for elements specified by a matcher function
   std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroups(boost::function<bool(cedar::proc::ConstElementPtr)> matcher) const;
+
+  /*!@brief A function that adds a connector even if the name alread exists. Used during loading
+   */
+  void addConnectorInternal(const std::string& name, bool input);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
