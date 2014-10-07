@@ -62,6 +62,19 @@ namespace
     group_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
     group_declaration->declare();
 
+    cedar::proc::GroupDeclarationPtr elementary_behavior_declaration
+                                   (
+                                     new cedar::proc::GroupDeclaration
+                                     (
+                                       "elementary behavior",
+                                       "resource://groupTemplates/elementaryBehavior.json",
+                                       "Elementary behavior",
+                                       "DFT"
+                                     )
+                                   );
+    elementary_behavior_declaration->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
+    elementary_behavior_declaration->declare();
+
     cedar::proc::GroupDeclarationPtr field_declaration
                                    (
                                      new cedar::proc::GroupDeclaration
