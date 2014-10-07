@@ -45,6 +45,9 @@
 
 // SYSTEM INCLUDES
 #include <QTime>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif // Q_MOC_RUN
 
 //!@brief Can start, stop and reset the network time and should be used as a central time giver in a network.
 class cedar::aux::GlobalClock
@@ -88,6 +91,17 @@ public:
   bool isRunning() const;
 
   //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Takes care of properly reacting to changes in the global time factor.
+  void globalTimeFactorChanged(double newFactor);
+
+  void addCurrentToAdditionalElapsedTime();
+
+  double getCurrentElapsedMSec() const;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -102,7 +116,13 @@ private:
   QTime mTimer;
 
   //!@brief This time is added to the elapsed time. It is used to track, e.g., times when the global clock is paused.
-  int mAdditionalElapsedTime;
+  double mAdditionalElapsedTime;
+
+  //! A copy of the current time factor, to avoid unnecessary locking/synchronization issues.
+  double mCurrentTimeFactor;
+
+  //! Connected to the change signal of the global time factor.
+  boost::signals2::scoped_connection mGlobalTimeFactorConnection;
 };
 
 #include "cedar/auxiliaries/Singleton.h"

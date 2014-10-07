@@ -36,6 +36,7 @@
 
 //CEDAR INCLUDES
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 
@@ -43,12 +44,38 @@ cedar::aux::GlobalClock::GlobalClock()
 :
 mRunning(false)
 {
+  this->mGlobalTimeFactorConnection = cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
+  (
+    boost::bind(&cedar::aux::GlobalClock::globalTimeFactorChanged, this, _1)
+  );
+
+  this->mCurrentTimeFactor = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
+
   this->reset();
 }
 
 cedar::aux::GlobalClock::~GlobalClock()
 {
 }
+
+void cedar::aux::GlobalClock::globalTimeFactorChanged(double newFactor)
+{
+  this->addCurrentToAdditionalElapsedTime();
+  this->mCurrentTimeFactor = newFactor;
+}
+
+double cedar::aux::GlobalClock::getCurrentElapsedMSec() const
+{
+  double elapsed = static_cast<double>(this->mTimer.elapsed());
+  return elapsed * this->mCurrentTimeFactor;
+}
+
+void cedar::aux::GlobalClock::addCurrentToAdditionalElapsedTime()
+{
+  this->mAdditionalElapsedTime += this->getCurrentElapsedMSec();
+  this->mTimer.restart();
+}
+
 
 bool cedar::aux::GlobalClock::isRunning() const
 {
@@ -75,19 +102,18 @@ void cedar::aux::GlobalClock::stop()
 {
   if (this->mRunning)
   {
-    this->mAdditionalElapsedTime += this->mTimer.elapsed();
-    this->mTimer.restart();
+    this->addCurrentToAdditionalElapsedTime();
     this->mRunning = false;
   }
 }
 
 cedar::unit::Time cedar::aux::GlobalClock::getTime()
 {
-  int time_msecs = this->mAdditionalElapsedTime;
+  double time_msecs = this->mAdditionalElapsedTime;
 
   if (this->mRunning)
   {
-    time_msecs += this->mTimer.elapsed();
+    time_msecs += this->getCurrentElapsedMSec();
   }
 
   return cedar::unit::Time(static_cast<double>(time_msecs) * cedar::unit::milli * cedar::unit::seconds);
