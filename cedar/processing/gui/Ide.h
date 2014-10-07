@@ -118,13 +118,13 @@ public slots:
    */
   void architectureToolFinished();
   
-  /*!@brief Starts all looped triggers (and other derivatives of looped thread).
+  /*!@brief Slot that is connected to the start/pause simulation action.
    */
-  void startThreads();
+  void startPauseSimulationToggled();
 
   /*!@brief Stops all looped triggers (and other derivatives of looped thread).
    */
-  void stopThreads();
+  void resetSimulationClicked();
 
   /*!@brief Single-step all looped triggers (and other derivatives of looped thread).
    */
