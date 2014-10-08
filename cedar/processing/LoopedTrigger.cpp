@@ -97,7 +97,7 @@ namespace
 cedar::proc::LoopedTrigger::LoopedTrigger(cedar::unit::Time stepSize, const std::string& name)
 :
 cedar::aux::LoopedThread(stepSize),
-cedar::proc::Trigger(name, true),
+cedar::proc::Trigger(name),
 mStarted(false),
 mStatistics(new TimeAverage(50))
 {
