@@ -1022,6 +1022,16 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     if (triggerable->isLooped())
     {
       this->mLoopedTriggerables.push_back(triggerable);
+      // if this is the root group, also connect to default trigger
+      if (this->isRoot())
+      {
+        // if there is no default trigger, create one
+        if (!this->nameExists("default trigger"))
+        {
+          this->create("cedar.processing.LoopedTrigger", "default trigger");
+        }
+        this->connectTrigger(this->getElement<cedar::proc::LoopedTrigger>("default trigger"), triggerable);
+      }
     }
     if (this->numberOfStartCalls())
     {
@@ -1368,7 +1378,23 @@ void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::p
   // check connection
   if (this->isConnected(source, target))
   {
+    if (source->getName() == "default trigger")
+    {
+      // this is ok, might happen (connections to the default trigger are saved, but also create on "add")
+      return;
+    }
     CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
+  }
+  if (this->isRoot()) // there might be a default connection to the default trigger, delete!
+  {
+    if (this->nameExists("default trigger"))
+    {
+      auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default trigger");
+      if (this->isConnected(default_trigger, target))
+      {
+        this->disconnectTrigger(default_trigger, target);
+      }
+    }
   }
   // create connection
   mTriggerConnections.push_back(cedar::proc::TriggerConnectionPtr(new TriggerConnection(source, target)));
@@ -1474,6 +1500,15 @@ void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar
     {
       this->mTriggerConnections.erase(it);
       this->signalTriggerConnectionChanged(source, target, false);
+      if (this->isRoot() && source->getName() != "default trigger") // connect to default trigger instead
+      {
+        // connect to default trigger, if it exists
+        if (this->nameExists("default trigger"))
+        {
+          auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default trigger");
+          this->connectTrigger(default_trigger, target);
+        }
+      }
       return;
     }
   }
