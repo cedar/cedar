@@ -224,7 +224,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>79</width>
+          <width>116</width>
           <height>422</height>
          </rect>
         </property>
@@ -237,7 +237,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>79</width>
+          <width>116</width>
           <height>422</height>
          </rect>
         </property>
@@ -486,15 +486,9 @@
    </property>
   </action>
   <action name="mpActionStartPauseSimulation">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
-     <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>
-     <normalon>:/cedar/auxiliaries/gui/pause.svg</normalon>
-     <activeoff>:/cedar/auxiliaries/gui/start.svg</activeoff>
-     <activeon>:/cedar/auxiliaries/gui/pause.svg</activeon>:/cedar/auxiliaries/gui/start.svg</iconset>
+     <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
    </property>
    <property name="text">
     <string>start/pause simulation</string>
