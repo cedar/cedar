@@ -78,6 +78,11 @@ Unreleased
     Note, that this is optional, and the default behavior is the same as before.
   - Double-clicking a boost in the boost control widget now shows the boost in the architecture.
   - In the settings of cedar, you can now choose the default plot that opens for 2d matrices.
+  - The start/stop buttons of the cedar gui have been remodeled. There is now a start button which, as before starts all
+    triggers in an achitecture. It also starts the global timer. When pushed, it turns into a pause button which halts
+    all triggers as well as the global timer. Pushing the pause-button will turn it back to a start button which can
+    then be used to resume the simulation. An addded reset button can reset the simulation; i.e., it resets the
+    architecture as well as the global timer. 
 
 
 Released versions
