@@ -1044,6 +1044,8 @@ void cedar::proc::gui::Ide::triggerStarted()
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
   this->mSimulationRunning.member() = true;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+
+  this->mpActionResetSimulation->setEnabled(false);
 }
 
 void cedar::proc::gui::Ide::allTriggersStopped()
@@ -1051,6 +1053,8 @@ void cedar::proc::gui::Ide::allTriggersStopped()
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
   this->mSimulationRunning.member() = false;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+
+  this->mpActionResetSimulation->setEnabled(true);
 }
 
 void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
@@ -1096,30 +1100,6 @@ void cedar::proc::gui::Ide::startPauseSimulationClicked()
     //!@todo Should this happen automatically as soon as one of the triggers is started? Or should this remain the responsibility of the GUI?
     cedar::aux::GlobalClockSingleton::getInstance()->start();
   }
-
-//  if (this->mpActionStartPauseSimulation->isChecked())
-//  {
-//    // start triggers (in a separate thread because this may lead to lockups)
-//    CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
-//    // calls this->mGroup->getGroup()->startTriggers()
-//    this->mStartThreadsCaller->start();
-//
-//    // start global timer
-//    //!@todo Should this happen automatically as soon as one of the triggers is started? Or should this remain the responsibility of the GUI?
-//    cedar::aux::GlobalClockSingleton::getInstance()->start();
-//  }
-//  else
-//  {
-//    // stop triggers (in a separate thread because this may lead to lockups)
-//    CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
-//    // calls this->mGroup->getGroup()->stopTriggers()
-//    this->mStopThreadsCaller->start();
-//
-//    // pause global timer
-//    cedar::aux::GlobalClockSingleton::getInstance()->stop();
-//  }
-//
-//  this->mpActionResetSimulation->setEnabled(!this->mpActionStartPauseSimulation->isChecked());
 }
 
 void cedar::proc::gui::Ide::resetSimulationClicked()
