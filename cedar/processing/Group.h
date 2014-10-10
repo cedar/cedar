@@ -128,6 +128,13 @@ public:
  signals:
   //! Signals when a step name changes.
   void stepNameChanged(const std::string& from, const std::string& to);
+
+  //! Emitted whenever a trigger in this group or any of its subgroups is started.
+  void triggerStarted();
+
+  //! Emitted whenever all trigger in this group and its subgroups are stopped.
+  void allTriggersStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -742,6 +749,9 @@ private slots:
 
   //!@brief Takes care of updating the list of looped triggerables if any of them change their state.
   void onLoopedChanged();
+
+  void triggerStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------

@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_Ide.h"
 #include "cedar/auxiliaries/LogInterface.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
@@ -118,13 +119,13 @@ public slots:
    */
   void architectureToolFinished();
   
-  /*!@brief Starts all looped triggers (and other derivatives of looped thread).
+  /*!@brief Slot that is connected to the start/pause simulation action.
    */
-  void startThreads();
+  void startPauseSimulationClicked();
 
   /*!@brief Stops all looped triggers (and other derivatives of looped thread).
    */
-  void stopThreads();
+  void resetSimulationClicked();
 
   /*!@brief Single-step all looped triggers (and other derivatives of looped thread).
    */
@@ -339,6 +340,8 @@ private:
   //! Constructs the widgets in the status bar.
   void buildStatusBar();
 
+  void updateSimulationRunningIcon(bool running);
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
@@ -351,6 +354,10 @@ private slots:
   void openManageArchitectureWidgetsDialog();
 
   void setSimulationControlsDisabled(bool disabled);
+
+  void triggerStarted();
+
+  void allTriggersStopped();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -410,6 +417,8 @@ private:
 
   //! Label used for displaying the current global time.
   QLabel* mpGlobalTimeLabel;
+
+  cedar::aux::LockableMember<bool> mSimulationRunning;
 
 }; // class cedar::MainWindow
 

@@ -169,11 +169,15 @@ void cedar::proc::sources::Picture::updatePicture()
   // fill output with new image
   this->compute(cedar::proc::Arguments());
   cv::Mat new_image = this->mImage->getData();
-  locker.unlock();
   if (!cedar::aux::math::matrixSizesEqual(old_image, new_image) || old_image.type() != new_image.type())
   {
     this->annotateImage();
+    locker.unlock();
     this->emitOutputPropertiesChangedSignal("Picture");
+  }
+  else
+  {
+    locker.unlock();
   }
   onTrigger();
 }
