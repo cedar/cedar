@@ -100,7 +100,8 @@ mpConsistencyDock(nullptr),
 mpBoostControlDock(nullptr),
 mpBoostControl(nullptr),
 mSuppressCloseDialog(false),
-mpExperimentDialog(nullptr)
+mpExperimentDialog(nullptr),
+mSimulationRunning(false)
 {
   // setup the (automatically generated) ui components
   this->setupUi(this);
@@ -198,9 +199,9 @@ mpExperimentDialog(nullptr)
 
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
                    this, SLOT(architectureToolFinished()));
-  QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
+  QObject::connect(this->mpActionStartPauseSimulation, SIGNAL(triggered()), this, SLOT(startPauseSimulationClicked()));
   QObject::connect(this->mpThreadsSingleStep, SIGNAL(triggered()), this, SLOT(stepThreads()));
-  QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()))
+  QObject::connect(this->mpActionResetSimulation, SIGNAL(triggered()), this, SLOT(resetSimulationClicked()))
   ;
   QObject::connect(this->mpActionNew, SIGNAL(triggered()), this, SLOT(newFile()));
 
@@ -298,6 +299,8 @@ mpExperimentDialog(nullptr)
 
   this->mpActionSave->setEnabled(true);
 
+  this->mpActionResetSimulation->setEnabled(false);
+
   this->buildStatusBar();
   this->startTimer(100);
 }
@@ -329,8 +332,8 @@ cedar::proc::gui::Ide::~Ide()
 
 void cedar::proc::gui::Ide::setSimulationControlsDisabled(bool disabled)
 {
-  this->mpThreadsStartAll->setEnabled(!disabled);
-  this->mpThreadsStopAll->setEnabled(!disabled);
+  this->mpActionStartPauseSimulation->setEnabled(!disabled);
+  this->mpActionResetSimulation->setEnabled(!disabled);
   this->mpThreadsSingleStep->setEnabled(!disabled);
 }
 
@@ -687,10 +690,8 @@ void cedar::proc::gui::Ide::selectAll()
 
 void cedar::proc::gui::Ide::resetRootGroup()
 {
-  //reset global timer @!todo should the time be reseted here?
-  //cedar::aux::GlobalClockSingleton::getInstance()->reset();
   this->getLog()->outdateAllMessages();
-  this->mGroup->getGroup()->reset();
+  QtConcurrent::run(boost::bind(&cedar::proc::Group::reset, this->mGroup->getGroup()));
 }
 
 void cedar::proc::gui::Ide::showAboutDialog()
@@ -1038,15 +1039,77 @@ void cedar::proc::gui::Ide::notify(const QString& message)
   QMessageBox::critical(this,"Notification", message);
 }
 
-void cedar::proc::gui::Ide::startThreads()
+void cedar::proc::gui::Ide::triggerStarted()
 {
-  this->mpThreadsStartAll->setChecked(true);
-  this->mpThreadsStopAll->setChecked(false);
-  //start global timer
-  cedar::aux::GlobalClockSingleton::getInstance()->start();
-  CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
-  // calls this->mGroup->getGroup()->startTriggers()
-  this->mStartThreadsCaller->start();
+  QWriteLocker locker(this->mSimulationRunning.getLockPtr());
+  this->mSimulationRunning.member() = true;
+  this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+
+  this->mpActionResetSimulation->setEnabled(false);
+}
+
+void cedar::proc::gui::Ide::allTriggersStopped()
+{
+  QWriteLocker locker(this->mSimulationRunning.getLockPtr());
+  this->mSimulationRunning.member() = false;
+  this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+
+  this->mpActionResetSimulation->setEnabled(true);
+}
+
+void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
+{
+  if (running)
+  {
+    this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/pause.svg"));
+  }
+  else
+  {
+    this->mpActionStartPauseSimulation->setIcon(QIcon(":/cedar/auxiliaries/gui/start.svg"));
+  }
+}
+
+void cedar::proc::gui::Ide::startPauseSimulationClicked()
+{
+  if (this->mStopThreadsCaller->isRunning() || this->mStartThreadsCaller->isRunning())
+  {
+    return;
+  }
+
+  QReadLocker locker(this->mSimulationRunning.getLockPtr());
+  bool running = this->mSimulationRunning.member();
+
+  if (running)
+  {
+    // stop triggers (in a separate thread because this may lead to lockups)
+    CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
+    // calls this->mGroup->getGroup()->stopTriggers()
+    this->mStopThreadsCaller->start();
+
+    // pause global timer
+    cedar::aux::GlobalClockSingleton::getInstance()->stop();
+  }
+  else if (!running)
+  {
+    // start triggers (in a separate thread because this may lead to lockups)
+    CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
+    // calls this->mGroup->getGroup()->startTriggers()
+    this->mStartThreadsCaller->start();
+
+    // start global timer
+    //!@todo Should this happen automatically as soon as one of the triggers is started? Or should this remain the responsibility of the GUI?
+    cedar::aux::GlobalClockSingleton::getInstance()->start();
+  }
+}
+
+void cedar::proc::gui::Ide::resetSimulationClicked()
+{
+  //!@todo Stop all triggers, notify start/pause button
+
+  this->resetRootGroup();
+  cedar::aux::GlobalClockSingleton::getInstance()->reset();
+
+  this->mpActionResetSimulation->setEnabled(false);
 }
 
 void cedar::proc::gui::Ide::stepThreads()
@@ -1060,17 +1123,6 @@ void cedar::proc::gui::Ide::stepThreads()
   {
     this->mGroup->getGroup()->stepTriggers();
   }
-}
-
-void cedar::proc::gui::Ide::stopThreads()
-{
-  this->mpThreadsStartAll->setChecked(false);
-  this->mpThreadsStopAll->setChecked(true);
-  //stop global timer @!todo should the time be stoped here?
-  //cedar::aux::GlobalClockSingleton::getInstance()->stop();
-  CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
-  // calls this->mGroup->getGroup()->stopTriggers()
-  this->mStopThreadsCaller->start();
 }
 
 void cedar::proc::gui::Ide::newFile()
@@ -1613,6 +1665,9 @@ cedar::proc::gui::GroupPtr cedar::proc::gui::Ide::getGroup()
 void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 {
   this->mGroup = group;
+
+  QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
+  QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
 
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mGroup->addElementsToScene();

@@ -36,18 +36,46 @@
 
 //CEDAR INCLUDES
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
 
 cedar::aux::GlobalClock::GlobalClock()
-:mRunning(false)
+:
+mRunning(false)
 {
+  this->mGlobalTimeFactorConnection = cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
+  (
+    boost::bind(&cedar::aux::GlobalClock::globalTimeFactorChanged, this, _1)
+  );
+
+  this->mCurrentTimeFactor = cedar::aux::SettingsSingleton::getInstance()->getGlobalTimeFactor();
+
   this->reset();
 }
 
 cedar::aux::GlobalClock::~GlobalClock()
 {
 }
+
+void cedar::aux::GlobalClock::globalTimeFactorChanged(double newFactor)
+{
+  this->addCurrentToAdditionalElapsedTime();
+  this->mCurrentTimeFactor = newFactor;
+}
+
+double cedar::aux::GlobalClock::getCurrentElapsedMSec() const
+{
+  double elapsed = static_cast<double>(this->mTimer.elapsed());
+  return elapsed * this->mCurrentTimeFactor;
+}
+
+void cedar::aux::GlobalClock::addCurrentToAdditionalElapsedTime()
+{
+  this->mAdditionalElapsedTime += this->getCurrentElapsedMSec();
+  this->mTimer.restart();
+}
+
 
 bool cedar::aux::GlobalClock::isRunning() const
 {
@@ -56,45 +84,39 @@ bool cedar::aux::GlobalClock::isRunning() const
 
 void cedar::aux::GlobalClock::start()
 {
-  //if timer on 0
-  if  (mStart==mStop)
+  if (!this->mRunning)
   {
-    mStart = QTime::currentTime();
+    this->mTimer.start();
+    this->mRunning = true;
   }
-  mRunning = true;
 }
 
 void cedar::aux::GlobalClock::reset()
 {
-  mStart = QTime::currentTime();
-  mStop = mStart;
+  this->mAdditionalElapsedTime = 0;
+  this->mTimer.restart();
 }
 
 
 void cedar::aux::GlobalClock::stop()
 {
-  mStop = QTime::currentTime();
-  mRunning = false;
+  if (this->mRunning)
+  {
+    this->addCurrentToAdditionalElapsedTime();
+    this->mRunning = false;
+  }
 }
 
 cedar::unit::Time cedar::aux::GlobalClock::getTime()
 {
-  if(mRunning)
+  double time_msecs = this->mAdditionalElapsedTime;
+
+  if (this->mRunning)
   {
-    cedar::unit::Time time
-                      (
-                        static_cast<float>(mStart.msecsTo(QTime::currentTime()))
-                        * cedar::unit::milli * cedar::unit::seconds
-                      );
-    return time;
+    time_msecs += this->getCurrentElapsedMSec();
   }
 
-  cedar::unit::Time time
-                    (
-                      static_cast<float>(mStart.msecsTo(mStop))
-                      * cedar::unit::milli * cedar::unit::seconds
-                    );
-  return time;
+  return cedar::unit::Time(static_cast<double>(time_msecs) * cedar::unit::milli * cedar::unit::seconds);
 }
 
 

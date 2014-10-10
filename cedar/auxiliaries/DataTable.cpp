@@ -176,6 +176,17 @@ void cedar::aux::DataTable::RowCollection::appendRow(RowPtr row)
   this->mRows.push_back(row);
 }
 
+void cedar::aux::DataTable::RowCollection::append(ConstRowCollectionPtr other)
+{
+  // both collections must be from the same table
+  CEDAR_ASSERT(other->mDataTable.lock() == this->mDataTable.lock());
+
+  for (auto row : other->mRows)
+  {
+    this->appendRow(row);
+  }
+}
+
 size_t cedar::aux::DataTable::IndexMap::createIndex(const std::string& indexName)
 {
   CEDAR_ASSERT(!indexName.empty());
