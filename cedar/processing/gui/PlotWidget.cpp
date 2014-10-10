@@ -557,7 +557,8 @@ std::tuple<int, int> cedar::proc::gui::PlotWidget::findGridPositionOf(LabeledPlo
     for (int c = 0; c < this->mpLayout->columnCount(); ++c)
     {
       auto item = this->mpLayout->itemAtPosition(r, c);
-      if (item->layout() == plot->mpTitleLayout)
+      // check for nullptr before accessing and comparing layout
+      if (item != nullptr && item->layout() == plot->mpTitleLayout)
       {
         return std::make_tuple(r, c);
       }
