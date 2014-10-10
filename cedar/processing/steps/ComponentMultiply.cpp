@@ -144,7 +144,11 @@ void cedar::proc::steps::ComponentMultiply::compute(const cedar::proc::Arguments
 
   for (unsigned int i = 0; i < this->mInputs->getDataCount(); ++i)
   {
-    cedar::aux::MatDataPtr mat_data = boost::static_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(i));
+    cedar::aux::MatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(i));
+    if (!mat_data)
+    {
+      continue;
+    }
     cv::Mat input = mat_data->getData();
 
     if (!mat_data->isEmpty())
