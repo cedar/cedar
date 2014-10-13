@@ -128,6 +128,9 @@ public:
     return this->_mBins->getValue();
   }
 
+  //! Sets the number of bins in the histogram.
+  void setNumberOfBins(unsigned int numberOfBins);
+
   //!@brief Returns the lower range of the histogram.
   inline double getRangeLower() const
   {
