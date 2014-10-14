@@ -799,19 +799,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
-  QAction *p_reset = menu.addAction("reset architecture");
-
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
 
   //!@todo Instead of this structure, connect each action with an appropriate slot.
-  if (a == p_reset)
-  {
-    if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
-    {
-      p_ide->resetRootGroup();
-    }
-  }
-  else if (a == p_importGroup || a == p_link_group)
+  if (a == p_importGroup || a == p_link_group)
   {
     this->importGroup(a == p_link_group);
   }
@@ -823,7 +814,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   {
     this->addStickyNote();
   }
-  else if (a != NULL)
+  else if (a != nullptr)
   {
     std::cout << "Unmatched action in cedar::proc::gui::Scene::contextMenuEvent." << std::endl;
   }
