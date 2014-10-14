@@ -1045,7 +1045,7 @@ void cedar::proc::gui::Ide::triggerStarted()
   this->mSimulationRunning.member() = true;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
 
-  this->mpActionResetSimulation->setEnabled(false);
+  this->mpActionResetSimulation->setEnabled(true);
 }
 
 void cedar::proc::gui::Ide::allTriggersStopped()
@@ -1053,8 +1053,6 @@ void cedar::proc::gui::Ide::allTriggersStopped()
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
   this->mSimulationRunning.member() = false;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
-
-  this->mpActionResetSimulation->setEnabled(true);
 }
 
 void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
@@ -1104,16 +1102,15 @@ void cedar::proc::gui::Ide::startPauseSimulationClicked()
 
 void cedar::proc::gui::Ide::resetSimulationClicked()
 {
-  //!@todo Stop all triggers, notify start/pause button
+  this->mpActionResetSimulation->setEnabled(false);
 
   this->resetRootGroup();
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
-
-  this->mpActionResetSimulation->setEnabled(false);
 }
 
 void cedar::proc::gui::Ide::stepThreads()
 {
+  this->mpActionResetSimulation->setEnabled(true);
   if (this->mpCustomTimeStep->isEnabled())
   {
     cedar::unit::Time step_size(this->mpCustomTimeStep->value() * cedar::unit::milli * cedar::unit::seconds);
