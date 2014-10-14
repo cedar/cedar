@@ -135,6 +135,11 @@ public:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
 
+  //! Sets the output size for the given dimension.
+  void setOutputSize(unsigned int dimension, unsigned int size);
+
+  //! Returns the output size for the given dimension.
+  unsigned int getOutputSize(unsigned int dimension) const;
 
 public slots:
   //!@brief Slot that reacts to changes in the output size.
