@@ -246,11 +246,6 @@ mSimulationRunning(false)
                    this,
                    SLOT(showAboutDialog()));
 
-  QObject::connect(mpActionResetRootGroup,
-                   SIGNAL(triggered()),
-                   this,
-                   SLOT(resetRootGroup()));
-
   QObject::connect(mpActionExportSVG,
                    SIGNAL(triggered()),
                    this,

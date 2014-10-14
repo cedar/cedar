@@ -237,8 +237,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -295,8 +295,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>429</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -534,21 +534,6 @@
   <action name="mpActionAbout">
    <property name="text">
     <string>About...</string>
-   </property>
-  </action>
-  <action name="mpActionResetRootGroup">
-   <property name="icon">
-    <iconset resource="icons/cedar_proc_gui_icons.qrc">
-     <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Reset root network</string>
-   </property>
-   <property name="toolTip">
-    <string>Resets all steps</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="mpActionExportSVG">
