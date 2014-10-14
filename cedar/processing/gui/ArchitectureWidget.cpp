@@ -240,7 +240,12 @@ void cedar::proc::gui::ArchitectureWidget::readConfiguration(const cedar::aux::C
   }
 }
 
-void cedar::proc::gui::ArchitectureWidget::addEntry(const cedar::aux::ConfigurationNode& entry, int rowOffset, int colOffset)
+void cedar::proc::gui::ArchitectureWidget::addEntry
+(
+  const cedar::aux::ConfigurationNode& entry,
+  int rowOffset, int colOffset,
+  const cedar::proc::gui::ArchitectureWidget::BaseCellAttributes& passedAttributes
+)
 {
   auto grid_layout = cedar::aux::asserted_cast<QGridLayout*>(this->layout());
 
@@ -248,13 +253,14 @@ void cedar::proc::gui::ArchitectureWidget::addEntry(const cedar::aux::Configurat
   auto column = readOptional<int>(entry, "column", 0) + colOffset;
   auto type = readOptional<std::string>(entry, "type", "plot");
 
-  auto row_stretch = readOptional<int>(entry, "row stretch", 1);
-  auto column_stretch = readOptional<int>(entry, "column stretch", 1);
-  grid_layout->setRowStretch(row, row_stretch);
-  grid_layout->setColumnStretch(column, column_stretch);
+  BaseCellAttributes attributes;
+  attributes.mRowStretch = readOptional<int>(entry, "row stretch", passedAttributes.mRowStretch);
+  attributes.mColumnStretch = readOptional<int>(entry, "column stretch", passedAttributes.mColumnStretch);
+  grid_layout->setRowStretch(row, attributes.mRowStretch);
+  grid_layout->setColumnStretch(column, attributes.mColumnStretch);
 
-  int column_span = readOptional<int>(entry, "column span", 1);
-  int row_span = readOptional<int>(entry, "row span", 1);
+  attributes.mRowSpan = readOptional<int>(entry, "row span", passedAttributes.mRowSpan);
+  attributes.mColumnSpan = readOptional<int>(entry, "column span", passedAttributes.mColumnSpan);
 
   QWidget* widget = nullptr;
   if (type == "plot")
@@ -267,7 +273,7 @@ void cedar::proc::gui::ArchitectureWidget::addEntry(const cedar::aux::Configurat
   }
   else if (type == "template")
   {
-    this->addTemplate(row, column, entry);
+    this->addTemplate(row, column, entry, attributes);
   }
   else
   {
@@ -278,7 +284,7 @@ void cedar::proc::gui::ArchitectureWidget::addEntry(const cedar::aux::Configurat
 
   if (widget != nullptr)
   {
-    grid_layout->addWidget(widget, row, column, row_span, column_span);
+    grid_layout->addWidget(widget, row, column, attributes.mRowSpan, attributes.mColumnSpan);
 
     auto style = readOptional<std::string>(entry, "style sheet", "");
     if (!style.empty())
@@ -288,7 +294,12 @@ void cedar::proc::gui::ArchitectureWidget::addEntry(const cedar::aux::Configurat
   }
 }
 
-void cedar::proc::gui::ArchitectureWidget::addTemplate(int row, int column, const cedar::aux::ConfigurationNode& entry)
+void cedar::proc::gui::ArchitectureWidget::addTemplate
+(
+  int row, int column,
+  const cedar::aux::ConfigurationNode& entry,
+  const cedar::proc::gui::ArchitectureWidget::BaseCellAttributes& passedAttributes
+)
 {
   auto template_name = readOptional<std::string>(entry, "template name", "");
   if (template_name.empty())
@@ -317,7 +328,7 @@ void cedar::proc::gui::ArchitectureWidget::addTemplate(int row, int column, cons
 
   for (const auto& entry_pair : conf)
   {
-    this->addEntry(entry_pair.second, row, column);
+    this->addEntry(entry_pair.second, row, column, passedAttributes);
   }
 }
 
