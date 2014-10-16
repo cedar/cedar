@@ -1525,6 +1525,7 @@ void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
 
 void cedar::proc::gui::Ide::closePlots()
 {
+  //!@todo Why is this not a function in proc::gui::Group?
   auto steps = this->mGroup->getScene()->getStepMap();
   for (auto step : steps)
   {
@@ -1536,10 +1537,13 @@ void cedar::proc::gui::Ide::closePlots()
   {
     group.second->closeAllPlots();
   }
+
+  this->mGroup->closeOpenArchitectureWidgets();
 }
 
 void cedar::proc::gui::Ide::toggleVisibilityOfPlots(bool hidden)
 {
+  //!@todo Why is this not a function in proc::gui::Group?
   auto steps = this->mGroup->getScene()->getStepMap();
   for (auto step : steps)
   {
@@ -1551,6 +1555,8 @@ void cedar::proc::gui::Ide::toggleVisibilityOfPlots(bool hidden)
   {
     group.second->toggleVisibilityOfPlots(!hidden);
   }
+
+  this->mGroup->toggleVisibilityOfOpenArchitectureWidgets(!hidden);
 }
 
 void cedar::proc::gui::Ide::toggleRecorder(bool status)
