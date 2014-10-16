@@ -102,17 +102,18 @@ unsigned int checkOutputsForInvalidValues(cedar::proc::StepPtr testStep)
   return errors;
 }
 
-unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testStep)
+unsigned int testStep(cedar::proc::GroupPtr group, cedar::proc::StepPtr testStep)
 {
   // try connecting steps of different types
   unsigned int errors = 0;
 
   // check if the step starts out with invalid values
+  std::cout << "Checking initial state of the step for invalid values." << std::endl;
   errors += checkOutputsForInvalidValues(testStep);
 
   try
   {
-    network->add(testStep, "testStep");
+    group->add(testStep, "testStep");
 
     // test if the step reacts properly when its parameters change (without an input)
     for (auto parameter : testStep->getParameters())
@@ -146,7 +147,7 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
         for (unsigned int i = 0; i < inputs.size(); ++i)
         {
           std::cout << "Connecting " << sources.at(src) << " to " << inputs.at(i)->getName() << std::endl;
-          network->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
+          group->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
         }
 
         if (!testStep->isLooped())
@@ -173,21 +174,25 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
           cedar::aux::ConfigurationNode conf;
           testStep->writeConfiguration(conf);
           testStep->readConfiguration(conf);
+          std::cout << "Done rereading." << std::endl;
         }
 
         for (unsigned int i = 0; i < inputs.size(); ++i)
         {
-          network->disconnectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
+          group->disconnectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
         }
       }
-      network->removeAll();
+      group->removeAll();
     }
   }
   catch (cedar::aux::ExceptionBase& exc)
   {
+    std::cout << "ERROR: An exception occurred." << std::endl;
     exc.printInfo();
     ++errors;
   }
+
+  std::cout << "Done with " << testStep->getName() << ". It produced " << errors << " error(s)." << std::endl;
   return errors;
 }
 
@@ -203,26 +208,26 @@ void run_tests()
   std::vector<std::string> failed_steps;
 
   auto declarations = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarations();
-  for (auto declaration_iter = declarations.begin(); declaration_iter != declarations.end(); ++declaration_iter)
+  for (auto declaration : declarations)
   {
-    cedar::aux::ConstPluginDeclarationPtr declaration = *declaration_iter;
-    cedar::proc::GroupPtr network(new cedar::proc::Group());
-    cedar::proc::ElementPtr elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
+    cedar::proc::GroupPtr group(new cedar::proc::Group());
+    auto elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
     {
       std::cout << "=========================================" << std::endl;
       std::cout << "  Testing class " << declaration->getClassName() << std::endl;
       std::cout << "=========================================" << std::endl;
-      network->readJson("processing_steps.json");
+      group->readJson("processing_steps.json");
 
-      EmptyMatrixProviderPtr empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
-      network->add(empty_provider, "emp");
+      auto empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
+      group->add(empty_provider, "emp");
 
-      int error_count = testStep(network, step);
+      unsigned int error_count = testStep(group, step);
       errors += error_count;
 
       if (error_count > 0)
       {
+        std::cout << "Step failed the test: " << step->getName() << std::endl;
         failed_steps.push_back(declaration->getClassName());
       }
     }
@@ -234,9 +239,9 @@ void run_tests()
   {
     std::cout << "The following steps produced errors:" << std::endl;
 
-    for (size_t i = 0; i < failed_steps.size(); ++i)
+    for (const auto& failed : failed_steps)
     {
-      std::cout << "- " << failed_steps.at(i) << std::endl;
+      std::cout << "- " << failed << std::endl;
     }
   }
 
