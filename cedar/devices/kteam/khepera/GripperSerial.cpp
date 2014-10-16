@@ -71,7 +71,7 @@ namespace
 
 cedar::dev::kteam::khepera::GripperSerial::GripperSerial()
 :
-_mCommandSetGripperPosition(new cedar::aux::StringParameter(this, "command set gripper position", "T,1,d")),
+_mCommandSetGripperPosition(new cedar::aux::StringParameter(this, "command set gripper position", "T,1,D")),
 _mCommandGetGripperPosition(new cedar::aux::StringParameter(this, "command get gripper position", "T,1,H,0")),
 _mAnswerGetGripperPosition(new cedar::aux::StringParameter(this, "answer get gripper position", "t,1,h")),
 _mCommandSetArmPosition(new cedar::aux::StringParameter(this, "command set arm position", "T,1,E")),
@@ -89,7 +89,7 @@ _mCommandGetGripperOpticalSensor
 cedar::dev::kteam::khepera::GripperSerial::GripperSerial(cedar::dev::kteam::SerialChannelPtr channel)
 :
 cedar::dev::kteam::khepera::Gripper(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
-_mCommandSetGripperPosition(new cedar::aux::StringParameter(this, "command set gripper position", "T,1,d")),
+_mCommandSetGripperPosition(new cedar::aux::StringParameter(this, "command set gripper position", "T,1,D")),
 _mCommandGetGripperPosition(new cedar::aux::StringParameter(this, "command get gripper position", "T,1,H,0")),
 _mAnswerGetGripperPosition(new cedar::aux::StringParameter(this, "answer get gripper position", "t,1,h")),
 _mCommandSetArmPosition(new cedar::aux::StringParameter(this, "command set arm position", "T,1,E")),

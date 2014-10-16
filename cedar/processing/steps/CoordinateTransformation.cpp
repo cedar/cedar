@@ -684,7 +684,7 @@ void cedar::proc::steps::CoordinateTransformation::allocateOutput(int rows, int 
     sizes[dim_0] = rows;
     sizes[dim_1] = cols;
     sizes[dim_sliced] = input.size[dim_sliced];
-    this->mOutput->setData(0.0 * cv::Mat(3, sizes, input.type()));
+    this->mOutput->setData(cv::Mat(3, sizes, input.type(), cv::Scalar(0.0)));
   }
 }
 

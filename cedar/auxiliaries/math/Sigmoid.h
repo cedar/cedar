@@ -72,11 +72,16 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   //!@brief Returns the current threshold value.
   inline double getThreshold() const
   {
     return this->mThreshold->getValue();
+  }
+
+  //! Sets the threshold.
+  inline void setThreshold(double threshold, bool lock = false)
+  {
+    this->mThreshold->setValue(threshold, lock);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

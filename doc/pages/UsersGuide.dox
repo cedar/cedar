@@ -14,6 +14,7 @@ beneficial or even necessary.
 - @link GroupsTutorial Groups tutorial @endlink
 - @ref ProjectsWithCedar
 - @link ProcessingFrameworkTutorial Processing framework @endlink
+- @link ArchitectureWidgets Architecture Widgets @endlink
 - @ref ConfigurableAndParameters
 - @link TemplatesTutorial Templates tutorial @endlink
 - @link CommandLineParser cedar's command line parser@endlink

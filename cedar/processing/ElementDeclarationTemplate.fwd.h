@@ -40,6 +40,9 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+// FORWARD DECLARATIONS
+#include "cedar/processing/gui/ConnectableIconView.fwd.h"
+
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 
@@ -53,7 +56,7 @@ namespace cedar
 {
   namespace proc
   {
-    template <class DerivedClass> class ElementDeclarationTemplate;
+    template <class DerivedClass, class IconView> class ElementDeclarationTemplate;
   }
 }
 
