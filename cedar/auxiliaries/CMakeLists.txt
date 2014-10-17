@@ -100,6 +100,7 @@ cedar_add_library(cedaraux
   gui/PluginManagerDialog.h
   gui/PropertyPane.h
   gui/QImagePlot.h
+  gui/QwtMatrixPlot.h
   gui/ResourceDialog.h
   gui/SceneWidget.h
   gui/SettingsWidget.h
