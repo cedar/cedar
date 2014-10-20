@@ -309,6 +309,18 @@ void cedar::proc::steps::Resize::linearInterpolationNDRecursion
   }
 }
 
+void cedar::proc::steps::Resize::setOutputSize(unsigned int dimension, unsigned int size)
+{
+  CEDAR_ASSERT(dimension < this->_mOutputSize->size());
+  this->_mOutputSize->set(dimension, size, true);
+}
+
+unsigned int cedar::proc::steps::Resize::getOutputSize(unsigned int dimension) const
+{
+  CEDAR_ASSERT(dimension < this->_mOutputSize->size());
+  return this->_mOutputSize->at(dimension);
+}
+
 cv::Size cedar::proc::steps::Resize::getOutputSize() const
 {
   cv::Size size;

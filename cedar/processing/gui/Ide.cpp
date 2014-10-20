@@ -246,11 +246,6 @@ mSimulationRunning(false)
                    this,
                    SLOT(showAboutDialog()));
 
-  QObject::connect(mpActionResetRootGroup,
-                   SIGNAL(triggered()),
-                   this,
-                   SLOT(resetRootGroup()));
-
   QObject::connect(mpActionExportSVG,
                    SIGNAL(triggered()),
                    this,
@@ -1045,7 +1040,7 @@ void cedar::proc::gui::Ide::triggerStarted()
   this->mSimulationRunning.member() = true;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
 
-  this->mpActionResetSimulation->setEnabled(false);
+  this->mpActionResetSimulation->setEnabled(true);
 }
 
 void cedar::proc::gui::Ide::allTriggersStopped()
@@ -1053,8 +1048,6 @@ void cedar::proc::gui::Ide::allTriggersStopped()
   QWriteLocker locker(this->mSimulationRunning.getLockPtr());
   this->mSimulationRunning.member() = false;
   this->updateSimulationRunningIcon(this->mSimulationRunning.member());
-
-  this->mpActionResetSimulation->setEnabled(true);
 }
 
 void cedar::proc::gui::Ide::updateSimulationRunningIcon(bool running)
@@ -1104,16 +1097,15 @@ void cedar::proc::gui::Ide::startPauseSimulationClicked()
 
 void cedar::proc::gui::Ide::resetSimulationClicked()
 {
-  //!@todo Stop all triggers, notify start/pause button
+  this->mpActionResetSimulation->setEnabled(false);
 
   this->resetRootGroup();
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
-
-  this->mpActionResetSimulation->setEnabled(false);
 }
 
 void cedar::proc::gui::Ide::stepThreads()
 {
+  this->mpActionResetSimulation->setEnabled(true);
   if (this->mpCustomTimeStep->isEnabled())
   {
     cedar::unit::Time step_size(this->mpCustomTimeStep->value() * cedar::unit::milli * cedar::unit::seconds);
@@ -1533,6 +1525,7 @@ void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
 
 void cedar::proc::gui::Ide::closePlots()
 {
+  //!@todo Why is this not a function in proc::gui::Group?
   auto steps = this->mGroup->getScene()->getStepMap();
   for (auto step : steps)
   {
@@ -1544,10 +1537,13 @@ void cedar::proc::gui::Ide::closePlots()
   {
     group.second->closeAllPlots();
   }
+
+  this->mGroup->closeOpenArchitectureWidgets();
 }
 
 void cedar::proc::gui::Ide::toggleVisibilityOfPlots(bool hidden)
 {
+  //!@todo Why is this not a function in proc::gui::Group?
   auto steps = this->mGroup->getScene()->getStepMap();
   for (auto step : steps)
   {
@@ -1559,6 +1555,8 @@ void cedar::proc::gui::Ide::toggleVisibilityOfPlots(bool hidden)
   {
     group.second->toggleVisibilityOfPlots(!hidden);
   }
+
+  this->mGroup->toggleVisibilityOfOpenArchitectureWidgets(!hidden);
 }
 
 void cedar::proc::gui::Ide::toggleRecorder(bool status)

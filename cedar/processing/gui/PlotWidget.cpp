@@ -672,17 +672,31 @@ void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationN
       auto layout_item = this->mpLayout->itemAtPosition(row, col);
       if (auto widget_item = dynamic_cast<QWidgetItem*>(layout_item))
       {
-        if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(widget_item->widget()))
+        // test if the widget contains a plot
+        auto widget = widget_item->widget();
+        if (widget->layout())
         {
-          cedar::aux::ConfigurationNode cfg, plot_cfg;
-          cfg.put("row", row);
-          cfg.put("col", col);
-          plot->writeConfiguration(plot_cfg);
-          if (!plot_cfg.empty())
+          for (int i = 0; i < widget->layout()->count(); ++i)
           {
-            cfg.push_back(cedar::aux::ConfigurationNode::value_type("plot configuration", plot_cfg));
+            auto item = dynamic_cast<QWidgetItem*>(widget->layout()->itemAt(i));
+            if (!item)
+            {
+              continue;
+            }
+            if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(item->widget()))
+            {
+              cedar::aux::ConfigurationNode cfg, plot_cfg;
+              cfg.put("row", row);
+              cfg.put("col", col);
+              plot->writeConfiguration(plot_cfg);
+              if (!plot_cfg.empty())
+              {
+                cfg.push_back(cedar::aux::ConfigurationNode::value_type("plot configuration", plot_cfg));
+              }
+              plot_settings.push_back(cedar::aux::ConfigurationNode::value_type("", cfg));
+              break;
+            }
           }
-          plot_settings.push_back(cedar::aux::ConfigurationNode::value_type("", cfg));
         }
       }
     }
@@ -732,6 +746,7 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   pConnectable->addPlotWidget(p_plot_widget, x, y, width, height);
 
 
+  //!@todo This method (and writeConfiguration) are way too tied into the layout of the widget. Just slight changes to the structure will break everything. Fix this!
   auto settings_iter = node.find("plot configurations");
   if (settings_iter != node.not_found())
   {
@@ -753,12 +768,27 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
         continue;
       }
 
-      if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(widget_item->widget()))
+      auto layout = widget_item->widget()->layout();
+      if (!layout)
       {
-        auto plot_cfg_iter = cfg.find("plot configuration");
-        if (plot_cfg_iter != cfg.not_found())
+        continue;
+      }
+
+      for (int i = 0; i < layout->count(); ++i)
+      {
+        auto item = dynamic_cast<QWidgetItem*>(layout->itemAt(i));
+        if (!item)
         {
-          plot->readConfiguration(plot_cfg_iter->second);
+          continue;
+        }
+
+        if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(item->widget()))
+        {
+          auto plot_cfg_iter = cfg.find("plot configuration");
+          if (plot_cfg_iter != cfg.not_found())
+          {
+            plot->readConfiguration(plot_cfg_iter->second);
+          }
         }
       }
     }
