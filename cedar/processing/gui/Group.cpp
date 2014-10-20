@@ -263,7 +263,43 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
 
   auto dock = this->createDockWidget(name, widget);
   dock->show();
+
+  this->mArchitectureWidgetDocks.push_back(dock);
 }
+
+void cedar::proc::gui::Group::toggleVisibilityOfOpenArchitectureWidgets(bool visible)
+{
+  for (auto iter = this->mArchitectureWidgetDocks.begin(); iter != this->mArchitectureWidgetDocks.end();)
+  {
+    auto widget_weak_ptr = *iter;
+    auto widget = widget_weak_ptr.data();
+    if (widget)
+    {
+      widget->setVisible(visible);
+      ++iter;
+    }
+    else
+    {
+      iter = this->mArchitectureWidgetDocks.erase(iter);
+    }
+  }
+}
+
+void cedar::proc::gui::Group::closeOpenArchitectureWidgets()
+{
+  for (auto iter = this->mArchitectureWidgetDocks.begin(); iter != this->mArchitectureWidgetDocks.end();)
+  {
+    auto widget_weak_ptr = *iter;
+    auto widget = widget_weak_ptr.data();
+    if (widget)
+    {
+      widget->close();
+    }
+
+    iter = this->mArchitectureWidgetDocks.erase(iter);
+  }
+}
+
 
 void cedar::proc::gui::Group::lastReadConfigurationChanged()
 {

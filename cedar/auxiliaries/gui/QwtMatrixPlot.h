@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GaussInput.h
+    File:        MatrixPlot.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Date:        2011 07 14
 
     Description:
 
@@ -38,116 +38,91 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_GAUSS_INPUT_H
-#define CEDAR_PROC_SOURCES_GAUSS_INPUT_H
+#ifndef CEDAR_AUX_GUI_QWT_MATRIX_PLOT_H
+#define CEDAR_AUX_GUI_QWT_MATRIX_PLOT_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/processing/sources/GaussInput.fwd.h"
+#include "cedar/auxiliaries/gui/ColorValueRGBA.fwd.h"
+#include "cedar/auxiliaries/gui/QwtMatrixPlot.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
+#include <QReadWriteLock>
+#include <opencv2/opencv.hpp>
+#include <vector>
+#include <string>
 
-
-/*!@brief Generates a matrix with a Gaussian.
+/*!@brief A class used for plotting with the Qwt and QwtPlot3D libraries.
  *
- *        The output matrix will contain values of a Gauss function, sampled based on the indices of the matrix taken as
- *        x,y,... coordinates.
+ * @todo This code is highly redundant with MatDataPlot, MatrixPlot and VtkMatrixPlot. Unify them.
  */
-class cedar::proc::sources::GaussInput : public cedar::proc::Step
+class cedar::aux::gui::QwtMatrixPlot : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GaussInput();
-
-  //!@brief Destructor
+  QwtMatrixPlot(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Sets the center of the Gauss in the given dimension.
-  void setCenter(unsigned int dimension, double center);
+  //!@brief display a MatData
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+  //!@brief Check if the given data can be appended to the plot.
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
+  //!@brief Check if the given data can be detached from the plot.
+  bool canDetach(cedar::aux::ConstDataPtr data) const;
 
-  //!@brief Sets the amplitude of the Gauss input.
-  void setAmplitude(double amplitude);
+  void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
 
-  //!@brief Returns the amplitude of the Gauss input.
-  double getAmplitude() const;
-
-  //! Sets the dimensionality of the Gauss input.
-  void setDimensionality(unsigned int dimensionality);
-
-  //! Sets the size of the Gauss in the given dimension.
-  void setSize(unsigned int dimension, unsigned int size);
-
-  //! Returns the size of the Gauss in the given dimension.
-  unsigned int getSize(unsigned int dimension) const;
+  void writeConfiguration(cedar::aux::ConfigurationNode& configuration) const;
 
 public slots:
-  //!@brief a slot that is triggered if any of the Gauss function parameters are changed
-  void updateMatrix();
-
-  //!@brief a slot that is triggered if the matrix size is changed
-  void updateMatrixSize();
-
-  //!@brief a slot to process changes in dimensionality, including reinitializing the buffers
-  void updateDimensionality();
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
+   */
+  void processChangedData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief refreshes the internal matrix containing the Gaussian input
-  void compute(const cedar::proc::Arguments& arguments);
-
-  void calculateOutput();
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void doDetach(cedar::aux::ConstDataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief the buffer containing the output
-  cedar::aux::MatDataPtr mOutput;
+  // none yet
 private:
+  //!@brief the displayed MatData
+  cedar::aux::ConstMatDataPtr mData;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief the amplitude of the Gauss function
-  cedar::aux::DoubleParameterPtr _mAmplitude;
-  //!@brief the dimensionality of the Gauss function
-  cedar::aux::UIntParameterPtr _mDimensionality;
-  //!@brief the vector of sigmas (i.e. width) of the Gauss function
-  cedar::aux::DoubleVectorParameterPtr _mSigmas;
-  //!@brief the vector of centers of the Gauss function
-  cedar::aux::DoubleVectorParameterPtr _mCenters;
-  //!@brief the vector of sizes of matrix containing the Gauss function for each dimension
-  cedar::aux::UIntVectorParameterPtr _mSizes;
-  //!@brief determines if the Gauss input is cyclic or not
-  cedar::aux::BoolParameterPtr _mIsCyclic;
+  //!@brief the plot widget
+  QWidget* mpCurrentPlotWidget;
 
-private:
+  std::string mTitle;
 
-}; // class cedar::proc::source::GaussInput
+}; // class cedar::aux::gui::QwtMatrixPlot
 
-#endif // CEDAR_PROC_SOURCES_GAUSS_INPUT_H
+#endif // CEDAR_AUX_GUI_QWT_MATRIX_PLOT_H

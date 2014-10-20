@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <QWeakPointer>
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
@@ -217,6 +218,12 @@ public:
 
   //! Displays the architecture plot with the given name.
   void showArchitectureWidget(const std::string& name);
+
+  //! Changes the visibility of all open architecture widgets
+  void toggleVisibilityOfOpenArchitectureWidgets(bool visible);
+
+  //! Closes all open architecture widgets
+  void closeOpenArchitectureWidgets();
 
 public slots:
   /*! sets the recording state of all steps
@@ -407,6 +414,8 @@ private:
   QColor mBackgroundColor;
 
   cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
+
+  std::vector<QWeakPointer<QWidget>> mArchitectureWidgetDocks;
 
   //! The vertical offset for data slots in the group used when the group is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;
