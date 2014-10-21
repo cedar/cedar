@@ -1035,6 +1035,7 @@ void cedar::dev::Component::stepCommunication(cedar::unit::Time time)
   // thus, if we cannot lock here, we skip the step
   if (!mGeneralAccessLock.tryLock())
   {
+    // remember that we skipped some integration/differentiation time, we have to remember this for future calls!
     this->mLostTime += time;
     return;
   }
