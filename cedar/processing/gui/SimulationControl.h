@@ -22,44 +22,44 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BoostControl.h
+    File:        SimulationControl.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 06 28
+    Date:        2014 10 21
 
-    Description:
+    Description: Header file for the class cedar::proc::gui::SimulationControl.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_BOOST_CONTROL_H
-#define CEDAR_PROC_GUI_BOOST_CONTROL_H
+#ifndef CEDAR_PROC_GUI_SIMULATION_CONTROL_H
+#define CEDAR_PROC_GUI_SIMULATION_CONTROL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_BoostControl.h"
+#include "cedar/processing/gui/ui_SimulationControl.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
-#include "cedar/processing/gui/BoostControl.fwd.h"
-#include "cedar/processing/gui/View.fwd.h"
-#include "cedar/processing/sources/Boost.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/SimulationControl.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
-#include <map>
 
 
-/*!@brief A widget for conveniently controlling the boosts in a network.
+/*!@brief A widget for controlling the simulation of a cedar::proc::Group.
  */
-class cedar::proc::gui::BoostControl : public QWidget, public Ui_BoostControl
+class cedar::proc::gui::SimulationControl : public QWidget, public Ui_SimulationControl
 {
   Q_OBJECT
 
@@ -72,15 +72,17 @@ class cedar::proc::gui::BoostControl : public QWidget, public Ui_BoostControl
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  BoostControl(cedar::proc::gui::View* view);
+  SimulationControl();
+
+  //! The destructor.
+  ~SimulationControl();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Sets the network whose boosts are controlled by this widget.
-   */
-  void setGroup(cedar::proc::GroupPtr network);
+  //! Sets the group whose simulation is controlled by this widget.
+  void setGroup(cedar::proc::gui::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,30 +94,30 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Adds a boost to this control widget.
-  void boostAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
-
-  bool isBoostItem(QTreeWidgetItem* pItem) const;
-
-  cedar::proc::sources::BoostPtr findBoostFor(QTreeWidgetItem* pItem) const;
-
-private slots:
-  //! If possible, centers the boost that was double-clicked.
-  void itemActivated(QTreeWidgetItem* pItem, int column);
+  void elementAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
+  void loopedTriggerAdded(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  cedar::proc::GroupPtr mGroup;
+  cedar::proc::gui::GroupPtr mGroup;
 
-  cedar::proc::gui::View* mpView;
+  boost::signals2::scoped_connection mElementAddedConnection;
 
-  boost::signals2::scoped_connection mBoostAddedConnection;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-}; // class cedar::proc::gui::BoostControl
+private:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_BOOST_CONTROL_H
+}; // class cedar::proc::gui::SimulationControl
+
+#endif // CEDAR_PROC_GUI_SIMULATION_CONTROL_H
 
