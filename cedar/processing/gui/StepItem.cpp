@@ -407,7 +407,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     return;
   }
 
-  this->fillPlotMenu(menu, event);
+  this->fillConnectableMenu(menu, event);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -448,7 +448,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   QAction *a = menu.exec(event->screenPos());
 
-  if (a == NULL)
+  if (a == nullptr)
     return;
 
   // execute an action

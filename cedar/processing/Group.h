@@ -552,7 +552,7 @@ public:
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
 
   //! Returns a list of all the looped triggers in this group.
-  std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
+  std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers(bool recursive = false) const;
 
   //! Reads the meta information from the given file and extracts the plugins required by the architecture.
   static std::set<std::string> getRequiredPlugins(const std::string& architectureFile);
