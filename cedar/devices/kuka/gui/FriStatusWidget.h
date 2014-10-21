@@ -44,7 +44,7 @@
 
 // CEDAR INCLUDES
 #include "namespace.h"
-#include "cedar/devices/kuka/KinematicChain.h"
+#include "cedar/devices/kuka/FRIChannel.h"
 #include "cedar/devices/kuka/gui/ui_FriStatusWidget.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 
@@ -72,7 +72,7 @@ public:
    * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
    * @param parent parent widget
    */
-  FriStatusWidget(cedar::dev::kuka::KinematicChainPtr pKukaIn, QWidget *parent=0);
+  FriStatusWidget(cedar::dev::kuka::FRIChannelPtr pKukaIn, QWidget *parent=0);
 
   //!@brief Destructor
   ~FriStatusWidget();
@@ -108,7 +108,7 @@ protected:
   // none yet
 private:
   bool mIsInit; //!<true, if object has been initialized
-  cedar::dev::kuka::KinematicChainPtr mpKukaIn; //!<this is an external reference
+  cedar::dev::kuka::FRIChannelPtr mpKukaIn; //!<this is an external reference
 }; // class cedar::dev::kuka::gui::FriStatusWidget
 
 #endif // CEDAR_USE_KUKA_FRI

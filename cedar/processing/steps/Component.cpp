@@ -296,8 +296,11 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 
     auto command_type = component->getCommandTypeForName(name);
 
-    auto mat_data = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
-    component->setUserSideCommandBuffer(command_type, mat_data->getData());
+    auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(slot->getData());
+    if (mat_data)
+    {
+      component->setUserSideCommandBuffer(command_type, mat_data->getData());
+    }
   }
 }
 
@@ -372,7 +375,7 @@ void cedar::proc::steps::Component::rebuildInputs()
   {
     std::string name = component->getNameForCommandType(command);
     //!@todo On inputConnectionChanged, incoming data must be set at the component.
-    this->declareInput(name);
+    this->declareInput(name, false);
   }
 }
 
