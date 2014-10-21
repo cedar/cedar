@@ -290,7 +290,7 @@ protected:
   void removeDecoration(cedar::proc::gui::Connectable::DecorationPtr decoration);
 
   //! Fill plot menu
-  void fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
+  void fillConnectableMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
 
   //!@brief Fills the defined plots into the given menu.
   void fillDefinedPlots(QMenu& menu, const QPoint& plotPosition);
@@ -361,10 +361,15 @@ private:
 
   void translateStoppedSignal();
 
+  //! Fill plot menu
+  void fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
+
 private slots:
   void triggerableStarted();
 
   void triggerableStopped();
+
+  void assignTriggerClicked();
 
 signals:
   //! translates a slot removed signal to Qt

@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/DefaultConnectableIconView.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/exceptions.h"
@@ -780,6 +781,53 @@ void cedar::proc::gui::Connectable::updateDecorations()
   }
 
   this->updateDecorationPositions();
+}
+
+void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)
+{
+  this->fillPlotMenu(menu, event);
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  QMenu* p_assign_trigger = menu.addMenu("assign to trigger");
+
+  auto group = this->getElement()->getGroup();
+
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  if (triggerable && triggerable->isLooped())
+  {
+    auto triggers = group->listLoopedTriggers();
+    auto current_trigger = triggerable->getParentTrigger();
+
+    for (auto trigger : triggers)
+    {
+      std::string path = group->findPath(trigger);
+      QAction* action = p_assign_trigger->addAction(QString::fromStdString(trigger->getName()));
+      action->setData(QString::fromStdString(path));
+      action->setEnabled(trigger != current_trigger);
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(assignTriggerClicked()));
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::assignTriggerClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_ASSERT(action);
+  std::string trigger_path = action->data().toString().toStdString();
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  auto group = this->getElement()->getGroup();
+  auto trigger_element = group->getElement(trigger_path);
+  auto trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger_element);
+
+  //!@todo Shouldn't this be done in cedar::proc::Group?
+  auto old_parent = triggerable->getParentTrigger();
+  if (old_parent)
+  {
+    group->disconnectTrigger(old_parent, triggerable);
+  }
+
+  group->connectTrigger(trigger, triggerable);
 }
 
 void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)

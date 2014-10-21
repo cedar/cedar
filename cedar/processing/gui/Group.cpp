@@ -1757,7 +1757,7 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     return;
   }
 
-  this->fillPlotMenu(menu, event);
+  this->fillConnectableMenu(menu, event);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 

@@ -454,19 +454,11 @@ std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Group::checkConsisten
   return issues;
 }
 
-std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTriggers() const
+std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTriggers(bool recursive) const
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers;
-
-  for (auto iter : this->getElements())
-  {
-    cedar::proc::ElementPtr element = iter.second;
-    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
-    {
-      triggers.push_back(trigger);
-    }
-  }
-
+  auto looped_trigger_set = this->findAll<cedar::proc::LoopedTrigger>(recursive);
+  triggers.insert(triggers.begin(), looped_trigger_set.begin(), looped_trigger_set.end());
   return triggers;
 }
 
