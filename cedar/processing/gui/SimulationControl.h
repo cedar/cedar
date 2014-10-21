@@ -54,10 +54,52 @@
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QFuture>
+#include <QPushButton>
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
 
+//!@cond SKIPPED_DOCUMENTATION
+// Hidden class; would be a private nested class of cedar::proc::gui::SimulationControl, but the moc cannot do that
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      namespace SimulationControlPrivate
+      {
+        /*! A widget that can be used to start/stop a looped trigger. Also reacts to when the trigger is started from
+         * elsewhere
+         */
+        class TriggerControlWidget : public QWidget
+        {
+          Q_OBJECT
+
+        public:
+          TriggerControlWidget(cedar::proc::LoopedTriggerPtr loopedTrigger);
+
+        private slots:
+          void startStopTriggerClicked();
+
+          void triggerStarted();
+
+          void triggerStopped();
+
+          void triggerChangingState();
+
+        private:
+          cedar::proc::LoopedTriggerPtr mLoopedTrigger;
+
+          QPushButton* mpStartStopButton;
+
+          //!@todo Single step button
+        };
+      }
+    }
+  }
+}
+//!@endcond
 
 /*!@brief A widget for controlling the simulation of a cedar::proc::Group.
  */
@@ -128,6 +170,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  static QString M_STARTED_ICON_PATH;
+  static QString M_PAUSED_ICON_PATH;
+
 protected:
   // none yet
 
@@ -137,4 +183,3 @@ private:
 }; // class cedar::proc::gui::SimulationControl
 
 #endif // CEDAR_PROC_GUI_SIMULATION_CONTROL_H
-

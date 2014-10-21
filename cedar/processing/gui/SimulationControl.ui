@@ -49,7 +49,17 @@
     <widget class="cedar::proc::gui::ElementTreeWidget" name="mpTree">
      <column>
       <property name="text">
+       <string/>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Control</string>
       </property>
      </column>
     </widget>

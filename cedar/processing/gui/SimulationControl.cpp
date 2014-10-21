@@ -46,6 +46,66 @@
 
 // SYSTEM INCLUDES
 #include <QtConcurrentRun>
+#include <QHBoxLayout>
+
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+QString cedar::proc::gui::SimulationControl::M_STARTED_ICON_PATH = ":/cedar/auxiliaries/gui/start.svg";
+QString cedar::proc::gui::SimulationControl::M_PAUSED_ICON_PATH = ":/cedar/auxiliaries/gui/pause.svg";
+
+//----------------------------------------------------------------------------------------------------------------------
+// private (pseudo) nested classes
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::TriggerControlWidget(cedar::proc::LoopedTriggerPtr loopedTrigger)
+:
+QWidget(),
+mLoopedTrigger(loopedTrigger)
+{
+  auto layout = new QHBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(layout);
+  this->mpStartStopButton = new QPushButton(QIcon(cedar::proc::gui::SimulationControl::M_STARTED_ICON_PATH), "");
+  this->mpStartStopButton->setFixedSize(28, 28);
+  layout->addWidget(this->mpStartStopButton);
+
+  layout->addStretch(1);
+
+  QObject::connect(this->mLoopedTrigger.get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
+  QObject::connect(this->mLoopedTrigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
+  QObject::connect(this->mpStartStopButton, SIGNAL(clicked()), this, SLOT(startStopTriggerClicked()));
+}
+
+void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::startStopTriggerClicked()
+{
+  if (this->mLoopedTrigger->isRunning())
+  {
+    this->mLoopedTrigger->stop();
+  }
+  else
+  {
+    this->mLoopedTrigger->start();
+  }
+}
+
+void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::triggerStarted()
+{
+  this->mpStartStopButton->setEnabled(true);
+  this->mpStartStopButton->setIcon(QIcon(cedar::proc::gui::SimulationControl::M_PAUSED_ICON_PATH));
+}
+
+void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::triggerStopped()
+{
+  this->mpStartStopButton->setEnabled(true);
+  this->mpStartStopButton->setIcon(QIcon(cedar::proc::gui::SimulationControl::M_STARTED_ICON_PATH));
+}
+
+void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::triggerChangingState()
+{
+  this->mpStartStopButton->setEnabled(false);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -62,6 +122,8 @@ mSimulationRunning(false)
     return static_cast<bool>(boost::dynamic_pointer_cast<cedar::proc::ConstLoopedTrigger>(element));
   };
   this->mpTree->setFilter(boost::bind<bool>(element_filter, _1));
+
+  this->mpTree->setNameColumn(1);
 
   this->mElementAddedConnection = this->mpTree->connectToElementAddedSignal
       (
@@ -103,8 +165,10 @@ void cedar::proc::gui::SimulationControl::elementAdded(QTreeWidgetItem* pItem, c
   }
 }
 
-void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* /* pItem */, cedar::proc::LoopedTriggerPtr /* loopedTrigger */)
+void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger)
 {
+  auto control = new cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget(loopedTrigger);
+  this->mpTree->setItemWidget(pItem, 2, control);
 }
 
 void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()
@@ -156,10 +220,10 @@ void cedar::proc::gui::SimulationControl::updateSimulationRunningIcon(bool runni
 {
   if (running)
   {
-    this->mpPlayPauseButton->setIcon(QIcon(":/cedar/auxiliaries/gui/pause.svg"));
+    this->mpPlayPauseButton->setIcon(QIcon(cedar::proc::gui::SimulationControl::M_PAUSED_ICON_PATH));
   }
   else
   {
-    this->mpPlayPauseButton->setIcon(QIcon(":/cedar/auxiliaries/gui/start.svg"));
+    this->mpPlayPauseButton->setIcon(QIcon(cedar::proc::gui::SimulationControl::M_STARTED_ICON_PATH));
   }
 }
