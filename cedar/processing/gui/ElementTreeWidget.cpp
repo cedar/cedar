@@ -52,10 +52,12 @@
 cedar::proc::gui::ElementTreeWidget::ElementTreeWidget(QWidget* pParent)
 :
 QTreeWidget(pParent),
-mNameColumn(0)
+mNameColumn(0),
+mNameEditingEnabled(false)
 {
   QObject::connect(this, SIGNAL(elementAddedSignal(QString)), this, SLOT(elementAdded(QString)));
   QObject::connect(this, SIGNAL(elementRemovedSignal(QString)), this, SLOT(elementRemoved(QString)));
+  QObject::connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(itemChanged(QTreeWidgetItem*, int)));
 }
 
 cedar::proc::gui::ElementTreeWidget::~ElementTreeWidget()
@@ -66,6 +68,26 @@ cedar::proc::gui::ElementTreeWidget::~ElementTreeWidget()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::ElementTreeWidget::itemChanged(QTreeWidgetItem* pItem, int column)
+{
+  // only react if the change was made in the name column
+  if (column != this->mNameColumn)
+  {
+    return;
+  }
+
+  QString new_name = pItem->text(this->mNameColumn);
+  std::string path = pItem->data(this->mNameColumn, Qt::UserRole).toString().toStdString();
+  auto element = this->mGroup->getElement(path);
+  element->setName(new_name.toStdString());
+  pItem->setData(this->mNameColumn, Qt::UserRole, QString::fromStdString(this->mGroup->findPath(element)));
+}
+
+void cedar::proc::gui::ElementTreeWidget::setNameEditingEnabled(bool enabled)
+{
+  this->mNameEditingEnabled = enabled;
+}
 
 void cedar::proc::gui::ElementTreeWidget::setFilter(const boost::function<bool(cedar::proc::ConstElementPtr)>& filter)
 {
@@ -118,7 +140,13 @@ void cedar::proc::gui::ElementTreeWidget::addElement(cedar::proc::ElementPtr ele
   auto p_item = new QTreeWidgetItem();
   p_item->setText(this->mNameColumn, QString::fromStdString(element->getName()));
   p_item->setData(this->mNameColumn, Qt::UserRole, QString::fromStdString(path));
-  p_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+
+  Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  if (this->mNameEditingEnabled)
+  {
+    flags |= Qt::ItemIsEditable;
+  }
+  p_item->setFlags(flags);
 
   // this retrieves the group item (or creates it if it does not exist)
   auto group_item = this->getGroupItem(path);
