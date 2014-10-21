@@ -128,12 +128,8 @@ public:
    */
   bool isPowerOn() const;
 
-  /*!@brief every step is used to do communication between FRI and KUKA-RC
-   *
-   * if in velocity- or acceleration mode, every step will also change joint angles/velocity
-   * @param time Unused.
-   */
-  void step(cedar::unit::Time time);
+  void sendSimulatedAngles(cv::Mat mat);
+  cv::Mat retrieveSimulatedAngles();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

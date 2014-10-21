@@ -1,0 +1,17 @@
+{
+  "name": "default CAREN robot",
+  "description file": "configs/caren/description.json",
+  "component slots":
+  {
+    "arm":
+    {
+      "channel": "hardware"
+    }
+  },
+  "channel configurations":
+  {
+    "hardware":
+    {
+    }
+  }
+}
