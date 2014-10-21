@@ -181,7 +181,6 @@ void cedar::dev::kuka::KinematicChain::copyFromFRI()
 
 void cedar::dev::kuka::KinematicChain::sendSimulatedAngles(cv::Mat mat)
 {
-  std::cout << "Sending commands to FRI" << std::endl;
   // if the thread has not been initialized, do nothing
   if (mIsInit)
   {
@@ -223,7 +222,6 @@ void cedar::dev::kuka::KinematicChain::sendSimulatedAngles(cv::Mat mat)
 
 cv::Mat cedar::dev::kuka::KinematicChain::retrieveSimulatedAngles()
 {
-  std::cout << "Receiving measurements from FRI" << std::endl;
   if (mIsInit)
   {
     mFRIChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
