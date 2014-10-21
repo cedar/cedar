@@ -86,6 +86,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::proc::sources::GaussInput::GaussInput()
 :
 cedar::proc::Step(),
@@ -106,9 +107,11 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
   QObject::connect(_mIsCyclic.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
 void cedar::proc::sources::GaussInput::setDimensionality(unsigned int dimensionality)
 {
   this->_mDimensionality->setValue(dimensionality);
@@ -117,6 +120,11 @@ void cedar::proc::sources::GaussInput::setDimensionality(unsigned int dimensiona
 void cedar::proc::sources::GaussInput::setSize(unsigned int dimension, unsigned int size)
 {
   this->_mSizes->set(dimension, size);
+}
+
+unsigned int cedar::proc::sources::GaussInput::getSize(unsigned int dimension) const
+{
+  return this->_mSizes->at(dimension);
 }
 
 void cedar::proc::sources::GaussInput::setCenter(unsigned int dimension, double center)

@@ -88,8 +88,19 @@ public:
   class ReadLocker : public cedar::aux::LockerBase
   {
   public:
-    //! Constructor.
+    //! Constructor that takes a raw pointer.
     ReadLocker(cedar::aux::Parameter* parameter)
+    :
+    cedar::aux::LockerBase
+    (
+      boost::bind(&cedar::aux::Parameter::lockForRead, parameter),
+      boost::bind(&cedar::aux::Parameter::unlock, parameter)
+    )
+    {
+    }
+
+    //! Constructor that takes a smart pointer.
+    ReadLocker(cedar::aux::ParameterPtr parameter)
     :
     cedar::aux::LockerBase
     (
@@ -108,8 +119,19 @@ public:
   class WriteLocker : public cedar::aux::LockerBase
   {
   public:
-    //! Constructor.
+    //! Constructor that takes a raw pointer.
     WriteLocker(cedar::aux::Parameter* parameter)
+    :
+    cedar::aux::LockerBase
+    (
+      boost::bind(&cedar::aux::Parameter::lockForWrite, parameter),
+      boost::bind(&cedar::aux::Parameter::unlock, parameter)
+    )
+    {
+    }
+
+    //! Constructor that takes a smart pointer.
+    WriteLocker(cedar::aux::ParameterPtr parameter)
     :
     cedar::aux::LockerBase
     (

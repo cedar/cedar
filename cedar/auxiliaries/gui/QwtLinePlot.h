@@ -201,6 +201,9 @@ public:
   //!@brief Returns the limits of the y axis.
   cedar::aux::math::Limits<double> getYLimits() const;
 
+  //! Returns whether or not autoscaling is enabled for this plot.
+  bool autoScalingEnabled() const;
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
@@ -248,7 +251,9 @@ private slots:
 
   void conversionDone(double min, double max);
 
-  void yAxisScalingParametersChanged();
+  void autoScalingChanged();
+
+  void axisLimitsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -280,11 +285,11 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! Whether the y axis limits are applied.
+  cedar::aux::BoolParameterPtr _mAutoScalingEnabled;
+
   //! Limits for the y axis.
   cedar::aux::math::DoubleLimitsParameterPtr _mYAxisLimits;
-
-  //! Whether the y axis limits are applied.
-  cedar::aux::BoolParameterPtr _mApplyYAxisLimits;
 
 }; // class cedar::aux::gui::QwtLinePlot
 
