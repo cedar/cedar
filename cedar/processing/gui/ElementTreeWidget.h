@@ -98,6 +98,9 @@ public:
     return this->mNameColumn;
   }
 
+  //! If set to true, the widget allows editing the names of the items it displays.
+  void setNameEditingEnabled(bool enabled);
+
 signals:
   //! Used to translate a boost signal to a Qt signal.
   void elementAddedSignal(QString);
@@ -145,6 +148,9 @@ private slots:
   //! Reacts to the change of the name of an element in the underlying group.
   void elementNameChanged();
 
+  //! Takes care of applying a new name, if the edit is such a change.
+  void itemChanged(QTreeWidgetItem* pItem, int column);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -162,6 +168,8 @@ private:
   boost::function<bool(cedar::proc::ConstElementPtr)> mFilter;
 
   int mNameColumn;
+
+  bool mNameEditingEnabled;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -139,6 +139,7 @@ mSimulationRunning(false)
   this->mpTree->setFilter(boost::bind<bool>(element_filter, _1));
 
   this->mpTree->setNameColumn(1);
+  this->mpTree->setNameEditingEnabled(true);
   this->mpTree->header()->setResizeMode(1, QHeaderView::Stretch);
 
   this->mElementAddedConnection = this->mpTree->connectToElementAddedSignal
