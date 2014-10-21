@@ -152,6 +152,11 @@ _mNormalizationType
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::Histogram::setNumberOfBins(unsigned int numberOfBins)
+{
+  this->_mBins->setValue(numberOfBins, true);
+}
+
 void cedar::proc::steps::Histogram::numberOfBinsChanged()
 {
   this->recompute();

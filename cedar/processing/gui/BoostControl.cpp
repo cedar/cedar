@@ -39,8 +39,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/BoostControl.h"
+#include "cedar/processing/gui/View.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/sources/Boost.h"
 #include "cedar/processing/Group.h"
+#include "cedar/processing/NetworkPath.h"
 #include "cedar/processing/Element.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
@@ -56,12 +59,15 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::BoostControl::BoostControl()
+cedar::proc::gui::BoostControl::BoostControl(cedar::proc::gui::View* view)
+:
+mpView(view)
 {
   this->setupUi(this);
 
   QObject::connect(this, SIGNAL(elementAddedSignal(QString)), this, SLOT(elementAdded(QString)));
   QObject::connect(this, SIGNAL(elementRemovedSignal(QString)), this, SLOT(elementRemoved(QString)));
+  QObject::connect(this->mpBoostTree, SIGNAL(itemActivated(QTreeWidgetItem*, int)), this, SLOT(itemActivated(QTreeWidgetItem*, int)));
 
   this->mpBoostTree->header()->setResizeMode(0, QHeaderView::Stretch);
   this->mpBoostTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
@@ -75,6 +81,47 @@ cedar::proc::gui::BoostControl::~BoostControl()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::BoostControl::itemActivated(QTreeWidgetItem* pItem, int column)
+{
+  // only activating the name centers the boost
+  if (column == 0 && isBoostItem(pItem))
+  {
+    auto boost = this->findBoostFor(pItem);
+    if (!boost)
+    {
+      return;
+    }
+
+    if (auto graphics_item = this->mpView->getScene()->getGraphicsItemFor(boost.get()))
+    {
+      this->mpView->centerOn(graphics_item);
+    }
+  }
+}
+
+bool cedar::proc::gui::BoostControl::isBoostItem(QTreeWidgetItem* pItem) const
+{
+  // there are only group- and boost items, and group items are expanded
+  return pItem->isExpanded() == false;
+}
+
+cedar::proc::sources::BoostPtr cedar::proc::gui::BoostControl::findBoostFor(QTreeWidgetItem* pItem) const
+{
+  cedar::proc::NetworkPath path;
+
+  // traverse the parents and add them to the path
+  QTreeWidgetItem* parent = pItem->parent();
+  while (parent != nullptr && parent != this->mpBoostTree->invisibleRootItem() && !parent->text(0).isEmpty())
+  {
+    path += parent->text(0).toStdString();
+    parent = parent->parent();
+  }
+
+  path += pItem->text(0).toStdString();
+
+  return boost::dynamic_pointer_cast<cedar::proc::sources::Boost>(this->mGroup->getElement(path));
+}
 
 void cedar::proc::gui::BoostControl::disconnectSignals()
 {
@@ -254,16 +301,20 @@ void cedar::proc::gui::BoostControl::addBoost(cedar::proc::sources::BoostPtr boo
   auto p_item = new QTreeWidgetItem(labels);
   p_item->setData(0, Qt::UserRole, QString::fromStdString(path));
   p_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+  p_item->setToolTip(0, "Double-click to show the boost in the architecture.");
 
+  // this retrieves the group item (or creates it if it does not exist)
   auto group_item = this->getGroupItem(path);
   group_item->addChild(p_item);
 
+  // create checkbox for enabling/disabling boost (by creating a gui::BoolParameter and passing the boost's parameter)
   cedar::aux::ParameterPtr active_parameter = boost->getParameter("active");
   cedar::aux::gui::Parameter* p_enabler
     = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(active_parameter)->allocateRaw();
   this->mpBoostTree->setItemWidget(p_item, 1, p_enabler);
   p_enabler->setParameter(active_parameter);
 
+  // create spinbox for setting boost strength (by creating a gui::DoubleParameter and passing the boost's parameter)
   cedar::aux::ParameterPtr strength_parameter = boost->getParameter("strength");
   cedar::aux::gui::Parameter* p_strength
     = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(strength_parameter)->allocateRaw();

@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <QWeakPointer>
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
@@ -129,7 +130,7 @@ public:
   void addElements(const std::list<QGraphicsItem*>& elements);
 
   //! Duplicates an element and places it at the given position.
-  void duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
+  cedar::proc::gui::GraphicsBase* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
 
   //!@brief Sets the scene containing this item.
   void setScene(cedar::proc::gui::Scene* pScene);
@@ -212,8 +213,17 @@ public:
   //! Returns the architecture plots for this group.
   const std::map<std::string, cedar::aux::Path>& getArchitectureWidgets() const;
 
+  //! Sets the architecture widgets for this group.
+  void setArchitectureWidgets(const std::map<std::string, cedar::aux::Path>& newWidgets);
+
   //! Displays the architecture plot with the given name.
   void showArchitectureWidget(const std::string& name);
+
+  //! Changes the visibility of all open architecture widgets
+  void toggleVisibilityOfOpenArchitectureWidgets(bool visible);
+
+  //! Closes all open architecture widgets
+  void closeOpenArchitectureWidgets();
 
 public slots:
   /*! sets the recording state of all steps
@@ -238,6 +248,24 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  std::string getStringForElementType(cedar::proc::ConstElementPtr element) const;
+
+  void tryToRestoreUIConfiguration
+       (
+         cedar::aux::ConfigurationNode& conf,
+         cedar::proc::ElementPtr element,
+         cedar::proc::gui::GraphicsBase* pSceneElement
+       );
+
+  void tryToRestoreGroupUIConfiguration
+       (
+         cedar::aux::ConfigurationNode& conf,
+         cedar::proc::gui::GraphicsBase* pSceneElement
+       );
+
+  //! Restores the UI configurations for any elements that are in the scene.
+  void tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode& conf);
+
   //! Adds all the steps already in the group
   void addGuiItemsForGroup();
 
@@ -386,6 +414,8 @@ private:
   QColor mBackgroundColor;
 
   cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
+
+  std::vector<QWeakPointer<QWidget>> mArchitectureWidgetDocks;
 
   //! The vertical offset for data slots in the group used when the group is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;

@@ -231,9 +231,16 @@ void cedar::proc::steps::Convolution::readConfiguration(const cedar::aux::Config
   mKernelAddedConnection.disconnect();
   mKernelRemovedConnection.disconnect();
 
+  // the convolution must be read completely before it computed again; thus, disconnect the compute signal
+  QObject::disconnect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
+
   this->cedar::proc::Step::readConfiguration(node);
 
   this->transferKernelsToConvolution();
+
+  // reconnect compute signal & recompute the step
+  QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
+  this->recompute();
 
   // reconnect slots
   mKernelAddedConnection
@@ -283,11 +290,14 @@ void cedar::proc::steps::Convolution::addKernelToConvolution(cedar::aux::kernel:
 {
   kernel->setDimensionality(this->getDimensionality());
   this->getConvolution()->getKernelList()->append(kernel);
+  QObject::connect(kernel.get(), SIGNAL(kernelUpdated()), this, SLOT(recompute()));
 }
 
 void cedar::proc::steps::Convolution::removeKernelFromConvolution(size_t index)
 {
+  auto kernel = this->getConvolution()->getKernelList()->getKernel(index);
+  //!@todo remove this const cast
+  const_cast<cedar::aux::kernel::Kernel*>(kernel.get())->disconnect(SIGNAL(kernelUpdated()), this, SLOT(recompute()));
   this->getConvolution()->getKernelList()->remove(index);
-
   this->onTrigger();
 }

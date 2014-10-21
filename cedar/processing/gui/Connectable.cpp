@@ -119,13 +119,27 @@ mInputOutputSlotOffset(static_cast<qreal>(0.0))
           SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
           SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString))
         );
+
+  this->connect
+  (
+      this,
+      SIGNAL(triggerableStartedSignal()),
+      SLOT(triggerableStarted())
+  );
+
+  this->connect
+  (
+      this,
+      SIGNAL(triggerableStoppedSignal()),
+      SLOT(triggerableStopped())
+  );
 }
 
 cedar::proc::gui::Connectable::~Connectable()
 {
-  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  for(auto child_widget : mChildWidgets)
   {
-    (*it)->close();
+    child_widget->close();
   }
   mSlotAddedConnection.disconnect();
   mSlotRenamedConnection.disconnect();
@@ -140,7 +154,8 @@ cedar::proc::gui::Connectable::Decoration::Decoration
   const QColor& bgColor
 )
 :
-mpIcon(nullptr)
+mpIcon(nullptr),
+mDefaultBackground(bgColor)
 {
   qreal padding = 1;
   this->mpRectangle = new QGraphicsRectItem
@@ -264,6 +279,44 @@ void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEv
   else
   {
     this->setBackgroundColor(Qt::white);
+  }
+}
+
+void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor& background)
+{
+  QBrush brush = this->mpRectangle->brush();
+  brush.setColor(background);
+  this->mpRectangle->setBrush(brush);
+}
+
+void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
+{
+  this->setBackgroundColor(this->mDefaultBackground);
+}
+
+void cedar::proc::gui::Connectable::translateStartedSignal()
+{
+  emit this->triggerableStartedSignal();
+}
+
+void cedar::proc::gui::Connectable::translateStoppedSignal()
+{
+  emit this->triggerableStoppedSignal();
+}
+
+void cedar::proc::gui::Connectable::triggerableStarted()
+{
+  if (this->mpLoopedDecoration)
+  {
+    this->mpLoopedDecoration->setBackgroundColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+  }
+}
+
+void cedar::proc::gui::Connectable::triggerableStopped()
+{
+  if (this->mpLoopedDecoration)
+  {
+    this->mpLoopedDecoration->resetBackgroundColor();
   }
 }
 
@@ -553,6 +606,13 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   mSlotRemovedConnection
     = connectable->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRemoved, this, _1, _2));
 
+  this->mStartedConnection.disconnect();
+  this->mStoppedConnection.disconnect();
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
+  {
+    this->mStartedConnection = triggerable->connectToStartedSignal(boost::bind(&cedar::proc::gui::Connectable::translateStartedSignal, this));
+    this->mStoppedConnection = triggerable->connectToStoppedSignal(boost::bind(&cedar::proc::gui::Connectable::translateStoppedSignal, this));
+  }
 
   this->mDecorations.clear();
   if (elem_decl->isDeprecated())

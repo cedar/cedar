@@ -243,6 +243,10 @@ void cedar::aux::MatData::serializeData(std::ostream& stream) const
           break;
         }
       }
+      if (i != mData.channels() - 1)
+      {
+        stream << ",";
+      }
     }
 
     //increase index

@@ -388,16 +388,22 @@ void cedar::proc::steps::ColorConversion::inputConnectionChanged(const std::stri
     return;
   }
 
-  this->mInput = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(data);
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
+
+  if (!this->mInput)
+  {
+    return;
+  }
 
   this->mOutput->copyAnnotationsFrom(this->mInput);
-  this->updateSourceImageColorSpace();
-  this->updateTargetImageColorSpace();
-  this->updateCvConvertConstant();
 
   // check if input is "valid" and propagate change
   if (this->mInput->getData().channels() == 3)
   {
+    this->updateSourceImageColorSpace();
+    this->updateTargetImageColorSpace();
+    this->updateCvConvertConstant();
+
     this->lock(cedar::aux::LOCK_TYPE_READ);
     this->compute(cedar::proc::Arguments());
     this->unlock();

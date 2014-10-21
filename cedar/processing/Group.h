@@ -128,6 +128,13 @@ public:
  signals:
   //! Signals when a step name changes.
   void stepNameChanged(const std::string& from, const std::string& to);
+
+  //! Emitted whenever a trigger in this group or any of its subgroups is started.
+  void triggerStarted();
+
+  //! Emitted whenever all trigger in this group and its subgroups are stopped.
+  void allTriggersStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -436,6 +443,9 @@ public:
    */
   const ElementMap& getElements() const;
 
+  //! Recursively lists all elements in the group and all its subgroups.
+  std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
+
   //!@deprecated Use getElements instead.
   CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
   {
@@ -490,9 +500,13 @@ public:
     return elements;
   }
 
-  /*!@brief This method lists all groups that are children of this group.
+  /*!@brief This method lists all groups that are children of this group (const).
    */
   void listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const;
+
+  /*!@brief This method lists all groups that are children of this group.
+   */
+  void listSubgroups(std::set<cedar::proc::GroupPtr>& subgroups);
 
   /*!@brief Returns a unique identifier containing the given string.
    *
@@ -660,6 +674,12 @@ public:
   //! Updates the trigger chains of all steps.
   void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
+  //!@brief connects two slots across groups, allocating connectors if necessary
+  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+
+  //!@brief disconnects two slots across groups, removing/merging connectors if necessary
+  static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -723,15 +743,15 @@ private:
    */
   void addConnectorInternal(const std::string& name, bool input);
 
-  //!@brief connects two slots across groups, allocating connectors if necessary
-  static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
-
-  //!@brief disconnects two slots across groups, removing/merging connectors if necessary
-  static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
-
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
+
+  //!@brief Takes care of updating the list of looped triggerables if any of them change their state.
+  void onLoopedChanged();
+
+  void triggerStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------

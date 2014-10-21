@@ -746,14 +746,32 @@ void cedar::proc::GroupFileFormatV1::readSteps
     const std::string class_id = iter->first;
     const cedar::aux::ConfigurationNode& step_node = iter->second;
 
-    cedar::proc::ElementPtr step;
-    try
+    // find the name of the step
+    auto name_it = step_node.find("name");
+    std::string name;
+    bool step_exists = false;
+    if (name_it != step_node.not_found())
     {
-      step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+      name = name_it->second.get_value<std::string>();
     }
-    catch (cedar::aux::ExceptionBase& e)
+
+    cedar::proc::ElementPtr step;
+
+    if (name.empty() || !group->nameExists(name))
     {
-      exceptions.push_back(e.exceptionInfo());
+      try
+      {
+        step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+      }
+    }
+    else
+    {
+      step = group->getElement(name);
+      step_exists = true;
     }
 
     if (step)
@@ -767,13 +785,16 @@ void cedar::proc::GroupFileFormatV1::readSteps
         exceptions.push_back(e.exceptionInfo());
       }
 
-      try
+      if (!step_exists)
       {
-        group->add(step);
-      }
-      catch (cedar::aux::ExceptionBase& e)
-      {
-        exceptions.push_back(e.exceptionInfo());
+        try
+        {
+          group->add(step);
+        }
+        catch (cedar::aux::ExceptionBase& e)
+        {
+          exceptions.push_back(e.exceptionInfo());
+        }
       }
 
       step->resetChangedStates(false);
@@ -788,27 +809,34 @@ void cedar::proc::GroupFileFormatV1::readGroups
        std::vector<std::string>& exceptions
      )
 {
-  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
-      iter != root.end();
-      ++iter)
+  for (const auto& name_config_pair : root)
   {
-    const std::string& group_name = iter->first;
-    const cedar::aux::ConfigurationNode& group_node = iter->second;
+    const std::string& group_name = name_config_pair.first;
+    const cedar::aux::ConfigurationNode& group_node = name_config_pair.second;
 
     cedar::proc::GroupPtr new_group;
+    bool group_exists = false;
 
-    try
+    if (group->nameExists(group_name))
     {
-      new_group
-        = boost::dynamic_pointer_cast<cedar::proc::Group>
-          (
-            cedar::proc::ElementManagerSingleton::getInstance()->allocate("cedar.processing.Group")
-          );
+        group_exists = true;
+        new_group = group->getElement<cedar::proc::Group>(group_name);
     }
-    catch (cedar::aux::ExceptionBase& e)
+    else
     {
-      exceptions.push_back(e.exceptionInfo());
-      continue;
+      try
+      {
+        new_group = cedar::proc::GroupPtr(new cedar::proc::Group());
+//          = boost::dynamic_pointer_cast<cedar::proc::Group>
+//            (
+//              cedar::proc::ElementManagerSingleton::getInstance()->allocate("cedar.processing.Group")
+//            );
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+        continue;
+      }
     }
 
     try
@@ -820,13 +848,16 @@ void cedar::proc::GroupFileFormatV1::readGroups
       exceptions.push_back(e.exceptionInfo());
     }
 
-    try
+    if (!group_exists)
     {
-      group->add(new_group);
-    }
-    catch (cedar::aux::ExceptionBase& e)
-    {
-      exceptions.push_back(e.exceptionInfo());
+      try
+      {
+        group->add(new_group);
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+      }
     }
 
     new_group->readConfiguration(group_node, exceptions);

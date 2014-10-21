@@ -48,6 +48,8 @@
 #include <string>
 
 /*!@brief A parameter for directories on the file system.
+ *
+ *@todo Why doesn't this inherit ParameterTemplate<cedar::aux::Path>?
  */
 class cedar::aux::FileParameter : public cedar::aux::Parameter
 {
@@ -82,7 +84,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode);
+  FileParameter(cedar::aux::Configurable *pOwner = nullptr, const std::string& name = "", Mode mode = READ);
 
   //!@brief A variant of the standard constructor, adding a default value
   FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode, const std::string& defaultValue);
@@ -96,6 +98,12 @@ public:
 
   //!@brief stores a directory as string in a configuration node
   void writeToNode(cedar::aux::ConfigurationNode& root) const;
+
+  //! Copies the value from another (file) parameter.
+  void copyValueFrom(cedar::aux::ConstParameterPtr other);
+
+  //! Checks if the value of the given parameter can be copied into this one.
+  bool canCopyFrom(cedar::aux::ConstParameterPtr other ) const;
 
   //!@brief sets a new directory from string
   void setValue(const std::string& value);

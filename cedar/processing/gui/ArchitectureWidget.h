@@ -59,6 +59,23 @@ class cedar::proc::gui::ArchitectureWidget : public QWidget, public cedar::aux::
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  struct BaseCellAttributes
+  {
+    BaseCellAttributes(int rowSpan = 1, int mColumnSpan = 1, int mRowStretch = 1, int mColumStretch = 1)
+    :
+    mRowSpan(rowSpan),
+    mColumnSpan(mColumnSpan),
+    mRowStretch(mRowStretch),
+    mColumnStretch(mColumStretch)
+    {
+    }
+
+    //! Determines how many cells an entry spans.
+    int mRowSpan, mColumnSpan;
+    //! Weight that determines how much an entry stretches in the layout.
+    int mRowStretch, mColumnStretch;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -96,13 +113,21 @@ private:
 
   QWidget* readLabel(const cedar::aux::ConfigurationNode& entry);
 
+  void addEntry(const cedar::aux::ConfigurationNode& entry, int rowOffset = 0, int colOffset = 0, const BaseCellAttributes& attributes = BaseCellAttributes());
+
+  void addTemplate(int row, int column, const cedar::aux::ConfigurationNode& entry, const BaseCellAttributes& attributes = BaseCellAttributes());
+
+  void readTemplates(const cedar::aux::ConfigurationNode& templates);
+
+  void applySubstitutions(cedar::aux::ConfigurationNode& target, const cedar::aux::ConfigurationNode& substitutions);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  // none yet
+  std::map<std::string, cedar::aux::ConfigurationNode> mTemplates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

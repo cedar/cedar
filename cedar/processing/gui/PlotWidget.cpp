@@ -57,13 +57,13 @@ cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::LabeledPlot
 )
 :
 //mpPlotDeclaration(pPlotDecl),
-mpLabel(new QLabel(pLabel)),
 mpPlotSelector(nullptr),
 mpPlotter(nullptr),
 mIsMultiPlot(false),
 mpData(pData),
 mpPlotData(pPlotData),
-mTitle(pLabel.toStdString())
+mTitle(pLabel.toStdString()),
+mpLabel(new QLabel(pLabel))
 {
   this->mpTitleLayout = new QHBoxLayout();
   this->mpTitleLayout->setContentsMargins(0, 0, 0, 0);
@@ -207,12 +207,18 @@ cedar::proc::gui::PlotWidget::PlotWidget
     const cedar::proc::ElementDeclaration::DataList& data
 )
 :
-mDataList(data),
 mConnectable(connectable),
 mGridSpacing(2),
 mColumns(2),
 mpLayout(new QGridLayout())
 {  
+  // make a copy of the data to be plotted
+  this->mDataList.clear();
+  for (const auto& plot_data : data)
+  {
+    this->mDataList.push_back(boost::make_shared<cedar::proc::PlotData>(*plot_data));
+  }
+
   if (mDataList.empty())
   {
     return;
@@ -220,27 +226,28 @@ mpLayout(new QGridLayout())
 
   // initialize layout
   this->setContentsMargins(0, 0, 0, 0);
-  mpLayout->setContentsMargins(mGridSpacing, mGridSpacing, mGridSpacing, mGridSpacing);
-  mpLayout->setSpacing(mGridSpacing);
+  this->mpLayout->setContentsMargins(mGridSpacing, mGridSpacing, mGridSpacing, mGridSpacing);
+  this->mpLayout->setSpacing(mGridSpacing);
   this->setLayout(mpLayout);
 
   fillGridWithPlots();
 
   // make all columns have the same stretch factor
-  for(int column = 0; column < mpLayout->columnCount(); ++column)
+  //!@todo Shouldn't this happen every time the plot is filled, i.e., within fillGridWithPlots?
+  for (int column = 0; column < mpLayout->columnCount(); ++column)
   {
-    mpLayout->setColumnStretch(static_cast<size_t>(column), 1);
+    this->mpLayout->setColumnStretch(static_cast<size_t>(column), 1);
   }
 }
 
 cedar::proc::gui::PlotWidget::~PlotWidget()
 {
-  for(auto connection : mSignalConnections)
+  for(auto connection : this->mSignalConnections)
   {
     connection.disconnect();
   }
-  mSignalConnections.clear();
-  mDataList.clear();
+  this->mSignalConnections.clear();
+  this->mDataList.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -334,7 +341,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
       {
         // could check if it's a collection with p_input_slot->isCollection();
         // but if it's not this loop should have just one iteration ...
-        for(size_t i = 0; i < p_input_slot->getDataCount(); ++i)
+        for (size_t i = 0; i < p_input_slot->getDataCount(); ++i)
         {
           process_if_set(p_input_slot->getData(i), data_item);
         }
@@ -403,8 +410,8 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   {
     mDataList.erase(std::remove(mDataList.begin(), mDataList.end(), invalid_data_item), mDataList.end());
   }
+
   // if there is only one plot and it is a multiplot, we need no label
-  
   //!@todo This can fail in some circumstances (possibly connected to when a step moves a buffer to the outputs)
   CEDAR_ASSERT(!this->mPlotGridMap.empty());
   auto p_current_labeled_plot = mPlotGridMap.begin()->second;
@@ -420,7 +427,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
 std::tuple<int, int> cedar::proc::gui::PlotWidget::usingNextFreeGridSlot()
 {
   std::tuple<int, int> free_grid_slot;
-  if(this->mFreeGridSlots.size() > 0)
+  if (this->mFreeGridSlots.size() > 0)
   {
     this->mFreeGridSlots.sort([](std::tuple<int, int> a, std::tuple<int, int> b)
       {
@@ -434,7 +441,7 @@ std::tuple<int, int> cedar::proc::gui::PlotWidget::usingNextFreeGridSlot()
           return false;
         }
 
-        return  true;
+        return true;
       }
     );
     free_grid_slot = this->mFreeGridSlots.front();
@@ -488,8 +495,8 @@ void cedar::proc::gui::PlotWidget::createAndAddPlotToGrid
     // clean up allocated data
     delete p_current_labeled_plot->mpPlotter;
     p_current_labeled_plot->mpPlotter = nullptr;
-    delete p_current_labeled_plot->mpLabel;
-    p_current_labeled_plot->mpLabel = nullptr;
+    delete p_current_labeled_plot->mpTitleLayout;
+    p_current_labeled_plot->mpTitleLayout = nullptr;
   }
 }
 
@@ -543,6 +550,24 @@ void cedar::proc::gui::PlotWidget::addPlotOfExternalData
   }
 }
 
+std::tuple<int, int> cedar::proc::gui::PlotWidget::findGridPositionOf(LabeledPlotPtr plot)
+{
+  for (int r = 0; r < this->mpLayout->rowCount(); ++r)
+  {
+    for (int c = 0; c < this->mpLayout->columnCount(); ++c)
+    {
+      auto item = this->mpLayout->itemAtPosition(r, c);
+      // check for nullptr before accessing and comparing layout
+      if (item != nullptr && item->layout() == plot->mpTitleLayout)
+      {
+        return std::make_tuple(r, c);
+      }
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::NotFoundException, "Plot not found in layout.");
+}
+
 void cedar::proc::gui::PlotWidget::removePlotOfExternalData
 (
   cedar::aux::ConstDataPtr pData
@@ -558,7 +583,7 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
 
   auto labeled_plot = plot_grid_map_item->second;
 
-  if(labeled_plot->mIsMultiPlot)
+  if (labeled_plot->mIsMultiPlot)
   {
     auto multi_plotter = cedar::aux::asserted_cast<cedar::aux::gui::MultiPlotInterface*>(labeled_plot->mpPlotter);
     if(multi_plotter->canDetach(pData))
@@ -573,19 +598,42 @@ void cedar::proc::gui::PlotWidget::removePlotOfExternalData
   else
   {
     // get the slot the plot occupies and mark that slot as free
-    auto index = this->mpLayout->indexOf(labeled_plot->mpLabel);
-    int row, col, r_span, c_span;
-    // get row and column of the label
-    this->mpLayout->getItemPosition(index, &row, &col, &r_span, &c_span);
-    // store the slot at the end of the list of free slots
-    mFreeGridSlots.push_back(std::make_tuple(row, col));
+    int row, col;
+    QLayoutItem* p_layout_item = nullptr;
+    try
+    {
+      std::tie(row, col) = this->findGridPositionOf(labeled_plot);
+      mFreeGridSlots.push_back(std::make_tuple(row, col));
+      p_layout_item = this->mpLayout->itemAtPosition(row, col);
+    }
+    catch (cedar::aux::NotFoundException&)
+    {
+      // ignored
+      cedar::aux::LogSingleton::getInstance()->debugMessage("Could not find plot.", CEDAR_CURRENT_FUNCTION_NAME);
+    }
 
     // now remove the widgets
-    remove_qgridlayout_widget(labeled_plot->mpLabel);
+    if (p_layout_item)
+    {
+      this->removeFromQGridlayout(p_layout_item);
+    }
     remove_qgridlayout_widget(labeled_plot->mpPlotContainer);
     // remove the entry that maps the data to the now removed plot
     this->mPlotGridMap.erase(plot_grid_map_item);
     // when we go out of scope no pointer to this plotter should remain since we removed deleted its members' memory
+  }
+}
+
+void cedar::proc::gui::PlotWidget::removeFromQGridlayout(QLayoutItem* item)
+{
+  this->mpLayout->removeItem(item);
+  QLayout* sublayout = item->layout();
+  for (int i = 0; i < sublayout->count(); ++i)
+  {
+    if (sublayout->itemAt(i)->widget() != nullptr)
+    {
+      sublayout->itemAt(i)->widget()->hide();
+    }
   }
 }
 
@@ -624,17 +672,31 @@ void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationN
       auto layout_item = this->mpLayout->itemAtPosition(row, col);
       if (auto widget_item = dynamic_cast<QWidgetItem*>(layout_item))
       {
-        if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(widget_item->widget()))
+        // test if the widget contains a plot
+        auto widget = widget_item->widget();
+        if (widget->layout())
         {
-          cedar::aux::ConfigurationNode cfg, plot_cfg;
-          cfg.put("row", row);
-          cfg.put("col", col);
-          plot->writeConfiguration(plot_cfg);
-          if (!plot_cfg.empty())
+          for (int i = 0; i < widget->layout()->count(); ++i)
           {
-            cfg.push_back(cedar::aux::ConfigurationNode::value_type("plot configuration", plot_cfg));
+            auto item = dynamic_cast<QWidgetItem*>(widget->layout()->itemAt(i));
+            if (!item)
+            {
+              continue;
+            }
+            if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(item->widget()))
+            {
+              cedar::aux::ConfigurationNode cfg, plot_cfg;
+              cfg.put("row", row);
+              cfg.put("col", col);
+              plot->writeConfiguration(plot_cfg);
+              if (!plot_cfg.empty())
+              {
+                cfg.push_back(cedar::aux::ConfigurationNode::value_type("plot configuration", plot_cfg));
+              }
+              plot_settings.push_back(cedar::aux::ConfigurationNode::value_type("", cfg));
+              break;
+            }
           }
-          plot_settings.push_back(cedar::aux::ConfigurationNode::value_type("", cfg));
         }
       }
     }
@@ -684,6 +746,7 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   pConnectable->addPlotWidget(p_plot_widget, x, y, width, height);
 
 
+  //!@todo This method (and writeConfiguration) are way too tied into the layout of the widget. Just slight changes to the structure will break everything. Fix this!
   auto settings_iter = node.find("plot configurations");
   if (settings_iter != node.not_found())
   {
@@ -705,12 +768,27 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
         continue;
       }
 
-      if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(widget_item->widget()))
+      auto layout = widget_item->widget()->layout();
+      if (!layout)
       {
-        auto plot_cfg_iter = cfg.find("plot configuration");
-        if (plot_cfg_iter != cfg.not_found())
+        continue;
+      }
+
+      for (int i = 0; i < layout->count(); ++i)
+      {
+        auto item = dynamic_cast<QWidgetItem*>(layout->itemAt(i));
+        if (!item)
         {
-          plot->readConfiguration(plot_cfg_iter->second);
+          continue;
+        }
+
+        if (auto plot = dynamic_cast<cedar::aux::gui::PlotInterface*>(item->widget()))
+        {
+          auto plot_cfg_iter = cfg.find("plot configuration");
+          if (plot_cfg_iter != cfg.not_found())
+          {
+            plot->readConfiguration(plot_cfg_iter->second);
+          }
         }
       }
     }

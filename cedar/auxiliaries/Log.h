@@ -148,7 +148,7 @@ public:
    */
   void clearLoggers();
   
-  /*! @brief Adds a logger that is activated by a filter.
+  /*! @brief Adds a logger that is activated by a filter. The logger will be added after all existing loggers.
    */
   void addLogger
   (
@@ -156,6 +156,14 @@ public:
     cedar::aux::LogFilterPtr filter = cedar::aux::LogFilterPtr(new cedar::aux::logFilter::All())
   );
   
+  /*! @brief Adds a logger that is activated by a filter. The logger will be added before all existing loggers.
+   */
+  void addLoggerAtFront
+  (
+    cedar::aux::LogInterfacePtr logger,
+    cedar::aux::LogFilterPtr filter = cedar::aux::LogFilterPtr(new cedar::aux::logFilter::All())
+  );
+
   /*!@brief Removes all occurrences of the logger in the message passing chain.
    */
   void removeLogger(cedar::aux::LogInterfacePtr logger);

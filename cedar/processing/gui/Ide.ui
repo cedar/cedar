@@ -84,10 +84,9 @@
     <property name="title">
      <string>Simulation</string>
     </property>
-    <addaction name="mpThreadsStartAll"/>
+    <addaction name="mpActionStartPauseSimulation"/>
+    <addaction name="mpActionResetSimulation"/>
     <addaction name="mpThreadsSingleStep"/>
-    <addaction name="mpThreadsStopAll"/>
-    <addaction name="mpActionResetRootGroup"/>
    </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
@@ -142,6 +141,7 @@
     <addaction name="mpActionArchitectureConsistencyCheck"/>
     <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
+    <addaction name="mpActionExperiments"/>
     <addaction name="mpActionParameterLinker"/>
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
@@ -415,8 +415,8 @@
    </attribute>
    <addaction name="mpActionSave"/>
    <addaction name="separator"/>
-   <addaction name="mpThreadsStartAll"/>
-   <addaction name="mpThreadsStopAll"/>
+   <addaction name="mpActionStartPauseSimulation"/>
+   <addaction name="mpActionResetSimulation"/>
    <addaction name="mpThreadsSingleStep"/>
    <addaction name="separator"/>
    <addaction name="mpActionRecord"/>
@@ -487,40 +487,16 @@
     <string>Manage plugins ...</string>
    </property>
   </action>
-  <action name="mpThreadsStartAll">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
+  <action name="mpActionStartPauseSimulation">
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
      <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
    </property>
    <property name="text">
-    <string>Start all triggers</string>
+    <string>start/pause simulation</string>
    </property>
    <property name="toolTip">
-    <string>Starts all triggers!</string>
-   </property>
-  </action>
-  <action name="mpThreadsStopAll">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
-     <normaloff>:/cedar/auxiliaries/gui/stop.svg</normaloff>:/cedar/auxiliaries/gui/stop.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Stop all triggers</string>
-   </property>
-   <property name="toolTip">
-    <string>Stops all triggers!</string>
+    <string>Starts and pauses the simulation.</string>
    </property>
   </action>
   <action name="mpActionLoadPlugin">
@@ -560,21 +536,6 @@
   <action name="mpActionAbout">
    <property name="text">
     <string>About...</string>
-   </property>
-  </action>
-  <action name="mpActionResetRootGroup">
-   <property name="icon">
-    <iconset resource="icons/cedar_proc_gui_icons.qrc">
-     <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Reset root network</string>
-   </property>
-   <property name="toolTip">
-    <string>Resets all steps</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="mpActionBrakeAllRobots">
@@ -814,6 +775,14 @@
     <string>Performance overview ...</string>
    </property>
   </action>
+  <action name="mpActionExperiments">
+   <property name="text">
+    <string>Experiments...</string>
+   </property>
+   <property name="toolTip">
+    <string>Framwork for starting experiments</string>
+   </property>
+  </action>
   <action name="mpActionCopy">
    <property name="text">
     <string>Copy step</string>
@@ -868,6 +837,18 @@
    </property>
    <property name="text">
     <string>none</string>
+   </property>
+  </action>
+  <action name="mpActionResetSimulation">
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/reset.svg</normaloff>:/cedar/auxiliaries/gui/reset.svg</iconset>
+   </property>
+   <property name="text">
+    <string>reset simulation</string>
+   </property>
+   <property name="toolTip">
+    <string>Resets the simulation, i.e., calls reset on the architecture and rewinds the global timer.</string>
    </property>
   </action>
  </widget>

@@ -86,6 +86,13 @@ cedar::aux::gui::StringParameter::~StringParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::StringParameter::propertiesChanged()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
+  cedar::aux::Parameter::ReadLocker locker(parameter.get());
+  this->mpEdit->setDisabled(parameter->isConstant());
+}
+
 void cedar::aux::gui::StringParameter::setReadOnly(bool readOnly)
 {
   this->mpEdit->setReadOnly(readOnly);
@@ -97,6 +104,8 @@ void cedar::aux::gui::StringParameter::parameterPointerChanged()
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   this->mpEdit->setText(parameter->getValue().c_str());
   QObject::connect(this->mpEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEdited(const QString&)));
+
+  this->propertiesChanged();
 }
 
 void cedar::aux::gui::StringParameter::textEdited(const QString& text)

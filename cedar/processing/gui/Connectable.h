@@ -63,6 +63,7 @@
 #include <map>
 #include <vector>
 
+
 /*!@brief A gui base class for all items that represent cedar::proc::Connectables.
  */
 class cedar::proc::gui::Connectable : public QObject, public cedar::proc::gui::GraphicsBase
@@ -153,7 +154,11 @@ protected:
 
       void setToolTip(const QString& toolTip);
 
-      void setBackgroundColor(const QColor& bg);
+      //! Sets the backgroud color of the decoration.
+      void setBackgroundColor(const QColor& background);
+
+      //! Resets the backgroud color of the decoration to the default.
+      void resetBackgroundColor();
 
     private:
       QGraphicsSvgItem* mpIcon;
@@ -161,6 +166,8 @@ protected:
       QGraphicsRectItem* mpRectangle;
 
       QString mIconFile;
+
+      QColor mDefaultBackground;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(Decoration);
@@ -372,6 +379,15 @@ private:
 
   void closeAllChildWidgets();
 
+  void translateStartedSignal();
+
+  void translateStoppedSignal();
+
+private slots:
+  void triggerableStarted();
+
+  void triggerableStopped();
+
 signals:
   //! translates a slot removed signal to Qt
   void reactToSlotRemovedSignal(cedar::proc::DataRole::Id role, QString name);
@@ -381,6 +397,13 @@ signals:
 
   //! translates a slot added signal to Qt
   void reactToSlotAddedSignal(cedar::proc::DataRole::Id role, QString name);
+
+  //! Emitted whenever the triggerable is started.
+  void triggerableStartedSignal();
+
+  //! Emitted whenever the triggerable is stopped.
+  void triggerableStoppedSignal();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -417,6 +440,8 @@ protected:
   std::vector<QWidget*> mChildWidgets;
 
 private:
+  DecorationPtr mpLoopedDecoration;
+
   //! An offset to be added to in- and output slot positions.
   qreal mInputOutputSlotOffset;
 
@@ -430,7 +455,8 @@ private:
   boost::signals2::connection mSlotRenamedConnection;
   boost::signals2::connection mSlotRemovedConnection;
 
-  DecorationPtr mpLoopedDecoration;
+  boost::signals2::scoped_connection mStartedConnection;
+  boost::signals2::scoped_connection mStoppedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

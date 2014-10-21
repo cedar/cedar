@@ -86,6 +86,11 @@ void cedar::proc::typecheck::Matrix::acceptsEmptyMatrix(bool accepts)
   this->mAcceptsEmptyMatrix = accepts;
 }
 
+void cedar::proc::typecheck::Matrix::addAcceptedMinimumSizes(std::vector<boost::optional<unsigned int> > minimumSizes)
+{
+  this->mAcceptedMinimumSizes[minimumSizes.size()] = minimumSizes;
+}
+
 cedar::proc::DataSlot::VALIDITY
   cedar::proc::typecheck::Matrix::check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data, std::string& info) const
 {
@@ -132,6 +137,24 @@ cedar::proc::DataSlot::VALIDITY
     {
       info = "Cannot handle this dimensionality.";
       return this->validityBad();
+    }
+
+    // check if any limits for minimum sizes are set
+    auto accepted_sizes = this->mAcceptedMinimumSizes.find(mat_data->getDimensionality());
+    if (accepted_sizes != this->mAcceptedMinimumSizes.end())
+    {
+      for (unsigned int i = 0; i < mat_data->getDimensionality(); ++i)
+      {
+        if (accepted_sizes->second.at(i).is_initialized())
+        {
+          if (accepted_sizes->second.at(i).get() > static_cast<unsigned int>(mat_data->getData().size[i]))
+          {
+            info = "The size of dimension " + cedar::aux::toString(i) + " is smaller than the required minimum size of "
+                   + cedar::aux::toString(accepted_sizes->second.at(i).get()) + ".";
+            return this->validityBad();
+          }
+        }
+      }
     }
 
     bool channel_ok = this->mAcceptedNumberOfChannels.empty(); // if empty, everything is accepted
