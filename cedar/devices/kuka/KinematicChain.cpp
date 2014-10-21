@@ -40,6 +40,7 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
+#include "cedar/devices/kuka/FRIChannel.h"
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -71,12 +72,9 @@ namespace
 cedar::dev::kuka::KinematicChain::KinematicChain()
 :
 mCommandedJointPosition(LBR_MNJ, 0),
-mMeasuredJointPosition(LBR_MNJ, 0),
-_mRemoteHost(new cedar::aux::StringParameter(this, "remote host", "NULL")),
-_mServerPort(new cedar::aux::IntParameter(this, "server port", 0))
+mMeasuredJointPosition(LBR_MNJ, 0)
 {
   mIsInit = false;
-  mpFriRemote = NULL;
   registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::sendSimulatedAngles, this, _1));
   registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::retrieveSimulatedAngles, this));
 }
@@ -90,13 +88,8 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
     // TODO The following line is not used at this point, the script "kukain.src" is not ready yet!
     // If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
     // it won't throw an exception, because the index is 0 and therefore valid
-    mpFriRemote->setToKRLBool(0, true);
-    mpFriRemote->doDataExchange();
-    // Free Memory
-    if (mpFriRemote)
-    {
-      delete mpFriRemote;
-    }
+    mFRIChannel->getInterface()->setToKRLBool(0, true);
+    mFRIChannel->getInterface()->doDataExchange();
   }
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -105,19 +98,8 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
 void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::dev::KinematicChain::readConfiguration(node);
-
-  // create a new Instance of the friRemote
-  if (_mRemoteHost->getValue() != "NULL")
-  {
-    // friRemote cannot handle const char*
-    mpFriRemote = new friRemote(_mServerPort->getValue(), const_cast<char*>(_mRemoteHost->getValue().c_str()));
-  }
-  else
-  {
-    mpFriRemote = new friRemote(_mServerPort->getValue());
-  }
   // copy default values from the FRI
-  copyFromFRI();
+  //copyFromFRI();
 
   // set step size and idle time for the looped thread
   cedar::unit::Time step_size(12.0 * cedar::unit::milli * cedar::unit::seconds);
@@ -134,8 +116,8 @@ void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::Confi
 bool cedar::dev::kuka::KinematicChain::isMovable() const
 {
   mLock.lockForRead();
-  bool on = mPowerOn;
-  FRI_STATE state = getFriState();
+  bool on = mFRIChannel->isPowerOn();
+  FRI_STATE state = mFRIChannel->getFriState();
   mLock.unlock();
 
   if (on && (state == FRI_STATE_CMD))
@@ -182,62 +164,28 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
 
 void cedar::dev::kuka::KinematicChain::copyFromFRI()
 {
-  mFriState = mpFriRemote->getState();
-  mFriQuality = mpFriRemote->getQuality();
-  mSampleTime = mpFriRemote->getSampleTime();
-  mPowerOn = mpFriRemote->isPowerOn();
+  mFRIChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
+  mFRIChannel->updateState();
   // use temporary float-array to receive the returned variables
-  float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
+  float *pJointPos = mFRIChannel->getInterface()->getMsrMsrJntPosition();
   for (unsigned i=0; i<LBR_MNJ; i++)
   {
     mMeasuredJointPosition[i] = double(pJointPos[i]);
   }
   // if not in command mode or Power is not on, reset commanded position to measured position
-  if (mpFriRemote->getState() != FRI_STATE_CMD || !mpFriRemote->isPowerOn())
+  if (mFRIChannel->getFriState() != FRI_STATE_CMD || !mFRIChannel->isPowerOn())
   {
     mCommandedJointPosition = mMeasuredJointPosition;
   }
 }
-//----------------------------------------------------------------------------------------------------------------------
-// wrapped fri-functions
-//----------------------------------------------------------------------------------------------------------------------
-FRI_STATE cedar::dev::kuka::KinematicChain::getFriState() const
-{
-  mLock.lockForRead();
-  FRI_STATE s = mFriState;
-  mLock.unlock();
-  return s;
-}
-
-FRI_QUALITY cedar::dev::kuka::KinematicChain::getFriQuality() const
-{
-  mLock.lockForRead();
-  FRI_QUALITY q = mFriQuality;
-  mLock.unlock();
-  return q;
-}
-
-float cedar::dev::kuka::KinematicChain::getSampleTime() const
-{
-  mLock.lockForRead();
-  float t = mSampleTime;
-  mLock.unlock();
-  return t;
-}
-
-bool cedar::dev::kuka::KinematicChain::isPowerOn() const
-{
-  mLock.lockForRead();
-  bool on = mPowerOn;
-  mLock.unlock();
-  return on;
-}
 
 void cedar::dev::kuka::KinematicChain::sendSimulatedAngles(cv::Mat mat)
 {
+  std::cout << "Sending commands to FRI" << std::endl;
   // if the thread has not been initialized, do nothing
   if (mIsInit)
   {
+    mFRIChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
     mLock.lockForWrite();
     // float array for copying joint position to fri
     float commanded_joint[LBR_MNJ];
@@ -249,7 +197,7 @@ void cedar::dev::kuka::KinematicChain::sendSimulatedAngles(cv::Mat mat)
     }
     // update joint angle and joint velocity if necessary (and only if in command mode)
     // this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
-    if (mpFriRemote->isPowerOn() && mpFriRemote->getState() == FRI_STATE_CMD)
+    if (mFRIChannel->isPowerOn() && mFRIChannel->getFriState() == FRI_STATE_CMD)
     {
       if (mat.rows == LBR_MNJ)
       {
@@ -269,14 +217,16 @@ void cedar::dev::kuka::KinematicChain::sendSimulatedAngles(cv::Mat mat)
     mLock.unlock();
 
     // now copy position data and do the data exchange
-    mpFriRemote->doPositionControl(commanded_joint);
+    mFRIChannel->getInterface()->doPositionControl(commanded_joint);
   }
 }
 
 cv::Mat cedar::dev::kuka::KinematicChain::retrieveSimulatedAngles()
 {
+  std::cout << "Receiving measurements from FRI" << std::endl;
   if (mIsInit)
   {
+    mFRIChannel = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(this->getChannel());
     // lock and copy data back
     mLock.lockForWrite();
     copyFromFRI();

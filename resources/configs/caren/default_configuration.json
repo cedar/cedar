@@ -12,6 +12,8 @@
   {
     "hardware":
     {
+      "port": "0",
+	  "ip address": "NULL"
     }
   }
 }
