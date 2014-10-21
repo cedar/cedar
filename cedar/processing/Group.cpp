@@ -503,6 +503,7 @@ void cedar::proc::Group::startTriggers(bool wait)
 
 void cedar::proc::Group::stopTriggers(bool wait)
 {
+  bool blocked = this->blockSignals(true);
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
   for (auto trigger : triggers)
@@ -530,6 +531,9 @@ void cedar::proc::Group::stopTriggers(bool wait)
       }
     }
   }
+
+  this->blockSignals(blocked);
+  emit allTriggersStopped();
 }
 
 void cedar::proc::Group::stepTriggers()
@@ -1035,9 +1039,36 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     }
   }
 
+  // connect the start and stop signals of a looped trigger
+  if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+  {
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStarting()), this, SIGNAL(triggerStarted()));
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
+  }
+
   if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
   {
     QObject::connect(group->getParameter("is looped").get(), SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
+  }
+}
+
+void cedar::proc::Group::triggerStopped()
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+
+  bool any_running = false;
+  for (auto trigger : triggers)
+  {
+    if (trigger->isRunning())
+    {
+      any_running = true;
+      break;
+    }
+  }
+
+  if (!any_running)
+  {
+    emit allTriggersStopped();
   }
 }
 
