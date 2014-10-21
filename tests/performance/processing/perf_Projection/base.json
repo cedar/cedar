@@ -1,0 +1,78 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.processing.Projection":
+        {
+            "name": "projection",
+            "threaded": "false",
+            "dimension mapping": "",
+            "output dimensionality": "0",
+            "output dimension sizes": "",
+            "compression type": "SUM"
+        },
+        "cedar.processing.sources.GaussInput":
+        {
+            "name": "source",
+            "threaded": "false",
+            "amplitude": "1",
+            "dimensionality": "1",
+            "sigma":
+            [
+                "3"
+            ],
+            "centers":
+            [
+                "3"
+            ],
+            "sizes":
+            [
+                "1"
+            ],
+            "cyclic": "false"
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "source.Gauss input",
+            "target": "projection.input"
+        }
+    ],
+    "name": "root",
+    "promotedSlots": "",
+    "ui":
+    [
+        {
+            "type": "step",
+            "step": "projection",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-368",
+            "positionY": "320"
+        },
+        {
+            "type": "step",
+            "step": "source",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-456",
+            "positionY": "320"
+        }
+    ],
+    "ui generic":
+    {
+        "network": "root",
+        "open plots": "",
+        "width": "33.28125",
+        "height": "30",
+        "smart mode": "false",
+        "positionX": "-10",
+        "positionY": "-50"
+    }
+}
