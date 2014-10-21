@@ -51,6 +51,21 @@
 #include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registered()
+  {
+    cedar::dev::ComponentManagerSingleton::getInstance()->registerType<cedar::dev::kuka::KinematicChainPtr>();
+    return true;
+  }
+
+  bool registerFnCall = registered();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::kuka::KinematicChain::KinematicChain()
@@ -62,6 +77,8 @@ _mServerPort(new cedar::aux::IntParameter(this, "server port", 0))
 {
   mIsInit = false;
   mpFriRemote = NULL;
+  registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::sendSimulatedAngles, this, _1));
+  registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::kuka::KinematicChain::retrieveSimulatedAngles, this));
 }
 
 cedar::dev::kuka::KinematicChain::~KinematicChain()
@@ -76,7 +93,7 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
     mpFriRemote->setToKRLBool(0, true);
     mpFriRemote->doDataExchange();
     // Free Memory
-    if(mpFriRemote)
+    if (mpFriRemote)
     {
       delete mpFriRemote;
     }
@@ -163,72 +180,6 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// private member functions
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kuka::KinematicChain::step(cedar::unit::Time)
-{
-  // if the thread has not been initialized, do nothing
-  if (mIsInit)
-  {
-    mLock.lockForWrite();
-    // float array for copying joint position to fri
-    float commanded_joint[LBR_MNJ];
-    // initialize it with current measured position. This value will be overwritten in any case
-    // so this is just for safety
-    for (unsigned i = 0; i < LBR_MNJ; i++)
-    {
-      commanded_joint[i] = mMeasuredJointPosition.at(i);
-    }
-    // update joint angle and joint velocity if necessary (and only if in command mode)
-    // this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
-    if (mpFriRemote->isPowerOn() && mpFriRemote->getState() == FRI_STATE_CMD)
-    {
-      // TODO: js, this needs to be rewritten. Was a check on working mode
-      switch (1)
-      {
-        case 1:
-        // increase speed for all joints
-        //!@todo this most likely does something stupid - why would we integrate measured vels and accs?
-        setJointVelocities(getJointVelocities() + getJointAccelerations() * mpFriRemote->getSampleTime());
-        case 2:
-          // change position for all joints
-          for (unsigned i=0; i<LBR_MNJ; i++)
-          {
-            mCommandedJointPosition.at(i) += getJointVelocity(i) * mpFriRemote->getSampleTime();
-          }
-        case 3:
-          for(unsigned i=0; i<LBR_MNJ; i++)
-          {
-            // if the joint position exceeds the one in the reference geometry, reset the angle
-            mCommandedJointPosition.at(i)
-              = std::max<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getLowerLimit());
-            mCommandedJointPosition.at(i)
-              = std::min<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getUpperLimit());
-            // copy commanded joint position
-            commanded_joint[i] = float(mCommandedJointPosition[i]);
-          }
-          break;
-        default:
-          cedar::aux::LogSingleton::getInstance()->error
-          (
-            "Invalid working mode in KinematicChain::step(double) (I'm afraid I can't let you do that, dave.)",
-            "cedar::dev::kuka::KinematicChain::step(double)"
-          );
-      }
-    }
-    mLock.unlock();
-
-    // now copy position data and do the data exchange
-    mpFriRemote->doPositionControl(commanded_joint);
-
-    // lock and copy data back
-    mLock.lockForWrite();
-    copyFromFRI();
-    mLock.unlock();
-  }
-}
-
 void cedar::dev::kuka::KinematicChain::copyFromFRI()
 {
   mFriState = mpFriRemote->getState();
@@ -280,6 +231,63 @@ bool cedar::dev::kuka::KinematicChain::isPowerOn() const
   bool on = mPowerOn;
   mLock.unlock();
   return on;
+}
+
+void cedar::dev::kuka::KinematicChain::sendSimulatedAngles(cv::Mat mat)
+{
+  // if the thread has not been initialized, do nothing
+  if (mIsInit)
+  {
+    mLock.lockForWrite();
+    // float array for copying joint position to fri
+    float commanded_joint[LBR_MNJ];
+    // initialize it with current measured position. This value will be overwritten in any case
+    // so this is just for safety
+    for (unsigned i = 0; i < LBR_MNJ; i++)
+    {
+      commanded_joint[i] = mMeasuredJointPosition.at(i);
+    }
+    // update joint angle and joint velocity if necessary (and only if in command mode)
+    // this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
+    if (mpFriRemote->isPowerOn() && mpFriRemote->getState() == FRI_STATE_CMD)
+    {
+      if (mat.rows == LBR_MNJ)
+      {
+        for(unsigned i=0; i<LBR_MNJ; i++)
+        {
+          mCommandedJointPosition.at(i) = static_cast<float>(mat.at<double>(i,0));
+          // if the joint position exceeds the one in the reference geometry, reset the angle
+          mCommandedJointPosition.at(i)
+            = std::max<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getLowerLimit());
+          mCommandedJointPosition.at(i)
+            = std::min<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getUpperLimit());
+          // copy commanded joint position
+          commanded_joint[i] = float(mCommandedJointPosition[i]);
+        }
+      }
+    }
+    mLock.unlock();
+
+    // now copy position data and do the data exchange
+    mpFriRemote->doPositionControl(commanded_joint);
+  }
+}
+
+cv::Mat cedar::dev::kuka::KinematicChain::retrieveSimulatedAngles()
+{
+  if (mIsInit)
+  {
+    // lock and copy data back
+    mLock.lockForWrite();
+    copyFromFRI();
+    mLock.unlock();
+  }
+  cv::Mat joint_angles = cv::Mat::zeros(7,1,CV_64F);
+  for (unsigned i = 0; i < LBR_MNJ; i++)
+  {
+    joint_angles.at<double>(i,0) = mMeasuredJointPosition.at(i);
+  }
+  return joint_angles;
 }
 
 #endif // CEDAR_USE_KUKA_FRI
