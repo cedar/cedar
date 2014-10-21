@@ -20,7 +20,7 @@ Before you start, keep in mind that this software is still under development and
  exceptions and crashes along the way. We are continuously improving @em cedar and feedback of any kind is welcome.
  
 @section StartingUpCedar Starting up cedar
-Please start your processing gui right now. If you do not know how to do this, take a look at 
+Please start your cedar gui right now. If you do not know how to do this, take a look at 
 @link ProcessingGuiTutorial this @endlink tutorial.  
 
 @section DFTTutorialFirstArchFirstStep A sample architecture - linking peaks in cedar
@@ -63,6 +63,7 @@ You should now have a peak representing a detection decision on the Gaussian inp
 <li> \[*\] you can also try out different interpolation methods</li>
 <li> add the last element to this chain, a @em Projection from the @em Utilities tab</li>
 <li> connect the ouput of the resize element to the input of the projection</li>
+<li> to9 alter the configuration of the projection, you have to first stop the trigger by right-clicking it and choosing \i stop</li>
 <li> select the projection, set @em output dimensionality to two, and the @em dimension mapping to zero in the property pane</li>
 <li> you'll notice that a part of the @em sizes section turns gray --- this indicates that you cannot change this parameter since the preceeding step determines the projection size in this dimension</li>
 <li> set the second size to 40 (we will later come back to this)</li>

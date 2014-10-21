@@ -252,6 +252,7 @@ void cedar::proc::gui::StepItem::updateStepState()
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
       this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
   }
+
   this->update();
 }
 
@@ -558,7 +559,7 @@ void cedar::proc::gui::StepItem::loadDataClicked()
 void cedar::proc::gui::StepItem::openDefinedPlotAction()
 {
   QAction* p_action = dynamic_cast<QAction*>(QObject::sender());
-  CEDAR_DEBUG_ASSERT(p_action != NULL);
+  CEDAR_DEBUG_ASSERT(p_action != nullptr);
   std::string plot_name = p_action->text().toStdString();
 
   // get declaration of the element displayed by this item

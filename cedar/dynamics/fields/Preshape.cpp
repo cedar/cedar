@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/fields/Preshape.h"
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -95,6 +96,15 @@ _mTimeScaleBuildUp
 _mTimeScaleDecay
 (
   new cedar::aux::DoubleParameter(this, "time scale decay", 1000.0, cedar::aux::DoubleParameter::LimitType::positive())
+),
+_mSigmoid
+(
+  new cedar::dyn::Preshape::SigmoidParameter
+  (
+    this,
+    "sigmoid",
+    cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.5, 1000.0))
+  )
 )
 {
   _mSizes->makeDefault();
@@ -122,13 +132,9 @@ void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
   const cv::Mat& input_mat = input->getData<cv::Mat>();
   const double& tau_build_up = this->_mTimeScaleBuildUp->getValue();
   const double& tau_decay = this->_mTimeScaleDecay->getValue();
-  cv::Mat sigmoided_input = cedar::aux::math::sigmoidAbs<float>(input_mat, 1000.0, 0.5);
+  cv::Mat sigmoided_input = this->_mSigmoid->getValue()->compute(input_mat);
   double peak = 1.0;
-  if
-  (
-    cedar::aux::ConstMatDataPtr peak_detector
-      = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput("peak detector"))
-  )
+  if (auto peak_detector = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput("peak detector")))
   {
     peak = cedar::aux::math::getMatrixEntry<double>(peak_detector->getData(), 0, 0);
   }
@@ -151,18 +157,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    /* if (cedar::dyn::ConstSpaceCodePtr input = boost::dynamic_pointer_cast<const cedar::dyn::SpaceCode>(data))
-    {
-      if (!this->isMatrixCompatibleInput(input->getData()))
-      {
-        return cedar::proc::DataSlot::VALIDITY_ERROR;
-      }
-      else
-      {
-        return cedar::proc::DataSlot::VALIDITY_VALID;
-      }
-    }
-    else */ if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {

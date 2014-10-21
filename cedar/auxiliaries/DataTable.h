@@ -185,6 +185,12 @@ public:
     //! Appends a given row to the collection.
     void appendRow(RowPtr);
 
+    /*! Appends the rows from another collection to this one.
+     *
+     * @remarks No data is copied.
+     */
+    void append(ConstRowCollectionPtr other);
+
     //! Returns the size of the collection.
     size_t size() const;
 

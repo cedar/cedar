@@ -80,6 +80,10 @@ public:
     const std::string& plotDeclaration = ""
   );
 
+  /*! Copy-Constructor.
+   */
+  PlotData(const cedar::proc::PlotData& other);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

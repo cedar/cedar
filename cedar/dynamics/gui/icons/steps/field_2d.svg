@@ -297,5 +297,25 @@
            inkscape:connector-curvature="0" />
       </g>
     </g>
+    <rect
+       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3257"
+       width="165.72092"
+       height="106.42857"
+       x="201.69119"
+       y="915.59875" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.8100729px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="287.69223"
+       y="994.58923"
+       id="text3253"
+       sodipodi:linespacing="100%"
+       transform="scale(0.9911293,1.0089501)"><tspan
+         sodipodi:role="line"
+         id="tspan3255"
+         x="287.69223"
+         y="994.58923"
+         style="font-size:97.29065704px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial Bold">2D</tspan></text>
   </g>
 </svg>

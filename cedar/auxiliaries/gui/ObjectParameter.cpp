@@ -44,6 +44,7 @@
 // SYSTEM INCLUDES
 #include <QGridLayout>
 #include <QDialog>
+#include <QEvent>
 #include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,8 +73,16 @@ cedar::aux::gui::ObjectParameter::ObjectParameter()
   p_layout->setSpacing(spacing);
   this->setLayout(p_layout);
 
-  mpTypeSelector = new QComboBox();
-  mpTypeSelector->setToolTip("Select the type of the object.");
+  // create the widget used for selecting a type
+  this->mpTypeSelector = new QComboBox();
+  this->mpTypeSelector->setToolTip("Select the type of the object.");
+
+  // this sets up the event filter that prevents changes via mouse-wheel scrolling
+  // this was a problem because these widgets were often accidentally be changed while scrolling
+  this->mpTypeSelector->setFocusPolicy(Qt::StrongFocus);
+  this->mpTypeSelector->installEventFilter(this);
+
+  // add the widget
   p_layout->addWidget(mpTypeSelector, 0, 0);
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
@@ -87,13 +96,29 @@ cedar::aux::gui::ObjectParameter::~ObjectParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-QString cedar::aux::gui::ObjectParameter::prettyTypeId(const QString& typeId) const
+bool cedar::aux::gui::ObjectParameter::eventFilter(QObject* object, QEvent* event)
+{
+  // check that the event is really a wheel event and refers to a combo box
+  if
+  (
+    event->type() == QEvent::Wheel &&
+    qobject_cast<QComboBox*>(object)
+  )
+  {
+    // if so, ignore the event
+    event->ignore();
+    return true;
+  }
+  // otherwise,
+  return QWidget::eventFilter(object, event);
+}
+
+void cedar::aux::gui::ObjectParameter::splitTypeId(const QString& typeId, QString& className) const
 {
   QStringList parts = typeId.split('.');
-  QString class_id = parts.back();
-  parts.pop_back();
-  QString namespace_id = parts.join(".");
-  return class_id + " (" + namespace_id + ")";
+  className = parts.back();
+//  parts.pop_back();
+//  namespaceName = parts.join(".");
 }
 
 void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
@@ -114,8 +139,11 @@ void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
   for (size_t i = 0; i < types.size(); ++i)
   {
     QString type_id = QString::fromStdString(types.at(i));
-    this->mpTypeSelector->addItem(this->prettyTypeId(type_id));
+    QString class_name;
+    this->splitTypeId(type_id, class_name);
+    this->mpTypeSelector->addItem(class_name);
     this->mpTypeSelector->setItemData(i, type_id);
+    this->mpTypeSelector->setItemData(i, type_id, Qt::ToolTipRole);
     if (current_type == -1 && types.at(i) == parameter->getTypeId())
     {
       current_type = static_cast<int>(i);

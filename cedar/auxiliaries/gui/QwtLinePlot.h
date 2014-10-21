@@ -47,6 +47,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -199,6 +201,9 @@ public:
   //!@brief Returns the limits of the y axis.
   cedar::aux::math::Limits<double> getYLimits() const;
 
+  //! Returns whether or not autoscaling is enabled for this plot.
+  bool autoScalingEnabled() const;
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
@@ -246,6 +251,10 @@ private slots:
 
   void conversionDone(double min, double max);
 
+  void autoScalingChanged();
+
+  void axisLimitsChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -271,6 +280,16 @@ private:
 
   //! The worker that does actual converison.
   cedar::aux::gui::detail::QwtLinePlotWorkerPtr mConversionWorker;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Whether the y axis limits are applied.
+  cedar::aux::BoolParameterPtr _mAutoScalingEnabled;
+
+  //! Limits for the y axis.
+  cedar::aux::math::DoubleLimitsParameterPtr _mYAxisLimits;
 
 }; // class cedar::aux::gui::QwtLinePlot
 

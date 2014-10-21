@@ -235,6 +235,11 @@ const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchi
   return this->_mArchitectureWidgets;
 }
 
+void cedar::proc::gui::Group::setArchitectureWidgets(const std::map<std::string, cedar::aux::Path>& newWidgets)
+{
+  this->_mArchitectureWidgets = newWidgets;
+}
+
 void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
 {
   auto plot_iter = this->_mArchitectureWidgets.find(name);
@@ -246,11 +251,55 @@ void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
   }
 
   auto widget = new cedar::proc::gui::ArchitectureWidget(this->getGroup(), this->mpMainWindow);
-  widget->readJson(plot_iter->second.absolute().toString());
+  cedar::aux::Path location = plot_iter->second;
+
+  if (location.isRelative() && !location.exists())
+  {
+    cedar::aux::Path architecture_path = this->mFileName;
+    location = architecture_path.getDirectory() + location;
+  }
+
+  widget->readJson(location);
 
   auto dock = this->createDockWidget(name, widget);
   dock->show();
+
+  this->mArchitectureWidgetDocks.push_back(dock);
 }
+
+void cedar::proc::gui::Group::toggleVisibilityOfOpenArchitectureWidgets(bool visible)
+{
+  for (auto iter = this->mArchitectureWidgetDocks.begin(); iter != this->mArchitectureWidgetDocks.end();)
+  {
+    auto widget_weak_ptr = *iter;
+    auto widget = widget_weak_ptr.data();
+    if (widget)
+    {
+      widget->setVisible(visible);
+      ++iter;
+    }
+    else
+    {
+      iter = this->mArchitectureWidgetDocks.erase(iter);
+    }
+  }
+}
+
+void cedar::proc::gui::Group::closeOpenArchitectureWidgets()
+{
+  for (auto iter = this->mArchitectureWidgetDocks.begin(); iter != this->mArchitectureWidgetDocks.end();)
+  {
+    auto widget_weak_ptr = *iter;
+    auto widget = widget_weak_ptr.data();
+    if (widget)
+    {
+      widget->close();
+    }
+
+    iter = this->mArchitectureWidgetDocks.erase(iter);
+  }
+}
+
 
 void cedar::proc::gui::Group::lastReadConfigurationChanged()
 {
@@ -346,7 +395,7 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::getUiElementFor(cedar::
 }
 
 
-void cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
 {
   auto to_duplicate = this->getGroup()->getElement(elementName);
   auto to_duplicate_ui = this->getUiElementFor(to_duplicate);
@@ -366,6 +415,8 @@ void cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::stri
   {
     group_item->restoreConnections();
   }
+
+  return duplicate_ui;
 }
 
 void cedar::proc::gui::Group::groupNameChanged()
@@ -840,13 +891,18 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
     this->toggleSmartConnectionMode(false);
   }
 
-  //read sticky notes
+  // read sticky notes
   if (root.find("ui") != root.not_found())
   {
     this->readStickyNotes(root.get_child("ui"));
   }
-  //update recorder icons
+  // update recorder icons
   this->stepRecordStateChanged();
+
+  //!@todo This is a quickfix, I think the entire read process needs to be revised
+  cedar::aux::ConfigurationNode root_copy = root;
+  // try to apply the UI configuration to any elements that may have already been added to the group.
+  this->tryRestoreUIConfigurationsOfElements(root_copy);
 }
 
 void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, const cedar::aux::ConfigurationNode& node)
@@ -1307,11 +1363,57 @@ void cedar::proc::gui::Group::updateConnectorPositions()
   }
 }
 
+//!@todo Can this also be used for determining the type written to the configuration?
+std::string cedar::proc::gui::Group::getStringForElementType(cedar::proc::ConstElementPtr element) const
+{
+  if (boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
+  {
+    return "connector";
+  }
+  else if (boost::dynamic_pointer_cast<cedar::proc::sinks::ConstGroupSink>(element))
+  {
+    return "connector";
+  }
+  // if step, add a step item
+  else if (boost::dynamic_pointer_cast<cedar::proc::ConstStep>(element))
+  {
+    return "step";
+  }
+  // if group, add a new group item
+  else if (boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(element))
+  {
+    return "group";
+  }
+  // if the new element is a trigger, add a trigger item
+  else if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
+  {
+    return "trigger";
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::UnknownTypeException, "Unknown element type for element " + element->getName());
+  }
+}
+
 void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr element)
 {
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
   cedar::proc::gui::GraphicsBase* p_scene_element = nullptr;
+
+  //!@todo Using a string type here seems odd -- can't this be done with dynamic_casts and typeids? Or better yet, virtual functions?
+  try
+  {
+    current_type = this->getStringForElementType(element);
+  }
+  catch (cedar::aux::UnknownTypeException&)
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Could not get type for element " + element->getName(),
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+  }
 
   // if connector, add the corresponding item
   if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(element))
@@ -1320,7 +1422,6 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
     this->mpScene->addItem(connector_item);
     mConnectorSources.push_back(connector_item);
     p_scene_element = connector_item;
-    current_type = "connector";
   }
   else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(element))
   {
@@ -1328,28 +1429,23 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
     this->mpScene->addItem(connector_item);
     mConnectorSinks.push_back(connector_item);
     p_scene_element = connector_item;
-    current_type = "connector";
   }
   // if step, add a step item
   else if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
   {
     this->mpScene->addProcessingStep(step, QPointF(0, 0));
-    current_type = "step";
-
     p_scene_element = this->mpScene->getStepItemFor(step.get());
   }
   // if group, add a new group item
   else if (cedar::proc::GroupPtr group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
   {
     this->mpScene->addGroup(QPointF(0, 0), group);
-    current_type = "group";
     p_scene_element = this->mpScene->getGroupFor(group.get());
   }
   // if the new element is a trigger, add a trigger item
   else if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
   {
     this->mpScene->addTrigger(trigger, QPointF(0, 0));
-    current_type = "trigger";
     p_scene_element = this->mpScene->getTriggerItemFor(trigger.get());
   }
   CEDAR_ASSERT(p_scene_element != nullptr);
@@ -1382,45 +1478,11 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   // see if there is a configuration for the UI item stored in the group's ui node
   if (current_type == "group")
   {
-    auto config = this->getGroup()->getLastReadConfiguration();
-    auto groups_iter = config.find("groups");
-    if (groups_iter == config.not_found())
-    {
-      groups_iter = config.find("networks"); // compatibility
-    }
-
-    if (groups_iter != config.not_found())
-    {
-      auto group = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(p_scene_element);
-      auto groups = groups_iter->second;
-      auto group_iter = groups.find(group->getGroup()->getName());
-      if (group_iter != groups.not_found())
-      {
-        group->readConfiguration(group_iter->second);
-      }
-    }
+    this->tryToRestoreGroupUIConfiguration(this->getGroup()->getLastReadConfiguration(), p_scene_element);
   }
   else
   {
-    auto config = this->getGroup()->getLastReadConfiguration();
-    auto ui_iter = config.find("ui");
-    if (ui_iter != config.not_found())
-    {
-      cedar::aux::ConfigurationNode& ui = ui_iter->second;
-      for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
-      {
-        const std::string& type = iter->second.get<std::string>("type");
-        if (type == current_type)
-        {
-          if (iter->second.get<std::string>(current_type) == element->getName())
-          {
-            p_scene_element->readConfiguration(iter->second);
-            ui.erase(iter);
-            break;
-          }
-        }
-      }
-    }
+    this->tryToRestoreUIConfiguration(this->getGroup()->getLastReadConfiguration(), element, p_scene_element);
   }
 
   if (current_type == "connector")
@@ -1431,6 +1493,96 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   if (this->isCollapsed())
   {
     p_scene_element->hide();
+  }
+}
+
+void cedar::proc::gui::Group::tryToRestoreGroupUIConfiguration
+     (
+       cedar::aux::ConfigurationNode& config,
+       cedar::proc::gui::GraphicsBase* pSceneElement
+     )
+{
+  auto groups_iter = config.find("groups");
+  if (groups_iter == config.not_found())
+  {
+    groups_iter = config.find("networks"); // compatibility
+  }
+
+  if (groups_iter != config.not_found())
+  {
+    auto group = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(pSceneElement);
+    auto groups = groups_iter->second;
+    auto group_iter = groups.find(group->getGroup()->getName());
+    if (group_iter != groups.not_found())
+    {
+      group->readConfiguration(group_iter->second);
+    }
+  }
+}
+
+void cedar::proc::gui::Group::tryRestoreUIConfigurationsOfElements(cedar::aux::ConfigurationNode& conf)
+{
+  // try to apply the configuration to any steps that have already been added to the group
+  for (auto name_element_iter : this->getGroup()->getElements())
+  {
+    auto element = name_element_iter.second;
+    auto ui_element = this->getUiElementFor(element);
+
+    // can only restore if gui element has already been added
+    if (ui_element)
+    {
+      //!@todo Make these restore functions virtual functions in graphics base/gui connectable
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(ui_element))
+      {
+        this->tryToRestoreGroupUIConfiguration(conf, group);
+      }
+      else
+      {
+        this->tryToRestoreUIConfiguration(conf, element, ui_element);
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Group::tryToRestoreUIConfiguration
+     (
+       cedar::aux::ConfigurationNode& config,
+       cedar::proc::ElementPtr element,
+       cedar::proc::gui::GraphicsBase* pSceneElement
+     )
+{
+  std::string current_type;
+  try
+  {
+    current_type = this->getStringForElementType(element);
+  }
+  catch (cedar::aux::UnknownTypeException&)
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Could not get type for element " + element->getName(),
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+    return;
+  }
+
+  auto ui_iter = config.find("ui");
+  if (ui_iter != config.not_found())
+  {
+    cedar::aux::ConfigurationNode& ui = ui_iter->second;
+    for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
+    {
+      const std::string& type = iter->second.get<std::string>("type");
+      if (type == current_type)
+      {
+        if (iter->second.get<std::string>(current_type) == element->getName())
+        {
+          pSceneElement->readConfiguration(iter->second);
+          ui.erase(iter);
+          break;
+        }
+      }
+    }
   }
 }
 

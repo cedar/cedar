@@ -85,7 +85,7 @@ namespace
 cedar::proc::steps::ScalarDivision::ScalarDivision()
 :
 mResult(new cedar::aux::MatData(cv::Mat())),
-_mTreatDivZero(new cedar::aux::BoolParameter(this, "treat division by zero", false)),
+_mTreatDivZero(new cedar::aux::BoolParameter(this, "treat division by zero", true)),
 _mDivZeroReplacement(new cedar::aux::DoubleParameter(this, "zero divisor replacement", 0.000001, cedar::aux::DoubleParameter::LimitType::positiveZero()))
 {
   auto matrix_slot = this->declareInput("matrix");

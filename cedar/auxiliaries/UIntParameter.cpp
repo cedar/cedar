@@ -45,7 +45,8 @@ namespace
     typedef cedar::aux::ParameterDeclaration<cedar::aux::UIntParameterPtr> Declaration;
     CEDAR_GENERATE_POINTER_TYPES(Declaration);
 
-    DeclarationPtr declaration(new Declaration("numeric", "cedar.aux.UIntParameterPtr"));
+    DeclarationPtr declaration(new Declaration("numeric", "cedar.aux.UIntParameter"));
+    declaration->deprecatedName("cedar.aux.UIntParameterPtr");
     declaration->declare();
 
     return true;

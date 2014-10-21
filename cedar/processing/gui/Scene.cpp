@@ -117,6 +117,8 @@ mDraggingItems(false)
 
 cedar::proc::gui::Scene::~Scene()
 {
+  QObject::disconnect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
+
   this->clear();
 }
 
@@ -131,14 +133,10 @@ void cedar::proc::gui::Scene::emitSceneChanged()
 
 void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
 {
-  auto item = this->itemAt(pHelpEvent->scenePos());
-  if (auto base_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+  auto items = this->items(pHelpEvent->scenePos());
+  for (auto item : items)
   {
-    base_item->updateToolTip();
-  }
-  else if (item && item->parentItem() != NULL)
-  {
-    if (auto base_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item->parentItem()))
+    if (auto base_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
     {
       base_item->updateToolTip();
     }
@@ -344,22 +342,35 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
   }
 
 
-  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
-  if (p_item != this->mpDropTarget)
+//  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
+  auto items = this->items(pEvent->scenePos());
+  if (items.size() > 0)
+  {
+    auto p_item = findFirstGroupItem(items);
+    if (p_item != this->mpDropTarget)
+    {
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
+      {
+        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
+      {
+        if (!group->getGroup()->isLinked())
+        {
+          group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+        }
+      }
+      this->mpDropTarget = p_item;
+    }
+  }
+  else if (this->mpDropTarget) // nothing below the mouse pointer, but there is still something in our drop memory
   {
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
     {
       group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
     }
-
-    if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
-    {
-      if (!group->getGroup()->isLinked())
-      {
-        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-      }
-    }
-    this->mpDropTarget = p_item;
+    this->mpDropTarget = nullptr;
   }
 }
 
@@ -404,7 +415,7 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
         (
           group_declaration->getClassName(),
-          this->getRootGroup()->getGroup(),
+          target_group,
           pEvent->modifiers().testFlag(Qt::ControlModifier)
         );
     this->getGraphicsItemFor(elem.get())->setPos(mapped);
@@ -449,6 +460,19 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::findConnectableItem(con
       {
         return graphics_item;
       }
+    }
+  }
+
+  return nullptr;
+}
+
+cedar::proc::gui::Group* cedar::proc::gui::Scene::findFirstGroupItem(const QList<QGraphicsItem*>& items)
+{
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::Group*>(items[i]))
+    {
+      return graphics_item;
     }
   }
 
@@ -771,19 +795,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
-  QAction *p_reset = menu.addAction("reset architecture");
-
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
 
   //!@todo Instead of this structure, connect each action with an appropriate slot.
-  if (a == p_reset)
-  {
-    if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
-    {
-      p_ide->resetRootGroup();
-    }
-  }
-  else if (a == p_importGroup || a == p_link_group)
+  if (a == p_importGroup || a == p_link_group)
   {
     this->importGroup(a == p_link_group);
   }
@@ -795,7 +810,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   {
     this->addStickyNote();
   }
-  else if (a != NULL)
+  else if (a != nullptr)
   {
     std::cout << "Unmatched action in cedar::proc::gui::Scene::contextMenuEvent." << std::endl;
   }
@@ -1159,18 +1174,10 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
     {
       return mGroup.get();
     }
-#ifdef DEBUG
-    if (element)
-    {
-      std::cout << "Could not find base item for element \"" << element->getName() << "\"" << std::endl;
-    }
-    else
-    {
-      std::cout << "Element is a null-pointer." << std::endl;
-    }
-#endif // DEBUG
+
     //!@todo This should not return null, but rather throw
-    return NULL;
+    // change affects at least: cedar::proc::gui::Group::getUiElementFor
+    return nullptr;
   }
   else
   {

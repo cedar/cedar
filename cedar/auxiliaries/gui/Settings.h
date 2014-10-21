@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/Settings.fwd.h"
@@ -106,6 +107,12 @@ public:
   //! Returns the maximal number of entries allowed for the log entry.
   cedar::aux::UIntParameterPtr getMaximalNumberOfLogEntriesParameter() const;
 
+  //! Returns the default plot to be opened for 2d mat data.
+  std::string getDefault2dMatDataPlot() const;
+
+  //! Sets the default plot to be opened for 2d mat data.
+  void setDefault2dMatDataPlot(const std::string& plotClass);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,6 +146,9 @@ private:
 
   //!@brief Directory, where the PluginLoadDialog is supposed to open.
   cedar::aux::DirectoryParameterPtr _mPluginLoadDialogLocation;
+
+  //!@brief Directory, where the PluginLoadDialog is supposed to open.
+  cedar::aux::StringParameterPtr _mDefaultMatDataPlot;
 
 }; // class cedar::proc::gui::Settings
 

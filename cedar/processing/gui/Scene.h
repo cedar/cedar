@@ -386,6 +386,8 @@ private:
 
   cedar::proc::gui::GraphicsBase* findConnectableItem(const QList<QGraphicsItem*>& items);
 
+  cedar::proc::gui::Group* findFirstGroupItem(const QList<QGraphicsItem*>& items);
+
 private slots:
   void promoteElementToExistingGroup();
 
