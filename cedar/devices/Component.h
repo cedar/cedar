@@ -328,11 +328,11 @@ protected:
   void setMeasurementDimensionality(ComponentDataType type, unsigned int dim);
   void setCommandAndMeasurementDimensionality(ComponentDataType type, unsigned int dim);
 
-  void registerDeviceSideCommandHook(ComponentDataType type, CommandFunctionType fun);
-  void registerDeviceSideMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
+  void registerCommandHook(ComponentDataType type, CommandFunctionType fun);
+  void registerMeasurementHook(ComponentDataType type, MeasurementFunctionType fun);
 
-  void registerUserSideCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
-  void registerDeviceSideMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+  void registerCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
+  void registerMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun);
 
   void setUserSideCommandBufferIndex(ComponentDataType type, int index, double value);
   void setInitialUserSideCommandBuffer(ComponentDataType type, cv::Mat);
@@ -424,7 +424,7 @@ namespace cedar
     //!@brief The manager of all sigmoind instances
     typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentManager;
 
-    //!@brief The singleton object of the TransferFunctionFactory.
+    //!@brief The singleton object of the ComponentManager.
 //    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
   }
 }

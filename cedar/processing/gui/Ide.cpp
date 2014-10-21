@@ -854,6 +854,25 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::GroupPtr group)
   this->setGroup(group);
 }
 
+void cedar::proc::gui::Ide::updateTriggerStartStopThreadCallers()
+{
+  this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+                              (
+                                new cedar::aux::CallFunctionInThread
+                                (
+                                  boost::bind(&cedar::proc::Group::startTriggers, this->mGroup->getGroup(), true)
+                                )
+                              );
+
+  this->mStopThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+                             (
+                               new cedar::aux::CallFunctionInThread
+                               (
+                                 boost::bind(&cedar::proc::Group::stopTriggers, this->mGroup->getGroup(), true)
+                               )
+                             );
+}
+
 void cedar::proc::gui::Ide::architectureToolFinished()
 {
   this->mpArchitectureToolBox->selectMode("mode.Select");
@@ -1413,6 +1432,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->displayFilename(file.toStdString());
 
+  this->updateTriggerStartStopThreadCallers();
   this->loadPlotGroupsIntoComboBox();
 
   cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(QDir(file).absolutePath().toStdString());
@@ -1664,6 +1684,8 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   this->mpPropertyTable->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
+
+  this->updateTriggerStartStopThreadCallers();
 
   if (this->mpConsistencyChecker != NULL)
   {

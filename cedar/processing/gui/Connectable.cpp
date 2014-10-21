@@ -218,12 +218,6 @@ void cedar::proc::gui::Connectable::Decoration::setToolTip(const QString& toolTi
   this->mpRectangle->setToolTip(toolTip);
 }
 
-void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor& bgColor)
-{
-  QBrush bg(bgColor);
-  this->mpRectangle->setBrush(bg);
-}
-
 void cedar::proc::gui::Connectable::DeviceQualityDecoration::timerEvent(QTimerEvent*)
 {
   if (!mStep->hasComponent())

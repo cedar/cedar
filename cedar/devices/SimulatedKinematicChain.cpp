@@ -47,11 +47,11 @@
 
 cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
 {
-  registerDeviceSideCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAngles, this, _1));
-  registerDeviceSideCommandHook(cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedVelocities, this, _1));
-  registerDeviceSideCommandHook(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAccelerations, this, _1));
+  registerCommandHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAngles, this, _1));
+  registerCommandHook(cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedVelocities, this, _1));
+  registerCommandHook(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::sendSimulatedAccelerations, this, _1));
 
-  registerDeviceSideMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this));
+  registerMeasurementHook(cedar::dev::KinematicChain::JOINT_ANGLES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAngles, this));
 //  registerDeviceSideMeasurementHook(cedar::dev::KinematicChain::JOINT_VELOCITIES, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedVelocities, this));
 //  registerDeviceSideMeasurementHook(cedar::dev::KinematicChain::JOINT_ACCELERATIONS, boost::bind(&cedar::dev::SimulatedKinematicChain::retrieveSimulatedAccelerations, this));
 
