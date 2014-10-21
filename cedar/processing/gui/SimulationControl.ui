@@ -18,7 +18,7 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
      <item>
       <widget class="QPushButton" name="mpPlayPauseButton">
        <property name="text">
@@ -27,28 +27,6 @@
        <property name="icon">
         <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
          <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="mpResetSimulationButton">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
-         <normaloff>:/cedar/auxiliaries/gui/reset.svg</normaloff>:/cedar/auxiliaries/gui/reset.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="mpSingleStepButton">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
-         <normaloff>:/cedar/auxiliaries/gui/singleStep.svg</normaloff>:/cedar/auxiliaries/gui/singleStep.svg</iconset>
        </property>
       </widget>
      </item>

@@ -41,15 +41,19 @@
 #include "cedar/processing/gui/SimulationControl.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <QtConcurrentRun>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::gui::SimulationControl::SimulationControl()
+:
+mSimulationRunning(false)
 {
   this->setupUi(this);
 
@@ -69,6 +73,9 @@ cedar::proc::gui::SimulationControl::SimulationControl()
           _2
         )
       );
+
+  // connect buttons
+  QObject::connect(this->mpPlayPauseButton, SIGNAL(clicked()), this, SLOT(startPauseSimulationClicked()));
 }
 
 cedar::proc::gui::SimulationControl::~SimulationControl()
@@ -83,6 +90,9 @@ void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr gr
 {
   this->mGroup = group;
   this->mpTree->setGroup(this->mGroup->getGroup());
+
+  QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
+  QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
 }
 
 void cedar::proc::gui::SimulationControl::elementAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element)
@@ -95,4 +105,61 @@ void cedar::proc::gui::SimulationControl::elementAdded(QTreeWidgetItem* pItem, c
 
 void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* /* pItem */, cedar::proc::LoopedTriggerPtr /* loopedTrigger */)
 {
+}
+
+void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()
+{
+  if (this->mStopSimulationResult.isRunning() || this->mStartSimulationResult.isRunning())
+  {
+    return;
+  }
+
+  QReadLocker locker(this->mSimulationRunning.getLockPtr());
+  bool running = this->mSimulationRunning.member();
+
+  if (running)
+  {
+    // stop triggers (in a separate thread because otherwise, this may lead to lockups)
+    this->mStopSimulationResult = QtConcurrent::run(boost::bind<void>(&cedar::proc::Group::stopTriggers, this->mGroup->getGroup(), true));
+
+    // pause global timer
+    cedar::aux::GlobalClockSingleton::getInstance()->stop();
+  }
+  else if (!running)
+  {
+    // start triggers (in a separate thread because otherwise, this may lead to lockups)
+    this->mStartSimulationResult = QtConcurrent::run(boost::bind<void>(&cedar::proc::Group::startTriggers, this->mGroup->getGroup(), true));
+
+    // start global timer
+    //!@todo Should this happen automatically as soon as one of the triggers is started? Or should this remain the responsibility of the GUI?
+    cedar::aux::GlobalClockSingleton::getInstance()->start();
+  }
+}
+
+void cedar::proc::gui::SimulationControl::triggerStarted()
+{
+  QWriteLocker locker(this->mSimulationRunning.getLockPtr());
+  this->mSimulationRunning.member() = true;
+  this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+
+  this->mpPlayPauseButton->setEnabled(true);
+}
+
+void cedar::proc::gui::SimulationControl::allTriggersStopped()
+{
+  QWriteLocker locker(this->mSimulationRunning.getLockPtr());
+  this->mSimulationRunning.member() = false;
+  this->updateSimulationRunningIcon(this->mSimulationRunning.member());
+}
+
+void cedar::proc::gui::SimulationControl::updateSimulationRunningIcon(bool running)
+{
+  if (running)
+  {
+    this->mpPlayPauseButton->setIcon(QIcon(":/cedar/auxiliaries/gui/pause.svg"));
+  }
+  else
+  {
+    this->mpPlayPauseButton->setIcon(QIcon(":/cedar/auxiliaries/gui/start.svg"));
+  }
 }
