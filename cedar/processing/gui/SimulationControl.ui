@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
+    <width>713</width>
     <height>593</height>
    </rect>
   </property>
@@ -50,9 +50,12 @@
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
+     <attribute name="headerStretchLastSection">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
-       <string/>
+       <string>Color</string>
       </property>
      </column>
      <column>
@@ -63,6 +66,26 @@
      <column>
       <property name="text">
        <string>Control</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Mode</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Step Size</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Idle Time</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Simulated Time</string>
       </property>
      </column>
     </widget>

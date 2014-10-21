@@ -41,6 +41,7 @@
 #include "cedar/processing/gui/SimulationControl.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/casts.h"
 
@@ -138,6 +139,7 @@ mSimulationRunning(false)
   this->mpTree->setFilter(boost::bind<bool>(element_filter, _1));
 
   this->mpTree->setNameColumn(1);
+  this->mpTree->header()->setResizeMode(1, QHeaderView::Stretch);
 
   this->mElementAddedConnection = this->mpTree->connectToElementAddedSignal
       (
@@ -183,6 +185,22 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
 {
   auto control = new cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget(loopedTrigger);
   this->mpTree->setItemWidget(pItem, 2, control);
+
+  int column = 3;
+  std::vector<std::string> parameter_names;
+  parameter_names.push_back("loop mode");
+  parameter_names.push_back("step size");
+  parameter_names.push_back("idle time");
+  parameter_names.push_back("simulated time");
+
+  for (const auto& name : parameter_names)
+  {
+    auto parameter = loopedTrigger->getParameter(name);
+    auto widget = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
+    this->mpTree->setItemWidget(pItem, column, widget);
+    widget->setParameter(parameter);
+    ++column;
+  }
 }
 
 void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()
