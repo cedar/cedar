@@ -76,6 +76,18 @@ class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! A class that takes care of dialog that can be opened by the Ide, such as the boost control.
+  class OpenableDialog;
+  CEDAR_GENERATE_POINTER_TYPES(OpenableDialog);
+
+  class OpenableArchitectureConsistencyCheck;
+
+  class OpenableSimulationControl;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -208,10 +220,6 @@ public slots:
   /*!@brief Show/hide all trigger connections
    */
   void showTriggerConnections(bool show);
-
-  /*!@brief Shows a dialog for architecture consistency checking.
-   */
-  void showConsistencyChecker();
 
   /*!@brief Opens a boost control widget.
    */
@@ -359,6 +367,8 @@ private slots:
 
   void allTriggersStopped();
 
+  void showOpenableDialog();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -373,14 +383,8 @@ private:
 
   cedar::proc::StepPtr mLastCopiedStep;
 
-  //! Architecture consistency check widget.
-  cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;
-
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;
-
-  //! Dock widget for the consistency checker.
-  QDockWidget* mpConsistencyDock;
 
   //! Dock widget for the boost control
   QDockWidget* mpBoostControlDock;
@@ -419,6 +423,9 @@ private:
   QLabel* mpGlobalTimeLabel;
 
   cedar::aux::LockableMember<bool> mSimulationRunning;
+
+  //! Map from name to an openable dialog
+  std::map<std::string, OpenableDialogPtr> mOpenableDialogs;
 
 }; // class cedar::MainWindow
 

@@ -22,47 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BoostControl.h
+    File:        ElementTreeWidget.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 06 28
+    Date:        2014 10 21
 
-    Description:
+    Description: Header file for the class cedar::proc::gui::ElementTreeWidget.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_BOOST_CONTROL_H
-#define CEDAR_PROC_GUI_BOOST_CONTROL_H
+#ifndef CEDAR_PROC_GUI_ELEMENT_TREE_WIDGET_H
+#define CEDAR_PROC_GUI_ELEMENT_TREE_WIDGET_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_BoostControl.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/gui/ElementTreeWidget.fwd.h"
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
-#include "cedar/processing/gui/BoostControl.fwd.h"
-#include "cedar/processing/gui/View.fwd.h"
-#include "cedar/processing/sources/Boost.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QTreeWidget>
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
+  #include <boost/function.hpp>
 #endif // Q_MOC_RUN
-#include <map>
 
 
-/*!@brief A widget for conveniently controlling the boosts in a network.
+/*!@brief A widget for displaying (a filtered subset of) the elements in a cedar::proc::Group.
  */
-class cedar::proc::gui::BoostControl : public QWidget, public Ui_BoostControl
+class cedar::proc::gui::ElementTreeWidget : public QTreeWidget
 {
   Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -72,15 +71,45 @@ class cedar::proc::gui::BoostControl : public QWidget, public Ui_BoostControl
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  BoostControl(cedar::proc::gui::View* view);
+  ElementTreeWidget(QWidget* pParent = nullptr);
+
+  //!@brief Destructor
+  virtual ~ElementTreeWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Sets the network whose boosts are controlled by this widget.
-   */
-  void setGroup(cedar::proc::GroupPtr network);
+  //! Sets the group whose simulation is controlled by this widget.
+  void setGroup(cedar::proc::GroupPtr group);
+
+  //! Sets the filter for elements. Only (non-group) elements for which the filter returns true will be added to the tree.
+  void setFilter(const boost::function<bool(cedar::proc::ConstElementPtr)>& filter);
+
+  //! Sets the column into which the name of the element is written.
+  void setNameColumn(int column)
+  {
+    this->mNameColumn = column;
+  }
+
+  //! Returns the name column.
+  int getNameColumn() const
+  {
+    return this->mNameColumn;
+  }
+
+signals:
+  //! Used to translate a boost signal to a Qt signal.
+  void elementAddedSignal(QString);
+
+  //! Used to translate a boost signal to a Qt signal.
+  void elementRemovedSignal(QString);
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // boost signals
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(ElementAdded, void(QTreeWidgetItem* item, cedar::proc::ElementPtr));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,16 +121,29 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Adds a boost to this control widget.
-  void boostAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
+  void translateElementAddedSignal(cedar::proc::ElementPtr);
 
-  bool isBoostItem(QTreeWidgetItem* pItem) const;
+  void translateElementRemovedSignal(cedar::proc::ConstElementPtr);
 
-  cedar::proc::sources::BoostPtr findBoostFor(QTreeWidgetItem* pItem) const;
+  void connectRenameSignal(cedar::proc::ElementPtr element);
+
+  void disconnectSignals();
+
+  void addGroup(cedar::proc::GroupPtr group);
+
+  void addElement(cedar::proc::ElementPtr element);
+
+  QTreeWidgetItem* getGroupItem(const std::string& elementPath);
 
 private slots:
-  //! If possible, centers the boost that was double-clicked.
-  void itemActivated(QTreeWidgetItem* pItem, int column);
+  //! Reacts to an element that has been added in the underlying group.
+  void elementAdded(QString elementName);
+
+  //! Reacts to the removal of a boost in the underlying group.
+  void elementRemoved(QString elementName);
+
+  //! Reacts to the change of the name of an element in the underlying group.
+  void elementNameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -111,11 +153,26 @@ protected:
 private:
   cedar::proc::GroupPtr mGroup;
 
-  cedar::proc::gui::View* mpView;
+  std::map<const cedar::proc::Element*, QString> mElementNames;
 
-  boost::signals2::scoped_connection mBoostAddedConnection;
+  std::vector<boost::signals2::connection> mElementAddedConnections;
 
-}; // class cedar::proc::gui::BoostControl
+  std::vector<boost::signals2::connection> mElementRemovedConnections;
 
-#endif // CEDAR_PROC_GUI_BOOST_CONTROL_H
+  boost::function<bool(cedar::proc::ConstElementPtr)> mFilter;
+
+  int mNameColumn;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::gui::ElementTreeWidget
+
+#endif // CEDAR_PROC_GUI_ELEMENT_TREE_WIDGET_H
 

@@ -55,6 +55,7 @@
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/SimulationControl.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
@@ -90,13 +91,115 @@
 #include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
+// nested private classes
+//----------------------------------------------------------------------------------------------------------------------
+//! A class that takes care of dialog that can be opened by the Ide, such as the boost control.
+class cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableDialog(const std::string& name, const QString& iconPath = "")
+  :
+  mpOpenedWidget(nullptr),
+  mName(name),
+  mpMenuAction(nullptr),
+  mpDock(nullptr),
+  mIconPath(iconPath)
+  {
+  }
+
+  void addToMenu(QMenu* menu);
+
+  void show(QWidget* parent, cedar::proc::gui::GroupPtr group);
+
+  QAction* getMenuAction() const
+  {
+    return this->mpMenuAction;
+  }
+
+  const std::string& getName() const
+  {
+    return this->mName;
+  }
+
+  virtual QWidget* createOpenable() const = 0;
+
+  virtual void setGroup(cedar::proc::gui::GroupPtr)
+  {
+    // empty default implementation
+  }
+
+protected:
+  QWidget* mpOpenedWidget;
+
+private:
+  std::string mName;
+
+  QAction* mpMenuAction;
+
+  QDockWidget* mpDock;
+
+  QString mIconPath;
+};
+
+class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar::proc::gui::Ide::OpenableDialog
+{
+  public:
+    OpenableArchitectureConsistencyCheck(cedar::proc::gui::View* pView)
+    :
+    OpenableDialog("Architecture consistency check", ":/menus/consistency_check.svg"),
+    mpView(pView)
+    {
+    }
+
+    QWidget* createOpenable() const
+    {
+      return new cedar::proc::gui::ArchitectureConsistencyCheck(this->mpView, this->mpView->getScene());
+    }
+
+    void setGroup(cedar::proc::gui::GroupPtr group)
+    {
+      if (this->mpOpenedWidget)
+      {
+        auto check = dynamic_cast<cedar::proc::gui::ArchitectureConsistencyCheck*>(this->mpOpenedWidget);
+        check->setGroup(group);
+      }
+    }
+
+  private:
+    cedar::proc::gui::View* mpView;
+};
+
+class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableSimulationControl()
+  :
+  OpenableDialog("Simulation control")
+  {
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new cedar::proc::gui::SimulationControl();
+  }
+
+  void setGroup(cedar::proc::gui::GroupPtr group)
+  {
+    if (this->mpOpenedWidget)
+    {
+      auto widget = dynamic_cast<cedar::proc::gui::SimulationControl*>(this->mpOpenedWidget);
+      widget->setGroup(group);
+    }
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 :
-mpConsistencyChecker(nullptr),
 mpPerformanceOverview(nullptr),
-mpConsistencyDock(nullptr),
 mpBoostControlDock(nullptr),
 mpBoostControl(nullptr),
 mSuppressCloseDialog(false),
@@ -264,7 +367,6 @@ mSimulationRunning(false)
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
 
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
-  QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
   QObject::connect(mpActionExperiments, SIGNAL(triggered()), this, SLOT(showExperimentDialog()));
 
@@ -296,6 +398,19 @@ mSimulationRunning(false)
 
   this->mpActionResetSimulation->setEnabled(false);
 
+  std::vector<OpenableDialogPtr> openable_dialogs;
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
+
+  // need to iterate in reverse, actions are always added at the beginning of the menu
+  for (auto iter = openable_dialogs.rbegin(); iter != openable_dialogs.rend(); ++iter)
+  {
+    auto openable_dialog = *iter;
+    this->mOpenableDialogs[openable_dialog->getName()] = openable_dialog;
+    openable_dialog->addToMenu(this->mpToolsMenu);
+    QObject::connect(openable_dialog->getMenuAction(), SIGNAL(triggered()), this, SLOT(showOpenableDialog()));
+  }
+
   this->buildStatusBar();
   this->startTimer(100);
 }
@@ -324,6 +439,48 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::OpenableDialog::addToMenu(QMenu* menu)
+{
+  this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + " ...", menu);
+  if (!this->mIconPath.isEmpty())
+  {
+    this->mpMenuAction->setIcon(QIcon(this->mIconPath));
+  }
+  this->mpMenuAction->setData(QString::fromStdString(this->getName()));
+  menu->insertAction(menu->actions().at(0), this->mpMenuAction);
+}
+
+void cedar::proc::gui::Ide::OpenableDialog::show(QWidget* parent, cedar::proc::gui::GroupPtr group)
+{
+  if (this->mpDock == nullptr)
+  {
+    this->mpDock = new QDockWidget(parent);
+    this->mpDock->setFloating(true);
+    this->mpDock->setWindowTitle(QString::fromStdString(this->getName()));
+    this->mpDock->setAllowedAreas(Qt::NoDockWidgetArea);
+    this->mpOpenedWidget = this->createOpenable();
+    this->setGroup(group);
+    this->mpDock->setWidget(this->mpOpenedWidget);
+  }
+
+  this->mpDock->show();
+}
+
+void cedar::proc::gui::Ide::showOpenableDialog()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_ASSERT(action);
+  QString name = action->data().toString();
+
+  auto openable_iter = this->mOpenableDialogs.find(name.toStdString());
+  CEDAR_ASSERT(openable_iter != this->mOpenableDialogs.end());
+
+  auto openable = openable_iter->second;
+
+  openable->show(this, this->mGroup);
+
+}
 
 void cedar::proc::gui::Ide::setSimulationControlsDisabled(bool disabled)
 {
@@ -434,23 +591,6 @@ void cedar::proc::gui::Ide::showExperimentDialog()
   this->mpExperimentDialog->show();
   this->mpExperimentDialog->raise();
   this->mpExperimentDialog->activateWindow();
-}
-
-void cedar::proc::gui::Ide::showConsistencyChecker()
-{
-  if (this->mpConsistencyDock == nullptr)
-  {
-    this->mpConsistencyDock = new QDockWidget(this);
-    this->mpConsistencyDock->setFloating(true);
-    this->mpConsistencyDock->setWindowTitle("consistency check");
-    this->mpConsistencyDock->setAllowedAreas(Qt::NoDockWidgetArea);
-    this->mpConsistencyChecker
-      = new cedar::proc::gui::ArchitectureConsistencyCheck(this->mpProcessingDrawer, this->mpProcessingDrawer->getScene());
-    this->mpConsistencyChecker->setGroup(this->mGroup);
-    this->mpConsistencyDock->setWidget(this->mpConsistencyChecker);
-  }
-
-  this->mpConsistencyDock->show();
 }
 
 void cedar::proc::gui::Ide::exportSvg()
@@ -1675,9 +1815,10 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 
   this->updateTriggerStartStopThreadCallers();
 
-  if (this->mpConsistencyChecker != NULL)
+  for (auto name_openable_pair : this->mOpenableDialogs)
   {
-    this->mpConsistencyChecker->setGroup(group);
+    auto openable_dialog = name_openable_pair.second;
+    openable_dialog->setGroup(group);
   }
 
   if (this->mpBoostControl != NULL)
