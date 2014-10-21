@@ -81,14 +81,7 @@ public slots:
 private:
 
   void sendSimulatedAngles(cv::Mat mat);
-  void sendSimulatedVelocities(cv::Mat mat);
-  void sendSimulatedAccelerations(cv::Mat mat);
-  // todo: torques
-
   cv::Mat retrieveSimulatedAngles();
-  cv::Mat retrieveSimulatedVelocities();
-  cv::Mat retrieveSimulatedAccelerations();
-  // todo: torques
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

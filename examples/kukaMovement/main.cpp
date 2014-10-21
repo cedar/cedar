@@ -85,8 +85,6 @@ private:
   // step function calculating and passing the movement command for each time step
   void step(cedar::unit::Time)
   {
-std::cout << "in example step" << std::endl;
-
     if (1)
     {
       // calculate direction of movement
