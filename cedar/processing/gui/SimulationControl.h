@@ -60,7 +60,7 @@
 #endif // Q_MOC_RUN
 
 //!@cond SKIPPED_DOCUMENTATION
-// Hidden class; would be a private nested class of cedar::proc::gui::SimulationControl, but the moc cannot do that
+// "Hidden" class; would be a private nested class of cedar::proc::gui::SimulationControl, but the moc cannot do that
 namespace cedar
 {
   namespace proc
@@ -88,12 +88,14 @@ namespace cedar
 
           void triggerChangingState();
 
+          void singleStepClicked();
+
         private:
           cedar::proc::LoopedTriggerPtr mLoopedTrigger;
 
           QPushButton* mpStartStopButton;
 
-          //!@todo Single step button
+          QPushButton* mpSingleStepButton;
         };
       }
     }

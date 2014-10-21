@@ -66,16 +66,27 @@ mLoopedTrigger(loopedTrigger)
 {
   auto layout = new QHBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(3);
   this->setLayout(layout);
   this->mpStartStopButton = new QPushButton(QIcon(cedar::proc::gui::SimulationControl::M_STARTED_ICON_PATH), "");
   this->mpStartStopButton->setFixedSize(28, 28);
   layout->addWidget(this->mpStartStopButton);
+
+  this->mpSingleStepButton = new QPushButton(QIcon(":/cedar/auxiliaries/gui/singleStep.svg"), "");
+  this->mpSingleStepButton->setFixedSize(28, 28);
+  layout->addWidget(this->mpSingleStepButton);
 
   layout->addStretch(1);
 
   QObject::connect(this->mLoopedTrigger.get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mLoopedTrigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
   QObject::connect(this->mpStartStopButton, SIGNAL(clicked()), this, SLOT(startStopTriggerClicked()));
+  QObject::connect(this->mpSingleStepButton, SIGNAL(clicked()), this, SLOT(singleStepClicked()));
+}
+
+void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::singleStepClicked()
+{
+  this->mLoopedTrigger->singleStep();
 }
 
 void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::startStopTriggerClicked()
@@ -93,18 +104,21 @@ void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::startStop
 void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::triggerStarted()
 {
   this->mpStartStopButton->setEnabled(true);
+  this->mpSingleStepButton->setEnabled(false);
   this->mpStartStopButton->setIcon(QIcon(cedar::proc::gui::SimulationControl::M_PAUSED_ICON_PATH));
 }
 
 void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::triggerStopped()
 {
   this->mpStartStopButton->setEnabled(true);
+  this->mpSingleStepButton->setEnabled(true);
   this->mpStartStopButton->setIcon(QIcon(cedar::proc::gui::SimulationControl::M_STARTED_ICON_PATH));
 }
 
 void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::triggerChangingState()
 {
   this->mpStartStopButton->setEnabled(false);
+  this->mpSingleStepButton->setEnabled(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
