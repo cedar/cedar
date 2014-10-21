@@ -68,6 +68,12 @@ cedar::dev::RobotManager::RobotManager()
   khepera_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/khepera/default_configuration.json"));
   this->addRobotTemplate("khepera", khepera_template);
 
+  // kuka ---------------------------------------------------------------------------------------------------------
+  cedar::dev::RobotManager::Template kuka_template;
+  kuka_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
+  kuka_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/caren/default_configuration.json"));
+  this->addRobotTemplate("kuka", kuka_template);
+
   this->restore();
 }
 
