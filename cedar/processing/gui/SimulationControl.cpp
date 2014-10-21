@@ -154,6 +154,8 @@ mSimulationRunning(false)
 
   // connect buttons
   QObject::connect(this->mpPlayPauseButton, SIGNAL(clicked()), this, SLOT(startPauseSimulationClicked()));
+  QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(createClicked()));
+  QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
 }
 
 cedar::proc::gui::SimulationControl::~SimulationControl()
@@ -171,6 +173,33 @@ void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr gr
 
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
+}
+
+void cedar::proc::gui::SimulationControl::createClicked()
+{
+  cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger());
+  std::string name = this->mGroup->getGroup()->getUniqueIdentifier("new LoopedTrigger");
+  this->mGroup->getGroup()->add(trigger, name);
+}
+
+void cedar::proc::gui::SimulationControl::removeClicked()
+{
+  auto selected_items = this->mpTree->selectedItems();
+
+  std::vector<cedar::proc::ElementPtr> to_remove;
+
+  // first, remember all the items to be removed (because removing them will affect the selection in the tree)
+  for (auto item : selected_items)
+  {
+    std::string path = item->data(1, Qt::UserRole).toString().toStdString();
+    to_remove.push_back(this->mGroup->getGroup()->getElement(path));
+  }
+
+  // then remove them
+  for (auto element : to_remove)
+  {
+    this->mGroup->getGroup()->remove(element);
+  }
 }
 
 void cedar::proc::gui::SimulationControl::elementAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element)
