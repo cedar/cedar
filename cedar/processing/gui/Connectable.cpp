@@ -49,6 +49,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 
@@ -755,13 +756,18 @@ void cedar::proc::gui::Connectable::updateDecorations()
     {
       if (!mpLoopedDecoration)
       {
+        std::string trigger_source = "It is currently not connected to a looped trigger.";
+        if (auto parent = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger()))
+        {
+          trigger_source = "It is connect to a looped trigger named \"" + parent->getName() + "\".";
+        }
         mpLoopedDecoration = DecorationPtr
         (
           new Decoration
           (
             this,
             ":/decorations/looped.svg",
-            "This step is looped, i.e., it expects to be connected to a looped trigger."
+            "This element is looped. " + QString::fromStdString(trigger_source)
           )
         );
       }
