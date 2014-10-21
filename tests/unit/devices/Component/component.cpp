@@ -100,26 +100,26 @@ public:
 
     auto dummy_command_hook = [](cv::Mat) {};
     CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
-    this->registerDeviceSideCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
+    this->registerCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
     CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "registering a hook for an uninstalled command type.");
 
     auto dummy_measurement_hook = []() { return cv::Mat();};
     CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
-    this->registerDeviceSideMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
+    this->registerMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
     CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "registering a hook for an uninstalled measurement type.");
 
     CEDAR_UNIT_TEST_BEGIN_EXCEPTION_FREE_CODE();
     this->installCommandAndMeasurementType(0, "test");
-    this->registerDeviceSideMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
-    this->registerDeviceSideCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
+    this->registerMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
+    this->registerCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
     CEDAR_UNIT_TEST_END_EXCEPTION_FREE_CODE(errors, "registering a measurement.");
 
     CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
-    this->registerDeviceSideMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
+    this->registerMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
     CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "registering measurement hook a second time");
 
     CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
-    this->registerDeviceSideCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
+    this->registerCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
     CEDAR_UNIT_TEST_END_EXPECTING_EXCEPTION(errors, "registering command hook a second time");
 
     return errors;
@@ -133,7 +133,7 @@ public:
     {
       auto dummy_command_hook = [](cv::Mat) {};
       this->installCommandType(0, "command");
-      this->registerDeviceSideCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
+      this->registerCommandHook(0, boost::bind<void>(dummy_command_hook, _1));
 
       CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
       this->getDeviceCommandData(0);
@@ -158,7 +158,7 @@ public:
     {
       auto dummy_measurement_hook = []() {return cv::Mat();};
       this->installMeasurementType(0, "measurement");
-      this->registerDeviceSideMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
+      this->registerMeasurementHook(0, boost::bind<cv::Mat>(dummy_measurement_hook));
 
       CEDAR_UNIT_TEST_BEGIN_EXPECTING_EXCEPTION()
       this->getMeasurementData(0);
@@ -207,7 +207,7 @@ public:
   {
     this->installMeasurementType(0, "test measurement");
     this->setMeasurementDimensionality(0, 1);
-    this->registerDeviceSideMeasurementHook(0, boost::bind(&TestComponent::makeTestMeasurement, this));
+    this->registerMeasurementHook(0, boost::bind(&TestComponent::makeTestMeasurement, this));
   }
 
   cv::Mat makeTestMeasurement() const

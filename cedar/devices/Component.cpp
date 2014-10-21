@@ -986,7 +986,7 @@ double cedar::dev::Component::getPreviousDeviceSideMeasurementBufferIndex(Compon
   return this->mMeasurementData->getPreviousDeviceBufferIndex(type, index);
 }
 
-void cedar::dev::Component::registerDeviceSideCommandHook(ComponentDataType type, CommandFunctionType fun)
+void cedar::dev::Component::registerCommandHook(ComponentDataType type, CommandFunctionType fun)
 {
   if (!this->mCommandData->hasType(type))
   {
@@ -1002,7 +1002,7 @@ void cedar::dev::Component::registerDeviceSideCommandHook(ComponentDataType type
   mSubmitCommandHooks.member()[ type ] = fun;
 }
 
-void cedar::dev::Component::registerDeviceSideMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
+void cedar::dev::Component::registerMeasurementHook(ComponentDataType type, MeasurementFunctionType fun)
 {
   if (!this->mMeasurementData->hasType(type))
   {
@@ -1018,12 +1018,12 @@ void cedar::dev::Component::registerDeviceSideMeasurementHook(ComponentDataType 
   mRetrieveMeasurementHooks.member()[ type ] = fun;
 }
 
-void cedar::dev::Component::registerUserSideCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
+void cedar::dev::Component::registerCommandTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
 {
   this->mCommandData->registerTransformationHook(from, to, fun);
 }
 
-void cedar::dev::Component::registerDeviceSideMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
+void cedar::dev::Component::registerMeasurementTransformationHook(ComponentDataType from, ComponentDataType to, TransformationFunctionType fun)
 {
   this->mMeasurementData->registerTransformationHook(from, to, fun);
 }

@@ -96,10 +96,10 @@ void cedar::dev::kteam::khepera::GripperSerial::construct()
   this->_mCommandGetGripperResistivity = new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F");
   this->_mCommandGetGripperOpticalSensor = new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G");
 
-  this->registerDeviceSideCommandHook(GRIPPER_POSITION, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::applyGripperPosition, this, _1));
+  this->registerCommandHook(GRIPPER_POSITION, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::applyGripperPosition, this, _1));
 
-  this->registerDeviceSideMeasurementHook(RESISTIVITY, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::measureResistivity, this));
-  this->registerDeviceSideMeasurementHook(OPTICAL_SENSOR, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::measureOpticalSensor, this));
+  this->registerMeasurementHook(RESISTIVITY, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::measureResistivity, this));
+  this->registerMeasurementHook(OPTICAL_SENSOR, boost::bind(&cedar::dev::kteam::khepera::GripperSerial::measureOpticalSensor, this));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

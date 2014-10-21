@@ -67,13 +67,13 @@ void cedar::dev::kteam::Drive::init()
   setCommandAndMeasurementDimensionality(cedar::dev::kteam::Drive::ENCODERS, 2);
   installMeasurementType(cedar::dev::kteam::Drive::ENCODERS_CHANGE, "Change Rate of Encoders");
   setMeasurementDimensionality(cedar::dev::kteam::Drive::ENCODERS_CHANGE, 2);
-  registerDeviceSideMeasurementTransformationHook
+  registerMeasurementTransformationHook
   (
       cedar::dev::kteam::Drive::ENCODERS,
       cedar::dev::kteam::Drive::ENCODERS_CHANGE,
       boost::bind(&cedar::dev::Component::differentiateDevice, this, _1, _2, cedar::dev::kteam::Drive::ENCODERS)
   );
-  registerDeviceSideMeasurementTransformationHook
+  registerMeasurementTransformationHook
   (
       cedar::dev::kteam::Drive::ENCODERS,
       cedar::dev::kteam::Drive::WHEEL_SPEED,
