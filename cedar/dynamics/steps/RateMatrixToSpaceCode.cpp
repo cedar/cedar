@@ -90,7 +90,7 @@ namespace
 cedar::dyn::RateMatrixToSpaceCode::RateMatrixToSpaceCode()
 :
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
+mOutput(new cedar::aux::MatData(cv::Mat())),
 mDimensionality(2),
 // parameters
 _mLowerLimit
@@ -342,9 +342,8 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
   }
   if (mDimensionality == 2)
   {
-    this->mOutput->lockForWrite();
+    QWriteLocker locker(&this->mOutput->getLock());
     this->mOutput->setData(cv::Mat::zeros(this->mInput->getData().rows, this->getNumberOfBins(), CV_32F));
-    this->mOutput->unlock();
   }
   else if (mDimensionality == 3)
   {
@@ -354,9 +353,8 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
     sizes_signed.push_back(this->getNumberOfBins());
     cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
     new_matrix = 0.0;
-    this->mOutput->lockForWrite();
+    QWriteLocker locker(&this->mOutput->getLock());
     this->mOutput->setData(new_matrix);
-    this->mOutput->unlock();
   }
   this->onTrigger();
   this->emitOutputPropertiesChangedSignal("output");

@@ -630,16 +630,43 @@ void cedar::proc::Group::listSubgroups(std::set<cedar::proc::GroupPtr>& subgroup
 
 void cedar::proc::Group::reset()
 {
-  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  // first, find all looped triggers that are running and stop them
+  auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
+  std::set<cedar::proc::LoopedTriggerPtr> running_triggers;
+
+  for (auto trigger : looped_triggers)
   {
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second))
+    if (trigger->isRunning())
+    {
+      running_triggers.insert(trigger);
+      trigger->stop();
+
+      // wait for the trigger to stop
+      while (trigger->isRunning())
+      {
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
+      }
+    }
+  }
+
+  // reset all elements in this group
+  for (auto name_element_pair : this->mElements)
+  {
+    auto element = name_element_pair.second;
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
     {
       step->callReset();
     }
-    else if (cedar::proc::GroupPtr group = boost::dynamic_pointer_cast<cedar::proc::Group>(iter->second))
+    else if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
     {
       group->reset();
     }
+  }
+
+  // restart all triggers that have been stopped
+  for (auto trigger : running_triggers)
+  {
+    trigger->start();
   }
 }
 
