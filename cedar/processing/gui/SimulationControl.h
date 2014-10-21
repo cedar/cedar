@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_SimulationControl.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
@@ -52,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QWidget>
+#include <QFuture>
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
@@ -97,6 +99,15 @@ private:
   void elementAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
   void loopedTriggerAdded(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger);
 
+  void updateSimulationRunningIcon(bool running);
+
+private slots:
+  void startPauseSimulationClicked();
+
+  void triggerStarted();
+
+  void allTriggersStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,6 +118,12 @@ private:
   cedar::proc::gui::GroupPtr mGroup;
 
   boost::signals2::scoped_connection mElementAddedConnection;
+
+  cedar::aux::LockableMember<bool> mSimulationRunning;
+
+  QFuture<void> mStartSimulationResult;
+
+  QFuture<void> mStopSimulationResult;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

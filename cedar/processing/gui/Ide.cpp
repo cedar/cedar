@@ -107,7 +107,18 @@ public:
   {
   }
 
-  void addToMenu(QMenu* menu);
+  void addToMenu(QMenu* menu)
+  {
+    this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + " ...", menu);
+    if (!this->mIconPath.isEmpty())
+    {
+      this->mpMenuAction->setIcon(QIcon(this->mIconPath));
+    }
+    this->mpMenuAction->setData(QString::fromStdString(this->getName()));
+    menu->insertAction(menu->actions().at(0), this->mpMenuAction);
+
+    this->actionAdded();
+  }
 
   void show(QWidget* parent, cedar::proc::gui::GroupPtr group);
 
@@ -126,6 +137,12 @@ public:
   virtual void setGroup(cedar::proc::gui::GroupPtr)
   {
     // empty default implementation
+  }
+
+private:
+  virtual void actionAdded()
+  {
+    // empty by default
   }
 
 protected:
@@ -190,6 +207,12 @@ public:
       auto widget = dynamic_cast<cedar::proc::gui::SimulationControl*>(this->mpOpenedWidget);
       widget->setGroup(group);
     }
+  }
+
+private:
+  void actionAdded()
+  {
+    this->getMenuAction()->setShortcut(Qt::SHIFT + Qt::Key_T);
   }
 };
 
@@ -439,17 +462,6 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::proc::gui::Ide::OpenableDialog::addToMenu(QMenu* menu)
-{
-  this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + " ...", menu);
-  if (!this->mIconPath.isEmpty())
-  {
-    this->mpMenuAction->setIcon(QIcon(this->mIconPath));
-  }
-  this->mpMenuAction->setData(QString::fromStdString(this->getName()));
-  menu->insertAction(menu->actions().at(0), this->mpMenuAction);
-}
 
 void cedar::proc::gui::Ide::OpenableDialog::show(QWidget* parent, cedar::proc::gui::GroupPtr group)
 {
