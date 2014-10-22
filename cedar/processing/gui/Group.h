@@ -225,6 +225,9 @@ public:
   //! Closes all open architecture widgets
   void closeOpenArchitectureWidgets();
 
+  //! Returns a color for a given looped trigger
+  static QColor getColorFor(cedar::proc::LoopedTriggerPtr trigger);
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??

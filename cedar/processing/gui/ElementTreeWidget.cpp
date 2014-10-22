@@ -82,6 +82,7 @@ void cedar::proc::gui::ElementTreeWidget::itemChanged(QTreeWidgetItem* pItem, in
   auto element = this->mGroup->getElement(path);
   element->setName(new_name.toStdString());
   pItem->setData(this->mNameColumn, Qt::UserRole, QString::fromStdString(this->mGroup->findPath(element)));
+  emit elementNameChanged(pItem);
 }
 
 void cedar::proc::gui::ElementTreeWidget::setNameEditingEnabled(bool enabled)
@@ -204,6 +205,7 @@ void cedar::proc::gui::ElementTreeWidget::elementNameChanged()
 {
   auto name = cedar::aux::asserted_cast<cedar::aux::Parameter*>(QObject::sender());
   auto element = dynamic_cast<cedar::proc::Element*>(name->getOwner());
+  auto new_path = this->mGroup->findPath(element);
 
   auto iter = this->mElementNames.find(element);
   if (iter == this->mElementNames.end())
@@ -218,10 +220,18 @@ void cedar::proc::gui::ElementTreeWidget::elementNameChanged()
 
   for (int i = 0; i < items.size(); ++i)
   {
-    items.at(i)->setText(this->mNameColumn, new_name);
+    QTreeWidgetItem* item = items.at(i);
+
+    item->setData(this->mNameColumn, Qt::UserRole, QString::fromStdString(new_path));
+    item->setText(this->mNameColumn, new_name);
   }
 
   this->mElementNames[element] = new_name;
+
+  for (auto changed : items)
+  {
+    emit elementNameChanged(changed);
+  }
 }
 
 void cedar::proc::gui::ElementTreeWidget::translateElementRemovedSignal(cedar::proc::ConstElementPtr element)

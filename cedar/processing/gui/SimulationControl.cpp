@@ -157,6 +157,7 @@ mSimulationRunning(false)
   QObject::connect(this->mpPlayPauseButton, SIGNAL(clicked()), this, SLOT(startPauseSimulationClicked()));
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(createClicked()));
   QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
+  QObject::connect(this->mpTree, SIGNAL(elementNameChanged(QTreeWidgetItem*)), this, SLOT(elementNameChanged(QTreeWidgetItem*)));
 }
 
 cedar::proc::gui::SimulationControl::~SimulationControl()
@@ -166,6 +167,20 @@ cedar::proc::gui::SimulationControl::~SimulationControl()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::SimulationControl::elementNameChanged(QTreeWidgetItem* pItem)
+{
+  QWidget* p_outer = this->mpTree->itemWidget(pItem, 0);
+  CEDAR_ASSERT(p_outer->layout() != nullptr);
+  QWidget* p_inner = p_outer->layout()->itemAt(0)->widget();
+  CEDAR_ASSERT(p_inner != nullptr);
+
+  auto path = pItem->data(this->mpTree->getNameColumn(), Qt::UserRole).toString().toStdString();
+  auto trigger = this->mGroup->getGroup()->getElement<cedar::proc::LoopedTrigger>(path);
+
+  QColor color = this->mGroup->getColorFor(trigger);
+  p_inner->setStyleSheet("QWidget {background: " + color.name() + ";}");
+}
 
 void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr group)
 {
@@ -216,6 +231,18 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
   auto control = new cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget(loopedTrigger);
   this->mpTree->setItemWidget(pItem, 2, control);
 
+  QColor color = this->mGroup->getColorFor(loopedTrigger);
+  auto color_indicator_frame = new QWidget();
+  auto layout = new QVBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
+  color_indicator_frame->setLayout(layout);
+  auto color_indicator = new QWidget();
+  color_indicator->setFixedSize(QSize(16, 16));
+  color_indicator->setAutoFillBackground(true);
+  color_indicator->setStyleSheet("QWidget {background: " + color.name() + ";}");
+  layout->addWidget(color_indicator, 0, Qt::AlignCenter);
+  this->mpTree->setItemWidget(pItem, 0, color_indicator_frame);
+
   int column = 3;
   std::vector<std::string> parameter_names;
   parameter_names.push_back("loop mode");
@@ -231,6 +258,9 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
     widget->setParameter(parameter);
     ++column;
   }
+
+  this->mpTree->resizeColumnToContents(0);
+  this->mpTree->resizeColumnToContents(2);
 }
 
 void cedar::proc::gui::SimulationControl::startPauseSimulationClicked()

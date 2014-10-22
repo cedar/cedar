@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connectable.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/gui/Scene.h"
@@ -805,6 +806,12 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
       QAction* action = p_assign_trigger->addAction(QString::fromStdString(trigger->getName()));
       action->setData(QString::fromStdString(path));
       action->setEnabled(trigger != current_trigger);
+
+      QPixmap color_pm(16, 16);
+      QColor trigger_color = cedar::proc::gui::Group::getColorFor(trigger);
+      color_pm.fill(trigger_color);
+      action->setIcon(QIcon(color_pm));
+
       QObject::connect(action, SIGNAL(triggered()), this, SLOT(assignTriggerClicked()));
     }
   }

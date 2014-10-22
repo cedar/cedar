@@ -108,6 +108,9 @@ signals:
   //! Used to translate a boost signal to a Qt signal.
   void elementRemovedSignal(QString);
 
+  //! Emitted whenever the name of an element changes. The integer passed along is the row of the changed element.
+  void elementNameChanged(QTreeWidgetItem* item);
+
   //--------------------------------------------------------------------------------------------------------------------
   // boost signals
   //--------------------------------------------------------------------------------------------------------------------
