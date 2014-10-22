@@ -2601,6 +2601,16 @@ void cedar::proc::Group::onLoopedChanged()
             {
               triggerable->callOnStart();
             }
+            // check if this is the root group
+            if (this->isRoot())
+            {
+              // if there is no default trigger, create one
+              if (!this->nameExists("default trigger"))
+              {
+                this->create("cedar.processing.LoopedTrigger", "default trigger");
+              }
+              this->connectTrigger(this->getElement<cedar::proc::LoopedTrigger>("default trigger"), triggerable);
+            }
           }
         }
         else // remove
