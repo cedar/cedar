@@ -1021,16 +1021,13 @@ void cedar::proc::gui::Ide::architectureToolFinished()
 void cedar::proc::gui::Ide::resetStepList()
 {
   //!@todo This should become its own widget
-
-  std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
-  for (auto iter = categories.begin(); iter != categories.end(); ++iter)
+  for (const auto& category_name : ElementManagerSingleton::getInstance()->listCategories())
   {
-    const std::string& category_name = *iter;
     cedar::proc::gui::ElementClassList *p_tab;
     if (mElementClassListWidgets.find(category_name) == mElementClassListWidgets.end())
     {
       p_tab = new cedar::proc::gui::ElementClassList();
-      this->mpCategoryList->addTab(p_tab, QString(category_name.c_str()));
+      this->mpCategoryList->addTab(p_tab, QString::fromStdString(category_name));
       mElementClassListWidgets[category_name] = p_tab;
     }
     else
@@ -1038,6 +1035,15 @@ void cedar::proc::gui::Ide::resetStepList()
       p_tab = mElementClassListWidgets[category_name];
     }
     p_tab->showList(category_name);
+
+    // if the category does not contain any displayed items, remove it
+    if (p_tab->count() == 0)
+    {
+      this->mpCategoryList->removeTab(this->mpCategoryList->indexOf(p_tab));
+      auto iter = mElementClassListWidgets.find(category_name);
+      CEDAR_DEBUG_ASSERT(iter != mElementClassListWidgets.end());
+      mElementClassListWidgets.erase(iter);
+    }
   }
 }
 

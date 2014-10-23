@@ -156,7 +156,12 @@ void cedar::proc::gui::ElementClassList::showList(const std::string& categoryNam
     std::string full_class_name = class_id->getClassName();
 
     // group sources and sinks should not be shown to the user
-    if (full_class_name == "cedar.processing.sources.GroupSource" || full_class_name == "cedar.processing.sinks.GroupSink")
+    if
+    (
+      full_class_name == "cedar.processing.sources.GroupSource"
+      || full_class_name == "cedar.processing.sinks.GroupSink"
+      || full_class_name == "cedar.processing.LoopedTrigger"
+    )
     {
       continue;
     }
