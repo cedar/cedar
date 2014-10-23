@@ -121,8 +121,6 @@ public:
   //!@brief Check if the given data can be detached from the plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
 
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
