@@ -79,6 +79,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
@@ -103,6 +104,22 @@ cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::HistoryPlot0D::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::aux::gui::MultiPlotInterface::readConfiguration(node);
+#ifdef CEDAR_USE_QWT
+  this->mpHistoryPlot->readConfiguration(node);
+#endif // CEDAR_USE_QWT
+}
+
+void cedar::aux::gui::HistoryPlot0D::writeConfiguration(cedar::aux::ConfigurationNode& node) const
+{
+  cedar::aux::gui::MultiPlotInterface::writeConfiguration(node);
+#ifdef CEDAR_USE_QWT
+  this->mpHistoryPlot->writeConfiguration(node);
+#endif // CEDAR_USE_QWT
+}
 
 bool cedar::aux::gui::HistoryPlot0D::canAppend(cedar::aux::ConstDataPtr data) const
 {
