@@ -165,12 +165,15 @@ public:
   }
 
   /*!@brief Removes all objects from the list.
-   *
-   * @todo This should emit an objectRemovedSignal for each object in the list
    */
   void clear()
   {
-    this->mObjectList.clear();
+    // remove the objects in reverse order; this will emit a removed signal and make sure the vector doesn't need to be
+    // moved around too much
+    for (size_t i = this->mObjectList.size(); i > 0; --i)
+    {
+      this->removeObject(i - 1);
+    }
 
     this->emitChangedSignal();
   }
@@ -181,6 +184,14 @@ public:
   cedar::aux::ConfigurablePtr configurableAt(size_t index)
   {
     return this->at(index);
+  }
+
+  //!@brief add an object before the index position
+  void insert(size_t index, BaseTypePtr object)
+  {
+    this->mObjectList.insert(this->mObjectList.begin() + index, object);
+    this->mObjectAdded(index);
+    this->emitChangedSignal();
   }
 
   //!@brief allocate and add an object at the end

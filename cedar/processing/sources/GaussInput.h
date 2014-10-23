@@ -94,6 +94,9 @@ public:
   //! Sets the size of the Gauss in the given dimension.
   void setSize(unsigned int dimension, unsigned int size);
 
+  //! Returns the size of the Gauss in the given dimension.
+  unsigned int getSize(unsigned int dimension) const;
+
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();

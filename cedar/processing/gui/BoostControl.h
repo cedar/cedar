@@ -47,6 +47,7 @@
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
+#include "cedar/processing/gui/View.fwd.h"
 #include "cedar/processing/sources/Boost.fwd.h"
 
 // SYSTEM INCLUDES
@@ -71,7 +72,7 @@ class cedar::proc::gui::BoostControl : public QWidget, public Ui_BoostControl
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  BoostControl();
+  BoostControl(cedar::proc::gui::View* view);
 
   //!@brief The destructor.
   ~BoostControl();
@@ -111,6 +112,10 @@ private:
 
   void connectRenameSignal(cedar::proc::ElementPtr element);
 
+  bool isBoostItem(QTreeWidgetItem* pItem) const;
+
+  cedar::proc::sources::BoostPtr findBoostFor(QTreeWidgetItem* pItem) const;
+
 signals:
   //! Used to translate a boost signal to a Qt signal.
   void elementAddedSignal(QString);
@@ -128,6 +133,9 @@ private slots:
   //! Reacts to the change of the name of a boost in the underlying network.
   void elementNameChanged();
 
+  //! If possible, centers the boost that was double-clicked.
+  void itemActivated(QTreeWidgetItem* pItem, int column);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,6 +143,8 @@ protected:
   // none yet
 private:
   cedar::proc::GroupPtr mGroup;
+
+  cedar::proc::gui::View* mpView;
 
   std::vector<boost::signals2::connection> mElementAddedConnections;
 
