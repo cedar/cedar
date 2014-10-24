@@ -192,6 +192,11 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
   return this->mParentTrigger.lock();
 }
 
+cedar::proc::ConstTriggerPtr cedar::proc::Triggerable::getParentTrigger() const
+{
+  return this->mParentTrigger.lock();
+}
+
 void cedar::proc::Triggerable::callOnStart()
 {
   // make sure no other thread can start the step

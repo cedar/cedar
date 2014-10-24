@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -223,8 +223,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -236,8 +236,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -294,8 +294,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>429</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -426,6 +426,7 @@
    <addaction name="mpActionToggleSmartConnections"/>
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionToggleTriggerVisibility"/>
+   <addaction name="mpActionToggleTriggerColor"/>
    <addaction name="mpActionClosePlots"/>
    <addaction name="mpActionToggleVisibilityOfPlots"/>
    <addaction name="separator"/>
@@ -825,6 +826,28 @@
    </property>
    <property name="toolTip">
     <string>Resets the simulation, i.e., calls reset on the architecture and rewinds the global timer.</string>
+   </property>
+  </action>
+  <action name="mpActionToggleTriggerColor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/hide_triggers.svg</normaloff>
+     <normalon>:/toolbaricons/show_triggers.svg</normalon>:/toolbaricons/hide_triggers.svg</iconset>
+   </property>
+   <property name="text">
+    <string>toggle color</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle visibility of trigger colors.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
    </property>
   </action>
  </widget>

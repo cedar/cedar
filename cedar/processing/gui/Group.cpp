@@ -2159,3 +2159,27 @@ void cedar::proc::gui::Group::removeElementFromPlotGroup(const std::string& plot
     }
   }
 }
+
+void cedar::proc::gui::Group::toggleTriggerColors(bool show)
+{
+  const auto elements = this->getGroup()->getElements();
+  for (const auto element : elements)
+  {
+    // get the gui representation, if this is a triggerable
+    auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element.second);
+    if (triggerable && triggerable->isLooped())
+    {
+      auto graphics_item = this->mpScene->getGraphicsItemFor(element.second.get());
+      const auto parent_trigger = triggerable->getParentTrigger();
+      if (show && parent_trigger)
+      {
+        graphics_item->setFillColor(this->getColorFor(this->getGroup()->getElement<cedar::proc::LoopedTrigger>(parent_trigger->getName())));
+      }
+      else
+      {
+        graphics_item->setFillColor(Qt::white);
+      }
+    }
+
+  }
+}
