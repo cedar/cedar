@@ -173,6 +173,9 @@ public:
   //!@brief Returns this step's parent trigger. Steps may only be triggered by one trigger.
   cedar::proc::TriggerPtr getParentTrigger();
 
+  //!@brief Returns this step's parent trigger. Steps may only be triggered by one trigger.
+  cedar::proc::ConstTriggerPtr getParentTrigger() const;
+
   //!@brief function that connects up a function to Triggerable's state changed signal
   boost::signals2::connection connectToStateChanged(boost::function<void ()> slot);
 

@@ -228,6 +228,8 @@ public:
   //! Returns a color for a given looped trigger
   static QColor getColorFor(cedar::proc::LoopedTriggerPtr trigger);
 
+  void toggleTriggerColors(bool show);
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??

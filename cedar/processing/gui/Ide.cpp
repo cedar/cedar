@@ -390,6 +390,7 @@ mSimulationRunning(false)
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
 
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
+  QObject::connect(mpActionToggleTriggerColor, SIGNAL(triggered(bool)), this, SLOT(toggleTriggerColors(bool)));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
   QObject::connect(mpActionExperiments, SIGNAL(triggered()), this, SLOT(showExperimentDialog()));
 
@@ -1672,6 +1673,11 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
   {
     mpProcessingDrawer->hideTriggerConnections();
   }
+}
+
+void cedar::proc::gui::Ide::toggleTriggerColors(bool show)
+{
+  this->mGroup->toggleTriggerColors(show);
 }
 
 void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)

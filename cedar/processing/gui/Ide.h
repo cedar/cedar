@@ -221,6 +221,10 @@ public slots:
    */
   void showTriggerConnections(bool show);
 
+  /*!@brief Show/hide all trigger colors
+   */
+  void toggleTriggerColors(bool show);
+
   /*!@brief Opens a boost control widget.
    */
   void showBoostControl();
