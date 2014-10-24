@@ -2624,6 +2624,17 @@ void cedar::proc::Group::onLoopedChanged()
             }
             this->mLoopedTriggerables.erase(item);
           }
+          // check if this is the root group
+          if (this->isRoot())
+          {
+            // check if this group was connected to a trigger
+            if (auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger()))
+            {
+              // make sure that this trigger is in the root group
+              CEDAR_ASSERT(this->getElement<cedar::proc::LoopedTrigger>(parent_trigger->getName()));
+              this->disconnectTrigger(parent_trigger, triggerable);
+            }
+          }
         }
       }
     }
