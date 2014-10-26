@@ -123,7 +123,7 @@ private:
 
 #include "cedar/auxiliaries/FactoryManager.h"
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ActionSequencePtr>);
+CEDAR_PROC_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ActionSequencePtr>);
 
 namespace cedar
 {

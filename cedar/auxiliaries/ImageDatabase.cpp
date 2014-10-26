@@ -1002,12 +1002,12 @@ void cedar::aux::ImageDatabase::selectImagesFromNRandomClasses
   struct RNG
   {
     typedef unsigned int result_type;
-    result_type min() const
+    static result_type min()
     {
       return 0;
     }
 
-    result_type max() const
+    static result_type max()
     {
       return static_cast<unsigned int>(RAND_MAX);
     }
