@@ -266,6 +266,9 @@ public:
   //!@brief renames an external connector of the specified type
   void renameConnector(const std::string& oldName, const std::string& newName, bool input);
 
+  //!@brief checks if a connector can be renamed
+  bool canRenameConnector(const std::string& oldName, const std::string& newName, bool input, std::string& error) const;
+
   //!@brief removes an external connector of the specified type from the group
   void removeConnector(const std::string& name, bool input);
 

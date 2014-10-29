@@ -1074,7 +1074,24 @@ void cedar::proc::Group::renameConnector(const std::string& oldName, const std::
     );
   }
 
-  // change name
+  // do some sanity checks first
+  if (oldName == newName)
+  {
+    // nothing to do
+    return;
+  }
+
+  // does the name already exist?
+  if (this->nameExists(newName))
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "There is already an element of name " + newName + " in group " + this->getName() + "."
+    );
+  }
+
+  // everything is fine, change name
   _mConnectors->erase(oldName);
   _mConnectors->set(newName, input);
   if (input)
@@ -1089,6 +1106,40 @@ void cedar::proc::Group::renameConnector(const std::string& oldName, const std::
     auto sink = this->getElement<cedar::proc::sinks::GroupSink>(oldName);
     sink->setName(newName);
   }
+}
+
+bool cedar::proc::Group::canRenameConnector(const std::string& oldName, const std::string& newName, bool input, std::string& error) const
+{
+  // check if connector is in map of connectors
+  auto it = _mConnectors->find(oldName);
+  if (it == _mConnectors->end() || it->second != input)
+  {
+    error = "There is no connector of name " + oldName + " in group " + this->getName() + ".";
+    return false;
+  }
+
+  // if names are identical, renaming is possible
+  if (oldName == newName)
+  {
+    // nothing to do
+    return true;
+  }
+
+  // check if new name is already taken
+  if (this->hasConnector(newName))
+  {
+    error = "There is already a connector of name " + newName + " in group " + this->getName() + ", cannot rename.";
+    return false;
+  }
+
+  // check if new name is already taken
+  if (this->nameExists(newName))
+  {
+    error = "There is already an element of name " + newName + " in group " + this->getName() + ", cannot rename.";
+    return false;
+  }
+  // everything ok!
+  return true;
 }
 
 void cedar::proc::Group::removeConnector(const std::string& name, bool input)
