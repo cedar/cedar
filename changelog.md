@@ -68,7 +68,21 @@ known issues
 Unreleased
 ==========
   
-  Nothing yet!
+- cedar::proc
+  - You can now add special widgets to architectures that allow you to define special plots and more. These can be
+    opened from the cedar gui, and their layout and contents are read from files. See the "Architecture Widgets"
+    tutorial for details on how to use this feature.
+  - ElementDeclarations can now provide a ConnectableIconView. This allows users to specify a custom class for
+    displaying the icon of a step. Among other things this can be used to change the icon based on the value of a
+    parameter. One such example is the static gain, which now changes its color based on the sign of the gain factor.
+    Note, that this is optional, and the default behavior is the same as before.
+  - Double-clicking a boost in the boost control widget now shows the boost in the architecture.
+  - In the settings of cedar, you can now choose the default plot that opens for 2d matrices.
+  - The start/stop buttons of the cedar gui have been remodeled. There is now a start button which, as before starts all
+    triggers in an achitecture. It also starts the global timer. When pushed, it turns into a pause button which halts
+    all triggers as well as the global timer. Pushing the pause-button will turn it back to a start button which can
+    then be used to resume the simulation. An addded reset button can reset the simulation; i.e., it resets the
+    architecture as well as the global timer. 
 
 
 Released versions

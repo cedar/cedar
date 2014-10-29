@@ -42,6 +42,7 @@ cedar_add_library(cedardyn
                   LINK_LIBRARIES
                   cedarproc
                   MOC_HEADERS
+                  gui/NeuralFieldView.h
                   fields/NeuralField.h
                   fields/Preshape.h
                   steps/RateMatrixToSpaceCode.h

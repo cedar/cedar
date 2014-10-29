@@ -284,8 +284,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Whether the y axis limits are applied.
   cedar::aux::BoolParameterPtr _mAutoScalingEnabled;
 
+  //! Limits for the y axis.
   cedar::aux::math::DoubleLimitsParameterPtr _mYAxisLimits;
 
 }; // class cedar::aux::gui::QwtLinePlot

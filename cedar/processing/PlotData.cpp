@@ -63,10 +63,22 @@ mName(new cedar::aux::StringParameter(this, "name", name)),
 mIgnoreIfMissing(new cedar::aux::BoolParameter(this, "ignoreIfMissing", ignoreIfMissing)),
 mPlotDeclaration(new cedar::aux::StringParameter(this, "plotDeclaration", plotDeclaration))
 {
-};
+}
+
+cedar::proc::PlotData::PlotData(const cedar::proc::PlotData& other)
+:
+mId(new cedar::aux::EnumParameter(this, "id", cedar::proc::DataRole::typePtr(), other.mId->getValue())),
+mName(new cedar::aux::StringParameter(this, "name", other.mName->getValue())),
+mIgnoreIfMissing(new cedar::aux::BoolParameter(this, "ignoreIfMissing", other.mIgnoreIfMissing->getValue())),
+mPlotDeclaration(new cedar::aux::StringParameter(this, "plotDeclaration", other.mPlotDeclaration->getValue()))
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-// none yet
+void cedar::proc::PlotData::setPlotDeclaration(const std::string& newDeclaration)
+{
+  this->mPlotDeclaration->setValue(newDeclaration);
+}

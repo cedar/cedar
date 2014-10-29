@@ -91,6 +91,7 @@ cedar::aux::gui::ThreadedPlot(pParent),
 mLegendAvailable(false),
 mpLegend(nullptr),
 _mSmoothScaling(new cedar::aux::BoolParameter(this, "smooth scaling", true)),
+_mKeepAspectRatio(new cedar::aux::BoolParameter(this, "keep aspect ratio", true)),
 _mAutoScaling(new cedar::aux::BoolParameter(this, "automatic value scaling", true)),
 _mShowLegend(new cedar::aux::BoolParameter(this, "show legend", false)),
 _mValueLimits(new cedar::aux::math::DoubleLimitsParameter(this, "value limits", 0.0, 1.0)),
@@ -319,6 +320,11 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   QObject::connect(p_smooth, SIGNAL(toggled(bool)), this, SLOT(setSmoothScaling(bool)));
   p_smooth->setChecked(this->isSmoothScaling());
 
+  auto p_ratio = menu.addAction("keep aspect ratio");
+  p_ratio->setCheckable(true);
+  p_ratio->setChecked(this->keepAspectRatio());
+  QObject::connect(p_ratio, SIGNAL(toggled(bool)), this, SLOT(setKeepAspectRatio(bool)));
+
   QAction *p_legend = menu.addAction("legend");
   p_legend->setCheckable(true);
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
@@ -369,9 +375,16 @@ void cedar::aux::gui::QImagePlot::resizeEvent(QResizeEvent * /*pEvent*/)
 
 void cedar::aux::gui::QImagePlot::resizePixmap()
 {
+  Qt::AspectRatioMode aspect_ratio_mode = Qt::KeepAspectRatio;
+
+  if (!this->keepAspectRatio())
+  {
+    aspect_ratio_mode = Qt::IgnoreAspectRatio;
+  }
+
   QReadLocker lock(&this->mImageLock);
   QSize scaled_size = this->mImage.size();
-  scaled_size.scale(this->mpImageDisplay->size(), Qt::KeepAspectRatio);
+  scaled_size.scale(this->mpImageDisplay->size(), aspect_ratio_mode);
   if ((!this->mpImageDisplay->pixmap()
     || scaled_size != this->mpImageDisplay->pixmap()->size()
     )
@@ -388,9 +401,7 @@ void cedar::aux::gui::QImagePlot::resizePixmap()
       transformation_mode = Qt::FastTransformation;
     }
 
-    QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(),
-                                              Qt::KeepAspectRatio,
-                                              transformation_mode);
+    QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(), aspect_ratio_mode, transformation_mode);
     this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
   }
 }
@@ -472,6 +483,18 @@ void cedar::aux::gui::QImagePlot::showLegendChanged()
     this->mpLegend->setVisible(show);
     this->mpLegend->setGradient(this->mColorGradient);
   }
+}
+
+void cedar::aux::gui::QImagePlot::setKeepAspectRatio(bool keepAspectRatio)
+{
+  this->_mKeepAspectRatio->setValue(keepAspectRatio, true);
+}
+
+bool cedar::aux::gui::QImagePlot::keepAspectRatio() const
+{
+  cedar::aux::Parameter::ReadLocker locker(this->_mKeepAspectRatio.get());
+  bool keep = this->_mKeepAspectRatio->getValue();
+  return keep;
 }
 
 //!@cond SKIPPED_DOCUMENTATION

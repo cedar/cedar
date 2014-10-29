@@ -40,7 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Group.h"
-#include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupFileFormatV1.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -132,32 +131,6 @@ namespace
     }
 #endif // CEDAR_COMPILER_MSVC
 
-    cedar::proc::GroupDeclarationPtr group_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "two-layer field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "two-layer",
-                                       "DFT"
-                                     )
-                                   );
-    group_declaration->setIconPath(":/steps/field_temp.svg");
-    group_declaration->declare();
-
-    cedar::proc::GroupDeclarationPtr field_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "one-dimensional field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "one-dimensional field",
-                                       "DFT"
-                                     )
-                                   );
-    field_declaration->setIconPath(":/steps/field_temp.svg");
-    field_declaration->declare();
-
     return true;
   }
 
@@ -199,6 +172,28 @@ cedar::proc::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::vector<cedar::proc::GroupPath> cedar::proc::Group::listAllElementPaths(const cedar::proc::GroupPath& base_path) const
+{
+  std::vector<cedar::proc::GroupPath> paths;
+
+  for (auto name_element_pair : this->mElements)
+  {
+    cedar::proc::GroupPath path = base_path;
+    path += name_element_pair.first;
+    paths.push_back(path);
+
+    if (auto subgroup = boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(name_element_pair.second))
+    {
+      cedar::proc::GroupPath subpath = base_path;
+      subpath += name_element_pair.first;
+      auto subpaths = subgroup->listAllElementPaths(subpath);
+      paths.insert(paths.end(), subpaths.begin(), subpaths.end());
+    }
+  }
+
+  return paths;
+}
 
 void cedar::proc::Group::updateTriggerChains(std::set<cedar::proc::Trigger*>& visited)
 {
@@ -508,6 +503,7 @@ void cedar::proc::Group::startTriggers(bool wait)
 
 void cedar::proc::Group::stopTriggers(bool wait)
 {
+  bool blocked = this->blockSignals(true);
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
   for (auto trigger : triggers)
@@ -535,6 +531,9 @@ void cedar::proc::Group::stopTriggers(bool wait)
       }
     }
   }
+
+  this->blockSignals(blocked);
+  emit allTriggersStopped();
 }
 
 void cedar::proc::Group::stepTriggers()
@@ -581,11 +580,19 @@ std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifie
     return identifier;
   }
 
+  std::string base_str = identifier;
+
+  size_t last_number = identifier.find_last_not_of("0123456789");
+  if (last_number != std::string::npos && last_number != base_str.size() - 1)
+  {
+    base_str = identifier.substr(0, last_number);
+  }
+
   unsigned int count = 2;
   std::string result;
   do
   {
-    result = identifier +  " " + cedar::aux::toString(count);
+    result = base_str +  " " + cedar::aux::toString(count);
     ++count;
   }
   while (this->nameExists(result));
@@ -623,16 +630,43 @@ void cedar::proc::Group::listSubgroups(std::set<cedar::proc::GroupPtr>& subgroup
 
 void cedar::proc::Group::reset()
 {
-  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  // first, find all looped triggers that are running and stop them
+  auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
+  std::set<cedar::proc::LoopedTriggerPtr> running_triggers;
+
+  for (auto trigger : looped_triggers)
   {
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second))
+    if (trigger->isRunning())
+    {
+      running_triggers.insert(trigger);
+      trigger->stop();
+
+      // wait for the trigger to stop
+      while (trigger->isRunning())
+      {
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
+      }
+    }
+  }
+
+  // reset all elements in this group
+  for (auto name_element_pair : this->mElements)
+  {
+    auto element = name_element_pair.second;
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
     {
       step->callReset();
     }
-    else if (cedar::proc::GroupPtr group = boost::dynamic_pointer_cast<cedar::proc::Group>(iter->second))
+    else if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
     {
       group->reset();
     }
+  }
+
+  // restart all triggers that have been stopped
+  for (auto trigger : running_triggers)
+  {
+    trigger->start();
   }
 }
 
@@ -1022,42 +1056,85 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     }
   }
 
+  // connect the start and stop signals of a looped trigger
+  if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+  {
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStarting()), this, SIGNAL(triggerStarted()));
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
+  }
+
   if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
   {
     QObject::connect(group->getParameter("is looped").get(), SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
   }
 }
 
+void cedar::proc::Group::triggerStopped()
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+
+  bool any_running = false;
+  for (auto trigger : triggers)
+  {
+    if (trigger->isRunning())
+    {
+      any_running = true;
+      break;
+    }
+  }
+
+  if (!any_running)
+  {
+    emit allTriggersStopped();
+  }
+}
+
 void cedar::proc::Group::addConnector(const std::string& name, bool input)
 {
-  if
-  (
-    this->nameExists(name)
-  )
+  if (this->_mConnectors->find(name) != this->_mConnectors->end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name + "\". It is already taken.");
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name +
+        "\" to group \"" + this->getFullPath() + "\" because there is already a connector with this name."
+    );
   }
+
+  if (this->nameExists(name))
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "Cannot add a connector with the name \"" + name +
+      "\" to group \"" + this->getFullPath() + "\"because there is an element with the same name inside the group."
+    );
+  }
+
+  this->addConnectorInternal(name, input);
+}
+
+void cedar::proc::Group::addConnectorInternal(const std::string& name, bool input)
+{
   // check if connector is in map of connectors
-  if (_mConnectors->find(name) != _mConnectors->end())
-  {
-    // do nothing for now
-  }
-  else
-  {
-    _mConnectors->set(name, input);
-  }
+  this->_mConnectors->set(name, input);
 
   if (input)
   {
-    this->declareInput(name, false);
-    cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
-    this->add(source, name);
+    if (!this->hasInputSlot(name))
+    {
+      this->declareInput(name, false);
+      cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
+      this->add(source, name);
+    }
   }
   else
   {
-    cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
-    this->declareSharedOutput(name, sink->getEmptyData());
-    this->add(sink, name);
+    if (!this->hasOutputSlot(name))
+    {
+      cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
+      this->declareSharedOutput(name, sink->getEmptyData());
+      this->add(sink, name);
+    }
   }
 }
 
@@ -1244,7 +1321,11 @@ cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::N
 
     if (!group)
     {
-      CEDAR_THROW(cedar::aux::InvalidNameException, "The given name does not specify a proper path in this group.");
+      CEDAR_THROW
+      (
+        cedar::aux::InvalidNameException,
+        "The path \"" + name.toString() + "\" does not specify a proper path in the group \"" + this->getName() + "\"."
+      );
     }
 
     return group->getElement(rest);
@@ -1906,7 +1987,7 @@ void cedar::proc::Group::processConnectors()
 {
   for (auto it = _mConnectors->begin(); it != _mConnectors->end(); ++it)
   {
-    this->addConnector(it->first, it->second);
+    this->addConnectorInternal(it->first, it->second);
   }
 }
 

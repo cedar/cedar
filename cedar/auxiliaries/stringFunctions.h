@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -58,6 +59,10 @@ namespace cedar
 {
   namespace aux
   {
+    /*!@brief Formats a time duration to a human-readable string.
+     */
+    CEDAR_AUX_LIB_EXPORT std::string formatDuration(const cedar::unit::Time& time);
+
     /*!@brief Template method that converts simple data types to a string.
      *
      * @param value The data value that will be converted to a string.
