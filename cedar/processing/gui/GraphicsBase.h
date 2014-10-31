@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
@@ -273,6 +274,12 @@ public:
   {
     return this->mReadOnly;
   }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public signals
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(FillColorChanged, void(QColor));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

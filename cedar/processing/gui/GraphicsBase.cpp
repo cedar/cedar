@@ -259,6 +259,7 @@ void cedar::proc::gui::GraphicsBase::setOutlineColor(const QColor& color)
 void cedar::proc::gui::GraphicsBase::setFillColor(const QColor& color)
 {
   this->mFillColor = color;
+  this->signalFillColorChanged(color);
   this->update();
 }
 
