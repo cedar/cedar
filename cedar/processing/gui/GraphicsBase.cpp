@@ -272,6 +272,46 @@ void cedar::proc::gui::GraphicsBase::setFillStyle(Qt::BrushStyle style, bool upd
   }
 }
 
+void cedar::proc::gui::GraphicsBase::setOverrideFillStyle(Qt::BrushStyle style, bool update)
+{
+  this->mOverrideFillStyle = style;
+
+  if (update)
+  {
+    this->update();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::unsetOverrideFillStyle(bool update)
+{
+  this->mOverrideFillStyle.reset();
+
+  if (update)
+  {
+    this->update();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::setOverrideFillColor(const QColor& color, bool update)
+{
+  this->mOverrideFillColor = color;
+
+  if (update)
+  {
+    this->update();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::unsetOverrideFillColor(bool update)
+{
+  this->mOverrideFillColor.reset();
+
+  if (update)
+  {
+    this->update();
+  }
+}
+
 void cedar::proc::gui::GraphicsBase::highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource)
 {
   switch (pConnectionSource->canConnectTo(this))
@@ -480,6 +520,11 @@ QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
     {
       QBrush brush;
       QColor color = this->mFillColor;
+      if (this->mOverrideFillColor)
+      {
+        color = this->mOverrideFillColor.get();
+      }
+
       if (this->mReadOnly)
       {
         if (color.hsvHue() == -1)
@@ -492,7 +537,14 @@ QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
         }
       }
       brush.setColor(color);
-      brush.setStyle(this->mFillStyle);
+      if (this->mOverrideFillStyle)
+      {
+        brush.setStyle(this->mOverrideFillStyle.get());
+      }
+      else
+      {
+        brush.setStyle(this->mFillStyle);
+      }
       return brush;
     }
   }
