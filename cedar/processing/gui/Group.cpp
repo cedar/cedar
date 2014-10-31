@@ -237,23 +237,22 @@ QColor cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigge
   std::hash<std::string> hasher;
   size_t trigger_int = hasher(trigger->getName());
 
-  // here, we use a linear congruence generator r = (a * x + b) % m;
-  size_t m_h = (1 << 31);
-  // to get a maximum sequence ...
-  // ... b and m must be relatively prime ...
-  size_t b_h = 12345;
-  // ... and a - 1 must be divisible by all prime factors of m (and by 4, if m is divisible by 4)
-  size_t a_h = 1103515245;
-  size_t r_h = (a_h * trigger_int + b_h) % m_h;
-  r_h = r_h % 360;
+  static size_t sat_step_size = 10;
+  static size_t sat_steps = 6;
+  static std::vector<QColor> colors;
+  if (colors.empty())
+  {
+    for (int h = 0; h < 360; h += 15)
+    {
+      colors.push_back(QColor::fromHsv(h, 200, 200));
+    }
+  }
+  size_t color_index = trigger_int % colors.size();
+  size_t saturation_index = (trigger_int % (colors.size() * sat_steps)) / colors.size();
 
-  // 100 = (2 * 5)^2
-  size_t m_v = 100;
-  size_t a_v = 21;
-  size_t b_v = 7;
-  size_t r_v = (a_v * trigger_int + b_v) % m_v;
-
-  return QColor::fromHsv(static_cast<int>(r_h), 200, 120 + r_v);
+  QColor color = colors.at(color_index);
+  color.setHsv(color.hsvHue(), std::max<int>(color.hsvSaturation() - saturation_index * sat_step_size, 80), color.value());
+  return color;
 }
 
 const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
