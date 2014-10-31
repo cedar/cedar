@@ -141,6 +141,16 @@ mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor)
       SIGNAL(triggerableParentTriggerChanged()),
       SLOT(updateTriggerColorState())
   );
+
+  mFillColorChangedConnection = this->connectToFillColorChangedSignal
+      (
+        boost::bind
+        (
+          &cedar::proc::gui::Connectable::fillColorChanged,
+          this,
+          _1
+        )
+      );
 }
 
 cedar::proc::gui::Connectable::~Connectable()
@@ -237,6 +247,11 @@ cedar::proc::gui::ConstGroup* cedar::proc::gui::Connectable::getGuiGroup() const
   }
 }
 
+void cedar::proc::gui::Connectable::fillColorChanged(QColor color)
+{
+  this->mPreviousFillColor = color;
+}
+
 void cedar::proc::gui::Connectable::updateTriggerColorState()
 {
   auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
@@ -250,9 +265,10 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
   if (show && parent_trigger)
   {
-    this->mPreviousFillColor = this->getFillColor();
+    auto last_color = this->getFillColor();
     auto color = cedar::proc::gui::Group::getColorFor(parent_trigger);
     this->setFillColor(color);
+    this->mPreviousFillColor = last_color;
   }
   else
   {

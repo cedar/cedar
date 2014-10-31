@@ -372,6 +372,8 @@ private:
 
   void translateParentTriggerChangedSignal();
 
+  void fillColorChanged(QColor color);
+
 private slots:
   void triggerableStarted();
 
@@ -449,6 +451,7 @@ private:
   boost::signals2::scoped_connection mStartedConnection;
   boost::signals2::scoped_connection mStoppedConnection;
   boost::signals2::scoped_connection mParentTriggerChangedConnection;
+  boost::signals2::scoped_connection mFillColorChangedConnection;
 
   QColor mPreviousFillColor;
 
