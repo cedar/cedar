@@ -245,6 +245,7 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
 
   int column = 3;
   std::vector<std::string> parameter_names;
+  parameter_names.push_back("start with all");
   parameter_names.push_back("loop mode");
   parameter_names.push_back("step size");
   parameter_names.push_back("idle time");

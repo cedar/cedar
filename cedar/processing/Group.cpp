@@ -468,7 +468,7 @@ void cedar::proc::Group::startTriggers(bool wait)
 
   for (auto trigger : triggers)
   {
-    if (!trigger->isRunning())
+    if (!trigger->isRunning() && trigger->startWithAll())
     {
       trigger->start();
     }
@@ -485,7 +485,7 @@ void cedar::proc::Group::startTriggers(bool wait)
   {
     for (auto trigger : triggers)
     {
-      while (!trigger->isRunning())
+      while (!trigger->isRunning() && trigger->startWithAll())
       {
         cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
