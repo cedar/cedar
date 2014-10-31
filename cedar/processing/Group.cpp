@@ -200,6 +200,31 @@ cedar::proc::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
+{
+  std::set<std::string> required_plugins;
+  for (const auto& name_element_pair : this->getElements())
+  {
+    auto element = name_element_pair.second;
+
+    if (auto subgroup = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+    {
+      auto subgroup_plugins = subgroup->listRequiredPlugins();
+      required_plugins.insert(subgroup_plugins.begin(), subgroup_plugins.end());
+    }
+    else
+    {
+      auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(element);
+      if (!declaration->getSource().empty())
+      {
+        required_plugins.insert(declaration->getSource());
+      }
+    }
+  }
+
+  return required_plugins;
+}
+
 void cedar::proc::Group::updateTriggerChains(std::set<cedar::proc::Trigger*>& visited)
 {
   for (auto name_element_pair : this->mElements)
