@@ -262,6 +262,12 @@ void cedar::proc::gui::GraphicsBase::setFillColor(const QColor& color)
   this->update();
 }
 
+QColor cedar::proc::gui::GraphicsBase::getFillColor() const
+{
+  return this->mFillColor;
+}
+
+
 void cedar::proc::gui::GraphicsBase::setFillStyle(Qt::BrushStyle style, bool update)
 {
   this->mFillStyle = style;

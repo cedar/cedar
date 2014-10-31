@@ -97,7 +97,8 @@ cedar::proc::gui::GraphicsBase
 mpIconView(nullptr),
 mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mpMainWindow(pMainWindow),
-mInputOutputSlotOffset(static_cast<qreal>(0.0))
+mInputOutputSlotOffset(static_cast<qreal>(0.0)),
+mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor)
 {
   this->connect
         (
@@ -249,12 +250,13 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
   if (show && parent_trigger)
   {
+    this->mPreviousFillColor = this->getFillColor();
     auto color = cedar::proc::gui::Group::getColorFor(parent_trigger);
     this->setFillColor(color);
   }
   else
   {
-    this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
+    this->setFillColor(this->mPreviousFillColor);
   }
 }
 

@@ -223,8 +223,12 @@ public:
 
   //!@brief set outline fill color
   void setOutlineColor(const QColor& color);
+
   //!@brief set fill color
   void setFillColor(const QColor& color);
+
+  //! Returns the color used to fill the base shape.
+  QColor getFillColor() const;
 
   /*!@brief Draw the default graphical representation.
    */
