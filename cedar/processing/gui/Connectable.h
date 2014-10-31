@@ -450,6 +450,8 @@ private:
   boost::signals2::scoped_connection mStoppedConnection;
   boost::signals2::scoped_connection mParentTriggerChangedConnection;
 
+  QColor mPreviousFillColor;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
