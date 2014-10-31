@@ -109,6 +109,7 @@ cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRA
 mGroup(group),
 mpScene(scene),
 mHoldFitToContents(false),
+mShowTriggerColors(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
 _mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
@@ -1519,6 +1520,14 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   {
     p_scene_element->hide();
   }
+
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element))
+  {
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_scene_element))
+    {
+      connectable->updateTriggerColorState();
+    }
+  }
 }
 
 void cedar::proc::gui::Group::tryToRestoreGroupUIConfiguration
@@ -2159,8 +2168,15 @@ void cedar::proc::gui::Group::removeElementFromPlotGroup(const std::string& plot
   }
 }
 
+bool cedar::proc::gui::Group::showsTriggerColors() const
+{
+  return this->mShowTriggerColors;
+}
+
 void cedar::proc::gui::Group::toggleTriggerColors(bool show)
 {
+  this->mShowTriggerColors = show;
+
   const auto elements = this->getGroup()->getElements();
   for (const auto element : elements)
   {
