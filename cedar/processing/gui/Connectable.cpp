@@ -857,13 +857,22 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
 
   QMenu* p_assign_trigger = menu.addMenu("assign to trigger");
 
+
   auto group = this->getElement()->getGroup();
 
   auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
   if (triggerable && triggerable->isLooped())
   {
-    auto triggers = group->listLoopedTriggers();
     auto current_trigger = triggerable->getParentTrigger();
+
+    {
+      QAction* action = p_assign_trigger->addAction("no trigger");
+      action->setEnabled(current_trigger.get() != nullptr);
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(assignTriggerClicked()));
+      p_assign_trigger->addSeparator();
+    }
+
+    auto triggers = group->listLoopedTriggers();
 
     for (auto trigger : triggers)
     {
@@ -887,19 +896,23 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
   auto action = dynamic_cast<QAction*>(QObject::sender());
   CEDAR_ASSERT(action);
   std::string trigger_path = action->data().toString().toStdString();
+
   auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
   auto group = this->getElement()->getGroup();
-  auto trigger_element = group->getElement(trigger_path);
-  auto trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger_element);
 
-  //!@todo Shouldn't this be done in cedar::proc::Group?
   auto old_parent = triggerable->getParentTrigger();
   if (old_parent)
   {
     group->disconnectTrigger(old_parent, triggerable);
   }
 
-  group->connectTrigger(trigger, triggerable);
+  if (!trigger_path.empty())
+  {
+    auto trigger_element = group->getElement(trigger_path);
+    auto trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger_element);
+
+    group->connectTrigger(trigger, triggerable);
+  }
 }
 
 void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)
