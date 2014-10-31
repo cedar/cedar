@@ -308,7 +308,19 @@ protected:
     return this->mConnections;
   }
 
-  //! Sets the fill stype
+  //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
+  void setOverrideFillStyle(Qt::BrushStyle style, bool update = true);
+
+  //! Removes the override fill style, reverting the item to using its normal fill style.
+  void unsetOverrideFillStyle(bool update = true);
+
+  //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
+  void setOverrideFillColor(const QColor& color, bool update = true);
+
+  //! Removes the override fill style, reverting the item to using its normal fill style.
+  void unsetOverrideFillColor(bool update = true);
+
+  //! Sets the fill style
   void setFillStyle(Qt::BrushStyle style, bool update = true);
 
   //! Set whether or not this item is resizeable.
@@ -388,8 +400,14 @@ private:
   //!@brief the current fill color
   QColor mFillColor;
 
+  //!@brief Override fill color.
+  boost::optional<QColor> mOverrideFillColor;
+
   //! Brush style used for filling the shape.
   Qt::BrushStyle mFillStyle;
+
+  //! Override fill style.
+  boost::optional<Qt::BrushStyle> mOverrideFillStyle;
 
   //!@brief The path used for drawing this shape.
   QPainterPath mPath;

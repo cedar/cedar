@@ -254,7 +254,7 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   }
   else
   {
-    this->setFillColor(Qt::white);
+    this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
   }
 }
 
