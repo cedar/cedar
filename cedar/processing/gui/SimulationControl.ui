@@ -105,6 +105,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Start with All</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Mode</string>
       </property>
      </column>
