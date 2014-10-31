@@ -51,6 +51,7 @@
 #include "cedar/processing/gui/ConnectableIconView.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/PlotWidget.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
 
@@ -218,6 +219,9 @@ public:
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
 
 public slots:
+  //! Updates whether the connectable shows the color of its trigger.
+  void updateTriggerColorState();
+
   //! reacts to the removal of a data slot
   void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
 
@@ -364,6 +368,10 @@ private:
   //! Fill plot menu
   void fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
 
+  cedar::proc::gui::ConstGroup* getGuiGroup() const;
+
+  void translateParentTriggerChangedSignal();
+
 private slots:
   void triggerableStarted();
 
@@ -386,6 +394,9 @@ signals:
 
   //! Emitted whenever the triggerable is stopped.
   void triggerableStoppedSignal();
+
+  //! Used for translating the boost signal to a Qt signal (in the GUI thread)
+  void triggerableParentTriggerChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -437,6 +448,7 @@ private:
 
   boost::signals2::scoped_connection mStartedConnection;
   boost::signals2::scoped_connection mStoppedConnection;
+  boost::signals2::scoped_connection mParentTriggerChangedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

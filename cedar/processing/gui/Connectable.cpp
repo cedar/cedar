@@ -133,6 +133,13 @@ mInputOutputSlotOffset(static_cast<qreal>(0.0))
       SIGNAL(triggerableStoppedSignal()),
       SLOT(triggerableStopped())
   );
+
+  this->connect
+  (
+      this,
+      SIGNAL(triggerableParentTriggerChanged()),
+      SLOT(updateTriggerColorState())
+  );
 }
 
 cedar::proc::gui::Connectable::~Connectable()
@@ -200,6 +207,55 @@ void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor&
 void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
 {
   this->setBackgroundColor(this->mDefaultBackground);
+}
+
+void cedar::proc::gui::Connectable::translateParentTriggerChangedSignal()
+{
+  emit triggerableParentTriggerChanged();
+}
+
+//!@todo This belongs into a cedar::proc::gui::Element class ...
+cedar::proc::gui::ConstGroup* cedar::proc::gui::Connectable::getGuiGroup() const
+{
+  if (auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene()))
+  {
+    auto group = this->getElement()->getGroup();
+    CEDAR_DEBUG_ASSERT(group);
+    if (group != scene->getRootGroup()->getGroup())
+    {
+      return scene->getGroupFor(group.get());
+    }
+    else
+    {
+      return scene->getRootGroup().get();
+    }
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+void cedar::proc::gui::Connectable::updateTriggerColorState()
+{
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  auto gui_group = this->getGuiGroup();
+  if (!triggerable || gui_group == nullptr)
+  {
+    return;
+  }
+
+  bool show = gui_group->showsTriggerColors();
+  auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
+  if (show && parent_trigger)
+  {
+    auto color = cedar::proc::gui::Group::getColorFor(parent_trigger);
+    this->setFillColor(color);
+  }
+  else
+  {
+    this->setFillColor(Qt::white);
+  }
 }
 
 void cedar::proc::gui::Connectable::translateStartedSignal()
@@ -546,6 +602,15 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
     this->mDecorations.push_back(decoration);
   }
   this->updateDecorations();
+  this->updateTriggerColorState();
+
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
+  {
+    this->mParentTriggerChangedConnection = triggerable->connectToParentTriggerChangedSignal
+        (
+          boost::bind(&cedar::proc::gui::Connectable::translateParentTriggerChangedSignal, this)
+        );
+  }
 }
 
 void cedar::proc::gui::Connectable::updateDataSlotPositions()

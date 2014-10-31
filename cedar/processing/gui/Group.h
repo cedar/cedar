@@ -230,6 +230,9 @@ public:
 
   void toggleTriggerColors(bool show);
 
+  //! Returns whether or not the trigger colors of elements in this group should be shown.
+  bool showsTriggerColors() const;
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??
@@ -421,6 +424,8 @@ private:
   cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 
   std::vector<QWeakPointer<QWidget>> mArchitectureWidgetDocks;
+
+  bool mShowTriggerColors;
 
   //! The vertical offset for data slots in the group used when the group is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;

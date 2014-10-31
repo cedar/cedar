@@ -239,6 +239,15 @@ public:
     return this->mElement;
   }
 
+  /*!@brief   Returns the element associated with this graphics item.
+   *
+   * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
+   */
+  inline cedar::proc::ConstElementPtr getElement() const
+  {
+    return this->mElement;
+  }
+
   //! Can be implemented to react to changes of the items size.
   virtual void sizeChanged();
 

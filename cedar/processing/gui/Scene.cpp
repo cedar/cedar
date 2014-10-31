@@ -1164,7 +1164,7 @@ cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar:
   }
 }
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(const cedar::proc::Element* element)
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cedar::proc::ConstElement* element)
 {
   ElementMap::iterator iter = this->mElementMap.find(element);
 
@@ -1192,7 +1192,7 @@ cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc:
   return iter->second;
 }
 
-cedar::proc::gui::Group* cedar::proc::gui::Scene::getGroupFor(cedar::proc::Group* group)
+cedar::proc::gui::Group* cedar::proc::gui::Scene::getGroupFor(cedar::proc::ConstGroup* group)
 {
   GroupMap::iterator iter = this->mGroupMap.find(group);
   if (iter == this->mGroupMap.end())
@@ -1281,7 +1281,12 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
 
 cedar::proc::gui::GroupPtr cedar::proc::gui::Scene::getRootGroup()
 {
-  return mGroup;
+  return this->mGroup;
+}
+
+cedar::proc::gui::ConstGroupPtr cedar::proc::gui::Scene::getRootGroup() const
+{
+  return this->mGroup;
 }
 
 void cedar::proc::gui::Scene::handleTriggerModeChange()
