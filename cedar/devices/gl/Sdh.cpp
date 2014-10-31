@@ -157,9 +157,9 @@ void cedar::dev::gl::Sdh::draw()
 
   prepareDraw();
 
-  if (mIsVisible)
+  if (isVisible())
   {
-    cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+    cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
 
     // save hand origin to stack
     glPushMatrix();
@@ -168,7 +168,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(0, 0, .098 - .0175 - 0.025);
     setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
@@ -184,7 +184,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
@@ -201,7 +201,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
@@ -220,7 +220,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, .0, -.104);
     glRotated(90, 1, 0, 0);
@@ -242,7 +242,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
@@ -259,7 +259,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
@@ -278,7 +278,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, .0, -.104);
     glRotated(90, 1, 0, 0);
@@ -298,7 +298,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
@@ -315,7 +315,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
@@ -334,7 +334,7 @@ void cedar::dev::gl::Sdh::draw()
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
+      cedar::aux::gl::setColor(getColorR(), getColorG(), getColorB());
     }
     glTranslated(.0, .0, -.104);
     glRotated(90, 1, 0, 0);

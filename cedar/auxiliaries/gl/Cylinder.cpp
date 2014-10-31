@@ -70,14 +70,14 @@ void cedar::aux::gl::Cylinder::draw()
   prepareDraw();
   
   // draw object
-  if (mIsVisible)
+  if (isVisible())
   {
-    gl::setColor(mColorR, mColorG, mColorB);
-    drawCone(-mHeight*0.5, mHeight*0.5, mRadius, mRadius, mResolution*2, mIsDrawnAsWireFrame);
+    gl::setColor(getColorR(), getColorG(), getColorB());
+    drawCone(-mHeight*0.5, mHeight*0.5, mRadius, mRadius, getResolution()*2, getIsDrawnAsWireFrame());
     glTranslated(0, 0, mHeight*-0.5);
-    drawDisk(0, mRadius, mResolution*2, mResolution, true, mIsDrawnAsWireFrame);
+    drawDisk(0, mRadius, getResolution()*2, getResolution(), true, getIsDrawnAsWireFrame());
     glTranslated(0, 0, mHeight);
-    drawDisk(0, mRadius, mResolution*2, mResolution, false, mIsDrawnAsWireFrame);
+    drawDisk(0, mRadius, getResolution()*2, getResolution(), false, getIsDrawnAsWireFrame());
   }
 }
 

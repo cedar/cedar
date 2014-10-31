@@ -110,7 +110,7 @@ void cedar::dev::gl::PowerCube110::drawBase()
 {
   prepareDraw();
   glRotated(90.0, 1.0, 0.0, 0.0);
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
@@ -130,9 +130,9 @@ void cedar::dev::gl::PowerCube110::drawSegment(unsigned int index)
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
-
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpKinematicChain->getJointTransformation(index).t();
+  glMultMatrixd((GLdouble*)transformation.data);
   glRotated(90.0, 1.0, 0.0, 0.0);
   glRotated(-90.0, 0.0, 1.0, 0.0);
 
@@ -140,7 +140,7 @@ void cedar::dev::gl::PowerCube110::drawSegment(unsigned int index)
   {
     cedar::aux::gl::drawAxes(0.2);
   }
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
