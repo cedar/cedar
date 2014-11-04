@@ -103,8 +103,13 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Constructs an empty path.
+  PathTemplate()
+  {
+  }
+
   //! Constructs a path from a string.
-  PathTemplate(const StringType& path = StringType())
+  PathTemplate(const StringType& path)
   {
     // append the vector above to the path
     this->fromString(path);
@@ -134,6 +139,14 @@ public:
     this->mComponents.insert(this->mComponents.end(), path.begin(), path.end());
   }
 
+  //! Appends a string component to the path
+  void append(const StringType& string)
+  {
+    // this makes sure the string is properly split into its components if it contains the separator
+    SelfType subpath(string);
+    this->append(subpath);
+  }
+
   //! Appends another path to this path.
   void append(const SelfType& other)
   {
@@ -161,6 +174,13 @@ public:
     SelfType copy(*this);
     copy.append(other);
     return copy;
+  }
+
+  //! Appends a string to the path.
+  SelfType& operator+=(const StringType& string)
+  {
+    this->append(string);
+    return *this;
   }
 
   //! Concatenates two paths.

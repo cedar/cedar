@@ -39,7 +39,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/SettingsWidget.h"
+#include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/gui/DirectoryParameter.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 
@@ -59,8 +63,61 @@ QWidget(pParent)
                                  (
                                    cedar::aux::SettingsSingleton::getInstance()->getRecorderWorkspaceParameter()
                                  );
+
+  this->fillPossible2dMatDataPlots();
+  QObject::connect(this->mpDefault2dMatDataPlot, SIGNAL(currentIndexChanged(int)), this, SLOT(default2dMatDataPlotChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::SettingsWidget::fillPossible2dMatDataPlots()
+{
+  std::string current_default = cedar::aux::gui::SettingsSingleton::getInstance()->getDefault2dMatDataPlot();
+
+  // list of available plots
+  //!@todo There should be a factory manager for this; this hard-coding is a quick-fix.
+  //!@todo This should also be done for 1d plots
+  std::set<std::string> declarations;
+  std::string base_namespace = "cedar::aux::gui::";
+
+#ifdef CEDAR_USE_QWTPLOT3D
+  declarations.insert(base_namespace + "QwtSurfacePlot");
+#endif // CEDAR_USE_QWTPLOT3D
+
+#ifdef CEDAR_USE_VTK
+  declarations.insert(base_namespace + "VtkSurfacePlot");
+#endif // CEDAR_USE_VTK
+
+  declarations.insert(base_namespace + "ImagePlot");
+
+  // fill the list
+  int selected = -1;
+  this->mpDefault2dMatDataPlot->clear();
+  for (const auto& class_name : declarations)
+  {
+    if (class_name == current_default)
+    {
+      selected = this->mpDefault2dMatDataPlot->count();
+    }
+    this->mpDefault2dMatDataPlot->addItem(QString::fromStdString(class_name));
+  }
+
+  if (selected >= 0 && selected < this->mpDefault2dMatDataPlot->count())
+  {
+    bool blocked = this->mpDefault2dMatDataPlot->blockSignals(true);
+    this->mpDefault2dMatDataPlot->setCurrentIndex(selected);
+    this->mpDefault2dMatDataPlot->blockSignals(blocked);
+  }
+}
+
+void cedar::aux::gui::SettingsWidget::default2dMatDataPlotChanged()
+{
+  if (this->mpDefault2dMatDataPlot->currentIndex() < 0)
+  {
+    return;
+  }
+  std::string selection = this->mpDefault2dMatDataPlot->currentText().toStdString();
+  cedar::aux::gui::SettingsSingleton::getInstance()->setDefault2dMatDataPlot(selection);
+}

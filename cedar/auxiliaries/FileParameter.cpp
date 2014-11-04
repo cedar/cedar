@@ -110,6 +110,21 @@ void cedar::aux::FileParameter::writeToNode(cedar::aux::ConfigurationNode& root)
   root.put(this->getName(), this->getPath());
 }
 
+void cedar::aux::FileParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
+{
+  auto other_file = boost::dynamic_pointer_cast<cedar::aux::ConstFileParameter>(other);
+  CEDAR_DEBUG_ASSERT(other_file);
+  this->mPathMode = other_file->mPathMode;
+  this->mMode = other_file->mMode;
+  this->mDefault = other_file->mDefault;
+  this->setValue(other_file->getValue());
+}
+
+bool cedar::aux::FileParameter::canCopyFrom(cedar::aux::ConstParameterPtr other) const
+{
+  return static_cast<bool>(boost::dynamic_pointer_cast<cedar::aux::ConstFileParameter>(other));
+}
+
 void cedar::aux::FileParameter::setValue(const std::string& value)
 {
   this->mValue = QString::fromStdString(value);

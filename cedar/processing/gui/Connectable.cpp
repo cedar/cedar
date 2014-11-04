@@ -43,6 +43,7 @@
 #include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/DefaultConnectableIconView.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -90,7 +91,7 @@ cedar::proc::gui::GraphicsBase
   group,
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE
 ),
-mpIconDisplay(NULL),
+mpIconView(nullptr),
 mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mpMainWindow(pMainWindow),
 mInputOutputSlotOffset(static_cast<qreal>(0.0))
@@ -115,13 +116,27 @@ mInputOutputSlotOffset(static_cast<qreal>(0.0))
           SIGNAL(reactToSlotRenamedSignal(cedar::proc::DataRole::Id, QString, QString)),
           SLOT(reactToSlotRenamed(cedar::proc::DataRole::Id, QString, QString))
         );
+
+  this->connect
+  (
+      this,
+      SIGNAL(triggerableStartedSignal()),
+      SLOT(triggerableStarted())
+  );
+
+  this->connect
+  (
+      this,
+      SIGNAL(triggerableStoppedSignal()),
+      SLOT(triggerableStopped())
+  );
 }
 
 cedar::proc::gui::Connectable::~Connectable()
 {
-  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  for(auto child_widget : mChildWidgets)
   {
-    (*it)->close();
+    child_widget->close();
   }
   mSlotAddedConnection.disconnect();
   mSlotRenamedConnection.disconnect();
@@ -135,6 +150,8 @@ cedar::proc::gui::Connectable::Decoration::Decoration
   const QString& description,
   const QColor& bgColor
 )
+:
+mDefaultBackground(bgColor)
 {
   qreal padding = 1;
   this->mpRectangle = new QGraphicsRectItem
@@ -169,6 +186,49 @@ cedar::proc::gui::Connectable::Decoration::Decoration
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor& background)
+{
+  QBrush brush = this->mpRectangle->brush();
+  brush.setColor(background);
+  this->mpRectangle->setBrush(brush);
+}
+
+void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
+{
+  this->setBackgroundColor(this->mDefaultBackground);
+}
+
+void cedar::proc::gui::Connectable::translateStartedSignal()
+{
+  emit this->triggerableStartedSignal();
+}
+
+void cedar::proc::gui::Connectable::translateStoppedSignal()
+{
+  emit this->triggerableStoppedSignal();
+}
+
+void cedar::proc::gui::Connectable::triggerableStarted()
+{
+  if (this->mpLoopedDecoration)
+  {
+    this->mpLoopedDecoration->setBackgroundColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+  }
+}
+
+void cedar::proc::gui::Connectable::triggerableStopped()
+{
+  if (this->mpLoopedDecoration)
+  {
+    this->mpLoopedDecoration->resetBackgroundColor();
+  }
+}
+
+std::string cedar::proc::gui::Connectable::getNameForTitle() const
+{
+  return this->getConnectable()->getFullPath();
+}
 
 void cedar::proc::gui::Connectable::addDecoration(cedar::proc::gui::Connectable::DecorationPtr decoration)
 {
@@ -212,16 +272,10 @@ void cedar::proc::gui::Connectable::setReadOnly(bool readOnly)
 
 void cedar::proc::gui::Connectable::setIconBounds(const qreal& x, const qreal& y, const qreal& size)
 {
-  if (this->mpIconDisplay == NULL)
+  if (this->mpIconView != nullptr)
   {
-    return;
+    this->mpIconView->setBounds(x, y, size);
   }
-
-  this->mpIconDisplay->setPos(x, y);
-  qreal w = this->mpIconDisplay->boundingRect().width();
-  qreal h = this->mpIconDisplay->boundingRect().width();
-  qreal major = std::max(w, h);
-  this->mpIconDisplay->setScale(size / major);
 }
 
 void cedar::proc::gui::Connectable::setInputOutputSlotOffset(qreal offset)
@@ -440,16 +494,14 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   cedar::proc::ConstElementDeclarationPtr elem_decl
     = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
 
-  if (this->mpIconDisplay != nullptr)
+  if (this->mpIconView != nullptr)
   {
-    delete this->mpIconDisplay;
-    this->mpIconDisplay = nullptr;
+    delete this->mpIconView;
   }
-  this->mpIconDisplay = new QGraphicsSvgItem(elem_decl->determinedIconPath(), this);
 
-
-  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
-  this->mpIconDisplay->setCacheMode(QGraphicsItem::NoCache);
+  this->mpIconView = elem_decl->createIconView();
+  this->mpIconView->setParentItem(this);
+  this->mpIconView->setConnectable(this->getConnectable());
 
   this->addDataItems();
   mSlotAddedConnection
@@ -459,6 +511,13 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
   mSlotRemovedConnection
     = connectable->connectToSlotRemovedSignal(boost::bind(&cedar::proc::gui::Connectable::slotRemoved, this, _1, _2));
 
+  this->mStartedConnection.disconnect();
+  this->mStoppedConnection.disconnect();
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
+  {
+    this->mStartedConnection = triggerable->connectToStartedSignal(boost::bind(&cedar::proc::gui::Connectable::translateStartedSignal, this));
+    this->mStoppedConnection = triggerable->connectToStoppedSignal(boost::bind(&cedar::proc::gui::Connectable::translateStoppedSignal, this));
+  }
 
   this->mDecorations.clear();
   if (elem_decl->isDeprecated())
@@ -867,24 +926,14 @@ void cedar::proc::gui::Connectable::fillPlots
        std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
      )
 {
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
+  for (const cedar::aux::Enum& e : cedar::proc::DataRole::type().list())
   {
-    try
+    if (this->getConnectable()->hasRole(e.id()))
     {
-      const cedar::aux::Enum& e = *enum_it;
       this->addRoleSeparator(e, pMenu);
 
-      const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(e.id());
-      for
-      (
-        cedar::proc::Connectable::SlotList::const_iterator slot_iter = slotmap.begin();
-        slot_iter != slotmap.end();
-        ++slot_iter
-      )
+      for (auto slot : this->getConnectable()->getOrderedDataSlots(e.id()))
       {
-        cedar::proc::DataSlotPtr slot = *slot_iter;
         QMenu *p_menu = pMenu->addMenu(slot->getText().c_str());
         cedar::aux::DataPtr data = slot->getData();
         if (!data)
@@ -912,7 +961,6 @@ void cedar::proc::gui::Connectable::fillPlots
               parameters.push_back(QString::fromStdString(slot->getName()));
               parameters.push_back(e.id());
               parameters.push_back(QString::fromStdString(declaration->getClassName()));
-//              p_action->setData(QString::fromStdString(slot->getName()));
               p_action->setData(parameters);
               declMap[p_action] = std::make_pair(declaration, e);
 
@@ -926,10 +974,6 @@ void cedar::proc::gui::Connectable::fillPlots
           }
         }
       }
-    }
-    catch (const cedar::proc::InvalidRoleException& e)
-    {
-      // that's ok, a step may not have any data in a certain role.
     }
   }
 }
@@ -987,7 +1031,7 @@ void cedar::proc::gui::Connectable::showPlot
   }
 
   auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->getConnectable(), data_list);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->getConnectable()->getName(), p_plot_widget, position);
+  auto p_dock_widget = this->createDockWidgetForPlots(this->getNameForTitle(), p_plot_widget, position);
 
   p_dock_widget->show();
 }
@@ -1072,13 +1116,9 @@ void cedar::proc::gui::Connectable::plotAll()
 
   // get datalist of step
   cedar::proc::ElementDeclaration::DataList data = cedar::proc::ElementDeclaration::DataList();
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-         enum_it != cedar::proc::DataRole::type().list().end();
-         ++enum_it)
+  for (const cedar::aux::Enum& e : cedar::proc::DataRole::type().list())
   {
-    const cedar::aux::Enum& e = *enum_it;
-
-    try
+    if (this->getConnectable()->hasRole(e.id()))
     {
       const cedar::proc::Step::SlotMap& slotmap = this->getConnectable()->getDataSlots(e.id());
       for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
@@ -1087,14 +1127,10 @@ void cedar::proc::gui::Connectable::plotAll()
         data.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(e.id(), slot->getName())));
       }
     }
-    catch (const cedar::proc::InvalidRoleException& e)
-    {
-      // that's ok, a step may not have any data in a certain role.
-      // Kai: I disagree, exceptions should be exceptional see http://pragmatictips.com/34
-    }
   }
+
   auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->getConnectable(), data);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->getConnectable()->getName(), p_plot_widget, p_sender->data().toPoint());
+  auto p_dock_widget = this->createDockWidgetForPlots(this->getNameForTitle(), p_plot_widget, p_sender->data().toPoint());
 
   p_dock_widget->show();
 }
@@ -1194,7 +1230,7 @@ void cedar::proc::gui::Connectable::writeOpenChildWidgets(cedar::aux::Configurat
 void cedar::proc::gui::Connectable::addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height)
 {
   QPoint position = QPoint(x, y);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->getConnectable()->getName(), pPlotWidget, position);
+  auto p_dock_widget = this->createDockWidgetForPlots(this->getNameForTitle(), pPlotWidget, position);
   p_dock_widget->resize(width, height);
   p_dock_widget->show();
 }

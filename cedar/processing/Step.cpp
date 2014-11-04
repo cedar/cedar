@@ -73,6 +73,8 @@
 //#define DEBUG_RUNNING
 // Show information about triggering
 //#define DEBUG_TRIGGERING
+// Check for NaNs after every compute call
+//#define CEDAR_ENABLE_NAN_CHECK
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -284,6 +286,8 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
   this->mTriggers.push_back(trigger);
 }
 
+#include "cedar/auxiliaries/MatData.h"
+
 void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::proc::TriggerPtr trigger)
 {
 #ifdef DEBUG_RUNNING
@@ -413,6 +417,21 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
 
   // take time measurements
   this->setRunTimeMeasurement(run_elapsed_s);
+
+#ifdef CEDAR_ENABLE_NAN_CHECK
+  for (auto name_slot_pair : this->getDataSlots(cedar::proc::DataRole::OUTPUT))
+  {
+    auto data = name_slot_pair.second->getData();
+    if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
+    {
+      if (!cv::checkRange(mat_data->getData(), true))
+      {
+        std::cout << "NaN detected! " << this->getFullPath() << std::endl;
+        this->setState(cedar::proc::Step::STATE_EXCEPTION, "NaN detected.");
+      }
+    }
+  }
+#endif // CEDAR_ENABLE_NAN_CHECK
 
   // unlock the step
   step_locker.unlock();

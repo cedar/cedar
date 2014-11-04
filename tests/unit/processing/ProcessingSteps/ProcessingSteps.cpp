@@ -78,24 +78,46 @@ class EmptyMatrixProvider : public cedar::proc::Step
 
 CEDAR_GENERATE_POINTER_TYPES(EmptyMatrixProvider);
 
+unsigned int checkOutputsForInvalidValues(cedar::proc::StepPtr testStep)
+{
+  unsigned int errors = 0;
 
-unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testStep)
+  if (testStep->hasRole(cedar::proc::DataRole::OUTPUT))
+  {
+    for (auto name_slot_pair : testStep->getDataSlots(cedar::proc::DataRole::OUTPUT))
+    {
+      auto slot = name_slot_pair.second;
+      if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(slot->getData()))
+      {
+        if (!cv::checkRange(mat_data->getData(), true))
+        {
+          std::cout << "ERROR: NaN detected in step's output slot " << slot->getName() << std::endl;
+          std::cout << "matrix: " << mat_data->getData() << std::endl;
+          ++errors;
+        }
+      }
+    }
+  }
+
+  return errors;
+}
+
+unsigned int testStep(cedar::proc::GroupPtr group, cedar::proc::StepPtr testStep)
 {
   // try connecting steps of different types
-  unsigned int i = 0;
+  unsigned int errors = 0;
+
+  // check if the step starts out with invalid values
+  std::cout << "Checking initial state of the step for invalid values." << std::endl;
+  errors += checkOutputsForInvalidValues(testStep);
+
   try
   {
-    network->add(testStep, "testStep");
+    group->add(testStep, "testStep");
 
     // test if the step reacts properly when its parameters change (without an input)
-    for
-    (
-      cedar::aux::Configurable::ParameterList::iterator iter = testStep->getParameters().begin();
-      iter != testStep->getParameters().end();
-      ++iter
-    )
+    for (auto parameter : testStep->getParameters())
     {
-      cedar::aux::ParameterPtr parameter = *iter;
       std::cout << "Emitting valueChanged() of parameter \"" << parameter->getName() << "\"." << std::endl;
       parameter->emitChangedSignal();
 
@@ -107,7 +129,6 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
     }
 
     // how many inputs does this step have?
-    const cedar::proc::Connectable::SlotList& inputs = testStep->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
     std::vector<std::string> sources;
     sources.push_back("0D.boost");
     sources.push_back("1D.Gauss input");
@@ -118,54 +139,61 @@ unsigned int testStep(cedar::proc::GroupPtr network, cedar::proc::StepPtr testSt
     sources.push_back("double_2D.converted matrix");
     sources.push_back("double_3D.converted matrix");
     sources.push_back("emp.empty matrix");
-    for (unsigned int src = 0; src < sources.size(); ++src)
+    if (testStep->hasRole(cedar::proc::DataRole::INPUT))
     {
-      std::cout << "Connecting " << sources.at(src) << " to " << inputs.at(i)->getName() << std::endl;
-      for (unsigned int i = 0; i < inputs.size(); ++i)
+      const auto& inputs = testStep->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
+      for (unsigned int src = 0; src < sources.size(); ++src)
       {
-        network->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
-      }
+        for (unsigned int i = 0; i < inputs.size(); ++i)
+        {
+          std::cout << "Connecting " << sources.at(src) << " to " << inputs.at(i)->getName() << std::endl;
+          group->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
+        }
 
-      if (!testStep->isLooped())
-      {
-        testStep->onTrigger();
-      }
-      else
-      {
-        // send a dummy step time
-        cedar::unit::Time time(0.1 * cedar::unit::milli * cedar::unit::seconds);
-        cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(time));
-        testStep->onTrigger(arguments);
-      }
+        if (!testStep->isLooped())
+        {
+          testStep->onTrigger();
+        }
+        else
+        {
+          // send a dummy step time
+          cedar::unit::Time time(0.1 * cedar::unit::milli * cedar::unit::seconds);
+          cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(time));
+          testStep->onTrigger(arguments);
+        }
 
-      // try a reset
-      testStep->callReset();
+        // check if the step produces NaNs/INFs or other invalid values
+        errors += checkOutputsForInvalidValues(testStep);
 
-      // try to re-read the configuration written by the step
-      {
-        std::cout << "Trying to re-read configuration into existing step." << std::endl;
-        cedar::aux::ConfigurationNode conf;
-        testStep->writeConfiguration(conf);
-        testStep->readConfiguration(conf);
-      }
+        // try a reset
+        testStep->callReset();
 
-      for (unsigned int i = 0; i < inputs.size(); ++i)
-      {
-        network->disconnectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
+        // try to re-read the configuration written by the step
+        {
+          std::cout << "Trying to re-read configuration into existing step." << std::endl;
+          cedar::aux::ConfigurationNode conf;
+          testStep->writeConfiguration(conf);
+          testStep->readConfiguration(conf);
+          std::cout << "Done rereading." << std::endl;
+        }
+
+        for (unsigned int i = 0; i < inputs.size(); ++i)
+        {
+          group->disconnectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
+        }
       }
+      group->removeAll();
     }
-    network->removeAll();
-  }
-  catch (cedar::proc::InvalidRoleException& exc)
-  {
-    // that's fine, it's a source
   }
   catch (cedar::aux::ExceptionBase& exc)
   {
+    std::cout << "ERROR: An exception occurred." << std::endl;
     exc.printInfo();
-    ++i;
+    ++errors;
   }
-  return i;
+
+  std::cout << "Done with " << testStep->getName() << ". It produced " << errors << " error(s)." << std::endl;
+  return errors;
 }
 
 void run_tests()
@@ -180,26 +208,26 @@ void run_tests()
   std::vector<std::string> failed_steps;
 
   auto declarations = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarations();
-  for (auto declaration_iter = declarations.begin(); declaration_iter != declarations.end(); ++declaration_iter)
+  for (auto declaration : declarations)
   {
-    cedar::aux::ConstPluginDeclarationPtr declaration = *declaration_iter;
-    cedar::proc::GroupPtr network(new cedar::proc::Group());
-    cedar::proc::ElementPtr elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
+    cedar::proc::GroupPtr group(new cedar::proc::Group());
+    auto elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
     {
       std::cout << "=========================================" << std::endl;
       std::cout << "  Testing class " << declaration->getClassName() << std::endl;
       std::cout << "=========================================" << std::endl;
-      network->readJson("processing_steps.json");
+      group->readJson("processing_steps.json");
 
-      EmptyMatrixProviderPtr empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
-      network->add(empty_provider, "emp");
+      auto empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
+      group->add(empty_provider, "emp");
 
-      int error_count = testStep(network, step);
+      unsigned int error_count = testStep(group, step);
       errors += error_count;
 
       if (error_count > 0)
       {
+        std::cout << "Step failed the test: " << step->getName() << std::endl;
         failed_steps.push_back(declaration->getClassName());
       }
     }
@@ -211,9 +239,9 @@ void run_tests()
   {
     std::cout << "The following steps produced errors:" << std::endl;
 
-    for (size_t i = 0; i < failed_steps.size(); ++i)
+    for (const auto& failed : failed_steps)
     {
-      std::cout << "- " << failed_steps.at(i) << std::endl;
+      std::cout << "- " << failed << std::endl;
     }
   }
 

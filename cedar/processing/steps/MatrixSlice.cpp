@@ -241,38 +241,98 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
   std::vector<int> sizes;
   sizes.resize(dimensionality, 1);
 
-  for (unsigned int d = 0; d < dimensionality; ++d)
+  auto apply_range = [&] (unsigned int input_dimension, unsigned int output_dimension, const cv::Mat& input)
   {
-    CEDAR_DEBUG_ASSERT(d < this->_mRangeLower->size());
-    CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
+    CEDAR_DEBUG_ASSERT(output_dimension < this->_mRangeLower->size());
+    CEDAR_DEBUG_ASSERT(output_dimension < this->_mRangeUpper->size());
 
-    const unsigned int& lower = this->_mRangeLower->at(d);
-    const unsigned int& upper = this->_mRangeUpper->at(d);
+    int lower = static_cast<int>(this->_mRangeLower->at(output_dimension));
+    int upper = static_cast<int>(this->_mRangeUpper->at(output_dimension));
 
-    CEDAR_DEBUG_ASSERT(lower < upper);
-    mRanges.at(d) = cv::Range(lower, upper);
-    sizes.at(d) = upper - lower;
-  }
-  if (dimensionality < 1)
-  {
-    mRanges.push_back(cv::Range::all());
-    sizes.push_back(1);
-  }
-  if (dimensionality < 2)
-  {
-    mRanges.push_back(cv::Range::all());
-    sizes.push_back(1);
-  }
+    // ensure that lower < upper, and that the interval isn't size 0 (i.e., lower != upper)
+    if (lower > upper)
+    {
+      std::swap(lower, upper);
+    }
+    else if (lower == upper)
+    {
+      if (upper < input.size[input_dimension])
+      {
+        upper += 1;
+      }
+      else
+      {
+        // this assertion should only fail if the matrix size is 0 in dimension d, which should not be possible
+        CEDAR_DEBUG_NON_CRITICAL_ASSERT(lower > 0);
+        lower -= 1;
+      }
+    }
 
-  // if the dimensionality is one ...
-  if (dimensionality == 1)
+    // make sure that lower and upper don't exceed the matrix size
+    lower = cedar::aux::math::Limits<int>::limit(lower, 0, input.size[input_dimension]);
+    upper = cedar::aux::math::Limits<int>::limit(upper, 0, input.size[input_dimension]);
+
+    mRanges.at(input_dimension) = cv::Range(lower, upper);
+    sizes.at(input_dimension) = upper - lower;
+  };
+
+  if (dimensionality > 1)
   {
-    // ... and the vector is stored in the columns, the first entries have to be swapped.
+    for (unsigned int d = 0; d < dimensionality; ++d)
+    {
+      apply_range(d, d, input);
+      /*
+      CEDA/R_DEBUG_ASSERT(d < this->_mRangeLower->size());
+      CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
+
+      int lower = static_cast<int>(this->_mRangeLower->at(d));
+      int upper = static_cast<int>(this->_mRangeUpper->at(d));
+
+      // ensure that lower < upper, and that the interval isn't size 0 (i.e., lower != upper)
+      if (lower > upper)
+      {
+        std::swap(lower, upper);
+      }
+      else if (lower == upper)
+      {
+        if (upper < input.size[d])
+        {
+          upper += 1;
+        }
+        else
+        {
+          // this assertion should only fail if the matrix size is 0 in dimension d, which should not be possible
+          CEDAR_DEBUG_NON_CRITICAL_ASSERT(lower > 0);
+          lower -= 1;
+        }
+      }
+
+      // make sure that lower and upper don't exceed the matrix size
+      lower = cedar::aux::math::Limits<int>::limit(lower, 0, input.size[d]);
+      upper = cedar::aux::math::Limits<int>::limit(upper, 0, input.size[d]);
+
+      mRanges.at(d) = cv::Range(lower, upper);
+      sizes.at(d) = upper - lower;
+      */
+    }
+  }
+  else // case: dimensionality <= 1
+  {
+    int slice_dim = 0;
+    int other_dim = 1;
+    mRanges.resize(2);
+    sizes.resize(2);
+
     if (input.rows == 1)
     {
-      std::swap(mRanges[0], mRanges[1]);
-      std::swap(sizes[0], sizes[1]);
+      slice_dim = 1;
+      other_dim = 0;
     }
+
+    apply_range(slice_dim, 0, input);
+
+    mRanges[other_dim] = cv::Range::all();
+    sizes[other_dim] = 1;
   }
 
   // preallocate the appropriate output matrix

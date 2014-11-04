@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
+#include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #ifdef CEDAR_USE_QWT
@@ -50,9 +51,8 @@
 #endif // CEDAR_USE_QWT
 #ifdef CEDAR_USE_QWTPLOT3D
   #include "cedar/auxiliaries/gui/QwtSurfacePlot.h"
-#else // CEDAR_USE_QWTPLOT3D
-  #include "cedar/auxiliaries/gui/ImagePlot.h"
 #endif // CEDAR_USE_QWTPLOT3D
+#include "cedar/auxiliaries/gui/ImagePlot.h"
 #ifdef CEDAR_USE_VTK
 #include "cedar/auxiliaries/gui/VtkLinePlot.h"
 #include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
@@ -239,17 +239,30 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 #endif // CEDAR_USE_QWT
 
     case 2:
+    {
+      std::string plot_class = cedar::aux::gui::SettingsSingleton::getInstance()->getDefault2dMatDataPlot();
 #ifdef CEDAR_USE_QWTPLOT3D
-      this->mpCurrentPlotWidget = new cedar::aux::gui::QwtSurfacePlot(this->mData, title);
-#elif defined CEDAR_USE_VTK
-      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
-      break;
-#else
-      this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
+      if (plot_class == "cedar::aux::gui::QwtSurfacePlot")
+      {
+        this->mpCurrentPlotWidget = new cedar::aux::gui::QwtSurfacePlot(this->mData, title);
+      }
 #endif // CEDAR_USE_QWTPLOT3D
+
+#ifdef CEDAR_USE_VTK
+      if (plot_class == "cedar::aux::gui::VtkSurfacePlot")
+      {
+        this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
+      }
+#endif // CEDAR_USE_VTK
+
+      if (plot_class == "cedar::aux::gui::ImagePlot" || this->mpCurrentPlotWidget == nullptr)
+      {
+        this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
+      }
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
+    }
+
     case 3:
     {
       this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixSlicePlot3D(this->mData, title);

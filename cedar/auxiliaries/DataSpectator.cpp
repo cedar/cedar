@@ -39,10 +39,17 @@
 #include "cedar/auxiliaries/DataSpectator.h"
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
-#include <boost/algorithm/string/replace.hpp>
+
+#ifndef Q_MOC_RUN
+  #include <boost/algorithm/string/replace.hpp>
+  #include <boost/filesystem.hpp>
+  #include <boost/date_time/posix_time/posix_time.hpp>
+  #include <boost/pointer_cast.hpp>
+#endif
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -200,6 +207,26 @@ cedar::unit::Time cedar::aux::DataSpectator::getRecordIntervalTime() const
 
 void cedar::aux::DataSpectator::makeSnapshot()
 {
-  this->prepareStart();
-  this->record();
+  // Create Directory
+  std::string project_name = cedar::aux::RecorderSingleton::getInstance()->getRecorderProjectName();
+  std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
+  std::string output_dir = cedar::aux::SettingsSingleton::getInstance()->getRecorderOutputDirectory()
+                           + "/"+project_name+"/Snapshots/snapshot_"+ time_stamp;
+  boost::filesystem::create_directories(output_dir);
+
+  DataPtr data = mData->clone();
+
+  // Create Ouput Path
+  std::string output_path = output_dir+"/" + boost::algorithm::replace_all_copy(mName," ","_") + ".csv";
+  std::ofstream output_stream;
+
+  // Write the data
+  output_stream.open(output_path, std::ios::out | std::ios::app);
+  data->serializeHeader(output_stream);
+  output_stream << std::endl;
+  output_stream << cedar::aux::GlobalClockSingleton::getInstance()->getTime() << ",";
+  data->serializeData(output_stream);
+  output_stream << std::endl;
+  output_stream.close();
+
 }

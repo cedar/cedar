@@ -46,6 +46,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::NetworkPath::NetworkPath()
+:
+cedar::proc::NetworkPath::PathType()
+{
+}
+
 cedar::proc::NetworkPath::NetworkPath(const cedar::proc::NetworkPath::String& path)
 :
 cedar::proc::NetworkPath::PathType(path)

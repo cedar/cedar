@@ -133,14 +133,10 @@ void cedar::proc::gui::Scene::emitSceneChanged()
 
 void cedar::proc::gui::Scene::helpEvent(QGraphicsSceneHelpEvent* pHelpEvent)
 {
-  auto item = this->itemAt(pHelpEvent->scenePos());
-  if (auto base_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+  auto items = this->items(pHelpEvent->scenePos());
+  for (auto item : items)
   {
-    base_item->updateToolTip();
-  }
-  else if (item && item->parentItem() != NULL)
-  {
-    if (auto base_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item->parentItem()))
+    if (auto base_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
     {
       base_item->updateToolTip();
     }
@@ -346,22 +342,35 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
   }
 
 
-  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
-  if (p_item != this->mpDropTarget)
+//  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
+  auto items = this->items(pEvent->scenePos());
+  if (items.size() > 0)
+  {
+    auto p_item = findFirstGroupItem(items);
+    if (p_item != this->mpDropTarget)
+    {
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
+      {
+        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+
+      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
+      {
+        if (!group->getGroup()->isLinked())
+        {
+          group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+        }
+      }
+      this->mpDropTarget = p_item;
+    }
+  }
+  else if (this->mpDropTarget) // nothing below the mouse pointer, but there is still something in our drop memory
   {
     if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
     {
       group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
     }
-
-    if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
-    {
-      if (!group->getGroup()->isLinked())
-      {
-        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-      }
-    }
-    this->mpDropTarget = p_item;
+    this->mpDropTarget = nullptr;
   }
 }
 
@@ -441,6 +450,35 @@ cedar::aux::PluginDeclaration* cedar::proc::gui::Scene::declarationFromDrop(QGra
   return nullptr;
 }
 
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::findConnectableItem(const QList<QGraphicsItem*>& items)
+{
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+    {
+      if (graphics_item->canConnect() && !graphics_item->isReadOnly())
+      {
+        return graphics_item;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
+cedar::proc::gui::Group* cedar::proc::gui::Scene::findFirstGroupItem(const QList<QGraphicsItem*>& items)
+{
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::Group*>(items[i]))
+    {
+      return graphics_item;
+    }
+  }
+
+  return nullptr;
+}
+
 void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent)
 {
   switch (this->mMode)
@@ -457,10 +495,13 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
         QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
         if (items.size() > 0)
         {
+          // find the first item under the mouse that inherits GraphicsBase and is connectable
+          mpConnectionStart = this->findConnectableItem(items);
+
           // check if the start item is a connectable thing.
-          if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
-               && mpConnectionStart->canConnect() && !mpConnectionStart->isReadOnly())
+          if (mpConnectionStart != nullptr)
           {
+            CEDAR_DEBUG_ASSERT(mpConnectionStart->canConnect());
             this->mMode = MODE_CONNECT;
             mpeParentView->setMode(cedar::proc::gui::Scene::MODE_CONNECT);
             this->connectModeProcessMousePress(pMouseEvent);
@@ -754,19 +795,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   menu.addSeparator();
   QAction *p_addSickyNode = menu.addAction("add sticky note");
   menu.addSeparator();
-  QAction *p_reset = menu.addAction("reset architecture");
-
   QAction *a = menu.exec(pContextMenuEvent->screenPos());
 
   //!@todo Instead of this structure, connect each action with an appropriate slot.
-  if (a == p_reset)
-  {
-    if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
-    {
-      p_ide->resetRootGroup();
-    }
-  }
-  else if (a == p_importGroup || a == p_link_group)
+  if (a == p_importGroup || a == p_link_group)
   {
     this->importGroup(a == p_link_group);
   }
@@ -778,7 +810,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   {
     this->addStickyNote();
   }
-  else if (a != NULL)
+  else if (a != nullptr)
   {
     std::cout << "Unmatched action in cedar::proc::gui::Scene::contextMenuEvent." << std::endl;
   }
@@ -788,10 +820,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
 void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)
 {
-  if (mpNewConnectionIndicator != NULL)
+  if (mpNewConnectionIndicator != nullptr)
   {
     delete mpNewConnectionIndicator;
-    mpNewConnectionIndicator = NULL;
+    mpNewConnectionIndicator = nullptr;
   }
 
   if (pMouseEvent->button() != Qt::LeftButton)
@@ -804,9 +836,9 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
 
   if (items.size() > 0)
   {
-    // check if the start item is a connectable thing.
-    if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
-         && mpConnectionStart->canConnect())
+    mpConnectionStart = this->findConnectableItem(items);
+
+    if (this->mpConnectionStart != nullptr)
     {
       QPointF start = mpConnectionStart->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
       QLineF line(start, start);
@@ -829,7 +861,7 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
 
 void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent* pMouseEvent)
 {
-  if(mpNewConnectionIndicator != NULL)
+  if (mpNewConnectionIndicator != NULL)
   {
     QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();
 
