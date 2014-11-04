@@ -73,7 +73,7 @@ public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief The standard constructor.
-  GrabberBase();
+  GrabberBase(bool looped = true);
 
 public:
   //!@brief Destructor
