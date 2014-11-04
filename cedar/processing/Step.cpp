@@ -71,6 +71,8 @@
 //#define DEBUG_LOCKS
 // Show information about execution/triggering of steps
 //#define DEBUG_RUNNING
+// Show information about triggering
+//#define DEBUG_TRIGGERING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -420,11 +422,14 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr arguments, cedar::pr
   // subsequent steps are triggered if one of the following conditions is met:
   // a) This step has not been triggered as part of a trigger chain. This is the case if trigger is NULL.
   // b) The step is looped. In this case it is the start of a trigger chain
-  // c) The step is not triggered by anyone. This can happen, e.g., if it has no inputs. This also makes it the start
+  // c) The step is a trigger source. This can happen, e.g., if it has no inputs. This also makes it the start
   //    of a trigger chain. The exception here are group sources because they are triggered from the outside (but via a
   //    special mechanism in Trigger::buildTriggerGraph)
-  if (!trigger || this->isLooped() || (!this->isTriggered() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this)))
+  if (!trigger || this->isLooped() || (this->isTriggerSource() && !dynamic_cast<cedar::proc::sources::GroupSource*>(this)))
   {
+#ifdef DEBUG_TRIGGERING
+    std::cout << "Step " << this->getName() << " was computed and thus triggers its done trigger." << std::endl;
+#endif // DEBUG_TRIGGERING
     // trigger subsequent steps in a non-blocking manner
     if (this->isLooped())
     {

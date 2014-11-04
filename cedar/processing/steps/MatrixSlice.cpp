@@ -219,7 +219,6 @@ void cedar::proc::steps::MatrixSlice::updateDimensionality()
   {
     this->allocateOutputMatrix();
   }
-  this->onTrigger();
 }
 
 void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
@@ -300,8 +299,6 @@ void cedar::proc::steps::MatrixSlice::rangeChanged()
   this->allocateOutputMatrix();
 
   this->resetState();
-
-  this->onTrigger();
 }
 
 void cedar::proc::steps::MatrixSlice::compute(const cedar::proc::Arguments&)
