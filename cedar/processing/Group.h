@@ -677,6 +677,10 @@ public:
   //! Updates the trigger chains of all steps.
   void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
+  /*! This function lists the required plugins for all the elements in this group and any of its subgroups.
+   */
+  std::set<std::string> listRequiredPlugins() const;
+
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 

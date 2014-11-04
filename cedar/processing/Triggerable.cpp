@@ -76,6 +76,11 @@ cedar::proc::Triggerable::~Triggerable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::Triggerable::isTriggerSource() const
+{
+  return !this->isTriggered();
+}
+
 void cedar::proc::Triggerable::updateTriggeringOrder(std::set<cedar::proc::Trigger*>& visited, bool recurseUp, bool recurseDown)
 {
   QReadLocker locker(this->mFinished.getLockPtr());

@@ -173,6 +173,31 @@ cedar::proc::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
+{
+  std::set<std::string> required_plugins;
+  for (const auto& name_element_pair : this->getElements())
+  {
+    auto element = name_element_pair.second;
+
+    if (auto subgroup = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+    {
+      auto subgroup_plugins = subgroup->listRequiredPlugins();
+      required_plugins.insert(subgroup_plugins.begin(), subgroup_plugins.end());
+    }
+    else
+    {
+      auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(element);
+      if (!declaration->getSource().empty())
+      {
+        required_plugins.insert(declaration->getSource());
+      }
+    }
+  }
+
+  return required_plugins;
+}
+
 std::vector<cedar::proc::GroupPath> cedar::proc::Group::listAllElementPaths(const cedar::proc::GroupPath& base_path) const
 {
   std::vector<cedar::proc::GroupPath> paths;
@@ -1656,6 +1681,16 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
     cedar::proc::ArchitectureLoadingException exception(exceptions);
     CEDAR_THROW_EXCEPTION(exception);
   }
+
+  // holding trigger chain updates may have caused some steps to not be computed; thus, re-trigger all sources
+  for (const auto& name_element_pair : this->getElements())
+  {
+    auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(name_element_pair.second);
+    if (triggerable && triggerable->isTriggerSource() && !triggerable->isLooped())
+    {
+      triggerable->onTrigger();
+    }
+  }
 }
 
 void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
@@ -2027,6 +2062,7 @@ void cedar::proc::Group::inputConnectionChanged(const std::string& inputName)
   {
     source->resetData();
   }
+  source->onTrigger();
 }
 
 const cedar::proc::Group::ConnectorMap& cedar::proc::Group::getConnectorMap()
