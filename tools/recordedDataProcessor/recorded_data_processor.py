@@ -26,11 +26,11 @@
 
     File:        recorded_data_processor.py
 
-    Maintainer:  Sascha Begovic
+    Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2014 11 04
+    Date:        2014 11 05
 
-    Description: This module .
+    Description: 
 
     Credits:
 
@@ -67,7 +67,7 @@ class SnapshotSequenceDialog(wx.Dialog):
         
         top_sizer = wx.BoxSizer(wx.VERTICAL)        
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        ok_btn = wx.Button(self, wx.ID_ANY, 'Plot')
+        ok_btn = wx.Button(self, wx.ID_OK, 'OK')
         cancel_btn = wx.Button(self, wx.ID_CANCEL, 'Cancel')
         
         btn_sizer.Add(ok_btn, 1, wx.ALL)
@@ -149,7 +149,7 @@ class BrowserPanel(wx.Panel):
         self.Show()
         
     def evt_sel_button(self, event):
-        frame     = self.GetParent()
+        frame = self.GetParent()
         frame.dir = self.browser.GetPath()
         RecordedDataProcessorPanel(frame)
         frame.Fit()
@@ -166,79 +166,79 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.dir = self.GetParent().dir
         
-        self.x_label          = ' '
-        self.y_label          = ' '
-        self.z_label          = ' '
-        self.marked           = False
-        self.nstep            = 0
-        self.step             = 0
-        self.step_size        = 0
-        self.slider_max       = 0
-        self.resolution       = 1
-        self.vmin             = None
-        self.vmax             = None
-        self.proj             = None
-        self.proj_method      = 'addition'
-        self.style            = ' '
-        self.mode             = ' '
-        self.ext              = '.csv'
-        self.flist            = [file for file in os.listdir(self.dir) if file.lower().endswith(self.ext)]
-        self.flist_sorted     = FieldPlot()._sort_alphnum(self.flist)
-        self.data             = None
-        self.header           = None
-        self.header_list      = []
-        self.ndim             = []
-        self.selection        = None
-        self.proj_choice      = None
+        self.x_label = ' '
+        self.y_label = ' '
+        self.z_label = ' '
+        self.marked = False
+        self.nstep = 0
+        self.step = 0
+        self.step_size = 0
+        self.slider_max = 0
+        self.resolution = 1
+        self.vmin = None
+        self.vmax = None
+        self.proj = None
+        self.proj_method = 'addition'
+        self.style = ' '
+        self.mode = ' '
+        self.ext = '.csv'
+        self.flist = [file for file in os.listdir(self.dir) if file.lower().endswith(self.ext)]
+        self.flist_sorted = FieldPlot()._sort_alphnum(self.flist)
+        self.data = None
+        self.header = None
+        self.header_list = []
+        self.ndim = []
+        self.selection = None
+        self.proj_choice = None
         self.proj_choice_step = None
-        self.plot             = None
+        self.plot = None
         
-        self.mode_ch          = [' ', 'snapshot', 'snapshot sequence', 'timeline']
-        self.proj_ch          = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
-        self.proj_ch_step     = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5', 
-                                 'x_1, x_2', 'x_1, x_3', 'x_1, x_4', 'x_1, x_5', 'x_2, x_3', 
-                                 'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
-        self.style_ch         = [' ', 'heatmap', 'image', 'surface', 'wireframe']
-        self.proj_methods     = [' ', 'addition', 'maximum']
+        self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'timeline']
+        self.proj_ch = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
+        self.proj_ch_step = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5', 
+                             'x_1, x_2', 'x_1, x_3', 'x_1, x_4', 'x_1, x_5', 'x_2, x_3', 
+                             'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
+        self.style_ch = [' ', 'heatmap', 'image', 'surface', 'wireframe']
+        self.proj_methods = [' ', 'addition', 'maximum']
         
-        self.vmin_spn                     = FS.FloatSpin(self, digits=4)
-        self.vmax_spn                     = FS.FloatSpin(self, digits=4)
+        self.vmin_spn = FS.FloatSpin(self, digits=4)
+        self.vmax_spn = FS.FloatSpin(self, digits=4)
         self.reset_heatmap_boundaries_btn = wx.Button(self, label = 'Reset heatmap boundaries')
         self.vmin_spn.Enable(False)
         self.vmax_spn.Enable(False)
         
-        self.sel_label              = wx.StaticText(self, -1, 'Recording')
-        self.mode_label             = wx.StaticText(self, -1, 'Plot mode')
-        self.proj_label             = wx.StaticText(self, -1, 'Projection')
-        self.proj_method_label      = wx.StaticText(self, -1, 'Projection method')
-        self.style_label            = wx.StaticText(self, -1, 'Plot style')
-        self.pos_slider_label       = wx.StaticText(self, -1, 'Time step')
-        self.vmin_label             = wx.StaticText(self, -1, 'Minimum')
-        self.vmax_label             = wx.StaticText(self, -1, 'Maximum')
+        self.sel_label = wx.StaticText(self, -1, 'Recording')
+        self.mode_label = wx.StaticText(self, -1, 'Plot mode')
+        self.proj_label = wx.StaticText(self, -1, 'Projection')
+        self.proj_method_label = wx.StaticText(self, -1, 'Projection method')
+        self.style_label = wx.StaticText(self, -1, 'Plot style')
+        self.pos_slider_label = wx.StaticText(self, -1, 'Time step')
+        self.vmin_label = wx.StaticText(self, -1, 'Minimum')
+        self.vmax_label = wx.StaticText(self, -1, 'Maximum')
         
-        self.x_axis_label           = wx.StaticText(self, -1, 'X axis')
-        self.y_axis_label           = wx.StaticText(self, -1, 'Y axis')
-        self.z_axis_label           = wx.StaticText(self, -1, 'Z axis')
+        self.x_axis_label = wx.StaticText(self, -1, 'X axis')
+        self.y_axis_label = wx.StaticText(self, -1, 'Y axis')
+        self.z_axis_label = wx.StaticText(self, -1, 'Z axis')
         
         self.heatmap_boundaries_txt = wx.StaticText(self, -1, 'Heatmap boundaries')
-        self.label_axes_txt         = wx.StaticText(self, -1, 'Label axes')
-        self.resolution_label       = wx.StaticText(self, -1, 'Plot resolution')
+        self.label_axes_txt = wx.StaticText(self, -1, 'Label axes')
+        self.resolution_label = wx.StaticText(self, -1, 'Plot resolution')
         
-        self.line_1                 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
-        self.line_2                 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
-        self.line_3                 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
-        self.line_4                 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
+        self.line_1 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
+        self.line_2 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
+        self.line_3 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
+        self.line_4 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
         
-        self.sel_cbox         = wx.ComboBox(self, choices = self.flist_sorted, value = ' ', style = wx.CB_READONLY)
-        self.mode_cbox        = wx.ComboBox(self, choices = self.mode_ch, style = wx.CB_READONLY)
-        self.proj_cbox        = wx.ComboBox(self, value=' ', style = wx.CB_READONLY)
+        self.sel_cbox = wx.ComboBox(self, choices = self.flist_sorted, value = ' ', style = wx.CB_READONLY)
+        self.mode_cbox = wx.ComboBox(self, choices = self.mode_ch, style = wx.CB_READONLY)
+        self.proj_cbox = wx.ComboBox(self, value=' ', style = wx.CB_READONLY)
         self.proj_method_cbox = wx.ComboBox(self, choices = self.proj_methods, value=' ', style = wx.CB_READONLY)
-        self.style_cbox       = wx.ComboBox(self, choices = self.style_ch, style = wx.CB_READONLY)
-        self.pos_slider       = wx.Slider(self, value=-1, minValue = -1, maxValue = 0, style = wx.SL_LABELS)
-        self.resolution_spn   = wx.SpinCtrl(self, min=1, max=100)
-        self.x_axis_text      = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        self.y_axis_text      = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        self.z_axis_text      = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        self.style_cbox = wx.ComboBox(self, choices = self.style_ch, style = wx.CB_READONLY)
+        self.pos_slider = wx.Slider(self, value=-1, minValue = -1, maxValue = 0, style = wx.SL_LABELS)
+        self.resolution_spn = wx.SpinCtrl(self, min=1, max=100)
+        self.x_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        self.y_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        self.z_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         
         
         self._add_content()
@@ -256,39 +256,38 @@ class RecordedDataProcessorPanel(wx.Panel):
         
         # Sizers
         #========================================================================================================================
-        sel_sizer         = wx.BoxSizer(wx.HORIZONTAL)
-        mode_sizer        = wx.BoxSizer(wx.HORIZONTAL)
-        proj_sizer        = wx.BoxSizer(wx.HORIZONTAL)
+        sel_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        mode_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        proj_sizer = wx.BoxSizer(wx.HORIZONTAL)
         proj_method_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        style_sizer       = wx.BoxSizer(wx.HORIZONTAL)
-        pos_slider_sizer  = wx.BoxSizer(wx.HORIZONTAL)
-        plot_sizer        = wx.BoxSizer(wx.HORIZONTAL)
-        line_sizer_1      = wx.BoxSizer(wx.HORIZONTAL)
-        line_sizer_2      = wx.BoxSizer(wx.HORIZONTAL)
-        line_sizer_3      = wx.BoxSizer(wx.HORIZONTAL)
-        line_sizer_4      = wx.BoxSizer(wx.HORIZONTAL)
-        resolution_sizer  = wx.BoxSizer(wx.HORIZONTAL)
-        heatmap_sizer     = wx.BoxSizer(wx.VERTICAL)
-        axes_label_sizer  = wx.BoxSizer(wx.VERTICAL)
-        btn_sizer         = wx.BoxSizer(wx.VERTICAL)
-        v_grid_sizer      = wx.GridSizer(rows=2, cols=2) 
-        axes_grid_sizer   = wx.GridSizer(rows=3, cols=3)
+        style_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        pos_slider_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        plot_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        line_sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
+        line_sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
+        line_sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
+        line_sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
+        resolution_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        heatmap_sizer = wx.BoxSizer(wx.VERTICAL)
+        axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
+        btn_sizer = wx.BoxSizer(wx.VERTICAL)
+        v_grid_sizer = wx.GridSizer(rows=2, cols=2) 
+        axes_grid_sizer = wx.GridSizer(rows=3, cols=3)
         
         # Buttons
         #========================================================================================================================
-        self.plot_btn          = wx.Button(self, label = 'Plot')
-        self.save_btn          = wx.Button(self, wx.ID_SAVE, label = 'Save')
-        self.switch_btn        = wx.Button(self, label = 'Switch directory')
+        self.plot_btn = wx.Button(self, label = 'Plot')
+        self.save_btn = wx.Button(self, wx.ID_SAVE, label = 'Save')
+        self.switch_btn = wx.Button(self, label = 'Switch directory')
         self.multiple_plot_btn = wx.Button(self, label = 'Add timeline')    
-        self.x_axis_ok_btn     = wx.Button(self, label='OK', size=(50, 25))
-        self.y_axis_ok_btn     = wx.Button(self, label='OK', size=(50, 25))
-        self.z_axis_ok_btn     = wx.Button(self, label='OK', size=(50, 25))
+        self.x_axis_ok_btn = wx.Button(self, label='OK', size=(50, 25))
+        self.y_axis_ok_btn = wx.Button(self, label='OK', size=(50, 25))
+        self.z_axis_ok_btn = wx.Button(self, label='OK', size=(50, 25))
         self.multiple_plot_btn.Disable()
         
         # Controls
         #========================================================================================================================
 
-        
         self.resolution_spn.SetToolTipString('Determines the resolution of the plot. Lower values lead to finer resolutions.')
         self.vmin_spn.SetToolTipString('Caps the colormap of heatmaps at the given minimum and maximum.')
         self.vmax_spn.SetToolTipString('Caps the colormap of heatmaps at the given minimum and maximum.')
@@ -416,7 +415,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         return
         
     def evt_resolution_spn(self, event):
-        widget          = event.GetEventObject()
+        widget = event.GetEventObject()
         self.resolution = int(widget.GetValue())
         
         if plt.get_fignums():
@@ -425,7 +424,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         return
     
     def evt_vmax_spn(self, event):
-        widget    = event.GetEventObject()
+        widget = event.GetEventObject()
         self.vmax = float(widget.GetValue())
         
         if plt.get_fignums():
@@ -434,7 +433,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         return
     
     def evt_vmin_spn(self, event):
-        widget    = event.GetEventObject()
+        widget = event.GetEventObject()
         self.vmin = float(widget.GetValue())
         
         if plt.get_fignums():
@@ -443,7 +442,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         return
     
     def evt_proj_cbox(self, event):
-        widget    = event.GetEventObject()
+        widget = event.GetEventObject()
         self.proj = widget.GetValue()
                         
         if plt.get_fignums():
@@ -459,7 +458,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self._plot()
     
     def evt_proj_method_cbox(self, event):
-        widget           = event.GetEventObject()
+        widget = event.GetEventObject()
         self.proj_method = widget.GetValue()
         
         if plt.get_fignums() and self.proj_method != '':
@@ -508,16 +507,12 @@ class RecordedDataProcessorPanel(wx.Panel):
             self.resolution_spn.Enable()
             self.vmin_spn.Disable()
             self.vmax_spn.Disable()
-        
-        if self.style == 'image':
-            dlg = wx.MessageDialog(parent  = None, 
-            message = 'The plot was not updated.', 
-            caption = '', 
-            style   = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
-            dlg.ShowModal()
-            dlg.Destroy()
-        elif plt.get_fignums():
-            self._update_plot()
+                    
+        if plt.get_fignums():
+            try:
+                self._update_plot()
+            except TypeError:
+                raise TypeError
         
         return
     
@@ -569,9 +564,6 @@ class RecordedDataProcessorPanel(wx.Panel):
         #======================================================================================================================== 
         if self.mode == 'snapshot':
             self.proj_cbox.SetItems(self.proj_choice_step)
-            self.plot_btn.SetLabel('Plot')
-            
-            self.save_btn.Enable(True)
             self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
             
             if plt.get_fignums():
@@ -581,17 +573,13 @@ class RecordedDataProcessorPanel(wx.Panel):
         #======================================================================================================================== 
         elif self.mode == 'snapshot sequence':
             self.proj_cbox.SetItems(self.proj_choice_step)
-            self.plot_btn.SetLabel('Configure')
-            
-            self.save_btn.Enable(False)
-            
+            self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
+                        
         # timeline option selected
         #======================================================================================================================== 
         elif self.mode == 'timeline':                
             self.proj_cbox.SetItems(self.proj_choice)
-            self.plot_btn.SetLabel('Plot')
             
-            self.save_btn.Enable(True)
             self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot) 
             
             if plt.get_fignums():
@@ -607,16 +595,17 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.slider_max = 0
     
         # valid checkbox selected
-        self.proj_choice      = self.proj_ch[:self.ndim[self.selection]+1]
+        self.proj_choice = self.proj_ch[:self.ndim[self.selection]+1]
         self.proj_choice_step = FieldPlot().build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
-        self.header           = FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
-        self.data             = FieldPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
-        self.slider_max       = self.data.shape[0] - 1
+        self.header = FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
+        self.data = FieldPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
+        self.slider_max = self.data.shape[0] - 1
         self.pos_slider.SetMax(self.slider_max)
         
     
     def evt_sel_cbox(self, event):
         
+        plt.close()
         self.selection = self.sel_cbox.GetSelection()
         self._update_selection_data()
         
@@ -636,14 +625,14 @@ class RecordedDataProcessorPanel(wx.Panel):
                 step = self.step
             
             try:
-                self.plot = FieldPlot().plot_snapshot(step       = step, 
-                                                     style       = self.style, 
-                                                     data        = self.data, 
-                                                     header      = self.header, 
-                                                     vmin        = self.vmin,
-                                                     vmax        = self.vmax,
-                                                     resolution  = self.resolution,
-                                                     proj        = self.proj,
+                self.plot = FieldPlot().plot_snapshot(step = step, 
+                                                     style = self.style, 
+                                                     data = self.data, 
+                                                     header = self.header, 
+                                                     vmin = self.vmin,
+                                                     vmax = self.vmax,
+                                                     resolution = self.resolution,
+                                                     proj = self.proj,
                                                      proj_method = self.proj_method)
                     
                 FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
@@ -661,37 +650,37 @@ class RecordedDataProcessorPanel(wx.Panel):
             dlg.ShowModal()
             dlg.Destroy()
             
-            self.plot = FieldPlot().plot_snapshot_sequence(start       = self.step, 
-                                                           step_size   = self.step_size, 
-                                                           steps       = self.nstep, 
-                                                           style       = self.style, 
-                                                           data        = self.data, 
-                                                           header      = self.header, 
-                                                            vmin        = self.vmin,
-                                                            vmax        = self.vmax,
-                                                            resolution  = self.resolution,
-                                                            proj        = self.proj,
-                                                            proj_method = self.proj_method,
-                                                            x_label     = self.x_label,
-                                                            y_label     = self.y_label,
-                                                            z_label     = self.z_label)
-            
-            FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-            FieldPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
-                        
+            self.plot = FieldPlot().plot_snapshot_sequence(start = self.step, 
+                                                           step_size = self.step_size, 
+                                                           steps = self.nstep, 
+                                                           style = self.style, 
+                                                           data = self.data, 
+                                                           header = self.header, 
+                                                           vmin = self.vmin,
+                                                           vmax = self.vmax,
+                                                           resolution = self.resolution,
+                                                           proj = self.proj,
+                                                           proj_method = self.proj_method,
+                                                           x_label = self.x_label,
+                                                           y_label = self.y_label,
+                                                           z_label = self.z_label,
+                                                           file_name = self.flist_sorted[self.selection],
+                                                           file_directory = self.dir,
+                                                           save_mode = True)
+                                                
         elif self.mode == 'timeline':
             try:
-                self.plot = FieldPlot().plot_timeline(data   = self.data, 
-                                                 header      = self.header,
-                                                 vmin        = self.vmin,
-                                                 vmax        = self.vmax,
-                                                 resolution  = self.resolution,
-                                                 plot        = self.plot,
-                                                 proj        = self.proj, 
-                                                 proj_method = self.proj_method,
-                                                 step        = self.step, 
-                                                 marker      = self.marked, 
-                                                 style       = self.style)
+                self.plot = FieldPlot().plot_timeline(data = self.data, 
+                                                      header = self.header,
+                                                      vmin = self.vmin,
+                                                      vmax = self.vmax,
+                                                      resolution = self.resolution,
+                                                      plot = self.plot,
+                                                      proj = self.proj, 
+                                                      proj_method = self.proj_method,
+                                                      step = self.step, 
+                                                      marker = self.marked, 
+                                                      style = self.style)
             
                 FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 FieldPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
@@ -699,8 +688,8 @@ class RecordedDataProcessorPanel(wx.Panel):
             except UnboundLocalError:
                 dlg = wx.MessageDialog(parent  = None, 
                 message = 'It is not possible to build a timeline out of 2-dimensional timeslices.', 
-                caption = 'An Error has occurred.', 
-                style   = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                caption = 'The attempted operation is not possible.', 
+                style   = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
                 dlg.Destroy()
                         
@@ -714,14 +703,14 @@ class RecordedDataProcessorPanel(wx.Panel):
                 step = self.step
             
             try:
-                self.plot = FieldPlot().plot_snapshot(step       = step, 
-                                                     style       = self.style, 
-                                                     data        = self.data, 
-                                                     header      = self.header, 
-                                                     vmin        = self.vmin,
-                                                     vmax        = self.vmax,
-                                                     resolution  = self.resolution, 
-                                                     proj        = self.proj,
+                self.plot = FieldPlot().plot_snapshot(step = step, 
+                                                     style = self.style, 
+                                                     data = self.data, 
+                                                     header = self.header, 
+                                                     vmin = self.vmin,
+                                                     vmax = self.vmax,
+                                                     resolution = self.resolution, 
+                                                     proj = self.proj,
                                                      proj_method = self.proj_method)
                         
                 FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
@@ -735,7 +724,7 @@ class RecordedDataProcessorPanel(wx.Panel):
                 dlg = wx.MessageDialog(parent  = None, 
                 message = 'The specified timeslice does not seem to exist.', 
                 caption = 'An Error has occurred.', 
-                style   = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
                 dlg.Destroy()
         
@@ -744,41 +733,34 @@ class RecordedDataProcessorPanel(wx.Panel):
             dlg.ShowModal()
             dlg.Destroy()
             
-            self.plot = FieldPlot().plot_snapshot_sequence(start      = self.step, 
-                                                          step_size   = self.step_size, 
-                                                          steps       = self.nstep, 
-                                                          style       = self.style, 
-                                                          data        = self.data, 
-                                                          header      = self.header, 
-                                                          vmin        = self.vmin,
-                                                          vmax        = self.vmax,
-                                                          resolution  = self.resolution,
-                                                          proj        = self.proj,
+            self.plot = FieldPlot().plot_snapshot_sequence(start = self.step, 
+                                                          step_size = self.step_size, 
+                                                          steps = self.nstep, 
+                                                          style = self.style, 
+                                                          data = self.data, 
+                                                          header = self.header, 
+                                                          vmin = self.vmin,
+                                                          vmax = self.vmax,
+                                                          resolution = self.resolution,
+                                                          proj = self.proj,
                                                           proj_method = self.proj_method,
-                                                          x_label     = self.x_label,
-                                                          y_label     = self.y_label,
-                                                          z_label     = self.z_label)
-            
-            #FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-            
-            manager = plt.get_current_fig_manager()
-            manager.window.SetPosition((500, 250))
-        
-            plt.draw()
-                        
+                                                          x_label = self.x_label,
+                                                          y_label = self.y_label,
+                                                          z_label = self.z_label)
+                                
         elif self.mode == 'timeline':
             try:
-                self.plot = FieldPlot().plot_timeline(data       = self.data, 
-                                                     header      = self.header, 
-                                                     vmin        = self.vmin,
-                                                     vmax        = self.vmax,
-                                                     resolution  = self.resolution,
-                                                     plot        = self.plot,
-                                                     proj        = self.proj, 
+                self.plot = FieldPlot().plot_timeline(data = self.data, 
+                                                     header = self.header, 
+                                                     vmin = self.vmin,
+                                                     vmax = self.vmax,
+                                                     resolution = self.resolution,
+                                                     plot = self.plot,
+                                                     proj = self.proj, 
                                                      proj_method = self.proj_method,
-                                                     step        = self.step, 
-                                                     marker      = self.marked, 
-                                                     style       = self.style)
+                                                     step = self.step, 
+                                                     marker = self.marked, 
+                                                     style = self.style)
                 
                 FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
             
@@ -789,10 +771,10 @@ class RecordedDataProcessorPanel(wx.Panel):
                 
             except UnboundLocalError:
                 plt.close()
-                dlg = wx.MessageDialog(parent  = None, 
+                dlg = wx.MessageDialog(parent = None, 
                                        message = 'It is not possible to build a timeline out of 2-dimensional timeslices.', 
-                                       caption = 'An Error has occurred.', 
-                                       style   = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                                       caption = 'The attempted operation is not possible.', 
+                                       style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
                 dlg.Destroy()
 
@@ -815,7 +797,7 @@ class FieldPlot(object):
         return
     
     def _sort_alphnum(self, unsorted):
-        conv        = lambda text: int(text) if text.isdigit() else text
+        conv = lambda text: int(text) if text.isdigit() else text
         alphnum_key = lambda key: [conv(c) for c in re.split('([0-9]+)', key)]
         
         return sorted(unsorted, key=alphnum_key)
@@ -864,7 +846,7 @@ class FieldPlot(object):
         '''
         
         ndim = self.get_dimension(header)
-        X    = np.zeros(ndim)
+        X = np.zeros(ndim)
  
         for i in range(ndim):
             X[i] = int(header[i+2])
@@ -872,14 +854,14 @@ class FieldPlot(object):
             if proj == 'x_' + str(i+1): 
                 col = (ndim-1) - i
                             
-        X     = X[::-1]
+        X = X[::-1]
         new_X = None
         
         for i in range(steps):
             try:
                 aux_col = col
-                aux_X   = np.reshape(data[i], X)
-                j       = 0
+                aux_X = np.reshape(data[i], X)
+                j = 0
                             
                 while np.ndim(aux_X) > 1:
                     if j != aux_col:   
@@ -889,7 +871,7 @@ class FieldPlot(object):
                             aux_X = np.maximum.reduce(array=aux_X, axis=j)
                             
                         elif proj_method == 'addition':
-                            div   = aux_X.shape[j]
+                            div = aux_X.shape[j]
                             aux_X = np.add.reduce(array=aux_X, axis=j)                        
                             aux_X = np.true_divide(aux_X, div)
                         
@@ -909,7 +891,7 @@ class FieldPlot(object):
                     new_X[i] = aux_X
     
                 X_1,X_2 = np.mgrid[:steps, :X[col]]
-                Z       = new_X
+                Z = new_X
                 
             except UnboundLocalError:
                 raise UnboundLocalError(86545)
@@ -921,10 +903,10 @@ class FieldPlot(object):
         Projects data onto 2 given dimensions.
         '''
         
-        ndim    = self.get_dimension(header)
-        X       = np.zeros(ndim)
-        col     = np.zeros(2)
-        proj    = proj.split(',')
+        ndim = self.get_dimension(header)
+        X = np.zeros(ndim)
+        col = np.zeros(2)
+        proj = proj.split(',')
         proj[0] = proj[0].strip()
         proj[1] = proj[1].strip()
               
@@ -936,10 +918,10 @@ class FieldPlot(object):
             elif proj[1] == 'x_' + str(i+1): 
                 col[1] = i
                 
-        X       = X[::-1]
-        aux_X   = np.reshape(data[step], X)
+        X = X[::-1]
+        aux_X = np.reshape(data[step], X)
         aux_col = col
-        j       = 0
+        j = 0
         
         for i in range(aux_col.shape[0]):
             aux_col[i] = math.fabs((ndim-1)-aux_col[i])
@@ -951,7 +933,7 @@ class FieldPlot(object):
                     aux_X = np.maximum.reduce(array=aux_X, axis=j)
                     
                 elif proj_method == 'addition':
-                    div   = aux_X.shape[j]
+                    div = aux_X.shape[j]
                     aux_X = np.add.reduce(array=aux_X, axis=j)
                     aux_X = np.true_divide(aux_X, div)
                     
@@ -964,7 +946,7 @@ class FieldPlot(object):
                 j += 1
         
         X_1, X_2 = np.mgrid[:aux_X.shape[0], :aux_X.shape[1]]
-        Z        = aux_X
+        Z = aux_X
         
         return X_1, X_2, Z
         
@@ -1011,11 +993,11 @@ class FieldPlot(object):
         Gets data from given csv file.
         '''
     
-        data      = None
-        count     = 0
-        csv_file  = open(csv_f, 'rb')
+        data = None
+        count = 0
+        csv_file = open(csv_f, 'rb')
         row_count = sum(1 for line in open(csv_f))-1
-        reader    = csv.reader(csv_file)
+        reader = csv.reader(csv_file)
                 
         # skip header
         next(reader, None)
@@ -1079,10 +1061,10 @@ class FieldPlot(object):
         #Color image
         if (img_data.shape[0]/x_1)/x_2 == 3:
 
-            img_array        = np.zeros((x_2, x_1, 3), 'uint8')
-            img_array_red    = np.reshape(img_data[2::3], (x_2, x_1))
-            img_array_green  = np.reshape(img_data[1::3], (x_2, x_1))
-            img_array_blue   = np.reshape(img_data[0::3], (x_2, x_1))
+            img_array = np.zeros((x_2, x_1, 3), 'uint8')
+            img_array_red = np.reshape(img_data[2::3], (x_2, x_1))
+            img_array_green = np.reshape(img_data[1::3], (x_2, x_1))
+            img_array_blue = np.reshape(img_data[0::3], (x_2, x_1))
             
             img_array[..., 0] = img_array_red
             img_array[..., 1] = img_array_green
@@ -1107,109 +1089,128 @@ class FieldPlot(object):
             step = 0
             
         if style == 'image':
-            image = self._process_image(data=data, header=header, step=step)
-            plot  = plt.imshow(image, origin='lower')
+            
+            try:
+                image = self._process_image(data=data, header=header, step=step)
+                plot = plt.imshow(image, origin='lower')
+                
+                return plot
+            
+            except TypeError:
+                dlg = wx.MessageDialog(parent  = None, 
+                message = 'The plot was not updated.', 
+                caption = '', 
+                style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
+                dlg.ShowModal()
+                dlg.Destroy()
         
-        elif ndim == 0:
-            if mode == 'snapshot sequence':
-                fig = plt.figure()
-            else:
-                if not plt.get_fignums():
+        else:                    
+            if ndim == 0:
+                if mode == 'snapshot sequence':
                     fig = plt.figure()
                 else:
-                    fig = plt.figure(1)
-                
-            plot = fig.add_subplot(1,1,1)
-            plot.plot(data[step], '+')
-        
-        elif ndim == 1:
-            if mode == 'snapshot sequence':
-                fig = plt.figure()
-            else:
-                if not plt.get_fignums():
-                    fig = plt.figure()
-                else:
-                    fig = plt.figure(1)
-                
-            plot = fig.add_subplot(1,1,1)
-            plot.plot(data[step])
-        
-        elif ndim != 1:
-            if proj != ' ':
-                                
-                if ',' in proj:
-                    
-                    X_1, X_2, data = self._project2D(step=step, data=data, header=header, proj=proj, proj_method=proj_method)
-
-                    if style != 'heatmap':
-                        plot = self._initialize_3D_plot(mode=mode)
-                        
-                        if style == 'surface':   
-                            plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5)
-                        elif style == 'wireframe':
-                            plot.plot_wireframe(X_1,X_2, data, rstride=resolution,cstride=resolution)
-                        
-                    elif style == 'heatmap':
-                        plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode)
-                                                
-                elif ',' not in proj:
-                    
-                    try:
-                        data = self._project(mode=mode, steps=steps, data=data, header=header, proj=proj, proj_method=proj_method)[2]    
-                    except UnboundLocalError:
-                        raise UnboundLocalError
-                        
                     if not plt.get_fignums():
                         fig = plt.figure()
-                    else:    
+                    else:
                         fig = plt.figure(1)
-                                        
-                    plot = fig.add_subplot(1,1,1)
                     
-                    try:
-                        plot.plot(data[step])
-                    except IndexError:
-                        raise IndexError
-                                        
-            elif proj == ' ':
-                
-                if ndim == 2:
-                    x_1      = int(header[2])
-                    x_2      = int(header[3])                    
+                plot = fig.add_subplot(1,1,1)
+                plot.plot(data[step], '+')
+            
+            elif ndim == 1:
+                if mode == 'snapshot sequence':
+                    fig = plt.figure()
+                else:
+                    if not plt.get_fignums():
+                        fig = plt.figure()
+                    else:
+                        fig = plt.figure(1)
                     
-                    if style != 'image':
-                        data     = np.reshape(data[step], (x_2, x_1))
-                        X_1, X_2 = np.mgrid[:x_2, :x_1]
-                
-                    if style != 'heatmap' and style != 'image':
-                        plot = self._initialize_3D_plot(mode=mode)
-        
-                        if style == 'surface': 
-                            plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5)
-                        elif style == 'wireframe':
-                            plot.plot_wireframe(X_1,X_2,data, rstride=resolution,cstride=resolution)
+                plot = fig.add_subplot(1,1,1)
+                plot.plot(data[step])
+            
+            elif ndim != 1:
+                if proj != ' ':
+                                    
+                    if ',' in proj:
                         
-                    elif style == 'heatmap':
-                        plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode)
+                        X_1, X_2, data = self._project2D(step=step, data=data, header=header, proj=proj, proj_method=proj_method)
+    
+                        if style != 'heatmap':
+                            plot = self._initialize_3D_plot(mode=mode)
+                            
+                            if style == 'surface':   
+                                plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5)
+                            elif style == 'wireframe':
+                                plot.plot_wireframe(X_1,X_2, data, rstride=resolution,cstride=resolution)
+                            
+                        elif style == 'heatmap':
+                            plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode)
+                                                    
+                    elif ',' not in proj:
+                        
+                        try:
+                            data = self._project(mode=mode, steps=steps, data=data, header=header, proj=proj, proj_method=proj_method)[2]    
+                        except UnboundLocalError:
+                            raise UnboundLocalError
+                            
+                        if not plt.get_fignums():
+                            fig = plt.figure()
+                        else:    
+                            fig = plt.figure(1)
+                                            
+                        plot = fig.add_subplot(1,1,1)
+                        
+                        try:
+                            plot.plot(data[step])
+                        except IndexError:
+                            raise IndexError
+                                            
+                elif proj == ' ':
+                    
+                    if ndim == 2:
+                        x_1      = int(header[2])
+                        x_2      = int(header[3])                    
+                        
+                        if style != 'image':
+                            data     = np.reshape(data[step], (x_2, x_1))
+                            X_1, X_2 = np.mgrid[:x_2, :x_1]
+                    
+                        if style != 'heatmap' and style != 'image':
+                            plot = self._initialize_3D_plot(mode=mode)
+            
+                            if style == 'surface': 
+                                plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5)
+                            elif style == 'wireframe':
+                                plot.plot_wireframe(X_1,X_2,data, rstride=resolution,cstride=resolution)
+                            
+                        elif style == 'heatmap':
+                            plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode)
                                                          
-        return plot
+            return plot
         
-    def plot_snapshot_sequence(self, data, header, vmin, vmax, resolution, start, step_size, steps, proj, proj_method, style, x_label=None, y_label=None, z_label=None):
+    def plot_snapshot_sequence(self, data, header, vmin, vmax, resolution, start, step_size, steps, proj, proj_method, style, 
+                               x_label=None, y_label=None, z_label=None, file_name=None, file_directory=None, save_mode=False):
+        
+        plot_mode = 'snapshot sequence'
         
         for i in range(int(steps)):
-            plot = self.plot_snapshot(data        = data, 
-                                      header      = header, 
-                                      vmin        = vmin, 
-                                      vmax        = vmax, 
-                                      resolution  = resolution, 
-                                      step        = int(start) + i*int(step_size), 
-                                      style       = style, 
-                                      mode        = 'snapshot sequence', 
-                                      proj        = proj, 
+            plot = self.plot_snapshot(data = data, 
+                                      header = header, 
+                                      vmin = vmin, 
+                                      vmax = vmax, 
+                                      resolution = resolution, 
+                                      step = int(start) + i*int(step_size), 
+                                      style = style, 
+                                      mode = plot_mode, 
+                                      proj = proj, 
                                       proj_method = proj_method)
             
             self.label_axis(plot=plot, x_label=x_label, y_label=y_label, z_label=z_label)
             
+            if save_mode == True:
+                self.save_plot(plot=plot, plot_mode=plot_mode, file_name=file_name, file_directory=file_directory, save_mode='sequence', plot_number=i)
+                        
         return
     
     def plot_timeline(self, data, header, vmin, vmax, resolution, proj, proj_method, style, plot=None, marker=False, step=None):
@@ -1281,34 +1282,74 @@ class FieldPlot(object):
     
     
     def label_axis(self, plot, x_label, y_label, z_label=None):
-                
-        if 'matplotlib.image.AxesImage' not in str(type(plot)):
-            plot.set_xlabel(x_label)
-            plot.set_ylabel(y_label)
+        if plot is None:
+            return 
         
-        if 'Axes3DSubplot' in str(type(plot)):
-            plot.set_zlabel(z_label)
+        else:
+            if 'matplotlib.image.AxesImage' not in str(type(plot)):
+                plot.set_xlabel(x_label)
+                plot.set_ylabel(y_label)
             
-        elif 'matplotlib.axes.AxesSubplot' in str(type(plot)):
-            try:
-                colorbar = plt.colorbar()
-                colorbar.set_label(z_label)
+            if 'Axes3DSubplot' in str(type(plot)):
+                plot.set_zlabel(z_label)
                 
-            except RuntimeError:
-                pass
-        
-        return plot
+            elif 'matplotlib.axes.AxesSubplot' in str(type(plot)):
+                try:
+                    colorbar = plt.colorbar()
+                    colorbar.set_label(z_label)
+                    
+                except RuntimeError:
+                    pass
+            
+            return plot
 
-    def save_plot(self, plot, plot_mode, file_name, file_directory):
-        plot_count = 0
-        file_path = file_directory + '/'+ file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
+    def save_plot(self, plot, plot_mode, file_name, file_directory, save_mode='single', plot_number=0):
         
-        while os.path.exists(file_path):
-            plot_count += 1
-            file_path = file_directory + '/'+ file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
+        plot_count = 1
         
-        plt.savefig(file_directory + '/'+ file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf', transparent=True, bbox_inches='tight')
-        plt.close()
+        if plot_mode == 'snapshot sequence':
+            plot_mode = 'snapshot_sequence'
+                    
+        # Snapshot or timeline
+        if save_mode == 'single':
+            file_path = file_directory + '/' + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
+            
+            while os.path.exists(file_path):
+                plot_count += 1
+                file_path = file_directory + '/' + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
+                
+            plt.savefig(file_path, transparent=True)
+            plt.close()
+        
+        # Snapshot Sequence
+        elif save_mode == 'sequence':
+            sequence_number = 1
+            file_path_partial = file_directory + '/' + file_name.strip('.csv') + '_sequence_' + str(sequence_number) + '/'
+            
+            if not os.path.exists(file_path_partial):
+                os.mkdir(file_path_partial)
+                
+            elif os.path.exists(file_path_partial):
+                
+                while os.path.exists(file_path_partial):
+                    sequence_number += 1
+                    file_path_partial = file_directory + '/' + file_name.strip('.csv') + '_sequence_' + str(sequence_number) + '/'
+                
+                # If the plot is the first one of a new sequence generate new folder
+                if plot_number == 0:
+                    os.mkdir(file_path_partial)
+                # Else fall back to the last one
+                else:
+                    file_path_partial = file_directory + '/' + file_name.strip('.csv') + '_sequence_' + str(sequence_number-1) + '/'
+                                
+            file_path = file_path_partial + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
+                                
+            while os.path.exists(file_path):
+                plot_count += 1
+                file_path = file_path_partial + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
+            
+            plt.savefig(file_path, transparent=True)
+            plt.close()
         
         return
 
