@@ -125,7 +125,13 @@ void cedar::aux::Parameter::setName(const std::string& name)
 
 void cedar::aux::Parameter::copyValueFrom(cedar::aux::ConstParameterPtr /* other */)
 {
-  CEDAR_THROW(cedar::aux::NotImplementedException, "Copying values from this type of parameter is not supported.");
+  CEDAR_THROW
+  (
+    cedar::aux::NotImplementedException,
+    "Copying values from this type of parameter ("
+    + cedar::aux::objectTypeToString(this) +
+    ") is not supported because the parameter type does not implement the copyValueFrom method."
+  );
 }
 
 bool cedar::aux::Parameter::canCopyFrom(cedar::aux::ConstParameterPtr /* other */) const

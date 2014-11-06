@@ -128,6 +128,13 @@ public:
  signals:
   //! Signals when a step name changes.
   void stepNameChanged(const std::string& from, const std::string& to);
+
+  //! Emitted whenever a trigger in this group or any of its subgroups is started.
+  void triggerStarted();
+
+  //! Emitted whenever all trigger in this group and its subgroups are stopped.
+  void allTriggersStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -439,6 +446,9 @@ public:
    */
   const ElementMap& getElements() const;
 
+  //! Recursively lists all elements in the group and all its subgroups.
+  std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
+
   //!@deprecated Use getElements instead.
   CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
   {
@@ -736,12 +746,19 @@ private:
   //!@brief searches for elements specified by a matcher function
   std::vector<cedar::proc::ConstElementPtr> findElementsAcrossGroups(boost::function<bool(cedar::proc::ConstElementPtr)> matcher) const;
 
+  /*!@brief A function that adds a connector even if the name alread exists. Used during loading
+   */
+  void addConnectorInternal(const std::string& name, bool input);
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
 
   //!@brief Takes care of updating the list of looped triggerables if any of them change their state.
   void onLoopedChanged();
+
+  void triggerStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------

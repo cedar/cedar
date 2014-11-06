@@ -38,6 +38,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/utilities.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -94,6 +95,42 @@ int test_to_and_from_string()
 
   std::cout << "to/fromString<" << cedar::aux::typeToString<T>()
             << "> test revealed " << errors << " error(s)." << std::endl;
+  return errors;
+}
+
+int test_formatDuration(cedar::unit::Time duration, const std::string& expected)
+{
+  std::string formatted = cedar::aux::formatDuration(duration);
+  if (formatted == expected)
+  {
+    std::cout << "Correctly formatted " << duration << " as " << formatted << std::endl;
+    return 0;
+  }
+  else
+  {
+    std::cout << "Incorrectly formatted " << duration << ": got \"" << formatted << "\", expected \"" << expected << "\"" << std::endl;
+    return 1;
+  }
+}
+
+int test_formatDuration()
+{
+  int errors = 0;
+
+  std::cout << "Testing formatDuration" << std::endl;
+  errors += test_formatDuration(1.0 * cedar::unit::seconds, "1.0s");
+  errors += test_formatDuration(11.11 * cedar::unit::seconds, "11.1s");
+  errors += test_formatDuration(60.0 * cedar::unit::seconds, "1m 00.0s");
+  errors += test_formatDuration(61.5678 * cedar::unit::seconds, "1m 01.6s");
+  errors += test_formatDuration(90.0 * cedar::unit::seconds, "1m 30.0s");
+  errors += test_formatDuration(31.0 * 60.0 * cedar::unit::seconds + 30.0 * cedar::unit::seconds, "31m 30.0s");
+  errors += test_formatDuration(60.0 * 60.0 * cedar::unit::seconds, "1h 00m 00.0s");
+  errors += test_formatDuration(24.0 * 60.0 * 60.0 * cedar::unit::seconds, "1d 00h 00m 00.0s");
+  errors += test_formatDuration(365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "1y 0d 00h 00m 00.0s");
+  errors += test_formatDuration(100.0 * 365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "100y 0d 00h 00m 00.0s");
+  errors += test_formatDuration(10000.0 * 365.0 * 24.0 * 60.0 * 60.0 * cedar::unit::seconds, "10000y 0d 00h 00m 00.0s");
+
+
   return errors;
 }
 
@@ -450,6 +487,8 @@ int main()
       ++errors;
     }
   }
+
+  errors += test_formatDuration();
 
   return errors;
 }

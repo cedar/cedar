@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
 #include "cedar/auxiliaries/ObjectListParameter.h"
+#include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
@@ -203,6 +204,43 @@ cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const
          (
            static_cast<const cedar::aux::Configurable*>(this)->getConfigurableChild(path)
          );
+}
+
+std::vector<std::string> cedar::aux::Configurable::listAllParameters() const
+{
+  std::vector<std::string> parameter_paths;
+
+  for (auto parameter : this->mParameterList)
+  {
+    parameter_paths.push_back(parameter->getName());
+
+    //!@todo This is another instance where special cases are made that be solved better with virtual functions
+    if (auto object_list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+    {
+      for (size_t i = 0; i < object_list_parameter->size(); ++i)
+      {
+        auto child = object_list_parameter->configurableAt(i);
+        auto child_parameter_paths = child->listAllParameters();
+
+        for (auto child_path : child_parameter_paths)
+        {
+          parameter_paths.push_back(parameter->getName() + "[" + cedar::aux::toString(i) + "]." + child_path);
+        }
+      }
+    }
+  }
+
+  for (const auto& name_child_iter : this->mChildren)
+  {
+    auto child_parameter_paths = name_child_iter.second->listAllParameters();
+
+    for (auto child_path : child_parameter_paths)
+    {
+      parameter_paths.push_back(name_child_iter.first + "." + child_path);
+    }
+  }
+
+  return parameter_paths;
 }
 
 cedar::aux::ConstConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const std::string& path) const
@@ -381,11 +419,10 @@ std::string cedar::aux::Configurable::findParameterPath(cedar::aux::ParameterPtr
   CEDAR_THROW(cedar::aux::NotFoundException, "Could not locate parameter \"" + findParameter->getName() + "\".");
 }
 
-
-void cedar::aux::Configurable::readJson(const std::string& filename)
+void cedar::aux::Configurable::readJson(const cedar::aux::Path& filename)
 {
   cedar::aux::ConfigurationNode configuration;
-  boost::property_tree::read_json(filename, configuration);
+  boost::property_tree::read_json(filename.absolute().toString(false), configuration);
   this->readConfiguration(configuration);
 }
 

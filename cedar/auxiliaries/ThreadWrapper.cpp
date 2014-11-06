@@ -171,8 +171,8 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 
 bool cedar::aux::ThreadWrapper::isRunning() const
 {
-  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
   QMutexLocker general_access_lock(&mGeneralAccessLock);
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
 
   if (mDestructing)
     return false;
@@ -407,6 +407,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time)
 
   // make sure we wait for a running start() or finishedThread() or
   // only enther stop() once:
+  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
   QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
   if (mDestructing) // see start()
@@ -415,8 +416,6 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time)
   requestStop(); // change internal state, will abort the thread earlier
  
   // cant wait for mFinishedThreadMutex here, because that will dead-lock
-
-  QReadLocker thread_worker_readlock(&mThreadAndWorkerLock);
 
   if (mDestructing)
     return;
