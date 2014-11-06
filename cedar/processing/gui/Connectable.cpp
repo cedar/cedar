@@ -249,7 +249,18 @@ cedar::proc::gui::ConstGroup* cedar::proc::gui::Connectable::getGuiGroup() const
 
 void cedar::proc::gui::Connectable::fillColorChanged(QColor color)
 {
-  this->mPreviousFillColor = color;
+  auto gui_group = this->getGuiGroup();
+  if (gui_group == nullptr)
+  {
+    return;
+  }
+
+  bool show = gui_group->showsTriggerColors();
+
+  if (!show)
+  {
+    this->mPreviousFillColor = color;
+  }
 }
 
 void cedar::proc::gui::Connectable::updateTriggerColorState()
