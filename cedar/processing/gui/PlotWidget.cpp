@@ -307,22 +307,22 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   cedar::proc::ElementDeclaration::DataList invalid_data;
 
   auto process_if_set = [&]
-    (
-      cedar::aux::ConstDataPtr data,
-      cedar::proc::PlotDataPtr data_item
-    )
+  (
+    cedar::aux::ConstDataPtr data,
+    cedar::proc::PlotDataPtr data_item
+  )
+  {
+    if (data)
+    // skip slots that aren't set
     {
-      if (data)
-      // skip slots that aren't set
-      {
-        processSlot(data, data_item, title);
-      }
-      else
-      {
-        // mark for removal
-        invalid_data.push_back(data_item);
-      }
-    };
+      processSlot(data, data_item, title);
+    }
+    else
+    {
+      // mark for removal
+      invalid_data.push_back(data_item);
+    }
+  };
 
   // iterate over all data slots
   for (auto data_item : mDataList)
@@ -412,8 +412,12 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   }
 
   // if there is only one plot and it is a multiplot, we need no label
-  //!@todo This can fail in some circumstances (possibly connected to when a step moves a buffer to the outputs)
-  CEDAR_ASSERT(!this->mPlotGridMap.empty());
+  if (this->mPlotGridMap.empty())
+  {
+    // nothing to do, return
+    return;
+  }
+
   auto p_current_labeled_plot = mPlotGridMap.begin()->second;
   if (mPlotGridMap.size() == 1 && p_current_labeled_plot->mIsMultiPlot)
   {
