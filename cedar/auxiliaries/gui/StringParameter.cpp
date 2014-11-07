@@ -104,15 +104,22 @@ void cedar::aux::gui::StringParameter::parameterPointerChanged()
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   this->mpEdit->setText(parameter->getValue().c_str());
   QObject::connect(this->mpEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEdited(const QString&)));
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
 
   this->propertiesChanged();
+}
+
+void cedar::aux::gui::StringParameter::parameterValueChanged()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
+  CEDAR_DEBUG_ASSERT(parameter);
+  this->mpEdit->setText(QString::fromStdString(parameter->getValue()));
 }
 
 void cedar::aux::gui::StringParameter::textEdited(const QString& text)
 {
   this->setStyleSheet("");
-  cedar::aux::StringParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   try
   {
     parameter->setValue(text.toStdString());
