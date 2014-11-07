@@ -432,7 +432,7 @@ protected:
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
 
-  //!@brief a vector of all child widgets fo the current step
+  //!@brief a vector of all child widgets for the current step
   std::vector<QWidget*> mChildWidgets;
 
 private:
@@ -457,6 +457,9 @@ private:
   boost::signals2::scoped_connection mFillColorChangedConnection;
 
   QColor mPreviousFillColor;
+
+  //! Stores whether or not the item is showing the color of its trigger.
+  bool mShowingTriggerColor;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
