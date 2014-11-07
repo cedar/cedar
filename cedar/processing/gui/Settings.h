@@ -205,9 +205,6 @@ public:
   //!@brief returns the settings concerning the docking behavior for the steps widget
   DockSettingsPtr stepsSettings();
 
-  //! Settings for cedar's boost control widget.
-  DockSettingsPtr boostCtrlSettings();
-
   //!@brief stores the state of the main window
   void storeMainWindow(QMainWindow *pWindow);
   //!@brief restores a state of the main window
@@ -300,6 +297,9 @@ public:
     return this->mUserDefinedColors;
   }
 
+  //! Returns a dock settings object identified by a string.
+  DockSettingsPtr getNamedDockSettings(const std::string& id) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -309,6 +309,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  void declareDockSettings(const std::string& id, bool defaultVisible = true);
 private slots:
   void userDefinedColorStringsChanged();
 
@@ -328,6 +330,9 @@ protected:
   // none yet
 
 private:
+  //! A list of dock settings that can be accessed via a name.
+  std::map<std::string, DockSettingsPtr> mNamedDockSettings;
+
   //!@brief the settings concerning the docking behavior for the log widget
   DockSettingsPtr mLog;
 
@@ -339,9 +344,6 @@ private:
 
   //!@brief the settings concerning the docking behavior for the property pane
   DockSettingsPtr mProperties;
-  
-  //! Settings for the boost control widget.
-  DockSettingsPtr mBoostCtrlSettgings;
 
   //!@brief list of bytes coming from Qt (sizes, ...)
   cedar::aux::StringParameterPtr mMainWindowGeometry;
