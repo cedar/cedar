@@ -87,6 +87,8 @@ private:
 
   class OpenableSimulationControl;
 
+  class OpenableBoostControl;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -224,10 +226,6 @@ public slots:
   /*!@brief Show/hide all trigger colors
    */
   void toggleTriggerColors(bool show);
-
-  /*!@brief Opens a boost control widget.
-   */
-  void showBoostControl();
 
   /*! Opens the parameter linker
    */
@@ -394,8 +392,6 @@ private:
   QDockWidget* mpBoostControlDock;
 
   QString mDefaultWindowTitle;
-
-  cedar::proc::gui::BoostControl* mpBoostControl;
 
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;

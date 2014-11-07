@@ -138,7 +138,6 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
     <addaction name="mpActionExperiments"/>
     <addaction name="mpActionParameterLinker"/>
@@ -236,8 +235,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -294,8 +293,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>429</height>
              </rect>
             </property>
             <property name="palette">
@@ -421,7 +420,7 @@
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
-   <addaction name="mpActionBoostControl"/>
+   <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleSmartConnections"/>
    <addaction name="mpActionShowHideGrid"/>
@@ -608,21 +607,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
-   </property>
-  </action>
-  <action name="mpActionBoostControl">
-   <property name="icon">
-    <iconset resource="icons/cedar_proc_gui_icons.qrc">
-     <normaloff>:/steps/boost.svg</normaloff>:/steps/boost.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Boost control ...</string>
-   </property>
-   <property name="toolTip">
-    <string>Open a boost control widget.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+B</string>
    </property>
   </action>
   <action name="mpActionToggleSmartConnections">
@@ -845,6 +829,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+T</string>
+   </property>
+  </action>
+  <action name="mpActionDummy">
+   <property name="text">
+    <string>dummy action</string>
+   </property>
+   <property name="toolTip">
+    <string>You should not see this. This is what tells the IDE where to (automatically) put buttons for, e.g., the boost control.</string>
    </property>
   </action>
  </widget>

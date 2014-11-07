@@ -75,7 +75,6 @@ mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
-mBoostCtrlSettgings(new cedar::proc::gui::Settings::DockSettings(false)),
 mMainWindowGeometry(new cedar::aux::StringParameter(this, "mainWindowGeometry", "")),
 mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 {
@@ -86,7 +85,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("steps", mSteps);
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
-  ui_settings->addConfigurableChild("boost control", mBoostCtrlSettgings);
+  this->declareDockSettings("boost control", false);
+  this->declareDockSettings("simulation control", false);
 
   cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
   this->addConfigurableChild("slot growth", slot_growth);
@@ -235,6 +235,21 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Settings::declareDockSettings(const std::string& id, bool defaultVisible)
+{
+  auto ui_child = this->getConfigurableChild("ui");
+  cedar::proc::gui::Settings::DockSettingsPtr dock_settings(new cedar::proc::gui::Settings::DockSettings(defaultVisible));
+  ui_child->addConfigurableChild(id, dock_settings);
+  this->mNamedDockSettings[id] = dock_settings;
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::getNamedDockSettings(const std::string& id) const
+{
+  auto iter = this->mNamedDockSettings.find(id);
+  CEDAR_ASSERT(iter != this->mNamedDockSettings.end());
+  return iter->second;
+}
 
 void cedar::proc::gui::Settings::userDefinedColorStringsChanged()
 {
@@ -434,9 +449,6 @@ void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
 
 void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
 {
-  pDock->setVisible(this->mVisible->getValue());
-  pDock->setFloating(this->mFloating->getValue());
-
   if (!this->mGeometry->getValue().empty())
   {
     QByteArray window_geometry_hex(this->mGeometry->getValue().c_str());
@@ -446,11 +458,9 @@ void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
       std::cout << "Could not restore geometry of dock widget." << std::endl;
     }
   }
-}
 
-cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::boostCtrlSettings()
-{
-  return this->mBoostCtrlSettgings;
+  pDock->setVisible(this->mVisible->getValue());
+  pDock->setFloating(this->mFloating->getValue());
 }
 
 cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::logSettings()
