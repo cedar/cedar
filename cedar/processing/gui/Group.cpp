@@ -1820,6 +1820,7 @@ void cedar::proc::gui::Group::setBackgroundColor(const QColor& color)
 {
   this->setFillColor(color);
   this->mBackgroundColor = color;
+  this->updateTriggerColorState();
 }
 
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
