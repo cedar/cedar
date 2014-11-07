@@ -83,6 +83,15 @@ mLoopedTrigger(loopedTrigger)
   QObject::connect(this->mLoopedTrigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
   QObject::connect(this->mpStartStopButton, SIGNAL(clicked()), this, SLOT(startStopTriggerClicked()));
   QObject::connect(this->mpSingleStepButton, SIGNAL(clicked()), this, SLOT(singleStepClicked()));
+
+  if (loopedTrigger->isRunning())
+  {
+    this->triggerStarted();
+  }
+  else
+  {
+    this->triggerStopped();
+  }
 }
 
 void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::singleStepClicked()
@@ -160,6 +169,11 @@ mSimulationRunning(false)
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(createClicked()));
   QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
   QObject::connect(this->mpTree, SIGNAL(elementNameChanged(QTreeWidgetItem*)), this, SLOT(elementNameChanged()));
+
+  if (cedar::aux::GlobalClockSingleton::getInstance()->isRunning())
+  {
+    this->triggerStarted();
+  }
 }
 
 cedar::proc::gui::SimulationControl::~SimulationControl()
