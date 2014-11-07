@@ -249,6 +249,8 @@ void cedar::proc::gui::Group::clearTriggerColorCache() const
 {
   this->mTriggerColors.clear();
 
+  this->updateAllElementsTriggerColorState();
+
   emit triggerColorsChanged();
 }
 
@@ -2219,8 +2221,12 @@ void cedar::proc::gui::Group::toggleTriggerColors(bool show)
 {
   this->mShowTriggerColors = show;
 
-  const auto elements = this->getGroup()->getElements();
-  for (const auto element : elements)
+  this->updateAllElementsTriggerColorState();
+}
+
+void cedar::proc::gui::Group::updateAllElementsTriggerColorState() const
+{
+  for (const auto element : this->getGroup()->getElements())
   {
     // get the gui representation, if this is a triggerable
     auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element.second);
