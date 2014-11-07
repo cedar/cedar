@@ -140,7 +140,9 @@ mSimulationRunning(false)
 
   this->mpTree->setNameColumn(1);
   this->mpTree->setNameEditingEnabled(true);
-  this->mpTree->header()->setResizeMode(1, QHeaderView::Stretch);
+  this->mpTree->header()->setResizeMode(this->mpTree->getNameColumn(), QHeaderView::Stretch);
+
+  this->sortItems();
 
   this->mElementAddedConnection = this->mpTree->connectToElementAddedSignal
       (
@@ -168,9 +170,15 @@ cedar::proc::gui::SimulationControl::~SimulationControl()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::SimulationControl::sortItems()
+{
+  this->mpTree->sortItems(this->mpTree->getNameColumn(), Qt::AscendingOrder);
+}
+
 void cedar::proc::gui::SimulationControl::elementNameChanged()
 {
   this->updateAllTriggerColors();
+  this->sortItems();
 }
 
 void cedar::proc::gui::SimulationControl::updateAllTriggerColors()
@@ -273,6 +281,7 @@ void cedar::proc::gui::SimulationControl::elementAdded(QTreeWidgetItem* pItem, c
   if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
   {
     this->loopedTriggerAdded(pItem, looped_trigger);
+    this->sortItems();
   }
 }
 

@@ -153,6 +153,8 @@ private:
 
   void updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr loopedTrigger);
 
+  void sortItems();
+
 private slots:
   void startPauseSimulationClicked();
 

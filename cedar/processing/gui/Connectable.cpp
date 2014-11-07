@@ -903,9 +903,16 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
 
     auto triggers = group->listLoopedTriggers();
 
-    auto gui_group = this->getGuiGroup();
+    std::map<std::string, cedar::proc::LoopedTriggerPtr> sorted_triggers;
     for (auto trigger : triggers)
     {
+      sorted_triggers[trigger->getName()] = trigger;
+    }
+
+    auto gui_group = this->getGuiGroup();
+    for (const auto& name_trigger_pair : sorted_triggers)
+    {
+      auto trigger = name_trigger_pair.second;
       std::string path = group->findPath(trigger);
       QAction* action = p_assign_trigger->addAction(QString::fromStdString(trigger->getName()));
       action->setData(QString::fromStdString(path));
