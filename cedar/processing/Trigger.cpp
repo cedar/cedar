@@ -144,6 +144,16 @@ std::string nameTrigger(cedar::proc::TriggerPtr trigger)
   return nameTrigger(trigger.get());
 }
 
+std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> cedar::proc::Trigger::getTriggeringOrder() const
+{
+  std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> copy;
+
+  QReadLocker locker(this->mTriggeringOrder.getLockPtr());
+  copy = this->mTriggeringOrder.member();
+  return copy;
+}
+
+
 void cedar::proc::Trigger::exploreSink
      (
        cedar::proc::TriggerablePtr source,
