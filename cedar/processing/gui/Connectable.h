@@ -152,6 +152,9 @@ protected:
       //! Resets the backgroud color of the decoration to the default.
       void resetBackgroundColor();
 
+      //! sets the description at the icon
+      virtual void setDescription(const QString& text);
+
     private:
       QGraphicsSvgItem* mpIcon;
 
@@ -454,7 +457,6 @@ private:
   boost::signals2::scoped_connection mFillColorChangedConnection;
 
   QColor mPreviousFillColor;
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

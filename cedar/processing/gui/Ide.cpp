@@ -435,6 +435,7 @@ mSimulationRunning(false)
     QObject::connect(openable_dialog->getMenuAction(), SIGNAL(triggered()), this, SLOT(showOpenableDialog()));
   }
 
+  this->showTriggerConnections(mpActionToggleTriggerVisibility->isChecked());
   this->buildStatusBar();
   this->startTimer(100);
 }
