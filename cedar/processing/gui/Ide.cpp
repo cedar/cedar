@@ -1563,13 +1563,14 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   // reset scene
   this->mpProcessingDrawer->resetViewport();
   // create new root network
-  cedar::proc::gui::GroupPtr network(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene()));
-  network->getGroup()->setName("root");
-  this->mpProcessingDrawer->getScene()->setGroup(network);
+  cedar::proc::gui::GroupPtr group(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene()));
+  group->getGroup()->setName("root");
+  group->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
+  this->mpProcessingDrawer->getScene()->setGroup(group);
   // read network
   try
   {
-    network->read(file.toStdString());
+    group->read(file.toStdString());
   }
   catch(const cedar::proc::ArchitectureLoadingException& e)
   {
@@ -1622,7 +1623,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
 
   //!@todo Why doesn't this call resetTo?
-  this->setGroup(network);
+  this->setGroup(group);
 
   this->displayFilename(file.toStdString());
 
