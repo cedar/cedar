@@ -226,7 +226,7 @@ public:
   void closeOpenArchitectureWidgets();
 
   //! Returns a color for a given looped trigger
-  static QColor getColorFor(cedar::proc::LoopedTriggerPtr trigger);
+  QColor getColorFor(cedar::proc::LoopedTriggerPtr trigger) const;
 
   void toggleTriggerColors(bool show);
 
@@ -334,6 +334,8 @@ private:
 
   void lastReadConfigurationChanged();
 
+  void clearTriggerColorCache() const;
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
@@ -400,6 +402,9 @@ private:
 
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::Group*> mpGroupsToAdd;
+
+  //! Map assigning colors to looped triggers. This is a cache to make calculations faster. The real assignment is determined algorithmically.
+  mutable std::map<cedar::proc::TriggerPtr, QColor> mTriggerColors;
 
 //  boost::signals2::connection mSlotConnection;
   //!@todo Make these scoped connections
