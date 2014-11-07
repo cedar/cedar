@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <QMessageBox>
 #include <boost/bind.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,10 +88,19 @@ void cedar::proc::gui::ElementTreeWidget::itemChanged(QTreeWidgetItem* pItem, in
     return;
   }
 
-  QString new_name = pItem->text(this->mNameColumn);
+  QString new_name = pItem->text(this->getNameColumn());
   std::string path = this->getPathFromItem(pItem);
   auto element = this->mGroup->getElement(path);
-  element->setName(new_name.toStdString());
+  try
+  {
+    element->setName(new_name.toStdString());
+  }
+  catch (cedar::aux::ValidationFailedException& e)
+  {
+    QMessageBox::critical(this, "Renaming failed", "Could not rename element. " + QString::fromStdString(e.getMessage()), QMessageBox::Ok);
+    pItem->setText(this->getNameColumn(), QString::fromStdString(element->getName()));
+    return;
+  }
   this->setItemPath(pItem, this->mGroup->findPath(element));
   emit elementNameChanged(pItem);
 }
