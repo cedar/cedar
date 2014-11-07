@@ -119,6 +119,12 @@ public:
     return this->mpOwner;
   }
 
+  /*! Returns a copy of the triggering order associated with this trigger.
+   *
+   *  The uint represents the depth; all triggerables with the same depths can be executed in parallel.
+   */
+  std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> getTriggeringOrder() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

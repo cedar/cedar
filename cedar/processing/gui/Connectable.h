@@ -223,7 +223,7 @@ public:
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.
-  void updateTriggerColorState();
+  virtual void updateTriggerColorState();
 
   //! reacts to the removal of a data slot
   void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
@@ -349,6 +349,11 @@ protected:
   /*! Returns a formatted string that can be used for labels/window titles.
    */
   std::string getNameForTitle() const;
+
+  void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
+
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -376,6 +381,10 @@ private:
   void translateParentTriggerChangedSignal();
 
   void fillColorChanged(QColor color);
+
+  void showTriggerChains();
+
+  void hideTriggerChains();
 
 private slots:
   void triggerableStarted();
@@ -460,6 +469,9 @@ private:
 
   //! Stores whether or not the item is showing the color of its trigger.
   bool mShowingTriggerColor;
+
+  std::vector<QGraphicsItem*> mTriggerChainVisualization;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

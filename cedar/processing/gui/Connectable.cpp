@@ -226,9 +226,113 @@ void cedar::proc::gui::Connectable::Decoration::setDescription(const QString& te
   this->mpIcon->setToolTip(text);
 }
 
+void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  this->showTriggerChains();
+
+  pEvent->setAccepted(true);
+}
+
+void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  this->hideTriggerChains();
+
+  pEvent->setAccepted(true);
+}
+
 void cedar::proc::gui::Connectable::translateParentTriggerChangedSignal()
 {
   emit triggerableParentTriggerChanged();
+}
+
+void cedar::proc::gui::Connectable::showTriggerChains()
+{
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
+  if (!triggerable)
+  {
+    return;
+  }
+
+  auto done_trigger = triggerable->getFinishedTrigger();
+  if (!done_trigger)
+  {
+    return;
+  }
+
+  auto make_circle = [&](unsigned int depth, qreal x, qreal y, qreal size, QGraphicsItem* parent)
+      {
+        auto circle = new QGraphicsEllipseItem(0, 0, size, size, parent);
+        circle->setPos(x, y);
+        circle->setBrush(QBrush(Qt::white, Qt::SolidPattern));
+        QPen pen(Qt::black);
+        pen.setWidth(2);
+        circle->setPen(pen);
+
+        auto text = new QGraphicsSimpleTextItem(QString("%1").arg(depth), circle);
+
+        // note: this order is important; if the circle got deleted before the text, this would lead to a crash
+        this->mTriggerChainVisualization.push_back(text);
+        this->mTriggerChainVisualization.push_back(circle);
+
+        // center the text on the circle
+        QRectF text_bounds = text->boundingRect();
+        QRectF circle_bounds = circle->boundingRect();
+        text->setPos
+        (
+          (circle_bounds.width() - text_bounds.width()) / static_cast<qreal>(2),
+          (circle_bounds.height() - text_bounds.height()) / static_cast<qreal>(2)
+        );
+      };
+
+
+  qreal root_size = static_cast<qreal>(40.0);
+  qreal item_size = static_cast<qreal>(30.0);
+
+  make_circle
+  (
+    0,
+    -root_size / static_cast<qreal>(2.0),
+    this->height() - root_size / static_cast<qreal>(2.0),
+    root_size,
+    this
+  );
+
+  auto trigger_chain = done_trigger->getTriggeringOrder();
+
+  auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  if (scene == nullptr)
+  {
+    return;
+  }
+
+  for (const auto& depth_triggerable_set_pair : trigger_chain)
+  {
+    auto depth = depth_triggerable_set_pair.first;
+    auto triggerable_set = depth_triggerable_set_pair.second;
+    for (auto link : triggerable_set)
+    {
+      auto link_element = boost::dynamic_pointer_cast<cedar::proc::Element>(link);
+      CEDAR_DEBUG_ASSERT(link_element);
+      auto link_gui = scene->getGraphicsItemFor(link_element.get());
+      if (!link_gui)
+      {
+        // ok
+        // can happen either for the processing done trigger of the start of the chain, or for group inputs
+        continue;
+      }
+      QRectF bounds = link_gui->boundingRect();
+      make_circle(depth, -item_size / static_cast<qreal>(2), bounds.height() - item_size / static_cast<qreal>(2), item_size, link_gui);
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::hideTriggerChains()
+{
+  for (auto p_item : this->mTriggerChainVisualization)
+  {
+    delete p_item;
+  }
+  this->mTriggerChainVisualization.clear();
 }
 
 //!@todo This belongs into a cedar::proc::gui::Element class ...
@@ -272,11 +376,12 @@ void cedar::proc::gui::Connectable::fillColorChanged(QColor color)
 void cedar::proc::gui::Connectable::updateTriggerColorState()
 {
   auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
-  auto gui_group = this->getGuiGroup();
-  if (!triggerable || gui_group == nullptr)
+  auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  if (!triggerable || scene == nullptr)
   {
     return;
   }
+  auto gui_group = scene->getRootGroup();
 
   bool show = gui_group->showsTriggerColors();
   auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
@@ -290,7 +395,7 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
     }
     else if (!triggerable->isLooped())
     {
-      color = QColor::fromRgb(200, 200, 200);
+      color = QColor::fromRgb(210, 210, 210);
     }
     this->setFillColor(color);
     if (!this->mShowingTriggerColor)
@@ -298,11 +403,14 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
       this->mPreviousFillColor = last_color;
     }
     this->mShowingTriggerColor = true;
+    this->setAcceptHoverEvents(true);
   }
   else
   {
     this->setFillColor(this->mPreviousFillColor);
     this->mShowingTriggerColor = false;
+    this->setAcceptHoverEvents(false);
+    this->hideTriggerChains();
   }
 }
 

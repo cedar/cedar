@@ -235,6 +235,34 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Group::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  // only looped groups have meaningful trigger chains (which are displayed in gui::Connectable::hoverEnterEvent)
+  if (!this->getGroup()->isLooped())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+  else
+  {
+    cedar::proc::gui::Connectable::hoverEnterEvent(pEvent);
+  }
+}
+
+void cedar::proc::gui::Group::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  // see cedar::proc::gui::Group::hoverEnterEvent
+  if (!this->getGroup()->isLooped())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+  else
+  {
+    cedar::proc::gui::Connectable::hoverLeaveEvent(pEvent);
+  }
+}
+
 void cedar::proc::gui::Group::elementNameChanged(const std::string&, const std::string& to)
 {
   auto element = this->getGroup()->getElement(to);
@@ -2224,6 +2252,12 @@ void cedar::proc::gui::Group::toggleTriggerColors(bool show)
 {
   this->mShowTriggerColors = show;
 
+  this->updateAllElementsTriggerColorState();
+}
+
+void cedar::proc::gui::Group::updateTriggerColorState()
+{
+  cedar::proc::gui::Connectable::updateTriggerColorState();
   this->updateAllElementsTriggerColorState();
 }
 
