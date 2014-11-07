@@ -230,12 +230,30 @@ void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pE
 {
   this->showTriggerChains();
 
+  // because qt doesn't send a leave event if a child is hovered over, we need to manually implement one
+  if (this->parentItem())
+  {
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->parentItem()))
+    {
+      connectable->hideTriggerChains();
+    }
+  }
+
   pEvent->setAccepted(true);
 }
 
 void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
 {
   this->hideTriggerChains();
+
+  // because qt doesn't send an enter event if a child is left, we need to manually implement one
+  if (this->parentItem())
+  {
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->parentItem()))
+    {
+      connectable->showTriggerChains();
+    }
+  }
 
   pEvent->setAccepted(true);
 }
@@ -268,7 +286,7 @@ void cedar::proc::gui::Connectable::showTriggerChains()
         pen.setWidth(2);
         circle->setPen(pen);
 
-        auto text = new QGraphicsSimpleTextItem(QString("%1").arg(depth), circle);
+        auto text = new QGraphicsSimpleTextItem(QString("%1").arg(depth + 1), circle);
 
         // note: this order is important; if the circle got deleted before the text, this would lead to a crash
         this->mTriggerChainVisualization.push_back(text);
@@ -395,7 +413,7 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
     }
     else if (!triggerable->isLooped())
     {
-      color = QColor::fromRgb(210, 210, 210);
+      color = QColor::fromRgb(220, 220, 220);
     }
     this->setFillColor(color);
     if (!this->mShowingTriggerColor)
