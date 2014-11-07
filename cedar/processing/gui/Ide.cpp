@@ -235,8 +235,9 @@ class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui
 public:
   OpenableSimulationControl()
   :
-  OpenableDialog("Simulation control", "", "simulation control")
+  OpenableDialog("Simulation control", ":/toolbaricons/simulation_control.svg", "simulation control")
   {
+    this->setIsInToolbar(true);
   }
 
   QWidget* createOpenable() const
