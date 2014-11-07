@@ -2230,11 +2230,9 @@ void cedar::proc::gui::Group::updateAllElementsTriggerColorState() const
   for (const auto element : this->getGroup()->getElements())
   {
     // get the gui representation, if this is a triggerable
-    auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element.second);
-    if (triggerable && triggerable->isLooped())
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element.second))
     {
-      auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->mpScene->getGraphicsItemFor(element.second.get()));
-      if (connectable)
+      if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->mpScene->getGraphicsItemFor(element.second.get())))
       {
         connectable->updateTriggerColorState();
       }

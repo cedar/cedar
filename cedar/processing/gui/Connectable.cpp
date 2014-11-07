@@ -279,10 +279,18 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
 
   bool show = gui_group->showsTriggerColors();
   auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
-  if (show && parent_trigger)
+  if (show)
   {
     auto last_color = this->getFillColor();
-    auto color = gui_group->getColorFor(parent_trigger);
+    QColor color = Qt::white;
+    if (parent_trigger)
+    {
+      color = gui_group->getColorFor(parent_trigger);
+    }
+    else if (!triggerable->isLooped())
+    {
+      color = QColor::fromRgb(200, 200, 200);
+    }
     this->setFillColor(color);
     this->mPreviousFillColor = last_color;
   }
