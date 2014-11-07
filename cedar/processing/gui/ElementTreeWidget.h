@@ -101,6 +101,12 @@ public:
   //! If set to true, the widget allows editing the names of the items it displays.
   void setNameEditingEnabled(bool enabled);
 
+  //! Returns the group path stored for the item.
+  std::string getPathFromItem(QTreeWidgetItem* pItem) const;
+
+  //! Sets the group path stored in the item.
+  void setItemPath(QTreeWidgetItem* pItem, const std::string& newPath);
+
 signals:
   //! Used to translate a boost signal to a Qt signal.
   void elementAddedSignal(QString);

@@ -145,6 +145,14 @@ private:
 
   void updateSimulationRunningIcon(bool running);
 
+  QWidget* getColorWidget(QTreeWidgetItem* pItem);
+
+  cedar::proc::LoopedTriggerPtr getItemTrigger(QTreeWidgetItem* pItem);
+
+  void updateItemTriggerColor(QTreeWidgetItem* pItem);
+
+  void updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr loopedTrigger);
+
 private slots:
   void startPauseSimulationClicked();
 
@@ -156,7 +164,9 @@ private slots:
 
   void removeClicked();
 
-  void elementNameChanged(QTreeWidgetItem* pItem);
+  void updateAllTriggerColors();
+
+  void elementNameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

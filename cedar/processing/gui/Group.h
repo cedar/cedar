@@ -340,6 +340,9 @@ signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
 
+  //! Emitted whenever trigger colors need updating.
+  void triggerColorsChanged() const;
+
 private slots:
   //!@brief Updates the label of the group.
   void groupNameChanged();
@@ -371,6 +374,8 @@ private slots:
   void openParameterEditor();
 
   void backgroundColorActionTriggered();
+
+  void elementNameChanged(const std::string&, const std::string&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

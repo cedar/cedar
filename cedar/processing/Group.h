@@ -125,7 +125,7 @@ public:
     CONNECTION_REMOVED,
   };
 
- signals:
+signals:
   //! Signals when a step name changes.
   void stepNameChanged(const std::string& from, const std::string& to);
 
