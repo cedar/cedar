@@ -336,6 +336,8 @@ private:
 
   void clearTriggerColorCache() const;
 
+  void updateAllElementsTriggerColorState() const;
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
