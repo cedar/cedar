@@ -87,6 +87,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("properties", mProperties);
   this->declareDockSettings("boost control", false);
   this->declareDockSettings("simulation control", false);
+  this->declareDockSettings("architecture consistency check", false);
 
   cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
   this->addConfigurableChild("slot growth", slot_growth);
