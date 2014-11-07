@@ -97,13 +97,15 @@
 class cedar::proc::gui::Ide::OpenableDialog
 {
 public:
-  OpenableDialog(const std::string& name, const QString& iconPath = "")
+  OpenableDialog(const std::string& name, const QString& iconPath = "", const std::string& configId = std::string())
   :
   mpOpenedWidget(nullptr),
   mName(name),
+  mConfigId(configId),
   mpMenuAction(nullptr),
   mpDock(nullptr),
-  mIconPath(iconPath)
+  mIconPath(iconPath),
+  mIsInToolBar(false)
   {
   }
 
@@ -120,7 +122,26 @@ public:
     this->actionAdded();
   }
 
-  void show(QWidget* parent, cedar::proc::gui::GroupPtr group);
+  void show(QWidget* parent, cedar::proc::gui::GroupPtr group)
+  {
+    if (this->mpDock == nullptr)
+    {
+      this->mpDock = new QDockWidget(parent);
+      this->mpDock->setFloating(true);
+      this->mpDock->setWindowTitle(QString::fromStdString(this->getName()));
+      this->mpDock->setAllowedAreas(Qt::NoDockWidgetArea);
+      this->mpOpenedWidget = this->createOpenable();
+      this->setGroup(group);
+      this->mpDock->setWidget(this->mpOpenedWidget);
+
+      if (!this->mConfigId.empty())
+      {
+        cedar::proc::gui::SettingsSingleton::getInstance()->getNamedDockSettings(this->mConfigId)->setTo(this->mpDock);
+      }
+    }
+
+    this->mpDock->show();
+  }
 
   QAction* getMenuAction() const
   {
@@ -139,6 +160,25 @@ public:
     // empty default implementation
   }
 
+  void storeSettings()
+  {
+    if (!this->mConfigId.empty() && this->mpDock != nullptr)
+    {
+      cedar::proc::gui::SettingsSingleton::getInstance()->getNamedDockSettings(this->mConfigId)->getFrom(this->mpDock);
+    }
+  }
+
+  bool isInToolbar() const
+  {
+    return this->mIsInToolBar;
+  }
+
+protected:
+  void setIsInToolbar(bool isInToolBar)
+  {
+    this->mIsInToolBar = isInToolBar;
+  }
+
 private:
   virtual void actionAdded()
   {
@@ -151,11 +191,15 @@ protected:
 private:
   std::string mName;
 
+  std::string mConfigId;
+
   QAction* mpMenuAction;
 
   QDockWidget* mpDock;
 
   QString mIconPath;
+
+  bool mIsInToolBar;
 };
 
 class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar::proc::gui::Ide::OpenableDialog
@@ -191,7 +235,7 @@ class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui
 public:
   OpenableSimulationControl()
   :
-  OpenableDialog("Simulation control")
+  OpenableDialog("Simulation control", "", "simulation control")
   {
   }
 
@@ -216,15 +260,50 @@ private:
   }
 };
 
+class cedar::proc::gui::Ide::OpenableBoostControl : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableBoostControl(cedar::proc::gui::View* view)
+  :
+  OpenableDialog("Boost control", ":/steps/boost.svg", "boost control"),
+  mpView(view)
+  {
+    this->setIsInToolbar(true);
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new cedar::proc::gui::BoostControl(mpView);
+  }
+
+  void setGroup(cedar::proc::gui::GroupPtr group)
+  {
+    if (this->mpOpenedWidget)
+    {
+      auto widget = dynamic_cast<cedar::proc::gui::BoostControl*>(this->mpOpenedWidget);
+      widget->setGroup(group->getGroup());
+    }
+  }
+
+private:
+  void actionAdded()
+  {
+    this->getMenuAction()->setShortcut(Qt::CTRL + Qt::Key_B);
+  }
+
+private:
+  cedar::proc::gui::View* mpView;
+};
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 :
 mpPerformanceOverview(nullptr),
 mpBoostControlDock(nullptr),
-mpBoostControl(nullptr),
 mSuppressCloseDialog(false),
 mpExperimentDialog(nullptr),
 mSimulationRunning(false)
@@ -391,7 +470,6 @@ mSimulationRunning(false)
 
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionToggleTriggerColor, SIGNAL(triggered(bool)), this, SLOT(toggleTriggerColors(bool)));
-  QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
   QObject::connect(mpActionExperiments, SIGNAL(triggered()), this, SLOT(showExperimentDialog()));
 
   QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
@@ -422,9 +500,12 @@ mSimulationRunning(false)
 
   this->mpActionResetSimulation->setEnabled(false);
 
+  auto boost_ctrl = OpenableDialogPtr(new OpenableBoostControl(this->mpProcessingDrawer));
+
   std::vector<OpenableDialogPtr> openable_dialogs;
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
   openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
+  openable_dialogs.push_back(boost_ctrl);
 
   // need to iterate in reverse, actions are always added at the beginning of the menu
   for (auto iter = openable_dialogs.rbegin(); iter != openable_dialogs.rend(); ++iter)
@@ -433,7 +514,15 @@ mSimulationRunning(false)
     this->mOpenableDialogs[openable_dialog->getName()] = openable_dialog;
     openable_dialog->addToMenu(this->mpToolsMenu);
     QObject::connect(openable_dialog->getMenuAction(), SIGNAL(triggered()), this, SLOT(showOpenableDialog()));
+    if (openable_dialog->isInToolbar())
+    {
+      this->mpToolBar->insertAction(this->mpActionDummy, openable_dialog->getMenuAction());
+    }
   }
+  // the action dummy used for placing openable dialogs has server its purpose; destroy it!
+  this->mpToolBar->removeAction(this->mpActionDummy);
+  delete this->mpActionDummy;
+
 
   this->buildStatusBar();
   this->startTimer(100);
@@ -463,22 +552,6 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::proc::gui::Ide::OpenableDialog::show(QWidget* parent, cedar::proc::gui::GroupPtr group)
-{
-  if (this->mpDock == nullptr)
-  {
-    this->mpDock = new QDockWidget(parent);
-    this->mpDock->setFloating(true);
-    this->mpDock->setWindowTitle(QString::fromStdString(this->getName()));
-    this->mpDock->setAllowedAreas(Qt::NoDockWidgetArea);
-    this->mpOpenedWidget = this->createOpenable();
-    this->setGroup(group);
-    this->mpDock->setWidget(this->mpOpenedWidget);
-  }
-
-  this->mpDock->show();
-}
 
 void cedar::proc::gui::Ide::showOpenableDialog()
 {
@@ -564,35 +637,6 @@ void cedar::proc::gui::Ide::showRobotManager()
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 {
   this->setWindowTitle(this->mDefaultWindowTitle + " - " + QString::fromStdString(filename) + "[*]");
-}
-
-void cedar::proc::gui::Ide::showBoostControl()
-{
-  if (this->mpBoostControlDock == nullptr)
-  {
-    this->mpBoostControlDock = new QDockWidget(this);
-    this->mpBoostControlDock->setFloating(true);
-    this->mpBoostControl = new cedar::proc::gui::BoostControl(this->mpProcessingDrawer);
-    this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
-    this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
-    this->mpBoostControlDock->setWidget(this->mpBoostControl);
-
-    if (this->mGroup)
-    {
-      this->mpBoostControl->setGroup(this->mGroup->getGroup());
-    }
-
-    cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->setTo(this->mpBoostControlDock);
-
-    // for some reason I do not get, the boost settings are only restored properly when this line is included. Qt bug?
-    this->mpBoostControlDock->setVisible(false);
-
-    this->mpBoostControlDock->show();
-  }
-  else
-  {
-    this->mpBoostControlDock->show();
-  }
 }
 
 void cedar::proc::gui::Ide::showExperimentDialog()
@@ -954,9 +998,10 @@ void cedar::proc::gui::Ide::storeSettings()
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
-  if (this->mpBoostControlDock)
+  for (const auto& name_openable_pair : this->mOpenableDialogs)
   {
-    cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->getFrom(this->mpBoostControlDock);
+    auto openable = name_openable_pair.second;
+    openable->storeSettings();
   }
 
   cedar::proc::gui::SettingsSingleton::getInstance()->storeMainWindow(this);
@@ -1843,11 +1888,6 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   {
     auto openable_dialog = name_openable_pair.second;
     openable_dialog->setGroup(group);
-  }
-
-  if (this->mpBoostControl != NULL)
-  {
-    this->mpBoostControl->setGroup(group->getGroup());
   }
 
   if (this->mpPerformanceOverview != NULL)
