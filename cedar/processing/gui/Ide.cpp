@@ -207,7 +207,7 @@ class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar
   public:
     OpenableArchitectureConsistencyCheck(cedar::proc::gui::View* pView)
     :
-    OpenableDialog("Architecture consistency check", ":/menus/consistency_check.svg"),
+    OpenableDialog("Architecture consistency check", ":/menus/consistency_check.svg", "architecture consistency check"),
     mpView(pView)
     {
     }
