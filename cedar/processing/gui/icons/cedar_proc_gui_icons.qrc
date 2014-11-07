@@ -84,6 +84,7 @@
     <file>toolbaricons/smart_connections.svg</file>
     <file>toolbaricons/close_all_plots.svg</file>
     <file>toolbaricons/simulation_control.svg</file>
+    <file>toolbaricons/show_trigger_colors.svg</file>
     <file>toolbaricons/snapshot.svg</file>
     <file>processing_ide_app_icon.svg</file>
     <file>processing_ide_app_icon_48.png</file>
