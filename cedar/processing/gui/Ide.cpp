@@ -1875,6 +1875,7 @@ cedar::proc::gui::GroupPtr cedar::proc::gui::Ide::getGroup()
 void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 {
   this->mGroup = group;
+  this->mGroup->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
 
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
