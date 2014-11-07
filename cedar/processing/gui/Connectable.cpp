@@ -220,6 +220,11 @@ void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
   this->setBackgroundColor(this->mDefaultBackground);
 }
 
+void cedar::proc::gui::Connectable::Decoration::setDescription(const QString& text)
+{
+  this->mpIcon->setToolTip(text);
+}
+
 void cedar::proc::gui::Connectable::translateParentTriggerChangedSignal()
 {
   emit triggerableParentTriggerChanged();
@@ -852,18 +857,13 @@ void cedar::proc::gui::Connectable::updateDecorations()
     {
       if (!mpLoopedDecoration)
       {
-        std::string trigger_source = "It is currently not connected to a looped trigger.";
-        if (auto parent = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger()))
-        {
-          trigger_source = "It is connect to a looped trigger named \"" + parent->getName() + "\".";
-        }
         mpLoopedDecoration = DecorationPtr
         (
           new Decoration
           (
             this,
             ":/decorations/looped.svg",
-            "This element is looped. " + QString::fromStdString(trigger_source)
+            "This element is looped."
           )
         );
       }
