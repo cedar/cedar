@@ -69,6 +69,16 @@ cedar::proc::gui::ElementTreeWidget::~ElementTreeWidget()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::ElementTreeWidget::setItemPath(QTreeWidgetItem* pItem, const std::string& newPath)
+{
+  pItem->setData(this->getNameColumn(), Qt::UserRole, QString::fromStdString(newPath));
+}
+
+std::string cedar::proc::gui::ElementTreeWidget::getPathFromItem(QTreeWidgetItem* pItem) const
+{
+  return pItem->data(this->getNameColumn(), Qt::UserRole).toString().toStdString();
+}
+
 void cedar::proc::gui::ElementTreeWidget::itemChanged(QTreeWidgetItem* pItem, int column)
 {
   // only react if the change was made in the name column
@@ -78,10 +88,10 @@ void cedar::proc::gui::ElementTreeWidget::itemChanged(QTreeWidgetItem* pItem, in
   }
 
   QString new_name = pItem->text(this->mNameColumn);
-  std::string path = pItem->data(this->mNameColumn, Qt::UserRole).toString().toStdString();
+  std::string path = this->getPathFromItem(pItem);
   auto element = this->mGroup->getElement(path);
   element->setName(new_name.toStdString());
-  pItem->setData(this->mNameColumn, Qt::UserRole, QString::fromStdString(this->mGroup->findPath(element)));
+  this->setItemPath(pItem, this->mGroup->findPath(element));
   emit elementNameChanged(pItem);
 }
 
@@ -140,7 +150,7 @@ void cedar::proc::gui::ElementTreeWidget::addElement(cedar::proc::ElementPtr ele
 
   auto p_item = new QTreeWidgetItem();
   p_item->setText(this->mNameColumn, QString::fromStdString(element->getName()));
-  p_item->setData(this->mNameColumn, Qt::UserRole, QString::fromStdString(path));
+  this->setItemPath(p_item, path);
 
   Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
   if (this->mNameEditingEnabled)
@@ -222,7 +232,7 @@ void cedar::proc::gui::ElementTreeWidget::elementNameChanged()
   {
     QTreeWidgetItem* item = items.at(i);
 
-    item->setData(this->mNameColumn, Qt::UserRole, QString::fromStdString(new_path));
+    this->setItemPath(item, new_path);
     item->setText(this->mNameColumn, new_name);
   }
 

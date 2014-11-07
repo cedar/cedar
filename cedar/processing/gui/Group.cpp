@@ -118,9 +118,9 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  if (!mGroup)
+  if (!this->mGroup)
   {
-    mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
+    this->mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
   }
 
   this->linkedChanged(this->mGroup->isLinked());
@@ -193,6 +193,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
   );
   this->updateDecorations();
   this->update();
+
+  this->connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), SLOT(elementNameChanged(const std::string&, const std::string&)));
 }
 
 cedar::proc::gui::Group::~Group()
@@ -233,9 +235,21 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Group::elementNameChanged(const std::string&, const std::string& to)
+{
+  auto element = this->getGroup()->getElement(to);
+
+  if (boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
+  {
+    this->clearTriggerColorCache();
+  }
+}
+
 void cedar::proc::gui::Group::clearTriggerColorCache() const
 {
   this->mTriggerColors.clear();
+
+  emit triggerColorsChanged();
 }
 
 QColor cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigger) const
@@ -266,7 +280,7 @@ QColor cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigge
       auto trigger = name_trigger_pair.second;
 
       size_t color_index = num % colors.size();
-      int sat_val = 220 - 50 * static_cast<int>(num / colors.size());
+      int sat_val = std::max(30, 220 - 40 * static_cast<int>(num / colors.size()));
       QColor color = colors[color_index];
       color.setHsv(color.hsvHue(), sat_val, sat_val);
       mTriggerColors[trigger] = color;
