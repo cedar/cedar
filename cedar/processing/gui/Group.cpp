@@ -233,27 +233,50 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-QColor cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigger)
+void cedar::proc::gui::Group::clearTriggerColorCache() const
 {
-  std::hash<std::string> hasher;
-  size_t trigger_int = hasher(trigger->getName());
+  this->mTriggerColors.clear();
+}
 
-  static size_t sat_step_size = 10;
-  static size_t sat_steps = 6;
+QColor cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigger) const
+{
   static std::vector<QColor> colors;
+
   if (colors.empty())
   {
-    for (int h = 0; h < 360; h += 15)
+    for (int h = 0; h < 360; h += 45)
     {
       colors.push_back(QColor::fromHsv(h, 200, 200));
     }
   }
-  size_t color_index = trigger_int % colors.size();
-  size_t saturation_index = (trigger_int % (colors.size() * sat_steps)) / colors.size();
 
-  QColor color = colors.at(color_index);
-  color.setHsv(color.hsvHue(), std::max<int>(color.hsvSaturation() - saturation_index * sat_step_size, 80), color.value());
-  return color;
+  if (mTriggerColors.empty())
+  {
+    auto triggers = this->mGroup->findAll<cedar::proc::Trigger>(false);
+    std::map<std::string, cedar::proc::TriggerPtr> sorted_triggers;
+
+    for (auto trigger : triggers)
+    {
+      sorted_triggers[trigger->getName()] = trigger;
+    }
+
+    size_t num = 0;
+    for (auto name_trigger_pair : sorted_triggers)
+    {
+      auto trigger = name_trigger_pair.second;
+
+      size_t color_index = num % colors.size();
+      int sat_val = 220 - 50 * static_cast<int>(num / colors.size());
+      QColor color = colors[color_index];
+      color.setHsv(color.hsvHue(), sat_val, sat_val);
+      mTriggerColors[trigger] = color;
+      ++num;
+    }
+  }
+
+  auto iter = this->mTriggerColors.find(trigger);
+  CEDAR_ASSERT(iter != this->mTriggerColors.end());
+  return iter->second;
 }
 
 const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
@@ -1473,6 +1496,8 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   {
     this->mpScene->addTrigger(trigger, QPointF(0, 0));
     p_scene_element = this->mpScene->getTriggerItemFor(trigger.get());
+
+    this->clearTriggerColorCache();
   }
   CEDAR_ASSERT(p_scene_element != nullptr);
 
@@ -1651,7 +1676,6 @@ void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::stri
 
 void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
-
   if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
   {
     this->removeConnectorItem(true, element->getName());
@@ -1659,6 +1683,10 @@ void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElem
   else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::ConstGroupSink>(element))
   {
     this->removeConnectorItem(false, element->getName());
+  }
+  else if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
+  {
+    this->clearTriggerColorCache();
   }
   else
   {
