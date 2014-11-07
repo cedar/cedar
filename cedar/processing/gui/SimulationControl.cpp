@@ -83,6 +83,15 @@ mLoopedTrigger(loopedTrigger)
   QObject::connect(this->mLoopedTrigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
   QObject::connect(this->mpStartStopButton, SIGNAL(clicked()), this, SLOT(startStopTriggerClicked()));
   QObject::connect(this->mpSingleStepButton, SIGNAL(clicked()), this, SLOT(singleStepClicked()));
+
+  if (loopedTrigger->isRunning())
+  {
+    this->triggerStarted();
+  }
+  else
+  {
+    this->triggerStopped();
+  }
 }
 
 void cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget::singleStepClicked()
@@ -140,7 +149,9 @@ mSimulationRunning(false)
 
   this->mpTree->setNameColumn(1);
   this->mpTree->setNameEditingEnabled(true);
-  this->mpTree->header()->setResizeMode(1, QHeaderView::Stretch);
+  this->mpTree->header()->setResizeMode(this->mpTree->getNameColumn(), QHeaderView::Stretch);
+
+  this->sortItems();
 
   this->mElementAddedConnection = this->mpTree->connectToElementAddedSignal
       (
@@ -157,7 +168,12 @@ mSimulationRunning(false)
   QObject::connect(this->mpPlayPauseButton, SIGNAL(clicked()), this, SLOT(startPauseSimulationClicked()));
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(createClicked()));
   QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
-  QObject::connect(this->mpTree, SIGNAL(elementNameChanged(QTreeWidgetItem*)), this, SLOT(elementNameChanged(QTreeWidgetItem*)));
+  QObject::connect(this->mpTree, SIGNAL(elementNameChanged(QTreeWidgetItem*)), this, SLOT(elementNameChanged()));
+
+  if (cedar::aux::GlobalClockSingleton::getInstance()->isRunning())
+  {
+    this->triggerStarted();
+  }
 }
 
 cedar::proc::gui::SimulationControl::~SimulationControl()
@@ -168,18 +184,73 @@ cedar::proc::gui::SimulationControl::~SimulationControl()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::SimulationControl::elementNameChanged(QTreeWidgetItem* pItem)
+void cedar::proc::gui::SimulationControl::sortItems()
+{
+  this->mpTree->sortItems(this->mpTree->getNameColumn(), Qt::AscendingOrder);
+}
+
+void cedar::proc::gui::SimulationControl::elementNameChanged()
+{
+  this->updateAllTriggerColors();
+  this->sortItems();
+}
+
+void cedar::proc::gui::SimulationControl::updateAllTriggerColors()
+{
+  QTreeWidgetItemIterator iterator(this->mpTree);
+  while (auto item = *iterator)
+  {
+    this->updateItemTriggerColor(item);
+    ++iterator;
+  }
+}
+
+QWidget* cedar::proc::gui::SimulationControl::getColorWidget(QTreeWidgetItem* pItem)
 {
   QWidget* p_outer = this->mpTree->itemWidget(pItem, 0);
-  CEDAR_ASSERT(p_outer->layout() != nullptr);
+  if (p_outer->layout() == nullptr)
+  {
+    return nullptr;
+  }
+
   QWidget* p_inner = p_outer->layout()->itemAt(0)->widget();
-  CEDAR_ASSERT(p_inner != nullptr);
+  return p_inner;
+}
 
-  auto path = pItem->data(this->mpTree->getNameColumn(), Qt::UserRole).toString().toStdString();
-  auto trigger = this->mGroup->getGroup()->getElement<cedar::proc::LoopedTrigger>(path);
+cedar::proc::LoopedTriggerPtr cedar::proc::gui::SimulationControl::getItemTrigger(QTreeWidgetItem* pItem)
+{
+  auto path = this->mpTree->getPathFromItem(pItem);
+  if (this->mGroup->getGroup()->nameExists(path))
+  {
+    return this->mGroup->getGroup()->getElement<cedar::proc::LoopedTrigger>(path);
+  }
+  else
+  {
+    return cedar::proc::LoopedTriggerPtr();
+  }
+}
 
+void cedar::proc::gui::SimulationControl::updateItemTriggerColor(QTreeWidgetItem* pItem)
+{
+  auto widget = this->getColorWidget(pItem);
+  if (widget == nullptr)
+  {
+    return;
+  }
+
+  auto trigger = this->getItemTrigger(pItem);
+  if (!trigger)
+  {
+    return;
+  }
+
+  this->updateItemColorWidgetColor(widget, trigger);
+}
+
+void cedar::proc::gui::SimulationControl::updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr trigger)
+{
   QColor color = this->mGroup->getColorFor(trigger);
-  p_inner->setStyleSheet("QWidget {background: " + color.name() + ";}");
+  pColorWidget->setStyleSheet("QWidget {background: " + color.name() + ";}");
 }
 
 void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr group)
@@ -189,6 +260,7 @@ void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr gr
 
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
+  QObject::connect(this->mGroup.get(), SIGNAL(triggerColorsChanged()), this, SLOT(updateAllTriggerColors()));
 }
 
 void cedar::proc::gui::SimulationControl::createClicked()
@@ -207,7 +279,7 @@ void cedar::proc::gui::SimulationControl::removeClicked()
   // first, remember all the items to be removed (because removing them will affect the selection in the tree)
   for (auto item : selected_items)
   {
-    std::string path = item->data(1, Qt::UserRole).toString().toStdString();
+    std::string path = this->mpTree->getPathFromItem(item);
     to_remove.push_back(this->mGroup->getGroup()->getElement(path));
   }
 
@@ -223,6 +295,7 @@ void cedar::proc::gui::SimulationControl::elementAdded(QTreeWidgetItem* pItem, c
   if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
   {
     this->loopedTriggerAdded(pItem, looped_trigger);
+    this->sortItems();
   }
 }
 
@@ -231,7 +304,6 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
   auto control = new cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget(loopedTrigger);
   this->mpTree->setItemWidget(pItem, 2, control);
 
-  QColor color = this->mGroup->getColorFor(loopedTrigger);
   auto color_indicator_frame = new QWidget();
   auto layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
@@ -239,9 +311,9 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
   auto color_indicator = new QWidget();
   color_indicator->setFixedSize(QSize(16, 16));
   color_indicator->setAutoFillBackground(true);
-  color_indicator->setStyleSheet("QWidget {background: " + color.name() + ";}");
   layout->addWidget(color_indicator, 0, Qt::AlignCenter);
   this->mpTree->setItemWidget(pItem, 0, color_indicator_frame);
+  this->updateItemColorWidgetColor(color_indicator, loopedTrigger);
 
   int column = 3;
   std::vector<std::string> parameter_names;

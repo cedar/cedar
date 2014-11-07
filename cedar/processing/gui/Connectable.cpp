@@ -282,7 +282,7 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   if (show && parent_trigger)
   {
     auto last_color = this->getFillColor();
-    auto color = cedar::proc::gui::Group::getColorFor(parent_trigger);
+    auto color = gui_group->getColorFor(parent_trigger);
     this->setFillColor(color);
     this->mPreviousFillColor = last_color;
   }
@@ -903,15 +903,23 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
 
     auto triggers = group->listLoopedTriggers();
 
+    std::map<std::string, cedar::proc::LoopedTriggerPtr> sorted_triggers;
     for (auto trigger : triggers)
     {
+      sorted_triggers[trigger->getName()] = trigger;
+    }
+
+    auto gui_group = this->getGuiGroup();
+    for (const auto& name_trigger_pair : sorted_triggers)
+    {
+      auto trigger = name_trigger_pair.second;
       std::string path = group->findPath(trigger);
       QAction* action = p_assign_trigger->addAction(QString::fromStdString(trigger->getName()));
       action->setData(QString::fromStdString(path));
       action->setEnabled(trigger != current_trigger);
 
       QPixmap color_pm(16, 16);
-      QColor trigger_color = cedar::proc::gui::Group::getColorFor(trigger);
+      QColor trigger_color = gui_group->getColorFor(trigger);
       color_pm.fill(trigger_color);
       action->setIcon(QIcon(color_pm));
 
