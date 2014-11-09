@@ -91,7 +91,7 @@ _mVisualizedObject(
 {
   // declare all data
   this->declareInput("Cartesian position");
-  this->declareOutput("Cartesion position", this->mOutput);
+  this->declareOutput("Cartesian position", this->mOutput);
 
   this->mInputs = this->getInputSlot("Cartesian position");
 
