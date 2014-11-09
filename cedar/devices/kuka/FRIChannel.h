@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KinematicChain.h
+    File:        FRIChannel.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
-    Date:        2010 11 23
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 03 06
 
-    Description:
+    Description: Communication channel for a component or device over Yarp.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H
-#define CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H
+#ifndef CEDAR_DEV_KUKA_FRI_CHANNEL_H
+#define CEDAR_DEV_KUKA_FRI_CHANNEL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,82 +44,93 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/kuka/namespace.h"
-#include "cedar/devices/KinematicChain.h"
-#include "cedar/auxiliaries/IntParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/net/Reader.h"
+#include "cedar/auxiliaries/net/Writer.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/devices/exceptions.h"
+#include "cedar/devices/NetworkChannel.h"
 
 // SYSTEM INCLUDES
 #include <fri/friremote.h>
-#include <QReadWriteLock>
-#include <vector>
+#include <map>
 
-
-/*!@brief kinematic chain interface for the KUKA LBR
+/*!@brief Communication channel for a component or device over Yarp.
  *
- * This class wraps the KUKA Fast Research Interface (FRI)
+ * @todo describe more.
  */
-class cedar::dev::kuka::KinematicChain :  public cedar::dev::KinematicChain
+class cedar::dev::kuka::FRIChannel : public cedar::dev::NetworkChannel
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Standard constructor
-   */
-  KinematicChain();
-
-  /*!the destructor */
-  virtual ~KinematicChain();
-
+  FRIChannel();
+  ~FRIChannel();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief check whether the kinematic chain is currently responsive to movement commands
+
+  bool isOpen() const
+  {
+    return this->mIsOpen;
+  }
+
+  /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
+
+  /*! @brief returns the state of the Interface.
    *
-   * @return    state
+   * this can be FRI_STATE_OFF, FRI_STATE_MON and FRI_STATE_CMD
+   * Commands can only be send if the state is FRI_STATE_CMD, which represents the command mode
+   * @return current state of the interface
    */
-  bool isMovable() const;
+  FRI_STATE getFriState() const;
 
-  /*! @brief returns angle for a specified joint
+  /*! @brief returns the quality of the connection.
    *
-   *  @param index  index of the joint, since the KUKA LBR has seven of them, it must be in the interval [0,6]
-   *  @return joint angle for the given index
+   * this can range from FRI_QUALITY_UNACCEPTABLE to FRI_QUALITY_PERFECT
+   * if the Quality is worse (means: less) than FRI_QUALITY_GOOD, command mode switches to monitor mode automatically
+   * @return current Quality of the connection
    */
-  virtual double getJointAngle(unsigned int index) const;
+  FRI_QUALITY getFriQuality() const;
 
-  /*! @brief returns all joint angles
+  /*! @brief returns sample time of the FRI
+
+   * The sample time is set on the FRI server. Each interval with the length of the sample time, data will be exchanged
+   * @return FRI sample time
+   */
+  float getSampleTime() const;
+
+  /*! @brief check if the robot is powered
    *
-   *  @return a vector filled with the joint angles
-   *  \throws std::out_of_range if index is out of range
+   * this especially means the dead man switch is in the right position and the robot is in command mode
+   * @return true, if power is on
    */
-  virtual void setJointAngle(unsigned int index, double angle);
+  bool isPowerOn() const;
 
+  void updateState();
 
-
-
-  void sendSimulatedAngles(cv::Mat mat);
-  cv::Mat retrieveSimulatedAngles();
+  friRemote* getInterface();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void openHook();
+
+  void closeHook()
+  {
+    if (mIsOpen)
+    {
+      mIsOpen = false;
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief This method initializes the object.
-   *
-   * This method is called from all constructors of the class.
-   * @param commandMode establish command mode if true
-   */
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  //!@brief copies data from the FRI to member variables for access from outside the loop thread
-  void copyFromFRI();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -127,16 +138,18 @@ private:
 protected:
   // none yet
 private:
-  //!@brief true, if the object has been initialized
-  bool mIsInit;
-  //!@brief locker for read/write protection
-  mutable QReadWriteLock mLock;
-  //!@brief last commanded joint position
-  std::vector<double> mCommandedJointPosition;
-  //!@brief last measured joint Position
-  std::vector<double> mMeasuredJointPosition;
-  //!@brief the FRI channel
-  cedar::dev::kuka::FRIChannelPtr mFRIChannel;
+  bool mIsOpen;
+  //!@brief KUKA Vendor-Interface, wrapped by this class
+  friRemote* mpFriRemote;
+  //!@brief Copy of the FRI state
+  FRI_STATE mFriState;
+  //!@brief Copy of the current FRI quality
+  FRI_QUALITY mFriQuality;
+  //!@brief Sample Time of the FRI connection
+  float mSampleTime;
+  //!@brief last known status if power is on on the KUKA RC
+  bool mPowerOn;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -145,6 +158,9 @@ protected:
   // none yet
 private:
   // none yet
-};
-#endif // CEDAR_USE_KUKA_FRI
-#endif /* CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H */
+
+}; // class cedar::dev::FRIChannel
+#endif // CEDAR_USE_KUKA_LWR
+
+#endif // CEDAR_DEV_KUKA_FRI_CHANNEL_H
+
