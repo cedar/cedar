@@ -170,10 +170,10 @@ public:
   };
 
   //!@brief a parameter for action sequence objects
-  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::ActionSequence> ActionSequencelListParameter;
+  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::ActionSequence> ActionSequenceListParameter;
 
   //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionSequencelListParameter);
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionSequenceListParameter);
   //!@endcond
 private:
 
@@ -371,11 +371,11 @@ private:
   //!@brief The filename of the experiment
   cedar::aux::StringParameterPtr _mFileName;
 
-  //!@brief The number of trials this experiment should run Through
+  //!@brief The number of trials this experiment should run
   cedar::aux::UIntParameterPtr _mTrials;
 
-  //!@brief The list of action sequences containing to the experiment
-  ActionSequencelListParameterPtr _mActionSequences;
+  //!@brief The list of action sequences belonging to the experiment
+  ActionSequenceListParameterPtr _mActionSequences;
 
   //!@brief The state of the group before the experiment has been started.
   cedar::aux::ConfigurationNode mGroupState;

@@ -81,7 +81,7 @@ _mFileName(new cedar::aux::StringParameter(this, "filename", "")),
 _mTrials(new cedar::aux::UIntParameter(this, "repetitions", 1)),
 _mActionSequences
 (
-  new ActionSequencelListParameter
+  new ActionSequenceListParameter
   (
     this,
     "ActionSequences",
@@ -464,9 +464,15 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(
 
 cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(std::string step, std::string parameter)
 {
-  cedar::aux::ConfigurablePtr stepItem =this->mGroup->getElement(step);
-
-  return stepItem->getParameter(parameter);
+  try
+  {
+    cedar::aux::ConfigurablePtr stepItem = this->mGroup->getElement(step);
+    return stepItem->getParameter(parameter);
+  }
+  catch (cedar::aux::InvalidNameException& exc)
+  {
+  }
+  CEDAR_THROW(cedar::aux::NotFoundException, "Could not find element \"" + step + "\" in group " + this->mGroup->getName());
 }
 
 std::vector<std::string> cedar::proc::experiment::Experiment::getStepDatas(std::string step, cedar::proc::DataRole::Id role )
@@ -485,8 +491,15 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getStepDatas(std::
 
 cedar::aux::ConstDataPtr cedar::proc::experiment::Experiment::getStepData(std::string step, std::string value,cedar::proc::DataRole::Id role)
 {
-  auto stepItem = this->mGroup->getElement<cedar::proc::Connectable>(step);
-  return stepItem->getData(role,value);
+  try
+  {
+    auto stepItem = this->mGroup->getElement<cedar::proc::Connectable>(step);
+    return stepItem->getData(role,value);
+  }
+  catch (cedar::aux::InvalidNameException& exc)
+  {
+  }
+  CEDAR_THROW(cedar::aux::NotFoundException, "Could not find element \"" + step + "\" in group " + this->mGroup->getName());
 }
 
 unsigned int cedar::proc::experiment::Experiment::getActualTrial()
