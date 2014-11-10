@@ -182,10 +182,9 @@ bool cedar::proc::experiment::StepPropertyParameter::canCopyFrom(cedar::aux::Con
 
 void cedar::proc::experiment::StepPropertyParameter::setProperty(const std::string& property)
 {
-  std::string old_value = this->mProperty;
-  this->mProperty=property;
-  if (old_value != this->mProperty)
+  if (property != this->mProperty)
   {
+    this->mProperty = property;
     updatePropertyCopy();
     this->emitChangedSignal();
   }
@@ -198,10 +197,9 @@ const std::string& cedar::proc::experiment::StepPropertyParameter::getProperty()
 
 void cedar::proc::experiment::StepPropertyParameter::setStep(const std::string& step)
 {
-  std::string old_value = this->mStep;
-  this->mStep=step;
-  if (old_value != this->mStep)
+  if (step != this->mStep)
   {
+    this->mStep = step;
     this->emitChangedSignal();
   }
 }
@@ -230,19 +228,19 @@ cedar::proc::experiment::StepPropertyParameter::PropertyType cedar::proc::experi
 cedar::aux::ConstDataPtr cedar::proc::experiment::StepPropertyParameter::getData() const
 {
   Experiment* experiment = SupervisorSingleton::getInstance()->getExperiment();
-  if (mType==OUTPUT)
+  if (mType == OUTPUT)
   {
       if (cedar::aux::ConstDataPtr data = experiment->
-          getStepData(mStep,mProperty,cedar::proc::DataRole::OUTPUT))
+          getStepData(mStep, mProperty, cedar::proc::DataRole::OUTPUT))
       {
           return data;
       }
   }
 
-  if (mType==BUFFER)
+  if (mType == BUFFER)
   {
     if (cedar::aux::ConstDataPtr data = experiment->
-        getStepData(mStep,mProperty,cedar::proc::DataRole::BUFFER))
+        getStepData(mStep, mProperty, cedar::proc::DataRole::BUFFER))
     {
         return data;
     }
@@ -253,12 +251,18 @@ cedar::aux::ConstDataPtr cedar::proc::experiment::StepPropertyParameter::getData
 
 cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameter() const
 {
-  if (mStep == "" || mProperty == "" || mType!=PARAMETER)
+  if (mStep == "" || mProperty == "" || mType != PARAMETER)
   {
     return cedar::aux::ParameterPtr();
   }
-  return SupervisorSingleton::getInstance()->
-         getExperiment()->getStepParameter(mStep,mProperty);
+  try
+  {
+    return SupervisorSingleton::getInstance()->getExperiment()->getStepParameter(mStep, mProperty);
+  }
+  catch (cedar::aux::NotFoundException& exc) // element was probably removed, reset
+  {
+    return cedar::aux::ParameterPtr();
+  }
 }
 
 cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameterCopy() const
@@ -275,7 +279,7 @@ bool cedar::proc::experiment::StepPropertyParameter::isAllowType(const std::stri
 {
   for (std::string allowed_type : allowedTypes)
   {
-    if (allowed_type==type)
+    if (allowed_type == type)
     {
       return true;
     }
@@ -285,7 +289,7 @@ bool cedar::proc::experiment::StepPropertyParameter::isAllowType(const std::stri
 
 void cedar::proc::experiment::StepPropertyParameter::disallowType(const std::string& type)
 {
-  int i=0;
+  int i = 0;
   for (std::string allowed_type : allowedTypes)
   {
     if (allowed_type==type)
@@ -314,10 +318,18 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
   {
     case PARAMETER:
     {
-      cedar::aux::ParameterPtr parameter = experiment->getStepParameter(mStep,mProperty);
-      std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
-      mParameterCopy = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
-      mParameterCopy->copyValueFrom(parameter);
+      try
+      {
+        cedar::aux::ParameterPtr parameter = experiment->getStepParameter(mStep, mProperty);
+        std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
+        mParameterCopy = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
+        mParameterCopy->copyValueFrom(parameter);
+      }
+      catch (cedar::aux::NotFoundException& exc) // element was not found, reset
+      {
+        mStep = "";
+        mProperty = "";
+      }
       break;
     }
     case OUTPUT:
