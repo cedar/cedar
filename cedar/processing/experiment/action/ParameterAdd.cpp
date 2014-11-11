@@ -87,7 +87,7 @@ void cedar::proc::experiment::action::ParameterAdd::run()
     return;
   }
   //check the type of the parameter
-  if(cedar::aux::DoubleParameterPtr parameter =
+  if (cedar::aux::DoubleParameterPtr parameter =
       boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(_mStepParamter->getParameter()))
   {
     cedar::aux::DoubleParameterPtr parameter_copy =
@@ -95,7 +95,7 @@ void cedar::proc::experiment::action::ParameterAdd::run()
     parameter->setValue(parameter->getValue() + parameter_copy->getValue());
   }
 
-  if(cedar::aux::UIntParameterPtr parameter =
+  if (cedar::aux::UIntParameterPtr parameter =
       boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(_mStepParamter->getParameter()))
   {
     cedar::aux::UIntParameterPtr parameter_copy =
