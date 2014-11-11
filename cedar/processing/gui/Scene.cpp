@@ -806,6 +806,9 @@ void cedar::proc::gui::Scene::assignSelectedToTrigger()
 
   auto trigger = cedar::proc::gui::Connectable::getTriggerFromConnectTriggerAction(action, this->mGroup->getGroup());
 
+  // because changing triggers can mean that some trigger connections that are potentially in the selection get
+  // destroyed, we first make a list of the triggerables to disconnect
+  std::vector<cedar::proc::TriggerablePtr> to_disconnect;
   for (auto selected : this->selectedItems())
   {
     auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(selected);
@@ -815,10 +818,14 @@ void cedar::proc::gui::Scene::assignSelectedToTrigger()
     }
 
     auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable->getElement());
-    if (!triggerable)
+    if (triggerable)
     {
-      continue;
+      to_disconnect.push_back(triggerable);
     }
+  }
+
+  for (auto triggerable : to_disconnect)
+  {
     if (trigger)
     {
       this->mGroup->getGroup()->connectTrigger(trigger, triggerable);
