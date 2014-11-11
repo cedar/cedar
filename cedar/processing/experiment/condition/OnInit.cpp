@@ -69,5 +69,10 @@ cedar::proc::experiment::condition::OnInit::OnInit()
 
 bool cedar::proc::experiment::condition::OnInit::check()
 {
-  return SupervisorSingleton::getInstance()->getExperiment()->isOnInit();
+  return false;
+}
+
+bool cedar::proc::experiment::condition::OnInit::initialCheck()
+{
+  return true;
 }

@@ -22,39 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnInit.h
+    File:        ActionStop.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 09
 
-    Description: Header file for the class cedar::proc::experiment::ConditionOnInit.
+    Description: Header file for the class cedar::proc::experiment::ActionStop.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_END_TRIAL_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_END_TRIAL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/processing/experiment/action/Action.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/condition/OnInit.fwd.h"
+#include "cedar/processing/experiment/action/EndTrial.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Checks if a trial is on initial state
+/*!@brief Stops a trial of the experiment framework
  *
- *      A trial is on initial state if it is not has been started yet.
- *      There should be at least one of this conditions in your experiment, containing ActionStart.
+ *        It also provides different kinds of reset methods
  */
-class cedar::proc::experiment::condition::OnInit : public cedar::proc::experiment::condition::Condition
+class cedar::proc::experiment::action::EndTrial : public cedar::proc::experiment::action::Action
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -65,20 +67,23 @@ class cedar::proc::experiment::condition::OnInit : public cedar::proc::experimen
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  OnInit();
+  EndTrial();
+
+  //!@brief Destructor
+  virtual ~EndTrial();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool initialCheck();
+  //!@brief Stops the trial, applies the reset method and send a message to the log file
+  void run();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Checks if a trial is on initial state
-  bool check();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -101,8 +106,16 @@ protected:
   // none yet
 
 private:
+  //!@brief The reset method that should be applied right after the stop
+  cedar::aux::EnumParameterPtr _mResetType;
 
-}; // class cedar::proc::experiment::ConditionOnInit
+  //!@brief Indicates if the trial is a success or a failure
+  cedar::aux::BoolParameterPtr _mSuccess;
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
+  //!@brief The message that will be send to the log file
+  cedar::aux::StringParameterPtr _mMessage;
+
+}; // class cedar::proc::experiment::ActionStop
+
+#endif // StopAllTriggers
 

@@ -49,11 +49,11 @@
 // register class
 //----------------------------------------------------------------------------------------------------------------------
 
-namespace
-{
-  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::action::StopAllTriggersPtr>();
-}
+//namespace
+//{
+//  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+//      registerType<cedar::proc::experiment::action::StopAllTriggersPtr>();
+//}
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
