@@ -123,16 +123,9 @@
     <property name="title">
      <string>View</string>
     </property>
-    <widget class="QMenu" name="menuTrigger_Connections">
-     <property name="title">
-      <string>Trigger Connections</string>
-     </property>
-     <addaction name="mpActionToggleTriggerVisibility"/>
-     <addaction name="mpActionTriggerSmartHide"/>
-    </widget>
-    <addaction name="menuTrigger_Connections"/>
     <addaction name="mpActionShowHideGrid"/>
     <addaction name="mpActionToggleSmartConnections"/>
+    <addaction name="mpActionToggleTriggerColor"/>
    </widget>
    <widget class="QMenu" name="mpToolsMenu">
     <property name="title">
@@ -821,7 +814,7 @@
      <normaloff>:/toolbaricons/show_trigger_colors.svg</normaloff>:/toolbaricons/show_trigger_colors.svg</iconset>
    </property>
    <property name="text">
-    <string>toggle color</string>
+    <string>Color elements by trigger</string>
    </property>
    <property name="toolTip">
     <string>Toggle visibility of trigger colors.</string>
