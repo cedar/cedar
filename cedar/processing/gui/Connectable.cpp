@@ -60,6 +60,7 @@
 #include <vector>
 #include <string>
 #include <QMenu>
+#include <QPainter>
 #include <QGraphicsSceneContextMenuEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -406,26 +407,31 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   if (show)
   {
     auto last_color = this->getFillColor();
-    QColor color = Qt::white;
+    auto last_style = this->getFillStyle();
+
+    QBrush brush(Qt::white);
     if (parent_trigger)
     {
-      color = gui_group->getColorFor(parent_trigger);
+      brush = gui_group->getColorFor(parent_trigger);
     }
     else if (!triggerable->isLooped())
     {
-      color = QColor::fromRgb(220, 220, 220);
+      brush = QBrush(QColor::fromRgb(220, 220, 220));
     }
-    this->setFillColor(color);
+    this->setFillColor(brush.color());
+    this->setFillStyle(brush.style());
     if (!this->mShowingTriggerColor)
     {
-      this->mPreviousFillColor = last_color;
+      this->mPreviousFillColor.setColor(last_color);
+      this->mPreviousFillColor.setStyle(last_style);
     }
     this->mShowingTriggerColor = true;
     this->setAcceptHoverEvents(true);
   }
   else
   {
-    this->setFillColor(this->mPreviousFillColor);
+    this->setFillColor(this->mPreviousFillColor.color());
+    this->setFillStyle(this->mPreviousFillColor.style());
     this->mShowingTriggerColor = false;
     this->setAcceptHoverEvents(false);
     this->hideTriggerChains();
@@ -1059,8 +1065,7 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
       action->setEnabled(trigger != current_trigger);
 
       QPixmap color_pm(16, 16);
-      QColor trigger_color = gui_group->getColorFor(trigger);
-      color_pm.fill(trigger_color);
+      cedar::proc::gui::GraphicsBase::paintBackgroundColor(color_pm, gui_group->getColorFor(trigger));
       action->setIcon(QIcon(color_pm));
 
       QObject::connect(action, SIGNAL(triggered()), this, SLOT(assignTriggerClicked()));

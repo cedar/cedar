@@ -231,6 +231,9 @@ public:
   //! Returns the color used to fill the base shape.
   QColor getFillColor() const;
 
+  //! Returns the currently set fill style.
+  Qt::BrushStyle getFillStyle() const;
+
   /*!@brief Draw the default graphical representation.
    */
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
@@ -274,6 +277,18 @@ public:
   {
     return this->mReadOnly;
   }
+
+  /*! Returns the color used to fill the foreground when the given brush is not solid.
+   */
+  static QColor nonsolidBrushForegroundColor(QBrush brush);
+
+  /*! Returns the color used to fill the background when the given brush is not solid.
+   */
+  static QColor nonsolidBrushBackgroundColor(QBrush brush);
+
+  /*! Fills the given pixmap in the same way that the background of a graphicsbase would be filled with the given brush.
+   */
+  static void paintBackgroundColor(QPixmap& pixmap, QBrush brush);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public signals

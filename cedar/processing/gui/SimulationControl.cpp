@@ -48,6 +48,7 @@
 // SYSTEM INCLUDES
 #include <QtConcurrentRun>
 #include <QHBoxLayout>
+#include <QLabel>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -249,8 +250,15 @@ void cedar::proc::gui::SimulationControl::updateItemTriggerColor(QTreeWidgetItem
 
 void cedar::proc::gui::SimulationControl::updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr trigger)
 {
-  QColor color = this->mGroup->getColorFor(trigger);
-  pColorWidget->setStyleSheet("QWidget {background: " + color.name() + ";}");
+  auto label = dynamic_cast<QLabel*>(pColorWidget);
+  CEDAR_DEBUG_ASSERT(label != nullptr);
+
+  QBrush brush = this->mGroup->getColorFor(trigger);
+
+  QPixmap color_pm(pColorWidget->width(), pColorWidget->height());
+  cedar::proc::gui::GraphicsBase::paintBackgroundColor(color_pm, brush);
+
+  label->setPixmap(color_pm);
 }
 
 void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr group)
@@ -308,7 +316,7 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
   auto layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
   color_indicator_frame->setLayout(layout);
-  auto color_indicator = new QWidget();
+  auto color_indicator = new QLabel();
   color_indicator->setFixedSize(QSize(16, 16));
   color_indicator->setAutoFillBackground(true);
   layout->addWidget(color_indicator, 0, Qt::AlignCenter);

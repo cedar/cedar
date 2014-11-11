@@ -465,7 +465,7 @@ private:
   boost::signals2::scoped_connection mParentTriggerChangedConnection;
   boost::signals2::scoped_connection mFillColorChangedConnection;
 
-  QColor mPreviousFillColor;
+  QBrush mPreviousFillColor;
 
   //! Stores whether or not the item is showing the color of its trigger.
   bool mShowingTriggerColor;

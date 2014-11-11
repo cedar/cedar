@@ -226,7 +226,7 @@ public:
   void closeOpenArchitectureWidgets();
 
   //! Returns a color for a given looped trigger
-  QColor getColorFor(cedar::proc::LoopedTriggerPtr trigger) const;
+  QBrush getColorFor(cedar::proc::LoopedTriggerPtr trigger) const;
 
   void toggleTriggerColors(bool show);
 
@@ -417,7 +417,7 @@ private:
   std::vector<cedar::proc::gui::Group*> mpGroupsToAdd;
 
   //! Map assigning colors to looped triggers. This is a cache to make calculations faster. The real assignment is determined algorithmically.
-  mutable std::map<cedar::proc::TriggerPtr, QColor> mTriggerColors;
+  mutable std::map<cedar::proc::TriggerPtr, QBrush> mTriggerColors;
 
 //  boost::signals2::connection mSlotConnection;
   //!@todo Make these scoped connections
