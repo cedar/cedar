@@ -1,0 +1,82 @@
+/*!
+
+@page CommandLineParser Tutorial: Using cedar's command line parser
+
+cedar comes with it own command line parser to help write applications that can be configured flexibly at run time
+with minimal effort. Here, we present a short tutorial that explains how you can use this functionality in your own
+code.
+
+@section BasicUsage Basic usage
+
+The command line parser comes with two types of inputs: values and flags. Flags are parameters that do not require any
+further input. Programs can then test whether or not the user specified them in the command line call. An example is the
+help flag which is present by default in any instances of the command line parser.
+
+Values are parameters that require more information from the user, such as a filename.
+
+All parameters (values and flags) consist of a long name and (optionally) a one-character short-hand. Both of these have
+to be unique in the set of defined parameters and may not contain any spaces. In the command line, long names are
+specified using two dashes (--<i>long-name</i>). Short-hands are specified by a single dash. Any single dash can be
+followed by an arbitrary number of short-hands, provided none of them expects a value.
+
+@section Help Help
+
+The special help command mentioned above is always part of any command-line parser. It automatically prints out a list
+of available options together with the description provided by the programmer.
+
+
+@section Instance Creating a Command Line Parser instance
+
+An instance of a command line parser can be created using the following code.
+@code
+  auto parser = cedar::aux::CommandLineParserPtr(new cedar::aux::CommandLineParser());
+@endcode
+This instance can then be used to define new parameters and to read their values. 
+
+
+@section Flags Flags
+
+To define a new flag, simply use
+@code
+  parser->defineFlag
+  (
+    "your-flag", // string to be specified at the command line: [program] --your-name
+    "description", // printed in the help menu
+    'y', // (optional, 0 for no value) short-hand characer: [program] -y
+    "group" // (optional, blank for default) a logical group for the parameter
+  );
+@endcode
+
+Testing whether this flag was specified by the command line parser is done by passing the long name as a parameter of
+cedar::aux::CommandLineParser::hasParsedFlag.
+
+
+@section Values Parameters with values
+
+Parameters that require values specified by the user can be defined using the following code:
+@code
+  parser->defineValue
+  (
+    "your-value", // unique identifier of the parameter
+    "description", // for the help option
+    [default value], // (optional) any type that cedar::aux::toString and fromString can deal with
+    'y', // (optional, 0 for no value) short-hand for the parameter
+    "group" // (optional) used for logically grouping parameters together 
+  );
+@endcode
+
+To read the value, use
+@code
+  parser->getValue<desired output type>("your-value");
+@endcode
+Note, that this will return the default value for the parameter if no value was given by the user, or throw an excepion
+when no default is specified.
+
+@section Advanced Advanced Functionality
+
+Part of the intended functionality for the command line parser is to offer ways to quickly build, store and read
+configurations for scientific experiments and other purposes. For this purpose, the commands
+<i>--read-config-from-file</i> and <i>--write-config-to-file</i> are predefined. Note, that reading from files features
+advanced mechanisms such as including other files to be read. See cedar::aux::CommandLineParser for further details.
+
+*/
