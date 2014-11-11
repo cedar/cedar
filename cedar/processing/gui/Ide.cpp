@@ -304,13 +304,22 @@ private:
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::gui::Ide::Ide(const cedar::aux::CommandLineParser& parser)
-:
-mpPerformanceOverview(nullptr),
-mpBoostControlDock(nullptr),
-mSuppressCloseDialog(false),
-mpExperimentDialog(nullptr),
-mSimulationRunning(false)
 {
+  this->init(!parser.hasParsedFlag("no-plugins"), !parser.hasParsedFlag("no-log"), parser);
+}
+
+cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
+{
+  this->init(loadDefaultPlugins, redirectLogToGui, cedar::aux::CommandLineParser());
+}
+
+void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui, const cedar::aux::CommandLineParser& parser)
+{
+  mpPerformanceOverview = nullptr;
+  mpBoostControlDock = nullptr;
+  mSuppressCloseDialog = false;
+  mpExperimentDialog = nullptr;
+  mSimulationRunning = false;
   // setup the (automatically generated) ui components
   this->setupUi(this);
 
@@ -384,12 +393,12 @@ mSimulationRunning(false)
   this->mDefaultWindowTitle = this->windowTitle();
 
   // setup the log to receive messages
-  if (!parser.hasParsedFlag("no-log"))
+  if (redirectLogToGui)
   {
     this->mpLog->installHandlers(true);
   }
 
-  if (!parser.hasParsedFlag("no-plugins"))
+  if (loadDefaultPlugins)
   {
     this->loadDefaultPlugins();
   }

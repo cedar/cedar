@@ -95,13 +95,20 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief A constructor that takes a command line parser.
+   *
+   * @param parser A command line parser that is used for getting startup options to the gui. Options in the parser
+   *               should be added by cedar::proc::gui::Ide::addCommandLineOptionsTo.
+   */
+  Ide(const cedar::aux::CommandLineParser& parser);
+
   /*!@brief The standard constructor.
    *
    * @param loadDefaultPlugins Loads all plugins set as default in the configuration.
    * @param redirectLogToGui   Enables or disables redirection of log messages to the gui (can help when too many log
    *                           messages lock up the user interface).
    */
-  Ide(const cedar::aux::CommandLineParser& parser);
+  Ide(bool loadDefaultPlugins = true, bool redirectLogToGui = true);
 
   //!@brief Destructor
   ~Ide();
@@ -361,6 +368,8 @@ private:
   void updateSimulationRunningIcon(bool running);
 
   void showOneTimeMessages(const std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr>& messages, bool markAsRead = false);
+
+  void init(bool loadDefaultPlugins, bool redirectLogToGui, const cedar::aux::CommandLineParser& parser);
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
