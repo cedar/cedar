@@ -1036,6 +1036,54 @@ void cedar::proc::gui::Connectable::updateDecorations()
   this->updateDecorationPositions();
 }
 
+void cedar::proc::gui::Connectable::buildConnectTriggerMenu
+(
+  QMenu* pMenu,
+  const cedar::proc::gui::Group* gui_group,
+  const QObject* receiver,
+  const char* slot,
+  boost::optional<cedar::proc::TriggerPtr> current
+)
+{
+  auto group = gui_group->getGroup();
+
+  {
+    QAction* action = pMenu->addAction("no trigger");
+    if (current)
+    {
+      action->setEnabled(current.get().get() != nullptr);
+    }
+    QObject::connect(action, SIGNAL(triggered()), receiver, slot);
+    pMenu->addSeparator();
+  }
+
+  auto triggers = group->listLoopedTriggers();
+
+  std::map<std::string, cedar::proc::LoopedTriggerPtr> sorted_triggers;
+  for (auto trigger : triggers)
+  {
+    sorted_triggers[trigger->getName()] = trigger;
+  }
+
+  for (const auto& name_trigger_pair : sorted_triggers)
+  {
+    auto trigger = name_trigger_pair.second;
+    std::string path = group->findPath(trigger);
+    QAction* action = pMenu->addAction(QString::fromStdString(trigger->getName()));
+    action->setData(QString::fromStdString(path));
+    if (current)
+    {
+      action->setEnabled(trigger != current.get());
+    }
+
+    QPixmap color_pm(16, 16);
+    cedar::proc::gui::GraphicsBase::paintBackgroundColor(color_pm, gui_group->getColorFor(trigger));
+    action->setIcon(QIcon(color_pm));
+
+    QObject::connect(action, SIGNAL(triggered()), receiver, slot);
+  }
+}
+
 void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)
 {
   this->fillPlotMenu(menu, event);
@@ -1045,43 +1093,34 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
   QMenu* p_assign_trigger = menu.addMenu("assign to trigger");
 
 
-  auto group = this->getElement()->getGroup();
+  auto gui_group = this->getGuiGroup();
 
   auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
   if (triggerable && triggerable->isLooped())
   {
-    auto current_trigger = triggerable->getParentTrigger();
+    cedar::proc::gui::Connectable::buildConnectTriggerMenu
+    (
+      p_assign_trigger,
+      gui_group,
+      this,
+      SLOT(assignTriggerClicked()),
+      triggerable->getParentTrigger()
+    );
+  }
+}
 
-    {
-      QAction* action = p_assign_trigger->addAction("no trigger");
-      action->setEnabled(current_trigger.get() != nullptr);
-      QObject::connect(action, SIGNAL(triggered()), this, SLOT(assignTriggerClicked()));
-      p_assign_trigger->addSeparator();
-    }
+cedar::proc::TriggerPtr cedar::proc::gui::Connectable::getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group)
+{
+  std::string trigger_path = action->data().toString().toStdString();
 
-    auto triggers = group->listLoopedTriggers();
-
-    std::map<std::string, cedar::proc::LoopedTriggerPtr> sorted_triggers;
-    for (auto trigger : triggers)
-    {
-      sorted_triggers[trigger->getName()] = trigger;
-    }
-
-    auto gui_group = this->getGuiGroup();
-    for (const auto& name_trigger_pair : sorted_triggers)
-    {
-      auto trigger = name_trigger_pair.second;
-      std::string path = group->findPath(trigger);
-      QAction* action = p_assign_trigger->addAction(QString::fromStdString(trigger->getName()));
-      action->setData(QString::fromStdString(path));
-      action->setEnabled(trigger != current_trigger);
-
-      QPixmap color_pm(16, 16);
-      cedar::proc::gui::GraphicsBase::paintBackgroundColor(color_pm, gui_group->getColorFor(trigger));
-      action->setIcon(QIcon(color_pm));
-
-      QObject::connect(action, SIGNAL(triggered()), this, SLOT(assignTriggerClicked()));
-    }
+  if (!trigger_path.empty())
+  {
+    auto trigger_element = group->getElement(trigger_path);
+    return boost::dynamic_pointer_cast<cedar::proc::Trigger>(trigger_element);
+  }
+  else
+  {
+    return cedar::proc::TriggerPtr();
   }
 }
 
@@ -1089,23 +1128,18 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
 {
   auto action = dynamic_cast<QAction*>(QObject::sender());
   CEDAR_ASSERT(action);
-  std::string trigger_path = action->data().toString().toStdString();
+
+  auto group = this->getElement()->getGroup();
+  auto trigger = getTriggerFromConnectTriggerAction(action, group);
 
   auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
-  auto group = this->getElement()->getGroup();
-
-  auto old_parent = triggerable->getParentTrigger();
-  if (old_parent)
+  if (trigger)
   {
-    group->disconnectTrigger(old_parent, triggerable);
-  }
-
-  if (!trigger_path.empty())
-  {
-    auto trigger_element = group->getElement(trigger_path);
-    auto trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger_element);
-
     group->connectTrigger(trigger, triggerable);
+  }
+  else if (triggerable->getParentTrigger())
+  {
+    group->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
   }
 }
 

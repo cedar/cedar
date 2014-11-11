@@ -47,6 +47,8 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
 #include "cedar/processing/gui/ConnectableIconView.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
@@ -220,6 +222,18 @@ public:
 
   //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
+
+  //! Fills the triggers in the group into the action as a submenu
+  static void buildConnectTriggerMenu
+  (
+    QMenu* pMenu,
+    const cedar::proc::gui::Group* gui_group,
+    const QObject* receiver,
+    const char* slot,
+    boost::optional<cedar::proc::TriggerPtr> current = (boost::optional<cedar::proc::TriggerPtr>())
+  );
+
+  static cedar::proc::TriggerPtr getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group);
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.

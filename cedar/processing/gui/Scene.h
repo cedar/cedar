@@ -392,6 +392,8 @@ private:
 
   cedar::proc::gui::Group* findFirstGroupItem(const QList<QGraphicsItem*>& items);
 
+  void multiItemContextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
+
 private slots:
   void promoteElementToExistingGroup();
 
@@ -402,6 +404,8 @@ private slots:
   //!@todo importGroup and importStep share a lot of code
   void importGroup(bool link);
   void importStep();
+
+  void assignSelectedToTrigger();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
