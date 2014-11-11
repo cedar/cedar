@@ -48,6 +48,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+#include "cedar/auxiliaries/CommandLineParser.fwd.h"
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
@@ -99,7 +100,7 @@ public:
    * @param redirectLogToGui   Enables or disables redirection of log messages to the gui (can help when too many log
    *                           messages lock up the user interface).
    */
-  Ide(bool loadDefaultPlugins = true, bool redirectLogToGui = true);
+  Ide(const cedar::aux::CommandLineParser& parser);
 
   //!@brief Destructor
   ~Ide();
@@ -123,6 +124,9 @@ public:
   {
     this->mSuppressCloseDialog = suppress;
   }
+
+  //! Adds command line options that are processed by the IDE to the given command line parser.
+  static void addCommandLineOptionsTo(cedar::aux::CommandLineParser& parser);
 
 public slots:
   /*!@brief Slot that displays notifications.
