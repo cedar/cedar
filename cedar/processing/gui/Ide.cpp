@@ -60,6 +60,7 @@
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
+#include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
@@ -301,7 +302,7 @@ private:
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
+cedar::proc::gui::Ide::Ide(const cedar::aux::CommandLineParser& parser)
 :
 mpPerformanceOverview(nullptr),
 mpBoostControlDock(nullptr),
@@ -382,12 +383,12 @@ mSimulationRunning(false)
   this->mDefaultWindowTitle = this->windowTitle();
 
   // setup the log to receive messages
-  if (redirectLogToGui)
+  if (!parser.hasParsedFlag("no-log"))
   {
     this->mpLog->installHandlers(true);
   }
 
-  if (loadDefaultPlugins)
+  if (!parser.hasParsedFlag("no-plugins"))
   {
     this->loadDefaultPlugins();
   }
@@ -470,6 +471,8 @@ mSimulationRunning(false)
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
 
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
+  this->mpActionToggleTriggerVisibility->setVisible(parser.hasParsedFlag("debug-enable-trigger-display"));
+
   QObject::connect(mpActionToggleTriggerColor, SIGNAL(triggered(bool)), this, SLOT(toggleTriggerColors(bool)));
   QObject::connect(mpActionExperiments, SIGNAL(triggered()), this, SLOT(showExperimentDialog()));
 
@@ -554,6 +557,35 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::addCommandLineOptionsTo(cedar::aux::CommandLineParser& parser)
+{
+  parser.defineFlag
+  (
+    "no-log",
+    "Don't redirect log messages to the user interface. May help debugging if too many log messages cause the UI to lock up.",
+    'l'
+  );
+
+#ifdef DEBUG
+  parser.defineFlag
+  (
+    "debug-enable-trigger-display",
+    "Debug option: show the show/hide looped triggers symbol.",
+    0,
+    "debug options"
+  );
+#endif // DEBUG
+
+  //!@todo This is more of a generic thing that needs to be taken care of by the processing/plugin framework
+  //!      I.e., it shouldn't happen here, because it is also needed for the cedar-shell
+  parser.defineFlag
+  (
+    "no-plugins",
+    "Start without loading any plugins.",
+    'p'
+  );
+}
 
 void cedar::proc::gui::Ide::showOpenableDialog()
 {
