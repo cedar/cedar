@@ -115,6 +115,13 @@ void cedar::proc::experiment::ActionSequence::prepareTrial()
 {
   // the condition must be reset
   this->_mCondition->getValue()->reset();
+  if (this->getCondition()->initialCheck())
+  {
+    for (auto action : this->getActions())
+    {
+      action->run();
+    }
+  }
 }
 
 void cedar::proc::experiment::ActionSequence::addAction(cedar::proc::experiment::action::ActionPtr action)

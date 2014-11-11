@@ -62,8 +62,7 @@ mpExperiment(nullptr)
 
 void cedar::proc::experiment::Supervisor::step(cedar::unit::Time)
 {
-  bool init = this->mpExperiment->hasStopped();
-  this->mpExperiment->executeAcionSequences(init);
+  this->mpExperiment->executeActionSequences();
 }
 
 void cedar::proc::experiment::Supervisor::setExperiment(Experiment* experiment)

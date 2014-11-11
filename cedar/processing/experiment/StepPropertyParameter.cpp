@@ -293,6 +293,10 @@ cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getPara
   {
     return cedar::aux::ParameterPtr();
   }
+  catch (cedar::aux::UnknownNameException& exc) // property not found
+  {
+    return cedar::aux::ParameterPtr();
+  }
   return cedar::aux::ParameterPtr();
   //!@todo catch parameter not found exception
 }
@@ -362,6 +366,10 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
       catch (cedar::aux::NotFoundException& exc) // element was not found, reset
       {
         mElement.reset();
+        mProperty = "";
+      }
+      catch (cedar::aux::UnknownNameException& exc) // property not found
+      {
         mProperty = "";
       }
       break;

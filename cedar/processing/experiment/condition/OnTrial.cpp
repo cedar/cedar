@@ -73,7 +73,12 @@ cedar::proc::experiment::condition::OnTrial::~OnTrial()
 //----------------------------------------------------------------------------------------------------------------------
 bool cedar::proc::experiment::condition::OnTrial::check()
 {
+  return false;
+}
+
+bool cedar::proc::experiment::condition::OnTrial::initialCheck()
+{
   Experiment* p_experiment = cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment();
-  auto current_trial = p_experiment->getActualTrial();
+  auto current_trial = p_experiment->getCurrentTrial();
   return current_trial == this->_mTrial->getValue();
 }

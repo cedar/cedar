@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Condition.cpp
+    File:        ActionStop.cpp
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 03 09
 
-    Description:
+    Description: Source file for the class cedar::proc::experiment::ActionStop.
 
     Credits:
 
@@ -38,46 +38,54 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/condition/Condition.h"
-#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/processing/experiment/action/EndTrial.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/Supervisor.h"
+
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// register class
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::action::EndTrialPtr>();
+}
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::condition::Condition::Condition()
+cedar::proc::experiment::action::EndTrial::EndTrial()
+:
+_mResetType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "Reset type",
+    cedar::proc::experiment::Experiment::ResetType::typePtr(),
+    cedar::proc::experiment::Experiment::ResetType::Reset
+  )
+),
+_mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
+_mMessage(new cedar::aux::StringParameter(this,"Message",""))
 {
-  this->reset();
+}
+
+cedar::proc::experiment::action::EndTrial::~EndTrial()
+{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired)
+void cedar::proc::experiment::action::EndTrial::run()
 {
-  if (this->mHasFired && skipIfFired)
-  {
-    return false;
-  }
-  bool v = this->check();
-  if (v)
-  {
-    this->mHasFired = true;
-  }
-  return v;
-}
-
-bool cedar::proc::experiment::condition::Condition::initialCheck()
-{
-  return false;
-}
-
-void cedar::proc::experiment::condition::Condition::reset()
-{
-  this->mHasFired = false;
+  auto super = cedar::proc::experiment::SupervisorSingleton::getInstance();
+  super->log(_mSuccess->getValue()?"Trial success":"Trial failed",_mMessage->getValue());
+  super->getExperiment()->stopTrial(_mResetType->getValue());
 }

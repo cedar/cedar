@@ -77,7 +77,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Performs the actual ckeck.
+  /*! @brief Performs the actual check.
    *
    * @param skipIfFired If true, the condition will return false if it returned true once before.
    * @todo Should this be const?
@@ -88,11 +88,14 @@ public:
    */
   void reset();
 
+  //! does this condition fire during initiation of a trial?
+  virtual bool initialCheck();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief This method has to be override by all derived classes
+  /*!@brief This method has to be overriden by all derived classes
    *         It should return true if the condition is fulfilled
    *
    * @todo Should this be const?

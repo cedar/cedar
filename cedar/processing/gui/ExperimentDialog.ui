@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
+    <width>649</width>
     <height>472</height>
    </rect>
   </property>
@@ -142,7 +142,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>490</width>
+        <width>538</width>
         <height>344</height>
        </rect>
       </property>
@@ -196,7 +196,7 @@
    <item row="9" column="13">
     <widget class="QPushButton" name="runButton">
      <property name="text">
-      <string>run</string>
+      <string>start</string>
      </property>
      <property name="checkable">
       <bool>false</bool>

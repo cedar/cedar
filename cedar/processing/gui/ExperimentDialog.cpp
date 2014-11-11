@@ -94,7 +94,10 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
 
 cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
 {
-  this->mExperiment->cancel();
+  if (this->mExperiment->isRunning())
+  {
+    this->mExperiment->stopExperiment();
+  }
   mpGroupTime->stop();
   delete mpGroupTime;
 }
@@ -189,7 +192,7 @@ void cedar::proc::gui::ExperimentDialog::trialChanged()
 
 void cedar::proc::gui::ExperimentDialog::clearActionSequences()
 {
-  QLayoutItem *child;
+  QLayoutItem* child;
   while ((child = this->mActionSequences->takeAt(0)) != 0)
   {
     delete child->widget();
@@ -228,7 +231,7 @@ void cedar::proc::gui::ExperimentDialog::runExperiment()
       return;
     }
   }
-  this->mExperiment->run();
+  this->mExperiment->startExperiment();
 }
 
 void cedar::proc::gui::ExperimentDialog::stopExperiment()
@@ -237,14 +240,14 @@ void cedar::proc::gui::ExperimentDialog::stopExperiment()
       "Do you really want to stop this experiment?", QMessageBox::Yes|QMessageBox::No);
   if (stop == QMessageBox::Yes)
   {
-    this->mExperiment->cancel();
+    this->mExperiment->stopExperiment();
   }
 }
 
 
 void cedar::proc::gui::ExperimentDialog::experimentRunning(bool status)
 {
-  if(status)
+  if (status)
   {
     this->runButton->setEnabled(false);
     this->stopButton->setEnabled(true);

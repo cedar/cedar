@@ -209,10 +209,10 @@ public:
   void setTrialCount(unsigned int repetitions);
 
   //!@brief Starts the experiment to running through each trial
-  void run();
+  void startExperiment();
 
   //!@brief Cancels the experiment
-  void cancel();
+  void stopExperiment();
 
   //!@brief Adds an action sequence to the experiment
   void addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
@@ -223,11 +223,8 @@ public:
   //!@brief  Returns a list of all action sequences of the experiment
   std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
 
-  //!@brief Checks if the condition is on initial state. This is the case if the last trial has stopped
-  bool isOnInit();
-
   //!@brief Checks if a trial currently running
-  bool hasStopped();
+  bool isRunning();
 
   //!@brief Get all steps of the current group
   std::vector<std::string> getGroupSteps();
@@ -243,7 +240,7 @@ public:
       = cedar::proc::DataRole::OUTPUT);
 
   //!@brief Returns the actual trial that is currently running
-  unsigned int getActualTrial();
+  unsigned int getCurrentTrial();
 
   //!@brief Writes the parameters to root
   void writeConfiguration(cedar::aux::ConfigurationNode& root);
@@ -297,9 +294,8 @@ protected:
 private:
   /*!@brief Checks for every action sequence if its condition is fulfilled.
    *           If this is the case all actions of the sequence will be executed.
-   *           The flag initial defines that all Conditions should thread this experiment as it is on initial state.
    */
-  void executeAcionSequences(bool initial = false);
+  void executeActionSequences();
 
   //!@brief Emits the group changed signal if called.
   void groupChanged(cedar::proc::ConstElementPtr element);
@@ -339,13 +335,13 @@ private:
 
   //!@brief The currently running trial. It is 0 if no trial is running
   //!@todo This should be called mCurrentTrial
-  unsigned int mActualTrial;
+  unsigned int mCurrentTrial;
 
   //!@brief The flag stores if the experiment is on initial state
   bool mInit;
 
   //!@brief The flag sores if there is currently no trial running
-  bool mStopped;
+  bool mIsRunning;
 
   std::string mRecordFolderName;
 
