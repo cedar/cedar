@@ -235,6 +235,9 @@ public:
 
   void updateTriggerColorState();
 
+  //! Returns the slot item used for the given group source.
+  cedar::proc::gui::DataSlotItem* getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const;
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??

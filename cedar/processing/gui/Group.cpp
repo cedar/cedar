@@ -1723,6 +1723,19 @@ void cedar::proc::gui::Group::slotRemoved(cedar::proc::DataRole::Id role, const 
   this->updateConnectorPositions();
 }
 
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const
+{
+  for (auto p_data_slot : mConnectorSources)
+  {
+    if (p_data_slot->getSlot()->getParentPtr() == source.get())
+    {
+      return p_data_slot;
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find data slot for group source \"" + source->getName() + "\".");
+}
+
 void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::string& name)
 {
   auto p_list = &mConnectorSources;
