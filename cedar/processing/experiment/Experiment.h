@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
@@ -224,7 +225,10 @@ public:
   std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
 
   //!@brief Checks if a trial currently running
-  bool isRunning();
+  bool isRunning() const;
+
+  //!@brief Checks if a trial currently running
+  bool trialIsRunning() const;
 
   //!@brief Get all steps of the current group
   std::vector<std::string> getGroupSteps();
@@ -259,15 +263,13 @@ public:
    */
   void stopTrial(ResetType::Id reset = ResetType::Reset);
 
-
-  //!@brief Checks if there is exactly one ActionStart in a ConditionOnInit
-  bool checkActionSequences();
-
   //! Sets the repeat flag of the experiment.
   void setRepeating(bool repeats);
 
   //! Returns the repeat flag of the experiment.
   bool getRepeating() const;
+
+  bool hasMoreTrials() const;
 
 signals:
 
@@ -316,6 +318,9 @@ private:
   //! Called after an experiment is stopped.
   void postExperiment();
 
+  //!@brief Calls a condition check.
+  void step(cedar::unit::Time);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -333,6 +338,9 @@ private:
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopGroup;
 
+  //! Used for evaluating stuff
+  cedar::aux::LoopFunctionInThreadPtr mLooper;
+
   //!@brief The currently running trial. It is 0 if no trial is running
   //!@todo This should be called mCurrentTrial
   unsigned int mCurrentTrial;
@@ -342,6 +350,8 @@ private:
 
   //!@brief The flag sores if there is currently no trial running
   bool mIsRunning;
+
+  bool mTrialIsRunning;
 
   std::string mRecordFolderName;
 

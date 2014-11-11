@@ -114,6 +114,14 @@ _mRepeat(new cedar::aux::BoolParameter(this, "repeat", false))
                                )
                              );
 
+  this->mLooper = cedar::aux::LoopFunctionInThreadPtr
+                             (
+                               new cedar::aux::LoopFunctionInThread
+                               (
+                                 boost::bind(&cedar::proc::experiment::Experiment::step, this, _1)
+                               )
+                             );
+
   mElementRemovedConnection = this->mGroup->connectToElementRemovedSignal
   (
     boost::bind(&cedar::proc::experiment::Experiment::groupChanged,this,_1)
@@ -216,36 +224,35 @@ void cedar::proc::experiment::Experiment::startExperiment()
   {
     this->preExperiment();
 
-    // Set record directory
     std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
+    cedar::aux::LogSingleton::getInstance()->message("New experiment started. Timestamp: " + time_stamp, "Experiment");
 
-    SupervisorSingleton::getInstance()->log("message", "New experiment started. Timestamp: " + time_stamp);
-
+    // Set record directory
     this->mRecordFolderName = this->_mName->getValue()+ "_" + time_stamp;
-    this->mCurrentTrial = 1;
-    SupervisorSingleton::getInstance()->start();
+    this->mCurrentTrial = 0;
+    this->mLooper->start();
     this->mIsRunning = true;
     emit experimentRunning(true);
-    this->startTrial();
   }
 }
 void cedar::proc::experiment::Experiment::stopExperiment()
 {
-  SupervisorSingleton::getInstance()->requestStop();
-  this->mCurrentTrial = this->_mTrials->getValue()+1;
+  this->mLooper->stop();
   stopTrial();
-  //!@todo It is unclear who is responsible for resetting the trial number (cf. stopTrial)
   this->mCurrentTrial = 0;
   emit trialNumberChanged(this->mCurrentTrial);
   mIsRunning = false;
   emit experimentRunning(false);
+
+  std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
+  cedar::aux::LogSingleton::getInstance()->message("message", "Experiment stopped. Timestamp: " + time_stamp, "Experiment");
 }
 
 void cedar::proc::experiment::Experiment::startTrial()
 {
   cedar::aux::GlobalClockSingleton::getInstance()->reset();
   cedar::aux::GlobalClockSingleton::getInstance()->start();
-
+  mTrialIsRunning = true;
   // reset all action sequences
   for (size_t i = 0; i < this->_mActionSequences->size(); ++i)
   {
@@ -265,10 +272,6 @@ void cedar::proc::experiment::Experiment::startTrial()
 
 void cedar::proc::experiment::Experiment::startTrigger(const std::string& triggerName)
 {
-  if (!this->isRunning())
-  {
-    this->startTrial();
-  }
   for (auto name_element_pair : this->mGroup->getElements())
   {
     if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(name_element_pair.second))
@@ -287,10 +290,6 @@ void cedar::proc::experiment::Experiment::startTrigger(const std::string& trigge
 
 void cedar::proc::experiment::Experiment::startAllTriggers()
 {
-  if (!this->isRunning())
-  {
-    startTrial();
-  }
   this->mStartGroup->start();
 }
 
@@ -348,30 +347,16 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
   }
   this->mCurrentTrial++;
 
-  // Stop the experiment if the actual trial exceeds the number of wanted trials
+  // reset the trial number if the actual trial exceeds the number of wanted trials
   if (this->mCurrentTrial >_mTrials->getValue())
   {
-    if (!this->getRepeating())
+    if (this->getRepeating())
     {
-      SupervisorSingleton::getInstance()->requestStop();
-      emit experimentRunning(false);
       mCurrentTrial = 0;
     }
-    else
-    {
-      mCurrentTrial = 1;
-      this->postExperiment();
-      emit trialNumberChanged(mCurrentTrial);
-      this->startTrial();
-    }
   }
-  else
-  {
-    this->postExperiment();
-    emit trialNumberChanged(mCurrentTrial);
-    // start the next trial
-    this->startTrial();
-  }
+  this->postExperiment();
+  mTrialIsRunning = false;
 }
 
 void cedar::proc::experiment::Experiment::executeActionSequences()
@@ -455,34 +440,15 @@ unsigned int cedar::proc::experiment::Experiment::getCurrentTrial()
   return this->mCurrentTrial;
 }
 
-bool cedar::proc::experiment::Experiment::isRunning()
+bool cedar::proc::experiment::Experiment::isRunning() const
 {
   return mIsRunning;
 }
 
-bool cedar::proc::experiment::Experiment::checkActionSequences()
+bool cedar::proc::experiment::Experiment::trialIsRunning() const
 {
-  for (ActionSequencePtr action_sequence: this->getActionSequences())
-  {
-    if (boost::dynamic_pointer_cast<cedar::proc::experiment::condition::OnInit>(action_sequence->getCondition()))
-    {
-      for (cedar::proc::experiment::action::ActionPtr action : action_sequence->getActions())
-      {
-        if (boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartAllTriggers>(action))
-        {
-          return true;
-        }
-
-        if (boost::dynamic_pointer_cast<cedar::proc::experiment::action::StartTrigger>(action))
-        {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
+  return mTrialIsRunning;
 }
-
 
 void cedar::proc::experiment::Experiment::saveGroupState()
 {
@@ -536,4 +502,33 @@ cedar::proc::GroupPtr cedar::proc::experiment::Experiment::getGroup()
 void cedar::proc::experiment::Experiment::elementRenamed(const std::string& /*oldName*/, const std::string& /*newName*/)
 {
   //!@todo this should handle name changes - or implement this in each condition/action?
+}
+
+bool cedar::proc::experiment::Experiment::hasMoreTrials() const
+{
+  if (this->mCurrentTrial < _mTrials->getValue() || this->getRepeating())
+  {
+    return true;
+  }
+  return false;
+}
+
+void cedar::proc::experiment::Experiment::step(cedar::unit::Time)
+{
+  if (this->trialIsRunning()) // trial is running
+  {
+    this->executeActionSequences();
+  }
+  else
+  {
+    // check if there are more trials to run
+    if (this->hasMoreTrials())
+    {
+      this->startTrial();
+    }
+    else
+    {
+      this->stopExperiment();
+    }
+  }
 }

@@ -216,21 +216,6 @@ cedar::proc::experiment::ExperimentPtr cedar::proc::gui::ExperimentDialog::getEx
 
 void cedar::proc::gui::ExperimentDialog::runExperiment()
 {
-  if (!this->mExperiment->checkActionSequences())
-  {
-    auto r = QMessageBox::warning
-             (
-               this,"No triggers started",
-               "None of the action sequences you have set up start any triggers. "
-               "Running the experiment might not have any effect. Start anyway?",
-               QMessageBox::Yes | QMessageBox::No
-             );
-
-    if (r == QMessageBox::No)
-    {
-      return;
-    }
-  }
   this->mExperiment->startExperiment();
 }
 
@@ -278,7 +263,7 @@ void cedar::proc::gui::ExperimentDialog::setActionSequenceWidgetsEnabled(bool en
 
 void cedar::proc::gui::ExperimentDialog::trialNumberChanged(int number)
 {
-  this->mActualRepetition->setText(QString::number(number));
+  this->mActualRepetition->setText(QString::number(number+1));
 }
 
 void cedar::proc::gui::ExperimentDialog::redraw()
