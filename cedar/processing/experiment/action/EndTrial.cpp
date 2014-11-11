@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.cpp
+    File:        ActionStop.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 09
 
-    Description: Source file for the class cedar::proc::experiment::ExperimentController.
+    Description: Source file for the class cedar::proc::experiment::ActionStop.
 
     Credits:
 
@@ -38,20 +38,44 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/Supervisor.h"
+#include "cedar/processing/experiment/action/EndTrial.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/auxiliaries/GlobalClock.h"
+#include "cedar/processing/experiment/Supervisor.h"
+
 
 // SYSTEM INCLUDES
-#include <QWriteLocker>
 
+//----------------------------------------------------------------------------------------------------------------------
+// register class
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::action::EndTrialPtr>();
+}
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::Supervisor::Supervisor()
+cedar::proc::experiment::action::EndTrial::EndTrial()
 :
-mpExperiment(nullptr)
+_mResetType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "Reset type",
+    cedar::proc::experiment::Experiment::ResetType::typePtr(),
+    cedar::proc::experiment::Experiment::ResetType::Reset
+  )
+),
+_mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
+_mMessage(new cedar::aux::StringParameter(this,"Message",""))
+{
+}
+
+cedar::proc::experiment::action::EndTrial::~EndTrial()
 {
 }
 
@@ -59,45 +83,9 @@ mpExperiment(nullptr)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-void cedar::proc::experiment::Supervisor::step(cedar::unit::Time)
+void cedar::proc::experiment::action::EndTrial::run()
 {
-  if (this->mpExperiment->trialIsRunning()) // trial is running
-  {
-    this->mpExperiment->executeActionSequences();
-  }
-  else
-  {
-    // check if there are more trials to run
-    if (this->mpExperiment->hasMoreTrials())
-    {
-      this->mpExperiment->startTrial();
-    }
-    else
-    {
-      this->mpExperiment->stopExperiment();
-    }
-  }
-}
-
-void cedar::proc::experiment::Supervisor::setExperiment(Experiment* experiment)
-{
-  if (this->mpExperiment != nullptr)
-  {
-    QObject::disconnect(this->mpExperiment, SIGNAL(experimentRunning(bool)), this, SIGNAL(experimentRunning(bool)));
-  }
-  this->mpExperiment = experiment;
-  QObject::connect(this->mpExperiment, SIGNAL(experimentRunning(bool)), this, SIGNAL(experimentRunning(bool)));
-}
-cedar::proc::experiment::Experiment* cedar::proc::experiment::Supervisor::getExperiment()
-{
-  return this->mpExperiment;
-}
-
-void cedar::proc::experiment::Supervisor::log(std::string messageType, std::string message)
-{
-  cedar::unit::Time time= cedar::aux::GlobalClockSingleton::getInstance()->getTime();
-
-  std::string message_str = cedar::aux::formatDuration(time) + "\t[" + messageType + "]\t" + message;
-  cedar::aux::LogSingleton::getInstance()->message(message_str, "experiment supervisor");
+  auto super = cedar::proc::experiment::SupervisorSingleton::getInstance();
+  super->log(_mSuccess->getValue()?"Trial success":"Trial failed",_mMessage->getValue());
+  super->getExperiment()->stopTrial(_mResetType->getValue());
 }

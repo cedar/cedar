@@ -22,62 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Condition.cpp
+    File:        ActionStop.fwd.h
 
     Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
-    Date:        2014 01 22
+    Email:       christian.bodenstein@ini.rub.de
+    Date:        2014 03 09
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::experiment::ActionStop.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_END_TRIAL_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_END_TRIAL_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/condition/Condition.h"
-#include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::experiment::condition::Condition::Condition()
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
 {
-  this->reset();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired)
-{
-  if (this->mHasFired && skipIfFired)
+  namespace proc
   {
-    return false;
+    namespace experiment
+    {
+      namespace action
+      {
+        CEDAR_DECLARE_PROC_CLASS(EndTrial);
+      }
+    }
   }
-  bool v = this->check();
-  if (v)
-  {
-    this->mHasFired = true;
-  }
-  return v;
 }
 
-bool cedar::proc::experiment::condition::Condition::initialCheck()
-{
-  return false;
-}
+//!@endcond
 
-void cedar::proc::experiment::condition::Condition::reset()
-{
-  this->mHasFired = false;
-}
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_END_TRIAL_FWD_H
+
