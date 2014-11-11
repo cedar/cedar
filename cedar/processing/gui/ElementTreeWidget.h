@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/NetworkPath.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
@@ -146,6 +147,8 @@ private:
   void addElement(cedar::proc::ElementPtr element);
 
   QTreeWidgetItem* getGroupItem(const std::string& elementPath);
+
+  QTreeWidgetItem* findItemWithPath(const cedar::proc::GroupPath& path);
 
 private slots:
   //! Reacts to an element that has been added in the underlying group.

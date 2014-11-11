@@ -73,3 +73,9 @@ cedar::proc::NetworkPath::PathType(path)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::proc::NetworkPath::getElementName() const
+{
+  CEDAR_ASSERT(!this->empty());
+  return this->operator[](this->getElementCount() - 1);
+}
