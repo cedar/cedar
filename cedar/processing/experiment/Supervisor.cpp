@@ -62,7 +62,22 @@ mpExperiment(nullptr)
 
 void cedar::proc::experiment::Supervisor::step(cedar::unit::Time)
 {
-  this->mpExperiment->executeActionSequences();
+  if (this->mpExperiment->trialIsRunning()) // trial is running
+  {
+    this->mpExperiment->executeActionSequences();
+  }
+  else
+  {
+    // check if there are more trials to run
+    if (this->mpExperiment->hasMoreTrials())
+    {
+      this->mpExperiment->startTrial();
+    }
+    else
+    {
+      this->mpExperiment->stopExperiment();
+    }
+  }
 }
 
 void cedar::proc::experiment::Supervisor::setExperiment(Experiment* experiment)
