@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/StringSetParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Enum.h"
 #include "cedar/auxiliaries/EnumType.h"
@@ -176,6 +177,22 @@ public:
 
   CEDAR_GENERATE_POINTER_TYPES(UserDefinedColor);
 
+  struct OneTimeMessage
+  {
+    //! The version in which the message was introduced.
+    unsigned int mVersion;
+
+    //! The unique identifier.
+    std::string mId;
+
+    //! A title for the message.
+    std::string mTitle;
+
+    //! The (possibly html-containing) message.
+    std::string mMessage;
+  };
+  CEDAR_GENERATE_POINTER_TYPES(OneTimeMessage);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -204,9 +221,6 @@ public:
   DockSettingsPtr propertiesSettings();
   //!@brief returns the settings concerning the docking behavior for the steps widget
   DockSettingsPtr stepsSettings();
-
-  //! Settings for cedar's boost control widget.
-  DockSettingsPtr boostCtrlSettings();
 
   //!@brief stores the state of the main window
   void storeMainWindow(QMainWindow *pWindow);
@@ -300,6 +314,18 @@ public:
     return this->mUserDefinedColors;
   }
 
+  //! Returns a dock settings object identified by a string.
+  DockSettingsPtr getNamedDockSettings(const std::string& id) const;
+
+  //! Returns a list of all the one-time messages to be displayed to the user.
+  std::vector<OneTimeMessagePtr> getUnreadOneTimeMessages() const;
+
+  //! Returns a list of recent one-time messages (including ones that were already read).
+  std::vector<OneTimeMessagePtr> getRecentOneTimeMessages() const;
+
+  //! Marks the given one time messages as read
+  void markAsRead(const std::vector<OneTimeMessagePtr>& messages);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -309,6 +335,24 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  void declareDockSettings(const std::string& id, bool defaultVisible = true);
+
+  /*! Adds a message that is to be displayed to the user once.
+   *
+   * @param version Which version the message was introduced in. Message will only be displayed when the current ceder
+   *        version is less than this. (This avoids users being spammed with messages when they check out cedar for the
+   *        first time.)
+   * @param messageId A unique identifier for messages.
+   */
+  void addOneTimeMessage
+  (
+    unsigned int version,
+    const std::string& messageId,
+    const std::string& title,
+    const std::string& message
+  );
+
 private slots:
   void userDefinedColorStringsChanged();
 
@@ -321,6 +365,8 @@ private:
   //! Disables writing of the properties; this is useful for unit tests that shouldn't alter the configuration.
   bool mWritingDisabled;
 
+  std::set<OneTimeMessagePtr> mOneTimeMessages;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -328,6 +374,9 @@ protected:
   // none yet
 
 private:
+  //! A list of dock settings that can be accessed via a name.
+  std::map<std::string, DockSettingsPtr> mNamedDockSettings;
+
   //!@brief the settings concerning the docking behavior for the log widget
   DockSettingsPtr mLog;
 
@@ -339,9 +388,6 @@ private:
 
   //!@brief the settings concerning the docking behavior for the property pane
   DockSettingsPtr mProperties;
-  
-  //! Settings for the boost control widget.
-  DockSettingsPtr mBoostCtrlSettgings;
 
   //!@brief list of bytes coming from Qt (sizes, ...)
   cedar::aux::StringParameterPtr mMainWindowGeometry;
@@ -396,6 +442,9 @@ private:
 
   //! Vector that holds all the user-defined colors parsed from the strings.
   std::vector<UserDefinedColorPtr> mUserDefinedColors;
+
+  //!@brief A list of one-time messages already read by the user
+  cedar::aux::StringSetParameterPtr _mReadOneTimeMessages;
 
 }; // class cedar::proc::gui::Settings
 

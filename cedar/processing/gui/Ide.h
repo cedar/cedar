@@ -43,11 +43,13 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_Ide.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/LogInterface.h"
 #include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
+#include "cedar/auxiliaries/CommandLineParser.fwd.h"
 #include "cedar/processing/gui/PerformanceOverview.fwd.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.fwd.h"
 #include "cedar/processing/gui/BoostControl.fwd.h"
@@ -76,6 +78,20 @@ class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! A class that takes care of dialog that can be opened by the Ide, such as the boost control.
+  class OpenableDialog;
+  CEDAR_GENERATE_POINTER_TYPES(OpenableDialog);
+
+  class OpenableArchitectureConsistencyCheck;
+
+  class OpenableSimulationControl;
+
+  class OpenableBoostControl;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -85,7 +101,7 @@ public:
    * @param redirectLogToGui   Enables or disables redirection of log messages to the gui (can help when too many log
    *                           messages lock up the user interface).
    */
-  Ide(bool loadDefaultPlugins = true, bool redirectLogToGui = true);
+  Ide(const cedar::aux::CommandLineParser& parser);
 
   //!@brief Destructor
   ~Ide();
@@ -109,6 +125,9 @@ public:
   {
     this->mSuppressCloseDialog = suppress;
   }
+
+  //! Adds command line options that are processed by the IDE to the given command line parser.
+  static void addCommandLineOptionsTo(cedar::aux::CommandLineParser& parser);
 
 public slots:
   /*!@brief Slot that displays notifications.
@@ -209,13 +228,9 @@ public slots:
    */
   void showTriggerConnections(bool show);
 
-  /*!@brief Shows a dialog for architecture consistency checking.
+  /*!@brief Show/hide all trigger colors
    */
-  void showConsistencyChecker();
-
-  /*!@brief Opens a boost control widget.
-   */
-  void showBoostControl();
+  void toggleTriggerColors(bool show);
 
   /*! Opens the parameter linker
    */
@@ -267,6 +282,9 @@ public slots:
 
   //! return the gui root group
   cedar::proc::gui::ConstGroupPtr getGroup() const;
+
+  //! Shows recent notifications
+  void showRecentNotifications();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -342,6 +360,8 @@ private:
 
   void updateSimulationRunningIcon(bool running);
 
+  void showOneTimeMessages(const std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr>& messages, bool markAsRead = false);
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
@@ -359,6 +379,8 @@ private slots:
 
   void allTriggersStopped();
 
+  void showOpenableDialog();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -373,21 +395,13 @@ private:
 
   cedar::proc::StepPtr mLastCopiedStep;
 
-  //! Architecture consistency check widget.
-  cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;
-
   //! Performance overview.
   cedar::proc::gui::PerformanceOverview* mpPerformanceOverview;
-
-  //! Dock widget for the consistency checker.
-  QDockWidget* mpConsistencyDock;
 
   //! Dock widget for the boost control
   QDockWidget* mpBoostControlDock;
 
   QString mDefaultWindowTitle;
-
-  cedar::proc::gui::BoostControl* mpBoostControl;
 
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;
@@ -419,6 +433,9 @@ private:
   QLabel* mpGlobalTimeLabel;
 
   cedar::aux::LockableMember<bool> mSimulationRunning;
+
+  //! Map from name to an openable dialog
+  std::map<std::string, OpenableDialogPtr> mOpenableDialogs;
 
 }; // class cedar::MainWindow
 

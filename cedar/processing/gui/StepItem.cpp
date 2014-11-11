@@ -236,21 +236,22 @@ bool cedar::proc::gui::StepItem::hasGuiConnection
 void cedar::proc::gui::StepItem::updateStepState()
 {
   this->setFillStyle(Qt::SolidPattern, false);
+  this->unsetOverrideFillColor(false);
+  this->unsetOverrideFillStyle(false);
 
   switch (this->getStep()->getState())
   {
     case cedar::proc::Step::STATE_EXCEPTION_ON_START:
-      this->setFillStyle(Qt::BDiagPattern);
+      this->setOverrideFillStyle(Qt::BDiagPattern, false);
     case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
       this->setOutlineColor(Qt::red);
-      this->setFillColor(QColor(255, 175, 175));
+      this->setOverrideFillColor(QColor(255, 175, 175), false);
       break;
 
     case cedar::proc::Step::STATE_RUNNING:
     default:
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
-      this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
   }
 
   this->update();
@@ -407,7 +408,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     return;
   }
 
-  this->fillPlotMenu(menu, event);
+  this->fillConnectableMenu(menu, event);
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -448,7 +449,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   QAction *a = menu.exec(event->screenPos());
 
-  if (a == NULL)
+  if (a == nullptr)
     return;
 
   // execute an action

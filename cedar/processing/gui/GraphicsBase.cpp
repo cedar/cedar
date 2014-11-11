@@ -259,12 +259,64 @@ void cedar::proc::gui::GraphicsBase::setOutlineColor(const QColor& color)
 void cedar::proc::gui::GraphicsBase::setFillColor(const QColor& color)
 {
   this->mFillColor = color;
+  this->signalFillColorChanged(color);
   this->update();
 }
+
+QColor cedar::proc::gui::GraphicsBase::getFillColor() const
+{
+  return this->mFillColor;
+}
+
+Qt::BrushStyle cedar::proc::gui::GraphicsBase::getFillStyle() const
+{
+  return this->mFillStyle;
+}
+
 
 void cedar::proc::gui::GraphicsBase::setFillStyle(Qt::BrushStyle style, bool update)
 {
   this->mFillStyle = style;
+
+  if (update)
+  {
+    this->update();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::setOverrideFillStyle(Qt::BrushStyle style, bool update)
+{
+  this->mOverrideFillStyle = style;
+
+  if (update)
+  {
+    this->update();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::unsetOverrideFillStyle(bool update)
+{
+  this->mOverrideFillStyle.reset();
+
+  if (update)
+  {
+    this->update();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::setOverrideFillColor(const QColor& color, bool update)
+{
+  this->mOverrideFillColor = color;
+
+  if (update)
+  {
+    this->update();
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::unsetOverrideFillColor(bool update)
+{
+  this->mOverrideFillColor.reset();
 
   if (update)
   {
@@ -480,6 +532,11 @@ QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
     {
       QBrush brush;
       QColor color = this->mFillColor;
+      if (this->mOverrideFillColor)
+      {
+        color = this->mOverrideFillColor.get();
+      }
+
       if (this->mReadOnly)
       {
         if (color.hsvHue() == -1)
@@ -492,7 +549,14 @@ QBrush cedar::proc::gui::GraphicsBase::getOutlineBrush() const
         }
       }
       brush.setColor(color);
-      brush.setStyle(this->mFillStyle);
+      if (this->mOverrideFillStyle)
+      {
+        brush.setStyle(this->mOverrideFillStyle.get());
+      }
+      else
+      {
+        brush.setStyle(this->mFillStyle);
+      }
       return brush;
     }
   }
@@ -545,6 +609,32 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
   return pen;
 }
 
+QColor cedar::proc::gui::GraphicsBase::nonsolidBrushBackgroundColor(QBrush brush)
+{
+  return brush.color();
+}
+
+QColor cedar::proc::gui::GraphicsBase::nonsolidBrushForegroundColor(QBrush /* brush */)
+{
+  return QColor(Qt::white);
+}
+
+
+void cedar::proc::gui::GraphicsBase::paintBackgroundColor(QPixmap& pixmap, QBrush brush)
+{
+  if (brush.style() != Qt::SolidPattern)
+  {
+    pixmap.fill(nonsolidBrushBackgroundColor(brush));
+  }
+  QPainter painter(&pixmap);
+  QBrush foreground = brush;
+  if (brush.style() != Qt::SolidPattern)
+  {
+    foreground.setColor(nonsolidBrushForegroundColor(brush));
+  }
+  painter.fillRect(QRect(0, 0, pixmap.width(), pixmap.height()), foreground);
+}
+
 void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   // draw the base shape
@@ -556,15 +646,22 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
     // for non-solid patterns, we draw a white background
     if (brush.style() != Qt::SolidPattern)
     {
-      QBrush solid_background(Qt::white);
+      QColor bg_color = nonsolidBrushBackgroundColor(brush);
+      QBrush solid_background(bg_color);
       painter->setBrush(solid_background);
       QPen invisible_pen(Qt::NoPen);
       painter->setPen(invisible_pen);
       this->drawShape(painter);
-    }
 
+      QBrush foreground = brush;
+      foreground.setColor(nonsolidBrushForegroundColor(brush));
+      painter->setBrush(foreground);
+    }
+    else
+    {
+      painter->setBrush(brush);
+    }
     painter->setPen(this->getOutlinePen());
-    painter->setBrush(this->getOutlineBrush());
 
     this->drawShape(painter);
 

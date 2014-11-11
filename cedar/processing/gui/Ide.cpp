@@ -55,10 +55,13 @@
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/SimulationControl.h"
+#include "cedar/processing/gui/OneTimeMessageDialog.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/devices/gui/RobotManager.h"
+#include "cedar/auxiliaries/CommandLineParser.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
@@ -90,15 +93,220 @@
 #include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
+// nested private classes
+//----------------------------------------------------------------------------------------------------------------------
+//! A class that takes care of dialog that can be opened by the Ide, such as the boost control.
+class cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableDialog(const std::string& name, const QString& iconPath = "", const std::string& configId = std::string())
+  :
+  mpOpenedWidget(nullptr),
+  mName(name),
+  mConfigId(configId),
+  mpMenuAction(nullptr),
+  mpDock(nullptr),
+  mIconPath(iconPath),
+  mIsInToolBar(false)
+  {
+  }
+
+  void addToMenu(QMenu* menu)
+  {
+    this->mpMenuAction = new QAction(QString::fromStdString(this->getName()) + " ...", menu);
+    if (!this->mIconPath.isEmpty())
+    {
+      this->mpMenuAction->setIcon(QIcon(this->mIconPath));
+    }
+    this->mpMenuAction->setData(QString::fromStdString(this->getName()));
+    menu->insertAction(menu->actions().at(0), this->mpMenuAction);
+
+    this->actionAdded();
+  }
+
+  void show(QWidget* parent, cedar::proc::gui::GroupPtr group)
+  {
+    if (this->mpDock == nullptr)
+    {
+      this->mpDock = new QDockWidget(parent);
+      this->mpDock->setFloating(true);
+      this->mpDock->setWindowTitle(QString::fromStdString(this->getName()));
+      this->mpDock->setAllowedAreas(Qt::NoDockWidgetArea);
+      this->mpOpenedWidget = this->createOpenable();
+      this->setGroup(group);
+      this->mpDock->setWidget(this->mpOpenedWidget);
+
+      if (!this->mConfigId.empty())
+      {
+        cedar::proc::gui::SettingsSingleton::getInstance()->getNamedDockSettings(this->mConfigId)->setTo(this->mpDock);
+      }
+    }
+
+    this->mpDock->show();
+  }
+
+  QAction* getMenuAction() const
+  {
+    return this->mpMenuAction;
+  }
+
+  const std::string& getName() const
+  {
+    return this->mName;
+  }
+
+  virtual QWidget* createOpenable() const = 0;
+
+  virtual void setGroup(cedar::proc::gui::GroupPtr)
+  {
+    // empty default implementation
+  }
+
+  void storeSettings()
+  {
+    if (!this->mConfigId.empty() && this->mpDock != nullptr)
+    {
+      cedar::proc::gui::SettingsSingleton::getInstance()->getNamedDockSettings(this->mConfigId)->getFrom(this->mpDock);
+    }
+  }
+
+  bool isInToolbar() const
+  {
+    return this->mIsInToolBar;
+  }
+
+protected:
+  void setIsInToolbar(bool isInToolBar)
+  {
+    this->mIsInToolBar = isInToolBar;
+  }
+
+private:
+  virtual void actionAdded()
+  {
+    // empty by default
+  }
+
+protected:
+  QWidget* mpOpenedWidget;
+
+private:
+  std::string mName;
+
+  std::string mConfigId;
+
+  QAction* mpMenuAction;
+
+  QDockWidget* mpDock;
+
+  QString mIconPath;
+
+  bool mIsInToolBar;
+};
+
+class cedar::proc::gui::Ide::OpenableArchitectureConsistencyCheck : public cedar::proc::gui::Ide::OpenableDialog
+{
+  public:
+    OpenableArchitectureConsistencyCheck(cedar::proc::gui::View* pView)
+    :
+    OpenableDialog("Architecture consistency check", ":/menus/consistency_check.svg", "architecture consistency check"),
+    mpView(pView)
+    {
+    }
+
+    QWidget* createOpenable() const
+    {
+      return new cedar::proc::gui::ArchitectureConsistencyCheck(this->mpView, this->mpView->getScene());
+    }
+
+    void setGroup(cedar::proc::gui::GroupPtr group)
+    {
+      if (this->mpOpenedWidget)
+      {
+        auto check = dynamic_cast<cedar::proc::gui::ArchitectureConsistencyCheck*>(this->mpOpenedWidget);
+        check->setGroup(group);
+      }
+    }
+
+  private:
+    cedar::proc::gui::View* mpView;
+};
+
+class cedar::proc::gui::Ide::OpenableSimulationControl : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableSimulationControl()
+  :
+  OpenableDialog("Simulation control", ":/toolbaricons/simulation_control.svg", "simulation control")
+  {
+    this->setIsInToolbar(true);
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new cedar::proc::gui::SimulationControl();
+  }
+
+  void setGroup(cedar::proc::gui::GroupPtr group)
+  {
+    if (this->mpOpenedWidget)
+    {
+      auto widget = dynamic_cast<cedar::proc::gui::SimulationControl*>(this->mpOpenedWidget);
+      widget->setGroup(group);
+    }
+  }
+
+private:
+  void actionAdded()
+  {
+    this->getMenuAction()->setShortcut(Qt::SHIFT + Qt::Key_T);
+  }
+};
+
+class cedar::proc::gui::Ide::OpenableBoostControl : public cedar::proc::gui::Ide::OpenableDialog
+{
+public:
+  OpenableBoostControl(cedar::proc::gui::View* view)
+  :
+  OpenableDialog("Boost control", ":/steps/boost.svg", "boost control"),
+  mpView(view)
+  {
+    this->setIsInToolbar(true);
+  }
+
+  QWidget* createOpenable() const
+  {
+    return new cedar::proc::gui::BoostControl(mpView);
+  }
+
+  void setGroup(cedar::proc::gui::GroupPtr group)
+  {
+    if (this->mpOpenedWidget)
+    {
+      auto widget = dynamic_cast<cedar::proc::gui::BoostControl*>(this->mpOpenedWidget);
+      widget->setGroup(group->getGroup());
+    }
+  }
+
+private:
+  void actionAdded()
+  {
+    this->getMenuAction()->setShortcut(Qt::CTRL + Qt::Key_B);
+  }
+
+private:
+  cedar::proc::gui::View* mpView;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
+
+cedar::proc::gui::Ide::Ide(const cedar::aux::CommandLineParser& parser)
 :
-mpConsistencyChecker(nullptr),
 mpPerformanceOverview(nullptr),
-mpConsistencyDock(nullptr),
 mpBoostControlDock(nullptr),
-mpBoostControl(nullptr),
 mSuppressCloseDialog(false),
 mpExperimentDialog(nullptr),
 mSimulationRunning(false)
@@ -176,12 +384,12 @@ mSimulationRunning(false)
   this->mDefaultWindowTitle = this->windowTitle();
 
   // setup the log to receive messages
-  if (redirectLogToGui)
+  if (!parser.hasParsedFlag("no-log"))
   {
     this->mpLog->installHandlers(true);
   }
 
-  if (loadDefaultPlugins)
+  if (!parser.hasParsedFlag("no-plugins"))
   {
     this->loadDefaultPlugins();
   }
@@ -264,8 +472,9 @@ mSimulationRunning(false)
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
 
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
-  QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
-  QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
+  this->mpActionToggleTriggerVisibility->setVisible(parser.hasParsedFlag("debug-enable-trigger-display"));
+
+  QObject::connect(mpActionToggleTriggerColor, SIGNAL(triggered(bool)), this, SLOT(toggleTriggerColors(bool)));
   QObject::connect(mpActionExperiments, SIGNAL(triggered()), this, SLOT(showExperimentDialog()));
 
   QObject::connect(mpActionPerformanceOverview, SIGNAL(triggered()), this->mpPerformanceOverview, SLOT(show()));
@@ -282,6 +491,11 @@ mSimulationRunning(false)
                    this,
                    SLOT(architectureChanged()));
 
+  QObject::connect(this->mpActionShowRecentNotifications,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showRecentNotifications()));
+
   QObject::connect(cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
                    SIGNAL(experimentRunning(bool)),
                    this,
@@ -296,8 +510,40 @@ mSimulationRunning(false)
 
   this->mpActionResetSimulation->setEnabled(false);
 
+  auto boost_ctrl = OpenableDialogPtr(new OpenableBoostControl(this->mpProcessingDrawer));
+
+  std::vector<OpenableDialogPtr> openable_dialogs;
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableArchitectureConsistencyCheck(this->mpProcessingDrawer)));
+  openable_dialogs.push_back(OpenableDialogPtr(new OpenableSimulationControl()));
+  openable_dialogs.push_back(boost_ctrl);
+
+  // need to iterate in reverse, actions are always added at the beginning of the menu
+  for (auto iter = openable_dialogs.rbegin(); iter != openable_dialogs.rend(); ++iter)
+  {
+    auto openable_dialog = *iter;
+    this->mOpenableDialogs[openable_dialog->getName()] = openable_dialog;
+    openable_dialog->addToMenu(this->mpToolsMenu);
+    QObject::connect(openable_dialog->getMenuAction(), SIGNAL(triggered()), this, SLOT(showOpenableDialog()));
+    if (openable_dialog->isInToolbar())
+    {
+      this->mpToolBar->insertAction(this->mpActionDummy, openable_dialog->getMenuAction());
+    }
+  }
+  // the action dummy used for placing openable dialogs has server its purpose; destroy it!
+  this->mpToolBar->removeAction(this->mpActionDummy);
+  delete this->mpActionDummy;
+
+
+  this->showTriggerConnections(mpActionToggleTriggerVisibility->isChecked());
   this->buildStatusBar();
   this->startTimer(100);
+
+  auto messages = cedar::proc::gui::SettingsSingleton::getInstance()->getUnreadOneTimeMessages();
+
+  if (!messages.empty())
+  {
+    this->showOneTimeMessages(messages, true);
+  }
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -324,6 +570,66 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showRecentNotifications()
+{
+  auto messages = cedar::proc::gui::SettingsSingleton::getInstance()->getRecentOneTimeMessages();
+  this->showOneTimeMessages(messages, false);
+}
+
+void cedar::proc::gui::Ide::showOneTimeMessages
+(
+  const std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr>& messages,
+  bool markAsRead
+)
+{
+  auto p_dialog = new cedar::proc::gui::OneTimeMessageDialog(messages, markAsRead, this);
+  p_dialog->show();
+}
+
+void cedar::proc::gui::Ide::addCommandLineOptionsTo(cedar::aux::CommandLineParser& parser)
+{
+  parser.defineFlag
+  (
+    "no-log",
+    "Don't redirect log messages to the user interface. May help debugging if too many log messages cause the UI to lock up.",
+    'l'
+  );
+
+#ifdef DEBUG
+  parser.defineFlag
+  (
+    "debug-enable-trigger-display",
+    "Debug option: show the show/hide looped triggers symbol.",
+    0,
+    "debug options"
+  );
+#endif // DEBUG
+
+  //!@todo This is more of a generic thing that needs to be taken care of by the processing/plugin framework
+  //!      I.e., it shouldn't happen here, because it is also needed for the cedar-shell
+  parser.defineFlag
+  (
+    "no-plugins",
+    "Start without loading any plugins.",
+    'p'
+  );
+}
+
+void cedar::proc::gui::Ide::showOpenableDialog()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_ASSERT(action);
+  QString name = action->data().toString();
+
+  auto openable_iter = this->mOpenableDialogs.find(name.toStdString());
+  CEDAR_ASSERT(openable_iter != this->mOpenableDialogs.end());
+
+  auto openable = openable_iter->second;
+
+  openable->show(this, this->mGroup);
+
+}
 
 void cedar::proc::gui::Ide::setSimulationControlsDisabled(bool disabled)
 {
@@ -396,35 +702,6 @@ void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
   this->setWindowTitle(this->mDefaultWindowTitle + " - " + QString::fromStdString(filename) + "[*]");
 }
 
-void cedar::proc::gui::Ide::showBoostControl()
-{
-  if (this->mpBoostControlDock == nullptr)
-  {
-    this->mpBoostControlDock = new QDockWidget(this);
-    this->mpBoostControlDock->setFloating(true);
-    this->mpBoostControl = new cedar::proc::gui::BoostControl(this->mpProcessingDrawer);
-    this->mpBoostControlDock->setWindowTitle(this->mpBoostControl->windowTitle());
-    this->mpBoostControlDock->setAllowedAreas(Qt::NoDockWidgetArea);
-    this->mpBoostControlDock->setWidget(this->mpBoostControl);
-
-    if (this->mGroup)
-    {
-      this->mpBoostControl->setGroup(this->mGroup->getGroup());
-    }
-
-    cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->setTo(this->mpBoostControlDock);
-
-    // for some reason I do not get, the boost settings are only restored properly when this line is included. Qt bug?
-    this->mpBoostControlDock->setVisible(false);
-
-    this->mpBoostControlDock->show();
-  }
-  else
-  {
-    this->mpBoostControlDock->show();
-  }
-}
-
 void cedar::proc::gui::Ide::showExperimentDialog()
 {
   if (this->mpExperimentDialog == nullptr)
@@ -434,23 +711,6 @@ void cedar::proc::gui::Ide::showExperimentDialog()
   this->mpExperimentDialog->show();
   this->mpExperimentDialog->raise();
   this->mpExperimentDialog->activateWindow();
-}
-
-void cedar::proc::gui::Ide::showConsistencyChecker()
-{
-  if (this->mpConsistencyDock == nullptr)
-  {
-    this->mpConsistencyDock = new QDockWidget(this);
-    this->mpConsistencyDock->setFloating(true);
-    this->mpConsistencyDock->setWindowTitle("consistency check");
-    this->mpConsistencyDock->setAllowedAreas(Qt::NoDockWidgetArea);
-    this->mpConsistencyChecker
-      = new cedar::proc::gui::ArchitectureConsistencyCheck(this->mpProcessingDrawer, this->mpProcessingDrawer->getScene());
-    this->mpConsistencyChecker->setGroup(this->mGroup);
-    this->mpConsistencyDock->setWidget(this->mpConsistencyChecker);
-  }
-
-  this->mpConsistencyDock->show();
 }
 
 void cedar::proc::gui::Ide::exportSvg()
@@ -801,9 +1061,10 @@ void cedar::proc::gui::Ide::storeSettings()
   cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
-  if (this->mpBoostControlDock)
+  for (const auto& name_openable_pair : this->mOpenableDialogs)
   {
-    cedar::proc::gui::SettingsSingleton::getInstance()->boostCtrlSettings()->getFrom(this->mpBoostControlDock);
+    auto openable = name_openable_pair.second;
+    openable->storeSettings();
   }
 
   cedar::proc::gui::SettingsSingleton::getInstance()->storeMainWindow(this);
@@ -869,16 +1130,13 @@ void cedar::proc::gui::Ide::architectureToolFinished()
 void cedar::proc::gui::Ide::resetStepList()
 {
   //!@todo This should become its own widget
-
-  std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
-  for (auto iter = categories.begin(); iter != categories.end(); ++iter)
+  for (const auto& category_name : ElementManagerSingleton::getInstance()->listCategories())
   {
-    const std::string& category_name = *iter;
     cedar::proc::gui::ElementClassList *p_tab;
     if (mElementClassListWidgets.find(category_name) == mElementClassListWidgets.end())
     {
       p_tab = new cedar::proc::gui::ElementClassList();
-      this->mpCategoryList->addTab(p_tab, QString(category_name.c_str()));
+      this->mpCategoryList->addTab(p_tab, QString::fromStdString(category_name));
       mElementClassListWidgets[category_name] = p_tab;
     }
     else
@@ -886,6 +1144,15 @@ void cedar::proc::gui::Ide::resetStepList()
       p_tab = mElementClassListWidgets[category_name];
     }
     p_tab->showList(category_name);
+
+    // if the category does not contain any displayed items, remove it
+    if (p_tab->count() == 0)
+    {
+      this->mpCategoryList->removeTab(this->mpCategoryList->indexOf(p_tab));
+      auto iter = mElementClassListWidgets.find(category_name);
+      CEDAR_DEBUG_ASSERT(iter != mElementClassListWidgets.end());
+      mElementClassListWidgets.erase(iter);
+    }
   }
 }
 
@@ -1357,13 +1624,14 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   // reset scene
   this->mpProcessingDrawer->resetViewport();
   // create new root network
-  cedar::proc::gui::GroupPtr network(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene()));
-  network->getGroup()->setName("root");
-  this->mpProcessingDrawer->getScene()->setGroup(network);
+  cedar::proc::gui::GroupPtr group(new cedar::proc::gui::Group(this, this->mpProcessingDrawer->getScene()));
+  group->getGroup()->setName("root");
+  group->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
+  this->mpProcessingDrawer->getScene()->setGroup(group);
   // read network
   try
   {
-    network->read(file.toStdString());
+    group->read(file.toStdString());
   }
   catch(const cedar::proc::ArchitectureLoadingException& e)
   {
@@ -1416,7 +1684,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
 
   //!@todo Why doesn't this call resetTo?
-  this->setGroup(network);
+  this->setGroup(group);
 
   this->displayFilename(file.toStdString());
 
@@ -1514,6 +1782,11 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
   {
     mpProcessingDrawer->hideTriggerConnections();
   }
+}
+
+void cedar::proc::gui::Ide::toggleTriggerColors(bool show)
+{
+  this->mGroup->toggleTriggerColors(show);
 }
 
 void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
@@ -1663,6 +1936,7 @@ cedar::proc::gui::GroupPtr cedar::proc::gui::Ide::getGroup()
 void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 {
   this->mGroup = group;
+  this->mGroup->toggleTriggerColors(this->mpActionToggleTriggerColor->isChecked());
 
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
@@ -1675,14 +1949,10 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 
   this->updateTriggerStartStopThreadCallers();
 
-  if (this->mpConsistencyChecker != NULL)
+  for (auto name_openable_pair : this->mOpenableDialogs)
   {
-    this->mpConsistencyChecker->setGroup(group);
-  }
-
-  if (this->mpBoostControl != NULL)
-  {
-    this->mpBoostControl->setGroup(group->getGroup());
+    auto openable_dialog = name_openable_pair.second;
+    openable_dialog->setGroup(group);
   }
 
   if (this->mpPerformanceOverview != NULL)

@@ -22,44 +22,90 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BoostControl.h
+    File:        SimulationControl.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 06 28
+    Date:        2014 10 21
 
-    Description:
+    Description: Header file for the class cedar::proc::gui::SimulationControl.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_BOOST_CONTROL_H
-#define CEDAR_PROC_GUI_BOOST_CONTROL_H
+#ifndef CEDAR_PROC_GUI_SIMULATION_CONTROL_H
+#define CEDAR_PROC_GUI_SIMULATION_CONTROL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/ui_BoostControl.h"
+#include "cedar/processing/gui/ui_SimulationControl.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
 #include "cedar/processing/Group.fwd.h"
-#include "cedar/processing/gui/BoostControl.fwd.h"
-#include "cedar/processing/gui/View.fwd.h"
-#include "cedar/processing/sources/Boost.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/SimulationControl.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
+#include <QFuture>
+#include <QPushButton>
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif // Q_MOC_RUN
-#include <map>
 
+//!@cond SKIPPED_DOCUMENTATION
+// "Hidden" class; would be a private nested class of cedar::proc::gui::SimulationControl, but the moc cannot do that
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      namespace SimulationControlPrivate
+      {
+        /*! A widget that can be used to start/stop a looped trigger. Also reacts to when the trigger is started from
+         * elsewhere
+         */
+        class TriggerControlWidget : public QWidget
+        {
+          Q_OBJECT
 
-/*!@brief A widget for conveniently controlling the boosts in a network.
+        public:
+          TriggerControlWidget(cedar::proc::LoopedTriggerPtr loopedTrigger);
+
+        private slots:
+          void startStopTriggerClicked();
+
+          void triggerStarted();
+
+          void triggerStopped();
+
+          void triggerChangingState();
+
+          void singleStepClicked();
+
+        private:
+          cedar::proc::LoopedTriggerPtr mLoopedTrigger;
+
+          QPushButton* mpStartStopButton;
+
+          QPushButton* mpSingleStepButton;
+        };
+      }
+    }
+  }
+}
+//!@endcond
+
+/*!@brief A widget for controlling the simulation of a cedar::proc::Group.
  */
-class cedar::proc::gui::BoostControl : public QWidget, public Ui_BoostControl
+class cedar::proc::gui::SimulationControl : public QWidget, public Ui_SimulationControl
 {
   Q_OBJECT
 
@@ -72,15 +118,17 @@ class cedar::proc::gui::BoostControl : public QWidget, public Ui_BoostControl
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  BoostControl(cedar::proc::gui::View* view);
+  SimulationControl();
+
+  //! The destructor.
+  ~SimulationControl();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Sets the network whose boosts are controlled by this widget.
-   */
-  void setGroup(cedar::proc::GroupPtr network);
+  //! Sets the group whose simulation is controlled by this widget.
+  void setGroup(cedar::proc::gui::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,30 +140,66 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Adds a boost to this control widget.
-  void boostAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
+  void elementAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
+  void loopedTriggerAdded(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger);
 
-  bool isBoostItem(QTreeWidgetItem* pItem) const;
+  void updateSimulationRunningIcon(bool running);
 
-  cedar::proc::sources::BoostPtr findBoostFor(QTreeWidgetItem* pItem) const;
+  QWidget* getColorWidget(QTreeWidgetItem* pItem);
+
+  cedar::proc::LoopedTriggerPtr getItemTrigger(QTreeWidgetItem* pItem);
+
+  void updateItemTriggerColor(QTreeWidgetItem* pItem);
+
+  void updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr loopedTrigger);
+
+  void sortItems();
 
 private slots:
-  //! If possible, centers the boost that was double-clicked.
-  void itemActivated(QTreeWidgetItem* pItem, int column);
+  void startPauseSimulationClicked();
+
+  void triggerStarted();
+
+  void allTriggersStopped();
+
+  void createClicked();
+
+  void removeClicked();
+
+  void updateAllTriggerColors();
+
+  void elementNameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  cedar::proc::GroupPtr mGroup;
+  cedar::proc::gui::GroupPtr mGroup;
 
-  cedar::proc::gui::View* mpView;
+  boost::signals2::scoped_connection mElementAddedConnection;
 
-  boost::signals2::scoped_connection mBoostAddedConnection;
+  cedar::aux::LockableMember<bool> mSimulationRunning;
 
-}; // class cedar::proc::gui::BoostControl
+  QFuture<void> mStartSimulationResult;
 
-#endif // CEDAR_PROC_GUI_BOOST_CONTROL_H
+  QFuture<void> mStopSimulationResult;
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  static QString M_STARTED_ICON_PATH;
+  static QString M_PAUSED_ICON_PATH;
+
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::gui::SimulationControl
+
+#endif // CEDAR_PROC_GUI_SIMULATION_CONTROL_H

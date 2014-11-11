@@ -68,11 +68,13 @@ cedar_add_library(cedarproc
   gui/Connectable.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
+  gui/ElementTreeWidget.h
   gui/ExperimentDialog.h
   gui/FindDialog.h
   gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
+  gui/OneTimeMessageDialog.h
   gui/PlotWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
@@ -81,6 +83,7 @@ cedar_add_library(cedarproc
   gui/Scene.h
   gui/Settings.h
   gui/SettingsDialog.h
+  gui/SimulationControl.h
   gui/StepItem.h
   gui/TriggerItem.h
   gui/Group.h

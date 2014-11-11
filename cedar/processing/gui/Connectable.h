@@ -47,10 +47,13 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
+#include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
 #include "cedar/processing/gui/ConnectableIconView.fwd.h"
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/PlotWidget.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.fwd.h"
 
@@ -151,6 +154,9 @@ protected:
       //! Resets the backgroud color of the decoration to the default.
       void resetBackgroundColor();
 
+      //! sets the description at the icon
+      virtual void setDescription(const QString& text);
+
     private:
       QGraphicsSvgItem* mpIcon;
 
@@ -217,7 +223,22 @@ public:
   //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
 
+  //! Fills the triggers in the group into the action as a submenu
+  static void buildConnectTriggerMenu
+  (
+    QMenu* pMenu,
+    const cedar::proc::gui::Group* gui_group,
+    const QObject* receiver,
+    const char* slot,
+    boost::optional<cedar::proc::TriggerPtr> current = (boost::optional<cedar::proc::TriggerPtr>())
+  );
+
+  static cedar::proc::TriggerPtr getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group);
+
 public slots:
+  //! Updates whether the connectable shows the color of its trigger.
+  virtual void updateTriggerColorState();
+
   //! reacts to the removal of a data slot
   void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
 
@@ -290,7 +311,7 @@ protected:
   void removeDecoration(cedar::proc::gui::Connectable::DecorationPtr decoration);
 
   //! Fill plot menu
-  void fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
+  void fillConnectableMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
 
   //!@brief Fills the defined plots into the given menu.
   void fillDefinedPlots(QMenu& menu, const QPoint& plotPosition);
@@ -342,6 +363,11 @@ protected:
   /*! Returns a formatted string that can be used for labels/window titles.
    */
   std::string getNameForTitle() const;
+
+  void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
+
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -361,10 +387,25 @@ private:
 
   void translateStoppedSignal();
 
+  //! Fill plot menu
+  void fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event);
+
+  cedar::proc::gui::ConstGroup* getGuiGroup() const;
+
+  void translateParentTriggerChangedSignal();
+
+  void fillColorChanged(QColor color);
+
+  void showTriggerChains();
+
+  void hideTriggerChains();
+
 private slots:
   void triggerableStarted();
 
   void triggerableStopped();
+
+  void assignTriggerClicked();
 
 signals:
   //! translates a slot removed signal to Qt
@@ -381,6 +422,9 @@ signals:
 
   //! Emitted whenever the triggerable is stopped.
   void triggerableStoppedSignal();
+
+  //! Used for translating the boost signal to a Qt signal (in the GUI thread)
+  void triggerableParentTriggerChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -411,7 +455,7 @@ protected:
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
 
-  //!@brief a vector of all child widgets fo the current step
+  //!@brief a vector of all child widgets for the current step
   std::vector<QWidget*> mChildWidgets;
 
 private:
@@ -432,6 +476,15 @@ private:
 
   boost::signals2::scoped_connection mStartedConnection;
   boost::signals2::scoped_connection mStoppedConnection;
+  boost::signals2::scoped_connection mParentTriggerChangedConnection;
+  boost::signals2::scoped_connection mFillColorChangedConnection;
+
+  QBrush mPreviousFillColor;
+
+  //! Stores whether or not the item is showing the color of its trigger.
+  bool mShowingTriggerColor;
+
+  std::vector<QGraphicsItem*> mTriggerChainVisualization;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

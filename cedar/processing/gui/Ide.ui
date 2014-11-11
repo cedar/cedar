@@ -106,6 +106,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="mpActionShowRecentNotifications"/>
+    <addaction name="separator"/>
     <addaction name="mpActionAbout"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -123,23 +125,14 @@
     <property name="title">
      <string>View</string>
     </property>
-    <widget class="QMenu" name="menuTrigger_Connections">
-     <property name="title">
-      <string>Trigger Connections</string>
-     </property>
-     <addaction name="mpActionToggleTriggerVisibility"/>
-     <addaction name="mpActionTriggerSmartHide"/>
-    </widget>
-    <addaction name="menuTrigger_Connections"/>
     <addaction name="mpActionShowHideGrid"/>
     <addaction name="mpActionToggleSmartConnections"/>
+    <addaction name="mpActionToggleTriggerColor"/>
    </widget>
-   <widget class="QMenu" name="menuTools">
+   <widget class="QMenu" name="mpToolsMenu">
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="mpActionArchitectureConsistencyCheck"/>
-    <addaction name="mpActionBoostControl"/>
     <addaction name="mpActionPerformanceOverview"/>
     <addaction name="mpActionExperiments"/>
     <addaction name="mpActionParameterLinker"/>
@@ -152,7 +145,7 @@
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuSimulation"/>
-   <addaction name="menuTools"/>
+   <addaction name="mpToolsMenu"/>
    <addaction name="mpMenuWindows"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -422,11 +415,12 @@
    <addaction name="mpActionRecord"/>
    <addaction name="mpActionSnapshot"/>
    <addaction name="separator"/>
-   <addaction name="mpActionBoostControl"/>
+   <addaction name="mpActionDummy"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleSmartConnections"/>
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionToggleTriggerVisibility"/>
+   <addaction name="mpActionToggleTriggerColor"/>
    <addaction name="mpActionClosePlots"/>
    <addaction name="mpActionToggleVisibilityOfPlots"/>
    <addaction name="separator"/>
@@ -570,7 +564,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
@@ -595,15 +589,6 @@
     <string>Smart hide</string>
    </property>
   </action>
-  <action name="mpActionArchitectureConsistencyCheck">
-   <property name="icon">
-    <iconset resource="icons/cedar_proc_gui_icons.qrc">
-     <normaloff>:/menus/consistency_check.svg</normaloff>:/menus/consistency_check.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Architecture consistency check ...</string>
-   </property>
-  </action>
   <action name="mpThreadsSingleStep">
    <property name="icon">
     <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
@@ -617,21 +602,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
-   </property>
-  </action>
-  <action name="mpActionBoostControl">
-   <property name="icon">
-    <iconset resource="icons/cedar_proc_gui_icons.qrc">
-     <normaloff>:/steps/boost.svg</normaloff>:/steps/boost.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Boost control ...</string>
-   </property>
-   <property name="toolTip">
-    <string>Open a boost control widget.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+B</string>
    </property>
   </action>
   <action name="mpActionToggleSmartConnections">
@@ -835,6 +805,37 @@
    </property>
    <property name="toolTip">
     <string>Resets the simulation, i.e., calls reset on the architecture and rewinds the global timer.</string>
+   </property>
+  </action>
+  <action name="mpActionToggleTriggerColor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/show_trigger_colors.svg</normaloff>:/toolbaricons/show_trigger_colors.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Color elements by trigger</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle visibility of trigger colors.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
+   </property>
+  </action>
+  <action name="mpActionDummy">
+   <property name="text">
+    <string>dummy action</string>
+   </property>
+   <property name="toolTip">
+    <string>You should not see this. This is what tells the IDE where to (automatically) put buttons for, e.g., the boost control.</string>
+   </property>
+  </action>
+  <action name="mpActionShowRecentNotifications">
+   <property name="text">
+    <string>Show recent notifications...</string>
    </property>
   </action>
  </widget>
