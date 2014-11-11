@@ -106,6 +106,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="mpActionShowRecentNotifications"/>
+    <addaction name="separator"/>
     <addaction name="mpActionAbout"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -829,6 +831,11 @@
    </property>
    <property name="toolTip">
     <string>You should not see this. This is what tells the IDE where to (automatically) put buttons for, e.g., the boost control.</string>
+   </property>
+  </action>
+  <action name="mpActionShowRecentNotifications">
+   <property name="text">
+    <string>Show recent notifications...</string>
    </property>
   </action>
  </widget>

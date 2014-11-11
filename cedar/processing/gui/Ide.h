@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_Ide.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/LogInterface.h"
 #include "cedar/auxiliaries/LockableMember.h"
 
@@ -282,6 +283,9 @@ public slots:
   //! return the gui root group
   cedar::proc::gui::ConstGroupPtr getGroup() const;
 
+  //! Shows recent notifications
+  void showRecentNotifications();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -355,6 +359,8 @@ private:
   void buildStatusBar();
 
   void updateSimulationRunningIcon(bool running);
+
+  void showOneTimeMessages(const std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr>& messages, bool markAsRead = false);
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);

@@ -56,6 +56,7 @@
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/SimulationControl.h"
+#include "cedar/processing/gui/OneTimeMessageDialog.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/gui/ExperimentDialog.h"
 #include "cedar/processing/exceptions.h"
@@ -490,6 +491,11 @@ mSimulationRunning(false)
                    this,
                    SLOT(architectureChanged()));
 
+  QObject::connect(this->mpActionShowRecentNotifications,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showRecentNotifications()));
+
   QObject::connect(cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
                    SIGNAL(experimentRunning(bool)),
                    this,
@@ -531,6 +537,13 @@ mSimulationRunning(false)
   this->showTriggerConnections(mpActionToggleTriggerVisibility->isChecked());
   this->buildStatusBar();
   this->startTimer(100);
+
+  auto messages = cedar::proc::gui::SettingsSingleton::getInstance()->getUnreadOneTimeMessages();
+
+  if (!messages.empty())
+  {
+    this->showOneTimeMessages(messages, true);
+  }
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -557,6 +570,22 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showRecentNotifications()
+{
+  auto messages = cedar::proc::gui::SettingsSingleton::getInstance()->getRecentOneTimeMessages();
+  this->showOneTimeMessages(messages, false);
+}
+
+void cedar::proc::gui::Ide::showOneTimeMessages
+(
+  const std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr>& messages,
+  bool markAsRead
+)
+{
+  auto p_dialog = new cedar::proc::gui::OneTimeMessageDialog(messages, markAsRead, this);
+  p_dialog->show();
+}
 
 void cedar::proc::gui::Ide::addCommandLineOptionsTo(cedar::aux::CommandLineParser& parser)
 {
