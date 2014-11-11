@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/DefaultConnectableIconView.h"
+#include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -335,9 +336,20 @@ void cedar::proc::gui::Connectable::showTriggerChains()
       auto link_gui = scene->getGraphicsItemFor(link_element.get());
       if (!link_gui)
       {
-        // ok
         // can happen either for the processing done trigger of the start of the chain, or for group inputs
-        continue;
+
+        if (auto group_input = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(link_element))
+        {
+          // if the link element is a group input, place the counter there
+          auto owner = group_input->getGroup();
+          auto owner_gui = scene->getGroupFor(owner.get());
+          link_gui = owner_gui->getSlotItemFor(group_input);
+        }
+        else
+        {
+          // otherwise, skip this one
+          continue;
+        }
       }
       QRectF bounds = link_gui->boundingRect();
       make_circle(depth, -item_size / static_cast<qreal>(2), bounds.height() - item_size / static_cast<qreal>(2), item_size, link_gui);
