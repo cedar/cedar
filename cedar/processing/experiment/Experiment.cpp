@@ -245,7 +245,7 @@ void cedar::proc::experiment::Experiment::stopExperiment()
   emit experimentRunning(false);
 
   std::string time_stamp = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
-  cedar::aux::LogSingleton::getInstance()->message("message", "Experiment stopped. Timestamp: " + time_stamp, "Experiment");
+  cedar::aux::LogSingleton::getInstance()->message("Experiment stopped. Timestamp: " + time_stamp, "Experiment");
 }
 
 void cedar::proc::experiment::Experiment::startTrial()

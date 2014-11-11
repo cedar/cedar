@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/condition/OnInit.h"
 #include "cedar/processing/experiment/Experiment.h"
-#include "cedar/processing/experiment/Supervisor.h"
 
 // SYSTEM INCLUDES
 
