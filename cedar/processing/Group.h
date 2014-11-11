@@ -273,6 +273,9 @@ public:
   //!@brief renames an external connector of the specified type
   void renameConnector(const std::string& oldName, const std::string& newName, bool input);
 
+  //!@brief checks if a connector can be renamed
+  bool canRenameConnector(const std::string& oldName, const std::string& newName, bool input, std::string& error) const;
+
   //!@brief removes an external connector of the specified type from the group
   void removeConnector(const std::string& name, bool input);
 
@@ -516,7 +519,7 @@ public:
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
   //!@brief Checks whether a name exists in the group.
-  bool nameExists(const std::string& name) const;
+  bool nameExists(const cedar::proc::NetworkPath& name) const;
 
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()
@@ -673,6 +676,10 @@ public:
 
   //! Updates the trigger chains of all steps.
   void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
+
+  /*! This function lists the required plugins for all the elements in this group and any of its subgroups.
+   */
+  std::set<std::string> listRequiredPlugins() const;
 
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);

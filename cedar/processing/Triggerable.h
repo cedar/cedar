@@ -193,6 +193,13 @@ public:
   //! Returns true if the step is started, i.e., if the last onStart call was not followed by an onStop call.
   bool isStarted() const;
 
+
+  /*! Returns true if the triggerable is a source of trigger signals.
+   *
+   * This is the case if the triggerable is not triggered by anyone else.
+   */
+  bool isTriggerSource() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------

@@ -170,10 +170,10 @@ public:
   };
 
   //!@brief a parameter for action sequence objects
-  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::ActionSequence> ActionSequencelListParameter;
+  typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::ActionSequence> ActionSequenceListParameter;
 
   //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionSequencelListParameter);
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ActionSequenceListParameter);
   //!@endcond
 private:
 
@@ -192,6 +192,9 @@ public:
 public:
   //!@brief Sets the group of this experiment
   void setGroup(cedar::proc::GroupPtr group);
+
+  //!@brief Gets the group of this experiment
+  cedar::proc::GroupPtr getGroup();
 
   //!@brief Returns the file name of this experiment
   const std::string& getFileName() const;
@@ -231,18 +234,6 @@ public:
 
   //!@brief Get all triggers of the current group
   std::vector<std::string> getGroupTriggers();
-
-  /*!@brief Returns all parameter names of a given step
-   *          allowedTypes defines what kind of parameters should be returned
-   *          If there is no allowed type specified, all parameters that are registered in the DeclarationFactory
-   *          will be returned
-   */
-  std::vector<std::string> getStepParameters(std::string step, const std::vector<std::string>& allowedTypes
-      = std::vector<std::string>());
-
-  //!@brief Returns all data names of the given role of a step
-  std::vector<std::string> getStepDatas(std::string step, cedar::proc::DataRole::Id role
-      = cedar::proc::DataRole::OUTPUT);
 
   //!@brief Returns the ParameterPtr defined by step name and parameter name
   cedar::aux::ParameterPtr getStepParameter(std::string step, std::string parameter);
@@ -292,7 +283,8 @@ signals:
   //!@brief Should be emitted if the group has changed
   void groupChanged();
 
-
+public slots:
+  void elementRenamed(const std::string& oldName, const std::string& newName);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -371,11 +363,11 @@ private:
   //!@brief The filename of the experiment
   cedar::aux::StringParameterPtr _mFileName;
 
-  //!@brief The number of trials this experiment should run Through
+  //!@brief The number of trials this experiment should run
   cedar::aux::UIntParameterPtr _mTrials;
 
-  //!@brief The list of action sequences containing to the experiment
-  ActionSequencelListParameterPtr _mActionSequences;
+  //!@brief The list of action sequences belonging to the experiment
+  ActionSequenceListParameterPtr _mActionSequences;
 
   //!@brief The state of the group before the experiment has been started.
   cedar::aux::ConfigurationNode mGroupState;

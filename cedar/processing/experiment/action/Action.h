@@ -111,7 +111,7 @@ private:
 
 }; // class cedar::proc::experiment::Action
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ActionPtr>);
+CEDAR_PROC_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::action::ActionPtr>);
 
 namespace cedar
 {

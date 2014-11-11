@@ -144,7 +144,7 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::Supervisor>);
+      CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::Supervisor>);
       typedef cedar::aux::Singleton<cedar::proc::experiment::Supervisor> SupervisorSingleton;
     }
   }

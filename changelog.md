@@ -89,7 +89,9 @@ Unreleased
     triggers in an achitecture. It also starts the global timer. When pushed, it turns into a pause button which halts
     all triggers as well as the global timer. Pushing the pause-button will turn it back to a start button which can
     then be used to resume the simulation. An addded reset button can reset the simulation; i.e., it resets the
-    architecture as well as the global timer. 
+    architecture as well as the global timer.
+  - Added a python plotting script for recorded data (in tools/recordedDataProcessor).
+  - Added a trial framework for running experiments with cedar architectures (in the GUI, Tools>Experiments...).
 
 
 Released versions

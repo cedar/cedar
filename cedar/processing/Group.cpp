@@ -173,6 +173,31 @@ cedar::proc::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
+{
+  std::set<std::string> required_plugins;
+  for (const auto& name_element_pair : this->getElements())
+  {
+    auto element = name_element_pair.second;
+
+    if (auto subgroup = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
+    {
+      auto subgroup_plugins = subgroup->listRequiredPlugins();
+      required_plugins.insert(subgroup_plugins.begin(), subgroup_plugins.end());
+    }
+    else
+    {
+      auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(element);
+      if (!declaration->getSource().empty())
+      {
+        required_plugins.insert(declaration->getSource());
+      }
+    }
+  }
+
+  return required_plugins;
+}
+
 std::vector<cedar::proc::GroupPath> cedar::proc::Group::listAllElementPaths(const cedar::proc::GroupPath& base_path) const
 {
   std::vector<cedar::proc::GroupPath> paths;
@@ -592,9 +617,26 @@ std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifie
   return result;
 }
 
-bool cedar::proc::Group::nameExists(const std::string& name) const
+bool cedar::proc::Group::nameExists(const cedar::proc::NetworkPath& name) const
 {
-  return this->mElements.find(name) != this->mElements.end();
+  CEDAR_ASSERT(name.getElementCount() > 0)
+  if (name.getElementCount() > 1)
+  {
+    auto group_name = name(0,0).toString();
+    auto it = this->mElements.find(name);
+    if (it != this->mElements.end())
+    {
+      if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(it->second))
+      {
+        return group->nameExists(name(1,name.getElementCount()-1));
+      }
+    }
+    return false;
+  }
+  else
+  {
+    return this->mElements.find(name) != this->mElements.end();
+  }
 }
 
 void cedar::proc::Group::listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const
@@ -1153,7 +1195,24 @@ void cedar::proc::Group::renameConnector(const std::string& oldName, const std::
     );
   }
 
-  // change name
+  // do some sanity checks first
+  if (oldName == newName)
+  {
+    // nothing to do
+    return;
+  }
+
+  // does the name already exist?
+  if (this->nameExists(newName))
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "There is already an element of name " + newName + " in group " + this->getName() + "."
+    );
+  }
+
+  // everything is fine, change name
   _mConnectors->erase(oldName);
   _mConnectors->set(newName, input);
   if (input)
@@ -1168,6 +1227,40 @@ void cedar::proc::Group::renameConnector(const std::string& oldName, const std::
     auto sink = this->getElement<cedar::proc::sinks::GroupSink>(oldName);
     sink->setName(newName);
   }
+}
+
+bool cedar::proc::Group::canRenameConnector(const std::string& oldName, const std::string& newName, bool input, std::string& error) const
+{
+  // check if connector is in map of connectors
+  auto it = _mConnectors->find(oldName);
+  if (it == _mConnectors->end() || it->second != input)
+  {
+    error = "There is no connector of name " + oldName + " in group " + this->getName() + ".";
+    return false;
+  }
+
+  // if names are identical, renaming is possible
+  if (oldName == newName)
+  {
+    // nothing to do
+    return true;
+  }
+
+  // check if new name is already taken
+  if (this->hasConnector(newName))
+  {
+    error = "There is already a connector of name " + newName + " in group " + this->getName() + ", cannot rename.";
+    return false;
+  }
+
+  // check if new name is already taken
+  if (this->nameExists(newName))
+  {
+    error = "There is already an element of name " + newName + " in group " + this->getName() + ", cannot rename.";
+    return false;
+  }
+  // everything ok!
+  return true;
 }
 
 void cedar::proc::Group::removeConnector(const std::string& name, bool input)
@@ -1629,6 +1722,16 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
     cedar::proc::ArchitectureLoadingException exception(exceptions);
     CEDAR_THROW_EXCEPTION(exception);
   }
+
+  // holding trigger chain updates may have caused some steps to not be computed; thus, re-trigger all sources
+  for (const auto& name_element_pair : this->getElements())
+  {
+    auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(name_element_pair.second);
+    if (triggerable && triggerable->isTriggerSource() && !triggerable->isLooped())
+    {
+      triggerable->onTrigger();
+    }
+  }
 }
 
 void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
@@ -2000,6 +2103,7 @@ void cedar::proc::Group::inputConnectionChanged(const std::string& inputName)
   {
     source->resetData();
   }
+  source->onTrigger();
 }
 
 const cedar::proc::Group::ConnectorMap& cedar::proc::Group::getConnectorMap()

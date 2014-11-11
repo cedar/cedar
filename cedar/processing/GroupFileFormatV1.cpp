@@ -126,25 +126,16 @@ void cedar::proc::GroupFileFormatV1::writeMetaData(cedar::proc::ConstGroupPtr gr
   meta.put("format", 1);
 
   // determine what plugins are used by the group
-  std::set<std::string> required_plugins;
-  for (auto& name_element_pair : group->getElements())
-  {
-    auto element = name_element_pair.second;
-    auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(element);
-    if (!declaration->getSource().empty())
-    {
-      required_plugins.insert(declaration->getSource());
-    }
-  }
+  std::set<std::string> required_plugins = group->listRequiredPlugins();
 
   // if plugins are used, write them to the meta node
   if (!required_plugins.empty())
   {
     cedar::aux::ConfigurationNode required_plugins_node;
-    for (auto iter = required_plugins.begin(); iter != required_plugins.end(); ++iter)
+    for (auto plugin_path : required_plugins)
     {
       cedar::aux::ConfigurationNode value_node;
-      value_node.put_value(*iter);
+      value_node.put_value(plugin_path);
       required_plugins_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
     }
 

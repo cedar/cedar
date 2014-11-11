@@ -106,6 +106,12 @@ void cedar::aux::CommandLineParser::setParsedValue(const std::string& longName, 
     }
   }
   this->mParsedValues[longName] = value;
+
+  // execute command action: read configuration
+  if (longName == M_READ_CONFIG_COMMAND)
+  {
+    this->readConfigFromFile(value);
+  }
 }
 
 void cedar::aux::CommandLineParser::setParsedFlag(const std::string& longName, bool value)
@@ -565,12 +571,6 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
     {
       exit(0);
     }
-  }
-
-  if (this->hasParsedValue(M_READ_CONFIG_COMMAND))
-  {
-    const std::string& path = this->getValue(M_READ_CONFIG_COMMAND);
-    this->readConfigFromFile(path);
   }
 
   if (this->hasParsedValue(M_WRITE_CONFIG_COMMAND))

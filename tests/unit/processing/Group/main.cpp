@@ -161,6 +161,88 @@ int test_looped_group_cycle()
   return 0;
 }
 
+int test_connector_renaming()
+{
+  using cedar::proc::Group;
+  using cedar::proc::GroupPtr;
+  using cedar::proc::Element;
+  using cedar::proc::ElementPtr;
+
+  int errors = 0;
+  std::cout << "testing renaming of group connectors" << std::endl;
+
+  { // simple renaming
+    cedar::proc::GroupPtr group(new cedar::proc::Group());
+    group->addConnector("test_in", true);
+    group->renameConnector("test_in", "test_in2", true);
+    group->addConnector("test_out", false);
+    group->renameConnector("test_out", "test_out2", false);
+  }
+
+  { // duplicate names
+    GroupPtr test(new Group());
+    test->addConnector("test", true);
+    test->addConnector("test 2", true);
+    try
+    {
+      std::cout << " trying to use a name that already exists" << std::endl;
+      test->renameConnector("test", "test 2", true);
+      std::cout << " ERROR: rename worked even though it shouldn't." << std::endl;
+      ++errors;
+    }
+    catch (const cedar::aux::ExceptionBase& e)
+    {
+      std::cout << "Properly caught an exception: " << e.exceptionInfo() << std::endl;
+    }
+  }
+
+
+  { // renaming & element names
+    GroupPtr test(new Group());
+    test->add(ElementPtr(new TestModule()), "test element");
+    test->addConnector("test", true);
+
+    try
+    {
+      std::cout << " trying rename with an element's name" << std::endl;
+      test->renameConnector("test", "test element", true);
+      std::cout << " ERROR: rename worked even though it shouldn't." << std::endl;
+      ++errors;
+    }
+    catch (const cedar::aux::ExceptionBase& e)
+    {
+      std::cout << "Properly caught an exception: " << e.exceptionInfo() << std::endl;
+    }
+
+    try
+    {
+      std::cout << " trying to undo rename" << std::endl;
+      test->renameConnector("test element", "test", true);
+      std::cout << " ERROR: rename worked even though it shouldn't." << std::endl;
+      ++errors;
+    }
+    catch (const cedar::aux::ExceptionBase& e)
+    {
+      std::cout << "Properly caught an exception: " << e.exceptionInfo() << std::endl;
+    }
+
+//    try
+//    {
+//      std::cout << " trying to use the name of an element for a connector" << std::endl;
+//      test->renameConnector("test", "test element", true);
+//      std::cout << " ERROR: rename worked even though it shouldn't." << std::endl;
+//      ++errors;
+//    }
+//    catch (const cedar::aux::ExceptionBase& e)
+//    {
+//      std::cout << "Properly caught an exception: " << e.exceptionInfo() << std::endl;
+//    }
+
+    // try to give a different
+  }
+  return errors;
+}
+
 void run_test()
 {
   using cedar::proc::Group;
@@ -445,18 +527,9 @@ void run_test()
   group_2->add(moved_gains);
   group_1->add(moved_gains);
 
-  {
-    std::cout << "testing renaming of group connectors" << std::endl;
-
-    cedar::proc::GroupPtr group(new cedar::proc::Group());
-    group->addConnector("test_in", true);
-    group->renameConnector("test_in", "test_in2", true);
-    group->addConnector("test_out", false);
-    group->renameConnector("test_out", "test_out2", false);
-  }
-
   errors += test_looped_group_cycle();
   errors += test_input_revalidation();
+  errors += test_connector_renaming();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
