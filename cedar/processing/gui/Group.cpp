@@ -282,16 +282,29 @@ void cedar::proc::gui::Group::clearTriggerColorCache() const
   emit triggerColorsChanged();
 }
 
-QColor cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigger) const
+QBrush cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigger) const
 {
   static std::vector<QColor> colors;
+  static std::vector<Qt::BrushStyle> brush_styles;
 
   if (colors.empty())
   {
-    for (int h = 0; h < 360; h += 45)
-    {
-      colors.push_back(QColor::fromHsv(h, 200, 200));
-    }
+    colors.push_back(QColor::fromRgb(0x6feb00));
+    colors.push_back(QColor::fromRgb(0x6100eb));
+    colors.push_back(QColor::fromRgb(0xeba900));
+    colors.push_back(QColor::fromRgb(0x00c2eb));
+    colors.push_back(QColor::fromRgb(0xeb6c00));
+    colors.push_back(QColor::fromRgb(0x008ceb));
+    colors.push_back(QColor::fromRgb(0xc7eb00));
+    colors.push_back(QColor::fromRgb(0x00eb71));
+    colors.push_back(QColor::fromRgb(0xeb00c5));
+  }
+
+  if (brush_styles.empty())
+  {
+    brush_styles.push_back(Qt::SolidPattern);
+    brush_styles.push_back(Qt::BDiagPattern);
+    brush_styles.push_back(Qt::Dense7Pattern);
   }
 
   if (mTriggerColors.empty())
@@ -304,17 +317,31 @@ QColor cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigge
       sorted_triggers[trigger->getName()] = trigger;
     }
 
+    size_t color_count = colors.size();
+    size_t style_count = brush_styles.size();
+    size_t color_style_count = color_count * style_count;
+
     size_t num = 0;
     for (auto name_trigger_pair : sorted_triggers)
     {
+      size_t color_index = num % colors.size();
+      size_t style_index = (num / colors.size()) % style_count;
+      size_t overflow = num / color_style_count;
+
+      QBrush brush;
+
       auto trigger = name_trigger_pair.second;
 
-      size_t color_index = num % colors.size();
-      int sat_val = std::max(30, 220 - 40 * static_cast<int>(num / colors.size()));
       QColor color = colors[color_index];
-      color.setHsv(color.hsvHue(), sat_val, sat_val);
-      mTriggerColors[trigger] = color;
+      int saturation = std::max(30, color.saturation() - 60 * static_cast<int>(overflow));
+      int value = std::max(30, color.value() - 60 * static_cast<int>(overflow));
+      color.setHsv(color.hsvHue(), saturation, value);
       ++num;
+
+      brush.setColor(color);
+      brush.setStyle(brush_styles.at(style_index));
+
+      mTriggerColors[trigger] = brush;
     }
   }
 
