@@ -75,6 +75,25 @@ void cedar::proc::gui::ElementTreeWidget::setItemPath(QTreeWidgetItem* pItem, co
   pItem->setData(this->getNameColumn(), Qt::UserRole, QString::fromStdString(newPath));
 }
 
+QTreeWidgetItem* cedar::proc::gui::ElementTreeWidget::findItemWithPath(const cedar::proc::GroupPath& path)
+{
+  auto searched_path = path.toString();
+  QTreeWidgetItemIterator it(this);
+  while (*it)
+  {
+    QTreeWidgetItem* p_item = *it;
+    auto item_path = p_item->data(this->getNameColumn(), Qt::UserRole).toString().toStdString();
+
+    if (item_path == path.toString())
+    {
+      return p_item;
+    }
+    ++it;
+  }
+
+  return nullptr;
+}
+
 std::string cedar::proc::gui::ElementTreeWidget::getPathFromItem(QTreeWidgetItem* pItem) const
 {
   return pItem->data(this->getNameColumn(), Qt::UserRole).toString().toStdString();
@@ -225,7 +244,7 @@ void cedar::proc::gui::ElementTreeWidget::elementNameChanged()
 {
   auto name = cedar::aux::asserted_cast<cedar::aux::Parameter*>(QObject::sender());
   auto element = dynamic_cast<cedar::proc::Element*>(name->getOwner());
-  auto new_path = this->mGroup->findPath(element);
+  cedar::proc::GroupPath new_path = this->mGroup->findPath(element);
 
   auto iter = this->mElementNames.find(element);
   if (iter == this->mElementNames.end())
@@ -236,22 +255,15 @@ void cedar::proc::gui::ElementTreeWidget::elementNameChanged()
   QString old_name = iter->second;
   QString new_name = QString::fromStdString(this->mGroup->findPath(element));
 
-  auto items = this->findItems(old_name, 0, this->mNameColumn);
-
-  for (int i = 0; i < items.size(); ++i)
-  {
-    QTreeWidgetItem* item = items.at(i);
-
-    this->setItemPath(item, new_path);
-    item->setText(this->mNameColumn, new_name);
-  }
-
   this->mElementNames[element] = new_name;
 
-  for (auto changed : items)
-  {
-    emit elementNameChanged(changed);
-  }
+  auto item = this->findItemWithPath(old_name.toStdString());
+  CEDAR_ASSERT(item != nullptr);
+
+  this->setItemPath(item, new_path.toString());
+  item->setText(this->mNameColumn, QString::fromStdString(new_path.getElementName()));
+
+  emit elementNameChanged(item);
 }
 
 void cedar::proc::gui::ElementTreeWidget::translateElementRemovedSignal(cedar::proc::ConstElementPtr element)
@@ -285,31 +297,41 @@ void cedar::proc::gui::ElementTreeWidget::elementRemoved(QString elementName)
 
 QTreeWidgetItem* cedar::proc::gui::ElementTreeWidget::getGroupItem(const std::string& elementPath)
 {
-  std::vector<std::string> subpaths;
-  cedar::aux::split(elementPath, ".", subpaths);
+  cedar::proc::GroupPath path(elementPath);
 
-  CEDAR_ASSERT(!subpaths.empty());
-
-  subpaths.pop_back();
+  CEDAR_ASSERT(!path.empty());
 
   QTreeWidgetItem* p_last = this->invisibleRootItem();
-  for (const auto& subpath : subpaths)
+  for (size_t path_index = 0; path.getElementCount() > 0 && path_index < path.getElementCount() - 1; ++path_index)
   {
+    std::string component = path[path_index];
     QTreeWidgetItem* p_item = nullptr;
+
+    // find the item that corresponds to the group
     for (int i = 0; i < p_last->childCount(); ++i)
     {
       auto child = p_last->child(i);
-      if (child->text(this->mNameColumn).toStdString() == subpath)
+      if (child->text(this->mNameColumn).toStdString() == component)
       {
         p_item = child;
+        break;
       }
     }
+
+    // if no group item was found, create one
     if (p_item == nullptr)
     {
+      auto subpath = path(0, path_index + 1);
+      std::string subpath_str = subpath.toString();
+
       p_item = new QTreeWidgetItem();
-      p_item->setText(this->mNameColumn, QString::fromStdString(subpath));
+      p_item->setText(this->mNameColumn, QString::fromStdString(component));
       p_last->addChild(p_item);
       p_item->setExpanded(true);
+      this->setItemPath(p_item, subpath_str);
+
+      auto group_element = this->mGroup->getElement(subpath);
+      this->mElementNames[group_element.get()] = QString::fromStdString(subpath_str);
     }
     p_last = p_item;
   }

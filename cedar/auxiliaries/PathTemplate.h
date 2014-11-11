@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -165,6 +166,12 @@ public:
     return this->mComponents.size();
   }
 
+  //! Checks whether the path is empty
+  bool empty() const
+  {
+    return this->mComponents.empty();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // public operators
   //--------------------------------------------------------------------------------------------------------------------
@@ -195,6 +202,13 @@ public:
     return this->toString();
   }
 
+  //! Returns the element of the path that has the given index.
+  StringType operator[](size_t index) const
+  {
+    CEDAR_ASSERT(index < this->getElementCount());
+    return this->mComponents.at(index);
+  }
+
   //! Returns the path, starting from the given index.
   SelfType operator()(size_t start) const
   {
@@ -215,7 +229,7 @@ public:
     }
 
     SelfType slice;
-    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.end() + end);
+    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.begin() + end);
     return slice;
   }
 
