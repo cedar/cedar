@@ -73,7 +73,6 @@ cedar::aux::EnumType<cedar::proc::experiment::Experiment::CompareMethod>
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::experiment::Experiment::Experiment(cedar::proc::GroupPtr group)
 :
-mGroup(group),
 mActualTrial(0),
 mInit(false),
 mStopped(true),
@@ -90,6 +89,7 @@ _mActionSequences
 ),
 _mRepeat(new cedar::aux::BoolParameter(this, "repeat", false))
 {
+  this->setGroup(group);
   SupervisorSingleton::getInstance()->setExperiment(this);
 
   // Create first action sequence
@@ -420,48 +420,6 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getGroupTriggers()
   return ret;
 }
 
-std::vector<std::string> cedar::proc::experiment::Experiment::getStepParameters(std::string stepPath, const std::vector<std::string>& allowedTypes)
-{
-  cedar::aux::ConfigurablePtr configurable = this->mGroup->getElement(stepPath);
-
-  std::vector<std::string> step_parameter_paths = configurable->listAllParameters();
-  std::vector<std::string> ret;
-  for (const auto& parameter_path : step_parameter_paths)
-  {
-    try
-    {
-      // Check if parameter is registered in the DeclarationManager
-      auto parameter = configurable->getParameter(parameter_path);
-      // never allow "name" to be in the list of parameters, same goes for hidden and constant parameters
-      if (parameter->getName() == "name" || parameter->isHidden() || parameter->isConstant())
-      {
-        continue;
-      }
-      std::string parameter_type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
-      if (allowedTypes.size() > 0)
-      {
-        for (std::string type : allowedTypes)
-        {
-          if (type == parameter_type)
-          {
-            ret.push_back(parameter_path);
-            break;
-          }
-        }
-      }
-      else
-      {
-        ret.push_back(parameter_path);
-      }
-    }
-    catch(cedar::aux::UnknownTypeException e)
-    {
-       //@todo
-    }
-  }
-  return ret;
-}
-
 cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(std::string step, std::string parameter)
 {
   try
@@ -473,20 +431,6 @@ cedar::aux::ParameterPtr cedar::proc::experiment::Experiment::getStepParameter(s
   {
   }
   CEDAR_THROW(cedar::aux::NotFoundException, "Could not find element \"" + step + "\" in group " + this->mGroup->getName());
-}
-
-std::vector<std::string> cedar::proc::experiment::Experiment::getStepDatas(std::string step, cedar::proc::DataRole::Id role )
-{
-  std::vector<std::string> ret;
-
-  if (auto stepItem = this->mGroup->getElement<cedar::proc::Connectable>(step))
-  {
-    for (auto data : stepItem->getDataSlots(role))
-    {
-      ret.push_back(data.first);
-    }
-  }
-  return ret;
 }
 
 cedar::aux::ConstDataPtr cedar::proc::experiment::Experiment::getStepData(std::string step, std::string value,cedar::proc::DataRole::Id role)
@@ -566,5 +510,26 @@ void cedar::proc::experiment::Experiment::resetGroupState()
 
 void cedar::proc::experiment::Experiment::setGroup(cedar::proc::GroupPtr group)
 {
-  this->mGroup = group;
+  if (group != this->mGroup)
+  {
+    //this->disconnect(this->mGroup.get(), SIGNAL(), SLOT())
+    this->mGroup = group;
+    QObject::connect
+    (
+      this->mGroup.get(),
+      SIGNAL(stepNameChanged(const std::string&, const std::string&)),
+      this,
+      SLOT(elementRenamed(const std::string&, const std::string&))
+    );
+  }
+}
+
+cedar::proc::GroupPtr cedar::proc::experiment::Experiment::getGroup()
+{
+  return this->mGroup;
+}
+
+void cedar::proc::experiment::Experiment::elementRenamed(const std::string& oldName, const std::string& newName)
+{
+  //!@todo this should handle name changes - or implement this in each condition/action?
 }

@@ -196,13 +196,13 @@ public:
   }
 
   //! Returns the path, starting from the given index.
-  SelfType operator()(size_t start)
+  SelfType operator()(size_t start) const
   {
     return this->operator()(start, this->getElementCount());
   }
 
   //! Returns the section of the path between start and end.
-  SelfType operator()(size_t start, size_t end)
+  SelfType operator()(size_t start, size_t end) const
   {
     if (start >= this->getElementCount())
     {

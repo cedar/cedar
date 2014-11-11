@@ -103,7 +103,11 @@ void cedar::proc::experiment::gui::StepPropertyParameter::parameterPointerChange
   updateSteps();
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
-  this->mpStep->setCurrentIndex(this->mpStep->findText((parameter->getStep().c_str())));
+  if (parameter && parameter->getStep())
+  {
+    this->mpStep->setCurrentIndex(this->mpStep->findText((parameter->getStep()->getName().c_str())));
+  }
+  stepChanged();
   updateProperties();
   this->mpProperty->setCurrentIndex(this->mpProperty->findText((parameter->getProperty().c_str())));
   updateValue();
@@ -117,6 +121,7 @@ void cedar::proc::experiment::gui::StepPropertyParameter::stepChanged()
   QString text = mpStep->currentText();
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
+
   parameter->setStep(text.toStdString());
 
   updateProperties();
@@ -157,17 +162,17 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
   {
     case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
     {
-      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepParameters(index, parameter->getAllowedTypes());
+      properties = parameter->getListOfParameters();
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::OUTPUT:
     {
-      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::OUTPUT);
+      properties = parameter->getListOfData(cedar::proc::DataRole::OUTPUT);
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::BUFFER:
     {
-      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::BUFFER);
+      properties = parameter->getListOfData(cedar::proc::DataRole::BUFFER);
       break;
     }
   }
