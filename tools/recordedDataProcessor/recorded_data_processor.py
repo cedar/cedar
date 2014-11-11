@@ -45,13 +45,13 @@ import csv
 import matplotlib as mpl
 mpl.use('WXAgg')
 import matplotlib.pyplot as plt
+plt.interactive(True)
 import math
 import numpy as np
 import os
 import re
 import wx
 import wx.lib.agw.floatspin as FS
-
 
 class Progress(wx.ProgressDialog):
     def __init__(self, parent, id, title, message, maximum):
@@ -121,6 +121,7 @@ class MainWindow(wx.Frame):
         wx.Frame.__init__(self, parent=None, title=title)
         
         self.dir = None 
+                
         BrowserPanel(self)
                 
         return
@@ -130,12 +131,13 @@ class MainWindow(wx.Frame):
 class BrowserPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
+                                  
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         select_directory = wx.StaticText(self, -1, 'Select directory :')
         
         self.browser = wx.GenericDirCtrl(self, 
                                          filter = ("*.csv"),
-                                         style  = wx.DIRCTRL_3D_INTERNAL)
+                                         style = wx.DIRCTRL_3D_INTERNAL)
         
         self.sel_btn = wx.Button(self, label = 'Select')
         
@@ -188,6 +190,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.header = None
         self.header_list = []
         self.ndim = []
+        self.time_codes = []
         self.selection = None
         self.proj_choice = None
         self.proj_choice_step = None
@@ -212,7 +215,9 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.proj_label = wx.StaticText(self, -1, 'Projection')
         self.proj_method_label = wx.StaticText(self, -1, 'Projection method')
         self.style_label = wx.StaticText(self, -1, 'Plot style')
-        self.pos_slider_label = wx.StaticText(self, -1, 'Time step')
+        self.pos_slider_label = wx.StaticText(self, -1, 'Time slice number')
+        self.time_code_display = wx.StaticText(self, -1, '-')
+        self.time_code_label = wx.StaticText(self, -1, 'Time code t:')
         self.vmin_label = wx.StaticText(self, -1, 'Minimum')
         self.vmax_label = wx.StaticText(self, -1, 'Maximum')
         
@@ -262,12 +267,14 @@ class RecordedDataProcessorPanel(wx.Panel):
         proj_method_sizer = wx.BoxSizer(wx.HORIZONTAL)
         style_sizer = wx.BoxSizer(wx.HORIZONTAL)
         pos_slider_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        time_code_sizer = wx.BoxSizer(wx.HORIZONTAL)        
         plot_sizer = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
         resolution_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        #player_sizer = wx.BoxSizer(wx.HORIZONTAL)
         heatmap_sizer = wx.BoxSizer(wx.VERTICAL)
         axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
         btn_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -284,6 +291,11 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.y_axis_ok_btn = wx.Button(self, label='OK', size=(50, 25))
         self.z_axis_ok_btn = wx.Button(self, label='OK', size=(50, 25))
         self.multiple_plot_btn.Disable()
+        
+        '''
+        self.play_pause_btn = wx.Button(self, label='Play')
+        self.stop_btn = wx.Button(self, label='Stop')
+        '''
         
         # Controls
         #========================================================================================================================
@@ -319,6 +331,14 @@ class RecordedDataProcessorPanel(wx.Panel):
         pos_slider_sizer.Add(self.pos_slider_label, 1, wx.LEFT)
         pos_slider_sizer.Add(self.pos_slider, 2, wx.RIGHT)
         
+        time_code_sizer.Add(self.time_code_label, 1, wx.LEFT)
+        time_code_sizer.Add(self.time_code_display, 2, wx.RIGHT)
+        
+        '''
+        player_sizer.Add(self.play_pause_btn, 1, wx.LEFT)
+        player_sizer.Add(self.stop_btn, 1, wx.LEFT)
+        '''
+        
         resolution_sizer.Add(self.resolution_label, 2, wx.LEFT)
         resolution_sizer.Add(self.resolution_spn, 1, wx.RIGHT)
         
@@ -341,8 +361,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         axes_label_sizer.Add(axes_grid_sizer, 0, wx.ALL)
         
         heatmap_sizer.Add(self.heatmap_boundaries_txt, 1, wx.BOTTOM,10)
-        heatmap_sizer.Add(v_grid_sizer, 0, wx.ALL)
-        heatmap_sizer.Add(self.reset_heatmap_boundaries_btn, 0, wx.ALL)
+        heatmap_sizer.Add(v_grid_sizer, 2, wx.ALL)
+        heatmap_sizer.Add(self.reset_heatmap_boundaries_btn, 1, wx.ALL)
         
         btn_sizer.Add(plot_sizer, 1, wx.ALL|wx.EXPAND)
         btn_sizer.Add(self.multiple_plot_btn, 1, wx.ALL|wx.EXPAND)
@@ -363,6 +383,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.main_sizer.Add(style_sizer, 0, wx.ALL|wx.EXPAND)
         self.main_sizer.Add(resolution_sizer, 0, wx.ALL|wx.EXPAND)
         self.main_sizer.Add(pos_slider_sizer, 0, wx.ALL|wx.EXPAND)
+        self.main_sizer.Add(time_code_sizer, 0, wx.ALL|wx.EXPAND)
+        #self.main_sizer.Add(player_sizer, 0, wx.ALL|wx.EXPAND)
         self.main_sizer.Add(line_sizer_2, 0, wx.ALL)
         self.main_sizer.Add(axes_label_sizer, 0, wx.ALL)
         self.main_sizer.Add(line_sizer_3, 0, wx.ALL)
@@ -382,6 +404,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.proj_method_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_method_cbox)
         self.style_cbox.Bind(wx.EVT_COMBOBOX, self.evt_style_cbox)
         self.pos_slider.Bind(wx.EVT_SCROLL, self.evt_slider)
+        #self.play_pause_btn.Bind(wx.EVT_BUTTON, self.evt_play_pause_btn)
         self.switch_btn.Bind(wx.EVT_BUTTON, self.evt_switch_button)
         self.vmin_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmin_spn)
         self.vmax_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmax_spn)
@@ -398,7 +421,31 @@ class RecordedDataProcessorPanel(wx.Panel):
                         
         return
     
+    '''
+    def _update_plot_threaded(self):
+        
+        for i in range(self.step, self.slider_max):
+            self.step = i
+            self._update_plot()
+            wx.MilliSleep(1)
+        
+        self.play_pause_btn.SetLabel('Play')
+            
+    def evt_play_pause_btn(self, event):
+        
+        if self.play_pause_btn.Label == 'Play':
+            
+            self.play_pause_btn.SetLabel('Pause')
+            #thread = threading.Thread(target=self._update_plot_threaded)
+            
+            if plt.get_fignums():
+                self._update_plot_threaded()
+                
+        else:
+            self.play_pause_btn.SetLabel('Play')
+    '''
     
+               
     def evt_axis_label(self, event):
         self.x_label = self.x_axis_text.GetValue()
         self.y_label = self.y_axis_text.GetValue()
@@ -410,6 +457,9 @@ class RecordedDataProcessorPanel(wx.Panel):
         return
     
     def evt_add_timeline(self, event):
+        '''
+        adds timeline to currently displayed plot.
+        '''
         self._add_timeline()
         
         return
@@ -538,11 +588,13 @@ class RecordedDataProcessorPanel(wx.Panel):
     def evt_slider(self, event):
         widget    = event.GetEventObject()
         self.step = widget.GetValue()
-        
-        if self.step != -1:
-            self.marked = True
-        else:
+            
+        if self.step == -1:
+            self.time_code_display.SetLabel('-')
             self.marked = False
+        else:
+            self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
+            self.marked = True
             
         if plt.get_fignums():
             self._update_plot()
@@ -590,6 +642,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         
     
     def _update_selection_data(self):
+        
         # clear memory
         del self.data
         self.slider_max = 0
@@ -598,10 +651,13 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.proj_choice = self.proj_ch[:self.ndim[self.selection]+1]
         self.proj_choice_step = FieldPlot().build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
         self.header = FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
-        self.data = FieldPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
-        self.slider_max = self.data.shape[0] - 1
-        self.pos_slider.SetMax(self.slider_max)
         
+        temp_data = FieldPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
+        self.data = temp_data[0]
+        self.time_codes = temp_data[1]
+        self.slider_max = len(self.time_codes)-1
+        self.pos_slider.SetMax(self.slider_max)
+                
     
     def evt_sel_cbox(self, event):
         
@@ -626,14 +682,14 @@ class RecordedDataProcessorPanel(wx.Panel):
             
             try:
                 self.plot = FieldPlot().plot_snapshot(step = step, 
-                                                     style = self.style, 
-                                                     data = self.data, 
-                                                     header = self.header, 
-                                                     vmin = self.vmin,
-                                                     vmax = self.vmax,
-                                                     resolution = self.resolution,
-                                                     proj = self.proj,
-                                                     proj_method = self.proj_method)
+                                                      style = self.style, 
+                                                      data = self.data, 
+                                                      header = self.header, 
+                                                      vmin = self.vmin,
+                                                      vmax = self.vmax,
+                                                      resolution = self.resolution,
+                                                      proj = self.proj,
+                                                      proj_method = self.proj_method)
                     
                 FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 FieldPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
@@ -704,14 +760,14 @@ class RecordedDataProcessorPanel(wx.Panel):
             
             try:
                 self.plot = FieldPlot().plot_snapshot(step = step, 
-                                                     style = self.style, 
-                                                     data = self.data, 
-                                                     header = self.header, 
-                                                     vmin = self.vmin,
-                                                     vmax = self.vmax,
-                                                     resolution = self.resolution, 
-                                                     proj = self.proj,
-                                                     proj_method = self.proj_method)
+                                                      style = self.style, 
+                                                      data = self.data, 
+                                                      header = self.header, 
+                                                      vmin = self.vmin,
+                                                      vmax = self.vmax,
+                                                      resolution = self.resolution, 
+                                                      proj = self.proj,
+                                                      proj_method = self.proj_method)
                         
                 FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 
@@ -784,7 +840,6 @@ class RecordedDataProcessorPanel(wx.Panel):
     def evt_plot(self, event):
         
         self._plot()            
-        plt.ion()
         plt.show()
                 
         return
@@ -796,6 +851,7 @@ class FieldPlot(object):
     def __init__(self):
         return
     
+                
     def _sort_alphnum(self, unsorted):
         conv = lambda text: int(text) if text.isdigit() else text
         alphnum_key = lambda key: [conv(c) for c in re.split('([0-9]+)', key)]
@@ -919,7 +975,11 @@ class FieldPlot(object):
                 col[1] = i
                 
         X = X[::-1]
-        aux_X = np.reshape(data[step], X)
+        try:
+            aux_X = np.reshape(data[step], X)
+        except IndexError:
+            raise IndexError
+            
         aux_col = col
         j = 0
         
@@ -998,6 +1058,7 @@ class FieldPlot(object):
         csv_file = open(csv_f, 'rb')
         row_count = sum(1 for line in open(csv_f))-1
         reader = csv.reader(csv_file)
+        time_codes = []
                 
         # skip header
         next(reader, None)
@@ -1006,6 +1067,7 @@ class FieldPlot(object):
         progress_dlg = Progress(None, -1, 'Load data recording', 'loading...', row_count+1)
         
         for row in reader:
+            time_codes.append(row[0])
             row.pop(0)
             
             # Matrix generation
@@ -1018,8 +1080,8 @@ class FieldPlot(object):
                                
         progress_dlg.Destroy()
         csv_file.close()
-            
-        return data
+                    
+        return data, time_codes
 
     def get_header(self, csv_f):
         '''
@@ -1134,8 +1196,16 @@ class FieldPlot(object):
                                     
                     if ',' in proj:
                         
-                        X_1, X_2, data = self._project2D(step=step, data=data, header=header, proj=proj, proj_method=proj_method)
-    
+                        try:
+                            X_1, X_2, data = self._project2D(step=step, data=data, header=header, proj=proj, proj_method=proj_method)
+                        except IndexError:
+                            dlg = wx.MessageDialog(parent = None, 
+                                                   message = 'The ' + str(step) + '. snapshot does not seem to exist.', 
+                                                   caption = 'An Error has occurred.', 
+                                                   style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                            dlg.ShowModal()
+                            dlg.Destroy()
+                            
                         if style != 'heatmap':
                             plot = self._initialize_3D_plot(mode=mode)
                             
@@ -1169,8 +1239,8 @@ class FieldPlot(object):
                 elif proj == ' ':
                     
                     if ndim == 2:
-                        x_1      = int(header[2])
-                        x_2      = int(header[3])                    
+                        x_1 = int(header[2])
+                        x_2 = int(header[3])                    
                         
                         if style != 'image':
                             data     = np.reshape(data[step], (x_2, x_1))
