@@ -781,8 +781,66 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   p_group->addElements(selected.toStdList());
 }
 
+void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
+{
+  QMenu menu;
+
+  auto p_assign_to_trigger = menu.addMenu("assign selected to trigger");
+  cedar::proc::gui::Connectable::buildConnectTriggerMenu
+  (
+    p_assign_to_trigger,
+    this->mGroup.get(),
+    this,
+    SLOT(assignSelectedToTrigger())
+  );
+
+  menu.exec(pContextMenuEvent->screenPos());
+
+  pContextMenuEvent->accept();
+}
+
+void cedar::proc::gui::Scene::assignSelectedToTrigger()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_ASSERT(action);
+
+  auto trigger = cedar::proc::gui::Connectable::getTriggerFromConnectTriggerAction(action, this->mGroup->getGroup());
+
+  for (auto selected : this->selectedItems())
+  {
+    auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(selected);
+    if (!connectable)
+    {
+      continue;
+    }
+
+    auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable->getElement());
+    if (!triggerable)
+    {
+      continue;
+    }
+    if (trigger)
+    {
+      this->mGroup->getGroup()->connectTrigger(trigger, triggerable);
+    }
+    else if (triggerable->getParentTrigger())
+    {
+      this->mGroup->getGroup()->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
+    }
+  }
+}
+
 void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
 {
+  auto selected = this->selectedItems();
+  if (selected.size() > 1)
+  {
+    this->multiItemContextMenuEvent(pContextMenuEvent);
+
+    if (pContextMenuEvent->isAccepted())
+      return;
+  }
+
   this->QGraphicsScene::contextMenuEvent(pContextMenuEvent);
 
   if (pContextMenuEvent->isAccepted())

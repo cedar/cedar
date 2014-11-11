@@ -1394,27 +1394,24 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
 
 void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
 {
+  // if the item is looped, it can only be triggered by a single trigger
+  // thus, check if there is already a connection, and remove it
+  if (target->isLooped() && target->getParentTrigger())
+  {
+    this->disconnectTrigger(target->getParentTrigger(), target);
+  }
+
   // check connection
   if (this->isConnected(source, target))
   {
     if (source->getName() == "default trigger")
     {
-      // this is ok, might happen (connections to the default trigger are saved, but also create on "add")
+      // this is ok, might happen (connections to the default trigger are saved, but also created when the element is added)
       return;
     }
     CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
   }
-  if (this->isRoot()) // there might be a default connection to the default trigger, delete!
-  {
-    if (this->nameExists("default trigger"))
-    {
-      auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default trigger");
-      if (this->isConnected(default_trigger, target))
-      {
-        this->disconnectTrigger(default_trigger, target);
-      }
-    }
-  }
+
   // create connection
   mTriggerConnections.push_back(cedar::proc::TriggerConnectionPtr(new TriggerConnection(source, target)));
   this->signalTriggerConnectionChanged
