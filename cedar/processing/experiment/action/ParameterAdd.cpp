@@ -82,7 +82,7 @@ cedar::proc::experiment::action::ParameterAdd::~ParameterAdd()
 
 void cedar::proc::experiment::action::ParameterAdd::run()
 {
-  if (_mStepParamter->getStep() == "" || _mStepParamter->getProperty() == "")
+  if (_mStepParamter->getStep() || _mStepParamter->getProperty() == "")
   {
     return;
   }

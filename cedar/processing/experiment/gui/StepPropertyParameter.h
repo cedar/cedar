@@ -86,6 +86,8 @@ public slots:
   //!@brief handles a change in the property combo box
   void propertyChanged();
 
+//  void valueChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,7 +100,6 @@ protected:
 private:
   //!@brief Updates the steps for the combo box
   void updateSteps();
-
   //!@brief Updates the properties the combo box
   void updateProperties();
 

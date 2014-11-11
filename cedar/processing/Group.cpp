@@ -625,9 +625,26 @@ std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifie
   return result;
 }
 
-bool cedar::proc::Group::nameExists(const std::string& name) const
+bool cedar::proc::Group::nameExists(const cedar::proc::NetworkPath& name) const
 {
-  return this->mElements.find(name) != this->mElements.end();
+  CEDAR_ASSERT(name.getElementCount() > 0)
+  if (name.getElementCount() > 1)
+  {
+    auto group_name = name(0,0).toString();
+    auto it = this->mElements.find(name);
+    if (it != this->mElements.end())
+    {
+      if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(it->second))
+      {
+        return group->nameExists(name(1,name.getElementCount()-1));
+      }
+    }
+    return false;
+  }
+  else
+  {
+    return this->mElements.find(name) != this->mElements.end();
+  }
 }
 
 void cedar::proc::Group::listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const

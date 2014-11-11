@@ -519,7 +519,7 @@ public:
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
   //!@brief Checks whether a name exists in the group.
-  bool nameExists(const std::string& name) const;
+  bool nameExists(const cedar::proc::NetworkPath& name) const;
 
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()

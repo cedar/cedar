@@ -43,6 +43,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/StepPropertyParameter.fwd.h"
@@ -115,10 +117,13 @@ public:
    const std::string& getProperty() const;
 
    //!@brief Sets the step name
+   void setStep(cedar::proc::ConnectableWeakPtr step);
+
+   //!@brief Sets the step name
    void setStep(const std::string& step);
 
    //!@brief Returns the step name
-   const std::string& getStep() const;
+   cedar::proc::ConnectablePtr getStep() const;
 
    //!@brief Sets the type of the property. Could be either PARAMETER, OUTPUT or BUFFER
    void setType(cedar::proc::experiment::StepPropertyParameter::PropertyType type);
@@ -131,6 +136,8 @@ public:
     *           Should only be called if the type is BUFFER or OUTPUT
     */
    cedar::aux::ConstDataPtr getData() const;
+
+   std::vector<std::string> getListOfData(cedar::proc::DataRole::Id role) const;
 
    /*!@brief Returns the ParameterPtr of the property
     *
@@ -160,11 +167,12 @@ public:
    //! Returns true if a parameter is selected
    bool isParameterSelected() const;
 
+   std::vector<std::string> getListOfParameters();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -189,7 +197,8 @@ protected:
 
 private:
   //!@brief The step
-  std::string mStep;
+//  std::string mStep;
+  cedar::proc::ConnectableWeakPtr mElement;
 
   //!@brief The property
   std::string mProperty;
