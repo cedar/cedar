@@ -476,6 +476,10 @@ void cedar::aux::gui::QwtLinePlot::setAutomaticYAxisScaling()
 void cedar::aux::gui::QwtLinePlot::showMajorGrid(bool show)
 {
   this->_mMajorGridVisible->setValue(show);
+  if (!show)
+  {
+    this->showMinorGrid(false);
+  }
 }
 
 void cedar::aux::gui::QwtLinePlot::showMinorGrid(bool show)
