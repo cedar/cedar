@@ -52,6 +52,63 @@ import os
 import re
 import wx
 import wx.lib.agw.floatspin as FS
+from wx.lib.embeddedimage import PyEmbeddedImage
+#import image_files
+
+    
+class ImageFiles():
+    play = PyEmbeddedImage(
+        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
+        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMCgc1zYOOZAAAAYtJREFUSMfVlr9Kw1AU"
+        "h79IRaVDpGv/7DrqA5R2an2AtKPabi66iJMgCKUPoIMpFnwBnyAVHAxdCw7tmOozdLE5Tleu"
+        "IbVJGhF/ELiE3PNx7sk5vwt/rK3fDH4GiPY8AcdpAvYDAAF8bX0LbK8KeVRBe72etNttyWaz"
+        "EgK2gc2kEAGk2WyKrsFgIJVKJQx2ERdQVJv7/b74vv8FUevJZCLVajUIegd2o0IO1MbRaCRh"
+        "UrDhcCilUilYs6sokBMFmc1m8pMUrNvtBrNyl0Gu1cdxNJ1OpVAo6KApsL4IcgNIJpOJBVFZ"
+        "1et1/fheF0HuATFNU+JKgSzL0jM6CoM8AJLL5SSJFEjLpq8Cr2mQD4D5fB6/uUQwDAPLstQr"
+        "A3hOvSa1Wi1STRL9XZ7nST6f12vhAZnU+qTT6QT75GXZ0dajdrzrulIsFoMdf5nK7BqPx/qg"
+        "VMHfgJ3YU7jRaHzLwHEcKZfLYVP4fCU/sW1bWq3WIj+5AzaS+sneEme8Acw0LPg0AHGAw395"
+        "W0ldn0BVyth0l+oCAAAAAElFTkSuQmCC")
+
+    pause = PyEmbeddedImage(
+        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
+        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMCg4cXvOtQQAAAZVJREFUSMftlrFKw0AY"
+        "x3+apKHNkgZbULC+g7jqoLM46STio5S+gauCk4u4+ARSirMPIPUBpKlZpZfzXO7CeYZ6wbUH"
+        "JV/z+933vyxfAqvVYK0tYXvAKZACz8AdoJy9J8Chrh+ASZPwS0DqpuZ37Ti3DpfAeZOQKaA6"
+        "nY7Kssw0+QIGmg/0f5VlmWq328aZ+gasAwJQo9FIjcdj+7T72jkw9yaTiRoOh4Yv9P5fDd3V"
+        "B0KAfr9Pr9ez2aa+blXyTycCNnxCMlN0u13SNLVZ6uF0fUKiqogiWq2WzVoeTuQTElZFGBJF"
+        "UR3zcfxDwjCsO6WPszQksBsEQVDHqptBELghgU9IWRVliZTSZtJ1pJSUZVnn+IUIIRBC2Ew0"
+        "cJaGCLuBc8qygeMfslgs6piPszRkboqiKCiKoo75OH+GlAB5npPnuc3enSuz2Yz5fG4/xYfv"
+        "kHwDVBzHKkkSe5Rva75jpnCSJCqOY+O8Nhn1F/pp7Al85Tg3Dhf6JdfozbgLnAEd4Al4rNl7"
+        "DBwBn8A98LL62Pj3+gaJWayoxGFTWwAAAABJRU5ErkJggg==")
+    
+    reset = PyEmbeddedImage(
+        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
+        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMChUs0RxWdwAAAVJJREFUSMftlU8rRVEU"
+        "xX+PnvSSCBk8ysSEqUyRkie9MhTyAYyMDQ3uV8BIRCiGeogv4BsYGZAXI5MXRUzOqd3u3Hv3"
+        "yZ+BrDp1T3ets/a6Z7cv/BU0R/LbgTLwDrx+ZyGzwBHwBHyI9QgcAjNfObwPuFQHp60LlzAK"
+        "o0DdaOBX3enMCbRBDZgGio7TAlSAc8V7sCY6E6IGsJDDX3Q8WVAmJlRlS8b0y0o3nkXeFcTT"
+        "yHusCe1OFlHeRTXSZE7dTRBtKnJHpEm30pdCpH5BeAMKkSZNbhL4M4JdVlKVdImEFvQqfat0"
+        "92gA92I/DxwAa0aTMfF8B7ykETdFJT56YjAoANdCu6G/o5zIzynv8rAKjIj9dojUCVylzKSt"
+        "HINh1yief5JFHgSOAyb7OSZTgnsL9FiiTwI3QpgYWncd2AOGYnq+CKy4H1XCD2PAjfh//B4+"
+        "Ac1ehBpa7nlwAAAAAElFTkSuQmCC")
+    
+    single_step = PyEmbeddedImage(
+        "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
+        "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMChYCJucIewAAAqBJREFUSMftlTFME2EU"
+        "x3+1d72ct/QqUScNEsMiJl3sYlw0ISEh6oBxYCQxkYaBWxwcSIxxoSwFF90Jzg5OaooJTYOQ"
+        "mA40iuKIWEpKRdtr/Vz6lcflLLDzkkvue/d/7/+9d9/3f3Bix7BoYO0Ao8A94AywCewdIU8E"
+        "uAs8BIaAX8D3MOAp4D2gxNMC3gB3AKMLycuQuNEw4G0NisViKhCkgBIw0t61tAvAX0AlEgll"
+        "27bGfwkjeQ4ox3FUtVpV+XxeeZ6nXNcNkuWBqyLuhv6Wy+XU1NSUxjXa3TlgRUANDg4qabVa"
+        "TU1PT6tEIiGJGsATwATua//a2pqam5uTuLMIpghwCWBgYODgSXAcPM9jfX2dyclJDMOgnfwx"
+        "8AG4rLGu6xKPx2W4K0nOAzZAb29v6J+Nx+NkMhkKhQLJZFK7rwGP9MI0TWKxmAwzJUmHvqen"
+        "p+tZTSaTLC0tMT4+rl2n9YthGJimKeGGJLG117btQy+FZVnMzs6SzWaJRPYPm2EYup2hlVja"
+        "Gyi3q6XTafr7+/dvdjQaJIlKkrr2NhqNI5Nks1lKpVJn3Wq1aDabEtKSJL+1d2/vcBWp1+uk"
+        "02kmJiZQSnX8vu/j+76E+gip2Nbera2trgQrKyuMjY2xurra2Zf++b7vBytpykp+aCHc2NgI"
+        "Tb6zs4PneaRSKUlQAJ7JSgLt9iWJAr4CFIvFA8lrtRqZTIa+vj5mZmb0Tn3gKXC9rWkAVCoV"
+        "KpWKDC8TUNYccGVxcZFqtcry8jILCwvMz8+zu7srA/PAA+BTe70pW10ul2WrtoMdGQpRXvl8"
+        "BIZDVPiiVmHHcZRlWRr/+X/z5F3IXHgN3ApJLu1FIK7ZHnwdYQxOxhHgHPANeAv8POJkHAZu"
+        "An+AV+3KT+z49g/v5g/7k3CcCwAAAABJRU5ErkJggg==")
+    
 
 class Progress(wx.ProgressDialog):
     def __init__(self, parent, id, title, message, maximum):
@@ -119,7 +176,7 @@ class RecordedDataProcessorApp(wx.App):
 class MainWindow(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent=None, title=title)
-        
+                        
         self.dir = None 
                 
         BrowserPanel(self)
@@ -215,9 +272,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.proj_label = wx.StaticText(self, -1, 'Projection')
         self.proj_method_label = wx.StaticText(self, -1, 'Projection method')
         self.style_label = wx.StaticText(self, -1, 'Plot style')
-        self.pos_slider_label = wx.StaticText(self, -1, 'Time slice number')
         self.time_code_display = wx.StaticText(self, -1, '-')
-        self.time_code_label = wx.StaticText(self, -1, 'Time code t:')
+        self.time_code_label = wx.StaticText(self, -1, 'Time code t')
         self.vmin_label = wx.StaticText(self, -1, 'Minimum')
         self.vmax_label = wx.StaticText(self, -1, 'Maximum')
         
@@ -233,6 +289,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.line_2 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
         self.line_3 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
         self.line_4 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
+        self.line_5 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
         
         self.sel_cbox = wx.ComboBox(self, choices = self.flist_sorted, value = ' ', style = wx.CB_READONLY)
         self.mode_cbox = wx.ComboBox(self, choices = self.mode_ch, style = wx.CB_READONLY)
@@ -245,20 +302,10 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.y_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         self.z_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         
-        
-        self._add_content()
-        
-        self.SetSizer(self.main_sizer)
-        self.main_sizer.Fit(self)
-        self.Show()
-        
-                        
-    def _add_content(self):
-        
         for i in range(len(self.flist_sorted)): 
             self.header_list.append(FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
             self.ndim.append(FieldPlot().get_dimension(self.header_list[i]))
-        
+            
         # Sizers
         #========================================================================================================================
         sel_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -266,20 +313,30 @@ class RecordedDataProcessorPanel(wx.Panel):
         proj_sizer = wx.BoxSizer(wx.HORIZONTAL)
         proj_method_sizer = wx.BoxSizer(wx.HORIZONTAL)
         style_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        pos_slider_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        pos_slider_sizer = wx.BoxSizer(wx.VERTICAL)
         time_code_sizer = wx.BoxSizer(wx.HORIZONTAL)        
         plot_sizer = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
+        line_sizer_5 = wx.BoxSizer(wx.HORIZONTAL)
         resolution_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        #player_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        player_sizer = wx.BoxSizer(wx.HORIZONTAL)
         heatmap_sizer = wx.BoxSizer(wx.VERTICAL)
         axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
         btn_sizer = wx.BoxSizer(wx.VERTICAL)
         v_grid_sizer = wx.GridSizer(rows=2, cols=2) 
         axes_grid_sizer = wx.GridSizer(rows=3, cols=3)
+        
+        play = ImageFiles().play.GetImage()
+        self.play_bitmap = wx.BitmapFromImage(play)
+        pause = ImageFiles().pause.GetImage()
+        self.pause_bitmap = wx.BitmapFromImage(pause)
+        reset = ImageFiles().reset.GetImage()
+        self.reset_bitmap = wx.BitmapFromImage(reset)
+        single_step = ImageFiles().single_step.GetImage()
+        self.single_step_bitmap = wx.BitmapFromImage(single_step)
         
         # Buttons
         #========================================================================================================================
@@ -290,12 +347,10 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.x_axis_ok_btn = wx.Button(self, label='OK', size=(50, 25))
         self.y_axis_ok_btn = wx.Button(self, label='OK', size=(50, 25))
         self.z_axis_ok_btn = wx.Button(self, label='OK', size=(50, 25))
+        self.play_pause_btn = wx.BitmapButton(self, -1, bitmap=self.play_bitmap)
+        self.reset_btn = wx.BitmapButton(self, -1, bitmap=self.reset_bitmap)
+        self.single_step_btn = wx.BitmapButton(self, -1, bitmap=self.single_step_bitmap)
         self.multiple_plot_btn.Disable()
-        
-        '''
-        self.play_pause_btn = wx.Button(self, label='Play')
-        self.stop_btn = wx.Button(self, label='Stop')
-        '''
         
         # Controls
         #========================================================================================================================
@@ -305,8 +360,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.vmax_spn.SetToolTipString('Caps the colormap of heatmaps at the given minimum and maximum.')
         
         # Other widgets
-        #========================================================================================================================                
-        
+        #========================================================================================================================   
         
         # Build partial sizers
         #========================================================================================================================
@@ -328,16 +382,15 @@ class RecordedDataProcessorPanel(wx.Panel):
         style_sizer.Add(self.style_label, 1, wx.LEFT)
         style_sizer.Add(self.style_cbox, 2, wx.RIGHT)
         
-        pos_slider_sizer.Add(self.pos_slider_label, 1, wx.LEFT)
-        pos_slider_sizer.Add(self.pos_slider, 2, wx.RIGHT)
         
+        pos_slider_sizer.Add(self.pos_slider, 1, wx.EXPAND)
+                
         time_code_sizer.Add(self.time_code_label, 1, wx.LEFT)
         time_code_sizer.Add(self.time_code_display, 2, wx.RIGHT)
         
-        '''
-        player_sizer.Add(self.play_pause_btn, 1, wx.LEFT)
-        player_sizer.Add(self.stop_btn, 1, wx.LEFT)
-        '''
+        player_sizer.Add(self.play_pause_btn, 1, wx.RIGHT)
+        player_sizer.Add(self.single_step_btn, 1, wx.RIGHT)
+        player_sizer.Add(self.reset_btn, 1, wx.RIGHT)
         
         resolution_sizer.Add(self.resolution_label, 2, wx.LEFT)
         resolution_sizer.Add(self.resolution_spn, 1, wx.RIGHT)
@@ -372,7 +425,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         line_sizer_2.Add(self.line_2, 1, wx.ALL)
         line_sizer_3.Add(self.line_3, 1, wx.ALL)
         line_sizer_4.Add(self.line_4, 1, wx.ALL)
-                        
+        line_sizer_5.Add(self.line_5, 1, wx.ALL)
+        
         # Build main sizer
         #========================================================================================================================
         self.main_sizer.Add(line_sizer_1, 0, wx.ALL)
@@ -382,70 +436,83 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.main_sizer.Add(proj_method_sizer, 0, wx.ALL|wx.EXPAND)
         self.main_sizer.Add(style_sizer, 0, wx.ALL|wx.EXPAND)
         self.main_sizer.Add(resolution_sizer, 0, wx.ALL|wx.EXPAND)
-        self.main_sizer.Add(pos_slider_sizer, 0, wx.ALL|wx.EXPAND)
-        self.main_sizer.Add(time_code_sizer, 0, wx.ALL|wx.EXPAND)
-        #self.main_sizer.Add(player_sizer, 0, wx.ALL|wx.EXPAND)
         self.main_sizer.Add(line_sizer_2, 0, wx.ALL)
-        self.main_sizer.Add(axes_label_sizer, 0, wx.ALL)
+        self.main_sizer.Add(pos_slider_sizer, 1, wx.ALL|wx.EXPAND)
+        self.main_sizer.Add(time_code_sizer, 0, wx.ALL|wx.EXPAND)
+        self.main_sizer.Add(player_sizer, 0, wx.LEFT)
         self.main_sizer.Add(line_sizer_3, 0, wx.ALL)
-        self.main_sizer.Add(heatmap_sizer, 0, wx.ALL)
+        self.main_sizer.Add(axes_label_sizer, 0, wx.ALL)
         self.main_sizer.Add(line_sizer_4, 0, wx.ALL)
+        self.main_sizer.Add(heatmap_sizer, 0, wx.ALL)
+        self.main_sizer.Add(line_sizer_5, 0, wx.ALL)
         self.main_sizer.Add(btn_sizer, 0, wx.ALL)
         
         # Event handling
         #========================================================================================================================
         self.sel_cbox.Bind(wx.EVT_COMBOBOX, self.evt_sel_cbox)
-        
         self.mode_cbox.Bind(wx.EVT_COMBOBOX, self.evt_mode_cbox)
-        
         self.reset_heatmap_boundaries_btn.Bind(wx.EVT_BUTTON, self.evt_reset_heatmap_boundaries_btn)
-        
         self.proj_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_cbox)
         self.proj_method_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_method_cbox)
         self.style_cbox.Bind(wx.EVT_COMBOBOX, self.evt_style_cbox)
         self.pos_slider.Bind(wx.EVT_SCROLL, self.evt_slider)
-        #self.play_pause_btn.Bind(wx.EVT_BUTTON, self.evt_play_pause_btn)
+        self.play_pause_btn.Bind(wx.EVT_BUTTON, self.evt_play_pause_btn)
+        self.single_step_btn.Bind(wx.EVT_BUTTON, self.evt_single_step_btn)
+        self.reset_btn.Bind(wx.EVT_BUTTON, self.evt_reset_btn)
         self.switch_btn.Bind(wx.EVT_BUTTON, self.evt_switch_button)
         self.vmin_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmin_spn)
         self.vmax_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmax_spn)
         self.resolution_spn.Bind(wx.EVT_SPINCTRL, self.evt_resolution_spn)
         self.multiple_plot_btn.Bind(wx.EVT_BUTTON, self.evt_add_timeline)
-        
         self.x_axis_text.Bind(wx.EVT_TEXT_ENTER, self.evt_axis_label)
         self.y_axis_text.Bind(wx.EVT_TEXT_ENTER, self.evt_axis_label)
         self.z_axis_text.Bind(wx.EVT_TEXT_ENTER, self.evt_axis_label)
-        
         self.x_axis_ok_btn.Bind(wx.EVT_BUTTON, self.evt_axis_label)
         self.y_axis_ok_btn.Bind(wx.EVT_BUTTON, self.evt_axis_label)
         self.z_axis_ok_btn.Bind(wx.EVT_BUTTON, self.evt_axis_label)
-                        
-        return
-    
-    '''
-    def _update_plot_threaded(self):
+                
+        self.SetSizer(self.main_sizer)
+        self.main_sizer.Fit(self)
+        self.Show()
         
-        for i in range(self.step, self.slider_max):
-            self.step = i
-            self._update_plot()
-            wx.MilliSleep(1)
-        
-        self.play_pause_btn.SetLabel('Play')
-            
+                    
     def evt_play_pause_btn(self, event):
         
-        if self.play_pause_btn.Label == 'Play':
-            
-            self.play_pause_btn.SetLabel('Pause')
-            #thread = threading.Thread(target=self._update_plot_threaded)
+        if self.play_pause_btn.GetBitmapLabel() == self.play_bitmap:
+            self.play_pause_btn.SetBitmapLabel(self.pause_bitmap)
             
             if plt.get_fignums():
-                self._update_plot_threaded()
-                
+                for i in range(self.step, self.slider_max):
+                    if self.play_pause_btn.GetBitmapLabel() == self.play_bitmap:
+                        break
+                    else:
+                        self.step = i
+                        self._update_plot()
+                        self.pos_slider.SetValue(self.step)
+                        self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
+                        wx.Yield()
+        
+            self.play_pause_btn.SetBitmapLabel(self.play_bitmap)
+            
         else:
-            self.play_pause_btn.SetLabel('Play')
-    '''
+            self.play_pause_btn.SetBitmapLabel(self.play_bitmap)
+     
+            
+    def evt_reset_btn(self, evt):
+
+        self.step = -1
+        self.pos_slider.SetValue(self.step)
+        self.time_code_display.SetLabel('-')
+        self._update_plot()
+        
     
-               
+    def evt_single_step_btn(self, evt):
+        self.step += 1
+        self.pos_slider.SetValue(min(self.slider_max, self.step))
+        self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
+        self._update_plot()
+        
+           
     def evt_axis_label(self, event):
         self.x_label = self.x_axis_text.GetValue()
         self.y_label = self.y_axis_text.GetValue()
