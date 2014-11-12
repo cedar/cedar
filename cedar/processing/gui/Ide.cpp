@@ -282,11 +282,6 @@ mSimulationRunning(false)
                    this,
                    SLOT(architectureChanged()));
 
-  QObject::connect(cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
-                   SIGNAL(experimentRunning(bool)),
-                   this,
-                   SLOT(setSimulationControlsDisabled(bool)));
-
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)

@@ -52,7 +52,7 @@ cedar_add_library(cedarproc
   MOC_HEADERS
   experiment/Experiment.h
   experiment/StepPropertyParameter.h
-  experiment/Supervisor.h
+  experiment/condition/OnMatrixValue.h
   experiment/gui/ActionListParameter.h
   experiment/gui/ActionSequence.h
   experiment/gui/ExperimentItemWidget.h

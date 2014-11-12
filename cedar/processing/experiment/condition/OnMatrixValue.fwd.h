@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_DATA_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_DATA_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_MATRIX_VALUE_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_MATRIX_VALUE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -57,7 +57,7 @@ namespace cedar
     {
       namespace condition
       {
-        CEDAR_DECLARE_PROC_CLASS(PartialCheckData);
+        CEDAR_DECLARE_PROC_CLASS(OnMatrixValue);
       }
     }
   }
@@ -65,5 +65,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_PARTIAL_CHECK_DATA_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_MATRIX_VALUE_FWD_H
 
