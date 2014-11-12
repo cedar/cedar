@@ -368,10 +368,12 @@ void cedar::aux::gui::QwtLinePlot::init()
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
 
-  mpPlot = new QwtPlot(this);
+  this->mpPlot = new QwtPlot(this);
   this->layout()->addWidget(mpPlot);
 
-  mpWorkerThread = new QThread();
+  this->mpGrid = nullptr;
+
+  this->mpWorkerThread = new QThread();
 
   mConversionWorker = cedar::aux::gui::detail::QwtLinePlotWorkerPtr(new cedar::aux::gui::detail::QwtLinePlotWorker(this));
   mConversionWorker->moveToThread(mpWorkerThread);
@@ -384,9 +386,13 @@ void cedar::aux::gui::QwtLinePlot::init()
 
   // parameters
   this->_mAutoScalingEnabled = new cedar::aux::BoolParameter(this, "autoscaling", true);
+  this->_mMajorGridVisible = new cedar::aux::BoolParameter(this, "major grid visible", false);
+  this->_mMinorGridVisible = new cedar::aux::BoolParameter(this, "minor grid visible", false);
   this->_mYAxisLimits = new cedar::aux::math::DoubleLimitsParameter(this, "y axis limits", 0.0, 1.0);
   QObject::connect(this->_mAutoScalingEnabled.get(), SIGNAL(valueChanged()), this, SLOT(autoScalingChanged()));
   QObject::connect(this->_mYAxisLimits.get(), SIGNAL(valueChanged()), this, SLOT(axisLimitsChanged()));
+  QObject::connect(this->_mMajorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
+  QObject::connect(this->_mMinorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
 }
 
 void cedar::aux::gui::QwtLinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
@@ -407,6 +413,25 @@ void cedar::aux::gui::QwtLinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   p_legend->setCheckable(true);
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpPlot->legend() != NULL);
+
+  auto p_grid_menu = menu.addMenu("grid");
+
+  auto p_grid = p_grid_menu->addAction("visible");
+  p_grid->setCheckable(true);
+  QObject::connect(p_grid, SIGNAL(toggled(bool)), this, SLOT(showGrid(bool)));
+  p_grid->setChecked(this->_mMajorGridVisible->getValue() && this->_mMinorGridVisible->getValue());
+
+  p_grid_menu->addSeparator();
+
+  auto p_major_grid = p_grid_menu->addAction("major");
+  p_major_grid->setCheckable(true);
+  QObject::connect(p_major_grid, SIGNAL(toggled(bool)), this, SLOT(showMajorGrid(bool)));
+  p_major_grid->setChecked(this->_mMajorGridVisible->getValue());
+
+  auto p_minor_grid = p_grid_menu->addAction("minor");
+  p_minor_grid->setCheckable(true);
+  QObject::connect(p_minor_grid, SIGNAL(toggled(bool)), this, SLOT(showMinorGrid(bool)));
+  p_minor_grid->setChecked(this->_mMinorGridVisible->getValue());
 
   menu.addSeparator();
   QMenu* p_y_scaling_menu = menu.addMenu("y axis scaling");
@@ -448,6 +473,47 @@ void cedar::aux::gui::QwtLinePlot::setAutomaticYAxisScaling()
   this->_mAutoScalingEnabled->setValue(true, true);
 }
 
+void cedar::aux::gui::QwtLinePlot::showMajorGrid(bool show)
+{
+  this->_mMajorGridVisible->setValue(show);
+}
+
+void cedar::aux::gui::QwtLinePlot::showMinorGrid(bool show)
+{
+  if (show)
+  {
+    this->showMajorGrid(true);
+  }
+  this->_mMinorGridVisible->setValue(show);
+}
+
+void cedar::aux::gui::QwtLinePlot::showGrid(bool show)
+{
+  this->showMajorGrid(show);
+  this->showMinorGrid(show);
+}
+
+void cedar::aux::gui::QwtLinePlot::gridVisibilityChanged()
+{
+  bool major_visible = this->_mMajorGridVisible->getValue();
+  bool minor_visible = this->_mMinorGridVisible->getValue();
+  bool any_visible = minor_visible || major_visible;
+  if (any_visible && this->mpGrid == nullptr)
+  {
+    this->mpGrid = new QwtPlotGrid();
+    this->mpGrid->setMajPen(QPen(Qt::gray, 0, Qt::SolidLine));
+    this->mpGrid->setMinPen(QPen(Qt::gray, 0, Qt::DotLine));
+    this->mpGrid->attach(this->mpPlot);
+  }
+
+  if (this->mpGrid)
+  {
+    this->mpGrid->enableX(major_visible);
+    this->mpGrid->enableY(major_visible);
+    this->mpGrid->enableXMin(minor_visible);
+    this->mpGrid->enableYMin(minor_visible);
+  }
+}
 
 void cedar::aux::gui::QwtLinePlot::autoScalingChanged()
 {
