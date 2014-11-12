@@ -228,7 +228,6 @@ void cedar::proc::experiment::StepPropertyParameter::setStep(const std::string& 
     element = SupervisorSingleton::getInstance()->getExperiment()->getGroup()->getElement<cedar::proc::Connectable>(step);
     this->setStep(element);
   }
-
 }
 
 cedar::proc::ConnectablePtr cedar::proc::experiment::StepPropertyParameter::getStep() const
