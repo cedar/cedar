@@ -117,7 +117,6 @@ void cedar::proc::experiment::gui::StepPropertyParameter::parameterPointerChange
 
 void cedar::proc::experiment::gui::StepPropertyParameter::stepChanged()
 {
-
   QString text = mpStep->currentText();
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());

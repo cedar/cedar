@@ -215,7 +215,7 @@ public:
     }
 
     SelfType slice;
-    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.end() + end);
+    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.begin() + end);
     return slice;
   }
 
