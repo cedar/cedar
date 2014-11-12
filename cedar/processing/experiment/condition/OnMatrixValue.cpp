@@ -50,8 +50,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-  bool declared = cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
-    registerType<cedar::proc::experiment::condition::OnMatrixValuePtr>();
+  bool register_it()
+  {
+    cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+          registerType<cedar::proc::experiment::condition::OnMatrixValuePtr>();
+
+    cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+        addDeprecatedName<cedar::proc::experiment::condition::OnMatrixValuePtr>("cedar.proc.experiment.condition.CheckData");
+
+    return true;
+  }
+  bool declared = register_it();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
