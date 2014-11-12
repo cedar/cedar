@@ -51,8 +51,17 @@
 
 namespace
 {
-  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::action::EndTrialPtr>();
+  bool register_it()
+  {
+    cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+          registerType<cedar::proc::experiment::action::EndTrialPtr>();
+
+    cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+        addDeprecatedName<cedar::proc::experiment::action::EndTrialPtr>("cedar.proc.experiment.action.StopAllTriggers");
+
+    return true;
+  }
+  bool declared = register_it();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
