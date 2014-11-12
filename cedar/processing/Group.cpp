@@ -630,13 +630,14 @@ bool cedar::proc::Group::nameExists(const cedar::proc::NetworkPath& name) const
   CEDAR_ASSERT(name.getElementCount() > 0)
   if (name.getElementCount() > 1)
   {
-    auto group_name = name(0,0).toString();
-    auto it = this->mElements.find(name);
+    auto group_name = name(0,1).toString();
+    auto it = this->mElements.find(group_name);
     if (it != this->mElements.end())
     {
       if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(it->second))
       {
-        return group->nameExists(name(1,name.getElementCount()-1));
+        auto sub_name = name(1,name.getElementCount()).toString();
+        return group->nameExists(name(1,name.getElementCount()));
       }
     }
     return false;
