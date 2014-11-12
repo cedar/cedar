@@ -268,6 +268,9 @@ public slots:
   //! return the gui root group
   cedar::proc::gui::ConstGroupPtr getGroup() const;
 
+public slots:
+  void setSimulationControlsDisabled(bool disabled);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -352,8 +355,6 @@ private slots:
   void architecturePlotActionTriggered();
 
   void openManageArchitectureWidgetsDialog();
-
-  void setSimulationControlsDisabled(bool disabled);
 
   void triggerStarted();
 

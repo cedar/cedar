@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/condition/PartialCheckData.h"
+#include "cedar/processing/experiment/condition/OnMatrixValue.h"
 #include "cedar/processing/experiment/Experiment.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -51,90 +51,120 @@
 namespace
 {
   bool declared = cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
-    registerType<cedar::proc::experiment::condition::PartialCheckDataPtr>();
+    registerType<cedar::proc::experiment::condition::OnMatrixValuePtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::condition::PartialCheckData::PartialCheckData()
+cedar::proc::experiment::condition::OnMatrixValue::OnMatrixValue()
 :
-
-_stepData
-(
-    new cedar::proc::experiment::StepPropertyParameter(this,"Step Data")
-)
-,
-_mNumberOfElements(new cedar::aux::UIntParameter(this,"Elements at least",1))
-,
+_stepData(new cedar::proc::experiment::StepPropertyParameter(this,"Step Data")),
+_mCheckFullMatrix(new cedar::aux::BoolParameter(this,"check full matrix", true)),
+_mNumberOfElements(new cedar::aux::UIntParameter(this,"number of elements",1)),
 _mCompareMethode
 (
   new cedar::aux::EnumParameter
   (
     this,
-    "Compare type",
+    "compare operator",
     cedar::proc::experiment::Experiment::CompareMethod::typePtr(),
-    cedar::proc::experiment::Experiment::CompareMethod::Lower
+    cedar::proc::experiment::Experiment::CompareMethod::Greater
   )
-)
-,
-_desiredValue( new cedar::aux::DoubleParameter(this,"DesiredValue",0.0))
+),
+_mDesiredValue(new cedar::aux::DoubleParameter(this,"value",0.0))
 {
   _stepData->setType(cedar::proc::experiment::StepPropertyParameter::OUTPUT);
+  this->toggleNumberOfElements();
+  QObject::connect(this->_mCheckFullMatrix.get(), SIGNAL(valueChanged()), this, SLOT(toggleNumberOfElements()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::experiment::condition::PartialCheckData::check()
+bool cedar::proc::experiment::condition::OnMatrixValue::check()
 {
   if (cedar::aux::ConstDataPtr data = _stepData->getData())
   {
     if (cedar::aux::ConstMatDataPtr value = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
     {
-      QReadLocker locker(&(value->getLock()));
-      cv::Mat matrix = value->getData();
-      unsigned int counter = 0;
-
-      // Iterate through all matrix elements
-      for (int x = 0; x < matrix.rows; x++)
+      if (_mCheckFullMatrix->getValue())
       {
-        for (int y = 0; y < matrix.cols; y++)
+        bool inRange = false;
+        QReadLocker locker(&(value->getLock()));
+        switch (_mCompareMethode->getValue())
         {
-          double current_val =value->getValue<double>(x,y);
-          bool in_range = false;
-          switch(_mCompareMethode->getValue())
-          {
-           case cedar::proc::experiment::Experiment::CompareMethod::Lower:
-           {
-             in_range = current_val < _desiredValue->getValue();
-             break;
-           }
-           case cedar::proc::experiment::Experiment::CompareMethod::Greater:
-           {
-             in_range = current_val > _desiredValue->getValue();
-             break;
-           }
-           case cedar::proc::experiment::Experiment::CompareMethod::Equal:
-           {
-             in_range = current_val == _desiredValue->getValue();
-             break;
-            }
-          }
-          if (in_range)
-          {
-            counter++;
-          }
+         case cedar::proc::experiment::Experiment::CompareMethod::Lower:
+         {
+           inRange = cv::checkRange(value->getData(), true, nullptr, -DBL_MAX, _mDesiredValue->getValue());
+           break;
+         }
+         case cedar::proc::experiment::Experiment::CompareMethod::Greater:
+         {
+           inRange = cv::checkRange(value->getData(), true, nullptr, _mDesiredValue->getValue(), DBL_MAX);
+           break;
+         }
+         case cedar::proc::experiment::Experiment::CompareMethod::Equal:
+         {
+           inRange = cv::checkRange(value->getData(), true, nullptr, _mDesiredValue->getValue(), _mDesiredValue->getValue());
+           break;
+         }
+        }
+        if (inRange)
+        {
+          return true;
         }
       }
-      if(counter >= _mNumberOfElements->getValue())
+      else
       {
-        return true;
+        QReadLocker locker(&(value->getLock()));
+        cv::Mat matrix = value->getData();
+        unsigned int counter = 0;
+
+        // Iterate through all matrix elements
+        for (int x = 0; x < matrix.rows; x++)
+        {
+          for (int y = 0; y < matrix.cols; y++)
+          {
+            double current_val =value->getValue<double>(x,y);
+            bool in_range = false;
+            switch(_mCompareMethode->getValue())
+            {
+             case cedar::proc::experiment::Experiment::CompareMethod::Lower:
+             {
+               in_range = current_val < _mDesiredValue->getValue();
+               break;
+             }
+             case cedar::proc::experiment::Experiment::CompareMethod::Greater:
+             {
+               in_range = current_val > _mDesiredValue->getValue();
+               break;
+             }
+             case cedar::proc::experiment::Experiment::CompareMethod::Equal:
+             {
+               in_range = current_val == _mDesiredValue->getValue();
+               break;
+              }
+            }
+            if (in_range)
+            {
+              counter++;
+            }
+          }
+        }
+        if (counter >= _mNumberOfElements->getValue())
+        {
+          return true;
+        }
       }
     }
   }
   return false;
 }
 
+void cedar::proc::experiment::condition::OnMatrixValue::toggleNumberOfElements()
+{
+  this->_mNumberOfElements->setConstant(_mCheckFullMatrix->getValue());
+}

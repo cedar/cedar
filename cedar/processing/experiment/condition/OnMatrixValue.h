@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,67 +22,67 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionCheckValue.h
+    File:        ConditionPartialCheckMat.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 04 04
 
-    Description: Header file for the class cedar::proc::experiment::ConditionCheckValue.
+    Description: Header file for the class cedar::proc::experiment::ConditionPartialCheckMat.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_MATRIX_VALUE_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_MATRIX_VALUE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/condition/CheckData.fwd.h"
+#include "cedar/processing/experiment/condition/OnMatrixValue.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 
-/*!@brief Checks if the data of a step fulfills the condition
- *
- *      If the data is of type MatData, this condition will check if every
- *      single element of the matrix fulfills the condition.
+/*!@brief Checks if a part of the step data fulfills the condition
  */
-class cedar::proc::experiment::condition::CheckData : public cedar::proc::experiment::condition::Condition
+class cedar::proc::experiment::condition::OnMatrixValue : public QObject, public cedar::proc::experiment::condition::Condition
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CheckData();
+  OnMatrixValue();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
 
+public slots:
+  void toggleNumberOfElements();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Checks if the data of a step fulfills the condition
+  //@brief Checks if a part of the step data fulfills the condition
   bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,16 +106,21 @@ protected:
   // none yet
 
 private:
-  //!@brief The step data to check
+  //@brief The step data to check
   cedar::proc::experiment::StepPropertyParameterPtr _stepData;
+
+  cedar::aux::BoolParameterPtr _mCheckFullMatrix;
+
+  //@brief The number of elements that should at least need to fulfill the condition
+  cedar::aux::UIntParameterPtr _mNumberOfElements;
 
   //!@brief The compare method. Can be greater, lower or equal
   cedar::aux::EnumParameterPtr _mCompareMethode;
 
   //!@brief The value the step data is compared to
-  cedar::aux::DoubleParameterPtr _desiredValue;
+  cedar::aux::DoubleParameterPtr _mDesiredValue;
 
-}; // class cedar::proc::experiment::ConditionCheckValue
+}; // class cedar::proc::experiment::OnMatrixValue
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_CHECK_VALUE_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_MATRIX_VALUE_H
 

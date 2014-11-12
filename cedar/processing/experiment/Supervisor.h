@@ -53,10 +53,8 @@
 /*!@brief This thread should continuously perform the action sequences of the experiment
  *
  */
-class cedar::proc::experiment::Supervisor : public cedar::aux::LoopedThread
+class cedar::proc::experiment::Supervisor
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,10 +95,6 @@ public:
   //!@brief Logs a message and writes it to the log file;
   void log(std::string messageType, std::string message);
 
-signals:
-  //! Emitted whenever the experiment is started or stopped.
-  void experimentRunning(bool);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,8 +105,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Calls write in the specified interval.
-  void step(cedar::unit::Time);
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
