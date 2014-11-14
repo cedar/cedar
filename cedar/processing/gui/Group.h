@@ -237,6 +237,9 @@ public slots:
   //! handes a change in step name
   void handleStepNameChanged(const std::string& from, const std::string& to);
 
+  //! Enables/disables resizing and moving of the group.
+  void setLockGeometry(bool lock = true);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -326,6 +329,8 @@ private:
 
   void lastReadConfigurationChanged();
 
+  bool canResize() const;
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
@@ -361,6 +366,8 @@ private slots:
   void openParameterEditor();
 
   void backgroundColorActionTriggered();
+
+  void geometryLockChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -435,6 +442,9 @@ private:
   cedar::aux::ConfigurationNode mPlotGroupsNode;
 
   cedar::aux::BoolParameterPtr _mIsCollapsed;
+
+  //! Disables moving/resizing the group
+  cedar::aux::BoolParameterPtr _mGeometryLocked;
 
   //! Width of the group in its uncollapsed state.
   cedar::aux::DoubleParameterPtr _mUncollapsedWidth;
