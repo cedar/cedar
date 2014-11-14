@@ -699,7 +699,7 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
 void cedar::proc::gui::GraphicsBase::updateResizeHandles()
 {
   bool show = this->isSelected();
-  if (this->scene()->selectedItems().count() > 1)
+  if (this->scene() && this->scene()->selectedItems().count() > 1)
   {
     show = false;
   }
