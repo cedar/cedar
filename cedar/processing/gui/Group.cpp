@@ -110,6 +110,7 @@ mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
 _mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
+_mGeometryLocked(new cedar::aux::BoolParameter(this, "lock geometry", false)),
 _mUncollapsedWidth(new cedar::aux::DoubleParameter(this, "uncollapsed width", width)),
 _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", height))
 {
@@ -181,6 +182,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 
   this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
+  this->connect(this->_mGeometryLocked.get(), SIGNAL(valueChanged()), SLOT(geometryLockChanged()));
+
   QObject::connect
   (
     this->mGroup.get(),
@@ -229,6 +232,30 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Group::canResize() const
+{
+  if (this->_mGeometryLocked->getValue())
+  {
+    return false;
+  }
+  else
+  {
+    return cedar::proc::gui::Connectable::canResize();
+  }
+}
+
+void cedar::proc::gui::Group::setLockGeometry(bool lock)
+{
+  this->_mGeometryLocked->setValue(lock);
+}
+
+void cedar::proc::gui::Group::geometryLockChanged()
+{
+  bool locked = this->_mGeometryLocked->getValue();
+  this->setFlag(QGraphicsItem::ItemIsMovable, !locked);
+  this->updateResizeHandles();
+}
 
 const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
 {
@@ -1765,6 +1792,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   p_collapse->setCheckable(true);
   p_collapse->setChecked(this->isCollapsed());
   this->connect(p_collapse, SIGNAL(toggled(bool)), SLOT(setCollapsed(bool)));
+
+  QAction* p_lock_geometry = menu.addAction("lock size/position");
+  p_lock_geometry->setCheckable(true);
+  p_lock_geometry->setChecked(this->_mGeometryLocked->getValue());
+  this->connect(p_lock_geometry, SIGNAL(toggled(bool)), SLOT(setLockGeometry(bool)));
 
   auto color_menu = menu.addMenu("color");
   auto colors = cedar::proc::gui::SettingsSingleton::getInstance()->getUserDefinedColors();
