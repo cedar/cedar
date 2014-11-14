@@ -372,7 +372,7 @@ void cedar::proc::gui::ArchitectureWidget::readDataNode
 
 cedar::aux::ConstDataPtr cedar::proc::gui::ArchitectureWidget::findData(const std::string& path) const
 {
-  //!@todo Move this code to a group function
+  //!@todo Use cedar::proc::GroupPath instead
   std::string data_name, step_path, step_path_rest, role;
   cedar::aux::splitLast(path, ".", step_path, data_name);
   cedar::aux::splitLast(step_path, "[", step_path_rest, role);
