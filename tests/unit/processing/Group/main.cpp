@@ -126,6 +126,46 @@ int test_input_revalidation()
   return errors;
 }
 
+int test_name_exists()
+{
+  std::cout << "-- Testing nameExists() --" << std::endl << std::endl;
+  int errors = 0;
+  cedar::proc::GroupPtr root(new cedar::proc::Group());
+  cedar::proc::GroupPtr subgroup1(new cedar::proc::Group());
+  cedar::proc::GroupPtr subgroup2(new cedar::proc::Group());
+  root->add(subgroup1, "subgroup1");
+  subgroup1->add(subgroup2, "subgroup2");
+
+  TestModulePtr test_1(new TestModule());
+  root->add(test_1, "test");
+  TestModulePtr test_2(new TestModule());
+  subgroup1->add(test_2, "test");
+  TestModulePtr test_3(new TestModule());
+  subgroup2->add(test_3, "test");
+
+  std::vector<std::string> names_to_check;
+  names_to_check.push_back("test");
+  names_to_check.push_back("subgroup1");
+  names_to_check.push_back("subgroup1.test");
+  names_to_check.push_back("subgroup1.subgroup2");
+  names_to_check.push_back("subgroup1.subgroup2.test");
+
+  for (const auto& name : names_to_check)
+  {
+    if (!root->nameExists(name))
+    {
+      std::cout << "ERROR: name \"" + name + "\" not found in root group." << std::endl;
+      ++errors;
+    }
+    else
+    {
+      std::cout << "name \"" + name + "\" properly found." << std::endl;
+    }
+  }
+
+  return errors;
+}
+
 int test_looped_group_cycle()
 {
   std::cout << "Testing a cycle in connections between looped groups." << std::endl;
@@ -530,6 +570,7 @@ void run_test()
   errors += test_looped_group_cycle();
   errors += test_input_revalidation();
   errors += test_connector_renaming();
+  errors += test_name_exists();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
