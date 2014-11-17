@@ -343,9 +343,5 @@ void cedar::aux::Recorder::setSubfolder(const std::string& subfolderName)
 }
 std::string cedar::aux::Recorder::getTimeStamp()
 {
-#ifdef CEDAR_OS_WINDOWS
-  return QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mmss").toStdString();
-#else // CEDAR_OS_WINDOWS
-   return QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
-#endif // CEDAR_OS_WINDOWS
+  return cedar::aux::Path::getTimestampForFileName();
 }
