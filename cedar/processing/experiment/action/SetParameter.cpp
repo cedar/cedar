@@ -88,8 +88,15 @@ void cedar::proc::experiment::action::SetParameter::preExperiment()
     return;
   }
 
-  cedar::aux::Parameter::ReadLocker locker(this->_mStepParameter->getParameter().get());
-  this->_mStepParameter->getParameter()->writeToNode(this->mOriginalParameterValue);
+
+  auto parameter = this->_mStepParameter->getParameter();
+  if (!parameter)
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find parameter \"" + this->_mStepParameter->getProperty() + "\" for set action.");
+  }
+
+  cedar::aux::Parameter::ReadLocker locker(parameter.get());
+  parameter->writeToNode(this->mOriginalParameterValue);
 }
 
 void cedar::proc::experiment::action::SetParameter::postExperiment()

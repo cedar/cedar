@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QDateTime>
 #include <boost/filesystem.hpp>
 
 
@@ -81,6 +82,11 @@ cedar::aux::Path::~Path()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::Path::getTimestampForFileName()
+{
+  return QDateTime::currentDateTime().toString("yyyy_MM_dd__hh_mm_ss").toStdString();
+}
 
 bool cedar::aux::Path::operator== (const cedar::aux::Path& other) const
 {
@@ -216,15 +222,41 @@ std::string cedar::aux::Path::getFileNameOnly() const
   return this->getLast();
 }
 
+bool cedar::aux::Path::hasExtension() const
+{
+  // look for the dot
+  auto index = this->getFileNameOnly().find_last_of('.');
+
+  // if it is in the string, a filename is present
+  return index != std::string::npos;
+}
+
+void cedar::aux::Path::setFileName(const std::string& fileName)
+{
+  if (this->mComponents.empty())
+  {
+    this->mComponents.push_back(fileName);
+  }
+  else
+  {
+    this->mComponents.back() = fileName;
+  }
+}
+
 void cedar::aux::Path::splitFileNameAndExtension(const std::string& fileNameAndExtension, std::string& fileName, std::string& extension)
 {
   size_t ext = fileNameAndExtension.find_last_of('.');
 
-  //!@todo Proper exception.
-  CEDAR_ASSERT(ext != std::string::npos);
-
-  fileName = fileNameAndExtension.substr(0, ext);
-  extension = fileNameAndExtension.substr(ext + 1);
+  if (ext != std::string::npos)
+  {
+    fileName = fileNameAndExtension.substr(0, ext);
+    extension = fileNameAndExtension.substr(ext + 1);
+  }
+  else
+  {
+    fileName = fileNameAndExtension;
+    extension = "";
+  }
 }
 
 std::string cedar::aux::Path::getExtension() const
