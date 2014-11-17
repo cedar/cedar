@@ -36,6 +36,16 @@
       <item row="0" column="1">
        <widget class="cedar::aux::gui::DirectoryParameter" name="mpRecorderWorkspaceEdit" native="true"/>
       </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Defautl 2d mat data plot</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="mpDefault2dMatDataPlot"/>
+      </item>
      </layout>
     </widget>
    </item>

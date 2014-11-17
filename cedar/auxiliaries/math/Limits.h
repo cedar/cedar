@@ -383,13 +383,22 @@ public:
    */
   inline const T& limit(const T& value) const
   {
-    if (value < getLower())
+    return limit(value, this->getLower(), this->getUpper());
+  }
+
+  /*! Restricts a value so that it lies within the given minimum and maximum.
+   *
+   * @remarks Minimum and maximum are inclusive, i.e., minimum <= return value <= maximum
+   */
+  static inline const T& limit(const T& value, const T& minimum, const T& maximum)
+  {
+    if (value < minimum)
     {
-      return getLower();
+      return minimum;
     }
-    else if (value > getUpper())
+    else if (value > maximum)
     {
-      return getUpper();
+      return maximum;
     }
 
     return value;

@@ -1,7 +1,7 @@
 {
   "name": "serial communication",
   "device path": "/dev/ttyUSB0",
-  "baud rate": "15",
+  "baud rate": "38400",
   "end of command string": "\\r\\n",
   "country flag": "0",
   "time out": "250000",

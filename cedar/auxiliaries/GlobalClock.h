@@ -45,6 +45,9 @@
 
 // SYSTEM INCLUDES
 #include <QTime>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif // Q_MOC_RUN
 
 //!@brief Can start, stop and reset the network time and should be used as a central time giver in a network.
 class cedar::aux::GlobalClock
@@ -71,18 +74,32 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Starts the timer
+  //!@brief Starts the timer.
   void start();
 
-  //!@brief Resets the timer
+  //!@brief Resets the timer.
   void reset();
 
-  //!@brief Stops the timer
+  //!@brief Stops the timer. It can be resumed with another call to start.
   void stop();
 
   //!@brief Returns the elapsed time since timer has started
   //!@todo make this const?
   cedar::unit::Time getTime();
+
+  //! Returns true if the timer is running.
+  bool isRunning() const;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Takes care of properly reacting to changes in the global time factor.
+  void globalTimeFactorChanged(double newFactor);
+
+  void addCurrentToAdditionalElapsedTime();
+
+  double getCurrentElapsedMSec() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -92,15 +109,20 @@ protected:
     // none yet
 
 private:
-
-  //!@brief Flag that is switched when the timer starts/stops
+  //!@brief Flag that indicates when the timer starts/stops
   bool mRunning;
 
-  //!@brief The time when the timer has started
-  QTime mStart;
+  //!@brief The timer used to measure how much time has elapsed since the start.
+  QTime mTimer;
 
-  //!@brief The time when the timer has stoped
-  QTime mStop;
+  //!@brief This time is added to the elapsed time. It is used to track, e.g., times when the global clock is paused.
+  double mAdditionalElapsedTime;
+
+  //! A copy of the current time factor, to avoid unnecessary locking/synchronization issues.
+  double mCurrentTimeFactor;
+
+  //! Connected to the change signal of the global time factor.
+  boost::signals2::scoped_connection mGlobalTimeFactorConnection;
 };
 
 #include "cedar/auxiliaries/Singleton.h"

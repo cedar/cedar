@@ -50,6 +50,8 @@
  */
 class cedar::aux::gui::SettingsWidget : public QWidget, public Ui_SettingsWidget
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -63,7 +65,7 @@ class cedar::aux::gui::SettingsWidget : public QWidget, public Ui_SettingsWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SettingsWidget(QWidget* pParent = NULL);
+  SettingsWidget(QWidget* pParent = nullptr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -80,7 +82,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void fillPossible2dMatDataPlots();
+
+private slots:
+  void default2dMatDataPlotChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -80,8 +80,10 @@ _mEngine
   this->_mEngine->markAdvanced();
   this->selectedEngineChanged();
 
-  QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SLOT(selectedEngineChanged()));
-  QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
+  // this needs to be a direct connection because the connected slot also updates the kernel list pointer in the engine
+  // if this were not the case, there could be short periods where the engine is changed but its kernel list is not updated
+  QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SLOT(selectedEngineChanged()), Qt::DirectConnection);
+
   QObject::connect(this->_mMode.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
   QObject::connect(this->_mBorderType.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
 }
@@ -155,6 +157,8 @@ void cedar::aux::conv::Convolution::selectedEngineChanged()
   this->updateEngineCapabilities();
 
   this->updateCombinedKernel();
+
+  emit configurationChanged();
 }
 
 void cedar::aux::conv::Convolution::updateEngineCapabilities()

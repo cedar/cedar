@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <QWeakPointer>
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
   #include <boost/signals2/connection.hpp>
@@ -209,6 +210,21 @@ public:
   //! search and replace every occurance of 'from' with 'to' in the plot groups node
   void changeStepName(const std::string& from, const std::string& to);
 
+  //! Returns the architecture plots for this group.
+  const std::map<std::string, cedar::aux::Path>& getArchitectureWidgets() const;
+
+  //! Sets the architecture widgets for this group.
+  void setArchitectureWidgets(const std::map<std::string, cedar::aux::Path>& newWidgets);
+
+  //! Displays the architecture plot with the given name.
+  void showArchitectureWidget(const std::string& name);
+
+  //! Changes the visibility of all open architecture widgets
+  void toggleVisibilityOfOpenArchitectureWidgets(bool visible);
+
+  //! Closes all open architecture widgets
+  void closeOpenArchitectureWidgets();
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??
@@ -220,6 +236,9 @@ public slots:
 
   //! handes a change in step name
   void handleStepNameChanged(const std::string& from, const std::string& to);
+
+  //! Enables/disables resizing and moving of the group.
+  void setLockGeometry(bool lock = true);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -310,6 +329,8 @@ private:
 
   void lastReadConfigurationChanged();
 
+  bool canResize() const;
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
@@ -345,6 +366,8 @@ private slots:
   void openParameterEditor();
 
   void backgroundColorActionTriggered();
+
+  void geometryLockChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -399,6 +422,8 @@ private:
 
   cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 
+  std::vector<QWeakPointer<QWidget>> mArchitectureWidgetDocks;
+
   //! The vertical offset for data slots in the group used when the group is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;
 
@@ -418,11 +443,17 @@ private:
 
   cedar::aux::BoolParameterPtr _mIsCollapsed;
 
+  //! Disables moving/resizing the group
+  cedar::aux::BoolParameterPtr _mGeometryLocked;
+
   //! Width of the group in its uncollapsed state.
   cedar::aux::DoubleParameterPtr _mUncollapsedWidth;
 
   //! Height of the group in its uncollapsed state.
   cedar::aux::DoubleParameterPtr _mUncollapsedHeight;
+
+  //! Map containing all the architecture plots. Keys are the names of the plots, values the paths to the files defining them.
+  std::map<std::string, cedar::aux::Path> _mArchitectureWidgets;
 
 }; // class cedar::proc::gui::GroupFile
 
