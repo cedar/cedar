@@ -89,9 +89,10 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
     this->setType(type);
     auto name = node.get_child("Step").get_value<std::string>();
     cedar::proc::ConnectablePtr element;
-    if (SupervisorSingleton::getInstance()->getExperiment()->getGroup()->nameExists(name))
+    auto group = SupervisorSingleton::getInstance()->getExperiment()->getGroup();
+    if (group->nameExists(name))
     {
-      element = SupervisorSingleton::getInstance()->getExperiment()->getGroup()->getElement<cedar::proc::Connectable>(name);
+      element = group->getElement<cedar::proc::Connectable>(name);
     }
     this->setStep(element);
     this->setProperty(node.get_child("Property").get_value<std::string>());
@@ -223,9 +224,10 @@ void cedar::proc::experiment::StepPropertyParameter::setStep(cedar::proc::Connec
 void cedar::proc::experiment::StepPropertyParameter::setStep(const std::string& step)
 {
   cedar::proc::ConnectablePtr element;
-  if (SupervisorSingleton::getInstance()->getExperiment()->getGroup()->nameExists(step))
+  auto group = SupervisorSingleton::getInstance()->getExperiment()->getGroup();
+  if (group->nameExists(step))
   {
-    element = SupervisorSingleton::getInstance()->getExperiment()->getGroup()->getElement<cedar::proc::Connectable>(step);
+    element = group->getElement<cedar::proc::Connectable>(step);
     this->setStep(element);
   }
 }
