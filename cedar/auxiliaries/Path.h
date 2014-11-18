@@ -167,6 +167,9 @@ public:
   //! Lists all the files that are in the path.
   std::vector<cedar::aux::Path> listFiles() const;
 
+  //! Lists all the files in the path whose absolute path matches the given regular expression.
+  std::vector<cedar::aux::Path> listFilesThatMatchRe(const std::string& regexp) const;
+
   //! Returns the last element in the path
   const std::string& getLast() const;
 

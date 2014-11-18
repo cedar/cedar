@@ -53,6 +53,7 @@ cedar_add_library(cedarproc
   experiment/Experiment.h
   experiment/StepPropertyParameter.h
   experiment/condition/OnMatrixValue.h
+  experiment/action/IterateDirectoryContents.h
   experiment/gui/ActionListParameter.h
   experiment/gui/ActionSequence.h
   experiment/gui/ExperimentItemWidget.h

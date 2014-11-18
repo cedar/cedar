@@ -47,6 +47,7 @@
 // SYSTEM INCLUDES
 #include <QDateTime>
 #include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -206,6 +207,25 @@ std::vector<cedar::aux::Path> cedar::aux::Path::listFiles() const
   }
 
   return files;
+}
+
+std::vector<cedar::aux::Path> cedar::aux::Path::listFilesThatMatchRe(const std::string& regexStr) const
+{
+  std::vector<cedar::aux::Path> files = this->listFiles();
+  std::vector<cedar::aux::Path> filtered_files;
+
+  boost::regex regex(regexStr);
+
+  for (const auto& path : files)
+  {
+    std::string absolute_path = path.absolute().toString();
+    if (boost::regex_search(absolute_path.begin(), absolute_path.end(), regex))
+    {
+      filtered_files.push_back(path);
+    }
+  }
+
+  return filtered_files;
 }
 
 const std::string& cedar::aux::Path::getLast() const

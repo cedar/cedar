@@ -73,6 +73,7 @@ class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parame
 public:
   enum PropertyType
   {
+    PARAMETER_VALUE,
     PARAMETER,
     OUTPUT,
     BUFFER
