@@ -85,8 +85,9 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
 {
   try
   {
-    PropertyType type = static_cast<PropertyType>(node.get_child("Type").get_value<int>());
-    this->setType(type);
+//!@todo This causes a lot of problems, e.g., if a value is added to the enumeration, thus changing the meaning of the integer values. Why was this even read from/written to the configuration? This is usually set by classes using this parameter...
+//    PropertyType type = static_cast<PropertyType>(node.get_child("Type").get_value<int>());
+//    this->setType(type);
     auto name = node.get_child("Step").get_value<std::string>();
     cedar::proc::ConnectablePtr element;
     auto group = SupervisorSingleton::getInstance()->getExperiment()->getGroup();
@@ -142,7 +143,8 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
     step_node.put("Step", "");
   }
   step_node.put("Property", mProperty);
-  step_node.put("Type", mType);
+  //!@todo see comment in readFromNode
+//  step_node.put("Type", mType);
 
   switch (mType)
   {
