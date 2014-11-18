@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,41 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.h
+    File:        IterateDirectoryContents.h
 
-    Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 07
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 11 17
 
-    Description: Header file for the class cedar::proc::experiment::ActionSetParameter.
+    Description: Header file for the class cedar::proc::experiment::action::IterateDirectoryContents.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_ITERATE_DIRECTORY_CONTENTS_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_ITERATE_DIRECTORY_CONTENTS_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/Action.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/experiment/action/SetParameter.h"
 #include "cedar/processing/experiment/StepPropertyParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/action/SetParameter.fwd.h"
+#include "cedar/processing/experiment/action/IterateDirectoryContents.fwd.h"
 
-// SYSTEM INCLUDE
+// SYSTEM INCLUDES
 #include <QObject>
 
 
-/*!@brief Sets the parameter of a step to a desired value
+/*!@brief An action that goes through a list of directory entries and applies it to a parameter on successive trials.
  */
-class cedar::proc::experiment::action::SetParameter : public cedar::proc::experiment::action::Action
+class cedar::proc::experiment::action::IterateDirectoryContents : QObject,
+                                                                  public cedar::proc::experiment::action::SetParameter
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,33 +71,27 @@ class cedar::proc::experiment::action::SetParameter : public cedar::proc::experi
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SetParameter();
+  IterateDirectoryContents();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Sets the parameter of a step to a desired value
-  void run();
-
   void preExperiment();
 
-  void postExperiment();
-
-public:
+  void run();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Returns the step parameter chosen for this action.
-  cedar::proc::experiment::StepPropertyParameterPtr getStepParameter() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void updateDirectoryContents();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -100,7 +99,9 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ConfigurationNode mOriginalParameterValue;
+  cedar::aux::LockableMember<std::vector<cedar::aux::Path>> mDirectoryContents;
+
+  cedar::aux::FileParameterPtr mChangedParameterAsFileParameter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -109,10 +110,11 @@ protected:
   // none yet
 
 private:
-  //!@brief The step parameter to set
-  cedar::proc::experiment::StepPropertyParameterPtr _mStepParameter;
+  cedar::aux::StringParameterPtr _mFilter;
 
-}; // class cedar::proc::experiment::ActionSetParameter
+  cedar::aux::DirectoryParameterPtr _mDirectory;
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
+}; // class cedar::proc::experiment::action::IterateDirectoryContents
+
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_ITERATE_DIRECTORY_CONTENTS_H
 

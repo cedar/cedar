@@ -158,6 +158,7 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
   std::vector<std::string> properties;
   switch (parameter->getType())
   {
+    case cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE:
     case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
     {
       properties = parameter->getListOfParameters();
@@ -180,7 +181,6 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
   {
     mpProperty->addItem(QString::fromStdString(property));
   }
-
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
@@ -190,7 +190,7 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
 
   switch(parameter->getType())
   {
-    case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
+    case cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE:
     {
       auto layout = cedar::aux::asserted_cast<QFormLayout*>(this->layout());
       cedar::aux::ParameterPtr parameter_copy = parameter->getParameterCopy();
@@ -214,6 +214,29 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
       parameter_widget->setParameter(parameter_copy);
       mpPropertyCopy = parameter_widget;
       layout->setWidget(2, QFormLayout::FieldRole, mpPropertyCopy);
+      break;
+    }
+    case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
+    {
+      auto layout = cedar::aux::asserted_cast<QFormLayout*>(this->layout());
+      auto p_label_item = layout->itemAt(2, QFormLayout::LabelRole);
+      if (p_label_item)
+      {
+        auto p_label = p_label_item->widget();
+        if (p_label != nullptr)
+        {
+          p_label->deleteLater();
+        }
+      }
+      auto p_widget_item = layout->itemAt(2, QFormLayout::FieldRole);
+      if (p_widget_item)
+      {
+        auto p_widget = layout->itemAt(2, QFormLayout::FieldRole)->widget();
+        if (p_widget != nullptr)
+        {
+          p_widget->deleteLater();
+        }
+      }
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::OUTPUT:

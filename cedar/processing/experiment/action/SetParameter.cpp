@@ -64,12 +64,17 @@ _mStepParameter
     new cedar::proc::experiment::StepPropertyParameter(this,"Step Parameter")
 )
 {
-  _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
+  _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::experiment::StepPropertyParameterPtr cedar::proc::experiment::action::SetParameter::getStepParameter() const
+{
+  return this->_mStepParameter;
+}
 
 void cedar::proc::experiment::action::SetParameter::run()
 {

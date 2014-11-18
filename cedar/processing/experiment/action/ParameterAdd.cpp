@@ -65,7 +65,7 @@ _mStepParamter
     new cedar::proc::experiment::StepPropertyParameter(this,"StepParameter")
 )
 {
-  _mStepParamter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER);
+  _mStepParamter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE);
 
   // allow only UIntParameter and DoubleParameter to increase
   _mStepParamter->allowType("cedar.aux.DoubleParameter");

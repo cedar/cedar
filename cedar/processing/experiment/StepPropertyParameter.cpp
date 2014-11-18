@@ -57,7 +57,7 @@ cedar::proc::experiment::StepPropertyParameter::StepPropertyParameter(
 :
 cedar::aux::Parameter(pOwner, name, false)
 ,
-mType(PARAMETER)
+mType(PARAMETER_VALUE)
 {
 }
 
@@ -98,12 +98,16 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
     this->setProperty(node.get_child("Property").get_value<std::string>());
     switch (mType)
     {
-      case PARAMETER:
+      case PARAMETER_VALUE:
       {
         if (mParameterCopy)
         {
           mParameterCopy->readFromNode(node.get_child("PropertyParameter"));
         }
+        break;
+      }
+      case PARAMETER:
+      {
         break;
       }
       case OUTPUT:
@@ -142,7 +146,7 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
 
   switch (mType)
   {
-    case PARAMETER:
+    case PARAMETER_VALUE:
     {
       if (mParameterCopy)
       {
@@ -150,6 +154,10 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
         mParameterCopy->writeToNode(copy_node);
         step_node.add_child("PropertyParameter",copy_node);
       }
+      break;
+    }
+    case PARAMETER:
+    {
       break;
     }
     case OUTPUT:
@@ -168,7 +176,7 @@ void cedar::proc::experiment::StepPropertyParameter::makeDefault()
 {
   this->mElement.reset();
   this->mProperty = "";
-  this->mType = PARAMETER;
+  this->mType = PARAMETER_VALUE;
 }
 
 void cedar::proc::experiment::StepPropertyParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
@@ -279,7 +287,7 @@ cedar::aux::ConstDataPtr cedar::proc::experiment::StepPropertyParameter::getData
 
 cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameter() const
 {
-  if (mElement.lock() == nullptr || mProperty == "" || mType != PARAMETER)
+  if (mElement.lock() == nullptr || mProperty == "" || (this->mType != PARAMETER_VALUE && this->mType != PARAMETER))
   {
     return cedar::aux::ParameterPtr();
   }
@@ -352,7 +360,7 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
 
   switch (mType)
   {
-    case PARAMETER:
+    case PARAMETER_VALUE:
     {
       try
       {
@@ -373,6 +381,10 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
       {
         mProperty = "";
       }
+      break;
+    }
+    case PARAMETER:
+    {
       break;
     }
     case OUTPUT:
