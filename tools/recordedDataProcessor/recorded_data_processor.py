@@ -325,6 +325,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.proj_method_cbox = wx.ComboBox(self, choices = self.proj_methods, value=' ', style = wx.CB_READONLY)
         self.style_cbox = wx.ComboBox(self, choices = self.style_ch, style = wx.CB_READONLY)
         self.pos_slider = wx.Slider(self, value=-1, minValue = -1, maxValue = 0, style = wx.SL_LABELS|wx.SL_AUTOTICKS)
+        self.pos_slider.Disable()
         self.resolution_spn = wx.SpinCtrl(self, min=1, max=100)
         self.x_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         self.y_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
@@ -374,12 +375,21 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.switch_btn = wx.Button(self, label = 'Switch directory')
         self.multiple_plot_btn = wx.Button(self, label = 'Add timeline')    
         self.axes_label_ok_btn = wx.Button(self, label='OK')
+        
+        # Player buttons
         self.play_pause_btn = wx.BitmapButton(self, -1, bitmap=self.play_bitmap)
         self.reverse_play_pause_btn = wx.BitmapButton(self, -1, bitmap=self.reverse_play_bitmap)
         self.reset_btn = wx.BitmapButton(self, -1, bitmap=self.reset_bitmap)
         self.decrease_single_step_btn = wx.BitmapButton(self, -1, bitmap=self.decrease_single_step_bitmap)
         self.increase_single_step_btn = wx.BitmapButton(self, -1, bitmap=self.increase_single_step_bitmap)
+        
+        self.play_pause_btn.Disable()
+        self.reverse_play_pause_btn.Disable()
+        self.reset_btn.Disable()
+        self.decrease_single_step_btn.Disable()
+        self.increase_single_step_btn.Disable()
         self.multiple_plot_btn.Disable()
+        
         
         # Controls
         #========================================================================================================================
@@ -830,13 +840,30 @@ class RecordedDataProcessorPanel(wx.Panel):
         # clear memory
         del self.data
         self.slider_max = 0
-    
+        self.step = -1
+        self.pos_slider.SetValue(self.step)
+        self.time_code_display.SetLabel('-')
+        self.pos_slider.Disable()
+        self.play_pause_btn.Disable()
+        self.reverse_play_pause_btn.Disable()
+        self.reset_btn.Disable()
+        self.decrease_single_step_btn.Disable()
+        self.increase_single_step_btn.Disable()
+        
         # valid checkbox selected
         self.proj_choice = self.proj_ch[:self.ndim[self.selection]+1]
         self.proj_choice_step = FieldPlot().build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
-        self.header = FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
         
+        self.header = FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
         temp_data = FieldPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
+        
+        self.pos_slider.Enable()
+        self.play_pause_btn.Enable()
+        self.reverse_play_pause_btn.Enable()
+        self.reset_btn.Enable()
+        self.decrease_single_step_btn.Enable()
+        self.increase_single_step_btn.Enable()
+        
         self.data = temp_data[0]
         self.time_codes = temp_data[1]
         self.slider_max = len(self.time_codes)-1
@@ -845,7 +872,8 @@ class RecordedDataProcessorPanel(wx.Panel):
     
     def evt_sel_cbox(self, event):
         
-        plt.close()
+        
+        #plt.close()
         self.selection = self.sel_cbox.GetSelection()
         self._update_selection_data()
         
