@@ -45,10 +45,10 @@
 #include "cedar/auxiliaries/gui/ThreadedPlot.h"
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/ColorGradient.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
-#include "cedar/auxiliaries/ColorGradient.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMenu>
@@ -152,6 +152,9 @@ public:
   {
     return this->_mValueLimits->getValue();
   }
+
+  //! Returns the currently active color jet.
+  cedar::aux::ColorGradient::StandardGradients::Id getColorJet() const;
 
 public slots:
   /*!@brief Set the scaling mode of the plot.

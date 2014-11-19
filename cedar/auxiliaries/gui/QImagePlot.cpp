@@ -359,6 +359,11 @@ void cedar::aux::gui::QImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   menu.exec(pEvent->globalPos());
 }
 
+cedar::aux::ColorGradient::StandardGradients::Id cedar::aux::gui::QImagePlot::getColorJet() const
+{
+  return this->_mColorJet->getValue().id();
+}
+
 void cedar::aux::gui::QImagePlot::colorJetActionTriggered()
 {
   auto p_action = dynamic_cast<QAction*>(QObject::sender());

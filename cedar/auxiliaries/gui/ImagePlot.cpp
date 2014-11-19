@@ -339,92 +339,99 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
     default:
     case DATA_TYPE_IMAGE:
     {
-      cedar::aux::annotation::ColorSpace::ChannelType type = cedar::aux::annotation::ColorSpace::Gray;
-
-      if (this->mDataColorSpace)
+      if (this->getColorJet() != cedar::aux::ColorGradient::StandardGradients::PlotDefault)
       {
-        type = this->mDataColorSpace->getChannelType(0);
-      }
-
-      if (type == cedar::aux::annotation::ColorSpace::Hue)
-      {
-        cv::Mat ones = 0.0 * in + 255.0;
-        std::vector<cv::Mat> merge_vec;
-        merge_vec.push_back(in);
-        merge_vec.push_back(ones);
-        merge_vec.push_back(ones);
-        cv::Mat merged, converted;
-        cv::merge(merge_vec, merged);
-        cv::cvtColor(merged, converted, CV_HSV2BGR);
-        cv::Mat converted_8uc3;
-        converted.convertTo(converted_8uc3, CV_8UC3);
-        return converted_8uc3;
+        return this->colorizeMatrix(in);
       }
       else
       {
-        std::vector<cv::Mat> merge_vec;
-        cv::Mat zeros = 0.0 * in;
+        cedar::aux::annotation::ColorSpace::ChannelType type = cedar::aux::annotation::ColorSpace::Gray;
 
-        cv::Mat in_scaled;
-        switch (in.type())
+        if (this->mDataColorSpace)
         {
-          case CV_32F:
-          case CV_64F:
+          type = this->mDataColorSpace->getChannelType(0);
+        }
+
+        if (type == cedar::aux::annotation::ColorSpace::Hue)
+        {
+          cv::Mat ones = 0.0 * in + 255.0;
+          std::vector<cv::Mat> merge_vec;
+          merge_vec.push_back(in);
+          merge_vec.push_back(ones);
+          merge_vec.push_back(ones);
+          cv::Mat merged, converted;
+          cv::merge(merge_vec, merged);
+          cv::cvtColor(merged, converted, CV_HSV2BGR);
+          cv::Mat converted_8uc3;
+          converted.convertTo(converted_8uc3, CV_8UC3);
+          return converted_8uc3;
+        }
+        else
+        {
+          std::vector<cv::Mat> merge_vec;
+          cv::Mat zeros = 0.0 * in;
+
+          cv::Mat in_scaled;
+          switch (in.type())
           {
-            double min_val = this->getValueLimits().getLower();
-            double max_val = this->getValueLimits().getUpper();
-            if (this->isAutoScaling())
+            case CV_32F:
+            case CV_64F:
             {
-              cv::minMaxLoc(in, &min_val, &max_val);
+              double min_val = this->getValueLimits().getLower();
+              double max_val = this->getValueLimits().getUpper();
+              if (this->isAutoScaling())
+              {
+                cv::minMaxLoc(in, &min_val, &max_val);
+              }
+              if (min_val != max_val)
+              {
+                in_scaled = 255.0 * (in - min_val) / (max_val - min_val);
+              }
+              else
+              {
+                in_scaled = in;
+              }
+              break;
             }
-            if (min_val != max_val)
-            {
-              in_scaled = 255.0 * (in - min_val) / (max_val - min_val);
-            }
-            else
-            {
+            default:
               in_scaled = in;
-            }
-            break;
+              break;
           }
-          default:
-            in_scaled = in;
-            break;
+
+          switch (type)
+          {
+            case cedar::aux::annotation::ColorSpace::Red:
+              merge_vec.push_back(zeros);
+              merge_vec.push_back(zeros);
+              merge_vec.push_back(in_scaled);
+              break;
+
+            case cedar::aux::annotation::ColorSpace::Green:
+              merge_vec.push_back(zeros);
+              merge_vec.push_back(in_scaled);
+              merge_vec.push_back(zeros);
+              break;
+
+            case cedar::aux::annotation::ColorSpace::Blue:
+              merge_vec.push_back(in_scaled);
+              merge_vec.push_back(zeros);
+              merge_vec.push_back(zeros);
+              break;
+
+            default:
+            case cedar::aux::annotation::ColorSpace::Gray:
+              merge_vec.push_back(in_scaled);
+              merge_vec.push_back(in_scaled);
+              merge_vec.push_back(in_scaled);
+              break;
+          }
+
+          cv::Mat converted;
+          cv::merge(merge_vec, converted);
+          cv::Mat converted_8uc3;
+          converted.convertTo(converted_8uc3, CV_8UC3);
+          return converted_8uc3;
         }
-
-        switch (type)
-        {
-          case cedar::aux::annotation::ColorSpace::Red:
-            merge_vec.push_back(zeros);
-            merge_vec.push_back(zeros);
-            merge_vec.push_back(in_scaled);
-            break;
-
-          case cedar::aux::annotation::ColorSpace::Green:
-            merge_vec.push_back(zeros);
-            merge_vec.push_back(in_scaled);
-            merge_vec.push_back(zeros);
-            break;
-
-          case cedar::aux::annotation::ColorSpace::Blue:
-            merge_vec.push_back(in_scaled);
-            merge_vec.push_back(zeros);
-            merge_vec.push_back(zeros);
-            break;
-
-          default:
-          case cedar::aux::annotation::ColorSpace::Gray:
-            merge_vec.push_back(in_scaled);
-            merge_vec.push_back(in_scaled);
-            merge_vec.push_back(in_scaled);
-            break;
-        }
-
-        cv::Mat converted;
-        cv::merge(merge_vec, converted);
-        cv::Mat converted_8uc3;
-        converted.convertTo(converted_8uc3, CV_8UC3);
-        return converted_8uc3;
       }
     }
 
