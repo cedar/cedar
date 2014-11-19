@@ -53,6 +53,7 @@ import re
 import wx
 import wx.lib.agw.floatspin as FS
 from wx.lib.embeddedimage import PyEmbeddedImage
+from matplotlib.colors import ColorConverter
 
     
 class ImageFiles():
@@ -279,6 +280,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.proj_choice = None
         self.proj_choice_step = None
         self.plot = None
+        self.plot_color = None
         
         self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'timeline']
         self.proj_ch = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
@@ -330,6 +332,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.x_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         self.y_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         self.z_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        self.plot_color_ctrl = wx.ColourPickerCtrl(self, -1)
+        self.plot_color_ctrl.Disable()
         
         for i in range(len(self.flist_sorted)): 
             self.header_list.append(FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
@@ -354,6 +358,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         axes_grid_sizer = wx.GridSizer(rows=3, cols=2)
         cbox_grid_sizer = wx.GridSizer(rows = 6, cols = 2)
         organization_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        multi_plot_sizer = wx.BoxSizer(wx.VERTICAL)
         
         play = ImageFiles().play.GetImage()
         self.play_bitmap = wx.BitmapFromImage(play)
@@ -470,13 +475,15 @@ class RecordedDataProcessorPanel(wx.Panel):
         heatmap_sizer.AddSpacer(25)
         heatmap_sizer.Add(self.reset_heatmap_boundaries_btn, 0, wx.ALIGN_CENTER|wx.LEFT|wx.TOP|wx.EXPAND, border=10)
         #========================================================================
-                
+        
+        multi_plot_sizer.Add(self.multiple_plot_btn, 0, wx.ALIGN_LEFT|wx.EXPAND)
+        multi_plot_sizer.Add(self.plot_color_ctrl, 0, wx.ALIGN_LEFT|wx.EXPAND)
+        
         # Buttons
         #========================================================================
         plot_sizer.Add(self.plot_btn, 1)
         plot_sizer.Add(self.save_btn, 1)
         btn_sizer.Add(plot_sizer, 1, wx.ALIGN_LEFT|wx.EXPAND)
-        btn_sizer.Add(self.multiple_plot_btn, 1, wx.ALIGN_LEFT|wx.EXPAND)
         btn_sizer.Add(self.switch_btn, 1, wx.ALIGN_LEFT|wx.EXPAND)
         #========================================================================
         
@@ -502,7 +509,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.main_sizer.Add(line_sizer_4, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND)
         self.main_sizer.Add(item=organization_sizer, proportion=0, flag=wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT, border=10)
         self.main_sizer.Add(line_sizer_5, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND)
-        self.main_sizer.Add(btn_sizer, 0, wx.ALIGN_LEFT|wx.LEFT|wx.BOTTOM|wx.TOP, border=10)
+        self.main_sizer.Add(btn_sizer, 0, wx.ALIGN_LEFT|wx.LEFT, border=10)
+        self.main_sizer.Add(multi_plot_sizer, 0, wx.ALIGN_LEFT|wx.LEFT|wx.BOTTOM, border=10)
         
         self.SetSizer(self.main_sizer)
         self.main_sizer.Fit(self)
@@ -530,6 +538,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.y_axis_text.Bind(wx.EVT_TEXT_ENTER, self.evt_axis_label)
         self.z_axis_text.Bind(wx.EVT_TEXT_ENTER, self.evt_axis_label)
         self.axes_label_ok_btn.Bind(wx.EVT_BUTTON, self.evt_axis_label)
+        self.plot_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_plot_color_ctrl)
         #========================================================================================================================
                 
         self.Show()
@@ -800,11 +809,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         
         self.mode  = self.mode_cbox.GetValue()         
         empty_list = []        
-                
-        if self.mode == ' ':
-            self.plot_btn.SetLabel('Plot')
-        else:
-            self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
+        self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
             
         # snapshot option selected
         #======================================================================================================================== 
@@ -868,21 +873,34 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.time_codes = temp_data[1]
         self.slider_max = len(self.time_codes)-1
         self.pos_slider.SetMax(self.slider_max)
-                
-    
+
+        
+    def evt_plot_color_ctrl(self, event):
+        widget = event.GetEventObject()
+        aux_plot_color = widget.GetColour()
+        
+        # Color conversion
+        red = aux_plot_color.Red()/255.
+        green = aux_plot_color.Green()/255.
+        blue = aux_plot_color.Blue()/255.
+        
+        self.plot_color = [red, green, blue]
+        
+                    
     def evt_sel_cbox(self, event):
         
-        
-        #plt.close()
         self.selection = self.sel_cbox.GetSelection()
         self._update_selection_data()
         
         if self.ndim[self.selection] == 0:
             self.multiple_plot_btn.Enable()
+            self.plot_color_ctrl.Enable()
         else:
             self.multiple_plot_btn.Disable()
+            self.plot_color_ctrl.Disable()
         
         return
+
                 
     def evt_save_plot(self, event):
         
@@ -946,6 +964,7 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                       plot = self.plot,
                                                       proj = self.proj, 
                                                       proj_method = self.proj_method,
+                                                      color = self.plot_color,
                                                       step = self.step, 
                                                       marker = self.marked, 
                                                       style = self.style)
@@ -964,6 +983,9 @@ class RecordedDataProcessorPanel(wx.Panel):
         return
     
     def _plot(self):
+        
+        
+        
         if self.mode == 'snapshot':
             if self.step < 0:
                 step = 0
@@ -1026,6 +1048,7 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                       plot = self.plot,
                                                       proj = self.proj, 
                                                       proj_method = self.proj_method,
+                                                      color = self.plot_color,
                                                       step = self.step, 
                                                       marker = self.marked, 
                                                       style = self.style)
@@ -1053,6 +1076,9 @@ class RecordedDataProcessorPanel(wx.Panel):
         
     
     def evt_plot(self, event):
+        
+        plt.close()
+        self.plot = None
         
         self._plot()            
         plt.show()
@@ -1511,8 +1537,8 @@ class FieldPlot(object):
                         
         return
     
-    def plot_timeline(self, data, header, vmin, vmax, resolution, proj, proj_method, style, plot=None, marker=False, step=None):
-        ndim  = self.get_dimension(header)
+    def plot_timeline(self, data, header, vmin, vmax, resolution, proj, proj_method, style, color=None, plot=None, marker=False, step=None):
+        ndim = self.get_dimension(header)
         steps = data.shape[0]
         
         if plot is None and ndim == 0:
@@ -1525,9 +1551,12 @@ class FieldPlot(object):
             plot = fig.add_subplot(1,1,1)
         
         if ndim == 0:
-            plot.plot(data)
+            if color == None:
+                plot.plot(data)
+            else:
+                plot.plot(data, color=color)
         
-        if ndim != 0:
+        elif ndim != 0:
             if ndim == 1:
                 x = int(header[2])
                 X_1,X_2 = np.mgrid[:steps, :x]
