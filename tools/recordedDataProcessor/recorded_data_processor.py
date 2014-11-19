@@ -53,7 +53,6 @@ import re
 import wx
 import wx.lib.agw.floatspin as FS
 from wx.lib.embeddedimage import PyEmbeddedImage
-from matplotlib.colors import ColorConverter
 
     
 class ImageFiles():
@@ -277,10 +276,10 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.ndim = []
         self.time_codes = []
         self.selection = None
-        self.proj_choice = None
-        self.proj_choice_step = None
+        self.proj_choice_timeline = None
+        self.proj_choice_snapshot = None
         self.plot = None
-        self.plot_color = None
+        self.plot_color = 'blue'
         
         self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'timeline']
         self.proj_ch = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
@@ -332,8 +331,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.x_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         self.y_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         self.z_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        self.plot_color_ctrl = wx.ColourPickerCtrl(self, -1)
-        self.plot_color_ctrl.Disable()
+        self.plot_color_ctrl = wx.ColourPickerCtrl(self, -1, col=wx.BLUE)
+
         
         for i in range(len(self.flist_sorted)): 
             self.header_list.append(FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
@@ -358,7 +357,6 @@ class RecordedDataProcessorPanel(wx.Panel):
         axes_grid_sizer = wx.GridSizer(rows=3, cols=2)
         cbox_grid_sizer = wx.GridSizer(rows = 6, cols = 2)
         organization_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        multi_plot_sizer = wx.BoxSizer(wx.VERTICAL)
         
         play = ImageFiles().play.GetImage()
         self.play_bitmap = wx.BitmapFromImage(play)
@@ -378,7 +376,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.plot_btn = wx.Button(self, label = 'Plot')
         self.save_btn = wx.Button(self, wx.ID_SAVE, label = 'Save')
         self.switch_btn = wx.Button(self, label = 'Switch directory')
-        self.multiple_plot_btn = wx.Button(self, label = 'Add timeline')    
+        self.multiple_plot_btn = wx.Button(self, label = 'Add timeline', size=(100,25))    
         self.axes_label_ok_btn = wx.Button(self, label='OK')
         
         # Player buttons
@@ -475,16 +473,15 @@ class RecordedDataProcessorPanel(wx.Panel):
         heatmap_sizer.AddSpacer(25)
         heatmap_sizer.Add(self.reset_heatmap_boundaries_btn, 0, wx.ALIGN_CENTER|wx.LEFT|wx.TOP|wx.EXPAND, border=10)
         #========================================================================
-        
-        multi_plot_sizer.Add(self.multiple_plot_btn, 0, wx.ALIGN_LEFT|wx.EXPAND)
-        multi_plot_sizer.Add(self.plot_color_ctrl, 0, wx.ALIGN_LEFT|wx.EXPAND)
-        
+                
         # Buttons
         #========================================================================
-        plot_sizer.Add(self.plot_btn, 1)
-        plot_sizer.Add(self.save_btn, 1)
-        btn_sizer.Add(plot_sizer, 1, wx.ALIGN_LEFT|wx.EXPAND)
-        btn_sizer.Add(self.switch_btn, 1, wx.ALIGN_LEFT|wx.EXPAND)
+        plot_sizer.Add(item=self.plot_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
+        plot_sizer.Add(item=self.save_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
+        btn_sizer.Add(item=plot_sizer, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
+        btn_sizer.Add(item=self.multiple_plot_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
+        btn_sizer.Add(item=self.plot_color_ctrl, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
+        btn_sizer.Add(item=self.switch_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         #========================================================================
         
         # Dividing lines
@@ -509,8 +506,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.main_sizer.Add(line_sizer_4, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND)
         self.main_sizer.Add(item=organization_sizer, proportion=0, flag=wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT, border=10)
         self.main_sizer.Add(line_sizer_5, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND)
-        self.main_sizer.Add(btn_sizer, 0, wx.ALIGN_LEFT|wx.LEFT, border=10)
-        self.main_sizer.Add(multi_plot_sizer, 0, wx.ALIGN_LEFT|wx.LEFT|wx.BOTTOM, border=10)
+        self.main_sizer.Add(btn_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.BOTTOM, border=10)
         
         self.SetSizer(self.main_sizer)
         self.main_sizer.Fit(self)
@@ -807,43 +803,25 @@ class RecordedDataProcessorPanel(wx.Panel):
 
     def evt_mode_cbox(self, event):
         
-        self.mode  = self.mode_cbox.GetValue()         
-        empty_list = []        
-        self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
+        self.mode = self.mode_cbox.GetValue()         
+        
+        if self.mode == 'timeline':
+            self.proj_cbox.SetItems(self.proj_choice_timeline)
+        elif self.mode == 'snapshot' or self.mode == 'snapshot sequence':
+            self.proj_cbox.SetItems(self.proj_choice_snapshot)
+        else:
+            self.proj_cbox.SetItems([])
             
-        # snapshot option selected
-        #======================================================================================================================== 
-        if self.mode == 'snapshot':
-            self.proj_cbox.SetItems(self.proj_choice_step)
-            self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
-            
-            if plt.get_fignums():
-                self._update_plot() 
-
-        # snapshot sequence option selected
-        #======================================================================================================================== 
-        elif self.mode == 'snapshot sequence':
-            self.proj_cbox.SetItems(self.proj_choice_step)
-            self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
-                        
-        # timeline option selected
-        #======================================================================================================================== 
-        elif self.mode == 'timeline':                
-            self.proj_cbox.SetItems(self.proj_choice)
-            
-            self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot) 
-            
+        if self.mode != 'snapshot sequence':
             if plt.get_fignums():
                 self._update_plot()  
-        
-        else:
-            self.proj_cbox.SetItems(empty_list) 
-        
+            
+        self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
+        self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
+            
     
     def _update_selection_data(self):
         
-        # clear memory
-        del self.data
         self.slider_max = 0
         self.step = -1
         self.pos_slider.SetValue(self.step)
@@ -856,8 +834,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.increase_single_step_btn.Disable()
         
         # valid checkbox selected
-        self.proj_choice = self.proj_ch[:self.ndim[self.selection]+1]
-        self.proj_choice_step = FieldPlot().build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
+        self.proj_choice_timeline = self.proj_ch[:self.ndim[self.selection]+1]
+        self.proj_choice_snapshot = FieldPlot().build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
         
         self.header = FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
         temp_data = FieldPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
@@ -894,10 +872,8 @@ class RecordedDataProcessorPanel(wx.Panel):
         
         if self.ndim[self.selection] == 0:
             self.multiple_plot_btn.Enable()
-            self.plot_color_ctrl.Enable()
         else:
             self.multiple_plot_btn.Disable()
-            self.plot_color_ctrl.Disable()
         
         return
 
@@ -919,7 +895,8 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                       vmax = self.vmax,
                                                       resolution = self.resolution,
                                                       proj = self.proj,
-                                                      proj_method = self.proj_method)
+                                                      proj_method = self.proj_method,
+                                                      color = self.plot_color)
                     
                 FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 FieldPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
@@ -952,7 +929,8 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                            z_label = self.z_label,
                                                            file_name = self.flist_sorted[self.selection],
                                                            file_directory = self.dir,
-                                                           save_mode = True)
+                                                           save_mode = True,
+                                                           color = self.plot_color)
                                                 
         elif self.mode == 'timeline':
             try:
@@ -1001,7 +979,8 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                       vmax = self.vmax,
                                                       resolution = self.resolution, 
                                                       proj = self.proj,
-                                                      proj_method = self.proj_method)
+                                                      proj_method = self.proj_method,
+                                                      color = self.plot_color)
                         
                 FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 
@@ -1036,7 +1015,8 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                            proj_method = self.proj_method,
                                                            x_label = self.x_label,
                                                            y_label = self.y_label,
-                                                           z_label = self.z_label)
+                                                           z_label = self.z_label,
+                                                           color = self.plot_color)
                                 
         elif self.mode == 'timeline':
             try:
@@ -1397,7 +1377,7 @@ class FieldPlot(object):
             return img_array
         #========================================================================================================================
 
-    def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, mode=' ', proj=' ', proj_method='addition'):        
+    def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, mode=' ', proj=' ', proj_method='addition', color='blue'):        
         ndim = self.get_dimension(header)
         steps = data.shape[0]
         
@@ -1431,7 +1411,7 @@ class FieldPlot(object):
                         fig = plt.figure(1)
                     
                 plot = fig.add_subplot(1,1,1)
-                plot.plot(data[step], '+')
+                plot.plot(data[step], '+', color=color)
             
             elif ndim == 1:
                 if mode == 'snapshot sequence':
@@ -1443,7 +1423,7 @@ class FieldPlot(object):
                         fig = plt.figure(1)
                     
                 plot = fig.add_subplot(1,1,1)
-                plot.plot(data[step])
+                plot.plot(data[step], color=color)
             
             elif ndim != 1:
                 if proj != ' ':
@@ -1466,7 +1446,7 @@ class FieldPlot(object):
                             if style == 'surface':   
                                 plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5)
                             elif style == 'wireframe':
-                                plot.plot_wireframe(X_1,X_2, data, rstride=resolution,cstride=resolution)
+                                plot.plot_wireframe(X_1,X_2, data, rstride=resolution,cstride=resolution, color=color)
                             
                         elif style == 'heatmap':
                             plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode)
@@ -1477,16 +1457,19 @@ class FieldPlot(object):
                             data = self._project(mode=mode, steps=steps, data=data, header=header, proj=proj, proj_method=proj_method)[2]    
                         except UnboundLocalError:
                             raise UnboundLocalError
-                            
-                        if not plt.get_fignums():
+                        
+                        if mode == 'snapshot sequence':
                             fig = plt.figure()
-                        else:    
-                            fig = plt.figure(1)
+                        else:
+                            if not plt.get_fignums():
+                                fig = plt.figure()
+                            else:    
+                                fig = plt.figure(1)
                                             
                         plot = fig.add_subplot(1,1,1)
                         
                         try:
-                            plot.plot(data[step])
+                            plot.plot(data[step], color=color)
                         except IndexError:
                             raise IndexError
                                             
@@ -1506,7 +1489,7 @@ class FieldPlot(object):
                             if style == 'surface': 
                                 plot.plot_surface(X_1,X_2,data,rstride=resolution, cstride=resolution,cmap='coolwarm', alpha=0.5)
                             elif style == 'wireframe':
-                                plot.plot_wireframe(X_1,X_2,data, rstride=resolution,cstride=resolution)
+                                plot.plot_wireframe(X_1,X_2,data, rstride=resolution,cstride=resolution, color=color)
                             
                         elif style == 'heatmap':
                             plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax, mode=mode)
@@ -1514,11 +1497,12 @@ class FieldPlot(object):
             return plot
         
     def plot_snapshot_sequence(self, data, header, vmin, vmax, resolution, start, step_size, steps, proj, proj_method, style, 
-                               x_label=None, y_label=None, z_label=None, file_name=None, file_directory=None, save_mode=False):
+                               x_label=None, y_label=None, z_label=None, file_name=None, file_directory=None, save_mode=False, color='blue'):
         
         plot_mode = 'snapshot sequence'
         
         for i in range(int(steps)):
+            
             plot = self.plot_snapshot(data = data, 
                                       header = header, 
                                       vmin = vmin, 
@@ -1528,9 +1512,10 @@ class FieldPlot(object):
                                       style = style, 
                                       mode = plot_mode, 
                                       proj = proj, 
-                                      proj_method = proj_method)
-            
-            self.label_axis(plot = plot, x_label=x_label, y_label=y_label, z_label=z_label)
+                                      proj_method = proj_method,
+                                      color = color)
+            if i == 0:
+                self.label_axis(plot = plot, x_label=x_label, y_label=y_label, z_label=z_label)
             
             if save_mode == True:
                 self.save_plot(plot=plot, plot_mode=plot_mode, file_name=file_name, file_directory=file_directory, save_mode='sequence', plot_number=i)
@@ -1574,7 +1559,7 @@ class FieldPlot(object):
                 if style == 'surface':   
                     plot.plot_surface(X_1, X_2, data, rstride=resolution, cstride=resolution, cmap='coolwarm', alpha=0.5)
                 elif style == 'wireframe': 
-                    plot.plot_wireframe(X_1, X_2, data, rstride=resolution, cstride=resolution)
+                    plot.plot_wireframe(X_1, X_2, data, rstride=resolution, cstride=resolution, color=color)
             
             elif style == 'heatmap':
                 plot = self.plot_heatmap(X_1=X_1, X_2=X_2, data=data, vmin=vmin, vmax=vmax)
