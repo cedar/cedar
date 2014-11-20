@@ -61,6 +61,44 @@ class cedar::proc::steps::MatrixPadding : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  class PaddingMode
+  {
+  public:
+    //! Type of the enum.
+    typedef cedar::aux::EnumId Id;
+
+    //! Pointer to the enumeration type.
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    //! Constructs the enumeration values.
+    static void construct()
+    {
+      mType.type()->def(cedar::aux::Enum(PadByBorder, "PadByBorder", "pad by border"));
+      mType.type()->def(cedar::aux::Enum(PadToSize, "PadToSize", "pad to size"));
+    }
+
+    //! Returns the enum base class.
+    static const cedar::aux::EnumBase& type()
+    {
+      return *mType.type();
+    }
+
+    //! Returns a pointer to the enum base class.
+    static const cedar::proc::steps::MatrixPadding::PaddingMode::TypePtr& typePtr()
+    {
+      return mType.type();
+    }
+
+    //! The input is padded by the specified amount.
+    static const Id PadByBorder = 0;
+
+    //! The output has the given size. The input is padded to match this size.
+    static const Id PadToSize = 1;
+
+  private:
+    static cedar::aux::EnumType<cedar::proc::steps::MatrixPadding::PaddingMode> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -117,9 +155,13 @@ protected:
   // none yet
 
 private:
-  // How much border is added in each dimension
+  //! How the input is padded.
+  cedar::aux::EnumParameterPtr _mPaddingMode;
+
+  //! How much border is added in each dimension
   cedar::aux::UIntVectorParameterPtr _mPaddedSize;
 
+  //! Type of border handling.
   cedar::aux::EnumParameterPtr _mBorderType;
 
 }; // class cedar::proc::steps::MatrixPadding
