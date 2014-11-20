@@ -105,7 +105,11 @@ void cedar::proc::experiment::gui::StepPropertyParameter::parameterPointerChange
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
   if (parameter && parameter->getStep())
   {
-    this->mpStep->setCurrentIndex(this->mpStep->findText((parameter->getStep()->getName().c_str())));
+    const std::string& step_name = parameter->getStep()->getFullPath();
+    int index = this->mpStep->findText(QString::fromStdString(step_name));
+    // index should not be -1 (which is Qt code for not found); if it is, the widget will not display the step's name
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(index != -1);
+    this->mpStep->setCurrentIndex(index);
   }
   stepChanged();
   updateProperties();
