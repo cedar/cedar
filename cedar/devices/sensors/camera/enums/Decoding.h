@@ -107,16 +107,16 @@ public:
   static const Id NONE = 0;
 
   /// Apply  bayer filter Blue-Green to BGR
-  static const Id FROM_BG = CV_BayerBG2BGR;
+  static const Id FROM_BG = cv::COLOR_BayerBG2BGR;
 
   /// Apply  bayer filter Green-Blue to BGR
-  static const Id FROM_GB = CV_BayerGB2BGR;
+  static const Id FROM_GB = cv::COLOR_BayerGB2BGR;
 
   /// Apply  bayer filter Red-Green to BGR
-  static const Id FROM_RG = CV_BayerRG2BGR;
+  static const Id FROM_RG = cv::COLOR_BayerRG2BGR;
 
   /// Apply  bayer filter Green-Red to BGR
-  static const Id FROM_GR = CV_BayerGR2BGR;
+  static const Id FROM_GR = cv::COLOR_BayerGR2BGR;
 
 protected:
   // none yet
