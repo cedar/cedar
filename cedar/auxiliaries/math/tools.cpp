@@ -392,11 +392,7 @@ void cedar::aux::math::reduceCvMat3D
 
   switch (reductionOperator)
   {
-#if CV_VERSION_MAJOR >= 3
-    case (cv::REDUCE_SUM):
-#else
-    case (CV_REDUCE_SUM):
-#endif
+    case CEDAR_OPENCV_CONSTANT(REDUCE_SUM):
     {
       for (dim_1 = 0; dim_1 < source_size[0]; ++dim_1)
       {
@@ -412,11 +408,7 @@ void cedar::aux::math::reduceCvMat3D
       }
       break;
     }
-#if CV_VERSION_MAJOR >= 3
-    case (cv::REDUCE_AVG):
-#else
-    case (CV_REDUCE_AVG):
-#endif
+    case CEDAR_OPENCV_CONSTANT(REDUCE_AVG):
     {
       for (dim_1 = 0; dim_1 < source_size[0]; ++dim_1)
       {
@@ -432,11 +424,7 @@ void cedar::aux::math::reduceCvMat3D
       }
       break;
     }
-#if CV_VERSION_MAJOR >= 3
-    case (cv::REDUCE_MAX):
-#else
-    case (CV_REDUCE_MAX):
-#endif
+    case CEDAR_OPENCV_CONSTANT(REDUCE_MAX):
     {
       for (dim_1 = 0; dim_1 < source_size[0]; ++dim_1)
       {
@@ -452,11 +440,7 @@ void cedar::aux::math::reduceCvMat3D
       }
       break;
     }
-#if CV_VERSION_MAJOR >= 3
-    case (cv::REDUCE_MIN):
-#else
-    case (CV_REDUCE_MIN):
-#endif
+    case CEDAR_OPENCV_CONSTANT(REDUCE_MIN):
     {
       for (dim_1 = 0; dim_1 < source_size[0]; ++dim_1)
       {

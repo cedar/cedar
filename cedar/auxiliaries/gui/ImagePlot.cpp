@@ -257,7 +257,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
         (
           this->mData->getData(),
           converted,
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
           cv::COLOR_HSV2BGR
 #else
           CV_HSV2BGR
@@ -368,7 +368,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         (
           merged,
           converted,
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
           cv::COLOR_HSV2BGR
 #else
           CV_HSV2BGR

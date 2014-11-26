@@ -45,6 +45,7 @@
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/opencv_helper.h"
 
 // SYSTEM INCLUDES
 
@@ -112,7 +113,7 @@ void cedar::proc::sinks::VideoSink::onStart()
   mVideoWriter.open
                (
                  _mOutputFileName->getValue().absolutePath().toStdString(),
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
                  cv::VideoWriter::fourcc('P','I','M','1')
 #else
                  static_cast<unsigned int>(CV_FOURCC('P','I','M','1'))
