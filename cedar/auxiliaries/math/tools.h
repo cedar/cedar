@@ -368,7 +368,11 @@ namespace cedar
                           const cv::Mat& source,
                           cv::Mat& destination,
                           int dimensionToReduce,
+#if CV_VERSION_MAJOR >= 3
+                          int reductionOperator = cv::REDUCE_SUM,
+#else
                           int reductionOperator = CV_REDUCE_SUM,
+#endif
                           bool swapDimensions = false
                         );
 

@@ -106,16 +106,40 @@ public:
   public:
 
     //! Compression is done by calculating the sum along the compressed direction.
-    static const Id SUM = CV_REDUCE_SUM;
+    static const Id SUM = 
+#if CV_VERSION_MAJOR >= 3
+      cv::REDUCE_SUM
+#else
+      CV_REDUCE_SUM
+#endif
+      ;
 
     //! Compression is done by averaging along the compressed direction.
-    static const Id AVERAGE = CV_REDUCE_AVG;
+    static const Id AVERAGE =
+#if CV_VERSION_MAJOR >= 3
+      cv::REDUCE_AVG
+#else
+      CV_REDUCE_AVG
+#endif
+      ;
 
     //! Compression is done by calculating the maximum along the compressed direction.
-    static const Id MAXIMUM = CV_REDUCE_MAX;
+    static const Id MAXIMUM =
+#if CV_VERSION_MAJOR >= 3
+      cv::REDUCE_MAX
+#else
+      CV_REDUCE_MAX
+#endif
+      ;
 
     //! Compression is done by calculating the minimum along the compressed direction.
-    static const Id MINIMUM = CV_REDUCE_MIN;
+    static const Id MINIMUM =
+#if CV_VERSION_MAJOR >= 3
+      cv::REDUCE_MIN
+#else
+      CV_REDUCE_MIN
+#endif
+      ;
 
   private:
     //!@brief The type object of the enum.

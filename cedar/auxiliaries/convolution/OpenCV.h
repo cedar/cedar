@@ -152,7 +152,11 @@ private:
   (
     cv::Point& anchor,
     const std::vector<int>& anchor_vector,
+#if CV_VERSION_MAJOR >= 3
+    const cv::MatSize& msize
+#else
     const cv::Mat::MSize& msize
+#endif
   ) const;
 
   void translateAnchor

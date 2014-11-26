@@ -253,7 +253,16 @@ bool cedar::aux::gui::ImagePlot::doConversion()
       )
       {
         cv::Mat converted;
-        cv::cvtColor(this->mData->getData(), converted, CV_HSV2BGR);
+        cv::cvtColor
+        (
+          this->mData->getData(),
+          converted,
+#if CV_VERSION_MAJOR >= 3
+          cv::COLOR_HSV2BGR
+#else
+          CV_HSV2BGR
+#endif
+        );
 				read_lock.unlock();
         this->displayMatrix(converted);
       }
@@ -355,7 +364,16 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         merge_vec.push_back(ones);
         cv::Mat merged, converted;
         cv::merge(merge_vec, merged);
-        cv::cvtColor(merged, converted, CV_HSV2BGR);
+        cv::cvtColor
+        (
+          merged,
+          converted,
+#if CV_VERSION_MAJOR >= 3
+          cv::COLOR_HSV2BGR
+#else
+          CV_HSV2BGR
+#endif
+        );
         cv::Mat converted_8uc3;
         converted.convertTo(converted_8uc3, CV_8UC3);
         return converted_8uc3;

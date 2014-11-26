@@ -194,12 +194,24 @@ void cedar::proc::steps::Threshold::compute(const cedar::proc::Arguments&)
 
   if (this->mApplyLowerThreshold->getValue())
   {
-    cv::threshold(input, lower_threshold_image, lower_threshold, max_value, CV_THRESH_BINARY);
+    cv::threshold(input, lower_threshold_image, lower_threshold, max_value,
+#if CV_VERSION_MAJOR >= 3
+     cv::THRESH_BINARY
+#else
+     CV_THRESH_BINARY
+#endif
+     );
   }
 
   if (this->mApplyUpperThreshold->getValue())
   {
-    cv::threshold(input, upper_threshold_image, upper_threshold, max_value, CV_THRESH_BINARY_INV);
+    cv::threshold(input, upper_threshold_image, upper_threshold, max_value,
+#if CV_VERSION_MAJOR >= 3
+     cv::THRESH_BINARY_INV
+#else
+     CV_THRESH_BINARY_INV
+#endif
+     );
   }
 
   if (this->mApplyLowerThreshold->getValue() && this->mApplyUpperThreshold->getValue())
