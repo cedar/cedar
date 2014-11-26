@@ -147,15 +147,7 @@ void cedar::proc::steps::MatrixPadding::compute(const cedar::proc::Arguments&)
       break;
 
     case 3:
-      switch (this->mInput->getCvType())
-      {
-        case CV_32F:
-          this->compute3D<float>();
-          break;
-
-        default:
-          CEDAR_ASSERT(false);
-      }
+      this->compute3D();
       break;
 
     default:
@@ -222,7 +214,6 @@ void cedar::proc::steps::MatrixPadding::compute2D()
   cv::copyMakeBorder(input, this->mPadded->getData(), top, bottom, left, right, border_type, 0.0);
 }
 
-template <typename T>
 void cedar::proc::steps::MatrixPadding::compute3D()
 {
   const cv::Mat& input = this->mInput->getData();

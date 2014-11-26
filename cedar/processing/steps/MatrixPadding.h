@@ -127,7 +127,7 @@ private:
 
   void compute2D();
 
-  template <typename T> void compute3D();
+  void compute3D();
 
   template <typename T> void computeND();
 
