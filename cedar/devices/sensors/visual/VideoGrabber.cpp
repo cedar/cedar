@@ -167,7 +167,14 @@ void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
 {
   if (isCreated())
   {
-    double fps = getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
+    double fps = getVideoChannel(0)->mVideoCapture.get
+    (
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_FPS
+#else
+      CV_CAP_PROP_FPS
+#endif
+    );
     setFramerate(fps * _mSpeedFactor->getValue());
     emit doSpeedFactorChanged();
   }
@@ -234,7 +241,15 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   unsigned int smallest = UINT_MAX;
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    unsigned int len = getVideoChannel(channel)->mVideoCapture.get(CV_CAP_PROP_FRAME_COUNT);
+    unsigned int len = getVideoChannel(channel)->mVideoCapture.get
+    (
+    
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_FRAME_COUNT
+#else
+      CV_CAP_PROP_FRAME_COUNT
+#endif
+    );
     if (len < smallest)
     {
       smallest = len;
@@ -243,7 +258,14 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   mFramesCount = smallest;
 
   // check for equal FPS
-  double fps_ch0 = getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
+  double fps_ch0 = getVideoChannel(0)->mVideoCapture.get
+  (
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_FPS
+#else
+      CV_CAP_PROP_FPS
+#endif
+  );
 
   if (fps_ch0 < 1)
   {
@@ -252,7 +274,14 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 
   if (num_channels > 1)
   {
-    double fps_ch1 = getVideoChannel(1)->mVideoCapture.get(CV_CAP_PROP_FPS);
+    double fps_ch1 = getVideoChannel(1)->mVideoCapture.get
+    (
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_FPS
+#else
+      CV_CAP_PROP_FPS
+#endif
+    );
     if (fps_ch0 != fps_ch1)
     {
       std::string msg =  this->getName() + ": Different framerates of channels 0 and 1";
@@ -290,7 +319,18 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
   if (getImageMat(channel).empty())
   {
     // is it a read error somewhere in the middle of the file?
-    if (getVideoChannel(channel)->mVideoCapture.get(CV_CAP_PROP_POS_FRAMES) < (mFramesCount))
+    if
+    (
+      getVideoChannel(channel)->mVideoCapture.get
+      (
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_POS_FRAMES
+#else
+      CV_CAP_PROP_POS_FRAMES
+#endif
+      )
+       < (mFramesCount)
+    )
     {
       std::string msg = "Could not read from video file on channel " + cedar::aux::toString(channel);
       CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
@@ -302,15 +342,40 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
       // rewind all already grabbed channels and grab first frame
       for (unsigned int i = 0; i <= channel; ++i)
       {
-        getVideoChannel(i)->mVideoCapture.set(CV_CAP_PROP_POS_FRAMES,0);
+        getVideoChannel(i)->mVideoCapture.set
+        (
+#if CV_VERSION_MAJOR >= 3
+          cv::CAP_PROP_POS_FRAMES
+#else
+          CAP_PROP_POS_FRAMES
+#endif
+          ,
+          0
+        );
         getVideoChannel(i)->mVideoCapture >> getImageMat(i);
       }
 
       // set all other channels to their last frame
       for (unsigned int i = channel+1; i < getNumChannels(); ++i)
       {
-        double last_frame = getVideoChannel(i)->mVideoCapture.get(CV_CAP_PROP_FRAME_COUNT)-1;
-        getVideoChannel(i)->mVideoCapture.set(CV_CAP_PROP_POS_FRAMES,last_frame);
+        double last_frame = getVideoChannel(i)->mVideoCapture.get
+        (
+#if CV_VERSION_MAJOR >= 3
+          cv::CAP_PROP_FRAME_COUNT
+#else
+          CV_CAP_PROP_FRAME_COUNT
+#endif
+        )-1;
+        getVideoChannel(i)->mVideoCapture.set
+        (
+#if CV_VERSION_MAJOR >= 3
+          cv::CAP_PROP_POS_FRAMES
+#else
+          CAP_PROP_POS_FRAMES
+#endif
+          ,
+          last_frame
+        );
         getVideoChannel(i)->mVideoCapture >> getImageMat(i);
       }
 
@@ -391,7 +456,16 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
   unsigned int num_channels = getNumChannels();
   for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    getVideoChannel(channel)->mVideoCapture.set(CV_CAP_PROP_POS_FRAMES, new_pos_abs);
+    getVideoChannel(channel)->mVideoCapture.set
+    (
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_POS_FRAMES
+#else
+      CAP_PROP_POS_FRAMES
+#endif
+      ,
+      new_pos_abs
+    );
   }
 }
 
@@ -421,7 +495,16 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
   unsigned int num_channels = getNumChannels();
   for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    (getVideoChannel(channel)->mVideoCapture).set(CV_CAP_PROP_POS_FRAMES, newPositionAbs);
+    (getVideoChannel(channel)->mVideoCapture).set
+    (
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_POS_FRAMES
+#else
+      CAP_PROP_POS_FRAMES
+#endif
+      ,
+      newPositionAbs
+    );
   }
 }
 
@@ -429,7 +512,14 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
 unsigned int cedar::dev::sensors::visual::VideoGrabber::getPositionAbsolute()
 {
   // the position in all avi's should be the same
-  return getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_POS_FRAMES);
+  return getVideoChannel(0)->mVideoCapture.get
+                (
+#if CV_VERSION_MAJOR >= 3
+                  cv::CAP_PROP_POS_FRAMES
+#else
+                  CV_CAP_PROP_POS_FRAMES
+#endif
+                );
 }
 
 
@@ -451,13 +541,29 @@ double cedar::dev::sensors::visual::VideoGrabber::getSourceProperty(unsigned int
 
 double cedar::dev::sensors::visual::VideoGrabber::getSourceFramerate(unsigned int channel)
 {
-  return getSourceProperty(channel, CV_CAP_PROP_FPS);
+  return getSourceProperty
+    (
+      channel,
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_FPS
+#else
+      CV_CAP_PROP_FPS
+#endif
+    );
 }
 
 
 double cedar::dev::sensors::visual::VideoGrabber::getSourceEncoding(unsigned int channel)
 {
-  return getSourceProperty(channel, CV_CAP_PROP_FOURCC);
+  return getSourceProperty
+      (
+        channel,
+#if CV_VERSION_MAJOR >= 3
+      cv::CAP_PROP_FOURCC
+#else
+      CV_CAP_PROP_FOURCC
+#endif
+      );
 }
 
 
