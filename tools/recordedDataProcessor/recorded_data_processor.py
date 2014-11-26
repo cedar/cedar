@@ -53,9 +53,10 @@ import re
 import wx
 import wx.lib.agw.floatspin as FS
 from wx.lib.embeddedimage import PyEmbeddedImage
+from functools import partial
 
-    
-class ImageFiles():
+
+class RDPImageFiles():
     play = PyEmbeddedImage(
         "iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABmJLR0QA/wD/AP+gvaeTAAAA"
         "CXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gsMCgc1zYOOZAAAAYtJREFUSMfVlr9Kw1AU"
@@ -148,7 +149,7 @@ class Progress(wx.ProgressDialog):
 
 class SnapshotSequenceDialog(wx.Dialog):
     def __init__(self, parent, id, title):
-        wx.Dialog.__init__(self, parent, id, title)
+        wx.Dialog.__init__(self, parent=parent, id=id, title=title)
         
         top_sizer = wx.BoxSizer(wx.VERTICAL)        
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -192,9 +193,9 @@ class SnapshotSequenceDialog(wx.Dialog):
 
 #========================================================================================================================
 
-class RecordedDataProcessorApp(wx.App):
+class RDPApp(wx.App):
     def OnInit(self):
-        frame = MainWindow(None, 'Recorded Data Processor')
+        frame = RDPMainWindow(None, 'Recorded Data Processor')
         frame.SetPosition((0, 0))
         frame.Show()
         
@@ -202,58 +203,74 @@ class RecordedDataProcessorApp(wx.App):
         
 #========================================================================================================================
 
-class MainWindow(wx.Frame):
+class RDPMainWindow(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent=None, title=title, style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)
-                        
-        self.dir = None 
-        BrowserPanel(self)
-                        
+        self.rdp_browser = RDPBrowserPanel(self)
+        self.Bind(wx.EVT_CLOSE, self.evt_close)
+        self.dir = None
+        self.SetSizer(self.rdp_browser.main_sizer) 
+        self.Fit()
+        #self.Show()
+                    
         return
+    
+    
+    def evt_close(self, event):
+        self.Destroy()
 
 #========================================================================================================================
 
-class BrowserPanel(wx.Panel):
+class RDPBrowserPanel(wx.Panel):
     def __init__(self, parent):
-        self.panel = wx.Panel.__init__(self, parent)
-                                  
+        wx.Panel.__init__(self, parent)
+        self.frame = parent
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
-        select_directory = wx.StaticText(self, -1, 'Select directory :')
+        self.select_directory = wx.StaticText(self, -1, 'Select directory:')
         
-        self.browser = wx.GenericDirCtrl(self,filter=("*.csv"), style=wx.DIRCTRL_3D_INTERNAL)
+        self.browser = wx.GenericDirCtrl(self,filter=("*.csv"), size=(275, 350), style=wx.DIRCTRL_3D_INTERNAL)
         
         self.sel_btn = wx.Button(self, label = 'Select')
-        self.sel_btn.Bind(wx.EVT_BUTTON, self.evt_sel_button)
+        self.sel_btn.Bind(wx.EVT_BUTTON, self.evt_sel_btn)
         
-        self.main_sizer.Add(item=select_directory, proportion=0, flag=wx.TOP|wx.LEFT|wx.BOTTOM, border=10)
+        self.main_sizer.Add(item=self.select_directory, proportion=0, flag=wx.TOP|wx.LEFT|wx.BOTTOM, border=10)
         self.main_sizer.Add(item=self.browser, proportion=2, flag=wx.LEFT|wx.BOTTOM|wx.RIGHT|wx.EXPAND, border=10)
         self.main_sizer.Add(item=self.sel_btn, proportion=0, flag=wx.LEFT|wx.BOTTOM, border=10)
         
-        self.SetSizerAndFit(self.main_sizer)
-        self.Show()
+        self.SetSizer(self.main_sizer)
+        self.Fit()
+        self.Layout()
+                        
+        return
     
-    
-    def evt_sel_button(self, event):
+        
+    def evt_sel_btn(self, event):        
         frame = self.GetParent()
         frame.SetPosition((0, 0))
         frame.dir = self.browser.GetPath()
-        RecordedDataProcessorPanel(frame)
+        rdp_gui = RDPGUI(frame)
+        frame.Hide()
+        self.main_sizer.DeleteWindows()
+        frame.SetSizer(rdp_gui.main_sizer)
+        wx.Yield()
+        frame.Layout()
+        wx.Yield()
         frame.Fit()
-        self.Destroy()
+        frame.Show()
         
 #========================================================================================================================
 
-class RecordedDataProcessorPanel(wx.Panel):
+class RDPGUI(wx.Panel):
     
     def __init__(self, parent):
-        self.panel = wx.Panel.__init__(self, parent)
+        wx.Panel.__init__(self, parent)
         wx.ToolTip.SetDelay(10)
         self.frame = parent
-        self.frame.SetPosition((0, 0))
+        self.control_plot_frame = None
         self.frame_size = self.frame.GetSize()
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.dir = self.GetParent().dir
-        
+        self.figure_size = None
         self.x_label = ' '
         self.y_label = ' '
         self.z_label = ' '
@@ -271,7 +288,7 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.mode = ' '
         self.ext = '.csv'
         self.flist = [file for file in os.listdir(self.dir) if file.lower().endswith(self.ext)]
-        self.flist_sorted = FieldPlot()._sort_alphnum(self.flist)
+        self.flist_sorted = RDPPlot()._sort_alphnum(self.flist)
         self.data = None
         self.header = None
         self.header_list = []
@@ -290,38 +307,20 @@ class RecordedDataProcessorPanel(wx.Panel):
                              'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
         self.style_ch = [' ', 'heatmap', 'image', 'surface', 'wireframe']
         self.proj_methods = [' ', 'addition', 'maximum']
-        
-        self.vmin_spn = FS.FloatSpin(self, digits=4)
-        self.vmax_spn = FS.FloatSpin(self, digits=4)
-        self.reset_heatmap_boundaries_btn = wx.Button(self, label = 'Reset')
-        self.vmin_spn.Disable()
-        self.vmax_spn.Disable()
-        self.reset_heatmap_boundaries_btn.Disable()
-        
+                
         self.sel_label = wx.StaticText(self, -1, 'Recording')
         self.mode_label = wx.StaticText(self, -1, 'Plot mode')
         self.proj_label = wx.StaticText(self, -1, 'Projection')
-        self.proj_method_label = wx.StaticText(self, -1, 'Projection method')
+        self.proj_method_label = wx.StaticText(self, -1, 'Projection method \t')
         self.style_label = wx.StaticText(self, -1, 'Plot style')
         self.time_code_display = wx.StaticText(self, -1, '-')
         self.time_code_label = wx.StaticText(self, -1, 'Time code t \t')
-        self.vmin_label = wx.StaticText(self, -1, 'Minimum')
-        self.vmax_label = wx.StaticText(self, -1, 'Maximum')
-        
-        self.x_axis_label = wx.StaticText(self, -1, 'X axis')
-        self.y_axis_label = wx.StaticText(self, -1, 'Y axis')
-        self.z_axis_label = wx.StaticText(self, -1, 'Z axis')
-        
-        self.heatmap_boundaries_txt = wx.StaticText(self, -1, 'Heatmap boundaries')
-        self.label_axes_txt = wx.StaticText(self, -1, 'Label plot axes')
         self.resolution_label = wx.StaticText(self, -1, 'Plot resolution')
         self.line_color_label = wx.StaticText(self, -1, 'Line color')
         
-        self.line_1 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
-        self.line_2 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
-        self.line_3 = wx.StaticLine(self, -1, style=wx.LI_VERTICAL)
-        self.line_4 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
-        self.line_5 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(400,10))
+        self.line_1 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
+        self.line_2 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
+        self.line_4 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
         
         self.sel_cbox = wx.ComboBox(self, choices = self.flist_sorted, value = ' ', style = wx.CB_READONLY)
         self.mode_cbox = wx.ComboBox(self, choices = self.mode_ch, style = wx.CB_READONLY)
@@ -331,16 +330,12 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.pos_slider = wx.Slider(self, value=-1, minValue = -1, maxValue = 0, style = wx.SL_LABELS|wx.SL_AUTOTICKS)
         self.pos_slider.Disable()
         self.resolution_spn = wx.SpinCtrl(self, min=1, max=100)
-        self.x_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        self.y_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        self.z_axis_text = wx.TextCtrl(self, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        self.line_color_ctrl = wx.ColourPickerCtrl(self, -1, col='#FF9600')
+        self.line_color_ctrl = wx.ColourPickerCtrl(self, -1, col=self.line_color)
 
-        
         for i in range(len(self.flist_sorted)): 
-            self.header_list.append(FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
-            self.ndim.append(FieldPlot().get_dimension(self.header_list[i]))
-            
+            self.header_list.append(RDPPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
+            self.ndim.append(RDPPlot().get_dimension(self.header_list[i]))
+        
         # Sizers
         #========================================================================================================================
         pos_slider_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -348,30 +343,27 @@ class RecordedDataProcessorPanel(wx.Panel):
         plot_sizer = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-        line_sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         line_sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
-        line_sizer_5 = wx.BoxSizer(wx.HORIZONTAL)
         player_sizer = wx.BoxSizer(wx.HORIZONTAL)
         player_time_code_sizer = wx.BoxSizer(wx.VERTICAL)
-        heatmap_sizer = wx.BoxSizer(wx.VERTICAL)
-        axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
         btn_sizer = wx.BoxSizer(wx.VERTICAL)
-        v_grid_sizer = wx.GridSizer(rows=2, cols=2) 
-        axes_grid_sizer = wx.GridSizer(rows=3, cols=2)
-        cbox_grid_sizer = wx.GridSizer(rows = 7, cols = 2)
-        organization_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+        axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
+        cbox_grid_sizer = wx.FlexGridSizer(rows=7, cols=2)
+        cbox_grid_sizer.SetFlexibleDirection(wx.BOTH)
+        selection_sizer = wx.BoxSizer(wx.VERTICAL)
         
-        play = ImageFiles().play.GetImage()
+        play = RDPImageFiles().play.GetImage()
         self.play_bitmap = wx.BitmapFromImage(play)
-        reverse_play = ImageFiles().reverse_play.GetImage()
+        reverse_play = RDPImageFiles().reverse_play.GetImage()
         self.reverse_play_bitmap = wx.BitmapFromImage(reverse_play)
-        pause = ImageFiles().pause.GetImage()
+        pause = RDPImageFiles().pause.GetImage()
         self.pause_bitmap = wx.BitmapFromImage(pause)
-        reset = ImageFiles().reset.GetImage()
+        reset = RDPImageFiles().reset.GetImage()
         self.reset_bitmap = wx.BitmapFromImage(reset)
-        decrease_single_step = ImageFiles().decrease_single_step.GetImage()
+        decrease_single_step = RDPImageFiles().decrease_single_step.GetImage()
         self.decrease_single_step_bitmap = wx.BitmapFromImage(decrease_single_step)
-        increase_single_step = ImageFiles().increase_single_step.GetImage()
+        increase_single_step = RDPImageFiles().increase_single_step.GetImage()
         self.increase_single_step_bitmap = wx.BitmapFromImage(increase_single_step)
         
         # Buttons
@@ -379,8 +371,6 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.plot_btn = wx.Button(self, label = 'Plot')
         self.save_btn = wx.Button(self, wx.ID_SAVE, label = 'Save')
         self.switch_btn = wx.Button(self, label = 'Switch directory')
-        self.multiple_plot_btn = wx.Button(self, label = 'Add timeline', size=(100,25))    
-        self.axes_label_ok_btn = wx.Button(self, label='OK')
         
         # Player buttons
         self.play_pause_btn = wx.BitmapButton(self, -1, bitmap=self.play_bitmap)
@@ -394,15 +384,10 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.reset_btn.Disable()
         self.decrease_single_step_btn.Disable()
         self.increase_single_step_btn.Disable()
-        self.multiple_plot_btn.Disable()
-        
         
         # Controls
         #========================================================================================================================
-
         self.resolution_spn.SetToolTipString('Determines the resolution of the plot. Lower values lead to finer resolutions.')
-        self.vmin_spn.SetToolTipString('Caps the colormap of heatmaps at the given minimum and maximum.')
-        self.vmax_spn.SetToolTipString('Caps the colormap of heatmaps at the given minimum and maximum.')
         self.play_pause_btn.SetToolTipString('Starts and pauses the Plot animation.')
         self.reverse_play_pause_btn.SetToolTipString('Starts and pauses the reverse Plot animation.')
         self.reset_btn.SetToolTipString('Resets the plot to default start parameters.')
@@ -432,34 +417,24 @@ class RecordedDataProcessorPanel(wx.Panel):
         player_time_code_sizer.Add(player_sizer, 2, wx.ALIGN_CENTER)
         player_time_code_sizer.AddSpacer(10)
         player_time_code_sizer.Add(time_code_sizer, 1, wx.ALIGN_LEFT)
+        
         #========================================================================
         
-        # Axes label functionalities
-        #========================================================================
-        axes_grid_sizer.Add(self.x_axis_label, 2, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-        axes_grid_sizer.Add(self.x_axis_text, 3, wx.ALIGN_CENTER)
-        axes_grid_sizer.Add(self.y_axis_label, 2, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-        axes_grid_sizer.Add(self.y_axis_text, 3, wx.ALIGN_CENTER)
-        axes_grid_sizer.Add(self.z_axis_label, 2, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-        axes_grid_sizer.Add(self.z_axis_text, 3, wx.ALIGN_CENTER)
-        
-        axes_label_sizer.Add(item=self.label_axes_txt, proportion=1, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
-        axes_label_sizer.Add(axes_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT, border=10)
-        axes_label_sizer.Add(self.axes_label_ok_btn,proportion=0, flag=wx.ALIGN_CENTER|wx.RIGHT|wx.TOP|wx.EXPAND, border=10)
-        #========================================================================
+        selection_sizer.Add(self.sel_cbox, 0)
+        selection_sizer.Add(self.switch_btn, 0, wx.EXPAND)
         
         # Selection ComboBoxes
         #========================================================================
         cbox_grid_sizer.Add(self.sel_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        cbox_grid_sizer.Add(self.sel_cbox, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+        cbox_grid_sizer.Add(selection_sizer, 1, wx.ALIGN_RIGHT)
         cbox_grid_sizer.Add(self.mode_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        cbox_grid_sizer.Add(self.mode_cbox, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+        cbox_grid_sizer.Add(self.mode_cbox, 1, wx.ALIGN_RIGHT)
         cbox_grid_sizer.Add(self.proj_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        cbox_grid_sizer.Add(self.proj_cbox, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+        cbox_grid_sizer.Add(self.proj_cbox, 1, wx.ALIGN_RIGHT)
         cbox_grid_sizer.Add(self.proj_method_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        cbox_grid_sizer.Add(self.proj_method_cbox, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+        cbox_grid_sizer.Add(self.proj_method_cbox, 1, wx.ALIGN_RIGHT)
         cbox_grid_sizer.Add(self.style_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        cbox_grid_sizer.Add(self.style_cbox, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+        cbox_grid_sizer.Add(self.style_cbox, 2, wx.ALIGN_RIGHT)
         cbox_grid_sizer.Add(item=self.line_color_label, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
         cbox_grid_sizer.Add(item=self.line_color_ctrl, proportion=1, flag=wx.ALIGN_RIGHT|wx.EXPAND)
         cbox_grid_sizer.Add(self.resolution_label, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
@@ -467,60 +442,33 @@ class RecordedDataProcessorPanel(wx.Panel):
 
         #========================================================================
         
-        # Heatmap functionalities
-        #========================================================================
-        v_grid_sizer.Add(self.vmin_label, 1, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-        v_grid_sizer.Add(self.vmin_spn, 1, wx.ALIGN_CENTER)
-        v_grid_sizer.Add(self.vmax_label, 1, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-        v_grid_sizer.Add(self.vmax_spn, 1, wx.ALIGN_CENTER)
-        
-        heatmap_sizer.Add(self.heatmap_boundaries_txt, 1, flag=wx.ALIGN_LEFT|wx.BOTTOM|wx.LEFT, border=10)
-        heatmap_sizer.Add(v_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT, border=10)
-        heatmap_sizer.AddSpacer(25)
-        heatmap_sizer.Add(self.reset_heatmap_boundaries_btn, 0, wx.ALIGN_CENTER|wx.LEFT|wx.TOP|wx.EXPAND, border=10)
-        #========================================================================
-                
         # Buttons
         #========================================================================
         plot_sizer.Add(item=self.plot_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         plot_sizer.Add(item=self.save_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         btn_sizer.Add(item=plot_sizer, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
-        btn_sizer.Add(item=self.multiple_plot_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
-        btn_sizer.Add(item=self.switch_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         #========================================================================
         
         # Dividing lines
         #========================================================================
         line_sizer_1.Add(item=self.line_1, proportion=1, flag=wx.LEFT|wx.RIGHT, border=10)
         line_sizer_2.Add(item=self.line_2, proportion=1, flag=wx.LEFT|wx.RIGHT, border=10)
-        line_sizer_3.Add(item=self.line_3, proportion=1, flag=wx.EXPAND)
         line_sizer_4.Add(item=self.line_4, proportion=1, flag=wx.LEFT|wx.RIGHT, border=10)
-        line_sizer_5.Add(item=self.line_5, proportion=1, flag=wx.LEFT|wx.RIGHT, border=10)
         #========================================================================
-        
-        # 
-        organization_sizer.Add(item=axes_label_sizer)
-        organization_sizer.Add(item=line_sizer_3, flag=wx.EXPAND)
-        organization_sizer.Add(item=heatmap_sizer)
-        
+                
         # Build main sizer
         #========================================================================================================================
-        self.main_sizer.Add(line_sizer_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND)
+        self.main_sizer.Add(line_sizer_1, 0, wx.ALIGN_CENTER_HORIZONTAL)
         self.main_sizer.Add(item=cbox_grid_sizer, proportion=0, flag=wx.EXPAND|wx.ALIGN_CENTER|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
-        self.main_sizer.Add(line_sizer_2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND)
-        self.main_sizer.Add(item=player_time_code_sizer, proportion=0, flag=wx.EXPAND|wx.ALIGN_CENTER|wx.LEFT|wx.RIGHT, border=10)
-        self.main_sizer.Add(line_sizer_4, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND)
-        self.main_sizer.Add(item=organization_sizer, proportion=0, flag=wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT, border=10)
-        self.main_sizer.Add(line_sizer_5, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND)
-        self.main_sizer.Add(btn_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.BOTTOM, border=10)
-        
-        self.SetSizerAndFit(self.main_sizer)
+        self.main_sizer.Add(line_sizer_2, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        self.main_sizer.Add(item=player_time_code_sizer, proportion=0, flag=wx.ALIGN_CENTER|wx.LEFT|wx.RIGHT|wx.EXPAND, border=10)
+        self.main_sizer.Add(line_sizer_4, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        self.main_sizer.Add(btn_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.BOTTOM|wx.TOP, border=10)
                 
         # Event handling
         #========================================================================================================================
         self.sel_cbox.Bind(wx.EVT_COMBOBOX, self.evt_sel_cbox)
         self.mode_cbox.Bind(wx.EVT_COMBOBOX, self.evt_mode_cbox)
-        self.reset_heatmap_boundaries_btn.Bind(wx.EVT_BUTTON, self.evt_reset_heatmap_boundaries_btn)
         self.proj_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_cbox)
         self.proj_method_cbox.Bind(wx.EVT_COMBOBOX, self.evt_proj_method_cbox)
         self.style_cbox.Bind(wx.EVT_COMBOBOX, self.evt_style_cbox)
@@ -530,21 +478,140 @@ class RecordedDataProcessorPanel(wx.Panel):
         self.increase_single_step_btn.Bind(wx.EVT_BUTTON, self.evt_increase_single_step_btn)
         self.decrease_single_step_btn.Bind(wx.EVT_BUTTON, self.evt_decrease_single_step_btn)
         self.reset_btn.Bind(wx.EVT_BUTTON, self.evt_reset_btn)
-        self.switch_btn.Bind(wx.EVT_BUTTON, self.evt_switch_button)
-        self.vmin_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmin_spn)
-        self.vmax_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmax_spn)
+        self.switch_btn.Bind(wx.EVT_BUTTON, self.evt_switch_btn)
         self.resolution_spn.Bind(wx.EVT_SPINCTRL, self.evt_resolution_spn)
-        self.multiple_plot_btn.Bind(wx.EVT_BUTTON, self.evt_add_timeline)
-        self.x_axis_text.Bind(wx.EVT_TEXT_ENTER, self.evt_axis_label)
-        self.y_axis_text.Bind(wx.EVT_TEXT_ENTER, self.evt_axis_label)
-        self.z_axis_text.Bind(wx.EVT_TEXT_ENTER, self.evt_axis_label)
-        self.axes_label_ok_btn.Bind(wx.EVT_BUTTON, self.evt_axis_label)
         self.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_plot_color_ctrl)
         #========================================================================================================================
                 
-        self.Show()
+        self.SetSizer(self.main_sizer)
+        self.Layout()
+        self.Fit()
         
-                    
+        self.size = self.GetSize()
+  
+ 
+        return
+    
+        
+    def evt_close_plot_control_frame(self, event):
+        self.control_plot_frame.Hide()
+        
+        
+    def create_plot_control_frame(self, parent):
+        
+        if self.control_plot_frame is None:
+            self.control_plot_frame = wx.Frame(parent=parent, id=-1, title='Plot controls', style=wx.MINIMIZE_BOX|wx.CAPTION|wx.CLOSE_BOX)
+            
+            if self.figure_size is None: 
+                if plt.get_fignums():
+                    manager = plt.get_current_fig_manager()
+                    self.figure_size = manager.window.GetSize()
+         
+            self.control_plot_frame.SetPosition((self.size[0]+self.figure_size[0]+12, 0))
+            self.control_plot_frame.Bind(wx.EVT_CLOSE, self.evt_close_plot_control_frame)
+        
+        heatmap_boundary = wx.Panel(parent=self.control_plot_frame, id=-1)
+        top_sizer = wx.BoxSizer(wx.VERTICAL)
+        axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+        axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
+        axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
+        min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
+        min_max_sizer.SetFlexibleDirection(wx.BOTH)
+        
+        label_axes_txt = wx.StaticText(heatmap_boundary, -1, 'Label plot axes')
+        x_axis_txt = wx.StaticText(heatmap_boundary, -1, 'X axis \t')
+        y_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Y axis \t')
+        
+        if self.style != 'heatmap':
+            z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Z axis \t')
+        else:
+            z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Legend \t')
+            
+        x_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        y_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        z_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+        
+        x_axis_label.SetValue(self.x_label)
+        y_axis_label.SetValue(self.y_label)
+        z_axis_label.SetValue(self.z_label)
+        
+        axes_label_ok_btn = wx.Button(heatmap_boundary, label='OK')
+        
+        x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+        y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+        z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+        axes_label_ok_btn.Bind(wx.EVT_BUTTON, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+        
+        axes_grid_sizer.Add(x_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
+        axes_grid_sizer.Add(x_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
+        axes_grid_sizer.Add(y_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
+        axes_grid_sizer.Add(y_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
+        axes_grid_sizer.Add(z_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
+        axes_grid_sizer.Add(z_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
+        
+        axes_label_sizer.Add(item=label_axes_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
+        axes_label_sizer.Add(axes_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
+        axes_label_sizer.Add(axes_label_ok_btn,proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
+        top_sizer.Add(item=axes_label_sizer, proportion=0, flag=wx.EXPAND|wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT, border=10)
+
+        
+        if self.style == 'heatmap':
+            line1 = wx.StaticLine(heatmap_boundary, -1, style=wx.LI_HORIZONTAL)
+            top_sizer.Add(line1, 0, wx.ALIGN_CENTER|wx.EXPAND|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
+            heatmap_boundaries_txt = wx.StaticText(heatmap_boundary, -1, 'Heatmap boundaries')
+            vmin_label = wx.StaticText(heatmap_boundary, -1, 'Minimum \t')
+            vmax_label = wx.StaticText(heatmap_boundary, -1, 'Maximum \t')
+            vmin_spn = FS.FloatSpin(heatmap_boundary, digits=4)
+            vmax_spn = FS.FloatSpin(heatmap_boundary, digits=4)
+            
+            if self.vmin is not None:
+                vmin_spn.SetValue(self.vmin)
+            else:
+                vmin_spn.SetValue(0.0000)
+                
+            if self.vmax is not None:
+                vmax_spn.SetValue(self.vmax)
+            else:
+                vmax_spn.SetValue(0.0000)
+            
+            reset_heatmap_boundaries_btn = wx.Button(heatmap_boundary, label = 'Reset')
+            reset_heatmap_boundaries_btn.Bind(wx.EVT_BUTTON, self.evt_reset_heatmap_boundaries_btn)
+        
+            min_max_sizer.Add(vmin_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
+            min_max_sizer.Add(vmin_spn, 2, wx.ALIGN_RIGHT|wx.EXPAND|wx.RIGHT, border=10)
+            min_max_sizer.Add(vmax_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.LEFT, border=10)
+            min_max_sizer.Add(vmax_spn, 2, wx.ALIGN_RIGHT|wx.EXPAND|wx.RIGHT, border=10)
+            
+            top_sizer.Add(heatmap_boundaries_txt, 0, flag=wx.ALIGN_LEFT|wx.BOTTOM|wx.LEFT, border=10)
+            top_sizer.Add(min_max_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
+            top_sizer.Add(reset_heatmap_boundaries_btn, 0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
+            
+            vmin_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmin_spn)
+            vmax_spn.Bind(FS.EVT_FLOATSPIN, self.evt_vmax_spn)    
+            
+        if self.ndim[self.selection] == 0 and self.mode == 'timeline':
+            line2 = wx.StaticLine(heatmap_boundary, -1, style=wx.LI_HORIZONTAL)
+            top_sizer.Add(line2, 0, wx.ALIGN_CENTER|wx.EXPAND|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
+            multi_plot_btn = wx.Button(heatmap_boundary, label = 'Add timeline', size=(100,25))
+            multi_plot_btn.Bind(wx.EVT_BUTTON, self.evt_add_timeline)
+            line_color_label = wx.StaticText(heatmap_boundary, -1, label='Line color \t')
+            line_color_ctrl = wx.ColourPickerCtrl(heatmap_boundary, -1)
+            line_color_ctrl.SetColour(self.line_color_ctrl.GetColour())
+            line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_plot_color_ctrl)
+            
+            line_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            line_sizer.Add(line_color_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+            line_sizer.Add(line_color_ctrl, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+            
+            top_sizer.Add(line_sizer, 0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, border=10)
+            top_sizer.Add(multi_plot_btn, 0, flag=wx.ALIGN_LEFT|wx.ALL|wx.EXPAND, border=10)
+            
+                
+        self.control_plot_frame.SetSizerAndFit(top_sizer)
+        heatmap_boundary.SetSizerAndFit(top_sizer)
+        self.control_plot_frame.Fit()
+        
+        
     def evt_play_pause_btn(self, event):
         
         if self.play_pause_btn.GetBitmapLabel() == self.play_bitmap:
@@ -651,10 +718,10 @@ class RecordedDataProcessorPanel(wx.Panel):
         self._update_plot()
         
         
-    def evt_axis_label(self, event):
-        self.x_label = self.x_axis_text.GetValue()
-        self.y_label = self.y_axis_text.GetValue()
-        self.z_label = self.z_axis_text.GetValue()
+    def evt_axis_label(self, event, x_axis_label, y_axis_label, z_axis_label):
+        self.x_label = x_axis_label.GetValue()
+        self.y_label = y_axis_label.GetValue()
+        self.z_label = z_axis_label.GetValue()
         
         if plt.get_fignums():
             self._update_plot()
@@ -697,15 +764,20 @@ class RecordedDataProcessorPanel(wx.Panel):
                         
         if plt.get_fignums():
             self._update_plot()
+            
+        wx.Yield()
 
     
     def _update_plot(self):
         plt.clf()
         self._plot()
-        
-        
+        self.create_plot_control_frame(parent=self)
+        self.control_plot_frame.Show()
+
+                
     def _add_timeline(self):
         self._plot()
+        wx.Yield()
     
     
     def evt_proj_method_cbox(self, event):
@@ -714,79 +786,68 @@ class RecordedDataProcessorPanel(wx.Panel):
         
         if plt.get_fignums() and self.proj_method != '':
             self._update_plot()
+        
+        wx.Yield()
 
     
     def evt_style_cbox(self, event):
-        widget     = event.GetEventObject()
+        widget = event.GetEventObject()
         self.style = widget.GetValue()
         
         self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
         
-        if self.style == 'image':
-            self.mode = 'snapshot'
-            self.reset_heatmap_boundaries_btn.Disable()
-            self.mode_cbox.Disable()
-            self.x_axis_text.Disable()
-            self.axes_label_ok_btn.Disable()
-            self.y_axis_text.Disable()
-            self.z_axis_text.Disable()
-            self.proj_cbox.Disable()
-            self.proj_method_cbox.Disable()
-            
-        else:
-            self.reset_heatmap_boundaries_btn.Enable()
+        if self.style != 'image':
             self.mode_cbox.Enable()
-            self.x_axis_text.Enable()
-            self.axes_label_ok_btn.Enable()
-            self.y_axis_text.Enable()
-            self.z_axis_text.Enable()
             self.proj_cbox.Enable()
             self.proj_method_cbox.Enable()
         
-        if self.style == 'heatmap':
-            self.z_axis_label.SetLabel('Legend')
-            self.resolution_spn.Disable()
-            self.vmin_spn.Enable()
-            self.vmax_spn.Enable()
-            self.reset_heatmap_boundaries_btn.Enable()
+            if self.style != 'heatmap':
+                self.resolution_spn.Enable()                                
+            else:
+                self.resolution_spn.Disable()
+
         else:
-            self.z_axis_label.SetLabel('Z axis')
-            self.resolution_spn.Enable()
-            self.vmin_spn.Disable()
-            self.vmax_spn.Disable()
-            self.reset_heatmap_boundaries_btn.Disable()
-                    
+            self.mode = 'snapshot'
+            self.mode_cbox.Disable()
+            self.proj_cbox.Disable()
+            self.proj_method_cbox.Disable()
+
         if plt.get_fignums():
             try:
                 self._update_plot()
             except TypeError:
                 raise TypeError
+        
+        wx.Yield()
 
     
     def evt_reset_heatmap_boundaries_btn(self, event):
-        self.vmin_spn.SetValue(0.0)
-        self.vmax_spn.SetValue(0.0)
         self.vmin = self.vmax = None
         
         if plt.get_fignums():
             self._update_plot()
+            
+        wx.Yield()
 
     
-    def evt_switch_button(self, event):
-        
+    def evt_switch_btn(self, event):        
         if plt.get_fignums():
             plt.close()
         
-        frame = MainWindow(None, 'Recorded Data Processor')
+        frame = self.GetParent()
         frame.SetPosition((0, 0))
-        app.SetTopWindow(frame)
-        frame.Show()
-        self.frame.Destroy()
-        self.Destroy()
-    
-    
+        browser_panel = RDPBrowserPanel(frame)
+        
+        self.main_sizer.DeleteWindows()
+        frame.SetSizer(browser_panel.main_sizer)
+        wx.Yield()
+        frame.Layout()
+        wx.Yield()
+        frame.Fit()
+        
+        
     def evt_slider(self, event):
-        widget    = event.GetEventObject()
+        widget = event.GetEventObject()
         self.step = widget.GetValue()
             
         if self.step == -1:
@@ -798,7 +859,9 @@ class RecordedDataProcessorPanel(wx.Panel):
             
         if plt.get_fignums():
             self._update_plot()
-    
+            
+        wx.Yield()
+            
 
     def evt_mode_cbox(self, event):
         
@@ -817,6 +880,8 @@ class RecordedDataProcessorPanel(wx.Panel):
             
         self.plot_btn.Bind(wx.EVT_BUTTON, self.evt_plot)
         self.save_btn.Bind(wx.EVT_BUTTON, self.evt_save_plot)
+        
+        
             
     
     def _update_selection_data(self):
@@ -834,10 +899,10 @@ class RecordedDataProcessorPanel(wx.Panel):
         
         # valid checkbox selected
         self.proj_choice_timeline = self.proj_ch[:self.ndim[self.selection]+1]
-        self.proj_choice_snapshot = FieldPlot().build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
+        self.proj_choice_snapshot = RDPPlot().build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
         
-        self.header = FieldPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
-        temp_data = FieldPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
+        self.header = RDPPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
+        temp_data = RDPPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
         
         self.pos_slider.Enable()
         self.play_pause_btn.Enable()
@@ -855,6 +920,7 @@ class RecordedDataProcessorPanel(wx.Panel):
     def evt_plot_color_ctrl(self, event):
         widget = event.GetEventObject()
         aux_plot_color = widget.GetColour()
+        self.line_color_ctrl.SetColour(aux_plot_color)
         
         # Color conversion
         red = aux_plot_color.Red()/255.
@@ -862,17 +928,12 @@ class RecordedDataProcessorPanel(wx.Panel):
         blue = aux_plot_color.Blue()/255.
         
         self.line_color = [red, green, blue]
-
+    
                             
     def evt_sel_cbox(self, event):
         
         self.selection = self.sel_cbox.GetSelection()
         self._update_selection_data()
-        
-        if self.ndim[self.selection] == 0:
-            self.multiple_plot_btn.Enable()
-        else:
-            self.multiple_plot_btn.Disable()
         
                 
     def evt_save_plot(self, event):
@@ -884,7 +945,7 @@ class RecordedDataProcessorPanel(wx.Panel):
                 step = self.step
             
             try:
-                self.plot = FieldPlot().plot_snapshot(step = step, 
+                self.plot = RDPPlot().plot_snapshot(step = step, 
                                                       style = self.style, 
                                                       data = self.data, 
                                                       header = self.header, 
@@ -895,8 +956,8 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                       proj_method = self.proj_method,
                                                       color = self.line_color)
                     
-                FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-                FieldPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
+                RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
+                RDPPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
             except IndexError:
                 dlg = wx.MessageDialog(parent  = None, 
                 message = 'The specified timeslice does not seem to exist.', 
@@ -910,7 +971,7 @@ class RecordedDataProcessorPanel(wx.Panel):
             dlg.ShowModal()
             dlg.Destroy()
             
-            self.plot = FieldPlot().plot_snapshot_sequence(start = self.step, 
+            self.plot = RDPPlot().plot_snapshot_sequence(start = self.step, 
                                                            step_size = self.step_size, 
                                                            steps = self.nstep, 
                                                            style = self.style, 
@@ -931,7 +992,7 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                 
         elif self.mode == 'timeline':
             try:
-                self.plot = FieldPlot().plot_timeline(data = self.data, 
+                self.plot = RDPPlot().plot_timeline(data = self.data, 
                                                       header = self.header,
                                                       vmin = self.vmin,
                                                       vmax = self.vmax,
@@ -944,8 +1005,8 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                       marker = self.marked, 
                                                       style = self.style)
             
-                FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-                FieldPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
+                RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
+                RDPPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
                 
             except UnboundLocalError:
                 dlg = wx.MessageDialog(parent  = None, 
@@ -965,7 +1026,7 @@ class RecordedDataProcessorPanel(wx.Panel):
                 step = self.step
             
             try:
-                self.plot = FieldPlot().plot_snapshot(step = step, 
+                self.plot = RDPPlot().plot_snapshot(step = step, 
                                                       style = self.style, 
                                                       data = self.data, 
                                                       header = self.header, 
@@ -975,13 +1036,11 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                       proj = self.proj,
                                                       proj_method = self.proj_method,
                                                       color = self.line_color)
-                        
-                FieldPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
+                
+                RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 
                 manager = plt.get_current_fig_manager()
-                
-                manager.window.SetPosition((self.frame_size[0]+38,0))
-                manager.window.SetSize((self.GetSize()[1]*1.25, self.GetSize()[1]))
+                manager.window.SetPosition((self.size[0]+6,0))
                                             
                 plt.draw()
                 
@@ -998,7 +1057,7 @@ class RecordedDataProcessorPanel(wx.Panel):
             dlg.ShowModal()
             dlg.Destroy()
             
-            self.plot = FieldPlot().plot_snapshot_sequence(start = self.step, 
+            self.plot = RDPPlot().plot_snapshot_sequence(start = self.step, 
                                                            step_size = self.step_size, 
                                                            steps = self.nstep, 
                                                            style = self.style, 
@@ -1016,7 +1075,7 @@ class RecordedDataProcessorPanel(wx.Panel):
                                 
         elif self.mode == 'timeline':
             try:
-                self.plot = FieldPlot().plot_timeline(data = self.data, 
+                self.plot = RDPPlot().plot_timeline(data = self.data, 
                                                       header = self.header, 
                                                       vmin = self.vmin,
                                                       vmax = self.vmax,
@@ -1029,15 +1088,14 @@ class RecordedDataProcessorPanel(wx.Panel):
                                                       marker = self.marked, 
                                                       style = self.style)
                 
-                FieldPlot().label_axis(plot=self.plot, 
+                RDPPlot().label_axis(plot=self.plot, 
                                        x_label=self.x_label, 
                                        y_label=self.y_label, 
                                        z_label=self.z_label)
             
                 manager = plt.get_current_fig_manager()
                 
-                manager.window.SetPosition((self.frame_size[0]+38,0))
-                manager.window.SetSize((self.GetSize()[1]*1.25, self.GetSize()[1]))
+                manager.window.SetPosition((self.size[0]+6,0))
                         
                 plt.draw()
                 
@@ -1055,13 +1113,15 @@ class RecordedDataProcessorPanel(wx.Panel):
         
         plt.close()
         self.plot = None
-        
-        self._plot()            
+        self._plot()
         plt.show()
-                       
+        
+        self.create_plot_control_frame(parent=self)
+        self.control_plot_frame.Show()
+        
 #========================================================================================================================
 
-class FieldPlot(object):
+class RDPPlot(object):
 
     def __init__(self):
         return
@@ -1307,6 +1367,7 @@ class FieldPlot(object):
                     
         return data, time_codes
 
+
     def get_header(self, csv_f):
         '''
         Gets header from given csv file.
@@ -1318,6 +1379,7 @@ class FieldPlot(object):
         csv_file.close()
                 
         return header      
+    
     
     def _initialize_3D_plot(self, mode=None):
         
@@ -1337,6 +1399,7 @@ class FieldPlot(object):
         plot.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
         
         return plot
+    
     
     def _process_image(self, data, header, step):
         
@@ -1369,7 +1432,7 @@ class FieldPlot(object):
             img_array = ndimage.rotate(img_array, 90)
 
             return img_array
-        #========================================================================================================================
+
 
     def plot_snapshot(self, step, data, vmin, vmax, resolution, header, style, mode=' ', proj=' ', proj_method='addition', color='#FF9600'):        
         ndim = self.get_dimension(header)
@@ -1490,6 +1553,7 @@ class FieldPlot(object):
                                  
             return plot
         
+        
     def plot_snapshot_sequence(self, data, header, vmin, vmax, resolution, start, step_size, steps, proj, proj_method, style, 
                                x_label=None, y_label=None, z_label=None, file_name=None, file_directory=None, save_mode=False, color='#FF9600'):
         
@@ -1514,7 +1578,6 @@ class FieldPlot(object):
             if save_mode == True:
                 self.save_plot(plot=plot, plot_mode=plot_mode, file_name=file_name, file_directory=file_directory, save_mode='sequence', plot_number=i)
                         
-        return
     
     def plot_timeline(self, data, header, vmin, vmax, resolution, proj, proj_method, style, color=None, plot=None, marker=False, step=None):
         ndim = self.get_dimension(header)
@@ -1564,6 +1627,7 @@ class FieldPlot(object):
         
         return plot
     
+    
     def plot_heatmap(self, X_1, X_2, data, vmin, vmax, mode=None):
         
         if vmax is None:
@@ -1576,14 +1640,14 @@ class FieldPlot(object):
                 fig = plt.figure()
             else:
                 fig = plt.figure(1)
+        
         else:
             fig = plt.figure()
-        
-        plot = fig.add_subplot(1,1,1)
             
+        plot = fig.add_subplot(1,1,1)
         plot.add_collection(plt.pcolor(X_1, X_2, data, cmap='RdYlBu_r', vmin=vmin, vmax=vmax))
         plt.axis([X_1.min(), X_1.max(), X_2.min(), X_2.max()])
-        
+                
         return plot
     
     
@@ -1608,6 +1672,7 @@ class FieldPlot(object):
                     pass
             
             return plot
+
 
     def save_plot(self, plot, plot_mode, file_name, file_directory, save_mode='single', plot_number=0):
         
@@ -1656,11 +1721,9 @@ class FieldPlot(object):
             
             plt.savefig(file_path, transparent=True)
             plt.close()
-        
-        return
 
 #========================================================================================================================
 
 if __name__ == '__main__':
-    app = RecordedDataProcessorApp(False)
+    app = RDPApp(False)
     app.MainLoop()
