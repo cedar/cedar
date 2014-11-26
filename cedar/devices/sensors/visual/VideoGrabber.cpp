@@ -42,6 +42,7 @@
 #include "cedar/devices/sensors/visual/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/opencv_helper.h"
 
 // SYSTEM INCLUDES
 
@@ -167,14 +168,7 @@ void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
 {
   if (isCreated())
   {
-    double fps = getVideoChannel(0)->mVideoCapture.get
-    (
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_FPS
-#else
-      CV_CAP_PROP_FPS
-#endif
-    );
+    double fps = getVideoChannel(0)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
     setFramerate(fps * _mSpeedFactor->getValue());
     emit doSpeedFactorChanged();
   }
@@ -241,15 +235,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   unsigned int smallest = UINT_MAX;
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    unsigned int len = getVideoChannel(channel)->mVideoCapture.get
-    (
-    
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_FRAME_COUNT
-#else
-      CV_CAP_PROP_FRAME_COUNT
-#endif
-    );
+    unsigned int len = getVideoChannel(channel)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FRAME_COUNT));
     if (len < smallest)
     {
       smallest = len;
@@ -258,14 +244,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   mFramesCount = smallest;
 
   // check for equal FPS
-  double fps_ch0 = getVideoChannel(0)->mVideoCapture.get
-  (
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_FPS
-#else
-      CV_CAP_PROP_FPS
-#endif
-  );
+  double fps_ch0 = getVideoChannel(0)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
 
   if (fps_ch0 < 1)
   {
@@ -274,14 +253,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 
   if (num_channels > 1)
   {
-    double fps_ch1 = getVideoChannel(1)->mVideoCapture.get
-    (
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_FPS
-#else
-      CV_CAP_PROP_FPS
-#endif
-    );
+    double fps_ch1 = getVideoChannel(1)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
     if (fps_ch0 != fps_ch1)
     {
       std::string msg =  this->getName() + ": Different framerates of channels 0 and 1";
@@ -321,15 +293,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
     // is it a read error somewhere in the middle of the file?
     if
     (
-      getVideoChannel(channel)->mVideoCapture.get
-      (
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_POS_FRAMES
-#else
-      CV_CAP_PROP_POS_FRAMES
-#endif
-      )
-       < (mFramesCount)
+      getVideoChannel(channel)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES)) < (mFramesCount)
     )
     {
       std::string msg = "Could not read from video file on channel " + cedar::aux::toString(channel);
@@ -342,38 +306,17 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
       // rewind all already grabbed channels and grab first frame
       for (unsigned int i = 0; i <= channel; ++i)
       {
-        getVideoChannel(i)->mVideoCapture.set
-        (
-#if CV_VERSION_MAJOR >= 3
-          cv::CAP_PROP_POS_FRAMES
-#else
-          CAP_PROP_POS_FRAMES
-#endif
-          ,
-          0
-        );
+        getVideoChannel(i)->mVideoCapture.set(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES), 0);
         getVideoChannel(i)->mVideoCapture >> getImageMat(i);
       }
 
       // set all other channels to their last frame
       for (unsigned int i = channel+1; i < getNumChannels(); ++i)
       {
-        double last_frame = getVideoChannel(i)->mVideoCapture.get
-        (
-#if CV_VERSION_MAJOR >= 3
-          cv::CAP_PROP_FRAME_COUNT
-#else
-          CV_CAP_PROP_FRAME_COUNT
-#endif
-        )-1;
+        double last_frame = getVideoChannel(i)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FRAME_COUNT)) - 1.0;
         getVideoChannel(i)->mVideoCapture.set
         (
-#if CV_VERSION_MAJOR >= 3
-          cv::CAP_PROP_POS_FRAMES
-#else
-          CAP_PROP_POS_FRAMES
-#endif
-          ,
+          CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES),
           last_frame
         );
         getVideoChannel(i)->mVideoCapture >> getImageMat(i);
@@ -458,12 +401,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
   {
     getVideoChannel(channel)->mVideoCapture.set
     (
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_POS_FRAMES
-#else
-      CAP_PROP_POS_FRAMES
-#endif
-      ,
+      CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES),
       new_pos_abs
     );
   }
@@ -497,12 +435,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
   {
     (getVideoChannel(channel)->mVideoCapture).set
     (
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_POS_FRAMES
-#else
-      CAP_PROP_POS_FRAMES
-#endif
-      ,
+      CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES),
       newPositionAbs
     );
   }
@@ -512,14 +445,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
 unsigned int cedar::dev::sensors::visual::VideoGrabber::getPositionAbsolute()
 {
   // the position in all avi's should be the same
-  return getVideoChannel(0)->mVideoCapture.get
-                (
-#if CV_VERSION_MAJOR >= 3
-                  cv::CAP_PROP_POS_FRAMES
-#else
-                  CV_CAP_PROP_POS_FRAMES
-#endif
-                );
+  return getVideoChannel(0)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES));
 }
 
 
@@ -541,29 +467,13 @@ double cedar::dev::sensors::visual::VideoGrabber::getSourceProperty(unsigned int
 
 double cedar::dev::sensors::visual::VideoGrabber::getSourceFramerate(unsigned int channel)
 {
-  return getSourceProperty
-    (
-      channel,
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_FPS
-#else
-      CV_CAP_PROP_FPS
-#endif
-    );
+  return getSourceProperty(channel, CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
 }
 
 
 double cedar::dev::sensors::visual::VideoGrabber::getSourceEncoding(unsigned int channel)
 {
-  return getSourceProperty
-      (
-        channel,
-#if CV_VERSION_MAJOR >= 3
-      cv::CAP_PROP_FOURCC
-#else
-      CV_CAP_PROP_FOURCC
-#endif
-      );
+  return getSourceProperty(channel, CEDAR_OPENCV_CONSTANT(CAP_PROP_FOURCC));
 }
 
 

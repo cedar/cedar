@@ -107,40 +107,16 @@ public:
   static const Id NONE = 0;
 
   /// Apply  bayer filter Blue-Green to BGR
-  static const Id FROM_BG =
-#if CV_VERSION_MAJOR >= 3
-      cv::COLOR_BayerBG2BGR
-#else
-      CV_BayerBG2BGR
-#endif
-      ;
+  static const Id FROM_BG = cv::COLOR_BayerBG2BGR;
 
   /// Apply  bayer filter Green-Blue to BGR
-  static const Id FROM_GB =
-#if CV_VERSION_MAJOR >= 3
-      cv::COLOR_BayerGB2BGR
-#else
-      CV_BayerGB2BGR
-#endif
-      ;
+  static const Id FROM_GB = cv::COLOR_BayerGB2BGR;
 
   /// Apply  bayer filter Red-Green to BGR
-  static const Id FROM_RG =
-#if CV_VERSION_MAJOR >= 3
-      cv::COLOR_BayerRG2BGR
-#else
-      CV_BayerRG2BGR
-#endif
-      ;
+  static const Id FROM_RG = cv::COLOR_BayerRG2BGR;
 
   /// Apply  bayer filter Green-Red to BGR
-  static const Id FROM_GR = 
-#if CV_VERSION_MAJOR >= 3
-      cv::COLOR_BayerGR2BGR
-#else
-      CV_BayerGR2BGR
-#endif
-      ;
+  static const Id FROM_GR = cv::COLOR_BayerGR2BGR;
 
 protected:
   // none yet

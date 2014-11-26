@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/Engine.h"
+#include "cedar/auxiliaries/opencv_helper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/convolution/OpenCV.fwd.h"
@@ -152,7 +153,7 @@ private:
   (
     cv::Point& anchor,
     const std::vector<int>& anchor_vector,
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
     const cv::MatSize& msize
 #else
     const cv::Mat::MSize& msize

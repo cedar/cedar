@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/opencv_helper.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -368,11 +369,7 @@ namespace cedar
                           const cv::Mat& source,
                           cv::Mat& destination,
                           int dimensionToReduce,
-#if CV_VERSION_MAJOR >= 3
-                          int reductionOperator = cv::REDUCE_SUM,
-#else
-                          int reductionOperator = CV_REDUCE_SUM,
-#endif
+                          int reductionOperator = CEDAR_OPENCV_CONSTANT(REDUCE_SUM),
                           bool swapDimensions = false
                         );
 

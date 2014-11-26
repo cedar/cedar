@@ -324,7 +324,7 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
       {
         case ColorSpace::BGR:
           this->mCvConversionConstant =
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
            cv::COLOR_HSV2BGR
 #else
            CV_HSV2BGR
@@ -348,7 +348,7 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
       {
         case ColorSpace::HSV:
           this->mCvConversionConstant =
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
            cv::COLOR_BGR2HSV
 #else
            CV_BGR2HSV
@@ -359,7 +359,7 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
         case ColorSpace::YCrCb:
         case ColorSpace::YUV:
           this->mCvConversionConstant =
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
            cv::COLOR_BGR2YCrCb
 #else
            CV_BGR2YCrCb
@@ -369,7 +369,7 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
 
         case ColorSpace::Lab:
           this->mCvConversionConstant =
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
            cv::COLOR_BGR2Lab
 #else
            CV_BGR2Lab
@@ -389,7 +389,7 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
       {
         case ColorSpace::BGR:
           this->mCvConversionConstant =
-#if CV_VERSION_MAJOR >= 3
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
            cv::COLOR_YCrCb2BGR
 #else
            CV_YCrCb2BGR
