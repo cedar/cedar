@@ -57,6 +57,7 @@
 #include "cedar/auxiliaries/ParameterLink.fwd.h"
 #include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/CppScript.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/TriggerConnection.fwd.h"
 #include "cedar/processing/GroupFileFormatV1.fwd.h"
@@ -681,6 +682,27 @@ public:
    */
   std::set<std::string> listRequiredPlugins() const;
 
+  /*! Creates a new cedar::proc::CppScript of the given type and adds it to the group.
+   *
+   *  @remarks the name for the script will be determined automatically.
+   */
+  void createScript(const std::string& type);
+
+  //! Adds the given script to the group.
+  void addScript(cedar::proc::CppScriptPtr script);
+
+  //! Retrieves the script with the given name.
+  cedar::proc::CppScriptPtr getScript(const std::string& name) const;
+
+  //! Removes the script with the given name.
+  void removeScript(const std::string& name);
+
+  //! Lists all scripts in this group.
+  std::set<cedar::proc::CppScriptPtr> getScripts() const;
+
+  //! Checks if a script with the given name exists in this group.
+  bool checkScriptNameExists(const std::string& name) const;
+
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
@@ -750,6 +772,12 @@ private:
    */
   void addConnectorInternal(const std::string& name, bool input);
 
+  //! Finds an identifier for which the @em checker function returns false.
+  static std::string findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker);
+
+  //! Converts camel-case instances to spaces.
+  static std::string camelCaseToSpaces(const std::string& camelCasedString);
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
@@ -806,6 +834,14 @@ public:
   //!@brief Signal that is emitted whenever a custom parameter is removed.
   CEDAR_DECLARE_SIGNAL(LastReadConfigurationChanged, void ());
 
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(ScriptAdded, void (const std::string&));
+
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(ScriptRemoved, void (const std::string&));
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -844,6 +880,9 @@ private:
 
   //! Flag if trigger chain updates should be executed (during connecting/loading)
   bool mHoldTriggerChainUpdates;
+
+  //! Map of scripts present in this architecture
+  cedar::aux::LockableMember<std::set<cedar::proc::CppScriptPtr>> mScripts;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
