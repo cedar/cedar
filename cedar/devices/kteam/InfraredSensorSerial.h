@@ -48,8 +48,7 @@
 #include "cedar/auxiliaries/MatData.fwd.h"
 
 // SYSTEM INCLUDES
-//!@todo Old-style opencv include?
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 
 /*!@brief Infrared sensor, which communicates over a serial channel.

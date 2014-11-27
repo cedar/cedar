@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/steps/MatrixPadding.h"
 #include "cedar/processing/typecheck/Matrix.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
 #include "cedar/auxiliaries/MatrixIterator.h"
@@ -81,12 +82,34 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// paddning mode enum class
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::EnumType<cedar::proc::steps::MatrixPadding::PaddingMode>
+  cedar::proc::steps::MatrixPadding::PaddingMode::mType("cedar::proc::steps::MatrixPadding::PaddingMode::");
+
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::proc::steps::MatrixPadding::PaddingMode::Id cedar::proc::steps::MatrixPadding::PaddingMode::PadByBorder;
+const cedar::proc::steps::MatrixPadding::PaddingMode::Id cedar::proc::steps::MatrixPadding::PaddingMode::PadToSize;
+#endif // CEDAR_COMPILER_MSVC
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::steps::MatrixPadding::MatrixPadding()
 :
 mPadded(new cedar::aux::MatData()),
+_mPaddingMode
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "padding mode",
+    cedar::proc::steps::MatrixPadding::PaddingMode::typePtr(),
+    cedar::proc::steps::MatrixPadding::PaddingMode::PadByBorder
+  )
+),
 _mPaddedSize(new cedar::aux::UIntVectorParameter(this, "border size", 0, 0)),
 _mBorderType
 (
@@ -108,6 +131,7 @@ _mBorderType
 
   this->connect(this->_mPaddedSize.get(), SIGNAL(valueChanged()), SLOT(updateOutputSize()));
   this->connect(this->_mBorderType.get(), SIGNAL(valueChanged()), SLOT(recompute()));
+  this->connect(this->_mPaddingMode.get(), SIGNAL(valueChanged()), SLOT(updateOutputSize()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -123,15 +147,7 @@ void cedar::proc::steps::MatrixPadding::compute(const cedar::proc::Arguments&)
       break;
 
     case 3:
-      switch (this->mInput->getCvType())
-      {
-        case CV_32F:
-          this->compute3D<float>();
-          break;
-
-        default:
-          CEDAR_ASSERT(false);
-      }
+      this->compute3D();
       break;
 
     default:
@@ -153,24 +169,51 @@ void cedar::proc::steps::MatrixPadding::compute2D()
   int top, bottom;
   int left, right;
 
+  const cv::Mat& input = this->mInput->getData();
+
   CEDAR_DEBUG_ASSERT(this->_mPaddedSize->size() >= 1);
 
-  top = bottom = this->_mPaddedSize->at(0);
-  if (this->_mPaddedSize->size() >= 2)
+  switch (this->_mPaddingMode->getValue())
   {
-    left = right = this->_mPaddedSize->at(1);
-  }
-  else
-  {
-    left = right = 0;
+    case cedar::proc::steps::MatrixPadding::PaddingMode::PadByBorder:
+      top = bottom = this->_mPaddedSize->at(0);
+      if (this->_mPaddedSize->size() >= 2)
+      {
+        left = right = this->_mPaddedSize->at(1);
+      }
+      else
+      {
+        left = right = 0;
+      }
+      break;
+
+    case cedar::proc::steps::MatrixPadding::PaddingMode::PadToSize:
+    {
+      int v_diff = static_cast<int>(this->_mPaddedSize->at(0)) - input.size[0];
+      top = v_diff / 2;
+      bottom = std::max(v_diff - top, 0);
+      top = std::max(top, 0);
+      if (this->_mPaddedSize->size() >= 2)
+      {
+        int h_diff = static_cast<int>(this->_mPaddedSize->at(1)) - input.size[1];
+        left = h_diff / 2;
+        right = std::max(h_diff - left, 0);
+        left = std::max(left, 0);
+      }
+      else
+      {
+        left = right = 0;
+      }
+
+      break;
+    }
   }
 
   int border_type = cedar::aux::conv::BorderType::toCvConstant(this->_mBorderType->getValue());
 
-  cv::copyMakeBorder(this->mInput->getData(), this->mPadded->getData(), top, bottom, left, right, border_type, 0.0);
+  cv::copyMakeBorder(input, this->mPadded->getData(), top, bottom, left, right, border_type, 0.0);
 }
 
-template <typename T>
 void cedar::proc::steps::MatrixPadding::compute3D()
 {
   const cv::Mat& input = this->mInput->getData();
@@ -319,6 +362,8 @@ void cedar::proc::steps::MatrixPadding::inputConnectionChanged(const std::string
 
   if (this->mInput && this->mInput->getDimensionality() > 0)
   {
+    this->_mPaddingMode->setEnabled(cedar::proc::steps::MatrixPadding::PaddingMode::PadToSize, this->mInput->getDimensionality() < 3);
+
     this->_mPaddedSize->resize(this->mInput->getDimensionality());
 
     this->updateOutputSize();
@@ -331,22 +376,48 @@ void cedar::proc::steps::MatrixPadding::updateOutputSize()
   {
     const cv::Mat& input = this->mInput->getData();
     std::vector<int> dest_size(static_cast<size_t>(input.dims));
+    bool changed = (input.type() != this->mPadded->getData().type());
+
     for (size_t d = 0; d < static_cast<size_t>(input.dims); ++d)
     {
       if (d < this->_mPaddedSize->size())
       {
-        dest_size.at(d) = input.size[d] + 2 * this->_mPaddedSize->at(d);
+        switch (this->_mPaddingMode->getValue())
+        {
+          case cedar::proc::steps::MatrixPadding::PaddingMode::PadByBorder:
+            dest_size.at(d) = input.size[d] + 2 * this->_mPaddedSize->at(d);
+            break;
+
+          case cedar::proc::steps::MatrixPadding::PaddingMode::PadToSize:
+            dest_size.at(d) = std::max(this->_mPaddedSize->at(d), static_cast<unsigned int>(input.size[d]));
+            break;
+        }
       }
       else
       {
         dest_size.at(d) = input.size[d];
       }
+
+      if
+      (
+        this->mPadded->getData().empty()
+        || static_cast<int>(d) > this->mPadded->getData().dims
+        || dest_size.at(d) != this->mPadded->getData().size[d]
+      )
+      {
+        changed = true;
+      }
     }
 
     this->mPadded->setData(cv::Mat(input.dims, &dest_size.front(), input.type(), 0.0));
 
-    this->onTrigger();
+    cedar::proc::Step::ReadLocker step_locker(this);
+    this->compute(cedar::proc::Arguments());
+    step_locker.unlock();
 
-    this->emitOutputPropertiesChangedSignal("padded");
+    if (changed)
+    {
+      this->emitOutputPropertiesChangedSignal("padded");
+    }
   }
 }
