@@ -156,6 +156,15 @@ private:
     std::vector<std::string>& exceptions
   );
 
+  /*!@brief Reads scripts from a configuration node and adds them to the given group.
+   */
+  void readScripts
+  (
+    cedar::proc::GroupPtr group,
+    const cedar::aux::ConfigurationNode& node,
+    std::vector<std::string>& exceptions
+  );
+
   void readCustomParameters
   (
     cedar::proc::GroupPtr group,
@@ -194,6 +203,8 @@ private:
   void writeParameterLinks(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
 
   void writeCustomParameters(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& root) const;
+
+  void writeScripts(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& node) const;
 
   cedar::proc::ElementPtr getLinkElement
   (
