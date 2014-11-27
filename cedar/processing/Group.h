@@ -66,6 +66,7 @@
 
 // SYSTEM INCLUDES
 #include <QThread>
+#include <QMetaType>
 #include <vector>
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
@@ -895,5 +896,7 @@ protected:
   cedar::aux::BoolParameterPtr _mIsLooped;
 
 }; // class cedar::proc::Group
+
+Q_DECLARE_METATYPE(cedar::proc::Group::ConnectionChange)
 
 #endif // CEDAR_PROC_GROUP_H
