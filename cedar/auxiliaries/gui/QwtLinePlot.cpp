@@ -505,8 +505,20 @@ void cedar::aux::gui::QwtLinePlot::gridVisibilityChanged()
   if (any_visible && this->mpGrid == nullptr)
   {
     this->mpGrid = new QwtPlotGrid();
-    this->mpGrid->setMajPen(QPen(Qt::gray, 0, Qt::SolidLine));
-    this->mpGrid->setMinPen(QPen(Qt::gray, 0, Qt::DotLine));
+    this->mpGrid->
+#if QWT_VERSION >= 0x060100
+                  setMajorPen
+#else
+                  setMajPen
+#endif
+                  (QPen(Qt::gray, 0, Qt::SolidLine));
+    this->mpGrid->
+#if QWT_VERSION >= 0x060100
+                  setMinorPen
+#else
+                  setMinPen
+#endif
+                  (QPen(Qt::gray, 0, Qt::DotLine));
     this->mpGrid->attach(this->mpPlot);
   }
 
