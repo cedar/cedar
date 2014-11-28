@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Group.h"
+#include "cedar/processing/CppScript.h"
 #include "cedar/processing/GroupFileFormatV1.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -75,10 +76,9 @@
 #include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/make_shared.hpp>
-	#include <boost/property_tree/json_parser.hpp>
-#endif
+#include <boost/make_shared.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/regex.hpp>
 #include <algorithm>
 #include <sstream>
 
@@ -135,6 +135,21 @@ namespace
   }
 
   bool declared = declare();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// qt meta type initialization
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registerMetaType()
+  {
+    qRegisterMetaType<cedar::proc::Group::ConnectionChange>("cedar::proc::Group::ConnectionChange");
+    return true;
+  }
+
+  bool registered = registerMetaType();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -195,7 +210,96 @@ std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
     }
   }
 
+  //!@todo Add plugins required by scripts
+
   return required_plugins;
+}
+
+std::string cedar::proc::Group::camelCaseToSpaces(const std::string& camelCasedString)
+{
+  boost::regex re("([A-Za-z])([A-Z][a-z])");
+  auto replacer = [] (const boost::smatch& m)
+  {
+     return m[1].str() + " " + m[2].str();
+  };
+  return boost::regex_replace(camelCasedString, re, replacer);
+}
+
+bool cedar::proc::Group::checkScriptNameExists(const std::string& name) const
+{
+  QReadLocker locker(this->mScripts.getLockPtr());
+  for (auto script : this->mScripts.member())
+  {
+    if (script->getName() == name)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void cedar::proc::Group::createScript(const std::string& type)
+{
+   auto manager = cedar::proc::CppScriptFactoryManagerSingleton::getInstance();
+   auto script = manager->allocate(type);
+
+   std::string class_name, rest;
+   cedar::aux::splitLast(type, ".", rest, class_name);
+   std::string script_name = findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(class_name), boost::bind<bool>(&cedar::proc::Group::checkScriptNameExists, this, _1));
+   script->setName(script_name);
+
+   this->addScript(script);
+}
+
+void cedar::proc::Group::addScript(cedar::proc::CppScriptPtr script)
+{
+  QWriteLocker locker(this->mScripts.getLockPtr());
+  this->mScripts.member().insert(script);
+  locker.unlock();
+
+  script->setGroup(cedar::aux::asserted_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
+
+  this->signalScriptAdded(script->getName());
+}
+
+std::set<cedar::proc::CppScriptPtr> cedar::proc::Group::getScripts() const
+{
+  std::set<cedar::proc::CppScriptPtr> scripts;
+  QReadLocker locker(this->mScripts.getLockPtr());
+  for (auto script : this->mScripts.member())
+  {
+    scripts.insert(script);
+  }
+  return scripts;
+}
+
+cedar::proc::CppScriptPtr cedar::proc::Group::getScript(const std::string& name) const
+{
+  QReadLocker locker(this->mScripts.getLockPtr());
+  for (auto script : this->mScripts.member())
+  {
+    if (script->getName() == name)
+    {
+      return script;
+    }
+  }
+  CEDAR_THROW(cedar::aux::NotFoundException, "No script with the name \"" + name + "\" was found.");
+}
+
+void cedar::proc::Group::removeScript(const std::string& name)
+{
+  auto script = this->getScript(name);
+
+  QWriteLocker locker(this->mScripts.getLockPtr());
+  auto iter = this->mScripts.member().find(script);
+  if (iter == this->mScripts.member().end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find script \"" + name + "\" in this group.");
+  }
+  this->mScripts.member().erase(iter);
+  locker.unlock();
+
+  this->signalScriptRemoved(script->getName());
 }
 
 std::vector<cedar::proc::GroupPath> cedar::proc::Group::listAllElementPaths(const cedar::proc::GroupPath& base_path) const
@@ -598,19 +702,19 @@ void cedar::proc::Group::onNameChanged()
   }
 }
 
-std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifier) const
+std::string cedar::proc::Group::findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker)
 {
-  if (!this->nameExists(identifier))
+  if (!checker(basis))
   {
-    return identifier;
+    return basis;
   }
 
-  std::string base_str = identifier;
+  std::string base_str = basis;
 
-  size_t last_number = identifier.find_last_not_of("0123456789");
+  size_t last_number = basis.find_last_not_of("0123456789");
   if (last_number != std::string::npos && last_number != base_str.size() - 1)
   {
-    base_str = identifier.substr(0, last_number);
+    base_str = basis.substr(0, last_number);
   }
 
   unsigned int count = 2;
@@ -620,9 +724,14 @@ std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifie
     result = base_str +  " " + cedar::aux::toString(count);
     ++count;
   }
-  while (this->nameExists(result));
+  while (checker(result));
 
   return result;
+}
+
+std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifier) const
+{
+  return findNewIdentifier(identifier, boost::bind(&cedar::proc::Group::nameExists, this, _1));
 }
 
 bool cedar::proc::Group::nameExists(const cedar::proc::NetworkPath& name) const

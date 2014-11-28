@@ -60,6 +60,7 @@ cedar_add_library(cedarproc
   experiment/gui/StepPropertyParameter.h
   experiment/gui/TriggerParameter.h
   gui/ArchitectureWidgetList.h
+  gui/ArchitectureScriptEditor.h
   gui/stepViews/BoostView.h
   gui/stepViews/StaticGainView.h
   gui/AdvancedParameterLinker.h
@@ -114,6 +115,7 @@ cedar_add_library(cedarproc
   sources/Camera.h
   steps/Projection.h
   steps/Resize.h
+  CppScript.h
   Group.h
   Step.h
   LoopedTrigger.h

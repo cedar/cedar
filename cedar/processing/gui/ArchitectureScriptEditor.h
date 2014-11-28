@@ -22,90 +22,94 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPadding.h
+    File:        ArchitectureScriptEditor.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 01 13
+    Date:        2014 11 21
 
-    Description: Header file for the class cedar::proc::steps::MatrixPadding.
+    Description: Header file for the class cedar::proc::gui::ArchitectureScriptEditor.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_MATRIX_PADDING_H
-#define CEDAR_PROC_STEPS_MATRIX_PADDING_H
+#ifndef CEDAR_PROC_GUI_ARCHITECTURE_SCRIPT_EDITOR_H
+#define CEDAR_PROC_GUI_ARCHITECTURE_SCRIPT_EDITOR_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/gui/ui_ArchitectureScriptEditor.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/processing/steps/MatrixPadding.fwd.h"
+#include "cedar/processing/gui/ArchitectureScriptEditor.fwd.h"
+#include "cedar/processing/gui/Group.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
 
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      namespace detail
+      {
+        class ScriptControlWidget : public QWidget
+        {
+        Q_OBJECT
 
-/*!@brief A processing step that pads borders onto an input matrix.
+        public:
+          ScriptControlWidget(cedar::proc::CppScriptPtr script);
+
+        private slots:
+          void runScript();
+
+          void requestScriptStop();
+
+          void scriptStarted();
+
+          void scriptStopped();
+
+        private:
+          void updateScriptRunningState();
+          void updateScriptRunningState(bool running);
+
+        private:
+          cedar::proc::CppScriptPtr mScript;
+
+          QPushButton* mpStartButton;
+          QPushButton* mpStopButton;
+        };
+      }
+    }
+  }
+}
+
+/*!@brief A widget for editing scripts associated with an architecture.
  */
-class cedar::proc::steps::MatrixPadding : public cedar::proc::Step
+class cedar::proc::gui::ArchitectureScriptEditor : public QWidget, Ui_ArchitectureScriptEditor
 {
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  class PaddingMode
-  {
-  public:
-    //! Type of the enum.
-    typedef cedar::aux::EnumId Id;
-
-    //! Pointer to the enumeration type.
-    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
-
-    //! Constructs the enumeration values.
-    static void construct()
-    {
-      mType.type()->def(cedar::aux::Enum(PadByBorder, "PadByBorder", "pad by border"));
-      mType.type()->def(cedar::aux::Enum(PadToSize, "PadToSize", "pad to size"));
-    }
-
-    //! Returns the enum base class.
-    static const cedar::aux::EnumBase& type()
-    {
-      return *mType.type();
-    }
-
-    //! Returns a pointer to the enum base class.
-    static const cedar::proc::steps::MatrixPadding::PaddingMode::TypePtr& typePtr()
-    {
-      return mType.type();
-    }
-
-    //! The input is padded by the specified amount.
-    static const Id PadByBorder = 0;
-
-    //! The output has the given size. The input is padded to match this size.
-    static const Id PadToSize = 1;
-
-  private:
-    static cedar::aux::EnumType<cedar::proc::steps::MatrixPadding::PaddingMode> mType;
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MatrixPadding();
+  ArchitectureScriptEditor(cedar::proc::gui::GroupPtr group, QWidget* pParent = nullptr);
+
+signals:
+  void scriptAddedInGroup(QString scriptName);
+
+  void scriptRemovedFromGroup(QString scriptName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -123,20 +127,32 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
+  void fillTypeComboBox();
 
-  void compute2D();
+  void setComboBoxItemEnabled(int index, bool enabled);
 
-  void compute3D();
+  void translateScriptAddedSignal(const std::string& scriptName);
 
-  template <typename T> void computeND();
+  void translateScriptRemovedSignal(const std::string& scriptName);
 
-  void inputConnectionChanged(const std::string& inputName);
+  void showItemProperties(QTableWidgetItem* pItem);
+
+  cedar::proc::CppScriptPtr getScriptFromItem(QTableWidgetItem* pItem) const;
+
+  void refreshScriptList();
 
 private slots:
-  void updateOutputSize();
+  void addClicked();
 
-  void recompute();
+  void removeClicked();
+
+  void addScriptToList(const QString& scriptName);
+
+  void removeScriptFromList(const QString& scriptName);
+
+  void itemSelected();
+
+  void scriptNameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -144,9 +160,17 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::aux::ConstMatDataPtr mInput;
+  cedar::proc::gui::GroupPtr mGroup;
 
-  cedar::aux::MatDataPtr mPadded;
+  boost::signals2::scoped_connection mConnectionScriptAdded;
+
+  boost::signals2::scoped_connection mConnectionScriptRemoved;
+
+  std::map<cedar::aux::Parameter*, std::string> mUsedParameterNames;
+
+  const static int M_NAME_COL;
+  const static int M_TYPE_COL;
+  const static int M_CTRL_COL;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -155,16 +179,9 @@ protected:
   // none yet
 
 private:
-  //! How the input is padded.
-  cedar::aux::EnumParameterPtr _mPaddingMode;
+  // none yet
 
-  //! How much border is added in each dimension
-  cedar::aux::UIntVectorParameterPtr _mPaddedSize;
+}; // class cedar::proc::gui::ArchitectureScriptEditor
 
-  //! Type of border handling.
-  cedar::aux::EnumParameterPtr _mBorderType;
-
-}; // class cedar::proc::steps::MatrixPadding
-
-#endif // CEDAR_PROC_STEPS_MATRIX_PADDING_H
+#endif // CEDAR_PROC_GUI_ARCHITECTURE_SCRIPT_EDITOR_H
 

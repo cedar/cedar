@@ -87,6 +87,8 @@ Unreleased
     architecture as well as the global timer.
   - Added a python plotting script for recorded data (in tools/recordedDataProcessor).
   - Added a trial framework for running experiments with cedar architectures (in the GUI, Tools>Experiments...).
+  - Plugins can now declare C++ scripts which can be executed from the GUI. These allow running arbitrary code on a
+    processing group. More details can be found in a tutorial in the documentation.
 
 
 Released versions
