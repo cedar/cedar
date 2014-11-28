@@ -828,14 +828,19 @@ cedar::proc::ConstGroupPtr cedar::proc::gui::Group::getGroup() const
   return this->mGroup;
 }
 
-void cedar::proc::gui::Group::write()
+void cedar::proc::gui::Group::write() const
 {
-  this->write(this->mFileName);
+  this->writeJson(this->mFileName);
 }
 
-void cedar::proc::gui::Group::write(const std::string& destination)
+void cedar::proc::gui::Group::write(const std::string& destination) const
 {
-  this->mFileName = destination;
+  this->writeJson(destination);
+}
+
+void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
+{
+  this->mFileName = filename.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
@@ -843,25 +848,30 @@ void cedar::proc::gui::Group::write(const std::string& destination)
   this->mGroup->writeConfiguration(root);
   this->writeConfiguration(root);
 
-  write_json(destination, root);
+  write_json(filename.toString(), root);
 
-  this->mGroup->writeDataFile(destination + ".data");
+  this->mGroup->writeDataFile(filename.toString() + ".data");
 }
 
 void cedar::proc::gui::Group::read(const std::string& source)
 {
-  this->mFileName = source;
+  this->readJson(source);
+}
+
+void cedar::proc::gui::Group::readJson(const cedar::aux::Path& source)
+{
+  this->mFileName = source.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
-  read_json(source, root);
+  read_json(source.toString(), root);
 
   this->mGroup->readConfiguration(root);
   this->readConfiguration(root);
 
-  if (boost::filesystem::exists(source + ".data"))
+  if (boost::filesystem::exists(source.toString() + ".data"))
   {
-    this->mGroup->readDataFile(source + ".data");
+    this->mGroup->readDataFile(source.toString() + ".data");
   }
 }
 

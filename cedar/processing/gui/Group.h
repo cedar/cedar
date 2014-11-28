@@ -94,11 +94,17 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief write group to file
-  void write();
+  void write() const;
+
   //!@brief write group to file given by destination
-  void write(const std::string& destination);
+  CEDAR_DECLARE_DEPRECATED(void write(const std::string& destination) const);
+
   //!@brief read group from given file
-  void read(const std::string& source);
+  CEDAR_DECLARE_DEPRECATED(void read(const std::string& source));
+
+  void writeJson(const cedar::aux::Path& filename) const;
+
+  void readJson(const cedar::aux::Path& filename);
 
   //! Checks if any connectables in the given list can be added to this group. Non-connectables are ignored.
   bool canAddAny(const QList<QGraphicsItem*>& items) const;
@@ -382,7 +388,7 @@ private:
   cedar::proc::gui::Scene* mpScene;
 
   //!@brief a filename from which to load a group configuration, or to which to save a configuration
-  std::string mFileName;
+  mutable std::string mFileName;
 
   //!@brief a vector of all source connectors
   std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;

@@ -1219,7 +1219,7 @@ bool cedar::proc::gui::Ide::saveAs()
     file += ".json";
   }
 
-  this->mGroup->write(file.toStdString());
+  this->mGroup->writeJson(file.toStdString());
   this->displayFilename(file.toStdString());
   this->setArchitectureChanged(false);
   
@@ -1359,7 +1359,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   // read network
   try
   {
-    network->read(file.toStdString());
+    network->readJson(file.toStdString());
   }
   catch(const cedar::proc::ArchitectureLoadingException& e)
   {
