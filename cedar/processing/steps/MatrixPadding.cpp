@@ -183,6 +183,7 @@ void cedar::proc::steps::MatrixPadding::compute2D()
 
   switch (this->_mPaddingMode->getValue())
   {
+    default:
     case cedar::proc::steps::MatrixPadding::PaddingMode::PadByBorder:
       top = bottom = this->_mPaddedSize->at(0);
       if (this->_mPaddedSize->size() >= 2)
