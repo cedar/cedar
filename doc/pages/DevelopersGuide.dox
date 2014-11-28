@@ -12,7 +12,7 @@ In these pages you can learn more about the structure and organization of cedar.
 - @link SoftwareTestingConcept Software testing @endlink
 
 @section ProgrammingConcepts Programming Concepts
-In the following pages you can find out about general programming concepts we used throughout the framework.
+In the following pages you can find out about general programming concepts we used throughout cedar.
 - @link ParametersConcept Storing and loading parameters @endlink
 - @link ProcessingFrameworkConcept Processing framework @endlink
 - @link ThreadingConcept Threads and dynamics @endlink
@@ -20,6 +20,7 @@ In the following pages you can find out about general programming concepts we us
 - @link UnitsConcept Physical units @endlink
 - @link BoostSignalsWrapper cedar's helper functions for boost signals @endlink
 - @ref EnumConcept
+- @ref PluginFramework
 
 @subsection RTTS cedar's runtime type system
 

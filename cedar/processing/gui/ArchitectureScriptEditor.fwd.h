@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright <copyright years> Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,40 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        ArchitectureScriptEditor.fwd.h
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 11 21
 
-    Description: Source file for the class <full class name>.
+    Description: Forward declaration file for the class cedar::proc::gui::ArchitectureScriptEditor.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_GUI_ARCHITECTURE_SCRIPT_EDITOR_FWD_H
+#define CEDAR_PROC_GUI_ARCHITECTURE_SCRIPT_EDITOR_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "<class header path>"
-
 // CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-<full class name>::<class name>()
+namespace cedar
 {
+  namespace proc
+  {
+    namespace gui
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(ArchitectureScriptEditor);
+      //!@endcond
+    }
+  }
 }
 
-<full class name>::~<class name>()
-{
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_PROC_GUI_ARCHITECTURE_SCRIPT_EDITOR_FWD_H
+

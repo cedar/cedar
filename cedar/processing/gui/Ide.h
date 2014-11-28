@@ -340,6 +340,9 @@ private:
   //! Updates the architecture widget menu.
   void updateArchitectureWidgetsMenu();
 
+  //! Updates the architecture widget menu.
+  void updateArchitectureScriptsMenu();
+
   //! Constructs the widgets in the status bar.
   void buildStatusBar();
 
@@ -354,7 +357,9 @@ private slots:
 
   void architecturePlotActionTriggered();
 
-  void openManageArchitectureWidgetsDialog();
+  void showManageArchitectureWidgetsDialog();
+
+  void showManageArchitectureScriptsDialog();
 
   void triggerStarted();
 

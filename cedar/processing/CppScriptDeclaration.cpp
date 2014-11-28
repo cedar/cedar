@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright <copyright years> Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        CppScriptDeclaration.cpp
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 11 20
 
-    Description: Source file for the class <full class name>.
+    Description: Source file for the class cedar::proc::CppScriptDeclaration.
 
     Credits:
 
@@ -37,10 +37,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CLASS HEADER
-#include "<class header path>"
-
 // CEDAR INCLUDES
+#include "cedar/processing/CppScriptDeclaration.h"
 
 // SYSTEM INCLUDES
 
@@ -48,14 +46,17 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-<full class name>::<class name>()
-{
-}
-
-<full class name>::~<class name>()
+cedar::proc::CppScriptDeclaration::CppScriptDeclaration(const std::string& category, const std::string& className)
+:
+cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::CppScriptPtr>(category, className)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::proc::CppScriptDeclaration::getPluginType() const
+{
+  return "c++ script";
+}

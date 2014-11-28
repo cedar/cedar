@@ -22,96 +22,95 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPadding.h
+    File:        CppScript.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 01 13
+    Date:        2014 11 20
 
-    Description: Header file for the class cedar::proc::steps::MatrixPadding.
+    Description: Header file for the class cedar::proc::CppScript.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_MATRIX_PADDING_H
-#define CEDAR_PROC_STEPS_MATRIX_PADDING_H
+#ifndef CEDAR_PROC_CPP_SCRIPT_H
+#define CEDAR_PROC_CPP_SCRIPT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/processing/steps/MatrixPadding.fwd.h"
+#include "cedar/processing/CppScript.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+#include "cedar/auxiliaries/CallFunctionInThread.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
+#ifndef Q_MOC_RUN
+  #include <boost/enable_shared_from_this.hpp>
+#endif
 
 
-/*!@brief A processing step that pads borders onto an input matrix.
+/*!@brief Derive this class to create scripts that can be executed on architectures from the cedar gui.
  */
-class cedar::proc::steps::MatrixPadding : public cedar::proc::Step
+class cedar::proc::CppScript : public QObject,
+                               public cedar::aux::NamedConfigurable,
+                               public boost::enable_shared_from_this<cedar::proc::CppScript>
 {
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  class PaddingMode
-  {
-  public:
-    //! Type of the enum.
-    typedef cedar::aux::EnumId Id;
-
-    //! Pointer to the enumeration type.
-    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
-
-    //! Constructs the enumeration values.
-    static void construct()
-    {
-      mType.type()->def(cedar::aux::Enum(PadByBorder, "PadByBorder", "pad by border"));
-      mType.type()->def(cedar::aux::Enum(PadToSize, "PadToSize", "pad to size"));
-    }
-
-    //! Returns the enum base class.
-    static const cedar::aux::EnumBase& type()
-    {
-      return *mType.type();
-    }
-
-    //! Returns a pointer to the enum base class.
-    static const cedar::proc::steps::MatrixPadding::PaddingMode::TypePtr& typePtr()
-    {
-      return mType.type();
-    }
-
-    //! The input is padded by the specified amount.
-    static const Id PadByBorder = 0;
-
-    //! The output has the given size. The input is padded to match this size.
-    static const Id PadToSize = 1;
-
-  private:
-    static cedar::aux::EnumType<cedar::proc::steps::MatrixPadding::PaddingMode> mType;
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MatrixPadding();
+  CppScript();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*! Prepares the script and then calls the run() function.
+   */
+  void callRun();
+
+  //! Returns whether requestStop() was called.
+  bool stopRequested() const;
+
+  //! Returns true if the script is running.
+  bool isRunning() const;
+
+  //! Returns the type of the script (i.e., what must be used with the factory manager to instantiate it).
+  std::string getType() const;
+
+  //! Sets the group that the script is run on.
+  void setGroup(cedar::proc::GroupPtr group);
+
+  /*! Returns the group on which the script operates. Scripts should not store this as a strong reference, as this would
+   *  lead to cyclic referencing (the script points to the group, the group to the script) and thus a memory leak.
+   */
+  cedar::proc::GroupPtr getGroup() const;
+
+public slots:
+  /*! Ask the script nicely to stop what it is doing.
+   *
+   * Scripts that run for a long time should periodically check with
+   */
+  void requestStop();
+
+signals:
+  void scriptStarted();
+
+  void scriptStopped();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -123,20 +122,19 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
+  /*!@brief Method in which child classes can provide their functionality.
+   *
+   * @remarks This method is called in the GUI context. Thus, it should not perform any long operations directly.
+   *          Typically, the code in this method should start a thread or open qt widgets.
+   */
+  virtual void run() = 0;
 
-  void compute2D();
+  void setStopRequested(bool requested);
 
-  void compute3D();
-
-  template <typename T> void computeND();
-
-  void inputConnectionChanged(const std::string& inputName);
+  void emitScriptStartedSignal();
 
 private slots:
-  void updateOutputSize();
-
-  void recompute();
+  void threadStopped();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -144,9 +142,13 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::aux::ConstMatDataPtr mInput;
+  cedar::proc::GroupWeakPtr mGroup;
 
-  cedar::aux::MatDataPtr mPadded;
+  cedar::aux::LockableMember<bool> mStopRequested;
+
+  cedar::aux::CallFunctionInThreadPtr mRunCaller;
+
+  boost::signals2::scoped_connection mConnectionThreadStarted;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -155,16 +157,34 @@ protected:
   // none yet
 
 private:
-  //! How the input is padded.
-  cedar::aux::EnumParameterPtr _mPaddingMode;
+  // none yet
 
-  //! How much border is added in each dimension
-  cedar::aux::UIntVectorParameterPtr _mPaddedSize;
+}; // class cedar::proc::CppScript
 
-  //! Type of border handling.
-  cedar::aux::EnumParameterPtr _mBorderType;
 
-}; // class cedar::proc::steps::MatrixPadding
+namespace cedar
+{
+  namespace proc
+  {
+    //! A manager for c++ script declarations
+    typedef
+      cedar::aux::DeclarationManagerTemplate<cedar::proc::CppScriptPtr>
+      CppScriptDeclarationManager;
 
-#endif // CEDAR_PROC_STEPS_MATRIX_PADDING_H
+    //! Sinleton of the c++ script declaration manager.
+    typedef
+      cedar::aux::Singleton<cedar::proc::CppScriptDeclarationManager>
+      CppScriptDeclarationManagerSingleton;
+
+    //! A manager for element factories
+    typedef
+      cedar::aux::FactoryManager<cedar::proc::CppScriptPtr>
+      CppScriptFactoryManager;
+  }
+}
+
+CEDAR_PROC_SINGLETON(CppScriptDeclarationManager);
+CEDAR_PROC_SINGLETON(CppScriptFactoryManager);
+
+#endif // CEDAR_PROC_CPP_SCRIPT_H
 

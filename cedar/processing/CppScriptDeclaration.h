@@ -22,96 +22,58 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPadding.h
+    File:        CppScriptDeclaration.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 01 13
+    Date:        2014 11 20
 
-    Description: Header file for the class cedar::proc::steps::MatrixPadding.
+    Description: Header file for the class cedar::proc::CppScriptDeclaration.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_MATRIX_PADDING_H
-#define CEDAR_PROC_STEPS_MATRIX_PADDING_H
+#ifndef CEDAR_PROC_CPP_SCRIPT_DECLARATION_H
+#define CEDAR_PROC_CPP_SCRIPT_DECLARATION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/MatData.fwd.h"
-#include "cedar/processing/steps/MatrixPadding.fwd.h"
+#include "cedar/processing/CppScript.fwd.h"
+#include "cedar/processing/CppScriptDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief A processing step that pads borders onto an input matrix.
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::steps::MatrixPadding : public cedar::proc::Step
+class cedar::proc::CppScriptDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::CppScriptPtr>
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  class PaddingMode
-  {
-  public:
-    //! Type of the enum.
-    typedef cedar::aux::EnumId Id;
-
-    //! Pointer to the enumeration type.
-    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
-
-    //! Constructs the enumeration values.
-    static void construct()
-    {
-      mType.type()->def(cedar::aux::Enum(PadByBorder, "PadByBorder", "pad by border"));
-      mType.type()->def(cedar::aux::Enum(PadToSize, "PadToSize", "pad to size"));
-    }
-
-    //! Returns the enum base class.
-    static const cedar::aux::EnumBase& type()
-    {
-      return *mType.type();
-    }
-
-    //! Returns a pointer to the enum base class.
-    static const cedar::proc::steps::MatrixPadding::PaddingMode::TypePtr& typePtr()
-    {
-      return mType.type();
-    }
-
-    //! The input is padded by the specified amount.
-    static const Id PadByBorder = 0;
-
-    //! The output has the given size. The input is padded to match this size.
-    static const Id PadToSize = 1;
-
-  private:
-    static cedar::aux::EnumType<cedar::proc::steps::MatrixPadding::PaddingMode> mType;
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MatrixPadding();
+  CppScriptDeclaration(const std::string& category, const std::string& className = "");
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  virtual void declare() const = 0;
+
+  std::string getPluginType() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -123,20 +85,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-
-  void compute2D();
-
-  void compute3D();
-
-  template <typename T> void computeND();
-
-  void inputConnectionChanged(const std::string& inputName);
-
-private slots:
-  void updateOutputSize();
-
-  void recompute();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -144,9 +93,7 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::aux::ConstMatDataPtr mInput;
-
-  cedar::aux::MatDataPtr mPadded;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -155,16 +102,58 @@ protected:
   // none yet
 
 private:
-  //! How the input is padded.
-  cedar::aux::EnumParameterPtr _mPaddingMode;
+  // none yet
 
-  //! How much border is added in each dimension
-  cedar::aux::UIntVectorParameterPtr _mPaddedSize;
+}; // class cedar::proc::CppScriptDeclaration
 
-  //! Type of border handling.
-  cedar::aux::EnumParameterPtr _mBorderType;
+/*!@brief This is a template class for comfortably generating element declarations.
+ *
+ * @todo This class should get its own header file
+ */
+template <class DerivedClass>
+class cedar::proc::CppScriptDeclarationTemplate
+    :
+    public cedar::aux::PluginDeclarationTemplate
+    <
+      cedar::proc::CppScriptPtr,
+      boost::shared_ptr<DerivedClass>,
+      cedar::proc::CppScriptDeclaration
+    >
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef
+      cedar::aux::PluginDeclarationTemplate<cedar::proc::CppScriptPtr, boost::shared_ptr<DerivedClass>, cedar::proc::CppScriptDeclaration>
+      DeclarationSuper;
 
-}; // class cedar::proc::steps::MatrixPadding
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*!@brief The constructor.
+   *
+   * @param category Category for the script.
+   * @param classId  Identifier of the class. If this is left empty, the name will be determined automatically. For
+   *                 example, a class example::namespaceName::ClassName will result in the name
+   *                 example.namespaceName.ClassName.
+   */
+  CppScriptDeclarationTemplate(const std::string& category, const std::string& classId = "")
+  :
+  DeclarationSuper
+  (
+    category,
+    classId
+  )
+  {
+  }
 
-#endif // CEDAR_PROC_STEPS_MATRIX_PADDING_H
+  void declare() const
+  {
+    DeclarationSuper::declare();
+  }
+}; // class cedar::proc::ElementDeclarationTemplate
+
+#endif // CEDAR_PROC_CPP_SCRIPT_DECLARATION_H
 

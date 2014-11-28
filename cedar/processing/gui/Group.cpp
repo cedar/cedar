@@ -940,6 +940,9 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     try
     {
+      //!@todo Why isn't there a virtual functon in cedar::proc::Connectable or cedar::proc::Step to restore plots that is called here instead of having these ifs?
+      //!@todo And why is a group/step item used here when all that is done in createAndShow... is to get its associated connectable? Why not pass step/group?
+      //!@todo Rewrite this code!
       // is it a step?
       auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
       if (step) // check if cast worked
