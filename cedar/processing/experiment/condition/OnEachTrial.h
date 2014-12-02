@@ -22,41 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStop.h
+    File:        OnEachTrial.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 09
+    Date:        2014 02 06
 
-    Description: Header file for the class cedar::proc::experiment::ActionStop.
+    Description: Header file for the class cedar::proc::experiment::OnEachTrial.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_STOP_ALL_TRIGGERS_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_STOP_ALL_TRIGGERS_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_EACH_TRIAL_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_EACH_TRIAL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/Action.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/experiment/condition/Condition.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/action/StopAllTriggers.fwd.h"
+#include "cedar/processing/experiment/condition/OnEachTrial.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Stops a trial of the experiment framework
+/*!@brief Checks if a trial is on initial state
  *
- *        It also provides different kinds of reset methods
+ *      A trial is on initial state if it is not has been started yet.
+ *      There should be at least one of this conditions in your experiment, containing ActionStart.
  */
-class cedar::proc::experiment::action::StopAllTriggers : public cedar::proc::experiment::action::Action
+class cedar::proc::experiment::condition::OnEachTrial : public cedar::proc::experiment::condition::Condition
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -67,23 +65,20 @@ class cedar::proc::experiment::action::StopAllTriggers : public cedar::proc::exp
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StopAllTriggers();
-
-  //!@brief Destructor
-  virtual ~StopAllTriggers();
+  OnEachTrial();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Stops the trial, applies the reset method and send a message to the log file
-  void run();
+  bool initialCheck();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief Checks if a trial is on initial state
+  bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -106,16 +101,8 @@ protected:
   // none yet
 
 private:
-  //!@brief The reset method that should be applied right after the stop
-  cedar::aux::EnumParameterPtr _mResetType;
 
-  //!@brief Indicates if the trial is a success or a failure
-  cedar::aux::BoolParameterPtr _mSuccess;
+}; // class cedar::proc::experiment::OnEachTrial
 
-  //!@brief The message that will be send to the log file
-  cedar::aux::StringParameterPtr _mMessage;
-
-}; // class cedar::proc::experiment::ActionStop
-
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_STOP_ALL_TRIGGERS_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_EACH_TRIAL_H
 

@@ -41,7 +41,7 @@
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/processing/experiment/action/StartAllTriggers.h"
 #include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/processing/experiment/condition/OnInit.h"
+#include "cedar/processing/experiment/condition/OnEachTrial.h"
 
 // SYSTEM INCLUDES
 
@@ -74,7 +74,7 @@ _mCondition
   (
     this,
     "Condition",
-    cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
+    cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnEachTrial())
   )
 )
 {
