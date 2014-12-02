@@ -48,6 +48,8 @@
 #include "cedar/processing/experiment/condition/OnTrialNumber.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@brief Checks if the current trial has the number provided by this condition

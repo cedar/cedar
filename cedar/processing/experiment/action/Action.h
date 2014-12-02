@@ -50,6 +50,7 @@
 #include "cedar/processing/experiment/Experiment.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief An abstract class for all the derived Action classes.

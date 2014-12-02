@@ -53,6 +53,7 @@
   #include <boost/signals2.hpp>
 #endif
 #include <QTimer>
+#include <map>
 
 
 /*!@brief A widget for setting up, save and load experiments

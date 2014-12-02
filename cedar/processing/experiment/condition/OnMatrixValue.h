@@ -54,6 +54,8 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <vector>
+#include <string>
 
 
 /*!@brief Checks if a part of the step data fulfills the condition

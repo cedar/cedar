@@ -49,8 +49,10 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/action/SetParameterValue.fwd.h"
 
-// SYSTEM INCLUDE
+// SYSTEM INCLUDES
 #include <QObject>
+#include <vector>
+#include <string>
 
 
 /*!@brief Sets the parameter of a step to a desired value
