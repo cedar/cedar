@@ -75,6 +75,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
 public slots:
   void toggleNumberOfElements();

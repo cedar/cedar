@@ -79,6 +79,8 @@ public:
 
   void postExperiment();
 
+  bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+
 public:
 
   //--------------------------------------------------------------------------------------------------------------------
