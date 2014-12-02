@@ -68,3 +68,9 @@ void cedar::proc::experiment::action::Action::postExperiment()
 {
   // empty default implementation
 }
+
+bool cedar::proc::experiment::action::Action::checkValidity(std::vector<std::string>&, std::vector<std::string>&) const
+{
+  // by default, actions are valid
+  return true;
+}

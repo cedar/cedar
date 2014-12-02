@@ -84,6 +84,19 @@ _mCondition
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::ActionSequence::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const
+{
+  bool all_valid = this->_mCondition->getValue()->checkValidity(errors, warnings);
+
+  for (size_t i = 0; i < this->_mActionSet->size(); ++i)
+  {
+    bool action_valid = this->_mActionSet->at(i)->checkValidity(errors, warnings);
+    all_valid = all_valid && action_valid;
+  }
+
+  return all_valid;
+}
+
 void cedar::proc::experiment::ActionSequence::preExperiment()
 {
   for (size_t i = 0; i < this->_mActionSet->size(); ++i)

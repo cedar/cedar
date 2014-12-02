@@ -82,6 +82,24 @@ _mStepParameter
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::action::SetParameterValue::checkValidity
+(
+  std::vector<std::string>& errors,
+  std::vector<std::string>& /* warnings */
+)
+const
+{
+  std::string parameter_error;
+  bool parameter_valid = this->_mStepParameter->checkValidity(parameter_error);
+  if (!parameter_valid)
+  {
+    errors.push_back("Cannot set parameter value: " + parameter_error);
+    return false;
+  }
+
+  return true;
+}
+
 cedar::proc::experiment::StepPropertyParameterPtr cedar::proc::experiment::action::SetParameterValue::getStepParameter() const
 {
   return this->_mStepParameter;

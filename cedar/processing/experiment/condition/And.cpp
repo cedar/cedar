@@ -92,4 +92,10 @@ bool cedar::proc::experiment::condition::And::check()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::condition::And::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const
+{
+  bool valid_1 = this->_mCondition1->getValue()->checkValidity(errors, warnings);
+  bool valid_2 = this->_mCondition2->getValue()->checkValidity(errors, warnings);
 
+  return valid_1 && valid_2;
+}
