@@ -278,6 +278,11 @@ void cedar::proc::experiment::StepPropertyParameter::setElementPath(const std::s
     auto element = group->getElement<cedar::proc::Connectable>(elementPath);
     this->setStep(element);
   }
+  else
+  {
+    // we have to reset the pointer if the step does not exist
+    this->mElement.reset();
+  }
 }
 
 std::string cedar::proc::experiment::StepPropertyParameter::getElementPath() const
@@ -415,6 +420,7 @@ void cedar::proc::experiment::StepPropertyParameter::updateParameterCopy()
 {
   if (!this->isParameterSelected())
   {
+    mParameterCopy.reset();
     return;
   }
 
@@ -435,10 +441,12 @@ void cedar::proc::experiment::StepPropertyParameter::updateParameterCopy()
       catch (cedar::aux::NotFoundException& exc) // element was not found, reset
       {
         mElement.reset();
+        mParameterCopy.reset();
         this->setParameterPath("");
       }
       catch (cedar::aux::UnknownNameException& exc) // parameter not found
       {
+        mParameterCopy.reset();
         this->setParameterPath("");
       }
       break;
