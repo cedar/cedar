@@ -70,7 +70,7 @@ namespace
 
 cedar::proc::experiment::condition::OnTrialNumber::OnTrialNumber()
 :
-_mTrial(new cedar::aux::UIntParameter(this,"on trial",1))
+_mTrial(new cedar::aux::UIntParameter(this, "on trial", 1))
 {
 }
 
@@ -81,6 +81,20 @@ cedar::proc::experiment::condition::OnTrialNumber::~OnTrialNumber()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::experiment::condition::OnTrialNumber::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const
+{
+  auto chosen_trial = this->_mTrial->getValue();
+  Experiment* p_experiment = cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment();
+  auto max_trial = p_experiment->getTrialCount();
+  if (chosen_trial >= max_trial)
+  {
+    warnings.push_back("OnTrialNumber condition will never fire: selected trial exceeds maximum number of trials.");
+  }
+
+  return true;
+}
+
 bool cedar::proc::experiment::condition::OnTrialNumber::check()
 {
   return false;

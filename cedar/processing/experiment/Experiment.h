@@ -268,6 +268,11 @@ public:
 
   bool hasMoreTrials() const;
 
+  /*! Checks if the experiment is valid. If it returns false, errors are written to the vectors passed as arguments and
+   * can be used to give hints about what is wrong. Warnings may always be generated, even for valid experiments.
+   */
+  bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+
 signals:
 
   //!@brief Should be emitted if the experiment has stopped
