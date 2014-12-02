@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnInit.fwd.h
+    File:        OnEachTrial.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 02 06
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionOnInit.
+    Description: Forward declaration file for the class cedar::proc::experiment::condition::OnEachTrial.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_EACH_TRIAL_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_EACH_TRIAL_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -57,7 +57,7 @@ namespace cedar
     {
       namespace condition
       {
-        CEDAR_DECLARE_PROC_CLASS(OnInit);
+        CEDAR_DECLARE_PROC_CLASS(OnEachTrial);
       }
     }
   }
@@ -65,5 +65,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_EACH_TRIAL_FWD_H
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTrial.fwd.h
+    File:        SetParameterValue.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 03 28
+    Date:        2014 03 07
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionOnTrial.
+    Description: Forward declaration file for the class cedar::proc::experiment::SetParameterValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_FWD_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,9 +55,9 @@ namespace cedar
   {
     namespace experiment
     {
-      namespace condition
+      namespace action
       {
-        CEDAR_DECLARE_PROC_CLASS(OnTrial);
+        CEDAR_DECLARE_PROC_CLASS(SetParameterValue);
       }
     }
   }
@@ -65,5 +65,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_FWD_H
 

@@ -39,7 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/condition/And.h"
-#include "cedar/processing/experiment/condition/OnInit.h"
+#include "cedar/processing/experiment/condition/OnMatrixValue.h"
+#include "cedar/processing/experiment/condition/AtTime.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/Experiment.h"
 
@@ -65,7 +66,7 @@ _mCondition1
    (
      this,
      "Condition 1",
-     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
+     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnMatrixValue())
    )
  )
 ,
@@ -75,7 +76,7 @@ _mCondition2
    (
      this,
      "Condition 2",
-     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
+     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::AtTime())
    )
  )
 {

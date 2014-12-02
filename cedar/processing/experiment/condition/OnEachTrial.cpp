@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnInit.cpp
+    File:        ConditionOnEachTrial.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 02 06
 
-    Description: Source file for the class cedar::proc::experiment::ConditionOnInit.
+    Description: Source file for the class cedar::proc::experiment::ConditionOnEachTrial.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/condition/OnInit.h"
+#include "cedar/processing/experiment/condition/OnEachTrial.h"
 #include "cedar/processing/experiment/Experiment.h"
 
 // SYSTEM INCLUDES
@@ -48,15 +48,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace
 {
-	bool declared = cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
-		registerType<cedar::proc::experiment::condition::OnInitPtr>();
+  bool declare()
+  {
+    cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::condition::OnEachTrialPtr>();
+    cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+      addDeprecatedName<cedar::proc::experiment::condition::OnEachTrialPtr>
+      (
+        "cedar.proc.experiment.condition.OnInit"
+      );
+    return true;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::condition::OnInit::OnInit()
+cedar::proc::experiment::condition::OnEachTrial::OnEachTrial()
 {
 }
 
@@ -66,12 +75,12 @@ cedar::proc::experiment::condition::OnInit::OnInit()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-bool cedar::proc::experiment::condition::OnInit::check()
+bool cedar::proc::experiment::condition::OnEachTrial::check()
 {
   return false;
 }
 
-bool cedar::proc::experiment::condition::OnInit::initialCheck()
+bool cedar::proc::experiment::condition::OnEachTrial::initialCheck()
 {
   return true;
 }

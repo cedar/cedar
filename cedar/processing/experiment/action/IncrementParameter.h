@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,39 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnInit.h
+    File:        IncrementParameter.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 19
 
-    Description: Header file for the class cedar::proc::experiment::ConditionOnInit.
+    Description: Header file for the class cedar::proc::experiment::IncrementParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
-#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_INCREMENT_PARAMETER_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_INCREMENT_PARAMETER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/processing/experiment/action/Action.h"
+#include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/condition/OnInit.fwd.h"
+#include "cedar/processing/experiment/action/IncrementParameter.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Checks if a trial is on initial state
+/*!@todo Increases a parameter of a step.
  *
- *      A trial is on initial state if it is not has been started yet.
- *      There should be at least one of this conditions in your experiment, containing ActionStart.
+ * @todo describe more.
  */
-class cedar::proc::experiment::condition::OnInit : public cedar::proc::experiment::condition::Condition
+class cedar::proc::experiment::action::IncrementParameter : public cedar::proc::experiment::action::Action
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -65,20 +65,23 @@ class cedar::proc::experiment::condition::OnInit : public cedar::proc::experimen
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  OnInit();
+  IncrementParameter();
+
+  //!@brief Destructor
+  virtual ~IncrementParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool initialCheck();
+  //!@brief Increases the step parameter.
+  void run();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Checks if a trial is on initial state
-  bool check();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -101,8 +104,10 @@ protected:
   // none yet
 
 private:
+  //!@brief The value by the parameter should be increased
+  cedar::proc::experiment::StepPropertyParameterPtr _mStepParamter;
 
-}; // class cedar::proc::experiment::ConditionOnInit
+}; // class cedar::proc::experiment::action::IncrementParameter
 
-#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_INIT_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_INCREMENT_PARAMETER_H
 
