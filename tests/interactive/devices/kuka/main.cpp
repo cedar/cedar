@@ -37,6 +37,8 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
+#include "cedar/devices/kuka/FRIChannel.h"
+#include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/gl/KinematicChain.h"
@@ -62,7 +64,10 @@ int main(int argc, char **argv)
   // create the hardware interface
   cedar::dev::kuka::KinematicChainPtr p_arm(new cedar::dev::kuka::KinematicChain());
   p_arm->readJson(configuration_file);
-  p_fri_status_widget = new FriStatusWidget(p_arm);
+
+  cedar::dev::kuka::FRIChannelPtr fri_channel
+    = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(p_arm->getChannel());
+  p_fri_status_widget = new FriStatusWidget(fri_channel);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
   p_kinematic_chain_widget = new cedar::dev::gui::KinematicChainWidget(p_arm);
