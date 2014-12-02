@@ -124,12 +124,14 @@ _mRepeat(new cedar::aux::BoolParameter(this, "repeat", false))
 
   mElementRemovedConnection = this->mGroup->connectToElementRemovedSignal
   (
-    boost::bind(&cedar::proc::experiment::Experiment::groupChanged,this,_1)
+    boost::bind(&cedar::proc::experiment::Experiment::groupChanged, this, _1)
   );
   mNewElementAddedConnection = this->mGroup->connectToNewElementAddedSignal
   (
-    boost::bind(&cedar::proc::experiment::Experiment::groupChanged,this,_1)
+    boost::bind(&cedar::proc::experiment::Experiment::groupChanged, this, _1)
   );
+
+  QObject::connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), this, SIGNAL(groupChanged()));
 }
 
 cedar::proc::experiment::Experiment::~Experiment()
