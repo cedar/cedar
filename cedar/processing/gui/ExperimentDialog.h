@@ -108,6 +108,9 @@ private:
   void setActionSequenceWidgetsEnabled(bool enabled);
 
 private slots:
+  //!@brief Creates a new experiment
+  void createNewExperiment();
+
   //!@brief Saves the experiment
   void save();
 
