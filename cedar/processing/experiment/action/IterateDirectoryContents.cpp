@@ -42,6 +42,7 @@
 #include "cedar/processing/experiment/Supervisor.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register class

@@ -51,6 +51,8 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <vector>
+#include <string>
 
 
 /*!@brief A parameter to set a property of a certain step

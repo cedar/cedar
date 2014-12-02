@@ -48,6 +48,8 @@
 // SYSTEM INCLUDES
 #include <QFormLayout>
 #include <QLabel>
+#include <string>
+#include <vector>
 
 
 //----------------------------------------------------------------------------------------------------------------------

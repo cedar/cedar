@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <vector>
 
 
 /*!@brief An action that goes through a list of directory entries and applies it to a parameter on successive trials.

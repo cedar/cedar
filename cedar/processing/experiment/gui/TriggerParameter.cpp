@@ -45,6 +45,8 @@
 // SYSTEM INCLUDES
 #include <QBoxLayout>
 #include <QLabel>
+#include <string>
+#include <vector>
 
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_EXPERIMENT_H
-#define CEDAR_proc_EXPERIMENT_EXPERIMENT_H
+#ifndef CEDAR_PROC_EXPERIMENT_EXPERIMENT_H
+#define CEDAR_PROC_EXPERIMENT_EXPERIMENT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -62,6 +62,8 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <vector>
+#include <string>
 
 
 /*!@brief A class for creating and starting experiments with the current architecture.
@@ -389,5 +391,5 @@ private:
   boost::signals2::scoped_connection mNewElementAddedConnection;
 }; // class cedar::proc::experiment::Experiment
 
-#endif // CEDAR_proc_EXPERIMENT_EXPERIMENT_H
+#endif // CEDAR_PROC_EXPERIMENT_EXPERIMENT_H
 
