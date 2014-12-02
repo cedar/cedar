@@ -107,6 +107,8 @@ private:
   //! Enables/disables all action widgets.
   void setActionSequenceWidgetsEnabled(bool enabled);
 
+  void setExperiment(cedar::proc::experiment::ExperimentPtr experiment);
+
 private slots:
   //!@brief Creates a new experiment
   void createNewExperiment();

@@ -93,7 +93,7 @@ cedar::proc::experiment::action::IncrementParameter::~IncrementParameter()
 
 void cedar::proc::experiment::action::IncrementParameter::run()
 {
-  if (_mStepParamter->getStep() || _mStepParamter->getProperty() == "")
+  if (_mStepParamter->getStep() || _mStepParamter->getParameterPath() == "")
   {
     return;
   }
