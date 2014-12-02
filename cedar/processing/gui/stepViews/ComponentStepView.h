@@ -22,155 +22,72 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        ComponentStepView.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 03 05
+    Date:        2014 12 02
 
-    Description:
+    Description: Header file for the class cedar::proc::gui::ComponentStepView.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_COMPONENT_H
-#define CEDAR_PROC_STEPS_COMPONENT_H
+#ifndef CEDAR_PROC_GUI_COMPONENT_STEP_VIEW_H
+#define CEDAR_PROC_GUI_COMPONENT_STEP_VIEW_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/Step.h"
-#include "cedar/devices/ComponentParameter.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/gui/stepViews/ComponentStepView.fwd.h"
+#include "cedar/processing/gui/DefaultConnectableIconView.h"
 #include "cedar/processing/steps/Component.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QComboBox>
 
 
-namespace cedar
-{
-  namespace proc
-  {
-    namespace details
-    {
-      //!@todo This mixes GUI and step -- is this ok?
-      class ComponentStepGroupParameterWidget : public cedar::aux::gui::Parameter
-      {
-        Q_OBJECT
-
-      public:
-        ComponentStepGroupParameterWidget();
-
-        void parameterChanged();
-
-      private:
-        void applyProperties();
-
-        void propertiesChanged();
-
-        void rebuildGroupList();
-
-      private slots:
-        void componentChanged();
-        void selectedGroupChanged(const QString& group);
-
-      private:
-        QComboBox* mpSelector;
-      };
-
-      class ComponentStepGroupParameter : public cedar::aux::ParameterTemplate<std::string>
-      {
-        Q_OBJECT
-
-      public:
-        ComponentStepGroupParameter(cedar::aux::Configurable* owner, const std::string& name);
-
-        void setComponent(cedar::dev::ComponentPtr component);
-
-        cedar::dev::ComponentPtr getComponent();
-
-      signals:
-        void componentChanged();
-
-      private:
-        cedar::dev::ComponentPtr mComponent;
-      };
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentStepGroupParameter);
-    }
-  }
-}
-
-
-/*!@brief A step for bringing device components into a processing architecture.
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::steps::Component : public cedar::proc::Step
+class cedar::proc::gui::ComponentStepView : public QObject, public cedar::proc::gui::DefaultConnectableIconView
 {
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Component();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! get the component
-  inline cedar::dev::ComponentPtr getComponent() const
-  {
-    return this->_mComponent->getValue();
-  }
-
-  bool hasComponent() const;
-
-signals:
-  void componentChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void connectableChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::ConstDataPtr data
-                                  ) const;
-
-  void onStart();
-
-  void onStop();
-
-  void rebuildInputs();
-
-  void rebuildOutputs();
+  cedar::proc::steps::ConstComponentPtr getComponentStep() const;
 
 private slots:
-  void componentChangedSlot();
-
-  void selectedGroupChanged();
+  void updateIcon();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -178,11 +95,7 @@ private slots:
 protected:
   // none yet
 private:
-  //! Id used for signaling "step measurement" times
-  unsigned int mMeasurementTimeId;
-
-  //! Id used for signaling "step command" times
-  unsigned int mCommandTimeId;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -191,11 +104,9 @@ protected:
   // none yet
 
 private:
-  cedar::dev::ComponentParameterPtr _mComponent;
+  // none yet
 
-  cedar::proc::details::ComponentStepGroupParameterPtr _mGroup;
+}; // class cedar::proc::gui::ComponentStepView
 
-}; // class cedar::proc::steps::Component
-
-#endif // CEDAR_PROC_STEPS_COMPONENT_H
+#endif // CEDAR_PROC_GUI_COMPONENT_STEP_VIEW_H
 
