@@ -82,7 +82,7 @@ cedar::proc::experiment::condition::OnTrialNumber::~OnTrialNumber()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::experiment::condition::OnTrialNumber::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const
+bool cedar::proc::experiment::condition::OnTrialNumber::checkValidity(std::vector<std::string>& /* errors */, std::vector<std::string>& warnings) const
 {
   auto chosen_trial = this->_mTrial->getValue();
   Experiment* p_experiment = cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment();
