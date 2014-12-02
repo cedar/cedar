@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -52,7 +52,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif
-#include<QTimer>
+#include <QTimer>
 
 
 /*!@brief A widget for setting up, save and load experiments

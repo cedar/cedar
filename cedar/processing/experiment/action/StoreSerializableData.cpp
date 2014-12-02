@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/LockerBase.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register class

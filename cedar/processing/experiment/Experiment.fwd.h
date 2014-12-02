@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_EXPERIMENT_FWD_H
-#define CEDAR_proc_EXPERIMENT_EXPERIMENT_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_EXPERIMENT_FWD_H
+#define CEDAR_PROC_EXPERIMENT_EXPERIMENT_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -62,5 +62,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_proc_ANNOTATION_EXPERIMENT_FWD_H
+#endif // CEDAR_PROC_ANNOTATION_EXPERIMENT_FWD_H
 
