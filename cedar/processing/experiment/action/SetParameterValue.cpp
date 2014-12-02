@@ -72,7 +72,7 @@ cedar::proc::experiment::action::SetParameterValue::SetParameterValue()
 :
 _mStepParameter
 (
-    new cedar::proc::experiment::StepPropertyParameter(this,"Step Parameter")
+    new cedar::proc::experiment::StepPropertyParameter(this, "Step Parameter")
 )
 {
   _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE);
@@ -104,11 +104,10 @@ void cedar::proc::experiment::action::SetParameterValue::preExperiment()
     return;
   }
 
-
   auto parameter = this->_mStepParameter->getParameter();
   if (!parameter)
   {
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find parameter \"" + this->_mStepParameter->getProperty() + "\" for set action.");
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find parameter \"" + this->_mStepParameter->getParameterPath() + "\" for set action.");
   }
 
   cedar::aux::Parameter::ReadLocker locker(parameter.get());

@@ -114,16 +114,19 @@ public:
    /*!@brief Sets the property name of the step.
     *               It should always be checked if the property name is still available
     */
-   void setProperty(const std::string& poperty);
+   void setParameterPath(const std::string& poperty);
 
-   //!@brief Returns the step property name
-   const std::string& getProperty() const;
+   //!@brief Sets the step.
+   void setStep(cedar::proc::ConnectablePtr step);
 
-   //!@brief Sets the step name
-   void setStep(cedar::proc::ConnectableWeakPtr step);
+   //!@brief Sets the path of the element.
+   void setElementPath(const std::string& step);
 
-   //!@brief Sets the step name
-   void setStep(const std::string& step);
+   //! Returns the path of the currently selected element.
+   std::string getElementPath() const;
+
+   //! Returns the path of the currently selected element.
+   const std::string& getParameterPath() const;
 
    //!@brief Returns the step name
    cedar::proc::ConnectablePtr getStep() const;
@@ -182,7 +185,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
 //!@brief If the property is changed, the parameter copy will be updated
-  void updatePropertyCopy();
+  void updateParameterCopy();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -206,7 +209,7 @@ private:
   cedar::proc::ConnectableWeakPtr mElement;
 
   //!@brief The property
-  std::string mProperty;
+  std::string mParameterPath;
 
   //!@brief The type
   cedar::proc::experiment::StepPropertyParameter::PropertyType mType;
