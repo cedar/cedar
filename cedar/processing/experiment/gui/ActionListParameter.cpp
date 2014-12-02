@@ -46,6 +46,8 @@
 // SYSTEM INCLUDES
 #include <QBoxLayout>
 #include <QPushButton>
+#include <vector>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

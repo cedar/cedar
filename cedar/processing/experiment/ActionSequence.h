@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_ACTION_SEQUENCE_H
-#define CEDAR_proc_EXPERIMENT_ACTION_SEQUENCE_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SEQUENCE_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_SEQUENCE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -51,6 +51,7 @@
 #include "cedar/processing/experiment/ActionSequence.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief  This class stores actions and a condition for the experiment framework
@@ -138,5 +139,5 @@ namespace cedar
   }
 }
 
-#endif // CEDAR_proc_EXPERIMENT_ACTION_SEQUENCE_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_SEQUENCE_H
 

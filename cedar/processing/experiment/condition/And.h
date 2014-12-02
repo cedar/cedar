@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionAnd.h
+    File:        And.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
