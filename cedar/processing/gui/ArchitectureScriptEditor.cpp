@@ -43,6 +43,8 @@
 #include "cedar/processing/CppScript.h"
 
 // SYSTEM INCLUDES
+#include <set>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members

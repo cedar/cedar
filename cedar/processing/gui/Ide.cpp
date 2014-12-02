@@ -89,6 +89,7 @@
 #include <set>
 #include <list>
 #include <string>
+#include <utility>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

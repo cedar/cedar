@@ -54,6 +54,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/enable_shared_from_this.hpp>
 #endif
+#include <string>
 
 
 /*!@brief Derive this class to create scripts that can be executed on architectures from the cedar gui.

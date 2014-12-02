@@ -55,6 +55,7 @@
   #include <boost/signals2.hpp>
 #endif
 #include <map>
+#include <vector>
 
 
 /*!@brief A widget for conveniently controlling the boosts in a network.

@@ -48,6 +48,7 @@
 #include "cedar/processing/CppScriptDeclaration.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@todo describe.

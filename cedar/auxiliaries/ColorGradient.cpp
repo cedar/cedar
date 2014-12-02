@@ -213,10 +213,6 @@ void cedar::aux::ColorGradient::updateLookupTable()
         {
           mix = (gray_f - lower) / (upper - lower);
         }
-        else
-        {
-          std::cout << lower << " >= " << upper << " for " << gray_f << std::endl;
-        }
         color.setRed((1.0 - mix) * lower_col.red() + mix * upper_col.red());
         color.setBlue((1.0 - mix) * lower_col.blue() + mix * upper_col.blue());
         color.setGreen((1.0 - mix) * lower_col.green() + mix * upper_col.green());

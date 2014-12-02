@@ -42,6 +42,9 @@
 #include "cedar/processing/gui/Group.h"
 
 // SYSTEM INCLUDES
+#include <map>
+#include <set>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -49,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <QWidget>
+#include <map>
 
 namespace cedar
 {

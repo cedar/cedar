@@ -58,6 +58,9 @@
 #endif // Q_MOC_RUN
 #include <iostream>
 #include <set>
+#include <map>
+#include <vector>
+#include <string>
 
 
 /*!@brief A class for finding images and annotation information from an image database.
