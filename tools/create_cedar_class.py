@@ -63,6 +63,7 @@ users_mail_cfg = "user's mail"
 # determine cedar home
 cedar_home = os.path.realpath(__file__ + "/../..")
 print "cedar home detected as:", cedar_home
+template_base_path = "../templates/"
 
 # Configuration reading
 config_file_path = home + os.sep + ".cedar" + os.sep + "template_script.cfg"
@@ -98,6 +99,10 @@ parser.add_option("-f", "--fwd-only", dest="fwd_only",
 parser.add_option("-p", "--output-path", dest="output_path",
                   help="When specified, the folder in which the new files are put.",
                   default=None, action="store")
+                  
+parser.add_option("-t", "--template", dest="template",
+                  help="When specified, selects a specific template to be used. Currently, the only option is processing_step",
+                  default=None, action="store")
                  
 
 (options, args) = parser.parse_args()
@@ -105,6 +110,11 @@ parser.add_option("-p", "--output-path", dest="output_path",
 # Deal with the arguments
 header_only = options.header_only
 fwd_only = options.fwd_only
+if not options.template is None:
+    if not os.path.exists(template_base_path + options.template):
+        print "Could not find template", options.template
+        sys.exit(-1)
+    template_base_path += options.template + os.sep
 
 if len(args) > 1:
     print "Too many arguments (", args, "). Stopping."
@@ -208,6 +218,8 @@ replacements["<namespaces indent>"] = indent
 # Get user confirmation
 
 print "Creating class:", class_name_full, "aka", class_name
+if not options.template is None:
+    print "Using template", options.template
 print "at:", class_path + ".{" + ", ".join(extensions) + "}"
 # print "replacements:", replacements
 # print "namespaces:", namespaces
@@ -230,7 +242,7 @@ if options.output_path is not None:
 for extension in extensions:
     print "Copying template", templates[extension]
     replacements["<filename>"] = class_name + "." + extension
-    with open("../templates/" + templates[extension], "r") as header:
+    with open(template_base_path + templates[extension], "r") as header:
         contents = header.read()
     
     for search, replace in replacements.items():
