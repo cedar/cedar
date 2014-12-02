@@ -48,9 +48,6 @@ likely to undergo major changes:
 
 known issues
 ============
-  - cedardyn is not properly loaded on some OSs (mainly Windows) when using cedar. If you want to use its
-    content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
-    this plugin to be loaded on every start.
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
   - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
@@ -89,6 +86,8 @@ Unreleased
   - Added a trial framework for running experiments with cedar architectures (in the GUI, Tools>Experiments...).
   - Plugins can now declare C++ scripts which can be executed from the GUI. These allow running arbitrary code on a
     processing group. More details can be found in a tutorial in the documentation.
+- cedar::dyn
+  - On Windows, it should no longer be necessary to load this part of cedar as a plugin.
 
 
 Released versions
