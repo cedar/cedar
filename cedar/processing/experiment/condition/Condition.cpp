@@ -58,7 +58,12 @@ cedar::proc::experiment::condition::Condition::Condition()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::experiment::condition::Condition::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const
+bool cedar::proc::experiment::condition::Condition::checkValidity
+(
+  std::vector<std::string>& /* errors */,
+  std::vector<std::string>& /* warnings */
+)
+const
 {
   // by default, conditions are just valid
   return true;
