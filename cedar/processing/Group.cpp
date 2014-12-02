@@ -81,6 +81,7 @@
 #include <boost/regex.hpp>
 #include <algorithm>
 #include <sstream>
+#include <cctype>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -217,12 +218,41 @@ std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
 
 std::string cedar::proc::Group::camelCaseToSpaces(const std::string& camelCasedString)
 {
-  boost::regex re("([A-Za-z])([A-Z][a-z])");
-  auto replacer = [] (const boost::smatch& m)
+  if (camelCasedString.empty())
   {
-     return m[1].str() + " " + m[2].str();
-  };
-  return boost::regex_replace(camelCasedString, re, replacer);
+    return camelCasedString;
+  }
+
+  std::string spaced;
+
+  for (size_t i = 0; i < camelCasedString.size(); ++i)
+  {
+    bool in_upper = isupper(camelCasedString.at(i));
+    bool in_lower = islower(camelCasedString.at(i));
+    if (in_upper)
+    {
+      if (i > 0 && (i + 1) < camelCasedString.size() && islower(camelCasedString.at(i + 1)) && isupper(camelCasedString.at(i - 1)))
+      {
+        spaced += " ";
+      }
+      spaced += camelCasedString.at(i);
+    }
+    else if (in_lower)
+    {
+      spaced += camelCasedString.at(i);
+      if (i > 0 && (i + 1) < camelCasedString.size() && isupper(camelCasedString.at(i + 1)))
+      {
+        spaced += " ";
+      }
+    }
+    else
+    {
+      // other case: character is not an alphabetical one
+      spaced += camelCasedString.at(i);
+    }
+  }
+
+  return spaced;
 }
 
 bool cedar::proc::Group::checkScriptNameExists(const std::string& name) const
@@ -731,7 +761,7 @@ std::string cedar::proc::Group::findNewIdentifier(const std::string& basis, boos
 
 std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifier) const
 {
-  return findNewIdentifier(identifier, boost::bind(&cedar::proc::Group::nameExists, this, _1));
+  return findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(identifier), boost::bind(&cedar::proc::Group::nameExists, this, _1));
 }
 
 bool cedar::proc::Group::nameExists(const cedar::proc::NetworkPath& name) const
@@ -1441,7 +1471,7 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
   std::string modified_name;
   if (!newName.empty()) // desired name given
   {
-    modified_name = this->getUniqueIdentifier(newName);
+    modified_name = findNewIdentifier(newName, boost::bind(&cedar::proc::Group::nameExists, this, _1));
   }
   else // default name
   {
