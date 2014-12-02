@@ -49,12 +49,14 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <QObject>
 
 /*!@brief This thread should continuously perform the action sequences of the experiment
- *
  */
-class cedar::proc::experiment::Supervisor
+class cedar::proc::experiment::Supervisor : public QObject
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,6 +96,9 @@ public:
 
   //!@brief Logs a message and writes it to the log file;
   void log(std::string messageType, std::string message);
+
+signals:
+  void experimentRunningChanged(bool running);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

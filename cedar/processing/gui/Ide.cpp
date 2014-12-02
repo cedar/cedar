@@ -284,6 +284,14 @@ mSimulationRunning(false)
                    this,
                    SLOT(architectureChanged()));
 
+  QObject::connect
+  (
+    cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
+    SIGNAL(experimentRunningChanged(bool)),
+    this,
+    SLOT(experimentRunningChanged(bool))
+  );
+
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
@@ -322,11 +330,32 @@ cedar::proc::gui::Ide::~Ide()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::Ide::setSimulationControlsDisabled(bool disabled)
+void cedar::proc::gui::Ide::experimentRunningChanged(bool running)
 {
-  this->mpActionStartPauseSimulation->setEnabled(!disabled);
-  this->mpActionResetSimulation->setEnabled(!disabled);
-  this->mpThreadsSingleStep->setEnabled(!disabled);
+  this->setSimulationControlsEnabled(!running);
+  this->setArchitectureSavingLoadingEnabled(!running);
+  this->setRecodringControlsEnabled(!running);
+}
+
+void cedar::proc::gui::Ide::setRecodringControlsEnabled(bool enabled)
+{
+  this->mpActionRecord->setEnabled(enabled);
+  this->mpActionSnapshot->setEnabled(enabled);
+}
+
+void cedar::proc::gui::Ide::setArchitectureSavingLoadingEnabled(bool enabled)
+{
+  this->mpActionSave->setEnabled(enabled);
+  this->mpActionSaveAs->setEnabled(enabled);
+  this->mpActionLoad->setEnabled(enabled);
+  this->mpRecentFiles->setEnabled(enabled);
+}
+
+void cedar::proc::gui::Ide::setSimulationControlsEnabled(bool enabled)
+{
+  this->mpActionStartPauseSimulation->setEnabled(enabled);
+  this->mpActionResetSimulation->setEnabled(enabled);
+  this->mpThreadsSingleStep->setEnabled(enabled);
 }
 
 void cedar::proc::gui::Ide::buildStatusBar()
