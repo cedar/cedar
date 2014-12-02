@@ -269,7 +269,7 @@ public slots:
   cedar::proc::gui::ConstGroupPtr getGroup() const;
 
 public slots:
-  void setSimulationControlsDisabled(bool disabled);
+  void experimentRunningChanged(bool running);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -347,6 +347,12 @@ private:
   void buildStatusBar();
 
   void updateSimulationRunningIcon(bool running);
+
+  void setArchitectureSavingLoadingEnabled(bool enabled);
+
+  void setRecodringControlsEnabled(bool enabled);
+
+  void setSimulationControlsEnabled(bool enabled);
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);

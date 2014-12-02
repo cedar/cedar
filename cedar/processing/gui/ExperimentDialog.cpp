@@ -79,11 +79,6 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
   connect(this->mAddActionSequence,SIGNAL(clicked()),this,SLOT(addActionSequence()));
   connect(this->mpRepeat, SIGNAL(toggled(bool)), this, SLOT(repeatChecked(bool)));
 
-  QObject::connect(this->mExperiment.get(),
-                   SIGNAL(experimentRunning(bool)),
-                   this->mParent,
-                   SLOT(setSimulationControlsDisabled(bool)));
-
   //Time update
   mpGroupTime = new QTimer(this);
   connect(mpGroupTime, SIGNAL(timeout()), this, SLOT(timeUpdate()));
