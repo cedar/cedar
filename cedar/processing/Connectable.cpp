@@ -193,18 +193,30 @@ void cedar::proc::Connectable::revalidateInputSlot(const std::string& slot)
   this->getInputValidity(slot);
 }
 
+void cedar::proc::Connectable::removeAllSlots(cedar::proc::DataRole::Id role)
+{
+  auto iter = this->mSlotMaps.find(role);
+  if (iter == this->mSlotMaps.end())
+  {
+    // no slots for this input, nothing to do
+    return;
+  }
+
+  const auto& slot_map = iter->second;
+
+  while (!slot_map.empty())
+  {
+    auto first_it = slot_map.begin();
+    this->removeSlot(role, first_it->first);
+  }
+}
+
 void cedar::proc::Connectable::removeAllDataSlots()
 {
   for (auto& slot_map_iter : this->mSlotMaps)
   {
     cedar::proc::DataRole::Id role = slot_map_iter.first;
-    const SlotMap& slot_map = slot_map_iter.second;
-
-    while (!slot_map.empty())
-    {
-      auto first_it = slot_map.begin();
-      this->removeSlot(role, first_it->first);
-    }
+    this->removeAllSlots(role);
   }
 }
 

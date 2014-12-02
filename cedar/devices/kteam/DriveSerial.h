@@ -60,17 +60,19 @@ public:
   //!@brief Constructor taking an externally created channel
   DriveSerial(cedar::dev::kteam::SerialChannelPtr channel);
 
+  ~DriveSerial();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns the current encoder value of the left and right wheel.
-  virtual std::vector<int> getEncoders() const;
+  cv::Mat retrieveEncoders() const;
 
   /*!@brief Sets the encoder values of both wheels.
    * @param[in] encoders encoder value for the left and right wheel
    */
-  virtual void setEncoders(const std::vector<int>& encoders);
+  void sendEncoders(const cv::Mat &mat);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -83,7 +85,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

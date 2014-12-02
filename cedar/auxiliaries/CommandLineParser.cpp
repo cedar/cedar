@@ -674,6 +674,11 @@ void cedar::aux::CommandLineParser::writeHelp(std::ostream& stream) const
     stream << "Usage: " << this->mArguments.front() << " [options]" << std::endl << std::endl;
   }
 
+  if (!this->mDescription.empty())
+  {
+    stream << this->mDescription << std::endl << std::endl;
+  }
+
   this->writeHeading(stream, "Options", '=');
   stream << std::endl;
 
@@ -827,4 +832,9 @@ void cedar::aux::CommandLineParser::writeSummary(std::ostream& stream) const
     }
     stream << std::endl;
   }
+}
+
+void cedar::aux::CommandLineParser::setDescription(const std::string& description)
+{
+  this->mDescription = description;
 }

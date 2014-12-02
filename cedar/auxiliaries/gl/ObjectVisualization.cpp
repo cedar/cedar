@@ -96,17 +96,20 @@ cedar::aux::gl::ObjectVisualization::ObjectVisualization
 )
 :
 mObjectType(objectType),
-mIsVisible(true),
-mIsDrawnAsWireFrame(false),
-mIsDrawingLocalCoordinateFrame(false),
-mAxisLength(1.0),
-mResolution(10),
-mColorR(colorR),
-mColorG(colorG),
-mColorB(colorB),
 mpLocalCoordinateFrame(pLocalCoordinateFrame),
-mTransformationTranspose(4, 4, CV_64FC1)
+_mColorR( new cedar::aux::DoubleParameter( this, "red RGB color", colorR, 0.0, 1.0) ),
+_mColorG( new cedar::aux::DoubleParameter( this, "green RGB color", colorG, 0.0, 1.0) ),
+_mColorB( new cedar::aux::DoubleParameter( this, "blue RGB color", colorB, 0.0, 1.0) ),
+_mResolution( new cedar::aux::IntParameter( this, "resolution", 10) ),
+_mAxisLength( new cedar::aux::DoubleParameter( this, "axis length", 0.03) ),
+_mIsDrawnAsWireFrame( new cedar::aux::BoolParameter( this, "draw as wire frame", false) ),
+_mIsDrawingLocalCoordinateFrame( new cedar::aux::BoolParameter( this, "draw local coordinate frame", false) ),
+_mIsVisible( new cedar::aux::BoolParameter( this, "visible", true) )
 {
+  _mIsDrawingLocalCoordinateFrame->markAdvanced();
+  _mResolution->markAdvanced();
+  _mAxisLength->markAdvanced();
+  _mIsDrawnAsWireFrame->markAdvanced();
 }
 
 cedar::aux::gl::ObjectVisualization::~ObjectVisualization()
@@ -124,7 +127,7 @@ void cedar::aux::gl::ObjectVisualization::initializeGl()
 bool cedar::aux::gl::ObjectVisualization::isVisible() const
 {
 
-  return mIsVisible;
+  return _mIsVisible->getValue();
 }
 
 const std::string& cedar::aux::gl::ObjectVisualization::getObjectVisualizationType() const
@@ -134,64 +137,64 @@ const std::string& cedar::aux::gl::ObjectVisualization::getObjectVisualizationTy
 
 int cedar::aux::gl::ObjectVisualization::getResolution() const
 {
-  return mResolution;
+  return _mResolution->getValue();
 }
 
 double cedar::aux::gl::ObjectVisualization::getColorR() const
 {
-  return mColorR;
+  return _mColorR->getValue();
 }
 
 double cedar::aux::gl::ObjectVisualization::getColorG() const
 {
-  return mColorG;
+  return _mColorG->getValue();
 }
 
 double cedar::aux::gl::ObjectVisualization::getColorB() const
 {
-  return mColorB;
+  return _mColorB->getValue();
 }
 
 void cedar::aux::gl::ObjectVisualization::setDrawAsWireFrame(bool state)
 {
-  mIsDrawnAsWireFrame = state;
+  _mIsDrawnAsWireFrame->setValue( state );
 }
 
 bool cedar::aux::gl::ObjectVisualization::isDrawnAsWireFrame() const
 {
-  return mIsDrawnAsWireFrame;
+  return getIsDrawnAsWireFrame();
 }
 
 void cedar::aux::gl::ObjectVisualization::setDrawLocalCoordinateFrame(bool state)
 {
-  mIsDrawingLocalCoordinateFrame = state;
+  _mIsDrawingLocalCoordinateFrame->setValue( state );
 }
 
 bool cedar::aux::gl::ObjectVisualization::isDrawingLocalCoordinateFrame() const
 {
-  return mIsDrawingLocalCoordinateFrame;
+  return _mIsDrawingLocalCoordinateFrame->getValue();
 }
 
 void cedar::aux::gl::ObjectVisualization::setAxisLength(double value)
 {
-  mAxisLength = value;
+  _mAxisLength->setValue( value );
 }
 
 double cedar::aux::gl::ObjectVisualization::getAxisLength() const
 {
-  return mAxisLength;
+  return _mAxisLength->getValue();
 }
 
 void cedar::aux::gl::ObjectVisualization::setResolution(int value)
 {
-  mResolution = value;
+  _mResolution->setValue( value );
 }
 
 void cedar::aux::gl::ObjectVisualization::setColor(double r, double g, double b)
 {
-  mColorR = r;
-  mColorG = g;
-  mColorB = b;
+  _mColorR->setValue( r );
+  _mColorG->setValue( g );
+  _mColorB->setValue( b );
 }
 
 cedar::aux::LocalCoordinateFramePtr cedar::aux::gl::ObjectVisualization::getLocalCoordinateFrame()
@@ -206,8 +209,9 @@ void cedar::aux::gl::ObjectVisualization::prepareDraw()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpLocalCoordinateFrame->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpLocalCoordinateFrame->getTransformation().t();
+  glMultMatrixd((GLdouble*)transformation.data);
 
   // draw local coordinate frame
   drawLocalCoordinateFrame();
@@ -215,9 +219,9 @@ void cedar::aux::gl::ObjectVisualization::prepareDraw()
 
 void cedar::aux::gl::ObjectVisualization::drawLocalCoordinateFrame()
 {
-  if (mIsDrawingLocalCoordinateFrame)
+  if (getIsDrawingLocalCoordinateFrame())
   {
-    cedar::aux::gl::drawAxes(mAxisLength);
+    cedar::aux::gl::drawAxes(getAxisLength());
   }
 }
 
@@ -302,7 +306,7 @@ void cedar::aux::gl::ObjectVisualization::drawElement
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_VERTEX_ARRAY);
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
@@ -382,5 +386,6 @@ void cedar::aux::gl::ObjectVisualization::setMaterial(int material)
 
 void cedar::aux::gl::ObjectVisualization::setVisibility(bool state)
 { 
-  mIsVisible = state;
+  _mIsVisible->setValue( state, true );
 }
+

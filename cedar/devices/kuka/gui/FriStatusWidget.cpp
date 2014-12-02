@@ -53,7 +53,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kuka::gui::FriStatusWidget::FriStatusWidget(cedar::dev::kuka::KinematicChainPtr pKukaIn, QWidget *parent)
+cedar::dev::kuka::gui::FriStatusWidget::FriStatusWidget(cedar::dev::kuka::FRIChannelPtr pKukaIn, QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("FriStatusWidget", parent)
 {

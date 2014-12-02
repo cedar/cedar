@@ -49,13 +49,17 @@
 cedar::aux::LockerBase::LockerBase
 (
   const boost::function<void()>& lockFunction,
-  const boost::function<void()>& unlockFunction
+  const boost::function<void()>& unlockFunction,
+  bool lockImmediately
 )
 :
 cedar::aux::CallOnScopeExit(unlockFunction),
 mLockFunction(lockFunction)
 {
-  this->relock();
+  if (lockImmediately)
+  {
+    this->relock();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
