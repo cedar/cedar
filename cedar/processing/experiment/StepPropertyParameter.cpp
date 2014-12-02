@@ -85,10 +85,22 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
 {
   try
   {
-//!@todo This causes a lot of problems, e.g., if a value is added to the enumeration, thus changing the meaning of the integer values. Why was this even read from/written to the configuration? This is usually set by classes using this parameter...
-//    PropertyType type = static_cast<PropertyType>(node.get_child("Type").get_value<int>());
-//    this->setType(type);
-    auto name = node.get_child("Step").get_value<std::string>();
+    std::string name;
+    auto element_path_iter = node.find("element path");
+    if (element_path_iter != node.not_found())
+    {
+      name = element_path_iter->second.get_value<std::string>();
+    }
+    else
+    {
+      // old naming
+      auto step_iter = node.find("Step");
+      if (step_iter != node.not_found())
+      {
+        name = step_iter->second.get_value<std::string>();
+      }
+    }
+
     cedar::proc::ConnectablePtr element;
     auto group = SupervisorSingleton::getInstance()->getExperiment()->getGroup();
     if (group->nameExists(name))
@@ -96,14 +108,37 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
       element = group->getElement<cedar::proc::Connectable>(name);
     }
     this->setStep(element);
-    this->setProperty(node.get_child("Property").get_value<std::string>());
+
+    std::string parameter_path;
+    auto parameter_path_iter = node.find("parameter path");
+    if (parameter_path_iter != node.not_found())
+    {
+      parameter_path = parameter_path_iter->second.get_value<std::string>();
+    }
+    else
+    {
+      // old naming
+      auto property_iter = node.find("Property");
+      if (property_iter != node.not_found())
+      {
+        parameter_path = property_iter->second.get_value<std::string>();
+      }
+    }
+    this->setProperty(parameter_path);
+
     switch (mType)
     {
       case PARAMETER_VALUE:
       {
         if (mParameterCopy)
         {
-          mParameterCopy->readFromNode(node.get_child("PropertyParameter"));
+          auto iter = node.find("parameter value");
+          if (iter == node.not_found())
+          {
+            iter = node.find("PropertyParameter");
+          }
+          CEDAR_ASSERT(iter != node.not_found());
+          mParameterCopy->readFromNode(iter->second);
         }
         break;
       }
@@ -136,15 +171,13 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
   cedar::aux::ConfigurationNode step_node;
   if (auto element = mElement.lock())
   {
-    step_node.put("Step", mElement.lock()->getFullPath());
+    step_node.put("element path", mElement.lock()->getFullPath());
   }
   else
   {
-    step_node.put("Step", "");
+    step_node.put("element path", this->mElementPath);
   }
-  step_node.put("Property", mProperty);
-  //!@todo see comment in readFromNode
-//  step_node.put("Type", mType);
+  step_node.put("parameter path", mProperty);
 
   switch (mType)
   {
