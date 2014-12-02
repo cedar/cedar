@@ -58,7 +58,11 @@ mRegisteredGrabber("")
 
 cedar::aux::gui::Viewer::~Viewer()
 {
-  mpScene->removeViewer(this);
+  if (mpScene)
+  {
+    mpScene->removeViewer(this);
+  }
+
   if (mpGrabberLock)
   {
     delete mpGrabberLock;

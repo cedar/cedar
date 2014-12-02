@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,65 +22,59 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Sphere.cpp
+    File:        ViewerManager.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 29
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        2014 10 21
 
-    Description: Visualization of a sphere
+    Description: Source file for the class cedar::aux::gui::ViewerManager.
 
     Credits:
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/drawShapes.h"
-#include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/gui/ViewerManager.h"
+#include "cedar/auxiliaries/gl/GlobalScene.h"
 
 // SYSTEM INCLUDES
-
+#include <boost/make_shared.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Sphere::Sphere
-(
-  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-  double radius,
-  double colorR,
-  double colorG,
-  double colorB
-)
-:
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Sphere", colorR, colorG, colorB),
-mRadius(radius)
+cedar::aux::gui::ViewerManager::ViewerManager()
+{
+}
+
+cedar::aux::gui::ViewerManager::~ViewerManager()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::gl::Sphere::setRadius(double value)
+cedar::aux::gui::ViewerPtr cedar::aux::gui::ViewerManager::getNewUnnamedViewer()
 {
-  mRadius = value;
+  auto scene = cedar::aux::gl::GlobalSceneSingleton::getInstance();
+
+  auto viewer = boost::make_shared< cedar::aux::gui::Viewer >( scene );
+
+  // todo: move this to somplace else
+  scene->setSceneLimit(2);
+  scene->drawFloor(true);
+
+  // sensible default settings:
+  viewer->setSceneRadius( scene->getSceneLimit() );
+
+  mViewers.push_back( viewer );
+
+  return viewer;
 }
 
-double cedar::aux::gl::Sphere::radius() const
-{
-  return mRadius;
-}
 
-void cedar::aux::gl::Sphere::draw()
-{
-  prepareDraw();
-  
-  // draw the sphere
-  if (isVisible())
-  {
-    gl::setColor(getColorR(), getColorG(), getColorB());
-    drawSphere(mRadius, getResolution()*2, getResolution(), getIsDrawnAsWireFrame());
-  }
-}

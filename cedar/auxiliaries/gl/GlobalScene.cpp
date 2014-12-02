@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,65 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Sphere.cpp
+    File:        GlobalScene.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 29
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        2014 10 21
 
-    Description: Visualization of a sphere
+    Description: Source file for the class cedar::aux::gl::GlobalScene.
 
     Credits:
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/drawShapes.h"
-#include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/gl/GlobalScene.h"
 
 // SYSTEM INCLUDES
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Sphere::Sphere
-(
-  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-  double radius,
-  double colorR,
-  double colorG,
-  double colorB
-)
-:
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Sphere", colorR, colorG, colorB),
-mRadius(radius)
+cedar::aux::gl::GlobalScene::GlobalScene()
+{
+}
+
+cedar::aux::gl::GlobalScene::~GlobalScene()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::gl::Sphere::setRadius(double value)
-{
-  mRadius = value;
-}
-
-double cedar::aux::gl::Sphere::radius() const
-{
-  return mRadius;
-}
-
-void cedar::aux::gl::Sphere::draw()
-{
-  prepareDraw();
-  
-  // draw the sphere
-  if (isVisible())
-  {
-    gl::setColor(getColorR(), getColorG(), getColorB());
-    drawSphere(mRadius, getResolution()*2, getResolution(), getIsDrawnAsWireFrame());
-  }
-}

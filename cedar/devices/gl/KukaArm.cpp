@@ -153,7 +153,7 @@ void cedar::dev::gl::KukaArm::initializeGl()
 void cedar::dev::gl::KukaArm::drawBase()
 {
   prepareDraw();
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
@@ -286,14 +286,15 @@ void cedar::dev::gl::KukaArm::drawSegment(unsigned int index)
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpKinematicChain->getJointTransformation(index).t();
+  glMultMatrixd((GLdouble*)transformation.data);
 
   if (isDrawingLocalCoordinateFrame())
   {
     cedar::aux::gl::drawAxes(0.2);
   }
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
@@ -351,9 +352,9 @@ void cedar::dev::gl::KukaArm::drawSegment(unsigned int index)
     this->drawElement(mWristRingVertexVboId, mWristRingIndexVboId, mWristRingFacesNumber);
     glTranslated(0, 0, -0.007099966);
     setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
-    cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, 45, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, 45, getIsDrawnAsWireFrame());
     glTranslated(0, 0, 0.02);
-    cedar::aux::gl::drawDisk(0.0, 0.0315, 45, 10, false, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0.0, 0.0315, 45, 10, false, getIsDrawnAsWireFrame());
     setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   }

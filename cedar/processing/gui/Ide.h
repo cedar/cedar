@@ -201,6 +201,10 @@ public slots:
   /*!@brief Opens a dialog that contains the robot manager widget.
    */
   void showRobotManager();
+
+  /*!@brief Opens a window that shows the simulated scene.
+   */
+  void addGlobalSceneViewer();
   
   /*!@brief Duplicates a selected step
    */

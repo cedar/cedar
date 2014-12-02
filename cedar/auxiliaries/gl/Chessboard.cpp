@@ -71,7 +71,7 @@ void cedar::aux::gl::Chessboard::draw()
   prepareDraw();
   
   // draw object
-  if (mIsVisible)
+  if (isVisible())
   {
     double l = mLength/mNumberOfRows;
     double w = mWidth/mNumberOfColumns;
@@ -82,13 +82,13 @@ void cedar::aux::gl::Chessboard::draw()
       {
         if(((i+j) % 2) == 0)
         {
-          gl::setColor(mColorR, mColorG, mColorB);
+          gl::setColor(getColorR(), getColorG(), getColorB());
         }
         else
         {
           gl::setColor(1, 1, 1);
         } // end if
-        drawBlock(l, w, mHeight, mIsDrawnAsWireFrame);
+        drawBlock(l, w, mHeight, getIsDrawnAsWireFrame());
         glTranslated(0, w, 0);
       } // end for (cols)
       glTranslated(l, -mWidth, 0);
