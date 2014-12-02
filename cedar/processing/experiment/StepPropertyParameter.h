@@ -199,8 +199,10 @@ protected:
   // none yet
 
 private:
-  //!@brief The step
-//  std::string mStep;
+  //!@brief The path of the element.
+  std::string mElementPath;
+
+  //! Weak pointer to the element.
   cedar::proc::ConnectableWeakPtr mElement;
 
   //!@brief The property
