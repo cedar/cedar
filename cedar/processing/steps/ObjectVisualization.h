@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,84 +22,70 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KinematicChain.h
+    File:        ObjectVisualization.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
-    Date:        2010 11 23
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        2014 10 21
 
-    Description:
+    Description: Header file for the class cedar::proc::steps::ObjectVisualization.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H
-#define CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H
+#ifndef CEDAR_PROC_STEPS_OBJECT_VISUALIZATION_H
+#define CEDAR_PROC_STEPS_OBJECT_VISUALIZATION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_KUKA_LWR
-
 // CEDAR INCLUDES
-#include "cedar/devices/kuka/namespace.h"
-#include "cedar/devices/KinematicChain.h"
-#include "cedar/auxiliaries/IntParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/ExternalData.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/processing/steps/ObjectVisualization.fwd.h"
 
 // SYSTEM INCLUDES
-#include <fri/friremote.h>
-#include <QReadWriteLock>
-#include <vector>
 
 
-/*!@brief kinematic chain interface for the KUKA LBR
+/*!@todo describe.
  *
- * This class wraps the KUKA Fast Research Interface (FRI)
+ * @todo describe more.
  */
-class cedar::dev::kuka::KinematicChain :  public cedar::dev::KinematicChain
+class cedar::proc::steps::ObjectVisualization : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  //!@brief a parameter for the object visualizations
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::gl::ObjectVisualization> ObjectVisualizationParameter;
+
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ObjectVisualizationParameter);
+  //!@endcond
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Standard constructor
-   */
-  KinematicChain();
+  //!@brief The standard constructor.
+  ObjectVisualization();
 
-  /*!the destructor */
-  virtual ~KinematicChain();
+  //!@brief Destructor
+  virtual ~ObjectVisualization();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief check whether the kinematic chain is currently responsive to movement commands
-   *
-   * @return    state
-   */
-  bool isMovable() const;
-
-  /*! @brief returns angle for a specified joint
-   *
-   *  @param index  index of the joint, since the KUKA LBR has seven of them, it must be in the interval [0,6]
-   *  @return joint angle for the given index
-   */
-  virtual double getJointAngle(unsigned int index) const;
-
-  /*! @brief returns all joint angles
-   *
-   *  @return a vector filled with the joint angles
-   *  \throws std::out_of_range if index is out of range
-   */
-  virtual void setJointAngle(unsigned int index, double angle);
-
-
-
-
-  void sendSimulatedAngles(cv::Mat mat);
-  cv::Mat retrieveSimulatedAngles();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -111,15 +97,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief This method initializes the object.
-   *
-   * This method is called from all constructors of the class.
-   * @param commandMode establish command mode if true
-   */
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  //!@brief copies data from the FRI to member variables for access from outside the loop thread
-  void copyFromFRI();
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -127,24 +106,25 @@ private:
 protected:
   // none yet
 private:
-  //!@brief true, if the object has been initialized
-  bool mIsInit;
-  //!@brief locker for read/write protection
-  mutable QReadWriteLock mLock;
-  //!@brief last commanded joint position
-  std::vector<double> mCommandedJointPosition;
-  //!@brief last measured joint Position
-  std::vector<double> mMeasuredJointPosition;
-  //!@brief the FRI channel
-  cedar::dev::kuka::FRIChannelPtr mFRIChannel;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  // none yet
-};
-#endif // CEDAR_USE_KUKA_FRI
-#endif /* CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H */
+  //!@brief The input slot containing all the terms.
+  cedar::proc::ExternalDataPtr mInputs;
+
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
+
+  //!@brief: object visualizations we are representing
+  ObjectVisualizationParameterPtr _mVisualizedObject;
+
+}; // class cedar::proc::steps::ObjectVisualization
+
+#endif // CEDAR_PROC_STEPS_OBJECT_VISUALIZATION_H
+

@@ -68,6 +68,7 @@
 #include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/gui/ViewerManager.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/units/prefixes.h"
 #include "cedar/auxiliaries/Recorder.h"
@@ -262,6 +263,11 @@ mSimulationRunning(false)
                    this,
                    SLOT(showRobotManager()));
 
+  QObject::connect(mpActionAddGlobalSceneViewer,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(addGlobalSceneViewer()));
+
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copyStep()));
   QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
@@ -395,6 +401,14 @@ void cedar::proc::gui::Ide::showRobotManager()
   p_layout->addWidget(new cedar::dev::gui::RobotManager());
   p_dialog->setMinimumHeight(500);
   p_dialog->show();
+}
+
+void cedar::proc::gui::Ide::addGlobalSceneViewer()
+{
+  auto viewer = cedar::aux::gui::ViewerManagerSingleton::getInstance()->getNewUnnamedViewer();
+
+  viewer->startTimer(50);
+  viewer->show();
 }
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,48 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        GlobalScene.fwd.h
 
-    Maintainer:  Guido Knips
-    Email:       guido.knips@ini.rub.de
-    Date:        2010 12 9
+    Maintainer:  jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        2014 10 21
 
-    Description: Namespace file for cedar::dev::kuka.
+    Description: Forward declaration file for the class cedar::aux::gl::GlobalScene.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KUKA_NAMESPACE_H
-#define CEDAR_DEV_KUKA_NAMESPACE_H
+#ifndef CEDAR_AUX_GL_GLOBAL_SCENE_FWD_H
+#define CEDAR_AUX_GL_GLOBAL_SCENE_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_KUKA_LWR
-
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
-#endif
+#endif // Q_MOC_RUN
+
 
 namespace cedar
 {
-  namespace dev
+  namespace aux
   {
-    /*! @brief Namespace for KinematicChain implementation for Kuka LWR. */
-    namespace kuka
+    namespace gl
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
-      CEDAR_DECLARE_DEV_CLASS(FRIChannel);
+      CEDAR_DECLARE_AUX_CLASS(GlobalScene);
       //!@endcond
     }
   }
 }
 
-#endif // CEDAR_USE_KUKA_FRI
-#endif // CEDAR_DEV_KUKA_NAMESPACE_H
+
+#endif // CEDAR_AUX_GL_GLOBAL_SCENE_FWD_H
+

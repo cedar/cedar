@@ -146,6 +146,8 @@
     <addaction name="separator"/>
     <addaction name="mpActionManagePlugins"/>
     <addaction name="mpActionShowRobotManager"/>
+    <addaction name="mpActionAddGlobalSceneViewer"/>
+    <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
    <addaction name="menuFile"/>
@@ -561,6 +563,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="mpActionAddGlobalSceneViewer">
+   <property name="text">
+    <string>add a Camera of the simulated scene ...</string>
    </property>
   </action>
   <action name="mpActionDuplicate">
