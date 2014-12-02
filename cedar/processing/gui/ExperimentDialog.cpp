@@ -184,6 +184,7 @@ void cedar::proc::gui::ExperimentDialog::load()
   if (!filename.empty())
   {
     location_dir->setValue(QDir(QString::fromStdString(filename)));
+    //!@todo Shouldn't this create a new experiment?
     this->mExperiment->readJson(filename);
     this->mExperiment->setFileName(filename);
     this->mpRepeat->setChecked(this->mExperiment->getRepeating());
