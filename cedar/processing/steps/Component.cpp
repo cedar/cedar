@@ -38,6 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/stepViews/ComponentStepView.h"
 #include "cedar/processing/steps/Component.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -63,7 +64,7 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::Component>
+      new ElementDeclarationTemplate<cedar::proc::steps::Component, cedar::proc::gui::ComponentStepView>
       (
         "Devices",
         "cedar.processing.steps.Component"
@@ -215,7 +216,8 @@ _mComponent(new cedar::dev::ComponentParameter(this, "component")),
 _mGroup(new cedar::proc::details::ComponentStepGroupParameter(this, "command group"))
 {
   this->_mGroup->setConstant(true);
-  QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChanged()));
+  QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChangedSlot()));
+  QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SIGNAL(componentChanged()));
   QObject::connect(this->_mGroup.get(), SIGNAL(valueChanged()), this, SLOT(selectedGroupChanged()));
 
   this->mMeasurementTimeId = this->registerTimeMeasurement("step measurements time");
@@ -394,7 +396,7 @@ void cedar::proc::steps::Component::rebuildOutputs()
   }
 }
 
-void cedar::proc::steps::Component::componentChanged()
+void cedar::proc::steps::Component::componentChangedSlot()
 {
   //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
   if (!this->hasComponent())
