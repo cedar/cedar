@@ -68,6 +68,7 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
   this->setupUi(this);
 
   // Connect the GUI elements
+  connect(this->mpNewButton, SIGNAL(clicked()), this, SLOT(createNewExperiment()));
   connect(this->saveButton, SIGNAL(clicked()), this, SLOT(save()));
   connect(this->loadButton, SIGNAL(clicked()), this, SLOT(load()));
   connect(this->saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
@@ -275,7 +276,7 @@ void cedar::proc::gui::ExperimentDialog::redraw()
       this->mExperiment->getActionSequences();
   for (unsigned int i = 0; i < action_sequences.size(); i++)
   {
-    cedar::proc::experiment::ActionSequencePtr action_seq =action_sequences[i];
+    cedar::proc::experiment::ActionSequencePtr action_seq = action_sequences[i];
     cedar::proc::experiment::gui::ActionSequence* as_gui
       = new cedar::proc::experiment::gui::ActionSequence(action_seq,this);
     this->mActionSequences->addWidget(as_gui);
@@ -287,4 +288,39 @@ void cedar::proc::gui::ExperimentDialog::timeUpdate()
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   std::string formatted_time = cedar::aux::formatDuration(time);
   this->mTimeLabel->setText(QString::fromStdString(formatted_time));
+}
+
+void cedar::proc::gui::ExperimentDialog::createNewExperiment()
+{
+  auto r = QMessageBox::question
+      (
+        this,
+        "New experiment?",
+        "Do you want to discard the old experiment and create a new one?",
+        QMessageBox::Ok | QMessageBox::Cancel
+      );
+
+  switch (r)
+  {
+    case QMessageBox::Cancel:
+      return;
+
+    case QMessageBox::Ok:
+      break;
+
+    default:
+      CEDAR_ASSERT(false);
+  }
+
+  if (this->mExperiment->isRunning())
+  {
+    this->mExperiment->stopExperiment();
+  }
+  this->mExperiment = cedar::proc::experiment::ExperimentPtr(new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup()));
+  this->mExperiment->setName("new experiment");
+  this->mExperiment->setFileName("new experiment.json");
+  this->mpRepeat->setChecked(this->mExperiment->getRepeating());
+  this->nameEdit->setText(QString::fromStdString(this->mExperiment->getName()));
+  this->repetitionSpinBox->setValue(this->mExperiment->getTrialCount());
+  this->redraw();
 }
