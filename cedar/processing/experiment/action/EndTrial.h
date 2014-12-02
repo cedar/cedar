@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStop.h
+    File:        EndTrial.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 03 09
 
-    Description: Header file for the class cedar::proc::experiment::ActionStop.
+    Description: Header file for the class cedar::proc::experiment::EndTrial.
 
     Credits:
 

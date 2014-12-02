@@ -63,10 +63,10 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::EnumType<cedar::proc::experiment::Experiment::ResetType>
-    cedar::proc::experiment::Experiment::ResetType::mType("Expermient.ResetType.");
+    cedar::proc::experiment::Experiment::ResetType::mType("Experiment.ResetType.");
 
 cedar::aux::EnumType<cedar::proc::experiment::Experiment::CompareMethod>
-    cedar::proc::experiment::Experiment::CompareMethod::mType("Expermient.CompareMethod.");
+    cedar::proc::experiment::Experiment::CompareMethod::mType("Experiment.CompareMethod.");
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -269,25 +269,6 @@ void cedar::proc::experiment::Experiment::startTrial()
   this->mStartGroup->start();
 }
 
-
-void cedar::proc::experiment::Experiment::startTrigger(const std::string& triggerName)
-{
-  for (auto name_element_pair : this->mGroup->getElements())
-  {
-    if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(name_element_pair.second))
-    {
-      if (name_element_pair.first == triggerName)
-      {
-        if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger))
-        {
-          looped_trigger->start();
-        }
-      }
-    }
-  }
-}
-
-
 void cedar::proc::experiment::Experiment::startAllTriggers()
 {
   this->mStartGroup->start();
@@ -321,15 +302,9 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
     {
       break;
     }
-    case ResetType::Wait:
+    case 1:
     {
-      //!@todo Why can't this wait time be changed?
-      cedar::aux::usleep(1000000);
-      break;
-    }
-    case ResetType::Reset:
-    {
-      this->mGroup->reset();
+      CEDAR_ASSERT(false && "The reset type Wait (value 1) is not supported anymore. Please fix your configuration file.");
       break;
     }
     case ResetType::Reload:
@@ -339,6 +314,7 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
       this->resetGroupState();
       break;
     }
+    case ResetType::Reset:
     default:
     {
       this->mGroup->reset();

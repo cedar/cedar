@@ -79,8 +79,8 @@ _mResetType
     cedar::proc::experiment::Experiment::ResetType::Reset
   )
 ),
-_mSuccess( new cedar::aux::BoolParameter(this,"Success",true) ),
-_mMessage(new cedar::aux::StringParameter(this,"Message",""))
+_mSuccess( new cedar::aux::BoolParameter(this, "Success", true)),
+_mMessage(new cedar::aux::StringParameter(this, "Message", ""))
 {
 }
 
@@ -95,6 +95,6 @@ cedar::proc::experiment::action::EndTrial::~EndTrial()
 void cedar::proc::experiment::action::EndTrial::run()
 {
   auto super = cedar::proc::experiment::SupervisorSingleton::getInstance();
-  super->log(_mSuccess->getValue()?"Trial success":"Trial failed",_mMessage->getValue());
+  super->log(_mSuccess->getValue() ? "Trial success" : "Trial failed", _mMessage->getValue());
   super->getExperiment()->stopTrial(_mResetType->getValue());
 }

@@ -104,10 +104,9 @@ public:
       //! Registers the enum values.
       static void construct()
       {
-        mType.type()->def(cedar::aux::Enum(None, "None"));
-        mType.type()->def(cedar::aux::Enum(Wait, "Wait"));
-        mType.type()->def(cedar::aux::Enum(Reset, "Reset"));
-        mType.type()->def(cedar::aux::Enum(Reload, "Reload"));
+        mType.type()->def(cedar::aux::Enum(None, "None", "", "The architecture is left in the state it had at the end of the trial."));
+        mType.type()->def(cedar::aux::Enum(Reset, "Reset", "", "The architecture is reset after reaching the end of the trial."));
+        mType.type()->def(cedar::aux::Enum(Reload, "Reload", "", "The architecture is reloaded after reaching the end of the trial."));
       }
 
       //! Returns the enumeration type.
@@ -123,12 +122,11 @@ public:
       }
 
     public:
+      //!@brief the architecture is left in the state it had at the end of the trial
       static const Id None = 0;
-
-      static const Id Wait = 1;
-
+      //!@brief the architecture is reset after reaching the end of the trial
       static const Id Reset = 2;
-
+      //!@brief the architecture is reloaded after reaching the end of the trial
       static const Id Reload = 3;
 
     private:
@@ -253,9 +251,6 @@ public:
 
   //!@brief Starts a trial. Should only be called when no trial is currently running
   void startTrial();
-
-  //!@brief Returns a trigger from a name
-  void startTrigger(const std::string& triggerName);
 
   //!@brief Returns a trigger from a name
   void startAllTriggers();
