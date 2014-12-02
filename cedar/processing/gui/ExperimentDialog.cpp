@@ -233,6 +233,58 @@ cedar::proc::experiment::ExperimentPtr cedar::proc::gui::ExperimentDialog::getEx
 
 void cedar::proc::gui::ExperimentDialog::runExperiment()
 {
+  std::map<std::string, std::vector<std::string> > issues;
+  issues["errors"] = std::vector<std::string>();
+  issues["warnings"] = std::vector<std::string>();
+
+  bool valid = this->mExperiment->checkValidity(issues["errors"], issues["warnings"]);
+
+  QMessageBox::Icon icon;
+  if (valid)
+  {
+    icon = QMessageBox::Warning;
+  }
+  else
+  {
+    icon = QMessageBox::Critical;
+  }
+
+  auto p_mb = new QMessageBox
+              (
+                icon,
+                "Issues with the experiment",
+                "Some parts of the experiment are not set up properly. Start anyway?",
+                QMessageBox::Yes | QMessageBox::No
+              );
+
+  QString details;
+
+  for (const auto& issue_list_pair : issues)
+  {
+    const auto& list = issue_list_pair.second;
+    if (!list.empty())
+    {
+      QString issue = QString::fromStdString(issue_list_pair.first);
+
+      details += "The following ";
+      details += issue;
+      details += " occurred:\n\n";
+      for (const auto& item : list)
+      {
+        details += QString::fromStdString(item) + "\n";
+      }
+    }
+  }
+
+  p_mb->setDetailedText(details);
+
+  int r = p_mb->exec();
+
+  if (r == QMessageBox::No)
+  {
+    return;
+  }
+
   this->mExperiment->startExperiment();
 }
 

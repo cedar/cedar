@@ -92,6 +92,11 @@ public:
   //! Called after an experiment is stopped.
   virtual void postExperiment();
 
+  /*! Reimplement this to check the validity of the action. Return true if the action is valid. If false is returned, an
+   *  inforative message should be added to the @em errors vector.
+   */
+  virtual bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -175,6 +175,9 @@ public:
 
    std::vector<std::string> getListOfParameters();
 
+   //! Checks the validity of the parameter.
+   bool checkValidity(std::string& errors) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
