@@ -93,6 +93,27 @@ _mDesiredValue(new cedar::aux::DoubleParameter(this,"value",0.0))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::condition::OnMatrixValue::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& /* warnings */) const
+{
+  cedar::aux::ConstDataPtr data = this->_stepData->getData();
+
+  if (!data)
+  {
+    errors.push_back("No proper data slot selected in OnMatrixValue.");
+    return false;
+  }
+
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+  {
+    return true;
+  }
+  else
+  {
+    errors.push_back("Selected data slot does not contain matrix data.");
+    return false;
+  }
+}
+
 bool cedar::proc::experiment::condition::OnMatrixValue::check()
 {
   if (cedar::aux::ConstDataPtr data = _stepData->getData())

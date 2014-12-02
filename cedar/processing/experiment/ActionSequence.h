@@ -97,6 +97,9 @@ public:
   //! To be called whenever an experiment was stopped.
   void postExperiment();
 
+  //! Checks the validity of the action sequence. Returns true if the action list is valid.
+  bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
