@@ -112,6 +112,12 @@ void cedar::proc::steps::ComponentMultiply::inputConnectionChanged(const std::st
 {
   cedar::proc::ConstExternalDataPtr slot = this->getInputSlot(inputName);
 
+  // first, check if all inputs are valid
+  if (!this->allInputsValid())
+  {
+    return;
+  }
+
   // Find the first non-0d input. If all are 0d, just use the last one as a "template".
   cv::Mat in_mat;
   for (unsigned int i = 0; i < this->mInputs->getDataCount(); ++i)

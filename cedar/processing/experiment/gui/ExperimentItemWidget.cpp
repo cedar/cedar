@@ -68,14 +68,14 @@ cedar::proc::experiment::gui::ExperimentItemWidget::~ExperimentItemWidget()
 void cedar::proc::experiment::gui::ExperimentItemWidget::display(cedar::aux::ConfigurablePtr experimentItem)
 {
   clear();
-  for(cedar::aux::ParameterPtr parameter : experimentItem->getParameters())
+  for (auto parameter : experimentItem->getParameters())
   {
     cedar::aux::gui::Parameter* parameterWidget;
     parameterWidget = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
     parameterWidget->setParameter(parameter);
     parameterWidget->setParent(this);
 
-    if(auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+    if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
     {
       QVBoxLayout* row = new QVBoxLayout;
       row->setAlignment(Qt::AlignTop);
@@ -83,12 +83,18 @@ void cedar::proc::experiment::gui::ExperimentItemWidget::display(cedar::aux::Con
       another_widget->display(object_parameter->getConfigurable());
       row->addWidget(parameterWidget);
       row->addWidget(another_widget);
-      ((QBoxLayout*)this->layout())->addLayout(row);
+      static_cast<QBoxLayout*>(this->layout())->addLayout(row);
       connect(object_parameter.get(),SIGNAL(valueChanged()),this,SLOT(objectParameterChanged()));
     }
     else
     {
-      this->layout()->addWidget(parameterWidget);
+      QVBoxLayout* p_column = new QVBoxLayout();
+      p_column->setAlignment(Qt::AlignCenter);
+      QLabel* p_label = new QLabel();
+      p_label->setText(QString::fromStdString(parameter->getName()));
+      p_column->addWidget(p_label);
+      p_column->addWidget(parameterWidget);
+      static_cast<QBoxLayout*>(this->layout())->addLayout(p_column);
     }
   }
 }

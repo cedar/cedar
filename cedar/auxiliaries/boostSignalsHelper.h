@@ -52,12 +52,12 @@
 
 // Declares a signal inside a class.
 #define CEDAR_DECLARE_SIGNAL(SIGNAL_NAME, SIGNATURE) \
-    inline boost::signals2::connection connectTo ## SIGNAL_NAME ## Signal(const boost::function<SIGNATURE>& function) \
+    inline boost::signals2::connection connectTo ## SIGNAL_NAME ## Signal(const boost::function<SIGNATURE>& function) const \
     { \
       return this->CEDAR_SIGNAL_MEMBER_NAME(SIGNAL_NAME).connect(function); \
     } \
   private: \
-    boost::signals2::signal<SIGNATURE> CEDAR_SIGNAL_MEMBER_NAME(SIGNAL_NAME);
+    mutable boost::signals2::signal<SIGNATURE> CEDAR_SIGNAL_MEMBER_NAME(SIGNAL_NAME);
 
 
 #endif // CEDAR_AUX_CASTS_H

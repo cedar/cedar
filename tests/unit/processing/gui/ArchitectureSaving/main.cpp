@@ -94,7 +94,7 @@ int testSaving(cedar::proc::gui::Ide *pIde)
   simulateEventLoop();
   CEDAR_DEBUG_ASSERT(!p_field_item->isSelected());
 
-  p_gui_network->write("test.json");
+  p_gui_network->writeJson("test.json");
 
   boost::filesystem::remove("test.json");
 

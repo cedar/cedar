@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,7 +41,7 @@
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/processing/experiment/action/StartAllTriggers.h"
 #include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/processing/experiment/condition/OnInit.h"
+#include "cedar/processing/experiment/condition/OnEachTrial.h"
 
 // SYSTEM INCLUDES
 
@@ -74,7 +74,7 @@ _mCondition
   (
     this,
     "Condition",
-    cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
+    cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnEachTrial())
   )
 )
 {
@@ -83,6 +83,19 @@ _mCondition
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::experiment::ActionSequence::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const
+{
+  bool all_valid = this->_mCondition->getValue()->checkValidity(errors, warnings);
+
+  for (size_t i = 0; i < this->_mActionSet->size(); ++i)
+  {
+    bool action_valid = this->_mActionSet->at(i)->checkValidity(errors, warnings);
+    all_valid = all_valid && action_valid;
+  }
+
+  return all_valid;
+}
 
 void cedar::proc::experiment::ActionSequence::preExperiment()
 {
@@ -115,6 +128,13 @@ void cedar::proc::experiment::ActionSequence::prepareTrial()
 {
   // the condition must be reset
   this->_mCondition->getValue()->reset();
+  if (this->getCondition()->initialCheck())
+  {
+    for (auto action : this->getActions())
+    {
+      action->run();
+    }
+  }
 }
 
 void cedar::proc::experiment::ActionSequence::addAction(cedar::proc::experiment::action::ActionPtr action)

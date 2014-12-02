@@ -62,6 +62,8 @@
 #include <QMainWindow>
 #include <map>
 #include <vector>
+#include <utility>
+#include <string>
 
 
 /*!@brief A gui base class for all items that represent cedar::proc::Connectables.

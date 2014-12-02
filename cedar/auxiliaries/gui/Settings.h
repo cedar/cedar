@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/gui/Settings.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief User interface settings for widgets in the aux namespace.
