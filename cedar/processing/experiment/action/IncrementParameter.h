@@ -48,6 +48,8 @@
 #include "cedar/processing/experiment/action/IncrementParameter.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@todo Increases a parameter of a step.

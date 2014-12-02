@@ -51,6 +51,8 @@
 #include "cedar/processing/experiment/condition/Condition.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@brief An abstract class for all kinds of conditions.

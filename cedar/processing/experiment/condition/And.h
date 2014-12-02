@@ -47,6 +47,8 @@
 #include "cedar/processing/experiment/condition/And.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@brief Condition to to combine two Conditions
