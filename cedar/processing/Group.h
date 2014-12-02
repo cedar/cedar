@@ -710,6 +710,9 @@ public:
   //!@brief disconnects two slots across groups, removing/merging connectors if necessary
   static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
 
+  //! Converts camel-case instances to spaces.
+  static std::string camelCaseToSpaces(const std::string& camelCasedString);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -775,9 +778,6 @@ private:
 
   //! Finds an identifier for which the @em checker function returns false.
   static std::string findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker);
-
-  //! Converts camel-case instances to spaces.
-  static std::string camelCaseToSpaces(const std::string& camelCasedString);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
