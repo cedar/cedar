@@ -76,10 +76,7 @@ mpProperty(new QComboBox()),
 mpPropertyCopy(nullptr)
 {
   this->mpStep->setEditable(true);
-  this->mpStep->setInsertPolicy(QComboBox::NoInsert);
-
   this->mpProperty->setEditable(true);
-  this->mpProperty->setInsertPolicy(QComboBox::NoInsert);
 
   auto layout = new QFormLayout();
   layout->setMargin(0);
@@ -105,31 +102,24 @@ void cedar::proc::experiment::gui::StepPropertyParameter::parameterPointerChange
   updateSteps();
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
-  if (parameter && parameter->getStep())
+  if (parameter)
   {
-    const std::string& step_name = parameter->getStep()->getFullPath();
-    int index = this->mpStep->findText(QString::fromStdString(step_name));
-    // index should not be -1 (which is Qt code for not found); if it is, the widget will not display the step's name
-    CEDAR_DEBUG_NON_CRITICAL_ASSERT(index != -1);
-    this->mpStep->setCurrentIndex(index);
+    auto path = parameter->getElementPath();
+    this->mpStep->setEditText(QString::fromStdString(path));
   }
-  stepChanged();
-  updateProperties();
-  this->mpProperty->setCurrentIndex(this->mpProperty->findText((parameter->getProperty().c_str())));
-  updateValue();
+  this->stepChanged();
+  this->updateProperties();
+  this->mpProperty->setEditText(QString::fromStdString(parameter->getParameterPath()));
+  this->updateValue();
   connect(this->mpStep, SIGNAL(currentIndexChanged(int)), this, SLOT(stepChanged()));
   connect(this->mpProperty, SIGNAL(currentIndexChanged(int)), this, SLOT(propertyChanged()));
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::stepChanged()
 {
-  QString text = mpStep->currentText();
-  cedar::proc::experiment::StepPropertyParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
-
-  parameter->setStep(text.toStdString());
-
-  updateProperties();
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
+  parameter->setElementPath(this->mpStep->currentText().toStdString());
+  this->updateProperties();
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()
@@ -137,7 +127,7 @@ void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()
   QString text = mpProperty->currentText();
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
-  parameter->setProperty(text.toStdString());
+  parameter->setParameterPath(text.toStdString());
 
   updateValue();
 }

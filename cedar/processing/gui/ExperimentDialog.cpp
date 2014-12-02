@@ -60,9 +60,10 @@
 cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* parent)
 {
   mParent = parent;
-  this->mExperiment = boost::shared_ptr<cedar::proc::experiment::Experiment>
+  //!@todo Can't this call createNewExperiment?
+  this->setExperiment
   (
-      new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup())
+    cedar::proc::experiment::ExperimentPtr(new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup()))
   );
   this->mExperiment->setName("TestExperiment");
   this->setupUi(this);
@@ -75,9 +76,6 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
   connect(this->nameEdit, SIGNAL(editingFinished()), this, SLOT(nameChanged()));
   connect(this->runButton, SIGNAL(clicked()), this, SLOT(runExperiment()));
   connect(this->stopButton, SIGNAL(clicked()), this, SLOT(stopExperiment()));
-  connect(this->mExperiment.get(), SIGNAL(experimentRunning(bool)), this, SLOT(experimentRunning(bool)));
-  connect(this->mExperiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
-  connect(this->mExperiment.get(), SIGNAL(groupChanged()), this, SLOT(redraw()));
   connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(trialChanged()));
   connect(this->mAddActionSequence,SIGNAL(clicked()),this,SLOT(addActionSequence()));
   connect(this->mpRepeat, SIGNAL(toggled(bool)), this, SLOT(repeatChecked(bool)));
@@ -108,6 +106,21 @@ cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::ExperimentDialog::setExperiment(cedar::proc::experiment::ExperimentPtr experiment)
+{
+  if (this->mExperiment)
+  {
+    QObject::disconnect(this->mExperiment.get(), SIGNAL(experimentRunning(bool)), this, SLOT(experimentRunning(bool)));
+    QObject::disconnect(this->mExperiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
+    QObject::disconnect(this->mExperiment.get(), SIGNAL(groupChanged()), this, SLOT(redraw()));
+  }
+
+  this->mExperiment = experiment;
+  QObject::connect(this->mExperiment.get(), SIGNAL(experimentRunning(bool)), this, SLOT(experimentRunning(bool)));
+  QObject::connect(this->mExperiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
+  QObject::connect(this->mExperiment.get(), SIGNAL(groupChanged()), this, SLOT(redraw()));
+}
 
 void cedar::proc::gui::ExperimentDialog::repeatChecked(bool checked)
 {
@@ -171,6 +184,7 @@ void cedar::proc::gui::ExperimentDialog::load()
   if (!filename.empty())
   {
     location_dir->setValue(QDir(QString::fromStdString(filename)));
+    //!@todo Shouldn't this create a new experiment?
     this->mExperiment->readJson(filename);
     this->mExperiment->setFileName(filename);
     this->mpRepeat->setChecked(this->mExperiment->getRepeating());
@@ -309,6 +323,7 @@ void cedar::proc::gui::ExperimentDialog::createNewExperiment()
       break;
 
     default:
+      // this should not happen, only Ok and Cancel are in the dialog
       CEDAR_ASSERT(false);
   }
 
@@ -316,7 +331,10 @@ void cedar::proc::gui::ExperimentDialog::createNewExperiment()
   {
     this->mExperiment->stopExperiment();
   }
-  this->mExperiment = cedar::proc::experiment::ExperimentPtr(new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup()));
+  this->setExperiment
+  (
+    cedar::proc::experiment::ExperimentPtr(new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup()))
+  );
   this->mExperiment->setName("new experiment");
   this->mExperiment->setFileName("new experiment.json");
   this->mpRepeat->setChecked(this->mExperiment->getRepeating());
