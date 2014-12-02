@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionIncreaseParameter.fwd.h
+    File:        IncrementParameter.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 03 19
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ActionIncreaseParameter.
+    Description: Forward declaration file for the class cedar::proc::experiment::IncrementParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_FWD_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_INCREMENT_PARAMETER_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_INCREMENT_PARAMETER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -57,7 +57,7 @@ namespace cedar
     {
       namespace action
       {
-        CEDAR_DECLARE_PROC_CLASS(ParameterAdd);
+        CEDAR_DECLARE_PROC_CLASS(IncrementParameter);
       }
     }
   }
@@ -65,5 +65,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_PARAMETER_ADD_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_INCREMENT_PARAMETER_FWD_H
 

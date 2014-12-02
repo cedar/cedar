@@ -74,7 +74,7 @@ _mDirectory(new cedar::aux::DirectoryParameter(this, "directory", ""))
 
 void cedar::proc::experiment::action::IterateDirectoryContents::preExperiment()
 {
-  cedar::proc::experiment::action::SetParameter::preExperiment();
+  cedar::proc::experiment::action::SetParameterValue::preExperiment();
 
   size_t trial_count = static_cast<size_t>(cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment()->getTrialCount());
   QReadLocker locker(this->mDirectoryContents.getLockPtr());

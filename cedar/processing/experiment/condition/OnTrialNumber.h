@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,39 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStart.h
+    File:        OnTrialNumber.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 28
 
-    Description: Header file for the class cedar::proc::experiment::ActionStart.
+    Description: Header file for the class cedar::proc::experiment::OnTrialNumber.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_NUMBER_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_NUMBER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/Action.h"
+#include "cedar/processing/experiment/condition/Condition.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/action/StartAllTriggers.fwd.h"
-#include "cedar/processing/experiment/Experiment.fwd.h"
+#include "cedar/processing/experiment/condition/OnTrialNumber.fwd.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Starts a trial of the experiment framework
+/*!@brief Checks if the current trial has the number provided by this condition
  *
- *            This Action should only be called a single time in the initial condition
  */
-class cedar::proc::experiment::action::StartAllTriggers : public cedar::proc::experiment::action::Action
+class cedar::proc::experiment::condition::OnTrialNumber : public cedar::proc::experiment::condition::Condition
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -65,23 +64,23 @@ class cedar::proc::experiment::action::StartAllTriggers : public cedar::proc::ex
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StartAllTriggers();
+  OnTrialNumber();
 
   //!@brief Destructor
-  virtual ~StartAllTriggers();
+  virtual ~OnTrialNumber();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Starts a trial of the experiment framework
-  void run();
+  bool initialCheck();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief Checks if the current trial has the number provided by this condition
+  bool check();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -104,8 +103,10 @@ protected:
   // none yet
 
 private:
+ //!@brief The trial number that has to been reached
+ cedar::aux::UIntParameterPtr _mTrial;
 
-}; // class cedar::proc::experiment::action::StartAllTriggers
+}; // class cedar::proc::experiment::OnTrialNumber
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_START_ALL_TRIGGERS_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_NUMBER_H
 

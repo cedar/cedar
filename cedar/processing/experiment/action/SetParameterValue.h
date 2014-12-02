@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.h
+    File:        SetParameterValueValue.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 03 07
 
-    Description: Header file for the class cedar::proc::experiment::ActionSetParameter.
+    Description: Header file for the class cedar::proc::experiment::SetParameterValueValue.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -47,7 +47,7 @@
 #include "cedar/processing/experiment/StepPropertyParameter.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/experiment/action/SetParameter.fwd.h"
+#include "cedar/processing/experiment/action/SetParameterValue.fwd.h"
 
 // SYSTEM INCLUDE
 #include <QObject>
@@ -55,7 +55,7 @@
 
 /*!@brief Sets the parameter of a step to a desired value
  */
-class cedar::proc::experiment::action::SetParameter : public cedar::proc::experiment::action::Action
+class cedar::proc::experiment::action::SetParameterValue : public cedar::proc::experiment::action::Action
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -66,7 +66,7 @@ class cedar::proc::experiment::action::SetParameter : public cedar::proc::experi
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SetParameter();
+  SetParameterValue();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -112,7 +112,7 @@ private:
   //!@brief The step parameter to set
   cedar::proc::experiment::StepPropertyParameterPtr _mStepParameter;
 
-}; // class cedar::proc::experiment::ActionSetParameter
+}; // class cedar::proc::experiment::SetParameterValue
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_SET_PARAMETER_VALUE_H
 

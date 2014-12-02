@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStart.cpp
+    File:        OnTrialNumber.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 02 06
+    Date:        2014 03 28
 
-    Description: Source file for the class cedar::proc::experiment::ActionStart.
+    Description: Source file for the class cedar::proc::experiment::condition::OnTrialNumber.
 
     Credits:
 
@@ -38,39 +38,56 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/StartAllTriggers.h"
-#include "cedar/processing/experiment/Experiment.h"
+#include "cedar/processing/experiment/condition/OnTrialNumber.h"
 #include "cedar/processing/experiment/Supervisor.h"
+#include "cedar/processing/experiment/Experiment.h"
+
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// register class
+// register the class
 //----------------------------------------------------------------------------------------------------------------------
-
-//namespace
-//{
-//  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
-//      registerType<cedar::proc::experiment::action::StartAllTriggersPtr>();
-//}
+namespace
+{
+  bool declare()
+  {
+    cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::condition::OnTrialNumberPtr>();
+    cedar::proc::experiment::condition::ConditionManagerSingleton::getInstance()->
+      addDeprecatedName<cedar::proc::experiment::condition::OnTrialNumberPtr>
+      (
+        "cedar.proc.experiment.condition.OnTrial"
+      );
+    return true;
+  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::action::StartAllTriggers::StartAllTriggers()
+cedar::proc::experiment::condition::OnTrialNumber::OnTrialNumber()
+:
+_mTrial(new cedar::aux::UIntParameter(this,"on trial",1))
 {
 }
 
-cedar::proc::experiment::action::StartAllTriggers::~StartAllTriggers()
+cedar::proc::experiment::condition::OnTrialNumber::~OnTrialNumber()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::proc::experiment::action::StartAllTriggers::run()
+bool cedar::proc::experiment::condition::OnTrialNumber::check()
 {
-  cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment()->startAllTriggers();
+  return false;
+}
+
+bool cedar::proc::experiment::condition::OnTrialNumber::initialCheck()
+{
+  Experiment* p_experiment = cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment();
+  auto current_trial = p_experiment->getCurrentTrial();
+  return current_trial == this->_mTrial->getValue();
 }

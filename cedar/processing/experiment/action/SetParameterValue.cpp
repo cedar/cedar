@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionSetParameter.cpp
+    File:        SetParameterValueValue.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 03 07
 
-    Description: Source file for the class cedar::proc::experiment::ActionSetParameter.
+    Description: Source file for the class cedar::proc::experiment::SetParameterValueValue.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/SetParameter.h"
+#include "cedar/processing/experiment/action/SetParameterValue.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 #include "cedar/processing/experiment/StepPropertyParameter.h"
 
@@ -50,14 +50,25 @@
 
 namespace
 {
-  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::action::SetParameterPtr>();
+  bool declare()
+  {
+    cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::action::SetParameterValuePtr>();
+    cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      addDeprecatedName<cedar::proc::experiment::action::SetParameterValuePtr>
+      (
+        "cedar.proc.experiment.action.SetParameter"
+      );
+    return true;
+  }
+
+  bool declared = declare();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::action::SetParameter::SetParameter()
+cedar::proc::experiment::action::SetParameterValue::SetParameterValue()
 :
 _mStepParameter
 (
@@ -71,12 +82,12 @@ _mStepParameter
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::StepPropertyParameterPtr cedar::proc::experiment::action::SetParameter::getStepParameter() const
+cedar::proc::experiment::StepPropertyParameterPtr cedar::proc::experiment::action::SetParameterValue::getStepParameter() const
 {
   return this->_mStepParameter;
 }
 
-void cedar::proc::experiment::action::SetParameter::run()
+void cedar::proc::experiment::action::SetParameterValue::run()
 {
   if (!_mStepParameter->isParameterSelected())
   {
@@ -86,7 +97,7 @@ void cedar::proc::experiment::action::SetParameter::run()
   parameter->copyValueFrom(_mStepParameter->getParameterCopy());
 }
 
-void cedar::proc::experiment::action::SetParameter::preExperiment()
+void cedar::proc::experiment::action::SetParameterValue::preExperiment()
 {
   if (!_mStepParameter->isParameterSelected())
   {
@@ -104,7 +115,7 @@ void cedar::proc::experiment::action::SetParameter::preExperiment()
   parameter->writeToNode(this->mOriginalParameterValue);
 }
 
-void cedar::proc::experiment::action::SetParameter::postExperiment()
+void cedar::proc::experiment::action::SetParameterValue::postExperiment()
 {
   if (!_mStepParameter->isParameterSelected())
   {
