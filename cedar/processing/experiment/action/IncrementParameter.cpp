@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionIncreaseParameter.cpp
+    File:        IncrementParameter.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 03 19
 
-    Description: Source file for the class cedar::proc::experiment::ActionIncreaseParameter.
+    Description: Source file for the class cedar::proc::experiment::IncrementParameter.
 
     Credits:
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/ParameterAdd.h"
+#include "cedar/processing/experiment/action/IncrementParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/IntParameter.h"
@@ -51,14 +51,25 @@
 
 namespace
 {
-  bool declared = cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
-      registerType<cedar::proc::experiment::action::ParameterAddPtr>();
+  bool declare()
+  {
+    cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      registerType<cedar::proc::experiment::action::IncrementParameterPtr>();
+    cedar::proc::experiment::action::ActionManagerSingleton::getInstance()->
+      addDeprecatedName<cedar::proc::experiment::action::IncrementParameterPtr>
+      (
+        "cedar.proc.experiment.action.ParameterAdd"
+      );
+    return true;
+  }
+
+  bool declared = declare();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::action::ParameterAdd::ParameterAdd()
+cedar::proc::experiment::action::IncrementParameter::IncrementParameter()
 :
 _mStepParamter
 (
@@ -72,7 +83,7 @@ _mStepParamter
   _mStepParamter->allowType("cedar.aux.UIntParameterPtr");
 }
 
-cedar::proc::experiment::action::ParameterAdd::~ParameterAdd()
+cedar::proc::experiment::action::IncrementParameter::~IncrementParameter()
 {
 }
 
@@ -80,7 +91,7 @@ cedar::proc::experiment::action::ParameterAdd::~ParameterAdd()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::experiment::action::ParameterAdd::run()
+void cedar::proc::experiment::action::IncrementParameter::run()
 {
   if (_mStepParamter->getStep() || _mStepParamter->getProperty() == "")
   {

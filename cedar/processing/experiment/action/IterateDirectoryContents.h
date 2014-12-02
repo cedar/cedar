@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/experiment/action/SetParameter.h"
+#include "cedar/processing/experiment/action/SetParameterValue.h"
 #include "cedar/processing/experiment/StepPropertyParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
@@ -57,8 +57,10 @@
 
 /*!@brief An action that goes through a list of directory entries and applies it to a parameter on successive trials.
  */
-class cedar::proc::experiment::action::IterateDirectoryContents : QObject,
-                                                                  public cedar::proc::experiment::action::SetParameter
+class cedar::proc::experiment::action::IterateDirectoryContents
+:
+QObject,
+public cedar::proc::experiment::action::SetParameterValue
 {
   Q_OBJECT
 

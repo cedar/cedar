@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StartTrigger.fwd.h
+    File:        OnTrialNumber.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
-    Date:        2014 05 10
+    Date:        2014 03 28
 
-    Description: Forward declaration file for the class cedar::proc::experiment::condition::StartTrigger.
+    Description: Forward declaration file for the class cedar::proc::experiment::OnTrialNumber.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_EXPERIMENT_ACTION_START_TRIGGER_FWD_H
-#define CEDAR_PROC_EXPERIMENT_ACTION_START_TRIGGER_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_NUMBER_FWD_H
+#define CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_NUMBER_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -55,9 +55,9 @@ namespace cedar
   {
     namespace experiment
     {
-      namespace action
+      namespace condition
       {
-        CEDAR_DECLARE_PROC_CLASS(StartTrigger);
+        CEDAR_DECLARE_PROC_CLASS(OnTrialNumber);
       }
     }
   }
@@ -65,5 +65,5 @@ namespace cedar
 
 //!@endcond
 
-#endif // CEDAR_PROC_EXPERIMENT_ACTION_START_TRIGGER_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_CONDITION_ON_TRIAL_NUMBER_FWD_H
 
