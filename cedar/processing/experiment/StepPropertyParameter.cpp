@@ -69,6 +69,33 @@ cedar::proc::experiment::StepPropertyParameter::~StepPropertyParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::StepPropertyParameter::checkValidity
+     (
+       std::string& error
+     )
+     const
+{
+  if (this->mElement.lock() == nullptr)
+  {
+    if (this->mElementPath.empty())
+    {
+      error = "No element path selected.";
+    }
+    else
+    {
+      error = "Element was not found.";
+    }
+    return false;
+  }
+  if (this->getParameterPath() == "")
+  {
+    error = "No parameter path was selected.";
+    return false;
+  }
+
+  return true;
+}
+
 bool cedar::proc::experiment::StepPropertyParameter::isParameterSelected() const
 {
   if (this->mElement.lock() == nullptr || this->getParameterPath() == "")

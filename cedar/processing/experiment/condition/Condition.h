@@ -91,6 +91,11 @@ public:
   //! does this condition fire during initiation of a trial?
   virtual bool initialCheck();
 
+  /*! Reimplement this to check the validity of the condition. Return true if the action is valid. If false is returned,
+   *  an inforative message should be added to the @em errors vector.
+   */
+  virtual bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -71,16 +71,16 @@ namespace
 
 cedar::proc::experiment::action::IncrementParameter::IncrementParameter()
 :
-_mStepParamter
+    _mStepParameter
 (
     new cedar::proc::experiment::StepPropertyParameter(this,"StepParameter")
 )
 {
-  _mStepParamter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE);
+  _mStepParameter->setType(cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE);
 
   // allow only UIntParameter and DoubleParameter to increase
-  _mStepParamter->allowType("cedar.aux.DoubleParameter");
-  _mStepParamter->allowType("cedar.aux.UIntParameterPtr");
+  _mStepParameter->allowType("cedar.aux.DoubleParameter");
+  _mStepParameter->allowType("cedar.aux.UIntParameterPtr");
 }
 
 cedar::proc::experiment::action::IncrementParameter::~IncrementParameter()
@@ -91,26 +91,41 @@ cedar::proc::experiment::action::IncrementParameter::~IncrementParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::action::IncrementParameter::checkValidity
+(
+  std::vector<std::string>& errors,
+  std::vector<std::string>& /* warnings */
+)
+const
+{
+  std::string parameter_error;
+  bool parameter_valid = this->_mStepParameter->checkValidity(parameter_error);
+  if (!parameter_valid)
+  {
+    errors.push_back("Cannot increment parameter: " + parameter_error);
+    return false;
+  }
+
+  return true;
+}
+
 void cedar::proc::experiment::action::IncrementParameter::run()
 {
-  if (_mStepParamter->getStep() || _mStepParamter->getParameterPath() == "")
+  if (_mStepParameter->isParameterSelected())
   {
     return;
   }
+
   //check the type of the parameter
-  if (cedar::aux::DoubleParameterPtr parameter =
-      boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(_mStepParamter->getParameter()))
+  if (auto parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(_mStepParameter->getParameter()))
   {
-    cedar::aux::DoubleParameterPtr parameter_copy =
-        boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(_mStepParamter->getParameterCopy());
+    auto parameter_copy = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(_mStepParameter->getParameterCopy());
     parameter->setValue(parameter->getValue() + parameter_copy->getValue());
   }
 
-  if (cedar::aux::UIntParameterPtr parameter =
-      boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(_mStepParamter->getParameter()))
+  if (auto parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(_mStepParameter->getParameter()))
   {
-    cedar::aux::UIntParameterPtr parameter_copy =
-        boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(_mStepParamter->getParameterCopy());
+    auto parameter_copy = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(_mStepParameter->getParameterCopy());
     parameter->setValue(parameter->getValue() + parameter_copy->getValue());
   }
 }

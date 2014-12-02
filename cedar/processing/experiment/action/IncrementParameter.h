@@ -77,6 +77,8 @@ public:
   //!@brief Increases the step parameter.
   void run();
 
+  bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,7 +107,7 @@ protected:
 
 private:
   //!@brief The value by the parameter should be increased
-  cedar::proc::experiment::StepPropertyParameterPtr _mStepParamter;
+  cedar::proc::experiment::StepPropertyParameterPtr _mStepParameter;
 
 }; // class cedar::proc::experiment::action::IncrementParameter
 

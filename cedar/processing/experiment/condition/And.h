@@ -66,7 +66,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

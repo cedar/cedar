@@ -140,6 +140,22 @@ cedar::proc::experiment::Experiment::~Experiment()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::Experiment::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const
+{
+  errors.clear();
+  warnings.clear();
+
+  bool all_valid = true;
+
+  for (unsigned int i = 0; i < this->_mActionSequences->size(); ++i)
+  {
+    bool valid = this->_mActionSequences->at(i)->checkValidity(errors, warnings);
+    all_valid = all_valid && valid;
+  }
+
+  return all_valid;
+}
+
 void cedar::proc::experiment::Experiment::setRepeating(bool repeats)
 {
   this->_mRepeat->setValue(repeats);
