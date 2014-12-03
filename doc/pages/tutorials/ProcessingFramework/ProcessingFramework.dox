@@ -25,6 +25,7 @@ This page contains the following sections:
   <li>@ref ProcessingTutorialInputCollections</li>
   <li>@ref ProcessingTutorialOwnParameters</li>
   <li>@ref ProcessingTutorialManualLocking</li>
+  <li>@ref ProcessingTutorialStepViews</li>
   <li>@ref ProcessingTutorialSummary</li>
 </ol>
 
@@ -611,6 +612,101 @@ Now, whenver you are accessing input or output data, you must lock it manually, 
   output->lockForWrite();
   // write result to output
   output->unlock();
+@endcode
+
+
+@section ProcessingTutorialStepViews Advanced Tutorial: Connectable Icon Views
+
+You may have noticed that some of the steps in cedar change their icon depending on their parameters. If you want to do
+this for you step, you can implement your own cedar::proc::gui::ConnectableIconView (which is a QGraphicsItem; if you're
+unfamiliar with that class, please refer to the Qt documentation).
+
+If you just want to use an icon from a file that changes depending on some events in your step, you can inherit
+cedar::proc::gui::DefaultConnectableIconView to implement this. In this case, your icon view will usually require two
+methods. One that creates the connections between the events (qt signals), and a slot that handles them.
+
+The code for connecting slots should be implemented in the connectableChanged function (which is called by the super
+class). Here's an example:
+@code
+void your::IconView::connectableChanged()
+{
+  this->cedar::proc::gui::DefaultConnectableIconView::connectableChanged();
+
+  auto parameter = this->getConnectable()->getParameter("some parameter");
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(updateIcon()));
+
+  this->updateIcon();
+}
+@endcode
+
+The updateIcon function can look like this:
+@code
+void your::IconView::connectableChanged()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::ConstBoolParameter>(this->getConnectable()->getParameter("active"));
+  if (parameter->getValue())
+  {
+    this->setIconPath(":/some/icon.svg");
+  }
+  else
+  {
+    this->setIconPath(":/some/other_icon.svg");
+  }
+}
+@endcode
+(this code is taken from cedar::proc::gui::BoostView).
+
+To make the processing framework use your icon view, you need to modify the declaration of the element that the icon
+view is associated with.
+@code
+// ...
+cedar::proc::ElementDeclarationPtr declaration
+(
+  // the second template argument below specifies that the custom icon view is to be used
+  new cedar::proc::ElementDeclarationTemplate<your::Step, your::IconView>
+  (
+    "Category"
+  )
+);
+// ...
+@endcode
+
+
+If you want to use a more sophisticated icon view, you can use cedar::proc::gui::DefaultConnectableIconView as an
+example. Mainly, you need to inherit cedar::proc::gui::ConnectableIconView and overwrite a few methods:
+@code
+class your::IconView : public cedar::proc::gui::ConnectableIconView
+{
+public:
+  IconView()
+  {
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  QRectF boundingRect() const
+  {
+    // here, you need to return the bounding rect of your drawing
+  }
+
+  void setBounds(const qreal& x, const qreal& y, const qreal& size)
+  {
+    // this tells you how large your icon may be
+  }
+
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr)
+  {
+    // paint your icon here using standard QPainter methods
+  }
+
+protected:
+  void connectableChanged()
+  {
+    // see above
+  }
+}; // class cedar::proc::gui::DefaultConnectableIconView
 @endcode
 
 
