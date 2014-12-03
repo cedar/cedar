@@ -53,7 +53,6 @@
 #include <string>
 
 
-//!@todo Does this deserve its own header? This problem might occur on multiple occasions
 namespace cedar
 {
   namespace aux

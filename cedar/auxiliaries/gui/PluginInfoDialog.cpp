@@ -80,7 +80,6 @@ void cedar::aux::gui::PluginInfoDialog::updateWidgets()
   std::string path = cedar::aux::PluginProxy::findPlugin(plugin_name);
   this->mpPluginPath->setText(QString::fromStdString(path));
 
-  //!@todo Make this checkbox actually do something
   this->mpLoadOnStartup->setEnabled(true);
   this->mpLoadOnStartup->setChecked(cedar::aux::SettingsSingleton::getInstance()->isPluginLoadedOnStartup(plugin_name));
   this->mpLoadOnStartup->setEnabled(false);

@@ -84,8 +84,7 @@ public:
   void stop();
 
   //!@brief Returns the elapsed time since timer has started
-  //!@todo make this const?
-  cedar::unit::Time getTime();
+  cedar::unit::Time getTime() const;
 
   //! Returns true if the timer is running.
   bool isRunning() const;

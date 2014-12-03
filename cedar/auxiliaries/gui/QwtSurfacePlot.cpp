@@ -50,6 +50,7 @@
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #include "cedar/auxiliaries/annotation/Dimensions.h"
+#include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -229,19 +230,7 @@ void cedar::aux::gui::QwtSurfacePlot::init()
   this->showGrid(false);
 
   // apply the standard color vector
-  Qwt3D::StandardColor col;
-  std::vector<Qwt3D::RGBA> qwt_colors;
-  auto colors = cedar::aux::gui::MatrixPlot::getStandardColorVector();
-  qwt_colors.resize(colors.size());
-  for (size_t i = 0; i < colors.size(); ++i)
-  {
-    qwt_colors.at(i).r = colors.at(i).red;
-    qwt_colors.at(i).g = colors.at(i).green;
-    qwt_colors.at(i).b = colors.at(i).blue;
-    qwt_colors.at(i).a = colors.at(i).alpha;
-  }
-  col.setColorVector(qwt_colors);
-  this->mpPlot->setDataColor(col);
+  this->mpPlot->setDataColor(cedar::aux::ColorGradient::getDefaultPlotColorJet()->toQwt3DStandardColor(50));
   this->mpPlot->updateGL();
 
   mDataRows = mDataCols = 0;

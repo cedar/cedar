@@ -53,11 +53,10 @@
 #include <string>
 
 
-/*!@todo describe.
+/*!@brief A template for plugin declarations.
  *
  * @tparam BaseClass The direct base class for this class. This class must either be or inherit
  *         cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr>.
- * @todo describe more.
  */
 template <class BaseClassPtr, class PluginClassPtr, class BaseClass = cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr> >
 class cedar::aux::PluginDeclarationTemplate

@@ -369,8 +369,10 @@ void cedar::aux::CommandLineParser::defineOption
        const std::string& group
      )
 {
-  //!@todo Proper exception
-  CEDAR_ASSERT(mDescriptions.find(longName) == mDescriptions.end());
+  if (mDescriptions.find(longName) != mDescriptions.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add command line option \"" + longName + "\": already defined.");
+  }
 
   this->mDescriptions[longName] = description;
 
@@ -551,8 +553,10 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
 
       case STATE_EXPECTING_VALUE:
       {
-        //!@todo Proper exception: expecting a value.
-        CEDAR_ASSERT(!current_option.empty());
+        if (current_option.empty())
+        {
+          CEDAR_THROW(cedar::aux::InvalidValueException, "Option " + current_option + " expects a value, none was given.");
+        }
         this->setParsedValue(current_option, string);
         state = STATE_PLAIN;
         current_option = std::string();
@@ -561,8 +565,10 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
     }
   }
 
-  //!@todo Proper exception: should not end while looking for value.
-  CEDAR_ASSERT(state == STATE_PLAIN);
+  if (state != STATE_PLAIN)
+  {
+    CEDAR_THROW(cedar::aux::InvalidValueException, "Error parsing options: still expecting a value at end of arguments.");
+  }
 
   if (this->hasParsedFlag("help"))
   {

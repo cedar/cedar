@@ -53,9 +53,9 @@
 #include <QResource>
 
 
-/*!@todo describe.
+/*!@brief A base class for plugin declarations.
  *
- * @todo describe more.
+ *        Everything that can be declared from a plugin needs to have a declaration class that inherits this one.
  */
 class cedar::aux::PluginDeclaration
 {
@@ -225,9 +225,7 @@ private:
 }; // class cedar::aux::PluginDeclaration
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A templated base class for plugin declarations.
  */
 template <class BaseTypePtr>
 class cedar::aux::PluginDeclarationBaseTemplate : public cedar::aux::PluginDeclaration

@@ -127,7 +127,6 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
-  //!@todo redundant code ahead! (e.g., the connects)
   if
   (
     boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data)
@@ -136,7 +135,6 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
   {
 #ifdef CEDAR_USE_QWT
     this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
-    connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
 #else
     CEDAR_THROW
     (
@@ -151,12 +149,10 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
 #ifdef CEDAR_USE_QWT
     case 0:
       this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
 #endif // CEDAR_USE_QWT
     case 1:
       this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot1D(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
 
     default:
@@ -172,6 +168,7 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData, "Don't know how to plot this data.");
   }
+  connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
   this->mpCurrentPlotWidget->plot(this->mData, title);
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }
