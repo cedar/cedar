@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
@@ -151,8 +152,7 @@ DeclarationSuper
 
 void declare() const
 {
-  cedar::dev::ComponentManagerSingleton::getInstance()->
-      registerType<boost::shared_ptr<DerivedClass> >();
+  DeclarationSuper::declare();
 }
 
 }; // class cedar::dev::ComponentDeclarationTemplate

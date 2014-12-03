@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Component.h"
+#include "cedar/devices/ComponentDeclaration.h"
 
 // SYSTEM INCLUDES
 
@@ -74,6 +75,7 @@ void cedar::proc::gui::ComponentStepView::updateIcon()
   auto component_step = boost::dynamic_pointer_cast<cedar::proc::steps::ConstComponent>(this->getConnectable());
   CEDAR_DEBUG_ASSERT(component_step);
 
+  QString default_icon_path = ":/cedar/dev/gui/icons/generic_hardware_icon.svg";
 
   if (component_step->hasComponent())
   {
@@ -81,14 +83,39 @@ void cedar::proc::gui::ComponentStepView::updateIcon()
     auto component = component_step->getComponent();
 
     // find the declaration of the component from the component manager
-    // TODO
+    cedar::dev::ConstComponentDeclarationPtr declaration;
+    try
+    {
+      auto plugin_declaration = cedar::dev::ComponentDeclarationManagerSingleton::getInstance()->getDeclarationOf(component);
+      declaration = boost::dynamic_pointer_cast<cedar::dev::ConstComponentDeclaration>(plugin_declaration);
+    }
+    catch (cedar::aux::UnknownTypeException)
+    {
+      // no declaration found, use default icon
+      this->setIconPath(default_icon_path);
+      return;
+    }
+
+    if (!declaration)
+    {
+      // no declaration found, use default icon
+      this->setIconPath(default_icon_path);
+      return;
+    }
 
     // get the icon from the component and apply it
-//    this->setIconPath(...);
+    if (!declaration->getIconPath().empty())
+    {
+      this->setIconPath(QString::fromStdString(declaration->getIconPath()));
+    }
+    else
+    {
+      this->setIconPath(default_icon_path);
+    }
   }
   else
   {
     // apply the default icon
-    this->setIconPath(":/cedar/dev/gui/icons/generic_hardware_icon.svg");
+    this->setIconPath(default_icon_path);
   }
 }
