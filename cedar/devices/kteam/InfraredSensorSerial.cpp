@@ -41,6 +41,7 @@
 #include "cedar/devices/kteam/InfraredSensorSerial.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
+#include "cedar/devices/ComponentDeclaration.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -65,8 +66,17 @@ namespace
 {
   bool registered()
   {
-    cedar::dev::ComponentManagerSingleton::getInstance()->
-        registerType<cedar::dev::kteam::InfraredSensorSerialPtr>();
+    cedar::dev::ComponentDeclarationPtr declaration
+    (
+      new cedar::dev::ComponentDeclarationTemplate<cedar::dev::kteam::InfraredSensorSerial>
+      (
+        "Sensors"
+      )
+    );
+
+    declaration->setIconPath(":/cedar/dev/gui/icons/ir_sensor_icon.svg");
+
+    declaration->declare();
     return true;
   }
 
