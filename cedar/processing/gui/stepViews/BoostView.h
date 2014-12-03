@@ -50,7 +50,7 @@
 #include <QObject>
 
 
-/*!@brief Responsible for changing the icon of StaticGains.
+/*!@brief Responsible for changing the icon of cedar::proc::sources::Boost.
  */
 class cedar::proc::gui::BoostView : public QObject, public cedar::proc::gui::DefaultConnectableIconView
 {
