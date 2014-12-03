@@ -48,12 +48,19 @@
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+unsigned int cedar::dev::kteam::khepera::Gripper::GRIPPER_POSITION = 0;
+unsigned int cedar::dev::kteam::khepera::Gripper::OPTICAL_SENSOR = 1;
+unsigned int cedar::dev::kteam::khepera::Gripper::RESISTIVITY = 2;
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::kteam::khepera::Gripper::Gripper()
-:
-_mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm position limits", 0, 0, 255, 255, 0, 255))
 {
   initialize();
 }
@@ -61,8 +68,7 @@ _mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm positio
 // constructor taking an externally created channel
 cedar::dev::kteam::khepera::Gripper::Gripper(cedar::dev::ChannelPtr channel)
 :
-cedar::dev::Component(channel),
-_mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm position limits", 0, 0, 255, 255, 0, 255))
+cedar::dev::Component(channel)
 {
   initialize();
 }
@@ -77,8 +83,14 @@ cedar::dev::kteam::khepera::Gripper::~Gripper()
 
 void cedar::dev::kteam::khepera::Gripper::initialize()
 {
-  _mArmPositionLimits->setDefaults(190, 249);
-  _mArmPositionLimits->makeDefault();
+  this->installCommandType(GRIPPER_POSITION, "gripper position");
+  this->setCommandDimensionality(GRIPPER_POSITION, 1);
+
+  this->installMeasurementType(OPTICAL_SENSOR, "optical sensor");
+  this->setMeasurementDimensionality(OPTICAL_SENSOR, 1);
+
+  this->installMeasurementType(RESISTIVITY, "resistivity");
+  this->setMeasurementDimensionality(RESISTIVITY, 1);
 }
 
 void cedar::dev::kteam::khepera::Gripper::openGripper()
@@ -90,3 +102,22 @@ void cedar::dev::kteam::khepera::Gripper::closeGripper()
 {
   this->setGripperPosition(false);
 }
+
+bool cedar::dev::kteam::khepera::Gripper::applyBrakeNow()
+{
+  // TODO
+  return false;
+}
+
+bool cedar::dev::kteam::khepera::Gripper::applyBrakeController()
+{
+  // TODO
+  return false;
+}
+
+bool cedar::dev::kteam::khepera::Gripper::applyCrashbrake()
+{
+  // TODO
+  return false;
+}
+

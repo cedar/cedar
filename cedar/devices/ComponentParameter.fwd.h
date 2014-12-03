@@ -22,46 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        ComponentParameter.fwd.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 07 23
 
-    Description:  Namespace file for cedar::dev::com::gui.
+    Description: Forward declaration file for the class cedar::dev::ComponentParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_NAMESPACE_H
-#define CEDAR_DEV_COM_GUI_NAMESPACE_H
+#ifndef CEDAR_DEV_COMPONENT_PARAMETER_FWD_H
+#define CEDAR_DEV_COMPONENT_PARAMETER_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
-
-
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
-#endif
+#endif // Q_MOC_RUN
+
 
 namespace cedar
 {
   namespace dev
   {
-    namespace com
-    {
-      /*! @brief Namespace for gui communication classes. */
-      namespace gui
-      {
-        //!@cond SKIPPED_DOCUMENTATION
-        CEDAR_DECLARE_DEV_CLASS(CommunicationWidget);
-        //!@endcond
-      }
-    }
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_DEV_CLASS_INTRUSIVE(ComponentParameter);
+    //!@endcond
   }
 }
 
-#endif // CEDAR_DEV_COM_GUI_NAMESPACE_H
+
+#endif // CEDAR_DEV_COMPONENT_PARAMETER_FWD_H
+

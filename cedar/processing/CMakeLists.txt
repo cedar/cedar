@@ -64,6 +64,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureScriptEditor.h
   gui/stepViews/BoostView.h
   gui/stepViews/StaticGainView.h
+  gui/stepViews/ComponentStepView.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h

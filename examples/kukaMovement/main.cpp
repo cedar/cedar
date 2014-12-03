@@ -38,6 +38,7 @@
 // PROJECT INCLUDES
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
 #include "cedar/devices/gui/KinematicChainMonitorWidget.h"
+#include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/devices/gl/KukaArm.h"
@@ -85,11 +86,7 @@ private:
   // step function calculating and passing the movement command for each time step
   void step(cedar::unit::Time)
   {
-    // update state variables
-    mpArm->updateTransformations();
-
-    // if movable, calculate and pass movement command
-    if (mpArm->isMovable())
+    if (1)
     {
       // calculate direction of movement
       cv::Mat vector_to_target_hom
@@ -181,7 +178,9 @@ int main(int argc, char **argv)
     lwr4->readJson(configuration_file);
     arm = lwr4;
     // status widget
-    p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(lwr4);
+    cedar::dev::kuka::FRIChannelPtr fri_channel
+      = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(lwr4->getChannel());
+    p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(fri_channel);
     p_fri_status_widget->startTimer(100);
     p_fri_status_widget->show();
   }
@@ -200,11 +199,14 @@ int main(int argc, char **argv)
     {"near zero", cv::Mat( 7, 1, CV_64F, initial_config1) },
     // add your configs here ...
   };
+
   arm->setInitialConfigurations( initial_configs );
 
   // set simulated arm to initial configuration
   if (!use_hardware)
+  {
     arm->applyInitialConfiguration("near zero");
+  }
 
   // create the scene for the visualization
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
@@ -224,7 +226,6 @@ int main(int argc, char **argv)
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
-  arm->updateTransformations();
   target->setTranslation(cedar::unit::LengthMatrix(arm->calculateEndEffectorPosition(), 1.0 * cedar::unit::meters));
   cedar::aux::gl::ObjectVisualizationPtr sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   sphere->setDrawAsWireFrame(true);
@@ -244,18 +245,17 @@ int main(int argc, char **argv)
 
   // create the worker thread
   WorkerThread worker(arm, target);
-  worker.setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
+  //worker.setStepSize(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
+  worker.setStepSize(arm->getCommunicationStepSize());
 
   // start everything
-  arm->start();
+  arm->startCommunication();
   worker.start();
   a.exec();
 
   // clean up
   worker.stop();
-  worker.wait();
-  arm->stop();
-  arm->wait();
+  arm->stopCommunication();
   if (use_hardware)
   {
     delete p_fri_status_widget;

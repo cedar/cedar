@@ -22,20 +22,23 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        RobotManager.fwd.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 07 23
 
-    Description: Namespace file for cedar::dev::com.
+    Description: Forward declaration file for the class cedar::dev::RobotManager.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_NAMESPACE_H
-#define CEDAR_DEV_COM_NAMESPACE_H
+#ifndef CEDAR_DEV_ROBOT_MANAGER_FWD_H
+#define CEDAR_DEV_ROBOT_MANAGER_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
@@ -43,21 +46,19 @@
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/smart_ptr.hpp>
-#endif
+#endif // Q_MOC_RUN
+
 
 namespace cedar
 {
   namespace dev
   {
-    /*! @brief Namespace for communication classes. */
-    namespace com
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(Communication);
-      CEDAR_DECLARE_DEV_CLASS(SerialCommunication);
-      //!@endcond
-    }
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_DEV_CLASS(RobotManager);
+    //!@endcond
   }
 }
 
-#endif // CEDAR_DEV_COM_NAMESPACE_H
+
+#endif // CEDAR_DEV_ROBOT_MANAGER_FWD_H
+

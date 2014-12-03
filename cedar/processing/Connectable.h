@@ -388,6 +388,9 @@ protected:
     return iter->second;
   }
 
+  //! Removes all data slots with the given id.
+  void removeAllSlots(cedar::proc::DataRole::Id role);
+
   /*!@brief Removes all declared data slots.
    */
   void removeAllDataSlots();

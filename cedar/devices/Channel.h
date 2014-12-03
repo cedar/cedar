@@ -41,8 +41,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
+
+// FORWARD DECLARATIONS
+#include "cedar/devices/Channel.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -116,7 +119,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //! Increases the use count of the channel. If the use cound was zero before, the channel is opened.
+  //!@todo This is more of a quick fix, may want to rewrite things so this is solved via shared ptrs.
+  void increaseUseCount();
+
+  //! Decreases the use count of the channel. If the resulting use count is zero, the channel is closed.
+  void decreaseUseCount();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -125,8 +133,10 @@ protected:
   //! read/write lock for the channel
   QReadWriteLock mLock;
 
+
 private:
-  // none yet
+  //! Use count
+  unsigned int mUseCount;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -153,7 +163,15 @@ namespace cedar
 //
 //    //!@brief The singleton object of the TransferFunctionFactory.
 //    typedef cedar::aux::Singleton<cedar::dev::ChannelManager> ChannelManagerSingleton;
-//
+
+    // this will be used for managing declarations; we still have to define a declaration class (see below)
+   typedef cedar::aux::DeclarationManagerTemplate<cedar::dev::ChannelPtr> ChannelDeclarationManager;
+
+   typedef cedar::aux::Singleton<cedar::dev::ChannelDeclarationManager> ChannelDeclarationManagerSingleton;
+
+   typedef cedar::aux::FactoryManager<cedar::dev::ChannelPtr> ChannelFactoryManager;
+
+
     //!@cond SKIPPED_DOCUMENTATION
 //    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::ChannelManager>);
     //!@endcond
@@ -161,6 +179,8 @@ namespace cedar
 }
 
 CEDAR_DEV_SINGLETON(ChannelManager);
+CEDAR_DEV_SINGLETON(ChannelDeclarationManager);
+CEDAR_DEV_SINGLETON(ChannelFactoryManager);
 
 
 #endif // CEDAR_DEV_CHANNEL_H

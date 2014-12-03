@@ -70,28 +70,29 @@ void cedar::dev::gl::CoraHead::drawBase()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getRootTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpKinematicChain->getRootTransformation().t();
+  glMultMatrixd((GLdouble*)transformation.data);
 
   setMaterial(CHROME);
   glTranslated(-.090 - .025, 0, .010 + .070);
-  cedar::aux::gl::drawBlock(.050, .050, .140, mIsDrawnAsWireFrame); // this is the aluminum block
+  cedar::aux::gl::drawBlock(.050, .050, .140, getIsDrawnAsWireFrame()); // this is the aluminum block
   setMaterial(DARK_BLUE_METAL);
   glTranslated(-.025 - .010, 0, 0);
-  cedar::aux::gl::drawBlock(.020, .050, .140, mIsDrawnAsWireFrame); // this is the small blue block
+  cedar::aux::gl::drawBlock(.020, .050, .140, getIsDrawnAsWireFrame()); // this is the small blue block
   glTranslated(-.010 - .025, 0, .1625);
-  cedar::aux::gl::drawBlock(.050, .050, .465, mIsDrawnAsWireFrame); // this is the tall pole
+  cedar::aux::gl::drawBlock(.050, .050, .465, getIsDrawnAsWireFrame()); // this is the tall pole
   setMaterial(CHROME);
   glTranslated(0, 0, .2325 + .004);
-  cedar::aux::gl::drawBlock(.050, .050, .008, mIsDrawnAsWireFrame); // now comes the aluminum connector
+  cedar::aux::gl::drawBlock(.050, .050, .008, getIsDrawnAsWireFrame()); // now comes the aluminum connector
   glTranslated(0, 0, .004 + .013);
   glRotated(45, 0, 0, 1);
-  cedar::aux::gl::drawBlock(.031, .031, .026, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.031, .031, .026, getIsDrawnAsWireFrame());
   glRotated(-45, 0, 0, 1);
   glTranslated(0, 0, .013 + .023);
-  cedar::aux::gl::drawBlock(.050, .050, .046, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.050, .050, .046, getIsDrawnAsWireFrame());
   glTranslated(-.025 + .1175, 0, .023 + .005);
-  cedar::aux::gl::drawBlock(.235, .050, .010, mIsDrawnAsWireFrame); // this is the long horizontal piece
+  cedar::aux::gl::drawBlock(.235, .050, .010, getIsDrawnAsWireFrame()); // this is the long horizontal piece
   setMaterial(NO_MATERIAL);
 
 }
@@ -103,72 +104,73 @@ void cedar::dev::gl::CoraHead::drawSegment(unsigned int index)
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpKinematicChain->getJointTransformation(index).t();
+  glMultMatrixd((GLdouble*)transformation.data);
 
   switch (index)
   {
   case 0:
     setMaterial(DARK_BLUE_METAL);
-    cedar::aux::gl::drawCone(0, .004, .025, .025, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawCone(0, .004, .025, .025, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(0, 0, .004);
-    cedar::aux::gl::drawDisk(.017, .025, mResolution, mResolution, false, mIsDrawnAsWireFrame);
-    cedar::aux::gl::drawCone(0, .013, .017, .017, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(.017, .025, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
+    cedar::aux::gl::drawCone(0, .013, .017, .017, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(0, 0, .013);
-    cedar::aux::gl::drawDisk(.017, .026, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-    cedar::aux::gl::drawCone(0, .0115, .026, .026, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(.017, .026, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+    cedar::aux::gl::drawCone(0, .0115, .026, .026, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(0, 0, .0115 + .0595);
-    cedar::aux::gl::drawBlock(.090, .070, .119, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.090, .070, .119, getIsDrawnAsWireFrame());
     setMaterial(NO_MATERIAL);
     break;
   case 1:
     setMaterial(DARK_BLUE_METAL);
     glRotated(90, 0, 1, 0);
     glTranslated(0, 0, -.055);
-    cedar::aux::gl::drawDisk(0, .035, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-    cedar::aux::gl::drawCone(0, .009, .035, .035, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0, .035, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+    cedar::aux::gl::drawCone(0, .009, .035, .035, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(0, 0, .009);
-    cedar::aux::gl::drawDisk(0, .035, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0, .035, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
     glTranslated(0, 0, .001 + .090 + .001);
-    cedar::aux::gl::drawDisk(0, .035, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-    cedar::aux::gl::drawCone(0, .009, .035, .035, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0, .035, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+    cedar::aux::gl::drawCone(0, .009, .035, .035, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(0, 0, .009);
-    cedar::aux::gl::drawDisk(0, .035, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0, .035, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
 
     glTranslated(-.032, 0, -.003 - .003);
-    cedar::aux::gl::drawBlock(.064, .070, .006, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.064, .070, .006, getIsDrawnAsWireFrame());
     glTranslated(0, 0, -.003 - .001 - .090 - .001 - .003);
-    cedar::aux::gl::drawBlock(.064, .070, .006, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.064, .070, .006, getIsDrawnAsWireFrame());
     glTranslated(-.032 - .003, 0, .003 + .001 + .045);
     setMaterial(LIGHT_BLUE_METAL);
-    cedar::aux::gl::drawBlock(.006, .070, .104, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.006, .070, .104, getIsDrawnAsWireFrame());
     setMaterial(BLACK_METAL);
     glTranslated(-.003 - .010, -.020 - .0075, -.020 - .0075);
-    cedar::aux::gl::drawBlock(.020, .015, .015, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.020, .015, .015, getIsDrawnAsWireFrame());
     glTranslated(0, .055, 0);
-    cedar::aux::gl::drawBlock(.020, .015, .015, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.020, .015, .015, getIsDrawnAsWireFrame());
     glTranslated(0, 0, .055);
-    cedar::aux::gl::drawBlock(.020, .015, .015, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.020, .015, .015, getIsDrawnAsWireFrame());
     glTranslated(0, -.055, 0);
-    cedar::aux::gl::drawBlock(.020, .015, .015, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.020, .015, .015, getIsDrawnAsWireFrame());
     glTranslated(-.010 - .004, .0075 + .020, -.0075 - .020);
-    cedar::aux::gl::drawBlock(.008, .070, .122, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.008, .070, .122, getIsDrawnAsWireFrame());
 
     // save this as origin, both cameras have to be drawn
     glPushMatrix();
     // right camera hold
     glRotated(-90, 0, 1, 0);
     glTranslated(.061, 0, -.004);
-    cedar::aux::gl::drawDisk(0, .035, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-    cedar::aux::gl::drawCone(0, .008, .035, .035, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0, .035, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+    cedar::aux::gl::drawCone(0, .008, .035, .035, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(0, 0, .008);
-    cedar::aux::gl::drawDisk(0, .035, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0, .035, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
     glTranslated(0, 0, .015);
-    cedar::aux::gl::drawCone(-.015, .015, .0125, .0125, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawCone(-.015, .015, .0125, .0125, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(.025, 0, .015 + .005);
-    cedar::aux::gl::drawBlock(.080, .030, .010, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.080, .030, .010, getIsDrawnAsWireFrame());
     glTranslated(.035, 0, .005 + .040);
-    cedar::aux::gl::drawBlock(.010, .030, .080, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.010, .030, .080, getIsDrawnAsWireFrame());
     glTranslated(.005, -.015, -.040 - .010);
     drawCameraHold();
     glRotated(-90, 0, 1, 0);
@@ -179,16 +181,16 @@ void cedar::dev::gl::CoraHead::drawSegment(unsigned int index)
     glRotated(180, 1, 0, 0);
     glRotated(-90, 0, 1, 0);
     glTranslated(.061, 0, -.004);
-    cedar::aux::gl::drawDisk(0, .035, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-    cedar::aux::gl::drawCone(0, .008, .035, .035, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0, .035, getResolution(), getResolution(), true, getIsDrawnAsWireFrame());
+    cedar::aux::gl::drawCone(0, .008, .035, .035, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(0, 0, .008);
-    cedar::aux::gl::drawDisk(0, .035, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0, .035, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
     glTranslated(0, 0, .015);
-    cedar::aux::gl::drawCone(-.015, .015, .0125, .0125, mResolution, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawCone(-.015, .015, .0125, .0125, getResolution(), getIsDrawnAsWireFrame());
     glTranslated(.025, 0, .015 + .005);
-    cedar::aux::gl::drawBlock(.080, .030, .010, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.080, .030, .010, getIsDrawnAsWireFrame());
     glTranslated(.035, 0, .005 + .040);
-    cedar::aux::gl::drawBlock(.010, .030, .080, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawBlock(.010, .030, .080, getIsDrawnAsWireFrame());
     glTranslated(.005, -.015, -.040 - .010);
     drawCameraHold();
 
@@ -204,12 +206,13 @@ void cedar::dev::gl::CoraHead::drawEndEffector()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getEndEffectorTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  cv::Mat transformation;
+  transformation = mpKinematicChain->getEndEffectorTransformation().t();
+  glMultMatrixd((GLdouble*)transformation.data);
   glPushMatrix();
 
   // draw the joint
-  glColor4d(mColorR, mColorG, mColorB, 0);
+  glColor4d(getColorR(), getColorG(), getColorB(), 0);
   glTranslated(0.061, .0, .0);
   drawCamera();
   glPopMatrix();
@@ -219,7 +222,7 @@ void cedar::dev::gl::CoraHead::drawEndEffector()
 
 void cedar::dev::gl::CoraHead::drawCameraHold()
 {
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
@@ -334,7 +337,7 @@ void cedar::dev::gl::CoraHead::drawCameraHold()
   glTranslated(-.065, .015, .040 + .004);
 
   setMaterial(NO_MATERIAL);
-  if (mIsDrawnAsWireFrame)
+  if (getIsDrawnAsWireFrame())
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
@@ -345,15 +348,15 @@ void cedar::dev::gl::CoraHead::drawCamera()
   setMaterial(WHITE_PLASTIC);
   glRotated(90, 1, 0, 0);
   glTranslated(0, .020, -.005);
-  cedar::aux::gl::drawBlock(.060, .110, .060, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawBlock(.060, .110, .060, getIsDrawnAsWireFrame());
   glTranslated(0, .055, 0);
   setMaterial(BLACK_METAL);
   glRotated(-90, 1, 0, 0);
-  cedar::aux::gl::drawCone(0, .003, .0185, .0185, mResolution, mIsDrawnAsWireFrame);
-  cedar::aux::gl::drawCone(0, .003, .0225, .0225, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone(0, .003, .0185, .0185, getResolution(), getIsDrawnAsWireFrame());
+  cedar::aux::gl::drawCone(0, .003, .0225, .0225, getResolution(), getIsDrawnAsWireFrame());
   glTranslated(0, 0, .0001);
-  cedar::aux::gl::drawDisk(0, .0185, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(0, .0185, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
   glTranslated(0, 0, .0029);
-  cedar::aux::gl::drawDisk(.0185, .0225, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(.0185, .0225, getResolution(), getResolution(), false, getIsDrawnAsWireFrame());
   setMaterial(NO_MATERIAL);
 }

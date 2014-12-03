@@ -70,6 +70,7 @@ _mCommandSetSpeed(new cedar::aux::StringParameter(this, "command set speed", "D"
 _mCommandSetEncoder(new cedar::aux::StringParameter(this, "command set encoder", "P")),
 _mCommandGetEncoder(new cedar::aux::StringParameter(this, "command get encoder", "Q"))
 {
+  this->init();
 }
 
 cedar::dev::kteam::DriveSerial::DriveSerial(cedar::dev::kteam::SerialChannelPtr channel)
@@ -79,6 +80,18 @@ _mCommandSetSpeed(new cedar::aux::StringParameter(this, "command set speed", "D"
 _mCommandSetEncoder(new cedar::aux::StringParameter(this, "command set encoder", "P")),
 _mCommandGetEncoder(new cedar::aux::StringParameter(this, "command get encoder", "Q"))
 {
+  this->init();
+}
+
+void cedar::dev::kteam::DriveSerial::init()
+{
+  this->registerCommandHook(cedar::dev::DifferentialDrive::WHEEL_SPEED, boost::bind(&cedar::dev::kteam::DriveSerial::sendMovementCommand, this));
+  this->registerMeasurementHook(cedar::dev::kteam::Drive::ENCODERS, boost::bind(&cedar::dev::kteam::DriveSerial::retrieveEncoders, this));
+}
+
+cedar::dev::kteam::DriveSerial::~DriveSerial()
+{
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,6 +104,7 @@ void cedar::dev::kteam::DriveSerial::sendMovementCommand()
   // of pulses per second (this is hardware-specific).
   // first: convert speed from m/s into Pulses/s ...
   std::vector<cedar::unit::Frequency> wheel_speed_pulses = convertWheelSpeedToPulses(getWheelSpeed());
+
 
   // construct the command string "D,x,y"
   // where x is the speed of the left wheel (in pulses/s)
@@ -108,10 +122,10 @@ void cedar::dev::kteam::DriveSerial::sendMovementCommand()
   checkSerialCommunicationAnswer(answer, _mCommandSetSpeed->getValue());
 }
 
-std::vector<int> cedar::dev::kteam::DriveSerial::getEncoders() const
+cv::Mat cedar::dev::kteam::DriveSerial::retrieveEncoders() const
 {
   // the left and right encoder value will be saved in this vector
-  std::vector<int> encoders(2);
+  cv::Mat encoders = cv::Mat(2, 1, CV_64F);
 
   // send the command to receive the values of the encoders
   std::string answer
@@ -128,7 +142,7 @@ std::vector<int> cedar::dev::kteam::DriveSerial::getEncoders() const
   checkStreamValidity(answer_stream, false);
 
   // read the left encoder value
-  answer_stream >> encoders[0];
+  answer_stream >> encoders.at<double>(0,0);
   checkStreamValidity(answer_stream, false);
 
   // skip the colon separating the encoder values
@@ -136,19 +150,21 @@ std::vector<int> cedar::dev::kteam::DriveSerial::getEncoders() const
   checkStreamValidity(answer_stream, false);
 
   // read the right encoder value
-  answer_stream >> encoders[1];
+  answer_stream >> encoders.at<double>(1,0);
   checkStreamValidity(answer_stream, true);
 
   return encoders;
 }
 
-void cedar::dev::kteam::DriveSerial::setEncoders(const std::vector<int>& encoders)
+void cedar::dev::kteam::DriveSerial::sendEncoders(const cv::Mat &mat)
 {
   // create a command string which will set the encoder values
   std::ostringstream command;
-  command << _mCommandSetEncoder->getValue() << "," << encoders[0] << "," << encoders[1];
+  command << _mCommandSetEncoder->getValue() << "," << mat.at<double>(0,0) << "," << mat.at<double>(1,0);
+
   std::string answer = convertToSerialChannel(getChannel())->writeAndReadLocked(command.str());
 
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandSetEncoder->getValue());
 }
+

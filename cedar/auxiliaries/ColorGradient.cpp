@@ -71,6 +71,11 @@ void cedar::aux::ColorGradient::StandardGradients::construct()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::aux::ColorGradient::empty() const
+{
+  return this->mGradientColors.empty();
+}
+
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getStandardGradient(const cedar::aux::Enum& id)
 {
   switch (id.id())
@@ -159,6 +164,49 @@ void cedar::aux::ColorGradient::setStop(double location, const QColor& color)
   this->updateLookupTable();
 }
 
+QColor cedar::aux::ColorGradient::getColor(double position) const
+{
+  QColor color;
+
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(position >= 0.0);
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(position <= 1.0);
+
+  // The first element in the map with a key >= gray_f
+  auto upper_it = this->mGradientColors.lower_bound(position);
+
+  if (upper_it == this->mGradientColors.begin())
+  {
+    color = upper_it->second;
+  }
+  else if (upper_it == this->mGradientColors.end())
+  {
+    upper_it--;
+    color = upper_it->second;
+  }
+  else
+  {
+    auto lower_it = upper_it;
+    lower_it--;
+
+    double lower = lower_it->first;
+    double upper = upper_it->first;
+
+    const QColor& lower_col = lower_it->second;
+    const QColor& upper_col = upper_it->second;
+
+    double mix = 0.0;
+    if (lower < upper)
+    {
+      mix = (position - lower) / (upper - lower);
+    }
+    color.setRed((1.0 - mix) * lower_col.red() + mix * upper_col.red());
+    color.setBlue((1.0 - mix) * lower_col.blue() + mix * upper_col.blue());
+    color.setGreen((1.0 - mix) * lower_col.green() + mix * upper_col.green());
+  }
+  return color;
+}
+
+
 void cedar::aux::ColorGradient::updateLookupTable()
 {
   mLookupTableR.clear();
@@ -184,39 +232,7 @@ void cedar::aux::ColorGradient::updateLookupTable()
     else
     {
       double gray_f = static_cast<double>(gray) / static_cast<double>(mLookupTableR.size());
-
-      // The first element in the map with a key >= gray_f
-      auto upper_it = this->mGradientColors.lower_bound(gray_f);
-
-      if (upper_it == this->mGradientColors.begin())
-      {
-        color = upper_it->second;
-      }
-      else if (upper_it == this->mGradientColors.end())
-      {
-        upper_it--;
-        color = upper_it->second;
-      }
-      else
-      {
-        auto lower_it = upper_it;
-        lower_it--;
-
-        double lower = lower_it->first;
-        double upper = upper_it->first;
-
-        const QColor& lower_col = lower_it->second;
-        const QColor& upper_col = upper_it->second;
-
-        double mix = 0.0;
-        if (lower < upper)
-        {
-          mix = (gray_f - lower) / (upper - lower);
-        }
-        color.setRed((1.0 - mix) * lower_col.red() + mix * upper_col.red());
-        color.setBlue((1.0 - mix) * lower_col.blue() + mix * upper_col.blue());
-        color.setGreen((1.0 - mix) * lower_col.green() + mix * upper_col.green());
-      }
+      color = this->getColor(gray_f);
     }
 
     this->mLookupTableR[gray] = static_cast<char>(color.red());

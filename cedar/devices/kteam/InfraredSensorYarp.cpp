@@ -77,7 +77,8 @@ mSensorPortWithPrefix(""),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F))),
 _mSensorPort(new cedar::aux::StringParameter(this, "sensor port", "proximitySensors"))
 {
-  this->addMeasuredData("sensor values", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorYarp::updateSensorValues, this));
+  //!@todo this has to be fixed
+//  this->addMeasuredData("sensor values", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorYarp::updateSensorValues, this));
 }
 
 cedar::dev::kteam::InfraredSensorYarp::InfraredSensorYarp
@@ -90,11 +91,13 @@ mSensorPortWithPrefix(""),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F))),
 _mSensorPort(new cedar::aux::StringParameter(this, "sensor port", "proximitySensors"))
 {
-  this->addMeasuredData("sensor values", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorYarp::updateSensorValues, this));
+  //!@todo this has to be fixed
+//  this->addMeasuredData("sensor values", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorYarp::updateSensorValues, this));
 }
 
 cedar::dev::kteam::InfraredSensorYarp::~InfraredSensorYarp()
 {
+  prepareComponentDestructAbsolutelyRequired();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
