@@ -118,7 +118,7 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(c
       // remember the old data that was plotted
       if (auto multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpPlotter))
       {
-        const auto& map = multi->getDataMap();
+        const auto& map = multi->getDataTitleMap();
         mMultiPlotData.insert(map.begin(), map.end());
       }
 

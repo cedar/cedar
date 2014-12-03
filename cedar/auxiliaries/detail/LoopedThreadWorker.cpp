@@ -276,11 +276,11 @@ void cedar::aux::detail::LoopedThreadWorker::initStatistics()
 
 void cedar::aux::detail::LoopedThreadWorker::updateStatistics(double stepsTaken)
 {
-  double old_sum = mSumOfStepsTaken;
-
   QWriteLocker locker1(&mNumberOfStepsLock);
   QWriteLocker locker2(&mSumOfStepsTakenLock);
   QWriteLocker locker3(&mMaxStepsTakenLock);
+
+  double old_sum = mSumOfStepsTaken;
 
   mNumberOfSteps += 1.0;
   mSumOfStepsTaken += stepsTaken;
@@ -297,11 +297,14 @@ void cedar::aux::detail::LoopedThreadWorker::updateStatistics(double stepsTaken)
       "cedar::aux::LoopedThread::updateStatistics(double)"
     );
 
-    //!@todo: unlock locker1 before going in here!
+    // init statistics locks these again
+    locker3.unlock();
+    locker2.unlock();
+    locker1.unlock();
+
     initStatistics();
     return;
   }
-
 }
 
 boost::posix_time::ptime cedar::aux::detail::LoopedThreadWorker::getLastTimeStepStart() const

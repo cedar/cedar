@@ -107,7 +107,7 @@ void cedar::aux::GlobalClock::stop()
   }
 }
 
-cedar::unit::Time cedar::aux::GlobalClock::getTime()
+cedar::unit::Time cedar::aux::GlobalClock::getTime() const
 {
   double time_msecs = this->mAdditionalElapsedTime;
 

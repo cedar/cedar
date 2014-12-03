@@ -154,20 +154,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Starts the recorder thread.
-  *
-  *              By calling start, every registered observer thread will automatically be started.
-  *              Additionally all files will be created and filled with headers.
-  *!todo: docu is wrong, should be private, no?
-  */
-  void prepareStart();
-
-  /*!@brief Stops the recorder thread.
-   *
-   *              By calling stop, the calling thread waits until all recorded data has been written to disk.
-   *!todo: docu is wrong, should be private, no?
-   */
-  void processQuit();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -178,6 +165,19 @@ private:
 
   //!@brief Creates a new Output directory
   void createOutputDirectory();
+
+  /*!@brief Starts the recorder thread.
+  *
+  *              By calling start, every registered observer thread will automatically be started.
+  *              Additionally all files will be created and filled with headers.
+  */
+  void prepareStart();
+
+  /*!@brief Stops the recorder thread.
+   *
+   *              By calling stop, the calling thread waits until all recorded data has been written to disk.
+   */
+  void processQuit();
 
 //--------------------------------------------------------------------------------------------------------------------
 // members

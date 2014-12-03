@@ -325,7 +325,6 @@ private:
 protected:
   // none yet
 private:
-  //!@todo Why aren't mLowerLimitMinimum etc. stored as cedar::aux::math::Limits?
   //!@brief The default value of the lower limit
   T mLowerLimitDefault;
   //!@brief The minimum value of the lower limit

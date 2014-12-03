@@ -76,7 +76,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns a string that contains the data in CSV format. Should be overridden for all inheriting classes.
-  //!@todo: Extend parameter for different Format(e. g. CSV, XML, BINARY).
+  //!@todo: It should be possible to specify the output format (e.g., CSV, XML, BINARY) via a second parameter.
   virtual void serializeData(std::ostream& stream) const;
 
   //!@brief Returns a string that describes the data in CSV format. Should be overridden for all inheriting classes.

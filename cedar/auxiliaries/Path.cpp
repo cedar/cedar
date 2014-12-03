@@ -230,8 +230,10 @@ std::vector<cedar::aux::Path> cedar::aux::Path::listFilesThatMatchRe(const std::
 
 const std::string& cedar::aux::Path::getLast() const
 {
-  //!@todo Proper exception
-  CEDAR_ASSERT(!this->mComponents.empty());
+  if (this->mComponents.empty())
+  {
+    CEDAR_THROW(cedar::aux::InvalidValueException, "Cannot return last part of path: path is empty.");
+  }
 
   return this->mComponents.back();
 }

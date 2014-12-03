@@ -215,29 +215,6 @@ std::string cedar::aux::PluginProxy::getPluginNameFromPath(const std::string& pa
 std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& plugin_path) const
 {
   std::string plugin_name = cedar::aux::PluginProxy::getPluginNameFromPath(plugin_path);
-  // plugin_name += ".xml";
-
-  // extract the path only
-  /*boost::filesystem::path plugin_dir(plugin_path);
-  plugin_dir.remove_filename();
-  plugin_dir /= plugin_name;
-
-  if (boost::filesystem::exists(plugin_dir))
-  {
-    return plugin_dir.string();
-  }
-
-  // remove filename and current directory (i.e., cd ..)
-  plugin_dir = plugin_dir.parent_path().parent_path();
-  plugin_dir /= plugin_name;
-  if (boost::filesystem::exists(plugin_dir))
-  {
-    return plugin_dir.string();
-  }
-
-  //!@todo This should throw an exception.
-  return "";
-  */
   
   try
   {

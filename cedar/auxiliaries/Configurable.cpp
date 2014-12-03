@@ -60,7 +60,6 @@
 #include <sstream>
 #include <fstream> // only used for legacy configurable compatibility
 
-//!@todo Store parameter locks of children & subparameters properly
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -631,7 +630,6 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* paramete
 {
   QWriteLocker locker (&mConfigurableLock);
 
-  //!@todo Make a global function for checking names. This function might then also be used for step/data/... names.
   auto name = parameter->getName();
   if (name.find(".") != std::string::npos)
   {
