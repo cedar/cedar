@@ -249,21 +249,15 @@ void cedar::proc::gui::ExperimentDialog::runExperiment()
     icon = QMessageBox::Critical;
   }
 
-  auto p_mb = new QMessageBox
-              (
-                icon,
-                "Issues with the experiment",
-                "Some parts of the experiment are not set up properly. Start anyway?",
-                QMessageBox::Yes | QMessageBox::No
-              );
-
   QString details;
 
+  bool issues_found = false;
   for (const auto& issue_list_pair : issues)
   {
     const auto& list = issue_list_pair.second;
     if (!list.empty())
     {
+      issues_found = true;
       QString issue = QString::fromStdString(issue_list_pair.first);
 
       details += "The following ";
@@ -276,14 +270,28 @@ void cedar::proc::gui::ExperimentDialog::runExperiment()
     }
   }
 
-  p_mb->setDetailedText(details);
-
-  int r = p_mb->exec();
-
-  if (r == QMessageBox::No)
+  if (issues_found)
   {
-    return;
+    auto p_mb = new QMessageBox
+                (
+                  icon,
+                  "Issues with the experiment",
+                  "Some parts of the experiment are not set up properly. Start anyway?",
+                  QMessageBox::Yes | QMessageBox::No
+                );
+
+    p_mb->setDetailedText(details);
+
+    int r = p_mb->exec();
+
+    delete p_mb;
+
+    if (r == QMessageBox::No)
+    {
+      return;
+    }
   }
+
 
   this->mExperiment->startExperiment();
 }
