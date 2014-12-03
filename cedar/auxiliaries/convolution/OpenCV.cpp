@@ -128,7 +128,11 @@ void cedar::aux::conv::OpenCV::translateAnchor
      (
        cv::Point& anchor,
        const std::vector<int>& anchor_vector,
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
+       const cv::MatSize& msize
+#else
        const cv::Mat::MSize& msize
+#endif
      ) const
 {
   anchor = cv::Point(-1, -1);

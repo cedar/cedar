@@ -324,10 +324,12 @@ void cedar::aux::Settings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    std::cout << "Error reading settings: " << e.what() << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Could not read settings: " + std::string(e.what()) + "; Trying a different name.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
-
-  std::cout << "Trying a different name." << std::endl;
 
   // backwards compatibility: there used to be a typo in the name of the settings file
   try

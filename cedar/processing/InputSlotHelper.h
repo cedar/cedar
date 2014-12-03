@@ -53,6 +53,7 @@
   #include <boost/signals2.hpp>
   #include <boost/optional.hpp>
 #endif // Q_MOC_RUN
+#include <vector>
 
 namespace cedar
 {

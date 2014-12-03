@@ -49,6 +49,8 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QColor>
+#include <map>
+#include <vector>
 
 
 /*!@brief Represents a gradient of colors.

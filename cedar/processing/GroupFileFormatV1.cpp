@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/GroupFileFormatV1.h"
+#include "cedar/processing/CppScript.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Trigger.h"
@@ -116,6 +117,12 @@ void cedar::proc::GroupFileFormatV1::write
     this->writeCustomParameters(group, custom_parameters);
     if (!custom_parameters.empty())
     root.add_child("custom parameters", custom_parameters);
+
+
+    cedar::aux::ConfigurationNode scripts;
+    this->writeScripts(group, scripts);
+    if (!scripts.empty())
+      root.add_child("scripts", scripts);
   }
 
   group->cedar::aux::Configurable::writeConfiguration(root);
@@ -126,25 +133,16 @@ void cedar::proc::GroupFileFormatV1::writeMetaData(cedar::proc::ConstGroupPtr gr
   meta.put("format", 1);
 
   // determine what plugins are used by the group
-  std::set<std::string> required_plugins;
-  for (auto& name_element_pair : group->getElements())
-  {
-    auto element = name_element_pair.second;
-    auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(element);
-    if (!declaration->getSource().empty())
-    {
-      required_plugins.insert(declaration->getSource());
-    }
-  }
+  std::set<std::string> required_plugins = group->listRequiredPlugins();
 
   // if plugins are used, write them to the meta node
   if (!required_plugins.empty())
   {
     cedar::aux::ConfigurationNode required_plugins_node;
-    for (auto iter = required_plugins.begin(); iter != required_plugins.end(); ++iter)
+    for (auto plugin_path : required_plugins)
     {
       cedar::aux::ConfigurationNode value_node;
-      value_node.put_value(*iter);
+      value_node.put_value(plugin_path);
       required_plugins_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
     }
 
@@ -364,6 +362,12 @@ void cedar::proc::GroupFileFormatV1::read
     {
       this->readParameterLinks(group, parameter_links_iter->second, exceptions);
     }
+
+    auto scripts_iter = root.find("scripts");
+    if (scripts_iter != root.not_found())
+    {
+      this->readScripts(group, scripts_iter->second, exceptions);
+    }
   }
 }
 
@@ -411,6 +415,26 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
   }
 }
 
+void cedar::proc::GroupFileFormatV1::writeScripts(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& node) const
+{
+  for (auto script : group->getScripts())
+  {
+    std::string type = cedar::proc::CppScriptDeclarationManagerSingleton::getInstance()->getTypeId(script);
+
+    cedar::aux::ConfigurationNode script_node, script_configuration;
+    script_node.put("type", type);
+
+    script->writeConfiguration(script_configuration);
+    if (!script_configuration.empty())
+    {
+      script_node.put_child("configuration", script_configuration);
+    }
+
+    node.push_back(cedar::aux::ConfigurationNode::value_type("", script_node));
+  }
+}
+
+
 void cedar::proc::GroupFileFormatV1::writeCustomParameters(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& customParameters) const
 {
   for (auto parameter : group->getCustomParameters())
@@ -452,6 +476,36 @@ void cedar::proc::GroupFileFormatV1::readCustomParameters
     std::string type = type_iter->second.get_value<std::string>();
     std::string name = name_iter->second.get_value<std::string>();
     group->addCustomParameter(type, name);
+  }
+}
+
+
+void cedar::proc::GroupFileFormatV1::readScripts
+(
+  cedar::proc::GroupPtr group,
+  const cedar::aux::ConfigurationNode& root,
+  std::vector<std::string>& /* exceptions */
+)
+{
+  for (const auto& link_iter : root)
+  {
+    const auto& node = link_iter.second;
+    auto type_iter = node.find("type");
+    if (type_iter == node.not_found())
+    {
+      continue;
+    }
+
+    std::string type = type_iter->second.get_value<std::string>();
+    auto script = cedar::proc::CppScriptFactoryManagerSingleton::getInstance()->allocate(type);
+
+    auto config_iter = node.find("configuration");
+    if (config_iter != node.not_found())
+    {
+      script->readConfiguration(config_iter->second);
+    }
+
+    group->addScript(script);
   }
 }
 

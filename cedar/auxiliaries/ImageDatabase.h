@@ -52,9 +52,15 @@
 #include "cedar/auxiliaries/CommandLineParser.fwd.h"
 
 // SYSTEM INCLUDES
-#include <boost/bimap.hpp>
+#ifndef Q_MOC_RUN
+  #include <boost/bimap.hpp>
+  #include <boost/optional.hpp>
+#endif // Q_MOC_RUN
 #include <iostream>
 #include <set>
+#include <map>
+#include <vector>
+#include <string>
 
 
 /*!@brief A class for finding images and annotation information from an image database.
@@ -426,6 +432,10 @@ private:
   void selectImages(std::set<ImagePtr>& images, cedar::aux::CommandLineParser& options) const;
 
   void selectImagesFromFirstNClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses) const;
+
+  void selectImagesFromNRandomClasses(std::set<ImagePtr>& images, unsigned int numberOfClasses, const boost::optional<unsigned int>& seed) const;
+
+  static void selectImagesWithClassesInSet(std::set<ImagePtr>& images, const std::set<ClassId>& acceptedClasses);
 
   void scanDirectory(const cedar::aux::Path& path);
 

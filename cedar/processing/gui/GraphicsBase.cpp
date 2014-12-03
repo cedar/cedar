@@ -696,6 +696,16 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
   return QGraphicsItem::itemChange(change, value);
 }
 
+void cedar::proc::gui::GraphicsBase::updateResizeHandles()
+{
+  bool show = this->isSelected();
+  if (this->scene() && this->scene()->selectedItems().count() > 1)
+  {
+    show = false;
+  }
+  this->updateResizeHandles(show);
+}
+
 void cedar::proc::gui::GraphicsBase::updateResizeHandles(bool show)
 {
   if (this->canResize() && show)

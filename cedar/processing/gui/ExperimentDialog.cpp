@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -51,6 +51,8 @@
 // SYSTEM INCLUDES
 #include <QFileDialog>
 #include <QMessageBox>
+#include <vector>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -58,23 +60,22 @@
 cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* parent)
 {
   mParent = parent;
-  this->mExperiment = boost::shared_ptr<cedar::proc::experiment::Experiment>
+  //!@todo Can't this call createNewExperiment?
+  this->setExperiment
   (
-      new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup())
+    cedar::proc::experiment::ExperimentPtr(new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup()))
   );
   this->mExperiment->setName("TestExperiment");
   this->setupUi(this);
 
   // Connect the GUI elements
+  connect(this->mpNewButton, SIGNAL(clicked()), this, SLOT(createNewExperiment()));
   connect(this->saveButton, SIGNAL(clicked()), this, SLOT(save()));
   connect(this->loadButton, SIGNAL(clicked()), this, SLOT(load()));
   connect(this->saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
   connect(this->nameEdit, SIGNAL(editingFinished()), this, SLOT(nameChanged()));
   connect(this->runButton, SIGNAL(clicked()), this, SLOT(runExperiment()));
   connect(this->stopButton, SIGNAL(clicked()), this, SLOT(stopExperiment()));
-  connect(this->mExperiment.get(), SIGNAL(experimentRunning(bool)), this, SLOT(experimentRunning(bool)));
-  connect(this->mExperiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
-  connect(this->mExperiment.get(), SIGNAL(groupChanged()), this, SLOT(redraw()));
   connect(this->repetitionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(trialChanged()));
   connect(this->mAddActionSequence,SIGNAL(clicked()),this,SLOT(addActionSequence()));
   connect(this->mpRepeat, SIGNAL(toggled(bool)), this, SLOT(repeatChecked(bool)));
@@ -94,7 +95,10 @@ cedar::proc::gui::ExperimentDialog::ExperimentDialog(cedar::proc::gui::Ide* pare
 
 cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
 {
-  this->mExperiment->cancel();
+  if (this->mExperiment->isRunning())
+  {
+    this->mExperiment->stopExperiment();
+  }
   mpGroupTime->stop();
   delete mpGroupTime;
 }
@@ -102,6 +106,21 @@ cedar::proc::gui::ExperimentDialog::~ExperimentDialog()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::ExperimentDialog::setExperiment(cedar::proc::experiment::ExperimentPtr experiment)
+{
+  if (this->mExperiment)
+  {
+    QObject::disconnect(this->mExperiment.get(), SIGNAL(experimentRunning(bool)), this, SLOT(experimentRunning(bool)));
+    QObject::disconnect(this->mExperiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
+    QObject::disconnect(this->mExperiment.get(), SIGNAL(groupChanged()), this, SLOT(redraw()));
+  }
+
+  this->mExperiment = experiment;
+  QObject::connect(this->mExperiment.get(), SIGNAL(experimentRunning(bool)), this, SLOT(experimentRunning(bool)));
+  QObject::connect(this->mExperiment.get(), SIGNAL(trialNumberChanged(int)), this, SLOT(trialNumberChanged(int)));
+  QObject::connect(this->mExperiment.get(), SIGNAL(groupChanged()), this, SLOT(redraw()));
+}
 
 void cedar::proc::gui::ExperimentDialog::repeatChecked(bool checked)
 {
@@ -165,6 +184,7 @@ void cedar::proc::gui::ExperimentDialog::load()
   if (!filename.empty())
   {
     location_dir->setValue(QDir(QString::fromStdString(filename)));
+    //!@todo Shouldn't this create a new experiment?
     this->mExperiment->readJson(filename);
     this->mExperiment->setFileName(filename);
     this->mpRepeat->setChecked(this->mExperiment->getRepeating());
@@ -189,7 +209,7 @@ void cedar::proc::gui::ExperimentDialog::trialChanged()
 
 void cedar::proc::gui::ExperimentDialog::clearActionSequences()
 {
-  QLayoutItem *child;
+  QLayoutItem* child;
   while ((child = this->mActionSequences->takeAt(0)) != 0)
   {
     delete child->widget();
@@ -213,22 +233,59 @@ cedar::proc::experiment::ExperimentPtr cedar::proc::gui::ExperimentDialog::getEx
 
 void cedar::proc::gui::ExperimentDialog::runExperiment()
 {
-  if (!this->mExperiment->checkActionSequences())
-  {
-    auto r = QMessageBox::warning
-             (
-               this,"No triggers started",
-               "None of the action sequences you have set up start any triggers. "
-               "Running the experiment might not have any effect. Start anyway?",
-               QMessageBox::Yes | QMessageBox::No
-             );
+  std::map<std::string, std::vector<std::string> > issues;
+  issues["errors"] = std::vector<std::string>();
+  issues["warnings"] = std::vector<std::string>();
 
-    if (r == QMessageBox::No)
+  bool valid = this->mExperiment->checkValidity(issues["errors"], issues["warnings"]);
+
+  QMessageBox::Icon icon;
+  if (valid)
+  {
+    icon = QMessageBox::Warning;
+  }
+  else
+  {
+    icon = QMessageBox::Critical;
+  }
+
+  auto p_mb = new QMessageBox
+              (
+                icon,
+                "Issues with the experiment",
+                "Some parts of the experiment are not set up properly. Start anyway?",
+                QMessageBox::Yes | QMessageBox::No
+              );
+
+  QString details;
+
+  for (const auto& issue_list_pair : issues)
+  {
+    const auto& list = issue_list_pair.second;
+    if (!list.empty())
     {
-      return;
+      QString issue = QString::fromStdString(issue_list_pair.first);
+
+      details += "The following ";
+      details += issue;
+      details += " occurred:\n\n";
+      for (const auto& item : list)
+      {
+        details += QString::fromStdString(item) + "\n";
+      }
     }
   }
-  this->mExperiment->run();
+
+  p_mb->setDetailedText(details);
+
+  int r = p_mb->exec();
+
+  if (r == QMessageBox::No)
+  {
+    return;
+  }
+
+  this->mExperiment->startExperiment();
 }
 
 void cedar::proc::gui::ExperimentDialog::stopExperiment()
@@ -237,14 +294,14 @@ void cedar::proc::gui::ExperimentDialog::stopExperiment()
       "Do you really want to stop this experiment?", QMessageBox::Yes|QMessageBox::No);
   if (stop == QMessageBox::Yes)
   {
-    this->mExperiment->cancel();
+    this->mExperiment->stopExperiment();
   }
 }
 
 
 void cedar::proc::gui::ExperimentDialog::experimentRunning(bool status)
 {
-  if(status)
+  if (status)
   {
     this->runButton->setEnabled(false);
     this->stopButton->setEnabled(true);
@@ -275,7 +332,7 @@ void cedar::proc::gui::ExperimentDialog::setActionSequenceWidgetsEnabled(bool en
 
 void cedar::proc::gui::ExperimentDialog::trialNumberChanged(int number)
 {
-  this->mActualRepetition->setText(QString::number(number));
+  this->mActualRepetition->setText(QString::number(number+1));
 }
 
 void cedar::proc::gui::ExperimentDialog::redraw()
@@ -285,7 +342,7 @@ void cedar::proc::gui::ExperimentDialog::redraw()
       this->mExperiment->getActionSequences();
   for (unsigned int i = 0; i < action_sequences.size(); i++)
   {
-    cedar::proc::experiment::ActionSequencePtr action_seq =action_sequences[i];
+    cedar::proc::experiment::ActionSequencePtr action_seq = action_sequences[i];
     cedar::proc::experiment::gui::ActionSequence* as_gui
       = new cedar::proc::experiment::gui::ActionSequence(action_seq,this);
     this->mActionSequences->addWidget(as_gui);
@@ -297,4 +354,43 @@ void cedar::proc::gui::ExperimentDialog::timeUpdate()
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   std::string formatted_time = cedar::aux::formatDuration(time);
   this->mTimeLabel->setText(QString::fromStdString(formatted_time));
+}
+
+void cedar::proc::gui::ExperimentDialog::createNewExperiment()
+{
+  auto r = QMessageBox::question
+      (
+        this,
+        "New experiment?",
+        "Do you want to discard the old experiment and create a new one?",
+        QMessageBox::Ok | QMessageBox::Cancel
+      );
+
+  switch (r)
+  {
+    case QMessageBox::Cancel:
+      return;
+
+    case QMessageBox::Ok:
+      break;
+
+    default:
+      // this should not happen, only Ok and Cancel are in the dialog
+      CEDAR_ASSERT(false);
+  }
+
+  if (this->mExperiment->isRunning())
+  {
+    this->mExperiment->stopExperiment();
+  }
+  this->setExperiment
+  (
+    cedar::proc::experiment::ExperimentPtr(new cedar::proc::experiment::Experiment(mParent->getGroup()->getGroup()))
+  );
+  this->mExperiment->setName("new experiment");
+  this->mExperiment->setFileName("new experiment.json");
+  this->mpRepeat->setChecked(this->mExperiment->getRepeating());
+  this->nameEdit->setText(QString::fromStdString(this->mExperiment->getName()));
+  this->repetitionSpinBox->setValue(this->mExperiment->getTrialCount());
+  this->redraw();
 }

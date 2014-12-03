@@ -128,6 +128,11 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
     QVariant data(QString(enum_val.name().c_str()));
     this->mpEdit->addItem(enum_val.prettyString().c_str(), data);
     int item_index = this->mpEdit->findData(data);
+    auto explanation = enum_val.explanatoryString();
+    if (explanation != "")
+    {
+      this->mpEdit->setItemData(item_index, explanation.c_str(), Qt::ToolTipRole);
+    }
     QStandardItemModel* model = qobject_cast<QStandardItemModel*>(this->mpEdit->model());
 
     CEDAR_DEBUG_ASSERT(model != NULL);

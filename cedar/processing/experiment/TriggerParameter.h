@@ -42,10 +42,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
+
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/TriggerParameter.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief a parameter to choose a certain trigger from the architecture
