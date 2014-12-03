@@ -30,6 +30,7 @@ interested in implementation details, you may have a look at the following topic
 - @link ParametersConcept Storing and loading parameters @endlink
 - @link ProcessingFrameworkConcept Processing framework @endlink
 - @link ThreadingConcept Threads and dynamics @endlink
+- @link ExperimentFrameworkConcept Experiment framework @endlink
 - @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
 - @link UnitsConcept Physical units @endlink
 - @ref EnumConcept
