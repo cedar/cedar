@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

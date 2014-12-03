@@ -61,7 +61,7 @@ namespace cedar
   {
     /*!@brief Formats a time duration to a human-readable string.
      */
-    std::string formatDuration(const cedar::unit::Time& time);
+    CEDAR_AUX_LIB_EXPORT std::string formatDuration(const cedar::unit::Time& time);
 
     /*!@brief Template method that converts simple data types to a string.
      *

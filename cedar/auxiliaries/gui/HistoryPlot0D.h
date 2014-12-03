@@ -112,12 +112,14 @@ public:
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void writeConfiguration(cedar::aux::ConfigurationNode& node) const;
+
   //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
   //!@brief Check if the given data can be detached from the plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

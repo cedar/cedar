@@ -47,6 +47,7 @@
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/xml_parser.hpp>
 #endif
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

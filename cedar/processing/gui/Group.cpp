@@ -80,6 +80,7 @@
 #endif
 #include <iostream>
 #include <set>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -110,6 +111,7 @@ mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
 _mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
+_mGeometryLocked(new cedar::aux::BoolParameter(this, "lock geometry", false)),
 _mUncollapsedWidth(new cedar::aux::DoubleParameter(this, "uncollapsed width", width)),
 _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", height))
 {
@@ -181,6 +183,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 
   this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
+  this->connect(this->_mGeometryLocked.get(), SIGNAL(valueChanged()), SLOT(geometryLockChanged()));
+
   QObject::connect
   (
     this->mGroup.get(),
@@ -229,6 +233,30 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Group::canResize() const
+{
+  if (this->_mGeometryLocked->getValue())
+  {
+    return false;
+  }
+  else
+  {
+    return cedar::proc::gui::Connectable::canResize();
+  }
+}
+
+void cedar::proc::gui::Group::setLockGeometry(bool lock)
+{
+  this->_mGeometryLocked->setValue(lock);
+}
+
+void cedar::proc::gui::Group::geometryLockChanged()
+{
+  bool locked = this->_mGeometryLocked->getValue();
+  this->setFlag(QGraphicsItem::ItemIsMovable, !locked);
+  this->updateResizeHandles();
+}
 
 const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
 {
@@ -801,14 +829,19 @@ cedar::proc::ConstGroupPtr cedar::proc::gui::Group::getGroup() const
   return this->mGroup;
 }
 
-void cedar::proc::gui::Group::write()
+void cedar::proc::gui::Group::write() const
 {
-  this->write(this->mFileName);
+  this->writeJson(this->mFileName);
 }
 
-void cedar::proc::gui::Group::write(const std::string& destination)
+void cedar::proc::gui::Group::write(const std::string& destination) const
 {
-  this->mFileName = destination;
+  this->writeJson(destination);
+}
+
+void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
+{
+  this->mFileName = filename.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
@@ -816,25 +849,30 @@ void cedar::proc::gui::Group::write(const std::string& destination)
   this->mGroup->writeConfiguration(root);
   this->writeConfiguration(root);
 
-  write_json(destination, root);
+  write_json(filename.toString(), root);
 
-  this->mGroup->writeDataFile(destination + ".data");
+  this->mGroup->writeDataFile(filename.toString() + ".data");
 }
 
 void cedar::proc::gui::Group::read(const std::string& source)
 {
-  this->mFileName = source;
+  this->readJson(source);
+}
+
+void cedar::proc::gui::Group::readJson(const cedar::aux::Path& source)
+{
+  this->mFileName = source.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
-  read_json(source, root);
+  read_json(source.toString(), root);
 
   this->mGroup->readConfiguration(root);
   this->readConfiguration(root);
 
-  if (boost::filesystem::exists(source + ".data"))
+  if (boost::filesystem::exists(source.toString() + ".data"))
   {
-    this->mGroup->readDataFile(source + ".data");
+    this->mGroup->readDataFile(source.toString() + ".data");
   }
 }
 
@@ -913,6 +951,9 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     try
     {
+      //!@todo Why isn't there a virtual functon in cedar::proc::Connectable or cedar::proc::Step to restore plots that is called here instead of having these ifs?
+      //!@todo And why is a group/step item used here when all that is done in createAndShow... is to get its associated connectable? Why not pass step/group?
+      //!@todo Rewrite this code!
       // is it a step?
       auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
       if (step) // check if cast worked
@@ -1766,6 +1807,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   p_collapse->setChecked(this->isCollapsed());
   this->connect(p_collapse, SIGNAL(toggled(bool)), SLOT(setCollapsed(bool)));
 
+  QAction* p_lock_geometry = menu.addAction("lock size/position");
+  p_lock_geometry->setCheckable(true);
+  p_lock_geometry->setChecked(this->_mGeometryLocked->getValue());
+  this->connect(p_lock_geometry, SIGNAL(toggled(bool)), SLOT(setLockGeometry(bool)));
+
   auto color_menu = menu.addMenu("color");
   auto colors = cedar::proc::gui::SettingsSingleton::getInstance()->getUserDefinedColors();
   colors.push_back
@@ -1906,36 +1952,21 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     this->getGroup()->removeConnector(name, false);
   }
 
-  else if (a->parentWidget() == p_rename_input_menu)
+  else if (a->parentWidget() == p_rename_input_menu || a->parentWidget() == p_rename_output_menu)
   {
+    bool is_output = (a->parentWidget() == p_rename_input_menu);
     std::string oldName = a->text().toStdString();
     QString newName = QInputDialog::getText(0, "Enter a new name", "Name", QLineEdit::Normal, QString::fromStdString(oldName));
     if (!newName.isEmpty())
     {
-      if (this->getGroup()->hasConnector(newName.toStdString()))
+      std::string error;
+      if (!this->getGroup()->canRenameConnector(oldName, newName.toStdString(), is_output, error))
       {
-        QMessageBox::critical(nullptr, "New name exists", "A connector of this name already exists.");
+        QMessageBox::critical(nullptr, "New name exists", QString::fromStdString(error));
       }
       else
       {
-        this->getGroup()->renameConnector(oldName, newName.toStdString(), true);
-      }
-    }
-  }
-
-  else if (a->parentWidget() == p_rename_output_menu)
-  {
-    std::string oldName = a->text().toStdString();
-    QString newName = QInputDialog::getText(0, "Enter a new name", "Name", QLineEdit::Normal, QString::fromStdString(oldName));
-    if (!newName.isEmpty())
-    {
-      if (this->getGroup()->hasConnector(newName.toStdString()))
-      {
-        QMessageBox::critical(nullptr, "New name exists", "A connector of this name already exists.");
-      }
-      else
-      {
-        this->getGroup()->renameConnector(oldName, newName.toStdString(), false);
+        this->getGroup()->renameConnector(oldName, newName.toStdString(), is_output);
       }
     }
   }

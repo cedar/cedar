@@ -277,6 +277,9 @@ public slots:
   //! return the gui root group
   cedar::proc::gui::ConstGroupPtr getGroup() const;
 
+public slots:
+  void experimentRunningChanged(bool running);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -346,10 +349,19 @@ private:
   //! Updates the architecture widget menu.
   void updateArchitectureWidgetsMenu();
 
+  //! Updates the architecture widget menu.
+  void updateArchitectureScriptsMenu();
+
   //! Constructs the widgets in the status bar.
   void buildStatusBar();
 
   void updateSimulationRunningIcon(bool running);
+
+  void setArchitectureSavingLoadingEnabled(bool enabled);
+
+  void setRecodringControlsEnabled(bool enabled);
+
+  void setSimulationControlsEnabled(bool enabled);
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
@@ -360,9 +372,9 @@ private slots:
 
   void architecturePlotActionTriggered();
 
-  void openManageArchitectureWidgetsDialog();
+  void showManageArchitectureWidgetsDialog();
 
-  void setSimulationControlsDisabled(bool disabled);
+  void showManageArchitectureScriptsDialog();
 
   void triggerStarted();
 

@@ -51,6 +51,8 @@
   #include <boost/enable_shared_from_this.hpp>
   #include <boost/signals2.hpp>
 #endif
+#include <set>
+#include <string>
 
 
 /*!@brief Base class for Elements in a processing architecture.

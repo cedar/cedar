@@ -86,6 +86,8 @@ public slots:
   //!@brief handles a change in the property combo box
   void propertyChanged();
 
+//  void valueChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,7 +100,6 @@ protected:
 private:
   //!@brief Updates the steps for the combo box
   void updateSteps();
-
   //!@brief Updates the properties the combo box
   void updateProperties();
 
@@ -126,7 +127,7 @@ private:
   //!@brief The property selector
   QComboBox* mpProperty;
 
-  //!@brief The parameter widget. Only appears if the StepPropertyParameter is of type PARMAETER
+  //!@brief The parameter widget. Only appears if the StepPropertyParameter is of type PARAMETER
   QWidget* mpPropertyCopy;
 
 }; // class cedar::proc::experiment::gui::StepPropertyParameter

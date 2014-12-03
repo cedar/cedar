@@ -57,6 +57,7 @@
 #include "cedar/auxiliaries/ParameterLink.fwd.h"
 #include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/CppScript.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/TriggerConnection.fwd.h"
 #include "cedar/processing/GroupFileFormatV1.fwd.h"
@@ -65,6 +66,7 @@
 
 // SYSTEM INCLUDES
 #include <QThread>
+#include <QMetaType>
 #include <vector>
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
@@ -272,6 +274,9 @@ public:
 
   //!@brief renames an external connector of the specified type
   void renameConnector(const std::string& oldName, const std::string& newName, bool input);
+
+  //!@brief checks if a connector can be renamed
+  bool canRenameConnector(const std::string& oldName, const std::string& newName, bool input, std::string& error) const;
 
   //!@brief removes an external connector of the specified type from the group
   void removeConnector(const std::string& name, bool input);
@@ -516,7 +521,7 @@ public:
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
   //!@brief Checks whether a name exists in the group.
-  bool nameExists(const std::string& name) const;
+  bool nameExists(const cedar::proc::NetworkPath& name) const;
 
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()
@@ -674,11 +679,39 @@ public:
   //! Updates the trigger chains of all steps.
   void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
 
+  /*! This function lists the required plugins for all the elements in this group and any of its subgroups.
+   */
+  std::set<std::string> listRequiredPlugins() const;
+
+  /*! Creates a new cedar::proc::CppScript of the given type and adds it to the group.
+   *
+   *  @remarks the name for the script will be determined automatically.
+   */
+  void createScript(const std::string& type);
+
+  //! Adds the given script to the group.
+  void addScript(cedar::proc::CppScriptPtr script);
+
+  //! Retrieves the script with the given name.
+  cedar::proc::CppScriptPtr getScript(const std::string& name) const;
+
+  //! Removes the script with the given name.
+  void removeScript(const std::string& name);
+
+  //! Lists all scripts in this group.
+  std::set<cedar::proc::CppScriptPtr> getScripts() const;
+
+  //! Checks if a script with the given name exists in this group.
+  bool checkScriptNameExists(const std::string& name) const;
+
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
   //!@brief disconnects two slots across groups, removing/merging connectors if necessary
   static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
+
+  //! Converts camel-case instances to spaces.
+  static std::string camelCaseToSpaces(const std::string& camelCasedString);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -743,6 +776,9 @@ private:
    */
   void addConnectorInternal(const std::string& name, bool input);
 
+  //! Finds an identifier for which the @em checker function returns false.
+  static std::string findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker);
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
@@ -799,6 +835,14 @@ public:
   //!@brief Signal that is emitted whenever a custom parameter is removed.
   CEDAR_DECLARE_SIGNAL(LastReadConfigurationChanged, void ());
 
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(ScriptAdded, void (const std::string&));
+
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(ScriptRemoved, void (const std::string&));
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -838,6 +882,9 @@ private:
   //! Flag if trigger chain updates should be executed (during connecting/loading)
   bool mHoldTriggerChainUpdates;
 
+  //! Map of scripts present in this architecture
+  cedar::aux::LockableMember<std::set<cedar::proc::CppScriptPtr>> mScripts;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -849,5 +896,7 @@ protected:
   cedar::aux::BoolParameterPtr _mIsLooped;
 
 }; // class cedar::proc::Group
+
+Q_DECLARE_METATYPE(cedar::proc::Group::ConnectionChange)
 
 #endif // CEDAR_PROC_GROUP_H

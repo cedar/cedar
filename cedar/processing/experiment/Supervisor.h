@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -49,11 +49,12 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <QObject>
+#include <string>
 
 /*!@brief This thread should continuously perform the action sequences of the experiment
- *
  */
-class cedar::proc::experiment::Supervisor : public cedar::aux::LoopedThread
+class cedar::proc::experiment::Supervisor : public QObject
 {
   Q_OBJECT
 
@@ -98,8 +99,7 @@ public:
   void log(std::string messageType, std::string message);
 
 signals:
-  //! Emitted whenever the experiment is started or stopped.
-  void experimentRunning(bool);
+  void experimentRunningChanged(bool running);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -111,8 +111,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Calls write in the specified interval.
-  void step(cedar::unit::Time);
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -144,7 +143,7 @@ namespace cedar
   {
     namespace experiment
     {
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::Supervisor>);
+      CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<cedar::proc::experiment::Supervisor>);
       typedef cedar::aux::Singleton<cedar::proc::experiment::Supervisor> SupervisorSingleton;
     }
   }

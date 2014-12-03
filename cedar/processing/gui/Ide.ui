@@ -150,12 +150,18 @@
     <addaction name="separator"/>
     <addaction name="mpActionSettings"/>
    </widget>
+   <widget class="QMenu" name="mpMenuArchitectureScripts">
+    <property name="title">
+     <string>Scripts</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuSimulation"/>
    <addaction name="menuTools"/>
    <addaction name="mpMenuWindows"/>
+   <addaction name="mpMenuArchitectureScripts"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -239,8 +245,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -297,8 +303,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>98</width>
-              <height>28</height>
+              <width>254</width>
+              <height>429</height>
              </rect>
             </property>
             <property name="palette">

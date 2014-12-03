@@ -109,7 +109,7 @@ public:
 
   /*!@brief Reads the configuration of this object from the given json file.
    */
-  void readJson(const cedar::aux::Path& filename);
+  virtual void readJson(const cedar::aux::Path& filename);
 
   /*!@brief   Reads the configuration from an INI file.
    *
@@ -129,7 +129,7 @@ public:
   virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a json file
-  void writeJson(const std::string& filename) const;
+  virtual void writeJson(const std::string& filename) const;
 
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a csv spreadsheet file
   void writeCsv(const std::string& filename, const char separator = ',') const;

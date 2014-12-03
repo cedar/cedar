@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionAnd.cpp
+    File:        And.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
@@ -39,7 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/condition/And.h"
-#include "cedar/processing/experiment/condition/OnInit.h"
+#include "cedar/processing/experiment/condition/OnMatrixValue.h"
+#include "cedar/processing/experiment/condition/AtTime.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/Experiment.h"
 
@@ -65,7 +66,7 @@ _mCondition1
    (
      this,
      "Condition 1",
-     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
+     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnMatrixValue())
    )
  )
 ,
@@ -75,7 +76,7 @@ _mCondition2
    (
      this,
      "Condition 2",
-     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::OnInit())
+     cedar::proc::experiment::condition::ConditionPtr(new cedar::proc::experiment::condition::AtTime())
    )
  )
 {
@@ -91,4 +92,10 @@ bool cedar::proc::experiment::condition::And::check()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::condition::And::checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const
+{
+  bool valid_1 = this->_mCondition1->getValue()->checkValidity(errors, warnings);
+  bool valid_2 = this->_mCondition2->getValue()->checkValidity(errors, warnings);
 
+  return valid_1 && valid_2;
+}

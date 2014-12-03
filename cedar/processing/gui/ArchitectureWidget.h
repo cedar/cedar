@@ -50,6 +50,8 @@
 
 // SYSTEM INCLUDES
 #include <QWidget>
+#include <map>
+#include <string>
 
 
 /*!@brief A widget for opening a set of plots for an architecture based on a configuration file.

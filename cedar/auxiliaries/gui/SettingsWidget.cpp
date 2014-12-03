@@ -48,6 +48,8 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 
 // SYSTEM INCLUDES
+#include <set>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

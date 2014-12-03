@@ -89,7 +89,7 @@ namespace
 
 cedar::proc::sources::Picture::Picture()
 :
-cedar::proc::sources::GrabberBase()
+cedar::proc::sources::GrabberBase(false)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
