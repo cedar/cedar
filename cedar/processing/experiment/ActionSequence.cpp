@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/ActionSequence.h"
-#include "cedar/processing/experiment/action/StartAllTriggers.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/processing/experiment/condition/OnEachTrial.h"
 

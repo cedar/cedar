@@ -41,8 +41,6 @@
 #include "cedar/processing/experiment/Experiment.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Recorder.h"
-#include "cedar/processing/experiment/action/StartAllTriggers.h"
-#include "cedar/processing/experiment/action/StartTrigger.h"
 #include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Trigger.h"
