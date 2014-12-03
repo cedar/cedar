@@ -39,6 +39,7 @@
 #define CEDAR_DEV_COMPONENT_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/auxiliaries/LockableMember.h"
@@ -426,8 +427,18 @@ namespace cedar
 
     //!@brief The singleton object of the ComponentManager.
 //    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
+
+    // this will be used for managing declarations; we still have to define a declaration class (see below)
+   typedef cedar::aux::DeclarationManagerTemplate<cedar::dev::ComponentPtr> ComponentDeclarationManager;
+
+   typedef cedar::aux::Singleton<cedar::dev::ComponentDeclarationManager> ComponentDeclarationManagerSingleton;
+
+   typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentFactoryManager;
   }
 }
 CEDAR_DEV_SINGLETON(ComponentManager);
+// this makes sure the singletons work properly on windows (across DLLs)
+CEDAR_DEV_SINGLETON(ComponentDeclarationManager);
+CEDAR_DEV_SINGLETON(ComponentFactoryManager);
 
 #endif // CEDAR_DEV_COMPONENT_H
