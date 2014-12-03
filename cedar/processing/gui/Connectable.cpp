@@ -59,6 +59,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <set>
 #include <QMenu>
 #include <QGraphicsSceneContextMenuEvent>
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -59,22 +59,17 @@ mpExperiment(nullptr)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-void cedar::proc::experiment::Supervisor::step(cedar::unit::Time)
-{
-  bool init = this->mpExperiment->hasStopped();
-  this->mpExperiment->executeAcionSequences(init);
-}
-
 void cedar::proc::experiment::Supervisor::setExperiment(Experiment* experiment)
 {
   if (this->mpExperiment != nullptr)
   {
-    QObject::disconnect(this->mpExperiment, SIGNAL(experimentRunning(bool)), this, SIGNAL(experimentRunning(bool)));
+    QObject::disconnect(this->mpExperiment, SIGNAL(experimentRunning(bool)), this, SIGNAL(experimentRunningChanged(bool)));
   }
+
   this->mpExperiment = experiment;
-  QObject::connect(this->mpExperiment, SIGNAL(experimentRunning(bool)), this, SIGNAL(experimentRunning(bool)));
+  QObject::connect(this->mpExperiment, SIGNAL(experimentRunning(bool)), this, SIGNAL(experimentRunningChanged(bool)));
 }
+
 cedar::proc::experiment::Experiment* cedar::proc::experiment::Supervisor::getExperiment()
 {
   return this->mpExperiment;

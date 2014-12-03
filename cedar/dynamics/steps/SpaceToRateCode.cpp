@@ -127,7 +127,15 @@ _mTau(new cedar::aux::TimeParameter
  * \f[
  *   x_{t + 1} = x_t + \frac{dt}{\tau} \cdot (-s x_t + o),
  * \f]
- * where \f$s\f$ and \f$o\f$ are values derived from the input, and \f$dt\f$ is the time step to be simulated.
+ * where
+ * \f[
+ *   s = \int \sigma(u(x)) dx
+ * \f]
+ * and
+ * \f[
+ *   o = \int x \cdot \sigma(u(x)) dx
+ * \f]
+ * (with \f$\sigma(u(x))\f$ being the input of the step, usually a DNF) and \f$dt\f$ is the time step to be simulated.
  *
  * However, \f$s\f$ and \f$o\f$ can potentially become quite large, leading to instabilities in the numerical
  * approximation of the solution. Thus, our approach to prevent these instabilities is to subdivide \f$dt\f$ into

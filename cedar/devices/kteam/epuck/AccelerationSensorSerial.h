@@ -46,7 +46,6 @@
 #include "cedar/devices/kteam/epuck/namespace.h"
 
 // SYSTEM INCLUDES
-#include <cv.h>
 
 
 /*!@brief Acceleration sensor of the e-puck, which communicates over a serial channel..

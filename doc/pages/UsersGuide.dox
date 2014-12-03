@@ -22,6 +22,7 @@ beneficial or even necessary.
 - @ref LoggingWithCedar
 - @ref ProvidingCompatibility
 - @link PluginsInCode Loading plugins @endlink
+- @link CppScriptTutorial C++ scripts in the cedar gui @endlink
 
 @section ProgrammingConcepts Programming Concepts
 In the following pages you can find out about general programming concepts we used throughout the framework. If you are

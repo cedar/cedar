@@ -196,26 +196,26 @@ public:
   }
 
   //! Returns the path, starting from the given index.
-  SelfType operator()(size_t start)
+  SelfType operator()(size_t start) const
   {
     return this->operator()(start, this->getElementCount());
   }
 
   //! Returns the section of the path between start and end.
-  SelfType operator()(size_t start, size_t end)
+  SelfType operator()(size_t start, size_t end) const
   {
     if (start >= this->getElementCount())
     {
       CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Invalid start index " + cedar::aux::toString(start) + " in path with " + cedar::aux::toString(this->getElementCount()) + " element(s).");
     }
 
-    if (end >= this->getElementCount())
+    if (end > this->getElementCount())
     {
       CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Invalid end index " + cedar::aux::toString(end) + " in path with " + cedar::aux::toString(this->getElementCount()) + " element(s).");
     }
 
     SelfType slice;
-    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.end() + end);
+    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.begin() + end);
     return slice;
   }
 

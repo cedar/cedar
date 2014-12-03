@@ -40,12 +40,14 @@
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/gui/ActionListParameter.h"
 #include "cedar/processing/experiment/gui/ExperimentItemWidget.h"
-#include "cedar/processing/experiment/action/StartAllTriggers.h"
+#include "cedar/processing/experiment/action/EndTrial.h"
 #include "cedar/auxiliaries/gui/ObjectParameter.h"
 
 // SYSTEM INCLUDES
 #include <QBoxLayout>
 #include <QPushButton>
+#include <vector>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -102,7 +104,7 @@ cedar::proc::experiment::gui::ActionListParameter::~ActionListParameter()
 void cedar::proc::experiment::gui::ActionListParameter::addAction()
 {
   cedar::proc::experiment::action::ActionPtr action =
-      cedar::proc::experiment::action ::StartAllTriggersPtr(new cedar::proc::experiment::action::StartAllTriggers());
+      cedar::proc::experiment::action ::EndTrialPtr(new cedar::proc::experiment::action::EndTrial());
   this->mActionListParameter->pushBack(action);
   updateList();
 }

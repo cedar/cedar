@@ -138,6 +138,9 @@ public:
 
   bool hasComponent() const;
 
+signals:
+  void componentChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -165,7 +168,7 @@ private:
   void rebuildOutputs();
 
 private slots:
-  void componentChanged();
+  void componentChangedSlot();
 
   void selectedGroupChanged();
 

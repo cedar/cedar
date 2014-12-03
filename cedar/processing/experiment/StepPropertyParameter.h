@@ -43,12 +43,16 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/Connectable.fwd.h"
+#include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/StepPropertyParameter.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <vector>
+#include <string>
 
 
 /*!@brief A parameter to set a property of a certain step
@@ -71,6 +75,7 @@ class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parame
 public:
   enum PropertyType
   {
+    PARAMETER_VALUE,
     PARAMETER,
     OUTPUT,
     BUFFER
@@ -109,16 +114,22 @@ public:
    /*!@brief Sets the property name of the step.
     *               It should always be checked if the property name is still available
     */
-   void setProperty(const std::string& poperty);
+   void setParameterPath(const std::string& poperty);
 
-   //!@brief Returns the step property name
-   const std::string& getProperty() const;
+   //!@brief Sets the step.
+   void setStep(cedar::proc::ConnectablePtr step);
 
-   //!@brief Sets the step name
-   void setStep(const std::string& step);
+   //!@brief Sets the path of the element.
+   void setElementPath(const std::string& step);
+
+   //! Returns the path of the currently selected element.
+   std::string getElementPath() const;
+
+   //! Returns the path of the currently selected element.
+   const std::string& getParameterPath() const;
 
    //!@brief Returns the step name
-   const std::string& getStep() const;
+   cedar::proc::ConnectablePtr getStep() const;
 
    //!@brief Sets the type of the property. Could be either PARAMETER, OUTPUT or BUFFER
    void setType(cedar::proc::experiment::StepPropertyParameter::PropertyType type);
@@ -131,6 +142,8 @@ public:
     *           Should only be called if the type is BUFFER or OUTPUT
     */
    cedar::aux::ConstDataPtr getData() const;
+
+   std::vector<std::string> getListOfData(cedar::proc::DataRole::Id role) const;
 
    /*!@brief Returns the ParameterPtr of the property
     *
@@ -160,18 +173,22 @@ public:
    //! Returns true if a parameter is selected
    bool isParameterSelected() const;
 
+   std::vector<std::string> getListOfParameters();
+
+   //! Checks the validity of the parameter.
+   bool checkValidity(std::string& errors) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
 //!@brief If the property is changed, the parameter copy will be updated
-  void updatePropertyCopy();
+  void updateParameterCopy();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -188,11 +205,14 @@ protected:
   // none yet
 
 private:
-  //!@brief The step
-  std::string mStep;
+  //!@brief The path of the element.
+  std::string mElementPath;
+
+  //! Weak pointer to the element.
+  cedar::proc::ConnectableWeakPtr mElement;
 
   //!@brief The property
-  std::string mProperty;
+  std::string mParameterPath;
 
   //!@brief The type
   cedar::proc::experiment::StepPropertyParameter::PropertyType mType;
