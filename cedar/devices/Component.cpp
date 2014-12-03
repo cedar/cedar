@@ -1296,7 +1296,7 @@ void cedar::dev::Component::startCommunication()
   mCommunicationThread->start();
   mRunningComponentInstances.insert( this );
 
-  // workaround to get at least several measurments to be able to differentiate
+  // workaround to get at least several measurements to be able to differentiate
   mCommunicationThread->waitUntilStepped();
   mCommunicationThread->waitUntilStepped();
   mCommunicationThread->waitUntilStepped();
