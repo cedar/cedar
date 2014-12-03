@@ -56,6 +56,7 @@
 #endif
 #include <string>
 #include <iostream>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -1045,7 +1046,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
 void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::INPUT, name, data);
-  this->inputConnectionChanged(name);
+
   // update the validity of the input
   this->getInputValidity(name);
 }

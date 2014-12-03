@@ -110,7 +110,7 @@ public:
   (
     const std::string& videoFileName = "",
     bool looped = true,
-    bool speedFactor = 1
+    double speedFactor = 1.0
   );
 
   /*! @brief Constructor for a stereo-file grabber
@@ -124,7 +124,7 @@ public:
     const std::string& videoFileName0,
     const std::string& videoFileName1,
     bool looped = true,
-    bool speedFactor = 1
+    double speedFactor = 1.0
   );
 
   //!@brief Destructor
@@ -253,7 +253,7 @@ protected:
 private:
   /*! @brief This function does internal variable initialization in  constructor
    */
-  void init();
+  void init(double speedFactor);
 
 
   /*! @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to
@@ -309,7 +309,7 @@ private:
    *  @remarks the speed stored in the AVI-File will be multiplied with this factor
    *    so effective FPS should be _mSpeedFactor*AVI-Speed
    */
-  cedar::aux::IntParameterPtr _mSpeedFactor;
+  cedar::aux::DoubleParameterPtr _mSpeedFactor;
 
 }; // class cedar::dev::sensors::visual::VideoGrabber
 

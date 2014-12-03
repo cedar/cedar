@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -50,6 +50,7 @@
 #include "cedar/processing/experiment/Experiment.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief An abstract class for all the derived Action classes.
@@ -92,6 +93,11 @@ public:
   //! Called after an experiment is stopped.
   virtual void postExperiment();
 
+  /*! Reimplement this to check the validity of the action. Return true if the action is valid. If false is returned, an
+   *  inforative message should be added to the @em errors vector.
+   */
+  virtual bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,7 +117,7 @@ private:
 
 }; // class cedar::proc::experiment::Action
 
-CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::ActionPtr>);
+CEDAR_PROC_EXPORT_SINGLETON(cedar::aux::FactoryManager<cedar::proc::experiment::action::ActionPtr>);
 
 namespace cedar
 {

@@ -323,7 +323,13 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
       switch (this->getTargetColorSpace())
       {
         case ColorSpace::BGR:
-          this->mCvConversionConstant = CV_HSV2BGR;
+          this->mCvConversionConstant =
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
+           cv::COLOR_HSV2BGR
+#else
+           CV_HSV2BGR
+#endif
+           ;
           break;
 
         case ColorSpace::YCrCb:
@@ -341,16 +347,34 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
       switch (this->getTargetColorSpace())
       {
         case ColorSpace::HSV:
-          this->mCvConversionConstant = CV_BGR2HSV;
+          this->mCvConversionConstant =
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
+           cv::COLOR_BGR2HSV
+#else
+           CV_BGR2HSV
+#endif
+           ;
           break;
 
         case ColorSpace::YCrCb:
         case ColorSpace::YUV:
-          this->mCvConversionConstant = CV_BGR2YCrCb;
+          this->mCvConversionConstant =
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
+           cv::COLOR_BGR2YCrCb
+#else
+           CV_BGR2YCrCb
+#endif
+           ;
           break;
 
         case ColorSpace::Lab:
-          this->mCvConversionConstant = CV_BGR2Lab;
+          this->mCvConversionConstant =
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
+           cv::COLOR_BGR2Lab
+#else
+           CV_BGR2Lab
+#endif
+           ;
           break;
 
         default:
@@ -364,7 +388,13 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
       switch (this->getTargetColorSpace())
       {
         case ColorSpace::BGR:
-          this->mCvConversionConstant = CV_YCrCb2BGR;
+          this->mCvConversionConstant =
+#if CEDAR_OPENCV_MAJOR_VERSION >= 3
+           cv::COLOR_YCrCb2BGR
+#else
+           CV_YCrCb2BGR
+#endif
+           ;
           break;
         case ColorSpace::HSV:
           CEDAR_THROW(cedar::aux::UnhandledValueException, "YUV to HSV is not handled.");

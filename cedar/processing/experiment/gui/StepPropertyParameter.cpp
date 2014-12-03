@@ -48,6 +48,8 @@
 // SYSTEM INCLUDES
 #include <QFormLayout>
 #include <QLabel>
+#include <string>
+#include <vector>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,10 +76,7 @@ mpProperty(new QComboBox()),
 mpPropertyCopy(nullptr)
 {
   this->mpStep->setEditable(true);
-  this->mpStep->setInsertPolicy(QComboBox::NoInsert);
-
   this->mpProperty->setEditable(true);
-  this->mpProperty->setInsertPolicy(QComboBox::NoInsert);
 
   auto layout = new QFormLayout();
   layout->setMargin(0);
@@ -103,32 +102,31 @@ void cedar::proc::experiment::gui::StepPropertyParameter::parameterPointerChange
   updateSteps();
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
-  this->mpStep->setCurrentIndex(this->mpStep->findText((parameter->getStep().c_str())));
-  updateProperties();
-  this->mpProperty->setCurrentIndex(this->mpProperty->findText((parameter->getProperty().c_str())));
-  updateValue();
-  connect(this->mpStep, SIGNAL(currentIndexChanged(int)), this, SLOT(stepChanged()));
-  connect(this->mpProperty, SIGNAL(currentIndexChanged(int)), this, SLOT(propertyChanged()));
+  if (parameter)
+  {
+    auto path = parameter->getElementPath();
+    this->mpStep->setEditText(QString::fromStdString(path));
+  }
+  this->stepChanged();
+  this->mpProperty->setEditText(QString::fromStdString(parameter->getParameterPath()));
+  this->updateValue();
+  connect(this->mpStep, SIGNAL(editTextChanged(const QString&)), this, SLOT(stepChanged()));
+  connect(this->mpProperty, SIGNAL(editTextChanged(const QString&)), this, SLOT(propertyChanged()));
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::stepChanged()
 {
-
-  QString text = mpStep->currentText();
-  cedar::proc::experiment::StepPropertyParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
-  parameter->setStep(text.toStdString());
-
-  updateProperties();
+  auto parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
+  parameter->setElementPath(this->mpStep->currentText().toStdString());
+  this->updateProperties();
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::propertyChanged()
 {
-
   QString text = mpProperty->currentText();
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
-  parameter->setProperty(text.toStdString());
+  parameter->setParameterPath(text.toStdString());
 
   updateValue();
 }
@@ -145,9 +143,12 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateSteps()
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
 {
+  mpProperty->clear();
   std::string index = mpStep->currentText().toStdString();
   if (index == "")
-     return;
+  {
+    return;
+  }
 
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
@@ -155,29 +156,28 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateProperties()
   std::vector<std::string> properties;
   switch (parameter->getType())
   {
+    case cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE:
     case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
     {
-      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepParameters(index, parameter->getAllowedTypes());
+      properties = parameter->getListOfParameters();
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::OUTPUT:
     {
-      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::OUTPUT);
+      properties = parameter->getListOfData(cedar::proc::DataRole::OUTPUT);
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::BUFFER:
     {
-      properties = SupervisorSingleton::getInstance()->getExperiment()->getStepDatas(index, cedar::proc::DataRole::BUFFER);
+      properties = parameter->getListOfData(cedar::proc::DataRole::BUFFER);
       break;
     }
   }
 
-  mpProperty->clear();
   for (std::string property : properties)
   {
     mpProperty->addItem(QString::fromStdString(property));
   }
-
 }
 
 void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
@@ -185,17 +185,13 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
   cedar::proc::experiment::StepPropertyParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::experiment::StepPropertyParameter>(this->getParameter());
 
-  switch(parameter->getType())
+  switch (parameter->getType())
   {
-    case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
+    case cedar::proc::experiment::StepPropertyParameter::PARAMETER_VALUE:
     {
       auto layout = cedar::aux::asserted_cast<QFormLayout*>(this->layout());
       cedar::aux::ParameterPtr parameter_copy = parameter->getParameterCopy();
 
-      if (!parameter_copy)
-      {
-        return;
-      }
       if (this->mpPropertyCopy)
       {
         delete this->mpPropertyCopy;
@@ -203,14 +199,45 @@ void cedar::proc::experiment::gui::StepPropertyParameter::updateValue()
       }
       else
       {
-        delete layout->itemAt(2, QFormLayout::FieldRole)->widget();
+        if (auto item = layout->itemAt(2, QFormLayout::FieldRole))
+        {
+          delete item->widget();
+        }
       }
+
+      if (!parameter_copy)
+      {
+        return;
+      }
+
       cedar::aux::gui::Parameter* parameter_widget =
           cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter_copy)->allocateRaw();
-//      parameter_widget->setParent(this);
       parameter_widget->setParameter(parameter_copy);
       mpPropertyCopy = parameter_widget;
       layout->setWidget(2, QFormLayout::FieldRole, mpPropertyCopy);
+      break;
+    }
+    case cedar::proc::experiment::StepPropertyParameter::PARAMETER:
+    {
+      auto layout = cedar::aux::asserted_cast<QFormLayout*>(this->layout());
+      auto p_label_item = layout->itemAt(2, QFormLayout::LabelRole);
+      if (p_label_item)
+      {
+        auto p_label = p_label_item->widget();
+        if (p_label != nullptr)
+        {
+          p_label->deleteLater();
+        }
+      }
+      auto p_widget_item = layout->itemAt(2, QFormLayout::FieldRole);
+      if (p_widget_item)
+      {
+        auto p_widget = layout->itemAt(2, QFormLayout::FieldRole)->widget();
+        if (p_widget != nullptr)
+        {
+          p_widget->deleteLater();
+        }
+      }
       break;
     }
     case cedar::proc::experiment::StepPropertyParameter::OUTPUT:

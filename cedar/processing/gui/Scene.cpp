@@ -1125,7 +1125,7 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
   std::vector<std::string> split_class_name;
   cedar::aux::split(classId, ".", split_class_name);
   CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
-  std::string name = "new " + split_class_name.back();
+  std::string name = split_class_name.back();
 
   std::string adjusted_name = group->getUniqueIdentifier(name);
 

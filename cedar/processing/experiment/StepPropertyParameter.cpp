@@ -39,8 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/StepPropertyParameter.h"
-#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/processing/experiment/Supervisor.h"
+#include "cedar/processing/Connectable.h"
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
@@ -56,7 +57,7 @@ cedar::proc::experiment::StepPropertyParameter::StepPropertyParameter(
 :
 cedar::aux::Parameter(pOwner, name, false)
 ,
-mType(PARAMETER)
+mType(PARAMETER_VALUE)
 {
 }
 
@@ -68,9 +69,36 @@ cedar::proc::experiment::StepPropertyParameter::~StepPropertyParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::experiment::StepPropertyParameter::checkValidity
+     (
+       std::string& error
+     )
+     const
+{
+  if (this->mElement.lock() == nullptr)
+  {
+    if (this->mElementPath.empty())
+    {
+      error = "No element path selected.";
+    }
+    else
+    {
+      error = "Element was not found.";
+    }
+    return false;
+  }
+  if (this->getParameterPath() == "")
+  {
+    error = "No parameter path was selected.";
+    return false;
+  }
+
+  return true;
+}
+
 bool cedar::proc::experiment::StepPropertyParameter::isParameterSelected() const
 {
-  if (this->getStep() == "" || this->getProperty() == "")
+  if (this->mElement.lock() == nullptr || this->getParameterPath() == "")
   {
     return false;
   }
@@ -84,18 +112,58 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
 {
   try
   {
-    PropertyType type =static_cast<PropertyType>(node.get_child("Type").get_value<int>());
-    this->setType(type);
-    this->setStep(node.get_child("Step").get_value<std::string>());
-    this->setProperty(node.get_child("Property").get_value<std::string>());
+    std::string element_path;
+    auto element_path_iter = node.find("element path");
+    if (element_path_iter != node.not_found())
+    {
+      element_path = element_path_iter->second.get_value<std::string>();
+    }
+    else
+    {
+      // old naming
+      auto step_iter = node.find("Step");
+      if (step_iter != node.not_found())
+      {
+        element_path = step_iter->second.get_value<std::string>();
+      }
+    }
+    this->setElementPath(element_path);
+
+    std::string parameter_path;
+    auto parameter_path_iter = node.find("parameter path");
+    if (parameter_path_iter != node.not_found())
+    {
+      parameter_path = parameter_path_iter->second.get_value<std::string>();
+    }
+    else
+    {
+      // old naming
+      auto property_iter = node.find("Property");
+      if (property_iter != node.not_found())
+      {
+        parameter_path = property_iter->second.get_value<std::string>();
+      }
+    }
+    this->setParameterPath(parameter_path);
+
     switch (mType)
     {
-      case PARAMETER:
+      case PARAMETER_VALUE:
       {
         if (mParameterCopy)
         {
-          mParameterCopy->readFromNode(node.get_child("PropertyParameter"));
+          auto iter = node.find("parameter value");
+          if (iter == node.not_found())
+          {
+            iter = node.find("PropertyParameter");
+          }
+          CEDAR_ASSERT(iter != node.not_found());
+          mParameterCopy->readFromNode(iter->second);
         }
+        break;
+      }
+      case PARAMETER:
+      {
         break;
       }
       case OUTPUT:
@@ -121,13 +189,12 @@ void cedar::proc::experiment::StepPropertyParameter::readFromNode(const cedar::a
 void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
 {
   cedar::aux::ConfigurationNode step_node;
-  step_node.put("Step", mStep);
-  step_node.put("Property", mProperty);
-  step_node.put("Type", mType);
+  step_node.put("element path", this->getElementPath());
+  step_node.put("parameter path", this->getParameterPath());
 
   switch (mType)
   {
-    case PARAMETER:
+    case PARAMETER_VALUE:
     {
       if (mParameterCopy)
       {
@@ -135,6 +202,10 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
         mParameterCopy->writeToNode(copy_node);
         step_node.add_child("PropertyParameter",copy_node);
       }
+      break;
+    }
+    case PARAMETER:
+    {
       break;
     }
     case OUTPUT:
@@ -151,9 +222,10 @@ void cedar::proc::experiment::StepPropertyParameter::writeToNode(cedar::aux::Con
 
 void cedar::proc::experiment::StepPropertyParameter::makeDefault()
 {
-  this->mStep ="";
-  this->mProperty ="";
-  this->mType=PARAMETER;
+  this->mElement.reset();
+  this->setParameterPath("");
+  //!@todo Is this right? Should restoring the default change the type of this object?
+  this->mType = PARAMETER_VALUE;
 }
 
 void cedar::proc::experiment::StepPropertyParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
@@ -162,7 +234,7 @@ void cedar::proc::experiment::StepPropertyParameter::copyValueFrom(cedar::aux::C
   {
     this->setType(other_self->getType());
     this->setStep(other_self->getStep());
-    this->setProperty(other_self->getProperty());
+    this->setParameterPath(other_self->getParameterPath());
   }
   else
   {
@@ -180,35 +252,62 @@ bool cedar::proc::experiment::StepPropertyParameter::canCopyFrom(cedar::aux::Con
   return static_cast<bool>(boost::dynamic_pointer_cast<ConstStepPropertyParameter>(other));
 }
 
-void cedar::proc::experiment::StepPropertyParameter::setProperty(const std::string& property)
+void cedar::proc::experiment::StepPropertyParameter::setParameterPath(const std::string& parameterPath)
 {
-  std::string old_value = this->mProperty;
-  this->mProperty=property;
-  if (old_value != this->mProperty)
+  if (parameterPath != this->mParameterPath)
   {
-    updatePropertyCopy();
+    this->mParameterPath = parameterPath;
+    this->updateParameterCopy();
     this->emitChangedSignal();
   }
 }
 
-const std::string& cedar::proc::experiment::StepPropertyParameter::getProperty() const
+void cedar::proc::experiment::StepPropertyParameter::setStep(cedar::proc::ConnectablePtr connectable)
 {
-  return this->mProperty;
+  this->mElement = connectable;
+  auto name_parameter = connectable->getParameter("name");
+  this->emitChangedSignal();
 }
 
-void cedar::proc::experiment::StepPropertyParameter::setStep(const std::string& step)
+void cedar::proc::experiment::StepPropertyParameter::setElementPath(const std::string& elementPath)
 {
-  std::string old_value = this->mStep;
-  this->mStep=step;
-  if (old_value != this->mStep)
+  this->mElementPath = elementPath;
+  auto group = SupervisorSingleton::getInstance()->getExperiment()->getGroup();
+  if (group && group->nameExists(elementPath))
   {
-    this->emitChangedSignal();
+    auto element = group->getElement<cedar::proc::Connectable>(elementPath);
+    this->setStep(element);
+  }
+  else
+  {
+    // we have to reset the pointer if the step does not exist
+    this->mElement.reset();
   }
 }
 
-const std::string& cedar::proc::experiment::StepPropertyParameter::getStep() const
+std::string cedar::proc::experiment::StepPropertyParameter::getElementPath() const
 {
-  return this->mStep;
+  // if a step is set, use its path
+  if (auto element = this->mElement.lock())
+  {
+    return element->getFullPath();
+  }
+  // if not, use the stored path
+  else
+  {
+    return this->mElementPath;
+  }
+}
+
+const std::string& cedar::proc::experiment::StepPropertyParameter::getParameterPath() const
+{
+  return this->mParameterPath;
+}
+
+
+cedar::proc::ConnectablePtr cedar::proc::experiment::StepPropertyParameter::getStep() const
+{
+  return this->mElement.lock();
 
 }
 
@@ -229,36 +328,51 @@ cedar::proc::experiment::StepPropertyParameter::PropertyType cedar::proc::experi
 
 cedar::aux::ConstDataPtr cedar::proc::experiment::StepPropertyParameter::getData() const
 {
-  Experiment* experiment = SupervisorSingleton::getInstance()->getExperiment();
-  if (mType==OUTPUT)
+  if (auto step = mElement.lock())
   {
-      if (cedar::aux::ConstDataPtr data = experiment->
-          getStepData(mStep,mProperty,cedar::proc::DataRole::OUTPUT))
+    if (mType == OUTPUT)
+    {
+        if (cedar::aux::ConstDataPtr data = step->getData(cedar::proc::DataRole::OUTPUT, this->getParameterPath()))
+        {
+            return data;
+        }
+    }
+
+    if (mType == BUFFER)
+    {
+      if (cedar::aux::ConstDataPtr data = step->getData(cedar::proc::DataRole::BUFFER, this->getParameterPath()))
       {
           return data;
       }
-  }
 
-  if (mType==BUFFER)
-  {
-    if (cedar::aux::ConstDataPtr data = experiment->
-        getStepData(mStep,mProperty,cedar::proc::DataRole::BUFFER))
-    {
-        return data;
     }
-
   }
   return cedar::aux::ConstDataPtr();
 }
 
 cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameter() const
 {
-  if (mStep == "" || mProperty == "" || mType!=PARAMETER)
+  if (!this->isParameterSelected() || (this->mType != PARAMETER_VALUE && this->mType != PARAMETER))
   {
     return cedar::aux::ParameterPtr();
   }
-  return SupervisorSingleton::getInstance()->
-         getExperiment()->getStepParameter(mStep,mProperty);
+  try
+  {
+    if (auto step = mElement.lock())
+    {
+      return step->getParameter(this->getParameterPath());
+    }
+  }
+  catch (cedar::aux::NotFoundException& exc) // element was probably removed, reset
+  {
+    return cedar::aux::ParameterPtr();
+  }
+  catch (cedar::aux::UnknownNameException& exc) // property not found
+  {
+    return cedar::aux::ParameterPtr();
+  }
+  return cedar::aux::ParameterPtr();
+  //!@todo catch parameter not found exception
 }
 
 cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameterCopy() const
@@ -275,7 +389,7 @@ bool cedar::proc::experiment::StepPropertyParameter::isAllowType(const std::stri
 {
   for (std::string allowed_type : allowedTypes)
   {
-    if (allowed_type==type)
+    if (allowed_type == type)
     {
       return true;
     }
@@ -285,10 +399,10 @@ bool cedar::proc::experiment::StepPropertyParameter::isAllowType(const std::stri
 
 void cedar::proc::experiment::StepPropertyParameter::disallowType(const std::string& type)
 {
-  int i=0;
+  int i = 0;
   for (std::string allowed_type : allowedTypes)
   {
-    if (allowed_type==type)
+    if (allowed_type == type)
     {
       this->allowedTypes.erase(this->allowedTypes.begin()+i);
       break;
@@ -302,22 +416,43 @@ const std::vector<std::string>& cedar::proc::experiment::StepPropertyParameter::
   return this->allowedTypes;
 }
 
-void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
+void cedar::proc::experiment::StepPropertyParameter::updateParameterCopy()
 {
-  if (mStep == "" || mProperty == "")
+  if (!this->isParameterSelected())
   {
+    mParameterCopy.reset();
     return;
   }
 
-  Experiment* experiment = SupervisorSingleton::getInstance()->getExperiment();
   switch (mType)
   {
+    case PARAMETER_VALUE:
+    {
+      try
+      {
+        if (auto step = mElement.lock())
+        {
+          cedar::aux::ParameterPtr parameter = step->getParameter(this->mParameterPath);
+          std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
+          mParameterCopy = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
+          mParameterCopy->copyValueFrom(parameter);
+        }
+      }
+      catch (cedar::aux::NotFoundException& exc) // element was not found, reset
+      {
+        mElement.reset();
+        mParameterCopy.reset();
+        this->setParameterPath("");
+      }
+      catch (cedar::aux::UnknownNameException& exc) // parameter not found
+      {
+        mParameterCopy.reset();
+        this->setParameterPath("");
+      }
+      break;
+    }
     case PARAMETER:
     {
-      cedar::aux::ParameterPtr parameter = experiment->getStepParameter(mStep,mProperty);
-      std::string type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
-      mParameterCopy = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->allocate(type);
-      mParameterCopy->copyValueFrom(parameter);
       break;
     }
     case OUTPUT:
@@ -329,4 +464,66 @@ void cedar::proc::experiment::StepPropertyParameter::updatePropertyCopy()
       break;
     }
   }
+}
+
+std::vector<std::string> cedar::proc::experiment::StepPropertyParameter::getListOfData(cedar::proc::DataRole::Id role) const
+{
+  std::vector<std::string> list;
+  if (auto step = mElement.lock())
+  {
+    if (step->hasRole(role))
+    {
+      for (auto data : step->getDataSlots(role))
+      {
+        list.push_back(data.first);
+      }
+    }
+  }
+  return list;
+}
+
+std::vector<std::string> cedar::proc::experiment::StepPropertyParameter::getListOfParameters()
+{
+  std::vector<std::string> list;
+  cedar::aux::ConfigurablePtr configurable = this->mElement.lock();
+  if (!configurable)
+  {
+    return list;
+  }
+
+  std::vector<std::string> step_parameter_paths = configurable->listAllParameters();
+  for (const auto& parameter_path : step_parameter_paths)
+  {
+    try
+    {
+      // Check if parameter is registered in the DeclarationManager
+      auto parameter = configurable->getParameter(parameter_path);
+      // never allow "name" to be in the list of parameters, same goes for hidden and constant parameters
+      if (parameter->getName() == "name" || parameter->isHidden() || parameter->isConstant())
+      {
+        continue;
+      }
+      std::string parameter_type = cedar::aux::ParameterDeclarationManagerSingleton::getInstance()->getTypeId(parameter);
+      if (this->getAllowedTypes().size() > 0)
+      {
+        for (auto type : this->getAllowedTypes())
+        {
+          if (type == parameter_type)
+          {
+            list.push_back(parameter_path);
+            break;
+          }
+        }
+      }
+      else
+      {
+        list.push_back(parameter_path);
+      }
+    }
+    catch (cedar::aux::UnknownTypeException e)
+    {
+       //!@todo handle this!
+    }
+  }
+  return list;
 }

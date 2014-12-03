@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -67,4 +67,10 @@ void cedar::proc::experiment::action::Action::preExperiment()
 void cedar::proc::experiment::action::Action::postExperiment()
 {
   // empty default implementation
+}
+
+bool cedar::proc::experiment::action::Action::checkValidity(std::vector<std::string>&, std::vector<std::string>&) const
+{
+  // by default, actions are valid
+  return true;
 }
