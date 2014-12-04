@@ -18,6 +18,7 @@ beneficial or even necessary.
 - @ref ConfigurableAndParameters
 - @link TemplatesTutorial Templates tutorial @endlink
 - @link CommandLineParser cedar's command line parser@endlink
+- @link ExperimentFrameworkTutorial Experiment framework @endlink
 @subsection AdvancedTutorials Advanced Tutorials
 - @ref LoggingWithCedar
 - @ref ProvidingCompatibility

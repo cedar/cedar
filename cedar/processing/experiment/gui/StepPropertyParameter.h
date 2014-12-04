@@ -121,8 +121,8 @@ protected:
   // none yet
 
 private:
-  //!@brief The step selector
-  QComboBox* mpStep;
+  //!@brief The element selector
+  QComboBox* mpElement;
 
   //!@brief The property selector
   QComboBox* mpProperty;
