@@ -8,7 +8,7 @@ The entry point for experiments in cedar is the GUI shown below, which can be fo
 
 @image html doc/pages/tutorials/ExperimentFramework/images/experiment_gui_startup.png "This is the GUI representation of an experiment. There is one action sequence with an OnEachTrial condition and no assigned actions. Functional regions are marked and labeled in red."
 
-The top-right corner contains buttons to save and load experiments, as well as create a new one. The bottom-right corner allows to start and stop a set up experiment. The largest area of the GUI on the left allows the user to specify named action sequences with a condition triggering the listed actions. The plus button adds a new action sequence and the "Add Action" button adds a new action to the given action sequence.
+The top-right corner contains buttons to save and load experiments, as well as create a new one. The bottom-right corner allows to start and stop an experiment. The largest area of the GUI on the left allows the user to specify named action sequences with a condition triggering the listed actions. The plus button adds a new action sequence and the "Add Action" button adds a new action to the given action sequence.
 
 @section EFTutorialExample Example
 To give an example of an experiment, we first have to assemble a small architecture: add a Gauss input, connect it to a NeuralField and connect a LoopedTrigger to the field. Open up the experiment dialog to set up a new experiment for this architecture.
