@@ -70,6 +70,7 @@ namespace cedar
     }
 
     // Generate types for the length parameter.
+    //! a unit parameter for plane angles
     typedef cedar::aux::UnitParameterTemplate<cedar::unit::PlaneAngle::unit_type> PlaneAngleParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(PlaneAngleParameter);
   }

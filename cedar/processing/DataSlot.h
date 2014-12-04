@@ -205,6 +205,7 @@ public:
   //! Get all data connections currently connected to this slot
   std::vector<DataConnectionPtr>& getDataConnections();
   
+  //! returns a string stating the validity of the slot
   const std::string& getValidityInfo() const;
 
   //--------------------------------------------------------------------------------------------------------------------

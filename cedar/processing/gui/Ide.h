@@ -102,6 +102,7 @@ public:
    */
   void resetTo(cedar::proc::gui::GroupPtr network);
 
+  //!@brief get the group
   cedar::proc::gui::GroupPtr getGroup();
   
   //! set if close dialog should be suppressed
@@ -269,6 +270,7 @@ public slots:
   cedar::proc::gui::ConstGroupPtr getGroup() const;
 
 public slots:
+  //! react to a change in experiment execution
   void experimentRunningChanged(bool running);
 
   //--------------------------------------------------------------------------------------------------------------------

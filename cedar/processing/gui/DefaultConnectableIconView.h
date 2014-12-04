@@ -69,22 +69,27 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! returns the bounding rectangle covering the icon
   QRectF boundingRect() const;
 
+  //! sets the bounding box (position and size)
   void setBounds(const qreal& x, const qreal& y, const qreal& size);
 
+  //! paints the icon
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! sets the path to the icon
   void setIconPath(const QString& path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! handles a change in connectable
   void connectableChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

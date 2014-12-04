@@ -51,6 +51,7 @@ namespace cedar
   namespace proc
   {
     //!@todo The actual class should be called GroupPath
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_PROC_CLASS(NetworkPath);
 

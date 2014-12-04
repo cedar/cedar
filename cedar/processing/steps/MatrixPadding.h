@@ -62,6 +62,8 @@ class cedar::proc::steps::MatrixPadding : public cedar::proc::Step
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief An enum defining the padding mode.
+   */
   class PaddingMode
   {
   public:

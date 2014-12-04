@@ -83,6 +83,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! access the experiment
   cedar::proc::experiment::ExperimentPtr getExperiment();
 
   //! Updates the group stored in the experiment. Must be called whenever the group of the Ide changes.

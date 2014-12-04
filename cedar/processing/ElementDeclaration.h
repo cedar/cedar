@@ -173,6 +173,7 @@ public:
     return this->mDefaultPlot;
   }
 
+  //! creates the icon view of an element
   virtual cedar::proc::gui::ConnectableIconView* createIconView() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -261,6 +262,7 @@ public:
   {
   }
 
+  //! creates an icon view of the element
   cedar::proc::gui::ConnectableIconView* createIconView() const
   {
     return new IconView();

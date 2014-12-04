@@ -59,12 +59,15 @@ namespace cedar
 {
   namespace proc
   {
+    /*!@brief an abstract output relation
+     */
     template <typename DataType>
     class OutputRelation
     {
     private:
       CEDAR_GENERATE_POINTER_TYPES(DataType);
     public:
+      //! constructor
       OutputRelation(cedar::proc::DataSlotPtr target)
       :
       mTarget(target)
@@ -94,9 +97,12 @@ namespace cedar
       cedar::proc::DataSlotPtr mTarget;
     };
 
+    /*!@brief An output relation copying the size and type of a source matrix.
+     */
     class CopyMatrixProperties : public OutputRelation<cedar::aux::MatData>
     {
     public:
+      //! constructor
       CopyMatrixProperties(cedar::proc::DataSlotPtr target)
       :
       OutputRelation<cedar::aux::MatData>(target)
@@ -110,6 +116,7 @@ namespace cedar
       }
 
     protected:
+      //! assigns a matrix to target given source; returns true if size or type changed
       bool assign(cedar::aux::ConstMatDataPtr source, cedar::aux::DataPtr target)
       {
         auto mat_target = boost::dynamic_pointer_cast<cedar::aux::MatData>(target);
@@ -189,26 +196,31 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! is set?
   bool isSet() const
   {
     return static_cast<bool>(this->mCachedData);
   }
 
+  //! get cached data type
   ConstDataTypePtr get() const
   {
     return this->mCachedData;
   }
 
+  //! get cached data
   const typename DataType::DataType& getData() const
   {
     return this->mCachedData->getData();
   }
 
+  //! get slot
   cedar::proc::DataSlotPtr getSlot() const
   {
     return this->mSlot;
   }
 
+  //! adds output relation
   void addOutputRelation(OutputRelationTypePtr relation)
   {
     mOutputRelations.push_back(relation);

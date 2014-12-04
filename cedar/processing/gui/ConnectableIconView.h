@@ -72,10 +72,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! set a connectable
   void setConnectable(cedar::proc::ConstConnectablePtr connectable);
 
+  //! get connectable
   cedar::proc::ConstConnectablePtr getConnectable() const;
 
+  //! set bounding box position and size
   virtual void setBounds(const qreal& x, const qreal& y, const qreal& size) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,6 +91,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! handles a change in connectable
   virtual void connectableChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

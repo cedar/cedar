@@ -209,6 +209,7 @@ namespace cedar
   namespace aux
   {
     CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::Recorder>);
+    //! a singleton for the recorder
     typedef cedar::aux::Singleton<cedar::aux::Recorder> RecorderSingleton;
   }
 }

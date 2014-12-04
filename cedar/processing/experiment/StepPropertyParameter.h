@@ -73,11 +73,16 @@ class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parame
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! enum defining the type of the property represented by this parameter
   enum PropertyType
   {
+    //! type parameter
     PARAMETER_VALUE,
+    //! type parameter
     PARAMETER,
+    //! type output slot
     OUTPUT,
+    //! type buffer slot
     BUFFER
   };
 
@@ -143,6 +148,7 @@ public:
     */
    cedar::aux::ConstDataPtr getData() const;
 
+   //! returns a list of data names for given data role
    std::vector<std::string> getListOfData(cedar::proc::DataRole::Id role) const;
 
    /*!@brief Returns the ParameterPtr of the property

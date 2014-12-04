@@ -99,6 +99,7 @@ public:
   void log(std::string messageType, std::string message);
 
 signals:
+  //!@brief signal emitted if state of running changes
   void experimentRunningChanged(bool running);
 
   //--------------------------------------------------------------------------------------------------------------------

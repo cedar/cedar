@@ -79,7 +79,8 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // private nested classes
 //----------------------------------------------------------------------------------------------------------------------
-
+/*!@brief An output relation for transposed matrices, which switches rows and columns.
+ */
 class cedar::proc::steps::Transpose::TransposeMatrixProperties : public cedar::proc::OutputRelation<cedar::aux::MatData>
 {
 public:

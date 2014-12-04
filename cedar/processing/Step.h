@@ -141,12 +141,14 @@ public:
   class ReadLocker : public Locker
   {
   public:
+    //! constructor accepting a shared pointer
     ReadLocker(cedar::proc::StepPtr step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_READ)
     {
     }
 
+    //! constructor accepting a raw pointer
     ReadLocker(cedar::proc::Step* step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_READ)
@@ -159,12 +161,14 @@ public:
   class WriteLocker : public Locker
   {
   public:
+    //! constructor accepting a shared pointer
     WriteLocker(cedar::proc::StepPtr step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_WRITE)
     {
     }
 
+    //! constructor accepting a raw pointer
     WriteLocker(cedar::proc::Step* step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_WRITE)
@@ -366,7 +370,7 @@ protected:
    *        To alleviate this, steps can disable automatic locking/unlocking of inputs and outputs. The envisioned use
    *        case for this is a compute function that looks as follows:
    *
-   *        @code
+   *        @code{.unparsed}
    * lock inputs
    *   preprocess inputs
    * unlock inputs

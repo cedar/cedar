@@ -60,8 +60,9 @@ class cedar::proc::experiment::action::Action : public cedar::aux::Configurable
 {
 public:
 
-	//!@brief a parameter for action sequence objects
+	//!@brief a parameter for a list of action objects
 	typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::action::Action> ActionListParameter;
+	//!@brief a parameter for action objects
 	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::action::Action> ActionParameter;
 
 	//!@cond SKIPPED_DOCUMENTATION

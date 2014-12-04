@@ -223,9 +223,10 @@ public:
    *
    *        In addition, this function will parser include directives in the file being read. These take the form of a
    *        json-list with the files to include, relative to the configuration file being read. Example:
-   *        @code
-   *  "include" : ["path1", "path2"]
-   *        @endcode
+   *
+           @code
+     "include" : ["path1", "path2"]
+           @endcode
    */
   void readConfigFromFile(const cedar::aux::Path& path);
 

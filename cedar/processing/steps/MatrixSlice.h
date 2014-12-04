@@ -63,6 +63,8 @@ class cedar::proc::steps::MatrixSlice : public cedar::proc::Step
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief An enum class defining types of anchors for a matrix slice.
+   */
   class AnchorType
   {
   public:

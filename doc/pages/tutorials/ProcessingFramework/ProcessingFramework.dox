@@ -403,7 +403,7 @@ starting the program, yous should see something like this:
 The main user interface of cedar consists of a few important elements, highlighted red in the following
 picture. Note, that the elements can be reordered freely, so your interface might look slightly different.
 
-@image html doc/pages/tutorials/ProcessingFramework/images/cedar_areas.png width=\textwidth
+@image html doc/pages/tutorials/ProcessingFramework/images/cedar_areas.png
 
 The elements are:
 <ul>

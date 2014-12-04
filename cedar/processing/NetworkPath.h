@@ -77,6 +77,7 @@ public:
   //!@brief Constructor accepting a c string
   NetworkPath(const char* path);
 
+  //!@brief Constructor accepting a dot-separated path
   NetworkPath(const PathType&);
 
   //--------------------------------------------------------------------------------------------------------------------

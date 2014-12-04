@@ -77,15 +77,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief checks validity of condition
   bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
 public slots:
+  //!@brief sets constness of number of elements parameter depending on check full matrix parameter
   void toggleNumberOfElements();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //@brief Checks if a part of the step data fulfills the condition
+  //!@brief Checks if a part of the step data fulfills the condition
   bool check();
 
   //--------------------------------------------------------------------------------------------------------------------

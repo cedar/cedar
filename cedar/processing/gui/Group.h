@@ -102,8 +102,10 @@ public:
   //!@brief read group from given file
   CEDAR_DECLARE_DEPRECATED(void read(const std::string& source));
 
+  //!@brief write configuration to path
   void writeJson(const cedar::aux::Path& filename) const;
 
+  //!@brief read configuration from path
   void readJson(const cedar::aux::Path& filename);
 
   //! Checks if any connectables in the given list can be added to this group. Non-connectables are ignored.

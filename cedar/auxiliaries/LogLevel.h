@@ -45,6 +45,7 @@ namespace cedar
 {
   namespace aux
   {
+    //! an enum for different levels of log messages
     enum LOG_LEVEL
     {
       //! System information. For example, this could be to inform the user of automatically determined constants/values.

@@ -162,9 +162,14 @@ public:
         return mType.type();
       }
     public:
-     static const Id Greater = 0;
-     static const Id Lower = 1;
-     static const Id Equal = 2;
+      //! greater than comparison
+      static const Id Greater = 0;
+
+      //! lower than comparison
+      static const Id Lower = 1;
+
+      //! equality comparison
+      static const Id Equal = 2;
 
     private:
       static cedar::aux::EnumType<CompareMethod> mType;
@@ -256,7 +261,7 @@ public:
   void startAllTriggers();
 
   /*!@brief Stops a  trial. Should only be called when a trial is currently running.
-   *              @param{reset} specifies what reset method should be used after stopping
+   *              @param reset specifies what reset method should be used after stopping
    */
   void stopTrial(ResetType::Id reset = ResetType::Reset);
 
@@ -266,6 +271,7 @@ public:
   //! Returns the repeat flag of the experiment.
   bool getRepeating() const;
 
+  //! Returns if there are any more trials to run.
   bool hasMoreTrials() const;
 
   /*! Checks if the experiment is valid. If it returns false, errors are written to the vectors passed as arguments and

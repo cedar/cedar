@@ -109,8 +109,10 @@ public slots:
   void requestStop();
 
 signals:
+  //! signal that is emitted if a script is started
   void scriptStarted();
 
+  //! signal that is emitted if a script is stopped
   void scriptStopped();
 
   //--------------------------------------------------------------------------------------------------------------------

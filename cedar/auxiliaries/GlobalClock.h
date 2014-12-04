@@ -131,6 +131,7 @@ namespace cedar
   namespace aux
   {
     CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::aux::GlobalClock>);
+    //! a singleton for the global clock
     typedef cedar::aux::Singleton<cedar::aux::GlobalClock> GlobalClockSingleton;
   }
 }

@@ -104,17 +104,28 @@ public:
    */
   struct ParameterLinkInfo
   {
+    //! returns the path to the source element of this parameter link
     std::string getSourceElementPath() const;
+
+    //! returns the path to the target element of this parameter link
     std::string getTargetElementPath() const;
 
+    //! returns the path to the source parameter of this parameter link
     std::string getSourceParameterPath() const;
+
+    //! returns the path to the target parameter of this parameter link
     std::string getTargetParameterPath() const;
 
+    //! the link parameter
     cedar::aux::ParameterLinkPtr mParameterLink;
 
+    //! the source element
     cedar::proc::ElementPtr mSourceElement;
+
+    //! the target element
     cedar::proc::ElementPtr mTargetElement;
 
+    //! the group
     cedar::proc::GroupWeakPtr mGroup;
   };
 
