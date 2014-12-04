@@ -21,6 +21,10 @@ trials (i.e., trial number 5), @em actions can be linked to an OnTrialNumber con
 clock counts the elapsed time since trial start. If a trial is ended through an EndTrial action, the outcome of the
 trial (success/failure) and the trial duration are logged. Note that there is no class associated with trials; they are 
 contained in cedar::proc::experiment::Experiment.
+
+@subsection EFConceptDefActionSequence ActionSequence
+An @em action @em sequence is a collection of @em actions tied to a @em condition. An experiment consists of multiple
+action sequences, of which at least one should contain an EndTrial action to end the trial at a given condition. 
  
 @subsection EFConceptDefCondition Condition
 A @em condition monitors a defined state of the architecture. If this state is reached, it triggers all actions 
