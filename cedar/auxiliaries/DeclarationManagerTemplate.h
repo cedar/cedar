@@ -136,8 +136,7 @@ public:
   {
     for (auto declaration : this->mDeclarations)
     {
-      //!@todo Get rid of this const cast
-      if (declaration->isObjectInstanceOf(boost::const_pointer_cast<typename BaseTypePtr::element_type>(object)))
+      if (declaration->isObjectInstanceOf(object))
       {
         return declaration;
       }

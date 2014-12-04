@@ -127,9 +127,14 @@ namespace cedar
       const std::string& alias
     )
     {
-      //!@todo Proper exceptions
-      CEDAR_ASSERT(map.find(name) != map.end());
-      CEDAR_ASSERT(map.find(alias) == map.end());
+      if (map.find(name) == map.end())
+      {
+        CEDAR_THROW(cedar::aux::UnknownNameException, "Cannot add an alias for \"" + name + "\": not a known unit.");
+      }
+      if (map.find(alias) != map.end())
+      {
+        CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add alias \"" + alias + "\" for unit \"" + name + "\": alias already exists.");
+      }
 
       map[alias] = map[name];
     }
@@ -149,7 +154,6 @@ namespace cedar
       }
 
       // could not find unit, throw exception
-      //!@todo Proper exception
       CEDAR_THROW(cedar::aux::UnknownUnitSuffixException, "Could not find unit for suffix \"" + postFix + "\".");
     }
 
