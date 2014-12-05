@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 #include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
+#include "cedar/auxiliaries/PluginProxy.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -107,6 +108,11 @@ class cedar::aux::PluginDeclarationList
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::PluginProxy;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 private:
   typedef std::vector<cedar::aux::PluginDeclarationPtr> DeclarationList;
 
@@ -149,9 +155,6 @@ public:
     return this->mDeclarations.at(i);
   }
 
-  //! Sets the source of the plugin list. Only set after the list has been populated!
-  void setSource(const std::string& source);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,6 +167,9 @@ protected:
 private:
   void readDeclarations(const cedar::aux::ConfigurationNode& declarations);
   void readDeclaration(const cedar::aux::ConfigurationNode& declarations);
+
+  //! Sets the source of the plugin list. Only set after the list has been populated!
+  void setSource(const std::string& source);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

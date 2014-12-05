@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/boostConstPointerHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/FactoryManager.fwd.h"
@@ -52,36 +53,6 @@
 #include <vector>
 #include <string>
 
-
-namespace cedar
-{
-  namespace aux
-  {
-    //! Uses template specialization to provide the const version of the base type pointer.
-    template<typename TPtr>
-    class ConstPtrProvider
-    {
-    };
-
-    //! Specialization for shared_ptr.
-    template<typename T>
-    class ConstPtrProvider<boost::shared_ptr<T> >
-    {
-      public:
-        //! Returns boost::shared_ptr<const T> for any boost::shared_ptr<T>
-        typedef boost::shared_ptr<const T> ConstBaseTypePtr;
-    };
-
-    //! Specialization for intrusive_ptr.
-    template<typename T>
-    class ConstPtrProvider<boost::intrusive_ptr<T> >
-    {
-      public:
-        //! Returns boost::intrusive_ptr<const T> for any boost::intrusive_ptr<T>
-        typedef boost::intrusive_ptr<const T> ConstBaseTypePtr;
-    };
-  }
-}
 
 /*!@brief A manager of factories.
  *

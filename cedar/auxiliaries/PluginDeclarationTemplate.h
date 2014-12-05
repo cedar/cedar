@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/DeclarationManagerTemplate.h"
+#include "cedar/auxiliaries/boostConstPointerHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/PluginDeclarationTemplate.fwd.h"
@@ -71,6 +72,7 @@ private:
   typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseClassPtr> > PluginFactoryManager;
   typedef typename cedar::aux::Singleton<cedar::aux::DeclarationManagerTemplate<BaseClassPtr> > DeclarationManager;
   typedef typename PluginClassPtr::element_type PluginClass;
+  typedef typename cedar::aux::ConstPtrProvider<BaseClassPtr>::ConstBaseTypePtr ConstBaseTypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -126,7 +128,7 @@ public:
    *
    * @param pointer Instance that is checked
    */
-  bool isObjectInstanceOf(BaseClassPtr pointer) const
+  bool isObjectInstanceOf(ConstBaseTypePtr pointer) const
   {
     if (pointer)
     {

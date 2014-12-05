@@ -220,7 +220,6 @@ void cedar::aux::Settings::removePlugin(const std::string& pluginName)
   auto iter = this->_mKnownPlugins->get().find(pluginName);
   if (iter == this->_mKnownPlugins->get().end())
   {
-    //!@todo Should this be a UnknownPluginException?
     CEDAR_THROW(cedar::aux::UnknownPluginException, "The plugin \"" + pluginName + "\" is not known.");
   }
 
