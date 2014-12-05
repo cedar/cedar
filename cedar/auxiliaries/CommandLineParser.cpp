@@ -106,6 +106,12 @@ void cedar::aux::CommandLineParser::setParsedValue(const std::string& longName, 
     }
   }
   this->mParsedValues[longName] = value;
+
+  // execute command action: read configuration
+  if (longName == M_READ_CONFIG_COMMAND)
+  {
+    this->readConfigFromFile(value);
+  }
 }
 
 void cedar::aux::CommandLineParser::setParsedFlag(const std::string& longName, bool value)
@@ -363,8 +369,10 @@ void cedar::aux::CommandLineParser::defineOption
        const std::string& group
      )
 {
-  //!@todo Proper exception
-  CEDAR_ASSERT(mDescriptions.find(longName) == mDescriptions.end());
+  if (mDescriptions.find(longName) != mDescriptions.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add command line option \"" + longName + "\": already defined.");
+  }
 
   this->mDescriptions[longName] = description;
 
@@ -545,8 +553,10 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
 
       case STATE_EXPECTING_VALUE:
       {
-        //!@todo Proper exception: expecting a value.
-        CEDAR_ASSERT(!current_option.empty());
+        if (current_option.empty())
+        {
+          CEDAR_THROW(cedar::aux::InvalidValueException, "Option " + current_option + " expects a value, none was given.");
+        }
         this->setParsedValue(current_option, string);
         state = STATE_PLAIN;
         current_option = std::string();
@@ -555,8 +565,10 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
     }
   }
 
-  //!@todo Proper exception: should not end while looking for value.
-  CEDAR_ASSERT(state == STATE_PLAIN);
+  if (state != STATE_PLAIN)
+  {
+    CEDAR_THROW(cedar::aux::InvalidValueException, "Error parsing options: still expecting a value at end of arguments.");
+  }
 
   if (this->hasParsedFlag("help"))
   {
@@ -565,12 +577,6 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
     {
       exit(0);
     }
-  }
-
-  if (this->hasParsedValue(M_READ_CONFIG_COMMAND))
-  {
-    const std::string& path = this->getValue(M_READ_CONFIG_COMMAND);
-    this->readConfigFromFile(path);
   }
 
   if (this->hasParsedValue(M_WRITE_CONFIG_COMMAND))

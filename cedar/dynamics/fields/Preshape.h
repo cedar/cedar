@@ -39,9 +39,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -58,6 +60,16 @@ class cedar::dyn::Preshape : public cedar::dyn::Dynamics
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  //!@brief a parameter for sigmoid objects
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> SigmoidParameter;
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
+  //!@endcond
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -131,6 +143,9 @@ protected:
   cedar::aux::DoubleParameterPtr _mTimeScaleBuildUp;
   //!@brief time scale decay
   cedar::aux::DoubleParameterPtr _mTimeScaleDecay;
+
+  //! Sigmoid applied to the input.
+  SigmoidParameterPtr _mSigmoid;
 private:
   // none yet
 

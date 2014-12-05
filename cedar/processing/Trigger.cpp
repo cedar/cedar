@@ -57,6 +57,8 @@
 #include <QReadLocker>
 #include <QWriteLocker>
 #include <algorithm>
+#include <string>
+#include <iostream>
 
 // for debugging
 #include "cedar/auxiliaries/NamedConfigurable.h"

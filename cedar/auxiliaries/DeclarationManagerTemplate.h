@@ -72,6 +72,7 @@ class cedar::aux::DeclarationManagerTemplate
 private:
   typedef cedar::aux::FactoryManager<BaseTypePtr> BaseFactoryManager;
   typedef cedar::aux::Singleton<BaseFactoryManager> BaseFactoryManagerSingleton;
+  typedef typename cedar::aux::ConstPtrProvider<BaseTypePtr>::ConstBaseTypePtr ConstBaseTypePtr;
 
 public:
   //! Typedef for the PluginDeclaration template containing a BaseType.
@@ -131,13 +132,13 @@ public:
   }
 
   //! Returns the declaration that was used to instantiate the given object.
-  cedar::aux::ConstPluginDeclarationPtr getDeclarationOf(BaseTypePtr object) const
+  cedar::aux::ConstPluginDeclarationPtr getDeclarationOf(ConstBaseTypePtr object) const
   {
-    for (size_t i = 0; i < mDeclarations.size(); ++i)
+    for (auto declaration : this->mDeclarations)
     {
-      if (this->mDeclarations.at(i)->isObjectInstanceOf(object))
+      if (declaration->isObjectInstanceOf(object))
       {
-        return this->mDeclarations.at(i);
+        return declaration;
       }
     }
 

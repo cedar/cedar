@@ -54,6 +54,17 @@ cedar::aux::gui::Settings::Settings()
 mWritingDisabled(false),
 _mMaximumNumberOfLogEntries(new cedar::aux::UIntParameter(this, "maximal number of log entries", 200))
 {
+  std::string default_plot = "cedar::aux::gui::";
+
+#ifdef CEDAR_USE_QWTPLOT3D
+  default_plot += "QwtSurfacePlot";
+#elif defined CEDAR_USE_VTK
+  default_plot += "VtkSurfacePlot";
+#else
+  default_plot += "ImagePlot";
+#endif // CEDAR_USE_QWTPLOT3D
+
+  this->_mDefaultMatDataPlot = new cedar::aux::StringParameter(this, "default 2d mat data plot", default_plot);
   this->_mPluginLoadDialogLocation = new cedar::aux::DirectoryParameter
                                      (
                                        this,
@@ -73,6 +84,19 @@ cedar::aux::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::gui::Settings::getDefault2dMatDataPlot() const
+{
+  cedar::aux::Parameter::ReadLocker locker(this->_mDefaultMatDataPlot.get());
+  std::string plot_class = this->_mDefaultMatDataPlot->getValue();
+  return plot_class;
+}
+
+void cedar::aux::gui::Settings::setDefault2dMatDataPlot(const std::string& plotClass)
+{
+  cedar::aux::Parameter::WriteLocker locker(this->_mDefaultMatDataPlot.get());
+  this->_mDefaultMatDataPlot->setValue(plotClass);
+}
 
 cedar::aux::DirectoryParameterPtr cedar::aux::gui::Settings::lastPluginLoadDialogLocation() const
 {

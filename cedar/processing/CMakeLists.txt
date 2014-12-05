@@ -50,6 +50,20 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
+  experiment/Experiment.h
+  experiment/StepPropertyParameter.h
+  experiment/Supervisor.h
+  experiment/condition/OnMatrixValue.h
+  experiment/action/IterateDirectoryContents.h
+  experiment/gui/ActionListParameter.h
+  experiment/gui/ActionSequence.h
+  experiment/gui/ExperimentItemWidget.h
+  experiment/gui/StepPropertyParameter.h
+  experiment/gui/TriggerParameter.h
+  gui/ArchitectureWidgetList.h
+  gui/ArchitectureScriptEditor.h
+  gui/stepViews/BoostView.h
+  gui/stepViews/StaticGainView.h
   gui/AdvancedParameterLinker.h
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
@@ -57,10 +71,12 @@ cedar_add_library(cedarproc
   gui/Connectable.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
+  gui/ExperimentDialog.h
   gui/FindDialog.h
   gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
+  gui/PlotWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
   gui/RecorderWidget.h
@@ -100,6 +116,7 @@ cedar_add_library(cedarproc
   sources/Camera.h
   steps/Projection.h
   steps/Resize.h
+  CppScript.h
   Group.h
   Step.h
   LoopedTrigger.h

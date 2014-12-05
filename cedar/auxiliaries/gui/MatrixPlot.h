@@ -95,9 +95,6 @@ public:
   //!@brief Check if the given data can be detached from the plot.
   bool canDetach(cedar::aux::ConstDataPtr data) const;
 
-  //!@brief return vector of standard colors
-  static const std::vector<cedar::aux::gui::ColorValueRGBA>& getStandardColorVector();
-
   void readConfiguration(const cedar::aux::ConfigurationNode& configuration);
 
   void writeConfiguration(cedar::aux::ConfigurationNode& configuration) const;
@@ -133,9 +130,6 @@ private:
 
   //!@brief the plot widget
   QWidget* mpCurrentPlotWidget;
-
-  //!@brief vector filled with standard colors
-  static std::vector<cedar::aux::gui::ColorValueRGBA> mStandardColorVector;
 
   std::string mTitle;
 

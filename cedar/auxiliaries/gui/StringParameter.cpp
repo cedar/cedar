@@ -93,6 +93,11 @@ void cedar::aux::gui::StringParameter::propertiesChanged()
   this->mpEdit->setDisabled(parameter->isConstant());
 }
 
+void cedar::aux::gui::StringParameter::setReadOnly(bool readOnly)
+{
+  this->mpEdit->setReadOnly(readOnly);
+}
+
 void cedar::aux::gui::StringParameter::parameterPointerChanged()
 {
   cedar::aux::StringParameterPtr parameter;

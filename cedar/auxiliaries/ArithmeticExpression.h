@@ -61,8 +61,6 @@
  *        factor = double | variable | '(' expression ')'
  *
  *        where 'c' means a literal c, * means zero or more repetitions and (A|B) means A or B.
- *
- * @todo This would be solved much nicer with boost spirit, but I could not get that to work.
  */
 class cedar::aux::ArithmeticExpression
 {

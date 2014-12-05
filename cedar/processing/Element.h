@@ -51,6 +51,8 @@
   #include <boost/enable_shared_from_this.hpp>
   #include <boost/signals2.hpp>
 #endif
+#include <set>
+#include <string>
 
 
 /*!@brief Base class for Elements in a processing architecture.
@@ -102,6 +104,9 @@ public:
 
   //!@brief updates the trigger chains of this element
   virtual void updateTriggerChains(std::set<cedar::proc::Trigger*>& visited);
+
+  //! Returns the full path of the element.
+  std::string getFullPath() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

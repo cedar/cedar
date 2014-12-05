@@ -126,6 +126,46 @@ int test_input_revalidation()
   return errors;
 }
 
+int test_name_exists()
+{
+  std::cout << "-- Testing nameExists() --" << std::endl << std::endl;
+  int errors = 0;
+  cedar::proc::GroupPtr root(new cedar::proc::Group());
+  cedar::proc::GroupPtr subgroup1(new cedar::proc::Group());
+  cedar::proc::GroupPtr subgroup2(new cedar::proc::Group());
+  root->add(subgroup1, "subgroup1");
+  subgroup1->add(subgroup2, "subgroup2");
+
+  TestModulePtr test_1(new TestModule());
+  root->add(test_1, "test");
+  TestModulePtr test_2(new TestModule());
+  subgroup1->add(test_2, "test");
+  TestModulePtr test_3(new TestModule());
+  subgroup2->add(test_3, "test");
+
+  std::vector<std::string> names_to_check;
+  names_to_check.push_back("test");
+  names_to_check.push_back("subgroup1");
+  names_to_check.push_back("subgroup1.test");
+  names_to_check.push_back("subgroup1.subgroup2");
+  names_to_check.push_back("subgroup1.subgroup2.test");
+
+  for (const auto& name : names_to_check)
+  {
+    if (!root->nameExists(name))
+    {
+      std::cout << "ERROR: name \"" + name + "\" not found in root group." << std::endl;
+      ++errors;
+    }
+    else
+    {
+      std::cout << "name \"" + name + "\" properly found." << std::endl;
+    }
+  }
+
+  return errors;
+}
+
 int test_looped_group_cycle()
 {
   std::cout << "Testing a cycle in connections between looped groups." << std::endl;
@@ -243,6 +283,34 @@ int test_connector_renaming()
   return errors;
 }
 
+int test_camel_case_to_string()
+{
+  int errors = 0;
+
+  auto check_string = [&] (const std::string& camelCase, const std::string& expected)
+  {
+    std::string produced = cedar::proc::Group::camelCaseToSpaces(camelCase);
+    if (produced == expected)
+    {
+      std::cout << "Properly converted \"" << camelCase << "\" to \"" << expected << "\"." << std::endl;
+    }
+    else
+    {
+      std::cout << "ERROR: \"" << camelCase << "\" was converted to \"" << produced << "\". Expected: \"" << expected << "\"." << std::endl;
+      ++errors;
+    }
+  };
+
+  std::cout << "Checking camel case to string function " << std::endl;
+  check_string("", "");
+  check_string("ThisIsATest", "This Is A Test");
+  check_string("ABBRVTest", "ABBRV Test");
+  check_string("AReallyDifficultABBRVTest", "A Really Difficult ABBRV Test");
+  check_string("Something With Spaces and lower case", "Something With Spaces and lower case");
+
+  return errors;
+}
+
 void run_test()
 {
   using cedar::proc::Group;
@@ -280,7 +348,7 @@ void run_test()
     // if this works ...
     network->getElement("stepB.foo");
     // ... increase error count.
-    std::cout << "Somehow got past a call that was not supposed to work." << std::endl;
+    std::cout << "ERROR: Somehow got past a call that was not supposed to work." << std::endl;
     ++errors;
   }
   catch(cedar::aux::ExceptionBase&) // this should throw some cedar exception.
@@ -294,14 +362,14 @@ void run_test()
   std::cout << "test duplication of steps" << std::endl;
   try
   {
-    std::string new_name = network->getUniqueIdentifier("stepB");
-    network->duplicate("stepB");
+    std::string new_name = network->duplicate("stepB");
     network->getElement(new_name);
   }
-  catch(cedar::aux::ExceptionBase&) // simple copy did not work
+  catch(cedar::aux::ExceptionBase& e) // simple copy did not work
   {
-    std::cout << "simple duplication did not work" << std::endl;
+    std::cout << "ERROR: simple duplication did not work" << std::endl;
     ++errors;
+    std::cout << "Got an exception: " << e.exceptionInfo() << std::endl;
   }
 
   try
@@ -311,7 +379,7 @@ void run_test()
   }
   catch(cedar::aux::ExceptionBase&) // named copy did not work
   {
-    std::cout << "named duplication did not work" << std::endl;
+    std::cout << "ERROR: named duplication did not work" << std::endl;
     ++errors;
   }
 
@@ -342,33 +410,33 @@ void run_test()
   network_nested->getElement<Step>("parent step");
   if (network_nested->getElement<Group>("network child")->getElement<Step>("child step")->getName() != "child step")
   {
+    std::cout << "ERROR: child step was not found in nested network" << std::endl;
     ++errors;
-    std::cout << "child step was not found in nested network" << std::endl;
   }
   if (network_nested->getElement<Step>("network child.child step")->getName() != "child step")
   {
+    std::cout << "ERROR: child step was not found in nested network using dot notation" << std::endl;
     ++errors;
-    std::cout << "child step was not found in nested network using dot notation" << std::endl;
   }
   if (network_nested->getElement<Group>("network child.network grand child")->getName() != "network grand child")
   {
+    std::cout << "ERROR: child step was not found in nested network using dot notation" << std::endl;
     ++errors;
-    std::cout << "child step was not found in nested network using dot notation" << std::endl;
   }
 
   std::cout << "testing Group::findPath" << std::endl;
   if (network_nested->findPath(network_nested->getElement<Step>("network child.child step")) != "network child.child step")
   {
+    std::cout << "ERROR: path to existing element not recovered" << std::endl;
     ++errors;
-    std::cout << "path to existing element not recovered" << std::endl;
   }
 
   TestModulePtr step_schmild (new TestModule());
   step_schmild->setName("schmild step");
   if (network_nested->findPath(step_schmild) != "")
   {
+    std::cout << "ERROR: path to non-existing element not empty" << std::endl;
     ++errors;
-    std::cout << "path to non-existing element not empty" << std::endl;
   }
 
   std::cout << "testing connectors" << std::endl;
@@ -482,7 +550,20 @@ void run_test()
   cedar::proc::GroupPtr network_importing(new cedar::proc::Group());
   network_importing->importGroupFromFile("network child", "Nested.json");
 
-  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("two-layer field", network_importing);
+  cedar::proc::GroupDeclarationPtr group_declaration
+                                 (
+                                   new cedar::proc::GroupDeclaration
+                                   (
+                                     "template",
+                                     "Template.json",
+                                     "template",
+                                     "test"
+                                   )
+                                 );
+  group_declaration->declare();
+
+  cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup("template", network_importing);
+  //!@todo check, if the template was loaded correctly
 
   // test connecting triggers to groups
   std::cout << "testing connecting triggers to groups" << std::endl;
@@ -517,6 +598,8 @@ void run_test()
   errors += test_looped_group_cycle();
   errors += test_input_revalidation();
   errors += test_connector_renaming();
+  errors += test_name_exists();
+  errors += test_camel_case_to_string();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

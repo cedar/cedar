@@ -41,10 +41,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/boostConstPointerHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
+#include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -53,12 +55,17 @@
 #include <QResource>
 
 
-/*!@todo describe.
+/*!@brief A base class for plugin declarations.
  *
- * @todo describe more.
+ *        Everything that can be declared from a plugin needs to have a declaration class that inherits this one.
  */
 class cedar::aux::PluginDeclaration
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::PluginDeclarationList;
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -145,14 +152,6 @@ public:
    */
   void read(const cedar::aux::ConfigurationNode& node);
 
-  /*! Sets the source of this declaration. Should be empty for build-in plugins.
-   *
-   * @remarks This is automatically set by the plugin system.
-   *
-   * @todo This should be done via being friends with PluginProxy, which is currently in proc.
-   */
-  void setSource(const std::string& source);
-
   /*! Returns the source of this declaration, i.e., the plugin which declared it. Empty for built-in types.
    */
   inline const std::string& getSource() const
@@ -181,26 +180,7 @@ public:
   /*! Returns the path for the icon to use; this will also return special icons if there is an error with the specified
    * icons.
    */
-  QString determinedIconPath() const
-  {
-    QResource existance_test(QString::fromStdString(this->getIconPath()));
-    if (existance_test.isValid())
-    {
-      auto icon = QIcon(QString::fromStdString(this->getIconPath()));
-      if (icon.isNull())
-      {
-        return ":/steps/no_icon.svg";
-      }
-      else
-      {
-        return QString::fromStdString(this->getIconPath());
-      }
-    }
-    else
-    {
-      return ":/steps/broken_icon.svg";
-    }
-  }
+  QString determinedIconPath() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -214,6 +194,12 @@ protected:
 private:
   //! Implement this to read custom values from plugin description files.
   virtual void customRead(const cedar::aux::ConfigurationNode& node);
+
+  /*! Sets the source of this declaration. Should be empty for build-in plugins.
+   *
+   * @remarks This is automatically set by the plugin system.
+   */
+  void setSource(const std::string& source);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -244,13 +230,14 @@ private:
 }; // class cedar::aux::PluginDeclaration
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A templated base class for plugin declarations.
  */
 template <class BaseTypePtr>
 class cedar::aux::PluginDeclarationBaseTemplate : public cedar::aux::PluginDeclaration
 {
+public:
+  typedef typename cedar::aux::ConstPtrProvider<BaseTypePtr>::ConstBaseTypePtr ConstBaseTypePtr;
+
 public:
   //!@brief The standard constructor.
   PluginDeclarationBaseTemplate()
@@ -268,7 +255,7 @@ public:
    *
    * @param pointer Instance that is checked
    */
-  virtual bool isObjectInstanceOf(BaseTypePtr pointer) const = 0;
+  virtual bool isObjectInstanceOf(ConstBaseTypePtr pointer) const = 0;
 };
 
 #endif // CEDAR_AUX_PLUGIN_DECLARATION_H

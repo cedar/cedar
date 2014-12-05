@@ -13,8 +13,10 @@ find_library(qwtplot3d_LIBS
   NAMES qwtplot3d
   PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
 )
+
 # now check if anything is missing
 if(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS)
+  set(qwtplot3d_INCLUDE_DIRS "${qwtplot3d_INCLUDE_DIRS}/..")
   set(qwtplot3d_FOUND true)
 else(qwtplot3d_INCLUDE_DIRS AND qwtplot3d_LIBS)
   set(qwtplot3d_FOUND false)

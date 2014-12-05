@@ -61,7 +61,8 @@ int main(int argc, char** argv)
   // this now prints double or int, depending on what the user chose
   number->print();
 
-  // for simplicity, we've used rare pointers, so imagine there's the appropriate code for deleting them here.
+  // for simplicity, we've used raw pointers for the factories, 
+  // so imagine there's the appropriate code for deleting them here.
 }
 @endcode
 

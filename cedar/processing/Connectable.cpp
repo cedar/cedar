@@ -56,6 +56,7 @@
 #endif
 #include <string>
 #include <iostream>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -188,6 +189,7 @@ void cedar::proc::Connectable::revalidateInputSlot(const std::string& slot)
 {
   this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   this->inputConnectionChanged(slot);
+  this->signalInputConnectionChanged(slot);
   this->getInputValidity(slot);
 }
 
@@ -430,6 +432,7 @@ void cedar::proc::Connectable::callInputConnectionChangedFor(cedar::proc::DataSl
   if (auto slot_shared = slot.lock())
   {
     this->inputConnectionChanged(slot_shared->getName());
+    this->signalInputConnectionChanged(slot_shared->getName());
   }
   else
   {

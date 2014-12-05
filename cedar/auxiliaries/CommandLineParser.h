@@ -355,8 +355,10 @@ namespace cedar
     //! Specialization of the getValue method for enums.
     template <> inline cedar::aux::Enum CommandLineParser::getValue(const std::string& longName) const
     {
-      //!@todo Proper exception: the given parameter is not an enum parameter.
-      CEDAR_ASSERT(this->isEnum(longName));
+      if (!this->isEnum(longName))
+      {
+        CEDAR_THROW(cedar::aux::TypeMismatchException, "The parameter \"" + longName + "\" is not an enum parameter.");
+      }
       return this->mEnumValues.find(longName)->second->get(this->getValue(longName));
     }
   }

@@ -52,6 +52,8 @@
 /*!@todo describe.
  *
  * @todo describe more.
+ *
+ * @todo Rename to GroupPath
  */
 class cedar::proc::NetworkPath : public cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> >
 {
@@ -67,10 +69,15 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NetworkPath(const String& path = String());
+  NetworkPath();
+
+  //! Constructor that takes a string.
+  NetworkPath(const String& path);
 
   //!@brief Constructor accepting a c string
   NetworkPath(const char* path);
+
+  NetworkPath(const PathType&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

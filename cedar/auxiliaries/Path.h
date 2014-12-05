@@ -138,6 +138,14 @@ public:
    */
   std::string getExtension() const;
 
+  /*! Checks if the path contains an extension.
+   */
+  bool hasExtension() const;
+
+  /*! Sets the filename, i.e., the last component of the path.
+   */
+  void setFileName(const std::string& fileName);
+
   //! Appends the given path to this one.
   cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
 
@@ -159,6 +167,9 @@ public:
   //! Lists all the files that are in the path.
   std::vector<cedar::aux::Path> listFiles() const;
 
+  //! Lists all the files in the path whose absolute path matches the given regular expression.
+  std::vector<cedar::aux::Path> listFilesThatMatchRe(const std::string& regexp) const;
+
   //! Returns the last element in the path
   const std::string& getLast() const;
 
@@ -167,6 +178,9 @@ public:
 
   //! Returns the separator for paths (depends on the operating system).
   static std::string separator();
+
+  //! Returns a formatted timestamp to be used in file and directory names.
+  static std::string getTimestampForFileName();
 
   //! Compares two paths.
   bool operator< (const cedar::aux::Path& other) const;

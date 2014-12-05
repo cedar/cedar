@@ -45,10 +45,10 @@
 #include "cedar/auxiliaries/gui/ThreadedPlot.h"
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/ColorGradient.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
-#include "cedar/auxiliaries/ColorGradient.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QMenu>
@@ -143,6 +143,9 @@ public:
     return this->_mSmoothScaling->getValue();
   }
 
+  //! Returns whether the plot is set to keep the aspect ratio of the original matrix.
+  bool keepAspectRatio() const;
+
   /*! Returns the currently set value limits.
    */
   const cedar::aux::math::Limits<double>& getValueLimits() const
@@ -150,10 +153,16 @@ public:
     return this->_mValueLimits->getValue();
   }
 
+  //! Returns the currently active color jet.
+  cedar::aux::ColorGradient::StandardGradients::Id getColorJet() const;
+
 public slots:
   /*!@brief Set the scaling mode of the plot.
   */
   void setSmoothScaling(bool smooth);
+
+  //! Sets whether the plot is to keep the aspect ratio of the original matrix.
+  void setKeepAspectRatio(bool keepAspectRatio);
 
   //! Toggles the visibility of the legend.
   void showLegend(bool show);
@@ -269,6 +278,9 @@ protected:
 private:
   //! Whether the matrix should be smoothed during scaling.
   cedar::aux::BoolParameterPtr _mSmoothScaling;
+
+  //! Whether the aspect ratio of the matrix should be preserved in the plot.
+  cedar::aux::BoolParameterPtr _mKeepAspectRatio;
 
   //! Whether scaling of plots is determined automatically or fixed.
   cedar::aux::BoolParameterPtr _mAutoScaling;

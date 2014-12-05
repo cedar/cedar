@@ -63,7 +63,13 @@ public:
   Enum();
 
   //!@brief constructor with all parameters for this entry
-  Enum(const cedar::aux::EnumId id, const std::string& name, const std::string& prettyString = "");
+  Enum
+  (
+    const cedar::aux::EnumId id,
+    const std::string& name,
+    const std::string& prettyString = "",
+    const std::string& explanatoryString = ""
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -80,6 +86,9 @@ public:
 
   //!@brief returns a beautified name of this enum entry
   const std::string& prettyString() const;
+
+  //!@brief returns an explanatory string for this enum entry
+  const std::string& explanatoryString() const;
 
   //!@brief returns the identification number of this enum entry
   operator cedar::aux::EnumId () const;
@@ -111,6 +120,8 @@ private:
   std::string mName;
   //!@brief the beautified name of this enum entry
   std::string mPrettyString;
+  //!@brief the explanatory string of this enum entry
+  std::string mExplanatoryString;
 }; // class cedar::aux::Enum
 
 #endif // CEDAR_AUX_ENUM_H

@@ -103,8 +103,13 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Constructs an empty path.
+  PathTemplate()
+  {
+  }
+
   //! Constructs a path from a string.
-  PathTemplate(const StringType& path = StringType())
+  PathTemplate(const StringType& path)
   {
     // append the vector above to the path
     this->fromString(path);
@@ -132,6 +137,14 @@ public:
   {
     // append the vector above to the path
     this->mComponents.insert(this->mComponents.end(), path.begin(), path.end());
+  }
+
+  //! Appends a string component to the path
+  void append(const StringType& string)
+  {
+    // this makes sure the string is properly split into its components if it contains the separator
+    SelfType subpath(string);
+    this->append(subpath);
   }
 
   //! Appends another path to this path.
@@ -163,6 +176,13 @@ public:
     return copy;
   }
 
+  //! Appends a string to the path.
+  SelfType& operator+=(const StringType& string)
+  {
+    this->append(string);
+    return *this;
+  }
+
   //! Concatenates two paths.
   friend StringType operator+(const StringType& string, const SelfType& path)
   {
@@ -176,26 +196,26 @@ public:
   }
 
   //! Returns the path, starting from the given index.
-  SelfType operator()(size_t start)
+  SelfType operator()(size_t start) const
   {
     return this->operator()(start, this->getElementCount());
   }
 
   //! Returns the section of the path between start and end.
-  SelfType operator()(size_t start, size_t end)
+  SelfType operator()(size_t start, size_t end) const
   {
     if (start >= this->getElementCount())
     {
       CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Invalid start index " + cedar::aux::toString(start) + " in path with " + cedar::aux::toString(this->getElementCount()) + " element(s).");
     }
 
-    if (end >= this->getElementCount())
+    if (end > this->getElementCount())
     {
       CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Invalid end index " + cedar::aux::toString(end) + " in path with " + cedar::aux::toString(this->getElementCount()) + " element(s).");
     }
 
     SelfType slice;
-    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.end() + end);
+    slice.mComponents.insert(slice.mComponents.end(), this->mComponents.begin() + start, this->mComponents.begin() + end);
     return slice;
   }
 

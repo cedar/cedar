@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LockableMember.h"
+#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Arguments.fwd.h"
@@ -195,6 +196,15 @@ public:
    * This is the case if the triggerable is not triggered by anyone else.
    */
   bool isTriggerSource() const;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(Started, void());
+
+public:
+  CEDAR_DECLARE_SIGNAL(Stopped, void());
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

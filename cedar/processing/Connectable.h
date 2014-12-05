@@ -53,6 +53,7 @@
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/Step.fwd.h"
 #include "cedar/processing/sources/GroupSource.fwd.h"
+#include "cedar/processing/InputSlotHelper.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -71,6 +72,7 @@ class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux:
   friend class cedar::proc::Group;
   friend class cedar::proc::Step;
   friend class cedar::proc::sources::GroupSource;
+  template <typename T> friend class cedar::proc::InputSlotHelper;
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
@@ -208,6 +210,14 @@ public:
                 std::string& connectableName,
                 std::string& dataName
               );
+
+  /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
+   *        changed.
+   *
+   *        Examples of instances in which this function should be called are matrices that change size, type or
+   *        dimensionality.
+   */
+  void emitOutputPropertiesChangedSignal(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -382,14 +392,6 @@ protected:
    */
   void removeAllDataSlots();
 
-  /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
-   *        changed.
-   *
-   *        Examples of instances in which this function should be called are matrices that change size, type or
-   *        dimensionality.
-   */
-  void emitOutputPropertiesChangedSignal(const std::string& slot);
-
   //! Determines the validity of an input slot anew.
   void redetermineInputValidity(const std::string& slot);
 
@@ -495,6 +497,8 @@ public:
   CEDAR_DECLARE_SIGNAL(SlotRemoved, void (cedar::proc::DataRole::Id, const std::string&));
 public:
   CEDAR_DECLARE_SIGNAL(OutputPropertiesChanged, void (const std::string&));
+public:
+  CEDAR_DECLARE_SIGNAL(InputConnectionChanged, void (const std::string&));
 
 private:
   //!@brief a connection to a signal emitted by an external data slot

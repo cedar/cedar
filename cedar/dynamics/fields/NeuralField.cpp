@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/dynamics/gui/NeuralFieldView.h"
 #include "cedar/processing/steps/Sum.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/exceptions.h"
@@ -61,15 +62,19 @@
 
 // SYSTEM INCLUDES
 #include <iostream>
-#ifndef Q_MOC_RUN
-  #include <boost/lexical_cast.hpp>
-  #include <boost/make_shared.hpp>
-  #include <boost/units/cmath.hpp>
-#endif
+#include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/units/cmath.hpp>
+#include <boost/signals2/connection.hpp>
 #include <QApplication>
 #include <vector>
 #include <set>
 #include <string>
+
+//----------------------------------------------------------------------------------------------------------------------
+// internal class: icon view for DNFs
+//----------------------------------------------------------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -85,9 +90,9 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("DFT", "cedar.dynamics.NeuralField")
+      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField, cedar::dyn::gui::NeuralFieldView>("DFT", "cedar.dynamics.NeuralField")
     );
-    declaration->setIconPath(":/steps/field_temp.svg");
+    declaration->setIconPath(":/cedar/dynamics/gui/steps/field_generic.svg");
     declaration->setDescription
     (
       "An implementation of Amari's dynamic neural fields."

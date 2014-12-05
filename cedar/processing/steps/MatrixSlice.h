@@ -41,6 +41,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/steps/MatrixSlice.fwd.h"
@@ -57,6 +58,48 @@ class cedar::proc::steps::MatrixSlice : public cedar::proc::Step
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  class AnchorType
+  {
+  public:
+    //! Type of the enum.
+    typedef cedar::aux::EnumId Id;
+
+    //! Pointer to the enumeration type.
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    //! Constructs the enumeration values.
+    static void construct()
+    {
+      mType.type()->def(cedar::aux::Enum(Absolute, "Absolute", "Absolute"));
+      mType.type()->def(cedar::aux::Enum(Center, "Center", "Center"));
+    }
+
+    //! Returns the enum base class.
+    static const cedar::aux::EnumBase& type()
+    {
+      return *mType.type();
+    }
+
+    //! Returns a pointer to the enum base class.
+    static const cedar::proc::steps::MatrixSlice::AnchorType::TypePtr& typePtr()
+    {
+      return mType.type();
+    }
+
+    //! Anchor is specified relative to (0, 0) in the matrix.
+    static const Id Absolute = 0;
+
+    //! Anchor is specified relative to the center of the matrix.
+    static const Id Center = 1;
+
+  private:
+    static cedar::aux::EnumType<cedar::proc::steps::MatrixSlice::AnchorType> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -119,6 +162,7 @@ private:
   //! Used to remember limits from the configuration file.
   std::vector<cedar::aux::math::Limits<unsigned int> > mStoredLimits;
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -126,6 +170,9 @@ protected:
   // none yet
 
 private:
+  //! How the position of the slice is determined.
+  cedar::aux::EnumParameterPtr _mAnchorType;
+
   //! Parameter used for determining the lower range of the matrix slice.
   cedar::aux::UIntVectorParameterPtr _mRangeLower;
 

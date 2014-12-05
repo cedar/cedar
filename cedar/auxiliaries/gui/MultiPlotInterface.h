@@ -87,9 +87,11 @@ public:
   //!@brief check if given data can be detached from the plot
   virtual bool canDetach(cedar::aux::ConstDataPtr data) const = 0;
 
+  //!@deprecated: Use getDataTitleMap instead.
+  CEDAR_DECLARE_DEPRECATED(const DataMap& getDataMap() const);
+
   //!@brief Returns a map of data associated with its title.
-  //!@todo Rename this to getDataNameMap?
-  const DataMap& getDataMap() const;
+  const DataMap& getDataTitleMap() const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

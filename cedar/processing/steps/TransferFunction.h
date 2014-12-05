@@ -88,13 +88,6 @@ public:
   //!@brief do this if the input changes
   void inputConnectionChanged(const std::string& inputName);
 
-  //!@brief determine if a given Data is a valid input
-  cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                  (
-                                    cedar::proc::ConstDataSlotPtr,
-                                    cedar::aux::ConstDataPtr
-                                  ) const;
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
