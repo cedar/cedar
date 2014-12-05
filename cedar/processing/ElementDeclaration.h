@@ -70,9 +70,6 @@
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
-  //! PlotData struct is replaced by cedar::proc::PlotData
-  CEDAR_DECLARE_DEPRECATED(typedef cedar::proc::PlotData PlotData);
-  
   //!@brief list that pairs a data role with the desired plot
   typedef std::vector<cedar::proc::PlotDataPtr> DataList;
 

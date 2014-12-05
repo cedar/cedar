@@ -353,8 +353,8 @@ private:
   //!@brief Fills the menu with available plots
   void fillPlots
   (
-    QMenu* pMenu,
-    std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
+    QMenu* pMenu//,
+    //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
   );
 
   void closeAllChildWidgets();

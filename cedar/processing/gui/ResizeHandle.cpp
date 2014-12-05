@@ -65,7 +65,6 @@ cedar::proc::gui::ResizeHandle::ResizeHandle
   cedar::proc::gui::ResizeHandle::Direction direction
 )
 :
-//!@todo Replace numbers with a static constant
 QGraphicsRectItem(static_cast<qreal>(0), static_cast<qreal>(0), M_HANDLE_SIZE, M_HANDLE_SIZE),
 mpResizedItem(pResizedItem),
 mPressed(false),

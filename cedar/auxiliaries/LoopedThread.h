@@ -111,8 +111,6 @@
  * to fulfill real-time constraints.
  *
  * The preferred way to stop the thread from itself is to call requestStop().
- *
- * \todo Use units instead of doubles
  */
 class cedar::aux::LoopedThread : public cedar::aux::ThreadWrapper
 {

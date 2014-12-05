@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImageData.h
+    File:        GroupPath.h
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-    Date:        2011 07 22
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 12 05
 
     Description:
 
@@ -34,49 +34,53 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_IMAGE_DATA_H
-#define CEDAR_AUX_IMAGE_DATA_H
+#ifndef CEDAR_PROC_GROUP_PATH_H
+#define CEDAR_PROC_GROUP_PATH_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/annotation/ColorSpace.h"
+#include "cedar/auxiliaries/PathTemplate.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/ImageData.fwd.h"
+#include "cedar/processing/GroupPath.fwd.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
 
-/*!@brief This is a data class representing images.
+
+/*!@brief a dot-separated path to an element nested in a group
  */
-CEDAR_DECLARE_DEPRECATED(class) cedar::aux::ImageData : public cedar::aux::MatData
+class cedar::proc::GroupPath : public cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> >
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> > PathType;
+  typedef PathType::StringType String;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImageData(const cv::Mat& value = cv::Mat())
-  :
-  cedar::aux::MatData(value)
-  {
-    this->setAnnotation
-    (
-      cedar::aux::annotation::ColorSpacePtr
-      (
-        new cedar::aux::annotation::ColorSpace
-        (
-          cedar::aux::annotation::ColorSpace::Blue,
-          cedar::aux::annotation::ColorSpace::Green,
-          cedar::aux::annotation::ColorSpace::Red
-        )
-      )
-    );
-  }
+  GroupPath();
+
+  //! Constructor that takes a string.
+  GroupPath(const String& path);
+
+  //!@brief Constructor accepting a c string
+  GroupPath(const char* path);
+
+  //!@brief Constructor accepting a dot-separated path
+  GroupPath(const PathType&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -95,8 +99,19 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+private:
+  // none yet
 
-}; // class cedar::aux::ImageData
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_AUX_IMAGE_DATA_H
+private:
+  // none yet
+
+}; // class cedar::proc::GroupPath
+
+#endif // CEDAR_PROC_GROUP_PATH_H
 

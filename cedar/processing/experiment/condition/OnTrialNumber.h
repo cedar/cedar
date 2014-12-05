@@ -75,7 +75,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool initialCheck();
+  bool initialCheck() const;
 
   bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
@@ -84,7 +84,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief Checks if the current trial has the number provided by this condition
-  bool check();
+  bool check() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

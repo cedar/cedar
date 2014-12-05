@@ -34,7 +34,6 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
 

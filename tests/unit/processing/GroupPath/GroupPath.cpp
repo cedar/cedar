@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,35 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        GroupPath.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 27
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 01 07
 
-    Description: Implements all unit tests for the @em cedar::aux::LogFile class.
+    Description: 
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/processing/GroupPath.h"
 
 // SYSTEM INCLUDES
-#include <string>
+#include <iostream>
 
-int main()
+int test_basics()
 {
-  cedar::aux::LogFile logFile("test.log");
+  int errors = 0;
 
-  logFile.addTimeStamp();
-  logFile << "This is a test log file entry.\n";
-  logFile.addSeparatorLine();
+  cedar::proc::GroupPath path = "network1.network2.elementName";
 
-  logFile.close();
+  if (path.getElementCount() != 3)
+  {
+    std::cout << "Path doesn't have the right amount of elements." << std::endl;
+    ++errors;
+  }
 
-  return 0;
+  std::cout << "Path as string: \"" << path << "\"" << std::endl;
+
+  std::cout << "test_basics() finished with " << errors << " error(s)." << std::endl;
+  return errors;
 }
+
+
+int main(int /* argc */, char** /* argv */)
+{
+  int errors = 0;
+
+  errors += test_basics();
+
+  std::cout << "Test finished with " << errors << " error(s)." << std::endl;
+  return errors;
+}
+
+

@@ -72,7 +72,6 @@ cedar::aux::EnumType<cedar::proc::experiment::Experiment::CompareMethod>
 cedar::proc::experiment::Experiment::Experiment(cedar::proc::GroupPtr group)
 :
 mCurrentTrial(0),
-mInit(false),
 mIsRunning(false),
 _mFileName(new cedar::aux::StringParameter(this, "filename", "")),
 _mTrials(new cedar::aux::UIntParameter(this, "repetitions", 1)),
@@ -326,7 +325,6 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
     case ResetType::Reload:
     {
       this->mGroup->reset();
-      //!@todo This won't work anymore, it should use pre/postExperiment
       this->resetGroupState();
       break;
     }
@@ -353,13 +351,10 @@ void cedar::proc::experiment::Experiment::stopTrial(ResetType::Id reset)
 
 void cedar::proc::experiment::Experiment::executeActionSequences()
 {
-  //!@todo Can this mInit stuff be replaced by using the new prepareExperiment function?
-  this->mInit = true;
   for (ActionSequencePtr action_sequence: this->getActionSequences())
   {
     action_sequence->run();
   }
-  this->mInit = false;
 }
 
 void cedar::proc::experiment::Experiment::removeActionSequence
@@ -490,11 +485,11 @@ cedar::proc::GroupPtr cedar::proc::experiment::Experiment::getGroup()
 {
   return this->mGroup;
 }
-
-void cedar::proc::experiment::Experiment::elementRenamed(const std::string& /*oldName*/, const std::string& /*newName*/)
-{
-  //!@todo this should handle name changes - or implement this in each condition/action?
-}
+//
+//void cedar::proc::experiment::Experiment::elementRenamed(const std::string& /*oldName*/, const std::string& /*newName*/)
+//{
+//  //!@todo this should handle name changes - or implement this in each condition/action?
+//}
 
 bool cedar::proc::experiment::Experiment::hasMoreTrials() const
 {

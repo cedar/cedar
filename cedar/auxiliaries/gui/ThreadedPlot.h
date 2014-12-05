@@ -54,7 +54,6 @@
 
 /*!@brief A base class for plots that convert data in a separate thread.
  *
- * @todo The inheritance order of PlotInterface/ThreadedPlot might have to be turned around, as it might otherwise be impossible to use this class with MultiPlotInterface.
  */
 class cedar::aux::gui::ThreadedPlot : public cedar::aux::gui::PlotInterface
 {

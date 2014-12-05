@@ -72,7 +72,7 @@ cedar::proc::experiment::condition::AtTime::~AtTime()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::experiment::condition::AtTime::check()
+bool cedar::proc::experiment::condition::AtTime::check() const
 {
   // reset the activated flag if the time is below the time to check
   cedar::unit::Time time = cedar::aux::GlobalClockSingleton::getInstance()->getTime();

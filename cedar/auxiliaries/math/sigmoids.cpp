@@ -40,13 +40,6 @@
 
 // SYSTEM INCLUDES
 
-//!@cond SKIPPED_DOCUMENTATION
-double cedar::aux::math::sigmoid(const double x, const double beta, const double threshold)
-{
-  return sigmoidExp(x, beta, threshold);
-}
-//!@endcond
-
 double cedar::aux::math::sigmoidExp(const double x, const double beta, const double threshold)
 {
   return 1 / (1 + exp(-beta * (x - threshold)));

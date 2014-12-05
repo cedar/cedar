@@ -135,7 +135,7 @@ private:
   //!@brief Copies the DataPtr and stores it as new RecordData in the queue.
   void record();
 
-  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written. @todo: this is only called when the thread is started
+  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written.
   void prepareStart();
 
   //!@brief Stops the DataSpactator. Before stopping all RecordDatas in the queue will be written to disk.

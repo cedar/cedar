@@ -54,9 +54,9 @@
 
 /*!@brief Exception that relates to arithmetic expression errors
  */
-class cedar::aux::ArithmeticExpressinError : public cedar::aux::ExceptionBase
+class cedar::aux::ArithmeticExpressionException : public cedar::aux::ExceptionBase
 {
-}; // class cedar::aux::ArithmeticExpressinError
+}; // class cedar::aux::ArithmeticExpressionException
 
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */
@@ -315,13 +315,17 @@ class cedar::aux::NotImplementedException: public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::NotImplementedException
 
-/*!@brief An exception that is thrown, when a thread is running and an operation
- *        is called which is not allowed.
- * @todo  This exception needs a better name
+/*!@brief An exception that is thrown, when the recorder cannot execute a method due to thread constraints
  */
-class cedar::aux::ThreadRunningExeption: public cedar::aux::ExceptionBase
+class cedar::aux::RecorderException: public cedar::aux::ExceptionBase
 {
-}; // class cedar::aux::ThreadRunningExeption
+}; // class cedar::aux::RecorderException
+
+/*!@brief An exception that is thrown when parameter linking encounters an error
+ */
+class cedar::aux::ParameterLinkingException: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ParameterLinkingException
 
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

@@ -78,17 +78,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief sets the network at which this element is registered
-  CEDAR_DECLARE_DEPRECATED(void setNetwork(cedar::proc::GroupPtr network));
-
   //!@brief sets the group at which this element is registered
   void setGroup(cedar::proc::GroupPtr group);
-
-  //!@brief get the network at which this element is registered
-  CEDAR_DECLARE_DEPRECATED(cedar::proc::GroupPtr getNetwork());
-
-  //!@brief get the network at which this element is registered as const
-  CEDAR_DECLARE_DEPRECATED(cedar::proc::ConstGroupPtr getNetwork() const);
 
   //!@brief get the group at which this element is registered
   cedar::proc::GroupPtr getGroup();

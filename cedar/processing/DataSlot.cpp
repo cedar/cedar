@@ -171,11 +171,6 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidity() const
   return this->mValidity;
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
-{
-  return this->getValidity();
-}
-
 void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
 {
   this->mValidity = validity;
@@ -223,11 +218,6 @@ bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) co
 void cedar::proc::DataSlot::setName(const std::string& name)
 {
   this->mName = name;
-}
-
-void cedar::proc::DataSlot::deleteParentPointer()
-{
-  this->resetParentPointer();
 }
 
 void cedar::proc::DataSlot::resetParentPointer()

@@ -22,42 +22,54 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImageData.fwd.h
+    File:        GroupPath.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 11
+    Date:        2014 12 05
 
-    Description: Forward declaration file for the class cedar::aux::ImageData.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_IMAGE_DATA_FWD_H
-#define CEDAR_AUX_IMAGE_DATA_FWD_H
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#include "cedar/processing/GroupPath.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif // Q_MOC_RUN
 
-//!@cond SKIPPED_DOCUMENTATION
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::GroupPath::GroupPath()
+:
+cedar::proc::GroupPath::PathType()
 {
-  namespace aux
-  {
-    CEDAR_DECLARE_AUX_CLASS(ImageData);
-  }
 }
 
-//!@endcond
+cedar::proc::GroupPath::GroupPath(const cedar::proc::GroupPath::String& path)
+:
+cedar::proc::GroupPath::PathType(path)
+{
+}
 
-#endif // CEDAR_AUX_IMAGE_DATA_FWD_H
+cedar::proc::GroupPath::GroupPath(const char* path)
+:
+cedar::proc::GroupPath::PathType(path)
+{
+}
 
+cedar::proc::GroupPath::GroupPath(const PathType& path)
+:
+cedar::proc::GroupPath::PathType(path)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

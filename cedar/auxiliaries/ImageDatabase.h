@@ -337,13 +337,6 @@ public:
    */
   std::set<ImagePtr> getImagesWithAnyTags(const std::vector<std::string>& tags) const;
 
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_DECLARE_DEPRECATED(std::set<ImagePtr> getImagesWithTags(const std::string& tags) const)
-  {
-    return this->getImagesWithAnyTags(tags);
-  }
-  //!@endcond
-
   /*!@brief Returns all images that have all of the given tags.
    *
    * @param tags A list of tags, separated by ",".

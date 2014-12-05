@@ -143,8 +143,14 @@ void cedar::aux::ParameterLink::setLinkedParameters(cedar::aux::ParameterPtr sou
 {
   CEDAR_ASSERT(source);
   CEDAR_ASSERT(target);
-  //!@todo Exception; also, this should be checked in setSource, setTarget as well
-  CEDAR_ASSERT(this->canLink(source, target));
+  if (!this->canLink(source, target))
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::ParameterLinkingException,
+      "Cannot link parameters " + source->getName() + " and " + target->getName()
+    );
+  }
 
   this->setSource(source);
   this->setTarget(target);

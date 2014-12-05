@@ -250,11 +250,6 @@ void cedar::proc::gui::Scene::reset()
   this->mStickyNotes.clear();
 }
 
-const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
-{
-  return this->getStepMap();
-}
-
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::getStepMap() const
 {
   return this->mStepMap;
@@ -263,11 +258,6 @@ const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::getStepMap() co
 const cedar::proc::gui::Scene::GroupMap& cedar::proc::gui::Scene::getGroupMap() const
 {
   return this->mGroupMap;
-}
-
-const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::triggerMap() const
-{
-  return this->getTriggerMap();
 }
 
 const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMap() const
