@@ -52,6 +52,12 @@
 #include <string>
 #include <vector>
 
+/*!@brief Exception that relates to arithmetic expression errors
+ */
+class cedar::aux::ArithmeticExpressinError : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ArithmeticExpressinError
+
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */
 class cedar::aux::UnhandledTypeException : public cedar::aux::ExceptionBase
@@ -75,6 +81,12 @@ class cedar::aux::UnknownTypeException : public cedar::aux::ExceptionBase
 class cedar::aux::UnknownNameException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::UnknownNameException
+
+/*!@brief Exception that occurs when a plugin is not known.
+ */
+class cedar::aux::UnknownPluginException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::UnknownPluginException
 
 /*!@brief Exception that signals that something could not be found.
  */

@@ -59,8 +59,10 @@ namespace cedar
 
       inline std::string getNumericType(cedar::aux::ConstParameterPtr parameter)
       {
-        //!@todo Exception
-        CEDAR_ASSERT(isNumeric(parameter));
+        if (!isNumeric(parameter))
+        {
+          CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot get the type of number stored in the parameter: parameter is not numeric.");
+        }
 
         std::string rest, last;
         cedar::aux::splitLast(cedar::aux::objectTypeToString(parameter), "<", rest, last);

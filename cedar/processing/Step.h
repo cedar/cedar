@@ -423,6 +423,8 @@ private:
   /*!@brief This is the reset method.
    *
    *        Implement this method if you want to react to a reset signal.
+   *
+   *        To call this method, use cedar::proc::Step::callReset.
    */
   virtual void reset();
 

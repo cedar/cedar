@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/ArchitectureWidget.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
@@ -79,6 +80,7 @@
 #endif
 #include <iostream>
 #include <set>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -109,6 +111,7 @@ mHoldFitToContents(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
 _mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
+_mGeometryLocked(new cedar::aux::BoolParameter(this, "lock geometry", false)),
 _mUncollapsedWidth(new cedar::aux::DoubleParameter(this, "uncollapsed width", width)),
 _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", height))
 {
@@ -180,6 +183,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 
   this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
+  this->connect(this->_mGeometryLocked.get(), SIGNAL(valueChanged()), SLOT(geometryLockChanged()));
+
   QObject::connect
   (
     this->mGroup.get(),
@@ -228,6 +233,101 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Group::canResize() const
+{
+  if (this->_mGeometryLocked->getValue())
+  {
+    return false;
+  }
+  else
+  {
+    return cedar::proc::gui::Connectable::canResize();
+  }
+}
+
+void cedar::proc::gui::Group::setLockGeometry(bool lock)
+{
+  this->_mGeometryLocked->setValue(lock);
+}
+
+void cedar::proc::gui::Group::geometryLockChanged()
+{
+  bool locked = this->_mGeometryLocked->getValue();
+  this->setFlag(QGraphicsItem::ItemIsMovable, !locked);
+  this->updateResizeHandles();
+}
+
+const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
+{
+  return this->_mArchitectureWidgets;
+}
+
+void cedar::proc::gui::Group::setArchitectureWidgets(const std::map<std::string, cedar::aux::Path>& newWidgets)
+{
+  this->_mArchitectureWidgets = newWidgets;
+}
+
+void cedar::proc::gui::Group::showArchitectureWidget(const std::string& name)
+{
+  auto plot_iter = this->_mArchitectureWidgets.find(name);
+
+  if (plot_iter == this->_mArchitectureWidgets.end())
+  {
+    CEDAR_THROW(cedar::aux::InvalidNameException, "No architecture plot with the name \"" + name
+                                                  + "\" was found in the group \"" + this->getGroup()->getName() + "\".");
+  }
+
+  auto widget = new cedar::proc::gui::ArchitectureWidget(this->getGroup(), this->mpMainWindow);
+  cedar::aux::Path location = plot_iter->second;
+
+  if (location.isRelative() && !location.exists())
+  {
+    cedar::aux::Path architecture_path = this->mFileName;
+    location = architecture_path.getDirectory() + location;
+  }
+
+  widget->readJson(location);
+
+  auto dock = this->createDockWidget(name, widget);
+  dock->show();
+
+  this->mArchitectureWidgetDocks.push_back(dock);
+}
+
+void cedar::proc::gui::Group::toggleVisibilityOfOpenArchitectureWidgets(bool visible)
+{
+  for (auto iter = this->mArchitectureWidgetDocks.begin(); iter != this->mArchitectureWidgetDocks.end();)
+  {
+    auto widget_weak_ptr = *iter;
+    auto widget = widget_weak_ptr.data();
+    if (widget)
+    {
+      widget->setVisible(visible);
+      ++iter;
+    }
+    else
+    {
+      iter = this->mArchitectureWidgetDocks.erase(iter);
+    }
+  }
+}
+
+void cedar::proc::gui::Group::closeOpenArchitectureWidgets()
+{
+  for (auto iter = this->mArchitectureWidgetDocks.begin(); iter != this->mArchitectureWidgetDocks.end();)
+  {
+    auto widget_weak_ptr = *iter;
+    auto widget = widget_weak_ptr.data();
+    if (widget)
+    {
+      widget->close();
+    }
+
+    iter = this->mArchitectureWidgetDocks.erase(iter);
+  }
+}
+
 
 void cedar::proc::gui::Group::lastReadConfigurationChanged()
 {
@@ -343,6 +443,7 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::duplicate(const QPointF
   {
     group_item->restoreConnections();
   }
+
   return duplicate_ui;
 }
 
@@ -728,14 +829,19 @@ cedar::proc::ConstGroupPtr cedar::proc::gui::Group::getGroup() const
   return this->mGroup;
 }
 
-void cedar::proc::gui::Group::write()
+void cedar::proc::gui::Group::write() const
 {
-  this->write(this->mFileName);
+  this->writeJson(this->mFileName);
 }
 
-void cedar::proc::gui::Group::write(const std::string& destination)
+void cedar::proc::gui::Group::write(const std::string& destination) const
 {
-  this->mFileName = destination;
+  this->writeJson(destination);
+}
+
+void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
+{
+  this->mFileName = filename.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
@@ -743,25 +849,30 @@ void cedar::proc::gui::Group::write(const std::string& destination)
   this->mGroup->writeConfiguration(root);
   this->writeConfiguration(root);
 
-  write_json(destination, root);
+  write_json(filename.toString(), root);
 
-  this->mGroup->writeDataFile(destination + ".data");
+  this->mGroup->writeDataFile(filename.toString() + ".data");
 }
 
 void cedar::proc::gui::Group::read(const std::string& source)
 {
-  this->mFileName = source;
+  this->readJson(source);
+}
+
+void cedar::proc::gui::Group::readJson(const cedar::aux::Path& source)
+{
+  this->mFileName = source.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
-  read_json(source, root);
+  read_json(source.toString(), root);
 
   this->mGroup->readConfiguration(root);
   this->readConfiguration(root);
 
-  if (boost::filesystem::exists(source + ".data"))
+  if (boost::filesystem::exists(source.toString() + ".data"))
   {
-    this->mGroup->readDataFile(source + ".data");
+    this->mGroup->readDataFile(source.toString() + ".data");
   }
 }
 
@@ -782,6 +893,19 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
     if (plot_groups != node.not_found())
     {
       this->mPlotGroupsNode = plot_groups->second;
+    }
+
+    auto architecture_plots_iter = node.find("architecture widgets");
+    if (architecture_plots_iter != node.not_found())
+    {
+      // _mArchitecturePlots
+      const auto& architecture_plots = architecture_plots_iter->second;
+      for (auto pair : architecture_plots)
+      {
+        const auto& key = pair.first;
+        const auto& value = pair.second;
+        this->_mArchitectureWidgets[key] = value.get_value<std::string>();
+      }
     }
 
     auto color_node = node.find("background color");
@@ -827,6 +951,9 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     try
     {
+      //!@todo Why isn't there a virtual functon in cedar::proc::Connectable or cedar::proc::Step to restore plots that is called here instead of having these ifs?
+      //!@todo And why is a group/step item used here when all that is done in createAndShow... is to get its associated connectable? Why not pass step/group?
+      //!@todo Rewrite this code!
       // is it a step?
       auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
       if (step) // check if cast worked
@@ -898,6 +1025,16 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
     generic.put_child("open plots", node);
     // add plot groups to architecture
     generic.put_child("plot groups", this->mPlotGroupsNode);
+  }
+
+  // write architecture plots
+  {
+    cedar::aux::ConfigurationNode architecture_plots;
+    for (const auto& pair : this->_mArchitectureWidgets)
+    {
+      architecture_plots.put(pair.first, pair.second.toString(true));
+    }
+    generic.put_child("architecture widgets", architecture_plots);
   }
 
   if (this->mBackgroundColor.isValid())
@@ -1670,6 +1807,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   p_collapse->setChecked(this->isCollapsed());
   this->connect(p_collapse, SIGNAL(toggled(bool)), SLOT(setCollapsed(bool)));
 
+  QAction* p_lock_geometry = menu.addAction("lock size/position");
+  p_lock_geometry->setCheckable(true);
+  p_lock_geometry->setChecked(this->_mGeometryLocked->getValue());
+  this->connect(p_lock_geometry, SIGNAL(toggled(bool)), SLOT(setLockGeometry(bool)));
+
   auto color_menu = menu.addMenu("color");
   auto colors = cedar::proc::gui::SettingsSingleton::getInstance()->getUserDefinedColors();
   colors.push_back
@@ -1787,13 +1929,13 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     QString name = QInputDialog::getText(0, "Enter a name", "Name", QLineEdit::Normal, default_name);
     if (!name.isEmpty())
     {
-      if (this->getGroup()->hasConnector(name.toStdString()))
-      {
-        QMessageBox::critical(NULL, "Name exists", "A connector of this name already exists.");
-      }
-      else
+      try
       {
         this->getGroup()->addConnector(name.toStdString(), (a == p_add_input));
+      }
+      catch (cedar::aux::DuplicateNameException& e)
+      {
+        QMessageBox::critical(nullptr, "Could not add connector.", QString::fromStdString(e.getMessage()));
       }
     }
   }

@@ -158,6 +158,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->addConfigurableChild("fileHistory", recent_files);
   this->_mMaxFileHistorySize = new cedar::aux::UIntParameter(recent_files.get(), "maximum history size", 10);
 
+  this->_mExperimentDialogDirectory = new cedar::aux::DirectoryParameter(recent_files.get(), "experiment dialog director", "");
+
   this->mArchitectureLoadDialogDirectory = cedar::aux::DirectoryParameterPtr
       (
         new cedar::aux::DirectoryParameter
@@ -375,6 +377,11 @@ void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::stri
 cedar::aux::StringVectorParameterPtr cedar::proc::gui::Settings::getArchitectureFileHistory()
 {
   return this->mRecentArchitectureFiles;
+}
+
+cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::getExperimentDialogDirectory()
+{
+  return this->_mExperimentDialogDirectory;
 }
 
 cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureLoadDialogDirectory()

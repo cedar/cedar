@@ -223,8 +223,11 @@ void cedar::proc::Triggerable::callOnStart()
 
   locker.unlock();
 
+
   if (this->mStartCalls == 1)
   {
+    this->signalStarted();
+
     QReadLocker lock_r(this->mFinished.getLockPtr());
     if (mFinished.member())
     {
@@ -262,9 +265,15 @@ void cedar::proc::Triggerable::callOnStop()
       boost::bind(&cedar::proc::Triggerable::onStop, this),
       "An exception occurred while calling onStop()"
     );
-  }
 
-  locker.unlock();
+    locker.unlock();
+
+    this->signalStopped();
+  }
+  else
+  {
+    locker.unlock();
+  }
 
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 

@@ -787,11 +787,13 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
       else
       {
         cv::Mat modified;
-        //@todo For even kernels, this may pad 1 too much
-        int dh = cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_x) / 2;
-        int dw = cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_y) / 2;
+        int height = static_cast<int>(cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_x));
+        int width = static_cast<int>(cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_y));
+        int dh = height / 2;
+        int dw = width / 2;
 
-        cv::copyMakeBorder(matrix, modified, dh, dh, dw, dw, cv::BORDER_WRAP);
+        // height - dh makes sure that in uneven cases, padding is not too small or too large
+        cv::copyMakeBorder(matrix, modified, dh, height - dh, dw, width - dw, cv::BORDER_WRAP);
         cv::sepFilter2D
         (
           modified,
@@ -1162,11 +1164,11 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
   else
   {
     cv::Mat modified;
-    //@todo For even kernels, this may pad 1 too much
     int dh = flipped_kernel.rows / 2;
     int dw = flipped_kernel.cols / 2;
 
-    cv::copyMakeBorder(matrix, modified, dh, dh, dw, dw, cv::BORDER_WRAP);
+    // rows - dh makes sure that in uneven cases, padding is not too small or too large
+    cv::copyMakeBorder(matrix, modified, dh, flipped_kernel.rows - dh, dw, flipped_kernel.cols - dw, cv::BORDER_WRAP);
     cv::filter2D(modified, result, -1, flipped_kernel, anchor, 0.0, cv::BORDER_DEFAULT);
     result = result(cv::Range(dh, dh + matrix.rows), cv::Range(dw, dw + matrix.cols));
   }

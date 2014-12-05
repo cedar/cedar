@@ -58,6 +58,7 @@
   #include <boost/signals2/signal.hpp>
 #endif
 #include <string>
+#include <vector>
 
 
 /*!@brief This class represents data slots in connectable objects.

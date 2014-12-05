@@ -40,7 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Group.h"
-#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/CppScript.h"
 #include "cedar/processing/GroupFileFormatV1.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
@@ -76,12 +76,12 @@
 #include "cedar/processing/consistency/LoopedElementInNonLoopedGroup.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/make_shared.hpp>
-	#include <boost/property_tree/json_parser.hpp>
-#endif
+#include <boost/make_shared.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/regex.hpp>
 #include <algorithm>
 #include <sstream>
+#include <cctype>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -132,36 +132,25 @@ namespace
     }
 #endif // CEDAR_COMPILER_MSVC
 
-    cedar::proc::GroupDeclarationPtr group_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "two-layer field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "two-layer",
-                                       "DFT"
-                                     )
-                                   );
-    group_declaration->setIconPath(":/steps/field_temp.svg");
-    group_declaration->declare();
-
-    cedar::proc::GroupDeclarationPtr field_declaration
-                                   (
-                                     new cedar::proc::GroupDeclaration
-                                     (
-                                       "one-dimensional field",
-                                       "resource://groupTemplates/fieldTemplates.json",
-                                       "one-dimensional field",
-                                       "DFT"
-                                     )
-                                   );
-    field_declaration->setIconPath(":/steps/field_temp.svg");
-    field_declaration->declare();
-
     return true;
   }
 
   bool declared = declare();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// qt meta type initialization
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registerMetaType()
+  {
+    qRegisterMetaType<cedar::proc::Group::ConnectionChange>("cedar::proc::Group::ConnectionChange");
+    return true;
+  }
+
+  bool registered = registerMetaType();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -222,7 +211,147 @@ std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
     }
   }
 
+  //!@todo Add plugins required by scripts
+
   return required_plugins;
+}
+
+std::string cedar::proc::Group::camelCaseToSpaces(const std::string& camelCasedString)
+{
+  if (camelCasedString.empty())
+  {
+    return camelCasedString;
+  }
+
+  std::string spaced;
+
+  for (size_t i = 0; i < camelCasedString.size(); ++i)
+  {
+    bool in_upper = isupper(camelCasedString.at(i));
+    bool in_lower = islower(camelCasedString.at(i));
+    if (in_upper)
+    {
+      if (i > 0 && (i + 1) < camelCasedString.size() && islower(camelCasedString.at(i + 1)) && isupper(camelCasedString.at(i - 1)))
+      {
+        spaced += " ";
+      }
+      spaced += camelCasedString.at(i);
+    }
+    else if (in_lower)
+    {
+      spaced += camelCasedString.at(i);
+      if (i > 0 && (i + 1) < camelCasedString.size() && isupper(camelCasedString.at(i + 1)))
+      {
+        spaced += " ";
+      }
+    }
+    else
+    {
+      // other case: character is not an alphabetical one
+      spaced += camelCasedString.at(i);
+    }
+  }
+
+  return spaced;
+}
+
+bool cedar::proc::Group::checkScriptNameExists(const std::string& name) const
+{
+  QReadLocker locker(this->mScripts.getLockPtr());
+  for (auto script : this->mScripts.member())
+  {
+    if (script->getName() == name)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void cedar::proc::Group::createScript(const std::string& type)
+{
+   auto manager = cedar::proc::CppScriptFactoryManagerSingleton::getInstance();
+   auto script = manager->allocate(type);
+
+   std::string class_name, rest;
+   cedar::aux::splitLast(type, ".", rest, class_name);
+   std::string script_name = findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(class_name), boost::bind<bool>(&cedar::proc::Group::checkScriptNameExists, this, _1));
+   script->setName(script_name);
+
+   this->addScript(script);
+}
+
+void cedar::proc::Group::addScript(cedar::proc::CppScriptPtr script)
+{
+  QWriteLocker locker(this->mScripts.getLockPtr());
+  this->mScripts.member().insert(script);
+  locker.unlock();
+
+  script->setGroup(cedar::aux::asserted_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
+
+  this->signalScriptAdded(script->getName());
+}
+
+std::set<cedar::proc::CppScriptPtr> cedar::proc::Group::getScripts() const
+{
+  std::set<cedar::proc::CppScriptPtr> scripts;
+  QReadLocker locker(this->mScripts.getLockPtr());
+  for (auto script : this->mScripts.member())
+  {
+    scripts.insert(script);
+  }
+  return scripts;
+}
+
+cedar::proc::CppScriptPtr cedar::proc::Group::getScript(const std::string& name) const
+{
+  QReadLocker locker(this->mScripts.getLockPtr());
+  for (auto script : this->mScripts.member())
+  {
+    if (script->getName() == name)
+    {
+      return script;
+    }
+  }
+  CEDAR_THROW(cedar::aux::NotFoundException, "No script with the name \"" + name + "\" was found.");
+}
+
+void cedar::proc::Group::removeScript(const std::string& name)
+{
+  auto script = this->getScript(name);
+
+  QWriteLocker locker(this->mScripts.getLockPtr());
+  auto iter = this->mScripts.member().find(script);
+  if (iter == this->mScripts.member().end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not find script \"" + name + "\" in this group.");
+  }
+  this->mScripts.member().erase(iter);
+  locker.unlock();
+
+  this->signalScriptRemoved(script->getName());
+}
+
+std::vector<cedar::proc::GroupPath> cedar::proc::Group::listAllElementPaths(const cedar::proc::GroupPath& base_path) const
+{
+  std::vector<cedar::proc::GroupPath> paths;
+
+  for (auto name_element_pair : this->mElements)
+  {
+    cedar::proc::GroupPath path = base_path;
+    path += name_element_pair.first;
+    paths.push_back(path);
+
+    if (auto subgroup = boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(name_element_pair.second))
+    {
+      cedar::proc::GroupPath subpath = base_path;
+      subpath += name_element_pair.first;
+      auto subpaths = subgroup->listAllElementPaths(subpath);
+      paths.insert(paths.end(), subpaths.begin(), subpaths.end());
+    }
+  }
+
+  return paths;
 }
 
 void cedar::proc::Group::updateTriggerChains(std::set<cedar::proc::Trigger*>& visited)
@@ -533,6 +662,7 @@ void cedar::proc::Group::startTriggers(bool wait)
 
 void cedar::proc::Group::stopTriggers(bool wait)
 {
+  bool blocked = this->blockSignals(true);
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
 
   for (auto trigger : triggers)
@@ -560,6 +690,9 @@ void cedar::proc::Group::stopTriggers(bool wait)
       }
     }
   }
+
+  this->blockSignals(blocked);
+  emit allTriggersStopped();
 }
 
 void cedar::proc::Group::stepTriggers()
@@ -599,28 +732,59 @@ void cedar::proc::Group::onNameChanged()
   }
 }
 
-std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifier) const
+std::string cedar::proc::Group::findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker)
 {
-  if (!this->nameExists(identifier))
+  if (!checker(basis))
   {
-    return identifier;
+    return basis;
+  }
+
+  std::string base_str = basis;
+
+  size_t last_number = basis.find_last_not_of("0123456789");
+  if (last_number != std::string::npos && last_number != base_str.size() - 1)
+  {
+    base_str = basis.substr(0, last_number);
   }
 
   unsigned int count = 2;
   std::string result;
   do
   {
-    result = identifier +  " " + cedar::aux::toString(count);
+    result = base_str +  " " + cedar::aux::toString(count);
     ++count;
   }
-  while (this->nameExists(result));
+  while (checker(result));
 
   return result;
 }
 
-bool cedar::proc::Group::nameExists(const std::string& name) const
+std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifier) const
 {
-  return this->mElements.find(name) != this->mElements.end();
+  return findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(identifier), boost::bind(&cedar::proc::Group::nameExists, this, _1));
+}
+
+bool cedar::proc::Group::nameExists(const cedar::proc::NetworkPath& name) const
+{
+  CEDAR_ASSERT(name.getElementCount() > 0)
+  if (name.getElementCount() > 1)
+  {
+    auto group_name = name(0,1).toString();
+    auto it = this->mElements.find(group_name);
+    if (it != this->mElements.end())
+    {
+      if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(it->second))
+      {
+        auto sub_name = name(1,name.getElementCount()).toString();
+        return group->nameExists(name(1,name.getElementCount()));
+      }
+    }
+    return false;
+  }
+  else
+  {
+    return this->mElements.find(name) != this->mElements.end();
+  }
 }
 
 void cedar::proc::Group::listSubgroups(std::set<cedar::proc::ConstGroupPtr>& subgroups) const
@@ -648,16 +812,43 @@ void cedar::proc::Group::listSubgroups(std::set<cedar::proc::GroupPtr>& subgroup
 
 void cedar::proc::Group::reset()
 {
-  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  // first, find all looped triggers that are running and stop them
+  auto looped_triggers = this->findAll<cedar::proc::LoopedTrigger>(true);
+  std::set<cedar::proc::LoopedTriggerPtr> running_triggers;
+
+  for (auto trigger : looped_triggers)
   {
-    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second))
+    if (trigger->isRunning())
+    {
+      running_triggers.insert(trigger);
+      trigger->stop();
+
+      // wait for the trigger to stop
+      while (trigger->isRunning())
+      {
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
+      }
+    }
+  }
+
+  // reset all elements in this group
+  for (auto name_element_pair : this->mElements)
+  {
+    auto element = name_element_pair.second;
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
     {
       step->callReset();
     }
-    else if (cedar::proc::GroupPtr group = boost::dynamic_pointer_cast<cedar::proc::Group>(iter->second))
+    else if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
     {
       group->reset();
     }
+  }
+
+  // restart all triggers that have been stopped
+  for (auto trigger : running_triggers)
+  {
+    trigger->start();
   }
 }
 
@@ -1047,42 +1238,85 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     }
   }
 
+  // connect the start and stop signals of a looped trigger
+  if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+  {
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStarting()), this, SIGNAL(triggerStarted()));
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
+  }
+
   if (auto group = boost::dynamic_pointer_cast<cedar::proc::Group>(element))
   {
     QObject::connect(group->getParameter("is looped").get(), SIGNAL(valueChanged()), this, SLOT(onLoopedChanged()));
   }
 }
 
+void cedar::proc::Group::triggerStopped()
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+
+  bool any_running = false;
+  for (auto trigger : triggers)
+  {
+    if (trigger->isRunning())
+    {
+      any_running = true;
+      break;
+    }
+  }
+
+  if (!any_running)
+  {
+    emit allTriggersStopped();
+  }
+}
+
 void cedar::proc::Group::addConnector(const std::string& name, bool input)
 {
-  if
-  (
-    this->nameExists(name)
-  )
+  if (this->_mConnectors->find(name) != this->_mConnectors->end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name + "\". It is already taken.");
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException, "Cannot add a connector with the name \"" + name +
+        "\" to group \"" + this->getFullPath() + "\" because there is already a connector with this name."
+    );
   }
+
+  if (this->nameExists(name))
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "Cannot add a connector with the name \"" + name +
+      "\" to group \"" + this->getFullPath() + "\"because there is an element with the same name inside the group."
+    );
+  }
+
+  this->addConnectorInternal(name, input);
+}
+
+void cedar::proc::Group::addConnectorInternal(const std::string& name, bool input)
+{
   // check if connector is in map of connectors
-  if (_mConnectors->find(name) != _mConnectors->end())
-  {
-    // do nothing for now
-  }
-  else
-  {
-    _mConnectors->set(name, input);
-  }
+  this->_mConnectors->set(name, input);
 
   if (input)
   {
-    this->declareInput(name, false);
-    cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
-    this->add(source, name);
+    if (!this->hasInputSlot(name))
+    {
+      this->declareInput(name, false);
+      cedar::proc::sources::GroupSourcePtr source(new cedar::proc::sources::GroupSource());
+      this->add(source, name);
+    }
   }
   else
   {
-    cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
-    this->declareSharedOutput(name, sink->getEmptyData());
-    this->add(sink, name);
+    if (!this->hasOutputSlot(name))
+    {
+      cedar::proc::sinks::GroupSinkPtr sink(new cedar::proc::sinks::GroupSink());
+      this->declareSharedOutput(name, sink->getEmptyData());
+      this->add(sink, name);
+    }
   }
 }
 
@@ -1237,7 +1471,7 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
   std::string modified_name;
   if (!newName.empty()) // desired name given
   {
-    modified_name = this->getUniqueIdentifier(newName);
+    modified_name = findNewIdentifier(newName, boost::bind(&cedar::proc::Group::nameExists, this, _1));
   }
   else // default name
   {
@@ -1269,7 +1503,11 @@ cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::N
 
     if (!group)
     {
-      CEDAR_THROW(cedar::aux::InvalidNameException, "The given name does not specify a proper path in this group.");
+      CEDAR_THROW
+      (
+        cedar::aux::InvalidNameException,
+        "The path \"" + name.toString() + "\" does not specify a proper path in the group \"" + this->getName() + "\"."
+      );
     }
 
     return group->getElement(rest);
@@ -1941,7 +2179,7 @@ void cedar::proc::Group::processConnectors()
 {
   for (auto it = _mConnectors->begin(); it != _mConnectors->end(); ++it)
   {
-    this->addConnector(it->first, it->second);
+    this->addConnectorInternal(it->first, it->second);
   }
 }
 

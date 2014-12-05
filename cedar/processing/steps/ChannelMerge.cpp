@@ -91,7 +91,7 @@ namespace
 
 cedar::proc::steps::ChannelMerge::ChannelMerge()
 :
-mOutput(new cedar::aux::MatData(cv::Mat(1,1,CV_32F)))
+mOutput(new cedar::aux::MatData(cv::Mat()))
 {
   // declare slots
   auto slot_1 = this->declareInput("channel 1");

@@ -188,7 +188,6 @@ void cedar::aux::kernel::Gauss::calculateParts()
       // normalize
       if (this->_mNormalize->getValue())
       {
-        //!@todo Is this the right approach to the normalization? Also, can't this be computed more efficient by sqrt(2*sigma...)?
         kernel_part /= cv::sum(kernel_part).val[0];
       }
 

@@ -49,9 +49,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::sources::GrabberBase::GrabberBase()
+cedar::proc::sources::GrabberBase::GrabberBase(bool looped)
 :
-cedar::proc::Step(true),
+cedar::proc::Step(looped),
 mImage(new cedar::aux::MatData(cv::Mat())),
 mRecording(new cedar::aux::BoolParameter(this, "record", false))
 {

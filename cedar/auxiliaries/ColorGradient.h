@@ -47,8 +47,13 @@
 #include "cedar/auxiliaries/ColorGradient.fwd.h"
 
 // SYSTEM INCLUDES
+#ifdef CEDAR_USE_QWTPLOT3D
+  #include <qwtplot3d/qwt3d_color_std.h>
+#endif // CEDAR_USE_QWTPLOT3D
 #include <opencv2/opencv.hpp>
 #include <QColor>
+#include <map>
+#include <vector>
 
 
 /*!@brief Represents a gradient of colors.
@@ -112,6 +117,13 @@ public:
 
   //! get a map of all color stops along the gradient
   const std::map<double, QColor>& getStops() const;
+
+#ifdef CEDAR_USE_QWTPLOT3D
+  Qwt3D::StandardColor toQwt3DStandardColor(size_t steps) const;
+#endif // CEDAR_USE_QWTPLOT3D
+
+  //! Returns the (interpolated) color for the given position.
+  QColor getColor(double position) const;
 
   //! get the default gradient color jet
   static ColorGradientPtr getDefaultPlotColorJet();

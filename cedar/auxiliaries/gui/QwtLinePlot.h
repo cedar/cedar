@@ -61,6 +61,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
+#include <qwt_plot_grid.h>
 #include <opencv2/opencv.hpp>
 #include <vector>
 
@@ -249,11 +250,20 @@ private:
 private slots:
   void showLegend(bool show = true);
 
+  void showMajorGrid(bool show = true);
+
+  void showMinorGrid(bool show = true);
+
+  //! Shows/hides the minor and major grid at the same time.
+  void showGrid(bool show = true);
+
   void conversionDone(double min, double max);
 
   void autoScalingChanged();
 
   void axisLimitsChanged();
+
+  void gridVisibilityChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -263,6 +273,8 @@ protected:
 private:
   //!@brief a plot
   QwtPlot *mpPlot;
+
+  QwtPlotGrid *mpGrid;
 
   PlotSeriesVector mPlotSeriesVector;
 
@@ -284,8 +296,17 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Whether the y axis limits are applied.
   cedar::aux::BoolParameterPtr _mAutoScalingEnabled;
 
+  //! Whether the major grid is displayed.
+  cedar::aux::BoolParameterPtr _mMajorGridVisible;
+
+  //! Whether the minor grid is displayed.
+  cedar::aux::BoolParameterPtr _mMinorGridVisible;
+
+  //! Limits for the y axis.
   cedar::aux::math::DoubleLimitsParameterPtr _mYAxisLimits;
 
 }; // class cedar::aux::gui::QwtLinePlot

@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/GroupFileFormatV1.h"
+#include "cedar/processing/CppScript.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Trigger.h"
@@ -116,6 +117,12 @@ void cedar::proc::GroupFileFormatV1::write
     this->writeCustomParameters(group, custom_parameters);
     if (!custom_parameters.empty())
     root.add_child("custom parameters", custom_parameters);
+
+
+    cedar::aux::ConfigurationNode scripts;
+    this->writeScripts(group, scripts);
+    if (!scripts.empty())
+      root.add_child("scripts", scripts);
   }
 
   group->cedar::aux::Configurable::writeConfiguration(root);
@@ -355,6 +362,12 @@ void cedar::proc::GroupFileFormatV1::read
     {
       this->readParameterLinks(group, parameter_links_iter->second, exceptions);
     }
+
+    auto scripts_iter = root.find("scripts");
+    if (scripts_iter != root.not_found())
+    {
+      this->readScripts(group, scripts_iter->second, exceptions);
+    }
   }
 }
 
@@ -402,6 +415,26 @@ void cedar::proc::GroupFileFormatV1::writeParameterLinks
   }
 }
 
+void cedar::proc::GroupFileFormatV1::writeScripts(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& node) const
+{
+  for (auto script : group->getScripts())
+  {
+    std::string type = cedar::proc::CppScriptDeclarationManagerSingleton::getInstance()->getTypeId(script);
+
+    cedar::aux::ConfigurationNode script_node, script_configuration;
+    script_node.put("type", type);
+
+    script->writeConfiguration(script_configuration);
+    if (!script_configuration.empty())
+    {
+      script_node.put_child("configuration", script_configuration);
+    }
+
+    node.push_back(cedar::aux::ConfigurationNode::value_type("", script_node));
+  }
+}
+
+
 void cedar::proc::GroupFileFormatV1::writeCustomParameters(cedar::proc::ConstGroupPtr group, cedar::aux::ConfigurationNode& customParameters) const
 {
   for (auto parameter : group->getCustomParameters())
@@ -443,6 +476,36 @@ void cedar::proc::GroupFileFormatV1::readCustomParameters
     std::string type = type_iter->second.get_value<std::string>();
     std::string name = name_iter->second.get_value<std::string>();
     group->addCustomParameter(type, name);
+  }
+}
+
+
+void cedar::proc::GroupFileFormatV1::readScripts
+(
+  cedar::proc::GroupPtr group,
+  const cedar::aux::ConfigurationNode& root,
+  std::vector<std::string>& /* exceptions */
+)
+{
+  for (const auto& link_iter : root)
+  {
+    const auto& node = link_iter.second;
+    auto type_iter = node.find("type");
+    if (type_iter == node.not_found())
+    {
+      continue;
+    }
+
+    std::string type = type_iter->second.get_value<std::string>();
+    auto script = cedar::proc::CppScriptFactoryManagerSingleton::getInstance()->allocate(type);
+
+    auto config_iter = node.find("configuration");
+    if (config_iter != node.not_found())
+    {
+      script->readConfiguration(config_iter->second);
+    }
+
+    group->addScript(script);
   }
 }
 
@@ -737,14 +800,32 @@ void cedar::proc::GroupFileFormatV1::readSteps
     const std::string class_id = iter->first;
     const cedar::aux::ConfigurationNode& step_node = iter->second;
 
-    cedar::proc::ElementPtr step;
-    try
+    // find the name of the step
+    auto name_it = step_node.find("name");
+    std::string name;
+    bool step_exists = false;
+    if (name_it != step_node.not_found())
     {
-      step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+      name = name_it->second.get_value<std::string>();
     }
-    catch (cedar::aux::ExceptionBase& e)
+
+    cedar::proc::ElementPtr step;
+
+    if (name.empty() || !group->nameExists(name))
     {
-      exceptions.push_back(e.exceptionInfo());
+      try
+      {
+        step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+      }
+    }
+    else
+    {
+      step = group->getElement(name);
+      step_exists = true;
     }
 
     if (step)
@@ -758,13 +839,16 @@ void cedar::proc::GroupFileFormatV1::readSteps
         exceptions.push_back(e.exceptionInfo());
       }
 
-      try
+      if (!step_exists)
       {
-        group->add(step);
-      }
-      catch (cedar::aux::ExceptionBase& e)
-      {
-        exceptions.push_back(e.exceptionInfo());
+        try
+        {
+          group->add(step);
+        }
+        catch (cedar::aux::ExceptionBase& e)
+        {
+          exceptions.push_back(e.exceptionInfo());
+        }
       }
 
       step->resetChangedStates(false);
@@ -779,27 +863,34 @@ void cedar::proc::GroupFileFormatV1::readGroups
        std::vector<std::string>& exceptions
      )
 {
-  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
-      iter != root.end();
-      ++iter)
+  for (const auto& name_config_pair : root)
   {
-    const std::string& group_name = iter->first;
-    const cedar::aux::ConfigurationNode& group_node = iter->second;
+    const std::string& group_name = name_config_pair.first;
+    const cedar::aux::ConfigurationNode& group_node = name_config_pair.second;
 
     cedar::proc::GroupPtr new_group;
+    bool group_exists = false;
 
-    try
+    if (group->nameExists(group_name))
     {
-      new_group
-        = boost::dynamic_pointer_cast<cedar::proc::Group>
-          (
-            cedar::proc::ElementManagerSingleton::getInstance()->allocate("cedar.processing.Group")
-          );
+        group_exists = true;
+        new_group = group->getElement<cedar::proc::Group>(group_name);
     }
-    catch (cedar::aux::ExceptionBase& e)
+    else
     {
-      exceptions.push_back(e.exceptionInfo());
-      continue;
+      try
+      {
+        new_group = cedar::proc::GroupPtr(new cedar::proc::Group());
+//          = boost::dynamic_pointer_cast<cedar::proc::Group>
+//            (
+//              cedar::proc::ElementManagerSingleton::getInstance()->allocate("cedar.processing.Group")
+//            );
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+        continue;
+      }
     }
 
     try
@@ -811,13 +902,16 @@ void cedar::proc::GroupFileFormatV1::readGroups
       exceptions.push_back(e.exceptionInfo());
     }
 
-    try
+    if (!group_exists)
     {
-      group->add(new_group);
-    }
-    catch (cedar::aux::ExceptionBase& e)
-    {
-      exceptions.push_back(e.exceptionInfo());
+      try
+      {
+        group->add(new_group);
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+      }
     }
 
     new_group->readConfiguration(group_node, exceptions);

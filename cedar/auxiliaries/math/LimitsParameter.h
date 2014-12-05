@@ -116,7 +116,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   /*!@brief Read limits from a configuration tree.
    *
    * @param root root of the configuration node holding the limits information
@@ -189,6 +188,12 @@ public:
     {
       this->emitChangedSignal();
     }
+  }
+
+  //! Sets both limits at the same time.
+  void setLimits(const T& lower, const T& upper, bool lock = false)
+  {
+    this->setValue(cedar::aux::math::Limits<T>(lower, upper), lock);
   }
 
   //!@brief sets the lower limit and emits a signal
@@ -320,7 +325,6 @@ private:
 protected:
   // none yet
 private:
-  //!@todo Why aren't mLowerLimitMinimum etc. stored as cedar::aux::math::Limits?
   //!@brief The default value of the lower limit
   T mLowerLimitDefault;
   //!@brief The minimum value of the lower limit

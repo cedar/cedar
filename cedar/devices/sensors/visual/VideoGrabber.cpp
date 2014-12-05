@@ -67,7 +67,7 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
 (
   const std::string& videoFileName,
   bool looped,
-  bool speedFactor
+  double speedFactor
 )
 :
 cedar::dev::sensors::visual::Grabber
@@ -78,10 +78,9 @@ cedar::dev::sensors::visual::Grabber
     new cedar::dev::sensors::visual::VideoChannel(videoFileName)
   )
 ),
-_mLooped(new cedar::aux::BoolParameter(this, "looped", looped)),
-_mSpeedFactor(new cedar::aux::IntParameter(this, "speed factor", speedFactor,1,20))
+_mLooped(new cedar::aux::BoolParameter(this, "looped", looped))
 {
-  init();
+  init(speedFactor);
 }
 
 
@@ -91,7 +90,7 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
   const std::string& videoFileName0,
   const std::string& videoFileName1,
   bool looped,
-  bool speedFactor
+  double speedFactor
 )
 :
 cedar::dev::sensors::visual::Grabber
@@ -106,16 +105,17 @@ cedar::dev::sensors::visual::Grabber
     new cedar::dev::sensors::visual::VideoChannel(videoFileName1)
   )
 ),
-_mLooped(new cedar::aux::BoolParameter(this, "looped", looped)),
-_mSpeedFactor(new cedar::aux::IntParameter(this, "speed factor", speedFactor,1,20))
+_mLooped(new cedar::aux::BoolParameter(this, "looped", looped))
 {
-  init();
+  init(speedFactor);
 }
 
 
-void cedar::dev::sensors::visual::VideoGrabber::init()
+void cedar::dev::sensors::visual::VideoGrabber::init(double speedFactor)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  this->_mSpeedFactor = new cedar::aux::DoubleParameter(this, "speed factor", speedFactor, 0.001, 20.0);
 
   mFramesCount = 0;
 
@@ -168,7 +168,7 @@ void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
 {
   if (isCreated())
   {
-    double fps = getVideoChannel(0)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
+    double fps = this->getSourceFramerate(0);
     setFramerate(fps * _mSpeedFactor->getValue());
     emit doSpeedFactorChanged();
   }
@@ -244,7 +244,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   mFramesCount = smallest;
 
   // check for equal FPS
-  double fps_ch0 = getVideoChannel(0)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
+  double fps_ch0 = this->getSourceFramerate(0);
 
   if (fps_ch0 < 1)
   {
@@ -253,7 +253,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 
   if (num_channels > 1)
   {
-    double fps_ch1 = getVideoChannel(1)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
+    double fps_ch1 = this->getSourceFramerate(1);
     if (fps_ch0 != fps_ch1)
     {
       std::string msg =  this->getName() + ": Different framerates of channels 0 and 1";
@@ -461,13 +461,34 @@ double cedar::dev::sensors::visual::VideoGrabber::getSourceProperty(unsigned int
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"VideoGrabber::getSourceProperty");
   }
-  return getVideoChannel(channel)->mVideoCapture.get(propId);
+  auto r = getVideoChannel(channel)->mVideoCapture.get(propId);
+  if (r != 0)
+  {
+    return r;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException, "Unsupported property.");
+  }
 }
 
 
 double cedar::dev::sensors::visual::VideoGrabber::getSourceFramerate(unsigned int channel)
 {
-  return getSourceProperty(channel, CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
+  auto fps = getSourceProperty(channel, CEDAR_OPENCV_CONSTANT(CAP_PROP_FPS));
+  if (std::isnan(fps))
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Could not read fps of source file. Defaulting to 30.0 fps.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
+    return 30.0;
+  }
+  else
+  {
+    return fps;
+  }
 }
 
 

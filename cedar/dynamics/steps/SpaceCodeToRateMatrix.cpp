@@ -88,8 +88,8 @@ namespace
 
 cedar::dyn::SpaceCodeToRateMatrix::SpaceCodeToRateMatrix()
 :
-mOutput(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
-mWeights(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
+mOutput(new cedar::aux::MatData(cv::Mat())),
+mWeights(new cedar::aux::MatData(cv::Mat())),
 // parameters
 _mLowerLimit
 (

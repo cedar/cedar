@@ -87,7 +87,8 @@ public:
    */
   const cedar::aux::Enum& get(const std::string& id) const;
 
-  /*! @todo solve this with a map */
+  /*! Returns the pretty string for the given id.
+   */
   const cedar::aux::Enum& getFromPrettyString(const std::string& id) const;
 
   /*! @brief Returns a list containing all enum values in this class (including cedar::aux::Enum::UNDEFINED!).

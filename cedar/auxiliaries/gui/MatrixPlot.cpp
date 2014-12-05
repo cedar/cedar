@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
+#include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #ifdef CEDAR_USE_QWT
@@ -50,9 +51,8 @@
 #endif // CEDAR_USE_QWT
 #ifdef CEDAR_USE_QWTPLOT3D
   #include "cedar/auxiliaries/gui/QwtSurfacePlot.h"
-#else // CEDAR_USE_QWTPLOT3D
-  #include "cedar/auxiliaries/gui/ImagePlot.h"
 #endif // CEDAR_USE_QWTPLOT3D
+#include "cedar/auxiliaries/gui/ImagePlot.h"
 #ifdef CEDAR_USE_VTK
 #include "cedar/auxiliaries/gui/VtkLinePlot.h"
 #include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
@@ -95,18 +95,13 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// static members
-//----------------------------------------------------------------------------------------------------------------------
-std::vector<cedar::aux::gui::ColorValueRGBA> cedar::aux::gui::MatrixPlot::mStandardColorVector;
-
-//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(NULL),
+mpCurrentPlotWidget(nullptr),
 mTitle("")
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
@@ -239,17 +234,30 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 #endif // CEDAR_USE_QWT
 
     case 2:
+    {
+      std::string plot_class = cedar::aux::gui::SettingsSingleton::getInstance()->getDefault2dMatDataPlot();
 #ifdef CEDAR_USE_QWTPLOT3D
-      this->mpCurrentPlotWidget = new cedar::aux::gui::QwtSurfacePlot(this->mData, title);
-#elif defined CEDAR_USE_VTK
-      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
-      break;
-#else
-      this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
+      if (plot_class == "cedar::aux::gui::QwtSurfacePlot")
+      {
+        this->mpCurrentPlotWidget = new cedar::aux::gui::QwtSurfacePlot(this->mData, title);
+      }
 #endif // CEDAR_USE_QWTPLOT3D
+
+#ifdef CEDAR_USE_VTK
+      if (plot_class == "cedar::aux::gui::VtkSurfacePlot")
+      {
+        this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
+      }
+#endif // CEDAR_USE_VTK
+
+      if (plot_class == "cedar::aux::gui::ImagePlot" || this->mpCurrentPlotWidget == nullptr)
+      {
+        this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
+      }
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
+    }
+
     case 3:
     {
       this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixSlicePlot3D(this->mData, title);
@@ -279,52 +287,6 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
   mTitle = title;
 }
 
-const std::vector<cedar::aux::gui::ColorValueRGBA>& cedar::aux::gui::MatrixPlot::getStandardColorVector()
-{
-  //!@todo Use cedar::aux::ColorGradient instead
-  if (cedar::aux::gui::MatrixPlot::mStandardColorVector.empty())
-  {
-    cedar::aux::gui::ColorValueRGBA rgb;
-    rgb.alpha = 1;
-    for (double i = 0; i < 256; i++)
-    {
-      if(i < 32.0)
-      {
-        rgb.red = 0.0;
-        rgb.green = 0.0;
-        rgb.blue = 0.5 + 0.5 * i/32.0;
-      }
-      else if(i < 96.0)
-      {
-        rgb.red = 0.0;
-        rgb.green = (i - 32.0) / 64.0;
-        rgb.blue = 1;
-      }
-      else if(i < 160.0)
-      {
-        rgb.red = (i - 96.0) / 64.0;
-        rgb.green = 1.0;
-        rgb.blue = 1.0 - (i - 96.0) / 64.0;
-      }
-      else if(i < 224.0)
-      {
-        rgb.red = 1.0;
-        rgb.green = 1.0 - (i - 160.0) / 64.0;
-        rgb.blue = 0.0;
-      }
-      else if(i < 256.0)
-      {
-        rgb.red = 1.0 - (i - 224.0) / 64.0;
-        rgb.green = 0.0;
-        rgb.blue = 0.0;
-      }
-      cedar::aux::gui::MatrixPlot::mStandardColorVector.push_back(rgb);
-    }
-  }
-
-  return cedar::aux::gui::MatrixPlot::mStandardColorVector;
-}
-
 void cedar::aux::gui::MatrixPlot::processChangedData()
 {
   if (mpCurrentPlotWidget)
@@ -336,7 +298,7 @@ void cedar::aux::gui::MatrixPlot::processChangedData()
     )
     {
       // first, recover data from multiplot
-      cedar::aux::gui::MultiPlotInterface::DataMap map = p_multi->getDataMap();
+      cedar::aux::gui::MultiPlotInterface::DataMap map = p_multi->getDataTitleMap();
       //QWriteLocker map_locker(p_multi->getLock());
       auto iter = map.begin();
       if (iter != map.end())

@@ -105,6 +105,9 @@ public:
   //!@brief Unregister all DataPtr.
   void clear();
 
+  //!@brief Saves the records in a special folder just for one session
+  void setSubfolder(const std::string& subfolderName);
+
   //!brief Takes a snapshot of all registered DataPtr
   void takeSnapshot();
 
@@ -112,6 +115,9 @@ public:
    *            If @param name is a full path the function will extract the stem of the filename.
    */
   void setRecordedProjectName(const std::string& name);
+
+  //!@brief Returns the directory the recorded data will be written to.
+  const std::string& getRecorderProjectName();
 
   //!@brief Gets the OutputDirectory
   const std::string& getOutputDirectory() const;
@@ -138,6 +144,9 @@ public:
   //!@brief Changes the name of the DataPtr.
   void renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName);
 
+  //!@brief Returns the current time formattedin a string
+  std::string getTimeStamp();
+
   //!@brief Returns all registered DataPtr by name and their record interval
   std::map<std::string, cedar::unit::Time> getRegisteredData() const;
 
@@ -145,20 +154,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Starts the recorder thread.
-  *
-  *              By calling start, every registered observer thread will automatically be started.
-  *              Additionally all files will be created and filled with headers.
-  *!todo: docu is wrong, should be private, no?
-  */
-  void prepareStart();
-
-  /*!@brief Stops the recorder thread.
-   *
-   *              By calling stop, the calling thread waits until all recorded data has been written to disk.
-   *!todo: docu is wrong, should be private, no?
-   */
-  void processQuit();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -169,6 +165,19 @@ private:
 
   //!@brief Creates a new Output directory
   void createOutputDirectory();
+
+  /*!@brief Starts the recorder thread.
+  *
+  *              By calling start, every registered observer thread will automatically be started.
+  *              Additionally all files will be created and filled with headers.
+  */
+  void prepareStart();
+
+  /*!@brief Stops the recorder thread.
+   *
+   *              By calling stop, the calling thread waits until all recorded data has been written to disk.
+   */
+  void processQuit();
 
 //--------------------------------------------------------------------------------------------------------------------
 // members
@@ -186,6 +195,8 @@ private:
 
   //!@brief The name of the project that will be recorded
   std::string mProjectName;
+
+  std::string mSubFolder;
 
 };
 

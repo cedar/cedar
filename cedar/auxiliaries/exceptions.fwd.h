@@ -44,6 +44,7 @@ namespace cedar
   {
     /* exceptions */
     CEDAR_DECLARE_AUX_CLASS(AnnotationNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(ArithmeticExpressinError);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
@@ -74,6 +75,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnhandledTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownPluginException);
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnknownUnitSuffixException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);

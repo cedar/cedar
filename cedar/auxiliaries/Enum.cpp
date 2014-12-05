@@ -44,11 +44,18 @@ cedar::aux::Enum::Enum()
 {
 }
 
-cedar::aux::Enum::Enum(const cedar::aux::EnumId id, const std::string& name, const std::string& prettyString)
+cedar::aux::Enum::Enum
+(
+  const cedar::aux::EnumId id,
+  const std::string& name,
+  const std::string& prettyString,
+  const std::string& explanatoryString
+)
 :
-mId (id),
-mName (name),
-mPrettyString (prettyString)
+mId(id),
+mName(name),
+mPrettyString(prettyString),
+mExplanatoryString(explanatoryString)
 {
 }
 
@@ -77,6 +84,11 @@ const std::string& cedar::aux::Enum::prettyString() const
   {
     return this->mName;
   }
+}
+
+const std::string& cedar::aux::Enum::explanatoryString() const
+{
+  return this->mExplanatoryString;
 }
 
 cedar::aux::Enum::operator cedar::aux::EnumId () const

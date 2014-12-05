@@ -37,8 +37,10 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// CEDAR INCLUDES
+// CLASS HEADER
 #include "<class header path>"
+
+// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 
