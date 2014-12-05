@@ -184,6 +184,14 @@ public:
     return this->at(index);
   }
 
+  /*!
+   * @remarks This method must be overridden because ConfigurablePtr and BaseTypePtr are not considered covariant types.
+   */
+  cedar::aux::ConstConfigurablePtr configurableAt(size_t index) const
+  {
+    return this->at(index);
+  }
+
   //!@brief add an object before the index position
   void insert(size_t index, BaseTypePtr object)
   {
