@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,54 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetworkPath.cpp
+    File:        GroupPath.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 07 25
+    Date:        2013 01 07
 
-    Description:
+    Description: 
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-
 // CEDAR INCLUDES
-#include "cedar/processing/NetworkPath.h"
+#include "cedar/processing/GroupPath.h"
 
 // SYSTEM INCLUDES
+#include <iostream>
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::NetworkPath::NetworkPath()
-:
-cedar::proc::NetworkPath::PathType()
+int test_basics()
 {
+  int errors = 0;
+
+  cedar::proc::GroupPath path = "network1.network2.elementName";
+
+  if (path.getElementCount() != 3)
+  {
+    std::cout << "Path doesn't have the right amount of elements." << std::endl;
+    ++errors;
+  }
+
+  std::cout << "Path as string: \"" << path << "\"" << std::endl;
+
+  std::cout << "test_basics() finished with " << errors << " error(s)." << std::endl;
+  return errors;
 }
 
-cedar::proc::NetworkPath::NetworkPath(const cedar::proc::NetworkPath::String& path)
-:
-cedar::proc::NetworkPath::PathType(path)
+
+int main(int /* argc */, char** /* argv */)
 {
+  int errors = 0;
+
+  errors += test_basics();
+
+  std::cout << "Test finished with " << errors << " error(s)." << std::endl;
+  return errors;
 }
 
-cedar::proc::NetworkPath::NetworkPath(const char* path)
-:
-cedar::proc::NetworkPath::PathType(path)
-{
-}
 
-cedar::proc::NetworkPath::NetworkPath(const PathType& path)
-:
-cedar::proc::NetworkPath::PathType(path)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------

@@ -50,9 +50,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief Writes a message.
  */
 class cedar::proc::experiment::action::WriteMessage : public cedar::proc::experiment::action::Action
 {

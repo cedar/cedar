@@ -156,9 +156,7 @@ namespace cedar
   }
 }
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief automatizes caching of input data in matrices. can do more!
  *
  * @remarks This functionality is currently in the prototype stage.
  */

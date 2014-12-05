@@ -53,8 +53,6 @@
 
 
 /*!@brief Writes its input into a video file.
- *
- * @todo describe more.
  */
 class cedar::proc::sinks::VideoSink : public cedar::proc::Step
 {

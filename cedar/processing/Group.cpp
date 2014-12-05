@@ -764,7 +764,7 @@ std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifie
   return findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(identifier), boost::bind(&cedar::proc::Group::nameExists, this, _1));
 }
 
-bool cedar::proc::Group::nameExists(const cedar::proc::NetworkPath& name) const
+bool cedar::proc::Group::nameExists(const cedar::proc::GroupPath& name) const
 {
   CEDAR_ASSERT(name.getElementCount() > 0)
   if (name.getElementCount() > 1)
@@ -1485,7 +1485,7 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
   return modified_name;
 }
 
-cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::NetworkPath& name) const
+cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupPath& name) const
 {
   ElementMap::const_iterator iter;
   std::string first;
@@ -1526,7 +1526,7 @@ cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::N
   }
 }
 
-cedar::proc::ElementPtr cedar::proc::Group::getElement(const cedar::proc::NetworkPath& name)
+cedar::proc::ElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupPath& name)
 {
   return boost::const_pointer_cast<Element>(static_cast<const Group*>(this)->getElement(name));
 }

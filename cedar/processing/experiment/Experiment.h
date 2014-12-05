@@ -289,9 +289,9 @@ signals:
 
   //!@brief Should be emitted if the group has changed
   void groupChanged();
-
-public slots:
-  void elementRenamed(const std::string& oldName, const std::string& newName);
+//
+//public slots:
+//  void elementRenamed(const std::string& oldName, const std::string& newName);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -350,11 +350,7 @@ private:
   cedar::aux::LoopFunctionInThreadPtr mLooper;
 
   //!@brief The currently running trial. It is 0 if no trial is running
-  //!@todo This should be called mCurrentTrial
   unsigned int mCurrentTrial;
-
-  //!@brief The flag stores if the experiment is on initial state
-  bool mInit;
 
   //!@brief The flag sores if there is currently no trial running
   bool mIsRunning;

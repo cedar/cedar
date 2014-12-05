@@ -59,8 +59,6 @@
  *
  *          The property could either be a parameter or an output or a buffer.
  *          The property type should be defined when creating an instance of this parameter.
- *
- * @todo describe more.
  */
 class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parameter
 {

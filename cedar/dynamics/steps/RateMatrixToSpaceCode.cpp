@@ -168,7 +168,6 @@ void cedar::dyn::RateMatrixToSpaceCode::limitsChanged()
 
 void cedar::dyn::RateMatrixToSpaceCode::interpolate()
 {
-  //!@todo member?
   std::vector<int> index;
   index.resize(this->mDimensionality);
   const cv::Mat& input = this->getInput("bin map")->getData<cv::Mat>();

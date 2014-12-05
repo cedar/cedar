@@ -53,9 +53,6 @@
  *
  * To make an enum using this class, create a new class that has a static construct function. In the construct function,
  * declare all the enum values belonging to your enum.
- * @todo explain this better and add example code
- *
- * @todo Make a "flag" version of this class.
  */
 class cedar::aux::EnumBase
 {

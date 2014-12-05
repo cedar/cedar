@@ -51,9 +51,7 @@
 #include <string>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief base class for scripts that can be executed in the gui
  */
 class cedar::proc::CppScriptDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::CppScriptPtr>
 {

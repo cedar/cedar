@@ -793,9 +793,8 @@ void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneCont
   p_close_all_plots->setIcon(QIcon(":/menus/close_all_plots.svg"));
   QObject::connect(p_close_all_plots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
 
-  //!@todo Is this plot map still used?
-  std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
-  this->fillPlots(p_advanced_plotting, advanced_plot_map);
+  //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
+  this->fillPlots(p_advanced_plotting);//, advanced_plot_map);
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;
@@ -923,8 +922,8 @@ void cedar::proc::gui::Connectable::addPlotAllAction(QMenu& menu, const QPoint& 
 
 void cedar::proc::gui::Connectable::fillPlots
      (
-       QMenu* pMenu,
-       std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
+       QMenu* pMenu//,
+       //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
      )
 {
   for (const cedar::aux::Enum& e : cedar::proc::DataRole::type().list())
@@ -963,7 +962,7 @@ void cedar::proc::gui::Connectable::fillPlots
               parameters.push_back(e.id());
               parameters.push_back(QString::fromStdString(declaration->getClassName()));
               p_action->setData(parameters);
-              declMap[p_action] = std::make_pair(declaration, e);
+              //declMap[p_action] = std::make_pair(declaration, e);
 
               if (declaration == cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data))
               {

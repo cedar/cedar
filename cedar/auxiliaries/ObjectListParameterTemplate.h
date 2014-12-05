@@ -51,8 +51,6 @@
 
 
 /*!@brief A parameter that reads a list of configurable objects from a file.
- *
- * @todo Should BaseType include the pointer type?
  */
 template <class BaseType>
 class cedar::aux::ObjectListParameterTemplate : public cedar::aux::ObjectListParameter

@@ -805,11 +805,6 @@ const std::string& cedar::proc::gui::Group::getFileName() const
   return this->mFileName;
 }
 
-//!@todo Can this method be removed?
-void cedar::proc::gui::Group::addElementsToScene()
-{
-}
-
 void cedar::proc::gui::Group::setScene(cedar::proc::gui::Scene* pScene)
 {
   //!@todo Why doesn't this use QGraphicsItem->scene() instead?
@@ -951,28 +946,16 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     try
     {
-      //!@todo Why isn't there a virtual functon in cedar::proc::Connectable or cedar::proc::Step to restore plots that is called here instead of having these ifs?
-      //!@todo And why is a group/step item used here when all that is done in createAndShow... is to get its associated connectable? Why not pass step/group?
-      //!@todo Rewrite this code!
-      // is it a step?
-      auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
-      if (step) // check if cast worked
+      // is it a connectable?
+      auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
+      if (connectable) // check if cast worked
       {
-        auto step_item = this->mpScene->getStepItemFor(step.get());
-        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+        auto graphics_item = this->mpScene->getGraphicsItemFor(connectable.get());
+        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, cedar::aux::asserted_cast<cedar::proc::gui::Connectable*>(graphics_item));
       }
-      else // might be a group instead
+      else // element is not present - show error
       {
-        auto group = this->getGroup()->getElement<cedar::proc::Group>(step_name);
-        if (group) // check if cast worked
-        {
-          auto group_item = this->mpScene->getGroupFor(group.get());
-          cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, group_item);
-        }
-        else // element is neither step nor group - show error
-        {
-          removed_elements.insert(step_name);
-        }
+        removed_elements.insert(step_name);
       }
     }
     catch (cedar::aux::InvalidNameException& exc)
@@ -1352,10 +1335,7 @@ void cedar::proc::gui::Group::checkTriggerConnection
 
 void cedar::proc::gui::Group::updateConnectorPositions()
 {
-//  qreal distance = 20;
   qreal pad_side = 5;
-//  QPointF start_dist(pad_side, this->getInputOutputSlotOffset());
-//  QPointF direction(0, 1);
 
   for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
   {

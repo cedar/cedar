@@ -55,8 +55,6 @@
  *
  * Most of the vector access functions are mirrored by this class. This ensures that a change signal is emitted every
  * time the content of the represented vector changes.
- *
- * @todo Write a unit test for this class.
  */
 template <typename T>
 class cedar::aux::MapParameter : public cedar::aux::Parameter

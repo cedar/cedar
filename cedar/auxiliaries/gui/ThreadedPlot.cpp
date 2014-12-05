@@ -61,7 +61,6 @@ mCaller(boost::bind(&cedar::aux::gui::ThreadedPlot::convert, this))
   QObject::connect(this, SIGNAL(conversionDoneSignal()), this, SLOT(conversionDone()), Qt::QueuedConnection);
   QObject::connect(this, SIGNAL(conversionFailedSignal()), this, SLOT(conversionFailed()), Qt::QueuedConnection);
 
-  //!@todo Give this a low priority!
   mCaller.start();
 }
 

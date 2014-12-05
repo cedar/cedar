@@ -50,7 +50,7 @@
 #include <QGraphicsSvgItem>
 
 
-/*!@todo Displays a static svg icon based on the icon in the connectable's declaration.
+/*!@brief Displays a static svg icon based on the icon in the connectable's declaration.
  */
 class cedar::proc::gui::DefaultConnectableIconView : public cedar::proc::gui::ConnectableIconView
 {

@@ -46,7 +46,6 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"

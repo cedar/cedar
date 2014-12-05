@@ -42,7 +42,6 @@
 #include "cedar/processing/ProjectionMapping.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
 #include "cedar/units/Time.h"

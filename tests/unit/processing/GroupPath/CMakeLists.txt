@@ -34,6 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(NetworkPath
-                    NetworkPath.cpp
+cedar_add_unit_test(GroupPath
+                    GroupPath.cpp
                     )

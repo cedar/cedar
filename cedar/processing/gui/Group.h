@@ -119,9 +119,6 @@ public:
    */
   cedar::proc::ConstGroupPtr getGroup() const;
 
-  //!@brief add all elements contained in this group to the scene
-  void addElementsToScene();
-
   //!@brief get the current file, to which the group configuration can be saved
   const std::string& getFileName() const;
 

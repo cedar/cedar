@@ -52,9 +52,7 @@
 #include <string>
 
 
-/*!@todo Increases a parameter of a step.
- *
- * @todo describe more.
+/*!@brief Increases a parameter of a step.
  */
 class cedar::proc::experiment::action::IncrementParameter : public cedar::proc::experiment::action::Action
 {
