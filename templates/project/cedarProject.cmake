@@ -176,6 +176,11 @@ macro(cedar_project_add_target)
     add_library(${target_name} SHARED ${files})
   endif()
   
+  # this makes sure that GCC doesn't prune away libraries that are not used at compile time, but only at run-time (like dynamics)
+  if (CMAKE_COMPILER_IS_GNUCC)
+  	set_target_properties(${target_name} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
+  endif(CMAKE_COMPILER_IS_GNUCC)
+  
   if (MSVC)
     target_link_libraries(${target_name}
                           optimized cedarunits debug cedarunitsd
