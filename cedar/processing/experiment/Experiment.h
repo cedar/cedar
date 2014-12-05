@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_proc_EXPERIMENT_EXPERIMENT_H
-#define CEDAR_proc_EXPERIMENT_EXPERIMENT_H
+#ifndef CEDAR_PROC_EXPERIMENT_EXPERIMENT_H
+#define CEDAR_PROC_EXPERIMENT_EXPERIMENT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/experiment/ActionSequence.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
@@ -61,6 +62,8 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <vector>
+#include <string>
 
 
 /*!@brief A class for creating and starting experiments with the current architecture.
@@ -101,10 +104,9 @@ public:
       //! Registers the enum values.
       static void construct()
       {
-        mType.type()->def(cedar::aux::Enum(None, "None"));
-        mType.type()->def(cedar::aux::Enum(Wait, "Wait"));
-        mType.type()->def(cedar::aux::Enum(Reset, "Reset"));
-        mType.type()->def(cedar::aux::Enum(Reload, "Reload"));
+        mType.type()->def(cedar::aux::Enum(None, "None", "", "The architecture is left in the state it had at the end of the trial."));
+        mType.type()->def(cedar::aux::Enum(Reset, "Reset", "", "The architecture is reset after reaching the end of the trial."));
+        mType.type()->def(cedar::aux::Enum(Reload, "Reload", "", "The architecture is reloaded after reaching the end of the trial."));
       }
 
       //! Returns the enumeration type.
@@ -120,12 +122,11 @@ public:
       }
 
     public:
+      //!@brief the architecture is left in the state it had at the end of the trial
       static const Id None = 0;
-
-      static const Id Wait = 1;
-
+      //!@brief the architecture is reset after reaching the end of the trial
       static const Id Reset = 2;
-
+      //!@brief the architecture is reloaded after reaching the end of the trial
       static const Id Reload = 3;
 
     private:
@@ -161,9 +162,14 @@ public:
         return mType.type();
       }
     public:
-     static const Id Greater = 0;
-     static const Id Lower = 1;
-     static const Id Equal = 2;
+      //! greater than comparison
+      static const Id Greater = 0;
+
+      //! lower than comparison
+      static const Id Lower = 1;
+
+      //! equality comparison
+      static const Id Equal = 2;
 
     private:
       static cedar::aux::EnumType<CompareMethod> mType;
@@ -209,10 +215,10 @@ public:
   void setTrialCount(unsigned int repetitions);
 
   //!@brief Starts the experiment to running through each trial
-  void run();
+  void startExperiment();
 
   //!@brief Cancels the experiment
-  void cancel();
+  void stopExperiment();
 
   //!@brief Adds an action sequence to the experiment
   void addActionSequence(cedar::proc::experiment::ActionSequencePtr actionSequence);
@@ -223,11 +229,11 @@ public:
   //!@brief  Returns a list of all action sequences of the experiment
   std::vector<cedar::proc::experiment::ActionSequencePtr> getActionSequences();
 
-  //!@brief Checks if the condition is on initial state. This is the case if the last trial has stopped
-  bool isOnInit();
+  //!@brief Checks if a trial currently running
+  bool isRunning() const;
 
   //!@brief Checks if a trial currently running
-  bool hasStopped();
+  bool trialIsRunning() const;
 
   //!@brief Get all steps of the current group
   std::vector<std::string> getGroupSteps();
@@ -243,7 +249,7 @@ public:
       = cedar::proc::DataRole::OUTPUT);
 
   //!@brief Returns the actual trial that is currently running
-  unsigned int getActualTrial();
+  unsigned int getCurrentTrial();
 
   //!@brief Writes the parameters to root
   void writeConfiguration(cedar::aux::ConfigurationNode& root);
@@ -252,25 +258,26 @@ public:
   void startTrial();
 
   //!@brief Returns a trigger from a name
-  void startTrigger(const std::string& triggerName);
-
-  //!@brief Returns a trigger from a name
   void startAllTriggers();
 
   /*!@brief Stops a  trial. Should only be called when a trial is currently running.
-   *              @param{reset} specifies what reset method should be used after stopping
+   *              @param reset specifies what reset method should be used after stopping
    */
   void stopTrial(ResetType::Id reset = ResetType::Reset);
-
-
-  //!@brief Checks if there is exactly one ActionStart in a ConditionOnInit
-  bool checkActionSequences();
 
   //! Sets the repeat flag of the experiment.
   void setRepeating(bool repeats);
 
   //! Returns the repeat flag of the experiment.
   bool getRepeating() const;
+
+  //! Returns if there are any more trials to run.
+  bool hasMoreTrials() const;
+
+  /*! Checks if the experiment is valid. If it returns false, errors are written to the vectors passed as arguments and
+   * can be used to give hints about what is wrong. Warnings may always be generated, even for valid experiments.
+   */
+  bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
 signals:
 
@@ -282,9 +289,9 @@ signals:
 
   //!@brief Should be emitted if the group has changed
   void groupChanged();
-
-public slots:
-  void elementRenamed(const std::string& oldName, const std::string& newName);
+//
+//public slots:
+//  void elementRenamed(const std::string& oldName, const std::string& newName);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -297,9 +304,8 @@ protected:
 private:
   /*!@brief Checks for every action sequence if its condition is fulfilled.
    *           If this is the case all actions of the sequence will be executed.
-   *           The flag initial defines that all Conditions should thread this experiment as it is on initial state.
    */
-  void executeAcionSequences(bool initial = false);
+  void executeActionSequences();
 
   //!@brief Emits the group changed signal if called.
   void groupChanged(cedar::proc::ConstElementPtr element);
@@ -320,6 +326,9 @@ private:
   //! Called after an experiment is stopped.
   void postExperiment();
 
+  //!@brief Calls a condition check.
+  void step(cedar::unit::Time);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -337,15 +346,16 @@ private:
   //! Used for stopping all triggers in a separate thread
   cedar::aux::CallFunctionInThreadPtr mStopGroup;
 
-  //!@brief The currently running trial. It is 0 if no trial is running
-  //!@todo This should be called mCurrentTrial
-  unsigned int mActualTrial;
+  //! Used for evaluating stuff
+  cedar::aux::LoopFunctionInThreadPtr mLooper;
 
-  //!@brief The flag stores if the experiment is on initial state
-  bool mInit;
+  //!@brief The currently running trial. It is 0 if no trial is running
+  unsigned int mCurrentTrial;
 
   //!@brief The flag sores if there is currently no trial running
-  bool mStopped;
+  bool mIsRunning;
+
+  bool mTrialIsRunning;
 
   std::string mRecordFolderName;
 
@@ -383,5 +393,5 @@ private:
   boost::signals2::scoped_connection mNewElementAddedConnection;
 }; // class cedar::proc::experiment::Experiment
 
-#endif // CEDAR_proc_EXPERIMENT_EXPERIMENT_H
+#endif // CEDAR_PROC_EXPERIMENT_EXPERIMENT_H
 

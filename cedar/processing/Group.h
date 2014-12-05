@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/NetworkPath.h"
+#include "cedar/processing/GroupPath.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
@@ -57,6 +57,7 @@
 #include "cedar/auxiliaries/ParameterLink.fwd.h"
 #include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/CppScript.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
 #include "cedar/processing/TriggerConnection.fwd.h"
 #include "cedar/processing/GroupFileFormatV1.fwd.h"
@@ -65,6 +66,7 @@
 
 // SYSTEM INCLUDES
 #include <QThread>
+#include <QMetaType>
 #include <vector>
 #ifndef Q_MOC_RUN
   #include <boost/signals2/signal.hpp>
@@ -102,17 +104,28 @@ public:
    */
   struct ParameterLinkInfo
   {
+    //! returns the path to the source element of this parameter link
     std::string getSourceElementPath() const;
+
+    //! returns the path to the target element of this parameter link
     std::string getTargetElementPath() const;
 
+    //! returns the path to the source parameter of this parameter link
     std::string getSourceParameterPath() const;
+
+    //! returns the path to the target parameter of this parameter link
     std::string getTargetParameterPath() const;
 
+    //! the link parameter
     cedar::aux::ParameterLinkPtr mParameterLink;
 
+    //! the source element
     cedar::proc::ElementPtr mSourceElement;
+
+    //! the target element
     cedar::proc::ElementPtr mTargetElement;
 
+    //! the group
     cedar::proc::GroupWeakPtr mGroup;
   };
 
@@ -287,15 +300,10 @@ public:
    */
   std::string duplicate(const std::string& elementName, const std::string& newName = "");
 
-  /*!@brief unmodifiedName unmodified name, possibly non-unique in group
-   * @return unique name created by attaching a number if name is already taken
-   */
-  CEDAR_DECLARE_DEPRECATED(std::string getUniqueName(const std::string& unmodifiedName) const);
-
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<T> getElement(const cedar::proc::NetworkPath& name)
+  boost::shared_ptr<T> getElement(const cedar::proc::GroupPath& name)
   {
     return boost::dynamic_pointer_cast<T>(this->getElement(name));
   }
@@ -303,7 +311,7 @@ public:
   /*!@brief Returns the element with the given name as a const pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<const T> getElement(const cedar::proc::NetworkPath& name) const
+  boost::shared_ptr<const T> getElement(const cedar::proc::GroupPath& name) const
   {
     return boost::dynamic_pointer_cast<const T>(this->getElement(name));
   }
@@ -312,13 +320,13 @@ public:
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ElementPtr getElement(const cedar::proc::NetworkPath& name);
+  cedar::proc::ElementPtr getElement(const cedar::proc::GroupPath& name);
 
   /*!@brief  Returns a const pointer to the element with the given name.
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ConstElementPtr getElement(const cedar::proc::NetworkPath& name) const;
+  cedar::proc::ConstElementPtr getElement(const cedar::proc::GroupPath& name) const;
 
   /*!@brief Connects data slots of two cedar::proc::Connectable elements.
    *
@@ -449,12 +457,6 @@ public:
   //! Recursively lists all elements in the group and all its subgroups.
   std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
 
-  //!@deprecated Use getElements instead.
-  CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
-  {
-    return this->getElements();
-  }
-
   /*!@brief Updates the name stored for the object.
    */
   void updateObjectName(cedar::proc::Element* object);
@@ -519,7 +521,7 @@ public:
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
   //!@brief Checks whether a name exists in the group.
-  bool nameExists(const cedar::proc::NetworkPath& name) const;
+  bool nameExists(const cedar::proc::GroupPath& name) const;
 
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()
@@ -681,11 +683,35 @@ public:
    */
   std::set<std::string> listRequiredPlugins() const;
 
+  /*! Creates a new cedar::proc::CppScript of the given type and adds it to the group.
+   *
+   *  @remarks the name for the script will be determined automatically.
+   */
+  void createScript(const std::string& type);
+
+  //! Adds the given script to the group.
+  void addScript(cedar::proc::CppScriptPtr script);
+
+  //! Retrieves the script with the given name.
+  cedar::proc::CppScriptPtr getScript(const std::string& name) const;
+
+  //! Removes the script with the given name.
+  void removeScript(const std::string& name);
+
+  //! Lists all scripts in this group.
+  std::set<cedar::proc::CppScriptPtr> getScripts() const;
+
+  //! Checks if a script with the given name exists in this group.
+  bool checkScriptNameExists(const std::string& name) const;
+
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
   //!@brief disconnects two slots across groups, removing/merging connectors if necessary
   static bool disconnectAcrossGroups(cedar::proc::OwnedDataPtr source, cedar::proc::ExternalDataPtr target);
+
+  //! Converts camel-case instances to spaces.
+  static std::string camelCaseToSpaces(const std::string& camelCasedString);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -750,6 +776,9 @@ private:
    */
   void addConnectorInternal(const std::string& name, bool input);
 
+  //! Finds an identifier for which the @em checker function returns false.
+  static std::string findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker);
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
@@ -806,6 +835,14 @@ public:
   //!@brief Signal that is emitted whenever a custom parameter is removed.
   CEDAR_DECLARE_SIGNAL(LastReadConfigurationChanged, void ());
 
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(ScriptAdded, void (const std::string&));
+
+public:
+  //!@brief Signal that is emitted whenever a custom parameter is removed.
+  CEDAR_DECLARE_SIGNAL(ScriptRemoved, void (const std::string&));
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -845,6 +882,9 @@ private:
   //! Flag if trigger chain updates should be executed (during connecting/loading)
   bool mHoldTriggerChainUpdates;
 
+  //! Map of scripts present in this architecture
+  cedar::aux::LockableMember<std::set<cedar::proc::CppScriptPtr>> mScripts;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -856,5 +896,7 @@ protected:
   cedar::aux::BoolParameterPtr _mIsLooped;
 
 }; // class cedar::proc::Group
+
+Q_DECLARE_METATYPE(cedar::proc::Group::ConnectionChange)
 
 #endif // CEDAR_PROC_GROUP_H

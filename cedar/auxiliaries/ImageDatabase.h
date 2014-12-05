@@ -58,6 +58,9 @@
 #endif // Q_MOC_RUN
 #include <iostream>
 #include <set>
+#include <map>
+#include <vector>
+#include <string>
 
 
 /*!@brief A class for finding images and annotation information from an image database.
@@ -333,13 +336,6 @@ public:
   /*!@brief Returns all images that have one or more of the given tags.
    */
   std::set<ImagePtr> getImagesWithAnyTags(const std::vector<std::string>& tags) const;
-
-  //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_DECLARE_DEPRECATED(std::set<ImagePtr> getImagesWithTags(const std::string& tags) const)
-  {
-    return this->getImagesWithAnyTags(tags);
-  }
-  //!@endcond
 
   /*!@brief Returns all images that have all of the given tags.
    *

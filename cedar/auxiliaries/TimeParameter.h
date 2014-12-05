@@ -49,6 +49,7 @@ namespace cedar
 {
   namespace aux
   {
+    //! a string parser for unit time
     template <>
     inline cedar::unit::Time getUnitFromPostFix(const std::string& postFix)
     {
@@ -97,6 +98,7 @@ namespace cedar
     }
 
     // Generate types for the length parameter.
+    //! a unit parameter for time
     typedef cedar::aux::UnitParameterTemplate<cedar::unit::Time::unit_type> TimeParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TimeParameter);
   }

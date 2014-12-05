@@ -61,8 +61,6 @@
  *        factor = double | variable | '(' expression ')'
  *
  *        where 'c' means a literal c, * means zero or more repetitions and (A|B) means A or B.
- *
- * @todo This would be solved much nicer with boost spirit, but I could not get that to work.
  */
 class cedar::aux::ArithmeticExpression
 {
@@ -406,7 +404,7 @@ public:
   //! Removes the contents of the equation.
   void clear();
 
-  //!@todo Return mat, use mat in variables?
+  //! Evaluates the expression given the values for all variables
   double evaluate(const Variables& variableValues = (Variables())) const;
 
   //! Returns the left-hand side of the expression.

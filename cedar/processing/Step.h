@@ -141,12 +141,14 @@ public:
   class ReadLocker : public Locker
   {
   public:
+    //! constructor accepting a shared pointer
     ReadLocker(cedar::proc::StepPtr step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_READ)
     {
     }
 
+    //! constructor accepting a raw pointer
     ReadLocker(cedar::proc::Step* step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_READ)
@@ -159,12 +161,14 @@ public:
   class WriteLocker : public Locker
   {
   public:
+    //! constructor accepting a shared pointer
     WriteLocker(cedar::proc::StepPtr step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_WRITE)
     {
     }
 
+    //! constructor accepting a raw pointer
     WriteLocker(cedar::proc::Step* step)
     :
     Locker(step, cedar::aux::LOCK_TYPE_WRITE)
@@ -181,10 +185,6 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // this constructor is deprecated because steps are no longer executed in their own thread
-  //!@brief A deprecated constructor. Do not use it anymore!
-  CEDAR_DECLARE_DEPRECATED(Step(bool runInThread, bool isLooped));
-
   //!@brief The standard constructor.
   Step(bool isLooped = false);
 
@@ -209,22 +209,6 @@ public:
          cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
          cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
        );
-
-  /*!@brief Sets the arguments used by the next execution of the run function.
-   */
-//  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent);
-
-  /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
-   *        the source of the trigger signal.
-   *        This function is deprecated because steps are not executed in their own thread anymore.
-   */
-  CEDAR_DECLARE_DEPRECATED(void setThreaded(bool isThreaded));
-
-  /*!@brief States if a step is executed as its own thread, or if the run() function is called in the same thread as
-   *        the source of the trigger signal.
-   *        This function is deprecated because steps are not executed in their own thread anymore.
-   */
-  CEDAR_DECLARE_DEPRECATED(bool isThreaded() const);
 
   //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
@@ -366,7 +350,7 @@ protected:
    *        To alleviate this, steps can disable automatic locking/unlocking of inputs and outputs. The envisioned use
    *        case for this is a compute function that looks as follows:
    *
-   *        @code
+   *        @code{.unparsed}
    * lock inputs
    *   preprocess inputs
    * unlock inputs
@@ -423,6 +407,8 @@ private:
   /*!@brief This is the reset method.
    *
    *        Implement this method if you want to react to a reset signal.
+   *
+   *        To call this method, use cedar::proc::Step::callReset.
    */
   virtual void reset();
 

@@ -42,11 +42,13 @@
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/xml_parser.hpp>
 #endif
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -123,8 +125,16 @@ void cedar::aux::PluginDeclarationList::readDeclarations(const cedar::aux::Confi
     const std::string& type = declaration_iter->first;
     const cedar::aux::ConfigurationNode& node = declaration_iter->second;
 
-    if (type == "element" || type == "plugin") //!@todo make the node type element deprecated
+    if (type == "element" || type == "plugin")
     {
+      if (type == "element")
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Declaration uses the old \"element\" node. This is deprecated and will be removed in future versions.",
+          CEDAR_CURRENT_FUNCTION_NAME
+        );
+      }
       this->readDeclaration(node);
     }
     else
@@ -133,7 +143,7 @@ void cedar::aux::PluginDeclarationList::readDeclarations(const cedar::aux::Confi
       (
         "Found an unhandled node type in cedar::aux::PluginDeclarationList::readDeclarations. Unhandled type is: \""
           + type + "\"",
-        "cedar::aux::PluginDeclarationList::readDeclarations(const cedar::aux::ConfigurationNode&)"
+        CEDAR_CURRENT_FUNCTION_NAME
       );
     }
   }

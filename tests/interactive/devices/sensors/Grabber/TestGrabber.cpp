@@ -36,7 +36,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/testingUtilities/devices/TestGrabber.h"
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"

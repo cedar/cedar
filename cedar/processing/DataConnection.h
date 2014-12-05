@@ -45,6 +45,7 @@
 #include "cedar/processing/ExternalData.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
 /*!@brief   This is a class that represents a connection between two data slots.

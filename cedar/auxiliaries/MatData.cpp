@@ -253,11 +253,11 @@ void cedar::aux::MatData::serializeData(std::ostream& stream) const
 	  //!@todo This is slow in multiple ways; a faster approach would be to iterate over the linear memory with a linear index
     //!@todo Also, we have an iterator class for iterating over a 3d matrix
     index[0]++;
-    for(int i =0; i < mData.dims-1; i++)
+    for (int i = 0; i < mData.dims-1; i++)
     {
-      if(index[i] >= mData.size[i])
+      if (index[i] >= mData.size[i])
       {
-        index[i]=0;
+        index[i] = 0;
         index[i+1]++;
       }
     }

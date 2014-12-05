@@ -64,6 +64,8 @@
 #include <QMainWindow>
 #include <map>
 #include <vector>
+#include <utility>
+#include <string>
 
 
 /*!@brief A gui base class for all items that represent cedar::proc::Connectables.
@@ -377,8 +379,8 @@ private:
   //!@brief Fills the menu with available plots
   void fillPlots
   (
-    QMenu* pMenu,
-    std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
+    QMenu* pMenu//,
+    //std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
   );
 
   void closeAllChildWidgets();

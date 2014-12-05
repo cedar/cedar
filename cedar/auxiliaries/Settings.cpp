@@ -220,8 +220,7 @@ void cedar::aux::Settings::removePlugin(const std::string& pluginName)
   auto iter = this->_mKnownPlugins->get().find(pluginName);
   if (iter == this->_mKnownPlugins->get().end())
   {
-    //!@todo Should this be a UnknownPluginException?
-    CEDAR_THROW(cedar::aux::UnknownNameException, "The plugin \"" + pluginName + "\" is not known.");
+    CEDAR_THROW(cedar::aux::UnknownPluginException, "The plugin \"" + pluginName + "\" is not known.");
   }
 
   auto load_iter = this->_mPluginsToLoad->get().find(pluginName);
@@ -324,10 +323,12 @@ void cedar::aux::Settings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    std::cout << "Error reading settings: " << e.what() << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Could not read settings: " + std::string(e.what()) + "; Trying a different name.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
   }
-
-  std::cout << "Trying a different name." << std::endl;
 
   // backwards compatibility: there used to be a typo in the name of the settings file
   try

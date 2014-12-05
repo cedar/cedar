@@ -68,7 +68,7 @@ void cedar::aux::gui::MultiPlotInterface::detach(cedar::aux::ConstDataPtr data)
   }
 }
 
-const cedar::aux::gui::MultiPlotInterface::DataMap& cedar::aux::gui::MultiPlotInterface::getDataMap() const
+const cedar::aux::gui::MultiPlotInterface::DataMap& cedar::aux::gui::MultiPlotInterface::getDataTitleMap() const
 {
   return this->mDataMap;
 }

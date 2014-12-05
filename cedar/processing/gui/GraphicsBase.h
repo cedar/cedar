@@ -45,7 +45,6 @@
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/boostSignalsHelper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Element.fwd.h"
@@ -358,6 +357,12 @@ protected:
    */
   void emitChangedEventToScene(bool alwaysEmit = false);
 
+  //! If this returns true, the item can be resized.
+  virtual bool canResize() const;
+
+  //! Updates the display of the resize handles.
+  void updateResizeHandles();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -367,8 +372,6 @@ private:
   void updateResizeHandles(bool show);
 
   void clearResizeHandles();
-
-  bool canResize() const;
   
   //! Called whenever the item has been selected or deselected.
   virtual void itemSelected(bool selected);

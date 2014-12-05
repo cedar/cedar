@@ -51,14 +51,14 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <vector>
+#include <string>
 
 
 /*!@brief A parameter to set a property of a certain step
  *
  *          The property could either be a parameter or an output or a buffer.
  *          The property type should be defined when creating an instance of this parameter.
- *
- * @todo describe more.
  */
 class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parameter
 {
@@ -71,10 +71,16 @@ class cedar::proc::experiment::StepPropertyParameter : public cedar::aux::Parame
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! enum defining the type of the property represented by this parameter
   enum PropertyType
   {
+    //! type parameter
+    PARAMETER_VALUE,
+    //! type parameter
     PARAMETER,
+    //! type output slot
     OUTPUT,
+    //! type buffer slot
     BUFFER
   };
 
@@ -111,16 +117,19 @@ public:
    /*!@brief Sets the property name of the step.
     *               It should always be checked if the property name is still available
     */
-   void setProperty(const std::string& poperty);
+   void setParameterPath(const std::string& poperty);
 
-   //!@brief Returns the step property name
-   const std::string& getProperty() const;
+   //!@brief Sets the step.
+   void setStep(cedar::proc::ConnectablePtr step);
 
-   //!@brief Sets the step name
-   void setStep(cedar::proc::ConnectableWeakPtr step);
+   //!@brief Sets the path of the element.
+   void setElementPath(const std::string& step);
 
-   //!@brief Sets the step name
-   void setStep(const std::string& step);
+   //! Returns the path of the currently selected element.
+   std::string getElementPath() const;
+
+   //! Returns the path of the currently selected element.
+   const std::string& getParameterPath() const;
 
    //!@brief Returns the step name
    cedar::proc::ConnectablePtr getStep() const;
@@ -137,6 +146,7 @@ public:
     */
    cedar::aux::ConstDataPtr getData() const;
 
+   //! returns a list of data names for given data role
    std::vector<std::string> getListOfData(cedar::proc::DataRole::Id role) const;
 
    /*!@brief Returns the ParameterPtr of the property
@@ -169,6 +179,9 @@ public:
 
    std::vector<std::string> getListOfParameters();
 
+   //! Checks the validity of the parameter.
+   bool checkValidity(std::string& errors) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -179,7 +192,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
 //!@brief If the property is changed, the parameter copy will be updated
-  void updatePropertyCopy();
+  void updateParameterCopy();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -196,12 +209,14 @@ protected:
   // none yet
 
 private:
-  //!@brief The step
-//  std::string mStep;
+  //!@brief The path of the element.
+  std::string mElementPath;
+
+  //! Weak pointer to the element.
   cedar::proc::ConnectableWeakPtr mElement;
 
   //!@brief The property
-  std::string mProperty;
+  std::string mParameterPath;
 
   //!@brief The type
   cedar::proc::experiment::StepPropertyParameter::PropertyType mType;

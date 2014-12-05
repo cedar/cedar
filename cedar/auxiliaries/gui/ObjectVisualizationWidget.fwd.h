@@ -56,7 +56,6 @@ namespace cedar
     namespace gui
     {
       CEDAR_DECLARE_AUX_CLASS(ObjectVisualizationWidget);
-      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualizationWidget RigidBodyVisualizationWidget);
     }
   }
 }

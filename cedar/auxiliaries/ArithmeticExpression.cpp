@@ -103,9 +103,11 @@ bool cedar::aux::ArithmeticExpression::isSolvedFor(const std::string& variable) 
 
 cedar::aux::ArithmeticExpressionPtr cedar::aux::ArithmeticExpression::solveFor(const std::string& variable) const
 {
-  //!@todo Proper exception
   // To solve equations, we need a left and right side
-  CEDAR_ASSERT(this->mLeft && this->mRight);
+  if (!this->mLeft && !this->mRight)
+  {
+    CEDAR_THROW(cedar::aux::ArithmeticExpressionException, "Cannot solve equation: need both a left- and righ hand side.");
+  }
 
   auto left = boost::dynamic_pointer_cast<Expression>(this->mLeft->clone());
   auto right = boost::dynamic_pointer_cast<Expression>(this->mRight->clone());
@@ -268,10 +270,15 @@ void cedar::aux::ArithmeticExpression::clear()
 
 double cedar::aux::ArithmeticExpression::evaluate(const Variables& variables) const
 {
-  //!@todo Exceptions
   // cannot evaluate if the equation has two sides because more information is needed
-  CEDAR_ASSERT(this->mLeft);
-  CEDAR_ASSERT(!this->mRight);
+  if (!this->mLeft)
+  {
+    CEDAR_THROW(cedar::aux::ArithmeticExpressionException, "Cannot evaluate: need a left-hand side.");
+  }
+  if (this->mRight)
+  {
+    CEDAR_THROW(cedar::aux::ArithmeticExpressionException, "Cannot evaluate if a right-hand side is present.");
+  }
   return this->mLeft->evaluate(variables);
 }
 
@@ -1099,8 +1106,7 @@ std::vector<cedar::aux::ArithmeticExpression::Token>
           default:
             if (state == InConstant)
             {
-              //!@todo Proper exception: cannot handle anything but numbers in constants
-              CEDAR_ASSERT(false); // tokenizer error
+              CEDAR_THROW(cedar::aux::ArithmeticExpressionException, "Cannot evaluate if a right-hand side is present.");
             }
             else
             {

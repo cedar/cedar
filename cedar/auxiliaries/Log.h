@@ -229,7 +229,9 @@ private:
   cedar::aux::LogInterfacePtr mDefaultLogger;
 };
 
+//!@cond SKIPPED_DOCUMENTATION
 CEDAR_AUX_SINGLETON(Log);
+//!@endcond
 
 #endif // CEDAR_AUX_LOG_H
 

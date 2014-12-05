@@ -57,6 +57,8 @@
 // SYSTEM INCLUDES
 #include <QDockWidget>
 #include <set>
+#include <vector>
+#include <string>
 
 
 /*!@brief All settings concerning the currently visible widgets of the ui: sizes, where they are docked and so on.

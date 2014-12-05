@@ -48,9 +48,6 @@ likely to undergo major changes:
 
 known issues
 ============
-  - cedardyn is not properly loaded on some OSs (mainly Windows) when using cedar. If you want to use its
-    content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
-    this plugin to be loaded on every start.
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
   - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
@@ -67,7 +64,7 @@ known issues
 
 Unreleased
 ==========
-  
+
 - cedar::proc
   - The use of (Looped)Triggers has been remodeled completely. They are no longer shown in the architecture. Instead,
     each looped element is, by default, connected to a default trigger that is created automatically. If you want to use
@@ -76,13 +73,26 @@ Unreleased
     There is also a new mode for seeing what steps are connected to what triggers. This can be enabled from the toolbar
     and the menu ("color elements by trigger"). In addition to showing what trigger elements are connected to, hovering
     over a step in this mode will also display in what order it will trigger its subsequent steps.
+
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+Version 4.1.0
+-------------
+
+- cedar::aux
+  - You can now enable grid lines in line plots from the right-click menu.
+- cedar::proc
   - You can now add special widgets to architectures that allow you to define special plots and more. These can be
     opened from the cedar gui, and their layout and contents are read from files. See the "Architecture Widgets"
     tutorial for details on how to use this feature.
   - ElementDeclarations can now provide a ConnectableIconView. This allows users to specify a custom class for
     displaying the icon of a step. Among other things this can be used to change the icon based on the value of a
     parameter. One such example is the static gain, which now changes its color based on the sign of the gain factor.
-    Note, that this is optional, and the default behavior is the same as before.
+    Note, that this is optional, and the default behavior is the same as before. Details on how to implement such a view
+    can be found in the processing framework tutorial.
   - Double-clicking a boost in the boost control widget now shows the boost in the architecture.
   - In the settings of cedar, you can now choose the default plot that opens for 2d matrices.
   - The start/stop buttons of the cedar gui have been remodeled. There is now a start button which, as before starts all
@@ -92,12 +102,10 @@ Unreleased
     architecture as well as the global timer.
   - Added a python plotting script for recorded data (in tools/recordedDataProcessor).
   - Added a trial framework for running experiments with cedar architectures (in the GUI, Tools>Experiments...).
-
-
-Released versions
-=================
-
-The following are the changes made in the release versions.
+  - Plugins can now declare C++ scripts which can be executed from the GUI. These allow running arbitrary code on a
+    processing group. More details can be found in a tutorial in the documentation.
+- cedar::dyn
+  - On Windows, it should no longer be necessary to load this part of cedar as a plugin.
 
 Version 4.0.0
 -------------

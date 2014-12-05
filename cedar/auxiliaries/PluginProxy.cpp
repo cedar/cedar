@@ -215,29 +215,6 @@ std::string cedar::aux::PluginProxy::getPluginNameFromPath(const std::string& pa
 std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& plugin_path) const
 {
   std::string plugin_name = cedar::aux::PluginProxy::getPluginNameFromPath(plugin_path);
-  // plugin_name += ".xml";
-
-  // extract the path only
-  /*boost::filesystem::path plugin_dir(plugin_path);
-  plugin_dir.remove_filename();
-  plugin_dir /= plugin_name;
-
-  if (boost::filesystem::exists(plugin_dir))
-  {
-    return plugin_dir.string();
-  }
-
-  // remove filename and current directory (i.e., cd ..)
-  plugin_dir = plugin_dir.parent_path().parent_path();
-  plugin_dir /= plugin_name;
-  if (boost::filesystem::exists(plugin_dir))
-  {
-    return plugin_dir.string();
-  }
-
-  //!@todo This should throw an exception.
-  return "";
-  */
   
   try
   {
@@ -273,7 +250,7 @@ bool cedar::aux::PluginProxy::canFindPlugin(const std::string& pluginName)
 
 std::string cedar::aux::PluginProxy::findPluginFile(const std::string& fileName)
 {
-  //!@todo This is more of an ad-hoc solution, the proper way would be to remove the same stuff at the end of the path as elsewhere in the plugin finding process, i.e., "build", "Debug" and "Release"
+  //!@todo Use cedar::aux::Path for this whole affair.
   // first, find the name of the plugin; it is the first element of the path
   std::string plugin_name, path, full_path, plugin_base_path, throw_away;
   cedar::aux::splitFirst(fileName, "/", plugin_name, path);

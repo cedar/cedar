@@ -43,7 +43,7 @@
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/sources/Boost.h"
 #include "cedar/processing/Group.h"
-#include "cedar/processing/NetworkPath.h"
+#include "cedar/processing/GroupPath.h"
 #include "cedar/processing/Element.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QHeaderView>
+#include <string>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,7 +119,7 @@ bool cedar::proc::gui::BoostControl::isBoostItem(QTreeWidgetItem* pItem) const
 
 cedar::proc::sources::BoostPtr cedar::proc::gui::BoostControl::findBoostFor(QTreeWidgetItem* pItem) const
 {
-  cedar::proc::NetworkPath path;
+  cedar::proc::GroupPath path;
 
   // traverse the parents and add them to the path
   QTreeWidgetItem* parent = pItem->parent();

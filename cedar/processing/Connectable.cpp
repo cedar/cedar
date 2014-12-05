@@ -56,6 +56,7 @@
 #endif
 #include <string>
 #include <iostream>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -35,6 +35,7 @@
     <file>steps/gauss_input.svg</file>
     <file>steps/histogram.svg</file>
     <file>steps/mask.svg</file>
+    <file>steps/matrix_transpose.svg</file>
     <file>steps/normalization.svg</file>
     <file>steps/rate_matrix_to_space_code.svg</file>
     <file>steps/rate_to_space_code.svg</file>

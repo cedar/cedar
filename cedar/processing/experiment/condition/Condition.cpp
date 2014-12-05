@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -58,7 +58,18 @@ cedar::proc::experiment::condition::Condition::Condition()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired)
+bool cedar::proc::experiment::condition::Condition::checkValidity
+(
+  std::vector<std::string>& /* errors */,
+  std::vector<std::string>& /* warnings */
+)
+const
+{
+  // by default, conditions are just valid
+  return true;
+}
+
+bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired) const
 {
   if (this->mHasFired && skipIfFired)
   {
@@ -70,6 +81,11 @@ bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired)
     this->mHasFired = true;
   }
   return v;
+}
+
+bool cedar::proc::experiment::condition::Condition::initialCheck() const
+{
+  return false;
 }
 
 void cedar::proc::experiment::condition::Condition::reset()
