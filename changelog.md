@@ -64,7 +64,17 @@ known issues
 
 Unreleased
 ==========
-  
+
+  ---
+
+Released versions
+=================
+
+The following are the changes made in the release versions.
+
+Version 4.1.0
+-------------
+
 - cedar::aux
   - You can now enable grid lines in line plots from the right-click menu.
 - cedar::proc
@@ -89,12 +99,6 @@ Unreleased
     processing group. More details can be found in a tutorial in the documentation.
 - cedar::dyn
   - On Windows, it should no longer be necessary to load this part of cedar as a plugin.
-
-
-Released versions
-=================
-
-The following are the changes made in the release versions.
 
 Version 4.0.0
 -------------
