@@ -46,76 +46,8 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/NetworkPath.fwd.h"
 
+#warning The class NetworkPath was renamed to GroupPath. Please change your includes.
+
 // SYSTEM INCLUDES
-
-
-/*!@todo describe.
- *
- * @todo describe more.
- *
- * @todo Rename to GroupPath
- */
-class cedar::proc::NetworkPath : public cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> >
-{
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> > PathType;
-  typedef PathType::StringType String;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // constructors and destructor
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief The standard constructor.
-  NetworkPath();
-
-  //! Constructor that takes a string.
-  NetworkPath(const String& path);
-
-  //!@brief Constructor accepting a c string
-  NetworkPath(const char* path);
-
-  //!@brief Constructor accepting a dot-separated path
-  NetworkPath(const PathType&);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // public methods
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
-}; // class cedar::proc::NetworkPath
-
 #endif // CEDAR_PROC_NETWORK_PATH_H
 

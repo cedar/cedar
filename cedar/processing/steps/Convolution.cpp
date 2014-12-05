@@ -202,7 +202,7 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     }
 
     this->mOutput->copyAnnotationsFrom(this->mMatrix);
-    //!@todo This is only correct when the mode of the convolution is "same:
+    //!@todo This is only correct when the mode of the convolution is "same":
     this->mOutput->setData(this->mMatrix->getData().clone());
 
     this->inputDimensionalityChanged();

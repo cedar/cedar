@@ -53,8 +53,6 @@
 #include <map>
 
 /*!@brief Manages declarations of group templates.
- *
- * @todo describe more.
  */
 class cedar::proc::GroupDeclarationManager
 {

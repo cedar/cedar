@@ -52,8 +52,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::experiment::StepPropertyParameter::StepPropertyParameter(
-    cedar::aux::Configurable *pOwner, const std::string& name)
+cedar::proc::experiment::StepPropertyParameter::StepPropertyParameter
+(
+  cedar::aux::Configurable* pOwner,
+  const std::string& name
+)
 :
 cedar::aux::Parameter(pOwner, name, false)
 ,
@@ -224,8 +227,6 @@ void cedar::proc::experiment::StepPropertyParameter::makeDefault()
 {
   this->mElement.reset();
   this->setParameterPath("");
-  //!@todo Is this right? Should restoring the default change the type of this object?
-  this->mType = PARAMETER_VALUE;
 }
 
 void cedar::proc::experiment::StepPropertyParameter::copyValueFrom(cedar::aux::ConstParameterPtr other)
@@ -372,7 +373,6 @@ cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getPara
     return cedar::aux::ParameterPtr();
   }
   return cedar::aux::ParameterPtr();
-  //!@todo catch parameter not found exception
 }
 
 cedar::aux::ParameterPtr cedar::proc::experiment::StepPropertyParameter::getParameterCopy() const
@@ -522,7 +522,6 @@ std::vector<std::string> cedar::proc::experiment::StepPropertyParameter::getList
     }
     catch (cedar::aux::UnknownTypeException e)
     {
-       //!@todo handle this!
     }
   }
   return list;

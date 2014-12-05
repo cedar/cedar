@@ -22,42 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LogFile.fwd.h
+    File:        GroupPath.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 08
+    Date:        2014 12 05
 
-    Description: Forward declaration file for the class cedar::aux::LogFile.
+    Description: Forward declaration file for the class cedar::proc::NetworkPath.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_LOG_FILE_FWD_H
-#define CEDAR_AUX_LOG_FILE_FWD_H
+#ifndef CEDAR_PROC_GROUP_PATH_FWD_H
+#define CEDAR_PROC_GROUP_PATH_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
-#ifndef Q_MOC_RUN
-  #include <boost/smart_ptr.hpp>
-#endif // Q_MOC_RUN
+#include <boost/smart_ptr.hpp>
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
-  namespace aux
+  namespace proc
   {
-    CEDAR_DECLARE_AUX_CLASS(LogFile);
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_PROC_CLASS(GroupPath);
+    //!@endcond
   }
 }
 
-//!@endcond
 
-#endif // CEDAR_AUX_LOG_FILE_FWD_H
+#endif // CEDAR_PROC_GROUP_PATH_FWD_H
 

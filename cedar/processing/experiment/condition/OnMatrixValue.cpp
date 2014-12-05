@@ -114,7 +114,7 @@ bool cedar::proc::experiment::condition::OnMatrixValue::checkValidity(std::vecto
   }
 }
 
-bool cedar::proc::experiment::condition::OnMatrixValue::check()
+bool cedar::proc::experiment::condition::OnMatrixValue::check() const
 {
   if (cedar::aux::ConstDataPtr data = _stepData->getData())
   {

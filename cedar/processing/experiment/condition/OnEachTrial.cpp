@@ -76,12 +76,12 @@ cedar::proc::experiment::condition::OnEachTrial::OnEachTrial()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-bool cedar::proc::experiment::condition::OnEachTrial::check()
+bool cedar::proc::experiment::condition::OnEachTrial::check() const
 {
   return false;
 }
 
-bool cedar::proc::experiment::condition::OnEachTrial::initialCheck()
+bool cedar::proc::experiment::condition::OnEachTrial::initialCheck() const
 {
   return true;
 }

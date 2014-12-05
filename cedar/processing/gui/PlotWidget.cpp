@@ -739,7 +739,7 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   auto serialized_data_list = node.get_child("data_list");
   cedar::proc::ElementDeclaration::DataList data_list;
   
-  for(auto data_item : serialized_data_list)
+  for (auto data_item : serialized_data_list)
   {
     auto p_plot_data = cedar::proc::PlotDataPtr(new cedar::proc::PlotData());
     p_plot_data->readConfiguration(data_item.second);

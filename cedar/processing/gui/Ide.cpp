@@ -1694,7 +1694,6 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
 
   this->mpProcessingDrawer->getScene()->setGroup(group);
-  this->mGroup->addElementsToScene();
   this->mpPropertyTable->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 

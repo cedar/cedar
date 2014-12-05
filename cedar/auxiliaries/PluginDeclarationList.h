@@ -81,8 +81,6 @@
  * if your plugin binary is located in /home/you/src/MyPluginLib/build/libMyPlugin.so, then the plugin description file can
  * be either /home/you/src/MyPluginLib/build/MyPlugin.xml or /home/you/src/MyPluginLib/MyPlugin.xml.
  *
- * @todo This should be made clearer; also, this is mixed with functionality in cedar::proc::PluginProxy
- *
  * The contents of the file should look like this:
  * @code
 <?xml version="1.0" encoding="UTF-8" ?>

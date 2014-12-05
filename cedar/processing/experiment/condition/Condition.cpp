@@ -69,7 +69,7 @@ const
   return true;
 }
 
-bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired)
+bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired) const
 {
   if (this->mHasFired && skipIfFired)
   {
@@ -83,7 +83,7 @@ bool cedar::proc::experiment::condition::Condition::runCheck(bool skipIfFired)
   return v;
 }
 
-bool cedar::proc::experiment::condition::Condition::initialCheck()
+bool cedar::proc::experiment::condition::Condition::initialCheck() const
 {
   return false;
 }

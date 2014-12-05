@@ -655,7 +655,6 @@ void cedar::proc::Trigger::updateTriggeringOrderRecurseUpSource(cedar::proc::sou
 
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
-  //!@todo Remove debug outputs here
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   QReadLocker lock(this->mTriggeringOrder.getLockPtr());
@@ -700,12 +699,6 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
   {
     this->mListeners.member().push_back(triggerable);
     triggerable->triggeredBy(this_ptr);
-    
-    //!@todo Can this be removed (because MultiTriggers don't exist anymore)
-    if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(triggerable))
-    {
-      trigger->notifyConnected(this_ptr);
-    }
 
     lock.unlock();
     std::set<cedar::proc::Trigger*> visited;
@@ -733,10 +726,6 @@ void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
   iter = this->find(triggerable);
   if (iter != this->mListeners.member().end())
   {
-    if (cedar::proc::Trigger* trigger = dynamic_cast<cedar::proc::Trigger*>(triggerable))
-    {
-      trigger->notifyDisconnected(this_ptr);
-    }
     this->mListeners.member().erase(iter);
     triggerable->noLongerTriggeredBy(this_ptr);
 
@@ -744,14 +733,6 @@ void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
     std::set<cedar::proc::Trigger*> visited;
     this->updateTriggeringOrder(visited);
   }
-}
-
-void cedar::proc::Trigger::notifyConnected(cedar::proc::TriggerPtr /* trigger */)
-{
-}
-
-void cedar::proc::Trigger::notifyDisconnected(cedar::proc::TriggerPtr /* trigger */)
-{
 }
 
 std::vector<cedar::proc::TriggerablePtr>::iterator cedar::proc::Trigger::find(cedar::proc::Triggerable* triggerable)

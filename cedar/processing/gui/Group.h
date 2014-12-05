@@ -96,10 +96,10 @@ public:
   //!@brief write group to file
   void write() const;
 
-  //!@brief write group to file given by destination
+  //!@brief write group to file given by destination (replaced by writeJson)
   CEDAR_DECLARE_DEPRECATED(void write(const std::string& destination) const);
 
-  //!@brief read group from given file
+  //!@brief read group from given file (replaced by readJson)
   CEDAR_DECLARE_DEPRECATED(void read(const std::string& source));
 
   //!@brief write configuration to path
@@ -118,9 +118,6 @@ public:
   /*!@brief access the underlying cedar::proc::Group
    */
   cedar::proc::ConstGroupPtr getGroup() const;
-
-  //!@brief add all elements contained in this group to the scene
-  void addElementsToScene();
 
   //!@brief get the current file, to which the group configuration can be saved
   const std::string& getFileName() const;

@@ -95,12 +95,12 @@ bool cedar::proc::experiment::condition::OnTrialNumber::checkValidity(std::vecto
   return true;
 }
 
-bool cedar::proc::experiment::condition::OnTrialNumber::check()
+bool cedar::proc::experiment::condition::OnTrialNumber::check() const
 {
   return false;
 }
 
-bool cedar::proc::experiment::condition::OnTrialNumber::initialCheck()
+bool cedar::proc::experiment::condition::OnTrialNumber::initialCheck() const
 {
   Experiment* p_experiment = cedar::proc::experiment::SupervisorSingleton::getInstance()->getExperiment();
   auto current_trial = p_experiment->getCurrentTrial();

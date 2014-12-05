@@ -71,7 +71,6 @@
 
 /*!@brief An interface for classes that can store and load parameters from files.
  *
- * @todo Lock this class -- accessing the parameter list is currently not thread safe.
  */
 class cedar::aux::Configurable : public boost::noncopyable
 {

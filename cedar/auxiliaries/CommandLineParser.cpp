@@ -502,7 +502,6 @@ void cedar::aux::CommandLineParser::parse(int argc, char* argv[], bool terminati
           else
           {
             // series of short names
-            //!@todo Only accept series if there's no value-expecting one in there
             for (size_t i = 1; i < string.size(); ++i)
             {
               char short_name = string.at(i);
@@ -676,7 +675,6 @@ void cedar::aux::CommandLineParser::writeHelp(std::ostream& stream) const
 {
   if (this->mArguments.size() > 0)
   {
-    //!@todo also append free-floating values, if allowed.
     stream << "Usage: " << this->mArguments.front() << " [options]" << std::endl << std::endl;
   }
 

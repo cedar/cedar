@@ -147,9 +147,6 @@ public:
   //!@brief is this a mandatory connection? i.e. there must be at least one connection using this slot
   bool isMandatory() const;
 
-  //!@brief typo version of getValidity() const
-  CEDAR_DECLARE_DEPRECATED(VALIDITY getValidlity() const);
-
   //!@brief get the current validity of this slot
   virtual VALIDITY getValidity() const;
 
@@ -266,9 +263,6 @@ private:
 
   //! Returns the type check function object for this slot.
   const TypeCheckFunction& getCheck() const;
-
-  //!@brief deprecated due to bad name, see resetParentPointer
-  CEDAR_DECLARE_DEPRECATED(void deleteParentPointer());
 
   //!@brief sets the parent pointer to NULL
   void resetParentPointer();

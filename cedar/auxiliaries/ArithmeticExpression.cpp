@@ -106,7 +106,7 @@ cedar::aux::ArithmeticExpressionPtr cedar::aux::ArithmeticExpression::solveFor(c
   // To solve equations, we need a left and right side
   if (!this->mLeft && !this->mRight)
   {
-    CEDAR_THROW(cedar::aux::ArithmeticExpressinError, "Cannot solve equation: need both a left- and righ hand side.");
+    CEDAR_THROW(cedar::aux::ArithmeticExpressionException, "Cannot solve equation: need both a left- and righ hand side.");
   }
 
   auto left = boost::dynamic_pointer_cast<Expression>(this->mLeft->clone());
@@ -273,11 +273,11 @@ double cedar::aux::ArithmeticExpression::evaluate(const Variables& variables) co
   // cannot evaluate if the equation has two sides because more information is needed
   if (!this->mLeft)
   {
-    CEDAR_THROW(cedar::aux::ArithmeticExpressinError, "Cannot evaluate: need a left-hand side.");
+    CEDAR_THROW(cedar::aux::ArithmeticExpressionException, "Cannot evaluate: need a left-hand side.");
   }
   if (this->mRight)
   {
-    CEDAR_THROW(cedar::aux::ArithmeticExpressinError, "Cannot evaluate if a right-hand side is present.");
+    CEDAR_THROW(cedar::aux::ArithmeticExpressionException, "Cannot evaluate if a right-hand side is present.");
   }
   return this->mLeft->evaluate(variables);
 }
@@ -1106,7 +1106,7 @@ std::vector<cedar::aux::ArithmeticExpression::Token>
           default:
             if (state == InConstant)
             {
-              CEDAR_THROW(cedar::aux::ArithmeticExpressinError, "Cannot evaluate if a right-hand side is present.");
+              CEDAR_THROW(cedar::aux::ArithmeticExpressionException, "Cannot evaluate if a right-hand side is present.");
             }
             else
             {

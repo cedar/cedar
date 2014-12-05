@@ -218,7 +218,6 @@ void cedar::aux::StackTrace::init(CONTEXT* context)
     machine_type = IMAGE_FILE_MACHINE_I386;
     break;
   default:
-    //!@todo Throw an exception.
     return;
   }
   STACKFRAME64 stack_frame;
