@@ -110,7 +110,7 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     //! return the current counter of steps
     unsigned long getNumberOfSteps();
 
-    //!@todo: needs documentation. I don't get it. js
+    //! return the maximum of skipped steps
     double getMaxStepsTaken();
 
   private:
@@ -124,7 +124,7 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     unsigned long mNumberOfSteps;
     //!@brief
     double mSumOfStepsTaken;
-    //!@brief
+    //!@brief the maximum number of skipped steps, ever!
     double mMaxStepsTaken;
 
     //! Used for multiplying all step times.

@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2012 02 14
 
-    Description: Implements all unit tests for the @em cedar::aux::LogFile class.
+    Description: Implements all unit tests for the @em cedar::aux::Log class.
 
     Credits:
 

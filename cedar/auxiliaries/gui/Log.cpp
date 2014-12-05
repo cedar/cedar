@@ -143,7 +143,6 @@ void cedar::aux::gui::Log::outdateAllMessages(QTableWidget* pPane)
 {
   int threshold = 200;
 
-  //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
   for (int i = 0; i < pPane->rowCount(); ++i)
   {
     this->setMessageCurrentness(pPane, i, threshold);
@@ -164,7 +163,6 @@ void cedar::aux::gui::Log::updatePaneCurrentness(QTableWidget* pPane)
     pPane->removeRow(0);
   }
 
-  //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
   for (int i = 0; i < pPane->rowCount(); ++i)
   {
     int currentness = this->getMessageCurrentness(pPane, i);

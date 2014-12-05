@@ -55,7 +55,6 @@
 
 /*!@brief A manager for different types of plots
  *
- * @todo Merge this class with some more generalized structure in cedar::aux.
  */
 class cedar::aux::gui::PlotManager
 {

@@ -53,8 +53,6 @@
 
 
 /*!@brief Defines a template group, which can be found in a given file.
- *
- * @todo describe more.
  */
 class cedar::proc::GroupDeclaration : public cedar::aux::PluginDeclaration, public boost::enable_shared_from_this<cedar::proc::GroupDeclaration>
 {

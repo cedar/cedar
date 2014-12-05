@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
-#include "cedar/processing/NetworkPath.h"
+#include "cedar/processing/GroupPath.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
@@ -303,7 +303,7 @@ public:
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<T> getElement(const cedar::proc::NetworkPath& name)
+  boost::shared_ptr<T> getElement(const cedar::proc::GroupPath& name)
   {
     return boost::dynamic_pointer_cast<T>(this->getElement(name));
   }
@@ -311,7 +311,7 @@ public:
   /*!@brief Returns the element with the given name as a const pointer of the specified type.
    */
   template <class T>
-  boost::shared_ptr<const T> getElement(const cedar::proc::NetworkPath& name) const
+  boost::shared_ptr<const T> getElement(const cedar::proc::GroupPath& name) const
   {
     return boost::dynamic_pointer_cast<const T>(this->getElement(name));
   }
@@ -320,13 +320,13 @@ public:
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ElementPtr getElement(const cedar::proc::NetworkPath& name);
+  cedar::proc::ElementPtr getElement(const cedar::proc::GroupPath& name);
 
   /*!@brief  Returns a const pointer to the element with the given name.
    *
    * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
-  cedar::proc::ConstElementPtr getElement(const cedar::proc::NetworkPath& name) const;
+  cedar::proc::ConstElementPtr getElement(const cedar::proc::GroupPath& name) const;
 
   /*!@brief Connects data slots of two cedar::proc::Connectable elements.
    *
@@ -521,7 +521,7 @@ public:
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
   //!@brief Checks whether a name exists in the group.
-  bool nameExists(const cedar::proc::NetworkPath& name) const;
+  bool nameExists(const cedar::proc::GroupPath& name) const;
 
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()

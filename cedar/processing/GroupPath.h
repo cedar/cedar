@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,60 +22,71 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LogFile.h
+    File:        GroupPath.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 27
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 12 05
 
-    Description: Header for the \em cedar::aux::LogFile class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_LOG_FILE_H
-#define CEDAR_AUX_LOG_FILE_H
+#ifndef CEDAR_PROC_GROUP_PATH_H
+#define CEDAR_PROC_GROUP_PATH_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/namespace.h"
+#include "cedar/auxiliaries/PathTemplate.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/LogFile.fwd.h"
+#include "cedar/processing/GroupPath.fwd.h"
 
 // SYSTEM INCLUDES
-#include <fstream>
-#include <string>
 
-/*!@brief A class for logging messages in a file.
- *
- * @todo Port this to the new logging framework or remove it.
+
+/*!@brief a dot-separated path to an element nested in a group
  */
-class cedar::aux::LogFile : public std::ofstream
+class cedar::proc::GroupPath : public cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> >
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> > PathType;
+  typedef PathType::StringType String;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  LogFile(const std::string& logFileName);
+  //!@brief The standard constructor.
+  GroupPath();
 
-  //!@brief Destructor
-  virtual ~LogFile();
+  //! Constructor that takes a string.
+  GroupPath(const String& path);
+
+  //!@brief Constructor accepting a c string
+  GroupPath(const char* path);
+
+  //!@brief Constructor accepting a dot-separated path
+  GroupPath(const PathType&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Adds a separator line to the log file.
-  void addSeparatorLine();
-  //!@brief Adds a time stamp to the log file, without linefeed.
-  void addTimeStamp();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -90,6 +101,17 @@ protected:
   // none yet
 private:
   // none yet
-}; // class cedar::aux::LogFile
 
-#endif // CEDAR_AUX_LOG_FILE_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::GroupPath
+
+#endif // CEDAR_PROC_GROUP_PATH_H
+

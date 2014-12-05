@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/testingUtilities/devices/TestGrabber.h"
 
 // PROJECT INCLUDES

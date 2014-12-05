@@ -36,7 +36,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

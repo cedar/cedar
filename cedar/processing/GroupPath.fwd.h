@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,35 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        GroupPath.fwd.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 27
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 12 05
 
-    Description: Implements all unit tests for the @em cedar::aux::LogFile class.
+    Description: Forward declaration file for the class cedar::proc::NetworkPath.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
+#ifndef CEDAR_PROC_GROUP_PATH_FWD_H
+#define CEDAR_PROC_GROUP_PATH_FWD_H
 
-// PROJECT INCLUDES
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+// CEDAR INCLUDES
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
-#include <string>
+#include <boost/smart_ptr.hpp>
 
-int main()
+namespace cedar
 {
-  cedar::aux::LogFile logFile("test.log");
-
-  logFile.addTimeStamp();
-  logFile << "This is a test log file entry.\n";
-  logFile.addSeparatorLine();
-
-  logFile.close();
-
-  return 0;
+  namespace proc
+  {
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_PROC_CLASS(GroupPath);
+    //!@endcond
+  }
 }
+
+
+#endif // CEDAR_PROC_GROUP_PATH_FWD_H
+

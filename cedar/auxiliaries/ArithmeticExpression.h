@@ -404,7 +404,7 @@ public:
   //! Removes the contents of the equation.
   void clear();
 
-  //!@todo Return mat, use mat in variables?
+  //! Evaluates the expression given the values for all variables
   double evaluate(const Variables& variableValues = (Variables())) const;
 
   //! Returns the left-hand side of the expression.

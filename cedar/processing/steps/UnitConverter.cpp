@@ -185,6 +185,5 @@ void cedar::proc::steps::UnitConverter::compute(const cedar::proc::Arguments&)
   }
   else
   {
-    //!@todo
   }
 }

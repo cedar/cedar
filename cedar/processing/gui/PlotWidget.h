@@ -120,7 +120,7 @@ namespace cedar
 }
 //!@endcond
 
-/*!@todo Document this.
+/*!@brief a widget for plots
  */
 class cedar::proc::gui::PlotWidget : public QWidget
 {

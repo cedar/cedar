@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
+#include "cedar/processing/GroupPath.fwd.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -50,17 +51,11 @@ namespace cedar
 {
   namespace proc
   {
-    //!@todo The actual class should be called GroupPath
-
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_PROC_CLASS(NetworkPath);
-
-    typedef NetworkPath GroupPath;
-    CEDAR_GENERATE_POINTER_TYPES(GroupPath);
+    CEDAR_DECLARE_DEPRECATED(typedef cedar::proc::GroupPath NetworkPath);
     //!@endcond
   }
 }
-
 
 #endif // CEDAR_PROC_NETWORK_PATH_FWD_H
 

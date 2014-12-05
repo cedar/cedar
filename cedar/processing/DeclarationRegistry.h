@@ -46,7 +46,6 @@
 #include "cedar/auxiliaries/assert.h"
 
 // FORWARD DECLARATIONS
-//!@todo The next two includes should probably be forward declaration includes.
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/DeclarationManagerTemplate.h"
 #include "cedar/processing/Element.fwd.h"

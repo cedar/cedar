@@ -88,8 +88,6 @@ namespace cedar
   }
 }
 
-//!@todo These functions should probably be in the appropriate header for the given parameters (e.g., LengthParameter.h)
-
 namespace cedar
 {
   namespace aux
@@ -303,9 +301,10 @@ namespace cedar
           unit_str = getDefaultUnit<T>();
         }
 
-        //!@todo Proper exceptions
-        CEDAR_ASSERT(!number_str.empty());
-        CEDAR_ASSERT(!unit_str.empty());
+        if (number_str.empty() || unit_str.empty())
+        {
+          CEDAR_THROW(cedar::aux::InvalidValueException, "Could not extract unit or value from string \"" + str + "\".");
+        }
 
         // normalize the white space in the unit
         unit_str = cedar::aux::regexReplace(unit_str, "\\s+", " ");

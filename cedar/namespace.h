@@ -38,7 +38,6 @@
 #define CEDAR_NAMESPACE_H
 
 // CEDAR INCLUDES
-//#include "cedar/defines.h" // \todo it might not be a clean design to include this here, any suggestions?
 
 // SYSTEM INCLUDES
 

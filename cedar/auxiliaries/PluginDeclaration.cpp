@@ -141,8 +141,6 @@ std::string cedar::aux::PluginDeclaration::getNamespaceName() const
 
 void cedar::aux::PluginDeclaration::read(const cedar::aux::ConfigurationNode& node)
 {
-  //!@todo Read deprecated names etc. from here.
-
   // read custom information
   this->customRead(node);
 }

@@ -47,8 +47,6 @@
 
 
 /*!@brief An interface for classes that redirect log outputs.
- *
- * @todo describe more.
  */
 class cedar::aux::LogInterface
 {

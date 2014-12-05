@@ -221,7 +221,6 @@ void cedar::proc::Step::callAction(const std::string& name)
   if (autolock)
   {
     // lock the step
-    //!@todo Should this be a read lock?
     locker = cedar::aux::Lockable::WriteLockerPtr(new cedar::aux::Lockable::WriteLocker(this));
   }
 
