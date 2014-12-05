@@ -136,24 +136,6 @@ public:
     return this->mValue;
   }
 
-  //!@brief Old version of the set function.
-  CEDAR_DECLARE_DEPRECATED(void set(const std::string& value))
-  {
-    this->setValue(value);
-  }
-
-  //!@brief Old version of the set function.
-  CEDAR_DECLARE_DEPRECATED(void set(const QDir& value))
-  {
-    this->setValue(value);
-  }
-
-  //!@brief Old version of the get function.
-  CEDAR_DECLARE_DEPRECATED(const QDir& get())
-  {
-    return this->getValue();
-  }
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

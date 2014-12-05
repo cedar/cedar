@@ -79,26 +79,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::Step::Step(bool /*runInThread*/, bool isLooped)
-:
-Triggerable(isLooped),
-// initialize parameters
-mAutoLockInputsAndOutputs(true)
-{
-  this->mComputeTimeId = this->registerTimeMeasurement("compute call");
-  this->mLockingTimeId = this->registerTimeMeasurement("locking");
-  this->mRoundTimeId = this->registerTimeMeasurement("round time");
-
-  // create the finished trigger singleton.
-  this->getFinishedTrigger();
-
-  // When the name changes, we need to tell the manager about this.
-  QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
-
-  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
-}
-
 cedar::proc::Step::Step(bool isLooped)
 :
 Triggerable(isLooped),
@@ -609,16 +589,6 @@ bool cedar::proc::Step::isRecorded() const
       }
     }
   }
-  return false;
-}
-
-void cedar::proc::Step::setThreaded(bool /*isThreaded*/)
-{
-  // does nothing
-}
-
-bool cedar::proc::Step::isThreaded() const
-{
   return false;
 }
 

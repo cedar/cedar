@@ -1485,11 +1485,6 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
   return modified_name;
 }
 
-std::string cedar::proc::Group::getUniqueName(const std::string& unmodifiedName) const
-{
-  return this->getUniqueIdentifier(unmodifiedName);
-}
-
 cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::NetworkPath& name) const
 {
   ElementMap::const_iterator iter;

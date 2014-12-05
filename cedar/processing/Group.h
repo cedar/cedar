@@ -300,11 +300,6 @@ public:
    */
   std::string duplicate(const std::string& elementName, const std::string& newName = "");
 
-  /*!@brief unmodifiedName unmodified name, possibly non-unique in group
-   * @return unique name created by attaching a number if name is already taken
-   */
-  CEDAR_DECLARE_DEPRECATED(std::string getUniqueName(const std::string& unmodifiedName) const);
-
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
@@ -461,12 +456,6 @@ public:
 
   //! Recursively lists all elements in the group and all its subgroups.
   std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
-
-  //!@deprecated Use getElements instead.
-  CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
-  {
-    return this->getElements();
-  }
 
   /*!@brief Updates the name stored for the object.
    */

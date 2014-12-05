@@ -72,8 +72,3 @@ const cedar::aux::gui::MultiPlotInterface::DataMap& cedar::aux::gui::MultiPlotIn
 {
   return this->mDataMap;
 }
-
-const cedar::aux::gui::MultiPlotInterface::DataMap& cedar::aux::gui::MultiPlotInterface::getDataMap() const
-{
-  return this->getDataTitleMap();
-}

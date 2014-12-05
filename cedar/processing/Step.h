@@ -185,10 +185,6 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // this constructor is deprecated because steps are no longer executed in their own thread
-  //!@brief A deprecated constructor. Do not use it anymore!
-  CEDAR_DECLARE_DEPRECATED(Step(bool runInThread, bool isLooped));
-
   //!@brief The standard constructor.
   Step(bool isLooped = false);
 
@@ -213,22 +209,6 @@ public:
          cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
          cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
        );
-
-  /*!@brief Sets the arguments used by the next execution of the run function.
-   */
-//  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments, bool triggerSubsequent);
-
-  /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
-   *        the source of the trigger signal.
-   *        This function is deprecated because steps are not executed in their own thread anymore.
-   */
-  CEDAR_DECLARE_DEPRECATED(void setThreaded(bool isThreaded));
-
-  /*!@brief States if a step is executed as its own thread, or if the run() function is called in the same thread as
-   *        the source of the trigger signal.
-   *        This function is deprecated because steps are not executed in their own thread anymore.
-   */
-  CEDAR_DECLARE_DEPRECATED(bool isThreaded() const);
 
   //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
