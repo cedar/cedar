@@ -49,8 +49,6 @@
 
 
 /*!@brief A lightweight convenience class for grouping a class member with a lock.
- *
- * @todo Use this in cedar::aux::Data?
  */
 template <typename T, class LockType>
 class cedar::aux::LockableMember
