@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -50,6 +50,7 @@
 #include "cedar/processing/experiment/Experiment.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief An abstract class for all the derived Action classes.
@@ -59,8 +60,9 @@ class cedar::proc::experiment::action::Action : public cedar::aux::Configurable
 {
 public:
 
-	//!@brief a parameter for action sequence objects
+	//!@brief a parameter for a list of action objects
 	typedef cedar::aux::ObjectListParameterTemplate<cedar::proc::experiment::action::Action> ActionListParameter;
+	//!@brief a parameter for action objects
 	typedef cedar::aux::ObjectParameterTemplate<cedar::proc::experiment::action::Action> ActionParameter;
 
 	//!@cond SKIPPED_DOCUMENTATION
@@ -91,6 +93,11 @@ public:
 
   //! Called after an experiment is stopped.
   virtual void postExperiment();
+
+  /*! Reimplement this to check the validity of the action. Return true if the action is valid. If false is returned, an
+   *  inforative message should be added to the @em errors vector.
+   */
+  virtual bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

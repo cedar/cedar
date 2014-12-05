@@ -51,8 +51,6 @@
 
 
 /*!@brief A parameter that reads a list of configurable objects from a file.
- *
- * @todo Should BaseType include the pointer type?
  */
 template <class BaseType>
 class cedar::aux::ObjectListParameterTemplate : public cedar::aux::ObjectListParameter
@@ -99,8 +97,6 @@ public:
 
     this->makeDefault();
   }
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -182,6 +178,14 @@ public:
    * @remarks This method must be overridden because ConfigurablePtr and BaseTypePtr are not considered covariant types.
    */
   cedar::aux::ConfigurablePtr configurableAt(size_t index)
+  {
+    return this->at(index);
+  }
+
+  /*!
+   * @remarks This method must be overridden because ConfigurablePtr and BaseTypePtr are not considered covariant types.
+   */
+  cedar::aux::ConstConfigurablePtr configurableAt(size_t index) const
   {
     return this->at(index);
   }

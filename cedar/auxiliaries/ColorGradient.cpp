@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QMutex>
+#include <QMutexLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -70,6 +72,26 @@ void cedar::aux::ColorGradient::StandardGradients::construct()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+#ifdef CEDAR_USE_QWTPLOT3D
+Qwt3D::StandardColor cedar::aux::ColorGradient::toQwt3DStandardColor(size_t steps) const
+{
+  Qwt3D::StandardColor col;
+  std::vector<Qwt3D::RGBA> qwt_colors;
+  qwt_colors.resize(steps);
+  for (size_t i = 0; i < steps; ++i)
+  {
+    double step = static_cast<double>(i) / static_cast<double>(steps - 1); // - 1 because we want to reach the last color
+    QColor color = this->getColor(step);
+    qwt_colors.at(i).r = static_cast<double>(color.redF());
+    qwt_colors.at(i).g = static_cast<double>(color.greenF());
+    qwt_colors.at(i).b = static_cast<double>(color.blueF());
+    qwt_colors.at(i).a = static_cast<double>(color.alphaF());
+  }
+  col.setColorVector(qwt_colors);
+  return col;
+}
+#endif // CEDAR_USE_QWTPLOT3D
 
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getStandardGradient(const cedar::aux::Enum& id)
 {
@@ -105,17 +127,22 @@ const std::map<double, QColor>& cedar::aux::ColorGradient::getStops() const
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getDefaultPlotColorJet()
 {
   static cedar::aux::ColorGradientPtr gradient;
-  //!@todo Locking?
   if (!gradient)
   {
-    gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
+    static QMutex lock;
+    QMutexLocker locker(&lock);
+    // the additional check makes sure the pointer is only created once (another thread might have hit the same code)
+    if (!gradient)
+    {
+      gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
 
-    gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.5));
-    gradient->setStop(0.125, QColor::fromRgbF(0.0, 0.0, 1.0));
-    gradient->setStop(0.375, QColor::fromRgbF(0.0, 1.0, 1.0));
-    gradient->setStop(0.625, QColor::fromRgbF(1.0, 1.0, 0.0));
-    gradient->setStop(0.875, QColor::fromRgbF(1.0, 0.0, 0.0));
-    gradient->setStop(1.000, QColor::fromRgbF(0.5, 0.0, 0.0));
+      gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.5));
+      gradient->setStop(0.125, QColor::fromRgbF(0.0, 0.0, 1.0));
+      gradient->setStop(0.375, QColor::fromRgbF(0.0, 1.0, 1.0));
+      gradient->setStop(0.625, QColor::fromRgbF(1.0, 1.0, 0.0));
+      gradient->setStop(0.875, QColor::fromRgbF(1.0, 0.0, 0.0));
+      gradient->setStop(1.000, QColor::fromRgbF(0.5, 0.0, 0.0));
+    }
   }
 
   return gradient;
@@ -124,13 +151,18 @@ cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getDefaultPlotColorJet()
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotGrayColorJet()
 {
   static cedar::aux::ColorGradientPtr gradient;
-  //!@todo Locking?
   if (!gradient)
   {
-    gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
+    static QMutex lock;
+    QMutexLocker locker(&lock);
+    // the additional check makes sure the pointer is only created once (another thread might have hit the same code)
+    if (!gradient)
+    {
+      gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
 
-    gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.0));
-    gradient->setStop(1.000, QColor::fromRgbF(1.0, 1.0, 1.0));
+      gradient->setStop(0.000, QColor::fromRgbF(0.0, 0.0, 0.0));
+      gradient->setStop(1.000, QColor::fromRgbF(1.0, 1.0, 1.0));
+    }
   }
 
   return gradient;
@@ -139,13 +171,18 @@ cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotGrayColorJet()
 cedar::aux::ColorGradientPtr cedar::aux::ColorGradient::getPlotInverseGrayColorJet()
 {
   static cedar::aux::ColorGradientPtr gradient;
-  //!@todo Locking?
   if (!gradient)
   {
-    gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
+    static QMutex lock;
+    QMutexLocker locker(&lock);
+    // the additional check makes sure the pointer is only created once (another thread might have hit the same code)
+    if (!gradient)
+    {
+      gradient = cedar::aux::ColorGradientPtr(new cedar::aux::ColorGradient());
 
-    gradient->setStop(0.000, QColor::fromRgbF(1.0, 1.0, 1.0));
-    gradient->setStop(1.000, QColor::fromRgbF(0.0, 0.0, 0.0));
+      gradient->setStop(0.000, QColor::fromRgbF(1.0, 1.0, 1.0));
+      gradient->setStop(1.000, QColor::fromRgbF(0.0, 0.0, 0.0));
+    }
   }
 
   return gradient;
@@ -157,6 +194,48 @@ void cedar::aux::ColorGradient::setStop(double location, const QColor& color)
   CEDAR_NON_CRITICAL_ASSERT(location <= 1.0);
   this->mGradientColors[location] = color;
   this->updateLookupTable();
+}
+
+QColor cedar::aux::ColorGradient::getColor(double position) const
+{
+  QColor color;
+
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(position >= 0.0);
+  CEDAR_DEBUG_NON_CRITICAL_ASSERT(position <= 1.0);
+
+  // The first element in the map with a key >= gray_f
+  auto upper_it = this->mGradientColors.lower_bound(position);
+
+  if (upper_it == this->mGradientColors.begin())
+  {
+    color = upper_it->second;
+  }
+  else if (upper_it == this->mGradientColors.end())
+  {
+    upper_it--;
+    color = upper_it->second;
+  }
+  else
+  {
+    auto lower_it = upper_it;
+    lower_it--;
+
+    double lower = lower_it->first;
+    double upper = upper_it->first;
+
+    const QColor& lower_col = lower_it->second;
+    const QColor& upper_col = upper_it->second;
+
+    double mix = 0.0;
+    if (lower < upper)
+    {
+      mix = (position - lower) / (upper - lower);
+    }
+    color.setRed((1.0 - mix) * lower_col.red() + mix * upper_col.red());
+    color.setBlue((1.0 - mix) * lower_col.blue() + mix * upper_col.blue());
+    color.setGreen((1.0 - mix) * lower_col.green() + mix * upper_col.green());
+  }
+  return color;
 }
 
 void cedar::aux::ColorGradient::updateLookupTable()
@@ -184,43 +263,7 @@ void cedar::aux::ColorGradient::updateLookupTable()
     else
     {
       double gray_f = static_cast<double>(gray) / static_cast<double>(mLookupTableR.size());
-
-      // The first element in the map with a key >= gray_f
-      auto upper_it = this->mGradientColors.lower_bound(gray_f);
-
-      if (upper_it == this->mGradientColors.begin())
-      {
-        color = upper_it->second;
-      }
-      else if (upper_it == this->mGradientColors.end())
-      {
-        upper_it--;
-        color = upper_it->second;
-      }
-      else
-      {
-        auto lower_it = upper_it;
-        lower_it--;
-
-        double lower = lower_it->first;
-        double upper = upper_it->first;
-
-        const QColor& lower_col = lower_it->second;
-        const QColor& upper_col = upper_it->second;
-
-        double mix = 0.0;
-        if (lower < upper)
-        {
-          mix = (gray_f - lower) / (upper - lower);
-        }
-        else
-        {
-          std::cout << lower << " >= " << upper << " for " << gray_f << std::endl;
-        }
-        color.setRed((1.0 - mix) * lower_col.red() + mix * upper_col.red());
-        color.setBlue((1.0 - mix) * lower_col.blue() + mix * upper_col.blue());
-        color.setGreen((1.0 - mix) * lower_col.green() + mix * upper_col.green());
-      }
+      color = this->getColor(gray_f);
     }
 
     this->mLookupTableR[gray] = static_cast<char>(color.red());

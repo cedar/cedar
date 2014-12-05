@@ -49,6 +49,7 @@ namespace cedar
 {
   namespace aux
   {
+    //! a string parser for unit acceleration
     template <>
     inline cedar::unit::Acceleration
       parseUnitString<cedar::unit::Acceleration::unit_type>(const std::string& unitStr)
@@ -65,8 +66,12 @@ namespace cedar
     }
 
     // Generate types for the length parameter.
+    //! a unit parameter for acceleration
     typedef cedar::aux::UnitParameterTemplate<cedar::unit::Acceleration::unit_type> AccelerationParameter;
+
+    //!@cond SKIIPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(AccelerationParameter);
+    //!@endcond
   }
 }
 

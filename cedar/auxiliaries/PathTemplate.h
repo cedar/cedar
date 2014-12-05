@@ -223,7 +223,7 @@ public:
       CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Invalid start index " + cedar::aux::toString(start) + " in path with " + cedar::aux::toString(this->getElementCount()) + " element(s).");
     }
 
-    if (end >= this->getElementCount())
+    if (end > this->getElementCount())
     {
       CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Invalid end index " + cedar::aux::toString(end) + " in path with " + cedar::aux::toString(this->getElementCount()) + " element(s).");
     }

@@ -49,9 +49,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief a sink for data in a group, passed on to the outside
  *
- * @todo describe more.
+ * @remark this is not meant to be used manually - each group takes care of this when adding/removing connectors
  */
 class cedar::proc::sinks::GroupSink : public cedar::proc::Step
 {

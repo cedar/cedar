@@ -109,7 +109,7 @@ void cedar::aux::Recorder::unregisterData(const std::string& name)
   //throw exception if running
   if (isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption, "Cannot unregister data while Recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot unregister data while Recorder is running");
   }
     
   //!@todo This is redundant with the code below (unregisterData(cedar::aux::ConstDataPtr data)); please remove these
@@ -186,7 +186,7 @@ void cedar::aux::Recorder::clear()
   //throw exception if running
   if (isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot unregister data while Recorder is Running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot unregister data while Recorder is Running");
   }
 
   stop();
@@ -200,7 +200,7 @@ void cedar::aux::Recorder::setRecordedProjectName(const std::string& name)
   //throw exception if running
   if (isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change output directory while recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot change output directory while recorder is running");
   }
 
   this->mProjectName = boost::filesystem::path(name).stem().string();
@@ -216,7 +216,7 @@ void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, cedar:
   //throw exception if running
   if (isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change record inerval while recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException,"Cannot change record inerval while recorder is running");
   }
 
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
@@ -288,9 +288,9 @@ bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data) const
 void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName)
 {
   //throw exception if running
-  if(isRunningNolocking())
+  if (isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot rename data while recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot rename data while recorder is running");
   }
 
   for (unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
@@ -334,18 +334,14 @@ const std::string& cedar::aux::Recorder::getRecorderProjectName()
 void cedar::aux::Recorder::setSubfolder(const std::string& subfolderName)
 {
   //throw exception if running
-  if(isRunningNolocking())
+  if (isRunningNolocking())
   {
-    CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot set ouput directory while recorder is running");
+    CEDAR_THROW(cedar::aux::RecorderException, "Cannot set ouput directory while recorder is running");
   }
 
   this->mSubFolder = subfolderName;
 }
 std::string cedar::aux::Recorder::getTimeStamp()
 {
-#ifdef CEDAR_OS_WINDOWS
-  return QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mmss").toStdString();
-#else // CEDAR_OS_WINDOWS
-   return QDateTime::currentDateTime().toString("yyyy.MM.dd_hh:mm:ss").toStdString();
-#endif // CEDAR_OS_WINDOWS
+  return cedar::aux::Path::getTimestampForFileName();
 }

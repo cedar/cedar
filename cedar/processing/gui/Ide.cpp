@@ -42,6 +42,7 @@
 #include "cedar/processing/experiment/Supervisor.h"
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureWidgetList.h"
+#include "cedar/processing/gui/ArchitectureScriptEditor.h"
 #include "cedar/processing/gui/FindDialog.h"
 #include "cedar/processing/gui/AdvancedParameterLinker.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
@@ -91,6 +92,7 @@
 #include <set>
 #include <list>
 #include <string>
+#include <utility>
 
 //----------------------------------------------------------------------------------------------------------------------
 // nested private classes
@@ -505,10 +507,13 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    this,
                    SLOT(showRecentNotifications()));
 
-  QObject::connect(cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
-                   SIGNAL(experimentRunning(bool)),
-                   this,
-                   SLOT(setSimulationControlsDisabled(bool)));
+  QObject::connect
+  (
+    cedar::proc::experiment::SupervisorSingleton::getInstance().get(),
+    SIGNAL(experimentRunningChanged(bool)),
+    this,
+    SLOT(experimentRunningChanged(bool))
+  );
 
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
@@ -640,11 +645,32 @@ void cedar::proc::gui::Ide::showOpenableDialog()
 
 }
 
-void cedar::proc::gui::Ide::setSimulationControlsDisabled(bool disabled)
+void cedar::proc::gui::Ide::experimentRunningChanged(bool running)
 {
-  this->mpActionStartPauseSimulation->setEnabled(!disabled);
-  this->mpActionResetSimulation->setEnabled(!disabled);
-  this->mpThreadsSingleStep->setEnabled(!disabled);
+  this->setSimulationControlsEnabled(!running);
+  this->setArchitectureSavingLoadingEnabled(!running);
+  this->setRecodringControlsEnabled(!running);
+}
+
+void cedar::proc::gui::Ide::setRecodringControlsEnabled(bool enabled)
+{
+  this->mpActionRecord->setEnabled(enabled);
+  this->mpActionSnapshot->setEnabled(enabled);
+}
+
+void cedar::proc::gui::Ide::setArchitectureSavingLoadingEnabled(bool enabled)
+{
+  this->mpActionSave->setEnabled(enabled);
+  this->mpActionSaveAs->setEnabled(enabled);
+  this->mpActionLoad->setEnabled(enabled);
+  this->mpRecentFiles->setEnabled(enabled);
+}
+
+void cedar::proc::gui::Ide::setSimulationControlsEnabled(bool enabled)
+{
+  this->mpActionStartPauseSimulation->setEnabled(enabled);
+  this->mpActionResetSimulation->setEnabled(enabled);
+  this->mpThreadsSingleStep->setEnabled(enabled);
 }
 
 void cedar::proc::gui::Ide::buildStatusBar()
@@ -1499,7 +1525,7 @@ bool cedar::proc::gui::Ide::saveAs()
     file += ".json";
   }
 
-  this->mGroup->write(file.toStdString());
+  this->mGroup->writeJson(file.toStdString());
   this->displayFilename(file.toStdString());
   this->setArchitectureChanged(false);
   
@@ -1640,7 +1666,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   // read network
   try
   {
-    group->read(file.toStdString());
+    group->readJson(file.toStdString());
   }
   catch(const cedar::proc::ArchitectureLoadingException& e)
   {
@@ -1951,7 +1977,6 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
 
   this->mpProcessingDrawer->getScene()->setGroup(group);
-  this->mGroup->addElementsToScene();
   this->mpPropertyTable->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
@@ -1980,6 +2005,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   );
 
   this->updateArchitectureWidgetsMenu();
+  this->updateArchitectureScriptsMenu();
 
   if (this->mpExperimentDialog != nullptr)
   {
@@ -1994,7 +2020,7 @@ void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
   menu->clear();
 
   auto manage_action = menu->addAction("manage");
-  QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(openManageArchitectureWidgetsDialog()));
+  QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(showManageArchitectureWidgetsDialog()));
   menu->addSeparator();
 
   const auto& plots = this->mGroup->getArchitectureWidgets();
@@ -2013,13 +2039,33 @@ void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
   }
 }
 
-void cedar::proc::gui::Ide::openManageArchitectureWidgetsDialog()
+void cedar::proc::gui::Ide::updateArchitectureScriptsMenu()
+{
+  QMenu* menu = this->mpMenuArchitectureScripts;
+  menu->clear();
+
+  // add an action to open the script manager
+  auto manage_action = menu->addAction("manage");
+  QObject::connect(manage_action, SIGNAL(triggered()), this, SLOT(showManageArchitectureScriptsDialog()));
+  menu->addSeparator();
+
+  // fill the menu with actions defined for the architecture
+  // TODO
+}
+
+void cedar::proc::gui::Ide::showManageArchitectureWidgetsDialog()
 {
   // create a list widget for managing architecture plots
   auto dialog = new cedar::proc::gui::ArchitectureWidgetList(this, this->mGroup);
   dialog->exec();
 
   this->updateArchitectureWidgetsMenu();
+}
+
+void cedar::proc::gui::Ide::showManageArchitectureScriptsDialog()
+{
+  auto dialog = new cedar::proc::gui::ArchitectureScriptEditor(this->mGroup);
+  dialog->show();
 }
 
 void cedar::proc::gui::Ide::architecturePlotActionTriggered()

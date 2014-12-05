@@ -81,12 +81,34 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// anchor type enum class
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::EnumType<cedar::proc::steps::MatrixSlice::AnchorType>
+  cedar::proc::steps::MatrixSlice::AnchorType::mType("cedar::proc::steps::MatrixSlice::AnchorType::");
+
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::proc::steps::MatrixSlice::AnchorType::Id cedar::proc::steps::MatrixSlice::AnchorType::Absolute;
+const cedar::proc::steps::MatrixSlice::AnchorType::Id cedar::proc::steps::MatrixSlice::AnchorType::Center;
+#endif // CEDAR_COMPILER_MSVC
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::steps::MatrixSlice::MatrixSlice()
 :
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+_mAnchorType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "anchor type",
+    cedar::proc::steps::MatrixSlice::AnchorType::typePtr(),
+    cedar::proc::steps::MatrixSlice::AnchorType::Absolute
+  )
+),
 _mRangeLower
 (
   new cedar::aux::UIntVectorParameter
@@ -117,6 +139,7 @@ _mRangeUpper
 
   this->declareOutput("slice", mOutput);
 
+  QObject::connect(this->_mAnchorType.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()));
   QObject::connect(this->_mRangeLower.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()));
   QObject::connect(this->_mRangeUpper.get(), SIGNAL(valueChanged()), this, SLOT(rangeChanged()));
 }
@@ -130,8 +153,10 @@ cv::Range cedar::proc::steps::MatrixSlice::getRange(unsigned int dimension) cons
   cv::Range range;
   CEDAR_ASSERT(dimension < this->_mRangeLower->size());
   CEDAR_ASSERT(dimension < this->_mRangeUpper->size());
+
   range.start = static_cast<int>(this->_mRangeLower->at(dimension));
   range.end = static_cast<int>(this->_mRangeUpper->at(dimension));
+
   return range;
 }
 
@@ -248,6 +273,25 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
 
     int lower = static_cast<int>(this->_mRangeLower->at(output_dimension));
     int upper = static_cast<int>(this->_mRangeUpper->at(output_dimension));
+    int dim_size = input.size[input_dimension];
+
+
+    switch (this->_mAnchorType->getValue())
+    {
+      case AnchorType::Absolute:
+        // nothing to do
+        break;
+
+      case AnchorType::Center:
+      {
+        // here we see "upper" as the size of the region to cut out
+        // "lower" is seen as an offset from the top-left of a center-aligned rectangle of size "upper"
+        int width = upper / 2;
+        lower = dim_size/2 - (upper - width) + lower; // upper - width to avoid issues with integer division
+        upper = dim_size/2 + width;
+        break;
+      }
+    }
 
     // ensure that lower < upper, and that the interval isn't size 0 (i.e., lower != upper)
     if (lower > upper)
@@ -256,7 +300,7 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
     }
     else if (lower == upper)
     {
-      if (upper < input.size[input_dimension])
+      if (upper < dim_size)
       {
         upper += 1;
       }
@@ -269,10 +313,10 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
     }
 
     // make sure that lower and upper don't exceed the matrix size
-    lower = cedar::aux::math::Limits<int>::limit(lower, 0, input.size[input_dimension]);
-    upper = cedar::aux::math::Limits<int>::limit(upper, 0, input.size[input_dimension]);
+    lower = cedar::aux::math::Limits<int>::limit(lower, 0, dim_size);
+    upper = cedar::aux::math::Limits<int>::limit(upper, 0, dim_size);
 
-    mRanges.at(input_dimension) = cv::Range(lower, upper);
+    this->mRanges.at(input_dimension) = cv::Range(lower, upper);
     sizes.at(input_dimension) = upper - lower;
   };
 
@@ -281,39 +325,6 @@ void cedar::proc::steps::MatrixSlice::allocateOutputMatrix()
     for (unsigned int d = 0; d < dimensionality; ++d)
     {
       apply_range(d, d, input);
-      /*
-      CEDA/R_DEBUG_ASSERT(d < this->_mRangeLower->size());
-      CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
-
-      int lower = static_cast<int>(this->_mRangeLower->at(d));
-      int upper = static_cast<int>(this->_mRangeUpper->at(d));
-
-      // ensure that lower < upper, and that the interval isn't size 0 (i.e., lower != upper)
-      if (lower > upper)
-      {
-        std::swap(lower, upper);
-      }
-      else if (lower == upper)
-      {
-        if (upper < input.size[d])
-        {
-          upper += 1;
-        }
-        else
-        {
-          // this assertion should only fail if the matrix size is 0 in dimension d, which should not be possible
-          CEDAR_DEBUG_NON_CRITICAL_ASSERT(lower > 0);
-          lower -= 1;
-        }
-      }
-
-      // make sure that lower and upper don't exceed the matrix size
-      lower = cedar::aux::math::Limits<int>::limit(lower, 0, input.size[d]);
-      upper = cedar::aux::math::Limits<int>::limit(upper, 0, input.size[d]);
-
-      mRanges.at(d) = cv::Range(lower, upper);
-      sizes.at(d) = upper - lower;
-      */
     }
   }
   else // case: dimensionality <= 1
@@ -359,6 +370,8 @@ void cedar::proc::steps::MatrixSlice::rangeChanged()
   this->allocateOutputMatrix();
 
   this->resetState();
+
+  this->onTrigger();
 }
 
 void cedar::proc::steps::MatrixSlice::compute(const cedar::proc::Arguments&)

@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/Configurable.fwd.h"
 #include "cedar/auxiliaries/PluginDeclaration.fwd.h"
 #include "cedar/auxiliaries/PluginDeclarationList.fwd.h"
+#include "cedar/auxiliaries/PluginProxy.fwd.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -80,8 +81,6 @@
  * if your plugin binary is located in /home/you/src/MyPluginLib/build/libMyPlugin.so, then the plugin description file can
  * be either /home/you/src/MyPluginLib/build/MyPlugin.xml or /home/you/src/MyPluginLib/MyPlugin.xml.
  *
- * @todo This should be made clearer; also, this is mixed with functionality in cedar::proc::PluginProxy
- *
  * The contents of the file should look like this:
  * @code
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -104,6 +103,11 @@
  */
 class cedar::aux::PluginDeclarationList
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::PluginProxy;
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -149,9 +153,6 @@ public:
     return this->mDeclarations.at(i);
   }
 
-  //! Sets the source of the plugin list. Only set after the list has been populated!
-  void setSource(const std::string& source);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,6 +165,9 @@ protected:
 private:
   void readDeclarations(const cedar::aux::ConfigurationNode& declarations);
   void readDeclaration(const cedar::aux::ConfigurationNode& declarations);
+
+  //! Sets the source of the plugin list. Only set after the list has been populated!
+  void setSource(const std::string& source);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -88,8 +88,7 @@ public:
   virtual bool canDetach(cedar::aux::ConstDataPtr data) const = 0;
 
   //!@brief Returns a map of data associated with its title.
-  //!@todo Rename this to getDataNameMap?
-  const DataMap& getDataMap() const;
+  const DataMap& getDataTitleMap() const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

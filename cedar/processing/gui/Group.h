@@ -94,11 +94,19 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief write group to file
-  void write();
-  //!@brief write group to file given by destination
-  void write(const std::string& destination);
-  //!@brief read group from given file
-  void read(const std::string& source);
+  void write() const;
+
+  //!@brief write group to file given by destination (replaced by writeJson)
+  CEDAR_DECLARE_DEPRECATED(void write(const std::string& destination) const);
+
+  //!@brief read group from given file (replaced by readJson)
+  CEDAR_DECLARE_DEPRECATED(void read(const std::string& source));
+
+  //!@brief write configuration to path
+  void writeJson(const cedar::aux::Path& filename) const;
+
+  //!@brief read configuration from path
+  void readJson(const cedar::aux::Path& filename);
 
   //! Checks if any connectables in the given list can be added to this group. Non-connectables are ignored.
   bool canAddAny(const QList<QGraphicsItem*>& items) const;
@@ -110,9 +118,6 @@ public:
   /*!@brief access the underlying cedar::proc::Group
    */
   cedar::proc::ConstGroupPtr getGroup() const;
-
-  //!@brief add all elements contained in this group to the scene
-  void addElementsToScene();
 
   //!@brief get the current file, to which the group configuration can be saved
   const std::string& getFileName() const;
@@ -250,6 +255,9 @@ public slots:
   //! handes a change in step name
   void handleStepNameChanged(const std::string& from, const std::string& to);
 
+  //! Enables/disables resizing and moving of the group.
+  void setLockGeometry(bool lock = true);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -343,6 +351,8 @@ private:
 
   void lastReadConfigurationChanged();
 
+  bool canResize() const;
+
   void clearTriggerColorCache() const;
 
   void updateAllElementsTriggerColorState() const;
@@ -388,6 +398,8 @@ private slots:
 
   void elementNameChanged(const std::string&, const std::string&);
 
+  void geometryLockChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -401,7 +413,7 @@ private:
   cedar::proc::gui::Scene* mpScene;
 
   //!@brief a filename from which to load a group configuration, or to which to save a configuration
-  std::string mFileName;
+  mutable std::string mFileName;
 
   //!@brief a vector of all source connectors
   std::vector<cedar::proc::gui::DataSlotItem*> mConnectorSources;
@@ -466,6 +478,9 @@ private:
   cedar::aux::ConfigurationNode mPlotGroupsNode;
 
   cedar::aux::BoolParameterPtr _mIsCollapsed;
+
+  //! Disables moving/resizing the group
+  cedar::aux::BoolParameterPtr _mGeometryLocked;
 
   //! Width of the group in its uncollapsed state.
   cedar::aux::DoubleParameterPtr _mUncollapsedWidth;

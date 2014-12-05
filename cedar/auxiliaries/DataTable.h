@@ -85,8 +85,12 @@ private:
   };
 
 public:
+  //!@cond SKIPPED_DOCUMENTATION
+
   CEDAR_DECLARE_AUX_CLASS(RowCollection);
   CEDAR_DECLARE_AUX_CLASS(Row);
+
+  //!@endcond
 
   /*! A row in the DataTable.
    */

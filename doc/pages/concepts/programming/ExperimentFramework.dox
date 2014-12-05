@@ -1,0 +1,47 @@
+/*!
+
+@page ExperimentFrameworkConcept Introduction to the experiment framework
+
+@section EFConceptIntroduction Introduction
+cedar provides a framework to run a series of trials (which we will call an experiment) with a given architecture.
+The following text introduces the concepts used in this experiment framework.
+
+@section EFConceptDefinitions Definitions
+
+@subsection EFConceptDefExperiment Experiment
+An @em experiment is a set of @em trials performed with a given architecture. During an experiment, all data marked for
+recording is recorded in a subfolder of the cedar recording directory. Experiments can be saved and loaded. See 
+cedar::proc::experiment::Experiment for more details.
+
+@subsection EFConceptDefTrial Trial 
+A @em trial is defined by a set of @em conditions that are checked frequently while an architecture is running. Trials
+are ended by the EndTrial action, which should be included in each experiment setup. If a trial is ended through an
+EndTrial action, the outcome of the trial (success/failure, defined by the EndTrial action) and the trial duration are
+logged. During a trial, the global clock counts the elapsed time since the start of the trial. Note that there is no
+class associated with trials; they are defined by a cedar::proc::experiment::Experiment.
+
+@subsection EFConceptDefActionSequence ActionSequence
+An @em action @em sequence is a collection of @em actions triggered by a @em condition. An experiment consists of
+multiple action sequences, of which at least one should contain an EndTrial action to prevent trials that run infinitely. 
+ 
+@subsection EFConceptDefCondition Condition
+A @em condition monitors a defined state of the architecture. If this state is reached, it triggers all actions 
+associated with this condition. For example, trials may execute specific actions at the beginning of trials by adding
+@em actions to an OnEachTrial condition; for applying different actions at the beginning of trials depending on the
+number of the trial, @em actions can be added to the OnTrialNumber condition; OnMatrixValue monitors a specific
+MatData, it triggers its actions if the defined value is reached, exceeded, or undershot; AtTime fires if the global
+clock exceeds the specified time; The @em And condition combines two conditions and fires when both conditions are true
+at the same time.
+
+Note, that conditions only fire once in each trial, i.e., their actions are not executed multiple times. See
+cedar::proc::experiment::condition::Condition for more details.
+
+@subsection EFConceptDefAction Action
+@em Actions can be divided into two types: some are applicable to specified elements, while the others influence the
+overall trial. Examples for the former are: IncrementParameter, which changes a parameter value with a given step size;
+SetParameterValue, which sets a specified value; IterateDirectoryContents, which changes the value of a parameter in
+each trial, setting a the path to the next file in a specified directory in every trial. Examples for the latter are:
+WriteMessage, which adds a custom message to the trial log; EndTrial, which ends the current trial and resets the
+architecture. See cedar::proc::experiment::action::Action for more details.
+
+ */

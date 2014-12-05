@@ -52,8 +52,6 @@
 
 
 /*!@brief A factory that creates objects based on types.
- *
- * @todo This concept needs far more explanation.
  */
 template
 <

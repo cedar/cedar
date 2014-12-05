@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/opencv_helper.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/auxiliaries/MatData.fwd.h"
@@ -106,16 +107,16 @@ public:
   public:
 
     //! Compression is done by calculating the sum along the compressed direction.
-    static const Id SUM = CV_REDUCE_SUM;
+    static const Id SUM = CEDAR_OPENCV_CONSTANT(REDUCE_SUM);
 
     //! Compression is done by averaging along the compressed direction.
-    static const Id AVERAGE = CV_REDUCE_AVG;
+    static const Id AVERAGE = CEDAR_OPENCV_CONSTANT(REDUCE_AVG);
 
     //! Compression is done by calculating the maximum along the compressed direction.
-    static const Id MAXIMUM = CV_REDUCE_MAX;
+    static const Id MAXIMUM = CEDAR_OPENCV_CONSTANT(REDUCE_MAX);
 
     //! Compression is done by calculating the minimum along the compressed direction.
-    static const Id MINIMUM = CV_REDUCE_MIN;
+    static const Id MINIMUM = CEDAR_OPENCV_CONSTANT(REDUCE_MIN);
 
   private:
     //!@brief The type object of the enum.

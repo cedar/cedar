@@ -104,12 +104,6 @@ public:
   //!@brief returns a list of listeners
   const std::vector<cedar::proc::TriggerablePtr>& getListeners() const;
 
-  //!@brief empty implementation of a function that gets called if a trigger connects to this instance
-  virtual void notifyConnected(cedar::proc::TriggerPtr trigger);
-
-  //!@brief empty implementation of a function that gets called if a trigger disconnects from this instance
-  virtual void notifyDisconnected(cedar::proc::TriggerPtr trigger);
-
   //!@brief saves a configuration to a ConfigurationNode
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 

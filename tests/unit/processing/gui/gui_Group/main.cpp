@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 
   try
   {
-    p_network->read("test_arch.json");
+    p_network->readJson("test_arch.json");
   }
   catch (cedar::proc::ArchitectureLoadingException& exception)
   {
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     }
   }
 
-  p_network->write("save_test.json");
+  p_network->writeJson("save_test.json");
 
   if (boost::filesystem::exists("save_test.json"))
   {

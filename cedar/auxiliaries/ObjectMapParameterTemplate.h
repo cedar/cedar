@@ -268,8 +268,10 @@ namespace cedar
         //! Allocates an object with the given key using a configuration that has previously been stored.
         void allocateKey(const std::string& key) const
         {
-          //!@todo make this a proper exception
-          CEDAR_ASSERT(this->isConfigurationKey(key));
+          if (!this->isConfigurationKey(key))
+          {
+            CEDAR_THROW(cedar::aux::UnknownNameException, "Key " + key + " is not in this map.");
+          }
 
           cedar::aux::ConfigurationNode node = this->mConfigurations.find(key)->second;
           this->mObjectMap[key] = this->allocate(node);
@@ -287,8 +289,6 @@ namespace cedar
 }
 
 /*!@brief A parameter that reads a map of configurable objects from a file.
- *
- * @todo describe more.
  */
 template <class ValueType, class TAllocationPolicy = cedar::aux::allocationPolicies::Instantly<ValueType> >
 class cedar::aux::ObjectMapParameterTemplate : public cedar::aux::Parameter, public TAllocationPolicy

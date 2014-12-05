@@ -48,6 +48,7 @@
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <map>
 
 
 /*!@brief Typecheck that can perform various checks on a matrix.

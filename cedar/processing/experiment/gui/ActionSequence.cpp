@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -111,7 +111,7 @@ void cedar::proc::experiment::gui::ActionSequence::update()
         = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(nameParameter)->allocateRaw();
   name->setParent(this);
   name->setParameter(nameParameter);
-  QPushButton* rm = new QPushButton(QString::fromStdString("-"));
+  QPushButton* rm = new QPushButton(QIcon(":/cedar/auxiliaries/gui/trashcan.svg"), "");
   connect(rm,SIGNAL(clicked()),this,SLOT(remove()));
   nameRow->addWidget(name);
   nameRow->addWidget(rm);

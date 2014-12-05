@@ -53,7 +53,7 @@ cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::LabeledPlot
   const QString& pLabel,
   cedar::aux::ConstDataPtr pData,
   cedar::proc::PlotDataPtr pPlotData,
-  const std::string& decalarationToUse
+  const std::string& declarationToUse
 )
 :
 //mpPlotDeclaration(pPlotDecl),
@@ -81,10 +81,10 @@ mpLabel(new QLabel(pLabel))
   this->mpTitleLayout->addWidget(this->mpPlotSelector);
   this->mpTitleLayout->addWidget(this->mpLabel);
 
-  this->openPlotFromDeclaration(decalarationToUse);
+  this->openPlotFromDeclaration(declarationToUse);
 };
 
-void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(const std::string& decalarationToFind)
+void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(const std::string& declarationToFind)
 {
   // first, check if there are any declarations for the data at all
   cedar::aux::gui::ConstPlotDeclarationPtr decl;
@@ -97,13 +97,13 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(c
     return;
   }
 
-  if (!decalarationToFind.empty())
+  if (!declarationToFind.empty())
   {
     // then, try to find one that matches the specified one
     auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
     for (auto declaration : declarations)
     {
-      if (declaration->getClassName() == decalarationToFind)
+      if (declaration->getClassName() == declarationToFind)
       {
         mpPlotDeclaration = declaration;
         break;
@@ -118,7 +118,7 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(c
       // remember the old data that was plotted
       if (auto multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpPlotter))
       {
-        const auto& map = multi->getDataMap();
+        const auto& map = multi->getDataTitleMap();
         mMultiPlotData.insert(map.begin(), map.end());
       }
 
@@ -739,7 +739,7 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   auto serialized_data_list = node.get_child("data_list");
   cedar::proc::ElementDeclaration::DataList data_list;
   
-  for(auto data_item : serialized_data_list)
+  for (auto data_item : serialized_data_list)
   {
     auto p_plot_data = cedar::proc::PlotDataPtr(new cedar::proc::PlotData());
     p_plot_data->readConfiguration(data_item.second);

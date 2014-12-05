@@ -156,9 +156,8 @@ namespace cedar
 {
   namespace aux
   {
-    typedef
-      cedar::aux::FactoryManager<cedar::aux::ParameterLinkPtr>
-      ParameterLinkFactoryManager;
+    //! a factory manager for parameter links
+    typedef cedar::aux::FactoryManager<cedar::aux::ParameterLinkPtr> ParameterLinkFactoryManager;
   }
 }
 

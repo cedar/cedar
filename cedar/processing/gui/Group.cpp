@@ -82,6 +82,7 @@
 #include <iostream>
 #include <functional>
 #include <set>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -113,6 +114,7 @@ mShowTriggerColors(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
 _mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
+_mGeometryLocked(new cedar::aux::BoolParameter(this, "lock geometry", false)),
 _mUncollapsedWidth(new cedar::aux::DoubleParameter(this, "uncollapsed width", width)),
 _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", height))
 {
@@ -184,6 +186,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 
   this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
 
+  this->connect(this->_mGeometryLocked.get(), SIGNAL(valueChanged()), SLOT(geometryLockChanged()));
+
   QObject::connect
   (
     this->mGroup.get(),
@@ -234,6 +238,30 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Group::canResize() const
+{
+  if (this->_mGeometryLocked->getValue())
+  {
+    return false;
+  }
+  else
+  {
+    return cedar::proc::gui::Connectable::canResize();
+  }
+}
+
+void cedar::proc::gui::Group::setLockGeometry(bool lock)
+{
+  this->_mGeometryLocked->setValue(lock);
+}
+
+void cedar::proc::gui::Group::geometryLockChanged()
+{
+  bool locked = this->_mGeometryLocked->getValue();
+  this->setFlag(QGraphicsItem::ItemIsMovable, !locked);
+  this->updateResizeHandles();
+}
 
 void cedar::proc::gui::Group::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
 {
@@ -897,11 +925,6 @@ const std::string& cedar::proc::gui::Group::getFileName() const
   return this->mFileName;
 }
 
-//!@todo Can this method be removed?
-void cedar::proc::gui::Group::addElementsToScene()
-{
-}
-
 void cedar::proc::gui::Group::setScene(cedar::proc::gui::Scene* pScene)
 {
   //!@todo Why doesn't this use QGraphicsItem->scene() instead?
@@ -921,14 +944,19 @@ cedar::proc::ConstGroupPtr cedar::proc::gui::Group::getGroup() const
   return this->mGroup;
 }
 
-void cedar::proc::gui::Group::write()
+void cedar::proc::gui::Group::write() const
 {
-  this->write(this->mFileName);
+  this->writeJson(this->mFileName);
 }
 
-void cedar::proc::gui::Group::write(const std::string& destination)
+void cedar::proc::gui::Group::write(const std::string& destination) const
 {
-  this->mFileName = destination;
+  this->writeJson(destination);
+}
+
+void cedar::proc::gui::Group::writeJson(const cedar::aux::Path& filename) const
+{
+  this->mFileName = filename.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
@@ -936,25 +964,30 @@ void cedar::proc::gui::Group::write(const std::string& destination)
   this->mGroup->writeConfiguration(root);
   this->writeConfiguration(root);
 
-  write_json(destination, root);
+  write_json(filename.toString(), root);
 
-  this->mGroup->writeDataFile(destination + ".data");
+  this->mGroup->writeDataFile(filename.toString() + ".data");
 }
 
 void cedar::proc::gui::Group::read(const std::string& source)
 {
-  this->mFileName = source;
+  this->readJson(source);
+}
+
+void cedar::proc::gui::Group::readJson(const cedar::aux::Path& source)
+{
+  this->mFileName = source.toString();
   cedar::aux::RecorderSingleton::getInstance()->setRecordedProjectName(mFileName);
 
   cedar::aux::ConfigurationNode root;
-  read_json(source, root);
+  read_json(source.toString(), root);
 
   this->mGroup->readConfiguration(root);
   this->readConfiguration(root);
 
-  if (boost::filesystem::exists(source + ".data"))
+  if (boost::filesystem::exists(source.toString() + ".data"))
   {
-    this->mGroup->readDataFile(source + ".data");
+    this->mGroup->readDataFile(source.toString() + ".data");
   }
 }
 
@@ -1033,25 +1066,16 @@ void cedar::proc::gui::Group::readPlotList(const std::string& plotGroupName, con
     std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it.second);
     try
     {
-      // is it a step?
-      auto step = this->getGroup()->getElement<cedar::proc::Step>(step_name);
-      if (step) // check if cast worked
+      // is it a connectable?
+      auto connectable = this->getGroup()->getElement<cedar::proc::Connectable>(step_name);
+      if (connectable) // check if cast worked
       {
-        auto step_item = this->mpScene->getStepItemFor(step.get());
-        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, step_item);
+        auto graphics_item = this->mpScene->getGraphicsItemFor(connectable.get());
+        cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, cedar::aux::asserted_cast<cedar::proc::gui::Connectable*>(graphics_item));
       }
-      else // might be a group instead
+      else // element is not present - show error
       {
-        auto group = this->getGroup()->getElement<cedar::proc::Group>(step_name);
-        if (group) // check if cast worked
-        {
-          auto group_item = this->mpScene->getGroupFor(group.get());
-          cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it.second, group_item);
-        }
-        else // element is neither step nor group - show error
-        {
-          removed_elements.insert(step_name);
-        }
+        removed_elements.insert(step_name);
       }
     }
     catch (cedar::aux::InvalidNameException& exc)
@@ -1431,10 +1455,7 @@ void cedar::proc::gui::Group::checkTriggerConnection
 
 void cedar::proc::gui::Group::updateConnectorPositions()
 {
-//  qreal distance = 20;
   qreal pad_side = 5;
-//  QPointF start_dist(pad_side, this->getInputOutputSlotOffset());
-//  QPointF direction(0, 1);
 
   for (size_t i = 0; i < this->mConnectorSources.size(); ++i)
   {
@@ -1912,6 +1933,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   p_collapse->setCheckable(true);
   p_collapse->setChecked(this->isCollapsed());
   this->connect(p_collapse, SIGNAL(toggled(bool)), SLOT(setCollapsed(bool)));
+
+  QAction* p_lock_geometry = menu.addAction("lock size/position");
+  p_lock_geometry->setCheckable(true);
+  p_lock_geometry->setChecked(this->_mGeometryLocked->getValue());
+  this->connect(p_lock_geometry, SIGNAL(toggled(bool)), SLOT(setLockGeometry(bool)));
 
   auto color_menu = menu.addMenu("color");
   auto colors = cedar::proc::gui::SettingsSingleton::getInstance()->getUserDefinedColors();

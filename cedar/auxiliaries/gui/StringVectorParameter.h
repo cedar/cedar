@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <QLineEdit>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // template specializations
@@ -85,40 +86,6 @@ namespace cedar
       {
         pWidget->setText(QString::fromStdString(value));
       }
-      //!@endcond
-//
-//      //!@cond SKIPPED_DOCUMENTATION
-//      template<>
-//      inline void NumericVectorParameterAbstraction<std::string, QLineEdit>::setMinimum
-//                  (
-//                    QLineEdit* pWidget,
-//                    const std::string& limit
-//                  )
-//      {
-//        unsigned int minimum = limit;
-//        if (minimum > static_cast<unsigned int>(std::numeric_limits<int>::max()))
-//        {
-//          minimum = static_cast<unsigned int>(std::numeric_limits<int>::max());
-//        }
-//        pWidget->setMinimum(minimum);
-//      }
-//      //!@endcond
-//
-//      //!@cond SKIPPED_DOCUMENTATION
-//      template<>
-//      inline void NumericVectorParameterAbstraction<std::string, QLineEdit>::setMaximum
-//                  (
-//                    QSpinBox* pWidget,
-//                    const unsigned int& limit
-//                  )
-//      {
-//        unsigned int maximum = limit;
-//        if (maximum > static_cast<unsigned int>(std::numeric_limits<int>::max()))
-//        {
-//          maximum = static_cast<unsigned int>(std::numeric_limits<int>::max());
-//        }
-//        pWidget->setMaximum(maximum);
-//      }
       //!@endcond
     }
   }

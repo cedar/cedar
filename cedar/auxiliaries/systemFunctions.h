@@ -61,6 +61,7 @@ namespace cedar
      *          This function locates cedar resources. These resources are usually stored in cedar's resource directory.
      *
      * @param   resourcePath The path to the resource, relative to cedar's resource directory.
+     * @param   showInLog Flag deciding whether this function writes log messages where resources were found.
      *
      * @remarks The function looks for the resource in the following order:
      *          First, the function looks in the current path.

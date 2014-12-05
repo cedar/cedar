@@ -50,7 +50,7 @@
 // SYSTEM INCLUDES
 #include <QListWidget>
 
-/*!@brieg A GUI implementation of cedar::proc::experiment::action::Action::ActionListParamter
+/*!@brief A GUI implementation of cedar::proc::experiment::action::Action::ActionListParamter
  *
  */
 class cedar::proc::experiment::gui::ActionListParameter : public cedar::aux::gui::Parameter
@@ -69,11 +69,16 @@ public:
   class ActionListWidget : public QListWidget
   {
     public:
+      //! constructor
       ActionListWidget(ActionListParameter* parent): QListWidget(parent),mpParent(parent),mStartDragPos(0){}
     public:
+      //! overloaded drag enter event
       void dragEnterEvent(QDragEnterEvent* event);
+
+      //! overloaded drop event
       void dropEvent(QDropEvent* event);
 
+      //! empty..
       void emitLayoutUpdateRequired()
       {
 //        emit layoutChanged();

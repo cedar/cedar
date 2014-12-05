@@ -121,13 +121,13 @@ protected:
   // none yet
 
 private:
-  //!@brief The step selector
-  QComboBox* mpStep;
+  //!@brief The element selector
+  QComboBox* mpElement;
 
   //!@brief The property selector
   QComboBox* mpProperty;
 
-  //!@brief The parameter widget. Only appears if the StepPropertyParameter is of type PARMAETER
+  //!@brief The parameter widget. Only appears if the StepPropertyParameter is of type PARAMETER
   QWidget* mpPropertyCopy;
 
 }; // class cedar::proc::experiment::gui::StepPropertyParameter

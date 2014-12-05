@@ -107,7 +107,6 @@ namespace
     declaration->definePlot(field_plot_data);
 
     // define field plot again, but this time with image plots
-    //!@todo different icon
     ElementDeclaration::PlotDefinition field_image_plot_data("field plot (image)", ":/cedar/dynamics/gui/field_image_plot.svg");
     field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot")));
     field_image_plot_data.mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot")));
@@ -530,13 +529,11 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
     neural_noise = this->_mNoiseCorrelationKernelConvolution->convolve(neural_noise);
 
-    //!@todo not sure, if dividing time by 1s (which is an implicit tau) makes any sense or should be a parameter
-    //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
+    //!@todo document why this has to use sqrt(time) for noise
     sigmoid_u = _mSigmoid->getValue()->compute
                 (
                   u
-                  + sqrt(time / (1.0 * cedar::unit::second))
-                    * neural_noise
+                  + sqrt(time / (1.0 * cedar::unit::second)) * neural_noise
                 );
   }
   else

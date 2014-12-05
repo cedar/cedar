@@ -74,7 +74,7 @@ namespace cedar
     {
       namespace PlotWidgetPrivate
       {
-        // This should be a private nested class, but that is not supported by the MOC.
+        //! This should be a private nested class, but that is not supported by the MOC.
         class LabeledPlot : public QObject
         {
           Q_OBJECT
@@ -85,13 +85,13 @@ namespace cedar
             const QString& pLabel,
             cedar::aux::ConstDataPtr pData,
             cedar::proc::PlotDataPtr pPlotData,
-            const std::string& decalarationToUse = std::string()
+            const std::string& declarationToUse = std::string()
           );
 
         private:
           void fillPlotOptions(QMenu* menu);
 
-          void openPlotFromDeclaration(const std::string& decalarationToFind);
+          void openPlotFromDeclaration(const std::string& declarationToFind);
 
         private slots:
           void openDefaultPlot();
@@ -120,7 +120,7 @@ namespace cedar
 }
 //!@endcond
 
-/*!@todo Document this.
+/*!@brief a widget for plots
  */
 class cedar::proc::gui::PlotWidget : public QWidget
 {

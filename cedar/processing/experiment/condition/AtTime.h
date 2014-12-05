@@ -80,7 +80,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //@brief Checks if a the current trial time is greater than the time provided by this condition
-  bool check();
+  bool check() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

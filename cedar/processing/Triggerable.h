@@ -285,7 +285,7 @@ protected:
 
   //! The triggers this step is triggered by.
   //!@todo Unify this with mParentTrigger
-  cedar::aux::LockableMember< std::set<TriggerWeakPtr> > mTriggersListenedTo;
+  cedar::aux::LockableMember<std::set<TriggerWeakPtr> > mTriggersListenedTo;
 
   //!@brief Signal that is emitted whenever the Triggerable's state is changed.
   boost::signals2::signal<void ()> mStateChanged;

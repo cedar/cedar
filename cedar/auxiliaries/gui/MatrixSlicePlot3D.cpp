@@ -162,8 +162,6 @@ unsigned int cedar::aux::gui::MatrixSlicePlot3D::getSlicedDimension() const
 
 void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 {
-  //!@todo This is actually kind of close to a 3d slice plot for a matrix with dims >= 3 (instead of just == 3)
-  //!      Could this be generalized to a ND-slice-plot where three dimension are selected for plotting?
   int dim_sliced = static_cast<int>(this->getSlicedDimension());
 
   int dim_0, dim_1;
@@ -208,7 +206,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   cv::Mat mSliceSize = cv::Mat(mat.size[dim_0], mat.size[dim_1], mat.type());
   unsigned int column = 0;
   unsigned int row = 0;
-  //!@todo For the special case of dim_sliced == 0, this can be done more efficiently
+
   for (unsigned int tile = 0; tile < tiles; tile++, column++)
   {
     if (column >= columns)

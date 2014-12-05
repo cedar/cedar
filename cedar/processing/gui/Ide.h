@@ -125,6 +125,7 @@ public:
    */
   void resetTo(cedar::proc::gui::GroupPtr network);
 
+  //!@brief get the group
   cedar::proc::gui::GroupPtr getGroup();
   
   //! set if close dialog should be suppressed
@@ -293,6 +294,10 @@ public slots:
   //! Shows recent notifications
   void showRecentNotifications();
 
+public slots:
+  //! react to a change in experiment execution
+  void experimentRunningChanged(bool running);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -362,6 +367,9 @@ private:
   //! Updates the architecture widget menu.
   void updateArchitectureWidgetsMenu();
 
+  //! Updates the architecture widget menu.
+  void updateArchitectureScriptsMenu();
+
   //! Constructs the widgets in the status bar.
   void buildStatusBar();
 
@@ -370,6 +378,12 @@ private:
   void showOneTimeMessages(const std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr>& messages, bool markAsRead = false);
 
   void init(bool loadDefaultPlugins, bool redirectLogToGui, const cedar::aux::CommandLineParser& parser);
+
+  void setArchitectureSavingLoadingEnabled(bool enabled);
+
+  void setRecodringControlsEnabled(bool enabled);
+
+  void setSimulationControlsEnabled(bool enabled);
 
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
@@ -380,9 +394,9 @@ private slots:
 
   void architecturePlotActionTriggered();
 
-  void openManageArchitectureWidgetsDialog();
+  void showManageArchitectureWidgetsDialog();
 
-  void setSimulationControlsDisabled(bool disabled);
+  void showManageArchitectureScriptsDialog();
 
   void triggerStarted();
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -51,6 +51,8 @@
 #include "cedar/processing/experiment/condition/Condition.fwd.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
 
 
 /*!@brief An abstract class for all kinds of conditions.
@@ -77,27 +79,32 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Performs the actual ckeck.
+  /*! @brief Performs the actual check.
    *
    * @param skipIfFired If true, the condition will return false if it returned true once before.
-   * @todo Should this be const?
    */
-  bool runCheck(bool skipIfFired = true);
+  bool runCheck(bool skipIfFired = true) const;
 
   /*! Resets the condition. If it is set to fire only once, this will allow it to fire again.
    */
   void reset();
 
+  //! does this condition fire during initiation of a trial?
+  virtual bool initialCheck() const;
+
+  /*! Reimplement this to check the validity of the condition. Return true if the action is valid. If false is returned,
+   *  an inforative message should be added to the @em errors vector.
+   */
+  virtual bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief This method has to be override by all derived classes
+  /*!@brief This method has to be overriden by all derived classes
    *         It should return true if the condition is fulfilled
-   *
-   * @todo Should this be const?
    */
-  virtual bool check() = 0;
+  virtual bool check() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -111,7 +118,7 @@ protected:
 
 private:
   //! Member for storing if the condition has fired before.
-  bool mHasFired;
+  mutable bool mHasFired;
 
 }; // class cedar::proc::experiment::Condition
 

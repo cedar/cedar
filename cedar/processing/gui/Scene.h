@@ -216,10 +216,6 @@ public:
    */
   void reset();
 
-  /*!@brief Deprecated, see getStepMap(). Returns the step map.
-   */
-  CEDAR_DECLARE_DEPRECATED(const StepMap& stepMap() const);
-
   /*!@brief Returns the step map.
    */
   const StepMap& getStepMap() const;
@@ -227,10 +223,6 @@ public:
   /*!@brief Returns the group map.
    */
   const GroupMap& getGroupMap() const;
-
-  /*!@brief Deprecated, see getTriggerMap(). Returns the trigger map.
-   */
-  CEDAR_DECLARE_DEPRECATED(const TriggerMap& triggerMap() const);
 
   /*!@brief Returns the trigger map.
    */

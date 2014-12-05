@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -52,7 +52,8 @@
 #ifndef Q_MOC_RUN
   #include <boost/signals2.hpp>
 #endif
-#include<QTimer>
+#include <QTimer>
+#include <map>
 
 
 /*!@brief A widget for setting up, save and load experiments
@@ -82,6 +83,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! access the experiment
   cedar::proc::experiment::ExperimentPtr getExperiment();
 
   //! Updates the group stored in the experiment. Must be called whenever the group of the Ide changes.
@@ -107,7 +109,12 @@ private:
   //! Enables/disables all action widgets.
   void setActionSequenceWidgetsEnabled(bool enabled);
 
+  void setExperiment(cedar::proc::experiment::ExperimentPtr experiment);
+
 private slots:
+  //!@brief Creates a new experiment
+  void createNewExperiment();
+
   //!@brief Saves the experiment
   void save();
 
