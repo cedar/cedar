@@ -80,7 +80,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //! Returns the name of the element stored in this path.
+  std::string getElementName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
