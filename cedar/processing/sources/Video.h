@@ -44,7 +44,6 @@
 #include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/units/Time.h"
