@@ -45,7 +45,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/DataTemplate.h"
-#include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES

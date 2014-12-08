@@ -44,10 +44,10 @@
 #include "cedar/auxiliaries/gui/ColorValueRGBA.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
-#include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
