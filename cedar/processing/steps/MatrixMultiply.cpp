@@ -41,7 +41,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/DataTemplate.h"
-#include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/math/tools.h"
 
