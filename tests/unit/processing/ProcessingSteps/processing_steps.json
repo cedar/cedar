@@ -1,0 +1,216 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.processing.sources.Boost":
+        {
+            "name": "0D",
+            "threaded": "false",
+            "strength": "1",
+            "active": "false",
+            "deactivate on reset": "false"
+        },
+        "cedar.processing.sources.GaussInput":
+        {
+            "name": "1D",
+            "threaded": "false",
+            "amplitude": "1",
+            "dimensionality": "1",
+            "sigma":
+            [
+                "3"
+            ],
+            "centers":
+            [
+                "3"
+            ],
+            "sizes":
+            [
+                "14"
+            ],
+            "cyclic": "false"
+        },
+        "cedar.processing.sources.GaussInput":
+        {
+            "name": "2D",
+            "threaded": "false",
+            "amplitude": "1",
+            "dimensionality": "2",
+            "sigma":
+            [
+                "3",
+                "3"
+            ],
+            "centers":
+            [
+                "3",
+                "3"
+            ],
+            "sizes":
+            [
+                "16",
+                "24"
+            ],
+            "cyclic": "false"
+        },
+        "cedar.processing.sources.GaussInput":
+        {
+            "name": "3D",
+            "threaded": "false",
+            "amplitude": "1",
+            "dimensionality": "3",
+            "sigma":
+            [
+                "3",
+                "3",
+                "3"
+            ],
+            "centers":
+            [
+                "3",
+                "3",
+                "3"
+            ],
+            "sizes":
+            [
+                "16",
+                "22",
+                "23"
+            ],
+            "cyclic": "false"
+        },
+        "cedar.processing.steps.MatrixTypeConverter":
+        {
+            "name": "double_0D",
+            "threaded": "false",
+            "target type": "Double"
+        },
+        "cedar.processing.steps.MatrixTypeConverter":
+        {
+            "name": "double_1D",
+            "threaded": "false",
+            "target type": "Double"
+        },
+        "cedar.processing.steps.MatrixTypeConverter":
+        {
+            "name": "double_2D",
+            "threaded": "false",
+            "target type": "Double"
+        },
+        "cedar.processing.steps.MatrixTypeConverter":
+        {
+            "name": "double_3D",
+            "threaded": "false",
+            "target type": "Double"
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "0D.boost",
+            "target": "double_0D.matrix"
+        },
+        {
+            "source": "1D.Gauss input",
+            "target": "double_1D.matrix"
+        },
+        {
+            "source": "2D.Gauss input",
+            "target": "double_2D.matrix"
+        },
+        {
+            "source": "3D.Gauss input",
+            "target": "double_3D.matrix"
+        }
+    ],
+    "name": "root",
+    "promotedSlots": "",
+    "ui":
+    [
+        {
+            "type": "step",
+            "step": "0D",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-568",
+            "positionY": "-184"
+        },
+        {
+            "type": "step",
+            "step": "1D",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-568",
+            "positionY": "-120"
+        },
+        {
+            "type": "step",
+            "step": "2D",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-568",
+            "positionY": "-48"
+        },
+        {
+            "type": "step",
+            "step": "3D",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "-568",
+            "positionY": "24"
+        },
+        {
+            "type": "step",
+            "step": "double_0D",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-339",
+            "positionY": "-183"
+        },
+        {
+            "type": "step",
+            "step": "double_1D",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-339",
+            "positionY": "-118"
+        },
+        {
+            "type": "step",
+            "step": "double_2D",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-338",
+            "positionY": "-46"
+        },
+        {
+            "type": "step",
+            "step": "double_3D",
+            "display style": "ICON_ONLY",
+            "width": "40",
+            "height": "40",
+            "positionX": "-337",
+            "positionY": "24"
+        }
+    ],
+    "ui generic":
+    {
+        "network": "root",
+        "open plots": "",
+        "width": "33.28125",
+        "height": "30",
+        "smart mode": "false",
+        "positionX": "-15",
+        "positionY": "-75"
+    }
+}
