@@ -476,7 +476,7 @@ void cedar::proc::experiment::Experiment::setGroup(cedar::proc::GroupPtr group)
       this->mGroup.get(),
       SIGNAL(stepNameChanged(const std::string&, const std::string&)),
       this,
-      SLOT(elementRenamed(const std::string&, const std::string&))
+      SIGNAL(groupChanged())
     );
   }
 }
