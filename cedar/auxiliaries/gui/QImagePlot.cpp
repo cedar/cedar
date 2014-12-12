@@ -481,6 +481,11 @@ void cedar::aux::gui::QImagePlot::showLegendChanged()
     p_layout->addWidget(this->mpLegend);
     p_layout->setStretch(0, 1);
     p_layout->setStretch(1, 0);
+
+    if (this->_mAutoScaling->getValue() == false)
+    {
+      this->mpLegend->updateMinMax(this->_mValueLimits->getLowerLimit(), this->_mValueLimits->getUpperLimit());
+    }
   }
 
   if (this->mpLegend)
