@@ -457,6 +457,10 @@ public:
   //! Recursively lists all elements in the group and all its subgroups.
   std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
 
+  /*! Recursively lists elements in the group and all its subgroups if they fit the function fit.
+   */
+  std::vector<cedar::proc::GroupPath> listElementPaths(std::function<bool(cedar::proc::ConstElementPtr)> fit, const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
+
   /*!@brief Updates the name stored for the object.
    */
   void updateObjectName(cedar::proc::Element* object);
