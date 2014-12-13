@@ -65,6 +65,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
@@ -122,7 +123,7 @@ namespace
         );
       if (module_handle == NULL)
       {
-        std::string error_message = cedar::aux::PluginProxy::getLastError();
+        std::string error_message = cedar::aux::windows::getLastError();
         cedar::aux::LogSingleton::getInstance()->error
         (
           "Failed to load dynamics library. You may be missing some processing steps. Windows says: \"" + error_message + "\".",
@@ -130,7 +131,7 @@ namespace
         );
       }
     }
-#endif // CEDAR_COMPILER_MSVC
+#endif // CEDAR_OS_WINDOWS
 
     return true;
   }
