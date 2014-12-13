@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
@@ -410,13 +411,13 @@ void cedar::aux::PluginProxy::load()
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
-    CEDAR_THROW(cedar::aux::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
+    CEDAR_THROW(cedar::aux::PluginException, "Could not load plugin: LoadLibraryEx failed: " + cedar::aux::windows::getLastError());
   }
   
   p_interface = (PluginInterfaceMethod) (GetProcAddress(this->mpLibHandle, TEXT("pluginDeclaration")));
   if (!p_interface)
   {
-    CEDAR_THROW(cedar::aux::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
+    CEDAR_THROW(cedar::aux::PluginException, "Error loading interface function: GetProcAddress failed: " + cedar::aux::windows::getLastError());
   }
 #endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS
   
@@ -446,27 +447,3 @@ cedar::aux::PluginDeclarationListPtr cedar::aux::PluginProxy::getDeclaration()
   return this->mDeclaration;
 }
 
-#ifdef CEDAR_OS_WINDOWS
-
-std::string cedar::aux::PluginProxy::getLastError()
-{
-  LPVOID lpMsgBuf;
-  DWORD dw = GetLastError(); 
-
-  FormatMessage(
-      FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-      FORMAT_MESSAGE_FROM_SYSTEM |
-      FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      dw,
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      (LPTSTR) &lpMsgBuf,
-      0, NULL );
-  
-  std::string error((char*)lpMsgBuf);
-
-  LocalFree(lpMsgBuf);
-  return error;
-}
-
-#endif //def CEDAR_OS_WINDOWS
