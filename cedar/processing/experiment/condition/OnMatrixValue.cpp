@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionPartialCheckMat.cpp
+    File:        OnMatrixValue.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 04 04
 
-    Description: Source file for the class cedar::proc::experiment::ConditionPartialCheckMat.
+    Description: Source file for the class cedar::proc::experiment::OnMatrixValue.
 
     Credits:
 
