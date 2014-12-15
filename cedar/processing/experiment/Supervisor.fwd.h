@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.fwd.h
+    File:        Supervisor.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 02 06
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ExperimentController.
+    Description: Forward declaration file for the class cedar::proc::experiment::Supervisor.
 
     Credits:
 

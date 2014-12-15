@@ -238,16 +238,6 @@ public:
   //!@brief Get all steps of the current group
   std::vector<std::string> getGroupSteps();
 
-  //!@brief Get all triggers of the current group
-  std::vector<std::string> getGroupTriggers();
-
-  //!@brief Returns the ParameterPtr defined by step name and parameter name
-  cedar::aux::ParameterPtr getStepParameter(std::string step, std::string parameter);
-
-  //!@brief Returns the ConstDataPtr defined by step name and data name
-  cedar::aux::ConstDataPtr getStepData(std::string step, std::string value, cedar::proc::DataRole::Id role
-      = cedar::proc::DataRole::OUTPUT);
-
   //!@brief Returns the actual trial that is currently running
   unsigned int getCurrentTrial();
 
@@ -263,7 +253,7 @@ public:
   /*!@brief Stops a  trial. Should only be called when a trial is currently running.
    *              @param reset specifies what reset method should be used after stopping
    */
-  void stopTrial(ResetType::Id reset = ResetType::Reset);
+  void stopTrial(ResetType::Id reset = ResetType::Reset, bool stopTriggers = true);
 
   //! Sets the repeat flag of the experiment.
   void setRepeating(bool repeats);
@@ -289,9 +279,7 @@ signals:
 
   //!@brief Should be emitted if the group has changed
   void groupChanged();
-//
-//public slots:
-//  void elementRenamed(const std::string& oldName, const std::string& newName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

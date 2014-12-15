@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SetParameterValueValue.cpp
+    File:        SetParameterValue.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 03 07
 
-    Description: Source file for the class cedar::proc::experiment::SetParameterValueValue.
+    Description: Source file for the class cedar::proc::experiment::SetParameterValue.
 
     Credits:
 

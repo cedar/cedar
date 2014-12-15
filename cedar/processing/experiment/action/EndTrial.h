@@ -115,6 +115,9 @@ private:
   //!@brief The message that will be send to the log file
   cedar::aux::StringParameterPtr _mMessage;
 
+  //!@brief Indicates if the triggers are stopped after this trial
+  cedar::aux::BoolParameterPtr _mStopTriggers;
+
 }; // class cedar::proc::experiment::ActionStop
 
 #endif // StopAllTriggers
