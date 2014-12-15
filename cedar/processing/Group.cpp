@@ -334,7 +334,7 @@ void cedar::proc::Group::removeScript(const std::string& name)
 
 std::vector<cedar::proc::GroupPath> cedar::proc::Group::listAllElementPaths(const cedar::proc::GroupPath& base_path) const
 {
-  return this->listElementPaths([](cedar::proc::ConstElementPtr ptr) -> bool { return true; }, base_path);
+  return this->listElementPaths([](cedar::proc::ConstElementPtr) -> bool { return true; }, base_path);
 }
 
 std::vector<cedar::proc::GroupPath> cedar::proc::Group::listElementPaths(std::function<bool(cedar::proc::ConstElementPtr)> fit, const cedar::proc::GroupPath& base_path) const
