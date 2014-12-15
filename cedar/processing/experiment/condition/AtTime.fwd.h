@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConditionOnTime.fwd.h
+    File:        AtTime.fwd.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 03 19
 
-    Description: Forward declaration file for the class cedar::proc::experiment::ConditionOnTime.
+    Description: Forward declaration file for the class cedar::proc::experiment::AtTime.
 
     Credits:
 

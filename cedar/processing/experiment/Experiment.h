@@ -279,9 +279,7 @@ signals:
 
   //!@brief Should be emitted if the group has changed
   void groupChanged();
-//
-//public slots:
-//  void elementRenamed(const std::string& oldName, const std::string& newName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
