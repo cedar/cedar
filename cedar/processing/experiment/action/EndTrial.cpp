@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ActionStop.cpp
+    File:        EndTrial.cpp
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 03 09
 
-    Description: Source file for the class cedar::proc::experiment::ActionStop.
+    Description: Source file for the class cedar::proc::experiment::EndTrial.
 
     Credits:
 
@@ -80,7 +80,8 @@ _mResetType
   )
 ),
 _mSuccess( new cedar::aux::BoolParameter(this, "Success", true)),
-_mMessage(new cedar::aux::StringParameter(this, "Message", ""))
+_mMessage(new cedar::aux::StringParameter(this, "Message", "")),
+_mStopTriggers( new cedar::aux::BoolParameter(this, "stop triggers", true))
 {
 }
 
@@ -96,5 +97,5 @@ void cedar::proc::experiment::action::EndTrial::run()
 {
   auto super = cedar::proc::experiment::SupervisorSingleton::getInstance();
   super->log(_mSuccess->getValue() ? "Trial success" : "Trial failed", _mMessage->getValue());
-  super->getExperiment()->stopTrial(_mResetType->getValue());
+  super->getExperiment()->stopTrial(_mResetType->getValue(), _mStopTriggers->getValue());
 }

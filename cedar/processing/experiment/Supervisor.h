@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExperimentController.h
+    File:        Supervisor.h
 
     Maintainer:  Christian Bodenstein
     Email:       christian.bodenstein@ini.rub.de
     Date:        2014 02 06
 
-    Description: Header file for the class cedar::proc::experiment::ExperimentController.
+    Description: Header file for the class cedar::proc::experiment::Supervisor.
 
     Credits:
 
