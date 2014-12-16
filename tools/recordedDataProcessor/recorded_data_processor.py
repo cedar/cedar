@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2014 11 13
+    Date:        2014 12 16
 
     Description: 
 
@@ -50,6 +50,7 @@ import math
 import numpy as np
 import os
 import re
+import sys
 import wx
 import wx.lib.agw.floatspin as FS
 from wx.lib.embeddedimage import PyEmbeddedImage
@@ -229,6 +230,26 @@ class SnapshotSequenceDialog(wx.Dialog):
     def evt_ok_btn(self, step_num_entry, step_size_entry, event):
         self.parent.nstep = step_num_entry.GetValue()
         self.parent.step_size = step_size_entry.GetValue()
+        
+        self.parent.plot = RDPPlot().plot_snapshot_sequence(start = self.parent.step, 
+                                               step_size = self.parent.step_size, 
+                                               steps = self.parent.nstep, 
+                                               style = self.parent.style, 
+                                               data = self.parent.data, 
+                                               header = self.parent.header, 
+                                               vmin = self.parent.vmin,
+                                               vmax = self.parent.vmax,
+                                               resolution = self.parent.resolution,
+                                               proj = self.parent.proj,
+                                               proj_method = self.parent.proj_method,
+                                               x_label = self.parent.x_label,
+                                               y_label = self.parent.y_label,
+                                               z_label = self.parent.z_label,
+                                               file_name = self.parent.flist_sorted[self.parent.selection],
+                                               file_directory = self.parent.dir,
+                                               save_mode = self.parent.save_mode,
+                                               color = self.parent.line_color)
+        
         self.Destroy()
         
     def evt_cancel_button(self, event):
@@ -238,21 +259,35 @@ class SnapshotSequenceDialog(wx.Dialog):
 
 class RDPApp(wx.App):
     def OnInit(self):
-        frame = RDPMainWindow(None, 'Recorded Data Processor')
-        frame.SetPosition((0, 0))
-        
+        self.main_window = RDPMainWindow(None, 'Recorded Data Processor')
+        self.main_window.SetPosition((0, 0))
+        self.SetTopWindow(self.main_window)
+                
         return True
-        
+            
 #========================================================================================================================
 
 class RDPMainWindow(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent=None, title=title, style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)
+        wx.Frame.__init__(self, parent=parent, title=title, style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)
         self.frame = self
+        
+        # search for standard cedarRecordings directory
+        self.dir='/home'
+        
+        for (self.dir, dirs, files) in os.walk(self.dir):
+            for j in range(len(dirs)):
+                if dirs[j] == 'cedarRecordings':
+                    new_dir = dirs[j]
+                    self.dir = os.path.join(self.dir, new_dir)
+                    break
+            
+            if 'cedarRecordings' in self.dir:
+                break
+                
         self.SetAutoLayout(True)
         self.rdp_browser = RDPBrowserPanel(self)
         self.Bind(wx.EVT_CLOSE, self.evt_close)
-        self.dir = None
         self.SetSizer(self.rdp_browser.main_sizer)
         self.Sizer.Fit(self)
         self.Fit()
@@ -262,8 +297,8 @@ class RDPMainWindow(wx.Frame):
     
     
     def evt_close(self, event):
-        self.Destroy()
-
+        sys.exit()
+    
 #========================================================================================================================
 
 class RDPBrowserPanel(ScrolledPanel):
@@ -275,8 +310,7 @@ class RDPBrowserPanel(ScrolledPanel):
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.select_directory = wx.StaticText(self, -1, 'Select directory:')
         
-        self.browser = wx.GenericDirCtrl(self,filter=("*.csv"), size=(275, 350), style=wx.DIRCTRL_3D_INTERNAL)
-        
+        self.browser = wx.GenericDirCtrl(self,filter=("*.csv"), dir=self.frame.dir, size=(275, 350))            
         self.sel_btn = wx.Button(self, label = 'Select')
         self.sel_btn.Bind(wx.EVT_BUTTON, self.evt_sel_btn)
         
@@ -293,7 +327,7 @@ class RDPBrowserPanel(ScrolledPanel):
         
     def evt_sel_btn(self, event):                
         frame = self.GetParent()
-        frame.dir = self.browser.GetPath()
+        frame.dir = self.browser.GetPath()        
         rdp_gui = RDPGUI(parent=frame)
         frame.SetPosition((0, 0))
         frame.SetSizer(rdp_gui.main_sizer)
@@ -344,6 +378,7 @@ class RDPGUI(wx.Panel):
         self.proj_choice_snapshot = None
         self.plot = None
         self.line_color = '#FF9600'
+        self.save_mode = False
         
         self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'timeline']
         self.proj_ch = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
@@ -1032,29 +1067,12 @@ class RDPGUI(wx.Panel):
                 dlg.Destroy()
         
         elif self.mode == 'snapshot sequence':
+            
+            self.save_mode = True
             dlg = SnapshotSequenceDialog(self, -1, 'Options')
             dlg.ShowModal()
             dlg.Destroy()
-            
-            self.plot = RDPPlot().plot_snapshot_sequence(start = self.step, 
-                                                           step_size = self.step_size, 
-                                                           steps = self.nstep, 
-                                                           style = self.style, 
-                                                           data = self.data, 
-                                                           header = self.header, 
-                                                           vmin = self.vmin,
-                                                           vmax = self.vmax,
-                                                           resolution = self.resolution,
-                                                           proj = self.proj,
-                                                           proj_method = self.proj_method,
-                                                           x_label = self.x_label,
-                                                           y_label = self.y_label,
-                                                           z_label = self.z_label,
-                                                           file_name = self.flist_sorted[self.selection],
-                                                           file_directory = self.dir,
-                                                           save_mode = True,
-                                                           color = self.line_color)
-                                                
+                                                            
         elif self.mode == 'timeline':
             try:
                 self.plot = RDPPlot().plot_timeline(data = self.data, 
@@ -1118,26 +1136,12 @@ class RDPGUI(wx.Panel):
                 dlg.Destroy()
         
         elif self.mode == 'snapshot sequence':
+            
+            self.save_mode = False
             dlg = SnapshotSequenceDialog(self, -1, 'Options')
             dlg.ShowModal()
             dlg.Destroy()
-            
-            self.plot = RDPPlot().plot_snapshot_sequence(start = self.step, 
-                                                           step_size = self.step_size, 
-                                                           steps = self.nstep, 
-                                                           style = self.style, 
-                                                           data = self.data, 
-                                                           header = self.header, 
-                                                           vmin = self.vmin,
-                                                           vmax = self.vmax,
-                                                           resolution = self.resolution,
-                                                           proj = self.proj,
-                                                           proj_method = self.proj_method,
-                                                           x_label = self.x_label,
-                                                           y_label = self.y_label,
-                                                           z_label = self.z_label,
-                                                           color = self.line_color)
-                                
+                                            
         elif self.mode == 'timeline':
             try:
                 self.plot = RDPPlot().plot_timeline(data = self.data, 
