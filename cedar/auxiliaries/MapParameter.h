@@ -189,9 +189,13 @@ public:
     return this->mDefaults;
   }
 
-  //!@brief set one entry of the vector to a new value
-  //!@todo This should be called setValue
-  virtual void set(const std::string& index, const T& value, bool lock = false)
+  CEDAR_DECLARE_DEPRECATED(virtual void set(const std::string& index, const T& value, bool lock = false))
+  {
+    this->setValue(index, value, lock);
+  }
+
+  //!@brief set one entry of the map to a new value
+  virtual void setValue(const std::string& index, const T& value, bool lock = false)
   {
     if (lock)
     {

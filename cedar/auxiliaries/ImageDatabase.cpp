@@ -730,8 +730,8 @@ void cedar::aux::ImageDatabase::readETH80CroppedClose(const cedar::aux::Path& pa
       ETH80AnnotationPtr annotation(new ETH80Annotation());
 
       cedar::aux::Path segmentation = folder;
-      segmentation.appendComponent("maps");
-      segmentation.appendComponent(file.getFileNameWithoutExtension() + "-map.png");
+      segmentation.append("maps");
+      segmentation.append(file.getFileNameWithoutExtension() + "-map.png");
 
       if (segmentation.exists())
       {

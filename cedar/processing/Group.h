@@ -665,7 +665,7 @@ public:
    */
   inline bool isLinked() const
   {
-    return !this->mLinkedGroupFile.isEmpty() && !this->mLinkedGroupName.empty();
+    return !this->mLinkedGroupFile.empty() && !this->mLinkedGroupName.empty();
   }
 
   //!@brief finds all elements in this group and child groups that match the given name

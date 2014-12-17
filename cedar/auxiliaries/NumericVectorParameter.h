@@ -198,9 +198,9 @@ public:
     return this->mLimits.getUpper();
   }
 
-  void set(size_t index, const T& value, bool lock = false)
+  void setValue(size_t index, const T& value, bool lock = false)
   {
-    this->Super::set(index, this->mLimits.limit(value), lock);
+    this->Super::setValue(index, this->mLimits.limit(value), lock);
   }
 
   //! Returns the limits for the values of this parameter.

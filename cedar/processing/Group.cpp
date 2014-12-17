@@ -1307,7 +1307,7 @@ void cedar::proc::Group::addConnector(const std::string& name, bool input)
 void cedar::proc::Group::addConnectorInternal(const std::string& name, bool input)
 {
   // check if connector is in map of connectors
-  this->_mConnectors->set(name, input);
+  this->_mConnectors->setValue(name, input);
 
   if (input)
   {
@@ -1361,7 +1361,7 @@ void cedar::proc::Group::renameConnector(const std::string& oldName, const std::
 
   // everything is fine, change name
   _mConnectors->erase(oldName);
-  _mConnectors->set(newName, input);
+  _mConnectors->setValue(newName, input);
   if (input)
   {
     this->renameInput(oldName, newName);
