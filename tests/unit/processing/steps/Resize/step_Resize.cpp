@@ -61,7 +61,7 @@ int testResize1D(cv::Mat inputOnes, unsigned int reSize, cv::Mat expectedValue)
     std::cout << "ERROR: Size parameter was not adapted to the new dimensionality properly." << std::endl;
   }
 
-  size->set(0, reSize);
+  size->setValue(0, reSize);
 
   resizer->setInput("input", input);
   resizer->onTrigger();

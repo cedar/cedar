@@ -316,7 +316,7 @@ void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
   extensions.push_back(".json");
   cedar::aux::Path resource = cedar::aux::gui::ResourceDialog::openResource(this, extensions);
 
-  if (!resource.isEmpty())
+  if (!resource.empty())
   {
     this->loadConfiguration(resource);
   }

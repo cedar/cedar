@@ -206,7 +206,7 @@ void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
 {
   if (dimension < _mSigmas->size())
   {
-    _mSigmas->set(dimension, sigma);
+    _mSigmas->setValue(dimension, sigma);
   }
   else
   {
@@ -223,7 +223,7 @@ void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
 {
   if (dimension < this->_mShifts->size())
   {
-    _mShifts->set(dimension, shift);
+    _mShifts->setValue(dimension, shift);
   }
   else
   {

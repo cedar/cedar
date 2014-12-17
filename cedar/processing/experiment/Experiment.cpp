@@ -408,7 +408,6 @@ void cedar::proc::experiment::Experiment::saveGroupState()
 //!@todo This should be called loadGroupState() (or rename saveGroupState to storeGroupState, this one to restoreGroupState)
 void cedar::proc::experiment::Experiment::resetGroupState()
 {
-  //!@todo fix exception // wrong reset
   for (auto name_element_pair : this->mGroup->getElements())
   {
     if (auto element = boost::dynamic_pointer_cast<cedar::proc::Element>(name_element_pair.second))
