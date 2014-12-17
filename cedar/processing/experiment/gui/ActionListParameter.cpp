@@ -174,7 +174,7 @@ void cedar::proc::experiment::gui::ActionListParameter::actionParameterChanged()
   int number;
   std::istringstream ( sender->getName() ) >> number;
   this->mActionListParameter->removeObject(number);
-  auto action = boost::dynamic_pointer_cast<cedar::proc::experiment::action::Action>(sender->getConfigurable());
+  auto action = boost::dynamic_pointer_cast<cedar::proc::experiment::action::Action>(sender->getSingleConfigurableChild());
   this->mActionListParameter->insert(number,action);
   this->updateList();
 }

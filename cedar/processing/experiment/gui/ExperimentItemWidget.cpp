@@ -75,16 +75,16 @@ void cedar::proc::experiment::gui::ExperimentItemWidget::display(cedar::aux::Con
     parameterWidget->setParameter(parameter);
     parameterWidget->setParent(this);
 
-    if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+    if (parameter->hasSingleConfigurableChild())
     {
       QVBoxLayout* row = new QVBoxLayout;
       row->setAlignment(Qt::AlignTop);
       cedar::proc::experiment::gui::ExperimentItemWidget* another_widget = new cedar::proc::experiment::gui::ExperimentItemWidget();
-      another_widget->display(object_parameter->getConfigurable());
+      another_widget->display(parameter->getSingleConfigurableChild());
       row->addWidget(parameterWidget);
       row->addWidget(another_widget);
       static_cast<QBoxLayout*>(this->layout())->addLayout(row);
-      connect(object_parameter.get(),SIGNAL(valueChanged()),this,SLOT(objectParameterChanged()));
+      connect(parameter.get(),SIGNAL(valueChanged()),this,SLOT(objectParameterChanged()));
     }
     else
     {
@@ -125,14 +125,14 @@ void cedar::proc::experiment::gui::ExperimentItemWidget::clear(QLayout* layout)
 
 void cedar::proc::experiment::gui::ExperimentItemWidget::objectParameterChanged()
 {
-  auto p_objec_parameter = dynamic_cast<cedar::aux::ObjectParameter*>(QObject::sender());
-  CEDAR_DEBUG_ASSERT(p_objec_parameter != nullptr);
-
+  auto p_parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_parameter != nullptr);
+  CEDAR_DEBUG_ASSERT(p_parameter->hasSingleConfigurableChild());
 
   QList<cedar::aux::gui::Parameter*> parameter_list = this->findChildren<cedar::aux::gui::Parameter*>();
   for(cedar::aux::gui::Parameter* parameter : parameter_list)
   {
-    if(parameter->getParameter().get() == p_objec_parameter)
+    if(parameter->getParameter().get() == p_parameter)
     {
       QLayoutItem* child;
       for(int i=0; i < this->layout()->count() ; i++)
@@ -146,7 +146,7 @@ void cedar::proc::experiment::gui::ExperimentItemWidget::objectParameterChanged(
             delete child->layout()->itemAt(1)->widget();
             cedar::proc::experiment::gui::ExperimentItemWidget* widget
                     = new cedar::proc::experiment::gui::ExperimentItemWidget();
-            widget->display(p_objec_parameter->getConfigurable());
+            widget->display(p_parameter->getSingleConfigurableChild());
             child->layout()->addWidget(widget);
             return;
 

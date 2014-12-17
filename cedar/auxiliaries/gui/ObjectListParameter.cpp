@@ -179,7 +179,7 @@ void cedar::aux::gui::ObjectListParameter::slotObjectAdded(int index)
 
 void cedar::aux::gui::ObjectListParameter::appendObjectToInstanceList(int index)
 {
-  cedar::aux::ConfigurablePtr object = this->getObjectList()->configurableAt(index);
+  cedar::aux::ConfigurablePtr object = this->getObjectList()->getConfigurableChild(index);
   const std::string& instance_type = this->getObjectList()->getTypeOfObject(object);
   int num = this->mpInstanceSelector->count();
   QString label = QString("[%1] ").arg(num) + this->prettyTypeId(QString::fromStdString(instance_type));
@@ -226,7 +226,7 @@ cedar::aux::ConfigurablePtr cedar::aux::gui::ObjectListParameter::getSelectedIns
   if (index != -1)
   {
     cedar::aux::ObjectListParameterPtr parameter = this->getObjectList();
-    return parameter->configurableAt(static_cast<size_t>(index));
+    return parameter->getConfigurableChild(static_cast<size_t>(index));
   }
   else
   {

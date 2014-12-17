@@ -280,6 +280,42 @@ public:
    */
   virtual bool canCopyFrom(cedar::aux::ConstParameterPtr other) const;
 
+  //! This specifies whether or not the parameter can have configurable children.
+  virtual bool canHaveConfigurableChildren() const;
+
+  /*! Specifies whether the parameter has a single configurable child.
+   *
+   * Parameters that return true for this always have exactly one configurable child that is returned by
+   * getConfigurableChild().
+   */
+  virtual bool hasSingleConfigurableChild() const;
+
+  //! Returns the number of configurable children in the parameter.
+  virtual size_t getNumberOfConfigurableChildren() const;
+
+  //! Returns the configurable child with the given index.
+  cedar::aux::ConfigurablePtr getConfigurableChild(size_t i);
+
+  //! Returns the configurable child with the given index.
+  cedar::aux::ConstConfigurablePtr getConfigurableChild(size_t i) const;
+
+  /*! Returns the path component for configurable child i. This is an index used later to identify the child.
+   *  The default implementation returns the number i, converted to a string.
+   */
+  virtual std::string childIndexToString(size_t i) const;
+
+  /*! Returns the position of the child indexed by string str.
+   */
+  virtual size_t childStringToIndex(std::string str) const;
+
+  /*! Returns the only configurable child of the parameter.
+   */
+  virtual cedar::aux::ConstConfigurablePtr getSingleConfigurableChild() const;
+
+  /*! Returns the only configurable child of the parameter.
+   */
+  cedar::aux::ConfigurablePtr getSingleConfigurableChild();
+
 public:
   //! Signal that is emitted whenever the name of the parameter changes. The first string is the old name, the second the new one.
   CEDAR_DECLARE_SIGNAL(NameChanged, void(const std::string&, const std::string&));
@@ -290,6 +326,16 @@ public:
 protected:
   //!@brief set the changed flag to a given state
   virtual void setChangedFlag(bool changed);
+
+  /*! Should return the configurable child with the index i.
+   *
+   *  Parameters that can have configurable children should override this function along with
+   *  getNumberOfConfigurableChildren and canHaveConfigurableChildren (always return true).
+   *
+   *  This method should always return the children in a fixed order that depends on the index i. How the children are
+   *  indexed internally, however, is left to the paramter itself.
+   */
+  virtual cedar::aux::ConstConfigurablePtr retrieveConfigurableChild(size_t index) const;
 
 signals:
   //!@brief a signal that is emitted each time the value of a parameter changes
