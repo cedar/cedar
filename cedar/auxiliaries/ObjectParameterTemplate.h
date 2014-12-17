@@ -161,8 +161,7 @@ public:
     FactoryManagerSingleton::getInstance()->listTypes(types);
   }
 
-  //!@brief returns the stored object as ConfigurablePtr
-  cedar::aux::ConfigurablePtr getConfigurable()
+  cedar::aux::ConstConfigurablePtr getSingleConfigurableChild() const
   {
     return this->mObject;
   }
@@ -180,6 +179,10 @@ public:
     return FactoryManagerSingleton::getInstance()->getTypeId(mObject);
   }
 
+  bool hasSingleConfigurableChild() const
+  {
+    return true;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
