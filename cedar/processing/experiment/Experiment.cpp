@@ -364,7 +364,7 @@ std::vector<std::string> cedar::proc::experiment::Experiment::getGroupSteps()
                (
                  [](cedar::proc::ConstElementPtr ptr) -> bool
                  {
-                   return boost::dynamic_pointer_cast<cedar::proc::ConstConnectable>(ptr);
+                   return static_cast<bool>(boost::dynamic_pointer_cast<cedar::proc::ConstConnectable>(ptr));
                  }
                );
 
