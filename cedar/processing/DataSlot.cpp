@@ -259,3 +259,8 @@ const std::string& cedar::proc::DataSlot::getValidityInfo() const
 {
   return this->mValidityInfo;
 }
+
+void cedar::proc::DataSlot::setValidityInfo(const std::string& info)
+{
+  this->mValidityInfo = info;
+}

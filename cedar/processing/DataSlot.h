@@ -205,6 +205,9 @@ public:
   //! returns a string stating the validity of the slot
   const std::string& getValidityInfo() const;
 
+  //! Sets the validity info that indicates why the slot is invalid.
+  void setValidityInfo(const std::string& info);
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
   //--------------------------------------------------------------------------------------------------------------------
