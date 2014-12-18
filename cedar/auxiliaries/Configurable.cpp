@@ -497,36 +497,24 @@ void cedar::aux::Configurable::newFormatToOld(cedar::aux::ConfigurationNode& nod
   }
 }
 
-std::string cedar::aux::Configurable::normalizeFilename(const std::string& filename) const
+void cedar::aux::Configurable::writeJson(const cedar::aux::Path& filename) const
 {
-  std::string dir = filename;
+  // make sure the directory to which the file is supposed to be written exists
+  filename.absolute().createDirectories();
 
-  size_t index;
-  if ( (index = dir.rfind("/")) != std::string::npos )
-  {
-    dir = dir.substr(0, index);
-    boost::filesystem::create_directories(dir);
-  }
-
-  return filename;
-}
-
-void cedar::aux::Configurable::writeJson(const std::string& filename) const
-{
-  std::string new_filename = normalizeFilename(filename);
-
+  // generate the configuration tree
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
-  boost::property_tree::write_json(filename, configuration);
+
+  // write the tree to a file
+  boost::property_tree::write_json(filename.absolute(), configuration);
 }
 
 void cedar::aux::Configurable::writeCsv(const std::string& filename, const char separator) const
 {
-  std::string new_filename = normalizeFilename(filename);
-
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
-  writeCsvConfiguration(new_filename, configuration, separator);
+  writeCsvConfiguration(filename, configuration, separator);
 }
 
 void cedar::aux::Configurable::parameterNameChanged(const std::string& oldName, const std::string& newName)
