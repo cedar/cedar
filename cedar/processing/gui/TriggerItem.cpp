@@ -133,6 +133,11 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::TriggerItem::canDuplicate() const
+{
+  return true;
+}
+
 void cedar::proc::gui::TriggerItem::disconnect(cedar::proc::gui::GraphicsBase* /*pListener*/)
 {
 }

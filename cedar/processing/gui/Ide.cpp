@@ -258,7 +258,7 @@ mSimulationRunning(false)
                    this,
                    SLOT(showRobotManager()));
 
-  QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
+  QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateSelected()));
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copyStep()));
   QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
   QObject::connect(mpActionFind, SIGNAL(triggered()), this, SLOT(openFindDialog()));
@@ -503,7 +503,7 @@ void cedar::proc::gui::Ide::exportSvg()
   }
 }
 
-void cedar::proc::gui::Ide::duplicateStep()
+void cedar::proc::gui::Ide::duplicateSelected()
 {
   // get current mouse position
   QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
@@ -519,11 +519,16 @@ void cedar::proc::gui::Ide::duplicateStep()
     bool add_to_list = true;
 
     // check if item is a connection
-    if (dynamic_cast<cedar::proc::gui::Connection*>(item))
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+    {
+      add_to_list = graphics_item->canDuplicate();
+    }
+    else
     {
       add_to_list = false;
     }
-    else
+
+    if (add_to_list)
     {
       // check if the item has a parent within the selection
       for (auto sub_item : selected)
@@ -544,6 +549,11 @@ void cedar::proc::gui::Ide::duplicateStep()
     {
       items_to_duplicate.append(item);
     }
+  }
+
+  if (items_to_duplicate.empty())
+  {
+    return;
   }
 
   // determine the position offset of the duplicates as the average of the positions of all selected elements

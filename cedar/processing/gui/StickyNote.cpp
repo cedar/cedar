@@ -92,6 +92,12 @@ cedar::proc::gui::StickyNote::~StickyNote()
     this->mpParent->emitSceneChanged();
   }
 }
+
+bool cedar::proc::gui::StickyNote::canDuplicate() const
+{
+  return false;
+}
+
 QRectF cedar::proc::gui::StickyNote::boundingRect() const
 {
   return mBound;

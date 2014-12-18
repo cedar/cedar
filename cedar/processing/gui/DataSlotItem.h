@@ -133,6 +133,8 @@ public:
   //! Sets whether the connections of this item are highlighted due to one of its owners being selected.
   void setHighlightedBySelection(bool highlight);
 
+  bool canDuplicate() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
