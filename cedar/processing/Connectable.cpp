@@ -102,7 +102,7 @@ void cedar::proc::Connectable::writeData(cedar::aux::ConfigurationNode& stored_d
 {
   for (auto role_enum : cedar::proc::DataRole::type().list())
   {
-    if (!this->hasRole(role_enum.id()))
+    if (!this->hasSlotForRole(role_enum.id()))
     {
       continue;
     }
@@ -384,7 +384,7 @@ const cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(
   return iter->second;
 }
 
-bool cedar::proc::Connectable::hasRole(cedar::proc::DataRole::Id role) const
+bool cedar::proc::Connectable::hasSlotForRole(cedar::proc::DataRole::Id role) const
 {
   auto iter = this->mDataConnectionsOrder.find(role);
   if (iter == this->mDataConnectionsOrder.end())

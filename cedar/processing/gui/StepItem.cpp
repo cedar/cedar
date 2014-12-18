@@ -481,7 +481,7 @@ void cedar::proc::gui::StepItem::fillDataSerialization(QMenu* pMenu)
       continue;
     }
 
-    if (!this->getStep()->hasRole(role_enum))
+    if (!this->getStep()->hasSlotForRole(role_enum))
     {
       continue;
     }

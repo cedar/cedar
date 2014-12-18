@@ -639,7 +639,7 @@ void cedar::proc::GroupFileFormatV1::readRecords
       slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
       for (unsigned int s = 0; s < slotTypes.size(); s++)
       {
-        if (step->hasRole(slotTypes[s]))
+        if (step->hasSlotForRole(slotTypes[s]))
         {
           cedar::proc::Connectable::SlotList dataSlots = step->getOrderedDataSlots(slotTypes[s]);
           for (unsigned int i = 0; i < dataSlots.size(); i++)

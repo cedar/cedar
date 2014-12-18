@@ -439,7 +439,7 @@ void cedar::proc::gui::Connectable::addDataItems()
       continue;
 
     // populate step item list
-    if (this->getConnectable()->hasRole(*enum_it))
+    if (this->getConnectable()->hasSlotForRole(*enum_it))
     {
       const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(*enum_it);
       for (cedar::proc::Connectable::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
@@ -928,7 +928,7 @@ void cedar::proc::gui::Connectable::fillPlots
 {
   for (const cedar::aux::Enum& e : cedar::proc::DataRole::type().list())
   {
-    if (this->getConnectable()->hasRole(e.id()))
+    if (this->getConnectable()->hasSlotForRole(e.id()))
     {
       this->addRoleSeparator(e, pMenu);
 
@@ -1118,7 +1118,7 @@ void cedar::proc::gui::Connectable::plotAll()
   cedar::proc::ElementDeclaration::DataList data = cedar::proc::ElementDeclaration::DataList();
   for (const cedar::aux::Enum& e : cedar::proc::DataRole::type().list())
   {
-    if (this->getConnectable()->hasRole(e.id()))
+    if (this->getConnectable()->hasSlotForRole(e.id()))
     {
       const cedar::proc::Step::SlotMap& slotmap = this->getConnectable()->getDataSlots(e.id());
       for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)

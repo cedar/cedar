@@ -145,7 +145,7 @@ protected:
   // the values of the properties
   cedar::aux::BoolParameterPtr mRecording;
 
-  //!@todo Enum RecordType (Encoding)
+  //!@todo Add an enum class for the encoding type used when recording
 
   //!@endcond
 private:

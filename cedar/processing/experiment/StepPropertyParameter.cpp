@@ -471,7 +471,7 @@ std::vector<std::string> cedar::proc::experiment::StepPropertyParameter::getList
   std::vector<std::string> list;
   if (auto step = mElement.lock())
   {
-    if (step->hasRole(role))
+    if (step->hasSlotForRole(role))
     {
       for (auto data : step->getDataSlots(role))
       {
