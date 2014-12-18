@@ -119,6 +119,11 @@ cedar::proc::gui::DataSlotItem::~DataSlotItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::DataSlotItem::canDuplicate() const
+{
+  return false;
+}
+
 void cedar::proc::gui::DataSlotItem::setHighlightedBySelection(bool highlight)
 {
   for (size_t i = 0; i < this->getConnections().size(); ++i)

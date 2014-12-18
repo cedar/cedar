@@ -200,7 +200,7 @@ public slots:
   
   /*!@brief Duplicates a selected step
    */
-  void duplicateStep();
+  void duplicateSelected();
 
   /*!@brief Select all elements
    */

@@ -125,6 +125,8 @@ public:
   //!@brief disconnect from a listener
   void disconnect(cedar::proc::gui::GraphicsBase* pListener);
 
+  bool canDuplicate() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

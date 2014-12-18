@@ -96,6 +96,8 @@ public:
   //!@brief Overrride the context menu. Used for setting colors.
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  bool canDuplicate() const;
+
   //!@brief Returns the text of the StickyNote.
   std::string getText() const;
 
