@@ -206,6 +206,9 @@ public:
   //!@deprecated Use append() instead.
   CEDAR_DECLARE_DEPRECATED(void appendComponent(const std::string& component));
 
+  //! Ensures that all directories that are part of this path exist.
+  void createDirectories() const;
+
   //! Returns the separator for paths (depends on the operating system).
   static std::string separator();
 

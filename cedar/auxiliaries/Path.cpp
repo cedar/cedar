@@ -104,6 +104,11 @@ cedar::aux::Path cedar::aux::Path::operator()(size_t start, size_t end) const
   return path;
 }
 
+void cedar::aux::Path::createDirectories() const
+{
+  boost::filesystem::create_directories(this->getDirectory().absolute().toString(false));
+}
+
 std::string cedar::aux::Path::getTimestampForFileName()
 {
   return QDateTime::currentDateTime().toString("yyyy_MM_dd__hh_mm_ss").toStdString();
