@@ -184,6 +184,7 @@ mDefaultBackground(bgColor)
   this->mpRectangle->setPen(pen);
   this->mpRectangle->setBrush(bg);
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -198,6 +199,11 @@ void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor&
 void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
 {
   this->setBackgroundColor(this->mDefaultBackground);
+}
+
+bool cedar::proc::gui::Connectable::canDuplicate() const
+{
+  return !this->isReadOnly();
 }
 
 void cedar::proc::gui::Connectable::translateStartedSignal()

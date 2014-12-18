@@ -219,6 +219,8 @@ public:
   //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
 
+  bool canDuplicate() const;
+
 public slots:
   //! reacts to the removal of a data slot
   void reactToSlotRemoved(cedar::proc::DataRole::Id role, QString name);
