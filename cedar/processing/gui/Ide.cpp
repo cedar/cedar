@@ -569,7 +569,7 @@ void cedar::proc::gui::Ide::duplicateStep()
         {
           std::vector<cedar::proc::DataConnectionPtr> connections;
           // get a list of all outgoing connections for this element
-          if (connectable->hasRole(cedar::proc::DataRole::OUTPUT))
+          if (connectable->hasSlotForRole(cedar::proc::DataRole::OUTPUT))
           {
             for (auto slot : connectable->getDataSlots(cedar::proc::DataRole::OUTPUT))
             {

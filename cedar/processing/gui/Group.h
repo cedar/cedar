@@ -405,12 +405,10 @@ private:
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::Group*> mpGroupsToAdd;
 
-//  boost::signals2::connection mSlotConnection;
-  //!@todo Make these scoped connections
-  boost::signals2::connection mNewElementAddedConnection;
-  boost::signals2::connection mElementRemovedConnection;
-  boost::signals2::connection mTriggerConnectionChangedConnection;
-  boost::signals2::connection mDataConnectionChangedConnection;
+  boost::signals2::scoped_connection mNewElementAddedConnection;
+  boost::signals2::scoped_connection mElementRemovedConnection;
+  boost::signals2::scoped_connection mTriggerConnectionChangedConnection;
+  boost::signals2::scoped_connection mDataConnectionChangedConnection;
   boost::signals2::scoped_connection mLinkedChangedConnection;
   boost::signals2::scoped_connection mLastReadConfigurationChangedConnection;
 

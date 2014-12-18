@@ -200,33 +200,9 @@ cedar::proc::gui::Group::~Group()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  if (mNewElementAddedConnection.connected())
-  {
-    mNewElementAddedConnection.disconnect();
-  }
-  if (mElementRemovedConnection.connected())
-  {
-    mElementRemovedConnection.disconnect();
-  }
-  if (mElementRemovedConnection.connected())
-  {
-    mElementRemovedConnection.disconnect();
-  }
-  if (mDataConnectionChangedConnection.connected())
-  {
-    mDataConnectionChangedConnection.disconnect();
-  }
-  if (mTriggerConnectionChangedConnection.connected())
-  {
-    mTriggerConnectionChangedConnection.disconnect();
-  }
   if (this->scene())
   {
     cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeGroupItem(this);
-  }
-  else
-  {
-//    CEDAR_DEBUG_ASSERT(this->isRootGroup());
   }
 }
 

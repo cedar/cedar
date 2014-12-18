@@ -212,7 +212,17 @@ std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
     }
   }
 
-  //!@todo Add plugins required by scripts
+  {
+    QReadLocker locker(this->mScripts.getLockPtr());
+    for (auto script : this->mScripts.member())
+    {
+      auto declaration = cedar::proc::CppScriptDeclarationManagerSingleton::getInstance()->getDeclarationOf(script);
+      if (!declaration->getSource().empty())
+      {
+        required_plugins.insert(declaration->getSource());
+      }
+    }
+  }
 
   return required_plugins;
 }
