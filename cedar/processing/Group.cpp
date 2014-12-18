@@ -1541,11 +1541,13 @@ cedar::proc::ElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupP
 
 void cedar::proc::Group::connectSlots(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target)
 {
+  //!@todo See entry below
   this->connectSlots(source->getParent() + "." + source->getName(), target->getParent() + "." + target->getName());
 }
 
 void cedar::proc::Group::connectSlots(const std::string& source, const std::string& target)
 {
+  //!@todo Given that this function first does some complicated stuff to find the slot pointers, why doesn't it call the other connectSlots method (rather than how it is now)?
   // parse element and slot name
   std::string source_name;
   std::string source_slot_name;
