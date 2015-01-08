@@ -293,6 +293,16 @@ mSimulationRunning(false)
     SLOT(experimentRunningChanged(bool))
   );
 
+  QObject::connect
+  (
+      this->mpPlotGroupsComboBox,
+      SIGNAL(currentIndexChanged(int)),
+      this,
+      SLOT(togglePlotGroupActions())
+  );
+  // make sure that we start with the right setting
+  this->togglePlotGroupActions();
+
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
     boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
@@ -1702,6 +1712,24 @@ void cedar::proc::gui::Ide::deletePlotGroup()
 
       this->setArchitectureChanged(true);
     }
+  }
+}
+
+void cedar::proc::gui::Ide::togglePlotGroupActions()
+{
+  if (this->mpPlotGroupsComboBox->count() == 0)
+  {
+    this->mpActionDisplayPlotGroup->setEnabled(false);
+    this->mpActionRenamePlotGroup->setEnabled(false);
+    this->mpActionEditPlotGroup->setEnabled(false);
+    this->mpActionDeletePlotGroup->setEnabled(false);
+  }
+  else
+  {
+    this->mpActionDisplayPlotGroup->setEnabled(true);
+    this->mpActionRenamePlotGroup->setEnabled(true);
+    this->mpActionEditPlotGroup->setEnabled(true);
+    this->mpActionDeletePlotGroup->setEnabled(true);
   }
 }
 

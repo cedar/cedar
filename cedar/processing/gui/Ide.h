@@ -112,6 +112,9 @@ public:
   }
 
 public slots:
+  //!@brief
+  void togglePlotGroupActions();
+
   /*!@brief Slot that displays notifications.
    */
   void notify(const QString& message);
