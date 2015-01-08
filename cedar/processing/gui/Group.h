@@ -191,6 +191,9 @@ public:
   //! creates plot group of provided name containing all currently opened plots
   void addPlotGroup(std::string plotGroupName);
 
+  //! creates plot group of provided name containing all currently opened plots
+  void editPlotGroup(std::string plotGroupName);
+
   //! removes plot group of given name
   void removePlotGroup(std::string plotGroupName);
 
@@ -199,6 +202,9 @@ public:
   
   //! returns the name of every plot group of this group
   std::list<std::string> getPlotGroupNames();
+
+  //! returns whether a name already exists in plot group list
+  bool plotGroupNameExists(const std::string& newName) const;
 
   //! opens the given plot group
   void displayPlotGroup(std::string plotGroupName);

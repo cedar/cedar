@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -230,8 +230,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -243,8 +243,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -301,8 +301,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>429</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
             <property name="palette">
@@ -438,9 +438,10 @@
    <addaction name="separator"/>
    <addaction name="mpActionDisplayPlotGroup"/>
    <addaction name="mpActionNewPlotGroup"/>
+   <addaction name="mpActionRenamePlotGroup"/>
    <addaction name="mpActionEditPlotGroup"/>
-   <addaction name="separator"/>
    <addaction name="mpActionDeletePlotGroup"/>
+   <addaction name="separator"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -726,16 +727,16 @@
     <string>add a plot group</string>
    </property>
   </action>
-  <action name="mpActionEditPlotGroup">
+  <action name="mpActionRenamePlotGroup">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/edit.svg</normaloff>:/toolbaricons/edit.svg</iconset>
    </property>
    <property name="text">
-    <string>Edit Plot Group</string>
+    <string>Rename Current Plot Group</string>
    </property>
    <property name="toolTip">
-    <string>edit selected plot group</string>
+    <string>rename selected plot group</string>
    </property>
   </action>
   <action name="mpActionDisplayPlotGroup">
@@ -841,6 +842,18 @@
    </property>
    <property name="toolTip">
     <string>Resets the simulation, i.e., calls reset on the architecture and rewinds the global timer.</string>
+   </property>
+  </action>
+  <action name="mpActionEditPlotGroup">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/store_plotgroup.svg</normaloff>:/toolbaricons/store_plotgroup.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Store Open Plots in Current Plot Group</string>
+   </property>
+   <property name="toolTip">
+    <string>store open plots in selected plot group</string>
    </property>
   </action>
  </widget>
