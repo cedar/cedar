@@ -224,6 +224,7 @@ mSimulationRunning(false)
   QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
 
   QObject::connect(this->mpActionNewPlotGroup, SIGNAL(triggered()), this, SLOT(addPlotGroup()));
+  QObject::connect(this->mpActionRenamePlotGroup, SIGNAL(triggered()), this, SLOT(renamePlotGroup()));
   QObject::connect(this->mpActionEditPlotGroup, SIGNAL(triggered()), this, SLOT(editPlotGroup()));
   QObject::connect(this->mpActionDisplayPlotGroup, SIGNAL(triggered()), this, SLOT(displayPlotGroup()));
   QObject::connect(this->mpActionDeletePlotGroup, SIGNAL(triggered()), this, SLOT(deletePlotGroup()));
@@ -291,6 +292,16 @@ mSimulationRunning(false)
     this,
     SLOT(experimentRunningChanged(bool))
   );
+
+  QObject::connect
+  (
+      this->mpPlotGroupsComboBox,
+      SIGNAL(currentIndexChanged(int)),
+      this,
+      SLOT(togglePlotGroupActions())
+  );
+  // make sure that we start with the right setting
+  this->togglePlotGroupActions();
 
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
@@ -1629,11 +1640,23 @@ void cedar::proc::gui::Ide::addPlotGroup()
     this->setArchitectureChanged(true);
   }
 }
-  
+
 void cedar::proc::gui::Ide::editPlotGroup()
 {
+  // get selected plot group
+  QString plot_group_current_name = this->mpPlotGroupsComboBox->currentText();
+  int position = this->mpPlotGroupsComboBox->currentIndex();
+  if(position != -1)
+  {
+    this->mGroup->editPlotGroup(plot_group_current_name.toStdString());
+    this->setArchitectureChanged(true);
+  }
+}
+  
+void cedar::proc::gui::Ide::renamePlotGroup()
+{
   bool ok;
-  // get selecte plot group
+  // get selected plot group
   QString plot_group_current_name = this->mpPlotGroupsComboBox->currentText();
   int position = this->mpPlotGroupsComboBox->currentIndex();
   if(position != -1)
@@ -1641,12 +1664,23 @@ void cedar::proc::gui::Ide::editPlotGroup()
     QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Plotgroup name:"), QLineEdit::Normal, plot_group_current_name, &ok);
     if (ok && !text.isEmpty())
     {
-      this->mGroup->renamePlotGroup(plot_group_current_name.toStdString(), text.toStdString()); // toStdString assumes ascii
-      this->mpPlotGroupsComboBox->removeItem(position);
-      this->mpPlotGroupsComboBox->insertItem(position, text);
-      this->mpPlotGroupsComboBox->setCurrentIndex(position);
+      if (plot_group_current_name.toStdString() == text.toStdString()) // same name, return
+      {
+        return;
+      }
+      else if (!this->mGroup->plotGroupNameExists(text.toStdString())) // valid name, rename
+      {
+        this->mGroup->renamePlotGroup(plot_group_current_name.toStdString(), text.toStdString()); // toStdString assumes ascii
+        this->mpPlotGroupsComboBox->removeItem(position);
+        this->mpPlotGroupsComboBox->insertItem(position, text);
+        this->mpPlotGroupsComboBox->setCurrentIndex(position);
 
-      this->setArchitectureChanged(true);
+        this->setArchitectureChanged(true);
+      }
+      else // name is already in use, notify
+      {
+        this->notify("The name you picked does already exist.");
+      }
     }
   }
 }
@@ -1678,6 +1712,24 @@ void cedar::proc::gui::Ide::deletePlotGroup()
 
       this->setArchitectureChanged(true);
     }
+  }
+}
+
+void cedar::proc::gui::Ide::togglePlotGroupActions()
+{
+  if (this->mpPlotGroupsComboBox->count() == 0)
+  {
+    this->mpActionDisplayPlotGroup->setEnabled(false);
+    this->mpActionRenamePlotGroup->setEnabled(false);
+    this->mpActionEditPlotGroup->setEnabled(false);
+    this->mpActionDeletePlotGroup->setEnabled(false);
+  }
+  else
+  {
+    this->mpActionDisplayPlotGroup->setEnabled(true);
+    this->mpActionRenamePlotGroup->setEnabled(true);
+    this->mpActionEditPlotGroup->setEnabled(true);
+    this->mpActionDeletePlotGroup->setEnabled(true);
   }
 }
 

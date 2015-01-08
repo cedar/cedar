@@ -85,6 +85,7 @@
     <file>toolbaricons/smart_connections.svg</file>
     <file>toolbaricons/close_all_plots.svg</file>
     <file>toolbaricons/snapshot.svg</file>
+    <file>toolbaricons/store_plotgroup.svg</file>
     <file>processing_ide_app_icon.svg</file>
     <file>processing_ide_app_icon_48.png</file>
   </qresource>
