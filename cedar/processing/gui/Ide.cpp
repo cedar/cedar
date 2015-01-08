@@ -224,7 +224,7 @@ mSimulationRunning(false)
   QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
 
   QObject::connect(this->mpActionNewPlotGroup, SIGNAL(triggered()), this, SLOT(addPlotGroup()));
-  QObject::connect(this->mpActionEditPlotGroup, SIGNAL(triggered()), this, SLOT(editPlotGroup()));
+  QObject::connect(this->mpActionEditPlotGroupName, SIGNAL(triggered()), this, SLOT(editPlotGroupName()));
   QObject::connect(this->mpActionDisplayPlotGroup, SIGNAL(triggered()), this, SLOT(displayPlotGroup()));
   QObject::connect(this->mpActionDeletePlotGroup, SIGNAL(triggered()), this, SLOT(deletePlotGroup()));
   
@@ -1630,10 +1630,10 @@ void cedar::proc::gui::Ide::addPlotGroup()
   }
 }
   
-void cedar::proc::gui::Ide::editPlotGroup()
+void cedar::proc::gui::Ide::editPlotGroupName()
 {
   bool ok;
-  // get selecte plot group
+  // get selected plot group
   QString plot_group_current_name = this->mpPlotGroupsComboBox->currentText();
   int position = this->mpPlotGroupsComboBox->currentIndex();
   if(position != -1)
@@ -1641,12 +1641,23 @@ void cedar::proc::gui::Ide::editPlotGroup()
     QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Plotgroup name:"), QLineEdit::Normal, plot_group_current_name, &ok);
     if (ok && !text.isEmpty())
     {
-      this->mGroup->renamePlotGroup(plot_group_current_name.toStdString(), text.toStdString()); // toStdString assumes ascii
-      this->mpPlotGroupsComboBox->removeItem(position);
-      this->mpPlotGroupsComboBox->insertItem(position, text);
-      this->mpPlotGroupsComboBox->setCurrentIndex(position);
+      if (plot_group_current_name.toStdString() == text.toStdString()) // same name, return
+      {
+        return;
+      }
+      else if (!this->mGroup->plotGroupNameExists(text.toStdString())) // valid name, rename
+      {
+        this->mGroup->renamePlotGroup(plot_group_current_name.toStdString(), text.toStdString()); // toStdString assumes ascii
+        this->mpPlotGroupsComboBox->removeItem(position);
+        this->mpPlotGroupsComboBox->insertItem(position, text);
+        this->mpPlotGroupsComboBox->setCurrentIndex(position);
 
-      this->setArchitectureChanged(true);
+        this->setArchitectureChanged(true);
+      }
+      else // name is already in use, notify
+      {
+        this->notify("The name you picked does already exist.");
+      }
     }
   }
 }
