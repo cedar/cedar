@@ -1691,6 +1691,22 @@ void cedar::proc::gui::Group::addPlotGroup(std::string plotGroupName)
   this->mPlotGroupsNode.put_child(plotGroupName, node);
 }
 
+void cedar::proc::gui::Group::editPlotGroup(std::string plotGroupName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Group::editPlotGroup could not edit plot group. Does not exist."
+    );
+  }
+  cedar::aux::ConfigurationNode node;
+  this->writeOpenPlotsTo(plot_group->second);
+  //this->mPlotGroupsNode.put_child(plotGroupName, node);
+}
+
 void cedar::proc::gui::Group::removePlotGroup(std::string plotGroupName)
 {
   auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
