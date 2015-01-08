@@ -240,16 +240,19 @@ public slots:
   //!@brief Takes a snap shot from the registered steps;
   void takeSnapshot();
 
-  //!@brief opens dialogue to add plotgroup
+  //!@brief opens dialogue to add plot group
   void addPlotGroup();
   
-  //!@brief opens dialogue to edit selected plotgroup name
-  void editPlotGroupName();
+  //!@brief opens dialogue to rename selected plot group
+  void renamePlotGroup();
 
-  //!@brief displays the selected plotgroup
+  //!@brief saves the open plots in current plot group
+  void editPlotGroup();
+
+  //!@brief displays the selected plot group
   void displayPlotGroup();
 
-  //!@brief deletes the selected plotgroup
+  //!@brief deletes the selected plot group
   void deletePlotGroup();
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const

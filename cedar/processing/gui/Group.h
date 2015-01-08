@@ -191,6 +191,9 @@ public:
   //! creates plot group of provided name containing all currently opened plots
   void addPlotGroup(std::string plotGroupName);
 
+  //! creates plot group of provided name containing all currently opened plots
+  void editPlotGroup(std::string plotGroupName);
+
   //! removes plot group of given name
   void removePlotGroup(std::string plotGroupName);
 
