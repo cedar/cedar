@@ -243,8 +243,8 @@ public slots:
   //!@brief opens dialogue to add plotgroup
   void addPlotGroup();
   
-  //!@brief opens dialogue to edit selected plotgroup
-  void editPlotGroup();
+  //!@brief opens dialogue to edit selected plotgroup name
+  void editPlotGroupName();
 
   //!@brief displays the selected plotgroup
   void displayPlotGroup();

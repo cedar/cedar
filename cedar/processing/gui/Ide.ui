@@ -438,7 +438,7 @@
    <addaction name="separator"/>
    <addaction name="mpActionDisplayPlotGroup"/>
    <addaction name="mpActionNewPlotGroup"/>
-   <addaction name="mpActionEditPlotGroup"/>
+   <addaction name="mpActionEditPlotGroupName"/>
    <addaction name="separator"/>
    <addaction name="mpActionDeletePlotGroup"/>
   </widget>
@@ -726,13 +726,13 @@
     <string>add a plot group</string>
    </property>
   </action>
-  <action name="mpActionEditPlotGroup">
+  <action name="mpActionEditPlotGroupName">
    <property name="icon">
     <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/edit.svg</normaloff>:/toolbaricons/edit.svg</iconset>
    </property>
    <property name="text">
-    <string>Edit Plot Group</string>
+    <string>Rename Current Plot Group</string>
    </property>
    <property name="toolTip">
     <string>edit selected plot group</string>

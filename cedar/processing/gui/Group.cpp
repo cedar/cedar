@@ -1735,6 +1735,18 @@ std::list<std::string> cedar::proc::gui::Group::getPlotGroupNames()
   return plot_group_names;
 }
 
+bool cedar::proc::gui::Group::plotGroupNameExists(const std::string& newName) const
+{
+  for (auto node : mPlotGroupsNode)
+  {
+    if (node.first == newName)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)
 {
   auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
