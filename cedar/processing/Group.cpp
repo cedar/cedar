@@ -2594,8 +2594,19 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const ced
 cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string& groupName, const std::string& fileName)
 {
   cedar::proc::GroupPtr imported_group(new cedar::proc::Group());
+  // this has to happen first or gui does not react on any added elements
   this->add(imported_group, this->getUniqueIdentifier(groupName));
-  imported_group->readLinkedGroup(groupName, fileName);
+  // the next may fail because the group cannot be found, handle this and rethrow
+  try
+  {
+    imported_group->readLinkedGroup(groupName, fileName);
+  }
+  catch (cedar::aux::NotFoundException& exc)
+  {
+    // remove the group and throw an exception
+    this->remove(imported_group);
+    CEDAR_THROW(cedar::aux::NotFoundException, exc.getMessage());
+  }
 
   return imported_group;
 }
