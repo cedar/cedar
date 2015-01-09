@@ -172,6 +172,7 @@ void cedar::dev::kuka::KinematicChain::copyFromFRI()
   {
     mMeasuredJointPosition[i] = double(pJointPos[i]);
   }
+
   // if not in command mode or Power is not on, reset commanded position to measured position
   if (mFRIChannel->getFriState() != FRI_STATE_CMD || !mFRIChannel->isPowerOn())
   {
@@ -194,6 +195,7 @@ void cedar::dev::kuka::KinematicChain::sendSimulatedAngles(cv::Mat mat)
     {
       commanded_joint[i] = mMeasuredJointPosition.at(i);
     }
+
     // update joint angle and joint velocity if necessary (and only if in command mode)
     // this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
     if (mFRIChannel->isPowerOn() && mFRIChannel->getFriState() == FRI_STATE_CMD)
