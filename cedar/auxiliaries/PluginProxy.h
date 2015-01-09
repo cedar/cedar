@@ -142,11 +142,6 @@ public:
     return mPluginDeclaredSignal.connect(slot);
   }
 
-#ifdef CEDAR_OS_WINDOWS
-  //!@todo This probably belongs somewhere else, as it is a wrapper around a generic windows function.
-  static std::string getLastError();
-#endif // CEDAR_OS_WINDOWS
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

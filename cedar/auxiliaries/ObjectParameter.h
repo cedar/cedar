@@ -77,10 +77,6 @@ public:
    */
   virtual void listTypes(std::vector<std::string>& types) const = 0;
 
-  /*!@brief   Returns the object currently stored in the parameter as a configurable.
-   */
-  virtual cedar::aux::ConfigurablePtr getConfigurable() = 0;
-
   /*!@brief   Sets the type of the object stored in the parameter.
    *
    * @remarks This will create a new object.

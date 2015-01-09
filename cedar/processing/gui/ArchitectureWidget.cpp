@@ -100,8 +100,10 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readLabel(const cedar::aux::Confi
 QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::ConfigurationNode& entry)
 {
   auto data_i = entry.find("data");
-  //!@todo Exception
-  CEDAR_ASSERT(data_i != entry.not_found());
+  if (data_i == entry.not_found())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not read plot: no data specified.");
+  }
   const auto& data_node = data_i->second;
 
   // hidden knowledge: boost ptree represents arrays by nodes with empty keys
@@ -120,8 +122,10 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::Config
 
   auto data = this->findData(first_data_path);
 
-  //!@todo Exception
-  CEDAR_ASSERT(data);
+  if (!data)
+  {
+    CEDAR_THROW(cedar::aux::NullPointerException, "Could not read plot: data is not set.");
+  }
 
   auto plot_type = readOptional<std::string>(entry, "plot type", "default");
 
@@ -181,8 +185,10 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::Config
       this->readDataNode(iter->second, path, title);
       auto data = this->findData(path);
 
-      //!@todo Exception
-      CEDAR_ASSERT(data);
+      if (!data)
+      {
+        CEDAR_THROW(cedar::aux::NullPointerException, "Could not add data while reading plot: data is not set.");
+      }
 
       if (multi_plot->canAppend(data))
       {
@@ -209,8 +215,18 @@ void cedar::proc::gui::ArchitectureWidget::readTemplates(const cedar::aux::Confi
     const auto& name = name_template_cfg_pair.first;
     const auto& template_cfg = name_template_cfg_pair.second;
 
-    //!@todo Check for duplicates
-    this->mTemplates[name] = template_cfg;
+    if (this->mTemplates.find(name) == this->mTemplates.end())
+    {
+      this->mTemplates[name] = template_cfg;
+    }
+    else
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Could not read template: there is already a template named \"" + name + "\".",
+        CEDAR_CURRENT_FUNCTION_NAME
+      );
+    }
   }
 }
 
@@ -304,14 +320,22 @@ void cedar::proc::gui::ArchitectureWidget::addTemplate
   auto template_name = readOptional<std::string>(entry, "template name", "");
   if (template_name.empty())
   {
-    //!@todo error
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Could not read template: template name is empty.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
     return;
   }
 
   auto iter = this->mTemplates.find(template_name);
   if (iter == this->mTemplates.end())
   {
-    //!@todo error
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Could not read template: template \"" + template_name + "\" not found.",
+      CEDAR_CURRENT_FUNCTION_NAME
+    );
     return;
   }
 

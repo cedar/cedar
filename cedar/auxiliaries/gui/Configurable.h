@@ -144,7 +144,7 @@ private:
 
   void appendObjectListParameter
        (
-         cedar::aux::ObjectListParameterPtr objectListParameter,
+         cedar::aux::ParameterPtr objectListParameter,
          QTreeWidgetItem* pParent,
          const std::string& path
        );

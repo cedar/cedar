@@ -97,8 +97,7 @@ void cedar::proc::CppScript::callRun()
 
 std::string cedar::proc::CppScript::getType() const
 {
-  //!@todo FactoryManager could as well have a raw-pointer version of this, then CppScript wouldn't need shared_from_this.
-  return cedar::proc::CppScriptFactoryManagerSingleton::getInstance()->getTypeId(this->shared_from_this());
+  return cedar::proc::CppScriptFactoryManagerSingleton::getInstance()->getTypeId(this);
 }
 
 void cedar::proc::CppScript::setStopRequested(bool requested)

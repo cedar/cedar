@@ -194,7 +194,7 @@ protected:
 
     if (WidgetAbstraction::getValue(this->mWidgets[index]) != this->parameter()->at(index))
     {
-      this->parameter()->set(index, WidgetAbstraction::getValue(this->mWidgets[index]), true);
+      this->parameter()->setValue(index, WidgetAbstraction::getValue(this->mWidgets[index]), true);
     }
   }
 

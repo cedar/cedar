@@ -566,7 +566,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
   // integrate one time step
   u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u
-       //!@todo Something may be wrong with the units here: technically, this would be sqrt(ms) / ms, which just seems to be a silly unit,
        + (sqrt(time / (cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds))) / tau)
            * _mInputNoiseGain->getValue() * input_noise;
 }

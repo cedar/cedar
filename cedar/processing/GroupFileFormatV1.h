@@ -56,8 +56,6 @@
 
 
 /*!@brief Responsible for reading and writing groups to boost configuration trees.
- *
- * @todo If there ever is a second format, define a common base class for formats.
  */
 class cedar::proc::GroupFileFormatV1
 {

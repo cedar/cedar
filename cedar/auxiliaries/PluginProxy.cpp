@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
@@ -250,23 +251,32 @@ bool cedar::aux::PluginProxy::canFindPlugin(const std::string& pluginName)
 
 std::string cedar::aux::PluginProxy::findPluginFile(const std::string& fileName)
 {
-  //!@todo Use cedar::aux::Path for this whole affair.
-  // first, find the name of the plugin; it is the first element of the path
-  std::string plugin_name, path, full_path, plugin_base_path, throw_away;
-  cedar::aux::splitFirst(fileName, "/", plugin_name, path);
-  std::string plugin_path = cedar::aux::PluginProxy::findPlugin(plugin_name);
-  cedar::aux::splitLast(plugin_path, "/", plugin_base_path, throw_away);
-  if (boost::filesystem::exists(plugin_base_path + "/" + path))
+  // fileName is something like: PluginName/file (where file is the name/path of the file to locate)
+  cedar::aux::Path plugin_file_path = fileName;
+
+  // first, get the name of the plugin; it is the first element of the path
+  std::string plugin_name = plugin_file_path.getFirst();
+
+  // get the actual path of the file, i.e., the remainder of the original path
+  cedar::aux::Path path = plugin_file_path(1);
+
+  // find the path of the plugin
+  cedar::aux::Path plugin_path = cedar::aux::PluginProxy::findPlugin(plugin_name);
+
+  // remove the filename, just use the path
+  std::string plugin_base_path = plugin_path.getDirectory();
+
+  if (boost::filesystem::exists(plugin_base_path + "/" + path.toString()))
   {
-    return plugin_base_path + "/" + path;
+    return plugin_base_path + "/" + path.toString();
   }
-  else if (boost::filesystem::exists(plugin_base_path + "/../" + path))
+  else if (boost::filesystem::exists(plugin_base_path + "/../" + path.toString()))
   {
-    return plugin_base_path + "/../" + path;
+    return plugin_base_path + "/../" + path.toString();
   }
   else
   {
-    return plugin_base_path + "/../../" + path;
+    return plugin_base_path + "/../../" + path.toString();
   }
 }
 
@@ -410,13 +420,13 @@ void cedar::aux::PluginProxy::load()
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
-    CEDAR_THROW(cedar::aux::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
+    CEDAR_THROW(cedar::aux::PluginException, "Could not load plugin: LoadLibraryEx failed: " + cedar::aux::windows::getLastError());
   }
   
   p_interface = (PluginInterfaceMethod) (GetProcAddress(this->mpLibHandle, TEXT("pluginDeclaration")));
   if (!p_interface)
   {
-    CEDAR_THROW(cedar::aux::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
+    CEDAR_THROW(cedar::aux::PluginException, "Error loading interface function: GetProcAddress failed: " + cedar::aux::windows::getLastError());
   }
 #endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS
   
@@ -446,27 +456,3 @@ cedar::aux::PluginDeclarationListPtr cedar::aux::PluginProxy::getDeclaration()
   return this->mDeclaration;
 }
 
-#ifdef CEDAR_OS_WINDOWS
-
-std::string cedar::aux::PluginProxy::getLastError()
-{
-  LPVOID lpMsgBuf;
-  DWORD dw = GetLastError(); 
-
-  FormatMessage(
-      FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-      FORMAT_MESSAGE_FROM_SYSTEM |
-      FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      dw,
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      (LPTSTR) &lpMsgBuf,
-      0, NULL );
-  
-  std::string error((char*)lpMsgBuf);
-
-  LocalFree(lpMsgBuf);
-  return error;
-}
-
-#endif //def CEDAR_OS_WINDOWS

@@ -111,7 +111,7 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 50, 1, 1000))
 void cedar::proc::sources::BoxInput::setLeftBound(unsigned int dimension, unsigned int leftBound)
 {
   CEDAR_ASSERT(dimension < this->_mLeftBounds->size());
-  this->_mLeftBounds->set(dimension, leftBound);
+  this->_mLeftBounds->setValue(dimension, leftBound);
 }
 
 double cedar::proc::sources::BoxInput::getAmplitude() const

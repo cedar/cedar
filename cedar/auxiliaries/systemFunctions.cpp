@@ -34,6 +34,7 @@
 
 ======================================================================================================================*/
 
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/Log.h"
@@ -56,11 +57,18 @@
   #pragma comment(lib, "comsuppw")
 #endif // CEDAR_COMPILER_MSVC
 
+#ifdef CEDAR_OS_WINDOWS
+#include <Windows.h>
+#endif // CEDAR_OS_WINDOWS
+
 // INTERNALS HEADER
 #define CEDAR_INTERNAL
 #include "cedar/internals.h"
 #undef CEDAR_INTERNAL
 
+// ---------------------------------------------------------------------------------------------------------------------
+//  general methods
+// ---------------------------------------------------------------------------------------------------------------------
 
 void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 {
@@ -122,7 +130,7 @@ std::string cedar::aux::getUserApplicationDataDirectory()
   }
   else
   {
-    //!@todo handle errors
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find application data directory. Error: " + cedar::aux::windows::getLastError());
   }
   return "";
 #endif // CEDAR_COMPILER_GCC
@@ -208,3 +216,33 @@ std::string cedar::aux::locateResource(const std::string& resourcePath, bool sho
   }
 }
 
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+//  Windows specific
+// ---------------------------------------------------------------------------------------------------------------------
+
+#ifdef CEDAR_OS_WINDOWS
+
+std::string cedar::aux::windows::getLastError()
+{
+  LPVOID lpMsgBuf;
+  DWORD dw = GetLastError();
+
+  FormatMessage(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    FORMAT_MESSAGE_FROM_SYSTEM |
+    FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    dw,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPTSTR)&lpMsgBuf,
+    0, NULL);
+
+  std::string error((char*)lpMsgBuf);
+
+  LocalFree(lpMsgBuf);
+  return error;
+}
+
+#endif //def CEDAR_OS_WINDOWS

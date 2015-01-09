@@ -163,7 +163,7 @@ public:
   inline void setSize(unsigned int dim, unsigned int size)
   {
     CEDAR_ASSERT(dim < this->_mSizes->size());
-    this->_mSizes->set(dim, size);
+    this->_mSizes->setValue(dim, size);
   }
 
   //! Returns the resting level (h) of the field.

@@ -171,7 +171,7 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
   }
 
   std::cout << "Setting value of last entry in the parameter" << std::endl;
-  parameter->set(parameter->size() - 1, firstValue);
+  parameter->setValue(parameter->size() - 1, firstValue);
   if (!testEquality<ParameterType, WidgetType>(parameter, p_widget))
   {
     ++errors;
@@ -235,7 +235,7 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
   parameter->setConstant(false);
   parameter->setMinimum(min2);
   parameter->setMaximum(max2);
-  parameter->set(0, val2);
+  parameter->setValue(0, val2);
 
   if (!testEquality<ParameterType, WidgetType>(parameter, p_widget))
   {

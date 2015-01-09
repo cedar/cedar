@@ -65,6 +65,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
@@ -122,7 +123,7 @@ namespace
         );
       if (module_handle == NULL)
       {
-        std::string error_message = cedar::aux::PluginProxy::getLastError();
+        std::string error_message = cedar::aux::windows::getLastError();
         cedar::aux::LogSingleton::getInstance()->error
         (
           "Failed to load dynamics library. You may be missing some processing steps. Windows says: \"" + error_message + "\".",
@@ -130,7 +131,7 @@ namespace
         );
       }
     }
-#endif // CEDAR_COMPILER_MSVC
+#endif // CEDAR_OS_WINDOWS
 
     return true;
   }
@@ -211,7 +212,17 @@ std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
     }
   }
 
-  //!@todo Add plugins required by scripts
+  {
+    QReadLocker locker(this->mScripts.getLockPtr());
+    for (auto script : this->mScripts.member())
+    {
+      auto declaration = cedar::proc::CppScriptDeclarationManagerSingleton::getInstance()->getDeclarationOf(script);
+      if (!declaration->getSource().empty())
+      {
+        required_plugins.insert(declaration->getSource());
+      }
+    }
+  }
 
   return required_plugins;
 }
@@ -1306,7 +1317,7 @@ void cedar::proc::Group::addConnector(const std::string& name, bool input)
 void cedar::proc::Group::addConnectorInternal(const std::string& name, bool input)
 {
   // check if connector is in map of connectors
-  this->_mConnectors->set(name, input);
+  this->_mConnectors->setValue(name, input);
 
   if (input)
   {
@@ -1360,7 +1371,7 @@ void cedar::proc::Group::renameConnector(const std::string& oldName, const std::
 
   // everything is fine, change name
   _mConnectors->erase(oldName);
-  _mConnectors->set(newName, input);
+  _mConnectors->setValue(newName, input);
   if (input)
   {
     this->renameInput(oldName, newName);

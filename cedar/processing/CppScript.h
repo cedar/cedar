@@ -60,8 +60,7 @@
 /*!@brief Derive this class to create scripts that can be executed on architectures from the cedar gui.
  */
 class cedar::proc::CppScript : public QObject,
-                               public cedar::aux::NamedConfigurable,
-                               public boost::enable_shared_from_this<cedar::proc::CppScript>
+                               public cedar::aux::NamedConfigurable
 {
   Q_OBJECT
 

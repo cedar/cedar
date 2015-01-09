@@ -128,7 +128,7 @@ public:
   virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a json file
-  virtual void writeJson(const std::string& filename) const;
+  virtual void writeJson(const cedar::aux::Path& filename) const;
 
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a csv spreadsheet file
   void writeCsv(const std::string& filename, const char separator = ',') const;
@@ -284,9 +284,6 @@ private:
 
   //!@brief Appends the locks of this configurable and its children to the set.
   void appendLocks(std::set<QReadWriteLock*>& locks);
-
-  //!@brief make sure the directories exist 
-  std::string normalizeFilename(const std::string& filename) const;
 
   //!@brief helper function to write a Ptree to .csv. internals start here. opens the stream
   template<class Ptree>

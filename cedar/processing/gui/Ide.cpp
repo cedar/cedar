@@ -115,12 +115,12 @@ mSimulationRunning(false)
 
   // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();
-  p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
+  p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");
   p_enable_custom_time_step->setChecked(false);
   this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
-  this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
+  this->mpCustomTimeStep->setToolTip("When enabled, this time step is passed to all looped triggers when single-stepping the architecture.");
   this->mpCustomTimeStep->setValue(10.0);
   this->mpCustomTimeStep->setMinimum(1.0);
   this->mpCustomTimeStep->setSuffix(" ms");
@@ -590,7 +590,7 @@ void cedar::proc::gui::Ide::duplicateSelected()
         {
           std::vector<cedar::proc::DataConnectionPtr> connections;
           // get a list of all outgoing connections for this element
-          if (connectable->hasRole(cedar::proc::DataRole::OUTPUT))
+          if (connectable->hasSlotForRole(cedar::proc::DataRole::OUTPUT))
           {
             for (auto slot : connectable->getDataSlots(cedar::proc::DataRole::OUTPUT))
             {

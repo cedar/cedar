@@ -121,7 +121,7 @@ void cedar::proc::steps::Flip::readConfiguration(const cedar::aux::Configuration
     {
       this->_mFlipDimensions->resize(1);
     }
-    this->_mFlipDimensions->set(0, value);
+    this->_mFlipDimensions->setValue(0, value);
   }
 
   auto flip_second = configuration.find("flip second dimension");
@@ -138,7 +138,7 @@ void cedar::proc::steps::Flip::readConfiguration(const cedar::aux::Configuration
     {
       this->_mFlipDimensions->resize(2);
     }
-    this->_mFlipDimensions->set(1, value);
+    this->_mFlipDimensions->setValue(1, value);
   }
 }
 

@@ -119,7 +119,7 @@ void cedar::proc::sources::GaussInput::setDimensionality(unsigned int dimensiona
 
 void cedar::proc::sources::GaussInput::setSize(unsigned int dimension, unsigned int size)
 {
-  this->_mSizes->set(dimension, size);
+  this->_mSizes->setValue(dimension, size);
 }
 
 unsigned int cedar::proc::sources::GaussInput::getSize(unsigned int dimension) const
@@ -130,7 +130,7 @@ unsigned int cedar::proc::sources::GaussInput::getSize(unsigned int dimension) c
 void cedar::proc::sources::GaussInput::setCenter(unsigned int dimension, double center)
 {
   CEDAR_ASSERT(dimension < this->_mCenters->size());
-  this->_mCenters->set(dimension, center);
+  this->_mCenters->setValue(dimension, center);
 }
 
 double cedar::proc::sources::GaussInput::getAmplitude() const
