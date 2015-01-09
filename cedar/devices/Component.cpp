@@ -1139,7 +1139,7 @@ void cedar::dev::Component::stepCommandCommunication(cedar::unit::Time dt)
   if (mDeviceCommandSelection)
   {
     type_for_Device = mDeviceCommandSelection.get();
-    //  std::cout << "commands restricted to ... " << type_for_Device  << std::endl;    
+    //std::cout << "    commands restricted to ... " << type_for_Device  << std::endl;    
   }
   else
   {

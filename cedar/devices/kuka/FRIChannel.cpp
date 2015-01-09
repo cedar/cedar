@@ -62,7 +62,19 @@ cedar::dev::kuka::FRIChannel::FRIChannel()
 :
 mpFriRemote(nullptr)
 {
-
+  // change the default for the FRI channel
+  auto ip = boost::dynamic_pointer_cast<cedar::aux::StringParameter>( this->getParameter("ip address") );
+  if (ip)
+  {
+    ip->setDefault("NULL");
+    ip->makeDefault();
+  }
+  auto port = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>( this->getParameter("port") );
+  if (port)
+  {
+    port->setDefault(0);
+    port->makeDefault();
+  }
 }
 
 cedar::dev::kuka::FRIChannel::~FRIChannel()

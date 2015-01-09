@@ -139,6 +139,7 @@ int main(int argc, char **argv)
 {
   std::string mode = "0";
   std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
+
   // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
   { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
@@ -159,6 +160,7 @@ int main(int argc, char **argv)
     }
   }
   bool use_hardware = false;
+
   if (mode == "hardware")
   {
     use_hardware = true;
@@ -173,24 +175,28 @@ int main(int argc, char **argv)
 
   if (use_hardware)
   {
+    // channel needs to be initialized manually, atm ...
+    auto fri_channel = boost::make_shared< cedar::dev::kuka::FRIChannel >();
+
     // hardware interface
-    cedar::dev::kuka::KinematicChainPtr lwr4(new cedar::dev::kuka::KinematicChain());
+    auto lwr4 = boost::make_shared< cedar::dev::kuka::KinematicChain >();
+    lwr4->setChannel( fri_channel );
     lwr4->readJson(configuration_file);
+
     arm = lwr4;
+
     // status widget
-    cedar::dev::kuka::FRIChannelPtr fri_channel
-      = boost::static_pointer_cast<cedar::dev::kuka::FRIChannel>(lwr4->getChannel());
     p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(fri_channel);
     p_fri_status_widget->startTimer(100);
     p_fri_status_widget->show();
   }
   else
   {
-    // simulated arm
-    cedar::dev::KinematicChainPtr sim(new cedar::dev::SimulatedKinematicChain());
+    auto sim = boost::make_shared< cedar::dev::SimulatedKinematicChain >();
     sim->readJson(configuration_file);
-    arm = sim;
 
+    // kein Channel
+    arm = sim;
   }
 
   // define some initial configurations we can choose from
