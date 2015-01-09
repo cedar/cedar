@@ -61,6 +61,7 @@ known issues
   - In rare cases, moving elements into groups breaks the triggering chain, which leads to steps not being iterated
     correctly. This can be fixed by saving and loading the architecture. If you encounter such a (reproducible)
     situation, please let us know.
+  - single elements cannot be loaded as linked templates into architectures. They are simply added to the architecture.
 
 Unreleased
 ==========
