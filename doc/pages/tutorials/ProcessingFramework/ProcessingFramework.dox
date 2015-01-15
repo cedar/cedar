@@ -1,0 +1,721 @@
+//Insert this below: @snippet processingTutorial/SimpleSummation.h [Includes]
+//@todo sadly, snippet is only available in Doxygen version 1.7.5 or later...
+/*!
+
+@page ProcessingFrameworkTutorial Tutorials for the Processing Framework
+
+@todo Most of the code on this page hasn't yet been tested directly; we need to make an examples folder and put it there.
+@todo There should also be an (advanced) tutorial on creating a custom data type (and visualizing it).
+
+This page offers several tutorials for using cedar's processing framework. A detailed description of the framework and 
+its concepts can be found at @ref ProcessingFrameworkConcept. In the following tutorials, we assume that you are 
+familiar with these concepts. You can, of course, always look them up again during the tutorials.
+
+This page contains the following sections:
+
+<ol>
+  <li>@ref ProcessingTutorialFirstStep</li>
+  <li>@ref ProcessingTutorialDeclarations</li>
+  <li>@ref ProcessingTutorialFirstStepArchitectureFile</li>
+  <li>@ref ProcessingTutorialPlugin</li>
+  <li>@ref ProcessingTutorialUsingTheProcessingIde</li>
+  <li>@ref ProcessingTutorialFirstStepDynamics</li>
+  <li>@ref ProcessingTutorialDataValidation</li>
+  <li>@ref ProcessingTutorialDataValidationAutomation</li>
+  <li>@ref ProcessingTutorialInputCollections</li>
+  <li>@ref ProcessingTutorialOwnParameters</li>
+  <li>@ref ProcessingTutorialManualLocking</li>
+  <li>@ref ProcessingTutorialStepViews</li>
+  <li>@ref ProcessingTutorialSummary</li>
+</ol>
+
+Tutorials are ordered into separate categories: beginner's tutorials are recommended for people who use the processing
+framework for the first time. They introduce all the features necessary to work with the processing framework.
+Intermediate tutorials introduce features that are optional but provide a more effective way of using the framework,
+such as input validation and others. Advanced tutorials cover features that are likely to only be needed in very few
+situations and require more advanced programming. Thus, the level of a tutorial doesn't reflect its difficulty, but
+rather it is a hint at what level of knowledge about the framework is expected from the reader.
+
+  
+
+@section ProcessingTutorialFirstStep Beginner's Tutorial: One Small Step
+
+In this section, we will give a brief introduction on how to create a new processing step that adheres to the principles
+of the processing framework.
+
+@subsection ProcessingTutorialFirstStep_Setup Setting up and building your project
+For this tutorial, we recommend using @link ProjectsWithCedar cedar's project scripts@endlink for compiling
+         your code. For the first tutorial, please add the necessary lines to compile an executable as described.
+         
+@subsection ProcessingTutorialFirstStep_Planning Planning
+
+The first thing to do when developing a new processing step (cedar::proc::Step) is to think about what the new step is
+supposed to do. For now, we pick a fairly simple example: we will create a processing step that receives two matrices
+and adds them together.
+
+@subsection ProcessingTutorialFirstStep_NewClass A New Class
+
+First, let's decide to call our class SimpleSummation. In order for it to work within the framework, it has to inherit
+cedar::proc::Step, so the class header looks something like this
+
+@code
+// ...
+#include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
+#include <cedar/auxiliaries/namespace.h> // forward declaration of all classes in cedar::aux
+// ...
+class SimpleSummation : public cedar::proc::Step
+{
+  // we assume that you declare all members and functions used throughout the tutorial here
+};
+// ...
+@endcode
+
+Let's begin by implementing the constructor. From our planning stage, we already know what the inputs and outputs of the
+step are going to be: we need two inputs (the matrices we plan to add up) and one output (the sum). In terms of the
+processing framework, this is expressed in the constructor:
+
+@code
+// CEDAR INCLUDES
+#include "SimpleSummation.h"
+#include <cedar/processing/ExternalData.h> // getInputSlot() returns ExternalData
+#include <cedar/auxiliaries/MatData.h> // this is the class MatData, used internally in this step
+
+SimpleSummation::SimpleSummation()
+: // <- the colon starts the member initialization list
+mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
+{
+  /* Declare both inputs; the "true" means that the inputs are mandatory, i.e.,
+     the step will not run unless both of the inputs are connected to data. 
+   */
+  this->declareInput("operand1", true);
+  this->declareInput("operand2", true);
+  
+  // Declare the output and set it to the output matrix defined above.
+  this->declareOutput("sum", mOutput);
+}
+@endcode
+
+Don't forget to declare a member variable \b mOutput of type cedar::aux::MatDataPtr. That's all we need to do in the 
+constructor for now. In order to be able to use the step, we also have to tell it what to compute; for this, we 
+implement the compute function:
+
+@code
+// The arguments are unused here
+void SimpleSummation::compute(const cedar::proc::Arguments&)
+{
+  // Using data like this is more convenient.
+  cv::Mat& sum = mOutput->getData();
+
+  // Get a pointer to the first input.
+  cedar::aux::ConstDataPtr op1 = this->getInputSlot("operand1")->getData();
+  
+  /* Retreive its stored data and add it to the sum. 
+     Note, that we assume that op1 can be cast to MatData!
+     The call to the clone function is necessary to avoid writing into the input matrix.
+   */
+  sum = op1->getData<cv::Mat>().clone();
+
+  // Same as above for the second input.
+  cedar::aux::ConstDataPtr op2 = this->getInputSlot("operand2")->getData();
+  sum += op2->getData<cv::Mat>();
+  
+  // In a console application, this lets us see that the computation is actually happening.
+  std::cout << "A sum was computed!" << std::endl;
+}
+@endcode
+
+Note, that the compute function does not check that operand1 and operand2 are valid, non-null pointers. This is done
+automatically by the framework, because we specified the inputs to be mandatory in the constructor. Something that we do
+assume here is that the data connected to the input slots can be cast to cedar::aux::MatData. This assumption can be
+checked automatically by the framework, as is described in @ref ProcessingTutorialDataValidation.
+
+
+
+
+@subsection ProcessingTutorialRunningTheSimpleStep Creating an Architecture
+
+Now that we have our simple summation step, we want to actually let it do something. For this purpose, we need two
+sources for inputs that we can sum together. Luckily, cedar comes with a few predefined input sources, and for the
+tutorial we choose a cedar::proc::sources::GaussInput. Generally, inputs to steps are of course not restricted to the
+Gauss inputs, but can be the output of any other processing step. This also means that if cedar doesn't provide the kind
+of input you need, you can just write one yourself.
+
+We now write a main method that connects up our architecture:
+@code
+#include <cedar/processing/Group.h>
+#include <cedar/processing/sources/GaussInput.h>
+#include "SimpleSummation.h" // header for the class we have written above
+
+int main(int, char**) // we don't use the arguments here
+{
+@endcode
+
+The first thing we need in order to connect some steps is a group:
+@code
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
+@endcode
+We can now start adding steps to this group:
+@code
+  boost::shared_ptr<SimpleSummation> sum(new SimpleSummation());
+  // This adds the sum step to the group under the name "sum".
+  group->add(sum, "sum");
+  
+  // Gauss inputs
+  cedar::proc::sources::GaussInputPtr gauss1(new cedar::proc::sources::GaussInput());
+  group->add(gauss1, "gauss1");
+  cedar::proc::sources::GaussInputPtr gauss2(new cedar::proc::sources::GaussInput());
+  group->add(gauss2, "gauss2");
+@endcode
+Note that the names we gave the steps are unique identifiers in the group. If you later chose to save the group to a
+file, you can use these names to retrieve the pointers to the steps from the group with the
+cedar::proc::Group::getElement function.
+
+Now it is time to connect things up:
+@code
+  // connect the first gauss to the sum
+  group->connectSlots("gauss1.Gauss input", "sum.operand1");
+  // connect the second gauss to the sum
+  group->connectSlots("gauss2.Gauss input", "sum.operand2");
+  
+  return 0;
+}
+@endcode
+Here, two strings specify the slots that we want to connect. Each string is always in the form @em step @em name @em dot 
+@em slot @em name, where @em slot @em name must be either an input or an output @link cedar::proc::DataSlot 
+slot @endlink of this step. And that's it, if you compile and run this program your step should now be computed.
+
+By the way, if you dislike writing this main method, you can use plugins and architecture files instead (see the next
+two sections, @ref ProcessingTutorialDeclarations and @ref ProcessingTutorialFirstStepArchitectureFile) or just use the
+cedar to do it all in a user interface (see @ref ProcessingTutorialUsingTheProcessingIde).
+
+
+@section ProcessingTutorialDeclarations Beginner's Tutorial: ElementDeclarations
+
+In the previous tutorials we have demonstrated how to write a simple processing step. So far, it may not have been clear
+what the actual advantage of writing all the code described above for a simple matrix addition is. However, in this
+section, we will start to use the actual emergent power of this added code. Note that we won't have to modify the 
+SimpleSummation code we have written @ref ProcessingTutorialFirstStep_NewClass "above" for this!
+
+We start out by turning the SimpleSummation step into a class that is actually known by the framework. One way of doing
+this is by simply adding a declaration for the step in the main method of our program:
+@code
+#include <cedar/processing/ElementDeclaration.h>
+#include <cedar/processing/DeclarationRegistry.h>
+// other includes you might need
+
+int main(int argc, char**) // we still don't use the arguments
+{
+  // Create the class's declaration
+  cedar::proc::ElementDeclarationPtr sum_declaration
+  (
+    new cedar::proc::ElementDeclarationTemplate<yourNamespace::SimpleSummation> 
+    (
+      "The Category you Would Like the Step to Have, Used Mainly by the UI"
+    )
+  );
+  sum_declaration->declare();
+@endcode
+We assume that the SimpleSummation class lives in some namespace @em yourNamespace. Using the
+cedar::proc::ElementDeclaration shown above, the framework will be able to create new objects of the class
+SimpleSummation based on its class id, which is autogenerated to be @em yourNamespace.SimpleSummation. This is useful
+later, e.g., when reading an architecture from a file, but for now we can also use it to replace the lines
+@code
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
+  
+  boost::shared_ptr<SimpleSummation> sum(new SimpleSummation());
+  // This adds the sum step to the group under the name "sum".
+  group->add(sum, "sum");
+  
+  // Gauss inputs
+  cedar::proc::sources::GaussInputPtr gauss1(new cedar::proc::sources::GaussInput());
+  group->add(gauss1, "gauss1");
+  cedar::proc::sources::GaussInputPtr gauss2(new cedar::proc::sources::GaussInput());
+  group->add(gauss2, "gauss2");
+@endcode
+from the example in @ref ProcessingTutorialRunningTheSimpleStep by
+@code
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
+  
+  group->create("yourNamespace.SimpleSummation", "sum");
+  group->create("cedar.processing.sources.GaussInput", "gauss1");
+  group->create("cedar.processing.sources.GaussInput", "gauss2");
+@endcode
+Note that we don't need to declare the Gauss input here, as it is automatically declared as a standard within the
+framework.
+
+The connect calls used for wiring things up stay the same and complete our main method. Here, source and target are 
+given by strings with the following syntax: [step name].[slot name]
+@code
+  group->connectSlots("gauss1.Gauss input", "sum.operand1");
+  group->connectSlots("gauss2.Gauss input", "sum.operand2");
+  
+  return 0;
+}
+@endcode
+
+"But dear tutorial-writer-person, when all this is done with strings, can't I just write a text file or something to do
+ most of this stuff" you ask? Why yes, or something indeed! Read on in @ref ProcessingTutorialFirstStepArchitectureFile.
+
+
+@section ProcessingTutorialFirstStepArchitectureFile Beginner's Tutorial: Architecture Files
+
+Architecture files are a specific file format used by the processing framework to describe the structure of a processing
+architecture, such as the two Gauss inputs and the summation step as well as their connections described in the previous
+tutorials.
+
+In order to wire up a group with these connections, we first write the architecture file. Architecture files are
+written in json format, and -- in our case -- look like this:
+@code
+{
+  "meta":
+  {
+    "format": "1"
+  },
+  "steps":
+  {
+    "yourNamespace.SimpleSummation":
+    {
+      "name": "sum"
+    },
+    "cedar.processing.sources.GaussInput":
+    {
+      "name": "gauss1"
+    },
+    "cedar.processing.sources.GaussInput":
+    {
+      "name": "gauss2"
+    }
+  },
+  "connections":
+  [
+    {
+      "source": "gauss1.Gauss input",
+      "target": "sum.operand1"
+    },
+    {
+      "source": "gauss2.Gauss input",
+      "target": "sum.operand2"
+    }
+  ]
+}
+@endcode
+Hopefully, most of this file is self-explanatory. The format entry in the meta node specifies what format version for
+architecture files we are using; it can be ommitted, however, it is recommended that it is specified so that newer
+versions of the framework may still read (or at least convert) these files properly. The steps node contains subnodes
+describing what kind of processing steps we have in our architecture, and for each step, what its parameters are (in the
+example, name is the only parameter). The connections node is a list of connections, where each connection specifies the
+source, i.e., an output of a step, and a target, i.e., an input of a different step.
+
+Onwards, now, to the loading of this architecture. We have to declare our class again and create a group
+like we did before:
+@code
+int main(int, char**)
+{
+  // Create the class's declaration
+  cedar::proc::ElementDeclarationPtr sum_declaration
+  (
+    new cedar::proc::ElementDeclarationTemplate<yourNamespace::SimpleSummation> 
+    (
+      "The Category you Would Like the Step to Have, Used Mainly by the UI"
+    )
+  );
+  sum_declaration->declare();
+  
+  cedar::proc::GroupPtr group(new cedar::proc::Group());
+@endcode
+
+Now, instead of declaring our group in the code, we can just read the %file:
+
+@code
+  group->readJson("path/to/the/file");
+  
+  return 0;
+}
+@endcode
+And that's it!
+
+"But dear tutorial-writer-person, do I really have to write these configuration files by hand? I'm much more of a
+ click-and-play person!" you say? Why yes, click-and-play indeed! Read on how to make the summation step available to
+ the UI in @ref ProcessingTutorialPlugin, and on how to use the UI in ProcessingTutorialUsingTheProcessingIde.
+
+@remarks In future versions, we plan to provide a ready-made console application for this purpose so you won't even have
+         to write this code.
+
+
+@section ProcessingTutorialPlugin Beginner's Tutorial: Plug In and Play
+
+As a prepraration for using the SimpleSummation step in cedar, we first have to group our declarations into
+a plugin. These plugins can then be loaded from cedar and used for creating architecture files in a
+comfortable way.
+
+The first step towards this is to move the SimpleSummation step into a separate project that is compiled as a library
+(i.e., .so, .dylib or .dll, depending on your operating system). Let us assume that our library compiles to
+@em libSimpleSummation.so and, so far, contains the code from the previous tutorials in @em SimpleSummation.h and
+@em SimpleSummation.cpp. In order to turn this library into a plugin, we add two more files: %plugin.h and
+%plugin.cpp. The header file must always contain at least this:
+@code
+#ifndef SIMPLE_SUMMATION_PLUGIN_H
+#define SIMPLE_SUMMATION_PLUGIN_H
+
+#include <cedar/auxiliaries/PluginDeclarationList.h>
+
+CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin));
+
+#endif // SIMPLE_SUMMATION_PLUGIN_H
+@endcode
+
+Upon loading the plugin, the processing framework calls the function declared here and imports everything declared in
+the cedar::proc::PluginDeclaration. Therefore, we declare our summation step in this function:
+@code
+#include "plugin.h"
+#include "SimpleSummation.h"
+
+#include <cedar/processing/ElementDeclaration.h>
+
+void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin)
+{
+  cedar::proc::ElementDeclarationPtr summation_decl
+  (
+    new cedar::proc::ElementDeclarationTemplate
+    <
+    SimpleSummation
+    >
+    (
+      "Utilities"
+    )
+  );
+  plugin->add(summation_decl);
+}
+@endcode
+The declaration code should look familiar from @ref ProcessingTutorialFirstStepArchitectureFile. After recompiling, now,
+the plugin is ready for use!
+
+@section ProcessingTutorialUsingTheProcessingIde Beginner's Tutorial: Using cedar's GUI
+
+In the folder @em cedar/bin, you can find an application called @em cedar. If you run it, you can generate the
+configuration files described in @ref ProcessingTutorialFirstStepArchitectureFile using a visual representation. After
+starting the program, yous should see something like this:
+
+@image html doc/pages/tutorials/ProcessingFramework/images/processingIde.png
+
+@subsection ProcessingTutorialUsingTheProcessingIdePartsOfTheUi Different Parts of the User Interface 
+
+The main user interface of cedar consists of a few important elements, highlighted red in the following
+picture. Note, that the elements can be reordered freely, so your interface might look slightly different.
+
+@image html doc/pages/tutorials/ProcessingFramework/images/cedar_areas.png
+
+The elements are:
+<ul>
+  <li>
+    @em Elements     A list of all the steps and other elements that can currently be used for building architectures.
+  </li>
+  <li>
+    @em Architecture This is where you construct your architecture. Items from the @em Elements pane can be dragged and
+                     dropped in here. Once they are in, you can right-click them to get various context-dependent
+                     actions. For example, you can display data of a processing step. 
+  </li>
+  <li>
+    @em Properties   When an element is selected in the architecture pane, its parameters are displayed here. 
+  </li>
+</ul>  
+
+
+@subsection ProcessingTutorialUsingTheProcessingIdeSummationStep Integrating the Summation Step 
+
+Now it is time to include the summation plugin we created in @ref ProcessingTutorialPlugin. First, click on "Plugins" in
+the main menu, then click on "Load plugin ...". In the dialog that opens up, click "browse", navigate to the library of
+our plugin and "open" it. The box in the middle of the plugin dialog should now display the names of all the steps that
+the plugin declares. In our case, this should be "yourNamespace.SimpleSummation". Once you click "ok", the plugins are
+loaded into the framework. Now, in the "Elements" tab, you should be able to find our plugin in the category
+"Utilities". If you want to create the architecture from previous sections, simply drag our summation step and two Gauss
+inputs into the white drawing field. Then connect the Gauss inputs to the summation step by dragging a line from the
+data slot (little circle) of the Gauss inputs to the input of the summation steps (also little circles).  
+
+
+
+@section ProcessingTutorialFirstStepDynamics Beginner's Tutorial: Dynamics
+
+Steps that run in a loop have a special place in the processing framework. Instead of being triggered by normal
+cedar::proc::Triggers, e.g., when a new image is loaded, looped steps are triggered by @link cedar::proc::LoopedTrigger 
+cedar::proc::LoopedTriggers@endlink. This means that the compute function of such a step receives cedar::proc::StepTime
+ as argument.
+
+Because one of the main purposes of cedar is to simulate dynamical system, there is a special class
+cedar::dyn::Dynamics. Whenever simulating a dynamical system, it is recommended that you inherit this class. Instead of
+implementing the compute function as for other @link cedar::proc::Step cedar::proc::Steps@endlink, classes derived from cedar::dyn::Dynamics must
+implement the cedar::dyn::Dynamics::eulerStep method.   
+
+
+@section ProcessingTutorialDataValidation Intermediate Tutorial: Data Validation
+
+In the compute function of the SimpleSummaton step introduced in @ref ProcessingTutorialFirstStep_NewClass, we assumed
+that the data we receive is always of the type cedar::aux::MatData. However, when we expose our step to users who might
+not be aware of this assumption, they might connect a different kind of data, likely resulting in a crash. However, the
+processing framework offers functionality that allows us to automatically check the data before the compute function is
+executed. This is done by overriding the method cedar::proc::Connectable::determineInputValidity in our step:
+@code
+cedar::proc::DataSlot::VALIDITY SimpleSummation::determineInputValidity
+                                (
+                                  cedar::proc::ConstDataSlotPtr,
+                                  cedar::aux::ConstDataPtr data
+                                ) const
+{
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+  {
+    return cedar::proc::DataSlot::VALIDITY_VALID;
+  }
+  else
+  {
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  }
+}
+@endcode
+Note, that the slot parameter is not used here because the same conditions must be met for all of our slots. This is
+just a simple check, and a real-world summation step should probably also check that the matrix has a compatible size
+in this function, however, the principle still remains the same.
+
+@remarks The data pointer in this function can be a null-pointer when the connection is deleted. Always perform checks
+         for this circumstance!
+
+
+@section ProcessingTutorialDataValidationAutomation Intermediate Tutorial: Data Validation II (The Automationing)
+
+We have recently introduced a new system that simplifies the type checking mechanisms and allows you to reuse type
+checking mechanisms. Every input slot can now have a type check associated with it that overrides the call to the
+determineInputValidity function. This check can, in principle, be any functor, i.e., any object that overloads
+operator(). The processing framework already has a few of these in the cedar::proc::typecheck namespace.
+
+Here's an example: say we write a step that can only deal with data that can be cast into cedar::aux::MatData (as in the
+example in @ref ProcessingTutorialDataValidation). With automatic type checking, we can express this in the constructor
+as follows:
+@code
+// ...
+#include <cedar/processing/typecheck/DerivedFrom.h>
+// ...
+
+  SimpleSummation::SimpleSummation()
+  :
+  // ...
+  {
+    // ...
+    // store a pointer to the slot
+    cedar::proc::DataSlotPtr operand1 = this->declareInput("operand1");
+    
+    // tell the slot what to expect
+    operand1->setCheck(cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>());
+    // ...
+  }
+@endcode
+With this code in place, we no longer need to write long functions that do these checks! If the checks provided by cedar
+don't provide what you need, you have two options: either you use the old way of implementing the check in
+determineInputValidity, or you write your own type check class by deriving from cedar::proc::typecheck::TypeCheck. 
+
+
+@section ProcessingTutorialInputCollections Intermediate Tutorial: Input Collections
+
+\"Dear tutorial-writer-person, way back in @ref ProcessingTutorialFirstStep_NewClass we wrote a summation class that
+ only has two inputs. Doesn't this get annoying if one wants to sum up a lot of matrices?\"
+Why yes, it does. Therefore, we have a special solution for this sort of problem: input collections. Instead of having
+an input that can only be associated with a single data object, these collections can receive an indetermined number of
+data. Defining an input as a collection can be done by declaring it in a step's constructor like this:
+@code
+  this->declareInputCollection("operands");
+@endcode
+Note that input collections are never mandatory. In the compute function, we can now sum all of the inputs like this:
+@code
+void SimpleSummation::compute(const cedar::proc::Arguments&)
+{
+  cedar::proc::ExternalDataPtr input_slot = this->getInputSlot("operands");
+  
+  if (input_slot->getDataCount() <= 0)
+  {
+    return;
+  }
+    
+  cv::Mat& sum = mOutput->getData();
+  sum = input_slot->getData(0)->getData<cv::Mat>().clone();
+  
+  for (size_t i = 1; i < input_slot->getDataCount(); ++i)
+  {
+    cedar::aux::DataPtr data = input_slot->getData(i);
+    if (data)
+    {
+      sum += data->getData<cv::Mat>();
+    }
+  }
+}
+@endcode
+
+@section ProcessingTutorialOwnParameters Advanced Tutorial: Writing your own Parameter Type
+
+@todo This tutorial must be improved a lot!
+
+When the standard parameter types that cedar provides just don't suffice for expressing settings of your class, you have
+the option of implementing your own parameter type.
+
+This involves writing (at least) two classes: the actual (data) representation of the parameter and a widget for
+manipulating this data.
+
+First, let us take a look at the data class. This class must inherit cedar::aux::Parameter class. For details on the
+concepts of parameters and the configurable interface, see @ref ParametersConcept.
+
+The widget class must implement cedar::proc::gui::Parameter. This class already takes care of storing a pointer to the
+parameter to be displayed. What must be implemented by you is a method that reacts when the parameter pointer stored in
+the superclass is changed. This means, that this function must adapt all previous widgets it created (if any), or
+allocate new widgets for the newly set parameter.
+
+Finally, the new parameter widget must be associated with the parameter type.
+
+@todo There is currently no proper way to associate a parameter with the widget outside of cedar.
+
+
+@section ProcessingTutorialManualLocking Advanced Tutorial: Locking your data manually
+
+By default, processing steps are automatically thread-safe, i.e., data and parameters are locked for reading and writing
+during any function calls by the processing framework. However, this may have a downside. Consider a processing step
+that has a very long-running compute method. Before calling it, the framework locks all inputs for reading and outputs
+for writing. Now, during the entire time the compute function is running, preceeding processing steps cannot lock their
+outputs for writing, because the long-running step holds a read lock on them.
+
+To counter this, we have introduced a method for disabling the automatic locking of inputs and outputs. In the above
+example, if the long-running step only accesses its inputs and outputs briefly, it can disable the automatic locking and
+only lock its data when it is actually accessed.
+
+To do so, a step has to call the following method in the constructor:
+@code
+your::Step::Step()
+{
+  // ...
+  this->setAutoLockInputsAndOutputs(false);
+  // ...
+}
+@endcode
+
+Note, that this only disables automatic locking of inputs and outputs. Parameters and buffers are still locked
+automatically (buffers are never passed to other steps, thus they cannot delay them.)
+
+Now, whenver you are accessing input or output data, you must lock it manually, e.g., by writing:
+@code
+  cedar::aux::ConstMatDataPtr input = ...
+  cedar::aux::MatDataPtr output = ...
+  
+  // ...
+  input->lockForRead();
+  // process input
+  input->unlock();
+  
+  
+  // do long computation
+  
+  
+  output->lockForWrite();
+  // write result to output
+  output->unlock();
+@endcode
+
+
+@section ProcessingTutorialStepViews Advanced Tutorial: Connectable Icon Views
+
+You may have noticed that some of the steps in cedar change their icon depending on their parameters. If you want to do
+this for you step, you can implement your own cedar::proc::gui::ConnectableIconView (which is a QGraphicsItem; if you're
+unfamiliar with that class, please refer to the Qt documentation).
+
+If you just want to use an icon from a file that changes depending on some events in your step, you can inherit
+cedar::proc::gui::DefaultConnectableIconView to implement this. In this case, your icon view will usually require two
+methods. One that creates the connections between the events (qt signals), and a slot that handles them.
+
+The code for connecting slots should be implemented in the connectableChanged function (which is called by the super
+class). Here's an example:
+@code
+void your::IconView::connectableChanged()
+{
+  this->cedar::proc::gui::DefaultConnectableIconView::connectableChanged();
+
+  auto parameter = this->getConnectable()->getParameter("some parameter");
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(updateIcon()));
+
+  this->updateIcon();
+}
+@endcode
+
+The updateIcon function can look like this:
+@code
+void your::IconView::connectableChanged()
+{
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::ConstBoolParameter>(this->getConnectable()->getParameter("active"));
+  if (parameter->getValue())
+  {
+    this->setIconPath(":/some/icon.svg");
+  }
+  else
+  {
+    this->setIconPath(":/some/other_icon.svg");
+  }
+}
+@endcode
+(this code is taken from cedar::proc::gui::BoostView).
+
+To make the processing framework use your icon view, you need to modify the declaration of the element that the icon
+view is associated with.
+@code
+// ...
+cedar::proc::ElementDeclarationPtr declaration
+(
+  // the second template argument below specifies that the custom icon view is to be used
+  new cedar::proc::ElementDeclarationTemplate<your::Step, your::IconView>
+  (
+    "Category"
+  )
+);
+// ...
+@endcode
+
+
+If you want to use a more sophisticated icon view, you can use cedar::proc::gui::DefaultConnectableIconView as an
+example. Mainly, you need to inherit cedar::proc::gui::ConnectableIconView and overwrite a few methods:
+@code
+class your::IconView : public cedar::proc::gui::ConnectableIconView
+{
+public:
+  IconView()
+  {
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  QRectF boundingRect() const
+  {
+    // here, you need to return the bounding rect of your drawing
+  }
+
+  void setBounds(const qreal& x, const qreal& y, const qreal& size)
+  {
+    // this tells you how large your icon may be
+  }
+
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr)
+  {
+    // paint your icon here using standard QPainter methods
+  }
+
+protected:
+  void connectableChanged()
+  {
+    // see above
+  }
+}; // class cedar::proc::gui::DefaultConnectableIconView
+@endcode
+
+
+@section ProcessingTutorialSummary Summary
+
+"But dear tutorial-writer-person, is this really everything?" you ask? No, it is not. By nature, a tutorial can only
+introduce so many features. If you have read all of the advanced tutorials, you should know a great deal about the
+processing framework, but there is probably still more to learn, e.g., by reading the documentation on the classes in
+cedar::proc and getting to grips with all the details in @ref ProcessingFrameworkConcept. In addition, we still have a giant
+pile of features that we want to implement (and that we wish we already had), so keep your eyes open for new releases!
+
+*/
