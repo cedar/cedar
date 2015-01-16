@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -99,7 +99,7 @@ void cedar::proc::gui::RecorderWidget::refreshWidget()
   for (unsigned int s = 0; s < slotTypes.size(); s++)
   {
 
-    if (mStepToConfigure->hasRole(slotTypes[s]))
+    if (mStepToConfigure->hasSlotForRole(slotTypes[s]))
     {
       cedar::proc::Connectable::SlotList dataSlots = mStepToConfigure->getOrderedDataSlots(slotTypes[s]);
       if (dataSlots.size() > 0)
@@ -196,7 +196,7 @@ void cedar::proc::gui::RecorderWidget::updateName()
 
     for (unsigned int s = 0; s < slotTypes.size(); s++)
     {
-      if (pStep->hasRole(slotTypes[s]))
+      if (pStep->hasSlotForRole(slotTypes[s]))
       {
         const cedar::proc::Connectable::SlotList dataSlots = pStep->getOrderedDataSlots(slotTypes[s]);
         for (unsigned int i = 0; i < dataSlots.size(); ++i)

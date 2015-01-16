@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -332,12 +332,12 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   // toolbar: custom timestep
   auto p_enable_custom_time_step = new QCheckBox();
-  p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
+  p_enable_custom_time_step->setToolTip("When enabled, the specified time step is used to iterate all steps connected to looped triggers once when single-step is clicked. Otherwise, the time step to be used is determined automatically.");
   p_enable_custom_time_step->setChecked(false);
   this->mpToolBar->insertWidget(this->mpActionRecord, p_enable_custom_time_step);
 
   this->mpCustomTimeStep = new QDoubleSpinBox();
-  this->mpCustomTimeStep->setToolTip("Enable/disable custom time step for architecture stepping.");
+  this->mpCustomTimeStep->setToolTip("When enabled, this time step is passed to all looped triggers when single-stepping the architecture.");
   this->mpCustomTimeStep->setValue(10.0);
   this->mpCustomTimeStep->setMinimum(1.0);
   this->mpCustomTimeStep->setSuffix(" ms");
@@ -441,6 +441,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   QObject::connect(this->mpActionSnapshot, SIGNAL(triggered()), this, SLOT(takeSnapshot()));
 
   QObject::connect(this->mpActionNewPlotGroup, SIGNAL(triggered()), this, SLOT(addPlotGroup()));
+  QObject::connect(this->mpActionRenamePlotGroup, SIGNAL(triggered()), this, SLOT(renamePlotGroup()));
   QObject::connect(this->mpActionEditPlotGroup, SIGNAL(triggered()), this, SLOT(editPlotGroup()));
   QObject::connect(this->mpActionDisplayPlotGroup, SIGNAL(triggered()), this, SLOT(displayPlotGroup()));
   QObject::connect(this->mpActionDeletePlotGroup, SIGNAL(triggered()), this, SLOT(deletePlotGroup()));
@@ -475,7 +476,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    this,
                    SLOT(showRobotManager()));
 
-  QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
+  QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateSelected()));
   QObject::connect(mpActionCopy, SIGNAL(triggered()), this, SLOT(copyStep()));
   QObject::connect(mpActionPasteConfiguration, SIGNAL(triggered()), this, SLOT(pasteStepConfiguration()));
   QObject::connect(mpActionFind, SIGNAL(triggered()), this, SLOT(openFindDialog()));
@@ -514,6 +515,16 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
     this,
     SLOT(experimentRunningChanged(bool))
   );
+
+  QObject::connect
+  (
+      this->mpPlotGroupsComboBox,
+      SIGNAL(currentIndexChanged(int)),
+      this,
+      SLOT(togglePlotGroupActions())
+  );
+  // make sure that we start with the right setting
+  this->togglePlotGroupActions();
 
   cedar::aux::PluginProxy::connectToPluginDeclaredSignal
   (
@@ -772,7 +783,7 @@ void cedar::proc::gui::Ide::exportSvg()
   }
 }
 
-void cedar::proc::gui::Ide::duplicateStep()
+void cedar::proc::gui::Ide::duplicateSelected()
 {
   // get current mouse position
   QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
@@ -788,11 +799,16 @@ void cedar::proc::gui::Ide::duplicateStep()
     bool add_to_list = true;
 
     // check if item is a connection
-    if (dynamic_cast<cedar::proc::gui::Connection*>(item))
+    if (auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+    {
+      add_to_list = graphics_item->canDuplicate();
+    }
+    else
     {
       add_to_list = false;
     }
-    else
+
+    if (add_to_list)
     {
       // check if the item has a parent within the selection
       for (auto sub_item : selected)
@@ -813,6 +829,11 @@ void cedar::proc::gui::Ide::duplicateStep()
     {
       items_to_duplicate.append(item);
     }
+  }
+
+  if (items_to_duplicate.empty())
+  {
+    return;
   }
 
   // determine the position offset of the duplicates as the average of the positions of all selected elements
@@ -838,7 +859,7 @@ void cedar::proc::gui::Ide::duplicateStep()
         {
           std::vector<cedar::proc::DataConnectionPtr> connections;
           // get a list of all outgoing connections for this element
-          if (connectable->hasRole(cedar::proc::DataRole::OUTPUT))
+          if (connectable->hasSlotForRole(cedar::proc::DataRole::OUTPUT))
           {
             for (auto slot : connectable->getDataSlots(cedar::proc::DataRole::OUTPUT))
             {
@@ -1901,11 +1922,23 @@ void cedar::proc::gui::Ide::addPlotGroup()
     this->setArchitectureChanged(true);
   }
 }
-  
+
 void cedar::proc::gui::Ide::editPlotGroup()
 {
+  // get selected plot group
+  QString plot_group_current_name = this->mpPlotGroupsComboBox->currentText();
+  int position = this->mpPlotGroupsComboBox->currentIndex();
+  if(position != -1)
+  {
+    this->mGroup->editPlotGroup(plot_group_current_name.toStdString());
+    this->setArchitectureChanged(true);
+  }
+}
+  
+void cedar::proc::gui::Ide::renamePlotGroup()
+{
   bool ok;
-  // get selecte plot group
+  // get selected plot group
   QString plot_group_current_name = this->mpPlotGroupsComboBox->currentText();
   int position = this->mpPlotGroupsComboBox->currentIndex();
   if(position != -1)
@@ -1913,12 +1946,23 @@ void cedar::proc::gui::Ide::editPlotGroup()
     QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Plotgroup name:"), QLineEdit::Normal, plot_group_current_name, &ok);
     if (ok && !text.isEmpty())
     {
-      this->mGroup->renamePlotGroup(plot_group_current_name.toStdString(), text.toStdString()); // toStdString assumes ascii
-      this->mpPlotGroupsComboBox->removeItem(position);
-      this->mpPlotGroupsComboBox->insertItem(position, text);
-      this->mpPlotGroupsComboBox->setCurrentIndex(position);
+      if (plot_group_current_name.toStdString() == text.toStdString()) // same name, return
+      {
+        return;
+      }
+      else if (!this->mGroup->plotGroupNameExists(text.toStdString())) // valid name, rename
+      {
+        this->mGroup->renamePlotGroup(plot_group_current_name.toStdString(), text.toStdString()); // toStdString assumes ascii
+        this->mpPlotGroupsComboBox->removeItem(position);
+        this->mpPlotGroupsComboBox->insertItem(position, text);
+        this->mpPlotGroupsComboBox->setCurrentIndex(position);
 
-      this->setArchitectureChanged(true);
+        this->setArchitectureChanged(true);
+      }
+      else // name is already in use, notify
+      {
+        this->notify("The name you picked does already exist.");
+      }
     }
   }
 }
@@ -1950,6 +1994,24 @@ void cedar::proc::gui::Ide::deletePlotGroup()
 
       this->setArchitectureChanged(true);
     }
+  }
+}
+
+void cedar::proc::gui::Ide::togglePlotGroupActions()
+{
+  if (this->mpPlotGroupsComboBox->count() == 0)
+  {
+    this->mpActionDisplayPlotGroup->setEnabled(false);
+    this->mpActionRenamePlotGroup->setEnabled(false);
+    this->mpActionEditPlotGroup->setEnabled(false);
+    this->mpActionDeletePlotGroup->setEnabled(false);
+  }
+  else
+  {
+    this->mpActionDisplayPlotGroup->setEnabled(true);
+    this->mpActionRenamePlotGroup->setEnabled(true);
+    this->mpActionEditPlotGroup->setEnabled(true);
+    this->mpActionDeletePlotGroup->setEnabled(true);
   }
 }
 

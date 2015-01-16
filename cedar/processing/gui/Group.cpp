@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -205,33 +205,9 @@ cedar::proc::gui::Group::~Group()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  if (mNewElementAddedConnection.connected())
-  {
-    mNewElementAddedConnection.disconnect();
-  }
-  if (mElementRemovedConnection.connected())
-  {
-    mElementRemovedConnection.disconnect();
-  }
-  if (mElementRemovedConnection.connected())
-  {
-    mElementRemovedConnection.disconnect();
-  }
-  if (mDataConnectionChangedConnection.connected())
-  {
-    mDataConnectionChangedConnection.disconnect();
-  }
-  if (mTriggerConnectionChangedConnection.connected())
-  {
-    mTriggerConnectionChangedConnection.disconnect();
-  }
   if (this->scene())
   {
     cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeGroupItem(this);
-  }
-  else
-  {
-//    CEDAR_DEBUG_ASSERT(this->isRootGroup());
   }
 }
 
@@ -1837,6 +1813,22 @@ void cedar::proc::gui::Group::addPlotGroup(std::string plotGroupName)
   this->mPlotGroupsNode.put_child(plotGroupName, node);
 }
 
+void cedar::proc::gui::Group::editPlotGroup(std::string plotGroupName)
+{
+  auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
+  if(plot_group == this->mPlotGroupsNode.not_found())
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::NotFoundException,
+      "cedar::proc::gui::Group::editPlotGroup could not edit plot group. Does not exist."
+    );
+  }
+  cedar::aux::ConfigurationNode node;
+  this->writeOpenPlotsTo(plot_group->second);
+  //this->mPlotGroupsNode.put_child(plotGroupName, node);
+}
+
 void cedar::proc::gui::Group::removePlotGroup(std::string plotGroupName)
 {
   auto plot_group = this->mPlotGroupsNode.find(plotGroupName);
@@ -1879,6 +1871,18 @@ std::list<std::string> cedar::proc::gui::Group::getPlotGroupNames()
   }
 
   return plot_group_names;
+}
+
+bool cedar::proc::gui::Group::plotGroupNameExists(const std::string& newName) const
+{
+  for (auto node : mPlotGroupsNode)
+  {
+    if (node.first == newName)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 void cedar::proc::gui::Group::displayPlotGroup(std::string plotGroupName)

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -471,7 +471,7 @@ std::vector<std::string> cedar::proc::experiment::StepPropertyParameter::getList
   std::vector<std::string> list;
   if (auto step = mElement.lock())
   {
-    if (step->hasRole(role))
+    if (step->hasSlotForRole(role))
     {
       for (auto data : step->getDataSlots(role))
       {

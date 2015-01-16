@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -65,6 +65,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
@@ -122,7 +123,7 @@ namespace
         );
       if (module_handle == NULL)
       {
-        std::string error_message = cedar::aux::PluginProxy::getLastError();
+        std::string error_message = cedar::aux::windows::getLastError();
         cedar::aux::LogSingleton::getInstance()->error
         (
           "Failed to load dynamics library. You may be missing some processing steps. Windows says: \"" + error_message + "\".",
@@ -130,7 +131,7 @@ namespace
         );
       }
     }
-#endif // CEDAR_COMPILER_MSVC
+#endif // CEDAR_OS_WINDOWS
 
     return true;
   }
@@ -211,7 +212,17 @@ std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
     }
   }
 
-  //!@todo Add plugins required by scripts
+  {
+    QReadLocker locker(this->mScripts.getLockPtr());
+    for (auto script : this->mScripts.member())
+    {
+      auto declaration = cedar::proc::CppScriptDeclarationManagerSingleton::getInstance()->getDeclarationOf(script);
+      if (!declaration->getSource().empty())
+      {
+        required_plugins.insert(declaration->getSource());
+      }
+    }
+  }
 
   return required_plugins;
 }
@@ -334,19 +345,27 @@ void cedar::proc::Group::removeScript(const std::string& name)
 
 std::vector<cedar::proc::GroupPath> cedar::proc::Group::listAllElementPaths(const cedar::proc::GroupPath& base_path) const
 {
+  return this->listElementPaths([](cedar::proc::ConstElementPtr) -> bool { return true; }, base_path);
+}
+
+std::vector<cedar::proc::GroupPath> cedar::proc::Group::listElementPaths(std::function<bool(cedar::proc::ConstElementPtr)> fit, const cedar::proc::GroupPath& base_path) const
+{
   std::vector<cedar::proc::GroupPath> paths;
 
   for (auto name_element_pair : this->mElements)
   {
-    cedar::proc::GroupPath path = base_path;
-    path += name_element_pair.first;
-    paths.push_back(path);
+    if (fit(name_element_pair.second))
+    {
+      cedar::proc::GroupPath path = base_path;
+      path += name_element_pair.first;
+      paths.push_back(path);
+    }
 
     if (auto subgroup = boost::dynamic_pointer_cast<cedar::proc::ConstGroup>(name_element_pair.second))
     {
       cedar::proc::GroupPath subpath = base_path;
       subpath += name_element_pair.first;
-      auto subpaths = subgroup->listAllElementPaths(subpath);
+      auto subpaths = subgroup->listElementPaths(fit, subpath);
       paths.insert(paths.end(), subpaths.begin(), subpaths.end());
     }
   }
@@ -1300,7 +1319,7 @@ void cedar::proc::Group::addConnector(const std::string& name, bool input)
 void cedar::proc::Group::addConnectorInternal(const std::string& name, bool input)
 {
   // check if connector is in map of connectors
-  this->_mConnectors->set(name, input);
+  this->_mConnectors->setValue(name, input);
 
   if (input)
   {
@@ -1354,7 +1373,7 @@ void cedar::proc::Group::renameConnector(const std::string& oldName, const std::
 
   // everything is fine, change name
   _mConnectors->erase(oldName);
-  _mConnectors->set(newName, input);
+  _mConnectors->setValue(newName, input);
   if (input)
   {
     this->renameInput(oldName, newName);
@@ -1535,11 +1554,13 @@ cedar::proc::ElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupP
 
 void cedar::proc::Group::connectSlots(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target)
 {
+  //!@todo See entry below
   this->connectSlots(source->getParent() + "." + source->getName(), target->getParent() + "." + target->getName());
 }
 
 void cedar::proc::Group::connectSlots(const std::string& source, const std::string& target)
 {
+  //!@todo Given that this function first does some complicated stuff to find the slot pointers, why doesn't it call the other connectSlots method (rather than how it is now)?
   // parse element and slot name
   std::string source_name;
   std::string source_slot_name;
@@ -2608,8 +2629,19 @@ void cedar::proc::Group::readLinkedGroup(const std::string& groupName, const ced
 cedar::proc::ElementPtr cedar::proc::Group::createLinkedGroup(const std::string& groupName, const std::string& fileName)
 {
   cedar::proc::GroupPtr imported_group(new cedar::proc::Group());
+  // this has to happen first or gui does not react on any added elements
   this->add(imported_group, this->getUniqueIdentifier(groupName));
-  imported_group->readLinkedGroup(groupName, fileName);
+  // the next may fail because the group cannot be found, handle this and rethrow
+  try
+  {
+    imported_group->readLinkedGroup(groupName, fileName);
+  }
+  catch (cedar::aux::NotFoundException& exc)
+  {
+    // remove the group and throw an exception
+    this->remove(imported_group);
+    CEDAR_THROW(cedar::aux::NotFoundException, exc.getMessage());
+  }
 
   return imported_group;
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -172,8 +172,8 @@ void cedar::proc::steps::MatrixSlice::setRanges(const std::vector<cv::Range>& ra
 
   for (size_t d = 0; d < ranges.size(); ++d)
   {
-    this->_mRangeUpper->set(d, ranges.at(d).end);
-    this->_mRangeLower->set(d, ranges.at(d).start);
+    this->_mRangeUpper->setValue(d, ranges.at(d).end);
+    this->_mRangeLower->setValue(d, ranges.at(d).start);
   }
 
   this->_mRangeLower->blockSignals(lower_blocked);
@@ -233,8 +233,8 @@ void cedar::proc::steps::MatrixSlice::updateDimensionality()
     CEDAR_DEBUG_ASSERT(d < this->_mRangeLower->size());
     CEDAR_DEBUG_ASSERT(d < this->_mRangeUpper->size());
 
-    this->_mRangeLower->set(d, limits.getLower());
-    this->_mRangeUpper->set(d, limits.getUpper());
+    this->_mRangeLower->setValue(d, limits.getLower());
+    this->_mRangeUpper->setValue(d, limits.getUpper());
 
     this->_mRangeLower->blockSignals(lower_blocked);
     this->_mRangeUpper->blockSignals(upper_blocked);

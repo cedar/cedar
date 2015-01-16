@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -730,8 +730,8 @@ void cedar::aux::ImageDatabase::readETH80CroppedClose(const cedar::aux::Path& pa
       ETH80AnnotationPtr annotation(new ETH80Annotation());
 
       cedar::aux::Path segmentation = folder;
-      segmentation.appendComponent("maps");
-      segmentation.appendComponent(file.getFileNameWithoutExtension() + "-map.png");
+      segmentation.append("maps");
+      segmentation.append(file.getFileNameWithoutExtension() + "-map.png");
 
       if (segmentation.exists())
       {

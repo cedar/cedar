@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -161,8 +161,7 @@ public:
     FactoryManagerSingleton::getInstance()->listTypes(types);
   }
 
-  //!@brief returns the stored object as ConfigurablePtr
-  cedar::aux::ConfigurablePtr getConfigurable()
+  cedar::aux::ConstConfigurablePtr getSingleConfigurableChild() const
   {
     return this->mObject;
   }
@@ -180,6 +179,10 @@ public:
     return FactoryManagerSingleton::getInstance()->getTypeId(mObject);
   }
 
+  bool hasSingleConfigurableChild() const
+  {
+    return true;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

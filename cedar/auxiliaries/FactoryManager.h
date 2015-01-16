@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -70,6 +70,7 @@ class cedar::aux::FactoryManager
 private:
   typedef typename boost::shared_ptr< cedar::aux::Factory<BaseTypePtr> > FactoryTypePtr;
   typedef typename BaseTypePtr::element_type BaseType;
+  typedef const typename BaseTypePtr::element_type ConstBaseType;
   typedef typename cedar::aux::ConstPtrProvider<BaseTypePtr>::ConstBaseTypePtr ConstBaseTypePtr;
 
   typedef std::map<std::string, std::vector<FactoryTypePtr> > CategoryMap;
@@ -225,10 +226,16 @@ public:
     return factory_record.factory->allocate();
   }
 
-  //!@brief look up the type id of an object
+  //!@brief look up the type id of an object using a smart pointer
   const std::string& getTypeId(ConstBaseTypePtr object) const
   {
-    std::string generated_type_name = cedar::aux::objectTypeToString(object);
+    return this->getTypeId(object.get());
+  }
+
+  //!@brief look up the type id of an object using a raw pointer
+  const std::string& getTypeId(ConstBaseType* pObject) const
+  {
+    std::string generated_type_name = cedar::aux::objectTypeToString(pObject);
 
     std::map<std::string, std::string>::const_iterator iter = mTypeNameMapping.find(generated_type_name);
     if (iter == mTypeNameMapping.end())
@@ -236,7 +243,7 @@ public:
       CEDAR_THROW
       (
         cedar::aux::UnknownTypeException,
-        "The type name of the object of type \"" + cedar::aux::objectTypeToString(object)
+        "The type name of the object of type \"" + generated_type_name
         + "\" could not be determined. This most likely means that the type is not registered with the factory manager "
         + cedar::aux::objectTypeToString(this)
       );

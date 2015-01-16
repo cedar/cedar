@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -102,6 +102,16 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  bool canHaveConfigurableChildren() const
+  {
+    return true;
+  }
+
+  size_t getNumberOfConfigurableChildren() const
+  {
+    return this->mObjectList.size();
+  }
+
   //!@brief set this parameter to a value, read from a configuration node
   virtual void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
@@ -250,7 +260,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::aux::ConstConfigurablePtr retrieveConfigurableChild(size_t index) const
+  {
+    return this->at(index);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

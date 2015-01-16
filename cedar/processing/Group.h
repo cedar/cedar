@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -457,6 +457,10 @@ public:
   //! Recursively lists all elements in the group and all its subgroups.
   std::vector<cedar::proc::GroupPath> listAllElementPaths(const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
 
+  /*! Recursively lists elements in the group and all its subgroups if they fit the function fit.
+   */
+  std::vector<cedar::proc::GroupPath> listElementPaths(std::function<bool(cedar::proc::ConstElementPtr)> fit, const cedar::proc::GroupPath& base_path = cedar::proc::GroupPath()) const;
+
   /*!@brief Updates the name stored for the object.
    */
   void updateObjectName(cedar::proc::Element* object);
@@ -661,7 +665,7 @@ public:
    */
   inline bool isLinked() const
   {
-    return !this->mLinkedGroupFile.isEmpty() && !this->mLinkedGroupName.empty();
+    return !this->mLinkedGroupFile.empty() && !this->mLinkedGroupName.empty();
   }
 
   //!@brief finds all elements in this group and child groups that match the given name

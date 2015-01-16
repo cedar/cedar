@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -464,7 +464,7 @@ void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::stri
   {
     new_order.erase(new_order.begin());
   }
-  this->mRecentArchitectureFiles->set(new_order);
+  this->mRecentArchitectureFiles->setValue(new_order);
 }
 
 cedar::aux::StringVectorParameterPtr cedar::proc::gui::Settings::getArchitectureFileHistory()

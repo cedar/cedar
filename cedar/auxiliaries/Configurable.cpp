@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,8 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/ObjectParameter.h"
-#include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -213,17 +211,16 @@ std::vector<std::string> cedar::aux::Configurable::listAllParameters() const
   {
     parameter_paths.push_back(parameter->getName());
 
-    //!@todo This is another instance where special cases are made that be solved better with virtual functions
-    if (auto object_list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+    if (parameter->canHaveConfigurableChildren())
     {
-      for (size_t i = 0; i < object_list_parameter->size(); ++i)
+      for (size_t i = 0; i < parameter->getNumberOfConfigurableChildren(); ++i)
       {
-        auto child = object_list_parameter->configurableAt(i);
+        auto child = parameter->getConfigurableChild(i);
         auto child_parameter_paths = child->listAllParameters();
 
         for (auto child_path : child_parameter_paths)
         {
-          parameter_paths.push_back(parameter->getName() + "[" + cedar::aux::toString(i) + "]." + child_path);
+          parameter_paths.push_back(parameter->getName() + "[" + parameter->childIndexToString(i) + "]." + child_path);
         }
       }
     }
@@ -257,16 +254,12 @@ cedar::aux::ConstConfigurablePtr cedar::aux::Configurable::getConfigurableChild(
   if (iter == this->mChildren.end())
   {
     auto param_iter = this->mParameterAssociations.find(first_path);
-    /*!@todo This should probably be solved differently: have two superclasses:
-     *       ParameterWithConfigurable and ParameterWithConfigurables
-     *       That way, this would generalize to, e.g., ObjectMapParameter.
-     */
     if (param_iter != this->mParameterAssociations.end())
     {
       auto parameter = *(param_iter->second);
-      if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+      if (parameter->hasSingleConfigurableChild())
       {
-        child = object_parameter->getConfigurable();
+        child = parameter->getSingleConfigurableChild();
       }
     }
     else if (index_start != std::string::npos && index_end != std::string::npos)
@@ -276,11 +269,11 @@ cedar::aux::ConstConfigurablePtr cedar::aux::Configurable::getConfigurableChild(
       if (param_iter != this->mParameterAssociations.end())
       {
         auto parameter = *(param_iter->second);
-        if (auto list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+        if (parameter->canHaveConfigurableChildren())
         {
           std::string index_str = first_path.substr(index_start + 1, index_end - index_start - 1);
-          unsigned int index = cedar::aux::fromString<unsigned int>(index_str);
-          child = list_parameter->configurableAt(index);
+          size_t index = parameter->childStringToIndex(index_str);
+          child = parameter->getConfigurableChild(index);
         }
       }
     }
@@ -378,34 +371,33 @@ std::string cedar::aux::Configurable::findParameterPath(cedar::aux::ParameterPtr
     }
   }
 
-  //!@todo All these special cases for object (list) parameters should be solved with a common interface
   // check if it is part of an object parameter
   for (auto parameter : this->mParameterList)
   {
-    if (auto object_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter))
+    if (parameter->hasSingleConfigurableChild())
     {
-      auto child = object_parameter->getConfigurable();
+      auto child = parameter->getSingleConfigurableChild();
 
       try
       {
         std::string subpath = child->findParameterPath(findParameter);
-        return object_parameter->getName() + "." + subpath;
+        return parameter->getName() + "." + subpath;
       }
       catch (cedar::aux::NotFoundException)
       {
         // ok, keep looking
       }
     }
-    else if (auto object_list_parameter = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter))
+    else if (parameter->canHaveConfigurableChildren())
     {
-      for (size_t i = 0; i < object_list_parameter->size(); ++i)
+      for (size_t i = 0; i < parameter->getNumberOfConfigurableChildren(); ++i)
       {
-        auto child = object_list_parameter->configurableAt(i);
+        auto child = parameter->getConfigurableChild(i);
 
         try
         {
           std::string subpath = child->findParameterPath(findParameter);
-          return object_list_parameter->getName() + "[" + cedar::aux::toString(i) + "]." + subpath;
+          return parameter->getName() + "[" + parameter->childIndexToString(i) + "]." + subpath;
         }
         catch (cedar::aux::NotFoundException)
         {
@@ -505,36 +497,24 @@ void cedar::aux::Configurable::newFormatToOld(cedar::aux::ConfigurationNode& nod
   }
 }
 
-std::string cedar::aux::Configurable::normalizeFilename(const std::string& filename) const
+void cedar::aux::Configurable::writeJson(const cedar::aux::Path& filename) const
 {
-  std::string dir = filename;
+  // make sure the directory to which the file is supposed to be written exists
+  filename.absolute().createDirectories();
 
-  size_t index;
-  if ( (index = dir.rfind("/")) != std::string::npos )
-  {
-    dir = dir.substr(0, index);
-    boost::filesystem::create_directories(dir);
-  }
-
-  return filename;
-}
-
-void cedar::aux::Configurable::writeJson(const std::string& filename) const
-{
-  std::string new_filename = normalizeFilename(filename);
-
+  // generate the configuration tree
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
-  boost::property_tree::write_json(filename, configuration);
+
+  // write the tree to a file
+  boost::property_tree::write_json(filename.absolute(), configuration);
 }
 
 void cedar::aux::Configurable::writeCsv(const std::string& filename, const char separator) const
 {
-  std::string new_filename = normalizeFilename(filename);
-
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
-  writeCsvConfiguration(new_filename, configuration, separator);
+  writeCsvConfiguration(filename, configuration, separator);
 }
 
 void cedar::aux::Configurable::parameterNameChanged(const std::string& oldName, const std::string& newName)

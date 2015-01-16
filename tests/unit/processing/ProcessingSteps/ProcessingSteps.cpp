@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -81,7 +81,7 @@ unsigned int checkOutputsForInvalidValues(cedar::proc::StepPtr testStep)
 {
   unsigned int errors = 0;
 
-  if (testStep->hasRole(cedar::proc::DataRole::OUTPUT))
+  if (testStep->hasSlotForRole(cedar::proc::DataRole::OUTPUT))
   {
     for (auto name_slot_pair : testStep->getDataSlots(cedar::proc::DataRole::OUTPUT))
     {
@@ -138,7 +138,7 @@ unsigned int testStep(cedar::proc::GroupPtr group, cedar::proc::StepPtr testStep
     sources.push_back("double_2D.converted matrix");
     sources.push_back("double_3D.converted matrix");
     sources.push_back("emp.empty matrix");
-    if (testStep->hasRole(cedar::proc::DataRole::INPUT))
+    if (testStep->hasSlotForRole(cedar::proc::DataRole::INPUT))
     {
       const auto& inputs = testStep->getOrderedDataSlots(cedar::proc::DataRole::INPUT);
       for (unsigned int src = 0; src < sources.size(); ++src)

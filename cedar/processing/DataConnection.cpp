@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -58,6 +58,7 @@ mAlreadyDisconnected(false)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
+  std::string exception_message;
   try
   {
     // add the source data to target
@@ -69,43 +70,34 @@ mAlreadyDisconnected(false)
   }
   catch (cedar::aux::ExceptionBase& exc)
   {
-    // we ignore exceptions during this constructor, but notify the user
-    if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getTarget()->getParentPtr()))
-    {
-      std::string message = "An exception occurred while connecting \"" + this->getDataSlotIdentifier(source)
-            + "\" to \"" + this->getDataSlotIdentifier(target) + "\": ";
-      p_triggerable->setState
-      (
-        cedar::proc::Triggerable::STATE_EXCEPTION,
-        message + exc.getMessage()
-      );
-
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        message + exc.exceptionInfo(),
-        "cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr)"
-      );
-    }
+    exception_message = exc.exceptionInfo();
   }
   catch (std::exception& exc)
+  {
+    exception_message = exc.what();
+  }
+
+  if (!exception_message.empty())
   {
     // we ignore exceptions during this constructor, but notify the user
     if (auto p_triggerable = dynamic_cast<cedar::proc::Triggerable*>(this->getTarget()->getParentPtr()))
     {
       std::string message = "An exception occurred while connecting \"" + this->getDataSlotIdentifier(source)
-            + "\" to \"" + this->getDataSlotIdentifier(target) + "\": ";
+            + "\" to \"" + this->getDataSlotIdentifier(target) + "\": " + exception_message;
 
       p_triggerable->setState
       (
         cedar::proc::Triggerable::STATE_EXCEPTION,
-        message + std::string(exc.what())
+        message
       );
 
       cedar::aux::LogSingleton::getInstance()->error
       (
-        message + std::string(exc.what()),
-        "cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr)"
+        message,
+        CEDAR_CURRENT_FUNCTION_NAME
       );
+
+      this->getTarget()->setValidityInfo(message);
     }
   }
 }

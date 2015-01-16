@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright <copyright years> Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,7 +41,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+<if: in_cedar>
 #include "<base namespace path>/lib.h"
+<endif>
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,7 +53,11 @@
 
 <begin namespaces>
 <namespaces indent>//!@cond SKIPPED_DOCUMENTATION
+<if: in_cedar>
 <namespaces indent>CEDAR_DECLARE_<CAP_SHORT_MAIN_NAMESPACE>_CLASS(<class name>);
+<else>
+<namespaces indent>class <class name>;
+<endif>
 <namespaces indent>//!@endcond
 <end namespaces>
 

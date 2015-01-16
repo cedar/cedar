@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -191,6 +191,9 @@ public:
   //! creates plot group of provided name containing all currently opened plots
   void addPlotGroup(std::string plotGroupName);
 
+  //! creates plot group of provided name containing all currently opened plots
+  void editPlotGroup(std::string plotGroupName);
+
   //! removes plot group of given name
   void removePlotGroup(std::string plotGroupName);
 
@@ -199,6 +202,9 @@ public:
   
   //! returns the name of every plot group of this group
   std::list<std::string> getPlotGroupNames();
+
+  //! returns whether a name already exists in plot group list
+  bool plotGroupNameExists(const std::string& newName) const;
 
   //! opens the given plot group
   void displayPlotGroup(std::string plotGroupName);
@@ -434,12 +440,10 @@ private:
   //! Map assigning colors to looped triggers. This is a cache to make calculations faster. The real assignment is determined algorithmically.
   mutable std::map<cedar::proc::TriggerPtr, QBrush> mTriggerColors;
 
-//  boost::signals2::connection mSlotConnection;
-  //!@todo Make these scoped connections
-  boost::signals2::connection mNewElementAddedConnection;
-  boost::signals2::connection mElementRemovedConnection;
-  boost::signals2::connection mTriggerConnectionChangedConnection;
-  boost::signals2::connection mDataConnectionChangedConnection;
+  boost::signals2::scoped_connection mNewElementAddedConnection;
+  boost::signals2::scoped_connection mElementRemovedConnection;
+  boost::signals2::scoped_connection mTriggerConnectionChangedConnection;
+  boost::signals2::scoped_connection mDataConnectionChangedConnection;
   boost::signals2::scoped_connection mLinkedChangedConnection;
   boost::signals2::scoped_connection mLastReadConfigurationChangedConnection;
 

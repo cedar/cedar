@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -63,26 +63,51 @@ const std::string cedar::aux::Path::M_PROTOCOL_PLUGIN_STR = "plugin";
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::Path::Path()
+:
+cedar::aux::Path::PathBase()
 {
 }
 
 cedar::aux::Path::Path(const std::string& path)
+:
+// cannot call string base constructor here because that won't call the appropriate virtual function
+cedar::aux::Path::PathBase()
 {
-  this->setPath(path);
+  this->fromString(path);
 }
 
 cedar::aux::Path::Path(const char* path)
+:
+cedar::aux::Path::PathBase()
 {
-  this->setPath(std::string(path));
+  this->fromString(std::string(path));
 }
 
-cedar::aux::Path::~Path()
+cedar::aux::Path::Path(const PathBase& path)
+:
+cedar::aux::Path::PathBase(path)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::Path cedar::aux::Path::operator()(size_t start) const
+{
+  return this->operator()(start, this->getElementCount());
+}
+
+cedar::aux::Path cedar::aux::Path::operator()(size_t start, size_t end) const
+{
+  Path path(cedar::aux::Path::PathBase::operator()(start, end));
+  return path;
+}
+
+void cedar::aux::Path::createDirectories() const
+{
+  boost::filesystem::create_directories(this->getDirectory().absolute().toString(false));
+}
 
 std::string cedar::aux::Path::getTimestampForFileName()
 {
@@ -92,55 +117,13 @@ std::string cedar::aux::Path::getTimestampForFileName()
 bool cedar::aux::Path::operator== (const cedar::aux::Path& other) const
 {
   //!@todo This would not detect that some/dir == some/../some/dir and other, similar cases.
-  if (other.mComponents.size() != this->mComponents.size())
-  {
-    return false;
-  }
-
-  auto this_iter = this->mComponents.begin();
-  auto other_iter = other.mComponents.begin();
-  for (; this_iter != this->mComponents.end() && other_iter != other.mComponents.end(); ++this_iter, ++other_iter)
-  {
-    const auto& this_component = *this_iter;
-    const auto& other_component = *other_iter;
-
-    if (this_component != other_component)
-    {
-      return false;
-    }
-  }
-
-  return true;
+  return PathBase::operator==(other);
 }
 
 bool cedar::aux::Path::operator< (const cedar::aux::Path& other) const
 {
-  if (other.mComponents.size() < this->mComponents.size())
-  {
-    return false;
-  }
-  if (other.mComponents.size() > this->mComponents.size())
-  {
-    return true;
-  }
-
-  auto this_iter = this->mComponents.begin();
-  auto other_iter = other.mComponents.begin();
-  for (; this_iter != this->mComponents.end() && other_iter != other.mComponents.end(); ++this_iter, ++other_iter)
-  {
-    const auto& this_component = *this_iter;
-    const auto& other_component = *other_iter;
-
-    if (this_component < other_component)
-    {
-      return true;
-    }
-    else if (this_component > other_component)
-    {
-      return false;
-    }
-  }
-  return false;
+  //!@todo This does not compare protocols etc.
+  return PathBase::operator<(other);
 }
 
 std::string cedar::aux::Path::separator()
@@ -150,11 +133,7 @@ std::string cedar::aux::Path::separator()
 
 void cedar::aux::Path::appendComponent(const std::string& component)
 {
-  cedar::aux::Path other(component);
-  for (auto other_component : other.mComponents)
-  {
-    this->mComponents.push_back(other_component);
-  }
+  this->append(component);
 }
 
 std::vector<cedar::aux::Path> cedar::aux::Path::listSubdirectories() const
@@ -226,16 +205,6 @@ std::vector<cedar::aux::Path> cedar::aux::Path::listFilesThatMatchRe(const std::
   }
 
   return filtered_files;
-}
-
-const std::string& cedar::aux::Path::getLast() const
-{
-  if (this->mComponents.empty())
-  {
-    CEDAR_THROW(cedar::aux::InvalidValueException, "Cannot return last part of path: path is empty.");
-  }
-
-  return this->mComponents.back();
 }
 
 std::string cedar::aux::Path::getFileNameOnly() const
@@ -339,8 +308,7 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
 {
   if (this->isResource())
   {
-    std::string path = cedar::aux::locateResource(this->toString(), showInLog);
-    return cedar::aux::Path(path);
+    return cedar::aux::Path(cedar::aux::locateResource(this->toString(), showInLog));
   }
 
   else if (this->isAbsolute())
@@ -354,12 +322,12 @@ cedar::aux::Path cedar::aux::Path::absolute(bool showInLog) const
   }
 
   // if the path is neither a resource, nor absolute, it should be relative
-  return cedar::aux::Path(boost::filesystem::current_path().string() + "/" + this->toString(false));
+  return cedar::aux::Path(boost::filesystem::current_path().string() + separator() + this->toString(false));
 }
 
 bool cedar::aux::Path::isEmpty() const
 {
-  return this->mComponents.empty();
+  return this->empty();
 }
 
 bool cedar::aux::Path::isResource() const
@@ -390,7 +358,7 @@ bool cedar::aux::Path::isPluginRelative() const
   return false;
 }
 
-void cedar::aux::Path::setPath(const std::string& path)
+void cedar::aux::Path::fromString(const std::string& path)
 {
   enum PARSE_STATE
   {
@@ -399,7 +367,7 @@ void cedar::aux::Path::setPath(const std::string& path)
     STATE_PROTOCOL_OR_PATH_COLON_SLASH,
     STATE_PATH
   };
-  this->mComponents.clear();
+  this->clear();
   this->mProtocol.clear();
 
   this->mComponents.resize(1);
@@ -522,6 +490,11 @@ void cedar::aux::Path::setPath(const std::string& path)
   }
 }
 
+std::string cedar::aux::Path::toString() const
+{
+  return this->toString(false);
+}
+
 std::string cedar::aux::Path::toString(bool withProtocol) const
 {
   std::string path;
@@ -547,15 +520,7 @@ std::string cedar::aux::Path::toString(bool withProtocol) const
     path += cedar::aux::Path::separator();
   }
 
-  for (auto iter = this->mComponents.begin(); iter != this->mComponents.end(); ++iter)
-  {
-    if (iter != this->mComponents.begin())
-    {
-      path += cedar::aux::Path::separator();
-    }
-
-    path += *iter;
-  }
+  path += cedar::aux::join(this->mComponents, separator());
 
   return path;
 }
@@ -574,13 +539,13 @@ cedar::aux::Path cedar::aux::Path::operator+ (const cedar::aux::Path& other) con
 
 cedar::aux::Path& cedar::aux::Path::operator= (const std::string& pathStr)
 {
-  this->setPath(pathStr);
+  this->fromString(pathStr);
   return *this;
 }
 
 cedar::aux::Path& cedar::aux::Path::operator= (const char* pathStr)
 {
-  this->setPath(std::string(pathStr));
+  this->fromString(std::string(pathStr));
   return *this;
 }
 
