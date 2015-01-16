@@ -247,13 +247,6 @@ public:
     return this->toString();
   }
 
-  //! Returns the element of the path that has the given index.
-  StringType operator[](size_t index) const
-  {
-    CEDAR_ASSERT(index < this->getElementCount());
-    return this->mComponents.at(index);
-  }
-
   //! Returns the path, starting from the given index.
   SelfType operator()(size_t start) const
   {
