@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -304,7 +304,7 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
         = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter)
     )
     {
-      cedar::aux::ConfigurablePtr configurable = object_parameter->getConfigurable();
+      cedar::aux::ConfigurablePtr configurable = object_parameter->getSingleConfigurableChild();
       this->append(configurable->getParameters());
       QObject::connect(object_parameter.get(), SIGNAL(valueChanged()), this, SLOT(redraw()));
     }
@@ -320,7 +320,7 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
 
       for (size_t i = 0; i < list_parameter->size(); ++i)
       {
-        cedar::aux::ConfigurablePtr configurable = list_parameter->configurableAt(i);
+        cedar::aux::ConfigurablePtr configurable = list_parameter->getConfigurableChild(i);
         std::string label = list_parameter->getName() + "[" + cedar::aux::toString(i) + "]";
         this->append(label, configurable);
       }

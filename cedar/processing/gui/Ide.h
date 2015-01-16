@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -138,6 +138,9 @@ public:
   static void addCommandLineOptionsTo(cedar::aux::CommandLineParser& parser);
 
 public slots:
+  //!@brief
+  void togglePlotGroupActions();
+
   /*!@brief Slot that displays notifications.
    */
   void notify(const QString& message);
@@ -226,7 +229,7 @@ public slots:
   
   /*!@brief Duplicates a selected step
    */
-  void duplicateStep();
+  void duplicateSelected();
 
   /*!@brief Select all elements
    */
@@ -262,16 +265,19 @@ public slots:
   //!@brief Takes a snap shot from the registered steps;
   void takeSnapshot();
 
-  //!@brief opens dialogue to add plotgroup
+  //!@brief opens dialogue to add plot group
   void addPlotGroup();
   
-  //!@brief opens dialogue to edit selected plotgroup
+  //!@brief opens dialogue to rename selected plot group
+  void renamePlotGroup();
+
+  //!@brief saves the open plots in current plot group
   void editPlotGroup();
 
-  //!@brief displays the selected plotgroup
+  //!@brief displays the selected plot group
   void displayPlotGroup();
 
-  //!@brief deletes the selected plotgroup
+  //!@brief deletes the selected plot group
   void deletePlotGroup();
   //! Returns the log widget of this ide.
   cedar::aux::gui::Log* getLog() const

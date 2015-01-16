@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -128,7 +128,7 @@ int main()
   }
 
   std::cout << "Checking limits" << std::endl;
-  param->set(1, -5.0);
+  param->setValue(1, -5.0);
   if (param->at(1) != 0.0)
   {
     std::cout << "Limits were not applied properly. Set -5.0 with min of 0.0; value is: "
@@ -136,7 +136,7 @@ int main()
     ++errors;
   }
 
-  param->set(0, 15.0);
+  param->setValue(0, 15.0);
   if (param->at(0) != 10.0)
   {
     std::cout << "Limits were not applied properly. Set 15.0 with max of 10.0; value is: "

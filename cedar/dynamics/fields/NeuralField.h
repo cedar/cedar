@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -163,7 +163,7 @@ public:
   inline void setSize(unsigned int dim, unsigned int size)
   {
     CEDAR_ASSERT(dim < this->_mSizes->size());
-    this->_mSizes->set(dim, size);
+    this->_mSizes->setValue(dim, size);
   }
 
   //! Returns the resting level (h) of the field.

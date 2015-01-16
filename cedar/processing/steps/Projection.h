@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -148,7 +148,7 @@ public:
   //! Sets the size of the output in the given dimension.
   inline void setOutputDimensionSize(unsigned int dimension, unsigned int size)
   {
-    this->_mOutputDimensionSizes->set(dimension, size);
+    this->_mOutputDimensionSizes->setValue(dimension, size);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

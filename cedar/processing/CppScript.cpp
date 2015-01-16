@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -97,8 +97,7 @@ void cedar::proc::CppScript::callRun()
 
 std::string cedar::proc::CppScript::getType() const
 {
-  //!@todo FactoryManager could as well have a raw-pointer version of this, then CppScript wouldn't need shared_from_this.
-  return cedar::proc::CppScriptFactoryManagerSingleton::getInstance()->getTypeId(this->shared_from_this());
+  return cedar::proc::CppScriptFactoryManagerSingleton::getInstance()->getTypeId(this);
 }
 
 void cedar::proc::CppScript::setStopRequested(bool requested)

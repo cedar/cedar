@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -59,7 +59,6 @@ cedar_add_library(cedarproc
   experiment/gui/ActionSequence.h
   experiment/gui/ExperimentItemWidget.h
   experiment/gui/StepPropertyParameter.h
-  experiment/gui/TriggerParameter.h
   gui/ArchitectureWidgetList.h
   gui/ArchitectureScriptEditor.h
   gui/stepViews/BoostView.h

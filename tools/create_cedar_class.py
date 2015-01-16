@@ -2,7 +2,7 @@
 """
 ========================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -99,6 +99,9 @@ parser.add_option("-f", "--fwd-only", dest="fwd_only",
 parser.add_option("-p", "--output-path", dest="output_path",
                   help="When specified, the folder in which the new files are put.",
                   default=None, action="store")
+parser.add_option("-o", "--overwrite", dest="overwrite",
+                  help="Overwrite existing files.",
+                  default=None, action="store_true")
                   
 parser.add_option("-t", "--template", dest="template",
                   help="When specified, selects a specific template to be used. Currently, the only option is processing_step",
@@ -110,6 +113,7 @@ parser.add_option("-t", "--template", dest="template",
 # Deal with the arguments
 header_only = options.header_only
 fwd_only = options.fwd_only
+overwrite = options.overwrite
 if not options.template is None:
     if not os.path.exists(template_base_path + options.template):
         print "Could not find template", options.template
@@ -236,8 +240,12 @@ templates = {"h": "classHeader.h", "fwd.h": "classHeader.fwd.h", "cpp": "classIm
 
 base_directory = cedar_home
 
-if options.output_path is not None:
+is_in_cedar = options.output_path is None
+if not is_in_cedar:
     base_directory = options.output_path
+    
+if_re = re.compile(r'\<if\s*:\s*(\w+)\s*\>\n(.*?)\<\s*endif\s*\>\n', re.DOTALL)
+else_re = re.compile(r'(.*?)\s*\<\s*else\s*\>\n(.*)', re.DOTALL)
 
 for extension in extensions:
     print "Copying template", templates[extension]
@@ -245,18 +253,53 @@ for extension in extensions:
     with open(template_base_path + templates[extension], "r") as header:
         contents = header.read()
     
-    for search, replace in replacements.items():
-      contents = contents.replace(search, replace)
+    # apply if-conditions
+    m = if_re.search(contents)
+    while not m is None:
+        condition = m.group(1)
+        block = m.group(2)
+        
+        # see if there is an else in the block
+        m_else = else_re.search(block)
+        
+        if m_else is None:
+            if_true = block
+            if_false = ""
+        else:
+            if_true = m_else.group(1) + "\n"
+            if_false = m_else.group(2)
+        
+        is_true = False
+        if condition == "in_cedar":
+            is_true = is_in_cedar
+        
+        if is_true:
+            replacement = if_true
+        else:
+            replacement = if_false
+        
+        contents = contents[:m.start(0)] + replacement + contents[m.end(0):]
+        
+        # match next instance
+        m = if_re.search(contents)
       
+    # apply simple search-and-replace things
+    for search, replace in replacements.items():
+        contents = contents.replace(search, replace)
+        
     destination = base_directory + os.sep + class_path + "." + extension
     print "destination:", destination
     
-    if os.path.exists(destination):
-      print "File already exists. Skipping."
-      continue
-      
-    with open(destination, "w") as out:
-      out.write(contents)
+    if not overwrite and os.path.exists(destination):
+        print "File already exists. Skipping."
+        continue
+
+    try:    
+        with open(destination, "w") as out:
+            out.write(contents)
+    except IOError as e:
+        print "Could not create file \"" + str(destination) + "\". Error:", str(e)
+        sys.exit(-1)
     
 print "Done. Please remember to rerun cmake!"
 

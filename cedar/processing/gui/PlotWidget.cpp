@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -94,47 +94,57 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(c
   }
   catch (cedar::aux::NotFoundException&)
   {
-    return;
+    // ok -- below, we display info to the user
+  }
+  catch (cedar::aux::UnknownTypeException)
+  {
+    // ok -- below, we display info to the user
   }
 
   if (!declarationToFind.empty())
   {
     // then, try to find one that matches the specified one
-    auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
-    for (auto declaration : declarations)
+    try
     {
-      if (declaration->getClassName() == declarationToFind)
+      auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
+      for (auto declaration : declarations)
       {
-        mpPlotDeclaration = declaration;
-        break;
+        if (declaration->getClassName() == declarationToFind)
+        {
+          mpPlotDeclaration = declaration;
+          break;
+        }
       }
     }
+    catch (cedar::aux::UnknownTypeException)
+    {
+    }
+  }
+
+  if (this->mpPlotter)
+  {
+    // remember the old data that was plotted
+    if (auto multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpPlotter))
+    {
+      const auto& map = multi->getDataTitleMap();
+      mMultiPlotData.insert(map.begin(), map.end());
+    }
+
+    this->mpPlotContainer->layout()->removeWidget(this->mpPlotter);
+    delete this->mpPlotter;
+  }
+
+  // clear all remaining widgets from the plot container
+  while (this->mpPlotContainer->layout()->count() > 0)
+  {
+    auto item = this->mpPlotContainer->layout()->itemAt(0);
+    auto widget = item->widget();
+    this->mpPlotContainer->layout()->removeItem(item);
+    delete widget;
   }
 
   if (mpPlotDeclaration)
   {
-    if (this->mpPlotter)
-    {
-      // remember the old data that was plotted
-      if (auto multi = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpPlotter))
-      {
-        const auto& map = multi->getDataTitleMap();
-        mMultiPlotData.insert(map.begin(), map.end());
-      }
-
-      this->mpPlotContainer->layout()->removeWidget(this->mpPlotter);
-      delete this->mpPlotter;
-    }
-
-    // clear all remaining widgets from the plot container
-    while (this->mpPlotContainer->layout()->count() > 0)
-    {
-      auto item = this->mpPlotContainer->layout()->itemAt(0);
-      auto widget = item->widget();
-      this->mpPlotContainer->layout()->removeItem(item);
-      delete widget;
-    }
-
     try
     {
       mpPlotter = mpPlotDeclaration->createPlot();
@@ -168,6 +178,12 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openPlotFromDeclaration(c
       }
     }
   }
+  else // No plot declaration found
+  {
+    auto label = new QLabel("Could not open plot: no known plot for type.");
+    label->setWordWrap(true);
+    this->mpPlotContainer->layout()->addWidget(label);
+  }
 }
 
 void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openDefaultPlot()
@@ -185,15 +201,26 @@ void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::openSpecificPlot()
 
 void cedar::proc::gui::PlotWidgetPrivate::LabeledPlot::fillPlotOptions(QMenu* menu)
 {
+  this->mpPlotSelector->setEnabled(true);
   auto default_action = menu->addAction("default");
   menu->addSeparator();
   QObject::connect(default_action, SIGNAL(triggered()), this, SLOT(openDefaultPlot()));
 
-  auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
-  for (auto declaration : declarations)
+  try
   {
-    auto action = menu->addAction(QString::fromStdString(declaration->getClassName()));
-    QObject::connect(action, SIGNAL(triggered()), this, SLOT(openSpecificPlot()));
+    auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(mpData)->getData();
+    for (auto declaration : declarations)
+    {
+      auto action = menu->addAction(QString::fromStdString(declaration->getClassName()));
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(openSpecificPlot()));
+    }
+  }
+  catch (cedar::aux::UnknownTypeException)
+  {
+    default_action->setEnabled(false);
+    auto no_action = menu->addAction("no plots found");
+    no_action->setEnabled(false);
+    this->mpPlotSelector->setEnabled(false);
   }
 }
 

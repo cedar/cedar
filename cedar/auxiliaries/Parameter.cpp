@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -85,6 +86,59 @@ cedar::aux::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::Parameter::childIndexToString(size_t i) const
+{
+  return cedar::aux::toString(i);
+}
+
+size_t cedar::aux::Parameter::childStringToIndex(std::string str) const
+{
+  return cedar::aux::fromString<size_t>(str);
+}
+
+cedar::aux::ConstConfigurablePtr cedar::aux::Parameter::getSingleConfigurableChild() const
+{
+  return cedar::aux::ConfigurablePtr();
+}
+
+cedar::aux::ConfigurablePtr cedar::aux::Parameter::getSingleConfigurableChild()
+{
+  // const casts prevent code duplication
+  return boost::const_pointer_cast<cedar::aux::Configurable>(const_cast<cedar::aux::ConstParameter*>(this)->getSingleConfigurableChild());
+}
+
+bool cedar::aux::Parameter::hasSingleConfigurableChild() const
+{
+  return false;
+}
+
+bool cedar::aux::Parameter::canHaveConfigurableChildren() const
+{
+  return false;
+}
+
+size_t cedar::aux::Parameter::getNumberOfConfigurableChildren() const
+{
+  return 0;
+}
+
+cedar::aux::ConfigurablePtr cedar::aux::Parameter::getConfigurableChild(size_t i)
+{
+  // this const-cast avoids duplicate code
+  return boost::const_pointer_cast<cedar::aux::Configurable>(this->retrieveConfigurableChild(i));
+}
+
+cedar::aux::ConstConfigurablePtr cedar::aux::Parameter::getConfigurableChild(size_t i) const
+{
+  return this->retrieveConfigurableChild(i);
+}
+
+cedar::aux::ConstConfigurablePtr cedar::aux::Parameter::retrieveConfigurableChild(size_t) const
+{
+  // default implementation returns an empty pointer; this should never be called.
+  return cedar::aux::ConstConfigurablePtr();
+}
 
 bool cedar::aux::Parameter::isLinked() const
 {

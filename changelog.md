@@ -4,7 +4,7 @@ List of changes
  <!--
 =======================================================================================================================
 
-   Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+   Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
    This file is part of cedar.
 
@@ -61,6 +61,7 @@ known issues
   - In rare cases, moving elements into groups breaks the triggering chain, which leads to steps not being iterated
     correctly. This can be fixed by saving and loading the architecture. If you encounter such a (reproducible)
     situation, please let us know.
+  - single elements cannot be loaded as linked templates into architectures. They are simply added to the architecture.
 
 Unreleased
 ==========

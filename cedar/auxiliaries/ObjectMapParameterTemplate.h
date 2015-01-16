@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -132,8 +132,7 @@ namespace cedar
         }
 
         //! Stores tje configuration of the object with the given key in the given configuration tree.
-        //!@todo Should be named writeObject.
-        void storeObject(const std::string& key, cedar::aux::ConfigurationNode& node) const
+        void writeObject(const std::string& key, cedar::aux::ConfigurationNode& node) const
         {
           typename AllocationPolicy<ValueType>::ConstValueTypePtr value = (*this)[key];
 
@@ -220,7 +219,7 @@ namespace cedar
         }
 
         //! Stores the configuration of the object with the given key in the given configuration tree.
-        void storeObject(const std::string& key, cedar::aux::ConfigurationNode& node) const
+        void writeObject(const std::string& key, cedar::aux::ConfigurationNode& node) const
         {
 //          typename AllocationPolicy::ValueTypePtr value = iter->second;
 //
@@ -369,7 +368,7 @@ public:
     {
       const std::string& key = iter->first;
       cedar::aux::ConfigurationNode object_node;
-      this->storeObject(key, object_node);
+      this->writeObject(key, object_node);
       object_map_node.push_back(cedar::aux::ConfigurationNode::value_type(key, object_node));
     }
 

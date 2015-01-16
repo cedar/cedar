@@ -16,7 +16,7 @@ beneficial or even necessary.
 - @link ProcessingFrameworkTutorial Processing framework @endlink
 - @link ArchitectureWidgets Architecture Widgets @endlink
 - @ref ConfigurableAndParameters
-- @link TemplatesTutorial Templates tutorial @endlink
+- @link TemplatesTutorial Group and Element Templates tutorial @endlink
 - @link CommandLineParser cedar's command line parser@endlink
 - @link ExperimentFrameworkTutorial Experiment framework @endlink
 @subsection AdvancedTutorials Advanced Tutorials
@@ -35,6 +35,7 @@ interested in implementation details, you may have a look at the following topic
 - @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
 - @link UnitsConcept Physical units @endlink
 - @ref EnumConcept
+- @ref CedarPaths
 
 
 */

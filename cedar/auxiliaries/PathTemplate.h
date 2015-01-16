@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -57,12 +57,24 @@ namespace cedar
     class CharSeparator
     {
       public:
-        //! Returns the separator used for the path.
-        static StorageT separator()
+        //! Splits the string based on the separator specified via template argument.
+        static std::vector<StorageT> separate(const StorageT& string)
         {
-          StorageT separator;
+          // we have to use += because std::string doesn't have a constructor that takes a single character.
+          std::string separator;
           separator += Separator;
-          return separator;
+
+          std::vector<StorageT> components;
+          cedar::aux::split(string, separator, components);
+          return components;
+        }
+
+        static StorageT joinComponents(const std::vector<StorageT>& components)
+        {
+          // we have to use += because std::string doesn't have a constructor that takes a single character.
+          std::string separator;
+          separator += Separator;
+          return cedar::aux::join(components, separator);
         }
     };
 
@@ -140,24 +152,23 @@ public:
     this->mComponents.insert(this->mComponents.end(), path.begin(), path.end());
   }
 
-  //! Appends a string component to the path
-  void append(const StringType& string)
-  {
-    // this makes sure the string is properly split into its components if it contains the separator
-    SelfType subpath(string);
-    this->append(subpath);
-  }
-
   //! Appends another path to this path.
   void append(const SelfType& other)
   {
     this->append(other.mComponents);
   }
 
-  //! Converts the path to a string.
-  StringType toString() const
+  //! Sets the path from a given string.
+  virtual void fromString(const StringType& string)
   {
-    return cedar::aux::join(this->mComponents, SeparatorType::separator());
+    this->clear();
+    this->append(SeparatorType::separate(string));
+  }
+
+  //! Converts the path to a string.
+  virtual StringType toString() const
+  {
+    return SeparatorType::joinComponents(this->mComponents);
   }
 
   //! Returns the number of components in the path.
@@ -172,9 +183,43 @@ public:
     return this->mComponents.empty();
   }
 
+  //! Returns the first element in the path
+  const StorageT& getFirst() const
+  {
+    if (this->mComponents.empty())
+    {
+      CEDAR_THROW(cedar::aux::InvalidValueException, "Cannot return first part of path: path is empty.");
+    }
+
+    return this->mComponents.front();
+  }
+
+  //! Returns the last element in the path
+  const StorageT& getLast() const
+  {
+    if (this->mComponents.empty())
+    {
+      CEDAR_THROW(cedar::aux::InvalidValueException, "Cannot return last part of path: path is empty.");
+    }
+
+    return this->mComponents.back();
+  }
+
+  //! Returns the component with the given index.
+  const StorageT& getComponent(size_t i) const
+  {
+    return this->mComponents.at(i);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // public operators
   //--------------------------------------------------------------------------------------------------------------------
+  //! Returns the component with the given index.
+  const StorageT& operator[](size_t index) const
+  {
+    return this->getComponent(index);
+  }
+
   //! Concatenates two paths.
   SelfType operator+(const SelfType& other) const
   {
@@ -233,6 +278,61 @@ public:
     return slice;
   }
 
+  //! Compares two paths.
+  virtual bool operator< (const SelfType& other) const
+  {
+    if (other.mComponents.size() < this->mComponents.size())
+    {
+      return false;
+    }
+    if (other.mComponents.size() > this->mComponents.size())
+    {
+      return true;
+    }
+
+    auto this_iter = this->mComponents.begin();
+    auto other_iter = other.mComponents.begin();
+    for (; this_iter != this->mComponents.end() && other_iter != other.mComponents.end(); ++this_iter, ++other_iter)
+    {
+      const auto& this_component = *this_iter;
+      const auto& other_component = *other_iter;
+
+      if (this_component < other_component)
+      {
+        return true;
+      }
+      else if (this_component > other_component)
+      {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  //! Compares two paths.
+  virtual bool operator== (const SelfType& other) const
+  {
+    if (other.mComponents.size() != this->mComponents.size())
+    {
+      return false;
+    }
+
+    auto this_iter = this->mComponents.begin();
+    auto other_iter = other.mComponents.begin();
+    for (; this_iter != this->mComponents.end() && other_iter != other.mComponents.end(); ++this_iter, ++other_iter)
+    {
+      const auto& this_component = *this_iter;
+      const auto& other_component = *other_iter;
+
+      if (this_component != other_component)
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -243,23 +343,16 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void fromString(const StringType& string)
-  {
-    this->clear();
-
-    std::vector<StringType> components;
-    cedar::aux::split(string, SeparatorType::separator(), components);
-    this->append(components);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
   //! The elements of the path, split apart.
   std::vector<StringType> mComponents;
+private:
+  // none yet
 
 }; // class cedar::aux::PathTemplate
 

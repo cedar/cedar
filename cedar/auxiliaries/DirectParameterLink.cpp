@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -80,13 +80,24 @@ void cedar::aux::DirectParameterLink::targetChanged()
 
 bool cedar::aux::DirectParameterLink::checkIfLinkable
      (
-       cedar::aux::ConstParameterPtr /* left */,
-       cedar::aux::ConstParameterPtr /* right */
+       cedar::aux::ConstParameterPtr source,
+       cedar::aux::ConstParameterPtr target
      )
      const
 {
-  // TODO
-  return true;
+  // can these parameters just copy from one another?
+  if (target->canCopyFrom(source))
+  {
+    return true;
+  }
+  // if they are numeric, we can convert to some extent
+  else if (cedar::aux::NumericParameterHelper::isNumeric(source) && cedar::aux::NumericParameterHelper::isNumeric(target))
+  {
+    return true;
+  }
+
+  // if none of the above applies, we cannot link the given parameters
+  return false;
 }
 
 

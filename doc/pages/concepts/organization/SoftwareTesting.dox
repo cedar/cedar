@@ -71,6 +71,24 @@ $ make test
 @endcode
 in the build directory.
 
+@section TestingCoverageAndMemCheck Coverage and memory testing
+
+You can run unit tests with a memory check tool or determine test coverage. To do so, you first need to set the
+CEDAR_COVERAGE_TEST and CEDAR_BUILD_VALGRIND_CHECK flags in your cedar.conf to 1 and compile your cedar with these
+values. You can then run memcheck-tests by calling
+@code
+$ ctest -D NightlyMemCheck
+@endcode
+in your build folder. To determine coverage, use
+@code
+$ ctest -D NightlyCoverage 
+@endcode
+instead. To run both at the same time, run 
+@code
+$ ctest -D NightlyMemoryCheck
+@endcode
+
+
 @section InteractiveTests Interactive tests
 
 While unit tests are a great tool for testing classes or deterministic processes in general, it does not

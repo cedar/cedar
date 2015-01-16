@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -276,6 +276,9 @@ public:
   {
     return this->mReadOnly;
   }
+
+  //! Specifies whether the item can be duplicated.
+  virtual bool canDuplicate() const = 0;
 
   /*! Returns the color used to fill the foreground when the given brush is not solid.
    */

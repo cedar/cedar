@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -107,8 +107,13 @@ public:
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
   //!@brief Returns whether this connectable has at least one slot of the given role.
-  //!@todo Rename this to hasSlotForRole.
-  bool hasRole(cedar::proc::DataRole::Id role) const;
+  bool hasSlotForRole(cedar::proc::DataRole::Id role) const;
+
+  //!@deprecated Use hasSlotForRole.
+  CEDAR_DECLARE_DEPRECATED(bool hasRole(cedar::proc::DataRole::Id role) const)
+  {
+    return this->hasSlotForRole(role);
+  }
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
