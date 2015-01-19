@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,66 +22,113 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GroupPath.h
+    File:        SimulationControl.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 12 05
+    Date:        2014 10 21
 
-    Description:
+    Description: Header file for the class cedar::proc::gui::SimulationControl.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GROUP_PATH_H
-#define CEDAR_PROC_GROUP_PATH_H
+#ifndef CEDAR_PROC_GUI_SIMULATION_CONTROL_H
+#define CEDAR_PROC_GUI_SIMULATION_CONTROL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/PathTemplate.h"
+#include "cedar/processing/gui/ui_SimulationControl.h"
+#include "cedar/auxiliaries/LockableMember.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/GroupPath.fwd.h"
+#include "cedar/processing/Element.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
+#include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/SimulationControl.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
+#include <QFuture>
+#include <QPushButton>
+#ifndef Q_MOC_RUN
+  #include <boost/signals2.hpp>
+#endif // Q_MOC_RUN
 
-
-/*!@brief a dot-separated path to an element nested in a group
- */
-class cedar::proc::GroupPath : public cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> >
+//!@cond SKIPPED_DOCUMENTATION
+// "Hidden" class; would be a private nested class of cedar::proc::gui::SimulationControl, but the moc cannot do that
+namespace cedar
 {
+  namespace proc
+  {
+    namespace gui
+    {
+      namespace SimulationControlPrivate
+      {
+        /*! A widget that can be used to start/stop a looped trigger. Also reacts to when the trigger is started from
+         * elsewhere
+         */
+        class TriggerControlWidget : public QWidget
+        {
+          Q_OBJECT
+
+        public:
+          TriggerControlWidget(cedar::proc::LoopedTriggerPtr loopedTrigger);
+
+        private slots:
+          void startStopTriggerClicked();
+
+          void triggerStarted();
+
+          void triggerStopped();
+
+          void triggerChangingState();
+
+          void singleStepClicked();
+
+        private:
+          cedar::proc::LoopedTriggerPtr mLoopedTrigger;
+
+          QPushButton* mpStartStopButton;
+
+          QPushButton* mpSingleStepButton;
+        };
+      }
+    }
+  }
+}
+//!@endcond
+
+/*!@brief A widget for controlling the simulation of a cedar::proc::Group.
+ */
+class cedar::proc::gui::SimulationControl : public QWidget, public Ui_SimulationControl
+{
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef cedar::aux::PathTemplate<cedar::aux::CharSeparator<'.'> > PathType;
-  typedef PathType::StringType String;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GroupPath();
+  SimulationControl();
 
-  //! Constructor that takes a string.
-  GroupPath(const String& path);
-
-  //!@brief Constructor accepting a c string
-  GroupPath(const char* path);
-
-  //!@brief Constructor accepting a dot-separated path
-  GroupPath(const PathType&);
+  //! The destructor.
+  ~SimulationControl();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Returns the name of the element stored in this path.
-  std::string getElementName() const;
+  //! Sets the group whose simulation is controlled by this widget.
+  void setGroup(cedar::proc::gui::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,26 +140,66 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void elementAdded(QTreeWidgetItem* pItem, cedar::proc::ElementPtr element);
+  void loopedTriggerAdded(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger);
+
+  void updateSimulationRunningIcon(bool running);
+
+  QWidget* getColorWidget(QTreeWidgetItem* pItem);
+
+  cedar::proc::LoopedTriggerPtr getItemTrigger(QTreeWidgetItem* pItem);
+
+  void updateItemTriggerColor(QTreeWidgetItem* pItem);
+
+  void updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr loopedTrigger);
+
+  void sortItems();
+
+private slots:
+  void startPauseSimulationClicked();
+
+  void triggerStarted();
+
+  void allTriggersStopped();
+
+  void createClicked();
+
+  void removeClicked();
+
+  void updateAllTriggerColors();
+
+  void elementNameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  // none yet
+  cedar::proc::gui::GroupPtr mGroup;
+
+  boost::signals2::scoped_connection mElementAddedConnection;
+
+  cedar::aux::LockableMember<bool> mSimulationRunning;
+
+  QFuture<void> mStartSimulationResult;
+
+  QFuture<void> mStopSimulationResult;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  static QString M_STARTED_ICON_PATH;
+  static QString M_PAUSED_ICON_PATH;
+
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::GroupPath
+}; // class cedar::proc::gui::SimulationControl
 
-#endif // CEDAR_PROC_GROUP_PATH_H
-
+#endif // CEDAR_PROC_GUI_SIMULATION_CONTROL_H

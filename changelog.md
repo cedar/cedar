@@ -66,7 +66,14 @@ known issues
 Unreleased
 ==========
 
-  ---
+- cedar::proc
+  - The use of (Looped)Triggers has been remodeled completely. They are no longer shown in the architecture. Instead,
+    each looped element is, by default, connected to a default trigger that is created automatically. If you want to use
+    more triggers, you can now do so via the simulation control widget (shift + t, or click the corresponding button in
+    the toolbar/menu). This allows you to add triggers, remove them and change their settings.
+    There is also a new mode for seeing what steps are connected to what triggers. This can be enabled from the toolbar
+    and the menu ("color elements by trigger"). In addition to showing what trigger elements are connected to, hovering
+    over a step in this mode will also display in what order it will trigger its subsequent steps.
 
 Released versions
 =================

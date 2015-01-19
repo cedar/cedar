@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -176,6 +177,12 @@ public:
     return this->mComponents.size();
   }
 
+  //! Checks whether the path is empty
+  bool empty() const
+  {
+    return this->mComponents.empty();
+  }
+
   //! Returns the first element in the path
   const StorageT& getFirst() const
   {
@@ -196,12 +203,6 @@ public:
     }
 
     return this->mComponents.back();
-  }
-
-  //! Checks whether the path is empty.
-  bool empty() const
-  {
-    return this->mComponents.empty();
   }
 
   //! Returns the component with the given index.

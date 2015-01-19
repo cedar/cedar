@@ -34,6 +34,7 @@
                     "idle time": "1e-05 s",
                     "simulated time": "0.001 s",
                     "loop mode": "Fixed",
+                    "start with all": "true",
                     "listeners":
                     [
                         "child step"

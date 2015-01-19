@@ -119,6 +119,9 @@ public:
   //! Returns the current time measurement statistics
   ConstTimeAveragePtr getStatistics() const;
 
+  //! If false, this trigger should not be started with start all triggers calls.
+  bool startWithAll() const;
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -171,7 +174,13 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! Used to prevent multiple start calls to the trigger.
+  bool mStarted;
+
+  //! Used to prevent multiple start calls to the trigger.
+  QMutex mStartedMutex;
+
+  TimeAveragePtr mStatistics;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -180,13 +189,7 @@ protected:
   // none yet
 
 private:
-  //! Used to prevent multiple start calls to the trigger.
-  bool mStarted;
-
-  //! Used to prevent multiple start calls to the trigger.
-  QMutex mStartedMutex;
-
-  TimeAveragePtr mStatistics;
+  cedar::aux::BoolParameterPtr _mStartWithAll;
 
 }; // class cedar::proc::LoopedTrigger
 
