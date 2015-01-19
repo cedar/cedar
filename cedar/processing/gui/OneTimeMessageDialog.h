@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,65 +22,65 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StringParameter.h
+    File:        OneTimeMessageDialog.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2014 11 11
 
-    Description:
+    Description: Header file for the class cedar::proc::gui::OneTimeMessageDialog.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_STRING_PARAMETER_H
-#define CEDAR_AUX_GUI_STRING_PARAMETER_H
+#ifndef CEDAR_PROC_GUI_ONE_TIME_MESSAGE_DIALOG_H
+#define CEDAR_PROC_GUI_ONE_TIME_MESSAGE_DIALOG_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/processing/gui/ui_OneTimeMessageDialog.h"
+#include "cedar/processing/gui/Settings.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/auxiliaries/gui/StringParameter.fwd.h"
+#include "cedar/processing/gui/OneTimeMessageDialog.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QLineEdit>
+#include <QDialog>
 
 
-/*!@brief Widget for displaying and manipulating cedar::aux::StringParameters.
+/*!@brief A dialog for displaying one-time messages.
  */
-class cedar::aux::gui::StringParameter : public cedar::aux::gui::Parameter
+class cedar::proc::gui::OneTimeMessageDialog : public QDialog, public Ui_OneTimeMessageDialog
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StringParameter(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  virtual ~StringParameter();
+  OneTimeMessageDialog
+  (
+    const std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr>& messages,
+    bool markAsRead = false,
+    QWidget* pParent = nullptr
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setReadOnly(bool readOnly);
+  // none yet
 
 public slots:
-  //!@brief handles a change of the associated parameter
-  void parameterPointerChanged();
-  //!@brief handles a change in the text box
-  void textEdited(const QString& text);
+  void showNextMessage();
+  void showPreviousMessage();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,10 +92,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void propertiesChanged();
+  void showMessage(size_t index);
 
 private slots:
-  void parameterValueChanged();
+  void dialogAccepted();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -103,8 +103,24 @@ private slots:
 protected:
   // none yet
 private:
-  //!@brief a text edit for the represented parameter
-  QLineEdit *mpEdit;
-}; // class cedar::aux::gui::StringParameter
+  //! The messages to be displayed
+  std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr> mMessages;
 
-#endif // CEDAR_AUX_GUI_STRING_PARAMETER_H
+  //! If true, the messages will be marked as read when the dialog is closed.
+  bool mMarkAsRead;
+
+  size_t mCurrentMessage;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::gui::OneTimeMessageDialog
+
+#endif // CEDAR_PROC_GUI_ONE_TIME_MESSAGE_DIALOG_H
+

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,60 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GroupPath.cpp
+    File:        SimulationControl.fwd.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 12 05
+    Date:        2014 10 21
 
-    Description:
+    Description: Forward declaration file for the class cedar::proc::gui::SimulationControl.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_GUI_SIMULATION_CONTROL_FWD_H
+#define CEDAR_PROC_GUI_SIMULATION_CONTROL_FWD_H
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/GroupPath.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::GroupPath::GroupPath()
-:
-cedar::proc::GroupPath::PathType()
+namespace cedar
 {
+  namespace proc
+  {
+    namespace gui
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(SimulationControl);
+      //!@endcond
+    }
+  }
 }
 
-cedar::proc::GroupPath::GroupPath(const cedar::proc::GroupPath::String& path)
-:
-cedar::proc::GroupPath::PathType(path)
-{
-}
 
-cedar::proc::GroupPath::GroupPath(const char* path)
-:
-cedar::proc::GroupPath::PathType(path)
-{
-}
+#endif // CEDAR_PROC_GUI_SIMULATION_CONTROL_FWD_H
 
-cedar::proc::GroupPath::GroupPath(const PathType& path)
-:
-cedar::proc::GroupPath::PathType(path)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-std::string cedar::proc::GroupPath::getElementName() const
-{
-  CEDAR_ASSERT(!this->empty());
-  return this->operator[](this->getElementCount() - 1);
-}
