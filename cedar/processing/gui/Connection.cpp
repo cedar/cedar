@@ -63,20 +63,84 @@ cedar::proc::gui::Connection::Connection
   cedar::proc::gui::GraphicsBase* pTarget
 )
 :
-mpSource(pSource),
-mpTarget(pTarget),
-mpArrowStart(0),
-mpArrowEnd(0),
+mpSource(nullptr),
+mpTarget(nullptr),
+mpArrowStart(nullptr),
+mpArrowEnd(nullptr),
 mValidity(CONNECT_NOT_SET),
 mSmartMode(false),
 mHighlight(false),
 mHighlightHover(false)
 {
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
-  this->setParentItem(pSource);
-  pSource->addConnection(this);
-  pTarget->addConnection(this);
+  this->setHighlightedBySelection(false);
+
+  this->setSourceAndTarget(pSource, pTarget);
+}
+
+cedar::proc::gui::Connection::~Connection()
+{
+  this->setSourceAndTarget(nullptr, nullptr);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connection::setSource(cedar::proc::gui::GraphicsBase* source)
+{
+  this->setSourceAndTarget(source, this->mpTarget);
+}
+
+void cedar::proc::gui::Connection::setTarget(cedar::proc::gui::GraphicsBase* target)
+{
+  this->setSourceAndTarget(this->mpSource, target);
+}
+
+void cedar::proc::gui::Connection::setSourceAndTarget(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target)
+{
+  if (this->mpSource != source)
+  {
+    if (this->mpSource)
+    {
+      this->mpSource->removeConnection(this);
+    }
+
+    this->mpSource = source;
+
+    if (this->mpSource)
+    {
+      this->mpSource->addConnection(this);
+    }
+  }
+
+  if (this->mpTarget != target)
+  {
+    if (this->mpTarget)
+    {
+      this->mpTarget->removeConnection(this);
+    }
+
+    this->mpTarget = target;
+
+    if (this->mpTarget)
+    {
+      this->mpTarget->addConnection(this);
+    }
+  }
+
+  this->updateGraphics();
+}
+
+void cedar::proc::gui::Connection::updateGraphics()
+{
+  if (!this->mpSource || !this->mpTarget)
+  {
+    return;
+  }
+
+  this->setParentItem(this->mpSource);
 
   QPen pen = this->pen();
   if (this->isTriggerConnection())
@@ -111,13 +175,13 @@ mHighlightHover(false)
 
 
   // update validity
-  if (pSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM)
+  if (this->mpSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM)
   {
     // data slots should only be connected to other slots
-    CEDAR_DEBUG_ASSERT(pTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM);
+    CEDAR_DEBUG_ASSERT(this->mpTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM);
 
     cedar::proc::gui::ConnectValidity validity = cedar::proc::gui::CONNECT_ERROR;
-    switch (cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(pTarget)->getSlot()->getValidity())
+    switch (cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(this->mpTarget)->getSlot()->getValidity())
     {
       case cedar::proc::DataSlot::VALIDITY_VALID:
         validity = cedar::proc::gui::CONNECT_YES;
@@ -141,16 +205,6 @@ mHighlightHover(false)
   this->setHighlightedBySelection(false);
   this->update();
 }
-
-cedar::proc::gui::Connection::~Connection()
-{
-  cedar::aux::LogSingleton::getInstance()->freeing(this);
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 
 bool cedar::proc::gui::Connection::isTriggerConnection() const
 {

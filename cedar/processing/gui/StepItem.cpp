@@ -604,9 +604,8 @@ void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
 
   p_sub_menu->setEnabled(!this->isReadOnly());
 
-  for (size_t i = 0; i < cedar::proc::gui::StepItem::DisplayMode::type().list().size(); ++i)
+  for (const cedar::aux::Enum& e : cedar::proc::gui::StepItem::DisplayMode::type().list())
   {
-    const cedar::aux::Enum& e = cedar::proc::gui::StepItem::DisplayMode::type().list().at(i);
     QAction* p_action = p_sub_menu->addAction(QString::fromStdString(e.prettyString()));
     p_action->setData(QString::fromStdString(e.name()));
 
@@ -615,6 +614,7 @@ void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
     {
       p_action->setChecked(true);
     }
+    p_action->setEnabled(this->supportsDisplayMode(e.id()));
   }
 
   QObject::connect(p_sub_menu, SIGNAL(triggered(QAction*)), this, SLOT(displayStyleMenuTriggered(QAction*)));
@@ -643,6 +643,10 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
     case cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT:
       this->setWidth(cedar::proc::gui::StepItem::mDefaultWidth);
       this->setHeight(cedar::proc::gui::StepItem::mDefaultHeight);
+      break;
+
+    case cedar::proc::gui::StepItem::DisplayMode::HIDE_IN_CONNECTIONS:
+      this->hideInConnections();
       break;
   }
 

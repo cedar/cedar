@@ -102,6 +102,7 @@ public:
       {
         mType.type()->def(cedar::aux::Enum(ICON_AND_TEXT, "ICON_AND_TEXT", "icon and text"));
         mType.type()->def(cedar::aux::Enum(ICON_ONLY, "ICON_ONLY", "icon only"));
+        mType.type()->def(cedar::aux::Enum(HIDE_IN_CONNECTIONS, "HIDE_IN_CONNECTIONS", "hide in connections"));
       }
 
       //! @returns A const reference to the base enum object.
@@ -115,6 +116,9 @@ public:
 
       //! Display an icon only
       static const Id ICON_ONLY = 1;
+
+      //! The connectable is hidden in the connections going to and from it.
+      static const Id HIDE_IN_CONNECTIONS = 2;
 
     private:
       //! The base enum object.
@@ -238,6 +242,18 @@ public:
   );
 
   static cedar::proc::TriggerPtr getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group);
+
+  //! Checks if the connectable can be hidden in the connections going from and to it.
+  bool canHideInConnections() const;
+
+  //! Checks if the given display style is supported by this connectable.
+  virtual bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
+
+  //! Returns the currently set display mode.
+  cedar::proc::gui::Connectable::DisplayMode::Id getDisplayMode() const;
+
+  //! Hides the connectable in its connections.
+  void hideInConnections();
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.
@@ -403,6 +419,8 @@ private:
   void showTriggerChains();
 
   void hideTriggerChains();
+
+  unsigned int getNumberOfSlotsFor(cedar::proc::DataRole::Id role) const;
 
 private slots:
   void triggerableStarted();

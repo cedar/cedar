@@ -244,6 +244,9 @@ public:
    */
   cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::ConstElement* element);
 
+  //! Returns the graphics item corresponding to the given element.
+  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::ConstElementPtr element);
+
   /*!@brief Returns, whether snap-to-grid is true.
    */
   bool getSnapToGrid() const;

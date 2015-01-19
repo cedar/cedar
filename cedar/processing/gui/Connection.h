@@ -69,7 +69,7 @@ class cedar::proc::gui::Connection : public QGraphicsPathItem
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Connection(cedar::proc::gui::GraphicsBase *pSource, cedar::proc::gui::GraphicsBase *pTarget);
+  Connection(cedar::proc::gui::GraphicsBase *pSource = nullptr, cedar::proc::gui::GraphicsBase *pTarget = nullptr);
 
   //!@brief Destructor
   ~Connection();
@@ -80,8 +80,18 @@ public:
 public:
   //!@brief access the source of this connection
   cedar::proc::gui::GraphicsBase* getSource();
+
   //!@brief access the target of this connection
   cedar::proc::gui::GraphicsBase* getTarget();
+
+  //! Sets the source of the connection
+  void setSource(cedar::proc::gui::GraphicsBase* source);
+
+  //! Sets the source of the connection
+  void setTarget(cedar::proc::gui::GraphicsBase* target);
+
+  //! Sets source and target of the connection.
+  void setSourceAndTarget(cedar::proc::gui::GraphicsBase* source, cedar::proc::gui::GraphicsBase* target);
 
   //!@brief set the validity (i.e. the color) of this instance
   void setValidity(cedar::proc::gui::ConnectValidity validity);
@@ -122,6 +132,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   QColor highlightColor(const QColor& source) const;
+
+  void updateGraphics();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/CouplingCollection.h"
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/ResizeHandle.h"
 #include "cedar/processing/gui/Scene.h"
@@ -170,8 +171,6 @@ void cedar::proc::gui::Scene::setRecorderWidget(cedar::proc::gui::RecorderWidget
 
 void cedar::proc::gui::Scene::itemSelected()
 {
-  using cedar::proc::Step;
-
   // either show the resize handles if only one item is selected, or hide them if more than one is selected
   auto selected_items = this->selectedItems();
   for (int i = 0; i < selected_items.size(); ++i)
@@ -190,17 +189,23 @@ void cedar::proc::gui::Scene::itemSelected()
 
   if (selected_items.size() == 1)
   {
-    if (cedar::proc::gui::GraphicsBase *p_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items[0]))
+    auto p_item = selected_items[0];
+    if (auto p_graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item))
     {
-      if (p_item->getElement())
+      //!@todo Instead of ifs and casts, should GraphicsBase have a virtual displayInConfigurableWidget method?
+      if (p_graphics_item->getElement())
       {
-        this->mpConfigurableWidget->display(p_item->getElement(), p_item->isReadOnly());
+        this->mpConfigurableWidget->display(p_graphics_item->getElement(), p_graphics_item->isReadOnly());
       
-        if(cedar::proc::StepPtr castedStep = boost::dynamic_pointer_cast<cedar::proc::Step>(p_item->getElement()))
+        if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(p_graphics_item->getElement()))
         {
-          this->mpRecorderWidget->setStep(castedStep);
+          this->mpRecorderWidget->setStep(step);
         }
       }
+    }
+    else if (auto coupling = dynamic_cast<cedar::proc::gui::CouplingCollection*>(p_item))
+    {
+      this->mpConfigurableWidget->display(coupling->getContentsAsConfigurables());
     }
   }
   else
@@ -1217,6 +1222,11 @@ cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar:
   {
     return iter->second;
   }
+}
+
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cedar::proc::ConstElementPtr element)
+{
+  return this->getGraphicsItemFor(element.get());
 }
 
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cedar::proc::ConstElement* element)

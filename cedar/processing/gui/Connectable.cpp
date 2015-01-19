@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connectable.h"
+#include "cedar/processing/gui/CouplingCollection.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/PlotWidget.h"
@@ -47,6 +48,7 @@
 #include "cedar/processing/gui/DefaultConnectableIconView.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -76,6 +78,7 @@ const qreal cedar::proc::gui::Connectable::M_DATA_SLOT_PADDING = static_cast<qre
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT;
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY;
+const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS;
 #endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -225,9 +228,145 @@ void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
   this->setBackgroundColor(this->mDefaultBackground);
 }
 
+cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::getDisplayMode() const
+{
+  return this->mDisplayMode;
+}
+
+bool cedar::proc::gui::Connectable::supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const
+{
+  switch (id)
+  {
+    case cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS:
+      return this->canHideInConnections();
+  }
+  return true;
+}
+
+unsigned int cedar::proc::gui::Connectable::getNumberOfSlotsFor(cedar::proc::DataRole::Id role) const
+{
+  auto iter = this->mSlotMap.find(role);
+  if (iter == this->mSlotMap.end())
+  {
+    return 0;
+  }
+  else
+  {
+    return iter->second.size();
+  }
+}
+
+bool cedar::proc::gui::Connectable::canHideInConnections() const
+{
+  //!@todo There might be other cases where this should work, e.g., if there is more than one slot but all connections come from the same source
+  //!@todo Don't check this in the GUI, check with this->getConnectable()->...
+  if (this->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) == 1 && this->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) == 1)
+  {
+    //!@todo Check if the are connections are set (cannot hide if there is no in- and output connection)
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 bool cedar::proc::gui::Connectable::canDuplicate() const
 {
   return !this->isReadOnly();
+}
+
+void cedar::proc::gui::Connectable::hideInConnections()
+{
+  auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_ASSERT(scene != nullptr);
+
+  cedar::proc::gui::CouplingCollection* incoming_collection = nullptr;
+  bool has_single_collection = true;
+  // hide the normal connections of this item (note, that output connections are automatically hidden as they are
+  // children of this graphics item)
+  for (const auto& name_slot_pair : this->mSlotMap[cedar::proc::DataRole::INPUT])
+  {
+    for (auto connection : name_slot_pair.second->getConnections())
+    {
+      if (auto collection = dynamic_cast<cedar::proc::gui::CouplingCollection*>(connection))
+      {
+        if (incoming_collection == nullptr)
+        {
+          incoming_collection = collection;
+        }
+        else
+        {
+          has_single_collection = false;
+        }
+      }
+      else
+      {
+        connection->setVisible(false);
+      }
+    }
+  }
+
+  // this should not happen: there should be only one incoming collection
+  CEDAR_ASSERT(has_single_collection);
+
+  // look for outgoing collections
+  has_single_collection = true;
+  cedar::proc::gui::CouplingCollection* outgoing_collection = nullptr;
+  for (const auto& name_slot_pair : this->mSlotMap[cedar::proc::DataRole::OUTPUT])
+  {
+    for (auto connection : name_slot_pair.second->getConnections())
+    {
+      if (auto collection = dynamic_cast<cedar::proc::gui::CouplingCollection*>(connection))
+      {
+        if (outgoing_collection == nullptr)
+        {
+          outgoing_collection = collection;
+        }
+        else
+        {
+          has_single_collection = false;
+        }
+      }
+    }
+  }
+
+  // this should not happen: there should be only one outgoing collection
+  CEDAR_ASSERT(has_single_collection);
+
+  if (incoming_collection || outgoing_collection)
+  {
+    if (incoming_collection && outgoing_collection)
+    {
+      // merge this and the outgoing collection into the incoming one
+      incoming_collection->append(this->getConnectable(), false);
+      incoming_collection->append(outgoing_collection);
+
+      // delete the outgoing collection
+      delete outgoing_collection;
+    }
+    else if (incoming_collection)
+    {
+      // use the incoming collection
+      incoming_collection->append(this->getConnectable());
+    }
+    else if (outgoing_collection)
+    {
+      // use the outgoing collection
+      outgoing_collection->prepend(this->getConnectable());
+    }
+  }
+  else
+  {
+    // create a new collection
+    auto collection = new cedar::proc::gui::CouplingCollection(scene);
+
+    // attach this step
+    collection->append(this->getConnectable());
+  }
+
+  // hide the item
+  this->setVisible(false);
 }
 
 void cedar::proc::gui::Connectable::Decoration::setDescription(const QString& text)

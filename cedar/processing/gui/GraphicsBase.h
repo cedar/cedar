@@ -277,6 +277,12 @@ public:
     return this->mReadOnly;
   }
 
+  //! Returns the vector of in- and outgoing (gui) connections for this (gui) element.
+  std::vector<Connection*>& getConnections()
+  {
+    return this->mConnections;
+  }
+
   //! Specifies whether the item can be duplicated.
   virtual bool canDuplicate() const = 0;
 
@@ -328,12 +334,6 @@ protected:
   inline void setSnapToGrid(bool snap)
   {
     this->mSnapToGrid = snap;
-  }
-
-  //! Returns the vector of in- and outgoing (gui) connections for this (gui) element.
-  std::vector<Connection*>& getConnections()
-  {
-    return this->mConnections;
   }
 
   //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
