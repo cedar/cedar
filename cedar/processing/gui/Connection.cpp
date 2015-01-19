@@ -70,7 +70,8 @@ mpArrowEnd(nullptr),
 mValidity(CONNECT_NOT_SET),
 mSmartMode(false),
 mHighlight(false),
-mHighlightHover(false)
+mHighlightHover(false),
+mBaseLineWidth(2.5)
 {
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
   this->setHighlightedBySelection(false);
@@ -87,6 +88,11 @@ cedar::proc::gui::Connection::~Connection()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connection::setBaseLineWidth(double width)
+{
+  this->mBaseLineWidth = width;
+}
 
 void cedar::proc::gui::Connection::setSource(cedar::proc::gui::GraphicsBase* source)
 {
@@ -143,38 +149,68 @@ void cedar::proc::gui::Connection::updateGraphics()
   this->setParentItem(this->mpSource);
 
   QPen pen = this->pen();
+  pen.setCapStyle(Qt::RoundCap);
+  pen.setJoinStyle(Qt::RoundJoin);
+
+  QVector<QPointF> arrow;
+  double arrow_size_factor = std::max(4.0 - this->mBaseLineWidth, 0.9);
+
+  arrow.push_back(QPointF(arrow_size_factor * this->mBaseLineWidth, 0.0));
+  arrow.push_back(QPointF(-arrow_size_factor * this->mBaseLineWidth, 0.0));
+  arrow.push_back(QPointF(0.0, 1.6 * arrow_size_factor * this->mBaseLineWidth));
+
+  if (!this->mpArrowStart)
+  {
+    this->mpArrowStart = new QGraphicsPolygonItem(this);
+    this->mpArrowStart->setPolygon(QPolygonF(arrow));
+  }
+
+  if (mSmartMode)
+  {
+    if (!this->mpArrowEnd)
+    {
+      this->mpArrowEnd = new QGraphicsPolygonItem(this);
+      this->mpArrowEnd->setPolygon(QPolygonF(arrow));
+    }
+    this->mpArrowEnd->setVisible(true);
+  }
+  else if (this->mpArrowEnd)
+  {
+    this->mpArrowEnd->setVisible(false);
+  }
+
+  QColor color;
   if (this->isTriggerConnection())
   {
-    pen.setColor(QColor(180, 180, 180));
-
-    QVector<QPointF> arrow;
-    arrow.push_back(QPointF(5.0, 0.0));
-    arrow.push_back(QPointF(-5.0, 0.0));
-    arrow.push_back(QPointF(0.0, 8.0));
-    mpArrowStart = new QGraphicsPolygonItem(this);
-    mpArrowStart->setPolygon(QPolygonF(arrow));
-    mpArrowStart->setPen(pen);
-    QBrush brush = this->brush();
-    brush.setColor(QColor(180, 180, 180));
-    brush.setStyle(Qt::SolidPattern);
-    mpArrowStart->setBrush(brush);
-
-    if (mSmartMode)
-    {
-      mpArrowEnd = new QGraphicsPolygonItem(this);
-      mpArrowEnd->setPolygon(QPolygonF(arrow));
-      mpArrowEnd->setPen(pen);
-      mpArrowEnd->setBrush(brush);
-    }
+    color = QColor(180, 180, 180);
   }
   else
   {
-    pen.setWidth(2.5);
+    color = cedar::proc::gui::GraphicsBase::getValidityColor(mValidity);
+    pen.setWidthF(static_cast<qreal>(this->mBaseLineWidth));
   }
-  this->setPen(pen);
+  QBrush brush = this->brush();
+  brush.setColor(color);
+  brush.setStyle(Qt::SolidPattern);
+  mpArrowStart->setBrush(brush);
+  if (mpArrowEnd)
+  {
+    mpArrowEnd->setBrush(brush);
+    this->mpArrowEnd->setPen(pen);
+  }
 
+  pen.setColor(color);
+  this->setPen(pen);
+  mpArrowStart->setPen(pen);
 
   // update validity
+  this->updateValidity();
+
+  this->update();
+}
+
+void cedar::proc::gui::Connection::updateValidity()
+{
   if (this->mpSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM)
   {
     // data slots should only be connected to other slots
@@ -201,9 +237,6 @@ void cedar::proc::gui::Connection::updateGraphics()
     }
     this->setValidity(validity);
   }
-
-  this->setHighlightedBySelection(false);
-  this->update();
 }
 
 bool cedar::proc::gui::Connection::isTriggerConnection() const
@@ -282,41 +315,7 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
     )
   );
 
-  QPen pen = this->pen();
-  pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
-  this->setPen(pen);
-
-  if (mpArrowStart == 0)
-  {
-    QVector<QPointF> arrow;
-    arrow.push_back(QPointF(5.0, 0.0));
-    arrow.push_back(QPointF(-5.0, 0.0));
-    arrow.push_back(QPointF(0.0, 8.0));
-    mpArrowStart = new QGraphicsPolygonItem(this);
-    mpArrowStart->setPolygon(QPolygonF(arrow));
-  }
-  pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
-  mpArrowStart->setPen(pen);
-  QBrush brush = this->brush();
-  brush.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
-  brush.setStyle(Qt::SolidPattern);
-  mpArrowStart->setBrush(brush);
-
-  if (mpArrowEnd == 0 && mSmartMode)
-  {
-    QVector<QPointF> arrow;
-    arrow.push_back(QPointF(5.0, 0.0));
-    arrow.push_back(QPointF(-5.0, 0.0));
-    arrow.push_back(QPointF(0.0, 8.0));
-    mpArrowEnd = new QGraphicsPolygonItem(this);
-    mpArrowEnd->setPolygon(QPolygonF(arrow));
-  }
-  if (mSmartMode)
-  {
-    mpArrowEnd->setPen(pen);
-    mpArrowEnd->setBrush(brush);
-  }
-  this->update();
+  this->updateGraphics();
 }
 
 void cedar::proc::gui::Connection::update()

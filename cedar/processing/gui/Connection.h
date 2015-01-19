@@ -125,7 +125,7 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void setBaseLineWidth(double width);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -134,6 +134,8 @@ private:
   QColor highlightColor(const QColor& source) const;
 
   void updateGraphics();
+
+  void updateValidity();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -159,6 +161,9 @@ private:
 
   //! Whether or not to highlight the connection due to mouse hovering.
   bool mHighlightHover;
+
+  //! Base width of the connection's line
+  double mBaseLineWidth;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H

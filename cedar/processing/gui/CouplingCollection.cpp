@@ -60,6 +60,7 @@ cedar::proc::gui::Connection(),
 mpScene(scene)
 {
   CEDAR_ASSERT(this->mpScene);
+  this->setBaseLineWidth(7.0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
