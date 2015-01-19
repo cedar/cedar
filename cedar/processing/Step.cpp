@@ -233,6 +233,11 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
   return this->mActions;
 }
 
+bool cedar::proc::Step::hasAction(const std::string& action) const
+{
+  return this->mActions.find(action) != this->mActions.end();
+}
+
 /*! This method takes care of changing the step's name in the registry as well.
  *
  * @todo Unify in element using boost signals/slots
