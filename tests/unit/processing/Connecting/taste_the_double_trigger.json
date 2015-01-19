@@ -1,0 +1,121 @@
+{
+    "meta":
+    {
+        "format": "1"
+    },
+    "steps":
+    {
+        "cedar.processing.Projection":
+        {
+            "name": "projection",
+            "threaded": "false",
+            "dimension mapping":
+            {
+                "0": "0"
+            },
+            "output dimensionality": "3",
+            "output dimension sizes":
+            [
+                "10",
+                "10",
+                "10"
+            ],
+            "compression type": "SUM"
+        },
+        "cedar.processing.sources.GaussInput":
+        {
+            "name": "step",
+            "threaded": "false",
+            "amplitude": "1",
+            "dimensionality": "1",
+            "sigma":
+            [
+                "3"
+            ],
+            "centers":
+            [
+                "3"
+            ],
+            "sizes":
+            [
+                "10"
+            ],
+            "cyclic": "false"
+        }
+    },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "trigger2",
+            "step size": "1",
+            "idle time": "0.01",
+            "simulated time": "1",
+            "loop mode": "Fixed",
+            "wait": "true",
+            "listeners":
+            [
+                "projection"
+            ]
+        },
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "trigger1",
+            "step size": "1",
+            "idle time": "0.01",
+            "simulated time": "1",
+            "loop mode": "Fixed",
+            "wait": "true",
+            "listeners":
+            [
+                "step"
+            ]
+        }
+    },
+    "connections":
+    [
+        {
+            "source": "step.Gauss input",
+            "target": "projection.input"
+        }
+    ],
+    "name": "root",
+    "promotedSlots": "",
+    "ui":
+    [
+        {
+            "type": "trigger",
+            "trigger": "trigger2",
+            "width": "30",
+            "height": "30",
+            "positionX": "581",
+            "positionY": "193"
+        },
+        {
+            "type": "trigger",
+            "trigger": "trigger1",
+            "width": "30",
+            "height": "30",
+            "positionX": "360",
+            "positionY": "200"
+        },
+        {
+            "type": "step",
+            "step": "projection",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "544",
+            "positionY": "307"
+        },
+        {
+            "type": "step",
+            "step": "step",
+            "display style": "ICON_AND_TEXT",
+            "width": "160",
+            "height": "50",
+            "positionX": "286",
+            "positionY": "311"
+        }
+    ]
+}
