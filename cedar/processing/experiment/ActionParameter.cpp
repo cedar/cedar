@@ -79,7 +79,12 @@ bool cedar::proc::experiment::ActionParameter::checkValidity(std::string& error)
 {
   if (const auto connectable = boost::dynamic_pointer_cast<cedar::proc::ConstStep>(this->getConnectable()))
   {
-    return connectable->hasAction(this->getAction());
+    if (connectable->hasAction(this->getAction()))
+    {
+      return true;
+    }
+    error = "Chosen action could not be found for element \"" + connectable->getName() + "\".";
+    return false;
   }
   error = "No action or connectable set.";
   return false;
