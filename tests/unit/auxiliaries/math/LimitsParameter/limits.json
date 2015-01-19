@@ -1,0 +1,12 @@
+{
+  "limits":
+  {
+    "lower limit": "-2.0",
+    "upper limit": "2.2"
+  },
+  "length limits":
+  {
+    "lower limit": "-2.0m",
+    "upper limit": "2.2m"
+  }
+}
