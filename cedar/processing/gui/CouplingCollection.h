@@ -51,6 +51,7 @@
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataConnection.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
+#include "cedar/processing/Group.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
@@ -120,8 +121,16 @@ private:
 
   cedar::proc::DataConnectionPtr getConnection(cedar::proc::DataRole::Id role);
 
+  bool containsSingleGroup() const;
+
+  bool canShowContentsInWindow() const;
+
+  cedar::proc::GroupPtr getSingleGroup() const;
+
 private slots:
   void unhideContents();
+
+  void showContentsInWindow();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
