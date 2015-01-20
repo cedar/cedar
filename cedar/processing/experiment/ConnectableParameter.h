@@ -43,10 +43,10 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
-#include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/experiment/ConnectableParameter.fwd.h"
 
 // SYSTEM INCLUDES
@@ -55,10 +55,7 @@
 #include <string>
 
 
-/*!@brief A parameter to set a property of a certain step
- *
- *          The property could either be a parameter or an output or a buffer.
- *          The property type should be defined when creating an instance of this parameter.
+/*!@brief A parameter storing a connectable, on which PropertyParameter classes might apply a property.
  */
 class cedar::proc::experiment::ConnectableParameter : public cedar::aux::Parameter
 {
@@ -84,27 +81,28 @@ public:
   //! Checks the validity of the parameter.
   bool checkValidity(std::string& errors) const;
 
-  //!@brief set this parameter to a value, read from a configuration node
+  //!@brief read from a configuration node
   void readFromNode(const cedar::aux::ConfigurationNode& node);
 
   //!@brief write value to a configuration node
   void writeToNode(cedar::aux::ConfigurationNode& root) const;
 
-  //!@brief Sets the step.
-  void setConnectable(cedar::proc::ConnectablePtr step);
+  //!@brief Sets the connectable.
+  void setConnectable(cedar::proc::ConnectablePtr connectable);
 
   //!@brief Sets the path of the connectable.
-  void setConnectablePath(const std::string& step);
+  void setConnectablePath(const std::string& connectable);
 
   //! Returns the path of the currently selected connectable.
   std::string getConnectablePath() const;
 
-  //!@brief Returns the step name
+  //!@brief Returns the connectable
   cedar::proc::ConstConnectablePtr getConnectable() const;
 
-  //!@brief Returns the step name
+  //!@brief Returns the connectable
   cedar::proc::ConnectablePtr getConnectable();
 
+  //!@brief Set parameter to default
   void makeDefault();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -136,7 +134,7 @@ private:
   //!@brief The path of the connectable.
   std::string mConnectablePath;
 
-  //! Weak pointer to the element.
+  //! Weak pointer to the connectable.
   cedar::proc::ConnectableWeakPtr mConnectable;
 }; // class cedar::proc::experiment::ConnectableParameter
 

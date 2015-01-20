@@ -42,10 +42,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/experiment/action/Action.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/processing/experiment/ConnectableParameter.h"
 #include "cedar/processing/experiment/ActionParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/experiment/action/CallElementAction.fwd.h"
@@ -78,6 +78,7 @@ public:
   //!@brief Call action.
   void run();
 
+  //!@brief checks the validity of this action and returns errors and warnings
   bool checkValidity(std::vector<std::string>& errors, std::vector<std::string>& warnings) const;
 
 public:

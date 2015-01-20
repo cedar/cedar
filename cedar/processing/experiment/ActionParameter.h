@@ -44,10 +44,10 @@
 #include "cedar/processing/experiment/PropertyParameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
-#include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/experiment/ActionParameter.fwd.h"
 
 // SYSTEM INCLUDES
@@ -107,9 +107,11 @@ public:
 
   void makeDefault();
 
+  //!@brief get a list of actions associated with a given connectable
   std::vector<std::string> getListOfActions();
 
 public slots:
+  //!@brief if the connectable changes, this class has to adapt
   void connectableChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -117,6 +119,7 @@ public slots:
 protected:
 
 signals:
+  //!@brief signal that the list of actions has changed (this happens only if the connectable changes)
   void actionListChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
