@@ -56,10 +56,9 @@
 #include <string>
 
 
-/*!@brief A parameter to set a property of a certain step
+/*!@brief A parameter to set a property of a certain connectable.
  *
- *          The property could either be a parameter or an output or a buffer.
- *          The property type should be defined when creating an instance of this parameter.
+ *          The property could be a parameter, data, actions (implemented in child classes).
  */
 class cedar::proc::experiment::PropertyParameter : public cedar::aux::Parameter
 {
@@ -90,13 +89,17 @@ public:
   //! Checks the validity of the parameter.
   virtual bool checkValidity(std::string& errors) const = 0;
 
+  //!@brief Set parameter to default
   void makeDefault();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Get the connectable (for all child classes)
   cedar::proc::ConnectablePtr getConnectable();
+
+  //!@brief Get the connectable (for all child classes, const)
   cedar::proc::ConstConnectablePtr getConnectable() const;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -43,7 +43,6 @@
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Log.h"
-#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
 
 // SYSTEM INCLUDES
@@ -124,13 +123,12 @@ void cedar::proc::experiment::ConnectableParameter::writeToNode(cedar::aux::Conf
 void cedar::proc::experiment::ConnectableParameter::setConnectable(cedar::proc::ConnectablePtr connectable)
 {
   this->mConnectable = connectable;
-  auto name_parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(connectable->getParameter("name"));
   this->emitChangedSignal();
 }
 
 std::string cedar::proc::experiment::ConnectableParameter::getConnectablePath() const
 {
-  // if a step is set, use its path
+  // if a connectable is set, use its path
   if (auto element = this->mConnectable.lock())
   {
     return element->getFullPath();

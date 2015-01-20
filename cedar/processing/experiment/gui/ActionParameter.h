@@ -79,9 +79,16 @@ public:
 public slots:
   //!@brief handles a change in the step combo box
   void parameterPointerChanged();
+
+  //!@brief react to a changing connectable
   void connectableChanged();
+
+  //!@brief react to a changed action list
   void actionListChanged();
+
+  //!@brief react to a changed
   void actionChanged();
+
   //!@brief Updates the actions for the combo box
   void updateActions();
   //--------------------------------------------------------------------------------------------------------------------
