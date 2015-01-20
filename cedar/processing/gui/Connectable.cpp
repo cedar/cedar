@@ -77,6 +77,10 @@ cedar::aux::EnumType<cedar::proc::gui::Connectable::DisplayMode> cedar::proc::gu
 const qreal cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE = static_cast<qreal>(12.0);
 const qreal cedar::proc::gui::Connectable::M_DATA_SLOT_PADDING = static_cast<qreal>(3.0);
 
+const int cedar::proc::gui::Connectable::M_ICON_SIZE = 40;
+const qreal cedar::proc::gui::Connectable::M_DEFAULT_WIDTH = static_cast<qreal>(160);
+const qreal cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT = static_cast<qreal>(50);
+
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT;
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY;
@@ -103,8 +107,8 @@ cedar::proc::gui::GraphicsBase
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE
 ),
 mpIconView(nullptr),
-mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mpMainWindow(pMainWindow),
+mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mInputOutputSlotOffset(static_cast<qreal>(0.0)),
 mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
 mShowingTriggerColor(false)
@@ -228,6 +232,38 @@ void cedar::proc::gui::Connectable::Decoration::setBackgroundColor(const QColor&
 void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
 {
   this->setBackgroundColor(this->mDefaultBackground);
+}
+
+void cedar::proc::gui::Connectable::displayModeChanged()
+{
+  // empty default implementation
+}
+
+void cedar::proc::gui::Connectable::setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::Id mode)
+{
+  this->mDisplayMode = mode;
+
+  switch (mode)
+  {
+    case cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY:
+      this->setWidth(cedar::proc::gui::Connectable::M_ICON_SIZE);
+      this->setHeight(cedar::proc::gui::Connectable::M_ICON_SIZE);
+      break;
+
+    case cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT:
+      this->setWidth(cedar::proc::gui::Connectable::M_ICON_SIZE);
+      this->setHeight(cedar::proc::gui::Connectable::M_ICON_SIZE);
+      break;
+
+    case cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS:
+      this->hideInConnections();
+      break;
+  }
+
+  this->displayModeChanged();
+  this->updateAttachedItems();
+  this->updateConnections();
+  this->update();
 }
 
 cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::getDisplayMode() const
