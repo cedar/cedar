@@ -243,7 +243,12 @@ void cedar::proc::gui::Connectable::setDisplayMode(cedar::proc::gui::StepItem::D
 {
   this->mDisplayMode = mode;
 
-  switch (mode)
+  this->applyDisplayMode();
+}
+
+void cedar::proc::gui::Connectable::applyDisplayMode()
+{
+  switch (this->getDisplayMode())
   {
     case cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY:
       this->setWidth(cedar::proc::gui::Connectable::M_ICON_SIZE);
@@ -256,7 +261,10 @@ void cedar::proc::gui::Connectable::setDisplayMode(cedar::proc::gui::StepItem::D
       break;
 
     case cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS:
-      this->hideInConnections();
+      if (this->canHideInConnections())
+      {
+        this->hideInConnections();
+      }
       break;
   }
 
@@ -265,6 +273,7 @@ void cedar::proc::gui::Connectable::setDisplayMode(cedar::proc::gui::StepItem::D
   this->updateConnections();
   this->update();
 }
+
 
 cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::getDisplayMode() const
 {
