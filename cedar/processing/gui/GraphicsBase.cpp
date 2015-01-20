@@ -116,20 +116,18 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 {
   this->disconnect();
 
-  for (auto connection : this->mConnections)
+  while (!this->mConnections.empty())
   {
-    delete connection;
+    // on destruction, connections remove themselves from their graphics base, thus, the connection will automatically
+    // be removed from this->mConnections
+    delete *this->mConnections.begin();
   }
-  this->mConnections.clear();
 
-  if (!this->mpResizeHandles.empty())
+  for (auto resize_handle : this->mpResizeHandles)
   {
-    for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
-    {
-      delete this->mpResizeHandles.at(i);
-    }
-    this->mpResizeHandles.clear();
+    delete resize_handle;
   }
+  this->mpResizeHandles.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -432,6 +432,9 @@ private:
   //! Called when the display mode of the connectable changed.
   virtual void displayModeChanged();
 
+  //! Makes all the changes necessary for the current display mode.
+  void applyDisplayMode();
+
 private slots:
   void triggerableStarted();
 
