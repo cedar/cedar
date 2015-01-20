@@ -43,9 +43,12 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connectable.h"
 #include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/GroupContainerItem.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/DataConnection.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
@@ -69,11 +72,40 @@ mpScene(scene)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::GroupPtr cedar::proc::gui::CouplingCollection::getSingleGroup() const
+{
+  CEDAR_ASSERT(this->mComponents.size() == 1);
+  return boost::dynamic_pointer_cast<cedar::proc::Group>(this->mComponents.at(0).lock());
+}
+
+bool cedar::proc::gui::CouplingCollection::containsSingleGroup() const
+{
+  if (this->mComponents.size() != 1)
+  {
+    return false;
+  }
+  else
+  {
+    return boost::dynamic_pointer_cast<cedar::proc::Group>(this->mComponents.at(0).lock()).get() != nullptr;
+  }
+}
+
+bool cedar::proc::gui::CouplingCollection::canShowContentsInWindow() const
+{
+  return this->containsSingleGroup();
+}
+
 void cedar::proc::gui::CouplingCollection::contextMenuEvent(QGraphicsSceneContextMenuEvent* pEvent)
 {
   QMenu menu;
+
   auto un_hide_action = menu.addAction("un-hide contents");
   QObject::connect(un_hide_action, SIGNAL(triggered()), this, SLOT(unhideContents()));
+
+  auto show_contents_action = menu.addAction("show contents in container");
+  show_contents_action->setEnabled(this->canShowContentsInWindow());
+  QObject::connect(show_contents_action, SIGNAL(triggered()), this, SLOT(showContentsInWindow()));
+
   menu.exec(pEvent->screenPos());
 }
 
@@ -90,6 +122,18 @@ void cedar::proc::gui::CouplingCollection::unhideContents()
     gui->resetDisplayMode(false);
   }
   this->deleteLater();
+}
+
+void cedar::proc::gui::CouplingCollection::showContentsInWindow()
+{
+  if (!this->canShowContentsInWindow())
+    return;
+
+  auto group = this->getSingleGroup();
+  auto group_gui = dynamic_cast<cedar::proc::gui::Group*>(this->mpScene->getGraphicsItemFor(group));
+
+  auto p_container = new cedar::proc::gui::GroupContainerItem(group_gui);
+  this->mpScene->addItem(p_container);
 }
 
 cedar::proc::gui::DataSlotItem* cedar::proc::gui::CouplingCollection::findSourceSlot()
