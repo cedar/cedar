@@ -173,12 +173,11 @@ private:
   //! Updates the display of the step's run time measurements.
   void updateToolTip();
 
-  //! Sets the current display mode.
-  void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode);
-
   void updateIconGeometry();
 
   qreal getContentsPadding() const;
+
+  void displayModeChanged();
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
@@ -201,15 +200,6 @@ protected:
 private:
   //!@brief a vector of all triggers of the current step
   std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
-
-  //! Size used for displaying the step icons.
-  static const int mIconSize;
-
-  //! The width of newly created steps.
-  static const qreal mDefaultWidth;
-
-  //! The height of newly created steps.
-  static const qreal mDefaultHeight;
 
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;

@@ -51,7 +51,6 @@
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/processing/Step.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/auxiliaries/Parameter.h"
@@ -91,7 +90,7 @@
 const qreal cedar::proc::gui::Group::M_EXPANDED_SLOT_OFFSET = static_cast<qreal>(25);
 
 const qreal cedar::proc::gui::Group::M_EXPANDED_ICON_SIZE = static_cast<qreal>(20);
-const qreal cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::mIconSize;
+const qreal cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::M_ICON_SIZE;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -2169,7 +2168,7 @@ void cedar::proc::gui::Group::updateCollapsedness()
   {
     this->setInputOutputSlotOffset(static_cast<qreal>(0));
     //!@todo Same size as processing steps/adapt to the number of inputs, outputs?
-    this->setSize(cedar::proc::gui::StepItem::mDefaultWidth, cedar::proc::gui::StepItem::mDefaultHeight);
+    this->setSize(cedar::proc::gui::Connectable::M_DEFAULT_WIDTH, cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT);
 
   }
   else

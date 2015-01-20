@@ -249,11 +249,14 @@ public:
   //! Checks if the given display style is supported by this connectable.
   virtual bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
 
+  //! Hides the connectable in its connections.
+  void hideInConnections();
+
   //! Returns the currently set display mode.
   cedar::proc::gui::Connectable::DisplayMode::Id getDisplayMode() const;
 
-  //! Hides the connectable in its connections.
-  void hideInConnections();
+  //! Sets the current display mode.
+  void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode);
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.
@@ -426,6 +429,9 @@ private:
   //! Returns the number of connections on all slots of the given role.
   unsigned int getNumberOfConnections(cedar::proc::DataRole::Id role) const;
 
+  //! Called when the display mode of the connectable changed.
+  virtual void displayModeChanged();
+
 private slots:
   void triggerableStarted();
 
@@ -469,9 +475,6 @@ protected:
   //!@brief the class id of the step
   cedar::aux::ConstPluginDeclarationPtr mClassId;
 
-  //!@brief The current display mode of the step.
-  cedar::proc::gui::Connectable::DisplayMode::Id mDisplayMode;
-
   //!@brief the decoration symbolizing that this connectable is being recorded
   DecorationPtr mpRecordedDecoration;
 
@@ -484,7 +487,19 @@ protected:
   //!@brief a vector of all child widgets for the current step
   std::vector<QWidget*> mChildWidgets;
 
+  //! Size used for displaying the step icons.
+  static const int M_ICON_SIZE;
+
+  //! The width of newly created steps.
+  static const qreal M_DEFAULT_WIDTH;
+
+  //! The height of newly created steps.
+  static const qreal M_DEFAULT_HEIGHT;
+
 private:
+  //!@brief The current display mode of the connectable.
+  cedar::proc::gui::Connectable::DisplayMode::Id mDisplayMode;
+
   DecorationPtr mpLoopedDecoration;
 
   //! An offset to be added to in- and output slot positions.
