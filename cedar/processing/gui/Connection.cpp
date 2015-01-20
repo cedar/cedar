@@ -472,6 +472,8 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
 
   QPen pen = this->pen();
 
+  qreal width_factor = static_cast<qreal>(std::max(2.5 - this->mBaseLineWidth, 0.8));
+
   if
   (
     !this->isSelected()
@@ -482,12 +484,12 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
     QColor new_color = this->highlightColor(pen.color());
 
     pen.setColor(new_color);
-    pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
+    pen.setWidthF(width_factor* static_cast<qreal>(2) * pen.widthF());
   }
 
   if (this->mHighlightHover && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightHoveredConnections())
   {
-    pen.setWidthF(static_cast<qreal>(2) * pen.widthF());
+    pen.setWidthF(width_factor * static_cast<qreal>(2) * pen.widthF());
   }
 
   if (this->isSelected())
@@ -495,7 +497,7 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
     QPen dash_pen = pen;
     dash_pen.setColor(Qt::black);
     dash_pen.setStyle(Qt::DashLine);
-    dash_pen.setWidthF(static_cast<qreal>(1.5) * pen.widthF());
+    dash_pen.setWidthF(width_factor * static_cast<qreal>(1.5) * pen.widthF());
     pPainter->setPen(dash_pen);
     pPainter->drawPath(this->path());
   }
