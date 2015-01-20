@@ -49,6 +49,8 @@
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/DataConnection.h"
+#include "cedar/processing/ExternalData.h"
+#include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -243,6 +245,22 @@ bool cedar::proc::gui::Connectable::supportsDisplayMode(cedar::proc::gui::Connec
   return true;
 }
 
+unsigned int cedar::proc::gui::Connectable::getNumberOfConnections(cedar::proc::DataRole::Id role) const
+{
+  auto connectable = this->getConnectable();
+  if (!connectable->hasSlotForRole(role))
+  {
+    return 0;
+  }
+
+  unsigned int count = 0;
+  for (const auto& slot : connectable->getOrderedDataSlots(role))
+  {
+    count += slot->getDataConnections().size();
+  }
+  return count;
+}
+
 unsigned int cedar::proc::gui::Connectable::getNumberOfSlotsFor(cedar::proc::DataRole::Id role) const
 {
   auto iter = this->mSlotMap.find(role);
@@ -258,11 +276,21 @@ unsigned int cedar::proc::gui::Connectable::getNumberOfSlotsFor(cedar::proc::Dat
 
 bool cedar::proc::gui::Connectable::canHideInConnections() const
 {
-  //!@todo There might be other cases where this should work, e.g., if there is more than one slot but all connections come from the same source
-  //!@todo Don't check this in the GUI, check with this->getConnectable()->...
-  if (this->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) == 1 && this->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) == 1)
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(this->getConnectable()))
   {
-    //!@todo Check if the are connections are set (cannot hide if there is no in- and output connection)
+    if (triggerable->isLooped())
+    {
+      return false;
+    }
+  }
+
+  //!@todo There might be other cases where this should work, e.g., if there is more than one slot but all connections come from the same source
+  if (this->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) == 1
+      && this->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) == 1
+      && this->getNumberOfConnections(cedar::proc::DataRole::INPUT) == 1
+      && this->getNumberOfConnections(cedar::proc::DataRole::OUTPUT) == 1
+      )
+  {
     return true;
   }
   else
