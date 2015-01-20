@@ -49,6 +49,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/GroupWidget.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
@@ -71,6 +72,11 @@
 class cedar::proc::gui::Group : public cedar::proc::gui::Connectable
 {
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::GroupWidget;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -118,6 +124,10 @@ public:
   /*!@brief access the underlying cedar::proc::Group
    */
   cedar::proc::ConstGroupPtr getGroup() const;
+
+  /*!@brief access the underlying cedar::proc::Group
+   */
+  void setGroup(cedar::proc::GroupPtr group);
 
   //!@brief get the current file, to which the group configuration can be saved
   const std::string& getFileName() const;
@@ -264,6 +274,8 @@ public slots:
   //! Enables/disables resizing and moving of the group.
   void setLockGeometry(bool lock = true);
 
+  void openGroupContainer();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -362,6 +374,8 @@ private:
   void clearTriggerColorCache() const;
 
   void updateAllElementsTriggerColorState() const;
+
+  void addElementsToGroup();
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

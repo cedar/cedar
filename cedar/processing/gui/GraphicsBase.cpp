@@ -67,6 +67,8 @@ const QColor cedar::proc::gui::GraphicsBase::mColorSearchResult = QColor::fromRg
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
 
+const QSizeF cedar::proc::gui::GraphicsBase::M_MINIMUM_SIZE(static_cast<qreal>(50.0), static_cast<qreal>(20.0));
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,6 +101,7 @@ mHeight
         this, "height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max()
       )
 ),
+mMinimumSize(M_MINIMUM_SIZE),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
@@ -867,4 +870,14 @@ void cedar::proc::gui::GraphicsBase::disconnect()
 unsigned int cedar::proc::gui::GraphicsBase::getNumberOfConnections()
 {
   return this->mConnections.size();
+}
+
+void cedar::proc::gui::GraphicsBase::setMinimumSize(QSizeF size)
+{
+  this->mMinimumSize = size;
+}
+
+const QSizeF cedar::proc::gui::GraphicsBase::getMinimumSize() const
+{
+  return this->mMinimumSize;
 }

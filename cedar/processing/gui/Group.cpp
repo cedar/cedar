@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Group.h"
+#include "cedar/processing/gui/GroupContainerItem.h"
 #include "cedar/processing/gui/ArchitectureWidget.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
@@ -2050,6 +2051,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     QObject::connect(edit_parameters_action, SIGNAL(triggered()), this, SLOT(openParameterEditor()));
   }
 
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QAction* open_group_container = menu.addAction("open group in container");
+  open_group_container->setEnabled(true);
+  QObject::connect(open_group_container, SIGNAL(triggered()), this, SLOT(openGroupContainer()));
+
   QAction* a = menu.exec(event->screenPos());
 
   if (a == NULL)
@@ -2328,5 +2334,98 @@ void cedar::proc::gui::Group::updateAllElementsTriggerColorState() const
         connectable->updateTriggerColorState();
       }
     }
+  }
+}
+
+void cedar::proc::gui::Group::openGroupContainer()
+{
+  cedar::proc::gui::GroupContainerItem* p_item = new cedar::proc::gui::GroupContainerItem(this);
+  this->getScene()->addItem(p_item);
+}
+
+void cedar::proc::gui::Group::setGroup(cedar::proc::GroupPtr group)
+{
+  mGroup = group;
+  this->linkedChanged(this->mGroup->isLinked());
+  this->mLinkedChangedConnection = this->mGroup->connectToLinkedChangedSignal(boost::bind(&cedar::proc::gui::Group::linkedChanged, this, _1));
+  this->mLastReadConfigurationChangedConnection
+    = this->mGroup->connectToLastReadConfigurationChangedSignal(boost::bind(&cedar::proc::gui::Group::lastReadConfigurationChanged, this));
+
+  this->setElement(mGroup);
+  this->setConnectable(mGroup);
+
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               );
+
+  mpNameDisplay = new QGraphicsTextItem(this);
+  this->groupNameChanged();
+
+
+  this->setCollapsed(false);
+  this->updateCollapsedness();
+
+  cedar::aux::ParameterPtr name_param = this->getGroup()->getParameter("name");
+  QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(groupNameChanged()));
+  QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
+  QObject::connect
+  (
+    this,
+    SIGNAL(signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange)),
+    this,
+    SLOT(dataConnectionChanged(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange))
+  );
+  cedar::aux::ParameterPtr looped_param = this->getGroup()->getParameter("is looped");
+  QObject::connect(looped_param.get(), SIGNAL(valueChanged()), this, SLOT(loopedChanged()));
+
+  mDataConnectionChangedConnection = mGroup->connectToDataConnectionChangedSignal
+                                     (
+                                       boost::bind(&cedar::proc::gui::Group::checkDataConnection, this, _1, _2, _3)
+                                     );
+  mTriggerConnectionChangedConnection = mGroup->connectToTriggerConnectionChangedSignal
+                                        (
+                                          boost::bind
+                                          (
+                                            &cedar::proc::gui::Group::checkTriggerConnection,
+                                            this,
+                                            _1,
+                                            _2,
+                                            _3
+                                          )
+                                        );
+
+  mNewElementAddedConnection
+    = mGroup->connectToNewElementAddedSignal
+      (
+        boost::bind(&cedar::proc::gui::Group::processElementAddedSignal, this, _1)
+      );
+  mElementRemovedConnection
+    = mGroup->connectToElementRemovedSignal
+      (
+        boost::bind(&cedar::proc::gui::Group::processElementRemovedSignal, this, _1)
+      );
+
+  this->connect(this->_mIsCollapsed.get(), SIGNAL(valueChanged()), SLOT(updateCollapsedness()));
+
+  this->connect(this->_mGeometryLocked.get(), SIGNAL(valueChanged()), SLOT(geometryLockChanged()));
+
+  QObject::connect
+  (
+    this->mGroup.get(),
+    SIGNAL(stepNameChanged(const std::string&, const std::string&)),
+    this,
+    SLOT(handleStepNameChanged(const std::string&, const std::string&))
+  );
+  this->updateDecorations();
+  this->update();
+
+  this->connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), SLOT(elementNameChanged(const std::string&, const std::string&)));
+}
+
+void cedar::proc::gui::Group::addElementsToGroup()
+{
+  for (const auto& element : this->mGroup->getElements())
+  {
+    this->processElementAddedSignal(element.second);
   }
 }

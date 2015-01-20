@@ -22,44 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GroupWidget.h
+    File:        GroupContainerItem.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2014 11 19
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2015 01 20
 
-    Description: Header file for the class cedar::proc::gui::GroupWidget.
+    Description: Header file for the class cedar::proc::gui::GroupContainerItem.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_GROUP_WIDGET_H
-#define CEDAR_PROC_GUI_GROUP_WIDGET_H
+#ifndef CEDAR_PROC_GUI_GROUP_CONTAINER_ITEM_H
+#define CEDAR_PROC_GUI_GROUP_CONTAINER_ITEM_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/gui/GraphicsBase.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/GroupWidget.fwd.h"
+#include "cedar/processing/gui/GroupContainerItem.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/GroupWidget.fwd.h"
 #include "cedar/processing/gui/Scene.fwd.h"
 #include "cedar/processing/gui/View.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
+#include <QGraphicsProxyWidget>
 
-
-/*!@brief A widget for managing and displaying a cedar::proc::gui::Group.
- *
- * @todo cedar::proc::gui::View could probably be rewritten to serve the same purpose as this class. Right now, however,
- *       it is very difficult to use; this widget is an easy-to-use alternative to it.
+/*!@brief An item that displays the content of a group.
  */
-class cedar::proc::gui::GroupWidget : public QWidget
+class cedar::proc::gui::GroupContainerItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,17 +68,17 @@ class cedar::proc::gui::GroupWidget : public QWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GroupWidget(QWidget* pParent = nullptr);
-
-  //!@brief The constructor for pre-existing groups.
-  GroupWidget(cedar::proc::gui::Group* pGroup, QWidget* pParent = nullptr);
+  GroupContainerItem(cedar::proc::gui::Group* pGroup);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! get the group
-  cedar::proc::gui::GroupPtr getGroup() const;
+  bool canDuplicate() const;
+
+  bool canResize() const;
+
+  void sizeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,9 +98,9 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::gui::GroupPtr mGroup;
-
-  cedar::proc::gui::View* mpView;
+  QGraphicsProxyWidget* mpGroupContainer;
+  QGraphicsProxyWidget* mpCloseButtonContainer;
+  cedar::proc::gui::GroupWidget* mpGroupWidget;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -112,7 +111,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::gui::GroupWidget
+}; // class cedar::proc::gui::GroupContainerItem
 
-#endif // CEDAR_PROC_GUI_GROUP_WIDGET_H
+#endif // CEDAR_PROC_GUI_GROUP_CONTAINER_ITEM_H
 

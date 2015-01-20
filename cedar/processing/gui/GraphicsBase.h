@@ -286,6 +286,8 @@ public:
   //! Specifies whether the item can be duplicated.
   virtual bool canDuplicate() const = 0;
 
+  const QSizeF getMinimumSize() const;
+
   /*! Returns the color used to fill the foreground when the given brush is not solid.
    */
   static QColor nonsolidBrushForegroundColor(QBrush brush);
@@ -365,6 +367,8 @@ protected:
 
   //! Updates the display of the resize handles.
   void updateResizeHandles();
+
+  void setMinimumSize(QSizeF size);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -472,6 +476,8 @@ private:
   //!@brief height of the GraphicsBase
   cedar::aux::DoubleParameterPtr mHeight;
 
+  QSizeF mMinimumSize;
+
   //!@brief group of this instance
   GraphicsGroup mGroup;
   //!@brief all groups this instance can connect to
@@ -479,6 +485,8 @@ private:
 
   //!@brief vector of connections
   std::vector<Connection*> mConnections;
+
+  static const QSizeF M_MINIMUM_SIZE;
 
 }; // class cedar::proc::gui::GraphicsBase
 
