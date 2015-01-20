@@ -272,32 +272,9 @@ void cedar::proc::gui::StepItem::redraw()
 
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
-  switch (cedar::proc::gui::SettingsSingleton::getInstance()->getDefaultDisplayMode())
-  {
-    case cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY:
-      this->setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY);
-      break;
-
-    case cedar::proc::gui::Settings::StepDisplayMode::ICON_AND_TEXT:
-      this->setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT);
-      break;
-
-    case cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED:
-      if (step->isLooped())
-      {
-        this->setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT);
-      }
-      else
-      {
-        this->setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY);
-      }
-      break;
-  }
-
   this->setElement(step);
   this->setConnectable(step);
-
-  this->updateIconGeometry();
+  this->resetDisplayMode();
 
 //  this->addDecorations();
 

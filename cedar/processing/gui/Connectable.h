@@ -256,7 +256,10 @@ public:
   cedar::proc::gui::Connectable::DisplayMode::Id getDisplayMode() const;
 
   //! Sets the current display mode.
-  void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode);
+  void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode, bool resize = true);
+
+  //! Resets the display mode to the default
+  void resetDisplayMode(bool resize = true);
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.
@@ -433,7 +436,9 @@ private:
   virtual void displayModeChanged();
 
   //! Makes all the changes necessary for the current display mode.
-  void applyDisplayMode();
+  void applyDisplayMode(bool resize = true);
+
+  void setConnectionsVisible(bool visible, bool modifyCouplingCollections = false);
 
 private slots:
   void triggerableStarted();

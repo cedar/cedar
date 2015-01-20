@@ -60,8 +60,10 @@
 
 /*!@brief Displays a collection of couplings between elements in processing architectures as a connection.
  */
-class cedar::proc::gui::CouplingCollection : public cedar::proc::gui::Connection
+class cedar::proc::gui::CouplingCollection : public QObject, public cedar::proc::gui::Connection
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -96,7 +98,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -117,6 +119,9 @@ private:
   cedar::proc::gui::DataSlotItem* findTargetSlot();
 
   cedar::proc::DataConnectionPtr getConnection(cedar::proc::DataRole::Id role);
+
+private slots:
+  void unhideContents();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

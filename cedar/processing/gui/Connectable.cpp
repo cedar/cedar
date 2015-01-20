@@ -239,25 +239,62 @@ void cedar::proc::gui::Connectable::displayModeChanged()
   // empty default implementation
 }
 
-void cedar::proc::gui::Connectable::setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::Id mode)
+void cedar::proc::gui::Connectable::resetDisplayMode(bool resize)
+{
+  switch (cedar::proc::gui::SettingsSingleton::getInstance()->getDefaultDisplayMode())
+  {
+    case cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY:
+      this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY, resize);
+      break;
+
+    case cedar::proc::gui::Settings::StepDisplayMode::ICON_AND_TEXT:
+      this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT, resize);
+      break;
+
+    case cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED:
+    {
+      auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
+      if (triggerable && triggerable->isLooped())
+      {
+        this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT, resize);
+      }
+      else
+      {
+        this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY, resize);
+      }
+      break;
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::Id mode, bool resize)
 {
   this->mDisplayMode = mode;
 
-  this->applyDisplayMode();
+  this->applyDisplayMode(resize);
 }
 
-void cedar::proc::gui::Connectable::applyDisplayMode()
+void cedar::proc::gui::Connectable::applyDisplayMode(bool resize)
 {
+  this->setVisible(true);
+  this->setConnectionsVisible(true);
+
   switch (this->getDisplayMode())
   {
     case cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY:
-      this->setWidth(cedar::proc::gui::Connectable::M_ICON_SIZE);
-      this->setHeight(cedar::proc::gui::Connectable::M_ICON_SIZE);
+      if (resize)
+      {
+        this->setWidth(cedar::proc::gui::Connectable::M_ICON_SIZE);
+        this->setHeight(cedar::proc::gui::Connectable::M_ICON_SIZE);
+      }
       break;
 
     case cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT:
-      this->setWidth(cedar::proc::gui::Connectable::M_DEFAULT_WIDTH);
-      this->setHeight(cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT);
+      if (resize)
+      {
+        this->setWidth(cedar::proc::gui::Connectable::M_DEFAULT_WIDTH);
+        this->setHeight(cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT);
+      }
       break;
 
     case cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS:
@@ -349,8 +386,31 @@ bool cedar::proc::gui::Connectable::canDuplicate() const
   return !this->isReadOnly();
 }
 
+void cedar::proc::gui::Connectable::setConnectionsVisible(bool visible, bool modifyCouplingCollections)
+{
+  std::vector<cedar::proc::DataRole::Id> roles;
+  roles.push_back(cedar::proc::DataRole::INPUT);
+  roles.push_back(cedar::proc::DataRole::OUTPUT);
+
+  for (auto role : roles)
+  {
+    for (const auto& name_slot_pair : this->mSlotMap[role])
+    {
+      for (auto connection : name_slot_pair.second->getConnections())
+      {
+        if (modifyCouplingCollections || !dynamic_cast<cedar::proc::gui::CouplingCollection*>(connection))
+        {
+          connection->setVisible(visible);
+        }
+      }
+    }
+  }
+}
+
 void cedar::proc::gui::Connectable::hideInConnections()
 {
+  this->setConnectionsVisible(false);
+
   auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_ASSERT(scene != nullptr);
 
@@ -372,10 +432,6 @@ void cedar::proc::gui::Connectable::hideInConnections()
         {
           has_single_collection = false;
         }
-      }
-      else
-      {
-        connection->setVisible(false);
       }
     }
   }

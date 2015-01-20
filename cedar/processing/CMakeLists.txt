@@ -68,6 +68,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
   gui/Connectable.h
+  gui/CouplingCollection.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
   gui/ElementTreeWidget.h

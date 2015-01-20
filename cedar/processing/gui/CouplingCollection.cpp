@@ -49,6 +49,8 @@
 #include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
+#include <QMenu>
+#include <QGraphicsSceneContextMenuEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -66,6 +68,29 @@ mpScene(scene)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::CouplingCollection::contextMenuEvent(QGraphicsSceneContextMenuEvent* pEvent)
+{
+  QMenu menu;
+  auto un_hide_action = menu.addAction("un-hide contents");
+  QObject::connect(un_hide_action, SIGNAL(triggered()), this, SLOT(unhideContents()));
+  menu.exec(pEvent->screenPos());
+}
+
+void cedar::proc::gui::CouplingCollection::unhideContents()
+{
+  for (const auto& component_weak : this->mComponents)
+  {
+    auto component = component_weak.lock();
+    if (!component)
+    {
+      continue;
+    }
+    auto gui = cedar::aux::asserted_cast<cedar::proc::gui::Connectable*>(this->mpScene->getGraphicsItemFor(component));
+    gui->resetDisplayMode(false);
+  }
+  this->deleteLater();
+}
 
 cedar::proc::gui::DataSlotItem* cedar::proc::gui::CouplingCollection::findSourceSlot()
 {
