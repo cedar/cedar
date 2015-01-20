@@ -251,8 +251,8 @@ void cedar::proc::gui::Connectable::setDisplayMode(cedar::proc::gui::StepItem::D
       break;
 
     case cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT:
-      this->setWidth(cedar::proc::gui::Connectable::M_ICON_SIZE);
-      this->setHeight(cedar::proc::gui::Connectable::M_ICON_SIZE);
+      this->setWidth(cedar::proc::gui::Connectable::M_DEFAULT_WIDTH);
+      this->setHeight(cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT);
       break;
 
     case cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS:
