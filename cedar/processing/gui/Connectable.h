@@ -420,7 +420,11 @@ private:
 
   void hideTriggerChains();
 
+  //! Returns the number of slots defined for the given role.
   unsigned int getNumberOfSlotsFor(cedar::proc::DataRole::Id role) const;
+
+  //! Returns the number of connections on all slots of the given role.
+  unsigned int getNumberOfConnections(cedar::proc::DataRole::Id role) const;
 
 private slots:
   void triggerableStarted();
