@@ -62,7 +62,7 @@ mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
   mpGroupContainer->setWidget(this->mpGroupWidget);
   auto p_close_button = new QPushButton("close");
   mpCloseButtonContainer->setWidget(p_close_button);
-  QObject::connect(p_close_button, SIGNAL(pressed()), this, SLOT(deleteLater()));
+  QObject::connect(p_close_button, SIGNAL(clicked()), this, SLOT(deleteLater()));
   this->setResizeable(true);
   this->setFlag(QGraphicsItem::ItemIsMovable, true);
   this->setFlag(QGraphicsItem::ItemIsSelectable, true);
