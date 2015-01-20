@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/Scene.fwd.h"
 #include "cedar/processing/gui/StepItem.fwd.h"
 #include "cedar/processing/gui/View.fwd.h"
@@ -168,6 +169,16 @@ public:
   /*!@brief Creates an element of the given classId at the specified position and adds it to the scene.
    */
   cedar::proc::ElementPtr createElement(cedar::proc::GroupPtr group, const std::string& classId, QPointF position);
+
+  /*!@brief Creates an element of the given classId with the given name at the specified position and adds it to the scene.
+   */
+  cedar::proc::ElementPtr createElement
+  (
+    cedar::proc::GroupPtr group,
+    const std::string& classId,
+    const std::string& desiredName,
+    QPointF position
+  );
 
   /*!@brief Adds a cedar::proc::gui::StepItem for the given cedar::proc::Step to the scene at the given position.
    */
@@ -388,6 +399,8 @@ private:
   cedar::proc::gui::Group* findFirstGroupItem(const QList<QGraphicsItem*>& items);
 
   void multiItemContextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
+
+  void connectSlots(cedar::proc::gui::DataSlotItem* pSource, cedar::proc::gui::DataSlotItem* pTarget, bool addConnectorGroup);
 
 private slots:
   void promoteElementToExistingGroup();
