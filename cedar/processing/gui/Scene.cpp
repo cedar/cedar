@@ -992,13 +992,13 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
 
 void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouseEvent * pMouseEvent)
 {
-  if (mpNewConnectionIndicator != NULL)
+  if (mpNewConnectionIndicator != nullptr)
   {
     delete mpNewConnectionIndicator;
-    mpNewConnectionIndicator = NULL;
+    mpNewConnectionIndicator = nullptr;
   }
 
-  if (mpConnectionStart == NULL)
+  if (mpConnectionStart == nullptr)
   {
     return;
   }
@@ -1029,19 +1029,12 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
 
             switch (target->getGroup())
             {
+              // case: connecting two data slots
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
               {
                 cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target);
-                //!@todo These paths should be determined from the slot itself, rather than made up here
-                std::string source_name
-                  = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
-                std::string target_name
-                  = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
-                CEDAR_DEBUG_ASSERT(dynamic_cast<cedar::proc::Element*>(p_source->getSlot()->getParentPtr()));
-                static_cast<cedar::proc::Element*>
-                (
-                  p_source->getSlot()->getParentPtr()
-                )->getGroup()->connectSlots(source_name, target_name);
+                bool create_connector_group = pMouseEvent->modifiers().testFlag(Qt::ShiftModifier);
+                this->connectSlots(p_source, p_data_target, create_connector_group);
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
             }
@@ -1141,6 +1134,64 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
   mpConnectionStart = NULL;
 }
 
+void cedar::proc::gui::Scene::connectSlots
+(
+  cedar::proc::gui::DataSlotItem* pSource,
+  cedar::proc::gui::DataSlotItem* pTarget,
+  bool addConnectorGroup
+)
+{
+  auto root_group = cedar::aux::asserted_cast<cedar::proc::Element*>(pSource->getSlot()->getParentPtr())->getGroup();
+  auto source_slot = pSource->getSlot();
+  auto target_slot = pTarget->getSlot();
+
+  if (addConnectorGroup)
+  {
+    QPointF pos = (pSource->scenePos() + pTarget->scenePos()) / 2.0;
+
+    // create the connector
+    auto connector
+      = boost::dynamic_pointer_cast<cedar::proc::Group>
+      (
+        this->createElement(root_group, "cedar.processing.Group", "connector", pos)
+      );
+
+    auto connector_gui = cedar::aux::asserted_cast<cedar::proc::gui::Group*>(this->getGraphicsItemFor(connector));
+
+    // adjust the connector's size
+    qreal width = std::abs(pSource->scenePos().x() - pTarget->scenePos().x()) - 75.0;
+    width = std::max(width, static_cast<qreal>(50.0));
+    connector_gui->setWidth(width);
+    connector_gui->setHeight(75.0);
+
+    // center the connector (shift it by half its size)
+    connector_gui->setPos
+    (
+      connector_gui->pos() - QPointF(connector_gui->width(), connector_gui->height()) / 2.0
+    );
+
+    // create connection from source to connector
+    const std::string input_name = "input";
+    connector->addConnector(input_name, true);
+    root_group->connectSlots(source_slot, connector->getInputSlot(input_name));
+
+    // create connection from connector to target
+    const std::string output_name = "output";
+    connector->addConnector(output_name, false);
+    root_group->connectSlots(connector->getOutputSlot(output_name), target_slot);
+
+    // connect slots in the group
+    connector->connectSlots(input_name + ".output", output_name + ".input");
+
+    // set the connector as a hidden element
+    connector_gui->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS);
+  }
+  else
+  {
+    root_group->connectSlots(source_slot, target_slot);
+  }
+}
+
 void cedar::proc::gui::Scene::addTrigger(cedar::proc::TriggerPtr trigger, QPointF position)
 {
   cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
@@ -1176,24 +1227,24 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem* p
 }
 
 cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
-                                                 (
-                                                   cedar::proc::GroupPtr group,
-                                                   const std::string& classId,
-                                                   QPointF position
-                                                 )
+(
+  cedar::proc::GroupPtr group,
+  const std::string& classId,
+  const std::string& desiredName,
+  QPointF position
+)
 {
-  std::vector<std::string> split_class_name;
-  cedar::aux::split(classId, ".", split_class_name);
-  CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
-  std::string name = split_class_name.back();
+  std::string adjusted_name = group->getUniqueIdentifier(desiredName);
 
-  std::string adjusted_name = group->getUniqueIdentifier(name);
-
+  cedar::proc::ElementPtr element;
   try
   {
     group->create(classId, adjusted_name);
-    CEDAR_DEBUG_ASSERT(group->getElement<cedar::proc::Element>(adjusted_name).get());
-    this->getGraphicsItemFor(group->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
+    element = group->getElement<cedar::proc::Element>(adjusted_name);
+    CEDAR_DEBUG_ASSERT(element);
+    auto graphics_item = this->getGraphicsItemFor(element);
+    CEDAR_DEBUG_ASSERT(graphics_item);
+    graphics_item->setPos(position);
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
@@ -1205,7 +1256,22 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
     return cedar::proc::ElementPtr();
   }
 
-  return group->getElement(adjusted_name);
+  return element;
+}
+
+cedar::proc::ElementPtr cedar::proc::gui::Scene::createElement
+                                                 (
+                                                   cedar::proc::GroupPtr group,
+                                                   const std::string& classId,
+                                                   QPointF position
+                                                 )
+{
+  std::vector<std::string> split_class_name;
+  cedar::aux::split(classId, ".", split_class_name);
+  CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
+  std::string name = split_class_name.back();
+
+  return this->createElement(group, classId, name, position);
 }
 
 cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar::proc::Trigger* trigger)

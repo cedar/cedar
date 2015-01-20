@@ -83,14 +83,6 @@
 Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 
 //----------------------------------------------------------------------------------------------------------------------
-// static members
-//----------------------------------------------------------------------------------------------------------------------
-
-const int cedar::proc::gui::StepItem::mIconSize = 40;
-const qreal cedar::proc::gui::StepItem::mDefaultWidth = static_cast<qreal>(160);
-const qreal cedar::proc::gui::StepItem::mDefaultHeight = static_cast<qreal>(50);
-
-//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -98,8 +90,8 @@ cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step, QMainWindow* pMa
 :
 cedar::proc::gui::Connectable
 (
-  cedar::proc::gui::StepItem::mDefaultWidth,
-  cedar::proc::gui::StepItem::mDefaultHeight,
+  cedar::proc::gui::Connectable::M_DEFAULT_WIDTH,
+  cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT,
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
   pMainWindow
 )
@@ -115,8 +107,8 @@ cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
 :
 cedar::proc::gui::Connectable
 (
-  cedar::proc::gui::StepItem::mDefaultWidth,
-  cedar::proc::gui::StepItem::mDefaultHeight,
+  cedar::proc::gui::Connectable::M_DEFAULT_WIDTH,
+  cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT,
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
   pMainWindow
 )
@@ -158,6 +150,11 @@ cedar::proc::gui::StepItem::~StepItem()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::StepItem::displayModeChanged()
+{
+  this->updateIconGeometry();
+}
 
 void cedar::proc::gui::StepItem::updateToolTip()
 {
@@ -311,7 +308,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 void cedar::proc::gui::StepItem::updateIconGeometry()
 {
   qreal padding = this->getContentsPadding();
-  this->setIconBounds(padding, padding, static_cast<qreal>(this->mIconSize));
+  this->setIconBounds(padding, padding, static_cast<qreal>(cedar::proc::gui::Connectable::M_ICON_SIZE));
 }
 
 void cedar::proc::gui::StepItem::emitStepStateChanged()
@@ -332,14 +329,14 @@ void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::Configurati
   else
   {
     // apply settings for the currently selected (default) display mode
-    this->setDisplayMode(this->mDisplayMode);
+    this->setDisplayMode(this->getDisplayMode());
   }
 }
 
 void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   root.put("step", this->getStep()->getName());
-  root.put("display style", cedar::proc::gui::StepItem::DisplayMode::type().get(this->mDisplayMode).name());
+  root.put("display style", cedar::proc::gui::StepItem::DisplayMode::type().get(this->getDisplayMode()).name());
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 
@@ -610,7 +607,7 @@ void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
     p_action->setData(QString::fromStdString(e.name()));
 
     p_action->setCheckable(true);
-    if (e == this->mDisplayMode)
+    if (e == this->getDisplayMode())
     {
       p_action->setChecked(true);
     }
@@ -629,36 +626,9 @@ void cedar::proc::gui::StepItem::displayStyleMenuTriggered(QAction* pAction)
   this->setDisplayMode(mode);
 }
 
-void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::Id mode)
-{
-  this->mDisplayMode = mode;
-
-  switch (mode)
-  {
-    case cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY:
-      this->setWidth(cedar::proc::gui::StepItem::mIconSize);
-      this->setHeight(cedar::proc::gui::StepItem::mIconSize);
-      break;
-
-    case cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT:
-      this->setWidth(cedar::proc::gui::StepItem::mDefaultWidth);
-      this->setHeight(cedar::proc::gui::StepItem::mDefaultHeight);
-      break;
-
-    case cedar::proc::gui::StepItem::DisplayMode::HIDE_IN_CONNECTIONS:
-      this->hideInConnections();
-      break;
-  }
-
-  this->updateIconGeometry();
-  this->updateAttachedItems();
-  this->updateConnections();
-  this->update();
-}
-
 qreal cedar::proc::gui::StepItem::getContentsPadding() const
 {
-  switch (this->mDisplayMode)
+  switch (this->getDisplayMode())
   {
     case cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY:
       return static_cast<qreal>(0);
@@ -677,10 +647,10 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 
   this->paintFrame(painter, style, widget);
 
-  if (this->mDisplayMode == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
+  if (this->getDisplayMode() == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
   {
-    painter->drawText(QPointF(2 * padding + mIconSize, 15), this->mClassId->getClassNameWithoutNamespace().c_str());
-    painter->drawText(QPointF(2 * padding + mIconSize, 25), this->getStep()->getName().c_str());
+    painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 15), this->mClassId->getClassNameWithoutNamespace().c_str());
+    painter->drawText(QPointF(2 * padding + M_ICON_SIZE, 25), this->getStep()->getName().c_str());
   }
 
   painter->restore(); // restore saved painter settings
