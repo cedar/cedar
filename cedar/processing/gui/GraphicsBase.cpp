@@ -116,6 +116,12 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 {
   this->disconnect();
 
+  for (auto connection : this->mConnections)
+  {
+    delete connection;
+  }
+  this->mConnections.clear();
+
   if (!this->mpResizeHandles.empty())
   {
     for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
@@ -862,6 +868,7 @@ void cedar::proc::gui::GraphicsBase::disconnect(cedar::proc::gui::GraphicsBase*)
 
 void cedar::proc::gui::GraphicsBase::disconnect()
 {
+  // empty default implementation
 }
 
 unsigned int cedar::proc::gui::GraphicsBase::getNumberOfConnections()
