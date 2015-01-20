@@ -52,7 +52,6 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 const qreal cedar::proc::gui::ResizeHandle::M_HANDLE_SIZE = static_cast<qreal>(10.0);
-const QSizeF cedar::proc::gui::ResizeHandle::M_MINIMUM_SIZE(static_cast<qreal>(50.0), static_cast<qreal>(20.0));
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -186,38 +185,38 @@ QVariant cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange change, c
             break;
         }
 
-        if (bounds.width() < M_MINIMUM_SIZE.width())
+        if (bounds.width() < mpResizedItem->getMinimumSize().width())
         {
           switch (this->mDirection)
           {
             case cedar::proc::gui::ResizeHandle::NORTH_EAST:
             case cedar::proc::gui::ResizeHandle::SOUTH_EAST:
-              bounds.setWidth(M_MINIMUM_SIZE.width());
+              bounds.setWidth(mpResizedItem->getMinimumSize().width());
               new_value.setX(this->mpResizedItem->pos().x() + bounds.right() - M_HANDLE_SIZE / static_cast<qreal>(2));
               break;
 
             case cedar::proc::gui::ResizeHandle::NORTH_WEST:
             case cedar::proc::gui::ResizeHandle::SOUTH_WEST:
-              bounds.setLeft(bounds.right() - M_MINIMUM_SIZE.width());
+              bounds.setLeft(bounds.right() - mpResizedItem->getMinimumSize().width());
               new_value.setX(this->mpResizedItem->pos().x() - bounds.left() - M_HANDLE_SIZE / static_cast<qreal>(2));
               break;
           }
         }
 
 
-        if (bounds.height() < M_MINIMUM_SIZE.height())
+        if (bounds.height() < mpResizedItem->getMinimumSize().height())
         {
           switch (this->mDirection)
           {
             case cedar::proc::gui::ResizeHandle::SOUTH_EAST:
             case cedar::proc::gui::ResizeHandle::SOUTH_WEST:
-              bounds.setHeight(M_MINIMUM_SIZE.height());
+              bounds.setHeight(mpResizedItem->getMinimumSize().height());
               new_value.setY(this->mpResizedItem->pos().y() + bounds.bottom() - M_HANDLE_SIZE / static_cast<qreal>(2));
               break;
 
             case cedar::proc::gui::ResizeHandle::NORTH_EAST:
             case cedar::proc::gui::ResizeHandle::NORTH_WEST:
-              bounds.setTop(bounds.bottom() - M_MINIMUM_SIZE.height());
+              bounds.setTop(bounds.bottom() - mpResizedItem->getMinimumSize().height());
               new_value.setY(this->mpResizedItem->pos().y() - bounds.top() - M_HANDLE_SIZE / static_cast<qreal>(2));
               break;
           }

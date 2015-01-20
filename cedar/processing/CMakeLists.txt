@@ -74,6 +74,7 @@ cedar_add_library(cedarproc
   gui/ElementTreeWidget.h
   gui/ExperimentDialog.h
   gui/FindDialog.h
+  gui/GroupContainerItem.h
   gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
