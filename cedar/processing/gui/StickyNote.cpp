@@ -55,7 +55,7 @@ cedar::proc::gui::StickyNote::StickyNote(
     float height,
     std::string text)
 :
-cedar::proc::gui::GraphicsBase(width,height)
+cedar::proc::gui::GraphicsBase(width, height, GRAPHICS_GROUP_UNKNOWN, GRAPHICS_GROUP_NONE, BASE_SHAPE_RECT)
 {
   //initialize
   mScaling = false;
@@ -105,6 +105,7 @@ QRectF cedar::proc::gui::StickyNote::boundingRect() const
 
 void cedar::proc::gui::StickyNote::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
+  //!@todo Why doesn't this use the paint method from GraphicsBase?
   //coloring TextEdit Widget
   QPalette p = mText.palette();
   p.setColor(QPalette::Base,mColor);
@@ -126,7 +127,7 @@ void cedar::proc::gui::StickyNote::paint(QPainter *painter, const QStyleOptionGr
   {
     painter->setPen(Qt::SolidLine);
   }
-  painter->drawRoundedRect(mBound,5,5);
+  painter->drawRect(mBound);
 
   //draw scaling corner
   QPointF ps[3];

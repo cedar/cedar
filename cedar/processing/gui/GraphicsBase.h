@@ -107,6 +107,7 @@ public:
   enum BaseShape
   {
     BASE_SHAPE_RECT,
+    BASE_SHAPE_ROUNDED_RECT,
     BASE_SHAPE_ROUND,
     BASE_SHAPE_DIAMOND,
     BASE_SHAPE_CROSS
@@ -121,7 +122,7 @@ public:
   GraphicsBase(qreal width, qreal height,
                GraphicsGroup group = GRAPHICS_GROUP_UNKNOWN,
                GraphicsGroup canConnectTo = GRAPHICS_GROUP_NONE,
-               BaseShape shape = BASE_SHAPE_RECT);
+               BaseShape shape = BASE_SHAPE_ROUNDED_RECT);
 
   //!@brief Destructor
   virtual ~GraphicsBase();
