@@ -302,6 +302,8 @@ void cedar::proc::gui::Scene::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pE
 
 void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
+  //!@todo This should be moved to gui::Group; this function should only call the functionality on the root group if no
+  //! other group/widget is at the drop location;
   if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
     auto declaration = this->declarationFromDrop(pEvent);
@@ -315,7 +317,7 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
     QString message;
     if (pEvent->modifiers().testFlag(Qt::ControlModifier) && can_link)
     {
-      message = "Inserted element will be added as a link, i.e., unmodifyable, and will be loaded from a file every time.";
+      message = "Inserted element will be added as a link, i.e., unmodifiable, and will be loaded from a file every time.";
       pEvent->setDropAction(Qt::LinkAction);
     }
     else

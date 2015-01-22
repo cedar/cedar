@@ -210,6 +210,7 @@ void cedar::proc::gui::GraphicsBase::updateShape()
       mPath.lineTo(this->width(), this->height());
       break;
 
+    case BASE_SHAPE_ROUNDED_RECT:
     case BASE_SHAPE_RECT:
     case BASE_SHAPE_ROUND:
       // no custom path is used
@@ -685,8 +686,12 @@ void cedar::proc::gui::GraphicsBase::drawShape(QPainter* painter)
   {
     switch (this->mShape)
     {
-      case BASE_SHAPE_RECT:
+      case BASE_SHAPE_ROUNDED_RECT:
         painter->drawRoundedRect(bounds, roundedness, roundedness);
+        break;
+
+      case BASE_SHAPE_RECT:
+        painter->drawRect(bounds);
         break;
 
       case BASE_SHAPE_ROUND:

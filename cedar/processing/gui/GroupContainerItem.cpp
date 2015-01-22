@@ -54,7 +54,7 @@
 
 cedar::proc::gui::GroupContainerItem::GroupContainerItem(cedar::proc::gui::Group* pGroup)
 :
-cedar::proc::gui::GraphicsBase(400, 300),
+cedar::proc::gui::GraphicsBase(400, 300, GRAPHICS_GROUP_UNKNOWN, GRAPHICS_GROUP_NONE, BASE_SHAPE_RECT),
 mpGroupContainer(new QGraphicsProxyWidget(this)),
 mpCloseButtonContainer(new QGraphicsProxyWidget(this)),
 mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
