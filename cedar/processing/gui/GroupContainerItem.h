@@ -55,6 +55,8 @@
 #include <QGraphicsProxyWidget>
 
 /*!@brief An item that displays the content of a group.
+ *
+ * @todo Make a superclass, cedar::proc::gui::GraphicsWidgetBase that encapsulates the titlebar/close button etc.
  */
 class cedar::proc::gui::GroupContainerItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
@@ -98,8 +100,7 @@ private:
 protected:
   // none yet
 private:
-  QGraphicsProxyWidget* mpGroupContainer;
-  QGraphicsProxyWidget* mpCloseButtonContainer;
+  QGraphicsProxyWidget* mpContainer;
   cedar::proc::gui::GroupWidget* mpGroupWidget;
 
   //--------------------------------------------------------------------------------------------------------------------
