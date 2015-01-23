@@ -48,12 +48,15 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/ConnectorItem.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/DataConnection.h"
+#include "cedar/processing/GroupDeclaration.h"
+#include "cedar/processing/GroupDeclarationManager.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -75,6 +78,7 @@
 #include <QSet>
 #include <QList>
 #include <QDialog>
+#include <QStatusBar>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/json_parser.hpp>
   #include <boost/filesystem.hpp>
@@ -83,6 +87,9 @@
 #include <functional>
 #include <set>
 #include <sstream>
+
+// needed for being able to cast data in drop events to a plugin declaration
+Q_DECLARE_METATYPE(cedar::aux::PluginDeclaration*)
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -199,6 +206,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
   this->update();
 
   this->connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), SLOT(elementNameChanged(const std::string&, const std::string&)));
+
+  this->setAcceptDrops(true);
 }
 
 cedar::proc::gui::Group::~Group()
@@ -214,6 +223,122 @@ cedar::proc::gui::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::PluginDeclaration* cedar::proc::gui::Group::declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const
+{
+  auto tree = dynamic_cast<cedar::proc::gui::ElementClassList*>(pEvent->source());
+
+  if (tree)
+  {
+    QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
+    QDataStream stream(&itemData, QIODevice::ReadOnly);
+
+    int r, c;
+    QMap<int, QVariant> v;
+    stream >> r >> c >> v;
+
+    QListWidgetItem *item = tree->item(r);
+
+    if (item)
+    {
+      return item->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
+    }
+  }
+
+  return nullptr;
+}
+
+void cedar::proc::gui::Group::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pEvent */)
+{
+  // reset the status message
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
+  {
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage("");
+  }
+}
+
+void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
+  {
+    auto declaration = this->declarationFromDrop(pEvent);
+    if (!declaration)
+    {
+      return;
+    }
+
+    bool can_link = (dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr);
+
+    QString message;
+    if (pEvent->modifiers().testFlag(Qt::ControlModifier) && can_link)
+    {
+      message = "Inserted element will be added as a link, i.e., unmodifiable, and will be loaded from a file every time.";
+      pEvent->setDropAction(Qt::LinkAction);
+    }
+    else
+    {
+      if (can_link)
+      {
+        message = "Inserted element will be copied. Hold ctrl to create a linked element.";
+      }
+      pEvent->setDropAction(Qt::CopyAction);
+    }
+
+    if (this->mpMainWindow && this->mpMainWindow->statusBar())
+    {
+      auto status_bar = this->mpMainWindow->statusBar();
+      status_bar->showMessage(message);
+    }
+
+    pEvent->accept();
+  }
+}
+
+void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  auto declaration = this->declarationFromDrop(pEvent);
+  if (declaration == nullptr)
+  {
+    return;
+  }
+
+  // reset the status message
+  if (this->mpMainWindow && this->mpMainWindow->statusBar())
+  {
+    auto status_bar = this->mpMainWindow->statusBar();
+    status_bar->showMessage("");
+  }
+
+  QPointF mapped = pEvent->scenePos();
+  auto target_group = this->getGroup();
+  if (!this->isRootGroup())
+  {
+    mapped -= this->scenePos();
+  }
+
+  if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(declaration))
+  {
+    //!@todo can createElement be moved into gui::Group?
+    this->mpScene->createElement(target_group, elem_declaration->getClassName(), mapped);
+  }
+  else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration))
+  {
+    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
+        (
+          group_declaration->getClassName(),
+          target_group,
+          pEvent->modifiers().testFlag(Qt::ControlModifier)
+        );
+    this->mpScene->getGraphicsItemFor(elem)->setPos(mapped);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
+  }
+
+  pEvent->setAccepted(true);
+}
 
 bool cedar::proc::gui::Group::supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const
 {
