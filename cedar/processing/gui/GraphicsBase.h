@@ -238,24 +238,6 @@ public:
    */
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
-  /*!@brief   Returns the element associated with this graphics item.
-   *
-   * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
-   */
-  inline cedar::proc::ElementPtr getElement()
-  {
-    return this->mElement;
-  }
-
-  /*!@brief   Returns the element associated with this graphics item.
-   *
-   * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
-   */
-  inline cedar::proc::ConstElementPtr getElement() const
-  {
-    return this->mElement;
-  }
-
   //! Can be implemented to react to changes of the items size.
   virtual void sizeChanged();
 
@@ -325,13 +307,6 @@ protected:
    * @remarks This method should only be called during construction.
    */
   void setBaseShape(BaseShape shape);
-
-  /*!@brief Sets the element associated with this graphics item.
-   */
-  inline void setElement(cedar::proc::ElementPtr element)
-  {
-    this->mElement = element;
-  }
 
   //! Sets the snap-to-grid property of the element.
   inline void setSnapToGrid(bool snap)
@@ -448,9 +423,6 @@ private:
 
   //!@brief The path used for drawing this shape.
   QPainterPath mPath;
-
-  //!@brief The element associated with this graphics item
-  cedar::proc::ElementPtr mElement;
 
   //!@brief Whether the item snaps to the grid.
   bool mSnapToGrid;

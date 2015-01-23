@@ -127,6 +127,145 @@ cedar::proc::gui::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Scene::keyPressEvent(QKeyEvent* pEvent)
+{
+  this->QGraphicsScene::keyPressEvent(pEvent);
+
+  if (!pEvent->isAccepted())
+  {
+    switch (pEvent->key())
+    {
+      case Qt::Key_Backspace:
+      case Qt::Key_Delete:
+      {
+        this->deleteSelectedElements();
+        pEvent->setAccepted(true);
+        break;
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Scene::deleteSelectedElements()
+{
+  auto selected_items = this->selectedItems();
+  this->deleteElements(selected_items);
+}
+
+void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items)
+{
+  // remove connections
+  for (int i = 0; i < items.size(); ++i)
+  {
+    //!@todo This code can probably use some cleaning up
+    // delete connections first
+    if (auto p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+    {
+      if (auto source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getSource()))
+      {
+        if (auto target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
+        {
+          auto source_item = dynamic_cast<cedar::proc::gui::Connectable*>(source->parentItem());
+          auto target_item = dynamic_cast<cedar::proc::gui::Connectable*>(target->parentItem());
+
+          if ( (!source_item || !source_item->isReadOnly()) && (!target_item || !target_item->isReadOnly()) )
+          {
+            std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
+            std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
+            // delete connection in network of source
+            source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
+          }
+        }
+      }
+      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
+      {
+        if (!source->isReadOnly())
+        {
+          if (cedar::proc::gui::Connectable* target = dynamic_cast<cedar::proc::gui::Connectable*>(p_connection->getTarget()))
+          {
+            if (!target->isReadOnly())
+            {
+              if (auto target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target->getConnectable()))
+              {
+                source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target_triggerable);
+              }
+            }
+          }
+          else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
+          {
+            if (!target->isReadOnly())
+            {
+              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+            }
+          }
+        }
+      }
+      else
+      {
+        CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
+      }
+      items[i] = nullptr;
+    }
+  }
+  std::vector<QGraphicsItem*> delete_stack;
+  // fill stack with elements
+  for (int i = 0; i < items.size(); ++i)
+  {
+    auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
+    if (graphics_base != nullptr)
+    {
+      if (!graphics_base->isReadOnly())
+      {
+        delete_stack.push_back(graphics_base);
+      }
+    }
+    else
+    {
+      delete_stack.push_back(items[i]);
+    }
+  }
+  // sort stack (make it a real stack)
+  std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
+  // while stack is not empty, check if any items must be added, then delete the current item
+  while (delete_stack.size() > 0)
+  {
+    // look at first item
+    QGraphicsItem* current_item = delete_stack.back();
+
+    // now delete the current element
+    deleteElement(current_item);
+    delete_stack.pop_back();
+  }
+}
+
+void cedar::proc::gui::Scene::deleteElement(QGraphicsItem* pItem)
+{
+  if (auto element = dynamic_cast<cedar::proc::gui::Element*>(pItem))
+  {
+    element->deleteElement();
+  }
+}
+
+bool cedar::proc::gui::Scene::sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem)
+{
+  unsigned int depth_first_item = 0;
+  unsigned int depth_second_item = 0;
+  QGraphicsItem* p_current_item = pFirstItem;
+  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
+  {
+    ++depth_first_item;
+    p_current_item = p_current_item->parentItem();
+  }
+
+  p_current_item = pSecondItem;
+  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
+  {
+    ++depth_second_item;
+    p_current_item = p_current_item->parentItem();
+  }
+  return (depth_first_item < depth_second_item);
+}
+
 void cedar::proc::gui::Scene::emitSceneChanged()
 {
   emit sceneChanged();
@@ -190,17 +329,13 @@ void cedar::proc::gui::Scene::itemSelected()
   if (selected_items.size() == 1)
   {
     auto p_item = selected_items[0];
-    if (auto p_graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item))
+    if (auto p_element = dynamic_cast<cedar::proc::gui::Element*>(p_item))
     {
-      //!@todo Instead of ifs and casts, should GraphicsBase have a virtual displayInConfigurableWidget method?
-      if (p_graphics_item->getElement())
+      this->mpConfigurableWidget->display(p_element->getElement(), p_element->isReadOnly());
+
+      if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(p_element->getElement()))
       {
-        this->mpConfigurableWidget->display(p_graphics_item->getElement(), p_graphics_item->isReadOnly());
-      
-        if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(p_graphics_item->getElement()))
-        {
-          this->mpRecorderWidget->setStep(step);
-        }
+        this->mpRecorderWidget->setStep(step);
       }
     }
     else if (auto coupling = dynamic_cast<cedar::proc::gui::CouplingCollection*>(p_item))
@@ -1292,14 +1427,14 @@ cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar:
   }
 }
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cedar::proc::ConstElementPtr element)
+cedar::proc::gui::Element* cedar::proc::gui::Scene::getGraphicsItemFor(cedar::proc::ConstElementPtr element)
 {
   return this->getGraphicsItemFor(element.get());
 }
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cedar::proc::ConstElement* element)
+cedar::proc::gui::Element* cedar::proc::gui::Scene::getGraphicsItemFor(cedar::proc::ConstElement* element)
 {
-  ElementMap::iterator iter = this->mElementMap.find(element);
+  auto iter = this->mElementMap.find(element);
 
   if (iter == this->mElementMap.end())
   {

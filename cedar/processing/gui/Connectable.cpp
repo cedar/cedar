@@ -99,7 +99,7 @@ cedar::proc::gui::Connectable::Connectable
   QMainWindow* pMainWindow
 )
 :
-cedar::proc::gui::GraphicsBase
+cedar::proc::gui::Element
 (
   width,
   height,
@@ -608,7 +608,7 @@ void cedar::proc::gui::Connectable::showTriggerChains()
     {
       auto link_element = boost::dynamic_pointer_cast<cedar::proc::Element>(link);
       CEDAR_DEBUG_ASSERT(link_element);
-      auto link_gui = scene->getGraphicsItemFor(link_element.get());
+      cedar::proc::gui::GraphicsBase* link_gui = scene->getGraphicsItemFor(link_element.get());
       if (!link_gui)
       {
         // can happen either for the processing done trigger of the start of the chain, or for group inputs

@@ -45,6 +45,7 @@
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/Element.fwd.h"
 #include "cedar/processing/gui/Scene.fwd.h"
 #include "cedar/processing/gui/StepItem.fwd.h"
 #include "cedar/processing/gui/View.fwd.h"
@@ -105,6 +106,7 @@ public:
     MODE_SMART
   };
 
+  //!@todo Can StepMap, TriggerMap, GroupMap be removed now that the ElementMap has a proc::gui::Element pointer?
   //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
   typedef std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
 
@@ -115,7 +117,7 @@ public:
   typedef std::map<const cedar::proc::Group*, cedar::proc::gui::Group*> GroupMap;
 
   //! Type for associating cedar::proc::Elements to cedar::proc::gui::GraphicsBase.
-  typedef std::map<const cedar::proc::Element*, cedar::proc::gui::GraphicsBase*> ElementMap;
+  typedef std::map<const cedar::proc::Element*, cedar::proc::gui::Element*> ElementMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -253,10 +255,10 @@ public:
 
   /*!@brief Returns the cedar::proc::gui::GraphicsBase item corresponding to the given element.
    */
-  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::ConstElement* element);
+  cedar::proc::gui::Element* getGraphicsItemFor(cedar::proc::ConstElement* element);
 
   //! Returns the graphics item corresponding to the given element.
-  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::ConstElementPtr element);
+  cedar::proc::gui::Element* getGraphicsItemFor(cedar::proc::ConstElementPtr element);
 
   /*!@brief Returns, whether snap-to-grid is true.
    */
@@ -330,6 +332,10 @@ public:
   //! emits a scene changed signal
   void emitSceneChanged();
 
+  /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
+   */
+  static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -352,6 +358,8 @@ protected:
   /*! Overrides the default help event to display tooltips for elements in the scene.
    */
   void helpEvent(QGraphicsSceneHelpEvent* pHelpEvent);
+
+  void keyPressEvent(QKeyEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -401,6 +409,18 @@ private:
   void multiItemContextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
 
   void connectSlots(cedar::proc::gui::DataSlotItem* pSource, cedar::proc::gui::DataSlotItem* pTarget, bool addConnectorGroup);
+
+  /*!@brief Deletes the list of graphics items.
+   */
+  void deleteElements(QList<QGraphicsItem*>& items);
+
+  /*!@brief Delete a single graphics item.
+   */
+  void deleteElement(QGraphicsItem* pItem);
+
+  /*!@brief Deletes the elements currently selected in the scene.
+   */
+  void deleteSelectedElements();
 
 private slots:
   void promoteElementToExistingGroup();
