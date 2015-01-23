@@ -157,53 +157,10 @@ void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items)
   // remove connections
   for (int i = 0; i < items.size(); ++i)
   {
-    //!@todo This code can probably use some cleaning up
     // delete connections first
     if (auto p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
-      if (auto source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getSource()))
-      {
-        if (auto target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
-        {
-          auto source_item = dynamic_cast<cedar::proc::gui::Connectable*>(source->parentItem());
-          auto target_item = dynamic_cast<cedar::proc::gui::Connectable*>(target->parentItem());
-
-          if ( (!source_item || !source_item->isReadOnly()) && (!target_item || !target_item->isReadOnly()) )
-          {
-            std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
-            std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-            // delete connection in network of source
-            source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
-          }
-        }
-      }
-      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
-      {
-        if (!source->isReadOnly())
-        {
-          if (cedar::proc::gui::Connectable* target = dynamic_cast<cedar::proc::gui::Connectable*>(p_connection->getTarget()))
-          {
-            if (!target->isReadOnly())
-            {
-              if (auto target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target->getConnectable()))
-              {
-                source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target_triggerable);
-              }
-            }
-          }
-          else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
-          {
-            if (!target->isReadOnly())
-            {
-              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
-            }
-          }
-        }
-      }
-      else
-      {
-        CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
-      }
+      p_connection->disconnectUnderlying();
       items[i] = nullptr;
     }
   }

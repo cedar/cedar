@@ -74,6 +74,9 @@ public:
   //!@brief Destructor
   ~Connection();
 
+  //! If this returns true, the connection can be deleted by pressing the delete key.
+  virtual bool isDeleteable() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -81,8 +84,14 @@ public:
   //!@brief access the source of this connection
   cedar::proc::gui::GraphicsBase* getSource();
 
+  //!@brief access the source of this connection
+  cedar::proc::gui::ConstGraphicsBase* getSource() const;
+
   //!@brief access the target of this connection
   cedar::proc::gui::GraphicsBase* getTarget();
+
+  //!@brief access the target of this connection
+  cedar::proc::gui::ConstGraphicsBase* getTarget() const;
 
   //! Sets the source of the connection
   void setSource(cedar::proc::gui::GraphicsBase* source);
@@ -99,8 +108,11 @@ public:
   //!@brief paint this connection
   void paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*);
 
-  //!@brief Removes the underlying connection in the processing framework.
+  //!@brief Removes the connection, but only in the GUI layer.
   void disconnect();
+
+  //! Disconnects the connection in the non-gui layer.
+  void disconnectUnderlying();
 
   //! Displays this connection in smart mode.
   void setSmartMode(bool smart);

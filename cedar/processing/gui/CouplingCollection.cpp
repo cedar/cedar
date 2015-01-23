@@ -72,6 +72,11 @@ mpScene(scene)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::CouplingCollection::isDeleteable() const
+{
+  return false;
+}
+
 cedar::proc::GroupPtr cedar::proc::gui::CouplingCollection::getSingleGroup() const
 {
   CEDAR_ASSERT(this->mComponents.size() == 1);
