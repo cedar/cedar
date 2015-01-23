@@ -164,12 +164,6 @@ private:
   //!@brief sets the represented step
   void setStep(cedar::proc::StepPtr step);
 
-  //! Fills the menu with the appropriate entries for serializing data.
-  void fillDataSerialization(QMenu* pMenu);
-
-  //! Fills in the actions for the display style.
-  void fillDisplayStyleMenu(QMenu* pMenu);
-
   //! Updates the display of the step's run time measurements.
   void updateToolTip();
 
@@ -180,17 +174,9 @@ private:
   void displayModeChanged();
 
 private slots:
-  void displayStyleMenuTriggered(QAction* pAction);
-
   void openDefinedPlotAction();
 
-  void openProperties();
-
   void openActionsDock();
-
-  void saveDataClicked();
-
-  void loadDataClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

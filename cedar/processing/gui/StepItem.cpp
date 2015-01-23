@@ -49,7 +49,6 @@
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -72,15 +71,11 @@
 #include <QGraphicsDropShadowEffect>
 #include <QLayout>
 #include <QResource>
-#include <QFileDialog>
 #include <iostream>
 #include <QMessageBox>
 #include <QPushButton>
 #include <string>
 #include <set>
-
-//! declares a metatype for slot pointers; used by the serialization menu
-Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -361,14 +356,6 @@ void cedar::proc::gui::StepItem::openActionsDock()
   p_dock_widget->show();
 }
 
-void cedar::proc::gui::StepItem::openProperties()
-{
-  cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
-  props->display(this->getStep(), this->isReadOnly());
-  auto p_widget = this->createDockWidget("Properties", props);
-  p_widget->show();
-}
-
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
   CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
@@ -383,12 +370,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 
   this->fillConnectableMenu(menu, event);
-
-  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-
-  QAction* p_properties = menu.addAction("open properties widget");
-  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
-  p_properties->setIcon(QIcon(":/menus/properties.svg"));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -410,16 +391,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     p_actions_menu->addSeparator();
     p_actions_menu->addAction("open actions dock");
   }
-
-  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-  QMenu* p_serialization_menu = menu.addMenu("save/load data");
-  p_serialization_menu->setIcon(QIcon(":/menus/save.svg"));
-  this->fillDataSerialization(p_serialization_menu);
-
-  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-
-  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-  this->fillDisplayStyleMenu(&menu);
 
   QAction *a = menu.exec(event->screenPos());
 
@@ -443,90 +414,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   else
   {
     this->handleContextMenuAction(a, event);
-  }
-}
-
-void cedar::proc::gui::StepItem::fillDataSerialization(QMenu* pMenu)
-{
-  for (auto role_enum : cedar::proc::DataRole::type().list())
-  {
-    if (role_enum.id() == cedar::proc::DataRole::INPUT)
-    {
-      // inputs cannot be serialized
-      continue;
-    }
-
-    if (!this->getStep()->hasSlotForRole(role_enum))
-    {
-      continue;
-    }
-
-    bool serializable_slots_found = false;
-    this->addRoleSeparator(role_enum, pMenu);
-
-    for (auto slot : this->getStep()->getOrderedDataSlots(role_enum.id()))
-    {
-      if (slot->isSerializable())
-      {
-        serializable_slots_found = true;
-
-        auto sub_menu = pMenu->addMenu(QString::fromStdString(slot->getText()));
-
-        QAction* save_action = sub_menu->addAction("save ...");
-        save_action->setData(QVariant::fromValue(slot));
-        QObject::connect(save_action, SIGNAL(triggered()), this, SLOT(saveDataClicked()));
-
-        QAction* load_action = sub_menu->addAction("load ...");
-        load_action->setData(QVariant::fromValue(slot));
-        QObject::connect(load_action, SIGNAL(triggered()), this, SLOT(loadDataClicked()));
-      }
-    }
-
-    if (!serializable_slots_found)
-    {
-      auto action = pMenu->addAction("No serializable slots.");
-      action->setEnabled(false);
-    }
-  }
-}
-
-void cedar::proc::gui::StepItem::saveDataClicked()
-{
-  auto action = dynamic_cast<QAction*>(QObject::sender());
-  CEDAR_DEBUG_ASSERT(action);
-
-  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
-  CEDAR_DEBUG_ASSERT(slot);
-
-  QString filename = QFileDialog::getSaveFileName
-                     (
-                       this->mpMainWindow,
-                       "Select a file for saving"
-                     );
-
-  if (!filename.isEmpty())
-  {
-    slot->writeDataToFile(cedar::aux::Path(filename.toStdString()));
-  }
-}
-
-void cedar::proc::gui::StepItem::loadDataClicked()
-{
-  auto action = dynamic_cast<QAction*>(QObject::sender());
-  CEDAR_DEBUG_ASSERT(action);
-
-  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
-  CEDAR_DEBUG_ASSERT(slot);
-
-  QString filename = QFileDialog::getOpenFileName
-                     (
-                       this->mpMainWindow,
-                       "Select a file to load"
-                     );
-
-  if (!filename.isEmpty())
-  {
-    slot->readDataFromFile(cedar::aux::Path(filename.toStdString()));
   }
 }
 
@@ -569,38 +456,6 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction()
   auto p_dock_widget = this->createDockWidgetForPlots(this->getNameForTitle(), p_plot_widget, p_action->data().toPoint());
   
   p_dock_widget->show();
-}
-
-void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
-{
-  QMenu* p_sub_menu = pMenu->addMenu("display style");
-  p_sub_menu->setIcon(QIcon(":/menus/display_style.svg"));
-
-  p_sub_menu->setEnabled(!this->isReadOnly());
-
-  for (const cedar::aux::Enum& e : cedar::proc::gui::StepItem::DisplayMode::type().list())
-  {
-    QAction* p_action = p_sub_menu->addAction(QString::fromStdString(e.prettyString()));
-    p_action->setData(QString::fromStdString(e.name()));
-
-    p_action->setCheckable(true);
-    if (e == this->getDisplayMode())
-    {
-      p_action->setChecked(true);
-    }
-    p_action->setEnabled(this->supportsDisplayMode(e.id()));
-  }
-
-  QObject::connect(p_sub_menu, SIGNAL(triggered(QAction*)), this, SLOT(displayStyleMenuTriggered(QAction*)));
-}
-
-void cedar::proc::gui::StepItem::displayStyleMenuTriggered(QAction* pAction)
-{
-  std::string enum_name = pAction->data().toString().toStdString();
-
-  cedar::proc::gui::StepItem::DisplayMode::Id mode;
-  mode = cedar::proc::gui::StepItem::DisplayMode::type().get(enum_name);
-  this->setDisplayMode(mode);
 }
 
 qreal cedar::proc::gui::StepItem::getContentsPadding() const

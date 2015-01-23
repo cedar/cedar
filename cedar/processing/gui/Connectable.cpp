@@ -57,6 +57,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 
@@ -67,7 +68,11 @@
 #include <set>
 #include <QMenu>
 #include <QPainter>
+#include <QFileDialog>
 #include <QGraphicsSceneContextMenuEvent>
+
+//! declares a metatype for slot pointers; used by the serialization menu
+Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -1382,6 +1387,145 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
       triggerable->getParentTrigger()
     );
   }
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  QAction* p_properties = menu.addAction("open properties widget");
+  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
+  p_properties->setIcon(QIcon(":/menus/properties.svg"));
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QMenu* p_serialization_menu = menu.addMenu("save/load data");
+  p_serialization_menu->setIcon(QIcon(":/menus/save.svg"));
+  this->fillDataSerialization(p_serialization_menu);
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  this->fillDisplayStyleMenu(&menu);
+}
+
+void cedar::proc::gui::Connectable::fillDataSerialization(QMenu* pMenu)
+{
+  for (auto role_enum : cedar::proc::DataRole::type().list())
+  {
+    if (role_enum.id() == cedar::proc::DataRole::INPUT)
+    {
+      // inputs cannot be serialized
+      continue;
+    }
+
+    if (!this->getConnectable()->hasSlotForRole(role_enum))
+    {
+      continue;
+    }
+
+    bool serializable_slots_found = false;
+    this->addRoleSeparator(role_enum, pMenu);
+
+    for (auto slot : this->getConnectable()->getOrderedDataSlots(role_enum.id()))
+    {
+      if (slot->isSerializable())
+      {
+        serializable_slots_found = true;
+
+        auto sub_menu = pMenu->addMenu(QString::fromStdString(slot->getText()));
+
+        QAction* save_action = sub_menu->addAction("save ...");
+        save_action->setData(QVariant::fromValue(slot));
+        QObject::connect(save_action, SIGNAL(triggered()), this, SLOT(saveDataClicked()));
+
+        QAction* load_action = sub_menu->addAction("load ...");
+        load_action->setData(QVariant::fromValue(slot));
+        QObject::connect(load_action, SIGNAL(triggered()), this, SLOT(loadDataClicked()));
+      }
+    }
+
+    if (!serializable_slots_found)
+    {
+      auto action = pMenu->addAction("No serializable slots.");
+      action->setEnabled(false);
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::saveDataClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+
+  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
+  CEDAR_DEBUG_ASSERT(slot);
+
+  QString filename = QFileDialog::getSaveFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file for saving"
+                     );
+
+  if (!filename.isEmpty())
+  {
+    slot->writeDataToFile(cedar::aux::Path(filename.toStdString()));
+  }
+}
+
+void cedar::proc::gui::Connectable::loadDataClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+
+  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
+  CEDAR_DEBUG_ASSERT(slot);
+
+  QString filename = QFileDialog::getOpenFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file to load"
+                     );
+
+  if (!filename.isEmpty())
+  {
+    slot->readDataFromFile(cedar::aux::Path(filename.toStdString()));
+  }
+}
+
+void cedar::proc::gui::Connectable::fillDisplayStyleMenu(QMenu* pMenu)
+{
+  QMenu* p_sub_menu = pMenu->addMenu("display style");
+  p_sub_menu->setIcon(QIcon(":/menus/display_style.svg"));
+
+  p_sub_menu->setEnabled(!this->isReadOnly());
+
+  for (const cedar::aux::Enum& e : cedar::proc::gui::Connectable::DisplayMode::type().list())
+  {
+    QAction* p_action = p_sub_menu->addAction(QString::fromStdString(e.prettyString()));
+    p_action->setData(QString::fromStdString(e.name()));
+
+    bool supported = this->supportsDisplayMode(e.id());
+    p_action->setCheckable(true);
+    if (e == this->getDisplayMode() && supported)
+    {
+      p_action->setChecked(true);
+    }
+    p_action->setEnabled(supported);
+  }
+
+  QObject::connect(p_sub_menu, SIGNAL(triggered(QAction*)), this, SLOT(displayStyleMenuTriggered(QAction*)));
+}
+
+void cedar::proc::gui::Connectable::displayStyleMenuTriggered(QAction* pAction)
+{
+  std::string enum_name = pAction->data().toString().toStdString();
+
+  cedar::proc::gui::Connectable::DisplayMode::Id mode;
+  mode = cedar::proc::gui::Connectable::DisplayMode::type().get(enum_name);
+  this->setDisplayMode(mode);
+}
+
+void cedar::proc::gui::Connectable::openProperties()
+{
+  auto configurable_widget = new cedar::aux::gui::Configurable();
+  configurable_widget->display(this->getConnectable(), this->isReadOnly());
+  auto p_widget = this->createDockWidget("Properties", configurable_widget);
+  p_widget->show();
 }
 
 cedar::proc::TriggerPtr cedar::proc::gui::Connectable::getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group)

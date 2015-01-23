@@ -215,6 +215,19 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::Group::supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const
+{
+  if (id == cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS)
+  {
+    return true;
+  }
+  else
+  {
+    //!@todo When the group is collapsed, this could return true as well, allowing the use of the same display styles that steps have
+    return false;
+  }
+}
+
 bool cedar::proc::gui::Group::canResize() const
 {
   if (this->_mGeometryLocked->getValue())
