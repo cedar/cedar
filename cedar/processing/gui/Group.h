@@ -77,6 +77,7 @@ class cedar::proc::gui::Group : public cedar::proc::gui::Connectable
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::GroupWidget;
+  friend class cedar::proc::gui::Scene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -289,6 +290,24 @@ protected:
 
   void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
+  /*!@brief Handles the drop event of the scene.
+   *
+   *        This method mainly instantiates elements that are dropped from the Element toolbar to create new items in
+   *        the scene.
+   */
+  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  /*!@brief Handles the dragLeave event of the scene.
+   */
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  /*!@brief Handles the dragMove event of the scene.
+   *
+   *        This method determines whether the contents of the drop can be handled by
+   *        cedar::proc::gui::Scene::dropEvent.
+   */
+  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -377,6 +396,8 @@ private:
   void updateAllElementsTriggerColorState() const;
 
   void addElementsToGroup();
+
+  cedar::aux::PluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const;
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

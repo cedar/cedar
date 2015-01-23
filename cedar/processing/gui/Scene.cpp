@@ -87,9 +87,6 @@
 #include <set>
 #include <list>
 
-// needed for being able to cast data in drop events to a plugin declaration
-Q_DECLARE_METATYPE(cedar::aux::PluginDeclaration*)
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -98,7 +95,7 @@ cedar::proc::gui::Scene::Scene(cedar::proc::gui::View* peParentView, QObject *pP
 QGraphicsScene (pParent),
 mMode(MODE_SELECT),
 mTriggerMode(MODE_SHOW_ALL),
-mpDropTarget(NULL),
+mpDropTarget(nullptr),
 mpeParentView(peParentView),
 mpNewConnectionIndicator(nullptr),
 mpConnectionStart(nullptr),
@@ -126,6 +123,80 @@ cedar::proc::gui::Scene::~Scene()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::forwardEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  pEvent->setAccepted(false);
+  auto items = this->items(pEvent->scenePos());
+  for (auto item : items)
+  {
+    if (item->acceptDrops())
+    {
+      QGraphicsScene::sendEvent(item, pEvent);
+      if (pEvent->isAccepted())
+      {
+        return dynamic_cast<cedar::proc::gui::GraphicsBase*>(item);
+      }
+    }
+  }
+
+  return nullptr;
+}
+
+void cedar::proc::gui::Scene::dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  this->forwardEvent(pEvent);
+
+  if (auto item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(this->mpDropTarget))
+  {
+    item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    this->mpDropTarget = nullptr;
+  }
+
+  // if none of the elements in the scene accepted the event, the root group might
+  if (!pEvent->isAccepted() && this->mGroup)
+  {
+    this->mGroup->dragLeaveEvent(pEvent);
+  }
+}
+
+void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  auto accepter = this->forwardEvent(pEvent);
+
+  if (auto item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(this->mpDropTarget))
+  {
+    item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+  }
+
+  // if none of the elements in the scene accepted the event, the root group might
+  if (!pEvent->isAccepted() && this->mGroup)
+  {
+    this->mGroup->dragMoveEvent(pEvent);
+  }
+  else if (accepter)
+  {
+    accepter->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+    this->mpDropTarget = accepter;
+  }
+}
+
+void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  this->forwardEvent(pEvent);
+
+  if (auto item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(this->mpDropTarget))
+  {
+    item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+    this->mpDropTarget = nullptr;
+  }
+
+  // if none of the elements in the scene accepted the event, the root group might
+  if (!pEvent->isAccepted() && this->mGroup)
+  {
+    this->mGroup->dropEvent(pEvent);
+  }
+}
 
 void cedar::proc::gui::Scene::keyPressEvent(QKeyEvent* pEvent)
 {
@@ -380,163 +451,6 @@ void cedar::proc::gui::Scene::setMode(MODE mode, const QString& param)
 {
   this->mMode = mode;
   this->mModeParam = param;
-}
-
-void cedar::proc::gui::Scene::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pEvent */)
-{
-  // reset the status message
-  if (this->mpMainWindow && this->mpMainWindow->statusBar())
-  {
-    auto status_bar = this->mpMainWindow->statusBar();
-    status_bar->showMessage("");
-  }
-}
-
-void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
-{
-  //!@todo This should be moved to gui::Group; this function should only call the functionality on the root group if no
-  //! other group/widget is at the drop location;
-  if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
-  {
-    auto declaration = this->declarationFromDrop(pEvent);
-    if (declaration == nullptr)
-    {
-      return;
-    }
-
-    bool can_link = (dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration) != nullptr);
-
-    QString message;
-    if (pEvent->modifiers().testFlag(Qt::ControlModifier) && can_link)
-    {
-      message = "Inserted element will be added as a link, i.e., unmodifiable, and will be loaded from a file every time.";
-      pEvent->setDropAction(Qt::LinkAction);
-    }
-    else
-    {
-      if (can_link)
-      {
-        message = "Inserted element will be copied. Hold ctrl to create a linked element.";
-      }
-      pEvent->setDropAction(Qt::CopyAction);
-    }
-
-    if (this->mpMainWindow && this->mpMainWindow->statusBar())
-    {
-      auto status_bar = this->mpMainWindow->statusBar();
-      status_bar->showMessage(message);
-    }
-
-    pEvent->accept();
-  }
-
-
-//  QGraphicsItem* p_item = this->itemAt(pEvent->scenePos());
-  auto items = this->items(pEvent->scenePos());
-  if (items.size() > 0)
-  {
-    auto p_item = findFirstGroupItem(items);
-    if (p_item != this->mpDropTarget)
-    {
-      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
-      {
-        group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      }
-
-      if (auto group = dynamic_cast<cedar::proc::gui::Group*>(p_item))
-      {
-        if (!group->getGroup()->isLinked())
-        {
-          group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-        }
-      }
-      this->mpDropTarget = p_item;
-    }
-  }
-  else if (this->mpDropTarget) // nothing below the mouse pointer, but there is still something in our drop memory
-  {
-    if (auto group = dynamic_cast<cedar::proc::gui::Group*>(this->mpDropTarget))
-    {
-      group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-    }
-    this->mpDropTarget = nullptr;
-  }
-}
-
-void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
-{
-  auto declaration = this->declarationFromDrop(pEvent);
-  if (declaration == nullptr)
-  {
-    return;
-  }
-
-  // reset the status message
-  if (this->mpMainWindow && this->mpMainWindow->statusBar())
-  {
-    auto status_bar = this->mpMainWindow->statusBar();
-    status_bar->showMessage("");
-  }
-
-  // the drop target must be reset, even if something goes wrong; so: do it now by remembering the target in another
-  // variable.
-  auto drop_target = this->mpDropTarget;
-  this->mpDropTarget = nullptr;
-
-  QPointF mapped = pEvent->scenePos();
-  auto target_group = this->getRootGroup()->getGroup();
-  if (auto group = dynamic_cast<cedar::proc::gui::Group*>(drop_target))
-  {
-    if (!group->getGroup()->isLinked())
-    {
-      group->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      target_group = group->getGroup();
-      mapped -= group->scenePos();
-    }
-  }
-
-  if (auto elem_declaration = dynamic_cast<const cedar::proc::ElementDeclaration*>(declaration))
-  {
-    this->createElement(target_group, elem_declaration->getClassName(), mapped);
-  }
-  else if (auto group_declaration = dynamic_cast<const cedar::proc::GroupDeclaration*>(declaration))
-  {
-    auto elem = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->addGroupTemplateToGroup
-        (
-          group_declaration->getClassName(),
-          target_group,
-          pEvent->modifiers().testFlag(Qt::ControlModifier)
-        );
-    this->getGraphicsItemFor(elem.get())->setPos(mapped);
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
-  }
-}
-
-cedar::aux::PluginDeclaration* cedar::proc::gui::Scene::declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const
-{
-  ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
-
-  if (tree)
-  {
-    QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
-    QDataStream stream(&itemData, QIODevice::ReadOnly);
-
-    int r, c;
-    QMap<int, QVariant> v;
-    stream >> r >> c >> v;
-
-    QListWidgetItem *item = tree->item(r);
-
-    if (item)
-    {
-      return item->data(Qt::UserRole).value<cedar::aux::PluginDeclaration*>();
-    }
-  }
-
-  return nullptr;
 }
 
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::findConnectableItem(const QList<QGraphicsItem*>& items)

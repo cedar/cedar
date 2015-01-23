@@ -138,24 +138,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Handles the drop event of the scene.
-   *
-   *        This method mainly instantiates elements that are dropped from the Element toolbar to create new items in
-   *        the scene.
-   */
-  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
-
-  /*!@brief Handles the dragLeave event of the scene.
-   */
-  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
-
-  /*!@brief Handles the dragMove event of the scene.
-   *
-   *        This method determines whether the contents of the drop can be handled by
-   *        cedar::proc::gui::Scene::dropEvent.
-   */
-  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
-
   /*!@brief Handler for mouse press events that happen within the bounds of the scene.
    */
   void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent);
@@ -400,8 +382,6 @@ private:
 
   void resetBackgroundColor();
 
-  cedar::aux::PluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const;
-
   cedar::proc::gui::GraphicsBase* findConnectableItem(const QList<QGraphicsItem*>& items);
 
   cedar::proc::gui::Group* findFirstGroupItem(const QList<QGraphicsItem*>& items);
@@ -421,6 +401,14 @@ private:
   /*!@brief Deletes the elements currently selected in the scene.
    */
   void deleteSelectedElements();
+
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  cedar::proc::gui::GraphicsBase* forwardEvent(QGraphicsSceneDragDropEvent *pEvent);
 
 private slots:
   void promoteElementToExistingGroup();
