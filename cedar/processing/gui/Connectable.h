@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Element.h"
 #include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
@@ -70,7 +70,7 @@
 
 /*!@brief A gui base class for all items that represent cedar::proc::Connectables.
  */
-class cedar::proc::gui::Connectable : public QObject, public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::Connectable : public QObject, public cedar::proc::gui::Element
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

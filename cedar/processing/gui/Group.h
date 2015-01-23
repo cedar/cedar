@@ -145,7 +145,7 @@ public:
   void addElements(const std::list<QGraphicsItem*>& elements);
 
   //! Duplicates an element and places it at the given position.
-  cedar::proc::gui::GraphicsBase* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
+  cedar::proc::gui::Element* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
 
   //!@brief Sets the scene containing this item.
   void setScene(cedar::proc::gui::Scene* pScene);
@@ -353,8 +353,7 @@ private:
 
   qreal getIconSizeForCurrentMode() const;
 
-  //!@todo Should return cedar::proc::gui::Element
-  cedar::proc::gui::GraphicsBase* getUiElementFor(cedar::proc::ElementPtr element) const;
+  cedar::proc::gui::Element* getUiElementFor(cedar::proc::ElementPtr element) const;
 
   void readStickyNotes(const cedar::aux::ConfigurationNode& node);
 

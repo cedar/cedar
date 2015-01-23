@@ -513,13 +513,13 @@ void cedar::proc::gui::Group::addGuiItemsForGroup()
   }
 }
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::getUiElementFor(cedar::proc::ElementPtr element) const
+cedar::proc::gui::Element* cedar::proc::gui::Group::getUiElementFor(cedar::proc::ElementPtr element) const
 {
-  return this->getScene()->getGraphicsItemFor(element.get());
+  return this->getScene()->getGraphicsItemFor(element);
 }
 
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
+cedar::proc::gui::Element* cedar::proc::gui::Group::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
 {
   auto to_duplicate = this->getGroup()->getElement(elementName);
   auto to_duplicate_ui = this->getUiElementFor(to_duplicate);
@@ -786,30 +786,24 @@ void cedar::proc::gui::Group::addElements(const std::list<QGraphicsItem*>& eleme
   {
     cedar::proc::ElementPtr element;
     //!@todo This if/else if stuff could probably be replaced by just casting to a common cedar::proc::gui::Element class.
-    if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(*it))
+    if (auto element_item = dynamic_cast<cedar::proc::gui::Element*>(*it))
     {
-      element = graphics_base->getElement();
+      element = element_item->getElement();
 
       std::vector<QGraphicsItem*> items;
-      items.push_back(graphics_base);
+      items.push_back(element_item);
       while (!items.empty())
       {
         auto item = *items.begin();
         items.erase(items.begin());
 
-        if (auto graphics_child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+        if (auto child_element = dynamic_cast<cedar::proc::gui::Element*>(item))
         {
-          auto child_element = graphics_child->getElement();
-          // some objects such as data slots may not have an element
-          //!@todo Cast to a common superclass, proc::gui::Element here.
-          if (child_element)
-          {
-            all_elements.push_back(child_element);
+          all_elements.push_back(child_element->getElement());
 
-            for (int i = 0; i < graphics_child->childItems().size(); ++i)
-            {
-              items.push_back(graphics_child->childItems().at(i));
-            }
+          for (int i = 0; i < child_element->childItems().size(); ++i)
+          {
+            items.push_back(child_element->childItems().at(i));
           }
         }
       }
@@ -1586,12 +1580,14 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   }
 
   // if there is a configuration stored for the UI of the element, load it
-  std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode>::iterator iter
-    = this->mNextElementUiConfigurations.find(p_scene_element->getElement().get());
-  if (iter != this->mNextElementUiConfigurations.end())
+  if (auto element_item = dynamic_cast<cedar::proc::gui::Element*>(p_scene_element))
   {
-    p_scene_element->readConfiguration(iter->second);
-    this->mNextElementUiConfigurations.erase(iter);
+    auto iter = this->mNextElementUiConfigurations.find(element_item->getElement().get());
+    if (iter != this->mNextElementUiConfigurations.end())
+    {
+      element_item->readConfiguration(iter->second);
+      this->mNextElementUiConfigurations.erase(iter);
+    }
   }
 
   // see if there is a configuration for the UI item stored in the group's ui node

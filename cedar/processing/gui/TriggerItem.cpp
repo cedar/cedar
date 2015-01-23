@@ -75,7 +75,7 @@
 
 cedar::proc::gui::TriggerItem::TriggerItem()
 :
-cedar::proc::gui::GraphicsBase(30, 30,
+cedar::proc::gui::Element(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
@@ -90,7 +90,7 @@ cedar::proc::gui::GraphicsBase(30, 30,
 
 cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 :
-cedar::proc::gui::GraphicsBase(30, 30,
+cedar::proc::gui::Element(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
