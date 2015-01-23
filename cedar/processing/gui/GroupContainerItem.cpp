@@ -47,6 +47,8 @@
 
 // SYSTEM INCLUDES
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -55,13 +57,23 @@
 cedar::proc::gui::GroupContainerItem::GroupContainerItem(cedar::proc::gui::Group* pGroup)
 :
 cedar::proc::gui::GraphicsBase(400, 300, GRAPHICS_GROUP_UNKNOWN, GRAPHICS_GROUP_NONE, BASE_SHAPE_RECT),
-mpGroupContainer(new QGraphicsProxyWidget(this)),
-mpCloseButtonContainer(new QGraphicsProxyWidget(this)),
+mpContainer(new QGraphicsProxyWidget(this)),
 mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
 {
-  mpGroupContainer->setWidget(this->mpGroupWidget);
+  auto outer = new QWidget();
+  mpContainer->setWidget(outer);
+  auto layout = new QVBoxLayout();
+  layout->setContentsMargins(2, 2, 2 ,2);
+  outer->setLayout(layout);
+
+  auto titlebar_layout = new QHBoxLayout();
+  layout->addLayout(titlebar_layout);
   auto p_close_button = new QPushButton("close");
-  mpCloseButtonContainer->setWidget(p_close_button);
+  titlebar_layout->addStretch(1);
+  titlebar_layout->addWidget(p_close_button, 0);
+
+  layout->addWidget(this->mpGroupWidget);
+
   QObject::connect(p_close_button, SIGNAL(clicked()), this, SLOT(deleteLater()));
   this->setResizeable(true);
   this->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -69,7 +81,6 @@ mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
   this->setMinimumSize(QSizeF(400,300));
   this->updateResizeHandles();
   this->sizeChanged();
-  mpCloseButtonContainer->setGeometry(QRectF(0, -p_close_button->height(), mpCloseButtonContainer->geometry().width(), mpCloseButtonContainer->geometry().height()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,5 +100,5 @@ bool cedar::proc::gui::GroupContainerItem::canResize() const
 
 void cedar::proc::gui::GroupContainerItem::sizeChanged()
 {
-  this->mpGroupContainer->setGeometry(QRectF(0, 0, this->width(), this->height()));
+  this->mpContainer->setGeometry(QRectF(0, 0, this->width(), this->height()));
 }

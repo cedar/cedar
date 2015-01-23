@@ -58,6 +58,7 @@ mpView(new cedar::proc::gui::View())
 {
   auto layout = new QVBoxLayout();
   this->setLayout(layout);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(this->mpView);
 
   this->mpView->resetViewport();
@@ -74,6 +75,7 @@ mpView(new cedar::proc::gui::View())
 {
   auto layout = new QVBoxLayout();
   this->setLayout(layout);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(this->mpView);
 
   this->mpView->resetViewport();
