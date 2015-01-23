@@ -440,12 +440,26 @@ private:
 
   void setConnectionsVisible(bool visible, bool modifyCouplingCollections = false);
 
+  //! Fills the menu with the appropriate entries for serializing data.
+  void fillDataSerialization(QMenu* pMenu);
+
+  //! Fills in the actions for the display style.
+  void fillDisplayStyleMenu(QMenu* pMenu);
+
 private slots:
   void triggerableStarted();
 
   void triggerableStopped();
 
   void assignTriggerClicked();
+
+  void openProperties();
+
+  void displayStyleMenuTriggered(QAction* pAction);
+
+  void saveDataClicked();
+
+  void loadDataClicked();
 
 signals:
   //! translates a slot removed signal to Qt
