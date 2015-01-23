@@ -95,6 +95,8 @@ public:
   //! Returns all connectables in this collection as configurables.
   std::vector<cedar::aux::ConfigurablePtr> getContentsAsConfigurables() const;
 
+  bool isDeleteable() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -43,6 +43,8 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/Group.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
@@ -88,6 +90,26 @@ cedar::proc::gui::Connection::~Connection()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Connection::isDeleteable() const
+{
+  auto source = this->getSource();
+  auto target = this->getTarget();
+  CEDAR_ASSERT(source);
+  CEDAR_ASSERT(target);
+
+  auto source_item = dynamic_cast<cedar::proc::gui::Connectable*>(source->parentItem());
+  auto target_item = dynamic_cast<cedar::proc::gui::Connectable*>(target->parentItem());
+
+  if ( (!source_item || !source_item->isReadOnly()) && (!target_item || !target_item->isReadOnly()) )
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
 
 void cedar::proc::gui::Connection::setBaseLineWidth(double width)
 {
@@ -294,9 +316,56 @@ void cedar::proc::gui::Connection::disconnect()
 {
   this->mpSource->disconnect(this->mpTarget);
   this->mpSource->removeConnection(this);
-  this->mpSource = NULL;
+  this->mpSource = nullptr;
   this->mpTarget->removeConnection(this);
-  this->mpTarget = NULL;
+  this->mpTarget = nullptr;
+}
+
+void cedar::proc::gui::Connection::disconnectUnderlying()
+{
+  //!@todo This code can probably use some cleaning up
+  if (this->isDeleteable())
+  {
+    auto source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(this->getSource());
+    auto target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(this->getTarget());
+    if (source && target)
+    {
+      auto source_slot = boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source->getSlot());
+      auto target_slot = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(target->getSlot());
+
+      if (source_slot && target_slot)
+      {
+        source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
+      }
+    }
+    else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(this->getSource()))
+    {
+      if (!source->isReadOnly())
+      {
+        if (cedar::proc::gui::Connectable* target = dynamic_cast<cedar::proc::gui::Connectable*>(this->getTarget()))
+        {
+          if (!target->isReadOnly())
+          {
+            if (auto target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target->getConnectable()))
+            {
+              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target_triggerable);
+            }
+          }
+        }
+        else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(this->getTarget()))
+        {
+          if (!target->isReadOnly())
+          {
+            source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+          }
+        }
+      }
+    }
+    else
+    {
+      CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
+    }
+  }
 }
 
 void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity validity)
@@ -513,6 +582,16 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getSource()
 }
 
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getTarget()
+{
+  return this->mpTarget;
+}
+
+cedar::proc::gui::ConstGraphicsBase* cedar::proc::gui::Connection::getSource() const
+{
+  return this->mpSource;
+}
+
+cedar::proc::gui::ConstGraphicsBase* cedar::proc::gui::Connection::getTarget() const
 {
   return this->mpTarget;
 }
