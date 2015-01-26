@@ -771,8 +771,76 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   p_group->addElements(selected.toStdList());
 }
 
+void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
+{
+  QMenu menu;
+
+  auto p_assign_to_trigger = menu.addMenu("assign selected to trigger");
+  cedar::proc::gui::Connectable::buildConnectTriggerMenu
+  (
+    p_assign_to_trigger,
+    this->mGroup.get(),
+    this,
+    SLOT(assignSelectedToTrigger())
+  );
+
+  menu.exec(pContextMenuEvent->screenPos());
+
+  pContextMenuEvent->accept();
+}
+
+void cedar::proc::gui::Scene::assignSelectedToTrigger()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_ASSERT(action);
+
+  auto trigger = cedar::proc::gui::Connectable::getTriggerFromConnectTriggerAction(action, this->mGroup->getGroup());
+
+  // because changing triggers can mean that some trigger connections that are potentially in the selection get
+  // destroyed, we first make a list of the triggerables to disconnect
+  std::vector<cedar::proc::TriggerablePtr> to_disconnect;
+  for (auto selected : this->selectedItems())
+  {
+    auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(selected);
+    if (!connectable)
+    {
+      continue;
+    }
+
+    auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable->getElement());
+    if (triggerable)
+    {
+      to_disconnect.push_back(triggerable);
+    }
+  }
+
+  for (auto triggerable : to_disconnect)
+  {
+    if (trigger)
+    {
+      if (trigger->testIfCanBeConnectedTo(triggerable))
+      {
+        this->mGroup->getGroup()->connectTrigger(trigger, triggerable);
+      }
+    }
+    else if (triggerable->getParentTrigger())
+    {
+      this->mGroup->getGroup()->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
+    }
+  }
+}
+
 void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
 {
+  auto selected = this->selectedItems();
+  if (selected.size() > 1)
+  {
+    this->multiItemContextMenuEvent(pContextMenuEvent);
+
+    if (pContextMenuEvent->isAccepted())
+      return;
+  }
+
   this->QGraphicsScene::contextMenuEvent(pContextMenuEvent);
 
   if (pContextMenuEvent->isAccepted())
@@ -1154,7 +1222,7 @@ cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar:
   }
 }
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(const cedar::proc::Element* element)
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cedar::proc::ConstElement* element)
 {
   ElementMap::iterator iter = this->mElementMap.find(element);
 
@@ -1182,7 +1250,7 @@ cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc:
   return iter->second;
 }
 
-cedar::proc::gui::Group* cedar::proc::gui::Scene::getGroupFor(cedar::proc::Group* group)
+cedar::proc::gui::Group* cedar::proc::gui::Scene::getGroupFor(cedar::proc::ConstGroup* group)
 {
   GroupMap::iterator iter = this->mGroupMap.find(group);
   if (iter == this->mGroupMap.end())
@@ -1271,7 +1339,12 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
 
 cedar::proc::gui::GroupPtr cedar::proc::gui::Scene::getRootGroup()
 {
-  return mGroup;
+  return this->mGroup;
+}
+
+cedar::proc::gui::ConstGroupPtr cedar::proc::gui::Scene::getRootGroup() const
+{
+  return this->mGroup;
 }
 
 void cedar::proc::gui::Scene::handleTriggerModeChange()

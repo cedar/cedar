@@ -727,7 +727,16 @@ void cedar::proc::GroupFileFormatV1::readTriggers
 
     try
     {
-      group->add(trigger);
+      // if this is the default trigger and group already has one, only copy the configuration
+      if (trigger->getName() == "default trigger" && group->nameExists("default trigger"))
+      {
+        auto existing_trigger = group->getElement<cedar::proc::Trigger>("default trigger");
+        existing_trigger->copyFrom(trigger);
+      }
+      else
+      {
+        group->add(trigger);
+      }
     }
     catch (cedar::aux::ExceptionBase& e)
     {

@@ -51,13 +51,18 @@ cedar_add_library(cedarproc
   cedardev
   MOC_HEADERS
   experiment/Experiment.h
+  experiment/ActionParameter.h
+  experiment/PropertyParameter.h
+  experiment/ConnectableParameter.h
   experiment/StepPropertyParameter.h
   experiment/Supervisor.h
   experiment/condition/OnMatrixValue.h
   experiment/action/IterateDirectoryContents.h
   experiment/gui/ActionListParameter.h
   experiment/gui/ActionSequence.h
+  experiment/gui/ActionParameter.h
   experiment/gui/ExperimentItemWidget.h
+  experiment/gui/ConnectableParameter.h
   experiment/gui/StepPropertyParameter.h
   gui/ArchitectureWidgetList.h
   gui/ArchitectureScriptEditor.h
@@ -70,11 +75,13 @@ cedar_add_library(cedarproc
   gui/Connectable.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
+  gui/ElementTreeWidget.h
   gui/ExperimentDialog.h
   gui/FindDialog.h
   gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
+  gui/OneTimeMessageDialog.h
   gui/PlotWidget.h
   gui/ProjectionMappingParameter.h
   gui/PerformanceOverview.h
@@ -83,6 +90,7 @@ cedar_add_library(cedarproc
   gui/Scene.h
   gui/Settings.h
   gui/SettingsDialog.h
+  gui/SimulationControl.h
   gui/StepItem.h
   gui/TriggerItem.h
   gui/Group.h
