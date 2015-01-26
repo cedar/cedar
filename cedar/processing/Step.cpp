@@ -100,25 +100,7 @@ mAutoLockInputsAndOutputs(true)
 
 cedar::proc::Step::~Step()
 {
-  std::vector<cedar::proc::DataRole::Id> roles;
-  roles.push_back(cedar::proc::DataRole::BUFFER);
-  roles.push_back(cedar::proc::DataRole::OUTPUT);
-  for (auto role : roles)
-  {
-    // if any data of this step is recorded, we have to remove them from the recorder
-    if (this->hasSlotForRole(role))
-    {
-      // we have to check every buffer if it is registered at recorder
-      for (auto slot : this->getDataSlots(role))
-      {
-        std::string data_path = slot.second->getDataPath().toString();
-        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(data_path))
-        {
-          cedar::aux::RecorderSingleton::getInstance()->unregisterData(data_path);
-        }
-      }
-    }
-  }
+  this->unregisterRecordedData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -613,4 +595,32 @@ bool cedar::proc::Step::isRecorded() const
 void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
   this->revalidateInputSlot(slot);
+}
+
+std::map<std::string, cedar::unit::Time> cedar::proc::Step::unregisterRecordedData() const
+{
+  std::vector<cedar::proc::DataRole::Id> roles;
+  roles.push_back(cedar::proc::DataRole::BUFFER);
+  roles.push_back(cedar::proc::DataRole::OUTPUT);
+  std::map<std::string, cedar::unit::Time> removed_recorded_data;
+  for (auto role : roles)
+  {
+    // if any data of this step is recorded, we have to remove them from the recorder
+    if (this->hasSlotForRole(role))
+    {
+      // we have to check every buffer if it is registered at recorder
+      for (auto slot : this->getDataSlots(role))
+      {
+        std::string data_path = slot.second->getDataPath().toString();
+        auto data = slot.second->getData();
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(data))
+        {
+          // remember the name and time
+          removed_recorded_data[data_path] = cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(data);
+          cedar::aux::RecorderSingleton::getInstance()->unregisterData(data);
+        }
+      }
+    }
+  }
+  return removed_recorded_data;
 }
