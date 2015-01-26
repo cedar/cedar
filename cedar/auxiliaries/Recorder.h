@@ -150,6 +150,15 @@ public:
   //!@brief Returns all registered DataPtr by name and their record interval
   std::map<std::string, cedar::unit::Time> getRegisteredData() const;
 
+  //!@brief Starts all threads.
+  void startAllRecordings();
+
+  //!@brief Stops all threads.
+  void stopAllRecordings();
+
+  //!@brief Removes all threads.
+  void removeAllRecordings();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -188,7 +197,8 @@ protected:
 
 private:
   //!@brief The registered DataSpectators.
-  cedar::aux::ThreadCollection mDataSpectatorCollection;
+  std::map<std::string, cedar::aux::DataSpectatorPtr> mDataSpectators;
+  QReadWriteLock* mpListLock;
 
   //!@brief The output directory.
   std::string mOutputDirectory;
@@ -197,7 +207,6 @@ private:
   std::string mProjectName;
 
   std::string mSubFolder;
-
 };
 
 
