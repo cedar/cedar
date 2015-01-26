@@ -113,7 +113,11 @@ void cedar::aux::gui::StringParameter::parameterValueChanged()
 {
   auto parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   CEDAR_DEBUG_ASSERT(parameter);
-  this->mpEdit->setText(QString::fromStdString(parameter->getValue()));
+  QString value = QString::fromStdString(parameter->getValue());
+  if (this->mpEdit->text() != value)
+  {
+    this->mpEdit->setText(value);
+  }
 }
 
 void cedar::aux::gui::StringParameter::textEdited(const QString& text)
