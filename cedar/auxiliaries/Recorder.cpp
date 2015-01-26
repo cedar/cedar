@@ -249,9 +249,33 @@ cedar::unit::Time cedar::aux::Recorder::getRecordIntervalTime(const std::string&
   }
 }
 
+cedar::unit::Time cedar::aux::Recorder::getRecordIntervalTime(cedar::aux::ConstDataPtr data) const
+{
+  for (auto data_spectator : mDataSpectators)
+  {
+    if (data_spectator.second->getData() == data)
+    {
+      return data_spectator.second->getRecordIntervalTime();
+    }
+  }
+  CEDAR_THROW(cedar::aux::NotFoundException, "No data found.");
+}
+
 bool cedar::aux::Recorder::isRegistered(const std::string& name) const
 {
   return this->mDataSpectators.find(name) != this->mDataSpectators.end();
+}
+
+bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data) const
+{
+  for (auto data_spectator : mDataSpectators)
+  {
+    if (data_spectator.second->getData() == data)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName)

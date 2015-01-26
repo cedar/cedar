@@ -1229,11 +1229,29 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     mElements[instanceName] = element;
     element->resetChangedStates(true);
   }
+  // remove element from old group
+  std::map<std::string, cedar::unit::Time> recorded_data;
   if (cedar::proc::GroupPtr old_group = element->getGroup()) // element was registered elsewhere
   {
+    // we only have to remember recorded data for steps
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+    {
+      recorded_data = step->unregisterRecordedData();
+    }
     old_group->remove(element);
   }
   element->setGroup(boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
+
+  // we might have to restore recorder entries
+  if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+  {
+    for (auto restored_record_entry : recorded_data)
+    {
+      cedar::proc::DataPath data_path(restored_record_entry.first);
+      auto slot = step->getSlot(data_path.getDataRole(), data_path.getDataName());
+      cedar::aux::RecorderSingleton::getInstance()->registerData(slot->getData(), restored_record_entry.second, slot->getDataPath().toString());
+    }
+  }
 
   this->signalNewElementAdded(element);
 
@@ -1982,6 +2000,20 @@ void cedar::proc::Group::updateObjectName(cedar::proc::Element* object)
     object->setName(old_iter->first);
     CEDAR_THROW(cedar::proc::DuplicateNameException, "Element name is already in use."
          " Old name of the element: \"" + old_iter->first + "\", requested name: \"" + object->getName() + "\".");
+  }
+
+  // dump recorded data and restore with new name
+  // we only have to remember recorded data for steps
+  std::map<std::string, cedar::unit::Time> recorded_data;
+  if (auto step = dynamic_cast<cedar::proc::Step*>(object))
+  {
+    recorded_data = step->unregisterRecordedData();
+    for (auto restored_record_entry : recorded_data)
+    {
+      cedar::proc::DataPath data_path(restored_record_entry.first);
+      auto slot = step->getSlot(data_path.getDataRole(), data_path.getDataName());
+      cedar::aux::RecorderSingleton::getInstance()->registerData(slot->getData(), restored_record_entry.second, slot->getDataPath().toString());
+    }
   }
 
   // erase the iterator

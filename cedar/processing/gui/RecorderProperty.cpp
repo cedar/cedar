@@ -55,7 +55,7 @@ cedar::proc::gui::RecorderProperty::RecorderProperty
 mDataSlot(slot)
 {
   this->mRecorderWidget = parent;
-  //Get slot properties.
+  // Get slot properties.
   bool registered = cedar::aux::RecorderSingleton::getInstance()->isRegistered(mDataSlot->getDataPath().toString());
 
   //Create name.
@@ -80,21 +80,20 @@ mDataSlot(slot)
   mStepSize->setMaximum(1000);
   mStepSize->setMinimum(0);
 
+  if (registered)
   {
-    if (registered)
-    {
-      cedar::unit::Time milli_second(1.0 * cedar::unit::milli * cedar::unit::second);
-      mStepSize->setValue(cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(this->mDataSlot->getDataPath().toString()) / milli_second);
-    }
-    else
-    {
-      // step size in ms
-      double value = 200.0;
-
-      mStepSize->setValue(static_cast<int>(value));
-      mStepSizeValue = cedar::unit::Time(value * cedar::unit::milli * cedar::unit::seconds);
-    }
+    cedar::unit::Time milli_second(1.0 * cedar::unit::milli * cedar::unit::second);
+    mStepSize->setValue(cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(this->mDataSlot->getDataPath().toString()) / milli_second);
   }
+  else
+  {
+    // step size in ms
+    double value = 200.0;
+
+    mStepSize->setValue(static_cast<int>(value));
+    mStepSizeValue = cedar::unit::Time(value * cedar::unit::milli * cedar::unit::seconds);
+  }
+
   mStepSize->setEnabled(registered);
   connect(mStepSize, SIGNAL(valueChanged(int)), this, SLOT(updateStepSize(int)));
   connect(mStepSize, SIGNAL(valueChanged(int)), this, SIGNAL(changed()));
