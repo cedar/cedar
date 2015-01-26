@@ -2010,10 +2010,8 @@ void cedar::proc::Group::updateObjectName(cedar::proc::Element* object)
     recorded_data = step->unregisterRecordedData();
     for (auto restored_record_entry : recorded_data)
     {
-      std::cout << "Renaming, before: " << restored_record_entry.first << std::endl;
       cedar::proc::DataPath data_path(restored_record_entry.first);
       auto slot = step->getSlot(data_path.getDataRole(), data_path.getDataName());
-      std::cout << "Renaming, now: " << slot->getDataPath().toString() << std::endl;
       cedar::aux::RecorderSingleton::getInstance()->registerData(slot->getData(), restored_record_entry.second, slot->getDataPath().toString());
     }
   }
