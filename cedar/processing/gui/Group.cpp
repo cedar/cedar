@@ -313,7 +313,7 @@ QBrush cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigge
 
   if (mTriggerColors.empty())
   {
-    auto triggers = this->mGroup->findAll<cedar::proc::Trigger>(false);
+    auto triggers = this->mGroup->findAll<cedar::proc::Trigger>(true);
     std::map<std::string, cedar::proc::TriggerPtr> sorted_triggers;
 
     for (auto trigger : triggers)
