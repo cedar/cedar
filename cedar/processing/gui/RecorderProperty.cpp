@@ -57,7 +57,6 @@ mDataSlot(slot)
   this->mRecorderWidget = parent;
   // Get slot properties.
   bool registered = cedar::aux::RecorderSingleton::getInstance()->isRegistered(mDataSlot->getDataPath().toString());
-
   //Create name.
   QLabel* label = new QLabel(QString::fromStdString(mDataSlot->getName()));
   //label->setMinimumWidth(180);
