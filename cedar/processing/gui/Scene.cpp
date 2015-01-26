@@ -818,7 +818,10 @@ void cedar::proc::gui::Scene::assignSelectedToTrigger()
   {
     if (trigger)
     {
-      this->mGroup->getGroup()->connectTrigger(trigger, triggerable);
+      if (trigger->testIfCanBeConnectedTo(triggerable))
+      {
+        this->mGroup->getGroup()->connectTrigger(trigger, triggerable);
+      }
     }
     else if (triggerable->getParentTrigger())
     {

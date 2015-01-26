@@ -146,6 +146,46 @@ std::string nameTrigger(cedar::proc::TriggerPtr trigger)
   return nameTrigger(trigger.get());
 }
 
+bool cedar::proc::Trigger::canTrigger(cedar::proc::TriggerablePtr target) const
+{
+  std::string reason;
+  return this->canTrigger(target, reason);
+}
+
+bool cedar::proc::Trigger::canTrigger(cedar::proc::TriggerablePtr, std::string&) const
+{
+  // default implementation, can be overridden in child classes
+  return true;
+}
+
+bool cedar::proc::Trigger::testIfCanBeConnectedTo(cedar::proc::TriggerablePtr target) const
+{
+  if (this->isListener(target))
+  {
+    return false;
+  }
+
+  if (!this->canTrigger(target))
+  {
+    return false;
+  }
+  return true;
+}
+
+void cedar::proc::Trigger::checkIfCanBeConnectedTo(cedar::proc::TriggerablePtr target) const
+{
+  if (this->isListener(target))
+  {
+    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "The given triggerable is already a listener of this trigger.");
+  }
+
+  std::string reason;
+  if (!this->canTrigger(target, reason))
+  {
+    CEDAR_THROW(cedar::proc::InvalidTriggerConnectionException, reason);
+  }
+}
+
 std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> cedar::proc::Trigger::getTriggeringOrder() const
 {
   std::map<unsigned int, std::set<cedar::proc::TriggerablePtr>> copy;

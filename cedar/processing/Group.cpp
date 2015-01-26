@@ -1651,14 +1651,21 @@ void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::p
   }
 
   // check connection
-  if (this->isConnected(source, target))
+  try
+  {
+    source->checkIfCanBeConnectedTo(target);
+  }
+  catch (const cedar::proc::DuplicateConnectionException& e)
   {
     if (source->getName() == "default trigger")
     {
       // this is ok, might happen (connections to the default trigger are saved, but also created when the element is added)
-      return;
     }
-    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
+    else
+    {
+      // this is not ok, rethrow
+      throw e;
+    }
   }
 
   // create connection
@@ -1759,7 +1766,8 @@ void cedar::proc::Group::disconnectSlots
 
 void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
 {
-  for (TriggerConnectionVector::iterator it = mTriggerConnections.begin(); it != mTriggerConnections.end(); ++it)
+  // iterate all connections to find the one that matches the given combination of source and target
+  for (auto it = mTriggerConnections.begin(); it != mTriggerConnections.end(); ++it)
   {
     if ((*it)->equals(source, target))
     {
@@ -1771,12 +1779,16 @@ void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar
         if (this->nameExists("default trigger"))
         {
           auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default trigger");
-          this->connectTrigger(default_trigger, target);
+          if (default_trigger->canTrigger(target))
+          {
+            this->connectTrigger(default_trigger, target);
+          }
         }
       }
       return;
     }
   }
+  // if none of the connections matched, throw an exception because nothing was disconnected
   CEDAR_THROW
   (
     cedar::proc::MissingConnectionException,
@@ -1958,14 +1970,7 @@ bool cedar::proc::Group::isConnected(const std::string& source, const std::strin
 
 bool cedar::proc::Group::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const
 {
-  for (size_t i = 0; i < mTriggerConnections.size(); ++i)
-  {
-    if (mTriggerConnections.at(i)->equals(source, target))
-    {
-      return true;
-    }
-  }
-  return false;
+  return source->isListener(target);
 }
 
 void cedar::proc::Group::updateObjectName(cedar::proc::Element* object)
