@@ -457,6 +457,19 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   }
 }
 
+QColor cedar::proc::gui::Connectable::getBackgroundColor() const
+{
+  return this->mBackgroundColor;
+}
+
+void cedar::proc::gui::Connectable::setBackgroundColor(const QColor& color)
+{
+  this->setFillColor(color);
+  this->mBackgroundColor = color;
+  this->mPreviousFillColor = color;
+  this->updateTriggerColorState();
+}
+
 void cedar::proc::gui::Connectable::translateStartedSignal()
 {
   emit this->triggerableStartedSignal();

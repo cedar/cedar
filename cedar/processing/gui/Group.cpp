@@ -999,6 +999,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
       }
     }
 
+    // read background color
     auto color_node = node.find("background color");
     if (color_node != node.not_found())
     {
@@ -1116,12 +1117,14 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
     generic.put_child("architecture widgets", architecture_plots);
   }
 
-  if (this->mBackgroundColor.isValid())
+  // write background color
+  auto bg_color = this->getBackgroundColor();
+  if (bg_color.isValid())
   {
     std::stringstream color_str;
-    color_str << this->mBackgroundColor.red() << ","
-        << this->mBackgroundColor.green() << ","
-        << this->mBackgroundColor.blue();
+    color_str << bg_color.red() << ","
+        << bg_color.green() << ","
+        << bg_color.blue();
     generic.put("background color", color_str.str());
   }
 
@@ -1907,13 +1910,6 @@ void cedar::proc::gui::Group::backgroundColorActionTriggered()
 
   QColor new_color = p_action->data().value<QColor>();
   this->setBackgroundColor(new_color);
-}
-
-void cedar::proc::gui::Group::setBackgroundColor(const QColor& color)
-{
-  this->setFillColor(color);
-  this->mBackgroundColor = color;
-  this->updateTriggerColorState();
 }
 
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

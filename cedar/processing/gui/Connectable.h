@@ -226,7 +226,7 @@ public:
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
 
   bool canDuplicate() const;
-  
+
   //! Fills the triggers in the group into the action as a submenu
   static void buildConnectTriggerMenu
   (
@@ -372,6 +372,13 @@ protected:
 
   void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
+  /*! Sets the desired background color of the connectable. Note that this may not be the color in which the connectable
+   * is drawn, e.g., when the group is showing trigger colors.
+   */
+  void setBackgroundColor(const QColor& color);
+
+  QColor getBackgroundColor() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -489,6 +496,8 @@ private:
   bool mShowingTriggerColor;
 
   std::vector<QGraphicsItem*> mTriggerChainVisualization;
+
+  QColor mBackgroundColor;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
