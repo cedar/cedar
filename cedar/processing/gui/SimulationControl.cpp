@@ -209,7 +209,7 @@ void cedar::proc::gui::SimulationControl::updateAllTriggerColors()
 QWidget* cedar::proc::gui::SimulationControl::getColorWidget(QTreeWidgetItem* pItem)
 {
   QWidget* p_outer = this->mpTree->itemWidget(pItem, 0);
-  if (p_outer->layout() == nullptr)
+  if (!p_outer || p_outer->layout() == nullptr)
   {
     return nullptr;
   }
