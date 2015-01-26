@@ -96,7 +96,7 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, ced
     CEDAR_THROW(cedar::aux::DuplicateNameException, "The data with name " + name + " is already registered");
   }
 
-  // create new DataSpectaor and push it to the DataSpectator list
+  // create new DataSpectator and push it to the DataSpectator list
   cedar::aux::DataSpectatorPtr spec
     = cedar::aux::DataSpectatorPtr(new cedar::aux::DataSpectator(toSpectate, recordInterval, name));
   QWriteLocker locker(mpListLock);
