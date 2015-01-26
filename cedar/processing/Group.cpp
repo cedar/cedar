@@ -1506,6 +1506,7 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
 
 cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupPath& name) const
 {
+  //!@todo this should use the functionality of group path instead of splitting the string by its own
   ElementMap::const_iterator iter;
   std::string first;
   std::string rest;

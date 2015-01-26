@@ -100,6 +100,25 @@ mAutoLockInputsAndOutputs(true)
 
 cedar::proc::Step::~Step()
 {
+  std::vector<cedar::proc::DataRole::Id> roles;
+  roles.push_back(cedar::proc::DataRole::BUFFER);
+  roles.push_back(cedar::proc::DataRole::OUTPUT);
+  for (auto role : roles)
+  {
+    // if any data of this step is recorded, we have to remove them from the recorder
+    if (this->hasSlotForRole(role))
+    {
+      // we have to check every buffer if it is registered at recorder
+      for (auto slot : this->getDataSlots(role))
+      {
+        std::string data_path = slot.second->getDataPath().toString();
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(data_path))
+        {
+          cedar::aux::RecorderSingleton::getInstance()->unregisterData(data_path);
+        }
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -581,7 +600,7 @@ bool cedar::proc::Step::isRecorded() const
       cedar::proc::Connectable::SlotList dataSlots = this->getOrderedDataSlots(slotTypes[s]);
       for (unsigned int i = 0; i < dataSlots.size(); i++)
       {
-        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getData()))
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getDataPath().toString()))
         {
           return true;
         }

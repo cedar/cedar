@@ -69,13 +69,13 @@ cedar::proc::gui::RecorderWidget::~RecorderWidget()
   delete mMainLayout;
 }
 
-
 void cedar::proc::gui::RecorderWidget::setStep(cedar::proc::StepPtr step)
 {
   this->mStepToConfigure = step;
   connect(step.get(), SIGNAL(nameChanged()), this, SLOT(updateName()));
   refreshWidget();
 }
+
 void cedar::proc::gui::RecorderWidget::refreshWidget()
 {
   // reset the widget
@@ -109,7 +109,7 @@ void cedar::proc::gui::RecorderWidget::refreshWidget()
 
       for (unsigned int i = 0; i < dataSlots.size(); i++)
       {
-        auto property = new RecorderProperty(this, mStepToConfigure->getName(), dataSlots[i]);
+        auto property = new RecorderProperty(this, dataSlots[i]);
         mMainLayout->addLayout(property);
         QObject::connect(property, SIGNAL(changed()), this, SIGNAL(settingsChanged()));
       }
@@ -117,6 +117,12 @@ void cedar::proc::gui::RecorderWidget::refreshWidget()
   }
 
   mMainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+}
+
+void cedar::proc::gui::RecorderWidget::clear()
+{
+  this->mStepToConfigure.reset();
+  this->clearLayout();
 }
 
 void cedar::proc::gui::RecorderWidget::clearLayout()
@@ -201,7 +207,7 @@ void cedar::proc::gui::RecorderWidget::updateName()
         const cedar::proc::Connectable::SlotList dataSlots = pStep->getOrderedDataSlots(slotTypes[s]);
         for (unsigned int i = 0; i < dataSlots.size(); ++i)
         {
-          if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getData()))
+          if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getDataPath().toString()))
           {
             cedar::aux::RecorderSingleton::getInstance()->renameRegisteredData
                                                           (

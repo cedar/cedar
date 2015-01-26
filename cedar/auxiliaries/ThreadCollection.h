@@ -47,7 +47,8 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
-#include <vector>
+#include <map>
+#include <string>
 
 /*!@brief This class manages multiple threads.
  *            It provides some functions and tools for easily start, stop and access the threads.
@@ -71,7 +72,7 @@ public:
 
 public:
   //!@brief Adds a new thread to the ThreadCollection.
-  void addThread(cedar::aux::ThreadWrapperPtr thread);
+  void addThread(const std::string& name, cedar::aux::ThreadWrapperPtr thread);
 
   //!@brief Starts all threads in the ThreadCollection.
   void startAll();
@@ -83,24 +84,36 @@ public:
   void removeAll();
 
   //!@brief Removes a thread from the collection.
-  void remove(int index);
+  void remove(const std::string& thread);
 
   //!@brief Returns the number of Threads in the ThreadCollection.
   unsigned int size() const;
 
-  //!@brief Returns thread i of the ThreadCollection and cast it to T.
+  //!@brief Returns thread of the ThreadCollection and cast it to T.
   template <typename T>
-  boost::shared_ptr<T> get(unsigned int index) const
+  boost::shared_ptr<T> get(const std::string& thread) const
   {
     QReadLocker locker(mpListLock);
-    return boost::static_pointer_cast<T>(mThreads[index]);
+    auto my_thread = mThreads.find(thread);
+    if (my_thread != mThreads.end())
+    {
+      auto my_thread_pointer = boost::static_pointer_cast<T>(my_thread->second);
+      return my_thread_pointer;
+    }
+    return boost::shared_ptr<T>();
   }
+
+  std::map<std::string, cedar::aux::ThreadWrapperPtr>& getCollection();
+
+  const std::map<std::string, cedar::aux::ThreadWrapperPtr>& getCollection() const;
+
+  bool isRegistered(const std::string& name) const;
 
   //----------------------------------------------------------------------------
   // private members
   //----------------------------------------------------------------------------
 private:
-  std::vector<cedar::aux::ThreadWrapperPtr> mThreads;
+  std::map<std::string, cedar::aux::ThreadWrapperPtr> mThreads;
   QReadWriteLock* mpListLock;
 };
 

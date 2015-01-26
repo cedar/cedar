@@ -51,41 +51,53 @@ cedar::aux::ThreadCollection::~ThreadCollection()
   delete mpListLock;
 }
 
-void cedar::aux::ThreadCollection::addThread(cedar::aux::ThreadWrapperPtr thread)
+void cedar::aux::ThreadCollection::addThread(const std::string& name, cedar::aux::ThreadWrapperPtr thread)
 {
   QWriteLocker locker(mpListLock);
-  mThreads.push_back(thread);
+  if (mThreads.find(name) != mThreads.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Thread of name \"" + name + "\" is already registered.");
+  }
+  mThreads[name] = thread;
 }
 
 void cedar::aux::ThreadCollection::startAll()
 {
-  QWriteLocker locker(mpListLock);
-  for (unsigned int i = 0; i < mThreads.size(); i++)
+  QReadLocker locker(mpListLock);
+  for (auto thread : mThreads)
   {
-    mThreads[i]->start();
+    thread.second->start();
   }
 }
 
 void cedar::aux::ThreadCollection::stopAll()
 {
-  QWriteLocker locker(mpListLock);
+  QReadLocker locker(mpListLock);
   //First performing a requestStop() to stop all thread as fast as possible without blocking
-  for (unsigned int i = 0; i < mThreads.size(); i++)
+  for (auto thread : mThreads)
   {
-    mThreads[i]->requestStop();
+    thread.second->requestStop();
   }
 
   //Waiting for each thread stopped.
-  for (unsigned int i = 0; i < mThreads.size(); i++)
+  for (auto thread : mThreads)
   {
-    mThreads[i]->stop();
+    thread.second->stop();
   }
 }
 
-void cedar::aux::ThreadCollection::remove(int index)
+void cedar::aux::ThreadCollection::remove(const std::string& thread)
 {
   QWriteLocker locker(mpListLock);
-  mThreads.erase(mThreads.begin()+index);
+  auto it = mThreads.find(thread);
+  if (it !=  mThreads.end())
+  {
+    mThreads.erase(it);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "Thread of name \"" + thread + "\" is not registered.");
+  }
 }
 
 void cedar::aux::ThreadCollection::removeAll()
@@ -98,4 +110,19 @@ unsigned int cedar::aux::ThreadCollection::size() const
 {
   QReadLocker locker(mpListLock);
   return mThreads.size();
+}
+
+std::map<std::string, cedar::aux::ThreadWrapperPtr>& cedar::aux::ThreadCollection::getCollection()
+{
+  return this->mThreads;
+}
+
+const std::map<std::string, cedar::aux::ThreadWrapperPtr>& cedar::aux::ThreadCollection::getCollection() const
+{
+  return this->mThreads;
+}
+
+bool cedar::aux::ThreadCollection::isRegistered(const std::string& name) const
+{
+  return this->mThreads.find(name) != this->mThreads.end();
 }
