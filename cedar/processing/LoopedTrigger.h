@@ -122,6 +122,12 @@ public:
   //! If false, this trigger should not be started with start all triggers calls.
   bool startWithAll() const;
 
+  // override name hiding
+  using cedar::proc::Trigger::canTrigger;
+
+  bool canTrigger(cedar::proc::TriggerablePtr target, std::string& reason) const;
+
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();

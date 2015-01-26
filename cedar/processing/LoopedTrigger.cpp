@@ -118,6 +118,20 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::LoopedTrigger::canTrigger(cedar::proc::TriggerablePtr triggerable, std::string& reason) const
+{
+  // looped triggers can only be connected to triggerables that are themselves looped
+  if (!triggerable->isLooped())
+  {
+    reason = "Cannot connect looped trigger to the target connectable because the target is not looped.";
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+
 bool cedar::proc::LoopedTrigger::startWithAll() const
 {
   cedar::aux::Parameter::ReadLocker locker(this->_mStartWithAll);
