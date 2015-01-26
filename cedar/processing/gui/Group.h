@@ -351,8 +351,6 @@ private:
    */
   void restoreConnections();
 
-  void setBackgroundColor(const QColor& color);
-
   void linkedChanged(bool readOnly);
 
   void lastReadConfigurationChanged();
@@ -455,8 +453,6 @@ private:
 
   //! Configuration of the next element that is added to the scene.
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
-
-  QColor mBackgroundColor;
 
   cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 
