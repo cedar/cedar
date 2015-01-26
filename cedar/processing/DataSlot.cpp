@@ -264,3 +264,8 @@ void cedar::proc::DataSlot::setValidityInfo(const std::string& info)
 {
   this->mValidityInfo = info;
 }
+
+cedar::proc::DataPath cedar::proc::DataSlot::getDataPath() const
+{
+  return cedar::proc::DataPath(this->mpParent->getFullPath(), this->getRole(), this->getName());
+}

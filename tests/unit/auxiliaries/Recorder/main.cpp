@@ -78,9 +78,9 @@ void run_test()
   }
 
   //Creating new DataPtr
-  cedar::aux::MatDataPtr dataPtr = cedar::aux::MatDataPtr( new cedar::aux::MatData( mat1));
-  cedar::aux::MatDataPtr dataPtr2 = cedar::aux::MatDataPtr( new cedar::aux::MatData( mat2));
-  cedar::aux::MatDataPtr dataPtr3 = cedar::aux::MatDataPtr( new cedar::aux::MatData( mat3));
+  cedar::aux::MatDataPtr dataPtr = cedar::aux::MatDataPtr(new cedar::aux::MatData(mat1));
+  cedar::aux::MatDataPtr dataPtr2 = cedar::aux::MatDataPtr(new cedar::aux::MatData(mat2));
+  cedar::aux::MatDataPtr dataPtr3 = cedar::aux::MatDataPtr(new cedar::aux::MatData(mat3));
 
   //Registering DataPtr
   cedar::aux::RecorderSingleton::getInstance()->registerData(dataPtr, timestep, "Mat1");
