@@ -68,6 +68,8 @@ class TestModule : public cedar::proc::Step
 {
 public:
   TestModule()
+  :
+  cedar::proc::Step(true)
   {
   }
 
@@ -569,6 +571,7 @@ void run_test()
   std::cout << "testing connecting triggers to groups" << std::endl;
   cedar::proc::GroupPtr group_trigger(new cedar::proc::Group());
   cedar::proc::GroupPtr group_triggered(new cedar::proc::Group());
+  group_triggered->setIsLooped(true);
   cedar::proc::LoopedTriggerPtr new_trigger(new cedar::proc::LoopedTrigger());
   group_trigger->add(group_triggered, "group");
   group_trigger->add(new_trigger, "trigger");
