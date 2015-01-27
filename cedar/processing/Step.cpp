@@ -100,6 +100,7 @@ mAutoLockInputsAndOutputs(true)
 
 cedar::proc::Step::~Step()
 {
+  this->unregisterRecordedData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -586,7 +587,7 @@ bool cedar::proc::Step::isRecorded() const
       cedar::proc::Connectable::SlotList dataSlots = this->getOrderedDataSlots(slotTypes[s]);
       for (unsigned int i = 0; i < dataSlots.size(); i++)
       {
-        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getData()))
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getDataPath().toString()))
         {
           return true;
         }
@@ -599,4 +600,32 @@ bool cedar::proc::Step::isRecorded() const
 void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
   this->revalidateInputSlot(slot);
+}
+
+std::map<std::string, cedar::unit::Time> cedar::proc::Step::unregisterRecordedData() const
+{
+  std::vector<cedar::proc::DataRole::Id> roles;
+  roles.push_back(cedar::proc::DataRole::BUFFER);
+  roles.push_back(cedar::proc::DataRole::OUTPUT);
+  std::map<std::string, cedar::unit::Time> removed_recorded_data;
+  for (auto role : roles)
+  {
+    // if any data of this step is recorded, we have to remove them from the recorder
+    if (this->hasSlotForRole(role))
+    {
+      // we have to check every buffer if it is registered at recorder
+      for (auto slot : this->getDataSlots(role))
+      {
+        std::string data_path = slot.second->getDataPath().toString();
+        auto data = slot.second->getData();
+        if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(data))
+        {
+          // remember the name and time
+          removed_recorded_data[data_path] = cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(data);
+          cedar::aux::RecorderSingleton::getInstance()->unregisterData(data);
+        }
+      }
+    }
+  }
+  return removed_recorded_data;
 }
