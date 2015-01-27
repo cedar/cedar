@@ -182,10 +182,13 @@ public:
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
-  /*!
-   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
+  /*! Attaches a marker to this plot.
    */
   void attachMarker(QwtPlotMarker *pMarker);
+
+  /*! Detaches the given marker from this plot. Also deletes the marker.
+   */
+  void detachMarker(QwtPlotMarker *pMarker);
 
   /*!@brief Detaches and deletes all markers added to this plot.
    *
@@ -204,6 +207,11 @@ public:
 
   //! Returns whether or not autoscaling is enabled for this plot.
   bool autoScalingEnabled() const;
+
+  //! Sets whether the plot emits dataChanged for 0d data
+  void setAccepts0DData(bool accept);
+
+  void getStyleFor(cedar::aux::ConstDataPtr data, QPen& pen, QBrush& brush) const;
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -292,6 +300,11 @@ private:
 
   //! The worker that does actual converison.
   cedar::aux::gui::detail::QwtLinePlotWorkerPtr mConversionWorker;
+
+  std::vector<QwtPlotMarker*> mMarkers;
+
+  //! If true, the plot will not complain about 0d data. Otherwise, 0D data will lead it to emit a dataChanged signal.
+  bool mPlot0D;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
