@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,102 +22,98 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Recorder.cpp
+    File:        DataPath.h
 
-    Maintainer:  Christian Bodenstein
-    Email:       christian.bodenstein@ini.rub.de
-    Date:        2013 08 19
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2015 01 23
 
-    Description: Header for the @em cedar::aux::gui::RecorderWidget class.
+    Description: Header file for the class cedar::proc::DataPath.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_DATA_PATH_H
+#define CEDAR_PROC_DATA_PATH_H
 
-#ifndef CEDAR_PROC_GUI_RECORDER_WIDGET_H
-#define CEDAR_PROC_GUI_RECORDER_WIDGET_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/processing/DataRole.h"
+#include "cedar/processing/GroupPath.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Step.fwd.h"
-#include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/DataPath.fwd.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
-#include <QVBoxLayout>
 
-/*!@brief GUI representation for the recorder tool.
-  */
-class cedar::proc::gui::RecorderWidget
-:
-public QWidget
+
+/*!@todo describe.
+ *
+ * @todo describe more.
+ */
+class cedar::proc::DataPath
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The public constructor.
-  RecorderWidget();
+  //!@brief The standard constructor.
+  DataPath(cedar::proc::GroupPath pathToElement, cedar::proc::DataRole::Id role, const std::string& dataName);
+  DataPath(const std::string& path);
 
-  //!@brief The public constructor.
-  RecorderWidget(QWidget* pParent);
-
-  //!@brief The public destructor.
-  ~RecorderWidget();
+  //!@brief Destructor
+  virtual ~DataPath();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Sets the obtained step and recreating the widget to set the record parameters.
-  void setStep(cedar::proc::StepPtr step);
+  cedar::proc::GroupPath getPathToElement() const;
+  cedar::proc::DataRole::Id getDataRole() const;
+  std::string getDataName() const;
+  void parseFromString(const std::string& dataPath);
+  void setDataPath(cedar::proc::GroupPath pathToElement, cedar::proc::DataRole::Id role, const std::string& dataName);
+  std::string toString() const;
 
-  void clear();
-
-  /*!@brief If the name of a Step has changed all slots have to unregister in the recorder and
-   *registered with the new name.
-   */
-  void emitStepRegisteredinRecorder();
-
-signals:
-  //! signal that a new step is registered in recorder
-  void stepRegisteredinRecorder();
-
-  //! signal that the settings changed
-  void settingsChanged();
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Updates the GUI.
-  void refreshWidget();
-
-  //!@brief Create the headers for the Widget.
-  void createHeader(const std::string& name);
-
-  //!@brief Create a header for a role section.
-  void createRoleSection(const std::string& name);
-
-  //!@brief Resets the widget and its GUI elements.
-  void clearLayout();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 private:
-  //!@brief The step currently displayed.
-  cedar::proc::StepPtr mStepToConfigure;
+  cedar::proc::GroupPath mPathToElement;
+  cedar::proc::DataRole::Id mDataRole;
+  std::string mDataName;
 
-  //!@brief The layout for this widget.
-  QVBoxLayout* mMainLayout;
-};
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_RECORDER_WIDGET_H
+private:
+  // none yet
+
+}; // class cedar::proc::DataPath
+
+#endif // CEDAR_PROC_DATA_PATH_H
+

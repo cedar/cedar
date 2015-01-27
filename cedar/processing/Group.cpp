@@ -1221,11 +1221,29 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     mElements[instanceName] = element;
     element->resetChangedStates(true);
   }
+  // remove element from old group
+  std::map<std::string, cedar::unit::Time> recorded_data;
   if (cedar::proc::GroupPtr old_group = element->getGroup()) // element was registered elsewhere
   {
+    // we only have to remember recorded data for steps
+    if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+    {
+      recorded_data = step->unregisterRecordedData();
+    }
     old_group->remove(element);
   }
   element->setGroup(boost::static_pointer_cast<cedar::proc::Group>(this->shared_from_this()));
+
+  // we might have to restore recorder entries
+  if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
+  {
+    for (auto restored_record_entry : recorded_data)
+    {
+      cedar::proc::DataPath data_path(restored_record_entry.first);
+      auto slot = step->getSlot(data_path.getDataRole(), data_path.getDataName());
+      cedar::aux::RecorderSingleton::getInstance()->registerData(slot->getData(), restored_record_entry.second, slot->getDataPath().toString());
+    }
+  }
 
   this->signalNewElementAdded(element);
 
@@ -1508,6 +1526,7 @@ std::string cedar::proc::Group::duplicate(const std::string& elementName, const 
 
 cedar::proc::ConstElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupPath& name) const
 {
+  //!@todo this should use the functionality of group path instead of splitting the string by its own
   ElementMap::const_iterator iter;
   std::string first;
   std::string rest;
@@ -2010,6 +2029,20 @@ void cedar::proc::Group::updateObjectName(cedar::proc::Element* object)
     object->setName(old_iter->first);
     CEDAR_THROW(cedar::proc::DuplicateNameException, "Element name is already in use."
          " Old name of the element: \"" + old_iter->first + "\", requested name: \"" + object->getName() + "\".");
+  }
+
+  // dump recorded data and restore with new name
+  // we only have to remember recorded data for steps
+  std::map<std::string, cedar::unit::Time> recorded_data;
+  if (auto step = dynamic_cast<cedar::proc::Step*>(object))
+  {
+    recorded_data = step->unregisterRecordedData();
+    for (auto restored_record_entry : recorded_data)
+    {
+      cedar::proc::DataPath data_path(restored_record_entry.first);
+      auto slot = step->getSlot(data_path.getDataRole(), data_path.getDataName());
+      cedar::aux::RecorderSingleton::getInstance()->registerData(slot->getData(), restored_record_entry.second, slot->getDataPath().toString());
+    }
   }
 
   // erase the iterator

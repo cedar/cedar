@@ -206,7 +206,7 @@ void cedar::proc::gui::Scene::itemSelected()
   else
   {
     this->mpConfigurableWidget->clear();
-    this->mpRecorderWidget->clearLayout();
+    this->mpRecorderWidget->clear();
   }
 }
 
