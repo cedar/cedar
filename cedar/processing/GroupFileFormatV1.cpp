@@ -663,6 +663,10 @@ void cedar::proc::GroupFileFormatV1::readRecords
             cedar::proc::DataPath path(element_name, cedar::proc::DataRole::BUFFER, data_name);
             cedar::aux::RecorderSingleton::getInstance()->registerData(slot, entry.second, path.toString());
           }
+          catch (cedar::proc::InvalidRoleException& exc)
+          {
+            // still ok,
+          }
           catch (cedar::aux::InvalidNameException& exc)
           {
             // still ok,
@@ -672,6 +676,10 @@ void cedar::proc::GroupFileFormatV1::readRecords
             auto slot = elem->getData(cedar::proc::DataRole::OUTPUT, data_name);
             cedar::proc::DataPath path(element_name, cedar::proc::DataRole::OUTPUT, data_name);
             cedar::aux::RecorderSingleton::getInstance()->registerData(slot, entry.second, path.toString());
+          }
+          catch (cedar::proc::InvalidRoleException& exc)
+          {
+            exceptions.push_back("Recorder: Could not find any recordable slots at element \"" + element_name + "\". This configuration file was created with an outdated version of cedar, which did not correctly store recordings.");
           }
           catch (cedar::aux::InvalidNameException& exc)
           {
