@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/ThreadCollection.h"
 #include "cedar/auxiliaries/DataSpectator.h"
 #include "cedar/units/Time.h"
 
