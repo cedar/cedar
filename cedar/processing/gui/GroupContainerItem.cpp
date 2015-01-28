@@ -50,6 +50,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGraphicsSceneDragDropEvent>
+#include <QStyle>
+#include <QApplication>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -61,6 +63,9 @@ cedar::proc::gui::GraphicsBase(400, 300, GRAPHICS_GROUP_UNKNOWN, GRAPHICS_GROUP_
 mpContainer(new QGraphicsProxyWidget(this)),
 mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
 {
+  auto style = QApplication::style();
+  auto close_icon = style->standardIcon(QStyle::SP_TitleBarCloseButton);
+
   auto outer = new QWidget();
   mpContainer->setWidget(outer);
   auto layout = new QVBoxLayout();
@@ -69,7 +74,11 @@ mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
 
   auto titlebar_layout = new QHBoxLayout();
   layout->addLayout(titlebar_layout);
-  auto p_close_button = new QPushButton("close");
+  auto p_close_button = new QPushButton(close_icon, "");
+  QSize size = close_icon.availableSizes().at(0);
+  size.setWidth(size.width() + 2);
+  size.setHeight(size.height() + 2);
+  p_close_button->setFixedSize(size);
   titlebar_layout->addStretch(1);
   titlebar_layout->addWidget(p_close_button, 0);
 
