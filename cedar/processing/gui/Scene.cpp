@@ -124,37 +124,21 @@ cedar::proc::gui::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::forwardEvent(QGraphicsSceneDragDropEvent *pEvent)
+void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  pEvent->setAccepted(false);
-  auto items = this->items(pEvent->scenePos());
-  for (auto item : items)
-  {
-    if (item->acceptDrops())
-    {
-      QGraphicsScene::sendEvent(item, pEvent);
-      if (pEvent->isAccepted())
-      {
-        return dynamic_cast<cedar::proc::gui::GraphicsBase*>(item);
-      }
-    }
-  }
+  this->QGraphicsScene::dragEnterEvent(pEvent);
 
-  return nullptr;
+  if (!pEvent->isAccepted())
+  {
+    this->mGroup->dragEnterEvent(pEvent);
+  }
 }
 
 void cedar::proc::gui::Scene::dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  this->forwardEvent(pEvent);
+  this->QGraphicsScene::dragLeaveEvent(pEvent);
 
-  if (auto item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(this->mpDropTarget))
-  {
-    item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-    this->mpDropTarget = nullptr;
-  }
-
-  // if none of the elements in the scene accepted the event, the root group might
-  if (!pEvent->isAccepted() && this->mGroup)
+  if (!pEvent->isAccepted())
   {
     this->mGroup->dragLeaveEvent(pEvent);
   }
@@ -162,37 +146,22 @@ void cedar::proc::gui::Scene::dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent
 
 void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  auto accepter = this->forwardEvent(pEvent);
+  this->QGraphicsScene::dragMoveEvent(pEvent);
 
-  if (auto item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(this->mpDropTarget))
-  {
-    item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-  }
-
-  // if none of the elements in the scene accepted the event, the root group might
-  if (!pEvent->isAccepted() && this->mGroup)
+  if (!pEvent->isAccepted())
   {
     this->mGroup->dragMoveEvent(pEvent);
-  }
-  else if (accepter)
-  {
-    accepter->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-    this->mpDropTarget = accepter;
   }
 }
 
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  this->forwardEvent(pEvent);
+  // not sure why, but the drop event starts out as accepted; thus, reset its accepted state
+  pEvent->setAccepted(false);
 
-  if (auto item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(this->mpDropTarget))
-  {
-    item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-    this->mpDropTarget = nullptr;
-  }
+  this->QGraphicsScene::dropEvent(pEvent);
 
-  // if none of the elements in the scene accepted the event, the root group might
-  if (!pEvent->isAccepted() && this->mGroup)
+  if (!pEvent->isAccepted())
   {
     this->mGroup->dropEvent(pEvent);
   }

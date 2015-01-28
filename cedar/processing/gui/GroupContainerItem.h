@@ -86,7 +86,13 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

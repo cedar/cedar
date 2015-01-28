@@ -80,7 +80,6 @@ mpRecorderWidget(nullptr)
   this->setZoomLevel(100);
 
   setResizeAnchor(AnchorViewCenter);
-  setInteractive(true);
   setTransformationAnchor(AnchorUnderMouse);
   setDragMode(QGraphicsView::RubberBandDrag);
 }
