@@ -58,6 +58,11 @@ cedar::aux::GlobalClock::~GlobalClock()
 {
 }
 
+void cedar::aux::GlobalClock::addTime(const cedar::unit::Time& time)
+{
+  this->mAdditionalElapsedTime += static_cast<double>(time / (0.001 * cedar::unit::seconds));
+}
+
 void cedar::aux::GlobalClock::globalTimeFactorChanged(double newFactor)
 {
   this->addCurrentToAdditionalElapsedTime();
