@@ -57,6 +57,7 @@
 #include "cedar/processing/sinks/GroupSink.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/ParameterDeclaration.h"
@@ -723,6 +724,7 @@ void cedar::proc::Group::stepTriggers()
 
 void cedar::proc::Group::stepTriggers(cedar::unit::Time timeStep)
 {
+  cedar::aux::GlobalClockSingleton::getInstance()->addTime(timeStep);
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
   // step all triggers with this time step
   for (auto trigger : triggers)

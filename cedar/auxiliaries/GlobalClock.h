@@ -89,6 +89,9 @@ public:
   //! Returns true if the timer is running.
   bool isRunning() const;
 
+  //! Adds the given amount of time to the global clock.
+  void addTime(const cedar::unit::Time& time);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

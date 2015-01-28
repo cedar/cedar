@@ -168,6 +168,8 @@ private:
 
   int mTimerId;
 
+  boost::optional<cedar::unit::Time> mTimeOfLastUpdate;
+
 }; // class cedar::aux::gui::HistoryPlot0D
 
 #endif // CEDAR_USE_QWT
