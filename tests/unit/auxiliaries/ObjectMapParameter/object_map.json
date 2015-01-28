@@ -1,0 +1,29 @@
+{
+  "my first object map":
+  {
+    "Key0":
+    {
+      "TestClassOne":
+      {
+        "unsigned integer parameter": "0",
+        "double parameter": "0.0"
+      }
+    },
+    "Key1":
+    {
+      "TestClassTwo":
+      {
+        "unsigned integer parameter": "1",
+        "double parameter": "1.0"
+      }
+    },
+    "Key2":
+    {
+      "TestClassOne":
+      {
+        "unsigned integer parameter": "2",
+        "double parameter": "2.0"
+      }
+    }
+  }
+}
