@@ -1,0 +1,28 @@
+/*! @page CedarPaths Paths in cedar
+
+cedar uses a special system for locating files. This system is implemented by the class cedar::aux::Path.
+
+There are several ways of specifying paths:
+<ul>
+  <li>Relative: a regular path specification like "some/path/to/a.file" </li>
+  <li>Absolute: again, a regular specification like "/an/absolute/path/to/a.file"</li>
+  <li>Resource: specifies a file relative to cedar's resource folder. For example, the file
+      [your cedar]/resources/configs/example.json can be found independent of where cedar is by specifying the path
+      "resource://configs/example.json"</li>. To get the path in code, you can do this:
+      @code
+        cedar::aux::Path resource_path = "resource://configs/example.json";
+        std::string actual_path = resource_path.absolute().toString(); // returns [your cedar]/resources/configs/example.json
+      @endcode
+      Note, that a cedar::aux::ResourceNotFoundException is thrown if the resource cannot be located.
+  </li>
+  <li> Relative to a plugin: if you want to use a file from a plugin, you can use the "plugin" protocol.
+       Let's say your plugin is located in SomePlugin/build/libSomePlugin.so, and the file you want to get is SomePlugin/a.file.
+       Then you can do this as follows:
+       @code
+         cedar::aux::Path resource_path = "plugin://SomePlugin/a.file";
+         std::string actual_path = resource_path.absolute().toString(); // returns absolute path to SomePlugin/a.file
+       @endcode
+  </li>
+</ul>
+
+*/
