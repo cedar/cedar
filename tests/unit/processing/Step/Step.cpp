@@ -87,8 +87,9 @@ CEDAR_GENERATE_POINTER_TYPES(TestStep);
 class StartStopTester : public cedar::proc::Step
 {
 public:
-  StartStopTester()
+  StartStopTester(bool looped = false)
   :
+  cedar::proc::Step(looped),
   mStartCount(0),
   mStopCount(0),
   mData(new cedar::aux::MatData())
@@ -129,10 +130,11 @@ CEDAR_GENERATE_POINTER_TYPES(StartStopTester);
 int testStartingStopping()
 {
   int errors = 0;
+  std::cout << "Testing starting/stopping" << std::endl;
 
   cedar::proc::GroupPtr network(new cedar::proc::Group());
-  StartStopTesterPtr step1(new StartStopTester());
-  StartStopTesterPtr step2(new StartStopTester());
+  StartStopTesterPtr step1(new StartStopTester(true));
+  StartStopTesterPtr step2(new StartStopTester(true));
   StartStopTesterPtr step3(new StartStopTester());
   cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger());
 
@@ -219,6 +221,8 @@ CEDAR_GENERATE_POINTER_TYPES(ThrowsInAction);
 
 int testThrowInAction()
 {
+  std::cout << "Testing throwing in actions" << std::endl;
+
   ThrowsInActionPtr step(new ThrowsInAction());
 
   std::cout << "Testing throwing something from a step action." << std::endl;

@@ -775,14 +775,38 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
 {
   QMenu menu;
 
-  auto p_assign_to_trigger = menu.addMenu("assign selected to trigger");
-  cedar::proc::gui::Connectable::buildConnectTriggerMenu
-  (
-    p_assign_to_trigger,
-    this->mGroup.get(),
-    this,
-    SLOT(assignSelectedToTrigger())
-  );
+  bool can_connect = false;
+  for (auto item : this->selectedItems())
+  {
+    //!@todo Cast to element instead
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(item))
+    {
+      if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable->getConnectable()))
+      {
+        if (triggerable->isLooped())
+        {
+          can_connect = true;
+          break;
+        }
+      }
+    }
+  }
+
+  auto p_assign_to_trigger = menu.addMenu("assign to trigger");
+  if (can_connect)
+  {
+    cedar::proc::gui::Connectable::buildConnectTriggerMenu
+    (
+      p_assign_to_trigger,
+      this->mGroup.get(),
+      this,
+      SLOT(assignSelectedToTrigger())
+    );
+  }
+  else
+  {
+    p_assign_to_trigger->setEnabled(false);
+  }
 
   menu.exec(pContextMenuEvent->screenPos());
 
