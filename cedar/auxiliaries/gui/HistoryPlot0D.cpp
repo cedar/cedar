@@ -193,14 +193,16 @@ void cedar::aux::gui::HistoryPlot0D::advanceHistory()
   }
 #endif // CEDAR_USE_QWT
 
-  // if the clock isn't running, no history is built
-  if (!cedar::aux::GlobalClockSingleton::getInstance()->isRunning())
+  // if the clock hasn't changed, abort!
+  cedar::unit::Time time_now = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  if (this->mTimeOfLastUpdate && this->mTimeOfLastUpdate.get() == time_now)
   {
     return;
   }
 
+  this->mTimeOfLastUpdate = time_now;
+
   // add current value to history
-  cedar::unit::Time time_now = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
   for (auto& plot_data : this->mPlotData)
   {
     QReadLocker data_locker(&plot_data.mData->getLock());
