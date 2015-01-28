@@ -230,7 +230,7 @@ public:
 
   /*!@brief Returns the gui::group that displays the given group.
    */
-  cedar::proc::gui::Group* getGroupFor(cedar::proc::Group* group);
+  cedar::proc::gui::Group* getGroupFor(cedar::proc::ConstGroup* group);
 
   /*!@brief Returns the step item that displays the given step.
    */
@@ -242,7 +242,7 @@ public:
 
   /*!@brief Returns the cedar::proc::gui::GraphicsBase item corresponding to the given element.
    */
-  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(const cedar::proc::Element* trigger);
+  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::ConstElement* element);
 
   /*!@brief Returns, whether snap-to-grid is true.
    */
@@ -255,6 +255,10 @@ public:
   /*!@brief Access the root group
    */
   cedar::proc::gui::GroupPtr getRootGroup();
+
+  /*!@brief Access the root group.
+   */
+  cedar::proc::gui::ConstGroupPtr getRootGroup() const;
   
   /*!@brief Returns the current mode.
    */
@@ -380,6 +384,8 @@ private:
 
   cedar::proc::gui::Group* findFirstGroupItem(const QList<QGraphicsItem*>& items);
 
+  void multiItemContextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
+
 private slots:
   void promoteElementToExistingGroup();
 
@@ -390,6 +396,8 @@ private slots:
   //!@todo importGroup and importStep share a lot of code
   void importGroup(bool link);
   void importStep();
+
+  void assignSelectedToTrigger();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -632,19 +632,11 @@ std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Group::checkConsisten
   return issues;
 }
 
-std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTriggers() const
+std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Group::listLoopedTriggers(bool recursive) const
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers;
-
-  for (auto iter : this->getElements())
-  {
-    cedar::proc::ElementPtr element = iter.second;
-    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
-    {
-      triggers.push_back(trigger);
-    }
-  }
-
+  auto looped_trigger_set = this->findAll<cedar::proc::LoopedTrigger>(recursive);
+  triggers.insert(triggers.begin(), looped_trigger_set.begin(), looped_trigger_set.end());
   return triggers;
 }
 
@@ -654,7 +646,7 @@ void cedar::proc::Group::startTriggers(bool wait)
 
   for (auto trigger : triggers)
   {
-    if (!trigger->isRunning())
+    if (!trigger->isRunning() && trigger->startWithAll())
     {
       trigger->start();
     }
@@ -671,7 +663,7 @@ void cedar::proc::Group::startTriggers(bool wait)
   {
     for (auto trigger : triggers)
     {
-      while (!trigger->isRunning())
+      while (!trigger->isRunning() && trigger->startWithAll())
       {
         cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
@@ -1268,6 +1260,16 @@ void cedar::proc::Group::add(cedar::proc::ElementPtr element)
     if (triggerable->isLooped())
     {
       this->mLoopedTriggerables.push_back(triggerable);
+      // if this is the root group, also connect to default trigger
+      if (this->isRoot())
+      {
+        // if there is no default trigger, create one
+        if (!this->nameExists("default trigger"))
+        {
+          this->create("cedar.processing.LoopedTrigger", "default trigger");
+        }
+        this->connectTrigger(this->getElement<cedar::proc::LoopedTrigger>("default trigger"), triggerable);
+      }
     }
     if (this->numberOfStartCalls())
     {
@@ -1660,11 +1662,31 @@ void cedar::proc::Group::connectSlots(const std::string& source, const std::stri
 
 void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
 {
-  // check connection
-  if (this->isConnected(source, target))
+  // if the item is looped, it can only be triggered by a single trigger
+  // thus, check if there is already a connection, and remove it
+  if (target->isLooped() && target->getParentTrigger())
   {
-    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
+    this->disconnectTrigger(target->getParentTrigger(), target);
   }
+
+  // check connection
+  try
+  {
+    source->checkIfCanBeConnectedTo(target);
+  }
+  catch (const cedar::proc::DuplicateConnectionException& e)
+  {
+    if (source->getName() == "default trigger")
+    {
+      // this is ok, might happen (connections to the default trigger are saved, but also created when the element is added)
+    }
+    else
+    {
+      // this is not ok, rethrow
+      throw e;
+    }
+  }
+
   // create connection
   mTriggerConnections.push_back(cedar::proc::TriggerConnectionPtr(new TriggerConnection(source, target)));
   this->signalTriggerConnectionChanged
@@ -1763,15 +1785,29 @@ void cedar::proc::Group::disconnectSlots
 
 void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
 {
-  for (TriggerConnectionVector::iterator it = mTriggerConnections.begin(); it != mTriggerConnections.end(); ++it)
+  // iterate all connections to find the one that matches the given combination of source and target
+  for (auto it = mTriggerConnections.begin(); it != mTriggerConnections.end(); ++it)
   {
     if ((*it)->equals(source, target))
     {
       this->mTriggerConnections.erase(it);
       this->signalTriggerConnectionChanged(source, target, false);
+      if (this->isRoot() && source->getName() != "default trigger") // connect to default trigger instead
+      {
+        // connect to default trigger, if it exists
+        if (this->nameExists("default trigger"))
+        {
+          auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default trigger");
+          if (default_trigger->canTrigger(target))
+          {
+            this->connectTrigger(default_trigger, target);
+          }
+        }
+      }
       return;
     }
   }
+  // if none of the connections matched, throw an exception because nothing was disconnected
   CEDAR_THROW
   (
     cedar::proc::MissingConnectionException,
@@ -1953,14 +1989,7 @@ bool cedar::proc::Group::isConnected(const std::string& source, const std::strin
 
 bool cedar::proc::Group::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const
 {
-  for (size_t i = 0; i < mTriggerConnections.size(); ++i)
-  {
-    if (mTriggerConnections.at(i)->equals(source, target))
-    {
-      return true;
-    }
-  }
-  return false;
+  return source->isListener(target);
 }
 
 void cedar::proc::Group::updateObjectName(cedar::proc::Element* object)
@@ -2878,6 +2907,16 @@ void cedar::proc::Group::onLoopedChanged()
             {
               triggerable->callOnStart();
             }
+            // check if this is the root group
+            if (this->isRoot())
+            {
+              // if there is no default trigger, create one
+              if (!this->nameExists("default trigger"))
+              {
+                this->create("cedar.processing.LoopedTrigger", "default trigger");
+              }
+              this->connectTrigger(this->getElement<cedar::proc::LoopedTrigger>("default trigger"), triggerable);
+            }
           }
         }
         else // remove
@@ -2890,6 +2929,17 @@ void cedar::proc::Group::onLoopedChanged()
               triggerable->callOnStop();
             }
             this->mLoopedTriggerables.erase(item);
+          }
+          // check if this is the root group
+          if (this->isRoot())
+          {
+            // check if this group was connected to a trigger
+            if (auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger()))
+            {
+              // make sure that this trigger is in the root group
+              CEDAR_ASSERT(this->getElement<cedar::proc::LoopedTrigger>(parent_trigger->getName()));
+              this->disconnectTrigger(parent_trigger, triggerable);
+            }
           }
         }
       }
