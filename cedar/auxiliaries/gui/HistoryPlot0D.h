@@ -87,6 +87,11 @@ private:
 
     //! X axis labels for the data
     std::deque<cedar::unit::Time> mXLabels;
+
+#ifdef CEDAR_USE_QWT
+    //! Marker that is used to indicate the most recent value.
+    QwtPlotMarker* mpZeroMarker;
+#endif // CEDAR_USE_QWT
   };
 
   //--------------------------------------------------------------------------------------------------------------------

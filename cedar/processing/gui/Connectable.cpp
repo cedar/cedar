@@ -1127,6 +1127,10 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
       triggerable->getParentTrigger()
     );
   }
+  else
+  {
+    p_assign_trigger->setEnabled(false);
+  }
 }
 
 cedar::proc::TriggerPtr cedar::proc::gui::Connectable::getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group)
