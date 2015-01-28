@@ -67,6 +67,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <tuple>
 
 
 /*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Groups.
@@ -402,13 +403,13 @@ private:
    */
   void deleteSelectedElements();
 
+  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+
   void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
-
-  cedar::proc::gui::GraphicsBase* forwardEvent(QGraphicsSceneDragDropEvent *pEvent);
 
 private slots:
   void promoteElementToExistingGroup();

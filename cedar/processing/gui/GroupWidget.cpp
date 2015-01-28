@@ -66,6 +66,8 @@ mpView(new cedar::proc::gui::View())
   this->mGroup = cedar::proc::gui::GroupPtr(new cedar::proc::gui::Group(nullptr, this->mpView->getScene()));
 
   this->mpView->getScene()->setGroup(this->mGroup);
+
+  this->setAcceptDrops(true);
 }
 
 cedar::proc::gui::GroupWidget::GroupWidget(cedar::proc::gui::Group* pGroup, QWidget* pParent)

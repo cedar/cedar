@@ -256,9 +256,11 @@ void cedar::proc::gui::Group::dragLeaveEvent(QGraphicsSceneDragDropEvent * /* pE
     auto status_bar = this->mpMainWindow->statusBar();
     status_bar->showMessage("");
   }
+
+  this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
 }
 
-void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
+void cedar::proc::gui::Group::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
@@ -292,7 +294,13 @@ void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
     }
 
     pEvent->accept();
+    this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
   }
+}
+
+void cedar::proc::gui::Group::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  this->dragEnterEvent(pEvent);
 }
 
 void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
@@ -302,14 +310,6 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   {
     return;
   }
-
-  // reset the status message
-  if (this->mpMainWindow && this->mpMainWindow->statusBar())
-  {
-    auto status_bar = this->mpMainWindow->statusBar();
-    status_bar->showMessage("");
-  }
-
   QPointF mapped = pEvent->scenePos();
   auto target_group = this->getGroup();
   if (!this->isRootGroup())
@@ -336,6 +336,9 @@ void cedar::proc::gui::Group::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "Could not cast the dropped declaration to any known type.");
   }
+
+  // reset the status message and display
+  this->dragLeaveEvent(pEvent);
 
   pEvent->setAccepted(true);
 }

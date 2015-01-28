@@ -297,6 +297,8 @@ protected:
    */
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
+  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+
   /*!@brief Handles the dragLeave event of the scene.
    */
   void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);

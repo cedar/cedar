@@ -49,6 +49,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QGraphicsSceneDragDropEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -81,17 +82,44 @@ mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
   this->setMinimumSize(QSizeF(400,300));
   this->updateResizeHandles();
   this->sizeChanged();
+
+  this->setAcceptDrops(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GroupContainerItem::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  this->scene()->sendEvent(this->mpContainer, pEvent);
+}
+
+void cedar::proc::gui::GroupContainerItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  this->scene()->sendEvent(this->mpContainer, pEvent);
+}
+
+void cedar::proc::gui::GroupContainerItem::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  std::cout << "Container move event: " << this << std::endl;
+  std::cout << "1Accepted: " << pEvent->isAccepted() << std::endl;
+  this->scene()->sendEvent(this->mpContainer, pEvent);
+  std::cout << "2Accepted: " << pEvent->isAccepted() << std::endl;
+}
+
+void cedar::proc::gui::GroupContainerItem::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
+{
+  std::cout << "Container drop event: " << this << std::endl;
+  std::cout << "1Accepted: " << pEvent->isAccepted() << std::endl;
+  this->scene()->sendEvent(this->mpContainer, pEvent);
+  std::cout << "2Accepted: " << pEvent->isAccepted() << std::endl;
+}
+
 bool cedar::proc::gui::GroupContainerItem::canDuplicate() const
 {
   return false;
 }
-
 
 bool cedar::proc::gui::GroupContainerItem::canResize() const
 {
