@@ -51,8 +51,9 @@
 class TestModule : public cedar::proc::Step
 {
   public:
-    TestModule(const std::string& name = "")
+    TestModule(const std::string& name = "", bool looped = false)
     :
+    cedar::proc::Step(looped),
     _mParam(new cedar::aux::UIntParameter(this, "param", 0, 0, 100)),
     mData(new cedar::aux::DoubleData(0.0))
     {
@@ -71,6 +72,16 @@ class TestModule : public cedar::proc::Step
 
     cedar::aux::UIntParameterPtr _mParam;
     cedar::aux::DoubleDataPtr mData;
+};
+
+class LoopedTestModule : public TestModule
+{
+public:
+  LoopedTestModule(const std::string& name = "")
+  :
+  TestModule(name, true)
+  {
+  }
 };
 
 /*!
@@ -101,6 +112,7 @@ class TestModuleDoubleConnection : public cedar::proc::Step
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestModule);
+CEDAR_GENERATE_POINTER_TYPES(LoopedTestModule);
 CEDAR_GENERATE_POINTER_TYPES(TestModuleDoubleConnection);
 
 int main(int, char**)
@@ -112,6 +124,10 @@ int main(int, char**)
   (
     new cedar::proc::ElementDeclarationTemplate<TestModule>("Test")
   );
+  cedar::proc::ElementDeclarationPtr looped_test_module_decl
+  (
+    new cedar::proc::ElementDeclarationTemplate<LoopedTestModule>("Test")
+  );
   cedar::proc::ElementDeclarationPtr double_test_module_decl
   (
     new cedar::proc::ElementDeclarationTemplate<TestModuleDoubleConnection>("Test")
@@ -120,26 +136,27 @@ int main(int, char**)
 
   std::cout << "Adding declarations to the registry ... ";
   test_module_decl->declare();
+  looped_test_module_decl->declare();
   double_test_module_decl->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Creating network ... " << std::endl;
-  cedar::proc::GroupPtr network (new cedar::proc::Group());
+  cedar::proc::GroupPtr group (new cedar::proc::Group());
 
   std::cout << "Creating step1 ... ";
-  TestModulePtr step1 (new TestModule("step1"));
-  network->add(step1);
+  LoopedTestModulePtr step1 (new LoopedTestModule("step1"));
+  group->add(step1);
   step1->_mParam->setValue(1);
   std::cout << "done." << std::endl;
 
   std::cout << "Creating step2 ... ";
   TestModulePtr step2 (new TestModule("step2"));
-  network->add(step2);
+  group->add(step2);
   step2->_mParam->setValue(2);
   std::cout << "done." << std::endl;
 
   std::cout << "Connecting step1 to step2 ... ";
-  network->connectSlots("step1.output", "step2.input");
+  group->connectSlots("step1.output", "step2.input");
   std::cout << "done." << std::endl;
 
   std::cout << "Creating trigger ... ";
@@ -151,29 +168,29 @@ int main(int, char**)
                                         "trigger"
                                       )
                                 );
-  network->add(trigger);
+  group->add(trigger);
   std::cout << "done." << std::endl;
 
   std::cout << "Connecting trigger to step1 ... ";
-  network->connectTrigger(trigger, step1);
+  group->connectTrigger(trigger, step1);
   std::cout << "done." << std::endl;
 
   std::cout << "Creating double connection steps ... ";
   TestModuleDoubleConnectionPtr double_step1 (new TestModuleDoubleConnection("doubleStep1"));
   TestModuleDoubleConnectionPtr double_step2 (new TestModuleDoubleConnection("doubleStep2"));
-  network->add(double_step1);
-  network->add(double_step2);
+  group->add(double_step1);
+  group->add(double_step2);
   std::cout << "done." << std::endl;
 
   std::cout << "Connecting double connection steps ... ";
-  network->connectSlots("doubleStep1.output1", "doubleStep2.input1");
-  network->connectSlots("doubleStep1.output2", "doubleStep2.input2");
+  group->connectSlots("doubleStep1.output1", "doubleStep2.input1");
+  group->connectSlots("doubleStep1.output2", "doubleStep2.input2");
   std::cout << "done." << std::endl;
 
   std::cout << "Group creation completed." << std::endl;
 
   std::cout << "Triggering ... ";
-  trigger->trigger();
+  trigger->step(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   std::cout << "done." << std::endl;
 
   if (step1->mData->getData() == 0.0)
@@ -190,41 +207,26 @@ int main(int, char**)
     ++errors;
   }
 
-  std::cout << "Creating a second trigger ... ";
-  cedar::proc::LoopedTriggerPtr trigger_2
-                                (
-                                  new cedar::proc::LoopedTrigger
-                                      (
-                                        cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds),
-                                        "trigger2"
-                                      )
-                                );
-  network->add(trigger_2);
-
-  std::cout << "Connecting trigger to trigger2 ... ";
-  network->connectTrigger(trigger, trigger_2);
-  std::cout << "done." << std::endl;
-
   std::cout << "Saving network ... ";
-  network->writeJson("architecture1.json");
+  group->writeJson("architecture1.json");
   std::cout << "done." << std::endl;
 
   std::cout << "Resetting ... ";
-  network.reset();
+  group.reset();
   step1.reset();
   step2.reset();
   trigger.reset();
   std::cout << "done." << std::endl;
 
   std::cout << "Loading network ... ";
-  network = cedar::proc::GroupPtr(new cedar::proc::Group());
-  network->readJson("architecture1.json");
+  group = cedar::proc::GroupPtr(new cedar::proc::Group());
+  group->readJson("architecture1.json");
   std::cout << "done." << std::endl;
 
   try
   {
     std::cout << "Looking for step1 ... ";
-    step1 = network->getElement<TestModule>("step1");
+    step1 = group->getElement<LoopedTestModule>("step1");
     CEDAR_ASSERT(step1);
     std::cout << "found." << std::endl;
 
@@ -249,7 +251,7 @@ int main(int, char**)
   try
   {
     std::cout << "Looking for step2 ... ";
-    step2 = network->getElement<TestModule>("step2");
+    step2 = group->getElement<TestModule>("step2");
     CEDAR_ASSERT(step2);
     std::cout << "found." << std::endl;
 
@@ -274,7 +276,7 @@ int main(int, char**)
   try
   {
     std::cout << "Looking for trigger ... ";
-    trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
+    trigger = group->getElement<cedar::proc::LoopedTrigger>("trigger");
     CEDAR_ASSERT(trigger);
     std::cout << "found." << std::endl;
   }
@@ -284,7 +286,7 @@ int main(int, char**)
     ++errors;
   }
 
-  trigger->trigger();
+  trigger->step(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
 
   if (step1->mData->getData() == 0.0)
   {

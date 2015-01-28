@@ -223,8 +223,15 @@ public:
 
   //!@brief set outline fill color
   void setOutlineColor(const QColor& color);
+
   //!@brief set fill color
   void setFillColor(const QColor& color);
+
+  //! Returns the color used to fill the base shape.
+  QColor getFillColor() const;
+
+  //! Returns the currently set fill style.
+  Qt::BrushStyle getFillStyle() const;
 
   /*!@brief Draw the default graphical representation.
    */
@@ -235,6 +242,15 @@ public:
    * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
    */
   inline cedar::proc::ElementPtr getElement()
+  {
+    return this->mElement;
+  }
+
+  /*!@brief   Returns the element associated with this graphics item.
+   *
+   * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
+   */
+  inline cedar::proc::ConstElementPtr getElement() const
   {
     return this->mElement;
   }
@@ -263,6 +279,24 @@ public:
 
   //! Specifies whether the item can be duplicated.
   virtual bool canDuplicate() const = 0;
+
+  /*! Returns the color used to fill the foreground when the given brush is not solid.
+   */
+  static QColor nonsolidBrushForegroundColor(QBrush brush);
+
+  /*! Returns the color used to fill the background when the given brush is not solid.
+   */
+  static QColor nonsolidBrushBackgroundColor(QBrush brush);
+
+  /*! Fills the given pixmap in the same way that the background of a graphicsbase would be filled with the given brush.
+   */
+  static void paintBackgroundColor(QPixmap& pixmap, QBrush brush);
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public signals
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(FillColorChanged, void(QColor));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -302,7 +336,19 @@ protected:
     return this->mConnections;
   }
 
-  //! Sets the fill stype
+  //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
+  void setOverrideFillStyle(Qt::BrushStyle style, bool update = true);
+
+  //! Removes the override fill style, reverting the item to using its normal fill style.
+  void unsetOverrideFillStyle(bool update = true);
+
+  //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
+  void setOverrideFillColor(const QColor& color, bool update = true);
+
+  //! Removes the override fill style, reverting the item to using its normal fill style.
+  void unsetOverrideFillColor(bool update = true);
+
+  //! Sets the fill style
   void setFillStyle(Qt::BrushStyle style, bool update = true);
 
   //! Set whether or not this item is resizeable.
@@ -386,8 +432,14 @@ private:
   //!@brief the current fill color
   QColor mFillColor;
 
+  //!@brief Override fill color.
+  boost::optional<QColor> mOverrideFillColor;
+
   //! Brush style used for filling the shape.
   Qt::BrushStyle mFillStyle;
+
+  //! Override fill style.
+  boost::optional<Qt::BrushStyle> mOverrideFillStyle;
 
   //!@brief The path used for drawing this shape.
   QPainterPath mPath;

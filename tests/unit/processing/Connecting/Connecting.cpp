@@ -296,28 +296,6 @@ int testOnlineDisconnecting()
     trigger->stop();
   }
 
-  for (size_t i = 0; i < trials; ++i)
-  {
-    std::cout << "Testing double-triggered case ..." << std::endl;
-    cedar::proc::GroupPtr network(new cedar::proc::Group());
-    network->readJson("taste_the_double_trigger.json");
-
-    auto trigger1 = network->getElement<cedar::proc::LoopedTrigger>("trigger1");
-    auto trigger2 = network->getElement<cedar::proc::LoopedTrigger>("trigger2");
-
-    trigger1->start();
-    trigger2->start();
-
-    cedar::aux::sleep(0.05 * cedar::unit::seconds);
-
-    network->disconnectSlots("step.Gauss input", "projection.input");
-
-    cedar::aux::sleep(0.05 * cedar::unit::seconds);
-
-    trigger1->stop();
-    trigger2->stop();
-  }
-
   std::cout << "Online (dis-)connecting revealed " << errors << " error(s)." << std::endl;
   return errors;
 }

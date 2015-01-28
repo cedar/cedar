@@ -190,9 +190,15 @@ void cedar::proc::Triggerable::setParentTrigger(cedar::proc::TriggerPtr parent)
     CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
   }
   this->mParentTrigger = parent;
+  this->signalParentTriggerChanged();
 }
 
 cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
+{
+  return this->mParentTrigger.lock();
+}
+
+cedar::proc::ConstTriggerPtr cedar::proc::Triggerable::getParentTrigger() const
 {
   return this->mParentTrigger.lock();
 }
