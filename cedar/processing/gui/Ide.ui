@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>983</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -223,8 +223,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>424</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -496,6 +496,9 @@
    </property>
    <property name="toolTip">
     <string>Starts and pauses the simulation.</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
    </property>
   </action>
   <action name="mpActionLoadPlugin">
