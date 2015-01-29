@@ -48,11 +48,10 @@
 #include "cedar/processing/DataPath.fwd.h"
 
 // SYSTEM INCLUDES
+#include <string>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A path for data in architectures.
  */
 class cedar::proc::DataPath
 {
