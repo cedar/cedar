@@ -39,16 +39,20 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connectable.h"
+#include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/DefaultConnectableIconView.h"
+#include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 
@@ -58,6 +62,7 @@
 #include <string>
 #include <set>
 #include <QMenu>
+#include <QPainter>
 #include <QGraphicsSceneContextMenuEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,7 +100,9 @@ cedar::proc::gui::GraphicsBase
 mpIconView(nullptr),
 mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mpMainWindow(pMainWindow),
-mInputOutputSlotOffset(static_cast<qreal>(0.0))
+mInputOutputSlotOffset(static_cast<qreal>(0.0)),
+mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
+mShowingTriggerColor(false)
 {
   this->connect
         (
@@ -131,6 +138,23 @@ mInputOutputSlotOffset(static_cast<qreal>(0.0))
       SIGNAL(triggerableStoppedSignal()),
       SLOT(triggerableStopped())
   );
+
+  this->connect
+  (
+      this,
+      SIGNAL(triggerableParentTriggerChanged()),
+      SLOT(updateTriggerColorState())
+  );
+
+  mFillColorChangedConnection = this->connectToFillColorChangedSignal
+      (
+        boost::bind
+        (
+          &cedar::proc::gui::Connectable::fillColorChanged,
+          this,
+          _1
+        )
+      );
 }
 
 cedar::proc::gui::Connectable::~Connectable()
@@ -204,6 +228,246 @@ void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
 bool cedar::proc::gui::Connectable::canDuplicate() const
 {
   return !this->isReadOnly();
+}
+
+void cedar::proc::gui::Connectable::Decoration::setDescription(const QString& text)
+{
+  this->mpIcon->setToolTip(text);
+}
+
+void cedar::proc::gui::Connectable::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  this->showTriggerChains();
+
+  // because qt doesn't send a leave event if a child is hovered over, we need to manually implement one
+  if (this->parentItem())
+  {
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->parentItem()))
+    {
+      connectable->hideTriggerChains();
+    }
+  }
+
+  pEvent->setAccepted(true);
+}
+
+void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  this->hideTriggerChains();
+
+  // because qt doesn't send an enter event if a child is left, we need to manually implement one
+  if (this->parentItem())
+  {
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->parentItem()))
+    {
+      connectable->showTriggerChains();
+    }
+  }
+
+  pEvent->setAccepted(true);
+}
+
+void cedar::proc::gui::Connectable::translateParentTriggerChangedSignal()
+{
+  emit triggerableParentTriggerChanged();
+}
+
+void cedar::proc::gui::Connectable::showTriggerChains()
+{
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
+  if (!triggerable)
+  {
+    return;
+  }
+
+  auto done_trigger = triggerable->getFinishedTrigger();
+  if (!done_trigger)
+  {
+    return;
+  }
+
+  auto make_circle = [&](unsigned int depth, qreal x, qreal y, qreal size, QGraphicsItem* parent)
+      {
+        auto circle = new QGraphicsEllipseItem(0, 0, size, size, parent);
+        circle->setPos(x, y);
+        circle->setBrush(QBrush(Qt::white, Qt::SolidPattern));
+        QPen pen(Qt::black);
+        pen.setWidth(2);
+        circle->setPen(pen);
+
+        auto text = new QGraphicsSimpleTextItem(QString("%1").arg(depth + 1), circle);
+
+        // note: this order is important; if the circle got deleted before the text, this would lead to a crash
+        this->mTriggerChainVisualization.push_back(text);
+        this->mTriggerChainVisualization.push_back(circle);
+
+        // center the text on the circle
+        QRectF text_bounds = text->boundingRect();
+        QRectF circle_bounds = circle->boundingRect();
+        text->setPos
+        (
+          (circle_bounds.width() - text_bounds.width()) / static_cast<qreal>(2),
+          (circle_bounds.height() - text_bounds.height()) / static_cast<qreal>(2)
+        );
+      };
+
+
+  qreal root_size = static_cast<qreal>(40.0);
+  qreal item_size = static_cast<qreal>(30.0);
+
+  make_circle
+  (
+    0,
+    -root_size / static_cast<qreal>(2.0),
+    this->height() - root_size / static_cast<qreal>(2.0),
+    root_size,
+    this
+  );
+
+  auto trigger_chain = done_trigger->getTriggeringOrder();
+
+  auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  if (scene == nullptr)
+  {
+    return;
+  }
+
+  for (const auto& depth_triggerable_set_pair : trigger_chain)
+  {
+    auto depth = depth_triggerable_set_pair.first;
+    auto triggerable_set = depth_triggerable_set_pair.second;
+    for (auto link : triggerable_set)
+    {
+      auto link_element = boost::dynamic_pointer_cast<cedar::proc::Element>(link);
+      CEDAR_DEBUG_ASSERT(link_element);
+      auto link_gui = scene->getGraphicsItemFor(link_element.get());
+      if (!link_gui)
+      {
+        // can happen either for the processing done trigger of the start of the chain, or for group inputs
+
+        if (auto group_input = boost::dynamic_pointer_cast<cedar::proc::sources::GroupSource>(link_element))
+        {
+          // if the link element is a group input, place the counter there
+          auto owner = group_input->getGroup();
+          auto owner_gui = scene->getGroupFor(owner.get());
+          link_gui = owner_gui->getSlotItemFor(group_input);
+        }
+        else
+        {
+          // otherwise, skip this one
+          continue;
+        }
+      }
+      QRectF bounds = link_gui->boundingRect();
+      make_circle(depth, -item_size / static_cast<qreal>(2), bounds.height() - item_size / static_cast<qreal>(2), item_size, link_gui);
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::hideTriggerChains()
+{
+  for (auto p_item : this->mTriggerChainVisualization)
+  {
+    delete p_item;
+  }
+  this->mTriggerChainVisualization.clear();
+}
+
+//!@todo This belongs into a cedar::proc::gui::Element class ...
+cedar::proc::gui::ConstGroup* cedar::proc::gui::Connectable::getGuiGroup() const
+{
+  if (auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene()))
+  {
+    auto group = this->getElement()->getGroup();
+    CEDAR_DEBUG_ASSERT(group);
+    if (group != scene->getRootGroup()->getGroup())
+    {
+      return scene->getGroupFor(group.get());
+    }
+    else
+    {
+      return scene->getRootGroup().get();
+    }
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+void cedar::proc::gui::Connectable::fillColorChanged(QColor color)
+{
+  auto gui_group = this->getGuiGroup();
+  if (gui_group == nullptr)
+  {
+    return;
+  }
+
+  bool show = gui_group->showsTriggerColors();
+
+  if (!show)
+  {
+    this->mPreviousFillColor = color;
+  }
+}
+
+void cedar::proc::gui::Connectable::updateTriggerColorState()
+{
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  if (!triggerable || scene == nullptr)
+  {
+    return;
+  }
+  auto gui_group = scene->getRootGroup();
+
+  bool show = gui_group->showsTriggerColors();
+  auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
+  if (show)
+  {
+    auto last_color = this->getFillColor();
+    auto last_style = this->getFillStyle();
+
+    QBrush brush(Qt::white);
+    if (parent_trigger)
+    {
+      brush = gui_group->getColorFor(parent_trigger);
+    }
+    else if (!triggerable->isLooped())
+    {
+      brush = QBrush(QColor::fromRgb(220, 220, 220));
+    }
+    this->setFillColor(brush.color());
+    this->setFillStyle(brush.style());
+    if (!this->mShowingTriggerColor)
+    {
+      this->mPreviousFillColor.setColor(last_color);
+      this->mPreviousFillColor.setStyle(last_style);
+    }
+    this->mShowingTriggerColor = true;
+    this->setAcceptHoverEvents(true);
+  }
+  else
+  {
+    this->setFillColor(this->mPreviousFillColor.color());
+    this->setFillStyle(this->mPreviousFillColor.style());
+    this->mShowingTriggerColor = false;
+    this->setAcceptHoverEvents(false);
+    this->hideTriggerChains();
+  }
+}
+
+QColor cedar::proc::gui::Connectable::getBackgroundColor() const
+{
+  return this->mBackgroundColor;
+}
+
+void cedar::proc::gui::Connectable::setBackgroundColor(const QColor& color)
+{
+  this->setFillColor(color);
+  this->mBackgroundColor = color;
+  this->mPreviousFillColor = color;
+  this->updateTriggerColorState();
 }
 
 void cedar::proc::gui::Connectable::translateStartedSignal()
@@ -550,6 +814,15 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
     this->mDecorations.push_back(decoration);
   }
   this->updateDecorations();
+  this->updateTriggerColorState();
+
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
+  {
+    this->mParentTriggerChangedConnection = triggerable->connectToParentTriggerChangedSignal
+        (
+          boost::bind(&cedar::proc::gui::Connectable::translateParentTriggerChangedSignal, this)
+        );
+  }
 }
 
 void cedar::proc::gui::Connectable::updateDataSlotPositions()
@@ -768,7 +1041,7 @@ void cedar::proc::gui::Connectable::updateDecorations()
           (
             this,
             ":/decorations/looped.svg",
-            "This step is looped, i.e., it expects to be connected to a looped trigger."
+            "This element is looped."
           )
         );
       }
@@ -781,6 +1054,117 @@ void cedar::proc::gui::Connectable::updateDecorations()
   }
 
   this->updateDecorationPositions();
+}
+
+void cedar::proc::gui::Connectable::buildConnectTriggerMenu
+(
+  QMenu* pMenu,
+  const cedar::proc::gui::Group* gui_group,
+  const QObject* receiver,
+  const char* slot,
+  boost::optional<cedar::proc::TriggerPtr> current
+)
+{
+  auto group = gui_group->getGroup();
+
+  {
+    QAction* action = pMenu->addAction("no trigger");
+    if (current)
+    {
+      action->setEnabled(current.get().get() != nullptr);
+    }
+    QObject::connect(action, SIGNAL(triggered()), receiver, slot);
+    pMenu->addSeparator();
+  }
+
+  auto triggers = group->listLoopedTriggers();
+
+  std::map<std::string, cedar::proc::LoopedTriggerPtr> sorted_triggers;
+  for (auto trigger : triggers)
+  {
+    sorted_triggers[trigger->getName()] = trigger;
+  }
+
+  for (const auto& name_trigger_pair : sorted_triggers)
+  {
+    auto trigger = name_trigger_pair.second;
+    std::string path = group->findPath(trigger);
+    QAction* action = pMenu->addAction(QString::fromStdString(trigger->getName()));
+    action->setData(QString::fromStdString(path));
+    if (current)
+    {
+      action->setEnabled(trigger != current.get());
+    }
+
+    QPixmap color_pm(16, 16);
+    cedar::proc::gui::GraphicsBase::paintBackgroundColor(color_pm, gui_group->getColorFor(trigger));
+    action->setIcon(QIcon(color_pm));
+
+    QObject::connect(action, SIGNAL(triggered()), receiver, slot);
+  }
+}
+
+void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)
+{
+  this->fillPlotMenu(menu, event);
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  QMenu* p_assign_trigger = menu.addMenu("assign to trigger");
+
+
+  auto gui_group = this->getGuiGroup();
+
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  if (triggerable && triggerable->isLooped())
+  {
+    cedar::proc::gui::Connectable::buildConnectTriggerMenu
+    (
+      p_assign_trigger,
+      gui_group,
+      this,
+      SLOT(assignTriggerClicked()),
+      triggerable->getParentTrigger()
+    );
+  }
+  else
+  {
+    p_assign_trigger->setEnabled(false);
+  }
+}
+
+cedar::proc::TriggerPtr cedar::proc::gui::Connectable::getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group)
+{
+  std::string trigger_path = action->data().toString().toStdString();
+
+  if (!trigger_path.empty())
+  {
+    auto trigger_element = group->getElement(trigger_path);
+    return boost::dynamic_pointer_cast<cedar::proc::Trigger>(trigger_element);
+  }
+  else
+  {
+    return cedar::proc::TriggerPtr();
+  }
+}
+
+void cedar::proc::gui::Connectable::assignTriggerClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_ASSERT(action);
+
+  auto group = this->getElement()->getGroup();
+  auto trigger = getTriggerFromConnectTriggerAction(action, group);
+
+  auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getElement());
+  if (trigger)
+  {
+    group->connectTrigger(trigger, triggerable);
+  }
+  else if (triggerable->getParentTrigger())
+  {
+    group->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
+  }
 }
 
 void cedar::proc::gui::Connectable::fillPlotMenu(QMenu& menu, QGraphicsSceneContextMenuEvent* event)
