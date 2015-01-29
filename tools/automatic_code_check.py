@@ -75,12 +75,17 @@ class IssueC0002 (Issue):
 
 class IssueM0001 (Issue):
   def __init__(self, line, column):
-    replacements = {"shared_dynamic_cast": "dynamic_pointer_cast"}
     Issue.__init__(self, 
                    issue_type_miscellaneous, 1,
                    "In line " + str(line) + ", col. " + str(column) + ": copyright year is outdated."
                    )
-                   
+
+class IssueM0002 (Issue):
+  def __init__(self):
+    Issue.__init__(self, 
+                   issue_type_miscellaneous, 2,
+                   "The copyright information does not conform to the established standards."
+                   )
 
 class IssueList:
   def __init__(self):
@@ -130,10 +135,13 @@ class REBasedCheck:
       contents = file_contents
       
     current_pos = 0
+    any_found = False
     while True:
       m = self._re.search(file_contents, current_pos)
       if m is None:
         break
+        
+      any_found = True
         
       current_pos = m.end()
       lines = contents[:m.start()].split("\n")
@@ -141,6 +149,9 @@ class REBasedCheck:
       col_no = len(lines[-1]) + 1
       
       self._found(issues, filename, line_no, col_no, m)
+      
+    if not any_found and "_no_matches" in dir(self):
+      self._no_matches(issues, filename)
 
     
 class CheckC0001 (REBasedCheck):
@@ -169,6 +180,9 @@ class CheckM0001 (REBasedCheck):
   def _found(self, issues, filename, line, column, match):
     if match.group(0) != "Copyright " + self.years + " ":
       issues.add_issue(filename, IssueM0001(line, column))
+    
+  def _no_matches(self, issues, filename):
+      issues.add_issue(filename, IssueM0002())
     
 
   

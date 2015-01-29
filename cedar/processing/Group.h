@@ -76,6 +76,7 @@
 #include <set>
 #include <list>
 #include <string>
+#include <functional>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
