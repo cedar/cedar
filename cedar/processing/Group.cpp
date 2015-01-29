@@ -774,7 +774,32 @@ std::string cedar::proc::Group::findNewIdentifier(const std::string& basis, boos
 
 std::string cedar::proc::Group::getUniqueIdentifier(const std::string& identifier) const
 {
-  return findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(identifier), boost::bind(&cedar::proc::Group::nameExists, this, _1));
+  return findNewIdentifier(cedar::proc::Group::camelCaseToSpaces(identifier), boost::bind(&cedar::proc::Group::nameExistsInAnyGroup, this, _1));
+}
+
+bool cedar::proc::Group::nameExistsInAnyGroup(const cedar::proc::GroupPath& name) const
+{
+  // recurse until we arrive at the top group
+  if (this->getGroup())
+  {
+    return this->getGroup()->nameExistsInAnyGroup(name);
+  }
+
+  // otherwise, check if the name exists in this group
+  if (this->nameExists(name))
+  {
+    return true;
+  }
+
+  // if it does not, check in all subgroups
+  for (auto group : this->findAll<cedar::proc::Group>(true))
+  {
+    if (group->nameExists(name))
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool cedar::proc::Group::nameExists(const cedar::proc::GroupPath& name) const

@@ -528,6 +528,9 @@ public:
   //!@brief Checks whether a name exists in the group.
   bool nameExists(const cedar::proc::GroupPath& name) const;
 
+  //!@brief Checks whether a name exists in this group or any of its children or parents.
+  bool nameExistsInAnyGroup(const cedar::proc::GroupPath& name) const;
+
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadConfiguration()
   {
