@@ -41,17 +41,10 @@
 #include "cedar/processing/gui/GroupContainerItem.h"
 #include "cedar/processing/gui/GroupWidget.h"
 #include "cedar/processing/gui/Group.h"
-#include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/View.h"
 #include "cedar/processing/Group.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGraphicsSceneDragDropEvent>
-#include <QStyle>
-#include <QApplication>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,57 +52,21 @@
 
 cedar::proc::gui::GroupContainerItem::GroupContainerItem(cedar::proc::gui::Group* pGroup)
 :
-cedar::proc::gui::GraphicsBase(400, 300, GRAPHICS_GROUP_UNKNOWN, GRAPHICS_GROUP_NONE, BASE_SHAPE_RECT),
-mpContainer(new QGraphicsProxyWidget(this)),
 mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
 {
-  auto style = QApplication::style();
-  auto close_icon = style->standardIcon(QStyle::SP_TitleBarCloseButton);
+  this->setWidget(this->mpGroupWidget);
 
-  auto outer = new QWidget();
-  mpContainer->setWidget(outer);
-  auto layout = new QVBoxLayout();
-  layout->setContentsMargins(2, 2, 2 ,2);
-  outer->setLayout(layout);
+  QObject::connect(pGroup->getGroup()->getParameter("name").get(), SIGNAL(valueChanged()), this, SLOT(groupNameChanged()));
 
-  auto titlebar_layout = new QHBoxLayout();
-  layout->addLayout(titlebar_layout);
-  auto p_close_button = new QPushButton(close_icon, "");
-  QSize size = close_icon.availableSizes().at(0);
-  size.setWidth(size.width() + 2);
-  size.setHeight(size.height() + 2);
-  p_close_button->setFixedSize(size);
-  titlebar_layout->addStretch(1);
-  titlebar_layout->addWidget(p_close_button, 0);
-
-  layout->addWidget(this->mpGroupWidget);
-
-  QObject::connect(p_close_button, SIGNAL(clicked()), this, SLOT(deleteLater()));
-  this->setResizeable(true);
-  this->setFlag(QGraphicsItem::ItemIsMovable, true);
-  this->setFlag(QGraphicsItem::ItemIsSelectable, true);
-  this->setMinimumSize(QSizeF(400,300));
-  this->updateResizeHandles();
-  this->sizeChanged();
-
-  this->setAcceptDrops(true);
+  this->groupNameChanged();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::gui::GroupContainerItem::canDuplicate() const
+void cedar::proc::gui::GroupContainerItem::groupNameChanged()
 {
-  return false;
-}
-
-bool cedar::proc::gui::GroupContainerItem::canResize() const
-{
-  return true;
-}
-
-void cedar::proc::gui::GroupContainerItem::sizeChanged()
-{
-  this->mpContainer->setGeometry(QRectF(0, 0, this->width(), this->height()));
+  auto group = this->mpGroupWidget->getGroup();
+  this->setTitle(group->getGroup()->getName());
 }
