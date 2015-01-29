@@ -22,40 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GroupContainerItem.h
+    File:        WidgetContainerItem.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2015 01 20
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2015 01 29
 
-    Description: Header file for the class cedar::proc::gui::GroupContainerItem.
+    Description: Header file for the class cedar::proc::gui::WidgetContainerItem.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_GROUP_CONTAINER_ITEM_H
-#define CEDAR_PROC_GUI_GROUP_CONTAINER_ITEM_H
+#ifndef CEDAR_PROC_GUI_WIDGET_CONTAINER_ITEM_H
+#define CEDAR_PROC_GUI_WIDGET_CONTAINER_ITEM_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/WidgetContainerItem.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/gui/GroupContainerItem.fwd.h"
-#include "cedar/processing/gui/Group.fwd.h"
-#include "cedar/processing/gui/GroupWidget.fwd.h"
+#include "cedar/processing/gui/WidgetContainerItem.fwd.h"
 
 // SYSTEM INCLUDES
+#include <QGraphicsProxyWidget>
+#include <QLabel>
+#include <QHBoxLayout>
 #include <QObject>
 
-/*!@brief An item that displays the content of a group.
+/*!@brief A base class for including window-like widgets in a graphics scene
  */
-class cedar::proc::gui::GroupContainerItem : public cedar::proc::gui::WidgetContainerItem
+class cedar::proc::gui::WidgetContainerItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
   Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,13 +67,19 @@ class cedar::proc::gui::GroupContainerItem : public cedar::proc::gui::WidgetCont
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GroupContainerItem(cedar::proc::gui::Group* pGroup);
+  WidgetContainerItem();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void setWidget(QWidget* widget);
+
+  bool canDuplicate() const;
+
+  bool canResize() const;
+
+  void setTitle(const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -82,8 +90,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private slots:
-  void groupNameChanged();
+private:
+  void sizeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -91,7 +99,17 @@ private slots:
 protected:
   // none yet
 private:
-  cedar::proc::gui::GroupWidget* mpGroupWidget;
+  //! The graphics proxy containing the widget
+  QGraphicsProxyWidget* mpContainer;
+
+  //! The contained widget
+  QWidget* mpContained;
+
+  //! Used for displaying the title
+  QLabel* mpTitleWidget;
+
+  //! Layout of the title bar
+  QHBoxLayout* mpTitleBarLayout;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -102,7 +120,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::gui::GroupContainerItem
+}; // class cedar::proc::gui::WidgetContainerItem
 
-#endif // CEDAR_PROC_GUI_GROUP_CONTAINER_ITEM_H
+#endif // CEDAR_PROC_GUI_WIDGET_CONTAINER_ITEM_H
 

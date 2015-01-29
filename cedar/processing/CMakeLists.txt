@@ -93,6 +93,7 @@ cedar_add_library(cedarproc
   gui/Group.h
   gui/ToolBox.h
   gui/View.h
+  gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
   steps/Component.h
