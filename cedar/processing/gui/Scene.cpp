@@ -460,8 +460,8 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
     {
       if // check if this is not a "fake" left click event that emulates middle mouse button scrolling
       (
-        (pMouseEvent->buttons() & Qt::LeftButton) > 0
-          && this->mpeParentView->dragMode() != QGraphicsView::ScrollHandDrag
+        pMouseEvent->buttons().testFlag(Qt::LeftButton)
+        && this->mpeParentView->dragMode() != QGraphicsView::ScrollHandDrag
       )
       {
         QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
@@ -868,7 +868,6 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
     QGraphicsScene::mousePressEvent(pMouseEvent);
     return;
   }
-
   QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
 
   if (items.size() > 0)
@@ -877,6 +876,9 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
 
     if (this->mpConnectionStart != nullptr)
     {
+      // we accept the mouse event, noone else should handle it
+      pMouseEvent->accept();
+
       QPointF start = mpConnectionStart->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
       QLineF line(start, start);
       mpNewConnectionIndicator = this->addLine(line);
