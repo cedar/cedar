@@ -65,6 +65,16 @@ mpGroupWidget(new cedar::proc::gui::GroupWidget(pGroup))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GroupContainerItem::setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget)
+{
+  this->mpGroupWidget->setConfigurableWidget(pConfigurableWidget);
+}
+
+void cedar::proc::gui::GroupContainerItem::setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget)
+{
+  this->mpGroupWidget->setRecorderWidget(pRecorderWidget);
+}
+
 void cedar::proc::gui::GroupContainerItem::groupNameChanged()
 {
   auto group = this->mpGroupWidget->getGroup();

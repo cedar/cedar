@@ -44,9 +44,11 @@
 #include "cedar/processing/gui/WidgetContainerItem.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
 #include "cedar/processing/gui/GroupContainerItem.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/GroupWidget.fwd.h"
+#include "cedar/auxiliaries/gui/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -71,7 +73,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*!@brief Sets the widget used for displaying/editing the parameters of configurables in the group.
+   */
+  void setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget);
+
+  /*!@brief Sets the widget used for displaying/editing the record parameters in the group.
+   */
+  void setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
