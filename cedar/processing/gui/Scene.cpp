@@ -124,6 +124,16 @@ cedar::proc::gui::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::gui::Configurable* cedar::proc::gui::Scene::getConfigurableWidget() const
+{
+  return this->mpConfigurableWidget;
+}
+
+cedar::proc::gui::RecorderWidget* cedar::proc::gui::Scene::getRecorderWidget() const
+{
+  return this->mpRecorderWidget;
+}
+
 void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   this->QGraphicsScene::dragEnterEvent(pEvent);
@@ -318,32 +328,43 @@ void cedar::proc::gui::Scene::itemSelected()
     }
   }
 
-  if (this->mpConfigurableWidget == nullptr || this->mpRecorderWidget == nullptr)
-  {
-    return;
-  }
-
   if (selected_items.size() == 1)
   {
     auto p_item = selected_items[0];
     if (auto p_element = dynamic_cast<cedar::proc::gui::Element*>(p_item))
     {
-      this->mpConfigurableWidget->display(p_element->getElement(), p_element->isReadOnly());
-
-      if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(p_element->getElement()))
+      if (this->mpConfigurableWidget != nullptr)
       {
-        this->mpRecorderWidget->setStep(step);
+        this->mpConfigurableWidget->display(p_element->getElement(), p_element->isReadOnly());
+      }
+
+      if (this->mpRecorderWidget != nullptr)
+      {
+        if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(p_element->getElement()))
+        {
+          this->mpRecorderWidget->setStep(step);
+        }
       }
     }
     else if (auto coupling = dynamic_cast<cedar::proc::gui::CouplingCollection*>(p_item))
     {
-      this->mpConfigurableWidget->display(coupling->getContentsAsConfigurables());
+      if (this->mpConfigurableWidget != nullptr)
+      {
+        this->mpConfigurableWidget->display(coupling->getContentsAsConfigurables());
+      }
     }
   }
   else
   {
-    this->mpConfigurableWidget->clear();
-    this->mpRecorderWidget->clearLayout();
+    if (this->mpConfigurableWidget != nullptr)
+    {
+      this->mpConfigurableWidget->clear();
+    }
+
+    if (this->mpRecorderWidget != nullptr)
+    {
+      this->mpRecorderWidget->clearLayout();
+    }
   }
 }
 

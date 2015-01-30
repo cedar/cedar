@@ -96,7 +96,6 @@ Q_DECLARE_METATYPE(cedar::aux::PluginDeclaration*)
 //----------------------------------------------------------------------------------------------------------------------
 
 const qreal cedar::proc::gui::Group::M_EXPANDED_SLOT_OFFSET = static_cast<qreal>(25);
-
 const qreal cedar::proc::gui::Group::M_EXPANDED_ICON_SIZE = static_cast<qreal>(20);
 const qreal cedar::proc::gui::Group::M_COLLAPSED_ICON_SIZE = cedar::proc::gui::StepItem::M_ICON_SIZE;
 
@@ -2475,7 +2474,9 @@ void cedar::proc::gui::Group::updateAllElementsTriggerColorState() const
 
 void cedar::proc::gui::Group::openGroupContainer()
 {
-  cedar::proc::gui::GroupContainerItem* p_item = new cedar::proc::gui::GroupContainerItem(this);
+  auto p_item = new cedar::proc::gui::GroupContainerItem(this);
+  p_item->setConfigurableWidget(this->getScene()->getConfigurableWidget());
+  p_item->setRecorderWidget(this->getScene()->getRecorderWidget());
   this->getScene()->addItem(p_item);
 }
 

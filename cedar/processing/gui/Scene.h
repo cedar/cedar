@@ -315,6 +315,12 @@ public:
   //! emits a scene changed signal
   void emitSceneChanged();
 
+  //! Returns the configurable widget of the scene.
+  cedar::aux::gui::Configurable* getConfigurableWidget() const;
+
+  //! Returns the configurable widget of the scene.
+  cedar::proc::gui::RecorderWidget* getRecorderWidget() const;
+
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
