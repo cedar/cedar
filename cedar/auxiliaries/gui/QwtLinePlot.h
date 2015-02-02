@@ -164,10 +164,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  QwtLinePlot(QWidget *pParent = NULL);
+  QwtLinePlot(QWidget *pParent = nullptr);
 
   //!@brief Constructor expecting a DataPtr.
-  QwtLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  QwtLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = nullptr);
 
   //!@brief Destructor
   ~QwtLinePlot();
@@ -242,15 +242,20 @@ protected:
   //!@brief create and handle the context menu
   void contextMenuEvent(QContextMenuEvent *pEvent);
 
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+
+  void doDetach(cedar::aux::ConstDataPtr data);
+
+  QwtPlot* getPlot();
+
+  void setAutoDetermineXLimits(bool automatic);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief initialize
   void init();
-
-  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
-  void doDetach(cedar::aux::ConstDataPtr data);
 
   //!@brief Applies a plot style to a given curve.
   static void applyStyle(cedar::aux::ConstDataPtr data, size_t lineId, QwtPlotCurve *pCurve);
@@ -305,6 +310,9 @@ private:
 
   //! If true, the plot will not complain about 0d data. Otherwise, 0D data will lead it to emit a dataChanged signal.
   bool mPlot0D;
+
+  //! If true, the plot will set its x limits automatically in each plot step.
+  bool mAutoDetermineXLimits;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

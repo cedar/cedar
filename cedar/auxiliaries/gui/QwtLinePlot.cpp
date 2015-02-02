@@ -123,6 +123,11 @@ cedar::aux::gui::QwtLinePlot::~QwtLinePlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+QwtPlot* cedar::aux::gui::QwtLinePlot::getPlot()
+{
+  return this->mpPlot;
+}
+
 cedar::aux::math::Limits<double> cedar::aux::gui::QwtLinePlot::getXLimits() const
 {
   cedar::aux::math::Limits<double> limits;
@@ -383,6 +388,7 @@ void cedar::aux::gui::QwtLinePlot::plot(cedar::aux::ConstDataPtr data, const std
 
 void cedar::aux::gui::QwtLinePlot::init()
 {
+  this->mAutoDetermineXLimits = true;
   this->mPlot0D = false;
 
   QPalette palette = this->palette();
@@ -418,6 +424,11 @@ void cedar::aux::gui::QwtLinePlot::init()
   QObject::connect(this->_mYAxisLimits.get(), SIGNAL(valueChanged()), this, SLOT(axisLimitsChanged()));
   QObject::connect(this->_mMajorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
   QObject::connect(this->_mMinorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
+}
+
+void cedar::aux::gui::QwtLinePlot::setAutoDetermineXLimits(bool automatic)
+{
+  this->mAutoDetermineXLimits = automatic;
 }
 
 void cedar::aux::gui::QwtLinePlot::setAccepts0DData(bool accept)
@@ -794,12 +805,15 @@ void cedar::aux::gui::QwtLinePlot::conversionDone(double min, double max)
     #endif
   }
 
-  if (min == max)
+  if (this->mAutoDetermineXLimits)
   {
-    min -= 0.5;
-    max += 0.5;
+    if (min == max)
+    {
+      min -= 0.5;
+      max += 0.5;
+    }
+    this->setFixedXAxisScaling(min, max);
   }
-  this->setFixedXAxisScaling(min, max);
 
   this->mpPlot->replot();
 }
