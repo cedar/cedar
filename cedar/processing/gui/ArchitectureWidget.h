@@ -123,6 +123,8 @@ private:
 
   void applySubstitutions(cedar::aux::ConfigurationNode& target, const cedar::aux::ConfigurationNode& substitutions);
 
+  void readConfig(const cedar::aux::ConfigurationNode& config);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
