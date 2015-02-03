@@ -1453,10 +1453,19 @@ QWidget* cedar::proc::gui::Connectable::createDockWidget(const std::string& titl
     p_dock->setFloating(true);
     p_dock->setContentsMargins(0, 0, 0, 0);
     p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    QRect g = pWidget->geometry();
     p_dock->setWidget(pWidget);
 
     mChildWidgets.push_back(p_dock);
     QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
+
+    QRect p = this->mpMainWindow->geometry();
+    g.setLeft(p.x() + (p.width() - g.width())/2);
+    g.setTop(p.y() + (p.height() - g.height())/2);
+    // changing left/top does not keep the correct width/heigh, thus, restore them
+    g.setWidth(pWidget->geometry().width());
+    g.setHeight(pWidget->geometry().height());
+    p_dock->setGeometry(g);
 
     return p_dock;
   }
