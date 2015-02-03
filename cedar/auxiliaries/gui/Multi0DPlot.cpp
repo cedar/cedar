@@ -47,6 +47,8 @@
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/LockerBase.h"
+#include "cedar/auxiliaries/threadingUtilities.h"
 
 // SYSTEM INCLUDES
 #include <qwt_scale_draw.h>
@@ -217,6 +219,10 @@ void cedar::aux::gui::Multi0DPlot::timerEvent(QTimerEvent *pEvent)
 
     unsigned int index = this->mTitleIndex[title];
     cedar::aux::MatDataPtr subdata = this->mSubtitleData[subtitle];
+    cedar::aux::LockSet locks;
+    cedar::aux::append(locks, &data->getLock(), cedar::aux::LOCK_TYPE_READ);
+    cedar::aux::append(locks, &subdata->getLock(), cedar::aux::LOCK_TYPE_WRITE);
+    cedar::aux::LockerBase locker(boost::bind(&cedar::aux::lock, boost::ref(locks)), boost::bind(&cedar::aux::unlock, boost::ref(locks)));
     subdata->getData().at<float>(static_cast<int>(index), 0) = cedar::aux::math::getMatrixEntry<float>(data->getData(), 0);
   }
 
