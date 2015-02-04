@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/ColorGradient.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/annotation/ValueRangeHint.fwd.h"
 #include "cedar/auxiliaries/gui/QImagePlot.fwd.h"
 
 // SYSTEM INCLUDES
@@ -155,6 +156,8 @@ public:
 
   //! Returns the currently active color jet.
   cedar::aux::ColorGradient::StandardGradients::Id getColorJet() const;
+
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
 public slots:
   /*!@brief Set the scaling mode of the plot.
@@ -268,6 +271,9 @@ private:
 
   //! The color gradient to be used.
   cedar::aux::ColorGradientPtr mColorGradient;
+
+  //! If not null, this is used to determine the range of the plot.
+  cedar::aux::annotation::ConstValueRangeHintPtr mValueHint;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

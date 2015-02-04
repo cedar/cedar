@@ -219,6 +219,7 @@ bool cedar::aux::gui::ImagePlot::doConversion()
     this->setInfo("cannot display matrices of dimensionality > 2");
     return false;
   }
+
   const cv::Mat& mat = this->mData->getData();
 
   if (mat.empty())
@@ -460,9 +461,10 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
   }
 }
 
-void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
+void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->stop();
+  this->cedar::aux::gui::QImagePlot::plot(data, title);
 
   this->mDataType = DATA_TYPE_MAT;
   this->setLegendAvailable(true);
