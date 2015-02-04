@@ -51,6 +51,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 
 // FORWARD DECLARATIONS
+#include "cedar/auxiliaries/annotation/ValueRangeHint.fwd.h"
 #include "cedar/auxiliaries/MatData.fwd.h"
 #include "cedar/auxiliaries/gui/QwtLinePlot.fwd.h"
 #include "cedar/auxiliaries/math/Limits.fwd.h"
@@ -133,7 +134,7 @@ private:
   {
     PlotSeries()
     :
-    mpCurve(NULL)
+    mpCurve(nullptr)
     {
     }
 
@@ -147,12 +148,18 @@ private:
 
     //!@brief the displayed data
     cedar::aux::ConstMatDataPtr mMatData;
+
     //!@brief a curve inside the plot
     QwtPlotCurve *mpCurve;
+
     //!@brief the x values of the plot
     std::vector<double> mXValues;
+
     //!@brief the y values of the plot
     std::vector<double> mYValues;
+
+    //! The value range hint, if any.
+    cedar::aux::annotation::ConstValueRangeHintPtr mValueRange;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(PlotSeries);
