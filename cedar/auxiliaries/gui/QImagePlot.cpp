@@ -38,6 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/annotation/ValueRangeHint.h"
 #include "cedar/auxiliaries/gui/QImagePlot.h"
 #include "cedar/auxiliaries/ColorGradient.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -171,6 +172,27 @@ cedar::aux::gui::detail::QImagePlotLegend::QImagePlotLegend()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::QImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /*title*/)
+{
+  if (data->hasAnnotation<cedar::aux::annotation::ValueRangeHint>())
+  {
+    this->mValueHint = data->getAnnotation<cedar::aux::annotation::ValueRangeHint>();
+
+    // set fixed scaling based on the value hint
+    this->setLimits(this->mValueHint->getRange().getLower(), this->mValueHint->getRange().getUpper());
+  }
+  else
+  {
+    // if a value hint was previously set, revert to automatic scaling
+    if (this->mValueHint)
+    {
+      this->setAutomaticScaling();
+    }
+    // reset the value hint
+    this->mValueHint.reset();
+  }
+}
 
 void cedar::aux::gui::QImagePlot::colorJetChanged()
 {
