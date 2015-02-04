@@ -787,6 +787,9 @@ private:
   //! Finds an identifier for which the @em checker function returns false.
   static std::string findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker);
 
+  //! if the parent group changes (i.e., this group looses its 'rootness'), the default trigger is removed if it exists
+  void onParentGroupChanged();
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
@@ -892,6 +895,9 @@ private:
 
   //! Map of scripts present in this architecture
   cedar::aux::LockableMember<std::set<cedar::proc::CppScriptPtr>> mScripts;
+
+  //! a connection to the groupChanged signal of element
+  boost::signals2::scoped_connection mParentGroupChangedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
