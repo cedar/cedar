@@ -103,8 +103,8 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! connects to network changed signal
-  inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
+  //! connects to group changed signal
+  inline boost::signals2::connection connectToGroupChanged(boost::function<void()> slot)
   {
     return this->mGroupChanged.connect(slot);
   }

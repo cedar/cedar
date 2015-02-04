@@ -168,6 +168,7 @@ _mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mConnectors->setHidden(true);
+  mParentGroupChangedConnection = this->connectToGroupChanged(boost::bind<void>(&cedar::proc::Group::onParentGroupChanged, this));
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
@@ -2950,6 +2951,19 @@ void cedar::proc::Group::onLoopedChanged()
           }
         }
       }
+    }
+  }
+}
+
+void cedar::proc::Group::onParentGroupChanged()
+{
+  // check if this is not the root group
+  if (!this->isRoot())
+  {
+    // if there is no default trigger, create one
+    if (this->nameExists("default trigger"))
+    {
+      this->remove(this->getElement("default trigger"));
     }
   }
 }
