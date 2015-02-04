@@ -1188,21 +1188,6 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
       }
     }
   }
-  // remember all trigger connections between moved elements
-  for (auto element : elements)
-  {
-    if (cedar::proc::TriggerPtr source_trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
-    {
-      for (auto target : elements)
-      {
-        cedar::proc::TriggerablePtr target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target);
-        if (target_triggerable && source_trigger->isListener(target_triggerable))
-        {
-          trigger_connections.push_back(TriggerConnectionInfo(source_trigger, target_triggerable));
-        }
-      }
-    }
-  }
 
   // delete data connections
   for (auto connection : data_connections)
@@ -1220,11 +1205,6 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
   for (auto connection : data_connections)
   {
     cedar::proc::Group::connectAcrossGroups(connection.from, connection.to);
-  }
-  // restore trigger connections
-  for (auto connection : trigger_connections)
-  {
-    this->connectTrigger(connection.from, connection.to);
   }
 }
 
@@ -1691,7 +1671,7 @@ void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::p
 {
   // if the item is looped, it can only be triggered by a single trigger
   // thus, check if there is already a connection, and remove it
-  if (target->isLooped() && target->getParentTrigger())
+  if (target->isLooped() && target->getParentTrigger() && !boost::dynamic_pointer_cast<cedar::proc::Group>(target))
   {
     this->disconnectTrigger(target->getParentTrigger(), target);
   }
