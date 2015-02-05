@@ -288,7 +288,11 @@ void cedar::proc::gui::SimulationControl::removeClicked()
   for (auto item : selected_items)
   {
     std::string path = this->mpTree->getPathFromItem(item);
-    to_remove.push_back(this->mGroup->getGroup()->getElement(path));
+    auto element = this->mGroup->getGroup()->getElement(path);
+    if (element->getName() != "default trigger")
+    {
+      to_remove.push_back(element);
+    }
   }
 
   // then remove them

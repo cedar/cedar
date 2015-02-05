@@ -179,8 +179,8 @@ cedar::proc::Group::~Group()
   // stop all triggers.
   this->stopTriggers();
 
-  // read out all elements and call this->remove for each element
-  this->removeAll();
+  // remove all elements and notify about destructing state
+  this->removeAll(true);
 
   this->mParameterLinks.clear();
   mDataConnections.clear();
@@ -896,7 +896,7 @@ const cedar::proc::Group::ElementMap& cedar::proc::Group::getElements() const
   return this->mElements;
 }
 
-void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
+void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destructing)
 {
   // first, delete all data connections to and from this Element
   std::vector<cedar::proc::DataConnectionPtr> delete_later;
@@ -954,7 +954,7 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
       }
       trigger_con = mTriggerConnections.erase(trigger_con);
       // if the deleted element is a looped trigger, connect the triggerable to the default trigger
-      if (source_trigger == element && this->isRoot())
+      if (source_trigger == element && !destructing && this->isRoot() && element->getName() != "default trigger")
       {
         // remember the triggerable for a later re-connection to the default trigger
         triggerables_for_default_trigger.push_back(target_triggerable);
@@ -1003,7 +1003,7 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
   this->signalElementRemoved(element);
 
   // reconnect looped triggerables to the default trigger
-  if (triggerables_for_default_trigger.size() > 0)
+  if (triggerables_for_default_trigger.size() > 0 && !destructing)
   {
     // if there is no default trigger, create one
     if (!this->nameExists("default trigger"))
@@ -2633,17 +2633,11 @@ bool cedar::proc::Group::disconnectAcrossGroups(cedar::proc::OwnedDataPtr source
   return false;
 }
 
-void cedar::proc::Group::removeAll()
+void cedar::proc::Group::removeAll(bool destructing)
 {
-  // read out all elements and call this->remove for each element
-  std::vector<cedar::proc::ElementPtr> elements;
-  for (auto it : mElements)
+  while (!mElements.empty())
   {
-    elements.push_back(it.second);
-  }
-  for (unsigned int i = 0; i < elements.size(); ++i)
-  {
-    this->remove(elements.at(i));
+    this->remove(mElements.begin()->second, destructing);
   }
 }
 
