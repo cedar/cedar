@@ -249,11 +249,11 @@ public:
    *
    * @remark Before calling this function, you should remove all connections to the element.
    */
-  void remove(cedar::proc::ConstElementPtr element);
+  void remove(cedar::proc::ConstElementPtr element, bool destructing = false);
 
   /*!@brief calls remove() for every element of the group
    */
-  void removeAll();
+  void removeAll(bool destructing = false);
 
   /*!@brief Creates a new element with the type given by className and the name instanceName.
    *
