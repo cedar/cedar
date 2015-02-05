@@ -913,6 +913,8 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
   }
   this->disconnectSlots(delete_later);
 
+  // remember all triggerables that have to be connected to the default trigger afterwards
+  std::vector<cedar::proc::ConstTriggerablePtr> triggerables_for_default_trigger;
   // then, delete all trigger connections to and from this Element
   for (
         cedar::proc::Group::TriggerConnectionVector::iterator trigger_con = mTriggerConnections.begin();
@@ -920,8 +922,10 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
         // empty
       )
   {
-    if ((*trigger_con)->getSourceTrigger() == boost::dynamic_pointer_cast<const cedar::proc::Trigger>(element)
-        || (*trigger_con)->getTarget() == boost::dynamic_pointer_cast<const cedar::proc::Triggerable>(element))
+    auto source_trigger = (*trigger_con)->getSourceTrigger();
+    auto target_triggerable = (*trigger_con)->getTarget();
+    if ( source_trigger == boost::dynamic_pointer_cast<const cedar::proc::Trigger>(element)
+        || target_triggerable == boost::dynamic_pointer_cast<const cedar::proc::Triggerable>(element))
     {
       cedar::proc::TriggerPtr source_trigger;
       try
@@ -949,6 +953,12 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
         );
       }
       trigger_con = mTriggerConnections.erase(trigger_con);
+      // if the deleted element is a looped trigger, connect the triggerable to the default trigger
+      if (source_trigger == element && this->isRoot())
+      {
+        // remember the triggerable for a later re-connection to the default trigger
+        triggerables_for_default_trigger.push_back(target_triggerable);
+      }
     }
     else
     {
@@ -991,6 +1001,30 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
   }
 
   this->signalElementRemoved(element);
+
+  // reconnect looped triggerables to the default trigger
+  if (triggerables_for_default_trigger.size() > 0)
+  {
+    // if there is no default trigger, create one
+    if (!this->nameExists("default trigger"))
+    {
+      this->create("cedar.processing.LoopedTrigger", "default trigger");
+    }
+
+    for (auto unconnected_triggerable : triggerables_for_default_trigger)
+    {
+      // cast to element to get name
+      auto element = boost::dynamic_pointer_cast<cedar::proc::ConstElement>(unconnected_triggerable);
+      if (element)
+      {
+        this->connectTrigger
+        (
+          this->getElement<cedar::proc::LoopedTrigger>("default trigger"),
+          this->getElement<cedar::proc::Triggerable>(element->getName())
+        );
+      }
+    }
+  }
 }
 
 void cedar::proc::Group::create(std::string className, std::string instanceName)
