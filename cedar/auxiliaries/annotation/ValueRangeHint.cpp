@@ -68,6 +68,11 @@ void cedar::aux::annotation::ValueRangeHint::init(const cedar::aux::math::Limits
   this->mRange = limits;
 }
 
+bool cedar::aux::annotation::ValueRangeHint::excludeFromCopying() const
+{
+  return true;
+}
+
 const cedar::aux::math::Limits<double>& cedar::aux::annotation::ValueRangeHint::getRange() const
 {
   return this->mRange;
