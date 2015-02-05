@@ -66,6 +66,10 @@ known issues
 Unreleased
 ==========
 
+- cedar::aux
+  - There is a new plot called Multi0DPlot. This is mainly intended to be used for showing the state of (EB) nodes in an
+    architecture, thus, it should be used in conjunction with an architecture widget. See the tutorial for architecture
+    widgets for details.
 - cedar::proc
   - The use of (Looped)Triggers has been remodeled completely. They are no longer shown in the architecture. Instead,
     each looped element is, by default, connected to a default trigger that is created automatically. If you want to use

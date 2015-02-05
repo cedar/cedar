@@ -104,9 +104,11 @@ void cedar::aux::gui::MatrixSlicePlot3D::init()
   this->setValueScalingEnabled(true);
 }
 
-void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
+void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->stop();
+
+  this->cedar::aux::gui::QImagePlot::plot(data, title);
 
   this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
