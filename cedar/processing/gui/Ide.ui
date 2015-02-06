@@ -87,6 +87,9 @@
     <addaction name="mpActionStartPauseSimulation"/>
     <addaction name="mpActionResetSimulation"/>
     <addaction name="mpThreadsSingleStep"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionRecord"/>
+    <addaction name="mpActionSnapshot"/>
    </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
