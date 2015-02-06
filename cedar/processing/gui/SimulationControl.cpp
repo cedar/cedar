@@ -175,6 +175,8 @@ mSimulationRunning(false)
   {
     this->triggerStarted();
   }
+
+  this->startTimer(1000);
 }
 
 cedar::proc::gui::SimulationControl::~SimulationControl()
@@ -184,6 +186,14 @@ cedar::proc::gui::SimulationControl::~SimulationControl()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::SimulationControl::timerEvent(QTimerEvent* /* pEvent */)
+{
+  if (this->isVisible())
+  {
+    this->updateTriggerQualities();
+  }
+}
 
 void cedar::proc::gui::SimulationControl::sortItems()
 {
@@ -206,9 +216,9 @@ void cedar::proc::gui::SimulationControl::updateAllTriggerColors()
   }
 }
 
-QWidget* cedar::proc::gui::SimulationControl::getColorWidget(QTreeWidgetItem* pItem)
+QWidget* cedar::proc::gui::SimulationControl::getColorWidget(QTreeWidgetItem* pItem, int column)
 {
-  QWidget* p_outer = this->mpTree->itemWidget(pItem, 0);
+  QWidget* p_outer = this->mpTree->itemWidget(pItem, column);
   if (!p_outer || p_outer->layout() == nullptr)
   {
     return nullptr;
@@ -216,6 +226,11 @@ QWidget* cedar::proc::gui::SimulationControl::getColorWidget(QTreeWidgetItem* pI
 
   QWidget* p_inner = p_outer->layout()->itemAt(0)->widget();
   return p_inner;
+}
+
+QWidget* cedar::proc::gui::SimulationControl::getQualityWidget(QTreeWidgetItem* pItem)
+{
+  return this->getColorWidget(pItem, 3);
 }
 
 cedar::proc::LoopedTriggerPtr cedar::proc::gui::SimulationControl::getItemTrigger(QTreeWidgetItem* pItem)
@@ -248,17 +263,65 @@ void cedar::proc::gui::SimulationControl::updateItemTriggerColor(QTreeWidgetItem
   this->updateItemColorWidgetColor(widget, trigger);
 }
 
-void cedar::proc::gui::SimulationControl::updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr trigger)
+void cedar::proc::gui::SimulationControl::applyBrushToColorWidget(QWidget* pWidget, const QBrush& brush)
 {
-  auto label = dynamic_cast<QLabel*>(pColorWidget);
+  auto label = dynamic_cast<QLabel*>(pWidget);
   CEDAR_DEBUG_ASSERT(label != nullptr);
 
-  QBrush brush = this->mGroup->getColorFor(trigger);
-
-  QPixmap color_pm(pColorWidget->width(), pColorWidget->height());
+  QPixmap color_pm(pWidget->width(), pWidget->height());
   cedar::proc::gui::GraphicsBase::paintBackgroundColor(color_pm, brush);
 
   label->setPixmap(color_pm);
+}
+
+void cedar::proc::gui::SimulationControl::updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr trigger)
+{
+  QBrush brush = this->mGroup->getColorFor(trigger);
+  this->applyBrushToColorWidget(pColorWidget, brush);
+}
+
+void cedar::proc::gui::SimulationControl::updateItemQualityWidget(QWidget* pQualityWidget, cedar::proc::LoopedTriggerPtr trigger)
+{
+  // -- determine quality level of trigger --
+  double steps_taken = trigger->getAverageStepsTaken();
+  double steps_skipped = steps_taken - 1.0;
+
+  // -- make quality level into a color --
+
+  // make a copy of the running state to avoid locking the trigger more than necessary
+  bool running = trigger->isRunning();
+  bool show_statistics = !std::isnan(steps_taken) && running;
+
+  QColor color;
+  if (!show_statistics)
+  {
+    color = Qt::gray;
+  }
+  else
+  {
+    double badness = std::max(0.0, std::min((steps_taken - 1.0) / 10.0, 1.0));
+    color = QColor(0, 0, 0);
+    color.setGreenF(1.0 - 2.0 * std::max(0.0, badness - 0.5));
+    color.setRedF(2.0 * std::min(badness, 0.5));
+  }
+  QString color_string = QString("rgb(%1, %2, %3)").arg(color.red()).arg(color.green()).arg(color.blue());
+
+  // -- apply color to the widget --
+  pQualityWidget->setStyleSheet("QLabel { background-color: " + color_string + "; }");
+
+  // -- set the text of the widget to give hints of how quality comes about --
+  auto label = cedar::aux::asserted_cast<QLabel*>(pQualityWidget);
+
+  if (show_statistics)
+  {
+    label->setText(QString("%1x").arg(std::round(steps_taken)));
+    label->setToolTip(QString("This trigger skips, on average, %1 of its computation steps.").arg(steps_skipped));
+  }
+  else
+  {
+    label->setText("");
+    label->setToolTip("");
+  }
 }
 
 void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr group)
@@ -269,6 +332,19 @@ void cedar::proc::gui::SimulationControl::setGroup(cedar::proc::gui::GroupPtr gr
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
   QObject::connect(this->mGroup->getGroup().get(), SIGNAL(allTriggersStopped()), this, SLOT(allTriggersStopped()));
   QObject::connect(this->mGroup.get(), SIGNAL(triggerColorsChanged()), this, SLOT(updateAllTriggerColors()));
+}
+
+void cedar::proc::gui::SimulationControl::updateTriggerQualities()
+{
+  for (QTreeWidgetItemIterator iter(this->mpTree); auto p_item = *iter; ++iter)
+  {
+    auto trigger = this->getItemTrigger(p_item);
+    auto widget = this->getQualityWidget(p_item);
+    if (widget && trigger)
+    {
+      this->updateItemQualityWidget(widget, trigger);
+    }
+  }
 }
 
 void cedar::proc::gui::SimulationControl::createClicked()
@@ -311,11 +387,8 @@ void cedar::proc::gui::SimulationControl::elementAdded(QTreeWidgetItem* pItem, c
   }
 }
 
-void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger)
+QLabel* cedar::proc::gui::SimulationControl::addColorWidget(QTreeWidgetItem* pItem, int column)
 {
-  auto control = new cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget(loopedTrigger);
-  this->mpTree->setItemWidget(pItem, 2, control);
-
   auto color_indicator_frame = new QWidget();
   auto layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
@@ -324,10 +397,26 @@ void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pI
   color_indicator->setFixedSize(QSize(16, 16));
   color_indicator->setAutoFillBackground(true);
   layout->addWidget(color_indicator, 0, Qt::AlignCenter);
-  this->mpTree->setItemWidget(pItem, 0, color_indicator_frame);
+  this->mpTree->setItemWidget(pItem, column, color_indicator_frame);
+  return color_indicator;
+}
+
+void cedar::proc::gui::SimulationControl::loopedTriggerAdded(QTreeWidgetItem* pItem, cedar::proc::LoopedTriggerPtr loopedTrigger)
+{
+  auto control = new cedar::proc::gui::SimulationControlPrivate::TriggerControlWidget(loopedTrigger);
+  this->mpTree->setItemWidget(pItem, 2, control);
+
+  auto color_indicator = this->addColorWidget(pItem, 0);
   this->updateItemColorWidgetColor(color_indicator, loopedTrigger);
 
-  int column = 3;
+  auto quality_indicator = this->addColorWidget(pItem, 3);
+  quality_indicator->setFrameStyle(QFrame::Box | QFrame::Plain);
+  this->updateItemQualityWidget(quality_indicator, loopedTrigger);
+  QFont font = quality_indicator->font();
+  font.setPointSize(5);
+  quality_indicator->setFont(font);
+
+  int column = 4;
   std::vector<std::string> parameter_names;
   parameter_names.push_back("start with all");
   parameter_names.push_back("loop mode");
