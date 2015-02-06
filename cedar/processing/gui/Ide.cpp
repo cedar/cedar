@@ -569,6 +569,12 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   {
     this->showOneTimeMessages(messages, true);
   }
+
+  this->recorderDataAddedOrRemoved();
+  QObject::connect(cedar::aux::RecorderSingleton::getInstance().get(),
+                   SIGNAL(recordedDataChanged()),
+                   this,
+                   SLOT(recorderDataAddedOrRemoved()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -595,6 +601,13 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::recorderDataAddedOrRemoved()
+{
+  bool enabled = cedar::aux::RecorderSingleton::getInstance()->hasDataToRecord();
+  this->mpActionRecord->setEnabled(enabled);
+  this->mpActionSnapshot->setEnabled(enabled);
+}
 
 void cedar::proc::gui::Ide::showRecentNotifications()
 {
@@ -2040,6 +2053,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpPropertyTable->clear();
+  this->mpRecorderWidget->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
 
