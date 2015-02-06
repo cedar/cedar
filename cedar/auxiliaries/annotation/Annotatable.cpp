@@ -71,10 +71,13 @@ void cedar::aux::annotation::Annotatable::setAnnotation(cedar::aux::annotation::
 
 void cedar::aux::annotation::Annotatable::copyAnnotationsFrom(cedar::aux::annotation::ConstAnnotatablePtr other)
 {
-  this->mAnnotations.resize(other->mAnnotations.size());
+  this->mAnnotations.clear();
   for (size_t i = 0; i < other->mAnnotations.size(); ++i)
   {
-    this->mAnnotations[i] = other->mAnnotations[i]->clone();
+    if (!other->mAnnotations[i]->excludeFromCopying())
+    {
+      this->mAnnotations.push_back(other->mAnnotations[i]->clone());
+    }
   }
 }
 
