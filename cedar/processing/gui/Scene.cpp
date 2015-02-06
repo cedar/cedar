@@ -558,10 +558,40 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
   }
 }
 
+QList<QGraphicsItem*> cedar::proc::gui::Scene::getSelectedParents() const
+{
+  auto selected = this->selectedItems();
+  QList<QGraphicsItem*> selected_parents;
+
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    auto item = selected.at(i);
+    bool parent_contained = false;
+    auto parent = item->parentItem();
+    while (parent)
+    {
+      if (selected.contains(parent))
+      {
+        parent_contained = true;
+        break;
+      }
+
+      parent = parent->parentItem();
+    }
+
+    if (!parent_contained)
+    {
+      selected_parents.push_back(item);
+    }
+  }
+
+  return selected_parents;
+}
+
 void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition)
 {
   auto items_under_mouse = this->items(mousePosition, Qt::IntersectsItemShape, Qt::DescendingOrder);
-  auto selected = this->selectedItems();
+  auto selected = this->getSelectedParents();
 
   // remember the old drop target ...
   auto old_drop_target = mpDropTarget;
@@ -686,7 +716,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   if (mTargetGroup)
   {
     std::list<QGraphicsItem*> items_to_move;
-    for (auto p_item : this->selectedItems())
+    for (auto p_item : this->getSelectedParents())
     {
       auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item);
       if (graphics_item && !graphics_item->isReadOnly())

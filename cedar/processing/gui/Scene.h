@@ -316,6 +316,10 @@ public:
   //! emits a scene changed signal
   void emitSceneChanged();
 
+  /*! Returns a list of selected items where those items whose parents are in the selection are removed.
+   */
+  QList<QGraphicsItem*> getSelectedParents() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
