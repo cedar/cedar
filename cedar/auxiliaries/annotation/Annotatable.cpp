@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/annotation/Annotatable.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 
@@ -84,7 +85,10 @@ void cedar::aux::annotation::Annotatable::copyAnnotationsFrom(cedar::aux::annota
 std::string cedar::aux::annotation::Annotatable::getDescription() const
 {
   std::string description;
-  description += "Type: <b>" + cedar::aux::objectTypeToString(this) + "</b>";
+  std::string clean_type = cedar::aux::objectTypeToString(this);
+  clean_type = cedar::aux::replace(clean_type, "<", "&lt;");
+  clean_type = cedar::aux::replace(clean_type, ">", "&gt;");
+  description += "Type: <b>" + clean_type + "</b>";
 
   for (size_t i = 0; i < this->mAnnotations.size(); ++i)
   {
