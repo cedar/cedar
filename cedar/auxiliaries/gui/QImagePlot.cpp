@@ -107,7 +107,7 @@ _mColorJet(new cedar::aux::EnumParameter(this, "color jet", cedar::aux::ColorGra
   this->mpImageDisplay = new cedar::aux::gui::QImagePlot::ImageDisplay(this, "no data");
   p_layout->addWidget(mpImageDisplay);
   this->mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-  this->mpImageDisplay->setMinimumSize(QSize(50, 50));
+  this->mpImageDisplay->setMinimumSize(QSize(5, 5));
 
   QObject::connect
   (
