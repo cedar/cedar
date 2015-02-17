@@ -1912,6 +1912,11 @@ void cedar::proc::gui::Group::backgroundColorActionTriggered()
   this->setBackgroundColor(new_color);
 }
 
+void cedar::proc::gui::Group::reset()
+{
+  this->getGroup()->reset();
+}
+
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
@@ -1926,6 +1931,10 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   }
 
   this->fillConnectableMenu(menu, event);
+  
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QAction* p_reset = menu.addAction("reset");
+  this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
