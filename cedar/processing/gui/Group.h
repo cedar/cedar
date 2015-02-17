@@ -263,6 +263,9 @@ public slots:
 
   //! Enables/disables resizing and moving of the group.
   void setLockGeometry(bool lock = true);
+  
+  //! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
