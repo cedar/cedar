@@ -111,7 +111,7 @@ private:
 
   void readDataNode(const cedar::aux::ConfigurationNode& node, std::string& dataPath, std::string& title);
 
-  QWidget* readPlot(const cedar::aux::ConfigurationNode& entry);
+  QWidget* readPlot(const cedar::aux::ConfigurationNode& entry, int row, int column);
 
   QWidget* readLabel(const cedar::aux::ConfigurationNode& entry);
 
