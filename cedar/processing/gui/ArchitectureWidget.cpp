@@ -97,7 +97,7 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readLabel(const cedar::aux::Confi
   return label;
 }
 
-QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::ConfigurationNode& entry)
+QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::ConfigurationNode& entry, int row, int column)
 {
   auto data_i = entry.find("data");
   if (data_i == entry.not_found())
@@ -171,7 +171,7 @@ QWidget* cedar::proc::gui::ArchitectureWidget::readPlot(const cedar::aux::Config
     {
       cedar::aux::LogSingleton::getInstance()->error
       (
-        "Cannot add more data: not a multi plot.",
+        "Cannot add more data to cell " + cedar::aux::toString(row) + ", " + cedar::aux::toString(column) + ": not a multi plot.",
         CEDAR_CURRENT_FUNCTION_NAME
       );
       return plot;
@@ -306,7 +306,7 @@ void cedar::proc::gui::ArchitectureWidget::addEntry
   QWidget* widget = nullptr;
   if (type == "plot")
   {
-    widget = this->readPlot(entry);
+    widget = this->readPlot(entry, row, column);
   }
   else if (type == "label")
   {
