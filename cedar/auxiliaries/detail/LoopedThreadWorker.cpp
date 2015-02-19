@@ -355,9 +355,16 @@ double cedar::aux::detail::LoopedThreadWorker::getMaxStepsTaken()
   return value;
 }
 
+double cedar::aux::detail::LoopedThreadWorker::getSumOfStepsTaken()
+{
+  QReadLocker locker(&this->mSumOfStepsTakenLock);
+  double value = this->mSumOfStepsTaken;
+  return value;
+}
+
 void cedar::aux::detail::LoopedThreadWorker::safeRequestStop()
 {
-  if (mpWrapper != NULL)
+  if (mpWrapper != nullptr)
   {
     mpWrapper->requestStop();
   }
@@ -365,7 +372,7 @@ void cedar::aux::detail::LoopedThreadWorker::safeRequestStop()
 
 bool cedar::aux::detail::LoopedThreadWorker::safeStopRequested()
 {
-  if (mpWrapper != NULL)
+  if (mpWrapper != nullptr)
   {
     return mpWrapper->stopRequested();
   }

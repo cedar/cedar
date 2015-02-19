@@ -261,6 +261,8 @@ public:
     return mpWorker->getLastTimeStepDuration();
   }
 
+  //! Returns the average number of steps that were skipped during iteration.
+  double getAverageStepsTaken() const;
 
   //----------------------------------------------------------------------------
   // protected methods

@@ -311,7 +311,7 @@ void cedar::proc::gui::DataSlotItem::generateTooltip()
   else
   {
     tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
-    tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getText()) + "</b>";
+    tool_tip += ": <b>" + Qt::escape(QString::fromStdString(this->mSlot->getText())) + "</b>";
   }
   if (this->mSlot->getData())
   {

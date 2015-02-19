@@ -50,6 +50,7 @@
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/sinks/GroupSink.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/DataConnection.h"
@@ -79,6 +80,7 @@
   #include <boost/filesystem.hpp>
 #endif
 #include <iostream>
+#include <functional>
 #include <set>
 #include <sstream>
 
@@ -108,6 +110,7 @@ cedar::proc::gui::Connectable(width, height, cedar::proc::gui::GraphicsBase::GRA
 mGroup(group),
 mpScene(scene),
 mHoldFitToContents(false),
+mShowTriggerColors(false),
 _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false)),
 mPlotGroupsNode(cedar::aux::ConfigurationNode()),
 _mIsCollapsed(new cedar::aux::BoolParameter(this, "collapsed", false)),
@@ -117,9 +120,9 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  if (!mGroup)
+  if (!this->mGroup)
   {
-    mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
+    this->mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
   }
 
   this->linkedChanged(this->mGroup->isLinked());
@@ -194,6 +197,8 @@ _mUncollapsedHeight(new cedar::aux::DoubleParameter(this, "uncollapsed height", 
   );
   this->updateDecorations();
   this->update();
+
+  this->connect(this->mGroup.get(), SIGNAL(stepNameChanged(const std::string&, const std::string&)), SLOT(elementNameChanged(const std::string&, const std::string&)));
 }
 
 cedar::proc::gui::Group::~Group()
@@ -232,6 +237,121 @@ void cedar::proc::gui::Group::geometryLockChanged()
   bool locked = this->_mGeometryLocked->getValue();
   this->setFlag(QGraphicsItem::ItemIsMovable, !locked);
   this->updateResizeHandles();
+}
+
+void cedar::proc::gui::Group::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  // only looped groups have meaningful trigger chains (which are displayed in gui::Connectable::hoverEnterEvent)
+  if (!this->getGroup()->isLooped())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+  else
+  {
+    cedar::proc::gui::Connectable::hoverEnterEvent(pEvent);
+  }
+}
+
+void cedar::proc::gui::Group::hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  // see cedar::proc::gui::Group::hoverEnterEvent
+  if (!this->getGroup()->isLooped())
+  {
+    pEvent->setAccepted(false);
+    return;
+  }
+  else
+  {
+    cedar::proc::gui::Connectable::hoverLeaveEvent(pEvent);
+  }
+}
+
+void cedar::proc::gui::Group::elementNameChanged(const std::string&, const std::string& to)
+{
+  auto element = this->getGroup()->getElement(to);
+
+  if (boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
+  {
+    this->clearTriggerColorCache();
+  }
+}
+
+void cedar::proc::gui::Group::clearTriggerColorCache() const
+{
+  this->mTriggerColors.clear();
+
+  this->updateAllElementsTriggerColorState();
+
+  emit triggerColorsChanged();
+}
+
+QBrush cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigger) const
+{
+  static std::vector<QColor> colors;
+  static std::vector<Qt::BrushStyle> brush_styles;
+
+  if (colors.empty())
+  {
+    colors.push_back(QColor::fromRgb(0x6feb00));
+    colors.push_back(QColor::fromRgb(0x6100eb));
+    colors.push_back(QColor::fromRgb(0xeba900));
+    colors.push_back(QColor::fromRgb(0x00c2eb));
+    colors.push_back(QColor::fromRgb(0xeb6c00));
+    colors.push_back(QColor::fromRgb(0x008ceb));
+    colors.push_back(QColor::fromRgb(0xc7eb00));
+    colors.push_back(QColor::fromRgb(0x00eb71));
+    colors.push_back(QColor::fromRgb(0xeb00c5));
+  }
+
+  if (brush_styles.empty())
+  {
+    brush_styles.push_back(Qt::SolidPattern);
+    brush_styles.push_back(Qt::BDiagPattern);
+    brush_styles.push_back(Qt::Dense7Pattern);
+  }
+
+  if (mTriggerColors.empty())
+  {
+    auto triggers = this->mGroup->findAll<cedar::proc::Trigger>(true);
+    std::map<std::string, cedar::proc::TriggerPtr> sorted_triggers;
+
+    for (auto trigger : triggers)
+    {
+      sorted_triggers[trigger->getName()] = trigger;
+    }
+
+    size_t color_count = colors.size();
+    size_t style_count = brush_styles.size();
+    size_t color_style_count = color_count * style_count;
+
+    size_t num = 0;
+    for (auto name_trigger_pair : sorted_triggers)
+    {
+      size_t color_index = num % colors.size();
+      size_t style_index = (num / colors.size()) % style_count;
+      size_t overflow = num / color_style_count;
+
+      QBrush brush;
+
+      auto trigger = name_trigger_pair.second;
+
+      QColor color = colors[color_index];
+      int saturation = std::max(30, color.saturation() - 60 * static_cast<int>(overflow));
+      int value = std::max(30, color.value() - 60 * static_cast<int>(overflow));
+      color.setHsv(color.hsvHue(), saturation, value);
+      ++num;
+
+      brush.setColor(color);
+      brush.setStyle(brush_styles.at(style_index));
+
+      mTriggerColors[trigger] = brush;
+    }
+  }
+
+  auto iter = this->mTriggerColors.find(trigger);
+  CEDAR_ASSERT(iter != this->mTriggerColors.end());
+  return iter->second;
 }
 
 const std::map<std::string, cedar::aux::Path>& cedar::proc::gui::Group::getArchitectureWidgets() const
@@ -879,6 +999,7 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
       }
     }
 
+    // read background color
     auto color_node = node.find("background color");
     if (color_node != node.not_found())
     {
@@ -996,12 +1117,14 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
     generic.put_child("architecture widgets", architecture_plots);
   }
 
-  if (this->mBackgroundColor.isValid())
+  // write background color
+  auto bg_color = this->getBackgroundColor();
+  if (bg_color.isValid())
   {
     std::stringstream color_str;
-    color_str << this->mBackgroundColor.red() << ","
-        << this->mBackgroundColor.green() << ","
-        << this->mBackgroundColor.blue();
+    color_str << bg_color.red() << ","
+        << bg_color.green() << ","
+        << bg_color.blue();
     generic.put("background color", color_str.str());
   }
 
@@ -1444,6 +1567,8 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   {
     this->mpScene->addTrigger(trigger, QPointF(0, 0));
     p_scene_element = this->mpScene->getTriggerItemFor(trigger.get());
+
+    this->clearTriggerColorCache();
   }
   CEDAR_ASSERT(p_scene_element != nullptr);
 
@@ -1490,6 +1615,14 @@ void cedar::proc::gui::Group::processElementAddedSignal(cedar::proc::ElementPtr 
   if (this->isCollapsed())
   {
     p_scene_element->hide();
+  }
+
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(element))
+  {
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(p_scene_element))
+    {
+      connectable->updateTriggerColorState();
+    }
   }
 }
 
@@ -1590,6 +1723,19 @@ void cedar::proc::gui::Group::slotRemoved(cedar::proc::DataRole::Id role, const 
   this->updateConnectorPositions();
 }
 
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Group::getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const
+{
+  for (auto p_data_slot : mConnectorSources)
+  {
+    if (p_data_slot->getSlot()->getParentPtr() == source.get())
+    {
+      return p_data_slot;
+    }
+  }
+
+  CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find data slot for group source \"" + source->getName() + "\".");
+}
+
 void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::string& name)
 {
   auto p_list = &mConnectorSources;
@@ -1614,7 +1760,6 @@ void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::stri
 
 void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
-
   if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
   {
     this->removeConnectorItem(true, element->getName());
@@ -1622,6 +1767,10 @@ void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElem
   else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::ConstGroupSink>(element))
   {
     this->removeConnectorItem(false, element->getName());
+  }
+  else if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
+  {
+    this->clearTriggerColorCache();
   }
   else
   {
@@ -1763,15 +1912,14 @@ void cedar::proc::gui::Group::backgroundColorActionTriggered()
   this->setBackgroundColor(new_color);
 }
 
-void cedar::proc::gui::Group::setBackgroundColor(const QColor& color)
+void cedar::proc::gui::Group::reset()
 {
-  this->setFillColor(color);
-  this->mBackgroundColor = color;
+  this->getGroup()->reset();
 }
 
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
+  cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
 
   QMenu menu;
@@ -1782,7 +1930,11 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     return;
   }
 
-  this->fillPlotMenu(menu, event);
+  this->fillConnectableMenu(menu, event);
+  
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QAction* p_reset = menu.addAction("reset");
+  this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -1820,6 +1972,8 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
       QObject::connect(action, SIGNAL(triggered()), this, SLOT(backgroundColorActionTriggered()));
     }
   }
+
+  color_menu->setDisabled(p_scene->getRootGroup()->showsTriggerColors());
 
   bool can_edit_slots = this->getGroup()->getState() != cedar::proc::Triggerable::STATE_RUNNING
                        && !this->getGroup()->isLinked();
@@ -2145,6 +2299,39 @@ void cedar::proc::gui::Group::removeElementFromPlotGroup(const std::string& plot
     else
     {
       ++plot_iter;
+    }
+  }
+}
+
+bool cedar::proc::gui::Group::showsTriggerColors() const
+{
+  return this->mShowTriggerColors;
+}
+
+void cedar::proc::gui::Group::toggleTriggerColors(bool show)
+{
+  this->mShowTriggerColors = show;
+
+  this->updateAllElementsTriggerColorState();
+}
+
+void cedar::proc::gui::Group::updateTriggerColorState()
+{
+  cedar::proc::gui::Connectable::updateTriggerColorState();
+  this->updateAllElementsTriggerColorState();
+}
+
+void cedar::proc::gui::Group::updateAllElementsTriggerColorState() const
+{
+  for (const auto element : this->getGroup()->getElements())
+  {
+    // get the gui representation, if this is a triggerable
+    if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(element.second))
+    {
+      if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(this->mpScene->getGraphicsItemFor(element.second.get())))
+      {
+        connectable->updateTriggerColorState();
+      }
     }
   }
 }

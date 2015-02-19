@@ -73,3 +73,9 @@ cedar::proc::GroupPath::PathType(path)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::proc::GroupPath::getElementName() const
+{
+  CEDAR_ASSERT(!this->empty());
+  return this->operator[](this->getElementCount() - 1);
+}
