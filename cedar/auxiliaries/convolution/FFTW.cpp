@@ -61,7 +61,7 @@
 
 QReadWriteLock cedar::aux::conv::FFTW::mPlanLock;
 bool cedar::aux::conv::FFTW::mMultiThreadActivated = false;
-bool cedar::aux::conv::FFTW::mWisdomLoaded = false;
+std::set<std::string> cedar::aux::conv::FFTW::mLoadedWisdoms;
 std::map<std::string, fftw_plan> cedar::aux::conv::FFTW::mForwardPlans;
 std::map<std::string, fftw_plan> cedar::aux::conv::FFTW::mBackwardPlans;
 
@@ -80,9 +80,9 @@ namespace
 cedar::aux::conv::FFTW::FFTW()
 :
 mAllocatedSize(0),
-mMatrixBuffer(NULL),
-mKernelBuffer(NULL),
-mResultBuffer(NULL),
+mMatrixBuffer(nullptr),
+mKernelBuffer(nullptr),
+mResultBuffer(nullptr),
 mRetransformKernel(true)
 {
  this->connect(this, SIGNAL(kernelListChanged()), SLOT(kernelListChanged()));
@@ -436,7 +436,7 @@ bool cedar::aux::conv::FFTW::checkModeCapability
 
 void cedar::aux::conv::FFTW::loadWisdom(const std::string& uniqueIdentifier)
 {
-  if (!cedar::aux::conv::FFTW::mWisdomLoaded)
+  if (cedar::aux::conv::FFTW::mLoadedWisdoms.find(uniqueIdentifier) == cedar::aux::conv::FFTW::mLoadedWisdoms.end())
   {
     std::string path = cedar::aux::getUserApplicationDataDirectory()
                          + "/.cedar/fftw/fftw."
@@ -446,7 +446,7 @@ void cedar::aux::conv::FFTW::loadWisdom(const std::string& uniqueIdentifier)
                          + uniqueIdentifier + "."
                          + "wisdom";
     fftw_import_wisdom_from_filename(path.c_str());
-    cedar::aux::conv::FFTW::mWisdomLoaded = true;
+    cedar::aux::conv::FFTW::mLoadedWisdoms.insert(uniqueIdentifier);
   }
 }
 
