@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/Path.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_USE_FFTW_THREADED
@@ -451,14 +452,16 @@ void cedar::aux::conv::FFTW::loadWisdom(const std::string& uniqueIdentifier)
 
 void cedar::aux::conv::FFTW::saveWisdom(const std::string& uniqueIdentifier)
 {
-  std::string path = cedar::aux::getUserApplicationDataDirectory()
-                       + "/.cedar/fftw/fftw."
-                       + CEDAR_BUILT_ON_MACHINE + "."
-                       + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads()) + "."
-                       + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategyString()) + "."
-                       + uniqueIdentifier + "."
-                       + "wisdom";
-  fftw_export_wisdom_to_filename(path.c_str());
+  cedar::aux::Path path = cedar::aux::getUserApplicationDataDirectory()
+                          + "/.cedar/fftw/fftw."
+                          + CEDAR_BUILT_ON_MACHINE + "."
+                          + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWNumberOfThreads()) + "."
+                          + cedar::aux::toString(cedar::aux::SettingsSingleton::getInstance()->getFFTWPlanningStrategyString()) + "."
+                          + uniqueIdentifier + "."
+                          + "wisdom";
+  path.createDirectories();
+                       
+  fftw_export_wisdom_to_filename(path.toString().c_str());
 }
 
 fftw_plan cedar::aux::conv::FFTW::getForwardPlan(unsigned int dimensionality, std::vector<unsigned int> sizes)
