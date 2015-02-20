@@ -51,6 +51,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/sources/GaussInput.h"
+#include "cedar/processing/sources/Noise.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
@@ -309,6 +310,110 @@ int test_camel_case_to_string()
   check_string("ABBRVTest", "ABBRV Test");
   check_string("AReallyDifficultABBRVTest", "A Really Difficult ABBRV Test");
   check_string("Something With Spaces and lower case", "Something With Spaces and lower case");
+
+  return errors;
+}
+
+int test_looped_trigger_auto_connect()
+{
+  int errors = 0;
+  // ------------------------------------
+  // test auto-connect to looped triggers
+  // ------------------------------------
+  cedar::proc::GroupPtr group_auto(new cedar::proc::Group());
+  cedar::proc::sources::NoisePtr noise(new cedar::proc::sources::Noise());
+  // noise should not have a parent trigger
+  if (noise->getParentTrigger())
+  {
+    std::cout << "error: looped element has a parent trigger outside of a group" << std::endl;
+    ++errors;
+  }
+  // hand looped element to group, this should create a default trigger
+  group_auto->add(noise, "noise");
+  // get the default trigger
+  cedar::proc::LoopedTriggerPtr loopy;
+  if (!group_auto->nameExists("default trigger"))
+  {
+    std::cout << "error: adding a looped element to a group did not create a looped trigger" << std::endl;
+    return ++errors;
+  }
+  else
+  {
+    loopy = group_auto->getElement<cedar::proc::LoopedTrigger>("default trigger");
+  }
+
+  // parent trigger of looped element should be default trigger
+  if (loopy != noise->getParentTrigger())
+  {
+    std::cout << "error: adding a looped element to a group did not connect it to the default trigger" << std::endl;
+    return ++errors;
+  }
+
+  // create a new trigger and add it to group
+  cedar::proc::LoopedTriggerPtr pretender(new cedar::proc::LoopedTrigger());
+  std::string name = group_auto->getUniqueIdentifier("pretender");
+  group_auto->add(pretender, name);
+
+  // now connect the looped element to the new trigger
+  group_auto->connectTrigger(pretender, noise);
+  if (noise->getParentTrigger() != pretender)
+  {
+    std::cout << "error: looped element has the wrong parent trigger" << std::endl;
+    ++errors;
+  }
+  // also check the other way around
+  if (!pretender->isListener(noise))
+  {
+    std::cout << "error: looped trigger does not know of its looped listener" << std::endl;
+    ++errors;
+  }
+
+  if (loopy->isListener(noise))
+  {
+    std::cout << "error: looped element still listens to default trigger" << std::endl;
+    ++errors;
+  }
+
+  // now, back to the default trigger!
+  group_auto->connectTrigger(loopy, noise);
+  if (noise->getParentTrigger() != loopy)
+  {
+    std::cout << "error: looped element has the wrong parent trigger" << std::endl;
+    ++errors;
+  }
+  // also check the other way around
+  if (!loopy->isListener(noise))
+  {
+    std::cout << "error: looped trigger does not know of its looped listener" << std::endl;
+    ++errors;
+  }
+
+  if (pretender->isListener(noise))
+  {
+    std::cout << "error: looped element still listens to custom trigger" << std::endl;
+    ++errors;
+  }
+
+  // now try the same thing, but this time, remove the looped trigger
+  group_auto->connectTrigger(pretender, noise);
+  group_auto->remove(pretender);
+  if (noise->getParentTrigger() != loopy)
+  {
+    std::cout << "error: looped element has the wrong parent trigger after removing custom trigger" << std::endl;
+    ++errors;
+  }
+  // also check the other way around
+  if (!loopy->isListener(noise))
+  {
+    std::cout << "error: looped trigger does not know of its looped listener after removing custom trigger" << std::endl;
+    ++errors;
+  }
+
+  if (pretender->isListener(noise))
+  {
+    std::cout << "error: looped element still listens to custom trigger after removing custom trigger" << std::endl;
+    ++errors;
+  }
 
   return errors;
 }
@@ -603,6 +708,7 @@ void run_test()
   errors += test_connector_renaming();
   errors += test_name_exists();
   errors += test_camel_case_to_string();
+  errors += test_looped_trigger_auto_connect();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

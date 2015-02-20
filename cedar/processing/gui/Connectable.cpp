@@ -1161,6 +1161,7 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
   {
     group->connectTrigger(trigger, triggerable);
   }
+  // if no trigger was chosen, the user clicked the "disconnect" option, so: disconnect!
   else if (triggerable->getParentTrigger())
   {
     group->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
