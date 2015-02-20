@@ -184,11 +184,6 @@ boost::signals2::connection cedar::proc::Triggerable::connectToStateChanged(boos
 
 void cedar::proc::Triggerable::setParentTrigger(cedar::proc::TriggerPtr parent)
 {
-  if (this->isLooped())
-  {
-    // If there is already a parent trigger for looped steps, disconnect it first!
-    CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
-  }
   this->mParentTrigger = parent;
   this->signalParentTriggerChanged();
 }
