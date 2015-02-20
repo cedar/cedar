@@ -45,7 +45,7 @@ import csv
 import matplotlib as mpl
 mpl.use('WXAgg')
 import matplotlib.pyplot as plt
-plt.interactive(True)
+mpl.interactive(True)
 import math
 import numpy as np
 import os
@@ -56,7 +56,6 @@ import wx.lib.agw.floatspin as FS
 from wx.lib.embeddedimage import PyEmbeddedImage
 from functools import partial
 from wx.lib.scrolledpanel import ScrolledPanel
-
 
 class RDPImageFiles():
     play = PyEmbeddedImage(
@@ -142,7 +141,7 @@ class RDPImageFiles():
     
 
 class Progress(wx.ProgressDialog):
-    def __init__(self, parent, id, title, message, maximum):
+    def __init__(self, parent, _, title, message, maximum):
         wx.ProgressDialog.__init__(self, title, message=message, maximum=maximum, parent=parent, style=wx.PD_ELAPSED_TIME|wx.PD_REMAINING_TIME|wx.STAY_ON_TOP)
         
         return
@@ -150,8 +149,8 @@ class Progress(wx.ProgressDialog):
 #========================================================================================================================
 
 class SnapshotSequenceDialog(wx.Dialog):
-    def __init__(self, parent, id, title):
-        wx.Dialog.__init__(self, parent=parent, id=id, title=title)
+    def __init__(self, parent, _, title):
+        wx.Dialog.__init__(self, parent=parent, id=_, title=title)
         self.parent = parent
         
         top_sizer = wx.BoxSizer(wx.VERTICAL)        
@@ -232,23 +231,23 @@ class SnapshotSequenceDialog(wx.Dialog):
         self.parent.step_size = step_size_entry.GetValue()
         
         self.parent.plot = RDPPlot().plot_snapshot_sequence(start = self.parent.step, 
-                                               step_size = self.parent.step_size, 
-                                               steps = self.parent.nstep, 
-                                               style = self.parent.style, 
-                                               data = self.parent.data, 
-                                               header = self.parent.header, 
-                                               vmin = self.parent.vmin,
-                                               vmax = self.parent.vmax,
-                                               resolution = self.parent.resolution,
-                                               proj = self.parent.proj,
-                                               proj_method = self.parent.proj_method,
-                                               x_label = self.parent.x_label,
-                                               y_label = self.parent.y_label,
-                                               z_label = self.parent.z_label,
-                                               file_name = self.parent.flist_sorted[self.parent.selection],
-                                               file_directory = self.parent.dir,
-                                               save_mode = self.parent.save_mode,
-                                               color = self.parent.line_color)
+                                                           step_size = self.parent.step_size, 
+                                                           steps = self.parent.nstep, 
+                                                           style = self.parent.style, 
+                                                           data = self.parent.data, 
+                                                           header = self.parent.header, 
+                                                           vmin = self.parent.vmin,
+                                                           vmax = self.parent.vmax,
+                                                           resolution = self.parent.resolution,
+                                                           proj = self.parent.proj,
+                                                           proj_method = self.parent.proj_method,
+                                                           x_label = self.parent.x_label,
+                                                           y_label = self.parent.y_label,
+                                                           z_label = self.parent.z_label,
+                                                           file_name = self.parent.flist_sorted[self.parent.selection],
+                                                           file_directory = self.parent.dir,
+                                                           save_mode = self.parent.save_mode,
+                                                           color = self.parent.line_color)
         
         self.Destroy()
         
@@ -275,7 +274,7 @@ class RDPMainWindow(wx.Frame):
         # search for standard cedarRecordings directory
         self.dir='/home'
         
-        for (self.dir, dirs, files) in os.walk(self.dir):
+        for (self.dir, dirs, _) in os.walk(self.dir):
             for j in range(len(dirs)):
                 if dirs[j] == 'cedarRecordings':
                     new_dir = dirs[j]
@@ -366,7 +365,7 @@ class RDPGUI(wx.Panel):
         self.style = ' '
         self.mode = ' '
         self.ext = '.csv'
-        self.flist = [file for file in os.listdir(self.dir) if file.lower().endswith(self.ext)]
+        self.flist = [record_file for record_file in os.listdir(self.dir) if record_file.lower().endswith(self.ext)]
         self.flist_sorted = RDPPlot()._sort_alphnum(self.flist)
         self.data = None
         self.header = None
@@ -566,7 +565,7 @@ class RDPGUI(wx.Panel):
         self.SetSizer(self.main_sizer)
         self.Fit()
         self.size = self.GetSize()
-  
+          
         return
     
         
@@ -583,13 +582,18 @@ class RDPGUI(wx.Panel):
                 if plt.get_fignums():
                     manager = plt.get_current_fig_manager()
                     self.figure_size = manager.window.GetSize()
-         
+                    
             self.control_plot_frame.SetPosition((self.size[0]+self.figure_size[0]+12, 0))
             self.control_plot_frame.Bind(wx.EVT_CLOSE, self.evt_close_plot_control_frame)
-        
+                
         heatmap_boundary = wx.Panel(parent=self.control_plot_frame, id=-1)
         top_sizer = wx.BoxSizer(wx.VERTICAL)
-        axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+        
+        if 'Axes3DSubplot' in str(type(self.plot)) or self.style == 'heatmap':
+            axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+        else:
+            axes_grid_sizer = wx.FlexGridSizer(rows=2, cols=2)
+            
         axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
         axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
         min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
@@ -599,33 +603,37 @@ class RDPGUI(wx.Panel):
         x_axis_txt = wx.StaticText(heatmap_boundary, -1, 'X axis \t')
         y_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Y axis \t')
         
-        if self.style != 'heatmap':
+        if self.style != 'heatmap' and 'Axes3DSubplot' in str(type(self.plot)):
             z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Z axis \t')
-        else:
+        elif self.style == 'heatmap':
             z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Legend \t')
             
         x_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         y_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
-        z_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         
         x_axis_label.SetValue(self.x_label)
         y_axis_label.SetValue(self.y_label)
-        z_axis_label.SetValue(self.z_label)
         
         axes_label_ok_btn = wx.Button(heatmap_boundary, label='OK')
-        
-        x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-        y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-        z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-        axes_label_ok_btn.Bind(wx.EVT_BUTTON, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-        
         axes_grid_sizer.Add(x_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
         axes_grid_sizer.Add(x_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
         axes_grid_sizer.Add(y_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
         axes_grid_sizer.Add(y_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
-        axes_grid_sizer.Add(z_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
-        axes_grid_sizer.Add(z_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
         
+        if 'Axes3DSubplot' in str(type(self.plot)) or self.style == 'heatmap':
+            z_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
+            z_axis_label.SetValue(self.z_label)
+            z_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+            axes_grid_sizer.Add(z_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
+            axes_grid_sizer.Add(z_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
+            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+            axes_label_ok_btn.Bind(wx.EVT_BUTTON, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+        else:
+            x_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
+            y_axis_label.Bind(wx.EVT_TEXT_ENTER, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
+            axes_label_ok_btn.Bind(wx.EVT_BUTTON, partial(self.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
+                
         axes_label_sizer.Add(item=label_axes_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.BOTTOM, border=10)
         axes_label_sizer.Add(axes_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.LEFT, border=10)
         axes_label_sizer.Add(axes_label_ok_btn,proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
@@ -796,10 +804,12 @@ class RDPGUI(wx.Panel):
         wx.CallAfter(self._update_plot)
         
         
-    def evt_axis_label(self, event, x_axis_label, y_axis_label, z_axis_label):
+    def evt_axis_label(self, event, x_axis_label, y_axis_label, z_axis_label=None):
         self.x_label = x_axis_label.GetValue()
         self.y_label = y_axis_label.GetValue()
-        self.z_label = z_axis_label.GetValue()
+        
+        if self.z_axis_label is not None:
+            self.z_label = z_axis_label.GetValue()
         
         if plt.get_fignums():
             wx.CallAfter(self._update_plot)
@@ -1046,21 +1056,22 @@ class RDPGUI(wx.Panel):
             
             try:
                 self.plot = RDPPlot().plot_snapshot(step = step, 
-                                                      style = self.style, 
-                                                      data = self.data, 
-                                                      header = self.header, 
-                                                      vmin = self.vmin,
-                                                      vmax = self.vmax,
-                                                      resolution = self.resolution,
-                                                      proj = self.proj,
-                                                      proj_method = self.proj_method,
-                                                      color = self.line_color)
+                                                    style = self.style, 
+                                                    data = self.data, 
+                                                    header = self.header, 
+                                                    vmin = self.vmin,
+                                                    vmax = self.vmax,
+                                                    resolution = self.resolution,
+                                                    proj = self.proj,
+                                                    proj_method = self.proj_method,
+                                                    color = self.line_color)
                     
                 RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 RDPPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
+                
             except IndexError:
                 dlg = wx.MessageDialog(parent  = None, 
-                message = 'The specified timeslice does not seem to exist.', 
+                message = 'The specified timeslice does not exist.', 
                 caption = 'An Error has occurred.', 
                 style   = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
@@ -1076,26 +1087,27 @@ class RDPGUI(wx.Panel):
         elif self.mode == 'timeline':
             try:
                 self.plot = RDPPlot().plot_timeline(data = self.data, 
-                                                      header = self.header,
-                                                      vmin = self.vmin,
-                                                      vmax = self.vmax,
-                                                      resolution = self.resolution,
-                                                      plot = self.plot,
-                                                      proj = self.proj, 
-                                                      proj_method = self.proj_method,
-                                                      color = self.line_color,
-                                                      step = self.step, 
-                                                      marker = self.marked, 
-                                                      style = self.style)
+                                                    header = self.header,
+                                                    vmin = self.vmin,
+                                                    vmax = self.vmax,
+                                                    resolution = self.resolution,
+                                                    plot = self.plot,
+                                                    proj = self.proj, 
+                                                    proj_method = self.proj_method,
+                                                    color = self.line_color,
+                                                    step = self.step, 
+                                                    marker = self.marked, 
+                                                    style = self.style)
             
                 RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 RDPPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
                 
             except UnboundLocalError:
+                self.control_plot_frame.Destroy()
                 dlg = wx.MessageDialog(parent  = None, 
                 message = 'It is not possible to build a timeline out of 2-dimensional timeslices.', 
                 caption = 'The attempted operation is not possible.', 
-                style   = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
+                style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
                 dlg.Destroy()
                         
@@ -1110,15 +1122,15 @@ class RDPGUI(wx.Panel):
             
             try:
                 self.plot = RDPPlot().plot_snapshot(step = step, 
-                                                      style = self.style, 
-                                                      data = self.data, 
-                                                      header = self.header, 
-                                                      vmin = self.vmin,
-                                                      vmax = self.vmax,
-                                                      resolution = self.resolution, 
-                                                      proj = self.proj,
-                                                      proj_method = self.proj_method,
-                                                      color = self.line_color)
+                                                    style = self.style, 
+                                                    data = self.data, 
+                                                    header = self.header, 
+                                                    vmin = self.vmin,
+                                                    vmax = self.vmax,
+                                                    resolution = self.resolution, 
+                                                    proj = self.proj,
+                                                    proj_method = self.proj_method,
+                                                    color = self.line_color)
                 
                 RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
                 
@@ -1145,22 +1157,22 @@ class RDPGUI(wx.Panel):
         elif self.mode == 'timeline':
             try:
                 self.plot = RDPPlot().plot_timeline(data = self.data, 
-                                                      header = self.header, 
-                                                      vmin = self.vmin,
-                                                      vmax = self.vmax,
-                                                      resolution = self.resolution,
-                                                      plot = self.plot,
-                                                      proj = self.proj, 
-                                                      proj_method = self.proj_method,
-                                                      color = self.line_color,
-                                                      step = self.step, 
-                                                      marker = self.marked, 
-                                                      style = self.style)
+                                                    header = self.header, 
+                                                    vmin = self.vmin,
+                                                    vmax = self.vmax,
+                                                    resolution = self.resolution,
+                                                    plot = self.plot,
+                                                    proj = self.proj, 
+                                                    proj_method = self.proj_method,
+                                                    color = self.line_color,
+                                                    step = self.step, 
+                                                    marker = self.marked, 
+                                                    style = self.style)
                 
                 RDPPlot().label_axis(plot=self.plot, 
-                                       x_label=self.x_label, 
-                                       y_label=self.y_label, 
-                                       z_label=self.z_label)
+                                     x_label=self.x_label, 
+                                     y_label=self.y_label, 
+                                     z_label=self.z_label)
             
                 manager = plt.get_current_fig_manager()
                 
@@ -1170,6 +1182,7 @@ class RDPGUI(wx.Panel):
                 
             except UnboundLocalError:
                 plt.close()
+                self.control_plot_frame.Destroy()
                 dlg = wx.MessageDialog(parent = None, 
                                        message = 'It is not possible to build a timeline out of 2-dimensional timeslices.', 
                                        caption = 'The attempted operation is not possible.', 
@@ -1407,10 +1420,10 @@ class RDPPlot(object):
         data = None
         count = 0
         csv_file = open(csv_f, 'rb')
-        row_count = sum(1 for line in open(csv_f))-1        
-        time_codes = []
         reader = csv.reader(csv_file)
-        
+        row_count = len(list(open(csv_f)))        
+        time_codes = []
+                
         # skip header
         next(reader, None)
         
@@ -1434,7 +1447,7 @@ class RDPPlot(object):
                                
         progress_dlg.Destroy()
         csv_file.close()
-                    
+        
         return data, time_codes
 
 
@@ -1444,13 +1457,13 @@ class RDPPlot(object):
         '''
         
         csv_file = open(csv_f, 'rb')        
-        reader   = csv.reader(csv_file)
-        header   = reader.next()
+        reader = csv.reader(csv_file)
+        header = reader.next()
         csv_file.close()
                 
-        return header      
+        return header   
     
-    
+        
     def _initialize_3D_plot(self, mode=None):
         
         if mode == 'snapshot sequence':
@@ -1561,7 +1574,7 @@ class RDPPlot(object):
                             X_1, X_2, data = self._project2D(step=step, data=data, header=header, proj=proj, proj_method=proj_method)
                         except IndexError:
                             dlg = wx.MessageDialog(parent = None, 
-                                                   message = 'The ' + str(step) + '. snapshot does not seem to exist.', 
+                                                   message = 'The ' + str(step) + '. snapshot does not exist.', 
                                                    caption = 'An Error has occurred.', 
                                                    style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
                             dlg.ShowModal()
