@@ -1706,7 +1706,13 @@ void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::p
 {
   // if the item is looped, it can only be triggered by a single trigger
   // thus, check if there is already a connection, and remove it
-  if (target->isLooped() && target->getParentTrigger() && !boost::dynamic_pointer_cast<cedar::proc::Group>(target))
+  if
+  (
+    target->isLooped()
+    && target->getParentTrigger()
+    && boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(source)
+    //&& !boost::dynamic_pointer_cast<cedar::proc::Group>(target)
+  )
   {
     this->disconnectTrigger(target->getParentTrigger(), target);
   }
