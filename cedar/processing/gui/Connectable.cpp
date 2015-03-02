@@ -422,18 +422,20 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   auto gui_group = scene->getRootGroup();
 
   bool show = gui_group->showsTriggerColors();
-  auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
   if (show)
   {
     auto last_color = this->getFillColor();
     auto last_style = this->getFillStyle();
 
     QBrush brush(Qt::white);
-    if (parent_trigger)
+    if (triggerable->isLooped())
     {
-      brush = gui_group->getColorFor(parent_trigger);
+      if (triggerable->getLoopedTrigger())
+      {
+        brush = gui_group->getColorFor(triggerable->getLoopedTrigger());
+      }
     }
-    else if (!triggerable->isLooped())
+    else
     {
       brush = QBrush(QColor::fromRgb(220, 220, 220));
     }
@@ -1062,7 +1064,7 @@ void cedar::proc::gui::Connectable::buildConnectTriggerMenu
   const cedar::proc::gui::Group* gui_group,
   const QObject* receiver,
   const char* slot,
-  boost::optional<cedar::proc::TriggerPtr> current
+  boost::optional<cedar::proc::LoopedTriggerPtr> current
 )
 {
   auto group = gui_group->getGroup();
@@ -1124,7 +1126,7 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
       gui_group,
       this,
       SLOT(assignTriggerClicked()),
-      triggerable->getParentTrigger()
+      triggerable->getLoopedTrigger()
     );
   }
   else
@@ -1162,9 +1164,9 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
     group->connectTrigger(trigger, triggerable);
   }
   // if no trigger was chosen, the user clicked the "disconnect" option, so: disconnect!
-  else if (triggerable->getParentTrigger())
+  else if (triggerable->getLoopedTrigger())
   {
-    group->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
+    group->disconnectTrigger(triggerable->getLoopedTrigger(), triggerable);
   }
 }
 

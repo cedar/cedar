@@ -790,6 +790,8 @@ private:
   //! if the parent group changes (i.e., this group looses its 'rootness'), the default trigger is removed if it exists
   void onParentGroupChanged();
 
+  void disconnectTriggerInternal(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();

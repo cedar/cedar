@@ -38,6 +38,7 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Group.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -182,20 +183,32 @@ boost::signals2::connection cedar::proc::Triggerable::connectToStateChanged(boos
   return mStateChanged.connect(slot);
 }
 
-void cedar::proc::Triggerable::setParentTrigger(cedar::proc::TriggerPtr parent)
+void cedar::proc::Triggerable::setLoopedTrigger(cedar::proc::LoopedTriggerPtr parent)
 {
-  this->mParentTrigger = parent;
+  if (!this->isLooped())
+  {
+    CEDAR_THROW(cedar::proc::LoopStateException, "Setting a looped trigger is only allowed for looped triggerables.");
+  }
+  this->mLoopedTrigger = parent;
   this->signalParentTriggerChanged();
 }
 
-cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
+cedar::proc::LoopedTriggerPtr cedar::proc::Triggerable::getLoopedTrigger()
 {
-  return this->mParentTrigger.lock();
+  if (!this->isLooped())
+  {
+    CEDAR_THROW(cedar::proc::LoopStateException, "Only looped triggerables have a looped trigger.");
+  }
+  return this->mLoopedTrigger.lock();
 }
 
-cedar::proc::ConstTriggerPtr cedar::proc::Triggerable::getParentTrigger() const
+cedar::proc::ConstLoopedTriggerPtr cedar::proc::Triggerable::getLoopedTrigger() const
 {
-  return this->mParentTrigger.lock();
+  if (!this->isLooped())
+  {
+    CEDAR_THROW(cedar::proc::LoopStateException, "Only looped triggerables have a looped trigger.");
+  }
+  return this->mLoopedTrigger.lock();
 }
 
 void cedar::proc::Triggerable::callOnStart()
@@ -344,4 +357,9 @@ unsigned int cedar::proc::Triggerable::numberOfStartCalls() const
   QMutexLocker locker(this->mpStartCallsLock);
   unsigned int calls = this->mStartCalls;
   return calls;
+}
+
+void cedar::proc::Triggerable::resetLoopedTrigger()
+{
+  this->mLoopedTrigger.reset();
 }
