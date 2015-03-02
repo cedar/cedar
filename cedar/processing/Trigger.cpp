@@ -830,3 +830,7 @@ void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& nod
   }
 }
 
+bool cedar::proc::Trigger::canConnectTo(cedar::proc::ConstTriggerablePtr) const
+{
+  return true;
+}

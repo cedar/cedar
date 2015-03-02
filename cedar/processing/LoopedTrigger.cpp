@@ -155,24 +155,6 @@ void cedar::proc::LoopedTrigger::onNameChanged()
   }
 }
 
-void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr triggerable)
-{
-  this->cedar::proc::Trigger::removeListener(triggerable);
-  if (this->isRunningNolocking())
-  {
-    triggerable->callOnStop();
-  }
-}
-
-void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr triggerable)
-{
-  this->cedar::proc::Trigger::addListener(triggerable);
-  if (this->isRunningNolocking())
-  {
-    triggerable->callOnStart();
-  }
-}
-
 void cedar::proc::LoopedTrigger::prepareStart()
 {
   QMutexLocker locker(&mStartedMutex);
@@ -239,4 +221,30 @@ void cedar::proc::LoopedTrigger::step(cedar::unit::Time time)
 cedar::proc::LoopedTrigger::ConstTimeAveragePtr cedar::proc::LoopedTrigger::getStatistics() const
 {
   return this->mStatistics;
+}
+
+void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr triggerable)
+{
+  cedar::proc::Trigger::addListener(triggerable);
+  triggerable->setLoopedTrigger(boost::static_pointer_cast<cedar::proc::LoopedTrigger>(this->shared_from_this()));
+  if (this->isRunningNolocking())
+  {
+    triggerable->callOnStart();
+  }
+}
+
+void cedar::proc::LoopedTrigger::removeListener(cedar::proc::Triggerable* triggerable)
+{
+  cedar::proc::Trigger::removeListener(triggerable);
+  if (this->isRunningNolocking())
+  {
+    triggerable->callOnStop();
+  }
+  // reset the looped trigger
+  triggerable->resetLoopedTrigger();
+}
+
+bool cedar::proc::LoopedTrigger::canConnectTo(cedar::proc::ConstTriggerablePtr target) const
+{
+  return target->isLooped() && !target->getLoopedTrigger();
 }

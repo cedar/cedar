@@ -203,4 +203,10 @@ class cedar::proc::TriggerCycleException : public cedar::aux::ExceptionBase
     TriggerCycleException(const std::vector<std::set<cedar::proc::TriggerablePtr> >& cycles);
 }; // cedar::proc::TriggerCycleException
 
+/*!@brief An exception that is thrown if a triggerable has not the right loop state (isLooped()).
+ */
+class cedar::proc::LoopStateException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::NoCheckException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H

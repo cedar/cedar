@@ -48,6 +48,7 @@
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
 #include "cedar/processing/gui/ConnectableIconView.fwd.h"
@@ -234,7 +235,7 @@ public:
     const cedar::proc::gui::Group* gui_group,
     const QObject* receiver,
     const char* slot,
-    boost::optional<cedar::proc::TriggerPtr> current = (boost::optional<cedar::proc::TriggerPtr>())
+    boost::optional<cedar::proc::LoopedTriggerPtr> current = (boost::optional<cedar::proc::LoopedTriggerPtr>())
   );
 
   static cedar::proc::TriggerPtr getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group);
