@@ -701,21 +701,22 @@ void cedar::proc::gui::Connectable::reactToSlotRemoved(cedar::proc::DataRole::Id
 
 void cedar::proc::gui::Connectable::addDataItems()
 {
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
+  std::vector<cedar::proc::DataRole::Id> to_show;
+  to_show.push_back(cedar::proc::DataRole::INPUT);
+  to_show.push_back(cedar::proc::DataRole::OUTPUT);
+  
+  for (const auto& id : to_show)
   {
-    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
+    if (id == cedar::aux::Enum::UNDEFINED)
       continue;
 
     // populate step item list
-    if (this->getConnectable()->hasSlotForRole(*enum_it))
+    if (this->getConnectable()->hasSlotForRole(id))
     {
-      const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(*enum_it);
-      for (cedar::proc::Connectable::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      for (auto data_slot : this->getConnectable()->getOrderedDataSlots(id))
       {
         // use a non-const version of this slot
-        this->addDataItemFor(this->getConnectable()->getSlot(*enum_it, (*iter)->getName()));
+        this->addDataItemFor(data_slot);
       }
     }
   }
