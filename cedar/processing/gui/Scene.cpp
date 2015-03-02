@@ -54,6 +54,7 @@
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupDeclarationManager.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
@@ -877,9 +878,9 @@ void cedar::proc::gui::Scene::assignSelectedToTrigger()
         this->mGroup->getGroup()->connectTrigger(trigger, triggerable);
       }
     }
-    else if (triggerable->getParentTrigger())
+    else if (triggerable->getLoopedTrigger())
     {
-      this->mGroup->getGroup()->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
+      this->mGroup->getGroup()->disconnectTrigger(triggerable->getLoopedTrigger(), triggerable);
     }
   }
 }
