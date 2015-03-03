@@ -1760,6 +1760,10 @@ void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::stri
 
 void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
+  if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
+  {
+    this->clearTriggerColorCache();
+  }
   if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
   {
     this->removeConnectorItem(true, element->getName());
@@ -1767,10 +1771,6 @@ void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElem
   else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::ConstGroupSink>(element))
   {
     this->removeConnectorItem(false, element->getName());
-  }
-  else if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
-  {
-    this->clearTriggerColorCache();
   }
   else
   {
