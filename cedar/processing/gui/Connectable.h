@@ -404,7 +404,7 @@ private:
 
   cedar::proc::gui::ConstGroup* getGuiGroup() const;
 
-  void translateParentTriggerChangedSignal();
+  void translateLoopedTriggerChangedSignal();
 
   void fillColorChanged(QColor color);
 

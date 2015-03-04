@@ -190,7 +190,7 @@ void cedar::proc::Triggerable::setLoopedTrigger(cedar::proc::LoopedTriggerPtr pa
     CEDAR_THROW(cedar::proc::LoopStateException, "Setting a looped trigger is only allowed for looped triggerables.");
   }
   this->mLoopedTrigger = parent;
-  this->signalParentTriggerChanged();
+  this->signalLoopedTriggerChanged();
 }
 
 cedar::proc::LoopedTriggerPtr cedar::proc::Triggerable::getLoopedTrigger()
@@ -362,4 +362,5 @@ unsigned int cedar::proc::Triggerable::numberOfStartCalls() const
 void cedar::proc::Triggerable::resetLoopedTrigger()
 {
   this->mLoopedTrigger.reset();
+  this->signalLoopedTriggerChanged();
 }
