@@ -267,7 +267,7 @@ void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pE
   pEvent->setAccepted(true);
 }
 
-void cedar::proc::gui::Connectable::translateParentTriggerChangedSignal()
+void cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal()
 {
   emit triggerableParentTriggerChanged();
 }
@@ -821,9 +821,9 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
 
   if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
   {
-    this->mParentTriggerChangedConnection = triggerable->connectToParentTriggerChangedSignal
+    this->mParentTriggerChangedConnection = triggerable->connectToLoopedTriggerChangedSignal
         (
-          boost::bind(&cedar::proc::gui::Connectable::translateParentTriggerChangedSignal, this)
+          boost::bind(&cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal, this)
         );
   }
 }

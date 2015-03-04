@@ -210,7 +210,7 @@ public:
   CEDAR_DECLARE_SIGNAL(Stopped, void());
 
 public:
-  CEDAR_DECLARE_SIGNAL(ParentTriggerChanged, void());
+  CEDAR_DECLARE_SIGNAL(LoopedTriggerChanged, void());
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
