@@ -322,18 +322,31 @@ void cedar::proc::steps::Projection::reconfigure()
     this->_mOutputDimensionSizes->setValue(output_dim, this->mInput->getData().size[input_dim]);
     this->_mOutputDimensionSizes->setConstantAt(output_dim, true);
   }
+
+  // if input type and output type do not match, we have to re-initialize the output matrix
+  if (this->mInput->getCvType() != this->mOutput->getCvType())
+  {
+    this->initializeOutputMatrix();
+  }
+
   // now do a final step and try to calculate an output with the new configuration
-  this->onTrigger(cedar::proc::ArgumentsPtr(new cedar::proc::Arguments()));
+  this->onTrigger(cedar::proc::ArgumentsPtr());
 }
 
 void cedar::proc::steps::Projection::initializeOutputMatrix()
 {
   int dimensionality = static_cast<int>(_mOutputDimensionality->getValue());
+  // use the input type if possible
+  int type = CV_32F;
+  if (this->mInput)
+  {
+    type = this->mInput->getData().type();
+  }
 
   if (dimensionality == 0)
   {
     cedar::aux::Lockable::Locker locker(this);
-    this->mOutput->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+    this->mOutput->getData() = cv::Mat(1, 1, type, cv::Scalar(0));
     locker.unlock();
   }
   else
@@ -347,18 +360,37 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
     }
 
     cedar::aux::Lockable::Locker locker(this);
-    this->mOutput->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
+    this->mOutput->getData() = cv::Mat(dimensionality, &sizes.at(0), type, cv::Scalar(0));
     locker.unlock();
   }
 }
 
+
+template<typename T>
 void cedar::proc::steps::Projection::expand0DtoND()
 {
   CEDAR_DEBUG_ASSERT(mInput->getData().size[0] == 1);
-  CEDAR_DEBUG_ASSERT(mInput->getData().type() == CV_32F);
-
   // set all values of the output matrix to the single value of the input
-  mOutput->getData() = cv::Scalar(mInput->getData().at<float>(0));
+  mOutput->getData() = cv::Scalar(mInput->getData().at<T>(0));
+}
+
+void cedar::proc::steps::Projection::expand0DtoND()
+{
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->expand0DtoND<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->expand0DtoND<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
 }
 
 //! not used at the moment
@@ -390,6 +422,26 @@ void cedar::proc::steps::Projection::expand1Dto2D()
 
 void cedar::proc::steps::Projection::expand2Dto3D()
 {
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->expand2Dto3D<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->expand2Dto3D<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+
+template<typename T>
+void cedar::proc::steps::Projection::expand2Dto3D()
+{
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& output = this->mOutput->getData();
   // sanity check
@@ -408,7 +460,7 @@ void cedar::proc::steps::Projection::expand2Dto3D()
     mMappingLookup.at(i) = mapping->lookUp(i);
   }
   CEDAR_DEBUG_ASSERT(mMappingLookup.size() == 2);
-  float value;
+  T value;
   int x;
   int y;
   int target_index;
@@ -420,10 +472,10 @@ void cedar::proc::steps::Projection::expand2Dto3D()
       {
         for (y = 0; y < input.size[1]; ++y)
         {
-          value = input.at<float>(x, y);
+          value = input.at<T>(x, y);
           for (target_index = 0; target_index < output.size[0]; ++ target_index)
           {
-            output.at<float>(target_index, x, y) = value;
+            output.at<T>(target_index, x, y) = value;
           }
         }
       }
@@ -434,10 +486,10 @@ void cedar::proc::steps::Projection::expand2Dto3D()
       {
         for (y = 0; y < input.size[1]; ++y)
         {
-          value = input.at<float>(x, y);
+          value = input.at<T>(x, y);
           for (target_index = 0; target_index < output.size[0]; ++ target_index)
           {
-            output.at<float>(target_index, y, x) = value;
+            output.at<T>(target_index, y, x) = value;
           }
         }
       }
@@ -451,10 +503,10 @@ void cedar::proc::steps::Projection::expand2Dto3D()
       {
         for (y = 0; y < input.size[1]; ++y)
         {
-          value = input.at<float>(x, y);
+          value = input.at<T>(x, y);
           for (target_index = 0; target_index < output.size[1]; ++ target_index)
           {
-            output.at<float>(x, target_index, y) = value;
+            output.at<T>(x, target_index, y) = value;
           }
         }
       }
@@ -465,10 +517,10 @@ void cedar::proc::steps::Projection::expand2Dto3D()
       {
         for (y = 0; y < input.size[1]; ++y)
         {
-          value = input.at<float>(x, y);
+          value = input.at<T>(x, y);
           for (target_index = 0; target_index < output.size[0]; ++ target_index)
           {
-            output.at<float>(y, target_index, x) = value;
+            output.at<T>(y, target_index, x) = value;
           }
         }
       }
@@ -482,10 +534,10 @@ void cedar::proc::steps::Projection::expand2Dto3D()
       {
         for (y = 0; y < input.size[1]; ++y)
         {
-          value = input.at<float>(x, y);
-          for (target_index = 0; target_index < output.size[2]; ++ target_index)
+          value = input.at<T>(x, y);
+          for (target_index = 0; target_index < output.size[2]; ++target_index)
           {
-            output.at<float>(x, y, target_index) = value;
+            output.at<T>(x, y, target_index) = value;
           }
         }
       }
@@ -496,10 +548,10 @@ void cedar::proc::steps::Projection::expand2Dto3D()
       {
         for (y = 0; y < input.size[1]; ++y)
         {
-          value = input.at<float>(x, y);
+          value = input.at<T>(x, y);
           for (target_index = 0; target_index < output.size[2]; ++ target_index)
           {
-            output.at<float>(y, x, target_index) = value;
+            output.at<T>(y, x, target_index) = value;
           }
         }
       }
@@ -511,6 +563,26 @@ void cedar::proc::steps::Projection::expand2Dto3D()
   }
 }
 
+void cedar::proc::steps::Projection::expand1Dto3D()
+{
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->expand1Dto3D<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->expand1Dto3D<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+
+template<typename T>
 void cedar::proc::steps::Projection::expand1Dto3D()
 {
   const cv::Mat& input = this->mInput->getData();
@@ -538,17 +610,17 @@ void cedar::proc::steps::Projection::expand1Dto3D()
     int y;
     case 0:
     {
-      float value;
+      T value;
       // outer loop
       for (int source_index = 0; source_index < input.rows; ++ source_index)
       {
         // get value
-        value = input.at<float>(source_index, 0);
+        value = input.at<T>(source_index, 0);
         for (x = 0; x < output.size[1]; ++x)
         {
           for (y = 0; y < output.size[2]; ++y)
           {
-            output.at<float>(source_index, x, y) = value;
+            output.at<T>(source_index, x, y) = value;
           }
         }
       }
@@ -556,17 +628,17 @@ void cedar::proc::steps::Projection::expand1Dto3D()
     }
     case 1:
     {
-      float value;
+      T value;
       // outer loop
       for (int source_index = 0; source_index < input.rows; ++ source_index)
       {
         // get value
-        value = input.at<float>(source_index, 0);
+        value = input.at<T>(source_index, 0);
         for (x = 0; x < output.size[0]; ++x)
         {
           for (y = 0; y < output.size[2]; ++y)
           {
-            output.at<float>(x, source_index, y) = value;
+            output.at<T>(x, source_index, y) = value;
           }
         }
       }
@@ -574,17 +646,17 @@ void cedar::proc::steps::Projection::expand1Dto3D()
     }
     case 2:
     {
-      float value;
+      T value;
       // outer loop
       for (int source_index = 0; source_index < input.rows; ++ source_index)
       {
         // get value
-        value = input.at<float>(source_index, 0);
+        value = input.at<T>(source_index, 0);
         for (x = 0; x < output.size[0]; ++x)
         {
           for (y = 0; y < output.size[1]; ++y)
           {
-            output.at<float>(x, y, source_index) = value;
+            output.at<T>(x, y, source_index) = value;
           }
         }
       }
@@ -597,6 +669,26 @@ void cedar::proc::steps::Projection::expand1Dto3D()
   }
 }
 
+void cedar::proc::steps::Projection::expandMDtoND()
+{
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->expandMDtoND<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->expandMDtoND<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+
+template<typename T>
 void cedar::proc::steps::Projection::expandMDtoND()
 {
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
@@ -635,8 +727,8 @@ void cedar::proc::steps::Projection::expandMDtoND()
     }
 
     // copy the activation value in the input matrix to the corresponding output matrix
-    mOutput->getData().at<float>(&(output_index.front()))
-        = mInput->getData().at<float>(&(input_index.front()));
+    mOutput->getData().at<T>(&(output_index.front()))
+        = mInput->getData().at<T>(&(input_index.front()));
   }
   while (output_iterator.increment());
 }
@@ -655,9 +747,29 @@ void cedar::proc::steps::Projection::compress2Dto1D()
 
 void cedar::proc::steps::Projection::compress3Dto2D()
 {
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->compress3Dto2D<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->compress3Dto2D<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+
+template<typename T>
+void cedar::proc::steps::Projection::compress3Dto2D()
+{
   CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 1);
 
-  cedar::aux::math::reduceCvMat3D<float>
+  cedar::aux::math::reduceCvMat3D<T>
   (
     mInput->getData(),
     mOutput->getData(),
@@ -669,9 +781,29 @@ void cedar::proc::steps::Projection::compress3Dto2D()
 
 void cedar::proc::steps::Projection::compress3Dto2DSwapped()
 {
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->compress3Dto2DSwapped<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->compress3Dto2DSwapped<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+
+template<typename T>
+void cedar::proc::steps::Projection::compress3Dto2DSwapped()
+{
   CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 1);
 
-  cedar::aux::math::reduceCvMat3D<float>
+  cedar::aux::math::reduceCvMat3D<T>
   (
     mInput->getData(),
     mOutput->getData(),
@@ -681,6 +813,26 @@ void cedar::proc::steps::Projection::compress3Dto2DSwapped()
   );
 }
 
+void cedar::proc::steps::Projection::compress3Dto1D()
+{
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->compress3Dto1D<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->compress3Dto1D<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+
+template<typename T>
 void cedar::proc::steps::Projection::compress3Dto1D()
 {
   CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 2);
@@ -702,10 +854,10 @@ void cedar::proc::steps::Projection::compress3Dto1D()
   }
 
   // ... and create the temporary 2D matrix with those sizes
-  cv::Mat tmp_2d(input_dimensionality - 1, &sizes.front(), CV_32F, cv::Scalar(0.0));
+  cv::Mat tmp_2d(input_dimensionality - 1, &sizes.front(), mInput->getCvType(), cv::Scalar(0.0));
 
   // reduce the 3D input to the (temporary) 2D matrix
-  cedar::aux::math::reduceCvMat3D<float>(mInput->getData(), tmp_2d, mIndicesToCompress.at(0), _mCompressionType->getValue());
+  cedar::aux::math::reduceCvMat3D<T>(mInput->getData(), tmp_2d, mIndicesToCompress.at(0), _mCompressionType->getValue());
 
   // reduce the temporary 2D matrix to the final 1D output of the projection
   cv::reduce(tmp_2d, mOutput->getData(), mIndicesToCompress.at(1) - 1, _mCompressionType->getValue());
@@ -718,14 +870,72 @@ void cedar::proc::steps::Projection::compress3Dto1D()
 
 void cedar::proc::steps::Projection::compressNDto0Dsum()
 {
-  mOutput->getData().at<float>(0) = cv::sum(mInput->getData())[0];
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->compressNDto0Dsum<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->compressNDto0Dsum<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+
+template<typename T>
+void cedar::proc::steps::Projection::compressNDto0Dsum()
+{
+  mOutput->getData().at<T>(0) = cv::sum(mInput->getData())[0];
 }
 
 void cedar::proc::steps::Projection::compressNDto0Dmean()
 {
-  mOutput->getData().at<float>(0) = cv::mean(mInput->getData())[0];
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->compressNDto0Dmean<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->compressNDto0Dmean<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+template<typename T>
+void cedar::proc::steps::Projection::compressNDto0Dmean()
+{
+  mOutput->getData().at<T>(0) = cv::mean(mInput->getData())[0];
 }
 
+void cedar::proc::steps::Projection::compressNDto0Dmin()
+{
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->compressNDto0Dmin<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->compressNDto0Dmin<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+template<typename T>
 void cedar::proc::steps::Projection::compressNDto0Dmin()
 {
   double minimum = std::numeric_limits<double>::max();
@@ -748,7 +958,7 @@ void cedar::proc::steps::Projection::compressNDto0Dmin()
     // iterate over input matrix and find the maximum value
     do
     {
-      double current_value = mInput->getData().at<float>(matrix_iterator.getCurrentIndex());
+      double current_value = mInput->getData().at<T>(matrix_iterator.getCurrentIndex());
 
       if (current_value < minimum)
       {
@@ -759,9 +969,29 @@ void cedar::proc::steps::Projection::compressNDto0Dmin()
   }
 
   // set the minimum of the input matrix as the output of the projection
-  mOutput->getData().at<float>(0) = minimum;
+  mOutput->getData().at<T>(0) = minimum;
 }
 
+void cedar::proc::steps::Projection::compressNDto0Dmax()
+{
+  switch (mInput->getCvType())
+  {
+    case CV_32F:
+    {
+      this->compressNDto0Dmax<float>();
+      break;
+    }
+    case CV_64F:
+    {
+      this->compressNDto0Dmax<double>();
+      break;
+    }
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot project matrices of this type.");
+  }
+}
+
+template<typename T>
 void cedar::proc::steps::Projection::compressNDto0Dmax()
 {
   double maximum = std::numeric_limits<double>::min();
@@ -784,7 +1014,7 @@ void cedar::proc::steps::Projection::compressNDto0Dmax()
     // iterate over input matrix and find the maximum value
     do
     {
-      double current_value = mInput->getData().at<float>(matrix_iterator.getCurrentIndex());
+      double current_value = mInput->getData().at<T>(matrix_iterator.getCurrentIndex());
 
       if (current_value > maximum)
       {
@@ -795,7 +1025,7 @@ void cedar::proc::steps::Projection::compressNDto0Dmax()
   }
 
   // set the maximum of the input matrix as the output of the projection
-  mOutput->getData().at<float>(0) = maximum;
+  mOutput->getData().at<T>(0) = maximum;
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputValidity
