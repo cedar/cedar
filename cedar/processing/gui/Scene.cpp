@@ -190,15 +190,15 @@ void cedar::proc::gui::Scene::itemSelected()
 
   if (selected_items.size() == 1)
   {
-    if (cedar::proc::gui::GraphicsBase *p_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items[0]))
+    if (auto p_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items[0]))
     {
       if (p_item->getElement())
       {
         this->mpConfigurableWidget->display(p_item->getElement(), p_item->isReadOnly());
       
-        if(cedar::proc::StepPtr castedStep = boost::dynamic_pointer_cast<cedar::proc::Step>(p_item->getElement()))
+        if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_item->getElement()))
         {
-          this->mpRecorderWidget->setStep(castedStep);
+          this->mpRecorderWidget->setConnectable(connectable);
         }
       }
     }
