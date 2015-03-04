@@ -76,7 +76,9 @@
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/version.h"
+#include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -87,12 +89,17 @@
 #include <QTableWidget>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/detail/json_parser_error.hpp>
+  #include <boost/version.hpp>
 #endif
 #include <vector>
 #include <set>
 #include <list>
 #include <string>
 #include <utility>
+
+#ifdef CEDAR_USE_YARP
+#include <yarp/conf/version.h>
+#endif // CEDAR_USE_YARP
 
 //----------------------------------------------------------------------------------------------------------------------
 // nested private classes
@@ -1030,13 +1037,10 @@ void cedar::proc::gui::Ide::showAboutDialog()
   QImage version_image(":/cedar/processing/gui/images/current_version_image.svg");
   p_version_image->setPixmap(QPixmap::fromImage(version_image));
 
-  QString about_text = "<center>This is cedar<br />built with library<br />version <b>";
-  about_text += QString::fromStdString(cedar::aux::versionNumberToString(CEDAR_VERSION));
-  about_text += "</b>"
-#ifdef DEBUG
-      "<br />(debug build)"
-#endif // DEBUG
-      "</center>";
+  QString about_text = "<center>";
+  about_text += QString::fromStdString(cedar::aux::getCedarConfigurationInfo("<hr />", "<br />"));
+  about_text += "</center>";
+
   QLabel* p_label = new QLabel(about_text);
   p_label->setTextFormat(Qt::RichText);
   p_layout->addWidget(p_label);
