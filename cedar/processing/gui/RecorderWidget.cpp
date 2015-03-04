@@ -38,7 +38,7 @@
 #include "cedar/processing/gui/RecorderWidget.h"
 #include "cedar/processing/gui/RecorderProperty.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Step.h"
+#include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Recorder.h"
 
@@ -69,9 +69,9 @@ cedar::proc::gui::RecorderWidget::~RecorderWidget()
   delete mMainLayout;
 }
 
-void cedar::proc::gui::RecorderWidget::setStep(cedar::proc::StepPtr step)
+void cedar::proc::gui::RecorderWidget::setConnectable(cedar::proc::ConnectablePtr connectable)
 {
-  this->mStepToConfigure = step;
+  this->mConnectable = connectable;
   refreshWidget();
 }
 
@@ -81,37 +81,39 @@ void cedar::proc::gui::RecorderWidget::refreshWidget()
   clearLayout();
 
   // Check if step not null
-  if (!mStepToConfigure)
+  if (!this->mConnectable)
   {
     return;
   }
 
   // draw Headers
-  this->createHeader(mStepToConfigure->getName());
+  this->createHeader(this->mConnectable->getName());
 
   // create recorder properties
 
-  std::vector<cedar::proc::DataRole::Id> slotTypes;
-  slotTypes.push_back(cedar::proc::DataRole::BUFFER);
-  slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
+  std::vector<cedar::proc::DataRole::Id> displayed_roles;
+  displayed_roles.push_back(cedar::proc::DataRole::BUFFER);
+  displayed_roles.push_back(cedar::proc::DataRole::OUTPUT);
 
-  for (unsigned int s = 0; s < slotTypes.size(); s++)
+  for (auto role : displayed_roles)
   {
-
-    if (mStepToConfigure->hasSlotForRole(slotTypes[s]))
+    if (!this->mConnectable->hasSlotForRole(role))
     {
-      cedar::proc::Connectable::SlotList dataSlots = mStepToConfigure->getOrderedDataSlots(slotTypes[s]);
-      if (dataSlots.size() > 0)
-      {
-        createRoleSection(cedar::proc::DataRole::type().get(slotTypes[s]).prettyString());
-      }
+      continue;
+    }
 
-      for (unsigned int i = 0; i < dataSlots.size(); i++)
-      {
-        auto property = new RecorderProperty(this, dataSlots[i]);
-        mMainLayout->addLayout(property);
-        QObject::connect(property, SIGNAL(changed()), this, SIGNAL(settingsChanged()));
-      }
+    cedar::proc::Connectable::SlotList data_slots = this->mConnectable->getOrderedDataSlots(role);
+    if (data_slots.empty())
+    {
+      continue;
+    }
+
+    createRoleSection(cedar::proc::DataRole::type().get(role).prettyString());
+    for (auto slot : data_slots)
+    {
+      auto property = new RecorderProperty(this, slot);
+      mMainLayout->addLayout(property);
+      QObject::connect(property, SIGNAL(changed()), this, SIGNAL(settingsChanged()));
     }
   }
 
@@ -120,7 +122,7 @@ void cedar::proc::gui::RecorderWidget::refreshWidget()
 
 void cedar::proc::gui::RecorderWidget::clear()
 {
-  this->mStepToConfigure.reset();
+  this->mConnectable.reset();
   this->clearLayout();
 }
 
