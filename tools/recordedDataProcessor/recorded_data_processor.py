@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2014 12 16
+    Date:        2015 03 04
 
     Description: 
 
@@ -174,7 +174,7 @@ class SnapshotSequenceDialog(wx.Dialog):
         step_sizer.Add(step_size, 1, wx.ALIGN_LEFT)
         step_sizer.Add(step_size_entry, 1, wx.ALIGN_RIGHT|wx.EXPAND)
             
-        axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+        axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)        
         axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
         axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
         min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
@@ -227,9 +227,9 @@ class SnapshotSequenceDialog(wx.Dialog):
         
     
     def evt_ok_btn(self, step_num_entry, step_size_entry, event):
-        self.parent.nstep = step_num_entry.GetValue()
-        self.parent.step_size = step_size_entry.GetValue()
-        
+        self.parent.nstep = int(step_num_entry.GetValue())
+        self.parent.step_size = int(step_size_entry.GetValue())
+
         self.parent.plot = RDPPlot().plot_snapshot_sequence(start = self.parent.step, 
                                                            step_size = self.parent.step_size, 
                                                            steps = self.parent.nstep, 
@@ -248,7 +248,7 @@ class SnapshotSequenceDialog(wx.Dialog):
                                                            file_directory = self.parent.dir,
                                                            save_mode = self.parent.save_mode,
                                                            color = self.parent.line_color)
-        
+                
         self.Destroy()
         
     def evt_cancel_button(self, event):
@@ -480,7 +480,7 @@ class RDPGUI(wx.Panel):
         #========================================================================================================================
                 
         # Slider and player functionalities
-        #========================================================================
+        #========================================================================================================================
         pos_slider_sizer.Add(self.pos_slider, 1, wx.EXPAND|wx.ALIGN_CENTER)
         
         time_code_sizer.Add(self.time_code_label, 1, wx.ALIGN_LEFT)
@@ -497,13 +497,13 @@ class RDPGUI(wx.Panel):
         player_time_code_sizer.AddSpacer(10)
         player_time_code_sizer.Add(time_code_sizer, 1, wx.ALIGN_LEFT)
         
-        #========================================================================
+        #========================================================================================================================
         
         selection_sizer.Add(self.sel_cbox, 0)
         selection_sizer.Add(self.switch_btn, 0, wx.EXPAND)
         
         # Selection ComboBoxes
-        #========================================================================
+        #========================================================================================================================
         cbox_grid_sizer.Add(self.sel_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
         cbox_grid_sizer.Add(selection_sizer, 1, wx.ALIGN_RIGHT)
         cbox_grid_sizer.Add(self.mode_label, 1, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
@@ -519,17 +519,17 @@ class RDPGUI(wx.Panel):
         cbox_grid_sizer.Add(self.resolution_label, proportion=1, flag=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
         cbox_grid_sizer.Add(self.resolution_spn, proportion=1, flag=wx.ALIGN_RIGHT)
 
-        #========================================================================
+        #========================================================================================================================
         
         # Buttons
-        #========================================================================
+        #========================================================================================================================
         plot_sizer.Add(item=self.plot_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         plot_sizer.Add(item=self.save_btn, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         btn_sizer.Add(item=plot_sizer, proportion=1, flag=wx.ALIGN_LEFT|wx.EXPAND)
-        #========================================================================
+        #========================================================================================================================
         
         # Dividing lines
-        #========================================================================
+        #========================================================================================================================
         line_sizer_1.Add(item=self.line_1, proportion=1, flag=wx.LEFT|wx.RIGHT, border=10)
         line_sizer_2.Add(item=self.line_2, proportion=1, flag=wx.LEFT|wx.RIGHT, border=10)
         line_sizer_4.Add(item=self.line_4, proportion=1, flag=wx.LEFT|wx.RIGHT, border=10)
@@ -724,7 +724,7 @@ class RDPGUI(wx.Panel):
             
         else:
             self.play_pause_btn.SetBitmapLabel(self.play_bitmap)
-            
+        
         self.reverse_play_pause_btn.Enable()
         self.increase_single_step_btn.Enable()
         self.decrease_single_step_btn.Enable()
@@ -808,7 +808,7 @@ class RDPGUI(wx.Panel):
         self.x_label = x_axis_label.GetValue()
         self.y_label = y_axis_label.GetValue()
         
-        if self.z_axis_label is not None:
+        if self.z_label is not None:
             self.z_label = z_axis_label.GetValue()
         
         if plt.get_fignums():
@@ -966,13 +966,15 @@ class RDPGUI(wx.Panel):
         
         self.mode = self.mode_cbox.GetValue()         
         
+        # Fill projection combobox with the fitting options
         if self.mode == 'timeline':
             self.proj_cbox.SetItems(self.proj_choice_timeline)
         elif self.mode == 'snapshot' or self.mode == 'snapshot sequence':
             self.proj_cbox.SetItems(self.proj_choice_snapshot)
         else:
             self.proj_cbox.SetItems([])
-            
+        
+        # Update plot
         if self.mode != 'snapshot sequence':
             if plt.get_fignums():
                 wx.CallAfter(self._update_plot)
@@ -982,11 +984,16 @@ class RDPGUI(wx.Panel):
         
         
     def _update_selection_data(self):
+        '''
+        Reset the control panel and update it with the newly selected data
+        '''
         
+        # Clear memory
         if self.data is not None:
             del self.data
             self.data = None
         
+        # Reset control panel
         self.slider_max = 0
         self.step = -1
         self.pos_slider.SetValue(self.step)
@@ -998,7 +1005,7 @@ class RDPGUI(wx.Panel):
         self.decrease_single_step_btn.Disable()
         self.increase_single_step_btn.Disable()
         
-        # valid checkbox selected
+        # Generate adequate options for the projection combobox, depending on data dimensionality and plot mode
         self.proj_choice_timeline = self.proj_ch[:self.ndim[self.selection]+1]
         self.proj_choice_snapshot = RDPPlot()._build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
         
@@ -1023,6 +1030,7 @@ class RDPGUI(wx.Panel):
         aux_plot_color = widget.GetColour()
         self.line_color_ctrl.SetColour(aux_plot_color)
         
+        # Mirror selected color on the control plot frame frame, if present
         if self.control_plot_frame:
             if hasattr(self.control_plot_frame, 'line_color_ctrl'):
                 self.control_plot_frame.line_color_ctrl.SetColour(self.line_color_ctrl.GetColour())
@@ -1041,85 +1049,28 @@ class RDPGUI(wx.Panel):
         self._update_selection_data()
         self.sel_cbox.SetValue(widget.GetValue())
         
+        # Mirror current selection on the control plot frame, if present
         if self.control_plot_frame:
             if hasattr(self.control_plot_frame, 'sel_cbox'):
                 self.control_plot_frame.sel_cbox.SetValue(widget.GetValue())
-            
-                   
-    def evt_save_plot(self, event):
-        
-        if self.mode == 'snapshot':
-            if self.step < 0:
-                step = 0
-            else:
-                step = self.step
-            
-            try:
-                self.plot = RDPPlot().plot_snapshot(step = step, 
-                                                    style = self.style, 
-                                                    data = self.data, 
-                                                    header = self.header, 
-                                                    vmin = self.vmin,
-                                                    vmax = self.vmax,
-                                                    resolution = self.resolution,
-                                                    proj = self.proj,
-                                                    proj_method = self.proj_method,
-                                                    color = self.line_color)
-                    
-                RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-                RDPPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
                 
-            except IndexError:
-                dlg = wx.MessageDialog(parent  = None, 
-                message = 'The specified timeslice does not exist.', 
-                caption = 'An Error has occurred.', 
-                style   = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
-                dlg.ShowModal()
-                dlg.Destroy()
-        
-        elif self.mode == 'snapshot sequence':
-            
-            self.save_mode = True
-            dlg = SnapshotSequenceDialog(self, -1, 'Options')
-            dlg.ShowModal()
-            dlg.Destroy()
-                                                            
-        elif self.mode == 'timeline':
-            try:
-                self.plot = RDPPlot().plot_timeline(data = self.data, 
-                                                    header = self.header,
-                                                    vmin = self.vmin,
-                                                    vmax = self.vmax,
-                                                    resolution = self.resolution,
-                                                    plot = self.plot,
-                                                    proj = self.proj, 
-                                                    proj_method = self.proj_method,
-                                                    color = self.line_color,
-                                                    step = self.step, 
-                                                    marker = self.marked, 
-                                                    style = self.style)
-            
-                RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-                RDPPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)
-                
-            except UnboundLocalError:
-                self.control_plot_frame.Destroy()
-                dlg = wx.MessageDialog(parent  = None, 
-                message = 'It is not possible to build a timeline out of 2-dimensional timeslices.', 
-                caption = 'The attempted operation is not possible.', 
-                style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
-                dlg.ShowModal()
-                dlg.Destroy()
-                        
     
-    def _plot(self):
+    def evt_save_plot(self, event):
+        self._plot(save=True)           
+    
+    
+    def _plot(self, save=False):
+        '''
+        Build plot(s) to either visualize or save as pdf file
+        '''
         
-        if self.mode == 'snapshot':
+        if self.mode == 'snapshot' or self.mode == 'snapshot sequence':
             if self.step < 0:
                 step = 0
             else:
                 step = self.step
-            
+        
+        if self.mode == 'snapshot':                    
             try:
                 self.plot = RDPPlot().plot_snapshot(step = step, 
                                                     style = self.style, 
@@ -1131,29 +1082,21 @@ class RDPGUI(wx.Panel):
                                                     proj = self.proj,
                                                     proj_method = self.proj_method,
                                                     color = self.line_color)
-                
-                RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
-                
-                manager = plt.get_current_fig_manager()
-                manager.window.SetPosition((self.size[0]+6,0))
-                                            
-                plt.draw()
-                
+            
             except IndexError:
                 dlg = wx.MessageDialog(parent  = None, 
-                                       message = 'The specified timeslice does not exist.', 
-                                       caption = 'An Error has occurred.', 
-                                       style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
+                message = 'The specified timeslice does not exist.', 
+                caption = 'An Error has occurred.', 
+                style = wx.OK | wx.ICON_ERROR | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
                 dlg.Destroy()
-        
-        elif self.mode == 'snapshot sequence':
             
-            self.save_mode = False
+        elif self.mode == 'snapshot sequence':
+            self.save_mode = save
             dlg = SnapshotSequenceDialog(self, -1, 'Options')
             dlg.ShowModal()
             dlg.Destroy()
-                                            
+            
         elif self.mode == 'timeline':
             try:
                 self.plot = RDPPlot().plot_timeline(data = self.data, 
@@ -1168,29 +1111,24 @@ class RDPGUI(wx.Panel):
                                                     step = self.step, 
                                                     marker = self.marked, 
                                                     style = self.style)
-                
-                RDPPlot().label_axis(plot=self.plot, 
-                                     x_label=self.x_label, 
-                                     y_label=self.y_label, 
-                                     z_label=self.z_label)
-            
-                manager = plt.get_current_fig_manager()
-                
-                manager.window.SetPosition((self.size[0]+6,0))
-                        
-                plt.draw()
-                
             except UnboundLocalError:
-                plt.close()
-                self.control_plot_frame.Destroy()
                 dlg = wx.MessageDialog(parent = None, 
                                        message = 'It is not possible to build a timeline out of 2-dimensional timeslices.', 
                                        caption = 'The attempted operation is not possible.', 
                                        style = wx.OK | wx.ICON_INFORMATION | wx.CENTER | wx.STAY_ON_TOP)
                 dlg.ShowModal()
                 dlg.Destroy()
-
-            
+                
+        RDPPlot().label_axis(plot=self.plot, x_label=self.x_label, y_label=self.y_label, z_label=self.z_label)
+        
+        if save is False and self.mode != 'snapshot sequence':
+            manager = plt.get_current_fig_manager()
+            manager.window.SetPosition((self.size[0]+6,0))                                    
+            plt.draw()
+        if save is True and self.mode != 'snapshot sequence':
+            RDPPlot().save_plot(plot=self.plot, plot_mode=self.mode, file_name=self.flist_sorted[self.selection], file_directory=self.dir)   
+             
+                            
     def evt_plot(self, event):
         
         plt.close()
@@ -1357,7 +1295,7 @@ class RDPPlot(object):
                     div = aux_X.shape[j]
                     aux_X = np.add.reduce(array=aux_X, axis=j)
                     aux_X = np.true_divide(aux_X, div)
-                    
+                
                 if j < aux_col[0]: 
                     aux_col[0] -= 1
                 if j < aux_col[1]: 
@@ -1399,6 +1337,7 @@ class RDPPlot(object):
         v.append(list(zip(xs, ys)))
         
         if style == ' ' or style == 'heatmap':
+            # Mark step with red line
             plt.axvline(x=step, color='red')
         
         else:
@@ -1408,6 +1347,8 @@ class RDPPlot(object):
                 cross = PolyCollection(v, facecolors='r', closed=False)
             
             cross.set_alpha(0.25)
+            
+            # Mark x with either blue (wireframe) or red (surface) plane
             plot.add_collection3d(cross, zs=step, zdir='x')
                     
         return plot
@@ -1643,13 +1584,12 @@ class RDPPlot(object):
         plot_mode = 'snapshot sequence'
         
         for i in range(int(steps)):
-            
             plot = self.plot_snapshot(data = data, 
                                       header = header, 
                                       vmin = vmin, 
                                       vmax = vmax, 
                                       resolution = resolution, 
-                                      step = int(start) + i*int(step_size), 
+                                      step = start + (i*step_size), 
                                       style = style, 
                                       mode = plot_mode, 
                                       proj = proj, 
@@ -1707,7 +1647,7 @@ class RDPPlot(object):
         # mark the selected time-slice if true                              
         if marker == True:
             plot = self._set_marker(step=step, data=data, plot=plot, style=style)
-        
+                    
         return plot
     
     
@@ -1761,20 +1701,14 @@ class RDPPlot(object):
         
         plot_count = 1
         
-        if plot_mode == 'snapshot sequence':
+        if plot_mode == 'snapshot sequence': 
             plot_mode = 'snapshot_sequence'
                     
         # Snapshot or timeline
         if save_mode == 'single':
+            print 'single'
             file_path = file_directory + '/' + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
-            
-            while os.path.exists(file_path):
-                plot_count += 1
-                file_path = file_directory + '/' + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
-                
-            plt.savefig(file_path, transparent=True)
-            plt.close()
-        
+                    
         # Snapshot Sequence
         elif save_mode == 'sequence':
             sequence_number = 1
@@ -1795,15 +1729,16 @@ class RDPPlot(object):
                 # Else fall back to the last one
                 else:
                     file_path_partial = file_directory + '/' + file_name.strip('.csv') + '_sequence_' + str(sequence_number-1) + '/'
-                                
+                                       
             file_path = file_path_partial + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
                                 
-            while os.path.exists(file_path):
+        while os.path.exists(file_path):
+            if os.path.exists(file_path_partial):
                 plot_count += 1
                 file_path = file_path_partial + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
             
-            plt.savefig(file_path, transparent=True)
-            plt.close()
+        plt.savefig(file_path, transparent=True)
+        plt.close()
 
 #========================================================================================================================
 
