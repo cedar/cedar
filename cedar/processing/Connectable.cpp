@@ -185,6 +185,11 @@ void cedar::proc::Connectable::callInputConnectionChanged(const std::string& slo
   this->revalidateInputSlot(slot);
 }
 
+void cedar::proc::Connectable::callOutputConnectionRemoved(cedar::proc::DataSlotPtr slot)
+{
+  this->outputConnectionRemoved(slot);
+}
+
 void cedar::proc::Connectable::revalidateInputSlot(const std::string& slot)
 {
   this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
@@ -454,6 +459,11 @@ void cedar::proc::Connectable::callInputConnectionChangedFor(cedar::proc::DataSl
  */
 void cedar::proc::Connectable::inputConnectionChanged(const std::string& /*inputName*/)
 {
+}
+
+void cedar::proc::Connectable::outputConnectionRemoved(cedar::proc::DataSlotPtr /* slot */)
+{
+  // empty by default -- override in derived classes if you want to react to changes in output connectivity
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::checkInputValidity
@@ -751,7 +761,6 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
 
   if (role == cedar::proc::DataRole::INPUT)
   {
-
     slot_ptr->connectToDataChangedSignal
     (
       boost::bind
@@ -1096,9 +1105,8 @@ void cedar::proc::Connectable::freeTargetSlots(cedar::proc::DataSlotWeakPtr slot
     connections
   );
 
-  for (size_t i = 0; i < connections.size(); ++i)
+  for (auto connection : connections)
   {
-    cedar::proc::DataConnectionPtr connection = connections.at(i);
     connection->getTarget()->getParentPtr()->freeInput(connection->getTarget()->getName(), data);
   }
 }
