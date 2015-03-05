@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 03 04
+    Date:        2015 03 05
 
     Description: 
 
@@ -56,6 +56,11 @@ import wx.lib.agw.floatspin as FS
 from wx.lib.embeddedimage import PyEmbeddedImage
 from functools import partial
 from wx.lib.scrolledpanel import ScrolledPanel
+
+# Prevent Eclipse warning from Axes3D import
+Axes3D
+
+
 
 class RDPImageFiles():
     play = PyEmbeddedImage(
@@ -141,6 +146,9 @@ class RDPImageFiles():
     
 
 class Progress(wx.ProgressDialog):
+    '''
+    Simple progress bar
+    '''
     def __init__(self, parent, _, title, message, maximum):
         wx.ProgressDialog.__init__(self, title, message=message, maximum=maximum, parent=parent, style=wx.PD_ELAPSED_TIME|wx.PD_REMAINING_TIME|wx.STAY_ON_TOP)
         
@@ -184,6 +192,7 @@ class SnapshotSequenceDialog(wx.Dialog):
         x_axis_txt = wx.StaticText(self, -1, 'X axis \t')
         y_axis_txt = wx.StaticText(self, -1, 'Y axis \t')
         
+        # Change Z axis text depending on plot mode
         if parent.style != 'heatmap':
             z_axis_txt = wx.StaticText(self, -1, 'Z axis \t')
         else:
@@ -227,6 +236,8 @@ class SnapshotSequenceDialog(wx.Dialog):
         
     
     def evt_ok_btn(self, step_num_entry, step_size_entry, event):
+        
+        # Get number of steps as well as step size from widgets
         self.parent.nstep = int(step_num_entry.GetValue())
         self.parent.step_size = int(step_size_entry.GetValue())
 
@@ -274,6 +285,7 @@ class RDPMainWindow(wx.Frame):
         # search for standard cedarRecordings directory
         self.dir='/home'
         
+        # Walk through directories until 'cedarRecordings' is found
         for (self.dir, dirs, _) in os.walk(self.dir):
             for j in range(len(dirs)):
                 if dirs[j] == 'cedarRecordings':
@@ -283,7 +295,8 @@ class RDPMainWindow(wx.Frame):
             
             if 'cedarRecordings' in self.dir:
                 break
-                
+        
+        # Frame layout    
         self.SetAutoLayout(True)
         self.rdp_browser = RDPBrowserPanel(self)
         self.Bind(wx.EVT_CLOSE, self.evt_close)
@@ -324,9 +337,15 @@ class RDPBrowserPanel(ScrolledPanel):
         return
     
         
-    def evt_sel_btn(self, event):                
+    def evt_sel_btn(self, event):
+        '''
+        Switch browser panel with control panel for plot generation/manipulation
+        '''
+                      
         frame = self.GetParent()
-        frame.dir = self.browser.GetPath()        
+        frame.dir = self.browser.GetPath()
+        
+        # Initialize plot generation GUI      
         rdp_gui = RDPGUI(parent=frame)
         frame.SetPosition((0, 0))
         frame.SetSizer(rdp_gui.main_sizer)
@@ -379,8 +398,13 @@ class RDPGUI(wx.Panel):
         self.line_color = '#FF9600'
         self.save_mode = False
         
+        # Plot modes
         self.mode_ch = [' ', 'snapshot', 'snapshot sequence', 'timeline']
+        
+        # Projection choices for timeline plot mode
         self.proj_ch = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5']
+        
+        # Projection choices for snapshot/snapshot sequence plot modes
         self.proj_ch_step = [' ', 'x_1', 'x_2', 'x_3', 'x_4', 'x_5', 
                              'x_1, x_2', 'x_1, x_3', 'x_1, x_4', 'x_1, x_5', 'x_2, x_3', 
                              'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
@@ -401,6 +425,8 @@ class RDPGUI(wx.Panel):
         self.line_2 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
         self.line_4 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
         
+        # Control widgets
+        #========================================================================================================================
         self.sel_cbox = wx.ComboBox(self, choices = self.flist_sorted, value = ' ', style = wx.CB_READONLY)
         self.mode_cbox = wx.ComboBox(self, choices = self.mode_ch, style = wx.CB_READONLY)
         self.proj_cbox = wx.ComboBox(self, value=' ', style = wx.CB_READONLY)
@@ -410,6 +436,7 @@ class RDPGUI(wx.Panel):
         self.pos_slider.Disable()
         self.resolution_spn = wx.SpinCtrl(self, min=1, max=100)
         self.line_color_ctrl = wx.ColourPickerCtrl(self, -1, col=self.line_color)
+        #========================================================================================================================
 
         for i in range(len(self.flist_sorted)): 
             self.header_list.append(RDPPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[i]))
@@ -452,11 +479,13 @@ class RDPGUI(wx.Panel):
         self.switch_btn = wx.Button(self, label = 'Switch directory')
         
         # Player buttons
+        #========================================================================================================================
         self.play_pause_btn = wx.BitmapButton(self, -1, bitmap=self.play_bitmap)
         self.reverse_play_pause_btn = wx.BitmapButton(self, -1, bitmap=self.reverse_play_bitmap)
         self.reset_btn = wx.BitmapButton(self, -1, bitmap=self.reset_bitmap)
         self.decrease_single_step_btn = wx.BitmapButton(self, -1, bitmap=self.decrease_single_step_bitmap)
         self.increase_single_step_btn = wx.BitmapButton(self, -1, bitmap=self.increase_single_step_bitmap)
+        #========================================================================================================================
         
         self.play_pause_btn.Disable()
         self.reverse_play_pause_btn.Disable()
@@ -464,7 +493,7 @@ class RDPGUI(wx.Panel):
         self.decrease_single_step_btn.Disable()
         self.increase_single_step_btn.Disable()
         
-        # Controls
+        # Player button tooltips
         #========================================================================================================================
         self.resolution_spn.SetToolTipString('Determines the resolution of the plot. Lower values lead to finer resolutions.')
         self.play_pause_btn.SetToolTipString('Starts and pauses the Plot animation.')
@@ -472,9 +501,6 @@ class RDPGUI(wx.Panel):
         self.reset_btn.SetToolTipString('Resets the plot to default start parameters.')
         self.increase_single_step_btn.SetToolTipString('Updates the plot by increasing the time slice index by 1.')
         self.decrease_single_step_btn.SetToolTipString('Updates the plot by decreasing the time slice index by 1.')
-        
-        # Other widgets
-        #========================================================================================================================   
         
         # Build partial sizers
         #========================================================================================================================
@@ -561,10 +587,13 @@ class RDPGUI(wx.Panel):
         self.resolution_spn.Bind(wx.EVT_SPINCTRL, self.evt_resolution_spn)
         self.line_color_ctrl.Bind(wx.EVT_COLOURPICKER_CHANGED, self.evt_plot_color_ctrl)
         #========================================================================================================================
-                
+        
+        # Layout
+        #========================================================================================================================
         self.SetSizer(self.main_sizer)
         self.Fit()
         self.size = self.GetSize()
+        #========================================================================================================================
           
         return
     
@@ -575,14 +604,17 @@ class RDPGUI(wx.Panel):
         
     def create_plot_control_frame(self, parent):
         
+        # Initialize control plot frame if none is present
         if self.control_plot_frame is None:
             self.control_plot_frame = wx.Frame(parent=parent, id=-1, title='Plot controls', style=wx.MINIMIZE_BOX|wx.CAPTION|wx.CLOSE_BOX)
             
+            # Set self.figure_size to current plot window size
             if self.figure_size is None: 
                 if plt.get_fignums():
                     manager = plt.get_current_fig_manager()
                     self.figure_size = manager.window.GetSize()
-                    
+            
+            # Position control plot frame and bind close event
             self.control_plot_frame.SetPosition((self.size[0]+self.figure_size[0]+12, 0))
             self.control_plot_frame.Bind(wx.EVT_CLOSE, self.evt_close_plot_control_frame)
                 
@@ -922,20 +954,27 @@ class RDPGUI(wx.Panel):
     
     def evt_switch_btn(self, event):  
         
+        # Clear memory
         if self.data is not None:
             del self.data
             self.data = None
-                      
+        
+        # Close open plots              
         if plt.get_fignums():
             plt.close()
         
+        # Close control plot frames if present
         if self.control_plot_frame:
             self.control_plot_frame.Close()
         
         frame = self.GetParent()
         browser_panel = RDPBrowserPanel(parent=frame)
         frame.SetPosition((0, 0))
+        
+        # Replace plot generation frame with file browser
         frame.SetSizer(browser_panel.main_sizer)
+        
+        # Layout
         frame.Sizer.Fit(frame)
         frame.Layout()
         wx.CallAfter(self.Hide)
@@ -945,16 +984,20 @@ class RDPGUI(wx.Panel):
     def evt_slider(self, event):
         widget = event.GetEventObject()
         self.step = widget.GetValue()
-            
+        
+        # Default state; no marker or time code is set
         if self.step == -1:
             self.time_code_display.SetLabel('-')
             self.marked = False
+        
+        # Set marker and time code
         else:
             self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
             self.marked = True
             
         wx.MilliSleep(5)
-            
+        
+        # Update currently displayed plot
         if plt.get_fignums():
             wx.CallAfter(self._update_plot)
             
@@ -1009,9 +1052,11 @@ class RDPGUI(wx.Panel):
         self.proj_choice_timeline = self.proj_ch[:self.ndim[self.selection]+1]
         self.proj_choice_snapshot = RDPPlot()._build_proj_ch_step(ndim=self.ndim[self.selection], temp_proj_ch_step=self.proj_ch_step)   
         
+        # Get data and data header
         self.header = RDPPlot().get_header(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
         temp_data = RDPPlot().get_data(csv_f=self.dir + '/' + self.flist_sorted[self.selection])
         
+        # Enable slider and player buttons
         self.pos_slider.Enable()
         self.play_pause_btn.Enable()
         self.reverse_play_pause_btn.Enable()
@@ -1019,6 +1064,7 @@ class RDPGUI(wx.Panel):
         self.decrease_single_step_btn.Enable()
         self.increase_single_step_btn.Enable()
         
+        # Update GUI elements with loaded data
         self.data = temp_data[0]
         self.time_codes = temp_data[1]
         self.slider_max = len(self.time_codes)-1
@@ -1065,6 +1111,8 @@ class RDPGUI(wx.Panel):
         '''
         
         if self.mode == 'snapshot' or self.mode == 'snapshot sequence':
+            
+            # If self.step is still set to the default value of -1
             if self.step < 0:
                 step = 0
             else:
@@ -1149,26 +1197,30 @@ class RDPPlot(object):
     
                 
     def _sort_alphnum(self, unsorted):
+        '''Sort given list alphanumerically.'''
         conv = lambda text: int(text) if text.isdigit() else text
         alphnum_key = lambda key: [conv(c) for c in re.split('([0-9]+)', key)]
         
         return sorted(unsorted, key=alphnum_key)
     
     def _build_proj_ch_step(self, ndim, temp_proj_ch_step):
-        '''
-        Builds the various projection choices for snapshot plots
-        '''
+        '''Build the various projection choices for snapshot plots.'''
         
+        # Empty (default) selection option
         proj_ch_step = [' ']
                 
         for j in range(ndim+1):
             for k in range(len(temp_proj_ch_step)):
+                
+                # temp_proj_ch_step[k] contains 1 axis
                 if 'x_'+ str(j) == temp_proj_ch_step[k]:
                     proj_ch_step.append(temp_proj_ch_step[k])
+                    
+                # temp_proj_ch_step[k] contains 2 axes
                 elif 'x_'+ str(j) in temp_proj_ch_step[k]:
                     count = 0
                     for l in range(len(re.findall('\d', temp_proj_ch_step[k]))):
-                        if int(re.findall('\d', temp_proj_ch_step[k])[l]) <= ndim :
+                        if int(re.findall('\d', temp_proj_ch_step[k])[l]) <= ndim:
                             count += 1
                             if count == 2 and temp_proj_ch_step[k] not in proj_ch_step:
                                 proj_ch_step.append(temp_proj_ch_step[k])
@@ -1179,9 +1231,7 @@ class RDPPlot(object):
         return proj_ch_step
     
     def get_dimension(self, header):
-        '''
-        Returns the dimensionality of the data belonging to the given header.
-        '''
+        '''Return the dimensionality of the data belonging to the given header.'''
         
         ndim = len(header[2:])
         
@@ -1196,9 +1246,7 @@ class RDPPlot(object):
     
     
     def _project(self, mode, steps, data, header, proj, proj_method='addition'):
-        '''
-        Projects data onto the given dimension.
-        '''
+        '''Project data onto the given axis.'''
         
         ndim = self.get_dimension(header)
         X = np.zeros(ndim)
@@ -1254,13 +1302,13 @@ class RDPPlot(object):
         return X_1, X_2, Z
     
     def _project2D(self, step, data, header, proj, proj_method='addition'):
-        '''
-        Projects data onto 2 given dimensions.
-        '''
+        '''Project data onto 2 given axes.'''
         
         ndim = self.get_dimension(header)
         X = np.zeros(ndim)
         col = np.zeros(2)
+        
+        # Extract dimensions on which data is to be projected from proj tuple
         proj = proj.split(',')
         proj[0] = proj[0].strip()
         proj[1] = proj[1].strip()
@@ -1310,9 +1358,7 @@ class RDPPlot(object):
         return X_1, X_2, Z
         
     def _set_marker(self, step, data, plot, style):
-        '''
-        Marks the given time slice in a timeline plot.
-        '''
+        '''Mark the given time slice in a timeline plot.'''
                     
         min_data = 9999999
         max_data = -9999999
@@ -1354,15 +1400,13 @@ class RDPPlot(object):
         return plot
         
     def get_data(self, csv_f):
-        '''
-        Gets data and time codes from given csv file.
-        '''
+        '''Gets data and time codes from given csv file.'''
     
         data = None
         count = 0
         csv_file = open(csv_f, 'rb')
         reader = csv.reader(csv_file)
-        row_count = len(list(open(csv_f)))        
+        row_count = len(list(open(csv_f))) 
         time_codes = []
                 
         # skip header
@@ -1374,6 +1418,8 @@ class RDPPlot(object):
         # build time_codes list and data matrix
         #========================================================================================================================
         for row in reader:
+            
+            # Update time_codecs list
             time_codes.append(row[0])
             row.pop(0)
             
@@ -1381,6 +1427,7 @@ class RDPPlot(object):
             if data is None:
                 data = np.zeros((row_count, len(row)))
             
+            # Fill current data row and update progress bar
             data[count] = row
             count += 1
             progress_dlg.Update(count)
@@ -1393,9 +1440,7 @@ class RDPPlot(object):
 
 
     def get_header(self, csv_f):
-        '''
-        Gets header from given csv file.
-        '''
+        '''Gets header from given csv file.'''
         
         csv_file = open(csv_f, 'rb')        
         reader = csv.reader(csv_file)
@@ -1426,6 +1471,7 @@ class RDPPlot(object):
     
     
     def _process_image(self, data, header, step):
+        '''Convert data read from cedar-recorded csv file into a numpy array fit for matplotlib plotting.'''
         
         img_data = data[step]
         x_1 = int(header[2])
@@ -1652,12 +1698,15 @@ class RDPPlot(object):
     
     
     def plot_heatmap(self, X_1, X_2, data, vmin, vmax, mode=None):
+        '''Plot data as either one heatmap or a sequence of heatmaps.'''
         
+        # Set plot minimum/maximum either to given values or to data minimum/maximum
         if vmax is None:
             vmax = data.max()
         if vmin is None:
             vmin = data.min()
         
+        # Either plot each plot in a separate figure (snapshot sequence) or override existing figure with new plot (otherwise)
         if mode != 'snapshot sequence':
             if not plt.get_fignums():
                 fig = plt.figure()
@@ -1675,17 +1724,23 @@ class RDPPlot(object):
     
     
     def label_axis(self, plot, x_label, y_label, z_label=None):
+        '''Adds axis labels to an existing plot.'''
+        
         if plot is None:
             return 
         
         else:
+            
+            # Plot is no heatmap
             if 'matplotlib.image.AxesImage' not in str(type(plot)):
                 plot.set_xlabel(x_label)
                 plot.set_ylabel(y_label)
             
+            # Plot is in 3D
             if 'Axes3DSubplot' in str(type(plot)):
                 plot.set_zlabel(z_label)
-                
+            
+            # Plot is a heatmap
             elif 'matplotlib.axes.AxesSubplot' in str(type(plot)):
                 try:
                     colorbar = plt.colorbar()
@@ -1698,6 +1753,7 @@ class RDPPlot(object):
 
 
     def save_plot(self, plot, plot_mode, file_name, file_directory, save_mode='single', plot_number=0):
+        '''Saves either a plot or a sequence of plots to one/several pdf files.'''
         
         plot_count = 1
         
