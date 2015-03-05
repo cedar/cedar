@@ -72,6 +72,7 @@ class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux:
   friend class cedar::proc::Group;
   friend class cedar::proc::Step;
   friend class cedar::proc::sources::GroupSource;
+  friend class cedar::proc::OwnedData;
   template <typename T> friend class cedar::proc::InputSlotHelper;
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -473,6 +474,10 @@ private:
    *
    */
   void callInputConnectionChanged(const std::string& slot);
+
+  void callOutputConnectionRemoved(cedar::proc::DataSlotPtr slot);
+
+  virtual void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
 
   //!@brief Declares an output slot and immediately sets a non-owned data pointer for that slot.
   cedar::proc::DataSlotPtr declareSharedOutput(const std::string& name, cedar::aux::DataPtr data);

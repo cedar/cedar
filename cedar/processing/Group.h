@@ -784,6 +784,8 @@ private:
   //! Finds an identifier for which the @em checker function returns false.
   static std::string findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker);
 
+  void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
