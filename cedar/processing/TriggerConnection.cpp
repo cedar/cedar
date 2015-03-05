@@ -55,11 +55,6 @@ mTarget(target)
   {
     // add the target to the list of listeners
     source->addListener(target);
-    // add parent to target if it is a looped trigger
-    if (boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(source))
-    {
-      target->setParentTrigger(source);
-    }
   }
   catch (cedar::aux::ExceptionBase& exc)
   {
@@ -91,10 +86,6 @@ cedar::proc::TriggerConnection::~TriggerConnection()
   if (source_shared && target_shared)
   {
     source_shared->removeListener(target_shared);
-    if (boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(source_shared))
-    {
-      target_shared->setParentTrigger(cedar::proc::TriggerPtr());
-    }
   }
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -64,6 +64,8 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
     class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
+    class CEDAR_PROC_LIB_EXPORT InvalidTriggerConnectionException;
+    class CEDAR_PROC_LIB_EXPORT LoopStateException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
     class CEDAR_PROC_LIB_EXPORT NoCheckException;
