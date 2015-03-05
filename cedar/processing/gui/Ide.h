@@ -311,7 +311,7 @@ protected:
 
   /*!@brief Deletes the list of graphics items.
    */
-  void deleteElements(QList<QGraphicsItem*>& items);
+  void deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation = false);
 
   /*!@brief Delete a single graphics item.
    */
@@ -319,7 +319,7 @@ protected:
 
   /*!@brief Deletes the elements currently selected in the scene.
    */
-  void deleteSelectedElements();
+  void deleteSelectedElements(bool skipConfirmation = false);
 
   /*!@brief Reacts to closing the window.
    */

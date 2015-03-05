@@ -1229,11 +1229,11 @@ void cedar::proc::gui::Ide::resetStepList()
   }
 }
 
-void cedar::proc::gui::Ide::deleteSelectedElements()
+void cedar::proc::gui::Ide::deleteSelectedElements(bool skipConfirmation)
 {
   //!@todo This code (and the code called from it) should probably be in proc::gui::Scene.
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
-  this->deleteElements(selected_items);
+  this->deleteElements(selected_items, skipConfirmation);
 }
 
 bool cedar::proc::gui::Ide::sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem)
@@ -1256,8 +1256,42 @@ bool cedar::proc::gui::Ide::sortElements(QGraphicsItem* pFirstItem, QGraphicsIte
   return (depth_first_item < depth_second_item);
 }
 
-void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
+void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation)
 {
+  if (!skipConfirmation)
+  {
+    // go through the list of elements and check if there are any that need confirmation
+    bool confirmation_needed = false;
+
+    for (auto item : items)
+    {
+      if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+      {
+        if (graphics_base->manualDeletionRequiresConfirmation())
+        {
+          confirmation_needed = true;
+          break;
+        }
+      }
+    }
+
+    if (confirmation_needed)
+    {
+      auto r = QMessageBox::question
+          (
+            this,
+            "Really delete the selected elements?",
+            "Do you really want to delete the selected element(s)? (Hold CTRL when deleting to suppress this dialog)",
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::No
+          );
+
+      if (r != QMessageBox::Yes)
+      {
+        return;
+      }
+    }
+  }
   // remove connections
   for (int i = 0; i < items.size(); ++i)
   {
@@ -1782,13 +1816,9 @@ void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
   switch (pEvent->key())
   {
     case Qt::Key_Delete:
-    {
-      this->deleteSelectedElements();
-      break;
-    }
     case Qt::Key_Backspace:
     {
-      this->deleteSelectedElements();
+      this->deleteSelectedElements(pEvent->modifiers().testFlag(Qt::ControlModifier));
       break;
     }
     // If the key is not handled by this widget, pass it on to the base widget.

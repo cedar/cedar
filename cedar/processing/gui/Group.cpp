@@ -215,6 +215,11 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::Group::manualDeletionRequiresConfirmation() const
+{
+  return !this->getGroup() || !this->getGroup()->getElements().empty();
+}
+
 bool cedar::proc::gui::Group::canResize() const
 {
   if (this->_mGeometryLocked->getValue())

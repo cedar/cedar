@@ -277,6 +277,9 @@ public:
     return this->mReadOnly;
   }
 
+  //! If the function returns true, this item will request manual confirmation from the user in case it is being deleted.
+  virtual bool manualDeletionRequiresConfirmation() const;
+
   //! Specifies whether the item can be duplicated.
   virtual bool canDuplicate() const = 0;
 
