@@ -792,6 +792,8 @@ private:
 
   void disconnectTriggerInternal(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
 
+  void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
+
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
   void onNameChanged();
