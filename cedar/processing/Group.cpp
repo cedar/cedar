@@ -1348,6 +1348,11 @@ void cedar::proc::Group::triggerStopped()
 
   if (!any_running)
   {
+    if (this->isRoot())
+    {
+      cedar::aux::GlobalClockSingleton::getInstance()->stop();
+    }
+
     emit allTriggersStopped();
   }
 }
