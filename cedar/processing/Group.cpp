@@ -1571,6 +1571,17 @@ cedar::proc::ElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupP
   return boost::const_pointer_cast<Element>(static_cast<const Group*>(this)->getElement(name));
 }
 
+void cedar::proc::Group::outputConnectionRemoved(cedar::proc::DataSlotPtr slot)
+{
+  // when a data connection from a connector is removed, we must update the triggering order of the group sink
+  // corresponding to the connector
+  const auto& name = slot->getName();
+  auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(this->getElement(name));
+  CEDAR_DEBUG_ASSERT(connector);
+  std::set<cedar::proc::Trigger*> visited;
+  connector->updateTriggeringOrder(visited, true, false);
+}
+
 void cedar::proc::Group::connectSlots(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target)
 {
   //!@todo See entry below
