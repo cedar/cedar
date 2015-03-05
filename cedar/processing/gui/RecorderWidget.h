@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
-#include "cedar/processing/Step.fwd.h"
+#include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/gui/RecorderWidget.fwd.h"
 
 // SYSTEM INCLUDES
@@ -77,7 +77,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Sets the obtained step and recreating the widget to set the record parameters.
-  void setStep(cedar::proc::StepPtr step);
+  void setConnectable(cedar::proc::ConnectablePtr connectable);
 
   void clear();
 
@@ -114,7 +114,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief The step currently displayed.
-  cedar::proc::StepPtr mStepToConfigure;
+  cedar::proc::ConnectablePtr mConnectable;
 
   //!@brief The layout for this widget.
   QVBoxLayout* mMainLayout;
