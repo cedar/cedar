@@ -28,7 +28,7 @@
 
     Maintainer:  Sascha T. Begovic
     Email:       sascha.begovic@ini.ruhr-uni-bochum.de
-    Date:        2015 03 05
+    Date:        2015 03 06
 
     Description: 
 
@@ -159,8 +159,9 @@ class Progress(wx.ProgressDialog):
 class SnapshotSequenceDialog(wx.Dialog):
     def __init__(self, parent, _, title):
         wx.Dialog.__init__(self, parent=parent, id=_, title=title)
-        self.parent = parent
         
+        self.parent = parent
+            
         top_sizer = wx.BoxSizer(wx.VERTICAL)        
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
         ok_btn = wx.Button(self, wx.ID_OK, 'OK')
@@ -181,8 +182,13 @@ class SnapshotSequenceDialog(wx.Dialog):
         step_sizer.Add(step_num_entry, 1, wx.ALIGN_RIGHT|wx.EXPAND)
         step_sizer.Add(step_size, 1, wx.ALIGN_LEFT)
         step_sizer.Add(step_size_entry, 1, wx.ALIGN_RIGHT|wx.EXPAND)
-            
-        axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)        
+        
+        # self.parent.proj consists of 2 axes => resulting plot will be 3D
+        if len(self.parent.proj) >= 8:
+            axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
+        else:
+            axes_grid_sizer = wx.FlexGridSizer(rows=2, cols=2) 
+                    
         axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
         axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
         min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
@@ -192,44 +198,54 @@ class SnapshotSequenceDialog(wx.Dialog):
         x_axis_txt = wx.StaticText(self, -1, 'X axis \t')
         y_axis_txt = wx.StaticText(self, -1, 'Y axis \t')
         
-        # Change Z axis text depending on plot mode
-        if parent.style != 'heatmap':
-            z_axis_txt = wx.StaticText(self, -1, 'Z axis \t')
-        else:
-            z_axis_txt = wx.StaticText(self, -1, 'Legend \t')
-            
         x_axis_label = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         y_axis_label = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
-        z_axis_label = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         
         x_axis_label.SetValue(parent.x_label)
         y_axis_label.SetValue(parent.y_label)
-        z_axis_label.SetValue(parent.z_label)
-                
-        x_axis_label.Bind(wx.EVT_TEXT, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-        y_axis_label.Bind(wx.EVT_TEXT, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
-        z_axis_label.Bind(wx.EVT_TEXT, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
         
-        axes_grid_sizer.Add(x_axis_txt, 0, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND)
-        axes_grid_sizer.Add(x_axis_label, 2, wx.ALIGN_RIGHT|wx.EXPAND)
-        axes_grid_sizer.Add(y_axis_txt, 0, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
+        x_axis_label.Bind(wx.EVT_TEXT, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
+        y_axis_label.Bind(wx.EVT_TEXT, partial(parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=None))
+        
+        axes_grid_sizer.Add(x_axis_txt, 0, wx.ALIGN_LEFT|wx.EXPAND)
+        axes_grid_sizer.Add(x_axis_label, 1, wx.ALIGN_RIGHT|wx.EXPAND)
+        axes_grid_sizer.Add(y_axis_txt, 0, wx.ALIGN_LEFT|wx.EXPAND)
         axes_grid_sizer.Add(y_axis_label, 1, wx.ALIGN_RIGHT)
-        axes_grid_sizer.Add(z_axis_txt, 0, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL)
-        axes_grid_sizer.Add(z_axis_label, 1, wx.ALIGN_RIGHT)
         
-        axes_label_sizer.Add(axes_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT, border=10)
+        # self.parent.proj consists of 2 axes => resulting plot will be 3D
+        if len(self.parent.proj) >= 8:
+            # Change Z axis text depending on plot mode
+            if parent.style != 'heatmap':
+                z_axis_txt = wx.StaticText(self, -1, 'Z axis \t')
+            else:
+                z_axis_txt = wx.StaticText(self, -1, 'Legend \t')
+            
+            z_axis_label = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
+            z_axis_label.SetValue(self.parent.z_label)
+            
+            z_axis_label.Bind(wx.EVT_TEXT, partial(self.parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+            x_axis_label.Bind(wx.EVT_TEXT, partial(self.parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+            y_axis_label.Bind(wx.EVT_TEXT, partial(self.parent.evt_axis_label, x_axis_label=x_axis_label, y_axis_label=y_axis_label, z_axis_label=z_axis_label))
+        
+            axes_grid_sizer.Add(z_axis_txt, 0, wx.ALIGN_LEFT|wx.EXPAND)
+            axes_grid_sizer.Add(z_axis_label, 1, wx.ALIGN_RIGHT)
+        
+        axes_label_sizer.Add(axes_grid_sizer, proportion=0, flag=wx.ALIGN_LEFT)
         axes_label_sizer.AddSpacer((10,10))
-        top_sizer.Add(item=label_axes_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.TOP|wx.LEFT, border=10)
-        top_sizer.Add(axes_label_sizer, 0, wx.ALIGN_LEFT|wx.ALL, border=10)
+        top_sizer.Add(item=label_axes_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.ALL, border=10)
+        top_sizer.Add(axes_label_sizer, 0, wx.ALIGN_CENTER|wx.TOP, border=10)
         
         top_sizer.Add(item=step_txt, proportion=0, flag=wx.ALIGN_LEFT|wx.RIGHT|wx.TOP|wx.LEFT, border=10)
-        top_sizer.Add(step_sizer, 0, wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT|wx.BOTTOM|wx.TOP, border=20)
+        top_sizer.Add(step_sizer, 0, wx.ALIGN_CENTER|wx.ALL, border=20)
         top_sizer.Add(btn_sizer, 0, wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT, border=20)
-                
+        
+        # Event handling
         ok_btn.Bind(wx.EVT_BUTTON, lambda evt, step_num_entry=step_num_entry, step_size_entry=step_size_entry: 
                     self.evt_ok_btn(step_num_entry, step_size_entry, evt))
+        
         cancel_btn.Bind(wx.EVT_BUTTON, self.evt_cancel_button)
         
+        # Layout
         self.SetSizer(top_sizer)
         top_sizer.Fit(self)
         self.Center(wx.CENTER_ON_SCREEN)
@@ -322,14 +338,17 @@ class RDPBrowserPanel(ScrolledPanel):
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.select_directory = wx.StaticText(self, -1, 'Select directory:')
         
+        # File browser
         self.browser = wx.GenericDirCtrl(self,filter=("*.csv"), dir=self.frame.dir, size=(275, 350))            
         self.sel_btn = wx.Button(self, label = 'Select')
         self.sel_btn.Bind(wx.EVT_BUTTON, self.evt_sel_btn)
         
+        # Main sizer
         self.main_sizer.Add(item=self.select_directory, proportion=0, flag=wx.TOP|wx.LEFT|wx.BOTTOM, border=10)
         self.main_sizer.Add(item=self.browser, proportion=0, flag=wx.LEFT|wx.BOTTOM|wx.RIGHT|wx.EXPAND, border=10)
         self.main_sizer.Add(item=self.sel_btn, proportion=0, flag=wx.LEFT|wx.BOTTOM, border=10)
         
+        # Layout
         self.SetSizer(self.main_sizer)
         self.main_sizer.Fit(self)
         self.Fit()
@@ -338,9 +357,7 @@ class RDPBrowserPanel(ScrolledPanel):
     
         
     def evt_sel_btn(self, event):
-        '''
-        Switch browser panel with control panel for plot generation/manipulation
-        '''
+        '''Switch browser panel with control panel for plot generation/manipulation'''
                       
         frame = self.GetParent()
         frame.dir = self.browser.GetPath()
@@ -485,7 +502,6 @@ class RDPGUI(wx.Panel):
         self.reset_btn = wx.BitmapButton(self, -1, bitmap=self.reset_bitmap)
         self.decrease_single_step_btn = wx.BitmapButton(self, -1, bitmap=self.decrease_single_step_bitmap)
         self.increase_single_step_btn = wx.BitmapButton(self, -1, bitmap=self.increase_single_step_bitmap)
-        #========================================================================================================================
         
         self.play_pause_btn.Disable()
         self.reverse_play_pause_btn.Disable()
@@ -647,11 +663,13 @@ class RDPGUI(wx.Panel):
         y_axis_label.SetValue(self.y_label)
         
         axes_label_ok_btn = wx.Button(heatmap_boundary, label='OK')
+        
         axes_grid_sizer.Add(x_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
         axes_grid_sizer.Add(x_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
         axes_grid_sizer.Add(y_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
         axes_grid_sizer.Add(y_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
         
+        # Plot is either 3-dimensional or a heatmap
         if 'Axes3DSubplot' in str(type(self.plot)) or self.style == 'heatmap':
             z_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
             z_axis_label.SetValue(self.z_label)
@@ -675,11 +693,14 @@ class RDPGUI(wx.Panel):
             line1 = wx.StaticLine(heatmap_boundary, -1, style=wx.LI_HORIZONTAL)
             top_sizer.Add(line1, 0, wx.ALIGN_CENTER|wx.EXPAND|wx.RIGHT|wx.LEFT|wx.BOTTOM, border=5)
             heatmap_boundaries_txt = wx.StaticText(heatmap_boundary, -1, 'Heatmap boundaries')
+            
+            # Controls for narrowing of depicted value range
             vmin_label = wx.StaticText(heatmap_boundary, -1, 'Minimum \t')
             vmax_label = wx.StaticText(heatmap_boundary, -1, 'Maximum \t')
             vmin_spn = FS.FloatSpin(heatmap_boundary, digits=4)
             vmax_spn = FS.FloatSpin(heatmap_boundary, digits=4)
             
+            # Set FloatSpin widgets to default values
             if self.vmin is not None:
                 vmin_spn.SetValue(self.vmin)
             else:
@@ -730,56 +751,35 @@ class RDPGUI(wx.Panel):
         self.control_plot_frame.Fit()
         
         
-    def evt_play_pause_btn(self, event):
+    def _play_pause_btn(self, reverse):
         
-        if self.play_pause_btn.GetBitmapLabel() == self.play_bitmap:
-            self.play_pause_btn.SetBitmapLabel(self.pause_bitmap)
-            
-            if plt.get_fignums():
-                for i in range(self.step, self.slider_max+1):
-                    
-                    if self.play_pause_btn.GetBitmapLabel() == self.play_bitmap:
-                        break
-                    else:
-                        self.reverse_play_pause_btn.Disable()
-                        self.increase_single_step_btn.Disable()
-                        self.decrease_single_step_btn.Disable()
-                        self.reset_btn.Disable()
-                        self.step = i
-                        self.marked = True
-                        self.pos_slider.SetValue(min(self.slider_max, self.step))
-                        self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
-                        self._update_plot()
-                        wx.Yield()
-        
-            self.play_pause_btn.SetBitmapLabel(self.play_bitmap)
+        if reverse == False:
+            active_btn = self.play_pause_btn
+            active_bitmap = self.play_bitmap
+            inactive_btn = self.reverse_play_pause_btn
+            loop_range = range(self.step, self.slider_max+1)
             
         else:
-            self.play_pause_btn.SetBitmapLabel(self.play_bitmap)
+            active_btn = self.reverse_play_pause_btn
+            active_bitmap = self.reverse_play_bitmap
+            inactive_btn = self.play_pause_btn
+            loop_range = range(self.step, -2, -1)
         
-        self.reverse_play_pause_btn.Enable()
-        self.increase_single_step_btn.Enable()
-        self.decrease_single_step_btn.Enable()
-        self.reset_btn.Enable()
-            
-    
-    def evt_reverse_play_pause_btn(self, event):
-        
-        if self.reverse_play_pause_btn.GetBitmapLabel() == self.reverse_play_bitmap:
-            self.reverse_play_pause_btn.SetBitmapLabel(self.pause_bitmap)
+        if active_btn.GetBitmapLabel() == active_bitmap:
+            active_btn.SetBitmapLabel(self.pause_bitmap)
             
             if plt.get_fignums():
-                for i in range(self.step, -2, -1):
+                for i in loop_range:
                     
-                    if self.reverse_play_pause_btn.GetBitmapLabel() == self.reverse_play_bitmap:
+                    if active_btn.GetBitmapLabel() == active_bitmap:
                         break
                     else:
-                        self.play_pause_btn.Disable()
+                        inactive_btn.Disable()
                         self.increase_single_step_btn.Disable()
                         self.decrease_single_step_btn.Disable()
                         self.reset_btn.Disable()
                         self.step = i
-                        self.pos_slider.SetValue(self.step)
+                        self.pos_slider.SetValue(min(self.slider_max, self.step))
                         
                         if self.step == -1:
                             self.time_code_display.SetLabel('-')
@@ -787,19 +787,27 @@ class RDPGUI(wx.Panel):
                         else:
                             self.marked = True
                             self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
-                            
+                        
                         self._update_plot()
                         wx.Yield()
         
-            self.reverse_play_pause_btn.SetBitmapLabel(self.reverse_play_bitmap)
+            active_btn.SetBitmapLabel(active_bitmap)
             
         else:
-            self.reverse_play_pause_btn.SetBitmapLabel(self.reverse_play_bitmap)
-            
-        self.play_pause_btn.Enable()
+            active_btn.SetBitmapLabel(active_bitmap)
+        
+        inactive_btn.Enable()
         self.increase_single_step_btn.Enable()
         self.decrease_single_step_btn.Enable()
         self.reset_btn.Enable()
+        
+        
+    def evt_play_pause_btn(self, event):
+        self._play_pause_btn(reverse=False)
+        
+        
+    def evt_reverse_play_pause_btn(self, event):
+        self._play_pause_btn(reverse=True)
         
             
     def evt_reset_btn(self, evt):
@@ -1607,7 +1615,7 @@ class RDPPlot(object):
                         x_2 = int(header[3])                    
                         
                         if style != 'image':
-                            data     = np.reshape(data[step], (x_2, x_1))
+                            data = np.reshape(data[step], (x_2, x_1))
                             X_1, X_2 = np.mgrid[:x_2, :x_1]
                     
                         if style != 'heatmap' and style != 'image':
