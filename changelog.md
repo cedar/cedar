@@ -66,6 +66,9 @@ known issues
 Unreleased
 ==========
 
+- build system
+  - fixed an error that made it imposssible to use opencv versions that are not in /usr/local/include.
+
   ---
 
 Released versions
