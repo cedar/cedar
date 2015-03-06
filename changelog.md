@@ -66,6 +66,9 @@ known issues
 Unreleased
 ==========
 
+- build system
+  - fixed an error that made it imposssible to use opencv versions that are not in /usr/local/include.
+
 - cedar::aux
   - There is a new plot called Multi0DPlot. This is mainly intended to be used for showing the state of (EB) nodes in an
     architecture, thus, it should be used in conjunction with an architecture widget. See the tutorial for architecture
