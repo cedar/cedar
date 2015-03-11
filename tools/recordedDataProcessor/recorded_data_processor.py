@@ -427,7 +427,9 @@ class RDPGUI(wx.Panel):
                              'x_2, x_4', 'x_2, x_5', 'x_3, x_4', 'x_3, x_5', 'x_4, x_5']
         self.style_ch = [' ', 'heatmap', 'image', 'surface', 'wireframe']
         self.proj_methods = [' ', 'addition', 'maximum']
-                
+        
+        # Labels
+        #========================================================================================================================
         self.sel_label = wx.StaticText(self, -1, 'Recording')
         self.mode_label = wx.StaticText(self, -1, 'Plot mode')
         self.proj_label = wx.StaticText(self, -1, 'Projection')
@@ -437,6 +439,7 @@ class RDPGUI(wx.Panel):
         self.time_code_label = wx.StaticText(self, -1, 'Time code t \t')
         self.resolution_label = wx.StaticText(self, -1, 'Plot resolution')
         self.line_color_label = wx.StaticText(self, -1, 'Line color')
+        #========================================================================================================================
         
         self.line_1 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
         self.line_2 = wx.StaticLine(self, -1, style=wx.LI_HORIZONTAL, size=(300,10))
@@ -635,18 +638,24 @@ class RDPGUI(wx.Panel):
             self.control_plot_frame.Bind(wx.EVT_CLOSE, self.evt_close_plot_control_frame)
                 
         heatmap_boundary = wx.Panel(parent=self.control_plot_frame, id=-1)
+        
+        # Sizers
+        #========================================================================================================================
         top_sizer = wx.BoxSizer(wx.VERTICAL)
         
         if 'Axes3DSubplot' in str(type(self.plot)) or self.style == 'heatmap':
             axes_grid_sizer = wx.FlexGridSizer(rows=3, cols=2)
         else:
             axes_grid_sizer = wx.FlexGridSizer(rows=2, cols=2)
-            
+        
         axes_grid_sizer.SetFlexibleDirection(wx.BOTH)
         axes_label_sizer = wx.BoxSizer(wx.VERTICAL)
         min_max_sizer = wx.FlexGridSizer(rows=2, cols=2)         
         min_max_sizer.SetFlexibleDirection(wx.BOTH)
+        #========================================================================================================================
         
+        # Labels
+        #========================================================================================================================
         label_axes_txt = wx.StaticText(heatmap_boundary, -1, 'Label plot axes')
         x_axis_txt = wx.StaticText(heatmap_boundary, -1, 'X axis \t')
         y_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Y axis \t')
@@ -655,6 +664,7 @@ class RDPGUI(wx.Panel):
             z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Z axis \t')
         elif self.style == 'heatmap':
             z_axis_txt = wx.StaticText(heatmap_boundary, -1, 'Legend \t')
+        #========================================================================================================================
             
         x_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
         y_axis_label = wx.TextCtrl(heatmap_boundary, -1, size=(100, 25), style=wx.TE_PROCESS_ENTER)
@@ -664,6 +674,8 @@ class RDPGUI(wx.Panel):
         
         axes_label_ok_btn = wx.Button(heatmap_boundary, label='OK')
         
+        # Build sizers
+        #========================================================================================================================
         axes_grid_sizer.Add(x_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
         axes_grid_sizer.Add(x_axis_label, 0, wx.ALIGN_CENTER|wx.EXPAND)
         axes_grid_sizer.Add(y_axis_txt, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL)
@@ -745,7 +757,11 @@ class RDPGUI(wx.Panel):
             top_sizer.Add(item=self.control_plot_frame.sel_cbox, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, border=10)
             top_sizer.Add(item=line_sizer, proportion=0, flag=wx.ALIGN_LEFT|wx.LEFT|wx.RIGHT|wx.EXPAND, border=10)
             top_sizer.Add(item=multi_plot_btn, proportion=0, flag=wx.ALIGN_LEFT|wx.ALL|wx.EXPAND, border=10)
-            
+        
+        #========================================================================================================================
+        
+        # Layout
+        #========================================================================================================================
         self.control_plot_frame.SetSizerAndFit(top_sizer)
         heatmap_boundary.SetSizerAndFit(top_sizer)
         self.control_plot_frame.Fit()
@@ -811,37 +827,40 @@ class RDPGUI(wx.Panel):
         
             
     def evt_reset_btn(self, evt):
-
+        '''Reset plot to default.'''
         self.step = -1
         self.marked = False
         self.pos_slider.SetValue(self.step)
         self.time_code_display.SetLabel('-')
         wx.CallAfter(self._update_plot)
         
-    
-    def evt_increase_single_step_btn(self, evt):
-        self.step += 1
-        self.pos_slider.SetValue(min(self.slider_max, self.step))
-        self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
-        if self.step != -1:
-            self.marked = True
-        else:
-            self.marked = False
-            
-        wx.CallAfter(self._update_plot)
         
-    
-    def evt_decrease_single_step_btn(self, evt):
-        self.step -= 1
-        self.pos_slider.SetValue(max(-1, self.step))
+    def _move_single_step(self, increase):
+        
+        if increase is False:
+            self.step -= 1
+            self.pos_slider.SetValue(max(-1, self.step))
+        else:
+            self.step += 1
+            self.pos_slider.SetValue(min(self.slider_max, self.step))
+            
+        self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
+        
         if self.step != -1:
-            self.time_code_display.SetLabel(str(self.time_codes[self.pos_slider.GetValue()]))
             self.marked = True
         else:
             self.time_code_display.SetLabel('-')
             self.marked = False
             
         wx.CallAfter(self._update_plot)
+        
+    
+    def evt_increase_single_step_btn(self, evt):
+        self._move_single_step(increase=True)
+        
+    
+    def evt_decrease_single_step_btn(self, evt):
+        self._move_single_step(increase=False)
         
         
     def evt_axis_label(self, event, x_axis_label, y_axis_label, z_axis_label=None):
@@ -856,9 +875,7 @@ class RDPGUI(wx.Panel):
 
     
     def evt_add_timeline(self, event):
-        '''
-        adds timeline to currently displayed plot.
-        '''
+        '''Add timeline to currently displayed plot.'''
         self._add_timeline()
 
         
@@ -1770,7 +1787,6 @@ class RDPPlot(object):
                     
         # Snapshot or timeline
         if save_mode == 'single':
-            print 'single'
             file_path = file_directory + '/' + file_name.strip('.csv') + '-' + str(plot_mode) + '-' + str(plot_count) + '.pdf'
                     
         # Snapshot Sequence
