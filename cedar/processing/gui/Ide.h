@@ -391,10 +391,14 @@ private:
 
   void setSimulationControlsEnabled(bool enabled);
 
+  void translateGlobalTimeFactorChangedSignal(double newValue);
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
   void globalTimeFactorSpinboxChanged(double value);
+
+  void globalTimeFactorSettingChanged(double newValue);
 
   void architectureChanged();
 
@@ -411,6 +415,9 @@ private slots:
   void showOpenableDialog();
 
   void recorderDataAddedOrRemoved();
+
+signals:
+  void signalGlobalTimeFactorSettingChanged(double newValue);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -467,6 +474,8 @@ private:
 
   //! Map from name to an openable dialog
   std::map<std::string, OpenableDialogPtr> mOpenableDialogs;
+
+  boost::signals2::scoped_connection mGlobalTimeFactorSettingChangedConnection;
 
 }; // class cedar::MainWindow
 
