@@ -51,8 +51,6 @@ known issues
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
   - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
-  - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
-    standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
   - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
   - Singleton-related classes may sometimes cause crashes when programs exit. If you experience random crashes when your
     own programs exit and the stack contains cedar::aux::Log::getMemoryDebugFlag(), this may be the cause. As a
