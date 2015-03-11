@@ -56,6 +56,10 @@
 #include <QKeyEvent>
 #include <vector>
 
+#if !defined(CV_MINOR_VERSION) || !defined(CV_MAJOR_VERSION) || CV_MAJOR_VERSION < 2 || (CV_MAJOR_VERSION == 2 && CV_MINOR_VERSION < 4)
+#define CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
+#endif
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -195,7 +199,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 
   // decide which plot code is used depending on the OpenCV version
   // versions are defined since version 2.4, which supports the following code
-#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
+#ifndef CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   // for each tile, copy content to right place
   // ranges is used to select the slice in the 3d-data
   cv::Range ranges[3];
@@ -246,7 +250,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       min = std::min(local_min, min);
     }
   }
-#else
+#else // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   // for each tile, copy content to right place
   unsigned int max_rows = static_cast<unsigned int>(mat.size[0]);
   unsigned int max_columns = static_cast<unsigned int>(mat.size[1]);
@@ -281,7 +285,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     min = this->getValueLimits().getLower();
     max = this->getValueLimits().getUpper();
   }
-#endif // OpenCV version
+#endif // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
 
   if (this->isAutoScaling())
   {
@@ -321,9 +325,9 @@ bool cedar::aux::gui::MatrixSlicePlot3D::doConversion()
   {
 //  case CV_8UC1:
     case CV_32FC1:
-#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
+#ifndef CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   case CV_64FC1:
-#endif
+#endif // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
     {
       this->slicesFromMat(cloned_mat);
       break;
@@ -342,7 +346,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::fillContextMenu(QMenu& menu)
 {
   QMenu* p_slice_menu = menu.addMenu("sliced dimension");
 
-#if defined(CV_MINOR_VERSION) && defined(CV_MAJOR_VERSION) && CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >= 4
+#ifndef CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   for (int d = 0; d < 3; ++d)
   {
     QString action_str = QString("along %1").arg(d);
@@ -353,9 +357,9 @@ void cedar::aux::gui::MatrixSlicePlot3D::fillContextMenu(QMenu& menu)
     p_action->setChecked(this->getSlicedDimension() == static_cast<unsigned int>(d));
     QObject::connect(p_action, SIGNAL(triggered()), SLOT(slicedDimensionSelected()));
   }
-#else
+#else // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
   p_slice_menu->setEnabled(false);
-#endif
+#endif // CEDAR_SLICE_PLOT_OPENCV_BACKWARDS_COMPATIBILITY_MODE
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::slicedDimensionSelected()
