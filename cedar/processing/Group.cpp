@@ -70,6 +70,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
@@ -164,7 +165,8 @@ cedar::proc::Group::Group()
 Triggerable(false),
 mHoldTriggerChainUpdates(false),
 _mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap())),
-_mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false))
+_mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false)),
+_mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mConnectors->setHidden(true);
@@ -191,6 +193,31 @@ cedar::proc::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Group::applyTimeFactor()
+{
+  QReadLocker locker(this->_mTimeFactor->getLock());
+  double value = this->_mTimeFactor->getValue();
+  locker.unlock();
+
+  cedar::aux::SettingsSingleton::getInstance()->setGlobalTimeFactor(value);
+}
+
+void cedar::proc::Group::setTimeFactor(double factor)
+{
+  this->_mTimeFactor->setValue(factor, true);
+
+  this->applyTimeFactor();
+}
+
+double cedar::proc::Group::getTimeFactor() const
+{
+  QReadLocker locker(this->_mTimeFactor->getLock());
+  double value = this->_mTimeFactor->getValue();
+  locker.unlock();
+
+  return value;
+}
 
 std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
 {

@@ -81,6 +81,7 @@ Unreleased
     There is also a new mode for seeing what steps are connected to what triggers. This can be enabled from the toolbar
     and the menu ("color elements by trigger"). In addition to showing what trigger elements are connected to, hovering
     over a step in this mode will also display in what order it will trigger its subsequent steps.
+  - The time factor setting is now saved per architecture. New architectures start with time factor 1. 
 
 Released versions
 =================

@@ -582,6 +582,14 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
                    SIGNAL(recordedDataChanged()),
                    this,
                    SLOT(recorderDataAddedOrRemoved()));
+
+  mGlobalTimeFactorSettingChangedConnection =
+      cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
+      (
+        boost::bind(&cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal, this, _1)
+      );
+
+  QObject::connect(this, SIGNAL(signalGlobalTimeFactorSettingChanged(double)), this, SLOT(globalTimeFactorSettingChanged(double)));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -727,6 +735,22 @@ void cedar::proc::gui::Ide::architectureChanged()
   this->setArchitectureChanged(true);
 }
 
+void cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal(double newValue)
+{
+  emit signalGlobalTimeFactorSettingChanged(newValue);
+}
+
+void cedar::proc::gui::Ide::globalTimeFactorSettingChanged(double newValue)
+{
+  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
+  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
+  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
+
+  blocked = this->mpGlobalTimeFactor->blockSignals(true);
+  this->mpGlobalTimeFactor->setValue(newValue);
+  this->mpGlobalTimeFactor->blockSignals(blocked);
+}
+
 void cedar::proc::gui::Ide::globalTimeFactorSliderChanged(int newValue)
 {
   this->mpGlobalTimeFactor->setValue(static_cast<double>(newValue) / 100.0);
@@ -738,7 +762,10 @@ void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
   this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
   this->mpGlobalTimeFactorSlider->blockSignals(blocked);
 
-  cedar::aux::SettingsSingleton::getInstance()->setGlobalTimeFactor(newValue);
+  if (this->mGroup)
+  {
+    this->mGroup->getGroup()->setTimeFactor(newValue);
+  }
 }
 
 void cedar::proc::gui::Ide::openParameterLinker()
@@ -2121,6 +2148,8 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   {
     this->mpExperimentDialog->updateGroup();
   }
+
+  this->mGroup->getGroup()->applyTimeFactor();
 }
 
 void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()

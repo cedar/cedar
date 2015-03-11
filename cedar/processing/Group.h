@@ -47,6 +47,7 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/units/Time.h"
@@ -712,6 +713,15 @@ public:
   //! Checks if a script with the given name exists in this group.
   bool checkScriptNameExists(const std::string& name) const;
 
+  //! Sets the time factor to be used for simulating this group. Only applied by the root group.
+  void setTimeFactor(double factor);
+
+  //! Returns the time factor set for this architecture.
+  double getTimeFactor() const;
+
+  //! Applies the group's time factor, i.e., sets it at the cedar::aux::SettingsSingleton.
+  void applyTimeFactor();
+
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
@@ -912,6 +922,8 @@ protected:
 
   //! loopiness of this group
   cedar::aux::BoolParameterPtr _mIsLooped;
+
+  cedar::aux::DoubleParameterPtr _mTimeFactor;
 
 }; // class cedar::proc::Group
 
