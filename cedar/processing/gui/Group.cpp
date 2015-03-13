@@ -2198,9 +2198,9 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
-  QAction* open_group_container = menu.addAction("open group in container");
-  open_group_container->setEnabled(true);
-  QObject::connect(open_group_container, SIGNAL(triggered()), this, SLOT(openGroupContainer()));
+//  QAction* open_group_container = menu.addAction("open group in container");
+//  open_group_container->setEnabled(true);
+//  QObject::connect(open_group_container, SIGNAL(triggered()), this, SLOT(openGroupContainer()));
 
   QAction* a = menu.exec(event->screenPos());
 
