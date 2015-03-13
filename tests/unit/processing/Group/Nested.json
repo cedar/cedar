@@ -10,6 +10,22 @@
             "name": "parent step"
         }
     },
+    "triggers":
+    {
+        "cedar.processing.LoopedTrigger":
+        {
+            "name": "default trigger",
+            "step size": "0.001 s",
+            "idle time": "1e-05 s",
+            "simulated time": "0.001 s",
+            "loop mode": "Fixed",
+            "start with all": "true",
+            "listeners":
+            [
+                "parent step"
+            ]
+        }
+    },
     "groups":
     {
         "network child":
@@ -34,6 +50,7 @@
                     "idle time": "1e-05 s",
                     "simulated time": "0.001 s",
                     "loop mode": "Fixed",
+                    "start with all": "true",
                     "listeners":
                     [
                         "child step"

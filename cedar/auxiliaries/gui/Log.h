@@ -169,6 +169,12 @@ private:
   //! Outdates all messages in the given pane.
   void outdateAllMessages(QTableWidget* pPane);
 
+  QString logLevelToString(cedar::aux::LOG_LEVEL level) const;
+
+  void updateAllMessageCounts();
+
+  void updateMessageCount(cedar::aux::LOG_LEVEL level, QTableWidget* pPane);
+
 private slots:
   void printMessage(int type, QString title, QString message);
 

@@ -88,6 +88,13 @@ void cedar::aux::Recorder::step(cedar::unit::Time)
   }
 }
 
+bool cedar::aux::Recorder::hasDataToRecord() const
+{
+  QReadLocker locker(mpListLock);
+  bool ret = !this->mDataSpectators.empty();
+  return ret;
+}
+
 void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, cedar::unit::Time recordInterval, const std::string& name)
 {
   // check if Name is not already in use
@@ -111,6 +118,9 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, ced
   {
     spec->start();
   }
+
+  locker.unlock();
+  emit recordedDataChanged();
 }
 
 void cedar::aux::Recorder::unregisterData(const std::string& name)
@@ -130,10 +140,14 @@ void cedar::aux::Recorder::unregisterData(const std::string& name)
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "Thread of name \"" + name + "\" is not registered.");
   }
+
+  locker.unlock();
+  emit recordedDataChanged();
 }
 
 void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 {
+  QWriteLocker locker(mpListLock);
   for (auto it = mDataSpectators.begin(); it != mDataSpectators.end(); ++it)
   {
     auto casted = boost::static_pointer_cast<cedar::aux::DataSpectator>(it->second);
@@ -143,6 +157,9 @@ void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
       break;
     }
   }
+
+  locker.unlock();
+  emit recordedDataChanged();
 }
 
 void cedar::aux::Recorder::createOutputDirectory()
