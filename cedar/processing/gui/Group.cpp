@@ -2197,7 +2197,9 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
     QObject::connect(edit_parameters_action, SIGNAL(triggered()), this, SLOT(openParameterEditor()));
   }
 
-  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  //!@todo Fully implement showing groups in cotnainers
+  // currently, this feature is disabled because there are too many bugs
+//  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 //  QAction* open_group_container = menu.addAction("open group in container");
 //  open_group_container->setEnabled(true);
 //  QObject::connect(open_group_container, SIGNAL(triggered()), this, SLOT(openGroupContainer()));
