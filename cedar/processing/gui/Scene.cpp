@@ -55,6 +55,7 @@
 #include "cedar/processing/GroupDeclaration.h"
 #include "cedar/processing/GroupDeclarationManager.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
@@ -188,7 +189,7 @@ void cedar::proc::gui::Scene::keyPressEvent(QKeyEvent* pEvent)
       case Qt::Key_Backspace:
       case Qt::Key_Delete:
       {
-        this->deleteSelectedElements();
+        this->deleteSelectedElements(pEvent->modifiers().testFlag(Qt::ControlModifier));
         pEvent->setAccepted(true);
         break;
       }
@@ -196,14 +197,49 @@ void cedar::proc::gui::Scene::keyPressEvent(QKeyEvent* pEvent)
   }
 }
 
-void cedar::proc::gui::Scene::deleteSelectedElements()
+void cedar::proc::gui::Scene::deleteSelectedElements(bool skipConfirmation)
 {
   auto selected_items = this->selectedItems();
-  this->deleteElements(selected_items);
+  this->deleteElements(selected_items, skipConfirmation);
 }
 
-void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items)
+void cedar::proc::gui::Scene::deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation)
 {
+  if (!skipConfirmation)
+  {
+    // go through the list of elements and check if there are any that need confirmation
+    bool confirmation_needed = false;
+
+    for (auto item : items)
+    {
+      if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(item))
+      {
+        if (graphics_base->manualDeletionRequiresConfirmation())
+        {
+          confirmation_needed = true;
+          break;
+        }
+      }
+    }
+
+    if (confirmation_needed)
+    {
+      auto r = QMessageBox::question
+          (
+            this->mpMainWindow,
+            "Really delete the selected elements?",
+            "Do you really want to delete the selected element(s)? (Hold CTRL when deleting to suppress this dialog)",
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::No
+          );
+
+      if (r != QMessageBox::Yes)
+      {
+        return;
+      }
+    }
+  }
+
   // remove connections
   for (int i = 0; i < items.size(); ++i)
   {
@@ -342,7 +378,7 @@ void cedar::proc::gui::Scene::itemSelected()
       {
         if (auto step = boost::dynamic_pointer_cast<cedar::proc::Step>(p_element->getElement()))
         {
-          this->mpRecorderWidget->setStep(step);
+          this->mpRecorderWidget->setConnectable(step);
         }
       }
     }
@@ -363,7 +399,7 @@ void cedar::proc::gui::Scene::itemSelected()
 
     if (this->mpRecorderWidget != nullptr)
     {
-      this->mpRecorderWidget->clearLayout();
+      this->mpRecorderWidget->clear();
     }
   }
 }
@@ -561,10 +597,40 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
   }
 }
 
+QList<QGraphicsItem*> cedar::proc::gui::Scene::getSelectedParents() const
+{
+  auto selected = this->selectedItems();
+  QList<QGraphicsItem*> selected_parents;
+
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    auto item = selected.at(i);
+    bool parent_contained = false;
+    auto parent = item->parentItem();
+    while (parent)
+    {
+      if (selected.contains(parent))
+      {
+        parent_contained = true;
+        break;
+      }
+
+      parent = parent->parentItem();
+    }
+
+    if (!parent_contained)
+    {
+      selected_parents.push_back(item);
+    }
+  }
+
+  return selected_parents;
+}
+
 void cedar::proc::gui::Scene::highlightTargetGroups(const QPointF& mousePosition)
 {
   auto items_under_mouse = this->items(mousePosition, Qt::IntersectsItemShape, Qt::DescendingOrder);
-  auto selected = this->selectedItems();
+  auto selected = this->getSelectedParents();
 
   // remember the old drop target ...
   auto old_drop_target = mpDropTarget;
@@ -689,7 +755,7 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   if (mTargetGroup)
   {
     std::list<QGraphicsItem*> items_to_move;
-    for (auto p_item : this->selectedItems())
+    for (auto p_item : this->getSelectedParents())
     {
       auto graphics_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(p_item);
       if (graphics_item && !graphics_item->isReadOnly())
@@ -778,14 +844,38 @@ void cedar::proc::gui::Scene::multiItemContextMenuEvent(QGraphicsSceneContextMen
 {
   QMenu menu;
 
-  auto p_assign_to_trigger = menu.addMenu("assign selected to trigger");
-  cedar::proc::gui::Connectable::buildConnectTriggerMenu
-  (
-    p_assign_to_trigger,
-    this->mGroup.get(),
-    this,
-    SLOT(assignSelectedToTrigger())
-  );
+  bool can_connect = false;
+  for (auto item : this->selectedItems())
+  {
+    //!@todo Cast to element instead
+    if (auto connectable = dynamic_cast<cedar::proc::gui::Connectable*>(item))
+    {
+      if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable->getConnectable()))
+      {
+        if (triggerable->isLooped())
+        {
+          can_connect = true;
+          break;
+        }
+      }
+    }
+  }
+
+  auto p_assign_to_trigger = menu.addMenu("assign to trigger");
+  if (can_connect)
+  {
+    cedar::proc::gui::Connectable::buildConnectTriggerMenu
+    (
+      p_assign_to_trigger,
+      this->mGroup.get(),
+      this,
+      SLOT(assignSelectedToTrigger())
+    );
+  }
+  else
+  {
+    p_assign_to_trigger->setEnabled(false);
+  }
 
   menu.exec(pContextMenuEvent->screenPos());
 
@@ -821,11 +911,14 @@ void cedar::proc::gui::Scene::assignSelectedToTrigger()
   {
     if (trigger)
     {
-      this->mGroup->getGroup()->connectTrigger(trigger, triggerable);
+      if (trigger->testIfCanBeConnectedTo(triggerable))
+      {
+        this->mGroup->getGroup()->connectTrigger(trigger, triggerable);
+      }
     }
-    else if (triggerable->getParentTrigger())
+    else if (triggerable->getLoopedTrigger())
     {
-      this->mGroup->getGroup()->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
+      this->mGroup->getGroup()->disconnectTrigger(triggerable->getLoopedTrigger(), triggerable);
     }
   }
 }

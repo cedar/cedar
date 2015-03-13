@@ -56,7 +56,10 @@
 #include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
+#ifdef CEDAR_USE_QWT
 #include <qwt_legend.h>
+#include <qwt_symbol.h>
+#endif // CEDAR_USE_QWT
 #include <QVBoxLayout>
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -153,28 +156,53 @@ bool cedar::aux::gui::HistoryPlot0D::canDetach(cedar::aux::ConstDataPtr data) co
 
 void cedar::aux::gui::HistoryPlot0D::init()
 {
-  mpHistoryPlot = new cedar::aux::gui::QwtLinePlot();
   auto p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
 #ifdef CEDAR_USE_QWT
-  mpHistoryPlot = new cedar::aux::gui::QwtLinePlot();
-#endif // CEDAR_USE_QWT
+  this->mpHistoryPlot = new cedar::aux::gui::QwtLinePlot();
   p_layout->addWidget(this->mpHistoryPlot);
+  this->mpHistoryPlot->setAccepts0DData(true);
+#endif // CEDAR_USE_QWT
 
-  mMaxHistorySize = 500;
+  this->mMaxHistorySize = 500;
 
-  mTimerId = 0;
+  this->mTimerId = 0;
 }
 
 void cedar::aux::gui::HistoryPlot0D::advanceHistory()
 {
-  if (!cedar::aux::GlobalClockSingleton::getInstance()->isRunning())
+  // update the markers for the current value
+#ifdef CEDAR_USE_QWT
+  for (auto& plot_data : this->mPlotData)
+  {
+    QReadLocker data_locker(&plot_data.mData->getLock());
+
+    if (plot_data.mData->getDimensionality() != 0)
+    {
+      data_locker.unlock();
+      emit dataChanged();
+      return;
+    }
+
+    cv::Mat now = plot_data.mData->getData().clone();
+    data_locker.unlock();
+
+    double value = cedar::aux::math::getMatrixEntry<double>(now, 0);
+    plot_data.mpZeroMarker->setYValue(value);
+  }
+#endif // CEDAR_USE_QWT
+
+  // if the clock hasn't changed, abort!
+  cedar::unit::Time time_now = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  if (this->mTimeOfLastUpdate && this->mTimeOfLastUpdate.get() == time_now)
   {
     return;
   }
 
-  cedar::unit::Time time_now = cedar::aux::GlobalClockSingleton::getInstance()->getTime();
+  this->mTimeOfLastUpdate = time_now;
+
+  // add current value to history
   for (auto& plot_data : this->mPlotData)
   {
     QReadLocker data_locker(&plot_data.mData->getLock());
@@ -307,6 +335,21 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, con
   plot_data.mHistory->setAnnotation(time_annotation);
 
   this->mpHistoryPlot->append(plot_data.mHistory, title);
+#ifdef CEDAR_USE_QWT
+  plot_data.mpZeroMarker = new QwtPlotMarker();
+  QBrush brush(Qt::black); // TODO proper color of line style
+  QPen pen(Qt::black); // TODO proper color of line style
+  this->mpHistoryPlot->getStyleFor(plot_data.mHistory, pen, brush);
+#if QWT_VERSION >= 0x060100
+  auto symbol = new QwtSymbol
+#else
+  QwtSymbol symbol
+#endif // QWT_VERSION
+      (QwtSymbol::Ellipse, brush, pen, QSize(7, 7));
+  plot_data.mpZeroMarker->setSymbol(symbol);
+  plot_data.mpZeroMarker->setXValue(0.0);
+  this->mpHistoryPlot->attachMarker(plot_data.mpZeroMarker);
+#endif // CEDAR_USE_QWT
 }
 
 void cedar::aux::gui::HistoryPlot0D::doDetach(cedar::aux::ConstDataPtr data)
@@ -316,6 +359,7 @@ void cedar::aux::gui::HistoryPlot0D::doDetach(cedar::aux::ConstDataPtr data)
     if (iter->mData == data)
     {
       this->mpHistoryPlot->detach(iter->mHistory);
+      this->mpHistoryPlot->detachMarker(iter->mpZeroMarker);
       iter = mPlotData.erase(iter);
     }
     else

@@ -22,24 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImageSetData.h
+    File:        ConnectableParameter.fwd.h
 
-    Maintainer:  Irina Popova
-    Email:       irina.popova@ini.ruhr-uni-bochum.de
-    Date:        2012 04 03
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2015 01 16
 
-    Description: This is a dummy header for the typedef ImageSetData
-                 (which is actually a cedar::aux::DataTemplate<std::vector<cv::Mat>>).
+    Description: Forward declaration file for the class cedar::proc::experiment::gui::ConnectableParameter.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_IMAGE_SET_DATA_H
-#define CEDAR_AUX_IMAGE_SET_DATA_H
+#ifndef CEDAR_PROC_EXPERIMENT_GUI_CONNECTABLE_PARAMETER_FWD_H
+#define CEDAR_PROC_EXPERIMENT_GUI_CONNECTABLE_PARAMETER_FWD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/processing/lib.h"
 
-#endif // CEDAR_AUX_IMAGE_SET_DATA_H
+// SYSTEM INCLUDES
+#ifndef Q_MOC_RUN
+  #include <boost/smart_ptr.hpp>
+#endif // Q_MOC_RUN
+
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace proc
+  {
+    namespace experiment
+    {
+      namespace gui
+      {
+        CEDAR_DECLARE_PROC_CLASS(ConnectableParameter);
+      }
+    }
+  }
+}
+
+//!@endcond
+
+#endif // CEDAR_PROC_EXPERIMENT_GUI_CONNECTABLE_PARAMETER_FWD_H
+

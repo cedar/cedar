@@ -260,6 +260,9 @@ public:
     return this->mReadOnly;
   }
 
+  //! If the function returns true, this item will request manual confirmation from the user in case it is being deleted.
+  virtual bool manualDeletionRequiresConfirmation() const;
+
   //! Returns the vector of in- and outgoing (gui) connections for this (gui) element.
   std::vector<Connection*>& getConnections()
   {

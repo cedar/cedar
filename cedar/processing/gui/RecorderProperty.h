@@ -52,7 +52,7 @@
 #include <QCheckBox>
 #include <string>
 
-/*!@brief With help if this class, the user is able to register,unregister and edit single DataSlots in the Recorder.
+/*!@brief With help of this class, the user is able to register, unregister and edit single DataSlots in the Recorder.
  */
 class cedar::proc::gui::RecorderProperty : public QHBoxLayout
 {
@@ -66,7 +66,7 @@ class cedar::proc::gui::RecorderProperty : public QHBoxLayout
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The public constructor.
-  RecorderProperty(cedar::proc::gui::RecorderWidget* parent, const std::string& stepName, cedar::proc::DataSlotPtr slot);
+  RecorderProperty(cedar::proc::gui::RecorderWidget* parent, cedar::proc::DataSlotPtr slot);
 
   //!@brief The public destructor. 
   ~RecorderProperty();
@@ -76,7 +76,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
   //!@brief Register this slot in the recorder. 
-  void registerRecordData(int status);
+  void registerRecordData(bool status);
 
   //!@brief Informs the recorder that the step size for this slot has changed. 
   void updateStepSize(int value);
@@ -89,12 +89,6 @@ signals:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief the name of the step.
-  std::string mStepName;
-
-  //!@brief The name of the slot. 
-  std::string mName;
-
   //!@brief A check box for register and unregister the slot.
   QCheckBox* mCheckBox;
 
@@ -102,7 +96,7 @@ private:
   QSpinBox* mStepSize; 
 
   //!@brief The pointer to the data of the slot.
-  cedar::aux::ConstDataPtr mData;
+  cedar::proc::DataSlotPtr mDataSlot;
 
   //!@brief Stores the record interval of the slot. Is changed by the mStepSize spin box.
   cedar::unit::Time mStepSizeValue;

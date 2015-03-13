@@ -137,6 +137,11 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::GraphicsBase::manualDeletionRequiresConfirmation() const
+{
+  return false;
+}
+
 void cedar::proc::gui::GraphicsBase::emitChangedEventToScene(bool alwaysEmit)
 {
   bool is_data_slot_item = ((this->mGroup & GRAPHICS_GROUP_DATA_ITEM) > 0);

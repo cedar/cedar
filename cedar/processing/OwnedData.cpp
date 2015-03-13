@@ -139,4 +139,9 @@ void cedar::proc::OwnedData::addOutgoingConnection(cedar::proc::DataConnectionPt
 void cedar::proc::OwnedData::removeOutgoingConnection(cedar::proc::DataConnectionPtr removedConnection)
 {
   this->removeConnection(removedConnection);
+  auto parent = this->getParentPtr();
+  if (parent)
+  {
+    parent->callOutputConnectionRemoved(this->shared_from_this());
+  }
 }

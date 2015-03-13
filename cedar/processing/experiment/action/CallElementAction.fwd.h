@@ -22,26 +22,26 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ThreadCollection.fwd.h
+    File:        CallElementAction.fwd.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 11 08
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2015 01 16
 
-    Description: Forward declaration file for the class cedar::aux::ThreadCollection.
+    Description: Forward declaration file for the class cedar::proc::experiment::CallElementAction.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_THREAD_COLLECTION_FWD_H
-#define CEDAR_AUX_THREAD_COLLECTION_FWD_H
+#ifndef CEDAR_PROC_EXPERIMENT_ACTION_CALL_ELEMENT_ACTION_FWD_H
+#define CEDAR_PROC_EXPERIMENT_ACTION_CALL_ELEMENT_ACTION_FWD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
@@ -51,13 +51,19 @@
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
-  namespace aux
+  namespace proc
   {
-    CEDAR_DECLARE_AUX_CLASS(ThreadCollection);
+    namespace experiment
+    {
+      namespace action
+      {
+        CEDAR_DECLARE_PROC_CLASS(CallElementAction);
+      }
+    }
   }
 }
 
 //!@endcond
 
-#endif // CEDAR_AUX_THREAD_COLLECTION_FWD_H
+#endif // CEDAR_PROC_EXPERIMENT_ACTION_CALL_ELEMENT_ACTION_FWD_H
 

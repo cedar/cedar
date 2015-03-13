@@ -51,8 +51,6 @@ known issues
   - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
   - Some of the interactive CAREN tests may not run if you do not have the corresponding meshes.
-  - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
-    standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
   - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
   - Singleton-related classes may sometimes cause crashes when programs exit. If you experience random crashes when your
     own programs exit and the stack contains cedar::aux::Log::getMemoryDebugFlag(), this may be the cause. As a
@@ -66,6 +64,13 @@ known issues
 Unreleased
 ==========
 
+- build system
+  - fixed an error that made it imposssible to use opencv versions that are not in /usr/local/include.
+
+- cedar::aux
+  - There is a new plot called Multi0DPlot. This is mainly intended to be used for showing the state of (EB) nodes in an
+    architecture, thus, it should be used in conjunction with an architecture widget. See the tutorial for architecture
+    widgets for details.
 - cedar::proc
   - The use of (Looped)Triggers has been remodeled completely. They are no longer shown in the architecture. Instead,
     each looped element is, by default, connected to a default trigger that is created automatically. If you want to use
@@ -74,6 +79,7 @@ Unreleased
     There is also a new mode for seeing what steps are connected to what triggers. This can be enabled from the toolbar
     and the menu ("color elements by trigger"). In addition to showing what trigger elements are connected to, hovering
     over a step in this mode will also display in what order it will trigger its subsequent steps.
+  - The time factor setting is now saved per architecture. New architectures start with time factor 1. 
 
 Released versions
 =================

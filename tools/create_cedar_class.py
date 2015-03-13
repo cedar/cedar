@@ -63,7 +63,7 @@ users_mail_cfg = "user's mail"
 # determine cedar home
 cedar_home = os.path.realpath(__file__ + "/../..")
 print "cedar home detected as:", cedar_home
-template_base_path = "../templates/"
+template_base_path = cedar_home + os.sep + "templates" + os.sep
 
 # Configuration reading
 config_file_path = home + os.sep + ".cedar" + os.sep + "template_script.cfg"
@@ -89,12 +89,15 @@ except IOError:
 
 
 # Set up option parser
-parser = OptionParser()
+parser = OptionParser(usage = "Usage: %prog [options] name::spaces::ClassName")
 parser.add_option("-c", "--header-only", dest="header_only",
                   help="When specified, no cpp file will be generated",
                   default=False, action="store_true")
 parser.add_option("-f", "--fwd-only", dest="fwd_only",
                   help="When specified, only the forward-declaration header will be generated.",
+                  default=False, action="store_true")
+parser.add_option("-s", "--no-subdirectories", dest="no_subdirectories",
+                  help="When specified, generates the class exactly in the current directory, i.e., no subdirectories will be created.",
                   default=False, action="store_true")
 parser.add_option("-p", "--output-path", dest="output_path",
                   help="When specified, the folder in which the new files are put.",
@@ -121,10 +124,10 @@ if not options.template is None:
     template_base_path += options.template + os.sep
 
 if len(args) > 1:
-    print "Too many arguments (", args, "). Stopping."
+    print "Please specify a single class name (you specified: ", args, ")."
     sys.exit(-1)
 elif len(args) == 0:
-    print "Not enough arguments."
+    print "Please specify a class name."
     parser.print_usage()
     sys.exit(-1)
 
@@ -149,23 +152,35 @@ with open(config_file_path, "w") as config:
     config.write(users_name_cfg + " = " + users_name + "\n")
     config.write(users_mail_cfg + " = " + users_mail + "\n")
   
+
+# split namespaces by separating according to ::
+namespaces = class_name_full.split("::")
+
+if len(namespaces) > 1:
+  # splice away the last entry, as it is the class name
+  namespaces = namespaces[:-1]
+  if namespaces[0] == "cedar":
+    top_level_namespace = namespaces[1]
+    is_cedar_class = True
+    has_namespace = True
+  else:
+    top_level_namespace = namespaces[0]
+    is_cedar_class = False
+    has_namespace = True
+else:
+    top_level_namespace = None
+    is_cedar_class = False
+    has_namespace = False
+
 # derive some names & values
 class_path = class_name_full
-
-namespaces = class_name_full.split("::")
-namespaces = namespaces[:-1]
-if namespaces[0] == "cedar":
-  top_level_namespace = namespaces[1]
-  is_cedar_class = True
-else:
-  top_level_namespace = namespaces[0]
-  is_cedar_class = False
 
 for namespace, alias in namespace_aliases.items():
   class_path = class_path.replace("::" + namespace, "::" + alias)
   
 class_path = class_path.replace("::", os.sep)
-namespace_path = class_path[:class_path.rfind(os.sep)]
+if has_namespace:
+  namespace_path = class_path[:class_path.rfind(os.sep)]
 
 standard_separator = "/"
 if os.sep != standard_separator:
@@ -190,16 +205,19 @@ replacements["<first name> <last name>"] = users_name
 replacements["<email address>"] = users_mail
 replacements["<class name>"] = class_name
 replacements["<full class name>"] = class_name_full
-replacements["<namespace path>"] = namespace_path
+if has_namespace:
+  replacements["<namespace path>"] = namespace_path
 replacements["<copyright years>"] = "2011"
 for year in range(2012, today.year + 1):
   replacements["<copyright years>"] += ", " + str(year)
 
 if is_cedar_class:
   replacements["<base namespace path>"] = "cedar/" + namespace_aliases[top_level_namespace]
-else:
+elif not top_level_namespace is None:
   replacements["<base namespace path>"] = top_level_namespace
-replacements["<CAP_SHORT_MAIN_NAMESPACE>"] = top_level_namespace.upper()
+
+if not top_level_namespace is None:
+  replacements["<CAP_SHORT_MAIN_NAMESPACE>"] = top_level_namespace.upper()
 
 # build namespace replacement
 namespace_begin = ""
@@ -236,13 +254,20 @@ if choice == 'n':
     print "Okay, bye!"
     sys.exit()
 
+# make sure the path for the namespace exists
+if has_namespace and not options.no_subdirectories and not os.path.exists(namespace_path):
+  os.makedirs(namespace_path)
+
 templates = {"h": "classHeader.h", "fwd.h": "classHeader.fwd.h", "cpp": "classImplementation.cpp"}
 
 base_directory = cedar_home
 
-is_in_cedar = options.output_path is None
+is_in_cedar = options.output_path is None and is_cedar_class
 if not is_in_cedar:
+  if not options.output_path is None:
     base_directory = options.output_path
+  else:
+    base_directory = os.getcwd()
     
 if_re = re.compile(r'\<if\s*:\s*(\w+)\s*\>\n(.*?)\<\s*endif\s*\>\n', re.DOTALL)
 else_re = re.compile(r'(.*?)\s*\<\s*else\s*\>\n(.*)', re.DOTALL)
@@ -287,7 +312,11 @@ for extension in extensions:
     for search, replace in replacements.items():
         contents = contents.replace(search, replace)
         
-    destination = base_directory + os.sep + class_path + "." + extension
+    if not options.no_subdirectories:
+      destination = base_directory + os.sep + class_path + "." + extension
+    else:
+      destination = base_directory + os.sep + class_name + "." + extension
+      
     print "destination:", destination
     
     if not overwrite and os.path.exists(destination):

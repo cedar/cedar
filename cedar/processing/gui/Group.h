@@ -260,6 +260,8 @@ public:
   //! Returns the slot item used for the given group source.
   cedar::proc::gui::DataSlotItem* getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const;
 
+  bool manualDeletionRequiresConfirmation() const;
+
   bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
 
 public slots:
@@ -276,6 +278,9 @@ public slots:
 
   //! Enables/disables resizing and moving of the group.
   void setLockGeometry(bool lock = true);
+  
+  //! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
+  void reset();
 
   void openGroupContainer();
 
@@ -385,8 +390,6 @@ private:
    */
   void restoreConnections();
 
-  void setBackgroundColor(const QColor& color);
-
   void linkedChanged(bool readOnly);
 
   void lastReadConfigurationChanged();
@@ -493,8 +496,6 @@ private:
 
   //! Configuration of the next element that is added to the scene.
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
-
-  QColor mBackgroundColor;
 
   cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 

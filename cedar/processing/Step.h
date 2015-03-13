@@ -219,6 +219,9 @@ public:
   //!@brief Returns the map of actions defined for this step.
   const ActionMap& getActions() const;
 
+  //!@brief Returns if this step has an action of this name.
+  bool hasAction(const std::string& action) const;
+
   //!@brief Calls the action with the given name.
   void callAction(const std::string& name);
 
@@ -440,6 +443,8 @@ private:
    *
    */
   void callInputConnectionChanged(const std::string& slot);
+
+  std::map<std::string, cedar::unit::Time> unregisterRecordedData() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

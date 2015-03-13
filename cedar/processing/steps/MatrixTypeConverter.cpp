@@ -123,9 +123,14 @@ _mTargetType(new cedar::aux::EnumParameter(this, "target type", MatrixType::type
 
 void cedar::proc::steps::MatrixTypeConverter::targetTypeChanged()
 {
-  this->onTrigger();
-
-  this->emitOutputPropertiesChangedSignal("converted matrix");
+  if (this->allInputsValid())
+  {
+    cedar::proc::Step::ReadLocker locker(this);
+    this->compute(cedar::proc::Arguments());
+    locker.unlock();
+    this->emitOutputPropertiesChangedSignal("converted matrix");
+    this->onTrigger();
+  }
 }
 
 void cedar::proc::steps::MatrixTypeConverter::compute(const cedar::proc::Arguments&)

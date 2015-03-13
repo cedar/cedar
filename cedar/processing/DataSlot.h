@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/DataPath.h"
 #include "cedar/auxiliaries/LockType.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 
@@ -207,6 +208,8 @@ public:
 
   //! Sets the validity info that indicates why the slot is invalid.
   void setValidityInfo(const std::string& info);
+
+  cedar::proc::DataPath getDataPath() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots

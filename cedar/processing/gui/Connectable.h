@@ -48,6 +48,7 @@
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
 #include "cedar/processing/gui/ConnectableIconView.fwd.h"
@@ -230,7 +231,7 @@ public:
   void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
 
   bool canDuplicate() const;
-  
+
   //! Fills the triggers in the group into the action as a submenu
   static void buildConnectTriggerMenu
   (
@@ -238,7 +239,7 @@ public:
     const cedar::proc::gui::Group* gui_group,
     const QObject* receiver,
     const char* slot,
-    boost::optional<cedar::proc::TriggerPtr> current = (boost::optional<cedar::proc::TriggerPtr>())
+    boost::optional<cedar::proc::LoopedTriggerPtr> current = (boost::optional<cedar::proc::LoopedTriggerPtr>())
   );
 
   static cedar::proc::TriggerPtr getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group);
@@ -394,6 +395,13 @@ protected:
 
   void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
 
+  /*! Sets the desired background color of the connectable. Note that this may not be the color in which the connectable
+   * is drawn, e.g., when the group is showing trigger colors.
+   */
+  void setBackgroundColor(const QColor& color);
+
+  QColor getBackgroundColor() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -418,7 +426,7 @@ private:
 
   cedar::proc::gui::ConstGroup* getGuiGroup() const;
 
-  void translateParentTriggerChangedSignal();
+  void translateLoopedTriggerChangedSignal();
 
   void fillColorChanged(QColor color);
 
@@ -548,6 +556,8 @@ private:
   bool mShowingTriggerColor;
 
   std::vector<QGraphicsItem*> mTriggerChainVisualization;
+
+  QColor mBackgroundColor;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
