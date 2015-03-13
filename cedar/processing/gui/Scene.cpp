@@ -550,6 +550,7 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
   }
 
   // see if the mouse is moving some items
+  //!@todo This should probably be done by overriding mouseMoveEvent etc in GraphicsBase/Connectable
   if (pMouseEvent->button() == Qt::LeftButton)
   {
     auto items = this->items(pMouseEvent->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder);
@@ -563,7 +564,7 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
         {
           if (auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items.at(i)))
           {
-            if (graphics_base->isSelected() && !graphics_base->isReadOnly())
+            if (graphics_base->isSelected() && graphics_base->canBeDragged())
             {
               // we cannot move with a
               this->mDraggingItems = true;

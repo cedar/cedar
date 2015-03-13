@@ -223,6 +223,16 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::Group::canBeDragged() const
+{
+  if (!cedar::proc::gui::Connectable::canBeDragged() || this->_mGeometryLocked->getValue())
+  {
+    return false;
+  }
+
+  return true;
+}
+
 bool cedar::proc::gui::Group::manualDeletionRequiresConfirmation() const
 {
   return !this->getGroup() || !this->getGroup()->getElements().empty();

@@ -232,6 +232,8 @@ public:
 
   bool canDuplicate() const;
 
+  bool canBeDragged() const;
+
   //! Fills the triggers in the group into the action as a submenu
   static void buildConnectTriggerMenu
   (

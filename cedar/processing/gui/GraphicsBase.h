@@ -272,6 +272,9 @@ public:
   //! Specifies whether the item can be duplicated.
   virtual bool canDuplicate() const = 0;
 
+  //! If this returns false, the item should not be dragged around.
+  virtual bool canBeDragged() const;
+
   const QSizeF getMinimumSize() const;
 
   /*! Returns the color used to fill the foreground when the given brush is not solid.

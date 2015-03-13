@@ -239,6 +239,16 @@ void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
   this->setBackgroundColor(this->mDefaultBackground);
 }
 
+bool cedar::proc::gui::Connectable::canBeDragged() const
+{
+  if (this->isReadOnly())
+  {
+    return false;
+  }
+
+  return true;
+}
+
 void cedar::proc::gui::Connectable::displayModeChanged()
 {
   // empty default implementation
