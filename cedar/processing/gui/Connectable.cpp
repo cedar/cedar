@@ -1516,6 +1516,12 @@ void cedar::proc::gui::Connectable::fillDisplayStyleMenu(QMenu* pMenu)
 
   for (const cedar::aux::Enum& e : cedar::proc::gui::Connectable::DisplayMode::type().list())
   {
+    //!@todo Reenable this mode and fully implement it
+    if (e.id() == cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS)
+    {
+      // currently, this feature is disabled because it isn't ready yet
+      continue;
+    }
     QAction* p_action = p_sub_menu->addAction(QString::fromStdString(e.prettyString()));
     p_action->setData(QString::fromStdString(e.name()));
 
