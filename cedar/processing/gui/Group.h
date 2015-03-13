@@ -264,6 +264,8 @@ public:
 
   bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
 
+  bool canBeDragged() const;
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??

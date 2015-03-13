@@ -137,6 +137,11 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::GraphicsBase::canBeDragged() const
+{
+  return false;
+}
+
 bool cedar::proc::gui::GraphicsBase::manualDeletionRequiresConfirmation() const
 {
   return false;
