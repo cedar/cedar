@@ -47,7 +47,7 @@ last_year_of_copyright = 2015
 # the default value assumes that you execute the script in the tools directory of the cedar repository
 top_path = "../.."
 # file extensions for the files scanned
-file_extensions = ['cpp', 'h', 'in', 'md', 'py', 'txt']
+file_extensions = ['cpp', 'h', 'in', 'md', 'py', 'txt', 'conf.example']
 
 copyright_prefix = "Copyright"
 copyright_institute = "Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany"
