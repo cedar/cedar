@@ -56,6 +56,7 @@ cedar::aux::LoopedThread::LoopedThread
   cedar::aux::EnumId mode
 )
 :
+mpWorker(nullptr),
 _mStepSize
 (
   new cedar::aux::TimeParameter
@@ -116,6 +117,18 @@ cedar::aux::LoopedThread::~LoopedThread()
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
+
+double cedar::aux::LoopedThread::getAverageStepsTaken() const
+{
+  if (this->mpWorker)
+  {
+    return this->mpWorker->getSumOfStepsTaken() / static_cast<double>(this->mpWorker->getNumberOfSteps());
+  }
+  else
+  {
+    return 0.0;
+  }
+}
 
 void cedar::aux::LoopedThread::makeParametersConst(bool makeConst)
 {

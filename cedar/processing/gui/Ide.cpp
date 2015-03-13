@@ -76,7 +76,9 @@
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/version.h"
+#include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -87,12 +89,17 @@
 #include <QTableWidget>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/detail/json_parser_error.hpp>
+  #include <boost/version.hpp>
 #endif
 #include <vector>
 #include <set>
 #include <list>
 #include <string>
 #include <utility>
+
+#ifdef CEDAR_USE_YARP
+#include <yarp/conf/version.h>
+#endif // CEDAR_USE_YARP
 
 //----------------------------------------------------------------------------------------------------------------------
 // nested private classes
@@ -569,6 +576,20 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   {
     this->showOneTimeMessages(messages, true);
   }
+
+  this->recorderDataAddedOrRemoved();
+  QObject::connect(cedar::aux::RecorderSingleton::getInstance().get(),
+                   SIGNAL(recordedDataChanged()),
+                   this,
+                   SLOT(recorderDataAddedOrRemoved()));
+
+  mGlobalTimeFactorSettingChangedConnection =
+      cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
+      (
+        boost::bind(&cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal, this, _1)
+      );
+
+  QObject::connect(this, SIGNAL(signalGlobalTimeFactorSettingChanged(double)), this, SLOT(globalTimeFactorSettingChanged(double)));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -595,6 +616,13 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::recorderDataAddedOrRemoved()
+{
+  bool enabled = cedar::aux::RecorderSingleton::getInstance()->hasDataToRecord();
+  this->mpActionRecord->setEnabled(enabled);
+  this->mpActionSnapshot->setEnabled(enabled);
+}
 
 void cedar::proc::gui::Ide::showRecentNotifications()
 {
@@ -707,6 +735,22 @@ void cedar::proc::gui::Ide::architectureChanged()
   this->setArchitectureChanged(true);
 }
 
+void cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal(double newValue)
+{
+  emit signalGlobalTimeFactorSettingChanged(newValue);
+}
+
+void cedar::proc::gui::Ide::globalTimeFactorSettingChanged(double newValue)
+{
+  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
+  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
+  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
+
+  blocked = this->mpGlobalTimeFactor->blockSignals(true);
+  this->mpGlobalTimeFactor->setValue(newValue);
+  this->mpGlobalTimeFactor->blockSignals(blocked);
+}
+
 void cedar::proc::gui::Ide::globalTimeFactorSliderChanged(int newValue)
 {
   this->mpGlobalTimeFactor->setValue(static_cast<double>(newValue) / 100.0);
@@ -718,7 +762,10 @@ void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
   this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
   this->mpGlobalTimeFactorSlider->blockSignals(blocked);
 
-  cedar::aux::SettingsSingleton::getInstance()->setGlobalTimeFactor(newValue);
+  if (this->mGroup)
+  {
+    this->mGroup->getGroup()->setTimeFactor(newValue);
+  }
 }
 
 void cedar::proc::gui::Ide::openParameterLinker()
@@ -1017,13 +1064,10 @@ void cedar::proc::gui::Ide::showAboutDialog()
   QImage version_image(":/cedar/processing/gui/images/current_version_image.svg");
   p_version_image->setPixmap(QPixmap::fromImage(version_image));
 
-  QString about_text = "<center>This is cedar<br />built with library<br />version <b>";
-  about_text += QString::fromStdString(cedar::aux::versionNumberToString(CEDAR_VERSION));
-  about_text += "</b>"
-#ifdef DEBUG
-      "<br />(debug build)"
-#endif // DEBUG
-      "</center>";
+  QString about_text = "<center>";
+  about_text += QString::fromStdString(cedar::aux::getCedarConfigurationInfo("<hr />", "<br />"));
+  about_text += "</center>";
+
   QLabel* p_label = new QLabel(about_text);
   p_label->setTextFormat(Qt::RichText);
   p_layout->addWidget(p_label);
@@ -1879,6 +1923,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpPropertyTable->clear();
+  this->mpRecorderWidget->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
 
@@ -1912,6 +1957,8 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   {
     this->mpExperimentDialog->updateGroup();
   }
+
+  this->mGroup->getGroup()->applyTimeFactor();
 }
 
 void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()

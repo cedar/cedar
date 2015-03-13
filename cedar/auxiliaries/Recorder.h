@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/ThreadCollection.h"
 #include "cedar/auxiliaries/DataSpectator.h"
 #include "cedar/units/Time.h"
 
@@ -65,6 +64,8 @@
    */
 class cedar::aux::Recorder : public cedar::aux::LoopedThread
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,7 +101,7 @@ public:
   void unregisterData(const std::string& name);
 
   //!@brief Used to unregister a DataPtr to stop him from being recorded.
-   void unregisterData(cedar::aux::ConstDataPtr);
+  void unregisterData(cedar::aux::ConstDataPtr);
 
   //!@brief Unregister all DataPtr.
   void clear();
@@ -150,6 +151,22 @@ public:
   //!@brief Returns all registered DataPtr by name and their record interval
   std::map<std::string, cedar::unit::Time> getRegisteredData() const;
 
+  //!@brief Starts all threads.
+  void startAllRecordings();
+
+  //!@brief Stops all threads.
+  void stopAllRecordings();
+
+  //!@brief Removes all threads.
+  void removeAllRecordings();
+
+  //! Returns true if any data is set to be recorded.
+  bool hasDataToRecord() const;
+
+signals:
+  //! Emitted whenver data is added or removed.
+  void recordedDataChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -187,8 +204,9 @@ protected:
   // none yet
 
 private:
-  //!@brief The registered DataSpectaors.
-  cedar::aux::ThreadCollection mDataSpectatorCollection;
+  //!@brief The registered DataSpectators.
+  std::map<std::string, cedar::aux::DataSpectatorPtr> mDataSpectators;
+  QReadWriteLock* mpListLock;
 
   //!@brief The output directory.
   std::string mOutputDirectory;
@@ -197,7 +215,6 @@ private:
   std::string mProjectName;
 
   std::string mSubFolder;
-
 };
 
 

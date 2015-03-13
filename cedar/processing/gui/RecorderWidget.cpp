@@ -38,7 +38,7 @@
 #include "cedar/processing/gui/RecorderWidget.h"
 #include "cedar/processing/gui/RecorderProperty.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Step.h"
+#include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Recorder.h"
 
@@ -69,54 +69,61 @@ cedar::proc::gui::RecorderWidget::~RecorderWidget()
   delete mMainLayout;
 }
 
-
-void cedar::proc::gui::RecorderWidget::setStep(cedar::proc::StepPtr step)
+void cedar::proc::gui::RecorderWidget::setConnectable(cedar::proc::ConnectablePtr connectable)
 {
-  this->mStepToConfigure = step;
-  connect(step.get(), SIGNAL(nameChanged()), this, SLOT(updateName()));
+  this->mConnectable = connectable;
   refreshWidget();
 }
+
 void cedar::proc::gui::RecorderWidget::refreshWidget()
 {
   // reset the widget
   clearLayout();
 
   // Check if step not null
-  if (!mStepToConfigure)
+  if (!this->mConnectable)
   {
     return;
   }
 
   // draw Headers
-  this->createHeader(mStepToConfigure->getName());
+  this->createHeader(this->mConnectable->getName());
 
   // create recorder properties
 
-  std::vector<cedar::proc::DataRole::Id> slotTypes;
-  slotTypes.push_back(cedar::proc::DataRole::BUFFER);
-  slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
+  std::vector<cedar::proc::DataRole::Id> displayed_roles;
+  displayed_roles.push_back(cedar::proc::DataRole::BUFFER);
+  displayed_roles.push_back(cedar::proc::DataRole::OUTPUT);
 
-  for (unsigned int s = 0; s < slotTypes.size(); s++)
+  for (auto role : displayed_roles)
   {
-
-    if (mStepToConfigure->hasSlotForRole(slotTypes[s]))
+    if (!this->mConnectable->hasSlotForRole(role))
     {
-      cedar::proc::Connectable::SlotList dataSlots = mStepToConfigure->getOrderedDataSlots(slotTypes[s]);
-      if (dataSlots.size() > 0)
-      {
-        createRoleSection(cedar::proc::DataRole::type().get(slotTypes[s]).prettyString());
-      }
+      continue;
+    }
 
-      for (unsigned int i = 0; i < dataSlots.size(); i++)
-      {
-        auto property = new RecorderProperty(this, mStepToConfigure->getName(), dataSlots[i]);
-        mMainLayout->addLayout(property);
-        QObject::connect(property, SIGNAL(changed()), this, SIGNAL(settingsChanged()));
-      }
+    cedar::proc::Connectable::SlotList data_slots = this->mConnectable->getOrderedDataSlots(role);
+    if (data_slots.empty())
+    {
+      continue;
+    }
+
+    createRoleSection(cedar::proc::DataRole::type().get(role).prettyString());
+    for (auto slot : data_slots)
+    {
+      auto property = new RecorderProperty(this, slot);
+      mMainLayout->addLayout(property);
+      QObject::connect(property, SIGNAL(changed()), this, SIGNAL(settingsChanged()));
     }
   }
 
   mMainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+}
+
+void cedar::proc::gui::RecorderWidget::clear()
+{
+  this->mConnectable.reset();
+  this->clearLayout();
 }
 
 void cedar::proc::gui::RecorderWidget::clearLayout()
@@ -183,39 +190,6 @@ void cedar::proc::gui::RecorderWidget::createRoleSection(const std::string& name
   role_font_layout->addWidget(role_name);
 
   mMainLayout->addLayout(role_font_layout);
-}
-
-void cedar::proc::gui::RecorderWidget::updateName()
-{
-  if (cedar::proc::Step* pStep = dynamic_cast<cedar::proc::Step*>(QObject::sender()))
-  {
-    //rename registered Data
-    std::vector<cedar::proc::DataRole::Id> slotTypes;
-    slotTypes.push_back(cedar::proc::DataRole::BUFFER);
-    slotTypes.push_back(cedar::proc::DataRole::OUTPUT);
-
-    for (unsigned int s = 0; s < slotTypes.size(); s++)
-    {
-      if (pStep->hasSlotForRole(slotTypes[s]))
-      {
-        const cedar::proc::Connectable::SlotList dataSlots = pStep->getOrderedDataSlots(slotTypes[s]);
-        for (unsigned int i = 0; i < dataSlots.size(); ++i)
-        {
-          if (cedar::aux::RecorderSingleton::getInstance()->isRegistered(dataSlots[i]->getData()))
-          {
-            cedar::aux::RecorderSingleton::getInstance()->renameRegisteredData
-                                                          (
-                                                              dataSlots[i]->getData(),
-                                                            pStep->getName() + "_" + dataSlots[i]->getName()
-                                                          );
-          }
-        }
-      }
-
-    }
-
-    this->refreshWidget();
-  }
 }
 
 void cedar::proc::gui::RecorderWidget::emitStepRegisteredinRecorder()

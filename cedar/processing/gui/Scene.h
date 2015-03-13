@@ -325,6 +325,10 @@ public:
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
 
+  /*! Returns a list of selected items where those items whose parents are in the selection are removed.
+   */
+  QList<QGraphicsItem*> getSelectedParents() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -399,7 +403,7 @@ private:
 
   /*!@brief Deletes the list of graphics items.
    */
-  void deleteElements(QList<QGraphicsItem*>& items);
+  void deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation = false);
 
   /*!@brief Delete a single graphics item.
    */
@@ -407,7 +411,7 @@ private:
 
   /*!@brief Deletes the elements currently selected in the scene.
    */
-  void deleteSelectedElements();
+  void deleteSelectedElements(bool skipConfirmation = false);
 
   void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
 

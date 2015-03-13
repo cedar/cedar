@@ -223,6 +223,11 @@ cedar::proc::gui::Group::~Group()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::Group::manualDeletionRequiresConfirmation() const
+{
+  return !this->getGroup() || !this->getGroup()->getElements().empty();
+}
+
 cedar::aux::PluginDeclaration* cedar::proc::gui::Group::declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const
 {
   auto tree = dynamic_cast<cedar::proc::gui::ElementClassList*>(pEvent->source());
@@ -453,7 +458,7 @@ QBrush cedar::proc::gui::Group::getColorFor(cedar::proc::LoopedTriggerPtr trigge
 
   if (mTriggerColors.empty())
   {
-    auto triggers = this->mGroup->findAll<cedar::proc::Trigger>(false);
+    auto triggers = this->mGroup->findAll<cedar::proc::Trigger>(true);
     std::map<std::string, cedar::proc::TriggerPtr> sorted_triggers;
 
     for (auto trigger : triggers)
@@ -1132,7 +1137,9 @@ void cedar::proc::gui::Group::readConfiguration(const cedar::aux::ConfigurationN
         this->_mArchitectureWidgets[key] = value.get_value<std::string>();
       }
     }
+    // read background color
 
+    // read background color
     auto color_node = node.find("background color");
     if (color_node != node.not_found())
     {
@@ -1250,12 +1257,14 @@ void cedar::proc::gui::Group::writeConfiguration(cedar::aux::ConfigurationNode& 
     generic.put_child("architecture widgets", architecture_plots);
   }
 
-  if (this->mBackgroundColor.isValid())
+  // write background color
+  auto bg_color = this->getBackgroundColor();
+  if (bg_color.isValid())
   {
     std::stringstream color_str;
-    color_str << this->mBackgroundColor.red() << ","
-        << this->mBackgroundColor.green() << ","
-        << this->mBackgroundColor.blue();
+    color_str << bg_color.red() << ","
+        << bg_color.green() << ","
+        << bg_color.blue();
     generic.put("background color", color_str.str());
   }
 
@@ -1893,6 +1902,10 @@ void cedar::proc::gui::Group::removeConnectorItem(bool isSource, const std::stri
 
 void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
+  if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
+  {
+    this->clearTriggerColorCache();
+  }
   if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sources::ConstGroupSource>(element))
   {
     this->removeConnectorItem(true, element->getName());
@@ -1900,10 +1913,6 @@ void cedar::proc::gui::Group::processElementRemovedSignal(cedar::proc::ConstElem
   else if (auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::ConstGroupSink>(element))
   {
     this->removeConnectorItem(false, element->getName());
-  }
-  else if (boost::dynamic_pointer_cast<cedar::proc::ConstTrigger>(element))
-  {
-    this->clearTriggerColorCache();
   }
   else
   {
@@ -2045,16 +2054,14 @@ void cedar::proc::gui::Group::backgroundColorActionTriggered()
   this->setBackgroundColor(new_color);
 }
 
-void cedar::proc::gui::Group::setBackgroundColor(const QColor& color)
+void cedar::proc::gui::Group::reset()
 {
-  this->setFillColor(color);
-  this->mBackgroundColor = color;
-  this->updateTriggerColorState();
+  this->getGroup()->reset();
 }
 
 void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-  CEDAR_DEBUG_ONLY(cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());)
+  cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
 
   QMenu menu;
@@ -2066,6 +2073,10 @@ void cedar::proc::gui::Group::contextMenuEvent(QGraphicsSceneContextMenuEvent *e
   }
 
   this->fillConnectableMenu(menu, event);
+  
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QAction* p_reset = menu.addAction("reset");
+  this->connect(p_reset, SIGNAL(triggered()), SLOT(reset()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 

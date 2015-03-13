@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <string>
 
 
 namespace cedar

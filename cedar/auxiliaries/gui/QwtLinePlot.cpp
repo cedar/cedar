@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/gui/QwtLinePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/annotation/Dimensions.h"
+#include "cedar/auxiliaries/annotation/ValueRangeHint.h"
 #include "cedar/auxiliaries/math/Limits.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -122,6 +123,11 @@ cedar::aux::gui::QwtLinePlot::~QwtLinePlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+QwtPlot* cedar::aux::gui::QwtLinePlot::getPlot()
+{
+  return this->mpPlot;
+}
 
 cedar::aux::math::Limits<double> cedar::aux::gui::QwtLinePlot::getXLimits() const
 {
@@ -223,6 +229,20 @@ void cedar::aux::gui::QwtLinePlot::applyStyle(cedar::aux::ConstDataPtr data, siz
   }
 }
 
+void cedar::aux::gui::QwtLinePlot::getStyleFor(cedar::aux::ConstDataPtr data, QPen& pen, QBrush& brush) const
+{
+  for (auto plot_series : this->mPlotSeriesVector)
+  {
+    if (plot_series->mMatData == data)
+    {
+      pen = plot_series->mpCurve->pen();
+      brush = plot_series->mpCurve->brush();
+      return;
+    }
+  }
+  CEDAR_THROW(cedar::aux::NotFoundException, "Could not find the given data.");
+}
+
 bool cedar::aux::gui::QwtLinePlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
   cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
@@ -254,11 +274,14 @@ void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
 
   size_t line_id = mPlotSeriesVector.size();
 
-  mpLock->lockForWrite();
+  QWriteLocker write_locker(mpLock);
   mPlotSeriesVector.push_back(plot_series);
 
   plot_series->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
-
+  if (data->hasAnnotation<cedar::aux::annotation::ConstValueRangeHint>())
+  {
+    plot_series->mValueRange = data->getAnnotation<cedar::aux::annotation::ConstValueRangeHint>();
+  }
 
   if (!plot_series->mMatData)
   {
@@ -296,7 +319,7 @@ void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
 #endif
   plot_series->mpCurve->attach(this->mpPlot);
 
-  mpLock->unlock();
+  write_locker.unlock();
 
   QReadLocker locker(&plot_series->mMatData->getLock());
   //!@todo This will only read the annotation from the last data appended; really, canAppend should check if they match.
@@ -342,6 +365,15 @@ void cedar::aux::gui::QwtLinePlot::doDetach(cedar::aux::ConstDataPtr data)
 void cedar::aux::gui::QwtLinePlot::attachMarker(QwtPlotMarker *pMarker)
 {
   pMarker->attach(this->mpPlot);
+  this->mMarkers.push_back(pMarker);
+}
+
+void cedar::aux::gui::QwtLinePlot::detachMarker(QwtPlotMarker *pMarker)
+{
+  auto iter = std::find(this->mMarkers.begin(), this->mMarkers.end(), pMarker);
+  this->mMarkers.erase(iter);
+
+  pMarker->detach();
 }
 
 void cedar::aux::gui::QwtLinePlot::clearMarkers()
@@ -351,15 +383,18 @@ void cedar::aux::gui::QwtLinePlot::clearMarkers()
 
 void cedar::aux::gui::QwtLinePlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  mpLock->lockForWrite();
-  mPlotSeriesVector.clear();
-  mpLock->unlock();
+  QWriteLocker locker(mpLock);
+  this->mPlotSeriesVector.clear();
+  locker.unlock();
 
   this->append(data, title);
 }
 
 void cedar::aux::gui::QwtLinePlot::init()
 {
+  this->mAutoDetermineXLimits = true;
+  this->mPlot0D = false;
+
   QPalette palette = this->palette();
   palette.setColor(QPalette::Window, Qt::white);
   this->setPalette(palette);
@@ -393,6 +428,16 @@ void cedar::aux::gui::QwtLinePlot::init()
   QObject::connect(this->_mYAxisLimits.get(), SIGNAL(valueChanged()), this, SLOT(axisLimitsChanged()));
   QObject::connect(this->_mMajorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
   QObject::connect(this->_mMinorGridVisible.get(), SIGNAL(valueChanged()), this, SLOT(gridVisibilityChanged()));
+}
+
+void cedar::aux::gui::QwtLinePlot::setAutoDetermineXLimits(bool automatic)
+{
+  this->mAutoDetermineXLimits = automatic;
+}
+
+void cedar::aux::gui::QwtLinePlot::setAccepts0DData(bool accept)
+{
+  this->mPlot0D = accept;
 }
 
 void cedar::aux::gui::QwtLinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
@@ -685,18 +730,22 @@ void cedar::aux::gui::QwtLinePlot::PlotSeries::buildArrays(unsigned int new_size
 void cedar::aux::gui::detail::QwtLinePlotWorker::convert()
 {
   QWriteLocker plot_locker(this->mpPlot->mpLock);
-  double min = std::numeric_limits<double>::max();
-  double max = -std::numeric_limits<double>::max();
+  double x_min = std::numeric_limits<double>::max();
+  double x_max = -std::numeric_limits<double>::max();
   for (size_t series_index = 0; series_index < this->mpPlot->mPlotSeriesVector.size(); ++series_index)
   {
     cedar::aux::gui::QwtLinePlot::PlotSeriesPtr series = this->mpPlot->mPlotSeriesVector.at(series_index);
 
     QReadLocker locker(&series->mMatData->getLock());
     const cv::Mat& mat = series->mMatData->getData();
-    if (cedar::aux::math::getDimensionalityOf(mat) != 1) // plot is no longer capable of displaying the data
+    auto dim = cedar::aux::math::getDimensionalityOf(mat);
+    if (dim != 1) // plot is no longer capable of displaying the data
     {
-      emit dataChanged();
-      return;
+      if (dim != 0 || !this->mpPlot->mPlot0D)
+      {
+        emit dataChanged();
+        return;
+      }
     }
     CEDAR_DEBUG_ASSERT(series->mXValues.size() == series->mYValues.size());
 
@@ -706,13 +755,13 @@ void cedar::aux::gui::detail::QwtLinePlotWorker::convert()
     // skip if the array is empty
     if (size == 0)
     {
-      return;
+      continue;
     }
 
     double local_min, local_max;
     series->buildArrays(size, local_min, local_max);
-    min = std::min(min, local_min);
-    max = std::max(max, local_max);
+    x_min = std::min(x_min, local_min);
+    x_max = std::max(x_max, local_max);
 
     for (size_t x = 0; x < series->mXValues.size(); ++x)
     {
@@ -720,9 +769,37 @@ void cedar::aux::gui::detail::QwtLinePlotWorker::convert()
     }
   }
 
+  for (QwtPlotMarker* marker : this->mpPlot->mMarkers)
+  {
+    x_min = std::min(x_min, marker->xValue());
+    x_max = std::max(x_max, marker->xValue());
+  }
+
+  double hinted_min = std::numeric_limits<double>::max();
+  double hinted_max = -std::numeric_limits<double>::max();
+  bool value_hints_for_all = true;
+  for (const auto& series : this->mpPlot->mPlotSeriesVector)
+  {
+    if (!series->mValueRange)
+    {
+      value_hints_for_all = false;
+      break;
+    }
+    else
+    {
+      hinted_min = std::min(hinted_min, series->mValueRange->getRange().getLower());
+      hinted_max = std::max(hinted_max, series->mValueRange->getRange().getUpper());
+    }
+  }
+
+  if (value_hints_for_all && this->mpPlot->autoScalingEnabled())
+  {
+    this->mpPlot->mpPlot->setAxisScale(QwtPlot::yLeft, hinted_min, hinted_max);
+  }
+
   plot_locker.unlock();
 
-  emit done(min, max);
+  emit done(x_min, x_max);
 }
 //!@endcond
 
@@ -754,7 +831,15 @@ void cedar::aux::gui::QwtLinePlot::conversionDone(double min, double max)
     #endif
   }
 
-  this->setFixedXAxisScaling(min, max);
+  if (this->mAutoDetermineXLimits)
+  {
+    if (min == max)
+    {
+      min -= 0.5;
+      max += 0.5;
+    }
+    this->setFixedXAxisScaling(min, max);
+  }
 
   this->mpPlot->replot();
 }

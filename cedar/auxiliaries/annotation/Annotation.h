@@ -89,6 +89,12 @@ public:
    */
   virtual std::string getDescription() const = 0;
 
+  /*! If this function returns true, Annotatable will not copy this annotation in the copyAnnotationsFrom function.
+   *
+   * The default implementation returns false.
+   */
+  virtual bool excludeFromCopying() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

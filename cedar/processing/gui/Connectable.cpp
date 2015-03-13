@@ -540,7 +540,7 @@ void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pE
   pEvent->setAccepted(true);
 }
 
-void cedar::proc::gui::Connectable::translateParentTriggerChangedSignal()
+void cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal()
 {
   emit triggerableParentTriggerChanged();
 }
@@ -695,18 +695,20 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   auto gui_group = scene->getRootGroup();
 
   bool show = gui_group->showsTriggerColors();
-  auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
   if (show)
   {
     auto last_color = this->getFillColor();
     auto last_style = this->getFillStyle();
 
     QBrush brush(Qt::white);
-    if (parent_trigger)
+    if (triggerable->isLooped())
     {
-      brush = gui_group->getColorFor(parent_trigger);
+      if (triggerable->getLoopedTrigger())
+      {
+        brush = gui_group->getColorFor(triggerable->getLoopedTrigger());
+      }
     }
-    else if (!triggerable->isLooped())
+    else
     {
       brush = QBrush(QColor::fromRgb(220, 220, 220));
     }
@@ -728,6 +730,19 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
     this->setAcceptHoverEvents(false);
     this->hideTriggerChains();
   }
+}
+
+QColor cedar::proc::gui::Connectable::getBackgroundColor() const
+{
+  return this->mBackgroundColor;
+}
+
+void cedar::proc::gui::Connectable::setBackgroundColor(const QColor& color)
+{
+  this->setFillColor(color);
+  this->mBackgroundColor = color;
+  this->mPreviousFillColor = color;
+  this->updateTriggerColorState();
 }
 
 void cedar::proc::gui::Connectable::translateStartedSignal()
@@ -961,21 +976,22 @@ void cedar::proc::gui::Connectable::reactToSlotRemoved(cedar::proc::DataRole::Id
 
 void cedar::proc::gui::Connectable::addDataItems()
 {
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
+  std::vector<cedar::proc::DataRole::Id> to_show;
+  to_show.push_back(cedar::proc::DataRole::INPUT);
+  to_show.push_back(cedar::proc::DataRole::OUTPUT);
+  
+  for (const auto& id : to_show)
   {
-    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
+    if (id == cedar::aux::Enum::UNDEFINED)
       continue;
 
     // populate step item list
-    if (this->getConnectable()->hasSlotForRole(*enum_it))
+    if (this->getConnectable()->hasSlotForRole(id))
     {
-      const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(*enum_it);
-      for (cedar::proc::Connectable::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      for (auto data_slot : this->getConnectable()->getOrderedDataSlots(id))
       {
         // use a non-const version of this slot
-        this->addDataItemFor(this->getConnectable()->getSlot(*enum_it, (*iter)->getName()));
+        this->addDataItemFor(data_slot);
       }
     }
   }
@@ -1078,9 +1094,9 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
 
   if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
   {
-    this->mParentTriggerChangedConnection = triggerable->connectToParentTriggerChangedSignal
+    this->mParentTriggerChangedConnection = triggerable->connectToLoopedTriggerChangedSignal
         (
-          boost::bind(&cedar::proc::gui::Connectable::translateParentTriggerChangedSignal, this)
+          boost::bind(&cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal, this)
         );
   }
 }
@@ -1322,7 +1338,7 @@ void cedar::proc::gui::Connectable::buildConnectTriggerMenu
   const cedar::proc::gui::Group* gui_group,
   const QObject* receiver,
   const char* slot,
-  boost::optional<cedar::proc::TriggerPtr> current
+  boost::optional<cedar::proc::LoopedTriggerPtr> current
 )
 {
   auto group = gui_group->getGroup();
@@ -1384,8 +1400,12 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
       gui_group,
       this,
       SLOT(assignTriggerClicked()),
-      triggerable->getParentTrigger()
+      triggerable->getLoopedTrigger()
     );
+  }
+  else
+  {
+    p_assign_trigger->setEnabled(false);
   }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
@@ -1556,9 +1576,10 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
   {
     group->connectTrigger(trigger, triggerable);
   }
-  else if (triggerable->getParentTrigger())
+  // if no trigger was chosen, the user clicked the "disconnect" option, so: disconnect!
+  else if (triggerable->getLoopedTrigger())
   {
-    group->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
+    group->disconnectTrigger(triggerable->getLoopedTrigger(), triggerable);
   }
 }
 
@@ -1848,10 +1869,19 @@ QWidget* cedar::proc::gui::Connectable::createDockWidget(const std::string& titl
     p_dock->setFloating(true);
     p_dock->setContentsMargins(0, 0, 0, 0);
     p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    QRect g = pWidget->geometry();
     p_dock->setWidget(pWidget);
 
     mChildWidgets.push_back(p_dock);
     QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
+
+    QRect p = this->mpMainWindow->geometry();
+    g.setLeft(p.x() + (p.width() - g.width())/2);
+    g.setTop(p.y() + (p.height() - g.height())/2);
+    // changing left/top does not keep the correct width/heigh, thus, restore them
+    g.setWidth(pWidget->geometry().width());
+    g.setHeight(pWidget->geometry().height());
+    p_dock->setGeometry(g);
 
     return p_dock;
   }
