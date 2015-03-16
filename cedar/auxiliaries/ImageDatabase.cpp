@@ -53,6 +53,9 @@
 cedar::aux::EnumType<cedar::aux::ImageDatabase::Type> cedar::aux::ImageDatabase::Type::mType("cedar::aux::ImageDatabase::Type::");
 
 const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_POSE_ANNOTATION_NAME = "object pose";
+const std::string cedar::aux::ImageDatabase::M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME = "multi_object_pose";
+const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_IMAGE_ANNOTATION_NAME = "object";
+const std::string cedar::aux::ImageDatabase::M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME = "frame_object";
 
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::aux::ImageDatabase::Type::Id cedar::aux::ImageDatabase::Type::ScanFolder;
@@ -104,6 +107,164 @@ void cedar::aux::ImageDatabase::ObjectPoseAnnotation::setScale(double factor)
   this->mScale = factor;
 }
 
+int cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getNewKey()
+{
+  int key = 0;
+  if(!this->mObjectMap.empty())
+  {
+    auto lastElement = this->mObjectMap.end();
+    lastElement--;
+    key = lastElement->first + 1;
+  }
+  return key;
+}
+ 
+void cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::setAnnotation(std::string& object, AnnotationPtr annotation, int id)
+{
+  std::pair<std::string, cedar::aux::ImageDatabase::ConstAnnotationPtr> pair = std::make_pair (object, annotation);
+
+  this->mObjectMap.insert(std::make_pair<int&, std::pair<std::string, ConstAnnotationPtr>& >(id, pair));
+}
+
+void cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::removeAnnotation(int id)
+{
+  this->mObjectMap.erase(id);
+}
+
+std::map<int, std::pair<std::string, cedar::aux::ImageDatabase::ConstAnnotationPtr>> 
+   cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getObjectAnnotationPairMap() const
+{
+  return this->mObjectMap;
+}
+
+cedar::aux::ImageDatabase::ConstAnnotationPtr
+  cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getLastAddedAnnotation() const
+{
+  auto lastElement = this->mObjectMap.end();
+  lastElement--;
+  return lastElement->second.second;
+}
+
+cedar::aux::ImageDatabase::ConstAnnotationPtr 
+  cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getAnnotation(int id) const
+{
+  auto iter = this->mObjectMap.find(id);
+  if(iter != this->mObjectMap.end())
+  {
+    return iter->second.second;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "An annotation with that id does not exists.");
+  }
+}
+
+void cedar::aux::ImageDatabase::FrameAnnotation::setAnnotation(AnnotationPtr annotation, int frame)
+{
+  this->mFrameAnnotationMapping[frame] = annotation;
+}
+
+bool cedar::aux::ImageDatabase::FrameAnnotation::hasAnnotation(int frame) const
+{
+  if(this->getAnnotation(frame))
+  {
+    return true;
+  }
+  return false;
+}
+
+cedar::aux::ImageDatabase::ConstAnnotationPtr
+  cedar::aux::ImageDatabase::FrameAnnotation::getAnnotation(int frame) const
+{
+  auto iter = this->mFrameAnnotationMapping.find(frame);
+  if(iter != this->mFrameAnnotationMapping.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    try
+    {
+      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr prev = NULL;
+      cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr next = NULL;
+      double prevFrame = 0.;
+      double nextFrame = 0.;
+      
+      for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
+      {
+        //find closest annotations
+        if(iter->first <= frame)
+        {
+          prev = boost::dynamic_pointer_cast<cedar::aux::ImageDatabase::ObjectPoseAnnotation>(iter->second);
+          prevFrame = iter->first;
+        }
+        else if(iter->first > frame)
+        {
+          next = boost::dynamic_pointer_cast<cedar::aux::ImageDatabase::ObjectPoseAnnotation>(iter->second);
+          nextFrame = iter->first;
+          break;
+        }
+      }
+      if(prev == NULL)
+      {
+        return NULL;
+      }
+      else if(next == NULL)
+      {
+        return prev;
+      }
+      else
+      {
+        //interpolate linear
+        cedar::aux::ImageDatabase::ObjectPoseAnnotationPtr poseAnnotation = ObjectPoseAnnotationPtr(new ObjectPoseAnnotation);
+        
+        double frameDiff = (1.*(frame-prevFrame))/(1.*(nextFrame-prevFrame));
+        
+        double xInterp = prev->getX()+(next->getX()-prev->getX())*frameDiff;
+        double yInterp = prev->getY()+(next->getY()-prev->getY())*frameDiff;
+        poseAnnotation->setPosition(xInterp,yInterp);
+        
+        double oriInterp = prev->getOrientation()+(next->getOrientation()-prev->getOrientation())*frameDiff;
+        poseAnnotation->setOrientation(oriInterp);
+        
+        double scaleInterp = prev->getScale()+(next->getScale()-prev->getScale())*frameDiff;
+        poseAnnotation->setScale(scaleInterp);
+        
+        return poseAnnotation;
+      }
+    }
+    catch(cedar::aux::NotFoundException e)
+    {
+      CEDAR_THROW(cedar::aux::NotFoundException, "Interpolation for annotation type not implemented");
+    }
+    return NULL;
+  }
+}
+
+std::map<int, cedar::aux::ImageDatabase::AnnotationPtr>
+  cedar::aux::ImageDatabase::FrameAnnotation::getKeyframeAnnotations()
+{
+  return this->mFrameAnnotationMapping;
+}
+
+bool cedar::aux::ImageDatabase::FrameAnnotation::isKeyframeAnnotation(int frame)
+{
+  auto iter = this->mFrameAnnotationMapping.find(frame);
+  if(iter != this->mFrameAnnotationMapping.end())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void cedar::aux::ImageDatabase::FrameAnnotation::deleteKeyFrameAnnotation(int frame)
+{
+  this->mFrameAnnotationMapping.erase(frame);
+}
+
 bool cedar::aux::ImageDatabase::Image::hasTag(const std::string& tag) const
 {
   return this->mTags.find(tag) != this->mTags.end();
@@ -112,6 +273,13 @@ bool cedar::aux::ImageDatabase::Image::hasTag(const std::string& tag) const
 void cedar::aux::ImageDatabase::Image::readImage() const
 {
   this->mImage = cv::imread(this->mFileName.absolute().toString());
+  
+  if (this->mImage.empty())
+  {
+    cv::VideoCapture capture(this->mFileName.absolute().toString(false));
+    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+    capture.read(this->mImage);
+  }
 }
 
 void cedar::aux::ImageDatabase::Image::setFileName(const cedar::aux::Path& fileName)
@@ -387,7 +555,10 @@ cedar::aux::ImageDatabase::ImagePtr cedar::aux::ImageDatabase::findImageWithFile
 {
   for (const auto& image : this->mImages)
   {
-    if (image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".png") //!@todo Don't hard-code file type
+    if (image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".png" ||
+        image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".avi" ||
+        image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".mp4" ||
+        image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".flv") //!@todo Don't hard-code file type
     {
       return image;
     }
@@ -463,6 +634,7 @@ void cedar::aux::ImageDatabase::readAnnotations(const cedar::aux::Path& path)
       {
         std::string left = parts[0];
         std::string right = parts[1];
+       
         if (right.empty())
         {
           current_image = left;
@@ -516,6 +688,185 @@ void cedar::aux::ImageDatabase::readAnnotations(const cedar::aux::Path& path)
             auto annotation = image->getAnnotation<ObjectPoseAnnotation>(M_STANDARD_OBJECT_POSE_ANNOTATION_NAME);
             double scale = cedar::aux::fromString<double>(right);
             annotation->setScale(scale);
+          }
+          else
+          {
+            std::cout << "WARNING: UNUSED ANNOTATION LINE: \"" << left << "\"=>\"" << right << "\"" << std::endl;
+          }
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+}
+
+void cedar::aux::ImageDatabase::readMultiAnnotations(const cedar::aux::Path& path)
+{
+  cedar::aux::Path annotation_file_path = path;
+  std::ifstream annotation_file(annotation_file_path.absolute().toString() + "/annotations");
+
+  if (!annotation_file.is_open())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Annotation file not found.",
+      "void cedar::aux::ImageDataBase::readMultiAnnotations(const cedar::aux::Path&)"
+    );
+    return;
+  }
+
+  std::string current_image;
+  ImagePtr image;
+  bool foundObject = false;
+  bool isFrameAnnotation = false;
+  unsigned int frame = 0;
+
+  while (!annotation_file.eof())
+  {
+    std::string line;
+    std::getline(annotation_file, line);
+
+    std::vector<std::string> parts;
+    cedar::aux::split(line, ":", parts);
+
+    for (size_t p = 0; p < parts.size(); ++p)
+    {
+      parts[p] = cedar::aux::replace(parts[p], " ", "");
+      parts[p] = cedar::aux::replace(parts[p], "\t", "");
+    }
+
+    switch (parts.size())
+    {
+      case 2:
+      {
+        std::string left = parts[0];
+        std::string right = parts[1];
+
+        if (right == M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME)
+        {
+          try
+          {
+            image = this->findImageWithFilenameNoPath(left);
+            image->setAnnotation(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME,
+               MultiObjectPoseAnnotationPtr(new MultiObjectPoseAnnotation()));
+          }
+          catch (cedar::aux::NotFoundException)
+          {
+            std::cout << "WARNING: image not found: "<< left << std::endl;
+            // make the image a nullptr, skip the reset of the annotations until the next image
+            image.reset();
+          }
+          foundObject = false;
+          isFrameAnnotation = false;
+        }
+        else if (image && right == M_STANDARD_OBJECT_IMAGE_ANNOTATION_NAME)
+        {
+          current_image = left;
+          foundObject = true;
+          isFrameAnnotation = false;
+          auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
+          int key = annotation->getNewKey();
+          annotation->setAnnotation(current_image, ObjectPoseAnnotationPtr(new ObjectPoseAnnotation()), key);
+        }
+        else if (image && right == M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME)
+        {
+          current_image = left;
+          foundObject = true;
+          isFrameAnnotation = true;
+          auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
+          int key = annotation->getNewKey();
+          annotation->setAnnotation(current_image, FrameAnnotationPtr(new FrameAnnotation()), key);
+        }
+        else
+        {
+          if (!image || !foundObject)
+          {
+            continue;
+          }
+          if (left == "frame")
+          {
+            frame = cedar::aux::fromString<unsigned int>(right);
+            auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
+            auto frameAnnotation= annotation->getLastAddedAnnotation<FrameAnnotation>();
+            frameAnnotation->setAnnotation(ObjectPoseAnnotationPtr(new ObjectPoseAnnotation), frame);
+          }
+          else if (left == "position")
+          {
+            CEDAR_ASSERT(right.size() > 3);
+            right = right.substr(1, right.length() - 2);
+            std::vector<std::string> position_str;
+            cedar::aux::split(right, ",", position_str);
+            CEDAR_ASSERT(position_str.size() == 2);
+            int x = cedar::aux::fromString<int>(position_str[0]);
+            int y = cedar::aux::fromString<int>(position_str[1]);
+
+            auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
+            
+            double region_rows, region_cols;
+            region_cols = static_cast<double>(image->getImageColumns());
+            region_rows = static_cast<double>(image->getImageRows());
+
+            double rel_x, rel_y;
+            rel_x = static_cast<double>(x) - region_cols/2.0;
+            rel_y = static_cast<double>(y) - region_rows/2.0;
+
+            if(isFrameAnnotation)
+            {
+              auto lastFrameAnnotation = annotation->getLastAddedAnnotation<FrameAnnotation>();
+              auto poseAnnotation = lastFrameAnnotation->getAnnotation<ObjectPoseAnnotation>(frame);
+              poseAnnotation->setPosition(rel_x, rel_y);
+            }
+            else
+            {
+              auto poseAnnotation = annotation->getLastAddedAnnotation<ObjectPoseAnnotation>();
+              poseAnnotation->setPosition(rel_x, rel_y);
+            }
+          }
+          else if (left == "orientation")
+          {
+            auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
+            double phi = cedar::aux::fromString<double>(right);
+            
+            if (isFrameAnnotation)
+            {
+              auto lastFrameAnnotation = annotation->getLastAddedAnnotation<FrameAnnotation>();
+              auto poseAnnotation = lastFrameAnnotation->getAnnotation<ObjectPoseAnnotation>(frame);
+              poseAnnotation->setOrientation(phi);        
+            }
+            else
+            {
+              auto poseAnnotation = annotation->getLastAddedAnnotation<ObjectPoseAnnotation>();
+              poseAnnotation->setOrientation(phi);
+            } 
+          }
+          else if (left == "scale-factor")
+          {
+            auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
+            double scale = cedar::aux::fromString<double>(right);
+            
+            if (isFrameAnnotation)
+            {
+              auto lastFrameAnnotation = annotation->getLastAddedAnnotation<FrameAnnotation>();
+              auto poseAnnotation = lastFrameAnnotation->getAnnotation<ObjectPoseAnnotation>(frame);
+              poseAnnotation->setScale(scale);
+            }
+            else
+            {
+              auto poseAnnotation = annotation->getLastAddedAnnotation<ObjectPoseAnnotation>();
+              poseAnnotation->setScale(scale);
+            } 
+          }
+          else if (left == "removed")
+          {
+            bool isRemoved = cedar::aux::fromString<bool>(right);
+            if(isRemoved && isFrameAnnotation)
+            {
+              auto annotation = image->getAnnotation<MultiObjectPoseAnnotation>(M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME);
+              annotation->getLastAddedAnnotation<FrameAnnotation>()->setAnnotation(NULL, frame);
+            }
           }
           else
           {
@@ -590,7 +941,8 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
 
     CEDAR_DEBUG_ASSERT(!parts.empty());
     std::string extension = "." + parts.back();
-    if (parts.size() > 0 && extension == ".png")
+    if (parts.size() > 0 && (extension == ".png" ||(extension == ".flv") || (extension == ".avi") ||
+                                              (extension == ".mp4")))
     {
       if (parts.size() == 3)
       {
@@ -608,6 +960,8 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
   }
 
   this->readAnnotations(path);
+  
+  this->readMultiAnnotations(path);
 }
 
 void cedar::aux::ImageDatabase::readCOIL100(const cedar::aux::Path& path)
