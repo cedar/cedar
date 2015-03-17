@@ -108,7 +108,7 @@ public:
    * @param redirectLogToGui   Enables or disables redirection of log messages to the gui (can help when too many log
    *                           messages lock up the user interface).
    */
-  Ide(bool loadDefaultPlugins = true, bool redirectLogToGui = true);
+  Ide(bool loadDefaultPlugins = true, bool redirectLogToGui = true, bool suppressChildWidgets = false);
 
   //!@brief Destructor
   ~Ide();
@@ -362,7 +362,7 @@ private:
 
   void showOneTimeMessages(const std::vector<cedar::proc::gui::Settings::OneTimeMessagePtr>& messages, bool markAsRead = false);
 
-  void init(bool loadDefaultPlugins, bool redirectLogToGui, const cedar::aux::CommandLineParser& parser);
+  void init(bool loadDefaultPlugins, bool redirectLogToGui, bool suppressChildWidgets, const cedar::aux::CommandLineParser& parser);
 
   void setArchitectureSavingLoadingEnabled(bool enabled);
 
@@ -440,6 +440,9 @@ private:
 
   //! Whether the save on close dialog should be suppressed.
   bool mSuppressCloseDialog;
+
+  //! When true, no child widgets will be spawned automatically. Mostly used for unit testing.
+  bool mSuppressChildWidgets;
 
   cedar::proc::gui::FindDialog* mpFindDialog;
 
