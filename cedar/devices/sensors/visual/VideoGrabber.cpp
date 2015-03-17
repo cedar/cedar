@@ -279,59 +279,38 @@ void cedar::dev::sensors::visual::VideoGrabber::onCloseGrabber()
 
 void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
 {
-
-  // rewinding is done very inefficient, because for the moment it is not possible to break the grabbing loop in
-  // the base grabber-class.
-  //! @todo Rewrite the video-grabbing and the rewinding more efficient
-
   // read next frame from file for this channel
-  (getVideoChannel(channel)->mVideoCapture) >> getImageMat(channel);
+  cv::Mat frame;
+  getVideoChannel(channel)->mVideoCapture >> frame;
 
   // check if the grabbed frame is empty
-  if (getImageMat(channel).empty())
+  if (frame.empty())
   {
-    // is it a read error somewhere in the middle of the file?
-    if
-    (
-      getVideoChannel(channel)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES)) < (mFramesCount)
-    )
+    // this is fine, skip frame
+    unsigned int frame_no = getVideoChannel(channel)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES));
+    // only increase the frame number if we are not already at the last frame
+    if (frame_no < mFramesCount-1)
     {
-      std::string msg = "Could not read from video file on channel " + cedar::aux::toString(channel);
-      CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
+      getVideoChannel(channel)->mVideoCapture.set(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES), ++frame_no);
+      return;
     }
-
-    // otherwise end of file. Rewind if looped is on
+    // end of file. Rewind if looped is on
     if (_mLooped->getValue())
     {
-      // rewind all already grabbed channels and grab first frame
-      for (unsigned int i = 0; i <= channel; ++i)
+      // rewind all channels and grab first frame for all channels up to this channel
+      for (unsigned int i = 0; i < this->getNumChannels(); ++i)
       {
         getVideoChannel(i)->mVideoCapture.set(CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES), 0);
-        getVideoChannel(i)->mVideoCapture >> getImageMat(i);
-      }
-
-      // set all other channels to their last frame
-      for (unsigned int i = channel+1; i < getNumChannels(); ++i)
-      {
-        double last_frame = getVideoChannel(i)->mVideoCapture.get(CEDAR_OPENCV_CONSTANT(CAP_PROP_FRAME_COUNT)) - 1.0;
-        getVideoChannel(i)->mVideoCapture.set
-        (
-          CEDAR_OPENCV_CONSTANT(CAP_PROP_POS_FRAMES),
-          last_frame
-        );
-        getVideoChannel(i)->mVideoCapture >> getImageMat(i);
-      }
-
-      // debug message for rewinding (if last channel)
-      if (channel == getNumChannels()-1)
-      {
-        cedar::aux::LogSingleton::getInstance()->debugMessage
-                                                (
-                                                  this->getName() + ": Video restarted",
-                                                  "cedar::dev::sensors::visual::VideoGrabber::onGrab()"
-                                                );
+        if (i <= channel)
+        {
+          getVideoChannel(i)->mVideoCapture >> getImageMat(i);
+        }
       }
     }
+  }
+  else
+  {
+    this->getImageMat(channel) = frame;
   }
 }
 
