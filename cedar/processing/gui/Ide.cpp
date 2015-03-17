@@ -314,19 +314,20 @@ private:
 
 cedar::proc::gui::Ide::Ide(const cedar::aux::CommandLineParser& parser)
 {
-  this->init(!parser.hasParsedFlag("no-plugins"), !parser.hasParsedFlag("no-log"), parser);
+  this->init(!parser.hasParsedFlag("no-plugins"), !parser.hasParsedFlag("no-log"), false, parser);
 }
 
-cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
+cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui, bool suppressChildWidgets)
 {
-  this->init(loadDefaultPlugins, redirectLogToGui, cedar::aux::CommandLineParser());
+  this->init(loadDefaultPlugins, redirectLogToGui, suppressChildWidgets, cedar::aux::CommandLineParser());
 }
 
-void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui, const cedar::aux::CommandLineParser& parser)
+void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui, bool suppressChildWidgets, const cedar::aux::CommandLineParser& parser)
 {
   mpPerformanceOverview = nullptr;
   mpBoostControlDock = nullptr;
   mSuppressCloseDialog = false;
+  mSuppressChildWidgets = suppressChildWidgets;
   mpExperimentDialog = nullptr;
   mSimulationRunning = false;
   // setup the (automatically generated) ui components
@@ -572,7 +573,7 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
 
   auto messages = cedar::proc::gui::SettingsSingleton::getInstance()->getUnreadOneTimeMessages();
 
-  if (!messages.empty())
+  if (!messages.empty() && !this->mSuppressChildWidgets)
   {
     this->showOneTimeMessages(messages, true);
   }
