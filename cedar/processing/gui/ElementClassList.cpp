@@ -136,24 +136,34 @@ void cedar::proc::gui::ElementClassList::rebuild()
 
 void cedar::proc::gui::ElementClassList::showList(const std::string& categoryName)
 {
+  struct ListEntryParameters
+  {
+    std::string mClassName;
+    std::string mFullClassName;
+    cedar::aux::ConstPluginDeclarationPtr mDeclaration;
+    std::vector<QString> mDecorations;
+    std::string mSource;
+    std::string mDescription;
+    std::string mDeprecation;
+    QIcon mIcon;
+  };
   using cedar::proc::ElementDeclarationPtr;
   using cedar::proc::GroupDeclarationPtr;
 
   this->mCategoryName = categoryName;
-  auto entries = ElementManagerSingleton::getInstance()->getCategoryEntries(this->mCategoryName);
-
-  auto group_entries = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDefinitions();
 
   this->clear();
 
-  for (auto iter = entries.begin(); iter != entries.end(); ++iter)
-  {
-    cedar::proc::ElementDeclarationManager::ConstBasePluginDeclarationPtr class_id = *iter;
-    auto elem_decl = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(class_id);
-    CEDAR_ASSERT(elem_decl);
+  std::multimap<std::string, ListEntryParameters> ordered_entries;
 
-    std::string class_name = class_id->getClassNameWithoutNamespace();
-    std::string full_class_name = class_id->getClassName();
+  // first, go trough all element declaration entries and put them in the map, thus ordering them
+  auto entries = ElementManagerSingleton::getInstance()->getCategoryEntries(this->mCategoryName);
+  for (const auto& base_declaration : entries)
+  {
+    auto declaration = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(base_declaration);
+    CEDAR_ASSERT(declaration);
+
+    std::string full_class_name = declaration->getClassName();
 
     // group sources and sinks should not be shown to the user
     if
@@ -166,52 +176,81 @@ void cedar::proc::gui::ElementClassList::showList(const std::string& categoryNam
       continue;
     }
 
-    QIcon icon = elem_decl->getIcon();
-    std::vector<QString> decorations;
-    if (!class_id->getSource().empty())
+    ListEntryParameters params;
+
+    params.mIcon = declaration->getIcon();
+
+    if (!declaration->getSource().empty())
     {
-      decorations.push_back(":/decorations/from_plugin.svg");
+      params.mDecorations.push_back(":/decorations/from_plugin.svg");
     }
 
-    if (class_id->isDeprecated())
+    if (declaration->isDeprecated())
     {
       if (!cedar::proc::gui::SettingsSingleton::getInstance()->getElementListShowsDeprecated())
       {
         continue;
       }
-      decorations.push_back(":/cedar/auxiliaries/gui/warning.svg");
+      params.mDecorations.push_back(":/cedar/auxiliaries/gui/warning.svg");
     }
 
-    std::string description;
-    if (!elem_decl->getDescription().empty())
+    if (!declaration->getDescription().empty())
     {
-      description = elem_decl->getDescription();
+      params.mDescription = declaration->getDescription();
     }
 
-    std::string deprecation;
-    if (class_id->isDeprecated() && !class_id->getDeprecationDescription().empty())
+    if (declaration->isDeprecated() && !declaration->getDeprecationDescription().empty())
     {
-      deprecation = class_id->getDeprecationDescription();
+      params.mDeprecation = declaration->getDeprecationDescription();
     }
 
-    std::string source;
-    if (!class_id->getSource().empty())
+    if (!declaration->getSource().empty())
     {
-      source = class_id->getSource();
+      params.mSource = declaration->getSource();
     }
 
-    this->addListEntry(class_name, full_class_name, icon, decorations, description, deprecation, source, elem_decl);
+    params.mClassName = declaration->getClassNameWithoutNamespace();
+    params.mFullClassName = full_class_name;
+    params.mDeclaration = declaration;
+
+    ordered_entries.insert(std::make_pair(cedar::aux::toLower(params.mClassName), params));
   }
 
+  // also go through all group declarations
+  auto group_entries = cedar::proc::GroupDeclarationManagerSingleton::getInstance()->getDefinitions();
   for (auto group_entry : group_entries)
   {
     auto definition = group_entry.second;
-    std::vector<QString> decorations;
-    decorations.push_back(":/decorations/template.svg");
     if (definition->getCategory() == categoryName)
     {
-      this->addListEntry(definition->getClassName(), "group template", definition->getIcon(), decorations, "", "", "", definition);
+      ListEntryParameters params;
+      params.mDeclaration = definition;
+      params.mDecorations.push_back(":/decorations/template.svg");
+      params.mClassName = definition->getClassName();
+      params.mFullClassName = "group template";
+      params.mIcon = definition->getIcon();
+
+      ordered_entries.insert(std::make_pair(cedar::aux::toLower(params.mClassName), params));
     }
+  }
+
+  // then, actually add the entries
+  for (const auto& name_params_pair : ordered_entries)
+  {
+    const auto& class_name = name_params_pair.first;
+    const ListEntryParameters& params = name_params_pair.second;
+
+    this->addListEntry
+    (
+      params.mClassName,
+      params.mFullClassName,
+      params.mIcon,
+      params.mDecorations,
+      params.mDescription,
+      params.mDeprecation,
+      params.mSource,
+      params.mDeclaration
+    );
   }
 }
 
