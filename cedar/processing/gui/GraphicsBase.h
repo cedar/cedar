@@ -107,6 +107,7 @@ public:
   enum BaseShape
   {
     BASE_SHAPE_RECT,
+    BASE_SHAPE_ROUNDED_RECT,
     BASE_SHAPE_ROUND,
     BASE_SHAPE_DIAMOND,
     BASE_SHAPE_CROSS
@@ -121,7 +122,7 @@ public:
   GraphicsBase(qreal width, qreal height,
                GraphicsGroup group = GRAPHICS_GROUP_UNKNOWN,
                GraphicsGroup canConnectTo = GRAPHICS_GROUP_NONE,
-               BaseShape shape = BASE_SHAPE_RECT);
+               BaseShape shape = BASE_SHAPE_ROUNDED_RECT);
 
   //!@brief Destructor
   virtual ~GraphicsBase();
@@ -223,21 +224,19 @@ public:
 
   //!@brief set outline fill color
   void setOutlineColor(const QColor& color);
+
   //!@brief set fill color
   void setFillColor(const QColor& color);
+
+  //! Returns the color used to fill the base shape.
+  QColor getFillColor() const;
+
+  //! Returns the currently set fill style.
+  Qt::BrushStyle getFillStyle() const;
 
   /*!@brief Draw the default graphical representation.
    */
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
-  /*!@brief   Returns the element associated with this graphics item.
-   *
-   * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
-   */
-  inline cedar::proc::ElementPtr getElement()
-  {
-    return this->mElement;
-  }
 
   //! Can be implemented to react to changes of the items size.
   virtual void sizeChanged();
@@ -261,8 +260,40 @@ public:
     return this->mReadOnly;
   }
 
+  //! If the function returns true, this item will request manual confirmation from the user in case it is being deleted.
+  virtual bool manualDeletionRequiresConfirmation() const;
+
+  //! Returns the vector of in- and outgoing (gui) connections for this (gui) element.
+  std::vector<Connection*>& getConnections()
+  {
+    return this->mConnections;
+  }
+
   //! Specifies whether the item can be duplicated.
   virtual bool canDuplicate() const = 0;
+
+  //! If this returns false, the item should not be dragged around.
+  virtual bool canBeDragged() const;
+
+  const QSizeF getMinimumSize() const;
+
+  /*! Returns the color used to fill the foreground when the given brush is not solid.
+   */
+  static QColor nonsolidBrushForegroundColor(QBrush brush);
+
+  /*! Returns the color used to fill the background when the given brush is not solid.
+   */
+  static QColor nonsolidBrushBackgroundColor(QBrush brush);
+
+  /*! Fills the given pixmap in the same way that the background of a graphicsbase would be filled with the given brush.
+   */
+  static void paintBackgroundColor(QPixmap& pixmap, QBrush brush);
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public signals
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  CEDAR_DECLARE_SIGNAL(FillColorChanged, void(QColor));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -283,26 +314,25 @@ protected:
    */
   void setBaseShape(BaseShape shape);
 
-  /*!@brief Sets the element associated with this graphics item.
-   */
-  inline void setElement(cedar::proc::ElementPtr element)
-  {
-    this->mElement = element;
-  }
-
   //! Sets the snap-to-grid property of the element.
   inline void setSnapToGrid(bool snap)
   {
     this->mSnapToGrid = snap;
   }
 
-  //! Returns the vector of in- and outgoing (gui) connections for this (gui) element.
-  std::vector<Connection*>& getConnections()
-  {
-    return this->mConnections;
-  }
+  //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
+  void setOverrideFillStyle(Qt::BrushStyle style, bool update = true);
 
-  //! Sets the fill stype
+  //! Removes the override fill style, reverting the item to using its normal fill style.
+  void unsetOverrideFillStyle(bool update = true);
+
+  //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
+  void setOverrideFillColor(const QColor& color, bool update = true);
+
+  //! Removes the override fill style, reverting the item to using its normal fill style.
+  void unsetOverrideFillColor(bool update = true);
+
+  //! Sets the fill style
   void setFillStyle(Qt::BrushStyle style, bool update = true);
 
   //! Set whether or not this item is resizeable.
@@ -319,6 +349,8 @@ protected:
 
   //! Updates the display of the resize handles.
   void updateResizeHandles();
+
+  void setMinimumSize(QSizeF size);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -386,14 +418,17 @@ private:
   //!@brief the current fill color
   QColor mFillColor;
 
+  //!@brief Override fill color.
+  boost::optional<QColor> mOverrideFillColor;
+
   //! Brush style used for filling the shape.
   Qt::BrushStyle mFillStyle;
 
+  //! Override fill style.
+  boost::optional<Qt::BrushStyle> mOverrideFillStyle;
+
   //!@brief The path used for drawing this shape.
   QPainterPath mPath;
-
-  //!@brief The element associated with this graphics item
-  cedar::proc::ElementPtr mElement;
 
   //!@brief Whether the item snaps to the grid.
   bool mSnapToGrid;
@@ -420,6 +455,8 @@ private:
   //!@brief height of the GraphicsBase
   cedar::aux::DoubleParameterPtr mHeight;
 
+  QSizeF mMinimumSize;
+
   //!@brief group of this instance
   GraphicsGroup mGroup;
   //!@brief all groups this instance can connect to
@@ -427,6 +464,8 @@ private:
 
   //!@brief vector of connections
   std::vector<Connection*> mConnections;
+
+  static const QSizeF M_MINIMUM_SIZE;
 
 }; // class cedar::proc::gui::GraphicsBase
 

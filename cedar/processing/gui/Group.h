@@ -49,6 +49,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/GroupWidget.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
@@ -71,6 +72,12 @@
 class cedar::proc::gui::Group : public cedar::proc::gui::Connectable
 {
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::GroupWidget;
+  friend class cedar::proc::gui::Scene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -119,6 +126,10 @@ public:
    */
   cedar::proc::ConstGroupPtr getGroup() const;
 
+  /*!@brief access the underlying cedar::proc::Group
+   */
+  void setGroup(cedar::proc::GroupPtr group);
+
   //!@brief get the current file, to which the group configuration can be saved
   const std::string& getFileName() const;
 
@@ -135,7 +146,7 @@ public:
   void addElements(const std::list<QGraphicsItem*>& elements);
 
   //! Duplicates an element and places it at the given position.
-  cedar::proc::gui::GraphicsBase* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
+  cedar::proc::gui::Element* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
 
   //!@brief Sets the scene containing this item.
   void setScene(cedar::proc::gui::Scene* pScene);
@@ -236,6 +247,25 @@ public:
   //! Closes all open architecture widgets
   void closeOpenArchitectureWidgets();
 
+  //! Returns a color for a given looped trigger
+  QBrush getColorFor(cedar::proc::LoopedTriggerPtr trigger) const;
+
+  void toggleTriggerColors(bool show);
+
+  //! Returns whether or not the trigger colors of elements in this group should be shown.
+  bool showsTriggerColors() const;
+
+  void updateTriggerColorState();
+
+  //! Returns the slot item used for the given group source.
+  cedar::proc::gui::DataSlotItem* getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const;
+
+  bool manualDeletionRequiresConfirmation() const;
+
+  bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
+
+  bool canBeDragged() const;
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??
@@ -250,6 +280,11 @@ public slots:
 
   //! Enables/disables resizing and moving of the group.
   void setLockGeometry(bool lock = true);
+  
+  //! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
+  void reset();
+
+  void openGroupContainer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -257,6 +292,30 @@ public slots:
 protected:
   //! handles removal of a slot
   void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
+
+  void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
+
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
+
+  /*!@brief Handles the drop event of the scene.
+   *
+   *        This method mainly instantiates elements that are dropped from the Element toolbar to create new items in
+   *        the scene.
+   */
+  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  /*!@brief Handles the dragLeave event of the scene.
+   */
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  /*!@brief Handles the dragMove event of the scene.
+   *
+   *        This method determines whether the contents of the drop can be handled by
+   *        cedar::proc::gui::Scene::dropEvent.
+   */
+  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -324,8 +383,7 @@ private:
 
   qreal getIconSizeForCurrentMode() const;
 
-  //!@todo Should return cedar::proc::gui::Element
-  cedar::proc::gui::GraphicsBase* getUiElementFor(cedar::proc::ElementPtr element) const;
+  cedar::proc::gui::Element* getUiElementFor(cedar::proc::ElementPtr element) const;
 
   void readStickyNotes(const cedar::aux::ConfigurationNode& node);
 
@@ -334,17 +392,26 @@ private:
    */
   void restoreConnections();
 
-  void setBackgroundColor(const QColor& color);
-
   void linkedChanged(bool readOnly);
 
   void lastReadConfigurationChanged();
 
   bool canResize() const;
 
+  void clearTriggerColorCache() const;
+
+  void updateAllElementsTriggerColorState() const;
+
+  void addElementsToGroup();
+
+  cedar::aux::PluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const;
+
 signals:
   //!@brief signal that is emitted when a boost signal is received
   void signalDataConnectionChange(QString, QString, QString, QString, cedar::proc::Group::ConnectionChange);
+
+  //! Emitted whenever trigger colors need updating.
+  void triggerColorsChanged() const;
 
 private slots:
   //!@brief Updates the label of the group.
@@ -377,6 +444,8 @@ private slots:
   void openParameterEditor();
 
   void backgroundColorActionTriggered();
+
+  void elementNameChanged(const std::string&, const std::string&);
 
   void geometryLockChanged();
 
@@ -411,6 +480,9 @@ private:
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::Group*> mpGroupsToAdd;
 
+  //! Map assigning colors to looped triggers. This is a cache to make calculations faster. The real assignment is determined algorithmically.
+  mutable std::map<cedar::proc::TriggerPtr, QBrush> mTriggerColors;
+
   boost::signals2::scoped_connection mNewElementAddedConnection;
   boost::signals2::scoped_connection mElementRemovedConnection;
   boost::signals2::scoped_connection mTriggerConnectionChangedConnection;
@@ -427,11 +499,11 @@ private:
   //! Configuration of the next element that is added to the scene.
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
-  QColor mBackgroundColor;
-
   cedar::proc::gui::Connectable::DecorationPtr mpLinkedDecoration;
 
   std::vector<QWeakPointer<QWidget>> mArchitectureWidgetDocks;
+
+  bool mShowTriggerColors;
 
   //! The vertical offset for data slots in the group used when the group is expanded.
   static const qreal M_EXPANDED_SLOT_OFFSET;

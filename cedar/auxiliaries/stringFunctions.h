@@ -53,6 +53,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <algorithm>
 #include <limits.h>
 
 namespace cedar
@@ -460,6 +461,14 @@ namespace cedar
         boost::match_default | boost::format_all // parameter
       );
       return t.str();
+    }
+
+    //! Returns a lower-case version of the given string.
+    inline std::string toLower(const std::string& in)
+    {
+      std::string lower_case_str = in;
+      std::transform(lower_case_str.begin(), lower_case_str.end(), lower_case_str.begin(), ::tolower);
+      return lower_case_str;
     }
   }
 }

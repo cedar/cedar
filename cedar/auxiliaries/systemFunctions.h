@@ -91,6 +91,10 @@ namespace cedar
     }
 
 #endif // CEDAR_OS_WINDOWS
+
+    /*! Returns a string identifying the cedar configuration.
+     */
+    CEDAR_AUX_LIB_EXPORT std::string getCedarConfigurationInfo(const std::string& separator, const std::string& lineEnd);
   }
 } // namespace cedar::aux
 

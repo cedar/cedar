@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 
   cedar::proc::gui::SettingsSingleton::getInstance()->disableWriting();
 
-  cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide(false);
+  cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide(false, false, true);
 
   errors += testSaving(p_ide);
 
