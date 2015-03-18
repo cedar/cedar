@@ -337,10 +337,10 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, con
   this->mpHistoryPlot->append(plot_data.mHistory, title);
 #ifdef CEDAR_USE_QWT
   plot_data.mpZeroMarker = new QwtPlotMarker();
-  QBrush brush(Qt::black); // TODO proper color of line style
-  QPen pen(Qt::black); // TODO proper color of line style
+  QBrush brush(Qt::black); //!@todo proper color of line style
+  QPen pen(Qt::black); //!@todo proper color of line style
   this->mpHistoryPlot->getStyleFor(plot_data.mHistory, pen, brush);
-#if QWT_VERSION >= 0x060100
+#if QWT_VERSION >= 0x060000
   auto symbol = new QwtSymbol
 #else
   QwtSymbol symbol
