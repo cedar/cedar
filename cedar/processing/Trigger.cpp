@@ -772,8 +772,7 @@ void cedar::proc::Trigger::removeListener(cedar::proc::Triggerable* triggerable)
   auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
 
   QWriteLocker lock(this->mListeners.getLockPtr());
-  std::vector<cedar::proc::TriggerablePtr>::iterator iter;
-  iter = this->find(triggerable);
+  auto iter = this->find(triggerable);
   if (iter != this->mListeners.member().end())
   {
     this->mListeners.member().erase(iter);
@@ -830,3 +829,7 @@ void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& nod
   }
 }
 
+bool cedar::proc::Trigger::canConnectTo(cedar::proc::ConstTriggerablePtr) const
+{
+  return true;
+}

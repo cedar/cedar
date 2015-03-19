@@ -155,6 +155,18 @@ public:
     {
       return this->mHasScale;
     }
+    
+    //! Returns the difference in pixel between the estimated and the annotated x position, negative values indicate that the estimated position is to the left of the annotated position.
+    double evaluateXposition(double dxFromCenterEstimation) const;
+    
+    //! Returns the difference in pixel between the estimated and the annotated y position, negative values indicate that the estimated position is to the top of the annotated position.
+    double evaluateYposition(double dxFromCenterEstimation) const;
+    
+    //! Returns the difference in degree between the estimated and the annotated orientation, negative values indicate that the estimated orientation is rotated clockwise to the annotated orientation.
+    double evaluateOrientation(double orientationEstimation) const;
+    
+    //! Returns the difference between the estimated and the annotated scale, negative values indicate that the estimated scale is smaller than the annotated scale.
+    double evaluateScale(double scaleEstimation) const;
 
   private:
     double mX;
@@ -286,6 +298,12 @@ public:
         );
       }
     }
+    
+    //! Returns the keyframe of the closest key annotation before frame, or -1 if there is no key annotation before frame.
+    int getPrevKeyframe(int frame);
+    
+    //! Returns the keyframe of the closest key annotation after frame, or -1 if there is no key annotation after frame.
+    int getNextKeyframe(int frame);
     
     //! Returns the map of all key frames and annotations.
     std::map<int, AnnotationPtr> getKeyframeAnnotations();
@@ -544,6 +562,12 @@ public:
 
   //! Returns the image corresponding to the given file path.
   ImagePtr findImageByFilename(const cedar::aux::Path& fileName) const;
+  
+  //! Returns true if the extension is a known image file extension.
+	static bool isKnownImageExtension(std::string extension);
+	
+  //! Returns true if the extension is a known video file extension.
+	static bool isKnownVideoExtension(std::string extension);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -603,6 +627,9 @@ public:
   static const std::string M_STANDARD_MULTI_OBJECT_POSE_ANNOTATION_NAME;
   static const std::string M_STANDARD_OBJECT_IMAGE_ANNOTATION_NAME;
   static const std::string M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME;
+  
+  static const std::vector<std::string> M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS;
+  static const std::vector<std::string> M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS;
 protected:
   // none yet
 private:

@@ -57,6 +57,9 @@ const std::string cedar::aux::ImageDatabase::M_STANDARD_MULTI_OBJECT_POSE_ANNOTA
 const std::string cedar::aux::ImageDatabase::M_STANDARD_OBJECT_IMAGE_ANNOTATION_NAME = "object";
 const std::string cedar::aux::ImageDatabase::M_STANDARD_FRAME_OBJECT_ANNOTATION_NAME = "frame_object";
 
+const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS = {"png"};
+const std::vector<std::string> cedar::aux::ImageDatabase::M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS = {"avi", "mpeg", "mp4", "flv", "ogg", "vob", "mpg"};
+
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::aux::ImageDatabase::Type::Id cedar::aux::ImageDatabase::Type::ScanFolder;
 #endif // CEDAR_COMPILER_MSVC
@@ -105,6 +108,50 @@ void cedar::aux::ImageDatabase::ObjectPoseAnnotation::setScale(double factor)
 {
   this->mHasScale = true;
   this->mScale = factor;
+}
+
+double cedar::aux::ImageDatabase::ObjectPoseAnnotation::evaluateXposition(double dxFromCenterEstimation) const
+{
+	double difference = dxFromCenterEstimation - this->mX;
+	return difference;
+}
+
+double cedar::aux::ImageDatabase::ObjectPoseAnnotation::evaluateYposition(double dyFromCenterEstimation) const
+{
+	double difference = dyFromCenterEstimation - this->mY;
+	return difference;
+}
+
+double cedar::aux::ImageDatabase::ObjectPoseAnnotation::evaluateOrientation(double orientationEstimation) const
+{
+  while(orientationEstimation < 0)
+  {
+   	orientationEstimation += 360;
+  }
+  
+  double orientation = this->mOrientation;
+  while(orientation < 0)
+  {
+    orientation += 360;
+  }
+  
+  double difference = orientationEstimation - orientation;     
+  while (difference > 180.0)
+  {
+    difference -= 360.0;
+  }
+  while (difference < -180.0)
+  {
+    difference += 360.0;
+  }
+        
+	return difference;
+}
+
+double cedar::aux::ImageDatabase::ObjectPoseAnnotation::evaluateScale(double scaleEstimation) const
+{
+	double difference = scaleEstimation - this->mScale;
+	return difference;
 }
 
 int cedar::aux::ImageDatabase::MultiObjectPoseAnnotation::getNewKey()
@@ -220,13 +267,34 @@ cedar::aux::ImageDatabase::ConstAnnotationPtr
         
         double frameDiff = (1.*(frame-prevFrame))/(1.*(nextFrame-prevFrame));
         
+        //position
         double xInterp = prev->getX()+(next->getX()-prev->getX())*frameDiff;
         double yInterp = prev->getY()+(next->getY()-prev->getY())*frameDiff;
         poseAnnotation->setPosition(xInterp,yInterp);
         
-        double oriInterp = prev->getOrientation()+(next->getOrientation()-prev->getOrientation())*frameDiff;
+        //orientation
+        double prevOri = prev->getOrientation();
+        double nextOri = next->getOrientation();
+        
+        double oridiff = nextOri-prevOri;
+        while (oridiff > 180.0)
+        {
+          oridiff -= 360.0;
+        }
+        while (oridiff < -180.0)
+        {
+          oridiff += 360.0;
+        }
+        
+        double oriInterp = prevOri+(oridiff)*frameDiff;
+        while (oriInterp > 180.0)
+        {
+          oriInterp -= 360.0;
+        }
+        
         poseAnnotation->setOrientation(oriInterp);
         
+        //scale
         double scaleInterp = prev->getScale()+(next->getScale()-prev->getScale())*frameDiff;
         poseAnnotation->setScale(scaleInterp);
         
@@ -245,6 +313,41 @@ std::map<int, cedar::aux::ImageDatabase::AnnotationPtr>
   cedar::aux::ImageDatabase::FrameAnnotation::getKeyframeAnnotations()
 {
   return this->mFrameAnnotationMapping;
+}
+
+int cedar::aux::ImageDatabase::FrameAnnotation::getPrevKeyframe(int frame)
+{
+  int prevFrame = -1;
+  
+  for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
+  {
+    //find previous annotation
+    if(iter->first < frame)
+    {
+      prevFrame = iter->first;
+    }
+    else if(iter->first > frame)
+    {
+      break;
+    }
+  }
+  return prevFrame;
+}
+
+int cedar::aux::ImageDatabase::FrameAnnotation::getNextKeyframe(int frame)
+{
+  int nextFrame = -1;
+  
+  for(auto iter = this->mFrameAnnotationMapping.begin(); iter!= this->mFrameAnnotationMapping.end(); ++iter)
+  {
+    //find next annotation
+    if(iter->first > frame)
+    {
+      nextFrame = iter->first;
+      break;
+    }
+  }
+  return nextFrame;
 }
 
 bool cedar::aux::ImageDatabase::FrameAnnotation::isKeyframeAnnotation(int frame)
@@ -316,6 +419,30 @@ cedar::aux::ImageDatabase::ImagePtr cedar::aux::ImageDatabase::findImageByFilena
   }
 
   CEDAR_THROW(cedar::aux::NotFoundException, "An image with the filename \"" + fileName.toString() + "\" could not be found.");
+}
+
+bool cedar::aux::ImageDatabase::isKnownImageExtension(std::string extension)
+{
+	for(auto it = M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS.begin(); it != M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS.end(); ++it)
+  {
+  	if (extension == *it)
+  	{
+     return true;
+    }
+  }
+  return false;
+}
+
+bool cedar::aux::ImageDatabase::isKnownVideoExtension(std::string extension)
+{
+	for(auto it = M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS.begin(); it != M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS.end(); ++it)
+  {
+  	if (extension == *it)
+  	{
+     return true;
+    }
+  }
+  return false;
 }
 
 std::vector<cedar::aux::ImageDatabase::ImagePtr> cedar::aux::ImageDatabase::shuffle(const std::set<ImagePtr>& images)
@@ -555,12 +682,22 @@ cedar::aux::ImageDatabase::ImagePtr cedar::aux::ImageDatabase::findImageWithFile
 {
   for (const auto& image : this->mImages)
   {
-    if (image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".png" ||
-        image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".avi" ||
-        image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".mp4" ||
-        image->getFileName().getFileNameOnly() == filenameWithoutExtension + ".flv") //!@todo Don't hard-code file type
-    {
-      return image;
+  	//check images
+  	for(auto it = M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS.begin(); it != M_STANDARD_KNOWN_IMAGE_FILE_EXTENSIONS.end(); ++it)
+  	{
+  		if (image->getFileName().getFileNameOnly() == filenameWithoutExtension + "." + *it)
+  		{
+      	return image;
+    	}
+    }
+    
+    //check videos
+    for(auto it = M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS.begin(); it != M_STANDARD_KNOWN_VIDEO_FILE_EXTENSIONS.end(); ++it)
+  	{
+  		if (image->getFileName().getFileNameOnly() == filenameWithoutExtension + "." + *it)
+  		{
+      	return image;
+    	}
     }
   }
   CEDAR_THROW(cedar::aux::NotFoundException, "Could not find sample " + filenameWithoutExtension);
@@ -940,9 +1077,9 @@ void cedar::aux::ImageDatabase::scanDirectory(const cedar::aux::Path& path)
     cedar::aux::split(file_no_dir, ".", parts);
 
     CEDAR_DEBUG_ASSERT(!parts.empty());
-    std::string extension = "." + parts.back();
-    if (parts.size() > 0 && (extension == ".png" ||(extension == ".flv") || (extension == ".avi") ||
-                                              (extension == ".mp4")))
+    std::string extension = parts.back();
+
+    if (parts.size() > 0 && (isKnownImageExtension(extension) || isKnownVideoExtension(extension)))
     {
       if (parts.size() == 3)
       {

@@ -47,6 +47,9 @@
 #include "cedar/processing/gui/Group.fwd.h"
 #include "cedar/processing/gui/Scene.fwd.h"
 #include "cedar/processing/gui/View.fwd.h"
+#include "cedar/processing/gui/RecorderWidget.fwd.h"
+#include "cedar/processing/Group.fwd.h"
+#include "cedar/auxiliaries/gui/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -70,12 +73,23 @@ public:
   //!@brief The standard constructor.
   GroupWidget(QWidget* pParent = nullptr);
 
+  //!@brief The constructor for pre-existing groups.
+  GroupWidget(cedar::proc::gui::Group* pGroup, QWidget* pParent = nullptr);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! get the group
   cedar::proc::gui::GroupPtr getGroup() const;
+
+  /*!@brief Sets the widget used for displaying/editing the parameters of configurables in the group.
+   */
+  void setConfigurableWidget(cedar::aux::gui::Configurable* pConfigurableWidget);
+
+  /*!@brief Sets the widget used for displaying/editing the record parameters in the group.
+   */
+  void setRecorderWidget(cedar::proc::gui::RecorderWidget* pRecorderWidget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

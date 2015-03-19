@@ -47,6 +47,7 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/MapParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/boostSignalsHelper.h"
 #include "cedar/units/Time.h"
@@ -249,11 +250,11 @@ public:
    *
    * @remark Before calling this function, you should remove all connections to the element.
    */
-  void remove(cedar::proc::ConstElementPtr element);
+  void remove(cedar::proc::ConstElementPtr element, bool destructing = false);
 
   /*!@brief calls remove() for every element of the group
    */
-  void removeAll();
+  void removeAll(bool destructing = false);
 
   /*!@brief Creates a new element with the type given by className and the name instanceName.
    *
@@ -712,6 +713,15 @@ public:
   //! Checks if a script with the given name exists in this group.
   bool checkScriptNameExists(const std::string& name) const;
 
+  //! Sets the time factor to be used for simulating this group. Only applied by the root group.
+  void setTimeFactor(double factor);
+
+  //! Returns the time factor set for this architecture.
+  double getTimeFactor() const;
+
+  //! Applies the group's time factor, i.e., sets it at the cedar::aux::SettingsSingleton.
+  void applyTimeFactor();
+
   //!@brief connects two slots across groups, allocating connectors if necessary
   static void connectAcrossGroups(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
 
@@ -786,6 +796,13 @@ private:
 
   //! Finds an identifier for which the @em checker function returns false.
   static std::string findNewIdentifier(const std::string& basis, boost::function<bool(const std::string&)> checker);
+
+  //! if the parent group changes (i.e., this group looses its 'rootness'), the default trigger is removed if it exists
+  void onParentGroupChanged();
+
+  void disconnectTriggerInternal(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+
+  void outputConnectionRemoved(cedar::proc::DataSlotPtr slot);
 
 private slots:
   //!@brief Takes care of updating the group's name in the parent's map.
@@ -893,6 +910,9 @@ private:
   //! Map of scripts present in this architecture
   cedar::aux::LockableMember<std::set<cedar::proc::CppScriptPtr>> mScripts;
 
+  //! a connection to the groupChanged signal of element
+  boost::signals2::scoped_connection mParentGroupChangedConnection;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -902,6 +922,8 @@ protected:
 
   //! loopiness of this group
   cedar::aux::BoolParameterPtr _mIsLooped;
+
+  cedar::aux::DoubleParameterPtr _mTimeFactor;
 
 }; // class cedar::proc::Group
 

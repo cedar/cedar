@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013, 2014 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013, 2014, 2015 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QWidget>
+#include <QLabel>
 #include <QFuture>
 #include <QPushButton>
 #ifndef Q_MOC_RUN
@@ -134,7 +135,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void timerEvent(QTimerEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -145,7 +146,9 @@ private:
 
   void updateSimulationRunningIcon(bool running);
 
-  QWidget* getColorWidget(QTreeWidgetItem* pItem);
+  QWidget* getColorWidget(QTreeWidgetItem* pItem, int column = 0);
+
+  QWidget* getQualityWidget(QTreeWidgetItem* pItem);
 
   cedar::proc::LoopedTriggerPtr getItemTrigger(QTreeWidgetItem* pItem);
 
@@ -153,7 +156,15 @@ private:
 
   void updateItemColorWidgetColor(QWidget* pColorWidget, cedar::proc::LoopedTriggerPtr loopedTrigger);
 
+  void updateItemQualityWidget(QWidget* pQualityWidget, cedar::proc::LoopedTriggerPtr trigger);
+
   void sortItems();
+
+  void updateTriggerQualities();
+
+  QLabel* addColorWidget(QTreeWidgetItem* pItem, int column);
+
+  void applyBrushToColorWidget(QWidget* pWidget, const QBrush& brush);
 
 private slots:
   void startPauseSimulationClicked();

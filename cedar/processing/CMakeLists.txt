@@ -73,11 +73,13 @@ cedar_add_library(cedarproc
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
   gui/Connectable.h
+  gui/CouplingCollection.h
   gui/DataSlotItem.h
   gui/ElementClassList.h
   gui/ElementTreeWidget.h
   gui/ExperimentDialog.h
   gui/FindDialog.h
+  gui/GroupContainerItem.h
   gui/GroupParameterDesigner.h
   gui/Ide.h
   gui/IdeApplication.h
@@ -96,6 +98,7 @@ cedar_add_library(cedarproc
   gui/Group.h
   gui/ToolBox.h
   gui/View.h
+  gui/WidgetContainerItem.h
   sources/BoxInput.h
   sources/GaussInput.h
   steps/Component.h

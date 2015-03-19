@@ -67,6 +67,8 @@ const QColor cedar::proc::gui::GraphicsBase::mColorSearchResult = QColor::fromRg
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
 
+const QSizeF cedar::proc::gui::GraphicsBase::M_MINIMUM_SIZE(static_cast<qreal>(50.0), static_cast<qreal>(20.0));
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,6 +101,7 @@ mHeight
         this, "height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max()
       )
 ),
+mMinimumSize(M_MINIMUM_SIZE),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
@@ -116,19 +119,33 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 {
   this->disconnect();
 
-  if (!this->mpResizeHandles.empty())
+  while (!this->mConnections.empty())
   {
-    for (size_t i = 0; i < this->mpResizeHandles.size(); ++i)
-    {
-      delete this->mpResizeHandles.at(i);
-    }
-    this->mpResizeHandles.clear();
+    // on destruction, connections remove themselves from their graphics base, thus, the connection will automatically
+    // be removed from this->mConnections
+    delete *this->mConnections.begin();
   }
+
+  for (auto resize_handle : this->mpResizeHandles)
+  {
+    delete resize_handle;
+  }
+  this->mpResizeHandles.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::GraphicsBase::canBeDragged() const
+{
+  return false;
+}
+
+bool cedar::proc::gui::GraphicsBase::manualDeletionRequiresConfirmation() const
+{
+  return false;
+}
 
 void cedar::proc::gui::GraphicsBase::emitChangedEventToScene(bool alwaysEmit)
 {
@@ -203,6 +220,7 @@ void cedar::proc::gui::GraphicsBase::updateShape()
       mPath.lineTo(this->width(), this->height());
       break;
 
+    case BASE_SHAPE_ROUNDED_RECT:
     case BASE_SHAPE_RECT:
     case BASE_SHAPE_ROUND:
       // no custom path is used
@@ -678,8 +696,12 @@ void cedar::proc::gui::GraphicsBase::drawShape(QPainter* painter)
   {
     switch (this->mShape)
     {
-      case BASE_SHAPE_RECT:
+      case BASE_SHAPE_ROUNDED_RECT:
         painter->drawRoundedRect(bounds, roundedness, roundedness);
+        break;
+
+      case BASE_SHAPE_RECT:
+        painter->drawRect(bounds);
         break;
 
       case BASE_SHAPE_ROUND:
@@ -862,9 +884,20 @@ void cedar::proc::gui::GraphicsBase::disconnect(cedar::proc::gui::GraphicsBase*)
 
 void cedar::proc::gui::GraphicsBase::disconnect()
 {
+  // empty default implementation
 }
 
 unsigned int cedar::proc::gui::GraphicsBase::getNumberOfConnections()
 {
   return this->mConnections.size();
+}
+
+void cedar::proc::gui::GraphicsBase::setMinimumSize(QSizeF size)
+{
+  this->mMinimumSize = size;
+}
+
+const QSizeF cedar::proc::gui::GraphicsBase::getMinimumSize() const
+{
+  return this->mMinimumSize;
 }

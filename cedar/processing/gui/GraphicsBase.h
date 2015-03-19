@@ -107,6 +107,7 @@ public:
   enum BaseShape
   {
     BASE_SHAPE_RECT,
+    BASE_SHAPE_ROUNDED_RECT,
     BASE_SHAPE_ROUND,
     BASE_SHAPE_DIAMOND,
     BASE_SHAPE_CROSS
@@ -121,7 +122,7 @@ public:
   GraphicsBase(qreal width, qreal height,
                GraphicsGroup group = GRAPHICS_GROUP_UNKNOWN,
                GraphicsGroup canConnectTo = GRAPHICS_GROUP_NONE,
-               BaseShape shape = BASE_SHAPE_RECT);
+               BaseShape shape = BASE_SHAPE_ROUNDED_RECT);
 
   //!@brief Destructor
   virtual ~GraphicsBase();
@@ -237,24 +238,6 @@ public:
    */
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
-  /*!@brief   Returns the element associated with this graphics item.
-   *
-   * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
-   */
-  inline cedar::proc::ElementPtr getElement()
-  {
-    return this->mElement;
-  }
-
-  /*!@brief   Returns the element associated with this graphics item.
-   *
-   * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
-   */
-  inline cedar::proc::ConstElementPtr getElement() const
-  {
-    return this->mElement;
-  }
-
   //! Can be implemented to react to changes of the items size.
   virtual void sizeChanged();
 
@@ -277,8 +260,22 @@ public:
     return this->mReadOnly;
   }
 
+  //! If the function returns true, this item will request manual confirmation from the user in case it is being deleted.
+  virtual bool manualDeletionRequiresConfirmation() const;
+
+  //! Returns the vector of in- and outgoing (gui) connections for this (gui) element.
+  std::vector<Connection*>& getConnections()
+  {
+    return this->mConnections;
+  }
+
   //! Specifies whether the item can be duplicated.
   virtual bool canDuplicate() const = 0;
+
+  //! If this returns false, the item should not be dragged around.
+  virtual bool canBeDragged() const;
+
+  const QSizeF getMinimumSize() const;
 
   /*! Returns the color used to fill the foreground when the given brush is not solid.
    */
@@ -317,23 +314,10 @@ protected:
    */
   void setBaseShape(BaseShape shape);
 
-  /*!@brief Sets the element associated with this graphics item.
-   */
-  inline void setElement(cedar::proc::ElementPtr element)
-  {
-    this->mElement = element;
-  }
-
   //! Sets the snap-to-grid property of the element.
   inline void setSnapToGrid(bool snap)
   {
     this->mSnapToGrid = snap;
-  }
-
-  //! Returns the vector of in- and outgoing (gui) connections for this (gui) element.
-  std::vector<Connection*>& getConnections()
-  {
-    return this->mConnections;
   }
 
   //! Sets an override fill style. If an override fill style is set, it will be used instead of the normal fill style.
@@ -365,6 +349,8 @@ protected:
 
   //! Updates the display of the resize handles.
   void updateResizeHandles();
+
+  void setMinimumSize(QSizeF size);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -444,9 +430,6 @@ private:
   //!@brief The path used for drawing this shape.
   QPainterPath mPath;
 
-  //!@brief The element associated with this graphics item
-  cedar::proc::ElementPtr mElement;
-
   //!@brief Whether the item snaps to the grid.
   bool mSnapToGrid;
 
@@ -472,6 +455,8 @@ private:
   //!@brief height of the GraphicsBase
   cedar::aux::DoubleParameterPtr mHeight;
 
+  QSizeF mMinimumSize;
+
   //!@brief group of this instance
   GraphicsGroup mGroup;
   //!@brief all groups this instance can connect to
@@ -479,6 +464,8 @@ private:
 
   //!@brief vector of connections
   std::vector<Connection*> mConnections;
+
+  static const QSizeF M_MINIMUM_SIZE;
 
 }; // class cedar::proc::gui::GraphicsBase
 

@@ -44,6 +44,8 @@
 // CEDAR INCLUDES
 
 // FORWARD DECLARATIONS
+#include "cedar/processing/gui/DataSlotItem.fwd.h"
+#include "cedar/processing/gui/Element.fwd.h"
 #include "cedar/processing/gui/Scene.fwd.h"
 #include "cedar/processing/gui/StepItem.fwd.h"
 #include "cedar/processing/gui/View.fwd.h"
@@ -65,6 +67,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <tuple>
 
 
 /*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Groups.
@@ -104,6 +107,7 @@ public:
     MODE_SMART
   };
 
+  //!@todo Can StepMap, TriggerMap, GroupMap be removed now that the ElementMap has a proc::gui::Element pointer?
   //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
   typedef std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
 
@@ -114,7 +118,7 @@ public:
   typedef std::map<const cedar::proc::Group*, cedar::proc::gui::Group*> GroupMap;
 
   //! Type for associating cedar::proc::Elements to cedar::proc::gui::GraphicsBase.
-  typedef std::map<const cedar::proc::Element*, cedar::proc::gui::GraphicsBase*> ElementMap;
+  typedef std::map<const cedar::proc::Element*, cedar::proc::gui::Element*> ElementMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -135,24 +139,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Handles the drop event of the scene.
-   *
-   *        This method mainly instantiates elements that are dropped from the Element toolbar to create new items in
-   *        the scene.
-   */
-  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
-
-  /*!@brief Handles the dragLeave event of the scene.
-   */
-  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
-
-  /*!@brief Handles the dragMove event of the scene.
-   *
-   *        This method determines whether the contents of the drop can be handled by
-   *        cedar::proc::gui::Scene::dropEvent.
-   */
-  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
-
   /*!@brief Handler for mouse press events that happen within the bounds of the scene.
    */
   void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent);
@@ -168,6 +154,16 @@ public:
   /*!@brief Creates an element of the given classId at the specified position and adds it to the scene.
    */
   cedar::proc::ElementPtr createElement(cedar::proc::GroupPtr group, const std::string& classId, QPointF position);
+
+  /*!@brief Creates an element of the given classId with the given name at the specified position and adds it to the scene.
+   */
+  cedar::proc::ElementPtr createElement
+  (
+    cedar::proc::GroupPtr group,
+    const std::string& classId,
+    const std::string& desiredName,
+    QPointF position
+  );
 
   /*!@brief Adds a cedar::proc::gui::StepItem for the given cedar::proc::Step to the scene at the given position.
    */
@@ -242,7 +238,10 @@ public:
 
   /*!@brief Returns the cedar::proc::gui::GraphicsBase item corresponding to the given element.
    */
-  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::ConstElement* element);
+  cedar::proc::gui::Element* getGraphicsItemFor(cedar::proc::ConstElement* element);
+
+  //! Returns the graphics item corresponding to the given element.
+  cedar::proc::gui::Element* getGraphicsItemFor(cedar::proc::ConstElementPtr element);
 
   /*!@brief Returns, whether snap-to-grid is true.
    */
@@ -316,6 +315,20 @@ public:
   //! emits a scene changed signal
   void emitSceneChanged();
 
+  //! Returns the configurable widget of the scene.
+  cedar::aux::gui::Configurable* getConfigurableWidget() const;
+
+  //! Returns the configurable widget of the scene.
+  cedar::proc::gui::RecorderWidget* getRecorderWidget() const;
+
+  /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
+   */
+  static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
+
+  /*! Returns a list of selected items where those items whose parents are in the selection are removed.
+   */
+  QList<QGraphicsItem*> getSelectedParents() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -338,6 +351,8 @@ protected:
   /*! Overrides the default help event to display tooltips for elements in the scene.
    */
   void helpEvent(QGraphicsSceneHelpEvent* pHelpEvent);
+
+  void keyPressEvent(QKeyEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -378,13 +393,33 @@ private:
 
   void resetBackgroundColor();
 
-  cedar::aux::PluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const;
-
   cedar::proc::gui::GraphicsBase* findConnectableItem(const QList<QGraphicsItem*>& items);
 
   cedar::proc::gui::Group* findFirstGroupItem(const QList<QGraphicsItem*>& items);
 
   void multiItemContextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
+
+  void connectSlots(cedar::proc::gui::DataSlotItem* pSource, cedar::proc::gui::DataSlotItem* pTarget, bool addConnectorGroup);
+
+  /*!@brief Deletes the list of graphics items.
+   */
+  void deleteElements(QList<QGraphicsItem*>& items, bool skipConfirmation = false);
+
+  /*!@brief Delete a single graphics item.
+   */
+  void deleteElement(QGraphicsItem* pItem);
+
+  /*!@brief Deletes the elements currently selected in the scene.
+   */
+  void deleteSelectedElements(bool skipConfirmation = false);
+
+  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
 
 private slots:
   void promoteElementToExistingGroup();

@@ -70,6 +70,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Recorder.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/prefixes.h"
@@ -164,10 +165,12 @@ cedar::proc::Group::Group()
 Triggerable(false),
 mHoldTriggerChainUpdates(false),
 _mConnectors(new ConnectorMapParameter(this, "connectors", ConnectorMap())),
-_mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false))
+_mIsLooped(new cedar::aux::BoolParameter(this, "is looped", false)),
+_mTimeFactor(new cedar::aux::DoubleParameter(this, "time factor", 1.0, cedar::aux::DoubleParameter::LimitType::positiveZero()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mConnectors->setHidden(true);
+  mParentGroupChangedConnection = this->connectToGroupChanged(boost::bind<void>(&cedar::proc::Group::onParentGroupChanged, this));
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
@@ -178,8 +181,8 @@ cedar::proc::Group::~Group()
   // stop all triggers.
   this->stopTriggers();
 
-  // read out all elements and call this->remove for each element
-  this->removeAll();
+  // remove all elements and notify about destructing state
+  this->removeAll(true);
 
   this->mParameterLinks.clear();
   mDataConnections.clear();
@@ -190,6 +193,31 @@ cedar::proc::Group::~Group()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Group::applyTimeFactor()
+{
+  QReadLocker locker(this->_mTimeFactor->getLock());
+  double value = this->_mTimeFactor->getValue();
+  locker.unlock();
+
+  cedar::aux::SettingsSingleton::getInstance()->setGlobalTimeFactor(value);
+}
+
+void cedar::proc::Group::setTimeFactor(double factor)
+{
+  this->_mTimeFactor->setValue(factor, true);
+
+  this->applyTimeFactor();
+}
+
+double cedar::proc::Group::getTimeFactor() const
+{
+  QReadLocker locker(this->_mTimeFactor->getLock());
+  double value = this->_mTimeFactor->getValue();
+  locker.unlock();
+
+  return value;
+}
 
 std::set<std::string> cedar::proc::Group::listRequiredPlugins() const
 {
@@ -895,7 +923,7 @@ const cedar::proc::Group::ElementMap& cedar::proc::Group::getElements() const
   return this->mElements;
 }
 
-void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
+void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element, bool destructing)
 {
   // first, delete all data connections to and from this Element
   std::vector<cedar::proc::DataConnectionPtr> delete_later;
@@ -912,6 +940,8 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
   }
   this->disconnectSlots(delete_later);
 
+  // remember all triggerables that have to be connected to the default trigger afterwards
+  std::vector<cedar::proc::ConstTriggerablePtr> triggerables_for_default_trigger;
   // then, delete all trigger connections to and from this Element
   for (
         cedar::proc::Group::TriggerConnectionVector::iterator trigger_con = mTriggerConnections.begin();
@@ -919,8 +949,10 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
         // empty
       )
   {
-    if ((*trigger_con)->getSourceTrigger() == boost::dynamic_pointer_cast<const cedar::proc::Trigger>(element)
-        || (*trigger_con)->getTarget() == boost::dynamic_pointer_cast<const cedar::proc::Triggerable>(element))
+    auto source_trigger = (*trigger_con)->getSourceTrigger();
+    auto target_triggerable = (*trigger_con)->getTarget();
+    if ( source_trigger == boost::dynamic_pointer_cast<const cedar::proc::Trigger>(element)
+        || target_triggerable == boost::dynamic_pointer_cast<const cedar::proc::Triggerable>(element))
     {
       cedar::proc::TriggerPtr source_trigger;
       try
@@ -948,6 +980,12 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
         );
       }
       trigger_con = mTriggerConnections.erase(trigger_con);
+      // if the deleted element is a looped trigger, connect the triggerable to the default trigger
+      if (source_trigger == element && !destructing && this->isRoot() && element->getName() != "default trigger")
+      {
+        // remember the triggerable for a later re-connection to the default trigger
+        triggerables_for_default_trigger.push_back(target_triggerable);
+      }
     }
     else
     {
@@ -990,6 +1028,30 @@ void cedar::proc::Group::remove(cedar::proc::ConstElementPtr element)
   }
 
   this->signalElementRemoved(element);
+
+  // reconnect looped triggerables to the default trigger
+  if (triggerables_for_default_trigger.size() > 0 && !destructing)
+  {
+    // if there is no default trigger, create one
+    if (!this->nameExists("default trigger"))
+    {
+      this->create("cedar.processing.LoopedTrigger", "default trigger");
+    }
+
+    for (auto unconnected_triggerable : triggerables_for_default_trigger)
+    {
+      // cast to element to get name
+      auto element = boost::dynamic_pointer_cast<cedar::proc::ConstElement>(unconnected_triggerable);
+      if (element)
+      {
+        this->connectTrigger
+        (
+          this->getElement<cedar::proc::LoopedTrigger>("default trigger"),
+          this->getElement<cedar::proc::Triggerable>(element->getName())
+        );
+      }
+    }
+  }
 }
 
 void cedar::proc::Group::create(std::string className, std::string instanceName)
@@ -1188,21 +1250,6 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
       }
     }
   }
-  // remember all trigger connections between moved elements
-  for (auto element : elements)
-  {
-    if (cedar::proc::TriggerPtr source_trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
-    {
-      for (auto target : elements)
-      {
-        cedar::proc::TriggerablePtr target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target);
-        if (target_triggerable && source_trigger->isListener(target_triggerable))
-        {
-          trigger_connections.push_back(TriggerConnectionInfo(source_trigger, target_triggerable));
-        }
-      }
-    }
-  }
 
   // delete data connections
   for (auto connection : data_connections)
@@ -1220,11 +1267,6 @@ void cedar::proc::Group::add(std::list<cedar::proc::ElementPtr> elements)
   for (auto connection : data_connections)
   {
     cedar::proc::Group::connectAcrossGroups(connection.from, connection.to);
-  }
-  // restore trigger connections
-  for (auto connection : trigger_connections)
-  {
-    this->connectTrigger(connection.from, connection.to);
   }
 }
 
@@ -1333,6 +1375,11 @@ void cedar::proc::Group::triggerStopped()
 
   if (!any_running)
   {
+    if (this->isRoot())
+    {
+      cedar::aux::GlobalClockSingleton::getInstance()->stop();
+    }
+
     emit allTriggersStopped();
   }
 }
@@ -1598,6 +1645,17 @@ cedar::proc::ElementPtr cedar::proc::Group::getElement(const cedar::proc::GroupP
   return boost::const_pointer_cast<Element>(static_cast<const Group*>(this)->getElement(name));
 }
 
+void cedar::proc::Group::outputConnectionRemoved(cedar::proc::DataSlotPtr slot)
+{
+  // when a data connection from a connector is removed, we must update the triggering order of the group sink
+  // corresponding to the connector
+  const auto& name = slot->getName();
+  auto connector = boost::dynamic_pointer_cast<cedar::proc::sinks::GroupSink>(this->getElement(name));
+  CEDAR_DEBUG_ASSERT(connector);
+  std::set<cedar::proc::Trigger*> visited;
+  connector->updateTriggeringOrder(visited, true, false);
+}
+
 void cedar::proc::Group::connectSlots(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target)
 {
   //!@todo See entry below
@@ -1691,9 +1749,15 @@ void cedar::proc::Group::connectTrigger(cedar::proc::TriggerPtr source, cedar::p
 {
   // if the item is looped, it can only be triggered by a single trigger
   // thus, check if there is already a connection, and remove it
-  if (target->isLooped() && target->getParentTrigger())
+  //!@todo why do we need to check for loopiness of the trigger?
+  if
+  (
+    target->isLooped()
+    && target->getLoopedTrigger()
+    && boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(source)
+  )
   {
-    this->disconnectTrigger(target->getParentTrigger(), target);
+    this->disconnectTriggerInternal(target->getLoopedTrigger(), target);
   }
 
   // check connection
@@ -1812,6 +1876,20 @@ void cedar::proc::Group::disconnectSlots
 
 void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
 {
+  CEDAR_DEBUG_ASSERT(source && target);
+  this->disconnectTriggerInternal(source, target);
+  if (this->nameExists("default trigger"))
+  {
+    auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default trigger");
+    if (default_trigger->canTrigger(target))
+    {
+      this->connectTrigger(default_trigger, target);
+    }
+  }
+}
+
+void cedar::proc::Group::disconnectTriggerInternal(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
+{
   // iterate all connections to find the one that matches the given combination of source and target
   for (auto it = mTriggerConnections.begin(); it != mTriggerConnections.end(); ++it)
   {
@@ -1819,18 +1897,6 @@ void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar
     {
       this->mTriggerConnections.erase(it);
       this->signalTriggerConnectionChanged(source, target, false);
-      if (this->isRoot() && source->getName() != "default trigger") // connect to default trigger instead
-      {
-        // connect to default trigger, if it exists
-        if (this->nameExists("default trigger"))
-        {
-          auto default_trigger = this->getElement<cedar::proc::LoopedTrigger>("default trigger");
-          if (default_trigger->canTrigger(target))
-          {
-            this->connectTrigger(default_trigger, target);
-          }
-        }
-      }
       return;
     }
   }
@@ -1838,7 +1904,7 @@ void cedar::proc::Group::disconnectTrigger(cedar::proc::TriggerPtr source, cedar
   CEDAR_THROW
   (
     cedar::proc::MissingConnectionException,
-    "Group \"" + this->getName() + "\": This trigger connection does not exist!"
+    "Group \"" + this->getName() + "\": Trigger connection between \"" + source->getName() + "\" and \"" + boost::dynamic_pointer_cast<cedar::proc::Element>(target)->getName() + "\" does not exist!"
   );
 }
 
@@ -2618,17 +2684,11 @@ bool cedar::proc::Group::disconnectAcrossGroups(cedar::proc::OwnedDataPtr source
   return false;
 }
 
-void cedar::proc::Group::removeAll()
+void cedar::proc::Group::removeAll(bool destructing)
 {
-  // read out all elements and call this->remove for each element
-  std::vector<cedar::proc::ElementPtr> elements;
-  for (auto it : mElements)
+  while (!mElements.empty())
   {
-    elements.push_back(it.second);
-  }
-  for (unsigned int i = 0; i < elements.size(); ++i)
-  {
-    this->remove(elements.at(i));
+    this->remove(mElements.begin()->second, destructing);
   }
 }
 
@@ -2922,10 +2982,11 @@ void cedar::proc::Group::onLoopedChanged()
       if (it != this->mElements.end())
       {
         // get the bool parameter
-        auto is_looped = it->second->getParameter<cedar::aux::BoolParameter>("is looped");
         auto triggerable = this->getElement<cedar::proc::Triggerable>(element->getName());
+//        auto is_looped = it->second->getParameter<cedar::aux::BoolParameter>("is looped");
+        auto is_looped = triggerable->isLooped();
         // check whether we have to add or remove the element from the list of triggerables
-        if (is_looped->getValue()) // add
+        if (is_looped) // add
         {
           if (triggerable)
           {
@@ -2934,7 +2995,7 @@ void cedar::proc::Group::onLoopedChanged()
             {
               triggerable->callOnStart();
             }
-            // check if this is the root group
+            // check if this is the root group, we have to connect this element to the looped trigger
             if (this->isRoot())
             {
               // if there is no default trigger, create one
@@ -2961,15 +3022,33 @@ void cedar::proc::Group::onLoopedChanged()
           if (this->isRoot())
           {
             // check if this group was connected to a trigger
-            if (auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger()))
+            for (auto trigger_connection : mTriggerConnections)
             {
-              // make sure that this trigger is in the root group
-              CEDAR_ASSERT(this->getElement<cedar::proc::LoopedTrigger>(parent_trigger->getName()));
-              this->disconnectTrigger(parent_trigger, triggerable);
+              if (trigger_connection->getTarget() == triggerable)
+              {
+                // get a non-const version of the trigger and disconnect
+                auto trigger
+                  = this->getElement<cedar::proc::Trigger>(trigger_connection->getSourceTrigger()->getName());
+                this->disconnectTrigger(trigger, triggerable);
+                break;
+              }
             }
           }
         }
       }
+    }
+  }
+}
+
+void cedar::proc::Group::onParentGroupChanged()
+{
+  // check if this is not the root group
+  if (!this->isRoot())
+  {
+    // if there is no default trigger, create one
+    if (this->nameExists("default trigger"))
+    {
+      this->remove(this->getElement("default trigger"));
     }
   }
 }

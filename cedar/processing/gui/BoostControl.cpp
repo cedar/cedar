@@ -41,6 +41,7 @@
 #include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Element.h"
 #include "cedar/processing/sources/Boost.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/GroupPath.h"

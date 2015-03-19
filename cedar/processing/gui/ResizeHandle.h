@@ -123,8 +123,6 @@ private:
 
   Direction mDirection;
 
-  static const QSizeF M_MINIMUM_SIZE;
-
   static const qreal M_HANDLE_SIZE;
 }; // class cedar::proc::gui::ResizeHandle
 

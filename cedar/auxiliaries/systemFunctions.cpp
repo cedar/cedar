@@ -39,13 +39,18 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/version.h"
 
 // SYSTEM INCLUDES
 #ifndef Q_MOC_RUN
   #include <boost/date_time.hpp>
   #include <boost/filesystem.hpp>
+  #include <boost/version.hpp>
 #endif
 #include <cstdlib>
+#include <qglobal.h>
+#include <opencv2/core/version.hpp>
 
 #if defined CEDAR_COMPILER_GCC
 #include <stdlib.h>
@@ -69,6 +74,132 @@
 // ---------------------------------------------------------------------------------------------------------------------
 //  general methods
 // ---------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::getCedarConfigurationInfo(const std::string& separator, const std::string& lineEnd)
+{
+  std::stringstream str;
+  str << "This is cedar version " << cedar::aux::versionNumberToString(CEDAR_VERSION);
+  str << " (";
+#ifdef DEBUG
+  str << "debug";
+#else
+  str << "release";
+#endif // DEBUG
+  str << " build)";
+  str << " built on " <<
+    CEDAR_BUILT_ON_MACHINE
+    << lineEnd;
+  str << separator;
+
+  auto print_library = [&] (const std::string& name, bool present, const std::string& version = "")
+  {
+    str << name << ": ";
+    if (present)
+    {
+      str << "yes";
+      if (!version.empty())
+      {
+        str << " (" << version << ")";
+      }
+    }
+    else
+    {
+      str << "no";
+    }
+    str << lineEnd;
+  };
+
+  str << "Mandatory third-party libraries:" << lineEnd;
+
+  print_library
+  (
+    "boost",
+    true
+#ifdef BOOST_LIB_VERSION
+    , BOOST_LIB_VERSION
+#endif // BOOST_LIB_VERSION
+  );
+
+  print_library
+  (
+    "Qt",
+    true
+#ifdef QT_VERSION_STR
+    , QT_VERSION_STR
+#endif // BOOST_LIB_VERSION
+  );
+
+  print_library
+  (
+    "OpenCV",
+    true
+#ifdef CV_VERSION
+    , CV_VERSION
+#endif // BOOST_LIB_VERSION
+  );
+
+  str << separator;
+
+  str << "Optional third-party libraries:" << lineEnd;
+
+  print_library
+  (
+    "FFTW",
+#ifdef CEDAR_USE_FFTW
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+#ifdef CEDAR_USE_FFTW_THREADED
+    , "threaded"
+#endif // CEDAR_USE_FFTW_THREADED
+  );
+
+  print_library
+  (
+    "LibDC1394",
+#ifdef CEDAR_USE_LIB_DC1394
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+  );
+
+  print_library
+  (
+    "Yarp",
+#ifdef CEDAR_USE_YARP
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+#ifdef YARP_VERSION_STRING
+    , YARP_VERSION_STRING
+#endif // YARP_VERSION_STRING
+  );
+
+  print_library
+  (
+    "Amtec",
+#ifdef CEDAR_USE_AMTEC
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+  );
+
+  print_library
+  (
+    "Kuka FRI",
+#ifdef CEDAR_USE_KUKA_LWR
+    true
+#else
+    false
+#endif // CEDAR_USE_FFTW
+  );
+
+  return str.str();
+}
 
 void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 {

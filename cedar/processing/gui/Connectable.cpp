@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connectable.h"
+#include "cedar/processing/gui/CouplingCollection.h"
 #include "cedar/processing/gui/Group.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/PlotWidget.h"
@@ -47,12 +48,16 @@
 #include "cedar/processing/gui/DefaultConnectableIconView.h"
 #include "cedar/processing/sources/GroupSource.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/DataConnection.h"
+#include "cedar/processing/ExternalData.h"
+#include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 
@@ -63,7 +68,11 @@
 #include <set>
 #include <QMenu>
 #include <QPainter>
+#include <QFileDialog>
 #include <QGraphicsSceneContextMenuEvent>
+
+//! declares a metatype for slot pointers; used by the serialization menu
+Q_DECLARE_METATYPE(boost::shared_ptr<cedar::proc::DataSlot>);
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -73,9 +82,14 @@ cedar::aux::EnumType<cedar::proc::gui::Connectable::DisplayMode> cedar::proc::gu
 const qreal cedar::proc::gui::Connectable::M_BASE_DATA_SLOT_SIZE = static_cast<qreal>(12.0);
 const qreal cedar::proc::gui::Connectable::M_DATA_SLOT_PADDING = static_cast<qreal>(3.0);
 
+const int cedar::proc::gui::Connectable::M_ICON_SIZE = 40;
+const qreal cedar::proc::gui::Connectable::M_DEFAULT_WIDTH = static_cast<qreal>(160);
+const qreal cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT = static_cast<qreal>(50);
+
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT;
 const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY;
+const cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS;
 #endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -90,7 +104,7 @@ cedar::proc::gui::Connectable::Connectable
   QMainWindow* pMainWindow
 )
 :
-cedar::proc::gui::GraphicsBase
+cedar::proc::gui::Element
 (
   width,
   height,
@@ -98,8 +112,8 @@ cedar::proc::gui::GraphicsBase
   cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE
 ),
 mpIconView(nullptr),
-mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mpMainWindow(pMainWindow),
+mDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT),
 mInputOutputSlotOffset(static_cast<qreal>(0.0)),
 mPreviousFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
 mShowingTriggerColor(false)
@@ -225,9 +239,278 @@ void cedar::proc::gui::Connectable::Decoration::resetBackgroundColor()
   this->setBackgroundColor(this->mDefaultBackground);
 }
 
+bool cedar::proc::gui::Connectable::canBeDragged() const
+{
+  if (this->isReadOnly())
+  {
+    return false;
+  }
+
+  return true;
+}
+
+void cedar::proc::gui::Connectable::displayModeChanged()
+{
+  // empty default implementation
+}
+
+void cedar::proc::gui::Connectable::resetDisplayMode(bool resize)
+{
+  switch (cedar::proc::gui::SettingsSingleton::getInstance()->getDefaultDisplayMode())
+  {
+    case cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY:
+      this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY, resize);
+      break;
+
+    case cedar::proc::gui::Settings::StepDisplayMode::ICON_AND_TEXT:
+      this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT, resize);
+      break;
+
+    case cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED:
+    {
+      auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(this->getConnectable());
+      if (triggerable && triggerable->isLooped())
+      {
+        this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT, resize);
+      }
+      else
+      {
+        this->setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY, resize);
+      }
+      break;
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::Id mode, bool resize)
+{
+  this->mDisplayMode = mode;
+
+  this->applyDisplayMode(resize);
+}
+
+void cedar::proc::gui::Connectable::applyDisplayMode(bool resize)
+{
+  this->setVisible(true);
+  this->setConnectionsVisible(true);
+
+  switch (this->getDisplayMode())
+  {
+    case cedar::proc::gui::Connectable::DisplayMode::ICON_ONLY:
+      if (resize)
+      {
+        this->setWidth(cedar::proc::gui::Connectable::M_ICON_SIZE);
+        this->setHeight(cedar::proc::gui::Connectable::M_ICON_SIZE);
+      }
+      break;
+
+    case cedar::proc::gui::Connectable::DisplayMode::ICON_AND_TEXT:
+      if (resize)
+      {
+        this->setWidth(cedar::proc::gui::Connectable::M_DEFAULT_WIDTH);
+        this->setHeight(cedar::proc::gui::Connectable::M_DEFAULT_HEIGHT);
+      }
+      break;
+
+    case cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS:
+      if (this->canHideInConnections())
+      {
+        this->hideInConnections();
+      }
+      break;
+  }
+
+  this->displayModeChanged();
+  this->updateAttachedItems();
+  this->updateConnections();
+  this->update();
+}
+
+
+cedar::proc::gui::Connectable::DisplayMode::Id cedar::proc::gui::Connectable::getDisplayMode() const
+{
+  return this->mDisplayMode;
+}
+
+bool cedar::proc::gui::Connectable::supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const
+{
+  switch (id)
+  {
+    case cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS:
+      return this->canHideInConnections();
+  }
+  return true;
+}
+
+unsigned int cedar::proc::gui::Connectable::getNumberOfConnections(cedar::proc::DataRole::Id role) const
+{
+  auto connectable = this->getConnectable();
+  if (!connectable->hasSlotForRole(role))
+  {
+    return 0;
+  }
+
+  unsigned int count = 0;
+  for (const auto& slot : connectable->getOrderedDataSlots(role))
+  {
+    count += slot->getDataConnections().size();
+  }
+  return count;
+}
+
+unsigned int cedar::proc::gui::Connectable::getNumberOfSlotsFor(cedar::proc::DataRole::Id role) const
+{
+  auto iter = this->mSlotMap.find(role);
+  if (iter == this->mSlotMap.end())
+  {
+    return 0;
+  }
+  else
+  {
+    return iter->second.size();
+  }
+}
+
+bool cedar::proc::gui::Connectable::canHideInConnections() const
+{
+  if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::ConstTriggerable>(this->getConnectable()))
+  {
+    if (triggerable->isLooped())
+    {
+      return false;
+    }
+  }
+
+  //!@todo There might be other cases where this should work, e.g., if there is more than one slot but all connections come from the same source
+  if (this->getNumberOfSlotsFor(cedar::proc::DataRole::INPUT) == 1
+      && this->getNumberOfSlotsFor(cedar::proc::DataRole::OUTPUT) == 1
+      && this->getNumberOfConnections(cedar::proc::DataRole::INPUT) == 1
+      && this->getNumberOfConnections(cedar::proc::DataRole::OUTPUT) == 1
+      )
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 bool cedar::proc::gui::Connectable::canDuplicate() const
 {
   return !this->isReadOnly();
+}
+
+void cedar::proc::gui::Connectable::setConnectionsVisible(bool visible, bool modifyCouplingCollections)
+{
+  std::vector<cedar::proc::DataRole::Id> roles;
+  roles.push_back(cedar::proc::DataRole::INPUT);
+  roles.push_back(cedar::proc::DataRole::OUTPUT);
+
+  for (auto role : roles)
+  {
+    for (const auto& name_slot_pair : this->mSlotMap[role])
+    {
+      for (auto connection : name_slot_pair.second->getConnections())
+      {
+        if (modifyCouplingCollections || !dynamic_cast<cedar::proc::gui::CouplingCollection*>(connection))
+        {
+          connection->setVisible(visible);
+        }
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::hideInConnections()
+{
+  this->setConnectionsVisible(false);
+
+  auto scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_ASSERT(scene != nullptr);
+
+  cedar::proc::gui::CouplingCollection* incoming_collection = nullptr;
+  bool has_single_collection = true;
+  // hide the normal connections of this item (note, that output connections are automatically hidden as they are
+  // children of this graphics item)
+  for (const auto& name_slot_pair : this->mSlotMap[cedar::proc::DataRole::INPUT])
+  {
+    for (auto connection : name_slot_pair.second->getConnections())
+    {
+      if (auto collection = dynamic_cast<cedar::proc::gui::CouplingCollection*>(connection))
+      {
+        if (incoming_collection == nullptr)
+        {
+          incoming_collection = collection;
+        }
+        else
+        {
+          has_single_collection = false;
+        }
+      }
+    }
+  }
+
+  // this should not happen: there should be only one incoming collection
+  CEDAR_ASSERT(has_single_collection);
+
+  // look for outgoing collections
+  has_single_collection = true;
+  cedar::proc::gui::CouplingCollection* outgoing_collection = nullptr;
+  for (const auto& name_slot_pair : this->mSlotMap[cedar::proc::DataRole::OUTPUT])
+  {
+    for (auto connection : name_slot_pair.second->getConnections())
+    {
+      if (auto collection = dynamic_cast<cedar::proc::gui::CouplingCollection*>(connection))
+      {
+        if (outgoing_collection == nullptr)
+        {
+          outgoing_collection = collection;
+        }
+        else
+        {
+          has_single_collection = false;
+        }
+      }
+    }
+  }
+
+  // this should not happen: there should be only one outgoing collection
+  CEDAR_ASSERT(has_single_collection);
+
+  if (incoming_collection || outgoing_collection)
+  {
+    if (incoming_collection && outgoing_collection)
+    {
+      // merge this and the outgoing collection into the incoming one
+      incoming_collection->append(this->getConnectable(), false);
+      incoming_collection->append(outgoing_collection);
+
+      // delete the outgoing collection
+      delete outgoing_collection;
+    }
+    else if (incoming_collection)
+    {
+      // use the incoming collection
+      incoming_collection->append(this->getConnectable());
+    }
+    else if (outgoing_collection)
+    {
+      // use the outgoing collection
+      outgoing_collection->prepend(this->getConnectable());
+    }
+  }
+  else
+  {
+    // create a new collection
+    auto collection = new cedar::proc::gui::CouplingCollection(scene);
+
+    // attach this step
+    collection->append(this->getConnectable());
+  }
+
+  // hide the item
+  this->setVisible(false);
 }
 
 void cedar::proc::gui::Connectable::Decoration::setDescription(const QString& text)
@@ -267,7 +550,7 @@ void cedar::proc::gui::Connectable::hoverLeaveEvent(QGraphicsSceneHoverEvent* pE
   pEvent->setAccepted(true);
 }
 
-void cedar::proc::gui::Connectable::translateParentTriggerChangedSignal()
+void cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal()
 {
   emit triggerableParentTriggerChanged();
 }
@@ -340,7 +623,7 @@ void cedar::proc::gui::Connectable::showTriggerChains()
     {
       auto link_element = boost::dynamic_pointer_cast<cedar::proc::Element>(link);
       CEDAR_DEBUG_ASSERT(link_element);
-      auto link_gui = scene->getGraphicsItemFor(link_element.get());
+      cedar::proc::gui::GraphicsBase* link_gui = scene->getGraphicsItemFor(link_element.get());
       if (!link_gui)
       {
         // can happen either for the processing done trigger of the start of the chain, or for group inputs
@@ -422,18 +705,20 @@ void cedar::proc::gui::Connectable::updateTriggerColorState()
   auto gui_group = scene->getRootGroup();
 
   bool show = gui_group->showsTriggerColors();
-  auto parent_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(triggerable->getParentTrigger());
   if (show)
   {
     auto last_color = this->getFillColor();
     auto last_style = this->getFillStyle();
 
     QBrush brush(Qt::white);
-    if (parent_trigger)
+    if (triggerable->isLooped())
     {
-      brush = gui_group->getColorFor(parent_trigger);
+      if (triggerable->getLoopedTrigger())
+      {
+        brush = gui_group->getColorFor(triggerable->getLoopedTrigger());
+      }
     }
-    else if (!triggerable->isLooped())
+    else
     {
       brush = QBrush(QColor::fromRgb(220, 220, 220));
     }
@@ -701,21 +986,22 @@ void cedar::proc::gui::Connectable::reactToSlotRemoved(cedar::proc::DataRole::Id
 
 void cedar::proc::gui::Connectable::addDataItems()
 {
-  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-      enum_it != cedar::proc::DataRole::type().list().end();
-      ++enum_it)
+  std::vector<cedar::proc::DataRole::Id> to_show;
+  to_show.push_back(cedar::proc::DataRole::INPUT);
+  to_show.push_back(cedar::proc::DataRole::OUTPUT);
+  
+  for (const auto& id : to_show)
   {
-    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
+    if (id == cedar::aux::Enum::UNDEFINED)
       continue;
 
     // populate step item list
-    if (this->getConnectable()->hasSlotForRole(*enum_it))
+    if (this->getConnectable()->hasSlotForRole(id))
     {
-      const cedar::proc::Connectable::SlotList& slotmap = this->getConnectable()->getOrderedDataSlots(*enum_it);
-      for (cedar::proc::Connectable::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      for (auto data_slot : this->getConnectable()->getOrderedDataSlots(id))
       {
         // use a non-const version of this slot
-        this->addDataItemFor(this->getConnectable()->getSlot(*enum_it, (*iter)->getName()));
+        this->addDataItemFor(data_slot);
       }
     }
   }
@@ -818,9 +1104,9 @@ void cedar::proc::gui::Connectable::setConnectable(cedar::proc::ConnectablePtr c
 
   if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(connectable))
   {
-    this->mParentTriggerChangedConnection = triggerable->connectToParentTriggerChangedSignal
+    this->mParentTriggerChangedConnection = triggerable->connectToLoopedTriggerChangedSignal
         (
-          boost::bind(&cedar::proc::gui::Connectable::translateParentTriggerChangedSignal, this)
+          boost::bind(&cedar::proc::gui::Connectable::translateLoopedTriggerChangedSignal, this)
         );
   }
 }
@@ -1062,7 +1348,7 @@ void cedar::proc::gui::Connectable::buildConnectTriggerMenu
   const cedar::proc::gui::Group* gui_group,
   const QObject* receiver,
   const char* slot,
-  boost::optional<cedar::proc::TriggerPtr> current
+  boost::optional<cedar::proc::LoopedTriggerPtr> current
 )
 {
   auto group = gui_group->getGroup();
@@ -1124,13 +1410,158 @@ void cedar::proc::gui::Connectable::fillConnectableMenu(QMenu& menu, QGraphicsSc
       gui_group,
       this,
       SLOT(assignTriggerClicked()),
-      triggerable->getParentTrigger()
+      triggerable->getLoopedTrigger()
     );
   }
   else
   {
     p_assign_trigger->setEnabled(false);
   }
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  QAction* p_properties = menu.addAction("open properties widget");
+  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
+  p_properties->setIcon(QIcon(":/menus/properties.svg"));
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  QMenu* p_serialization_menu = menu.addMenu("save/load data");
+  p_serialization_menu->setIcon(QIcon(":/menus/save.svg"));
+  this->fillDataSerialization(p_serialization_menu);
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+  this->fillDisplayStyleMenu(&menu);
+}
+
+void cedar::proc::gui::Connectable::fillDataSerialization(QMenu* pMenu)
+{
+  for (auto role_enum : cedar::proc::DataRole::type().list())
+  {
+    if (role_enum.id() == cedar::proc::DataRole::INPUT)
+    {
+      // inputs cannot be serialized
+      continue;
+    }
+
+    if (!this->getConnectable()->hasSlotForRole(role_enum))
+    {
+      continue;
+    }
+
+    bool serializable_slots_found = false;
+    this->addRoleSeparator(role_enum, pMenu);
+
+    for (auto slot : this->getConnectable()->getOrderedDataSlots(role_enum.id()))
+    {
+      if (slot->isSerializable())
+      {
+        serializable_slots_found = true;
+
+        auto sub_menu = pMenu->addMenu(QString::fromStdString(slot->getText()));
+
+        QAction* save_action = sub_menu->addAction("save ...");
+        save_action->setData(QVariant::fromValue(slot));
+        QObject::connect(save_action, SIGNAL(triggered()), this, SLOT(saveDataClicked()));
+
+        QAction* load_action = sub_menu->addAction("load ...");
+        load_action->setData(QVariant::fromValue(slot));
+        QObject::connect(load_action, SIGNAL(triggered()), this, SLOT(loadDataClicked()));
+      }
+    }
+
+    if (!serializable_slots_found)
+    {
+      auto action = pMenu->addAction("No serializable slots.");
+      action->setEnabled(false);
+    }
+  }
+}
+
+void cedar::proc::gui::Connectable::saveDataClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+
+  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
+  CEDAR_DEBUG_ASSERT(slot);
+
+  QString filename = QFileDialog::getSaveFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file for saving"
+                     );
+
+  if (!filename.isEmpty())
+  {
+    slot->writeDataToFile(cedar::aux::Path(filename.toStdString()));
+  }
+}
+
+void cedar::proc::gui::Connectable::loadDataClicked()
+{
+  auto action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(action);
+
+  cedar::proc::DataSlotPtr slot = action->data().value<cedar::proc::DataSlotPtr>();
+  CEDAR_DEBUG_ASSERT(slot);
+
+  QString filename = QFileDialog::getOpenFileName
+                     (
+                       this->mpMainWindow,
+                       "Select a file to load"
+                     );
+
+  if (!filename.isEmpty())
+  {
+    slot->readDataFromFile(cedar::aux::Path(filename.toStdString()));
+  }
+}
+
+void cedar::proc::gui::Connectable::fillDisplayStyleMenu(QMenu* pMenu)
+{
+  QMenu* p_sub_menu = pMenu->addMenu("display style");
+  p_sub_menu->setIcon(QIcon(":/menus/display_style.svg"));
+
+  p_sub_menu->setEnabled(!this->isReadOnly());
+
+  for (const cedar::aux::Enum& e : cedar::proc::gui::Connectable::DisplayMode::type().list())
+  {
+    //!@todo Reenable this mode and fully implement it
+    if (e.id() == cedar::proc::gui::Connectable::DisplayMode::HIDE_IN_CONNECTIONS)
+    {
+      // currently, this feature is disabled because it isn't ready yet
+      continue;
+    }
+    QAction* p_action = p_sub_menu->addAction(QString::fromStdString(e.prettyString()));
+    p_action->setData(QString::fromStdString(e.name()));
+
+    bool supported = this->supportsDisplayMode(e.id());
+    p_action->setCheckable(true);
+    if (e == this->getDisplayMode() && supported)
+    {
+      p_action->setChecked(true);
+    }
+    p_action->setEnabled(supported);
+  }
+
+  QObject::connect(p_sub_menu, SIGNAL(triggered(QAction*)), this, SLOT(displayStyleMenuTriggered(QAction*)));
+}
+
+void cedar::proc::gui::Connectable::displayStyleMenuTriggered(QAction* pAction)
+{
+  std::string enum_name = pAction->data().toString().toStdString();
+
+  cedar::proc::gui::Connectable::DisplayMode::Id mode;
+  mode = cedar::proc::gui::Connectable::DisplayMode::type().get(enum_name);
+  this->setDisplayMode(mode);
+}
+
+void cedar::proc::gui::Connectable::openProperties()
+{
+  auto configurable_widget = new cedar::aux::gui::Configurable();
+  configurable_widget->display(this->getConnectable(), this->isReadOnly());
+  auto p_widget = this->createDockWidget("Properties", configurable_widget);
+  p_widget->show();
 }
 
 cedar::proc::TriggerPtr cedar::proc::gui::Connectable::getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group)
@@ -1161,9 +1592,10 @@ void cedar::proc::gui::Connectable::assignTriggerClicked()
   {
     group->connectTrigger(trigger, triggerable);
   }
-  else if (triggerable->getParentTrigger())
+  // if no trigger was chosen, the user clicked the "disconnect" option, so: disconnect!
+  else if (triggerable->getLoopedTrigger())
   {
-    group->disconnectTrigger(triggerable->getParentTrigger(), triggerable);
+    group->disconnectTrigger(triggerable->getLoopedTrigger(), triggerable);
   }
 }
 
@@ -1453,10 +1885,19 @@ QWidget* cedar::proc::gui::Connectable::createDockWidget(const std::string& titl
     p_dock->setFloating(true);
     p_dock->setContentsMargins(0, 0, 0, 0);
     p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    QRect g = pWidget->geometry();
     p_dock->setWidget(pWidget);
 
     mChildWidgets.push_back(p_dock);
     QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
+
+    QRect p = this->mpMainWindow->geometry();
+    g.setLeft(p.x() + (p.width() - g.width())/2);
+    g.setTop(p.y() + (p.height() - g.height())/2);
+    // changing left/top does not keep the correct width/heigh, thus, restore them
+    g.setWidth(pWidget->geometry().width());
+    g.setHeight(pWidget->geometry().height());
+    p_dock->setGeometry(g);
 
     return p_dock;
   }

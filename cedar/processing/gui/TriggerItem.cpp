@@ -75,7 +75,7 @@
 
 cedar::proc::gui::TriggerItem::TriggerItem()
 :
-cedar::proc::gui::GraphicsBase(30, 30,
+cedar::proc::gui::Element(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
@@ -90,7 +90,7 @@ cedar::proc::gui::GraphicsBase(30, 30,
 
 cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 :
-cedar::proc::gui::GraphicsBase(30, 30,
+cedar::proc::gui::Element(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
@@ -175,15 +175,16 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
   {
     if (auto triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(p_connectable->getConnectable()))
     {
-      if (!triggerable->isLooped() || triggerable->getParentTrigger() || this->mTrigger->isListener(triggerable))
+      if (!this->mTrigger->canConnectTo(triggerable))
+      //if (!triggerable->isLooped() || triggerable->getLoopedTrigger() || this->mTrigger->isListener(triggerable))
       {
         return cedar::proc::gui::CONNECT_NO;
       }
       // ... source and target are not in the same group
-      else if (this->getTrigger()->getGroup() != p_connectable->getConnectable()->getGroup())
-      {
-        return cedar::proc::gui::CONNECT_NO;
-      }
+//      else if (this->getTrigger()->getGroup() != p_connectable->getConnectable()->getGroup())
+//      {
+//        return cedar::proc::gui::CONNECT_NO;
+//      }
     }
   }
 

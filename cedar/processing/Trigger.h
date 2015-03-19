@@ -138,6 +138,8 @@ public:
    */
   bool testIfCanBeConnectedTo(cedar::proc::TriggerablePtr target) const;
 
+  virtual bool canConnectTo(cedar::proc::ConstTriggerablePtr target) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

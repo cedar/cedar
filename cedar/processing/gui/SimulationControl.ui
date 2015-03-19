@@ -69,6 +69,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="mpDeleteButton">
+       <property name="toolTip">
+        <string>Deletes a selected looped trigger. Note that the default trigger can never be deleted.</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -101,6 +104,11 @@
      <column>
       <property name="text">
        <string>Control</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Quality</string>
       </property>
      </column>
      <column>

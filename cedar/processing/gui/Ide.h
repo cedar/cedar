@@ -117,10 +117,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Handles key presses in the main window.
-   */
-  void keyPressEvent(QKeyEvent* pEvent);
-
   /*!@brief Resets the current scene and displays the new network.
    */
   void resetTo(cedar::proc::gui::GroupPtr network);
@@ -308,19 +304,6 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  /*!@brief Deletes the list of graphics items.
-   */
-  void deleteElements(QList<QGraphicsItem*>& items);
-
-  /*!@brief Delete a single graphics item.
-   */
-  void deleteElement(QGraphicsItem* pItem);
-
-  /*!@brief Deletes the elements currently selected in the scene.
-   */
-  void deleteSelectedElements();
-
   /*!@brief Reacts to closing the window.
    */
   void closeEvent(QCloseEvent *pEvent);
@@ -356,10 +339,6 @@ private:
   //! Updates the start and stop triggers threads.
   void updateTriggerStartStopThreadCallers();
 
-  /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
-   */
-  static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
-
   //!@brief populates the Plot Groups Combobox with available Plot Groups
   void loadPlotGroupsIntoComboBox();
 
@@ -391,10 +370,14 @@ private:
 
   void setSimulationControlsEnabled(bool enabled);
 
+  void translateGlobalTimeFactorChangedSignal(double newValue);
+
 private slots:
   void globalTimeFactorSliderChanged(int newValue);
 
   void globalTimeFactorSpinboxChanged(double value);
+
+  void globalTimeFactorSettingChanged(double newValue);
 
   void architectureChanged();
 
@@ -409,6 +392,11 @@ private slots:
   void allTriggersStopped();
 
   void showOpenableDialog();
+
+  void recorderDataAddedOrRemoved();
+
+signals:
+  void signalGlobalTimeFactorSettingChanged(double newValue);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -465,6 +453,8 @@ private:
 
   //! Map from name to an openable dialog
   std::map<std::string, OpenableDialogPtr> mOpenableDialogs;
+
+  boost::signals2::scoped_connection mGlobalTimeFactorSettingChangedConnection;
 
 }; // class cedar::MainWindow
 

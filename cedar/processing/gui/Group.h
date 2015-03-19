@@ -49,6 +49,7 @@
 // FORWARD DECLARATIONS
 #include "cedar/processing/gui/DataSlotItem.fwd.h"
 #include "cedar/processing/gui/Group.fwd.h"
+#include "cedar/processing/gui/GroupWidget.fwd.h"
 #include "cedar/auxiliaries/Configurable.fwd.h"
 
 // SYSTEM INCLUDES
@@ -71,6 +72,12 @@
 class cedar::proc::gui::Group : public cedar::proc::gui::Connectable
 {
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::GroupWidget;
+  friend class cedar::proc::gui::Scene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -119,6 +126,10 @@ public:
    */
   cedar::proc::ConstGroupPtr getGroup() const;
 
+  /*!@brief access the underlying cedar::proc::Group
+   */
+  void setGroup(cedar::proc::GroupPtr group);
+
   //!@brief get the current file, to which the group configuration can be saved
   const std::string& getFileName() const;
 
@@ -135,7 +146,7 @@ public:
   void addElements(const std::list<QGraphicsItem*>& elements);
 
   //! Duplicates an element and places it at the given position.
-  cedar::proc::gui::GraphicsBase* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
+  cedar::proc::gui::Element* duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName = "");
 
   //!@brief Sets the scene containing this item.
   void setScene(cedar::proc::gui::Scene* pScene);
@@ -249,6 +260,12 @@ public:
   //! Returns the slot item used for the given group source.
   cedar::proc::gui::DataSlotItem* getSlotItemFor(cedar::proc::sources::GroupSourcePtr source) const;
 
+  bool manualDeletionRequiresConfirmation() const;
+
+  bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
+
+  bool canBeDragged() const;
+
 public slots:
   /*! sets the recording state of all steps
    * @todo why is this done here? why is this done for all steps if one changes??
@@ -263,6 +280,11 @@ public slots:
 
   //! Enables/disables resizing and moving of the group.
   void setLockGeometry(bool lock = true);
+  
+  //! Calls reset on the underlying group, i.e., resets all elements in the group displayed by this item.
+  void reset();
+
+  void openGroupContainer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -274,6 +296,26 @@ protected:
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
   void hoverLeaveEvent(QGraphicsSceneHoverEvent* pEvent);
+
+  /*!@brief Handles the drop event of the scene.
+   *
+   *        This method mainly instantiates elements that are dropped from the Element toolbar to create new items in
+   *        the scene.
+   */
+  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  /*!@brief Handles the dragLeave event of the scene.
+   */
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  /*!@brief Handles the dragMove event of the scene.
+   *
+   *        This method determines whether the contents of the drop can be handled by
+   *        cedar::proc::gui::Scene::dropEvent.
+   */
+  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -341,8 +383,7 @@ private:
 
   qreal getIconSizeForCurrentMode() const;
 
-  //!@todo Should return cedar::proc::gui::Element
-  cedar::proc::gui::GraphicsBase* getUiElementFor(cedar::proc::ElementPtr element) const;
+  cedar::proc::gui::Element* getUiElementFor(cedar::proc::ElementPtr element) const;
 
   void readStickyNotes(const cedar::aux::ConfigurationNode& node);
 
@@ -360,6 +401,10 @@ private:
   void clearTriggerColorCache() const;
 
   void updateAllElementsTriggerColorState() const;
+
+  void addElementsToGroup();
+
+  cedar::aux::PluginDeclaration* declarationFromDrop(QGraphicsSceneDragDropEvent *pEvent) const;
 
 signals:
   //!@brief signal that is emitted when a boost signal is received

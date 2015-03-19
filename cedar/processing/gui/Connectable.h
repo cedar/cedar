@@ -41,13 +41,14 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/Element.h"
 #include "cedar/processing/DataRole.h"
 
 // FORWARD DECLARATIONS
 #include "cedar/processing/Connectable.fwd.h"
 #include "cedar/processing/DataSlot.fwd.h"
 #include "cedar/processing/Trigger.fwd.h"
+#include "cedar/processing/LoopedTrigger.fwd.h"
 #include "cedar/processing/Group.fwd.h"
 #include "cedar/processing/gui/Connectable.fwd.h"
 #include "cedar/processing/gui/ConnectableIconView.fwd.h"
@@ -70,7 +71,7 @@
 
 /*!@brief A gui base class for all items that represent cedar::proc::Connectables.
  */
-class cedar::proc::gui::Connectable : public QObject, public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::Connectable : public QObject, public cedar::proc::gui::Element
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -102,6 +103,7 @@ public:
       {
         mType.type()->def(cedar::aux::Enum(ICON_AND_TEXT, "ICON_AND_TEXT", "icon and text"));
         mType.type()->def(cedar::aux::Enum(ICON_ONLY, "ICON_ONLY", "icon only"));
+        mType.type()->def(cedar::aux::Enum(HIDE_IN_CONNECTIONS, "HIDE_IN_CONNECTIONS", "hide in connections"));
       }
 
       //! @returns A const reference to the base enum object.
@@ -115,6 +117,9 @@ public:
 
       //! Display an icon only
       static const Id ICON_ONLY = 1;
+
+      //! The connectable is hidden in the connections going to and from it.
+      static const Id HIDE_IN_CONNECTIONS = 2;
 
     private:
       //! The base enum object.
@@ -227,6 +232,8 @@ public:
 
   bool canDuplicate() const;
 
+  bool canBeDragged() const;
+
   //! Fills the triggers in the group into the action as a submenu
   static void buildConnectTriggerMenu
   (
@@ -234,10 +241,28 @@ public:
     const cedar::proc::gui::Group* gui_group,
     const QObject* receiver,
     const char* slot,
-    boost::optional<cedar::proc::TriggerPtr> current = (boost::optional<cedar::proc::TriggerPtr>())
+    boost::optional<cedar::proc::LoopedTriggerPtr> current = (boost::optional<cedar::proc::LoopedTriggerPtr>())
   );
 
   static cedar::proc::TriggerPtr getTriggerFromConnectTriggerAction(QAction* action, cedar::proc::GroupPtr group);
+
+  //! Checks if the connectable can be hidden in the connections going from and to it.
+  bool canHideInConnections() const;
+
+  //! Checks if the given display style is supported by this connectable.
+  virtual bool supportsDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id id) const;
+
+  //! Hides the connectable in its connections.
+  void hideInConnections();
+
+  //! Returns the currently set display mode.
+  cedar::proc::gui::Connectable::DisplayMode::Id getDisplayMode() const;
+
+  //! Sets the current display mode.
+  void setDisplayMode(cedar::proc::gui::Connectable::DisplayMode::Id mode, bool resize = true);
+
+  //! Resets the display mode to the default
+  void resetDisplayMode(bool resize = true);
 
 public slots:
   //! Updates whether the connectable shows the color of its trigger.
@@ -403,7 +428,7 @@ private:
 
   cedar::proc::gui::ConstGroup* getGuiGroup() const;
 
-  void translateParentTriggerChangedSignal();
+  void translateLoopedTriggerChangedSignal();
 
   void fillColorChanged(QColor color);
 
@@ -411,12 +436,40 @@ private:
 
   void hideTriggerChains();
 
+  //! Returns the number of slots defined for the given role.
+  unsigned int getNumberOfSlotsFor(cedar::proc::DataRole::Id role) const;
+
+  //! Returns the number of connections on all slots of the given role.
+  unsigned int getNumberOfConnections(cedar::proc::DataRole::Id role) const;
+
+  //! Called when the display mode of the connectable changed.
+  virtual void displayModeChanged();
+
+  //! Makes all the changes necessary for the current display mode.
+  void applyDisplayMode(bool resize = true);
+
+  void setConnectionsVisible(bool visible, bool modifyCouplingCollections = false);
+
+  //! Fills the menu with the appropriate entries for serializing data.
+  void fillDataSerialization(QMenu* pMenu);
+
+  //! Fills in the actions for the display style.
+  void fillDisplayStyleMenu(QMenu* pMenu);
+
 private slots:
   void triggerableStarted();
 
   void triggerableStopped();
 
   void assignTriggerClicked();
+
+  void openProperties();
+
+  void displayStyleMenuTriggered(QAction* pAction);
+
+  void saveDataClicked();
+
+  void loadDataClicked();
 
 signals:
   //! translates a slot removed signal to Qt
@@ -454,9 +507,6 @@ protected:
   //!@brief the class id of the step
   cedar::aux::ConstPluginDeclarationPtr mClassId;
 
-  //!@brief The current display mode of the step.
-  cedar::proc::gui::Connectable::DisplayMode::Id mDisplayMode;
-
   //!@brief the decoration symbolizing that this connectable is being recorded
   DecorationPtr mpRecordedDecoration;
 
@@ -469,7 +519,19 @@ protected:
   //!@brief a vector of all child widgets for the current step
   std::vector<QWidget*> mChildWidgets;
 
+  //! Size used for displaying the step icons.
+  static const int M_ICON_SIZE;
+
+  //! The width of newly created steps.
+  static const qreal M_DEFAULT_WIDTH;
+
+  //! The height of newly created steps.
+  static const qreal M_DEFAULT_HEIGHT;
+
 private:
+  //!@brief The current display mode of the connectable.
+  cedar::proc::gui::Connectable::DisplayMode::Id mDisplayMode;
+
   DecorationPtr mpLoopedDecoration;
 
   //! An offset to be added to in- and output slot positions.

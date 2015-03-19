@@ -51,6 +51,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/sources/GaussInput.h"
+#include "cedar/processing/sources/Noise.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
@@ -313,6 +314,132 @@ int test_camel_case_to_string()
   return errors;
 }
 
+int test_looped_trigger_auto_connect_internal(cedar::proc::TriggerablePtr child)
+{
+  int errors = 0;
+  cedar::proc::GroupPtr group_auto(new cedar::proc::Group());
+  // hand looped element to group, this should create a default trigger
+  group_auto->add(boost::dynamic_pointer_cast<cedar::proc::Element>(child), "child");
+  // get the default trigger
+  cedar::proc::LoopedTriggerPtr loopy;
+  if (!group_auto->nameExists("default trigger"))
+  {
+    std::cout << "error: adding a looped element to a group did not create a looped trigger" << std::endl;
+    return ++errors;
+  }
+  else
+  {
+    loopy = group_auto->getElement<cedar::proc::LoopedTrigger>("default trigger");
+  }
+
+  // parent trigger of looped element should be default trigger
+  if (loopy != child->getLoopedTrigger())
+  {
+    std::cout << "error: adding a looped element to a group did not connect it to the default trigger" << std::endl;
+    return ++errors;
+  }
+
+  // create a new trigger and add it to group
+  cedar::proc::LoopedTriggerPtr pretender(new cedar::proc::LoopedTrigger());
+  std::string name = group_auto->getUniqueIdentifier("pretender");
+  group_auto->add(pretender, name);
+
+  // do the following five times
+  for (unsigned int i = 0; i < 5; ++ i)
+  {
+    // now connect the looped element to the new trigger
+    group_auto->connectTrigger(pretender, child);
+    if (child->getLoopedTrigger() != pretender)
+    {
+      std::cout << "error: looped element has the wrong parent trigger" << std::endl;
+      ++errors;
+    }
+    // also check the other way around
+    if (!pretender->isListener(child))
+    {
+      std::cout << "error: looped trigger does not know of its looped listener" << std::endl;
+      ++errors;
+    }
+
+    if (loopy->isListener(child))
+    {
+      std::cout << "error: looped element still listens to default trigger" << std::endl;
+      ++errors;
+    }
+
+    // now, back to the default trigger!
+    group_auto->connectTrigger(loopy, child);
+    if (child->getLoopedTrigger() != loopy)
+    {
+      std::cout << "error: looped element has the wrong parent trigger" << std::endl;
+      ++errors;
+    }
+    // also check the other way around
+    if (!loopy->isListener(child))
+    {
+      std::cout << "error: looped trigger does not know of its looped listener" << std::endl;
+      ++errors;
+    }
+
+    if (pretender->isListener(child))
+    {
+      std::cout << "error: looped element still listens to custom trigger" << std::endl;
+      ++errors;
+    }
+  }
+
+  // now try the same thing, but this time, remove the looped trigger
+  group_auto->connectTrigger(pretender, child);
+  group_auto->remove(pretender);
+  if (child->getLoopedTrigger() != loopy)
+  {
+    std::cout << "error: looped element has the wrong parent trigger after removing custom trigger" << std::endl;
+    ++errors;
+  }
+  // also check the other way around
+  if (!loopy->isListener(child))
+  {
+    std::cout << "error: looped trigger does not know of its looped listener after removing custom trigger" << std::endl;
+    ++errors;
+  }
+
+  if (pretender->isListener(child))
+  {
+    std::cout << "error: looped element still listens to custom trigger after removing custom trigger" << std::endl;
+    ++errors;
+  }
+
+  return errors;
+}
+
+int test_looped_trigger_auto_connect()
+{
+  int errors = 0;
+  std::cout << "Testing trigger-auto-connect for a step" << std::endl;
+  cedar::proc::sources::NoisePtr noise(new cedar::proc::sources::Noise());
+  // noise should not have a parent trigger
+  if (noise->getLoopedTrigger())
+  {
+    std::cout << "error: looped element has a parent trigger outside of a group" << std::endl;
+    ++errors;
+  }
+  errors += test_looped_trigger_auto_connect_internal(noise);
+
+  // now, let's do the same for groups - this will be fun!
+  std::cout << "Testing trigger-auto-connect for a group" << std::endl;
+  cedar::proc::GroupPtr childish_group(new cedar::proc::Group());
+  childish_group->setIsLooped(true);
+  if (noise->getLoopedTrigger())
+  {
+    std::cout << "error: looped element has a parent trigger outside of a group" << std::endl;
+    ++errors;
+  }
+
+  errors += test_looped_trigger_auto_connect_internal(childish_group);
+
+  return errors;
+}
+
 void run_test()
 {
   using cedar::proc::Group;
@@ -402,9 +529,9 @@ void run_test()
   network_child->add(network_grand_child);
   network_parent->add(network_child);
 
-  std::cout << "Write nested network." << std::endl;
+  std::cout << "Write nested group." << std::endl;
   network_parent->writeJson("Nested.json");
-  std::cout << "Read nested network." << std::endl;
+  std::cout << "Read nested group." << std::endl;
   cedar::proc::GroupPtr network_nested(new cedar::proc::Group());
   network_nested->readJson("Nested.json");
 
@@ -603,6 +730,7 @@ void run_test()
   errors += test_connector_renaming();
   errors += test_name_exists();
   errors += test_camel_case_to_string();
+  errors += test_looped_trigger_auto_connect();
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

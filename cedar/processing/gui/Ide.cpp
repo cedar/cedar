@@ -76,7 +76,9 @@
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/GlobalClock.h"
 #include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/version.h"
+#include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -87,12 +89,17 @@
 #include <QTableWidget>
 #ifndef Q_MOC_RUN
   #include <boost/property_tree/detail/json_parser_error.hpp>
+  #include <boost/version.hpp>
 #endif
 #include <vector>
 #include <set>
 #include <list>
 #include <string>
 #include <utility>
+
+#ifdef CEDAR_USE_YARP
+#include <yarp/conf/version.h>
+#endif // CEDAR_USE_YARP
 
 //----------------------------------------------------------------------------------------------------------------------
 // nested private classes
@@ -569,6 +576,20 @@ void cedar::proc::gui::Ide::init(bool loadDefaultPlugins, bool redirectLogToGui,
   {
     this->showOneTimeMessages(messages, true);
   }
+
+  this->recorderDataAddedOrRemoved();
+  QObject::connect(cedar::aux::RecorderSingleton::getInstance().get(),
+                   SIGNAL(recordedDataChanged()),
+                   this,
+                   SLOT(recorderDataAddedOrRemoved()));
+
+  mGlobalTimeFactorSettingChangedConnection =
+      cedar::aux::SettingsSingleton::getInstance()->connectToGlobalTimeFactorChangedSignal
+      (
+        boost::bind(&cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal, this, _1)
+      );
+
+  QObject::connect(this, SIGNAL(signalGlobalTimeFactorSettingChanged(double)), this, SLOT(globalTimeFactorSettingChanged(double)));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -595,6 +616,13 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::recorderDataAddedOrRemoved()
+{
+  bool enabled = cedar::aux::RecorderSingleton::getInstance()->hasDataToRecord();
+  this->mpActionRecord->setEnabled(enabled);
+  this->mpActionSnapshot->setEnabled(enabled);
+}
 
 void cedar::proc::gui::Ide::showRecentNotifications()
 {
@@ -707,6 +735,22 @@ void cedar::proc::gui::Ide::architectureChanged()
   this->setArchitectureChanged(true);
 }
 
+void cedar::proc::gui::Ide::translateGlobalTimeFactorChangedSignal(double newValue)
+{
+  emit signalGlobalTimeFactorSettingChanged(newValue);
+}
+
+void cedar::proc::gui::Ide::globalTimeFactorSettingChanged(double newValue)
+{
+  bool blocked = this->mpGlobalTimeFactorSlider->blockSignals(true);
+  this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
+  this->mpGlobalTimeFactorSlider->blockSignals(blocked);
+
+  blocked = this->mpGlobalTimeFactor->blockSignals(true);
+  this->mpGlobalTimeFactor->setValue(newValue);
+  this->mpGlobalTimeFactor->blockSignals(blocked);
+}
+
 void cedar::proc::gui::Ide::globalTimeFactorSliderChanged(int newValue)
 {
   this->mpGlobalTimeFactor->setValue(static_cast<double>(newValue) / 100.0);
@@ -718,7 +762,10 @@ void cedar::proc::gui::Ide::globalTimeFactorSpinboxChanged(double newValue)
   this->mpGlobalTimeFactorSlider->setValue(static_cast<int>(newValue * 100.0));
   this->mpGlobalTimeFactorSlider->blockSignals(blocked);
 
-  cedar::aux::SettingsSingleton::getInstance()->setGlobalTimeFactor(newValue);
+  if (this->mGroup)
+  {
+    this->mGroup->getGroup()->setTimeFactor(newValue);
+  }
 }
 
 void cedar::proc::gui::Ide::openParameterLinker()
@@ -785,6 +832,7 @@ void cedar::proc::gui::Ide::exportSvg()
 
 void cedar::proc::gui::Ide::duplicateSelected()
 {
+  //!@todo Doesn't this code belong into scene?
   // get current mouse position
   QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
   QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
@@ -849,10 +897,9 @@ void cedar::proc::gui::Ide::duplicateSelected()
   for (auto connected_item : items_to_duplicate)
   {
     // first, try to get the underlying connectable and parent group for each item
-    if (auto p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(connected_item))
+    if (auto p_base = dynamic_cast<cedar::proc::gui::Element*>(connected_item))
     {
-      auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_base->getElement());
-      if (connectable)
+      if (auto connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_base->getElement()))
       {
         auto group = connectable->getGroup();
         if (group)
@@ -892,7 +939,7 @@ void cedar::proc::gui::Ide::duplicateSelected()
   // perform the actual duplication
   for (int i = 0; i < items_to_duplicate.size(); ++i)
   {
-    if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items_to_duplicate.at(i)))
+    if (auto p_base = dynamic_cast<cedar::proc::gui::Element*>(items_to_duplicate.at(i)))
     {
       try
       {
@@ -986,7 +1033,7 @@ void cedar::proc::gui::Ide::pasteStepConfiguration()
     }
     if (selected_items.size() == 1)
     {
-      if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(0)))
+      if (auto p_base = dynamic_cast<cedar::proc::gui::Element*>(selected_items.at(0)))
       {
         this->mpPropertyTable->display(p_base->getElement());
       }
@@ -1017,13 +1064,10 @@ void cedar::proc::gui::Ide::showAboutDialog()
   QImage version_image(":/cedar/processing/gui/images/current_version_image.svg");
   p_version_image->setPixmap(QPixmap::fromImage(version_image));
 
-  QString about_text = "<center>This is cedar<br />built with library<br />version <b>";
-  about_text += QString::fromStdString(cedar::aux::versionNumberToString(CEDAR_VERSION));
-  about_text += "</b>"
-#ifdef DEBUG
-      "<br />(debug build)"
-#endif // DEBUG
-      "</center>";
+  QString about_text = "<center>";
+  about_text += QString::fromStdString(cedar::aux::getCedarConfigurationInfo("<hr />", "<br />"));
+  about_text += "</center>";
+
   QLabel* p_label = new QLabel(about_text);
   p_label->setTextFormat(Qt::RichText);
   p_layout->addWidget(p_label);
@@ -1209,146 +1253,6 @@ void cedar::proc::gui::Ide::resetStepList()
       CEDAR_DEBUG_ASSERT(iter != mElementClassListWidgets.end());
       mElementClassListWidgets.erase(iter);
     }
-  }
-}
-
-void cedar::proc::gui::Ide::deleteSelectedElements()
-{
-  //!@todo This code (and the code called from it) should probably be in proc::gui::Scene.
-  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
-  this->deleteElements(selected_items);
-}
-
-bool cedar::proc::gui::Ide::sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem)
-{
-  unsigned int depth_first_item = 0;
-  unsigned int depth_second_item = 0;
-  QGraphicsItem* p_current_item = pFirstItem;
-  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
-  {
-    ++depth_first_item;
-    p_current_item = p_current_item->parentItem();
-  }
-
-  p_current_item = pSecondItem;
-  while (p_current_item != nullptr && p_current_item->parentItem() != nullptr)
-  {
-    ++depth_second_item;
-    p_current_item = p_current_item->parentItem();
-  }
-  return (depth_first_item < depth_second_item);
-}
-
-void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
-{
-  // remove connections
-  for (int i = 0; i < items.size(); ++i)
-  {
-    //!@todo This code can probably use some cleaning up
-    // delete connections
-    if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
-    {
-      if (cedar::proc::gui::DataSlotItem* source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getSource()))
-      {
-        if (cedar::proc::gui::DataSlotItem* target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
-        {
-          auto source_item = dynamic_cast<cedar::proc::gui::Connectable*>(source->parentItem());
-          auto target_item = dynamic_cast<cedar::proc::gui::Connectable*>(target->parentItem());
-
-          if ( (!source_item || !source_item->isReadOnly()) && (!target_item || !target_item->isReadOnly()) )
-          {
-            std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
-            std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-            // delete connection in network of source
-            source->getSlot()->getParentPtr()->getGroup()->disconnectSlots(source_slot, target_slot);
-          }
-        }
-      }
-      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
-      {
-        if (!source->isReadOnly())
-        {
-          if (cedar::proc::gui::Connectable* target = dynamic_cast<cedar::proc::gui::Connectable*>(p_connection->getTarget()))
-          {
-            if (!target->isReadOnly())
-            {
-              if (auto target_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(target->getConnectable()))
-              {
-                source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target_triggerable);
-              }
-            }
-          }
-          else if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
-          {
-            if (!target->isReadOnly())
-            {
-              source->getTrigger()->getGroup()->disconnectTrigger(source->getTrigger(), target->getTrigger());
-            }
-          }
-        }
-      }
-      else
-      {
-        CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
-      }
-      items[i] = nullptr;
-    }
-  }
-  std::vector<QGraphicsItem*> delete_stack;
-  // fill stack with elements
-  for (int i = 0; i < items.size(); ++i)
-  {
-    auto graphics_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]);
-    if (graphics_base != nullptr)
-    {
-      if (!graphics_base->isReadOnly())
-      {
-        delete_stack.push_back(graphics_base);
-      }
-    }
-    else
-    {
-      delete_stack.push_back(items[i]);
-    }
-  }
-  // sort stack (make it a real stack)
-  std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
-  // while stack is not empty, check if any items must be added, then delete the current item
-  while (delete_stack.size() > 0)
-  {
-    // look at first item
-    QGraphicsItem* current_item = delete_stack.back();
-
-    // now delete the current element
-    deleteElement(current_item);
-    delete_stack.pop_back();
-  }
-}
-
-void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
-{
-  // delete step
-  if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(pItem))
-  {
-    this->mpPropertyTable->clear();
-    p_drawer->hide();
-    p_drawer->getStep()->getGroup()->remove(p_drawer->getStep());
-  }
-  // delete trigger
-  else if (cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(pItem))
-  {
-    p_trigger_drawer->hide();
-    p_trigger_drawer->getTrigger()->getGroup()->remove(p_trigger_drawer->getTrigger());
-  }
-  // delete network
-  else if (cedar::proc::gui::Group *p_network_drawer = dynamic_cast<cedar::proc::gui::Group*>(pItem))
-  {
-    p_network_drawer->hide();
-    p_network_drawer->getGroup()->getGroup()->remove(p_network_drawer->getGroup());
-  }
-  else
-  {
-    // some other representations that do not need to be deleted
   }
 }
 
@@ -1760,27 +1664,6 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   this->setArchitectureChanged(false);
 }
 
-void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
-{
-  switch (pEvent->key())
-  {
-    case Qt::Key_Delete:
-    {
-      this->deleteSelectedElements();
-      break;
-    }
-    case Qt::Key_Backspace:
-    {
-      this->deleteSelectedElements();
-      break;
-    }
-    // If the key is not handled by this widget, pass it on to the base widget.
-    default:
-      this->QMainWindow::keyPressEvent(pEvent);
-      break;
-  }
-}
-
 void cedar::proc::gui::Ide::recentFileItemTriggered()
 {
   QAction *p_sender = dynamic_cast<QAction*>(QObject::sender());
@@ -2040,6 +1923,7 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
 
   this->mpProcessingDrawer->getScene()->setGroup(group);
   this->mpPropertyTable->clear();
+  this->mpRecorderWidget->clear();
   this->mpActionShowHideGrid->setChecked(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 
 
@@ -2073,6 +1957,8 @@ void cedar::proc::gui::Ide::setGroup(cedar::proc::gui::GroupPtr group)
   {
     this->mpExperimentDialog->updateGroup();
   }
+
+  this->mGroup->getGroup()->applyTimeFactor();
 }
 
 void cedar::proc::gui::Ide::updateArchitectureWidgetsMenu()
