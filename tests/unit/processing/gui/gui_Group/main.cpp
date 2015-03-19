@@ -56,7 +56,7 @@ int main(int argc, char** argv)
 
   unsigned int errors = 0;
 
-  cedar::proc::gui::Ide* p_window = new cedar::proc::gui::Ide(false);
+  cedar::proc::gui::Ide* p_window = new cedar::proc::gui::Ide(false, false, true);
 
   cedar::proc::gui::Group* p_network
     = new cedar::proc::gui::Group(p_window, p_window->getArchitectureView()->getScene());
